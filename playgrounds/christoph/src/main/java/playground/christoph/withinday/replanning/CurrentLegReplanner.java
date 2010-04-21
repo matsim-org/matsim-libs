@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -62,17 +62,14 @@ import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 
 public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 
-	private Network network;
-
 	private EventsManager events;
 
 	private static final Logger log = Logger.getLogger(CurrentLegReplanner.class);
 
-	public CurrentLegReplanner(Id id, Network network, EventsManager events)
+	public CurrentLegReplanner(Id id, Scenario scenario, EventsManager events)
 	{
-		super(id);
+		super(id, scenario);
 		this.events = events;
-		this.network = network;
 	}
 
 	/*
@@ -168,13 +165,13 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 		newRoute.setVehicleId(vehicle.getId());
 
 		// get Nodes from the current Route
-		List<Node> nodesBuffer = RouteUtils.getNodes(route, this.network);
+		List<Node> nodesBuffer = RouteUtils.getNodes(route, this.scenario.getNetwork());
 
 		// remove Nodes after the current Position in the Route
 		nodesBuffer.subList(currentNodeIndex - 1, nodesBuffer.size()).clear();
 
 		// Merge already driven parts of the Route with the new routed parts.
-		nodesBuffer.addAll(RouteUtils.getNodes(newRoute, this.network));
+		nodesBuffer.addAll(RouteUtils.getNodes(newRoute, this.scenario.getNetwork()));
 
 		// Update Route by replacing the Nodes.
 		route.setLinkIds(route.getStartLinkId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(nodesBuffer)), route.getEndLinkId());
@@ -183,17 +180,17 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 		double distance = 0.0;
 		for (Id id : route.getLinkIds())
 		{
-			distance = distance + this.network.getLinks().get(id).getLength();
+			distance = distance + this.scenario.getNetwork().getLinks().get(id).getLength();
 		}
-		distance = distance + this.network.getLinks().get(route.getEndLinkId()).getLength();
+		distance = distance + this.scenario.getNetwork().getLinks().get(route.getEndLinkId()).getLength();
 		route.setDistance(distance);
 
 		// finally reset the cached next Link of the PersonAgent - it may have changed!
-		withinDayPersonAgent.resetCachedNextLink();
-
-		// create ReplanningEvent
+//		withinDayPersonAgent.resetCachedNextLink();
+		withinDayPersonAgent.resetCaches();
 		
-		this.events.processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));
+//		// create ReplanningEvent		
+//		this.events.processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));
 
 		return true;
 	}
@@ -201,7 +198,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 	@Override
 	public CurrentLegReplanner clone()
 	{
-		CurrentLegReplanner clone = new CurrentLegReplanner(this.id, this.network, this.events);
+		CurrentLegReplanner clone = new CurrentLegReplanner(this.id, this.scenario, this.events);
 
 		super.cloneBasicData(clone);
 

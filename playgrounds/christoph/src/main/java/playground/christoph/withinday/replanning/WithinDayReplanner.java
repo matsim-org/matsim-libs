@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -42,14 +43,16 @@ public abstract class WithinDayReplanner implements Cloneable {
 	
 	private static final Logger log = Logger.getLogger(WithinDayReplanner.class);
 	
+	protected Scenario scenario;
 	protected Id id;
 	protected double time;
 	protected PlanAlgorithm planAlgorithm;
 	protected List<AgentsToReplanIdentifier> identifiers = new ArrayList<AgentsToReplanIdentifier>();
 	
-	public WithinDayReplanner(Id id)
+	public WithinDayReplanner(Id id, Scenario scenario)
 	{
 		this.id = id;
+		this.scenario = scenario;
 	}
 	
 	public abstract boolean doReplanning(PersonDriverAgent driverAgent);

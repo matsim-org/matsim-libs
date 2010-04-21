@@ -21,6 +21,7 @@
 package playground.christoph.withinday.replanning;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 
 /*
  * Replans only Agents that are currently performing
@@ -28,9 +29,9 @@ import org.matsim.api.core.v01.Id;
  */
 public abstract class WithinDayDuringActivityReplanner extends WithinDayReplanner {
 
-	public WithinDayDuringActivityReplanner(Id id)
+	public WithinDayDuringActivityReplanner(Id id, Scenario scenario)
 	{
-		super(id);
+		super(id, scenario);
 	}
 	
 	public abstract WithinDayDuringActivityReplanner clone();

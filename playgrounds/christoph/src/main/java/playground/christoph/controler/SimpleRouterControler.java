@@ -196,28 +196,28 @@ public class SimpleRouterControler extends Controler {
 		// each replanner can handle an arbitrary number of persons
 		RandomRoute randomRoute = new RandomRoute(this.network);
 		CloneablePlansCalcRoute randomRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, randomRoute, null, new SimpleRouterFactory());
-		this.randomReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.randomReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
 		this.randomReplanner.setReplanner(randomRouter);
 		this.randomReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomReplanner);
 
 		TabuRoute tabuRoute = new TabuRoute(this.network);
 		CloneablePlansCalcRoute tabuRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, tabuRoute, null, new SimpleRouterFactory());
-		this.tabuReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.tabuReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
 		this.tabuReplanner.setReplanner(tabuRouter);
 		this.tabuReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.tabuReplanner);
 
 		CompassRoute compassRoute = new CompassRoute(this.network);
 		CloneablePlansCalcRoute compassRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, compassRoute, null, new SimpleRouterFactory());
-		this.compassReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.compassReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
 		this.compassReplanner.setReplanner(compassRouter);
 		this.compassReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.compassReplanner);
 
 		RandomCompassRoute randomCompassRoute = new RandomCompassRoute(this.network); 
 		CloneablePlansCalcRoute randomCompassRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, randomCompassRoute, null, new SimpleRouterFactory());
-		this.randomCompassReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.randomCompassReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
 		this.randomCompassReplanner.setReplanner(randomCompassRouter);
 		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomCompassReplanner);
@@ -226,7 +226,7 @@ public class SimpleRouterControler extends Controler {
 		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, dijkstraTravelCost, dijkstraTravelTime);
 		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
 		CloneablePlansCalcRoute randomDijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, randomDijkstraRoute, null, new SimpleRouterFactory());
-		this.randomDijkstraReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.randomDijkstraReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
 		this.randomDijkstraReplanner.setReplanner(randomDijkstraRouter);
 		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomDijkstraReplanner);

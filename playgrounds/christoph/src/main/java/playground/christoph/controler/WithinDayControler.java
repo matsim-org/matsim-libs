@@ -171,19 +171,19 @@ public class WithinDayControler extends Controler {
 		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
 			
 		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
-		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
+		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
 		this.initialReplanner.setReplanner(dijkstraRouter);
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
 		
 		this.duringActivityIdentifier = new ActivityEndIdentifier(this.sim);
-		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId(), this.events);
+		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData, this.events);
 		this.duringActivityReplanner.setReplanner(dijkstraRouter);
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 		
 		this.duringLegIdentifier = new LeaveLinkIdentifier(this.sim);
-		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.network, this.getEvents());
+		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData, this.getEvents());
 		this.duringLegReplanner.setReplanner(dijkstraRouter);
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);

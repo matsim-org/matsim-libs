@@ -1,6 +1,7 @@
 package playground.christoph.withinday;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -18,17 +19,14 @@ import playground.christoph.withinday.utils.ReplacePlanElements;
 
 public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 
-	private Network network;
-
 	@Override
 	public WithinDayDuringLegReplanner clone() {
 		return this;
 	}
 
-	public ReplannerYoungPeople(Id id, Network network)
+	public ReplannerYoungPeople(Id id, Scenario scenario)
 	{
-		super(id);
-		this.network = network;
+		super(id, scenario);
 	}
 
 	@Override
@@ -59,7 +57,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		// If it is not a car Leg we don't replan it.
 		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
 		
-		ActivityImpl newWorkAct = new ActivityImpl("w", new ScenarioImpl().createId("22"));
+		ActivityImpl newWorkAct = new ActivityImpl("w", this.scenario.createId("22"));
 		newWorkAct.setDuration(3600);
 
 		// Replace Activity
@@ -69,7 +67,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		 *  Replan Routes
 		 */
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((WithinDayPersonAgent)driverAgent).getCurrentNodeIndex(), planAlgorithm, network, time);
+		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((WithinDayPersonAgent)driverAgent).getCurrentNodeIndex(), planAlgorithm, scenario.getNetwork(), time);
 		
 		// new Route for next Leg
 		Leg homeLeg = selectedPlan.getNextLeg(newWorkAct);

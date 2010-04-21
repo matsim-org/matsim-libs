@@ -22,6 +22,7 @@ package playground.christoph.withinday.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
@@ -39,9 +40,9 @@ public class InitialReplanner extends WithinDayInitialReplanner{
 	private KnowledgeTools knowledgeTools = new KnowledgeTools();
 	private boolean removeKnowledge = true;
 	
-	public InitialReplanner(Id id)
+	public InitialReplanner(Id id, Scenario scenario)
 	{
-		super(id);
+		super(id, scenario);
 	}
 	
 	public void setRemoveKnowledge(boolean removeKnowledge)
@@ -73,7 +74,7 @@ public class InitialReplanner extends WithinDayInitialReplanner{
 	
 	public InitialReplanner clone()
 	{
-		InitialReplanner clone = new InitialReplanner(this.id);
+		InitialReplanner clone = new InitialReplanner(this.id, this.scenario);
 		clone.setRemoveKnowledge(this.removeKnowledge);
 		
 		super.cloneBasicData(clone);

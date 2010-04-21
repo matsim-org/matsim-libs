@@ -21,6 +21,7 @@
 package playground.christoph.withinday.replanning;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 
 /*
  * Replans Agents initially after the Simulation has
@@ -28,9 +29,9 @@ import org.matsim.api.core.v01.Id;
  */
 public abstract class WithinDayInitialReplanner extends WithinDayReplanner {
 
-	public WithinDayInitialReplanner(Id id)
+	public WithinDayInitialReplanner(Id id, Scenario scenario)
 	{
-		super(id);
+		super(id, scenario);
 	}
 	
 	public abstract WithinDayInitialReplanner clone();
