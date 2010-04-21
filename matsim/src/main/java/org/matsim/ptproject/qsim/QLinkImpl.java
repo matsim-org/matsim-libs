@@ -22,7 +22,6 @@ package org.matsim.ptproject.qsim;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -39,12 +38,9 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.PositionInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
  * @author dstrippgen
@@ -555,11 +551,24 @@ public class QLinkImpl implements QLink {
 	QVehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
+	
+	@Override
+	public void addAgentInActivity(PersonAgent agent) {
+		this.agentsInActivities.put(agent.getPerson().getId(), agent);
+	}
 
-	//	private static int getVehPosCnt = 0 ;
-	//	private static int qSimAccessCnt = 0 ;
+	@Override
+	public void removeAgentInActivity(PersonAgent agent) {
+		this.agentsInActivities.remove(agent.getPerson().getId());
+	}
+
+	@Override
+	public double getBufferLastMovedTime() {
+		return this.bufferLastMovedTime;
+	}
+
+
 	private static String snapshotStyleCache = null ;
-	private static double cellSizeCache = Double.NaN ;
 	/**
 	 * Inner class to encapsulate visualization methods
 	 *
@@ -567,7 +576,8 @@ public class QLinkImpl implements QLink {
 	 */
 	class VisDataImpl implements VisData {
 
-		private final float vehSpacingAsQueueCache ; // using only float to conserve memory
+		private float vehSpacingAsQueueCache ; // using only float to conserve memory
+		private double cellSize = Double.NaN ;
 
 		private VisDataImpl() {
 
@@ -579,29 +589,7 @@ public class QLinkImpl implements QLink {
 			} else if ( !snapshotStyleCache.equals(snapshotStyle) ) {
 				log.warn( "snapshot styles on a per-link basis are not supported to conserve memory") ;
 			}
-
-			final double cellSize = ((NetworkImpl)QLinkImpl.this.getQSimEngine().getQSim().getQNetwork().getNetwork()).getEffectiveCellSize();
-			if ( Double.isNaN( cellSizeCache ) ) {
-				cellSizeCache = cellSize ;
-			} else if ( (cellSizeCache != cellSize) && (cellSizeCacheWarningCount < 10) ) {
-				log.warn( " cell sizes on a per-link basis are not supported to conserve memory") ;
-				cellSizeCacheWarningCount++;
-				if (cellSizeCacheWarningCount > 9) {
-					log.warn( "  no more incidents of this warning will be reported.") ;
-				}
-			}
-
-			double storageCapFactor = QLinkImpl.this.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
-			vehSpacingAsQueueCache = (float) calculateQueueVehicleSpacing(link, storageCapFactor, cellSizeCache);
-
 		}
-
-//		/**
-//		 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
-//		 */
-//		public double getDisplayableSpaceCapValue() {
-//			return (QLinkImpl.this.buffer.size() + QLinkImpl.this.vehQueue.size()) / QLinkImpl.this.storageCapacity;
-//		}
 
 		/**
 		 * see javadoc of the interface
@@ -619,13 +607,17 @@ public class QLinkImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
-			QLinkImpl.this.getQSimEngine().getPositionInfoBuilder().init(link);
+			cellSize = ((NetworkImpl)QLinkImpl.this.getQSimEngine().getQSim().getQNetwork().getNetwork()).getEffectiveCellSize();
+			
+			QLinkImpl.this.getQSimEngine().getPositionInfoBuilder().init(link, QLinkImpl.this.storageCapacity, QLinkImpl.this.bufferStorageCapacity);
 
 			// positions of the "moving" vehicles (buffer, queue):
 			if ("queue".equals(snapshotStyleCache)) {
-				addVehiclePositionsAsQueue(positions);
+				QLinkImpl.this.getQSimEngine().getPositionInfoBuilder().addVehiclePositionsAsQueue(positions, time, QLinkImpl.this.buffer,
+						QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacity);
 			} else if ("equiDist".equals(snapshotStyleCache)) {
-				addVehiclePositionsEquil(positions);
+				QLinkImpl.this.getQSimEngine().getPositionInfoBuilder().addVehiclePositionsEquil(positions, time, QLinkImpl.this.buffer,
+						QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacity);
 			} else {
 				log.warn("The snapshotStyle \"" + snapshotStyleCache + "\" is not supported.");
 			}
@@ -644,203 +636,5 @@ public class QLinkImpl implements QLink {
 			// return:
 			return positions;
 		}
-
-		/**
-		 * Calculates the positions of all vehicles on this link so that there is always the same distance between following cars. A
-		 * single vehicle will be placed at the middle (0.5) of the link, two cars will be placed at positions 0.25 and 0.75, three
-		 * cars at positions 0.16, 0.50, 0.83, and so on.
-		 *
-		 * @param positions
-		 *            A collection where the calculated positions can be stored.
-		 */
-		private void addVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions) {
-			double time = QLinkImpl.this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
-			int cnt = QLinkImpl.this.buffer.size() + QLinkImpl.this.vehQueue.size();
-			int nLanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QLinkImpl.this.getLink());
-			if (cnt > 0) {
-				double spacing = QLinkImpl.this.getLink().getLength() / cnt;
-				double distFromFromNode = QLinkImpl.this.getLink().getLength() - spacing / 2.0;
-				double freespeed = QLinkImpl.this.getLink().getFreespeed();
-
-				// the cars in the buffer
-				for (QVehicle veh : QLinkImpl.this.buffer) {
-					int lane = 1 + (veh.getId().hashCode() % nLanes);
-					int cmp = (int) (veh.getEarliestLinkExitTime() + QLinkImpl.this.inverseSimulatedFlowCapacity + 2.0);
-					double speed = (time > cmp ? 0.0 : freespeed);
-					Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-					createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distFromFromNode, link, lane, speed);
-//					for (PersonAgent person : peopleInVehicle) {
-//						PositionInfo position = new PositionInfo(person.getPerson().getId(), QLinkImpl.this.getLink(),
-//								distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
-//						positions.add(position);
-//					}
-					distFromFromNode -= spacing;
-				}
-
-				// the cars in the drivingQueue
-				for (QVehicle veh : QLinkImpl.this.vehQueue) {
-					int lane = 1 + (veh.getId().hashCode() % nLanes);
-					int cmp = (int) (veh.getEarliestLinkExitTime() + QLinkImpl.this.inverseSimulatedFlowCapacity + 2.0);
-					double speed = (time > cmp ? 0.0 : freespeed);
-					Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-					createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distFromFromNode, link, lane, speed);
-					distFromFromNode -= spacing;
-				}
-			}
-
-
-		}
-
-		/**
-		 * Calculates the positions of all vehicles on this link according to the queue-logic: Vehicles are placed on the link
-		 * according to the ratio between the free-travel time and the time the vehicles are already on the link. If they could have
-		 * left the link already (based on the time), the vehicles start to build a traffic-jam (queue) at the end of the link.
-		 *
-		 * @param positions
-		 *            A collection where the calculated positions can be stored.
-		 */
-		private void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions) {
-			double now = QLinkImpl.this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
-			Link link = QLinkImpl.this.getLink();
-			double currentQueueEnd = link.getLength(); // queue end initialized at end of link
-
-			// treat vehicles from buffer:
-			currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, now, currentQueueEnd, link, vehSpacingAsQueueCache);
-
-			// treat other driving vehicles:
-			positionOtherDrivingVehiclesAsQueue(positions, now, currentQueueEnd, link, vehSpacingAsQueueCache );
-
-			// yyyy waiting list, transit stops, persons at activity, etc. all do not depend on "queue" vs "equil"
-			// and should thus not be treated in this method. kai, apr'10
-
-		}
-
-		private double calculateQueueVehicleSpacing(Link link, double storageCapFactor, double cellSize) {
-			double vehLen = Math.min( // the length of a vehicle in visualization
-					link.getLength() / (QLinkImpl.this.storageCapacity + QLinkImpl.this.bufferStorageCapacity), // all vehicles must have place on the link
-					cellSize / storageCapFactor); // a vehicle should not be larger than it's actual size. yyyy why is that an issue? kai, apr'10
-			return vehLen;
-		}
-
-		/**
-		 *  put all cars in the buffer one after the other
-		 */
-		private double positionVehiclesFromBufferAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
-				double queueEnd, Link link, double vehSpacing)
-		{
-			for (QVehicle veh : QLinkImpl.this.buffer) {
-
-				int lane = 1 + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QLinkImpl.this.getLink()));
-
-				int cmp = (int) (veh.getEarliestLinkExitTime() + QLinkImpl.this.inverseSimulatedFlowCapacity + 2.0);
-				double speed = (now > cmp) ? 0.0 : link.getFreespeed();
-				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-				createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, queueEnd, link, lane, speed);
-				queueEnd -= vehSpacing;
-			}
-			return queueEnd;
-		}
-
-		/**
-		 * place other driving cars according the following rule: - calculate the time how long the vehicle is on the link already -
-		 * calculate the position where the vehicle should be if it could drive with freespeed - if the position is already within
-		 * the congestion queue, add it to the queue with slow speed - if the position is not within the queue, just place the car
-		 * with free speed at that place
-		 */
-		private void positionOtherDrivingVehiclesAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
-				double queueEnd, Link link, double vehSpacing)
-		{
-			double lastDistance = Double.POSITIVE_INFINITY;
-			double ttfs = link.getLength() / link.getFreespeed(now);
-			for (QVehicle veh : QLinkImpl.this.vehQueue) {
-				double travelTime = now - veh.getLinkEnterTime();
-				double distanceOnLink = (ttfs == 0.0 ? 0.0
-						: ((travelTime / ttfs) * link.getLength()));
-				if (distanceOnLink > queueEnd) { // vehicle is already in queue
-					distanceOnLink = queueEnd;
-					queueEnd -= vehSpacing;
-				}
-				if (distanceOnLink >= lastDistance) {
-					/*
-					 * we have a queue, so it should not be possible that one vehicles overtakes another. additionally, if two
-					 * vehicles entered at the same time, they would be drawn on top of each other. we don't allow this, so in this
-					 * case we put one after the other. Theoretically, this could lead to vehicles placed at negative distance when
-					 * a lot of vehicles all enter at the same time on an empty link. not sure what to do about this yet... just
-					 * setting them to 0 currently.
-					 */
-					distanceOnLink = lastDistance - vehSpacing;
-					if (distanceOnLink < 0)
-						distanceOnLink = 0.0;
-				}
-				int cmp = (int) (veh.getEarliestLinkExitTime() + QLinkImpl.this.inverseSimulatedFlowCapacity + 2.0);
-				double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
-				int tmpLane ;
-				try {
-					tmpLane = Integer.parseInt(veh.getId().toString()) ;
-				} catch ( NumberFormatException ee ) {
-					tmpLane = veh.getId().hashCode() ;
-				}
-				int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
-
-				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-				this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distanceOnLink, link, lane, speed );
-				lastDistance = distanceOnLink;
-			}
-		}
-
-		private void createAndAddSnapshotInfoForPeopleInMovingVehicle(Collection<AgentSnapshotInfo> positions,
-				Collection<PersonAgent> peopleInVehicle, double distanceOnLane, Link link, int lane, double speed )
-		{
-			// yyyy stateless, could (should?) be made static. kai, apr'10
-			int cnt = 0 ;
-			for (PersonAgent passenger : peopleInVehicle) {
-				AgentSnapshotInfo passengerPosition = new PositionInfo(passenger.getPerson().getId(), link, distanceOnLane, lane, cnt );
-				passengerPosition.setColorValueBetweenZeroAndOne(speed);
-				if (passenger.getPerson().getId().toString().startsWith("pt")) {
-					passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
-				} else if (cnt==0) {
-					passengerPosition.setAgentState(AgentState.PERSON_DRIVING_CAR);
-				} else {
-					passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE); // in 2010, probably a passenger
-				}
-				positions.add(passengerPosition);
-				cnt++ ;
-			}
-		}
-
-
-		/**
-		 * Returns all the people sitting in this vehicle.
-		 * @param vehicle
-		 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
-		 */
-		private Collection<PersonAgent> getPeopleInVehicle(QVehicle vehicle) {
-			Collection<PersonAgent> passengers = QLinkImpl.this.transitQueueLaneFeature.getPassengers(vehicle); // yy seems to me that "getPassengers" is a vehicle feature???
-			if (passengers.isEmpty()) {
-				return Collections.singletonList((PersonAgent) vehicle.getDriver());
-			} else {
-				ArrayList<PersonAgent> people = new ArrayList<PersonAgent>();
-				people.add(vehicle.getDriver());
-				people.addAll(passengers);
-				return people;
-			}
-		}
-
 	}
-
-	@Override
-	public void addAgentInActivity(PersonAgent agent) {
-		this.agentsInActivities.put(agent.getPerson().getId(), agent);
-	}
-
-	@Override
-	public void removeAgentInActivity(PersonAgent agent) {
-		this.agentsInActivities.remove(agent.getPerson().getId());
-	}
-
-	@Override
-	public double getBufferLastMovedTime() {
-		return this.bufferLastMovedTime;
-	}
-
 }

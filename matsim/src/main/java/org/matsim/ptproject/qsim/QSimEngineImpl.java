@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
+import org.matsim.core.network.NetworkImpl;
+
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -58,11 +60,13 @@ public class QSimEngineImpl implements QSimEngine{
 	private final Random random;
   private final QSim qsim;
   
-  private final PositionInfoBuilder positionInfoBuilder = new PositionInfoBuilder();
+  private final PositionInfoBuilder positionInfoBuilder; 
 
 	public QSimEngineImpl(final QSim sim, final Random random) {
     this.random = random;
     this.qsim = sim;
+    this.positionInfoBuilder = new PositionInfoBuilder(sim.scenario.getConfig().getQSimConfigGroup(), 
+    		((NetworkImpl)sim.getScenario().getNetwork()).getEffectiveCellSize());
 	}
 	
   @Override

@@ -105,7 +105,7 @@ public class QLane implements QBufferItem {
 
 	/*package*/ double inverseSimulatedFlowCapacity; // optimization, cache 1.0 / simulatedFlowCapacity
 
-	private int bufferStorageCapacity; // optimization, cache Math.ceil(simulatedFlowCap)
+	protected int bufferStorageCapacity; // optimization, cache Math.ceil(simulatedFlowCap)
 
 	private double flowCapFraction; // optimization, cache simulatedFlowCap - (int)simulatedFlowCap
 
