@@ -35,6 +35,6 @@ public interface QSimEngine extends LinkActivator, SimEngine{
 	 */
 	public void simStep(final double time);
 	
-	public PositionInfoBuilder getPositionInfoBuilder();
+	public AgentSnapshotInfoBuilder getPositionInfoBuilder();
 		
 }

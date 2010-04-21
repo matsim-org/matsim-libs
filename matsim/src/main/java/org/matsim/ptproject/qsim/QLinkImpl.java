@@ -609,7 +609,7 @@ public class QLinkImpl implements QLink {
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
 			cellSize = ((NetworkImpl)QLinkImpl.this.getQSimEngine().getQSim().getQNetwork().getNetwork()).getEffectiveCellSize();
 			
-			PositionInfoBuilder positionInfoBuilder = QLinkImpl.this.getQSimEngine().getPositionInfoBuilder();
+			AgentSnapshotInfoBuilder positionInfoBuilder = QLinkImpl.this.getQSimEngine().getPositionInfoBuilder();
 			positionInfoBuilder.init(QLinkImpl.this.getLink());
 			positionInfoBuilder.setOffset(0.0);
 

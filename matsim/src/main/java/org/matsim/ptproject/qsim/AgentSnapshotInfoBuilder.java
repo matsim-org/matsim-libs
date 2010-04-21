@@ -37,11 +37,10 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
  * @author dgrether
- * TODO rename to AgentSnapshotInfoBuilder
  */
-public class PositionInfoBuilder {
+public class AgentSnapshotInfoBuilder {
 	
-	private static final Logger log = Logger.getLogger(PositionInfoBuilder.class);
+	private static final Logger log = Logger.getLogger(AgentSnapshotInfoBuilder.class);
 	
 	private Link link;
 	
@@ -53,7 +52,7 @@ public class PositionInfoBuilder {
 
 	private double offset = 0.0;
 	
-	public PositionInfoBuilder(QSimConfigGroup configGroup, double cellSize){
+	public AgentSnapshotInfoBuilder(QSimConfigGroup configGroup, double cellSize){
 		this.storageCapacityFactor = configGroup.getStorageCapFactor();
 		this.cellSize = cellSize;
 		snapshotStyle = configGroup.getSnapshotStyle() ;
@@ -316,7 +315,10 @@ public class PositionInfoBuilder {
 			return people;
 		}
 	}
-
+	/**
+	 * Sets an offset to be added to the positionOnLinkInformation
+	 * @param offset
+	 */
 	public void setOffset(double offset) {
 		this.offset  = offset;
 	}

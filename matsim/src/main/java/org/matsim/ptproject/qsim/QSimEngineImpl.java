@@ -60,12 +60,12 @@ public class QSimEngineImpl implements QSimEngine{
 	private final Random random;
   private final QSim qsim;
   
-  private final PositionInfoBuilder positionInfoBuilder; 
+  private final AgentSnapshotInfoBuilder positionInfoBuilder; 
 
 	public QSimEngineImpl(final QSim sim, final Random random) {
     this.random = random;
     this.qsim = sim;
-    this.positionInfoBuilder = new PositionInfoBuilder(sim.scenario.getConfig().getQSimConfigGroup(), 
+    this.positionInfoBuilder = new AgentSnapshotInfoBuilder(sim.scenario.getConfig().getQSimConfigGroup(), 
     		((NetworkImpl)sim.getScenario().getNetwork()).getEffectiveCellSize());
 	}
 	
@@ -161,7 +161,7 @@ public class QSimEngineImpl implements QSimEngine{
     return this.qsim;
   }
   
-  public PositionInfoBuilder getPositionInfoBuilder(){
+  public AgentSnapshotInfoBuilder getPositionInfoBuilder(){
   	return this.positionInfoBuilder;
   }
 

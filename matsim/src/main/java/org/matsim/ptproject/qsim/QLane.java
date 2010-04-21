@@ -755,7 +755,7 @@ public class QLane implements QBufferItem {
     }
 
     public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
-    	PositionInfoBuilder positionInfoBuilder = QLane.this.queueLink.getQSimEngine().getPositionInfoBuilder();
+    	AgentSnapshotInfoBuilder positionInfoBuilder = QLane.this.queueLink.getQSimEngine().getPositionInfoBuilder();
 //    	 this.getVehiclePositionsQueue(positions);
    	
     	double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLength(); 
