@@ -19,7 +19,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.RouteWRefs;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -62,12 +62,12 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 		this.transitRouter = new PTRouter(schedule);
 
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
-		if (routeAlgo instanceof Dijkstra) {
-			((Dijkstra) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
+			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
 		}
 		routeAlgo = super.getPtFreeflowLeastCostPathCalculator();
-		if (routeAlgo instanceof Dijkstra) {
-			((Dijkstra) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
+			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
 		}
 	}
 

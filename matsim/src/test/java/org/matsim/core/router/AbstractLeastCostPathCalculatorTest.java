@@ -95,7 +95,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		loadConfig(null);
 		MultiModeFixture f = new MultiModeFixture();
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
-		if (routerAlgo instanceof Dijkstra) {
+		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
 
 			d.setModeRestriction(EnumSet.of(TransportMode.car));
@@ -118,7 +118,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		loadConfig(null);
 		MultiModeFixture f = new MultiModeFixture();
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
-		if (routerAlgo instanceof Dijkstra) {
+		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
 			
 			d.setModeRestriction(EnumSet.of(TransportMode.car));
@@ -141,7 +141,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		loadConfig(null);
 		MultiModeFixture f = new MultiModeFixture();
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
-		if (routerAlgo instanceof Dijkstra) {
+		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
 			
 			d.setModeRestriction(EnumSet.of(TransportMode.car, TransportMode.bus));
@@ -161,7 +161,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		loadConfig(null);
 		MultiModeFixture f = new MultiModeFixture();
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
-		if (routerAlgo instanceof Dijkstra) {
+		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
 			
 			d.setModeRestriction(EnumSet.noneOf(TransportMode.class));
@@ -180,7 +180,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		loadConfig(null);
 		MultiModeFixture f = new MultiModeFixture();
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
-		if (routerAlgo instanceof Dijkstra) {
+		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
 			
 			d.setModeRestriction(null);
@@ -201,7 +201,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		loadConfig(null);
 		MultiModeFixture f = new MultiModeFixture();
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
-		if (routerAlgo instanceof Dijkstra) {
+		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
 			
 			d.setModeRestriction(EnumSet.of(TransportMode.bus));
@@ -221,7 +221,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		loadConfig(null);
 		MultiModeFixture f = new MultiModeFixture();
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
-		if (routerAlgo instanceof Dijkstra) {
+		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
 			
 			d.setModeRestriction(EnumSet.of(TransportMode.car));
@@ -242,7 +242,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		loadConfig(null);
 		MultiModeFixture f = new MultiModeFixture();
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
-		if (routerAlgo instanceof Dijkstra) {
+		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
 			
 			d.setModeRestriction(EnumSet.of(TransportMode.bus));
@@ -262,7 +262,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		loadConfig(null);
 		MultiModeFixture f = new MultiModeFixture();
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
-		if (routerAlgo instanceof Dijkstra) {
+		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
 			
 			d.setModeRestriction(EnumSet.of(TransportMode.car));

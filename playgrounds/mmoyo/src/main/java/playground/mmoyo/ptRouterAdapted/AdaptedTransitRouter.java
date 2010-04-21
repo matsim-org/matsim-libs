@@ -49,8 +49,8 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetwork.TransitRouterNetworkNode;
 import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetwork.TransitRouterNetworkLink;
+import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetwork.TransitRouterNetworkNode;
 
 /** changes made to the original org.matsim.pt.router.TransitRouter:
  * -stop search 

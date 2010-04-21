@@ -45,6 +45,7 @@ public class AdaptedLauncher {
 
 		// yy The following comes from PlansCalcRoute; in consequence, one can configure the car router attributes.  In addition, one can configure _some_
 		// of the transit attributes from here (transitSchedule, transitConfig), but not some others.  Please describe the design reason for this.  kai, apr'10
+		// The design reason is, I guess, that these are the arguments that are used for the constructor of the super-class (designed by others)?  kai, apr'10
 		AdaptedPlansCalcTransitRoute adaptedRouter = new AdaptedPlansCalcTransitRoute(scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getNetwork(), 
 				freespeedTravelTimeCost, freespeedTravelTimeCost, dijkstraFactory, scenarioImpl.getTransitSchedule(), transitConfig);
 
@@ -53,6 +54,7 @@ public class AdaptedLauncher {
 		//fragment plans
 		// yy why is this necessary here?  I would think it could be done just before output? kai, apr'10
 		// it was moved just before the writing   manuel, apr10
+		// Thanks. kai, apr'10
 		if (myTransitRouterConfig.fragmentPlans){
 			scenarioImpl.setPopulation(new PlanFragmenter().run(scenarioImpl.getPopulation()));					
 		}

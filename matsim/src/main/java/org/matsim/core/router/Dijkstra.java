@@ -74,7 +74,7 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
  * @author lnicolas
  * @author mrieser
  */
-public class Dijkstra implements LeastCostPathCalculator {
+public class Dijkstra implements IntermodalLeastCostPathCalculator {
 
 	private final static Logger log = Logger.getLogger(Dijkstra.class);
 
@@ -172,13 +172,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 		}
 	}
 
-	/**
-	 * Restricts the router to only use links that have at least on of the given modes set as allowed.
-	 * Set to <code>null</code> to disable any restrictions, i.e. to use all available modes.
-	 *
-	 * @param modeRestriction {@link TransportMode}s that can be used to find a route
-	 *
-	 * @see Link#setAllowedModes(Set)
+	/* (non-Javadoc)
+	 * @see org.matsim.core.router.IntermodalLeastCostPathCalculator#setModeRestriction(java.util.Set)
 	 */
 	public void setModeRestriction(final Set<TransportMode> modeRestriction) {
 		if (modeRestriction == null) {

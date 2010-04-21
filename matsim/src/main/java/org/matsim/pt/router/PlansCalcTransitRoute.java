@@ -38,7 +38,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.RouteWRefs;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -84,12 +84,12 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 		this.transitRouter = new TransitRouter(schedule, this.routerConfig);
 
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
-		if (routeAlgo instanceof Dijkstra) {
-			((Dijkstra) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
+			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
 		}
 		routeAlgo = super.getPtFreeflowLeastCostPathCalculator();
-		if (routeAlgo instanceof Dijkstra) {
-			((Dijkstra) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
+			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
 		}
 	}
 
@@ -112,7 +112,7 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 		return super.handleLeg(person, leg, fromAct, toAct, depTime);
 	}
 
-	private double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		List<Leg> legs= this.transitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
 		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 
@@ -189,6 +189,37 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 			}
 		}
 
+	}
+	
+	// inserting a bunch of protected getters so that derived methods do not need to store their own copies of these elements.  
+	// Just providing getters means that these cannot be modified by the subclass.  Don't know if this is sufficient. kai, apr'10
+
+	protected TransitActsRemover getTransitLegsRemover() {
+		return transitLegsRemover;
+	}
+
+	protected TransitRouterConfig getRouterConfig() {
+		return routerConfig;
+	}
+
+	protected TransitRouter getTransitRouter() {
+		return transitRouter;
+	}
+
+	protected TransitConfigGroup getTransitConfig() {
+		return transitConfig;
+	}
+
+	protected TransitSchedule getSchedule() {
+		return schedule;
+	}
+
+	protected Plan getCurrentPlan() {
+		return currentPlan;
+	}
+
+	protected List<Tuple<Leg, List<Leg>>> getLegReplacements() {
+		return legReplacements;
 	}
 
 }

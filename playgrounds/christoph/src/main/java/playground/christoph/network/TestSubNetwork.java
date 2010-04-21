@@ -19,7 +19,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.ptproject.qsim.QSim;
 
@@ -53,7 +53,7 @@ public class TestSubNetwork {
 	private OnlyTimeDependentTravelCostCalculator travelCost;
 	private KnowledgeTravelCostWrapper travelCostWrapper;
 	
-	private Dijkstra dijkstra;
+	private IntermodalLeastCostPathCalculator dijkstra;
 	private CloneablePlansCalcRoute dijkstraRouter;
 	private QNetwork qNetwork;
 	

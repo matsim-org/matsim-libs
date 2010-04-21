@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,7 +39,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.RouteWRefs;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -52,14 +53,13 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.router.*;
 
 public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
+	private static final Logger log = Logger.getLogger(AdaptedPlansCalcTransitRoute.class);
 
 	//private final TransitActsRemover transitLegsRemover = new TransitActsRemover();
 	private final AdaptedTransitRouter adaptedTransitRouter;
-	private final TransitConfigGroup transitConfig;
-	private final TransitSchedule schedule;
 
 	//private Plan currentPlan = null;
-	private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
+	//private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
 
 	public AdaptedPlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator,
@@ -68,8 +68,7 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 		//super(config, network, costCalculator, timeCalculator, factory);
 		super(config, network, costCalculator, timeCalculator, factory, schedule, transitConfig);
 		
-		this.schedule = schedule;
-		this.transitConfig = transitConfig;
+		log.warn("At this point, I think that everything beyond this line is happily ignored in the end. kai, apr'10") ;
 		
 		MyTransitRouterConfig trConfig = new MyTransitRouterConfig() ;
 		this.adaptedTransitRouter = new AdaptedTransitRouter( trConfig, schedule);
@@ -77,14 +76,33 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 		// both "super" route algos are made to route only on the "car" network.  yy I assume this is since the non-car modes are handled
 		// here.  This is, in fact, NOT correct, since this does not handle bike, so would need to be fixed before production use).  kai, apr'10
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
-		if (routeAlgo instanceof Dijkstra) {
-			((Dijkstra) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
+			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
 		}
 		routeAlgo = super.getPtFreeflowLeastCostPathCalculator();
-		if (routeAlgo instanceof Dijkstra) {
-			((Dijkstra) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
+			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
 		}
 	}
+
+	@Override
+	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+		log.warn("is this ever called? (Now it is called.)") ;
+		log.error("it is called, but the calculated route is never returned to anywhere. kai, apr'10") ;
+		List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
+//		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
+		super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, legs));
+
+		double travelTime = 0.0;
+		if (legs != null) {
+			for (Leg leg2 : legs) {
+				travelTime += leg2.getTravelTime();
+			}
+		}
+		return travelTime;
+	}
+
+	// no functionality beyond this line.
 
 	/*
 	@Override // necessary in order to remove the "pt interaction" activities and corresponding legs from earlier pt plans.
@@ -118,19 +136,6 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 		return super.handleLeg(person, leg, fromAct, toAct, depTime);
 	}
 	 */
-
-	private double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
-		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
-
-		double travelTime = 0.0;
-		if (legs != null) {
-			for (Leg leg2 : legs) {
-				travelTime += leg2.getTravelTime();
-			}
-		}
-		return travelTime;
-	}
 
 	/*
 	private void replaceLegs() {
