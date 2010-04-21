@@ -401,7 +401,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 //		protected float startX, startY, color;
 //		protected int state;
 
-		public static  Texture  carjpg = null;
+		public static  Texture  agentpng = null;
 
 		//for backward compatibility only
 		@Deprecated
@@ -664,7 +664,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this.mouseMan.init(this.gl);
 
-		AgentDrawer.carjpg = createTexture(MatsimResource.getAsInputStream("car.png"));
+		AgentDrawer.agentpng = createTexture(MatsimResource.getAsInputStream("icon18.png"));
+//		AgentDrawer.carjpg = createTexture(MatsimResource.getAsInputStream("car.png"));
 		AgentDrawer.wavejpg = createTexture(MatsimResource.getAsInputStream("square.png"));
 		AgentDrawer.pedpng = createTexture(MatsimResource.getAsInputStream("ped.png"));
 
