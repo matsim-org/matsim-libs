@@ -36,6 +36,8 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
+ * A builder for AgentSnapshotInfo objects that can be used by links with queue logic
+ * 
  * @author dgrether
  */
 public class AgentSnapshotInfoBuilder {

@@ -22,7 +22,6 @@ package org.matsim.ptproject.qsim;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -36,14 +35,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LaneEnterEventImpl;
 import org.matsim.core.events.LaneLeaveEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -51,10 +48,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
-import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.PositionInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 
 /**
@@ -756,17 +750,14 @@ public class QLane implements QBufferItem {
 
     public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
     	AgentSnapshotInfoBuilder positionInfoBuilder = QLane.this.queueLink.getQSimEngine().getPositionInfoBuilder();
-//    	 this.getVehiclePositionsQueue(positions);
    	
     	double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLength(); 
     	positionInfoBuilder.setOffset(offset);      
-
     	
       positionInfoBuilder.addVehiclePositionsAsQueue(positions, time, QLane.this.buffer, QLane.this.vehQueue, 
       		QLane.this.inverseSimulatedFlowCapacity, QLane.this.inverseSimulatedFlowCapacity, 
       		QLane.this.bufferStorageCapacity, QLane.this.length);
     	      
-      
   		// treat vehicles from waiting list:
       int cnt2 = 0;
       positionInfoBuilder.positionVehiclesFromWaitingList(positions, cnt2, 
@@ -774,151 +765,6 @@ public class QLane implements QBufferItem {
       
       return positions;
     }
-
-
-    /**
-     * Calculates the positions of all vehicles on this link according to the
-     * queue-logic: Vehicles are placed on the link according to the ratio between
-     * the free-travel time and the time the vehicles are already on the link. If
-     * they could have left the link already (based on the time), the vehicles
-     * start to build a traffic-jam (queue) at the end of the link.
-     *
-     * @param positions
-     *          A collection where the calculated positions can be stored.
-     */
-    private void getVehiclePositionsQueue(final Collection<AgentSnapshotInfo> positions) {
-      double now = QLane.this.queueLink.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
-      Link link = QLane.this.getQLink().getLink();
-//      log.error("link: " + QLane.this.queueLink.getLink().getId() + "lane: " + QLane.this.getLaneId() + " drawing vehicles!");
-      double queueEnd = getInitialQueueEnd();
-      double storageCapFactor = QLane.this.getQLink().getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
-      double cellSize = ((NetworkImpl)QLane.this.getQLink().getQSimEngine().getQSim().getQNetwork().getNetwork()).getEffectiveCellSize();
-      double vehLen = calculateVehicleLength(storageCapFactor, cellSize);
-      
-      queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);
-      positionOtherDrivingVehicles(positions, now, queueEnd, link, vehLen);
-      
-      
-    }
-
-    private double calculateVehicleLength(double storageCapFactor, double cellSize) {
-      double vehLen = Math.min( // the length of a vehicle in visualization
-          (QLane.this.getLength() / (QLane.this.storageCapacity + QLane.this.bufferStorageCapacity)), // all vehicles must have place on the link
-          (cellSize / storageCapFactor)); // a vehicle should not be larger than it's actual size
-      return vehLen;
-    }
-
-    private double getInitialQueueEnd() {
-      double queueEnd = QLane.this.getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
-      return queueEnd;
-    }
-
-    /**
-     *  put all cars in the buffer one after the other
-     */
-    private double positionVehiclesFromBuffer(
-        final Collection<AgentSnapshotInfo> positions, double now,
-        double queueEnd, Link link, double vehLen) {
-      for (QVehicle veh : QLane.this.buffer) {
-
-        int lane = QLane.this.visualizerLane * 2;// + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QLane.this.getLink()));
-
-        int cmp = (int) (veh.getEarliestLinkExitTime() + QLane.this.inverseSimulatedFlowCapacity + 2.0);
-        double speed = (now > cmp) ? 0.0 : link.getFreespeed();
-        Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-        this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, link, queueEnd, lane, speed);
-        queueEnd -= vehLen;
-      }
-      return queueEnd;
-    }
-    
-    private void createAndAddSnapshotInfoForPeopleInMovingVehicle(Collection<AgentSnapshotInfo> positions, Collection<PersonAgent> peopleInVehicle, Link link, 
-        double distanceOnLane, int lane, double speed){
-      double distanceOnLink = distanceOnLane;
-      if (QLane.this.getMeterFromLinkEnd() == 0.0){
-        distanceOnLink = distanceOnLane + (link.getLength() - QLane.this.getLength()); 
-      }
-      for (PersonAgent passenger : peopleInVehicle) {
-      	AgentSnapshotInfo passengerPosition = new PositionInfo(OTFDefaultLinkHandler.LINK_SCALE, passenger.getPerson().getId(), link, distanceOnLink,
-            lane );
-        passengerPosition.setColorValueBetweenZeroAndOne( speed ) ;
-        if ( passenger.getPerson().getId().toString().startsWith("pt") ) {
-          passengerPosition.setAgentState( AgentState.TRANSIT_DRIVER ) ;
-        } else {
-          passengerPosition.setAgentState( AgentState.PERSON_DRIVING_CAR ) ;
-        }
-        positions.add(passengerPosition);
-      }
-    }
-
-    /**
-     * place other driving cars according the following rule:
-     * - calculate the time how long the vehicle is on the link already
-     * - calculate the position where the vehicle should be if it could drive with freespeed
-     * - if the position is already within the congestion queue, add it to the queue with slow speed
-     * - if the position is not within the queue, just place the car  with free speed at that place
-     */
-    private void positionOtherDrivingVehicles(final Collection<AgentSnapshotInfo> positions, double now, double queueEnd, Link link, double vehLen) {
-      double lastDistance = Double.POSITIVE_INFINITY;
-      double ttfs = QLane.this.getLength() / link.getFreespeed(now);
-      for (QVehicle veh : QLane.this.vehQueue) {
-        double travelTime = now - QLane.this.vehQueueEnterTimeMap.get(veh);
-        double distanceOnLane = 0.0;
-        if (ttfs != 0.0){
-          distanceOnLane = (travelTime / ttfs) * QLane.this.getLength();
-        }
-//        if (link.getId().equals(new IdImpl("6")) && QLane.this.getLaneId().equals(new IdImpl("6.ol"))){
-//          log.info("distanceOnLane1: " + distanceOnLane);
-//        }
-        if (distanceOnLane > queueEnd) { // vehicle is already in queue
-          distanceOnLane = queueEnd;
-          queueEnd -= vehLen;
-        }
-        if (distanceOnLane >= lastDistance) {
-          /*
-           * we have a queue, so it should not be possible that one vehicles
-           * overtakes another. additionally, if two vehicles entered at the same
-           * time, they would be drawn on top of each other. we don't allow this,
-           * so in this case we put one after the other. Theoretically, this could
-           * lead to vehicles placed at negative distance when a lot of vehicles
-           * all enter at the same time on an empty link. not sure what to do
-           * about this yet... just setting them to 0 currently.
-           */
-          distanceOnLane = lastDistance - vehLen;
-          if (distanceOnLane < 0)
-            distanceOnLane = 0.0;
-        }
-        int cmp = (int) (veh.getEarliestLinkExitTime() + QLane.this.inverseSimulatedFlowCapacity + 2.0);
-        double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
-        int lane = QLane.this.visualizerLane * 2;// QLane.this.visualizerLane;
-        if ( cnt < 10 ) {
-          cnt++ ;
-          log.warn(veh) ;
-        }
-
-//        if (link.getId().equals(new IdImpl("6")) && QLane.this.getLaneId().equals(new IdImpl("6.ol"))){
-//          log.error("ttfs: " + ttfs + " travelTime: " + travelTime + " Qlane.length: " + QLane.this.getLength());
-//          log.error("distanceOnLane " +distanceOnLane + " queueEnd " + queueEnd);
-//        }
-        Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh);
-        this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, link, distanceOnLane, lane, speed);
-        lastDistance = distanceOnLane;
-      }
-    }
-
-
-    private Collection<PersonAgent> getPeopleInVehicle(QVehicle vehicle) {
-      Collection<PersonAgent> passengers = QLane.this.transitQueueLaneFeature.getPassengers(vehicle);
-      if (passengers.isEmpty()) {
-        return Collections.singletonList((PersonAgent) vehicle.getDriver());
-      } else {
-        ArrayList<PersonAgent> people = new ArrayList<PersonAgent>();
-        people.add(vehicle.getDriver());
-        people.addAll(passengers);
-        return people;
-      }
-    }
-
   };
 
 	public static class FromLinkEndComparator implements Comparator<QLane>, Serializable {
@@ -933,8 +779,4 @@ public class QLane implements QBufferItem {
       }
     }
   };
-	
-  private static int cnt = 0 ;
-
-
 }
