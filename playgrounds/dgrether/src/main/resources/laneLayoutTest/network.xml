@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+
+<network name="lane layout test network">
+   <nodes>
+      <node id="1" x="0" y="0"/>
+      <node id="2" x="0" y="500"/>
+      <node id="3" x="500" y="500"/>
+      <node id="4" x="-500" y="500"/>
+   </nodes>
+   <links capperiod="01:00:00">
+     <link id="1" from="1" to="2" length="500.00" capacity="3600" freespeed="27.78" permlanes="1"  />
+     <link id="2" from="2" to="3" length="500.00" capacity="3600" freespeed="27.78" permlanes="1"  />
+     <link id="3" from="2" to="4" length="500.00" capacity="3600" freespeed="27.78" permlanes="1"  />
+   </links>
+</network>
