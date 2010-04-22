@@ -53,7 +53,7 @@ public class BKickLegScoring extends LegScoringFunction {
 	}
 
 	@Override
-	protected double calculateLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in
 		// seconds
