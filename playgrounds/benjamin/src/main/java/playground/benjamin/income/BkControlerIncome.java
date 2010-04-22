@@ -20,6 +20,8 @@
 package playground.benjamin.income;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.households.PersonHouseholdMapping;
@@ -60,12 +62,8 @@ public class BkControlerIncome extends BkControler {
 		this.setScoringFunctionFactory(scoringFactory);
 		super.setUp();
 	}
-	
-	
 
-	@Override
-	protected void loadCoreListeners() {
-		super.loadCoreListeners();
+	private void installTravelCostCalculatorFactory() {
 		RoadPricingScheme roadPricingScheme = super.getRoadPricing().getRoadPricingScheme();
 		
 		//setting the travel cost calculator for the router
@@ -73,6 +71,17 @@ public class BkControlerIncome extends BkControler {
 		setTravelCostCalculatorFactory(travelCostCalculatorFactory);
 	}
 
+	private void addInstallTravelCostCalculatorFactoryControlerListener() {
+		addControlerListener(new StartupListener() {
+
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				installTravelCostCalculatorFactory();
+			}
+			
+		});
+	}
+	
 	public static void main(String[] args) {
 		//	String config = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
 		//	String[] args2 = {config};
@@ -83,6 +92,7 @@ public class BkControlerIncome extends BkControler {
 			System.out.println();
 		} else {
 			final BkControlerIncome controler = new BkControlerIncome(args);
+			controler.addInstallTravelCostCalculatorFactoryControlerListener();
 			controler.run();
 		}
 	}
