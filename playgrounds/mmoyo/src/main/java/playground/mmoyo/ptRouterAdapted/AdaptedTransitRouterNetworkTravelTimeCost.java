@@ -34,10 +34,10 @@ import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetworkTravelTimeCost {
 	private static final Logger log = Logger.getLogger(AdaptedTransitRouterNetworkTravelTimeCost.class);
 
-	private final static double MIDNIGHT = 24.0*3600;
-	private Link previousLink = null;
-	private double previousTime = Double.NaN;
-	private double cachedTravelTime = Double.NaN;
+//	private final static double MIDNIGHT = 24.0*3600;
+//	private Link previousLink = null;
+//	private double previousTime = Double.NaN;
+//	private double cachedTravelTime = Double.NaN;
 
 	public AdaptedTransitRouterNetworkTravelTimeCost(TransitRouterConfig config ) {
 		super( config ) ;
@@ -47,7 +47,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 	@Override
 	public double getLinkTravelCost(final Link link, final double time) {
 		double cost;
-		if (((TransitRouterNetworkLink) link).route == null) {
+		if (((TransitRouterNetworkLink) link).getRoute() == null) {
 			// transfer link
 			cost = -getLinkTravelTime(link, time) * this.config.marginalUtilityOfTravelTimeWalk + this.config.costLineSwitch;
 		} else {
@@ -56,6 +56,9 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		}
 		return cost;
 	}
+	
+
+	// no functionality beyond this line 
 
 	/*
 	public double getLinkTravelTime(final Link link, final double time) {

@@ -86,14 +86,24 @@ public class AdaptedLauncher {
 		myTransitRouterConfig.noCarPlans= true;
 		myTransitRouterConfig.allowDirectWalks= true;
 		myTransitRouterConfig.compressPlan = false;
-		myTransitRouterConfig.marginalUtilityOfTravelTimeWalk = -1.0;
 
-		// values to compare with old implementation
-		myTransitRouterConfig.scenarioName = "adaptedRouter85_15";
-		myTransitRouterConfig.marginalUtilityOfTravelTimeTransit = -0.85;
-		myTransitRouterConfig.marginalUtilityOfTravelDistanceTransit = -0.15;
-		System.out.println(myTransitRouterConfig.scenarioName);
-		new AdaptedLauncher().route(configFile);
+		
+		//		myTransitRouterConfig.marginalUtilityOfTravelTimeWalk = -1.0;
+
+//		// values to compare with old implementation
+//		myTransitRouterConfig.scenarioName = "adaptedRouter85_15";
+////		myTransitRouterConfig.marginalUtilityOfTravelTimeTransit = -0.85;
+////		myTransitRouterConfig.marginalUtilityOfTravelDistanceTransit = -0.15;
+//		System.out.println(myTransitRouterConfig.scenarioName);
+//		new AdaptedLauncher().route(configFile);
+		
+		for ( double costLineSwitchInSecs = 0 ; costLineSwitchInSecs <= 1200 ; costLineSwitchInSecs += 60 ) {
+			myTransitRouterConfig.costLineSwitch = costLineSwitchInSecs * -myTransitRouterConfig.marginalUtilityOfTravelTimeTransit ;
+			myTransitRouterConfig.scenarioName = "_costLineSwitch" + myTransitRouterConfig.costLineSwitch ;
+			System.out.println(myTransitRouterConfig.scenarioName) ;
+			AdaptedLauncher adaptedLauncher	= new AdaptedLauncher();
+			adaptedLauncher.route(configFile);
+		}
 		
 		/*
 		// incremental marginalUtilities

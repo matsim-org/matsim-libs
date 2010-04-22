@@ -68,27 +68,25 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 		//super(config, network, costCalculator, timeCalculator, factory);
 		super(config, network, costCalculator, timeCalculator, factory, schedule, transitConfig);
 		
-		log.warn("At this point, I think that everything beyond this line is happily ignored in the end. kai, apr'10") ;
-		
 		MyTransitRouterConfig trConfig = new MyTransitRouterConfig() ;
 		this.adaptedTransitRouter = new AdaptedTransitRouter( trConfig, schedule);
 	
-		// both "super" route algos are made to route only on the "car" network.  yy I assume this is since the non-car modes are handled
-		// here.  This is, in fact, NOT correct, since this does not handle bike, so would need to be fixed before production use).  kai, apr'10
-		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
-		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
-		}
-		routeAlgo = super.getPtFreeflowLeastCostPathCalculator();
-		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
-		}
+//		// both "super" route algos are made to route only on the "car" network.  yy I assume this is since the non-car modes are handled
+//		// here.  This is, in fact, NOT correct, since this does not handle bike, so would need to be fixed before production use).  kai, apr'10
+//		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
+//		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
+//			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+//		}
+//		routeAlgo = super.getPtFreeflowLeastCostPathCalculator();
+//		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
+//			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+//		}
+		// I don't think the above lines are needed (configuring the car router ... but this is already done in the
+		// super constructor).  kai, apr'10
 	}
 
 	@Override
 	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		log.warn("is this ever called? (Now it is called.)") ;
-		log.error("it is called, but the calculated route is never returned to anywhere. kai, apr'10") ;
 		List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
 //		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 		super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, legs));

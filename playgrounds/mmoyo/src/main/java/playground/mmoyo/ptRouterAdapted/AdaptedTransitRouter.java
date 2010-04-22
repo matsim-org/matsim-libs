@@ -43,7 +43,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
-import org.matsim.pt.router.TransitRouterNetwork.*;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -247,8 +246,8 @@ public class AdaptedTransitRouter {
 		return legs;
 	}
 
-	private AdaptedTransitRouterNetwork buildNetwork() {
-		final AdaptedTransitRouterNetwork network = new AdaptedTransitRouterNetwork();
+	private TransitRouterNetwork buildNetwork() {
+		final TransitRouterNetwork network = new TransitRouterNetwork();
 
 		// build nodes and links connecting the nodes according to the transit routes
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
@@ -294,10 +293,6 @@ public class AdaptedTransitRouter {
 		System.out.println(" # links: " + network.getLinks().size());
 
 		return network;
-	}
-
-	public AdaptedTransitRouterNetwork getTransitRouterNetwork() {
-		return this.adaptedTransitNetwork;
 	}
 
 	// the procedures with * were adapted
