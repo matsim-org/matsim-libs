@@ -41,7 +41,11 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.MultiNodeDijkstra;
+import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
+import org.matsim.pt.router.TransitRouterNetwork.*;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -49,8 +53,6 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetwork.TransitRouterNetworkLink;
-import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetwork.TransitRouterNetworkNode;
 
 /** changes made to the original org.matsim.pt.router.TransitRouter:
  * -stop search 
@@ -61,7 +63,7 @@ import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetwork.TransitRoute
 public class AdaptedTransitRouter {
 
 	private final TransitSchedule schedule;
-	private final AdaptedTransitRouterNetwork adaptedTransitNetwork;
+	private final TransitRouterNetwork adaptedTransitNetwork;
 	
 	private final Map<TransitRouterNetworkLink, Tuple<TransitLine, TransitRoute>> linkMappings;
 	private final Map<TransitRouterNetworkNode, TransitStopFacility> nodeMappings;

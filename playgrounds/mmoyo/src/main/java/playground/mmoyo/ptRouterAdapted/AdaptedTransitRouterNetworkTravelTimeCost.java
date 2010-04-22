@@ -26,7 +26,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
-import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetwork.TransitRouterNetworkLink;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 
 /**
  *    
@@ -57,6 +57,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		return cost;
 	}
 
+	/*
 	public double getLinkTravelTime(final Link link, final double time) {
 		if ((link == this.previousLink) && (time == this.previousTime)) {
 			return this.cachedTravelTime;
@@ -83,7 +84,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		this.cachedTravelTime = time2;
 		return time2;
 	}
-
+*/
 //	private final HashMap<TransitRoute, double[]> sortedDepartureCache = new HashMap<TransitRoute, double[]>();
 //
 //	public double getNextDepartureTime(final TransitRoute route, final TransitRouteStop stop, final double depTime) {
