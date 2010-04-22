@@ -359,6 +359,12 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			poly.addPoint((int)(quad[2].x), (int)(quad[2].y));
 			display.setColor(netColor);
 			display.fill(poly);
+			
+//			Line2D line = new Line2D.Float(quad[0].x, quad[0].y, quad[1].x, quad[1].y);
+//			display.setColor(Color.RED);
+//			display.draw(line);
+//			display.fill(poly);
+			
 			//display.setColor(Color.BLUE);
 			//display.draw(poly);
 		}
