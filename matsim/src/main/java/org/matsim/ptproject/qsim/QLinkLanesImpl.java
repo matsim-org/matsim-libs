@@ -525,7 +525,7 @@ public class QLinkLanesImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
-			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder(QLinkLanesImpl.this.link);
+			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 			
 		  for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
 		    lane.visdata.getVehiclePositions(time, positions);
@@ -533,10 +533,10 @@ public class QLinkLanesImpl implements QLink {
 		  
 		  int cnt2 = 0;
   		// treat vehicles from waiting list:
-		  agentSnapshotInfoBuilder.positionVehiclesFromWaitingList(positions, cnt2, 
+		  agentSnapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkLanesImpl.this.link, cnt2, 
 					QLinkLanesImpl.this.waitingList, null);
 		  cnt2 = QLinkLanesImpl.this.waitingList.size();
-		  cnt2 = agentSnapshotInfoBuilder.positionAgentsInActivities(positions, 
+		  cnt2 = agentSnapshotInfoBuilder.positionAgentsInActivities(positions, QLinkLanesImpl.this.link,
 		  		QLinkLanesImpl.this.agentsInActivities.values(), cnt2);
 		  
 		  return positions;

@@ -26,7 +26,6 @@ import java.util.ListIterator;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.ParallelQSimEngine.ExtendedQueueNode;
 
@@ -222,8 +221,7 @@ public class QSimEngineThread extends Thread implements QSimEngine{
   }
 
 	@Override
-	public AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(Link link) {
-		this.positionInfoBuilder.init(link);
+	public AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder() {
 		return this.positionInfoBuilder;
 	}
 

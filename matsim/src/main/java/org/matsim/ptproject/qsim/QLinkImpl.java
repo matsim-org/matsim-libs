@@ -594,22 +594,21 @@ public class QLinkImpl implements QLink {
 		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
-			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder(QLinkImpl.this.getLink());
-			snapshotInfoBuilder.setOffset(0.0);
+			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
-			snapshotInfoBuilder.addVehiclePositions(positions, time, QLinkImpl.this.buffer,
+			snapshotInfoBuilder.addVehiclePositions(positions, time, QLinkImpl.this.link, QLinkImpl.this.buffer,
 					QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacity, QLinkImpl.this.storageCapacity, 
-					QLinkImpl.this.bufferStorageCapacity, QLinkImpl.this.getLink().getLength());
+					QLinkImpl.this.bufferStorageCapacity, QLinkImpl.this.getLink().getLength(), QLinkImpl.this.transitQueueLaneFeature);
 
 			int cnt2 = 0 ; // a counter according to which non-moving items can be "spread out" in the visualization
 			// treat vehicles from transit stops
 			QLinkImpl.this.transitQueueLaneFeature.positionVehiclesFromTransitStop(positions, cnt2 );
 
 			// treat vehicles from waiting list:
-			snapshotInfoBuilder.positionVehiclesFromWaitingList(positions, cnt2, 
+			snapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkImpl.this.link, cnt2,  
 					QLinkImpl.this.waitingList, QLinkImpl.this.transitQueueLaneFeature);
 			
-			cnt2 = snapshotInfoBuilder.positionAgentsInActivities(positions, 
+			cnt2 = snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkImpl.this.link,
 					QLinkImpl.this.agentsInActivities.values(), cnt2);
 			
 			// return:

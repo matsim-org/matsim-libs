@@ -20,7 +20,6 @@
 
 package org.matsim.ptproject.qsim;
 
-import org.matsim.api.core.v01.network.Link;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -37,6 +36,6 @@ public interface QSimEngine extends LinkActivator, SimEngine{
 	 */
 	public void simStep(final double time);
 	
-	public AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(Link link);
+	public AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder();
 		
 }
