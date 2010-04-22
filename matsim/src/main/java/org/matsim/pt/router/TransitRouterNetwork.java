@@ -109,6 +109,18 @@ public final class TransitRouterNetwork implements Network {
 		public Id getId() {
 			return this.id;
 		}
+
+		public TransitRouteStop getStop() {
+			return stop;
+		}
+
+		public TransitRoute getRoute() {
+			return route;
+		}
+
+		public TransitLine getLine() {
+			return line;
+		}
 	}
 
 	public static final class TransitRouterNetworkLink implements Link {
@@ -226,6 +238,14 @@ public final class TransitRouterNetwork implements Network {
 		@Override
 		public void setAllowedModes(final Set<TransportMode> modes) {
 			throw new UnsupportedOperationException();
+		}
+
+		public TransitRoute getRoute() {
+			return route;
+		}
+
+		public TransitLine getLine() {
+			return line;
 		}
 
 	}
