@@ -19,11 +19,14 @@
  * *********************************************************************** */
 package playground.benjamin.income;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.households.PersonHouseholdMapping;
+import org.matsim.roadpricing.RoadPricingScheme;
 
 
 /**
@@ -34,18 +37,33 @@ public class IncomeTravelCostCalculatorFactory implements TravelCostCalculatorFa
 
 	private PersonHouseholdMapping personHouseholdMapping;
 	
-	
+	private RoadPricingScheme scheme;
 
-	public IncomeTravelCostCalculatorFactory(
-			PersonHouseholdMapping personHouseholdMapping) {
-		super();
+	public IncomeTravelCostCalculatorFactory(PersonHouseholdMapping personHouseholdMapping, RoadPricingScheme roadPricingScheme) {
 		this.personHouseholdMapping = personHouseholdMapping;
+		this.scheme = roadPricingScheme;
 	}
 
-
-
 	public PersonalizableTravelCost createTravelCostCalculator(TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
-		return new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
+		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
+		final IncomeTollTravelCostCalculator incomeTollTravelCostCalculator = new IncomeTollTravelCostCalculator(personHouseholdMapping, scheme);
+		
+		return new PersonalizableTravelCost() {
+
+			@Override
+			public void setPerson(Person person) {
+				incomeTravelCostCalculator.setPerson(person);
+				incomeTollTravelCostCalculator.setPerson(person);
+			}
+
+			@Override
+			public double getLinkTravelCost(Link link, double time) {
+				double tollCost = incomeTollTravelCostCalculator.getLinkTravelCost(link, time);
+				double otherCost = incomeTravelCostCalculator.getLinkTravelCost(link, time);
+				return tollCost + otherCost;
+			}
+			
+		};
 	}
 
 }

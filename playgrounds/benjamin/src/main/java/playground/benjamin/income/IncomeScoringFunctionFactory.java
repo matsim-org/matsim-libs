@@ -19,6 +19,7 @@
 package playground.benjamin.income;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
@@ -28,7 +29,9 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
+import org.matsim.households.Income;
 import org.matsim.households.PersonHouseholdMapping;
+import org.matsim.households.Income.IncomePeriod;
 
 
 /**
@@ -51,23 +54,26 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 
 	public ScoringFunction getNewScoringFunction(Plan plan) {
 
+		Person person = plan.getPerson();
+		double householdIncomePerDay = getHouseholdIncomePerDay(person, hhdb);
+		
 		//summing up all relevant ulitlites
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		//utility earned from daily income
 		//income dependent!
-		scoringFunctionAccumulator.addScoringFunction(new ScoringFromDailyIncome(params, this.hhdb));
+		scoringFunctionAccumulator.addScoringFunction(new ScoringFromDailyIncome(householdIncomePerDay));
 
 		//utility earned from activities
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));
 
 		//utility spend for traveling (in this case: travel time and distance costs)
 		//income dependent!
-		scoringFunctionAccumulator.addScoringFunction(new ScoringFromLeg(plan, params, this.hhdb, this.network));
+		scoringFunctionAccumulator.addScoringFunction(new ScoringFromLeg(plan, params, this.network, householdIncomePerDay ));
 
 		//utility spend for traveling (toll costs)
 		//income dependent!
-		scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll(params, this.hhdb));
+		scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll(params, householdIncomePerDay));
 
 		//utility spend for being stuck
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
@@ -76,4 +82,22 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 
 	}
 
+	private double getHouseholdIncomePerDay(Person person, PersonHouseholdMapping hhdb) {
+		Income income = hhdb.getHousehold(person.getId()).getIncome();
+		double incomePerDay = this.calculateIncomePerDay(income);
+		if (Double.isNaN(incomePerDay)){
+			throw new IllegalStateException("cannot calculate income for person: " + person.getId());
+		}
+		return incomePerDay;
+	}
+
+	private double calculateIncomePerDay(Income income) {
+		if (income.getIncomePeriod().equals(IncomePeriod.year)) {
+			double incomePerDay = income.getIncome() / 240;
+			return incomePerDay;
+		} else {
+			throw new UnsupportedOperationException("Can't calculate income per day");
+		}
+	}
+	
 }

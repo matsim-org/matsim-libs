@@ -4,14 +4,28 @@ import org.matsim.core.scoring.interfaces.BasicScoring;
 
 public class ScoringFromDailyIncome implements BasicScoring {
 
-	private double score;
-	private double betaIncomeCar;
+	private static double betaIncomeCar = 4.58;
 	private double incomePerDay;
+
+	public ScoringFromDailyIncome(double householdIncomePerDay) {
+		this.incomePerDay = householdIncomePerDay;
+	}
+
 
 	@Override
 	public void finish() {
-		this.score += (betaIncomeCar * Math.log(this.incomePerDay));
 
 	}
+
+	@Override
+	public double getScore() {
+		return betaIncomeCar * Math.log(this.incomePerDay);
+	}
+
+	@Override
+	public void reset() {
+
+	}
+
 
 }

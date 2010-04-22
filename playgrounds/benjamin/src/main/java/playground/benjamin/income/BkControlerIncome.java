@@ -23,11 +23,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.households.PersonHouseholdMapping;
+import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.benjamin.BkControler;
 
 /**
- * @author dgrether
+ * @author bkick
+ * @author michaz
  *
  */
 public class BkControlerIncome extends BkControler {
@@ -54,12 +56,21 @@ public class BkControlerIncome extends BkControler {
 		//setting the needed scoring function
 		ScoringFunctionFactory scoringFactory = new IncomeScoringFunctionFactory(this.getScenario().getConfig().charyparNagelScoring(), personHouseholdMapping, this.getNetwork());
 		
-		//setting the travel cost calculator for the router
-		TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
 		
-		setTravelCostCalculatorFactory(travelCostCalculatorFactory);
 		this.setScoringFunctionFactory(scoringFactory);
 		super.setUp();
+	}
+	
+	
+
+	@Override
+	protected void loadCoreListeners() {
+		super.loadCoreListeners();
+		RoadPricingScheme roadPricingScheme = super.getRoadPricing().getRoadPricingScheme();
+		
+		//setting the travel cost calculator for the router
+		TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme);
+		setTravelCostCalculatorFactory(travelCostCalculatorFactory);
 	}
 
 	public static void main(String[] args) {

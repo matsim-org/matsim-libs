@@ -27,9 +27,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-import org.matsim.households.Income;
-import org.matsim.households.PersonHouseholdMapping;
-import org.matsim.households.Income.IncomePeriod;
 
 /**
  * @author dgrether
@@ -51,20 +48,26 @@ public class ScoringFromLeg extends LegScoringFunction {
 
 	private final Network network;
 
-	public ScoringFromLeg(final Plan plan, final CharyparNagelScoringParameters params, PersonHouseholdMapping hhdb, Network network) {
+	public ScoringFromLeg(final Plan plan, final CharyparNagelScoringParameters params, Network network, double householdIncomePerDay) {
 		super(plan, params);
-		Income income = hhdb.getHousehold(plan.getPerson().getId()).getIncome();
-		this.incomePerDay = this.calculateIncomePerDay(income);
+		this.incomePerDay = householdIncomePerDay;
 		this.network = network;
 		log.trace("Using BKickLegScoring...");
 	}
 
+
+
 	@Override
 	public void finish() {
-		this.score += (betaIncomeCar * Math.log(this.incomePerDay));
+		
 	}
 
-	protected double calculateLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
+	@Override
+	protected double calcLegScore(double departureTime, double arrivalTime, LegImpl leg) {
+		return calculateLegScore(departureTime, arrivalTime, leg);
+	}
+
+	private double calculateLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
 		double dist = calculateLegDistance(leg);
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		if (TransportMode.car.equals(leg.getMode())) {
@@ -109,18 +112,6 @@ public class ScoringFromLeg extends LegScoringFunction {
 			throw new IllegalStateException("Leg score is NaN for person: " + this.plan.getPerson().getId());
 		}
 		return score;
-	}
-
-	private double calculateIncomePerDay(Income income) {
-		if (income.getIncomePeriod().equals(IncomePeriod.year)) {
-			double incomePerDay = income.getIncome() / 240;
-			if (Double.isNaN(incomePerDay)){
-				throw new IllegalStateException("cannot calculate income for person: " + this.plan.getPerson().getId());
-			}
-			return incomePerDay;
-		} else {
-			throw new UnsupportedOperationException("Can't calculate income per day");
-		}
 	}
 
 }

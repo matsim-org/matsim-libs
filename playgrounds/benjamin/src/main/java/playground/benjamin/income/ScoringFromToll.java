@@ -23,7 +23,6 @@ package playground.benjamin.income;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
-import org.matsim.households.PersonHouseholdMapping;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -33,28 +32,23 @@ import org.matsim.households.PersonHouseholdMapping;
  */
 public class ScoringFromToll implements MoneyScoring, BasicScoring {
 
-	protected double score;
+	private double score = 0.0;
 	
 	private double betaIncomeCar;
 	
 	private double incomePerDay;
 	
-	private static final double INITIAL_SCORE = 0.0;
 	
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
-	private PersonHouseholdMapping hhdb;
 
-	
-	public ScoringFromToll(final CharyparNagelScoringParameters params, PersonHouseholdMapping hhdb) {
+	public ScoringFromToll(final CharyparNagelScoringParameters params, double householdIncomePerDay) {
 		this.params = params;
-		this.hhdb = hhdb;
-		this.reset();
-
+		this.incomePerDay = householdIncomePerDay;
 	}	
 	
 	public void reset() {
-		this.score = INITIAL_SCORE;
+		
 	}
 
 	public void addMoney(final double amount) {
