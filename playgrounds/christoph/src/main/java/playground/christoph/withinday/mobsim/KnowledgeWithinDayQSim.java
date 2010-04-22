@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.ptproject.qsim.QSimEngineFactory;
 
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 
@@ -46,6 +47,11 @@ public class KnowledgeWithinDayQSim extends WithinDayQSim{
 		super(scenario, events);
 	}
 
+	protected KnowledgeWithinDayQSim(final Scenario scenario, final EventsManager events, QSimEngineFactory factory)
+	{
+		super(scenario, events, factory);
+	}
+	
 	public void useKnowledgeStorageHandler(boolean value)
 	{
 		if (value && (knowledgeDBStorageHandler == null))

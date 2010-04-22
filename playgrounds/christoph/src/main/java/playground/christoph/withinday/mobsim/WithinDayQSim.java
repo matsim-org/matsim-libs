@@ -26,7 +26,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.ptproject.qsim.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QSimEngineFactory;
 
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 
@@ -46,7 +48,12 @@ public class WithinDayQSim extends QSim{
 
 	public WithinDayQSim(final Scenario scenario, final EventsManager events)
 	{
-		super(scenario, events);
+		this(scenario, events, new DefaultQSimEngineFactory());
+	}
+	
+	public WithinDayQSim(final Scenario scenario, final EventsManager events, QSimEngineFactory factory)
+	{
+		super(scenario, events, factory);
 		
 		// use WithinDayAgentFactory that creates WithinDayPersonAgents who can reset their chachedNextLink
 		super.setAgentFactory(new WithinDayAgentFactory(this));

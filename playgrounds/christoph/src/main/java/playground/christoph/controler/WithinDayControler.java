@@ -50,6 +50,7 @@ import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
+import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSimFactory;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.CurrentLegReplanner;
@@ -88,8 +89,8 @@ public class WithinDayControler extends Controler {
 	 * Replanning Strategy. It is possible to assign
 	 * multiple Strategies to the Agents.
 	 */
-	protected double pInitialReplanning = 1.0;
-	protected double pActEndReplanning = 0.1;
+	protected double pInitialReplanning = 0.0;
+	protected double pActEndReplanning = 1.0;
 	protected double pLeaveLinkReplanning = 0.0;
 
 	/*
@@ -215,7 +216,8 @@ public class WithinDayControler extends Controler {
 	{	
 		createHandlersAndListeners();
 		
-		sim = new KnowledgeWithinDayQSim(this.scenarioData, this.events);
+//		sim = new KnowledgeWithinDayQSim(this.scenarioData, this.events, new KnowledgeWithinDayQSimFactory());
+		sim = new KnowledgeWithinDayQSimFactory().createMobsim(this.scenarioData, this.events);
 	
 		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
 		foqsl.addQueueSimulationInitializedListener(rfi);
