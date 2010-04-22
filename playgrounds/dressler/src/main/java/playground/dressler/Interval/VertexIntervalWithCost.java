@@ -98,7 +98,8 @@ public class VertexIntervalWithCost extends VertexInterval {
 	 * @param other a VertexInterval
 	 * @return null if not, and the first subinterval of other that should be replaced otherwise 
 	 */
-	public Interval isBetterThan(final VertexIntervalWithCost other) {
+	@Override
+	public Interval isBetterThan(final VertexInterval other) {
 		VertexIntervalWithCost temp = (VertexIntervalWithCost) other;  
 		
 		boolean isbetter = false;
@@ -123,13 +124,16 @@ public class VertexIntervalWithCost extends VertexInterval {
 				if (this.costIsRelative) {			
 					// we increase steadily in cost, the other does not
 					// stop one before the breakeven spot. 
-					r = temp.cost - this.cost - 1;
+					int better_r = temp.cost - this.cost - 1;
+					r = Math.min(r, better_r);
 					
 					isbetter = true; // this relies on the final l < r check!
 				} else {
 					// we stay constant, the other increases
 					// start one after the breakeven spot
-					l = temp.cost - this.cost + 1;
+					int better_l = this.cost - temp.cost + 1;
+					
+					l = Math.max(l, better_l);
 					
 					isbetter = true; // this relies on the final l < r check!
 				}
@@ -191,7 +195,7 @@ public class VertexIntervalWithCost extends VertexInterval {
 	 * Set the fields of the VertexInterval to the one given.
 	 * Predecessor or Successor are only updated if they are not null. 
 	 * @param other The VertexInterval from which the settings are copied
-	 * @return if there is an unusual reason to scan again ... this is never true here, but would be if costs get upgraded  
+	 * @return if there is an unusual reason to scan again ... with costs, this is not checked and simply returns true all the time!  
 	 */
 	@Override
 	public boolean setArrivalAttributes (final VertexInterval other)
@@ -199,15 +203,15 @@ public class VertexIntervalWithCost extends VertexInterval {
 		// argh.
 		if (!(other instanceof VertexIntervalWithCost)) return super.setArrivalAttributes(other);
 				
-		boolean needsRescanning = false;
+		//boolean needsRescanning = false;
 		
 		VertexIntervalWithCost temp = (VertexIntervalWithCost) other;
 		
 		this.scanned = temp.scanned;
 		
-		if (!this.reachable && other.reachable) {
-			needsRescanning = true;
-		}
+//		if (!this.reachable && other.reachable) {
+//			needsRescanning = true;
+//		}
 		
 		this.reachable = temp.reachable;
 		if (temp._pred != null) 
@@ -218,8 +222,13 @@ public class VertexIntervalWithCost extends VertexInterval {
 		
 		this.costIsRelative = temp.costIsRelative;
 		this.cost = temp.cost;
+
+		// FIXME rescanning if cost is decreased!
+		// actually, if this is called, it already is an improvement
+		// so rescan always!
+		return true;
 		
-		return needsRescanning;
+		//return needsRescanning;
 	}
 
 	/**

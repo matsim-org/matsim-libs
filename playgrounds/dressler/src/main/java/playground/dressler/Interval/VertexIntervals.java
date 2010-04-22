@@ -258,8 +258,19 @@ public class VertexIntervals extends Intervals<VertexInterval> {
 				
 		while(current.getLowBound() < arrive.getHighBound()){
 
-			// only do something if current was not reachable or can be improved			
-			Interval improvement = arrive.isBetterThan(current); 
+			// DEBUG
+			// FIXME
+			if (!(arrive instanceof VertexIntervalWithCost)) {
+				System.out.println("arrive not with cost");
+				System.out.println(arrive);
+			}
+			if (!(arrive instanceof VertexIntervalWithCost)) {
+				System.out.println("current not with cost");
+				System.out.println(current);
+			}
+			
+			// only do something if current was not reachable or can be improved
+			Interval improvement = arrive.isBetterThan(current);			
 			if (improvement != null) {
 				
 				// let's modify the interval to look just right

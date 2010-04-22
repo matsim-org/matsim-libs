@@ -21,11 +21,16 @@
 package playground.dressler.Interval;
 
 public class Pair<S,T> {
-  public final S first;
-  public final T second;
-  
-  public Pair(S s, T t) {
-	  first = s;
-	  second = t;
-  }
+	public final S first;
+	public final T second;
+
+	public Pair(S s, T t) {
+		first = s;
+		second = t;
+	}
+
+	@Override
+	public String toString() {
+		return "Pair(" + first.toString() + "," + second.toString() + ")";	  		
+	}
 }

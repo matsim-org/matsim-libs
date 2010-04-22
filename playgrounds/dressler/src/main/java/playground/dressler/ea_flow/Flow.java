@@ -611,26 +611,27 @@ public class Flow {
 				source = ssf.getArrivalNode().getRealNode();
 			}
 
-			Integer demand = this._demands.get(source);
-
-			if (demand == null) {
-				throw new IllegalArgumentException("Startnode is no source for StepSourceFlow " + step);
-			}
+			// do not adjust the demands! This is only safe at the very first and last step!
+//			Integer demand = this._demands.get(source);
+//
+//			if (demand == null) {
+//				throw new IllegalArgumentException("Startnode is no source for StepSourceFlow " + step);
+//			}
 
 			if (ssf.getForward()) {
-				demand -= gamma;
-				if (demand < 0) {
-					throw new IllegalArgumentException("too much flow on StepSourceFlow " + step);
-				}
+//				demand -= gamma;
+//				if (demand < 0) {
+//					throw new IllegalArgumentException("too much flow on StepSourceFlow " + step);
+//				}
 				this._sourceoutflow.get(source).augment(ssf.getArrivalTime(), gamma, Integer.MAX_VALUE);
-				this._demands.put(source, demand);
+//				this._demands.put(source, demand);
 			} else {
-				demand += gamma;
-				if (demand > this._settings.getDemand(source)) {
-					throw new IllegalArgumentException("too much flow sent back into source " + step);
-				}
+//				demand += gamma;
+//				if (demand > this._settings.getDemand(source)) {
+//					throw new IllegalArgumentException("too much flow sent back into source " + step);
+//				}
 				this._sourceoutflow.get(source).augment(ssf.getStartTime(), -gamma, Integer.MAX_VALUE);
-				this._demands.put(source, demand);
+//				this._demands.put(source, demand);
 			}
 
 		} else if (step instanceof StepSinkFlow) {
@@ -643,25 +644,25 @@ public class Flow {
 			} else {
 				sink = ssf.getStartNode().getRealNode();
 			}
-			Integer demand = this._demands.get(sink);
 			
-			if (demand == null) {
-				throw new IllegalArgumentException("Startnode is no sink for StepSinkFlow " + step);
-			}
+			// do not adjust the demands! This is only safe at the very first and last step!
+//			Integer demand = this._demands.get(sink);
+//			
+//			if (demand == null) {
+//				throw new IllegalArgumentException("Startnode is no sink for StepSinkFlow " + step);
+//			}
 
-			// FIXME check handling of sinkflow
-			if (!step.getForward()) {
-				//throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
-				demand -= gamma;
-				this._demands.put(sink, demand);
+			if (!step.getForward()) {			
+//				demand -= gamma;
+//				this._demands.put(sink, demand);
 				// there isn't any upper capacity on this link
 				this._sinkflow.get(sink).augment(step.getArrivalTime(), -gamma, Integer.MAX_VALUE);
 			} else {
-				demand += gamma;
-				if (demand > 0) {
-					throw new IllegalArgumentException("too much flow sent into sink " + step);
-				}
-				this._demands.put(sink, demand);
+//				demand += gamma;
+//				if (demand > 0) {
+//					throw new IllegalArgumentException("too much flow sent into sink " + step);
+//				}
+//				this._demands.put(sink, demand);
 				// there isn't any upper capacity on this link
 				this._sinkflow.get(sink).augment(step.getStartTime(), gamma, Integer.MAX_VALUE);
 			}
@@ -869,13 +870,80 @@ public class Flow {
 
 
 	/**
-	 * Method to change just the flow values according to TimeExpandedPath and gamma
+	 * Method to change just the flow values and source/sink demands according to TimeExpandedPath and gamma
 	 * @param TEP The TimeExpandedPath on which the flow is augmented
 	 * @param gamma Amount of flow to augment
 	 */
 
 	private void dumbaugment(TimeExpandedPath TEP, int gamma) {
+		// We need to augment the demands at the beginning and at the end manually,
+		// because otherwise they might be temporarily exceeded if flow passes through a
+		// empty source or full sink!
+		
+		// the Source
+		{
+			StepSourceFlow ssf = (StepSourceFlow) TEP.getPathSteps().getFirst();
 
+			Node source;
+
+			// doesn't really matter, both retun the source ...
+			if (ssf.getForward()) {
+				source = ssf.getStartNode().getRealNode();
+			} else {
+				source = ssf.getArrivalNode().getRealNode();
+			}
+
+			Integer demand = this._demands.get(source);
+
+			if (demand == null) {
+				throw new IllegalArgumentException("Startnode is no source for StepSourceFlow " + ssf);
+			}
+
+			if (ssf.getForward()) {
+				demand -= gamma;
+				if (demand < 0) {
+					throw new IllegalArgumentException("too much flow on StepSourceFlow " + ssf);
+				}
+			} else {
+				demand += gamma;
+				if (demand > this._settings.getDemand(source)) {
+					throw new IllegalArgumentException("too much flow sent back into source " + ssf);
+				}
+			}
+			this._demands.put(source, demand);
+
+		}
+		
+		// the Sink
+		{
+			StepSinkFlow ssf = (StepSinkFlow) TEP.getPathSteps().getLast();
+			Node sink;
+
+			// doesn't really matter, both retun the sink ...
+			if (ssf.getForward()) {
+				sink = ssf.getArrivalNode().getRealNode();
+			} else {
+				sink = ssf.getStartNode().getRealNode();
+			}
+			Integer demand = this._demands.get(sink);
+
+			if (demand == null) {
+				throw new IllegalArgumentException("Startnode is no sink for StepSinkFlow " + ssf);
+			}
+
+			if (!ssf.getForward()) {
+				demand -= gamma;
+			} else {
+				demand += gamma;
+				if (demand > 0) {
+					throw new IllegalArgumentException("too much flow sent into sink " + ssf);
+				}				
+			}
+			this._demands.put(sink, demand);
+		}
+		
+		// Now do all the steps, including the first and last to fix the actual source/sinkflows.
+		
 		for (PathStep step : TEP.getPathSteps()) {
 			augmentStep(step, gamma);
 		}

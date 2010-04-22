@@ -199,7 +199,7 @@ public class VertexInterval extends Interval {
 	 */
 	public Interval isBetterThan(final VertexInterval other) {
 		boolean isbetter = false;
-		
+		System.out.println("Huh?");
 		if (!other.reachable) {
 			isbetter = true;
 		} // having more breadcrumbs than other is also better 

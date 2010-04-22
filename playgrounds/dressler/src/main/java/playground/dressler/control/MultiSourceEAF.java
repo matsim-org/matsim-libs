@@ -362,6 +362,11 @@ public class MultiSourceEAF {
 			timer2 = System.currentTimeMillis();
 			timeMBF += timer2 - timer1;
 
+			// DEBUG
+			//System.out.println("Returned paths");
+			//System.out.println(result);
+			
+			
 			boolean trySuccessfulPaths = false;
 			tempstr = "";
 			int zeroaugment = 0;
@@ -508,6 +513,9 @@ public class MultiSourceEAF {
 					} else {
 						zeroaugment += 1;
 					}
+					// BIG DEBUG
+					// augment only the first path
+					//break;
 				}
 			}
 
@@ -549,6 +557,15 @@ public class MultiSourceEAF {
 				}
 			}
 
+			// DEBUG
+			int[] arrivals = fluss.arrivals();
+			long totalcost = 0;
+			long totalflow = 0;
+			for (int ii = 0; ii < arrivals.length; ii++) {
+				totalflow += arrivals[ii];
+				totalcost += ii*arrivals[ii];
+			}
+			System.out.println("Total flow: " + totalflow + " , total cost: " + totalcost);
 		}
 
 
@@ -609,7 +626,7 @@ public class MultiSourceEAF {
 		// 4 = padang, with 10% plans, 10s steps
 		// 41 = padang, with 100% plans, 1s steps ...
 		// 42 = padang, v2010, with 100% plans (no shelters yet)
-		// 43 = padang, v2010, with 100% plans, 10s steps (no shelters yet)
+		// 43 = padang, v2010, with 100% plans, 10s steps, shelters
 		// 44 = padang, v2010, with 100% plans, 5s steps (no shelters yet)
 		//421-441 same as above only Manuel
 		// 5 = probeevakuierung telefunken
@@ -730,8 +747,8 @@ public class MultiSourceEAF {
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/demo.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/audimax.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/otto hahn straße 14.zet.dat";
-			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
-			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
+			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
+			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
 
 			uniformDemands = 100;
 
@@ -745,7 +762,7 @@ public class MultiSourceEAF {
 		}
 		
 		// outputplansfile = "/homes/combi/dressler/V/code/meine_EA/tempplans.xml";
-		//flowfile = "/homes/combi/dressler/V/vnotes/statistik_2010_04_april/bug_shelters.pathflow";
+		//flowfile = "/homes/combi/dressler/V/vnotes/statistik_2010_04_april/bug_shelters_mit_kosten_2.pathflow";
 		
 
 		if(_debug){
@@ -863,12 +880,12 @@ public class MultiSourceEAF {
 		settings.flowFactor = flowFactor; // default 1.0
 
 		// set additional parameters
-		//settings.TimeHorizon = 3;
-		//settings.MaxRounds = 2;
+		settings.TimeHorizon = 70;
+		//settings.MaxRounds = 1;
 		//settings.checkConsistency = 100;
 		//settings.useVertexCleanup = false;
 		//settings.useSinkCapacities = false;
-		//settings.useImplicitVertexCleanup = true;
+		settings.useImplicitVertexCleanup = true;
 		settings.useShadowFlow = true;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
@@ -879,7 +896,7 @@ public class MultiSourceEAF {
 		//settings.sortPathsBeforeAugmenting = true;
 		//settings.checkTouchedNodes = true;
 		//settings.keepPaths = true; // do not store paths at all!
-		//settings.unfoldPaths = true; // unfold stored paths into forward paths
+		settings.unfoldPaths = true; // unfold stored paths into forward paths
 
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
@@ -918,6 +935,7 @@ public class MultiSourceEAF {
 		//fluss.writePathflow();
 
 		/* --------- the actual work is done --------- */
+		
 
 		int[] arrivals = fluss.arrivals();
 		long totalcost = 0;
@@ -935,7 +953,7 @@ public class MultiSourceEAF {
 			int demand = fluss.getDemands().get(node);
 			if (demand > 0) {
 				// this can be a lot of text
-				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
+				//System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
 			}
 		}
 
@@ -951,7 +969,5 @@ public class MultiSourceEAF {
 			System.out.println("done");
 		}
 	}
-
-	
 
 }

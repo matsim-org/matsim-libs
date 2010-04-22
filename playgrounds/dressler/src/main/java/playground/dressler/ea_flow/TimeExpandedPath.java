@@ -347,7 +347,7 @@ public class TimeExpandedPath {
 	
 	
 	/**
-	 * getter for length of the path
+	 * getter for length of the path in steps (not cost or time or anything clever)
 	 * @return length
 	 */
 	public int length(){

@@ -209,7 +209,7 @@ public class BellmanFordIntervalBased {
 		
 		@Override
 		public String toString(){
-			return node.toString() + " @ " + time;
+			return node.toString() + " @ " + time +  " interval " + ival + " reverse " + reverse;
 		}
 	}
 	
