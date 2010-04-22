@@ -32,9 +32,9 @@ import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.SparseGraphBuilder;
 import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.generators.ErdosRenyiGenerator;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 
@@ -52,29 +52,23 @@ public class AdjacencyMatrixTest extends MatsimTestCase {
 		
 		Graph g2 = m.getGraph(new SparseGraphBuilder());
 		
+		Degree degree = new Degree();
 		assertEquals(g2.getVertices().size(), g1.getVertices().size());
 		assertEquals(g2.getEdges().size(), g1.getEdges().size());
-		assertEquals(GraphStatistics.degreeDistribution(g2).mean(), GraphStatistics.degreeDistribution(g1).mean());
+		assertEquals(degree.distribution(g2.getVertices()).mean(), degree.distribution(g1.getVertices()).mean());
 		
-//		int addCount = 0;
 		for(int i = 0; i < 100; i+=2) {
 			m.addEdge(i, i+1);
-//				addCount++;
 		}
 		
-//		Graph g3 = m.getGraph(new PlainGraphFactory());
-//		assertEquals(g3.getEdges().size(), g1.getEdges().size() + addCount);
-		
-//		int removeCount = 0;
 		for(int i = 0; i < 100; i+=2) {
 			m.removeEdge(i+1, i);
-//				removeCount++;
 		}
 		
 		Graph g4 = m.getGraph(new SparseGraphBuilder());
 		assertEquals(g4.getEdges().size(), g1.getEdges().size());
 		
-		assertEquals(GraphStatistics.degreeDistribution(g2).mean(), GraphStatistics.degreeDistribution(g4).mean());
+		assertEquals(degree.distribution(g2.getVertices()).mean(), degree.distribution(g4.getVertices()).mean());
 	}
 
 	public void testCommonNeighbours() {

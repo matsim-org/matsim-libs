@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSocialTie.java
+ * SampledSocialNetFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,28 +19,54 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
-import org.matsim.core.utils.collections.Tuple;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.GraphFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
+
+import com.vividsolutions.jts.geom.Point;
+
 
 /**
  * @author illenberger
  *
  */
-public class SampledSocialEdge extends SpatialSparseEdge implements SocialEdge {//, SampledEdge {
+public class SocialSparseGraphFactory implements GraphFactory<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> {
 
-	@Override
-	public SampledSocialVertex getOpposite(Vertex v) {
-		return (SampledSocialVertex) super.getOpposite(v);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Tuple<? extends SampledSocialVertex, ? extends SampledSocialVertex> getVertices() {
-		return (Tuple<? extends SampledSocialVertex, ? extends SampledSocialVertex>) super.getVertices();
-	}
-
+	private static final Logger logger = Logger.getLogger(SocialSparseGraphFactory.class);
 	
+	private final CoordinateReferenceSystem crs;
+	
+	private final int SRID;
+	
+	public SocialSparseGraphFactory(CoordinateReferenceSystem crs) {
+		this.crs = crs;
+		SRID = CRSUtils.getSRID(crs);
+		if(SRID == 0)
+			logger.warn("Coordinate reference system has no SRID. Setting SRID to 0.");
+	}
+	
+	public SocialSparseEdge createEdge() {
+		return new SocialSparseEdge();
+	}
+
+	public SocialSparseGraph createGraph() {
+		return new SocialSparseGraph(crs);
+	}
+	
+//	public SampledSocialGraph createGraph(CoordinateReferenceSystem crs) {
+//		return new SampledSocialGraph(crs);
+//	}
+
+	public SocialSparseVertex createVertex() {
+		throw new UnsupportedOperationException();
+	}
+	
+	public SocialSparseVertex createVertex(SocialPerson person, Point point) {
+		point.setSRID(SRID);
+		return new SocialSparseVertex(person, point);
+	}
+
 }

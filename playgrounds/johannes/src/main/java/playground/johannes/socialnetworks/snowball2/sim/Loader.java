@@ -93,10 +93,10 @@ public class Loader {
 		Map<String, EstimatorSet> estimators = new HashMap<String, EstimatorSet>();
 		Set<BiasedDistribution> estimatorSet = new HashSet<BiasedDistribution>();
 		
-		BiasedDistribution estim1 = new Estimator1(N);
-		estimatorSet.add(estim1);
-		estimators.put("estim1a", new EstimatorSet(estim1, null, null));
-		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
+//		BiasedDistribution estim1 = new Estimator1(N);
+//		estimatorSet.add(estim1);
+//		estimators.put("estim1a", new EstimatorSet(estim1, null, null));
+//		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
 		
 //		BiasedDistribution estim2 = new Estimator2(N);
 //		estimatorSet.add(estim2);
@@ -123,20 +123,25 @@ public class Loader {
 //		estimators.put("estim6a", new EstimatorSet(estim6, null, null));
 //		estimators.put("estim6b", new EstimatorSet(estim6, new HTEstimator(N), new HTEstimator(M)));
 		
-//		BiasedDistribution estim7 = new Estimator7(N);
-//		estimatorSet.add(estim7);
-//		estimators.put("estim7a", new EstimatorSet(estim7, null, null));
-//		estimators.put("estim7b", new EstimatorSet(estim7, new HTEstimator(N), new HTEstimator(M)));
+		BiasedDistribution estim7 = new Estimator7(N);
+		estimatorSet.add(estim7);
+		estimators.put("estim7a", new EstimatorSet(estim7, null, null));
+		estimators.put("estim7b", new EstimatorSet(estim7, new HTEstimator(N), new HTEstimator(M)));
 		
 //		BiasedDistribution estim8 = new Estimator8(N);
 //		estimatorSet.add(estim8);
 //		estimators.put("estim8a", new EstimatorSet(estim8, null, null));
 //		estimators.put("estim8b", new EstimatorSet(estim8, new HTEstimator(N), new HTEstimator(M)));
 		
-		BiasedDistribution estim9 = new Estimator9(N);
-		estimatorSet.add(estim9);
-		estimators.put("estim9a", new EstimatorSet(estim9, null, null));
-		estimators.put("estim9b", new EstimatorSet(estim9, new HTEstimator(N), new HTEstimator(M)));
+//		BiasedDistribution estim9 = new Estimator9(N);
+//		estimatorSet.add(estim9);
+//		estimators.put("estim9a", new EstimatorSet(estim9, null, null));
+//		estimators.put("estim9b", new EstimatorSet(estim9, new HTEstimator(N), new HTEstimator(M)));
+		
+//		BiasedDistribution estim10 = new Estimator10(N);
+//		estimatorSet.add(estim10);
+//		estimators.put("estim10a", new EstimatorSet(estim10, null, null));
+//		estimators.put("estim10b", new EstimatorSet(estim10, new HTEstimator(N), new HTEstimator(M)));
 		/*
 		 * Load analyzers.
 		 */

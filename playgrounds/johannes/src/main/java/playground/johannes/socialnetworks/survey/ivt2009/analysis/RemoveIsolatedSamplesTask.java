@@ -23,20 +23,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraphBuilder;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import visad.data.netcdf.UnsupportedOperationException;
 
 /**
  * @author illenberger
  *
  */
-public class RemoveIsolatedSamplesTask implements GraphFilter<SampledSocialGraph> {
+public class RemoveIsolatedSamplesTask implements GraphFilter<SocialSparseGraph> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public SampledSocialGraph apply(SampledSocialGraph graph) {
+	public SocialSparseGraph apply(SocialSparseGraph graph) {
 		throw new UnsupportedOperationException("Need to think about that!");
 //		Set<SampledSocialVertex> partition = SnowballPartitions.createSampledPartition((Set<SampledSocialVertex>)(graph.getVertices()));
 //		Set<SampledSocialVertex> remove = new HashSet<SampledSocialVertex>();

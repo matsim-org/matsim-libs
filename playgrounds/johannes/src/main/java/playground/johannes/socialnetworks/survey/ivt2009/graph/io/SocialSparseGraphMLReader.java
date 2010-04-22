@@ -27,46 +27,45 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphML;
-import org.matsim.contrib.sna.snowball.io.SampledGraphML;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.xml.sax.Attributes;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphML;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialEdge;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraphBuilder;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 
 /**
  * @author illenberger
  * 
  */
-public class SampledSocialGraphMLReader
+public class SocialSparseGraphMLReader
 		extends
-		AbstractGraphMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> {
+		AbstractGraphMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> {
 
-	private SampledSocialGraphBuilder builder;
+	private SocialSparseGraphBuilder builder;
 
 	private Scenario scenario;
 
 	private String baseDir;
 
 	@Override
-	public SampledSocialGraph readGraph(String file) {
+	public SocialSparseGraph readGraph(String file) {
 		baseDir = new File(file).getParent();
 		return super.readGraph(file);
 	}
 
 	@Override
-	protected SampledSocialEdge addEdge(SampledSocialVertex v1,
-			SampledSocialVertex v2, Attributes attrs) {
+	protected SocialSparseEdge addEdge(SocialSparseVertex v1,
+			SocialSparseVertex v2, Attributes attrs) {
 		return builder.addEdge(getGraph(), v1, v2);
 	}
 
 	@Override
-	protected SampledSocialVertex addVertex(Attributes attrs) {
+	protected SocialSparseVertex addVertex(Attributes attrs) {
 		/*
 		 * get the person's id
 		 */
@@ -84,18 +83,13 @@ public class SampledSocialGraphMLReader
 		 * create a social person and social vertex
 		 */
 		SocialPerson sPerson = new SocialPerson((PersonImpl) person);
-		SampledSocialVertex vertex = builder.addVertex(getGraph(), sPerson, SpatialGraphML.newPoint(attrs));
-		/*
-		 * set snowball attributes
-		 */
-//		SampledGraphML.applyDetectedState(vertex, attrs);
-//		SampledGraphML.applySampledState(vertex, attrs);
+		SocialSparseVertex vertex = builder.addVertex(getGraph(), sPerson, SpatialGraphML.newPoint(attrs));
 		
 		return vertex;
 	}
 
 	@Override
-	protected SampledSocialGraph newGraph(Attributes attrs) {
+	protected SocialSparseGraph newGraph(Attributes attrs) {
 		String popFile = attrs.getValue(SocialGraphML.POPULATION_FILE_ATTR);
 		if (popFile == null)
 			throw new RuntimeException("Population file must not be null!");
@@ -104,14 +98,14 @@ public class SampledSocialGraphMLReader
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
 		reader.readFile(baseDir + "/" + popFile);
 
-		builder = new SampledSocialGraphBuilder(SpatialGraphML.newCRS(attrs));
+		builder = new SocialSparseGraphBuilder(SpatialGraphML.newCRS(attrs));
 
 		return builder.createGraph();
 	}
 
 	public static void main(String args[]) {
-		SampledSocialGraphMLReader reader = new SampledSocialGraphMLReader();
-		SampledSocialGraph graph = reader
+		SocialSparseGraphMLReader reader = new SocialSparseGraphMLReader();
+		SocialSparseGraph graph = reader
 				.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/tmp.graphml");
 		System.out.println("Graph has " + graph.getVertices().size()
 				+ " vertices");

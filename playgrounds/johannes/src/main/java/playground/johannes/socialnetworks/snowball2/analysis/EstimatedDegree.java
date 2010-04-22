@@ -61,7 +61,8 @@ public class EstimatedDegree extends Degree {
 		
 		Set<SampledVertex> samples = SnowballPartitions.<SampledVertex>createSampledPartition((Set<SampledVertex>)vertices);
 		for(SampledVertex vertex : samples) {
-			distr.add(vertex.getNeighbours().size(), 1/biasedDistribution.getProbability(vertex));
+//			distr.add(vertex.getNeighbours().size(), 1/biasedDistribution.getProbability(vertex));
+			distr.add(vertex.getNeighbours().size(), biasedDistribution.getWeight(vertex));
 		}
 		
 		return distr;

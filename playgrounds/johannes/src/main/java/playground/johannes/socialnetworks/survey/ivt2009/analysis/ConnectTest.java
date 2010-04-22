@@ -34,10 +34,10 @@ import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledVertexDecorator;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialEdge;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SampledSocialGraphMLReader;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 /**
  * @author illenberger
@@ -49,18 +49,18 @@ public class ConnectTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SampledGraphProjMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> reader =
-			new SampledGraphProjMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>(new SampledSocialGraphMLReader());
+		SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> reader =
+			new SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(new SocialSparseGraphMLReader());
 		
-		reader.setGraphProjectionBuilder(new SocialSampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>());
+		reader.setGraphProjectionBuilder(new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>());
 		
-		SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> graph = reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/graph/graph.graphml");
+		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/graph/graph.graphml");
 		
-		SampledSocialVertex v1 = null;
-		SampledSocialVertex v613 = null;
+		SocialSparseVertex v1 = null;
+		SocialSparseVertex v613 = null;
 		int seeds = 0;
-		for(VertexDecorator<SampledSocialVertex> v : graph.getVertices()) {
-			if(((SampledVertexDecorator<SampledSocialVertex>)v).getIterationSampled() == 0)
+		for(VertexDecorator<SocialSparseVertex> v : graph.getVertices()) {
+			if(((SampledVertexDecorator<SocialSparseVertex>)v).getIterationSampled() == 0)
 				seeds++;
 			
 			if(v.getDelegate().getPerson().getId().toString().equals("1196")) {

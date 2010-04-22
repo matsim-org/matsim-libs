@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSocialNetFactory.java
+ * SampledSocialNet.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,39 +19,40 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
-import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
+import java.util.Set;
+
+import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.johannes.socialnetworks.graph.social.SocialPerson;
-
-import com.vividsolutions.jts.geom.Point;
-
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
 
 /**
  * @author illenberger
  *
  */
-public class SampledSocialGraphBuilder extends AbstractSparseGraphBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> {
+public class SocialSparseGraph extends SpatialSparseGraph implements SocialGraph {
 
-	public SampledSocialGraphBuilder(CoordinateReferenceSystem crs) {
-		super(new SampledSocialGraphFactory(crs));
-	}
-	
-	public SampledSocialGraph createGraph() {
-		return ((SampledSocialGraphFactory)getFactory()).createGraph();
+	public SocialSparseGraph(CoordinateReferenceSystem crs) {
+		super(crs);
 	}
 
 	@Override
-	public SampledSocialVertex addVertex(SampledSocialGraph g) {
-		throw new UnsupportedOperationException("Use addVertex(SampledSocialGraph, SocialPerson, Point) instead.");
-	}
-	
-	public SampledSocialVertex addVertex(SampledSocialGraph graph, SocialPerson person, Point point) {
-		SampledSocialVertex vertex = ((SampledSocialGraphFactory)getFactory()).createVertex(person, point);
-		if(insertVertex(graph, vertex))
-			return vertex;
-		else
-			return null;
+	@SuppressWarnings("unchecked")
+	public Set<? extends SocialSparseEdge> getEdges() {
+		return (Set<? extends SocialSparseEdge>) super.getEdges();
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	public Set<? extends SocialSparseVertex> getVertices() {
+		return (Set<? extends SocialSparseVertex>) super.getVertices();
+	}
+
+	@Override
+	public SocialSparseEdge getEdge(SparseVertex v1, SparseVertex v2) {
+		return (SocialSparseEdge) super.getEdge(v1, v2);
+	}
+
+	
 }

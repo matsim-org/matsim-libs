@@ -32,10 +32,10 @@ import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjection;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialEdge;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SampledSocialGraphMLReader;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 /**
  * @author illenberger
@@ -62,9 +62,9 @@ public class AnalyzerExe {
 //		
 //		SpatialGraph graphPrj = builder.decorate(graph, geometry);
 //		
-		SampledGraphProjMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> reader = new SampledGraphProjMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>(new SampledSocialGraphMLReader());
-		reader.setGraphProjectionBuilder(new SocialSampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>());
-		SocialSampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> graph = (SocialSampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>) reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/tmp.graphml");
+		SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> reader = new SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(new SocialSparseGraphMLReader());
+		reader.setGraphProjectionBuilder(new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>());
+		SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = (SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>) reader.readGraph("/Users/jillenberger/Work/work/socialnets/data/ivt2009/tmp.graphml");
 		
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 		

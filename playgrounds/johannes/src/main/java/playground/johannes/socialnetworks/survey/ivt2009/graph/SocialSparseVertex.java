@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialNetworkStatistics.java
+ * SampledEgo.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,43 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.social;
+import java.util.List;
 
-import playground.johannes.socialnetworks.sim.SimSocialEdge;
-import playground.johannes.socialnetworks.sim.SimSocialGraph;
-import playground.johannes.socialnetworks.sim.SimSocialVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
-
-
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetworkStatistics {
+public class SocialSparseVertex extends SpatialSparseVertex implements SocialVertex {
+
+	private SocialPerson person;
 	
-	public static double ageCorrelation(SimSocialGraph g) {
-		double product = 0;
-		double sum = 0;
-		double squareSum = 0;
+	protected SocialSparseVertex(SocialPerson person, Point point) {
+		super(point);
+		this.person = person;
+	}
 
-		for (SimSocialEdge e : g.getEdges()) {
-			SimSocialVertex v1 = (SimSocialVertex) e.getVertices().getFirst();
-			SimSocialVertex v2 = (SimSocialVertex) e.getVertices().getSecond();
-			int age1 = v1.getPerson().getAge();
-			int age2 = v2.getPerson().getAge();
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<? extends SocialSparseEdge> getEdges() {
+		return (List<? extends SocialSparseEdge>) super.getEdges();
+	}
 
-			sum += 0.5 * (age1 + age2);
-			squareSum += 0.5 * (Math.pow(age1, 2) + Math.pow(age2, 2));
-			product += age1 * age2;			
-		}
-		
-		double norm = 1 / (double)g.getEdges().size();
-		return ((norm * product) - Math.pow(norm * sum, 2)) / ((norm * squareSum) - Math.pow(norm * sum, 2));
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<? extends SocialSparseVertex> getNeighbours() {
+		return (List<? extends SocialSparseVertex>) super.getNeighbours();
+	}
+
+	@Override
+	public SocialPerson getPerson() {
+		return person;
 	}
 }

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.geotools.filter.IsBetweenImpl;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.contrib.sna.gis.CRSUtils;
@@ -35,14 +34,15 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
+import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLWriter;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjectionBuilder;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialEdge;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraphBuilder;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.AlterTableReader.VertexRecord;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -57,10 +57,10 @@ public class GraphBuilder {
 	
 	public static final Logger logger = Logger.getLogger(GraphBuilder.class);
 	
-	private SampledSocialGraphBuilder builder = new SampledSocialGraphBuilder(CRSUtils.getCRS(4326));
+	private SocialSparseGraphBuilder builder = new SocialSparseGraphBuilder(CRSUtils.getCRS(4326));
 	
-	private SpatialSampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> projBuilder
-		= new SpatialSampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>();
+	private SpatialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> projBuilder
+		= new SpatialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
 	
 	private Scenario scenario = new ScenarioImpl();
 	
@@ -68,7 +68,7 @@ public class GraphBuilder {
 
 	private ErrorLogger errLogger;
 	
-	public SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> buildGraph(
+	public SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> buildGraph(
 			List<String> alterTables, List<String> egoTables, List<String> sqlDumps) throws IOException {
 		errLogger = new ErrorLogger();
 		/*
@@ -80,14 +80,14 @@ public class GraphBuilder {
 		/*
 		 * Build the raw graph and a sampled projection.
 		 */
-		SampledSocialGraph graph = builder.createGraph();
-		SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> proj = projBuilder.createGraph(graph);
+		SocialSparseGraph graph = builder.createGraph();
+		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> proj = projBuilder.createGraph(graph);
 		/*
 		 * Create the vertices.
 		 */
-		Map<SampledSocialVertex, SampledVertexDecorator<SampledSocialVertex>> projMap =
-			new HashMap<SampledSocialVertex, SampledVertexDecorator<SampledSocialVertex>>();
-		Map<String, SampledSocialVertex> idMap = new HashMap<String, SampledSocialVertex>();
+		Map<SocialSparseVertex, SampledVertexDecorator<SocialSparseVertex>> projMap =
+			new HashMap<SocialSparseVertex, SampledVertexDecorator<SocialSparseVertex>>();
+		Map<String, SocialSparseVertex> idMap = new HashMap<String, SocialSparseVertex>();
 		
 		for(Entry<String, VertexRecord> entry : alterReader.getVertices().entrySet()) {
 			VertexRecord vRecord = entry.getValue();
@@ -114,14 +114,14 @@ public class GraphBuilder {
 			/*
 			 * Create a vertex and its projection.
 			 */
-			SampledSocialVertex vertex = builder.addVertex(graph, createPerson(vRecord, sqlReader), point);
-			SampledVertexDecorator<SampledSocialVertex> vProj = projBuilder.addVertex(proj, vertex);
+			SocialSparseVertex vertex = builder.addVertex(graph, createPerson(vRecord, sqlReader), point);
+			SampledVertexDecorator<SocialSparseVertex> vProj = projBuilder.addVertex(proj, vertex);
 			/*
 			 * If it is an ego set the snowball attributes.
 			 */
 			if(vRecord.isEgo()) {
 				vProj.sample(infereIterationSampled(new Integer(vRecord.id)));
-				vProj.detect(Math.max(0, vertex.getIterationSampled() - 1));
+				vProj.detect(Math.max(0, vProj.getIterationSampled() - 1));
 			}
 			
 			projMap.put(vertex, vProj);
@@ -131,15 +131,15 @@ public class GraphBuilder {
 		 * Create the edges.
 		 */
 		for(Tuple<VertexRecord, VertexRecord> edge : alterReader.getEdges()) {
-			SampledSocialVertex v1 = idMap.get(edge.getFirst().id);
-			SampledSocialVertex v2 = idMap.get(edge.getSecond().id);
-			SampledSocialEdge socialEdge = builder.addEdge(graph, v1, v2);
+			SocialSparseVertex v1 = idMap.get(edge.getFirst().id);
+			SocialSparseVertex v2 = idMap.get(edge.getSecond().id);
+			SocialSparseEdge socialEdge = builder.addEdge(graph, v1, v2);
 			/*
 			 * Check if we have double edges.
 			 */
 			if(socialEdge != null) {
-				SampledVertexDecorator<SampledSocialVertex> vProj1 = projMap.get(v1);
-				SampledVertexDecorator<SampledSocialVertex> vProj2 = projMap.get(v2);
+				SampledVertexDecorator<SocialSparseVertex> vProj1 = projMap.get(v1);
+				SampledVertexDecorator<SocialSparseVertex> vProj2 = projMap.get(v2);
 			
 				projBuilder.addEdge(proj, vProj1, vProj2, socialEdge);
 				/*
@@ -265,8 +265,8 @@ public class GraphBuilder {
 		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/sqlDumpSub1.csv");
 		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/sqlDumpSub2.csv");
 		
-		SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> graph = builder.buildGraph(alterTables, egoTables, sqlDumps);
-		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SampledSocialGraphMLWriter());
+		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = builder.buildGraph(alterTables, egoTables, sqlDumps);
+		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SocialGraphMLWriter());
 		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/graph/graph.graphml");
 		
 //		GraphAnalyzer.analyze(graph, new ObservedAnalyzerTask());

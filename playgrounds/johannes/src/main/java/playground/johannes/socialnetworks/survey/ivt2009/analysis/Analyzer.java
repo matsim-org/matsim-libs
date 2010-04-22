@@ -31,11 +31,11 @@ import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialEdge;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraphBuilder;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SampledSocialGraphMLReader;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -50,12 +50,12 @@ public class Analyzer {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		SampledGraphProjMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> reader =
-			new SampledGraphProjMLReader<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>(new SampledSocialGraphMLReader());
+		SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> reader =
+			new SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(new SocialSparseGraphMLReader());
 		
-		reader.setGraphProjectionBuilder(new SocialSampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>());
+		reader.setGraphProjectionBuilder(new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>());
 		
-		SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> graph = reader.readGraph(args[0]);
+		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = reader.readGraph(args[0]);
 		/*
 		 * analyze the complete graph
 		 */
@@ -67,9 +67,9 @@ public class Analyzer {
 		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
 		Geometry geometry = feature.getDefaultGeometry();
 		geometry.setSRID(21781);
-		GraphFilter filter = new GraphClippingFilter(new SampledSocialGraphBuilder(graph.getDelegate().getCoordinateReferenceSysten()), geometry);
+		GraphFilter filter = new GraphClippingFilter(new SocialSparseGraphBuilder(graph.getDelegate().getCoordinateReferenceSysten()), geometry);
 		filter.apply(graph.getDelegate());
-		SampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> builder = new SampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>();
+		SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
 		builder.synchronize(graph);
 //		SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> clippedGraph = (SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>) filter.apply(graph);
 		
@@ -79,7 +79,7 @@ public class Analyzer {
 		
 	}
 
-	private static void analyze(SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> graph, String output) {
+	private static void analyze(SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph, String output) {
 		ObservedAnalyzerTask task = new ObservedAnalyzerTask();
 		task.setOutputDirectoy(output);
 		

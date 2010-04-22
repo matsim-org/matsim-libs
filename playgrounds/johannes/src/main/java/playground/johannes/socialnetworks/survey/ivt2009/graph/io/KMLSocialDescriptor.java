@@ -26,7 +26,7 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
 
 import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSnowballDescriptor;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 
 /**
  * @author illenberger
@@ -40,7 +40,7 @@ public class KMLSocialDescriptor extends KMLSnowballDescriptor {
 		
 		StringBuilder builder = new StringBuilder(kmlPlacemark.getDescription());
 		builder.append("<br>Seed: ");
-		SampledVertexDecorator<SampledSocialVertex> seed = (SampledVertexDecorator<SampledSocialVertex>) ((SampledVertex)object).getSeed(); 
+		SampledVertexDecorator<SocialSparseVertex> seed = (SampledVertexDecorator<SocialSparseVertex>) ((SampledVertex)object).getSeed(); 
 		builder.append(seed.getDelegate().getPerson().toString());
 		
 		kmlPlacemark.setDescription(builder.toString());

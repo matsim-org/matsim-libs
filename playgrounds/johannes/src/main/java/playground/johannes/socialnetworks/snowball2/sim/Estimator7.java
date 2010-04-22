@@ -98,7 +98,7 @@ public class Estimator7 implements BiasedDistribution {
 	
 	@Override
 	public double getWeight(SampledVertex vertex) {
-		throw new UnsupportedOperationException();
+		return 1/getProbability(vertex);
 	}
 
 	@Override

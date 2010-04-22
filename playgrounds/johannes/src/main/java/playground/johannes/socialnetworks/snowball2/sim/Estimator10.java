@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EstimatorTask.java
+ * SnowballEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,70 +19,71 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
-import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.TObjectDoubleHashMap;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
-
-import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
-
 
 /**
  * @author illenberger
  *
  */
-public class EstimatorTask extends AnalyzerTask {
+public class Estimator10 implements BiasedDistribution {
 
-	private final BiasedDistribution estimator;
+	private final int N;
 	
-	public EstimatorTask(BiasedDistribution estimator) {
-		this.estimator = estimator;
+	private SampleStats stats;
+	
+	private TObjectDoubleHashMap<SampledVertex> probas;
+	
+	private double c;
+	
+	public Estimator10(int N) {
+		this.N = N;
+	}
+	
+	public void update(SampledGraph graph) {
+		stats = new SampleStats(graph);
+		probas = new TObjectDoubleHashMap<SampledVertex>();
+		
+		double p_sum = 0;
+		for(Vertex vertex : graph.getVertices()) {
+			SampledVertex v = (SampledVertex)vertex;
+			if(v.isSampled()) {
+				double p = getProbabilityIntern(v);
+				probas.put(v, p);
+				p_sum += 1/p;
+			}
+		}
+		
+		c = N/p_sum;
+	}
+	
+	public double getProbabilityIntern(SampledVertex vertex) {
+		int it = stats.getMaxIteration();
+		if(it == 0)
+			return stats.getNumSampled(0)/(double)N;
+		else {
+			int n = stats.getAccumulatedNumSampled(it - 1);
+			double p_k = 1 - Math.pow(1 - n/(double)N, vertex.getNeighbours().size());
+			double p = 1;
+//			if(vertex.getIterationSampled() == it)
+//				p = stats.getNumSampled(it)/((double)stats.getNumDetected(it - 1) * stats.getResonseRate());
+			return p * p_k;
+		}
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-		TIntDoubleHashMap probas = new TIntDoubleHashMap();
-		
-		double p_sum = 0;
-		
-		for(Vertex vertex : graph.getVertices()) {
-			if(((SampledVertex)vertex).isSampled()) {
-				int k = vertex.getNeighbours().size();
-				double p = estimator.getProbability((SampledVertex) vertex);
-				probas.put(k, p);
-				
-				p_sum += estimator.getWeight((SampledVertex) vertex);
-			}
-		}
-		System.out.println("Proba sum = " + p_sum);
-		writeValues(probas, "proba");	
+	public double getWeight(SampledVertex vertex) {
+		return 1 / getProbability(vertex) * c;
 	}
 
-	private void writeValues(TIntDoubleHashMap values, String valName) {
-		int[] keys = values.keys();
-		Arrays.sort(keys);
-		
-		BufferedWriter writer;
-		try {
-			writer = new BufferedWriter(new FileWriter(String.format("%1$s/%2$s.txt", getOutputDirectory(), valName)));
-			writer.write("k\t");
-			writer.write(valName);
-			writer.newLine();
-			for(int key : keys) {
-				writer.write(String.valueOf(key));
-				writer.write("\t");
-				writer.write(String.valueOf(values.get(key)));
-				writer.newLine();
-			}
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	/* (non-Javadoc)
+	 * @see playground.johannes.socialnetworks.snowball2.sim.BiasedDistribution#getProbability(org.matsim.contrib.sna.snowball.SampledVertex)
+	 */
+	@Override
+	public double getProbability(SampledVertex vertex) {
+		return probas.get(vertex);
 	}
 }

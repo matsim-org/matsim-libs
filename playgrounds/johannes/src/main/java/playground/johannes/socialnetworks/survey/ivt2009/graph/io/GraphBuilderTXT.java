@@ -36,14 +36,15 @@ import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.core.population.PersonImpl;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
+import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLWriter;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialEdge;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialGraphBuilder;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SampledSocialVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.EgoAlterTableReader.RespondentData;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -58,35 +59,35 @@ public class GraphBuilderTXT {
 	
 	private static final Logger logger = Logger.getLogger(GraphBuilderTXT.class);
 
-	private SampledSocialGraphBuilder builder = new SampledSocialGraphBuilder(CRSUtils.getCRS(4326));
+	private SocialSparseGraphBuilder builder = new SocialSparseGraphBuilder(CRSUtils.getCRS(4326));
 	
-	private SampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> projBuilder = new SampledGraphProjectionBuilder<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge>();
+	private SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> projBuilder = new SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
 	
 	private GeometryFactory geoFactory = new GeometryFactory();
 	
 	private Scenario scenario = new ScenarioImpl();
 	
-	public SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> buildGraph(String egoTableFile, String alterTableFile, String surveyData) throws IOException {
+	public SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> buildGraph(String egoTableFile, String alterTableFile, String surveyData) throws IOException {
 		EgoAlterTableReader tableReader = new EgoAlterTableReader();
 		Set<RespondentData> egoData = tableReader.readEgoData(egoTableFile);
 		Set<RespondentData> alterData = tableReader.readAlterData(alterTableFile);
 		
-		SampledSocialGraph graph = builder.createGraph();
-		SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> proj = projBuilder.createGraph(graph);
-		Map<SampledSocialVertex, SampledVertexDecorator<SampledSocialVertex>> mapping = new HashMap<SampledSocialVertex, SampledVertexDecorator<SampledSocialVertex>>();
+		SocialSparseGraph graph = builder.createGraph();
+		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> proj = projBuilder.createGraph(graph);
+		Map<SocialSparseVertex, SampledVertexDecorator<SocialSparseVertex>> mapping = new HashMap<SocialSparseVertex, SampledVertexDecorator<SocialSparseVertex>>();
 		/*
 		 * build ego vertices
 		 */
-		Map<Integer, SampledSocialVertex> egos = new HashMap<Integer, SampledSocialVertex>();
+		Map<Integer, SocialSparseVertex> egos = new HashMap<Integer, SocialSparseVertex>();
 		for(RespondentData data : egoData) {
-			SampledSocialVertex vertex = builder.addVertex(graph, createPerson(data), createPoint(data));
-			SampledVertexDecorator<SampledSocialVertex> vProj = projBuilder.addVertex(proj, vertex);
+			SocialSparseVertex vertex = builder.addVertex(graph, createPerson(data), createPoint(data));
+			SampledVertexDecorator<SocialSparseVertex> vProj = projBuilder.addVertex(proj, vertex);
 			
 //			vertex.sample(infereIterationSampled(data.id));
 //			vertex.detect(Math.max(0, vertex.getIterationSampled() - 1));
 			
 			vProj.sample(infereIterationSampled(data.id));
-			vProj.detect(Math.max(0, vertex.getIterationSampled() - 1));
+			vProj.detect(Math.max(0, vProj.getIterationSampled() - 1));
 			mapping.put(vertex, vProj);
 			
 			if(egos.put(data.id, vertex) != null) {
@@ -100,14 +101,14 @@ public class GraphBuilderTXT {
 		 */
 		ErrorLogger errLogger = new ErrorLogger();
 		
-		Map<Integer, SampledSocialVertex> alteri = new HashMap<Integer, SampledSocialVertex>();
+		Map<Integer, SocialSparseVertex> alteri = new HashMap<Integer, SocialSparseVertex>();
 		for(RespondentData data : alterData) {
-			SampledSocialVertex source = egos.get(data.source);
+			SocialSparseVertex source = egos.get(data.source);
 			if(source != null) {
 				/*
 				 * check if there is already an ego with this id
 				 */
-				SampledSocialVertex vertex = egos.get(data.id);
+				SocialSparseVertex vertex = egos.get(data.id);
 				/*
 				 * if not check if there is already an alter with this id
 				 */
@@ -118,10 +119,10 @@ public class GraphBuilderTXT {
 				 */
 				if(vertex == null) {
 					vertex = builder.addVertex(graph, createPerson(data), createPoint(data));
-					SampledVertexDecorator<SampledSocialVertex> vProj = projBuilder.addVertex(proj, vertex);
+					SampledVertexDecorator<SocialSparseVertex> vProj = projBuilder.addVertex(proj, vertex);
 					
-					vertex.detect(source.getIterationSampled());
-					vProj.detect(source.getIterationSampled());
+//					vertex.detect(mapping.get(source).getIterationSampled());
+					vProj.detect(mapping.get(source).getIterationSampled());
 					mapping.put(vertex, vProj);
 					
 					alteri.put(data.id, vertex);
@@ -131,12 +132,12 @@ public class GraphBuilderTXT {
 					 */
 					errLogger.multipleNamedVertex(vertex);
 				}
-				SampledSocialEdge edge = builder.addEdge(graph, vertex, source);
+				SocialSparseEdge edge = builder.addEdge(graph, vertex, source);
 				
 				if(edge != null) {
-					vertex.addSource(source);
-					SampledVertexDecorator<SampledSocialVertex> sourceProj = mapping.get(source);
-					SampledVertexDecorator<SampledSocialVertex> vProj = mapping.get(vertex);
+//					vertex.addSource(source);
+					SampledVertexDecorator<SocialSparseVertex> sourceProj = mapping.get(source);
+					SampledVertexDecorator<SocialSparseVertex> vProj = mapping.get(vertex);
 					if(sourceProj != null && vProj != null)
 						projBuilder.addEdge(proj, vProj, sourceProj, edge);
 					/*
@@ -193,7 +194,7 @@ public class GraphBuilderTXT {
 		
 		private Set<Integer> unkownSources = new HashSet<Integer>();
 		
-		private Set<SampledSocialVertex> mulitpleNamedVertices = new HashSet<SampledSocialVertex>();
+		private Set<SocialSparseVertex> mulitpleNamedVertices = new HashSet<SocialSparseVertex>();
 		
 		private int doubledEdges = 0;
 		
@@ -201,7 +202,7 @@ public class GraphBuilderTXT {
 			unkownSources.add(id);
 		}
 		
-		private void multipleNamedVertex(SampledSocialVertex vertex) {
+		private void multipleNamedVertex(SocialSparseVertex vertex) {
 			mulitpleNamedVertices.add(vertex);
 		}
 		
@@ -230,7 +231,7 @@ public class GraphBuilderTXT {
 		String surveyData = "";
 		
 		GraphBuilderTXT builder = new GraphBuilderTXT();
-		SampledGraphProjection<SampledSocialGraph, SampledSocialVertex, SampledSocialEdge> graph = builder.buildGraph(egoTableFile, alterTableFile, surveyData);
+		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = builder.buildGraph(egoTableFile, alterTableFile, surveyData);
 		
 //		RemoveIsolatedSamplesTask task = new RemoveIsolatedSamplesTask();
 //		graph = task.apply(graph);
@@ -239,7 +240,7 @@ public class GraphBuilderTXT {
 //		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/tmp.graphml");
 //		SampledSocialGraphMLWriter writer = new SampledSocialGraphMLWriter();
 //		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/tmp.graphml");
-		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SampledSocialGraphMLWriter());
+		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SocialGraphMLWriter());
 		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/tmp.graphml");
 		
 		SpatialGraphKMLWriter kmlwriter = new SpatialGraphKMLWriter();
