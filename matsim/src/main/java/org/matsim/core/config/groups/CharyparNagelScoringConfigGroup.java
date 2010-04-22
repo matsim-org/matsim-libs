@@ -22,6 +22,7 @@ package org.matsim.core.config.groups;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
@@ -37,7 +38,8 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	
 	private static final long serialVersionUID = 1L;
 
-	public static final String GROUP_NAME = "planCalcScore"; // TODO [MR] switch to better name
+	public static final String GROUP_NAME = "planCalcScore"; 
+	// TODO [MR] switch to better name
 
 	private static final String LEARNING_RATE = "learningRate";
 	private static final String BRAIN_EXP_BETA = "BrainExpBeta";
@@ -254,7 +256,21 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		}
 		return map;
 	}
-
+	
+	@Override
+	protected final Map<String, String> getComments() {
+		Map<String,String> map = super.getComments();
+		map.put(PERFORMING,"[utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of time if agent is doing nothing.");
+		map.put(TRAVELING, "[utils/hr] utility offset of traveling by car.  normally negative.  this comes on top of the opportunity cost of time") ;
+		map.put(TRAVELING_PT, "[utils/hr] utility offset of traveling by pt.  normally negative.  this comes on top of the opportunity cost of time") ;
+		map.put(TRAVELING_WALK, "[utils/hr] utility offset of traveling by foot.  normally negative.  this comes on top of the opportunity cost of time") ;
+		map.put(LATE_ARRIVAL, "[utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative") ;
+		map.put(EARLY_DEPARTURE, "[utils/hr] utility for departing early (i.e. before the earliest end time).  Probably implemented correctly, but not tested." );
+		map.put(WAITING, "[utils/hr] utility offset for waiting.  this comes on top of the opportunity cost of time.  Probably implemented correctly, but not tested.") ;
+		map.put(BRAIN_EXP_BETA, "[1/utils] conversion factor of utility model for use in logit-based choice model.  Set to 1 if your utl function is estimated") ;
+		map.put(LEARNING_RATE, "new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates close to zero emulate score averaging, but slow down initial convergence") ;
+		return map ;
+	}
 
 	private ActivityParams getActivityTypeByNumber(final String number, final boolean createIfMissing) {
 		ActivityParams actType = this.activityTypesByNumber.get(number);
