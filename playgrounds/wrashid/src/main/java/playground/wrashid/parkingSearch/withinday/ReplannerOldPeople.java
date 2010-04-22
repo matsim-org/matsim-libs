@@ -1,6 +1,7 @@
 package playground.wrashid.parkingSearch.withinday;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -17,8 +18,8 @@ import playground.christoph.withinday.utils.EditRoutes;
 
 public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 
-	public ReplannerOldPeople(Id id) {
-		super(id);
+	public ReplannerOldPeople(Id id, Scenario scenario) {
+		super(id, scenario);
 	}
 
 	@Override
