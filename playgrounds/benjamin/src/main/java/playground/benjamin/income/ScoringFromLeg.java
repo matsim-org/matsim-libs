@@ -38,19 +38,20 @@ import org.matsim.households.Income.IncomePeriod;
  * 
  *
  */
-public class BKickIncome2LegScoring extends LegScoringFunction {
+public class ScoringFromLeg extends LegScoringFunction {
 
-	private static final Logger log = Logger.getLogger(BKickIncome2LegScoring.class);
+	private static final Logger log = Logger.getLogger(ScoringFromLeg.class);
 
+	//setting these parameters differently, will cause problems when converting utils into money terms
+	//also see ScoringFromDailyIncom, ScoringFromToll or other money related parts of the scoring function
 	private static double betaIncomeCar = 4.58;
-
 	private static double betaIncomePt = 4.58;
 
 	private double incomePerDay;
 
 	private final Network network;
 
-	public BKickIncome2LegScoring(final Plan plan, final CharyparNagelScoringParameters params, PersonHouseholdMapping hhdb, Network network) {
+	public ScoringFromLeg(final Plan plan, final CharyparNagelScoringParameters params, PersonHouseholdMapping hhdb, Network network) {
 		super(plan, params);
 		Income income = hhdb.getHousehold(plan.getPerson().getId()).getIncome();
 		this.incomePerDay = this.calculateIncomePerDay(income);
@@ -63,8 +64,7 @@ public class BKickIncome2LegScoring extends LegScoringFunction {
 		this.score += (betaIncomeCar * Math.log(this.incomePerDay));
 	}
 
-	@Override
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
+	protected double calculateLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
 		double dist = calculateLegDistance(leg);
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		if (TransportMode.car.equals(leg.getMode())) {
@@ -99,9 +99,12 @@ public class BKickIncome2LegScoring extends LegScoringFunction {
 
 	private double calculateScore(double betaIncome, double distanceCost, double betaTravelTime, double travelTime) {
 		double betaCost = betaIncome / this.incomePerDay;
-		double distanceScore = betaCost * distanceCost;
+		double distanceCostScore = betaCost * distanceCost;
 		double travelTimeScore = travelTime * betaTravelTime;
-		double score = distanceScore + travelTimeScore;
+		
+		//this is the actual (negative) utility from distance costs and travel time
+		double score = distanceCostScore + travelTimeScore;
+		
 		if (Double.isNaN(score)){
 			throw new IllegalStateException("Leg score is NaN for person: " + this.plan.getPerson().getId());
 		}

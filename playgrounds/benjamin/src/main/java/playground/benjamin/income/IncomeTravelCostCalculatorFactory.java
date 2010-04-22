@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickIncomeControlerMain
+ * Income1TravelCostCalculatorFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,18 +19,33 @@
  * *********************************************************************** */
 package playground.benjamin.income;
 
-import playground.dgrether.DgPaths;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.households.PersonHouseholdMapping;
 
 
-public class BKickIncome2ControlerMain {
+/**
+ * @author dgrether
+ *
+ */
+public class IncomeTravelCostCalculatorFactory implements TravelCostCalculatorFactory {
+
+	private PersonHouseholdMapping personHouseholdMapping;
 	
-	public static void main(String[] args){
-//		String config = DgPaths.STUDIESDG + "einkommenSchweiz/config_households_all_zrh30km_10pct.xml";
-//		String config = DgPaths.RUNBASE + "run724/resumeConfig.xml";
-//		new BKickIncomeControler(config).run();
-		
-		String config = DgPaths.RUNBASE + "run734/resumeConfig.xml";
-		new BKickIncome2Controler(config).run();
+	
+
+	public IncomeTravelCostCalculatorFactory(
+			PersonHouseholdMapping personHouseholdMapping) {
+		super();
+		this.personHouseholdMapping = personHouseholdMapping;
+	}
+
+
+
+	public PersonalizableTravelCost createTravelCostCalculator(TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
+		return new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
 	}
 
 }

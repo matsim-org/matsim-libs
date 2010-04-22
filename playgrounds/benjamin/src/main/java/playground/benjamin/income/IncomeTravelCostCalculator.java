@@ -35,9 +35,9 @@ import org.matsim.households.Income.IncomePeriod;
  * @author dgrether
  *
  */
-public class BKickIncome2TravelTimeDistanceCostCalculator implements PersonalizableTravelCost {
+public class IncomeTravelCostCalculator implements PersonalizableTravelCost {
 
-	private static final Logger log = Logger.getLogger(BKickIncome2TravelTimeDistanceCostCalculator.class);
+	private static final Logger log = Logger.getLogger(IncomeTravelCostCalculator.class);
 	
 	private static double betaIncomeCar = 4.58;
 	
@@ -49,7 +49,7 @@ public class BKickIncome2TravelTimeDistanceCostCalculator implements Personaliza
 	
 	private double income;
 
-	public BKickIncome2TravelTimeDistanceCostCalculator(final TravelTime timeCalculator, CharyparNagelScoringConfigGroup charyparNagelScoring, PersonHouseholdMapping personHouseholdMapping) {
+	public IncomeTravelCostCalculator(final TravelTime timeCalculator, CharyparNagelScoringConfigGroup charyparNagelScoring, PersonHouseholdMapping personHouseholdMapping) {
 		this.timeCalculator = timeCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.

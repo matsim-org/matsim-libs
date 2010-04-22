@@ -35,14 +35,14 @@ import org.matsim.households.PersonHouseholdMapping;
  * @author dgrether
  *
  */
-public class BKickIncome2ScoringFunctionFactory implements ScoringFunctionFactory {
+public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private CharyparNagelScoringConfigGroup configGroup;
 	private CharyparNagelScoringParameters params;
 	private PersonHouseholdMapping hhdb;
 	private final Network network;
 
-	public BKickIncome2ScoringFunctionFactory(CharyparNagelScoringConfigGroup charyparNagelScoring, PersonHouseholdMapping hhmapping, Network network) {
+	public IncomeScoringFunctionFactory(CharyparNagelScoringConfigGroup charyparNagelScoring, PersonHouseholdMapping hhmapping, Network network) {
 		this.configGroup = charyparNagelScoring;
 		this.params = new CharyparNagelScoringParameters(configGroup);
 		this.hhdb = hhmapping;
@@ -51,14 +51,25 @@ public class BKickIncome2ScoringFunctionFactory implements ScoringFunctionFactor
 
 	public ScoringFunction getNewScoringFunction(Plan plan) {
 
+		//summing up all relevant ulitlites
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		
+		//utility earned from daily income
+		//income dependent!
+		scoringFunctionAccumulator.addScoringFunction(new ScoringFromDailyIncome(params, this.hhdb));
 
+		//utility earned from activities
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));
 
-		scoringFunctionAccumulator.addScoringFunction(new BKickIncome2LegScoring(plan, params, this.hhdb, this.network));
+		//utility spend for traveling (in this case: travel time and distance costs)
+		//income dependent!
+		scoringFunctionAccumulator.addScoringFunction(new ScoringFromLeg(plan, params, this.hhdb, this.network));
 
-		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
+		//utility spend for traveling (toll costs)
+		//income dependent!
+		scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll(params, this.hhdb));
 
+		//utility spend for being stuck
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
 
 		return scoringFunctionAccumulator;

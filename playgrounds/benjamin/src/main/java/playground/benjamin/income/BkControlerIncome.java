@@ -30,21 +30,19 @@ import playground.benjamin.BkControler;
  * @author dgrether
  *
  */
-public class BKickIncome2Controler extends BkControler {
+public class BkControlerIncome extends BkControler {
 
 	private PersonHouseholdMapping personHouseholdMapping;
 
-	public BKickIncome2Controler(String arg) {
+	public BkControlerIncome(String arg) {
 		super(arg);
 	}
-
-
-	public BKickIncome2Controler(String[] args) {
+	
+	public BkControlerIncome(String[] args) {
 		super(args);
 	}
 
-
-	public BKickIncome2Controler(Config config) {
+	public BkControlerIncome(Config config) {
 		super(config);
 	}
 
@@ -53,8 +51,11 @@ public class BKickIncome2Controler extends BkControler {
 		this.scenarioData.getConfig().global().setNumberOfThreads(1);
 		this.personHouseholdMapping = new PersonHouseholdMapping(this.getScenario().getHouseholds());
 		
-		ScoringFunctionFactory scoringFactory = new BKickIncome2ScoringFunctionFactory(this.getScenario().getConfig().charyparNagelScoring(), personHouseholdMapping, this.getNetwork());
-		TravelCostCalculatorFactory travelCostCalculatorFactory = new Income2TravelCostCalculatorFactory(personHouseholdMapping);
+		//setting the needed scoring function
+		ScoringFunctionFactory scoringFactory = new IncomeScoringFunctionFactory(this.getScenario().getConfig().charyparNagelScoring(), personHouseholdMapping, this.getNetwork());
+		
+		//setting the travel cost calculator for the router
+		TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
 		
 		setTravelCostCalculatorFactory(travelCostCalculatorFactory);
 		this.setScoringFunctionFactory(scoringFactory);
@@ -62,7 +63,7 @@ public class BKickIncome2Controler extends BkControler {
 	}
 
 	public static void main(String[] args) {
-		//	String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
+		//	String config = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
 		//	String[] args2 = {config};
 		//	args = args2;
 		if ((args == null) || (args.length == 0)) {
@@ -70,7 +71,7 @@ public class BKickIncome2Controler extends BkControler {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final BKickIncome2Controler controler = new BKickIncome2Controler(args);
+			final BkControlerIncome controler = new BkControlerIncome(args);
 			controler.run();
 		}
 	}
