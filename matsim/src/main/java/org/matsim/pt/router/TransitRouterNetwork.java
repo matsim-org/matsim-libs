@@ -47,7 +47,7 @@ import org.matsim.world.Layer;
  *
  * @author mrieser
  */
-/*package*/ class TransitRouterNetwork implements Network {
+public final class TransitRouterNetwork implements Network {
 
 	private static final long serialVersionUID = 1L;
 
@@ -62,13 +62,13 @@ import org.matsim.world.Layer;
 
 	}
 
-	/*package*/ static class TransitRouterNetworkNode implements Node {
+	public static final class TransitRouterNetworkNode implements Node {
 
 		private static final long serialVersionUID = 1L;
 
-		final TransitRouteStop stop;
-		final TransitRoute route;
-		final TransitLine line;
+		public final TransitRouteStop stop;
+		public final TransitRoute route;
+		public final TransitLine line;
 		final Id id;
 		final Map<Id, TransitRouterNetworkLink> ingoingLinks = new LinkedHashMap<Id, TransitRouterNetworkLink>();
 		final Map<Id, TransitRouterNetworkLink> outgoingLinks = new LinkedHashMap<Id, TransitRouterNetworkLink>();
@@ -111,12 +111,12 @@ import org.matsim.world.Layer;
 		}
 	}
 
-	/*package*/ static class TransitRouterNetworkLink implements Link {
+	public static final class TransitRouterNetworkLink implements Link {
 
 		private static final long serialVersionUID = 1L;
 
-		final TransitRouterNetworkNode fromNode;
-		final TransitRouterNetworkNode toNode;
+		public final TransitRouterNetworkNode fromNode;
+		public final TransitRouterNetworkNode toNode;
 		final TransitRoute route;
 		final TransitLine line;
 		final Id id;
