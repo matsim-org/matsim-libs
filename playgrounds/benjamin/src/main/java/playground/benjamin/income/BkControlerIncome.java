@@ -28,6 +28,7 @@ import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.benjamin.BkControler;
+import playground.benjamin.BkPaths;
 
 /**
  * @author bkick
@@ -70,7 +71,7 @@ public class BkControlerIncome extends BkControler {
 		TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme);
 		setTravelCostCalculatorFactory(travelCostCalculatorFactory);
 	}
-
+	
 	private void addInstallTravelCostCalculatorFactoryControlerListener() {
 		addControlerListener(new StartupListener() {
 
@@ -83,15 +84,20 @@ public class BkControlerIncome extends BkControler {
 	}
 	
 	public static void main(String[] args) {
-		//	String config = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
-		//	String[] args2 = {config};
-		//	args = args2;
+		
+//			String config = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
+//			String[] args2 = {config};
+//			args = args2;
+			
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
 			final BkControlerIncome controler = new BkControlerIncome(args);
+			
+//			controler.setOverwriteFiles(true);
+			
 			controler.addInstallTravelCostCalculatorFactoryControlerListener();
 			controler.run();
 		}
