@@ -21,10 +21,15 @@ package org.matsim.contrib.sna.graph.spatial;
 
 import java.util.Set;
 
+import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.SparseVertex;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -35,7 +40,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class SpatialSparseGraph extends SparseGraph implements SpatialGraph {
 
-	private final CoordinateReferenceSystem crs;
+	private CoordinateReferenceSystem crs;
 	
 	/**
 	 * Creates a new spatial sparse graph with the given coordinate reference
@@ -108,5 +113,39 @@ public class SpatialSparseGraph extends SparseGraph implements SpatialGraph {
 	@Override
 	public CoordinateReferenceSystem getCoordinateReferenceSysten() {
 		return crs;
+	}
+	
+	/**
+	 * Transforms the graph to the given coordinate reference system.
+	 * 
+	 * @param newCRS the new coordinate reference system.
+	 */
+	public void transformToCRS(CoordinateReferenceSystem newCRS) {
+		try {
+			MathTransform transform = CRS.findMathTransform(crs, newCRS);
+			int srid = CRSUtils.getSRID(newCRS);
+			if(srid == 0) {
+				throw new RuntimeException("Cannot obtain SRID form coordinate reference system.");
+			}
+			
+			for (SpatialVertex vertex : getVertices()) {
+				double[] points = new double[] { vertex.getPoint().getCoordinate().x,
+						vertex.getPoint().getCoordinate().y };
+				transform.transform(points, 0, points, 0, 1);
+				vertex.getPoint().getCoordinate().x = points[0];
+				vertex.getPoint().getCoordinate().y = points[1];
+				vertex.getPoint().setSRID(srid);
+			}
+			
+			crs = newCRS;
+		} catch (FactoryException e) {
+			e.printStackTrace();
+		} catch (TransformException e) {
+			e.printStackTrace();
+			/*
+			 * Graph is probably in an inconsistent state. Better exit.
+			 */
+			System.exit(-1);
+		}
 	}
 }

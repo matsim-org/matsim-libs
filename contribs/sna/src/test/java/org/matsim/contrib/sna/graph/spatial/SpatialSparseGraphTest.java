@@ -43,10 +43,20 @@ public class SpatialSparseGraphTest extends TestCase {
 		
 		GeometryFactory geometryFactory = new GeometryFactory();
 		
-		SpatialSparseVertex v1 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(0, 0)));
-		SpatialSparseVertex v2 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(0, 10)));
-		SpatialSparseVertex v3 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(10, 10)));
-		SpatialSparseVertex v4 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(10, 0)));
+		double[][] coords = new double[4][2];
+		coords[0][0] = 0;
+		coords[0][1] = 0;
+		coords[1][0] = 0;
+		coords[1][1] = 10;
+		coords[2][0] = 10;
+		coords[2][1] = 10;
+		coords[3][0] = 10;
+		coords[3][1] = 0;
+		
+		SpatialSparseVertex v1 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(coords[0][0], coords[0][1])));
+		SpatialSparseVertex v2 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(coords[1][0], coords[1][1])));
+		SpatialSparseVertex v3 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(coords[2][0], coords[2][1])));
+		SpatialSparseVertex v4 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(coords[3][0], coords[3][1])));
 		
 		builder.addEdge(graph, v1, v2);
 		builder.addEdge(graph, v2, v3);
@@ -54,6 +64,24 @@ public class SpatialSparseGraphTest extends TestCase {
 		builder.addEdge(graph, v4, v1);
 		builder.addEdge(graph, v1, v3);
 		builder.addEdge(graph, v4, v2);
+		
+		assertEquals(10.0, graph.getEdge(v1, v2).length(), EPSILON);
+		assertEquals(10.0, graph.getEdge(v2, v3).length(), EPSILON);
+		assertEquals(10.0, graph.getEdge(v3, v4).length(), EPSILON);
+		assertEquals(10.0, graph.getEdge(v4, v1).length(), EPSILON);
+		assertEquals(14.1421, graph.getEdge(v1, v3).length(), EPSILON);
+		assertEquals(14.1421, graph.getEdge(v2, v4).length(), EPSILON);
+		
+		graph.transformToCRS(CRSUtils.getCRS(4326));
+		
+		assertFalse(v1.getPoint().getCoordinate().x == coords[0][0]);
+		assertFalse(v1.getPoint().getCoordinate().y == coords[0][1]);
+		assertFalse(v2.getPoint().getCoordinate().x == coords[1][0]);
+		assertFalse(v2.getPoint().getCoordinate().y == coords[1][1]);
+		assertFalse(v3.getPoint().getCoordinate().x == coords[2][0]);
+		assertFalse(v3.getPoint().getCoordinate().y == coords[2][1]);
+		assertFalse(v4.getPoint().getCoordinate().x == coords[3][0]);
+		assertFalse(v4.getPoint().getCoordinate().y == coords[3][1]);
 		
 		assertEquals(10.0, graph.getEdge(v1, v2).length(), EPSILON);
 		assertEquals(10.0, graph.getEdge(v2, v3).length(), EPSILON);

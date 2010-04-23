@@ -24,6 +24,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
@@ -40,12 +45,26 @@ public class ZoneLayer {
 	
 	private final Set<Zone> zones;
 	
+	private CoordinateReferenceSystem crs;
+	
+	private int srid = -1;
+	
 	/**
 	 * Creates a new zone layer containing the zones in <tt>zones</tt>.
 	 * 
 	 * @param zones a set of zones.
 	 */
 	public ZoneLayer(Set<Zone> zones) {
+		for(Zone z : zones) {
+			if(srid < 0) {
+				srid = z.getGeometry().getSRID();
+				crs = CRSUtils.getCRS(srid);
+			} else {
+				if(z.getGeometry().getSRID() != srid)
+					throw new RuntimeException("Cannot build a spatial index with zones that have different coordinate reference systems.");
+			}
+		}
+		
 		this.zones = Collections.unmodifiableSet(zones);
 		quadtree = new Quadtree();
 		for(Zone zone : zones) {
@@ -53,8 +72,22 @@ public class ZoneLayer {
 		}
 	}
 
+	/**
+	 * Allows to manually overwrite the coordinate reference system (e.g. if the
+	 * ZoneLayer is read from a shape file without crs information).
+	 * 
+	 * @param crs a coordinate reference system.
+	 */
+	public void overwriteCRS(CoordinateReferenceSystem crs) {
+		this.crs = crs;
+		this.srid = CRSUtils.getSRID(crs);
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<Zone> getZones(Point point) {
+		if(point.getSRID() != srid)
+			point = transformPoint(point);
+		
 		List<Zone> result = quadtree.query(point.getEnvelopeInternal());
 		List<Zone> zones = new ArrayList<Zone>(result.size());
 		for(Zone z : result) {
@@ -64,6 +97,18 @@ public class ZoneLayer {
 		return zones;
 	}
 	
+	private Point transformPoint(Point point) {
+		CoordinateReferenceSystem sourceCRS = CRSUtils.getCRS(point.getSRID());
+		CoordinateReferenceSystem targetCRS = crs;
+
+		try {
+			MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS);
+			return CRSUtils.transformPoint(point, transform);
+		} catch (FactoryException e) {
+			e.printStackTrace();
+			return null;
+		}	
+	}
 	/**
 	 * Returns the zone containing <tt>point</tt>. If multiple zones contain
 	 * <tt>point</tt> one random zone is returned.
