@@ -57,9 +57,9 @@ public class EvacuationConfigGroup extends Module {
 	private static final String BUILDINGS_FILE = "buildingsFile";
 
 	/**
-	 * name of the shoreline shape file in config
+	 * name of the evac decision shape file in config
 	 */
-	private static final String SHORELINE_FILE = "shorelineFile";
+	private static final String EVACUATION_DECISION_ZONES = "evacDecisionZonesFile";
 
 	/**
 	 * type of the scenario
@@ -105,9 +105,9 @@ public class EvacuationConfigGroup extends Module {
 	private String buildingsFile;
 
 	/**
-	 * file name of the shoreline shape file
+	 * file name of the evac decision shape file
 	 */
-	private String shorelineFile;
+	private String evacDecisionZonesFile;
 
 	/**
 	 * the scenario type
@@ -155,8 +155,8 @@ public class EvacuationConfigGroup extends Module {
 			return getEvacuationAreaFile();
 		}else if (BUILDINGS_FILE.equals(key)) {
 			return getBuildingsFile();
-		}else if (SHORELINE_FILE.equals(key)) {
-			return getShorelineFile();
+		}else if (EVACUATION_DECISION_ZONES.equals(key)) {
+			return getEvacDecisionZonesFile();
 		}else if (SCENARIO.equals(key)) {
 			return getEvacuationScanrio().toString();
 		}else if (SAMPLE_SIZE.equals(key)) {
@@ -199,8 +199,8 @@ public class EvacuationConfigGroup extends Module {
 			log.warn("The parameter " + FLOODING_DATA_FILE + " in the group " + GROUP_NAME + " is no longer supported and should be removed from the config file.");
 		}else if(BUILDINGS_FILE.equals(key)){
 			setBuildingsFile(value.replace('\\', '/'));
-		}else if(SHORELINE_FILE.equals(key)){
-			setShorelineFile(value.replace('\\', '/'));
+		}else if(EVACUATION_DECISION_ZONES.equals(key)){
+			setEvacDecsionZonesFile(value.replace('\\', '/'));
 		}else if(SWW_ROOT.equals(key)){
 			setSWWRoot(value.replace('\\', '/'));
 		}else if(SWW_FILE_PREFIX.equals(key)){
@@ -376,19 +376,19 @@ public class EvacuationConfigGroup extends Module {
 
 	/**
 	 *
-	 * @return the shapes of the shoreline
+	 * @return the shapes of the evac decision zones
 	 */
-	public String getShorelineFile() {
-		return this.shorelineFile;
+	public String getEvacDecisionZonesFile() {
+		return this.evacDecisionZonesFile;
 	}
 
 	/**
 	 *
 	 * @param shorelineFile
-	 * the shapes of the shoreline
+	 * the shapes of the evac decsion zones
 	 */
-	public void setShorelineFile(String shorelineFile) {
-		this.shorelineFile = shorelineFile;
+	public void setEvacDecsionZonesFile(String evacDecsionZonesFile) {
+		this.evacDecisionZonesFile = evacDecsionZonesFile;
 	}
 
 	/**
