@@ -24,6 +24,12 @@ import org.matsim.roadpricing.RoadPricingScheme;
 public class MZComparisonData extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
 	public static boolean isInRange(Id linkId, RoadPricingScheme toll) {
+		// if (toll == null)
+		// throw new RuntimeException("RoadPricingScheme toll == null");
+		// if (linkId == null)
+		// throw new RuntimeException("linkId == null");
+		// if (toll.getLinkIdSet() == null)
+		// throw new RuntimeException("toll.getLinkIdSet() == null");
 		return toll.getLinkIdSet().contains(linkId);
 	}
 
@@ -49,7 +55,8 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 	public void run(Person person) {
 		// count++;
 		Plan pl = person.getSelectedPlan();
-		inTollRange = isInRange(((PlanImpl) pl).getFirstActivity().getLinkId(), toll);
+		inTollRange = isInRange(((PlanImpl) pl).getFirstActivity().getLinkId(),
+				toll);
 		if (inTollRange)
 			count_toll++;
 		run(pl);

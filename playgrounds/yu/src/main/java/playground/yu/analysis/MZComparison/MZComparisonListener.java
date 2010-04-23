@@ -29,7 +29,6 @@ public class MZComparisonListener implements IterationEndsListener,
 			MZComparisonData mzcd = new MZComparisonData(ctl.getScenario()
 					.getRoadPricingScheme());
 			mzcd.run(ctl.getPopulation());
-
 			mzcdi.setData2Compare(mzcd);
 			mzcdi.write(ctl.getControlerIO().getIterationFilename(iter,
 					"MZ05Comparison"));
