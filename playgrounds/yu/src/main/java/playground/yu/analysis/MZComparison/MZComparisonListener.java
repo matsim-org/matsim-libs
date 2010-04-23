@@ -22,7 +22,7 @@ public class MZComparisonListener implements IterationEndsListener, StartupListe
 	}
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		if (event.getIteration() % 10 == 0) {
+		if (event.getIteration() % 100 == 0) {
 			MZComparisonData mzcd = new MZComparisonData(event.getControler().getScenario()
 					.getRoadPricingScheme());
 			mzcd.run(event.getControler().getPopulation());

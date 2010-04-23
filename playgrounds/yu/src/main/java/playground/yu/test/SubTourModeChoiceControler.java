@@ -28,6 +28,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
+import playground.yu.analysis.MZComparison.MZComparisonListener;
 import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
 
 /**
@@ -53,6 +54,7 @@ public class SubTourModeChoiceControler extends Controler {
 		controler
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
 						config.charyparNagelScoring()));
+		controler.addControlerListener(new MZComparisonListener());
 		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
 		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
 		controler.setOverwriteFiles(true);
