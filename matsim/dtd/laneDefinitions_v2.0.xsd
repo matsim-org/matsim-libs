@@ -53,7 +53,7 @@ the simulation -->
             <xs:attribute name="meterFromLinkEnd" type="xs:double" use="optional" default="45.0"></xs:attribute>
           </xs:complexType>
         </xs:element>
-        <xs:element name="alignment" type="xs:integer"></xs:element>
+        <xs:element name="alignment" type="xs:int"></xs:element>
       </xs:sequence>    
     </xs:extension>
   </xs:complexContent>
