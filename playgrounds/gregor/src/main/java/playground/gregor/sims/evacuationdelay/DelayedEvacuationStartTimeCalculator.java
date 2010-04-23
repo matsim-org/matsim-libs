@@ -10,75 +10,109 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.evacuation.base.EvacuationStartTimeCalculator;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 public class DelayedEvacuationStartTimeCalculator implements EvacuationStartTimeCalculator {
 
 	private final double baseTime;
-	private QuadTree<Coord> coordQuadTree;
+	private QuadTree<Feature> coordQuadTree;
 	private final Network network;
 
-	public DelayedEvacuationStartTimeCalculator(double earliestEvacTime, String shorelineFile, Network network) {
+	public DelayedEvacuationStartTimeCalculator(double earliestEvacTime, String evacDecsionZonesFile, Network network) {
 		this.baseTime = earliestEvacTime;
 		this.network = network;
 		try {
-			loadShapeFile(shorelineFile);
+			loadShapeFile(evacDecsionZonesFile);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private void loadShapeFile(String shorelineFile) throws IOException {
-		FeatureSource fs = ShapeFileReader.readDataFile(shorelineFile);
+	private void loadShapeFile(String evacDecsionZonesFile) throws IOException {
+		FeatureSource fs = ShapeFileReader.readDataFile(evacDecsionZonesFile);
 		Envelope e = fs.getBounds();
-		this.coordQuadTree = new QuadTree<Coord>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
+		this.coordQuadTree = new QuadTree<Feature>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
 		Iterator it = fs.getFeatures().iterator();
 		while (it.hasNext()) {
 			Feature f = (Feature) it.next();
-			Coord c = MGC.coordinate2Coord(f.getDefaultGeometry().getCoordinate());
-			this.coordQuadTree.put(c.getX(), c.getY(), c);
+			Coord c = MGC.coordinate2Coord(f.getDefaultGeometry().getCentroid().getCoordinate());
+			this.coordQuadTree.put(c.getX(), c.getY(), f);
 		}
 		
 	}
 
-	public QuadTree<Coord> getCoordinateQuadTree() {
-		return this.coordQuadTree;
-	}
-	
 	public double getEvacuationStartTime(ActivityImpl act) {
 		Coord c = act.getCoord();
 		if (c == null) {
 			c = this.network.getLinks().get(act.getLinkId()).getCoord();
 		}
-		double dist = ((CoordImpl) this.coordQuadTree.get(c.getX(), c.getY())).calcDistance(c);
-		return this.baseTime + getOffset(dist);
+		Feature ft = this.coordQuadTree.get(c.getX(), c.getY());
+		
+		Geometry geo = ft.getDefaultGeometry();
+		Point p = MGC.coord2Point(c);
+		
+		try {
+			if (!geo.contains(p)) {
+				ft = getFt(p);
+			}
+			return this.baseTime + getOffset(ft);
+		} catch (Exception e) {
+			return this.baseTime;
+		}
+			
+		
 	}
 
-	private double getOffset(double dist) {
-		if (dist <= 3000) {
-			double rnd = MatsimRandom.getRandom().nextDouble();
-			if (rnd <= .214) {
-				return 25 * 60;
-			} else if (rnd <= .631 ) {
-				return 15 * 60;
-			} else {
-				return .0;
+
+	private Feature getFt(Point p) {
+		for (Feature ft : this.coordQuadTree.values()) {
+			if (ft.getDefaultGeometry().contains(p)) {
+				return ft;
 			}
-		} else {
-			double rnd = MatsimRandom.getRandom().nextDouble();
-			if (rnd <= .357) {
-				return 25 * 60;
-			} else if (rnd <= .596 ) {
-				return 15 * 60;
-			} else {
-				return .0;
-			}			
 		}
+		return null;
 	}
+
+	private double getOffset(Feature ft) {
+		double immed = ((Double) ft.getAttribute("EVACIMMED")) /100;
+		double delay = ((Double) ft.getAttribute("EVACDELAY")) /100;
+//		double noevac = ((Double) ft.getAttribute("NOEVAC")) /100;
+		double rand = MatsimRandom.getRandom().nextDouble();
+		if (rand <= immed) {
+			return 0;
+		} 
+		rand -= immed;
+		if (rand < delay) {
+			return 60 * 20;
+		}
+		return 60 * 28;
+	}
+//	private double getOffset(double dist) {
+//		if (dist <= 3000) {
+//			double rnd = MatsimRandom.getRandom().nextDouble();
+//			if (rnd <= .214) {
+//				return 25 * 60;
+//			} else if (rnd <= .631 ) {
+//				return 15 * 60;
+//			} else {
+//				return .0;
+//			}
+//		} else {
+//			double rnd = MatsimRandom.getRandom().nextDouble();
+//			if (rnd <= .357) {
+//				return 25 * 60;
+//			} else if (rnd <= .596 ) {
+//				return 15 * 60;
+//			} else {
+//				return .0;
+//			}			
+//		}
+//	}
 
 }

@@ -36,8 +36,8 @@ import playground.gregor.snapshots.writers.SnapshotGenerator;
 public class OTFSnapshotGenerator {
 
 	public static String SHARED_SVN = "../../../../../arbeit/svn/shared-svn/studies";
-		public static String RUNS_SVN = "../../../../../arbeit/svn/runs-svn/run1032/output";
-	//	public static String RUNS_SVN = "/home/laemmel/devel/outputs/output";
+//		public static String RUNS_SVN = "../../../../../arbeit/svn/runs-svn/run1032/output";
+		public static String RUNS_SVN = "/home/laemmel/devel/outputs/output";
 //	public static String RUNS_SVN = "../../../matsim/test/output/org/matsim/evacuation/run/ShelterEvacuationControllerTest/testShelterEvacuationController";
 	
 	public static String MVI_FILE;
@@ -46,7 +46,7 @@ public class OTFSnapshotGenerator {
 
 	private final String lsFile;
 
-	private final static double VIS_OUTPUT_SAMPLE = 0.1;
+	private final static double VIS_OUTPUT_SAMPLE = 1.;
 	private static String LABEL = null;
 
 	private final ScenarioImpl scenario;

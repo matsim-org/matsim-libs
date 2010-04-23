@@ -121,7 +121,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 		this.quad.addAdditionalElement(this.writer);
 		if (this.insertWave ){
 			this.quad.addAdditionalElement(new InundationDataWriter_v2(new InundationDataFromBinaryFileReader().readData(),this.startTime));
-//			this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromNetcdfReaderII(OTFServerQuad2.offsetNorth,OTFServerQuad2.offsetEast).createData()));
+//			this.quad.addAdditionalElement(new InundationDataWriter_v2(new InundationDataFromNetcdfReaderII(OTFServerQuad2.offsetNorth,OTFServerQuad2.offsetEast).createData(),this.startTime));
 		}
 		
 

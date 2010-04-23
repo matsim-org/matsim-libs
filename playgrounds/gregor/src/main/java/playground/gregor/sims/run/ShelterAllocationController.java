@@ -6,10 +6,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.EvacuationConfigGroup.EvacuationScenario;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
@@ -20,7 +18,6 @@ import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationNetFromNetcdfGenerator;
 import org.matsim.evacuation.base.EvacuationNetGenerator;
-import org.matsim.evacuation.base.EvacuationPlansGenerator;
 import org.matsim.evacuation.base.NetworkChangeEventsFromNetcdf;
 import org.matsim.evacuation.flooding.FloodingReader;
 import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
@@ -31,9 +28,9 @@ import org.matsim.evacuation.shelters.signalsystems.ShelterInputCounterSignalSys
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
 
-import playground.gregor.sims.evacuationdelay.DelayedEvacuationPopulationLoader;
+import playground.gregor.sims.shelters.allocation.ShelterAllocator;
 
-public class EvacuationDelayController extends Controler {
+public class ShelterAllocationController extends Controler {
 
 	final private static Logger log = Logger.getLogger(EvacuationQSimControllerII.class);
 
@@ -47,7 +44,7 @@ public class EvacuationDelayController extends Controler {
 
 	PluggableTravelCostCalculator pluggableTravelCost = null;
 
-	public EvacuationDelayController(String[] args) {
+	public ShelterAllocationController(String[] args) {
 		super(args);
 		this.setOverwriteFiles(true);
 		this.config.scenario().setUseSignalSystems(true);
@@ -112,7 +109,7 @@ public class EvacuationDelayController extends Controler {
 				public PersonalizableTravelCost createTravelCostCalculator(
 						TravelTime timeCalculator,
 						CharyparNagelScoringConfigGroup cnScoringGroup) {
-					return EvacuationDelayController.this.pluggableTravelCost;
+					return ShelterAllocationController.this.pluggableTravelCost;
 				}
 
 			});
@@ -214,28 +211,31 @@ public class EvacuationDelayController extends Controler {
 			}
 	
 			if (this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile()) {
-				new DelayedEvacuationPopulationLoader(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.netcdfReaders).getPopulation();
+				throw new RuntimeException("Not implemented yet!");
+//				new EvacuationPopulationFromShapeFileLoader(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.netcdfReaders).getPopulation();
 			} else {
-				new DelayedEvacuationPopulationLoader(this.scenarioData.getPopulation(),this.buildings,this.scenarioData, null).getPopulation();
+				new ShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl).getPopulation();
 			}
 		} else {
-			if (this.scenarioData.getConfig().evacuation().getEvacuationScanrio() != EvacuationScenario.night) {
-				throw new RuntimeException("Evacuation simulation from plans file so far only works for the night scenario.");
-			}
-			new EvacuationPlansGenerator(this.population,this.network,this.network.getLinks().get(new IdImpl("el1"))).run();
+			throw new RuntimeException("This does not work!");
+//			if (this.scenarioData.getConfig().evacuation().getEvacuationScanrio() != EvacuationScenario.night) {
+//				throw new RuntimeException("Evacuation simulation from plans file so far only works for the night scenario.");
+//			}
+//			new EvacuationPlansGenerator(this.population,this.network,this.network.getLinks().get(new IdImpl("el1"))).run();
 		}
 
 		
 		this.population = this.scenarioData.getPopulation();
 
-		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
-			this.esnl.generateShelterLinks();
-		}
+//		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
+//			this.esnl.generateShelterLinks();
+//		}
 	}
 
 	public static void main(final String[] args) {
-		final Controler controler = new EvacuationDelayController(args);
+		final Controler controler = new ShelterAllocationController(args);
 		controler.run();
 		System.exit(0);
 	}
+	
 }
