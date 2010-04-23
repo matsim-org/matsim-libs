@@ -212,8 +212,8 @@ public class LanesGenerator {
 				if (this.network != null){
 					Link link = this.network.getLinks().get(linkId);
 					double linkLaneFraction = 0.5 * link.getLength();
-					if (lane.getLength() > linkLaneFraction){
-						lane.setLength(linkLaneFraction);
+					if (lane.getStartsAtMeterFromLinkEnd() > linkLaneFraction){
+						lane.setStartsAtMeterFromLinkEnd(linkLaneFraction);
 						log.info("Reset lane length of lane Id : " + lane.getId() + " of Link Id " + linkId + " to " + linkLaneFraction);
 					}
 				}
@@ -268,7 +268,7 @@ public class LanesGenerator {
 	private Lane createLaneWithDefaults(Integer fromLaneId) {
 		Id laneId = new IdImpl(fromLaneId);
 		Lane lane = new LaneImpl(laneId);
-		lane.setLength(45.0);
+		lane.setStartsAtMeterFromLinkEnd(45.0);
 		lane.setNumberOfRepresentedLanes(1);
 		return lane;
 	}

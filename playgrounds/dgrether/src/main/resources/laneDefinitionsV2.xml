@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!--<laneDefinitions xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd" -->
-<!--xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">-->
-<laneDefinitions>
-
-how to encode alignment
+<laneDefinitions xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
     <lanesToLinkAssignment linkIdRef="23">
         <lane id="1">
             <leadsTo>
@@ -32,7 +29,7 @@ how to encode alignment
         </lane>
     </lanesToLinkAssignment>
 
-    <lanesToLinkAssignment linkIdRef="23">
+    <lanesToLinkAssignment linkIdRef="42">
         <lane id="1">
             <leadsTo>
               <toLane refId="2" /> 

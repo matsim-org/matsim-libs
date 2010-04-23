@@ -71,7 +71,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 			else {
 				Link link = this.network.getLinks().get(l2l.getLinkId());
 				for (Lane l : l2l.getLanes().values()){
-					if (link.getLength() < l.getLength()) {
+					if (link.getLength() < l.getStartsAtMeterFromLinkEnd()) {
 						log.error("Link Id " + link.getId() + " is shorter than an assigned lane with id " + l.getId());
 						malformedLinkIds.add(l2l.getLinkId());
 					}
