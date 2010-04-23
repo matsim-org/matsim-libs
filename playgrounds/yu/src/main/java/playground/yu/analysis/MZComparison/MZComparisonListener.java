@@ -13,7 +13,8 @@ import org.matsim.core.controler.listener.StartupListener;
  * @author yu
  * 
  */
-public class MZComparisonListener implements IterationEndsListener, StartupListener {
+public class MZComparisonListener implements IterationEndsListener,
+		StartupListener {
 	private MZComparisonDataIO mzcdi = new MZComparisonDataIO();
 
 	public void notifyStartup(StartupEvent event) {
@@ -22,14 +23,16 @@ public class MZComparisonListener implements IterationEndsListener, StartupListe
 	}
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		if (event.getIteration() % 100 == 0) {
-			MZComparisonData mzcd = new MZComparisonData(event.getControler().getScenario()
+		int iter = event.getIteration();
+		if (iter % 100 == 0) {
+			Controler ctl = event.getControler();
+			MZComparisonData mzcd = new MZComparisonData(ctl.getScenario()
 					.getRoadPricingScheme());
-			mzcd.run(event.getControler().getPopulation());
+			mzcd.run(ctl.getPopulation());
 
 			mzcdi.setData2Compare(mzcd);
-			event.getControler();
-			mzcdi.write(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "MZ05Comparison"));
+			mzcdi.write(ctl.getControlerIO().getIterationFilename(iter,
+					"MZ05Comparison"));
 		}
 	}
 
