@@ -31,24 +31,24 @@ import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
-import org.matsim.jaxb.lanedefinitions11.ObjectFactory;
-import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
-import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
-import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
-import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
+import org.matsim.jaxb.lanedefinitions20.ObjectFactory;
+import org.matsim.jaxb.lanedefinitions20.XMLIdRefType;
+import org.matsim.jaxb.lanedefinitions20.XMLLaneDefinitions;
+import org.matsim.jaxb.lanedefinitions20.XMLLaneType;
+import org.matsim.jaxb.lanedefinitions20.XMLLanesToLinkAssignmentType;
 import org.xml.sax.SAXException;
 
 
 /**
- * Reader for the http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd
+ * Reader for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
  * file format.
  * @author dgrether
  *
  */
-public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
+public class LaneDefinitionsReader20 extends MatsimJaxbXmlParser {
 
 	private static final Logger log = Logger
-			.getLogger(LaneDefinitionsReader11.class);
+			.getLogger(LaneDefinitionsReader20.class);
 
 	private LaneDefinitions laneDefinitions;
 
@@ -56,7 +56,7 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
 	/**
 	 * @param schemaLocation
 	 */
-	public LaneDefinitionsReader11(LaneDefinitions laneDefs, String schemaLocation) {
+	public LaneDefinitionsReader20(LaneDefinitions laneDefs, String schemaLocation) {
 		super(schemaLocation);
 		this.laneDefinitions = laneDefs;
 		builder = this.laneDefinitions.getFactory();
@@ -72,7 +72,7 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
 		JAXBContext jc;
 		XMLLaneDefinitions xmlLaneDefinitions;
 			jc = JAXBContext
-					.newInstance(org.matsim.jaxb.lanedefinitions11.ObjectFactory.class);
+					.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
 			ObjectFactory fac = new ObjectFactory();
 			Unmarshaller u = jc.createUnmarshaller();
 			// validate XML file
@@ -90,6 +90,7 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
 					log.warn("Could not close stream.", e);
 				}
 			}
+			
 			//convert the parsed xml-instances to basic instances
 			LanesToLinkAssignment l2lAssignment;
 			Lane lane = null;
@@ -99,19 +100,32 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
 						.getLinkIdRef()));
 				for (XMLLaneType laneType : lldef.getLane()) {
 					lane = builder.createLane(new IdImpl(laneType.getId()));
-					for (XMLIdRefType toLinkId : laneType.getToLink()) {
-						lane.addToLinkId(new IdImpl(toLinkId.getRefId()));
+					
+					if (!laneType.getLeadsTo().getToLane().isEmpty()) {
+						for (XMLIdRefType toLaneId : laneType.getLeadsTo().getToLane()){
+							lane.addToLaneId(new IdImpl(toLaneId.getRefId()));
+						}
 					}
+					else if (!laneType.getLeadsTo().getToLink().isEmpty()){
+						for (XMLIdRefType toLinkId : laneType.getLeadsTo().getToLink()){
+							lane.addToLinkId(new IdImpl(toLinkId.getRefId()));
+						}
+					}
+					
 					if (laneType.getRepresentedLanes() == null) {
 						laneType.setRepresentedLanes(fac
 								.createXMLLaneTypeXMLRepresentedLanes());
 					}
 					lane.setNumberOfRepresentedLanes(laneType.getRepresentedLanes()
 							.getNumber());
-					if (laneType.getLength() == null) {
-						laneType.setLength(fac.createXMLLaneTypeXMLLength());
+					
+					if (laneType.getStartsAt() == null) {
+						laneType.setStartsAt(fac.createXMLLaneTypeXMLStartsAt());
 					}
-					lane.setStartsAtMeterFromLinkEnd(laneType.getLength().getMeter());
+					lane.setStartsAtMeterFromLinkEnd(laneType.getStartsAt().getMeterFromLinkEnd());
+					
+					lane.setAlignment(laneType.getAlignment());
+					
 					l2lAssignment.addLane(lane);
 				}
 				this.laneDefinitions.addLanesToLinkAssignment(l2lAssignment);

@@ -97,12 +97,12 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		Lane lane = lanes.get(0);
 		assertEquals(id3, lane.getId());
 		assertEquals(id1, lane.getToLinkIds().get(0));
-		assertEquals(45.0, lane.getLength(), EPSILON);
-		assertEquals(1, lane.getNumberOfRepresentedLanes());
+		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
+		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
 		lane = lanes.get(1);
 		assertEquals(id5, lane.getId());
-		assertEquals(60.0, lane.getLength(), EPSILON);
-		assertEquals(2, lane.getNumberOfRepresentedLanes());
+		assertEquals(60.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
+		assertEquals(2.0, lane.getNumberOfRepresentedLanes());
 		//check a lanes2linkassignment using default values
 		l2la = assignments.get(1);
 		assertNotNull(l2la);
@@ -112,8 +112,8 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		lane = lanes.get(0);
 		assertEquals(id1, lane.getId());
 		assertEquals(id1, lane.getToLinkIds().get(0));
-		assertEquals(45.0, lane.getLength(), EPSILON);
-		assertEquals(1, lane.getNumberOfRepresentedLanes());
+		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
+		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
 
 
 

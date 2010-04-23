@@ -72,7 +72,7 @@ public class QLaneTest extends MatsimTestCase {
 		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(id1);
 		Lane link1lane1 = builder.createLane(id1);
 		link1lane1.addToLinkId(id2);
-		link1lane1.setLength(105.0);
+		link1lane1.setStartsAtMeterFromLinkEnd(105.0);
 		link1lane1.setNumberOfRepresentedLanes(numberOfRepresentedLanes);
 		lanesForLink1.addLane(link1lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink1);
@@ -87,18 +87,18 @@ public class QLaneTest extends MatsimTestCase {
 		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(id1);
 		Lane link1lane1 = builder.createLane(id1);
 		link1lane1.addToLinkId(id2);
-		link1lane1.setLength(105.0);
+		link1lane1.setStartsAtMeterFromLinkEnd(105.0);
 		lanesForLink1.addLane(link1lane1);
 		
 		Lane link1lane2 = builder.createLane(id2);
 		link1lane2.addToLinkId(id2);
 		link1lane2.setNumberOfRepresentedLanes(2);
-		link1lane2.setLength(105.0);
+		link1lane2.setStartsAtMeterFromLinkEnd(105.0);
 		lanesForLink1.addLane(link1lane2);
 
 		Lane link1lane3 = builder.createLane(id3);
 		link1lane3.addToLinkId(id2);
-		link1lane3.setLength(105.0);
+		link1lane3.setStartsAtMeterFromLinkEnd(105.0);
 		lanesForLink1.addLane(link1lane3);
 		
 		lanes.addLanesToLinkAssignment(lanesForLink1);

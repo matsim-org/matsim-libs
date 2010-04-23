@@ -141,7 +141,7 @@ public class MixedLaneTest extends TestCase {
 		LaneDefinitions lanes = this.sc.getLaneDefinitions();
 		LaneDefinitionsFactory lb = lanes.getFactory();
 		Lane lane = lb.createLane(id1);
-		lane.setLength(50.0);
+		lane.setStartsAtMeterFromLinkEnd(50.0);
 		lane.addToLinkId(id2);
 		lane.addToLinkId(id3);
 		LanesToLinkAssignment l2l = lb.createLanesToLinkAssignment(id1);

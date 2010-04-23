@@ -31,18 +31,32 @@ public interface Lane {
 	/**
 	 * @param number
 	 */
-	public void setNumberOfRepresentedLanes(int number);
+	public void setNumberOfRepresentedLanes(double number);
 
-	public void setLength(double meter);
+	public void setStartsAtMeterFromLinkEnd(double meter);
 
 	public Id getId();
 
-	public int getNumberOfRepresentedLanes();
+	public double getNumberOfRepresentedLanes();
 
-	public double getLength();
+	public double getStartsAtMeterFromLinkEnd();
 
 	public void addToLinkId(Id id);
-
+	
+	public void addToLaneId(Id id);
+	/**
+	 * 
+	 * @return List may be null if nothing is set
+	 */
 	public List<Id> getToLinkIds();
+	/**
+	 * 
+	 * @return List may be null if nothing is set
+	 */
+	public List<Id> getToLaneIds();
 
+	public void setAlignment(int alignment);
+
+	public int getAlignment();
+	
 }

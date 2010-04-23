@@ -120,7 +120,7 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 					if (laneType.getLength() == null) {
 						laneType.setLength(fac.createXMLLaneTypeXMLLength());
 					}
-					lane.setLength(laneType.getLength().getMeter());
+					lane.setStartsAtMeterFromLinkEnd(laneType.getLength().getMeter());
 					l2lAssignment.addLane(lane);
 				}
 				this.laneDefinitions.addLanesToLinkAssignment(l2lAssignment);

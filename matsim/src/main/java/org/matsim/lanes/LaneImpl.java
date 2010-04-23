@@ -33,13 +33,14 @@ public class LaneImpl implements Lane {
 	/**
 	 * the default according to the xml schema, never change the value if schema is not changed
 	 */
-	private int numberOfRepresentedLanes = 1;
+	private double numberOfRepresentedLanes = 1;
 	/**
 	 * the default according to the xml schema, never change the value if schema is not changed
 	 */
-	private double length = 45.0;
+	private double startsAtMeterFromLinkEnd = 45.0;
 	private List<Id> toLinkIds;
-
+  private List<Id> toLaneIds;
+  private int alignment = 0;
 	/**
 	 * @param id
 	 */
@@ -50,12 +51,12 @@ public class LaneImpl implements Lane {
 	/**
 	 * @param number
 	 */
-	public void setNumberOfRepresentedLanes(int number) {
+	public void setNumberOfRepresentedLanes(double number) {
 		this.numberOfRepresentedLanes = number;
 	}
 
-	public void setLength(double meter) {
-		this.length = meter;
+	public void setStartsAtMeterFromLinkEnd(double meter) {
+		this.startsAtMeterFromLinkEnd = meter;
 	}
 
 	public Id getId() {
@@ -63,13 +64,13 @@ public class LaneImpl implements Lane {
 	}
 
 	
-	public int getNumberOfRepresentedLanes() {
+	public double getNumberOfRepresentedLanes() {
 		return numberOfRepresentedLanes;
 	}
 
 	
-	public double getLength() {
-		return length;
+	public double getStartsAtMeterFromLinkEnd() {
+		return startsAtMeterFromLinkEnd;
 	}
 
 	public void addToLinkId(Id id) {
@@ -81,6 +82,25 @@ public class LaneImpl implements Lane {
 	
 	public List<Id> getToLinkIds() {
 		return this.toLinkIds;
+	}
+	
+	public void addToLaneId(Id id) {
+		if (this.toLaneIds == null) {
+			this.toLaneIds = new ArrayList<Id>();
+		}
+		this.toLaneIds.add(id);
+	}
+	
+	public List<Id> getToLaneIds() {
+		return this.toLaneIds;
+	}
+	
+	public int getAlignment() {
+		return alignment;
+	}
+	
+	public void setAlignment(int alignment) {
+		this.alignment = alignment;
 	}
 	
 }

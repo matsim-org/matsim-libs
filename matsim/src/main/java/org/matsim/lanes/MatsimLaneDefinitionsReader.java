@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
-
 import org.xml.sax.SAXException;
 
 /**
@@ -39,6 +38,8 @@ public class MatsimLaneDefinitionsReader {
 			.getLogger(MatsimLaneDefinitionsReader.class);
 	
 	public static final String SCHEMALOCATIONV11 = "http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd";
+
+	public static final String SCHEMALOCATIONV20 = "http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd";
 	
 	private LaneDefinitions laneDefinitions;
 

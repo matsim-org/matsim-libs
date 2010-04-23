@@ -177,7 +177,7 @@ public class QLinkLanesImpl implements QLink {
 		boolean firstNodeLinkInitialized = false;
 
 		for (Lane signalLane : map.values()) {
-			if (signalLane.getLength() > this.link.getLength()) {
+			if (signalLane.getStartsAtMeterFromLinkEnd() > this.link.getLength()) {
 				throw new IllegalStateException("Link Id " + this.link.getId() + " is shorter than Lane Id " + signalLane.getId() + " on this link!");
 			}
 			if (this.originalLane.getLaneId().equals(signalLane.getId())){
@@ -187,7 +187,7 @@ public class QLinkLanesImpl implements QLink {
 			QLane lane = null;
 			lane = new QLane(this, signalLane);
 			lane.setMetersFromLinkEnd(0.0);
-			lane.setLaneLength(signalLane.getLength());
+			lane.setLaneLength(signalLane.getStartsAtMeterFromLinkEnd());
 			lane.calculateCapacities();
 
 			this.originalLane.addToLane(lane);
@@ -196,14 +196,14 @@ public class QLinkLanesImpl implements QLink {
 			this.queueLanes.add(lane);
 
 			if(!firstNodeLinkInitialized){
-				this.originalLane.setMetersFromLinkEnd(signalLane.getLength());
-				double originalLaneEnd = this.getLink().getLength() - signalLane.getLength();
+				this.originalLane.setMetersFromLinkEnd(signalLane.getStartsAtMeterFromLinkEnd());
+				double originalLaneEnd = this.getLink().getLength() - signalLane.getStartsAtMeterFromLinkEnd();
 				this.originalLane.setLaneLength(originalLaneEnd);
 				this.originalLane.calculateCapacities();
 				firstNodeLinkInitialized = true;
 				this.originalLane.setFireLaneEvents(true);
 			}
-			else if (signalLane.getLength() != this.originalLane.getMeterFromLinkEnd()){
+			else if (signalLane.getStartsAtMeterFromLinkEnd() != this.originalLane.getMeterFromLinkEnd()){
 					String message = "The lanes on link id " + this.getLink().getId() + " have "
 						+ "different length. Currently this feature is not supported. To " +
 								"avoid this exception set all lanes to the same lenght in lane definition file";
