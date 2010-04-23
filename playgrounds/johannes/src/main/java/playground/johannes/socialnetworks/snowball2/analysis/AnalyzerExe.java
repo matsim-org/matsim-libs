@@ -32,6 +32,7 @@ import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjection;
+import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
@@ -79,7 +80,7 @@ public class AnalyzerExe {
 		task.addTask(tTask);
 		
 		DistanceTask distTask = new DistanceTask();
-		distTask.setModule(new SampledDistance());
+		distTask.setModule(new ObservedDistance());
 		task.addTask(distTask);
 		
 //		Map<String, Object> analyzers = new HashMap<String, Object>();

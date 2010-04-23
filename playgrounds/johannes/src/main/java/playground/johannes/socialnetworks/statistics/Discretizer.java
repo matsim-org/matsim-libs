@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RemoveIsolatedSamplesTask.java
+ * Descretizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
-import visad.data.netcdf.UnsupportedOperationException;
+package playground.johannes.socialnetworks.statistics;
 
 /**
  * @author illenberger
  *
  */
-public class RemoveIsolatedSamplesTask implements GraphFilter<SocialSparseGraph> {
+public interface Discretizer {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public SocialSparseGraph apply(SocialSparseGraph graph) {
-		throw new UnsupportedOperationException("Need to think about that!");
-//		Set<SampledSocialVertex> partition = SnowballPartitions.createSampledPartition((Set<SampledSocialVertex>)(graph.getVertices()));
-//		Set<SampledSocialVertex> remove = new HashSet<SampledSocialVertex>();
-//		for(SampledSocialVertex vertex : partition) {
-//			if(vertex.getNeighbours().size() < 2) {
-//				remove.add(vertex);
-//			}
-//		}
-//		
-//		SampledSocialGraphBuilder builder = new SampledSocialGraphBuilder(null);
-//		for(SampledSocialVertex vertex : remove)
-//			builder.removeVertex(graph, vertex);
-		
-//		return graph;
-	}
-
+	public double discretize(double value);
 }

@@ -17,16 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.graph.analysis;
 
 import org.matsim.contrib.sna.graph.Graph;
 
 /**
+ * Representation of a generic algorithm that modifies an existing graph or
+ * creates a modified copy of a graph.
+ * 
  * @author illenberger
- *
+ * 
  */
 public interface GraphFilter<G extends Graph> {
 
+	/**
+	 * Applies a modification to <tt>graph</tt> or creates and returns a
+	 * modified copy of <tt>graph</tt>.
+	 * 
+	 * @param graph
+	 *            a graph.
+	 * @return the modified graph.
+	 */
 	public G apply(G graph);
-	
+
 }

@@ -31,13 +31,10 @@ import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 
-import playground.johannes.socialnetworks.survey.ivt2009.analysis.GraphFilter;
+import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -73,26 +70,15 @@ public class GraphClippingFilter implements GraphFilter<SpatialGraph> {
 
 	}
 
-	protected void findElements(SpatialGraph graph, Set<SpatialVertex> vertices,
-			Set<SpatialEdge> edges) {
+	protected void findElements(SpatialGraph graph, Set<SpatialVertex> vertices, Set<SpatialEdge> edges) {
 		try {
-			GeometryFactory geoFactory = new GeometryFactory();
-			CoordinateReferenceSystem sourceCRS = graph
-					.getCoordinateReferenceSysten();
-			CoordinateReferenceSystem targetCRS = CRSUtils.getCRS(geometry
-					.getSRID());
+			CoordinateReferenceSystem sourceCRS = graph.getCoordinateReferenceSysten();
+			CoordinateReferenceSystem targetCRS = CRSUtils.getCRS(geometry.getSRID());
 
-			MathTransform transform = CRS.findMathTransform(sourceCRS,
-					targetCRS);
+			MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS);
 
-			//			
 			for (SpatialVertex vertex : graph.getVertices()) {
-				double[] points = new double[] {
-						vertex.getPoint().getCoordinate().x,
-						vertex.getPoint().getCoordinate().y };
-				transform.transform(points, 0, points, 0, 1);
-				Point p = geoFactory.createPoint(new Coordinate(points[0],
-						points[1]));
+				Point p = CRSUtils.transformPoint(vertex.getPoint(), transform);
 				if (!geometry.contains(p)) {
 					vertices.add(vertex);
 					edges.addAll(vertex.getEdges());
@@ -101,10 +87,6 @@ public class GraphClippingFilter implements GraphFilter<SpatialGraph> {
 			}
 		} catch (FactoryException e) {
 			e.printStackTrace();
-			// return null;
-		} catch (TransformException e) {
-			e.printStackTrace();
-			// return null;
 		}
 
 	}

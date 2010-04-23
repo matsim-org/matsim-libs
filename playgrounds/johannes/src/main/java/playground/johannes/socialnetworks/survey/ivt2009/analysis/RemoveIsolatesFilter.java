@@ -31,15 +31,17 @@ import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 
+import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
+
 
 
 /**
  * @author illenberger
  *
  */
-public class RemoveIsolatesTask implements GraphFilter<SparseGraph> {
+public class RemoveIsolatesFilter implements GraphFilter<SparseGraph> {
 
-	private static final Logger logger = Logger.getLogger(RemoveIsolatesTask.class);
+	private static final Logger logger = Logger.getLogger(RemoveIsolatesFilter.class);
 	
 	@Override
 	public SparseGraph apply(SparseGraph graph) {
@@ -60,7 +62,7 @@ public class RemoveIsolatesTask implements GraphFilter<SparseGraph> {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		RemoveIsolatesTask task = new RemoveIsolatesTask();
+		RemoveIsolatesFilter task = new RemoveIsolatesFilter();
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		SpatialGraph graph = reader.readGraph(args[0]);
 		graph = (SpatialGraph) task.apply((SparseGraph) graph);

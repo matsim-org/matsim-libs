@@ -17,45 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.analysis;
+package playground.johannes.socialnetworks.snowball2.spatial.analysis;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.spatial.Distance;
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
+import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledVertexDecorator;
 
 /**
  * @author illenberger
  *
  */
-public class SampledDistance extends Distance {
+public class ObservedDistance extends Distance {
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
-		return super.distribution(extractDelegates(vertices));
+		Set<SpatialSampledVertexDecorator<SpatialVertex>> spatialVertices = (Set<SpatialSampledVertexDecorator<SpatialVertex>>)vertices;
+		return super.distribution(SnowballPartitions.createSampledPartition(spatialVertices));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Distribution vertexAccumulatedDistribution(
-			Set<? extends SpatialVertex> vertices) {
-		return super.vertexAccumulatedDistribution(extractDelegates(vertices));
-	}
-
-	private Set<SpatialVertex> extractDelegates(Set<? extends SpatialVertex> vertices) {
-		Set<SpatialSampledVertexDecorator<? extends SpatialVertex>> partition =
-			SnowballPartitions.<SpatialSampledVertexDecorator<? extends SpatialVertex>>
-			createSampledPartition((Set<SpatialSampledVertexDecorator<? extends SpatialVertex>>)vertices);
-		
-		Set<SpatialVertex> delegates = new HashSet<SpatialVertex>();
-		for(SampledVertexDecorator<? extends SpatialVertex> v : partition)
-			delegates.add(v.getDelegate());
-		
-		return delegates;
-//		return null;
+	public Distribution vertexAccumulatedDistribution(Set<? extends SpatialVertex> vertices) {
+		Set<SpatialSampledVertexDecorator<SpatialVertex>> spatialVertices = (Set<SpatialSampledVertexDecorator<SpatialVertex>>)vertices;
+		return super.vertexAccumulatedDistribution(spatialVertices);
 	}
 }

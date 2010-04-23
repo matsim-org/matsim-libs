@@ -30,7 +30,6 @@ import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.spatial.Distance;
 
 /**
  * @author illenberger

@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
+import java.util.Set;
+
+import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
@@ -26,10 +29,16 @@ import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.ComponentsTask;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeDensityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedTransitivity;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
+import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
@@ -37,25 +46,36 @@ import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
  */
 public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 	
-	public ObservedAnalyzerTask() {
+	public ObservedAnalyzerTask(ZoneLayer zones, Set<Point> choiceSet) {
 		addTask(new GraphSizeTask());
 		addTask(new WaveSizeTask());
 		
-		DegreeTask dTask = new DegreeTask();
-		dTask.setModule(new ObservedDegree());
-		addTask(dTask);
+		DegreeTask degree = new DegreeTask();
+		degree.setModule(new ObservedDegree());
+		addTask(degree);
 		
-		DegreeIterationTask dItTask = new DegreeIterationTask();
-		dItTask.setModule(new ObservedDegree());
-		addTask(dItTask);
+		DegreeIterationTask degreeIt = new DegreeIterationTask();
+		degreeIt.setModule(new ObservedDegree());
+		addTask(degreeIt);
 		
-		TransitivityTask tTask = new TransitivityTask();
-		tTask.setModule(new ObservedTransitivity());
-		addTask(tTask);
+		TransitivityTask transitivity = new TransitivityTask();
+		transitivity.setModule(new ObservedTransitivity());
+		addTask(transitivity);
 		
-		AgeTask aTask = new AgeTask();
-		aTask.setModule(new ObservedAge());
-		addTask(aTask);
+		DistanceTask distance = new DistanceTask();
+		distance.setModule(new ObservedDistance());
+		addTask(distance);
+		
+		AcceptanceProbabilityTask pAccept = new AcceptanceProbabilityTask(choiceSet);
+		addTask(pAccept);
+		
+		AgeTask age = new AgeTask();
+		age.setModule(new ObservedAge());
+		addTask(age);
+		
+		DegreeDensityTask density = new DegreeDensityTask(zones);
+		density.setModule(new ObservedDegree());
+		addTask(density);
 		
 		addTask(new ComponentsTask());
 	}

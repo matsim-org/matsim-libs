@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialAnalyzerTask.java
+ * DensityCorrelationTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,21 +19,52 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import org.matsim.contrib.sna.gis.ZoneLayer;
+import gnu.trove.TDoubleDoubleHashMap;
 
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
+import java.io.IOException;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.gis.ZoneLayer;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+
+import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialAnalyzerTask extends AnalyzerTaskComposite {
+public class DensityCorrelationTask extends ModuleAnalyzerTask<DensityCorrelation> {
 
-	public SpatialAnalyzerTask(ZoneLayer zones) {
-		addTask(new StandardAnalyzerTask());
-		addTask(new DistanceTask());
-		addTask(new PopDensityTask(zones));
+	private static final Logger logger = Logger.getLogger(DensityCorrelationTask.class);
+	
+	public static final String POPDENSITY_PERARSON_CORRELATION = "rho_rho_pearson";
+	
+	private final ZoneLayer zoneLayer;
+	
+	private static final double binsize = 1000.0;
+	
+	public DensityCorrelationTask(ZoneLayer zoneLayer) {
+		this.setModule(new DensityCorrelation());
+		this.zoneLayer = zoneLayer;
+	}
+	
+	@Override
+	public void analyze(Graph graph, Map<String, Double> stats) {
+		double pearson = module.pearsonCorrelation((SpatialGraph) graph, zoneLayer);
+		stats.put(POPDENSITY_PERARSON_CORRELATION, pearson);
+		logger.info(String.format("%1$s\t%2$.4f", POPDENSITY_PERARSON_CORRELATION, pearson));
+		
+		if(getOutputDirectory() != null) {
+			TDoubleDoubleHashMap values = module.densityCorrelation((SpatialGraph) graph, zoneLayer, binsize);
+			try {
+				Correlations.writeToFile(values, String.format("%1$s/rho_rho.txt", getOutputDirectory()), "rho", "rho");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

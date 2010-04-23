@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphTaskComposite.java
+ * LinearDiscretizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.contrib.sna.graph.Graph;
+package playground.johannes.socialnetworks.statistics;
 
 /**
  * @author illenberger
  *
  */
-public class GraphTaskComposite<G extends Graph> implements GraphFilter<G> {
+public class LinearDiscretizer implements Discretizer {
 
-	private List<GraphFilter<G>> tasks = new ArrayList<GraphFilter<G>>();
+	private final double binsize;
 	
-	public void addTask(GraphFilter<G> task) {
-		tasks.add(task);
+	public LinearDiscretizer(double binsize) {
+		this.binsize = binsize;
 	}
 	
 	@Override
-	public G apply(G graph) {
-		
-		for(GraphFilter<G> task : tasks) {
-			graph = task.apply(graph);
-		}
-		
-		return graph;
+	public double discretize(double value) {
+		return Math.ceil(value/binsize);
 	}
 
 }

@@ -45,6 +45,7 @@ import org.matsim.contrib.sna.math.Distribution;
 import playground.johannes.socialnetworks.graph.GraphAnalyser;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.Partitions;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.ZoneLegacy;
 import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;

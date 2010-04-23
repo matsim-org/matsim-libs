@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSocialNetFactory.java
+ * AcceptanceProbabilityTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,52 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.graph;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.graph.GraphFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.social.SocialPerson;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
 
 import com.vividsolutions.jts.geom.Point;
-
 
 /**
  * @author illenberger
  *
  */
-public class SocialSparseGraphFactory implements GraphFactory<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> {
+public class AcceptanceProbabilityTask extends ModuleAnalyzerTask<AcceptanceProbability> {
 
-	private static final Logger logger = Logger.getLogger(SocialSparseGraphFactory.class);
+	private final Set<Point> choiceSet;;
 	
-	private final CoordinateReferenceSystem crs;
-	
-	private final int SRID;
-	
-	public SocialSparseGraphFactory(CoordinateReferenceSystem crs) {
-		this.crs = crs;
-		SRID = CRSUtils.getSRID(crs);
-		if(SRID == 0)
-			logger.warn("Coordinate reference system has no SRID. Setting SRID to 0.");
+	public AcceptanceProbabilityTask(Set<Point> choiceSet) {
+		this.choiceSet = choiceSet;
+		setModule(new AcceptanceProbability());
 	}
 	
-	public SocialSparseEdge createEdge() {
-		return new SocialSparseEdge();
+	@SuppressWarnings("unchecked")
+	@Override
+	public void analyze(Graph graph, Map<String, Double> stats) {
+		if(getOutputDirectory() != null) {
+			Distribution distr = module.distribution((Set<? extends SpatialVertex>) graph.getVertices(), choiceSet);
+			try {
+				writeHistograms(distr, 1000, true, "p_accept");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
-
-	public SocialSparseGraph createGraph() {
-		return new SocialSparseGraph(crs);
-	}
-
-	public SocialSparseVertex createVertex() {
-		throw new UnsupportedOperationException();
-	}
-	
-	public SocialSparseVertex createVertex(SocialPerson person, Point point) {
-		point.setSRID(SRID);
-		return new SocialSparseVertex(person, point);
-	}
-
 }

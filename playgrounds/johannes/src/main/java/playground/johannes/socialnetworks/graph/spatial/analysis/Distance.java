@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import java.util.Collection;
 import java.util.HashSet;
