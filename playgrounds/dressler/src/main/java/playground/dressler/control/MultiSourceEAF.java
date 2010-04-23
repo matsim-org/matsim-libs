@@ -880,12 +880,12 @@ public class MultiSourceEAF {
 		settings.flowFactor = flowFactor; // default 1.0
 
 		// set additional parameters
-		settings.TimeHorizon = 70;
-		//settings.MaxRounds = 1;
+		settings.TimeHorizon = 400;
+		//settings.MaxRounds = 2;
 		//settings.checkConsistency = 100;
 		//settings.useVertexCleanup = false;
 		//settings.useSinkCapacities = false;
-		//settings.useImplicitVertexCleanup = true;
+		settings.useImplicitVertexCleanup = false;
 		settings.useShadowFlow = true;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
@@ -932,7 +932,7 @@ public class MultiSourceEAF {
 		
 		fluss = MultiSourceEAF.calcEAFlow(settings, flowpaths);
 		
-		//fluss.writePathflow();
+		fluss.writePathflow();
 
 		/* --------- the actual work is done --------- */
 		

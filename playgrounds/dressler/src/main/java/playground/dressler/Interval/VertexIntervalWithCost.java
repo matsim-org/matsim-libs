@@ -123,8 +123,9 @@ public class VertexIntervalWithCost extends VertexInterval {
 				// TODO test ...
 				if (this.costIsRelative) {			
 					// we increase steadily in cost, the other does not
-					// stop one before the breakeven spot. 
-					int better_r = temp.cost - this.cost - 1;
+					// stop before the breakeven spot
+					// So the breakeven point is the new right bound, which is not included!
+					int better_r = temp.cost - this.cost;
 					r = Math.min(r, better_r);
 					
 					isbetter = true; // this relies on the final l < r check!
@@ -240,7 +241,8 @@ public class VertexIntervalWithCost extends VertexInterval {
 	 * @param other VertexInterval to compare to
 	 * @return true iff the intervalls agree on their arrival properties
 	 */
-	public boolean continuedBy(final VertexIntervalWithCost o) {
+	@Override
+	public boolean continuedBy(final VertexInterval o) {
 		// argh.
 		if (!(o instanceof VertexIntervalWithCost)) return super.setArrivalAttributes(o);
 		

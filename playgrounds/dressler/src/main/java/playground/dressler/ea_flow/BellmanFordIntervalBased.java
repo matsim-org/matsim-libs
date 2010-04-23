@@ -187,7 +187,7 @@ public class BellmanFordIntervalBased {
 		
 		BFTask(VirtualNode node, Interval ival, boolean rev){
 			this.time = ival.getLowBound();
-			this.ival = ival;
+			this.ival = new Interval(ival); // we don't want this to be a reference!
 			this.node = node;
 			this.reverse = rev;
 		}

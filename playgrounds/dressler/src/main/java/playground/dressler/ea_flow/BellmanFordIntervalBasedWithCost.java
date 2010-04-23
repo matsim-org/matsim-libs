@@ -259,6 +259,10 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			for (VertexInterval changedinterval : changed) {
 				queue.add(new BFTask(new VirtualNormalNode(w, 0), changedinterval, false));
 			}
+			// DEBUG
+			/*if (v.getId().equals(new IdImpl("1241")) && link.getToNode().getId().equals(new IdImpl("1240"))) {
+				System.out.println("queue after forward link" + queue);
+			}*/
 
 		}
 		
@@ -312,7 +316,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				// is it worth updating?
 				if (temp.isBetterThan(sourcelabel) != null) {
 					sourcelabel.setArrivalAttributes(temp);
-					queue.add(new BFTask(new VirtualSource(v), temp, false));
+					queue.add(new BFTask(new VirtualSource(v), timetosource, false));
 				}					
 			}
 
@@ -773,7 +777,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			Node v = task.node.getRealNode();
 			
 			// DEBUG
-			/*if (v.getId().equals(new IdImpl("2997"))) {
+			/*if (v.getId().equals(new IdImpl("1241")) || v.getId().equals(new IdImpl("1240"))) {
 				System.out.println(task);
 			}*/
 			
@@ -826,14 +830,14 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				}
 
 				// DEBUG
-				/*if (v.getId().equals(new IdImpl("834"))) {
-					System.out.println("scanning normal node ...");
+				/*if (v.getId().equals(new IdImpl("1241")) || v.getId().equals(new IdImpl("1240"))) {
+					System.out.println("scanning normal node ..." + v.getId());					
 				}*/
 				
 				int low = task.ival.getLowBound();
 				while (low < task.ival.getHighBound()) {
 					// DEBUG
-					/*if (v.getId().equals(new IdImpl("834"))) {
+					/*if (v.getId().equals(new IdImpl("1241")) || v.getId().equals(new IdImpl("1240"))) {
 						System.out.println("scanning starting at low = " + low);
 					}*/
 					Pair<List<BFTask>, Interval> ret = processNormalNodeForward(v, low); 
@@ -842,16 +846,14 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 					if (tempqueue != null) {
 						queue.addAll(tempqueue);
 					}
-					// FIXME
-					// +1 seems wrong!
-					//low = ret.second.getHighBound() + 1;
+					
 					low = ret.second.getHighBound();
+					
+					// DEBUG
+					/*if (v.getId().equals(new IdImpl("1241")) || v.getId().equals(new IdImpl("1240"))) {
+						System.out.println("tempqueue ..." + tempqueue);					
+					}*/
 				}
-				
-				// DEBUG
-				/*if (v.getId().equals(new IdImpl("834"))) {
-					System.out.println("scanning finished");
-				}*/
 				
 				this.Tnormaltime.onoff();				
 
@@ -1470,7 +1472,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			}
 
 			// check sourceoutflow backwards
-			{
+			// but only for nonactive sources
+			if (this._flow.isNonActiveSource(v)) {
 
 				boolean thisokay = true;
 
@@ -1561,7 +1564,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			}
 			
 			// check sinkflow backwards
-			if (isink.getReachable()) {
+			// but only for nonactive sinks
+			if (isink.getReachable() && this._flow.isNonActiveSink(v)) {
 				boolean thisokay = true;
 
 				for (int t = 0; t < this._settings.TimeHorizon; t++) {
@@ -1645,9 +1649,9 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		
 		
 		// DEBUG
-		/*if (from.getId().equals(new IdImpl("2384"))) {
+		/*if (from.getId().equals(new IdImpl("1241")) && to.getId().equals(new IdImpl("1240"))) {
 			System.out.println("relabel");
-			System.out.println("from " + from.getId() + " to " + to.getId() + " over " + over.getId() + " original " + original + " ival " + ival);
+			System.out.println("from " + from.getId() + " to " + to.getId() + " over " + over.getId() + " (length " + this._settings.getLength(over) + ") original " + original + " ival " + ival);
 			System.out.println("cost " + cost + " isrelative " + costIsRelative);
 		}*/
 
@@ -1676,8 +1680,9 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				}
 			}
 			
-		} else {
+		} else { // reverse search
 			// Create successor. It is not shifted correctly.
+			// FIXME cost is missing for REVERSE search
 			PathStep succ;
 			if (original) {
 				succ = new StepEdge(over, 0, this._settings.getLength(over), original);
@@ -1685,12 +1690,11 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				succ = new StepEdge(over, this._settings.getLength(over), 0, original);
 			}
 			arriveProperties.setSuccessor(succ);
-			
-			// FIXME cost is missing for REVERSE search
+		
 		}
 		
 		// DEBUG
-		/*if (from.getId().equals(new IdImpl("2384"))) {
+		/*if (from.getId().equals(new IdImpl("1241")) && to.getId().equals(new IdImpl("1240"))) {
 			System.out.println("arriveproperties");
 			System.out.println(arriveProperties);
 		}*/
@@ -1700,14 +1704,14 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		this.Tpropagate.onoff();
 		
 		// DEBUG
-		/*if (from.getId().equals(new IdImpl("2384"))) {
+		/*if (from.getId().equals(new IdImpl("1241")) && to.getId().equals(new IdImpl("1240"))) {
 			System.out.println("arrive");
 			System.out.println(arrive);
 		}*/
 		
 		if (arrive != null && !arrive.isEmpty()) {
 			// DEBUG
-			/*if (from.getId().equals(new IdImpl("2384"))) {
+			/*if (from.getId().equals(new IdImpl("1241")) && to.getId().equals(new IdImpl("1240"))) {
 				System.out.println("label before changed");
 				System.out.println(labelto);
 			}*/
@@ -1716,7 +1720,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			this.Tsettrue.onoff();
 			
 			// DEBUG
-			/*if (from.getId().equals(new IdImpl("2384"))) {
+			/*if (from.getId().equals(new IdImpl("1241")) && to.getId().equals(new IdImpl("1240"))) {
 				System.out.println("label after changed");
 				System.out.println(labelto);			
 				System.out.println("changed");
