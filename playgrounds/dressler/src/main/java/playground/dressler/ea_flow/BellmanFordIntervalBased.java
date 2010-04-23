@@ -866,7 +866,7 @@ public class BellmanFordIntervalBased {
 				// we might have to do something ...
 				// check if we can reverse flow
 				SourceIntervals si = this._flow.getSourceOutflow(v);
-				Interval arrive = si.canSendFlowBack(inter);
+				Interval arrive = si.canSendFlowBackFirst(inter);
 				if (arrive != null) {
 					
 					// indeed, we need to process this source

@@ -78,7 +78,7 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 	 * @param incoming The interval on which one arrives.
 	 * @return the first interval with flow on it (within incoming), or null 
 	 */
-	public Interval canSendFlowBack(final Interval incoming){
+	public Interval canSendFlowBackFirst(final Interval incoming){
 
 		EdgeInterval current;
 		
@@ -98,6 +98,36 @@ public class SourceIntervals extends Intervals<EdgeInterval> {
 				break;
 			}
 			current = this.getIntervalAt(current.getHighBound());
+		}
+			
+
+		return null;
+	}
+	
+	/**
+	 * Checks whether flow coming out of the source can be sent back   
+	 * @param incoming The interval on which one arrives.
+	 * @return the last interval with flow on it (within incoming), or null 
+	 */
+	public Interval canSendFlowBackLatest(final Interval incoming){
+
+		EdgeInterval current;
+		
+		current = this.getIntervalAt(incoming.getHighBound() - 1);
+		while (current != null) {		
+			if (current.getFlow() > 0) {				
+				int low = Math.max(current.getLowBound(), incoming.getLowBound());					  
+				int high = Math.min(current.getHighBound(), incoming.getHighBound());
+				return new Interval(low, high);
+
+			}
+			
+			// this should in particular catch current.getLowBound() == 0 
+			if (current.getLowBound() <= incoming.getLowBound()) {
+				break;
+			}
+			
+			current = this.getIntervalAt(current.getLowBound() - 1);
 		}
 			
 

@@ -565,7 +565,7 @@ public class MultiSourceEAF {
 				totalflow += arrivals[ii];
 				totalcost += ii*arrivals[ii];
 			}
-			System.out.println("Total flow: " + totalflow + " , total cost: " + totalcost);
+			System.out.println("Iter " + i + " , total flow: " + totalflow + " , total cost: " + totalcost);
 		}
 
 
@@ -762,7 +762,7 @@ public class MultiSourceEAF {
 		}
 		
 		// outputplansfile = "/homes/combi/dressler/V/code/meine_EA/tempplans.xml";
-		//flowfile = "/homes/combi/dressler/V/vnotes/statistik_2010_04_april/bug_shelters_mit_kosten_2.pathflow";
+		//flowfile = "/homes/combi/dressler/V/vnotes/statistik_2010_04_april/bug_shelters_mit_kosten_3.pathflow";
 		
 
 		if(_debug){
@@ -885,7 +885,7 @@ public class MultiSourceEAF {
 		//settings.checkConsistency = 100;
 		//settings.useVertexCleanup = false;
 		//settings.useSinkCapacities = false;
-		settings.useImplicitVertexCleanup = true;
+		//settings.useImplicitVertexCleanup = true;
 		settings.useShadowFlow = true;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;

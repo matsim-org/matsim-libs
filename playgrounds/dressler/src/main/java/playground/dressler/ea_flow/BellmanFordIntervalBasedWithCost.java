@@ -34,6 +34,7 @@ import playground.dressler.Interval.EdgeFlowI;
 import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.Pair;
+import playground.dressler.Interval.SinkIntervals;
 import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.Interval.VertexInterval;
 import playground.dressler.Interval.VertexIntervalWithCost;
@@ -153,6 +154,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 
 		if (inter.isScanned()) {
 			// don't scan again
+			this._totalnonpolls++;
+			this._roundnonpolls++;
 			return null;
 		}
 		inter.setScanned(true);
@@ -278,41 +281,41 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		this.Temptysourcestime.onoff();
 
 		// treat empty sources!
+		// note: reachable sources can be updated with better costs
 		if (this._flow.isNonActiveSource(v)) {
-			// FIXME
-			// DEBUG
-			// even reachable sources might be updated with better costs!
-			//if (!this._sourcelabels.get(v).getReachable()) {
-				// we might have to do something ...
-				// check if we can reverse flow
-				SourceIntervals si = this._flow.getSourceOutflow(v);
-				
-				// the first free time on the link gives the best cost				
-				Interval arrive = si.canSendFlowBack(inter);
-				if (arrive != null) {
-					// we could reach the source
-					VertexIntervalWithCost temp = new VertexIntervalWithCost(0, this._settings.TimeHorizon);
-					
-					StepSourceFlow pred = new StepSourceFlow(v, arrive.getLowBound(), false);
-					temp.setArrivalAttributesForward(pred);
-					
-					temp.setScanned(false);
-					temp.costIsRelative = false;
-					
-					// The earliest time is the cheapest.
-					// We still need to subtract the travel time, though.
-					temp.cost = label.getAbsoluteCost(arrive.getLowBound()) - arrive.getLowBound();
+			// check if we can reverse flow
+			SourceIntervals si = this._flow.getSourceOutflow(v);
 
-					
-					VertexIntervalWithCost sourcelabel = (VertexIntervalWithCost) this._sourcelabels.get(v);
-					
-					// is it worth updating?
-					if (temp.isBetterThan(sourcelabel) != null) {
-						sourcelabel.setArrivalAttributes(temp);
-						queue.add(new BFTask(new VirtualSource(v), temp, false));
-					}
-				}
-			//}
+			// the LAST free time on the link gives the best cost (see below)
+			Interval arrive = si.canSendFlowBackLatest(inter);
+
+			if (arrive != null) {
+				// we could reach the source
+				// choose the latest time, which is getHighBound() - 1
+				int timetosource = arrive.getHighBound() - 1;
+				VertexIntervalWithCost temp = new VertexIntervalWithCost(0, this._settings.TimeHorizon);
+
+				StepSourceFlow pred = new StepSourceFlow(v, timetosource, false);
+				temp.setArrivalAttributesForward(pred);
+
+				temp.setScanned(false);
+				temp.costIsRelative = false;
+
+				// Find the point with the best cost.
+				// If the cost is relative, we can take any point.
+				// If it is absolute, using the latest time in the interval is best!
+				// So we always take the latest point in time.
+				temp.cost = label.getAbsoluteCost(timetosource) - timetosource;
+
+				VertexIntervalWithCost sourcelabel = (VertexIntervalWithCost) this._sourcelabels.get(v);
+
+				// is it worth updating?
+				if (temp.isBetterThan(sourcelabel) != null) {
+					sourcelabel.setArrivalAttributes(temp);
+					queue.add(new BFTask(new VirtualSource(v), temp, false));
+				}					
+			}
+
 		}
 		
 		this.Temptysourcestime.onoff();
@@ -320,7 +323,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		
 		// treat sinks
 		if (this._settings.isSink(v)) {
-			// the first time when we can go to the sink will also be the cheapest!
+			// the FIRST time when we can go to the sink will also be the cheapest!
 			int reachsink = inter.getLowBound();
 			
 			VertexIntervalWithCost oldlabel = (VertexIntervalWithCost) this._sinklabels.get(v);
@@ -770,7 +773,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			Node v = task.node.getRealNode();
 			
 			// DEBUG
-			/*if (v.getId().equals(new IdImpl("2384"))) {
+			/*if (v.getId().equals(new IdImpl("2997"))) {
 				System.out.println(task);
 			}*/
 			
@@ -896,7 +899,9 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		}
 		
 		// big debug function
-		//checkAllLabels();
+		if (!checkAllLabels()) {
+			throw new RuntimeException("Labels not okay!");
+		}
 				
 		/*System.out.println("final labels: \n");
 		printStatus();*/
@@ -1284,12 +1289,30 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	/** Debug function to check all labels in a naive way.
 	 * Be careful with timeexpansion!
 	 */
-	public void checkAllLabels() {
+	private boolean checkAllLabels() {
 		System.out.println("Checking all labels ... ");
 		// check normal links
 		
+		boolean allokay = true;
+
 		for (Node from : this._network.getNodes().values()) {
 			VertexIntervalsWithCost VIfrom = (VertexIntervalsWithCost) this._labels.get(from);
+			
+			// check label itself
+			boolean thislabelokay = true;
+			for (int t = 0; t < this._settings.TimeHorizon; t++) {
+				VertexIntervalWithCost ifrom = (VertexIntervalWithCost) VIfrom.getIntervalAt(t);
+				if (ifrom.getReachable() && !ifrom.isScanned()) {
+					thislabelokay = false;
+				}
+			}
+			
+			if (!thislabelokay) {
+				allokay = false;
+				System.out.println("Reachable but not scanned interval!");
+				System.out.println("Node v " + from.getId());
+				System.out.println(VIfrom);
+			}
 			
 			// forward links
 			for (Link edge : from.getOutLinks().values()) {
@@ -1297,6 +1320,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				VertexIntervalsWithCost VIto = (VertexIntervalsWithCost) this._labels.get(to);
 				EdgeFlowI EF = this._flow.getFlow(edge);
 				int length = this._settings.getLength(edge);
+				boolean thisedgeokay = true;
 				for (int t = 0; t < this._settings.TimeHorizon - length; t++) {
 					VertexIntervalWithCost ifrom = (VertexIntervalWithCost) VIfrom.getIntervalAt(t);
 					if (ifrom.getReachable()) {
@@ -1313,32 +1337,37 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 								okay = false;
 							}
 
-							if (!okay) {							  
-								System.out.println("Label not okay!");
-								System.out.println("From node " + from.getId());
-								System.out.println("To node " + to.getId());
-								System.out.println("Edge " + edge.getId() + " forward");
-								System.out.println("Edge from " + edge.getFromNode().getId() + " to " + edge.getToNode().getId());
-								System.out.println("Edge length " + length + " edge cap " + this._settings.getCapacity(edge));
-								System.out.println("Time t " + t);
-								System.out.println("From label:\n");
-								System.out.println(VIfrom);
-								System.out.println("To label:\n");
-								System.out.println(VIto);
-								System.out.println("Edge flow:\n");
-								System.out.println(EF);
+							if (!okay) {		
+								System.out.println("bad t = " + t);
+								thisedgeokay = false;
 							}
 						}
 					}
 				}
+				if (!thisedgeokay) {		
+					allokay = false;
+					System.out.println("Label not okay!");
+					System.out.println("From node " + from.getId());
+					System.out.println("To node " + to.getId());
+					System.out.println("Edge " + edge.getId() + " forward");
+					System.out.println("Edge from " + edge.getFromNode().getId() + " to " + edge.getToNode().getId());
+					System.out.println("Edge length " + length + " edge cap " + this._settings.getCapacity(edge));					
+					System.out.println("From label:\n");
+					System.out.println(VIfrom);
+					System.out.println("To label:\n");
+					System.out.println(VIto);
+					System.out.println("Edge flow:\n");
+					System.out.println(EF);
+				}
 			}
-			
+
 			// backward links
 			for (Link edge : from.getInLinks().values()) {
 				Node to = edge.getFromNode();
 				VertexIntervalsWithCost VIto = (VertexIntervalsWithCost) this._labels.get(to);
 				EdgeFlowI EF = this._flow.getFlow(edge);
 				int length = this._settings.getLength(edge);
+				boolean thisedgeokay = true;				
 				for (int t = length; t < this._settings.TimeHorizon; t++) {
 					VertexIntervalWithCost ifrom = (VertexIntervalWithCost) VIfrom.getIntervalAt(t);
 					if (ifrom.getReachable()) {
@@ -1355,32 +1384,227 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 								okay = false;
 							}
 
-							if (!okay) {							  
-								System.out.println("Label not okay!");
-								System.out.println("From node " + from.getId());
-								System.out.println("To node " + to.getId());
-								System.out.println("Edge " + edge.getId() + " backward");
-								System.out.println("Edge from " + edge.getFromNode().getId() + " to " + edge.getToNode().getId());
-								System.out.println("Edge length " + length + " edge cap " + this._settings.getCapacity(edge));
-								System.out.println("Time t " + t);
-								System.out.println("From label:\n");
-								System.out.println(VIfrom);
-								System.out.println("To label:\n");
-								System.out.println(VIto);
-								System.out.println("Edge flow:\n");
-								System.out.println(EF);
+							if (!okay) {		
+								System.out.println("bad t = " + t);
+								thisedgeokay = false;
 							}
 						}
 					}
 				}
+
+				if (!thisedgeokay) {		
+					allokay = false;
+					System.out.println("Label not okay!");
+					System.out.println("From node " + from.getId());
+					System.out.println("To node " + to.getId());
+					System.out.println("Edge " + edge.getId() + " backward");
+					System.out.println("Edge from " + edge.getFromNode().getId() + " to " + edge.getToNode().getId());
+					System.out.println("Edge length " + length + " edge cap " + this._settings.getCapacity(edge));					
+					System.out.println("From label:\n");
+					System.out.println(VIfrom);
+					System.out.println("To label:\n");
+					System.out.println(VIto);
+					System.out.println("Edge flow:\n");
+					System.out.println(EF);
+				}
 			}
 		}
 		
-		System.out.println("Sources not checked yet.");
-		System.out.println("Sinks not checked yet.");
+		// check sources
+		for (Node v : this._flow.getSources()) {
+			VertexIntervalWithCost ifrom = (VertexIntervalWithCost) this._sourcelabels.get(v);
+
+			// check basic attributes
+			if (this._flow.isActiveSource(v) && (!ifrom.getReachable() || ifrom.getAbsoluteCost(0) > 0)) {
+				allokay = false;
+				System.out.println("Active source not updated properly!");
+				System.out.println("Source v " + v);
+				System.out.println(ifrom);
+			}
+
+			if (ifrom.getReachable() && !ifrom.isScanned()) {
+				allokay = false;
+				System.out.println("Reachable but not scanned interval!");
+				System.out.println("Source v " + v);
+				System.out.println(ifrom);
+			}
+
+			VertexIntervalsWithCost VIto = (VertexIntervalsWithCost) this._labels.get(v);
+			SourceIntervals SI = this._flow.getSourceOutflow(v);
+			
+			// check forward flow out of source
+			if (ifrom.getReachable()) {
+				boolean thisokay = true;
+
+				for (int t = 0; t < this._settings.TimeHorizon; t++) {
+					VertexIntervalWithCost ito = (VertexIntervalWithCost) VIto.getIntervalAt(t);
+
+					boolean okay = true;
+
+					if (!ito.getReachable()) { 
+						okay = false;
+					}
+
+					if (ifrom.getAbsoluteCost(0) + t < ito.getAbsoluteCost(t)) {
+						okay = false;
+					}
+
+					if (!okay) {		
+						System.out.println("bad t = " + t);
+						thisokay = false;
+					}
+
+				}
+				if (!thisokay) {		
+					allokay = false;
+					System.out.println("Label not okay!");
+					System.out.println("From source " + v.getId());
+					System.out.println("To real node " + v.getId());
+					System.out.println("From label:\n");
+					System.out.println(ifrom);
+					System.out.println("To label:\n");
+					System.out.println(VIto);
+					System.out.println("Source out flow:\n");
+					System.out.println(SI);
+				}
+			}
+
+			// check sourceoutflow backwards
+			{
+
+				boolean thisokay = true;
+
+				for (int t = 0; t < this._settings.TimeHorizon; t++) {
+					VertexIntervalWithCost ito = (VertexIntervalWithCost) VIto.getIntervalAt(t);
+
+					boolean okay = true;
+
+					if (ito.getReachable() && SI.getFlowAt(t) > 0) {
+						if (!ifrom.getReachable() || ito.getAbsoluteCost(t) - t < ifrom.getAbsoluteCost(0)) {
+							okay = false;
+						}
+					}
+
+					if (!okay) {		
+						System.out.println("bad t = " + t);
+						thisokay = false;
+					}
+
+				}
+				if (!thisokay) {		
+					allokay = false;
+					System.out.println("Label not okay!");
+					System.out.println("From real node  " + v.getId());
+					System.out.println("back to source node " + v.getId());
+					System.out.println("From label:\n");
+					System.out.println(ifrom);
+					System.out.println("To label:\n");
+					System.out.println(VIto);
+					System.out.println("Source out flow:\n");
+					System.out.println(SI);
+				}
+
+			}
+		}
+		
+		// check sinks
+		// TODO
+		for (Node v : this._flow.getSinks()) {
+			VertexIntervalWithCost isink = (VertexIntervalWithCost) this._sinklabels.get(v);
+
+			// check basic attributes
+			if (isink.getReachable() && !isink.isScanned()) {
+				allokay = false;
+				System.out.println("Reachable but not scanned interval!");
+				System.out.println("Sink v " + v);
+				System.out.println(isink);
+			}
+
+			VertexIntervalsWithCost VIto = (VertexIntervalsWithCost) this._labels.get(v);
+			SinkIntervals SI = this._flow.getSinkFlow(v);
+			
+			// check forward flow into sink			
+			{
+
+				boolean thisokay = true;
+
+				for (int t = 0; t < this._settings.TimeHorizon; t++) {
+					VertexIntervalWithCost inode = (VertexIntervalWithCost) VIto.getIntervalAt(t);
+
+					boolean okay = true;
+
+					if (inode.getReachable()) {
+						if (!isink.getReachable() || isink.getAbsoluteCost(0) > inode.getAbsoluteCost(t)) {
+							okay = false;
+						}
+					}
+
+					if (!okay) {		
+						System.out.println("bad t = " + t);
+						thisokay = false;
+					}
+
+				}
+				if (!thisokay) {		
+					allokay = false;
+					System.out.println("Label not okay!");
+					System.out.println("From real node  " + v.getId());
+					System.out.println("to sink node " + v.getId());
+					System.out.println("Sink label:\n");
+					System.out.println(isink);
+					System.out.println("Node label:\n");
+					System.out.println(VIto);
+					System.out.println("Sink flow:\n");
+					System.out.println(SI);
+				}
+
+			}
+			
+			// check sinkflow backwards
+			if (isink.getReachable()) {
+				boolean thisokay = true;
+
+				for (int t = 0; t < this._settings.TimeHorizon; t++) {
+					VertexIntervalWithCost inode = (VertexIntervalWithCost) VIto.getIntervalAt(t);
+
+					boolean okay = true;
+
+					if (SI.getFlowAt(t) > 0) {
+						if (!inode.getReachable()) { 
+							okay = false;
+						}
+
+						if (isink.getAbsoluteCost(0) < inode.getAbsoluteCost(t)) {
+							okay = false;
+						}
+					}
+
+					if (!okay) {		
+						System.out.println("bad t = " + t);
+						thisokay = false;
+					}
+
+				}
+				if (!thisokay) {		
+					allokay = false;
+					System.out.println("Label not okay!");
+					System.out.println("From sink " + v.getId());
+					System.out.println("back to real node " + v.getId());
+					System.out.println("Sink label:\n");
+					System.out.println(isink);
+					System.out.println("Node label:\n");
+					System.out.println(VIto);
+					System.out.println("Sink flow:\n");
+					System.out.println(SI);
+				}
+			}
+
+			
+		}
 		
 		
 		System.out.println("Done checking all labels.");
+		return allokay;
 	}
 	
 
