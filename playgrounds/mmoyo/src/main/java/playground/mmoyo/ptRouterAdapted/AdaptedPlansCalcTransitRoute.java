@@ -64,12 +64,11 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 	public AdaptedPlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
-			final TransitConfigGroup transitConfig) {
+			final TransitConfigGroup transitConfig, MyTransitRouterConfig myTransitRouterConfig) {
 		//super(config, network, costCalculator, timeCalculator, factory);
 		super(config, network, costCalculator, timeCalculator, factory, schedule, transitConfig);
 		
-		MyTransitRouterConfig trConfig = new MyTransitRouterConfig() ;
-		this.adaptedTransitRouter = new AdaptedTransitRouter( trConfig, schedule);
+		this.adaptedTransitRouter = new AdaptedTransitRouter( myTransitRouterConfig, schedule);
 	
 //		// both "super" route algos are made to route only on the "car" network.  yy I assume this is since the non-car modes are handled
 //		// here.  This is, in fact, NOT correct, since this does not handle bike, so would need to be fixed before production use).  kai, apr'10

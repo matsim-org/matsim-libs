@@ -15,7 +15,7 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 public class TransportModeCounter {
 
 	/**
-	 * Reads a TransitSchedule a counts the number of lines and routers using a TransportMode
+	 * Reads a TransitSchedule and counts the number of transitLines and transitRoutes using a TransportMode
 	 */
 	public void count(TransitSchedule transitSchedule){
 		Map <TransportMode, List<Tuple<TransitLine, TransitRoute>>>  modeMap = new TreeMap <TransportMode,List<Tuple<TransitLine, TransitRoute>>> ();		

@@ -22,8 +22,6 @@ package playground.mmoyo.ptRouterAdapted;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
@@ -39,9 +37,11 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 //	private double previousTime = Double.NaN;
 //	private double cachedTravelTime = Double.NaN;
 
-	public AdaptedTransitRouterNetworkTravelTimeCost(TransitRouterConfig config ) {
+	private MyTransitRouterConfig myConfig;	
+	public AdaptedTransitRouterNetworkTravelTimeCost(MyTransitRouterConfig config ) {
 		super( config ) ;
-		log.error("a problem at this point is that the walk speed comes from the config" ) ;
+		log.error("a problem at this point is that the walk speed comes from the config" );
+		myConfig= (MyTransitRouterConfig) this.config; 
 	}
 
 	@Override
@@ -49,10 +49,10 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		double cost;
 		if (((TransitRouterNetworkLink) link).getRoute() == null) {
 			// transfer link
-			cost = -getLinkTravelTime(link, time) * this.config.marginalUtilityOfTravelTimeWalk + this.config.costLineSwitch;
+			cost = -getLinkTravelTime(link, time) * this.myConfig.marginalUtilityOfTravelTimeWalk + this.myConfig.costLineSwitch;
 		} else {
 			//pt link
-			cost = -getLinkTravelTime(link, time) * this.config.marginalUtilityOfTravelTimeTransit - link.getLength() * this.config.marginalUtilityOfTravelDistanceTransit;
+			cost = -getLinkTravelTime(link, time) * this.myConfig.marginalUtilityOfTravelTimeTransit - link.getLength() * this.myConfig.marginalUtilityOfTravelDistanceTransit;
 		}
 		return cost;
 	}
