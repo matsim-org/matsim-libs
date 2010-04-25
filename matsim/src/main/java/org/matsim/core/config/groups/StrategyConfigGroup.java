@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 
@@ -249,7 +250,7 @@ public class StrategyConfigGroup extends Module {
 		return this.externalExeTimeOut;
 	}
 
-	public static class StrategySettings {
+	public static class StrategySettings implements MatsimParameters {
 		private Id id;
 		private double probability = -1.0;
 		private String moduleName = null;
