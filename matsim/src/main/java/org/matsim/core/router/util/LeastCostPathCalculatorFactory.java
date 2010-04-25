@@ -21,8 +21,9 @@
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.internal.MatsimFactory;
 
-public interface LeastCostPathCalculatorFactory {
+public interface LeastCostPathCalculatorFactory extends MatsimFactory {
 
 	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelCost travelCosts, final TravelTime travelTimes);
 
