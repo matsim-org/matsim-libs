@@ -21,12 +21,13 @@ package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.internal.MatsimFactory;
 
 
 /**
  * @author dgrether
  */
-public interface QueueNetworkFactory<QN extends QueueNode, QL extends QueueLink> {
+public interface QueueNetworkFactory<QN extends QueueNode, QL extends QueueLink> extends MatsimFactory {
 
 	public QN newQueueNode(Node node, QueueNetwork queueNetwork);
 
