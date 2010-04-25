@@ -28,6 +28,7 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -38,7 +39,13 @@ import org.matsim.core.utils.misc.Time;
  * @author illenberger
  *
  */
-public class NetworkChangeEventsWriter extends MatsimXmlWriter {
+public class NetworkChangeEventsWriter extends MatsimXmlWriter implements MatsimSomeWriter {
+	// yy uses syntax 
+	//   write( filename, container ) 
+	// rather than the matsim standard
+	//   ctor( container ) 
+	//   write( filename )
+	// kai, apr'10
 	
 	private static final Logger log = Logger.getLogger(NetworkChangeEventsWriter.class);
 	
