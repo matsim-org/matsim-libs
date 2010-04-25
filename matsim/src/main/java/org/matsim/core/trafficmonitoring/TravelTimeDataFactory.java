@@ -21,8 +21,9 @@
 package org.matsim.core.trafficmonitoring;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimFactory;
 
-public interface TravelTimeDataFactory {
+public interface TravelTimeDataFactory extends MatsimFactory {
 	
 	public TravelTimeData createTravelTimeData(final Id linkId);
 
