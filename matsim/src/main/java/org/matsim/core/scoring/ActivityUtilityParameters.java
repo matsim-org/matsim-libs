@@ -20,7 +20,9 @@
 
 package org.matsim.core.scoring;
 
-public class ActivityUtilityParameters {
+import org.matsim.core.api.internal.MatsimParameters;
+
+public class ActivityUtilityParameters implements MatsimParameters {
 
 	private final String type;
 	private final double priority;
