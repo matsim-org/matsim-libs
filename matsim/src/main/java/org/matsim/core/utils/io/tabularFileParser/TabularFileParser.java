@@ -24,12 +24,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.matsim.core.api.internal.MatsimSomeReader;
+
 /**
  * Parser for plain text files that are structured in columns.
  *
  * @author gunnar
  */
-public class TabularFileParser {
+public class TabularFileParser implements MatsimSomeReader {
 
     private TabularFileParserConfig config = null;
 
