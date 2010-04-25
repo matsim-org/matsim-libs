@@ -19,12 +19,13 @@
 
 package org.matsim.pt.qsim;
 
+import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.vehicles.BasicVehicle;
 
 /**
  * @author mrieser
  */
-public interface TransitStopHandlerFactory {
+public interface TransitStopHandlerFactory extends MatsimFactory {
 
 	public TransitStopHandler createTransitStopHandler(BasicVehicle vehicle);
 
