@@ -20,11 +20,12 @@
 package org.matsim.ptproject.qsim;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.internal.MatsimFactory;
 
 /**
  * @author dgrether
  */
-public class AgentFactory {
+public class AgentFactory implements MatsimFactory {
 
 	protected final QSim simulation;
 
