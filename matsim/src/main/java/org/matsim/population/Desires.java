@@ -24,9 +24,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.utils.misc.Time;
 
-public class Desires {
+import visad.UnimplementedException;
+
+public class Desires implements MatsimToplevelContainer {
+	// yyyy this is an unfinished matsim toplevel container since
+	// (1) the factory method is not there
+	// (2) the public interface has not been reviewed.
+	// kai, apr'10
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -114,5 +122,12 @@ public class Desires {
 	@Override
 	public final String toString() {
 		return "[desc=" + this.desc + "]" + "[nof_act_durs=" + this.act_durs.size() + "]";
+	}
+
+	@Override
+	@Deprecated // not yet implemented.  kai, apr'10
+	public MatsimFactory getFactory() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
 	}
 }
