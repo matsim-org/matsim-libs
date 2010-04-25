@@ -29,11 +29,12 @@ import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
+import org.matsim.core.api.internal.MatsimSomeReader;
 
 /**
  * @author glaemmel
  */
-public class ShapeFileReader {
+public class ShapeFileReader implements MatsimSomeReader {
 
 	private static final Logger log = Logger.getLogger(ShapeFileReader.class);
 
