@@ -22,6 +22,7 @@ package org.matsim.core.api.experimental;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.config.Config;
 
 /**
@@ -30,7 +31,7 @@ import org.matsim.core.config.Config;
  * @deprecated this is, as of now, a _proposal_.  
  */
 @Deprecated
-public class ScenarioFactoryImpl {
+public class ScenarioFactoryImpl implements MatsimFactory {
 	
 	public Scenario createScenario() {
 		return new ScenarioImpl() ;
