@@ -20,13 +20,14 @@
 
 package org.matsim.core.api.experimental.events;
 
+import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.events.EventsManagerImpl;
 
 /**
  * @author nagel
  *
  */
-public class EventsManagerFactoryImpl {
+public class EventsManagerFactoryImpl implements MatsimFactory {
 	
 	public EventsManager createEventsManager() {
 		return new EventsManagerImpl() ;
