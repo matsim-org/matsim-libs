@@ -31,7 +31,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  */
 public class JohScoringFunctionFactory implements ScoringFunctionFactory {
 	
-	public ScoringFunction getNewScoringFunction(final Plan plan) {
+	public ScoringFunction createNewScoringFunction(final Plan plan) {
 		return new JohScoringFunction(plan);
 	}
 

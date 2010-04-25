@@ -472,7 +472,7 @@ public class ControlerTest extends MatsimTestCase {
 	/** A helper class for testSetScoringFunctionFactory() */
 	/*package*/ static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
 
-		public ScoringFunction getNewScoringFunction(final Plan plan) {
+		public ScoringFunction createNewScoringFunction(final Plan plan) {
 			return new ScoringFunctionAccumulator();
 		}
 	}

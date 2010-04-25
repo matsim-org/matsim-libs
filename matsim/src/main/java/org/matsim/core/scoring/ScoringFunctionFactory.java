@@ -21,6 +21,7 @@
 package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.internal.MatsimFactory;
 
 /**
  * The <code>ScoringFunctionFactory</code> creates new scoring functions.
@@ -31,7 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
  *
  * @author mrieser
  */
-public interface ScoringFunctionFactory {
+public interface ScoringFunctionFactory extends MatsimFactory {
 
 	/**
 	 * Creates a new scoring function for the given plan.
@@ -40,6 +41,6 @@ public interface ScoringFunctionFactory {
 	 * used by the scoring function to look additional information.
 	 * @return A scoring function.
 	 */
-	public ScoringFunction getNewScoringFunction(final Plan plan);
+	public ScoringFunction createNewScoringFunction(final Plan plan);
 
 }

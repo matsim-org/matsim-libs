@@ -82,7 +82,7 @@ public class Template implements MatsimModule {
 		// *** ScoringFunction *********************
 		
 		ScoringFunctionFactory scoringFactory = new ScoringFunctionFactory() {
-			public ScoringFunction getNewScoringFunction(Plan plan) {
+			public ScoringFunction createNewScoringFunction(Plan plan) {
 				return null;
 			}
 		};

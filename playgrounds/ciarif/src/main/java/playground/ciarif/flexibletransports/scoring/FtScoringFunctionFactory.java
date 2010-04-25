@@ -36,7 +36,7 @@ public class FtScoringFunctionFactory extends CharyparNagelScoringFunctionFactor
 		}
 	
 		@Override
-		public ScoringFunction getNewScoringFunction(Plan plan) {
+		public ScoringFunction createNewScoringFunction(Plan plan) {
 			
 			ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 			

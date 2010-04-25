@@ -30,7 +30,7 @@ public class RetailersScoringFunctionFactory extends org.matsim.core.scoring.cha
 	}
 	
 	@Override
-	public ScoringFunction getNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Plan plan) {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		

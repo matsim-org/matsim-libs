@@ -47,7 +47,7 @@ public class EUTScoringFactory implements ScoringFunctionFactory {
 		this.params = new CharyparNagelScoringParameters(config);
 	}
 	
-	public ScoringFunction getNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));
 		scoringFunctionAccumulator.addScoringFunction(new EUTScoringFunction(plan, params, utilFunc));

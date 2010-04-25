@@ -49,7 +49,7 @@ public class PlanomatXScoringFunctionFactory implements ScoringFunctionFactory {
 	 * @param plan
 	 * @return
 	 */
-	public ScoringFunction getNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Plan plan) {
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 

@@ -71,7 +71,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 			// empty public constructor for private inner class
 		}
 
-		public ScoringFunction getNewScoringFunction(final Plan plan) {
+		public ScoringFunction createNewScoringFunction(final Plan plan) {
 			this.counter++;
 			return this.sf;
 		}

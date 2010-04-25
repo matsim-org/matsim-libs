@@ -37,7 +37,7 @@ public class BkScoringFunctionFactory implements ScoringFunctionFactory {
 		this.configGroup = charyparNagelScoring;
 	}
 
-	public ScoringFunction getNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Plan plan) {
 		return new BkScoringFunction(plan, this.configGroup);
 	}
 

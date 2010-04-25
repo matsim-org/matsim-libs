@@ -273,7 +273,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 	private playground.jhackney.scoring.EventSocScoringFunction getScoringFunctionForAgent(final String agentId) {
 		playground.jhackney.scoring.EventSocScoringFunction sf = this.agentScorers.get(agentId);
 		if (sf == null) {
-			sf = this.sfFactory.getNewScoringFunction(this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan());
+			sf = this.sfFactory.createNewScoringFunction(this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan());
 			this.agentScorers.put(agentId, sf);
 		}
 		return sf;

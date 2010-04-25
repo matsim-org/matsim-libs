@@ -30,7 +30,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 public class OnlyTimeDependentScoringFunctionFactory implements ScoringFunctionFactory {
 	
-	public ScoringFunction getNewScoringFunction(Plan plan) 
+	public ScoringFunction createNewScoringFunction(Plan plan) 
 	{
 		return new OnlyTimeDependentScoringFunction(plan);
 	}

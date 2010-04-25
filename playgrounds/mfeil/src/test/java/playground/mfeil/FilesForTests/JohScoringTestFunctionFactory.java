@@ -33,7 +33,7 @@ import playground.mfeil.JohScoringFunction;
  */
 public class JohScoringTestFunctionFactory implements ScoringFunctionFactory {
 	
-	public ScoringFunction getNewScoringFunction(final Plan plan) {
+	public ScoringFunction createNewScoringFunction(final Plan plan) {
 		return new JohScoringTestFunction(plan);
 	}
 

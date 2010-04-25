@@ -38,7 +38,7 @@ public class PlanScorer {
 	}
 
 	public double getScore(final Plan plan) {
-		ScoringFunction function = this.factory.getNewScoringFunction((PlanImpl) plan);
+		ScoringFunction function = this.factory.createNewScoringFunction((PlanImpl) plan);
 		boolean firstActivityDone = false;
 
 		for (PlanElement pe : plan.getPlanElements()) {

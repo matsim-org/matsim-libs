@@ -38,7 +38,7 @@ public class JohScoringFunctionEstimationFactory implements ScoringFunctionFacto
 		this.network = network;
 	}
 		
-	public ScoringFunction getNewScoringFunction(final Plan plan) {
+	public ScoringFunction createNewScoringFunction(final Plan plan) {
 		return new JohScoringFunctionEstimation(plan, network);
 	}
 

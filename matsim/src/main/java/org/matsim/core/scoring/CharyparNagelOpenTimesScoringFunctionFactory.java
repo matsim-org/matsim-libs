@@ -42,7 +42,7 @@ public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunc
 		this.facilities = facilities;
 	}
 
-	public ScoringFunction getNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesScoringFunction(plan, params, this.facilities));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(plan, params));

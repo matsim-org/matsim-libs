@@ -53,7 +53,7 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.char
 	}
 
 	@Override
-	public ScoringFunction getNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Plan plan) {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		

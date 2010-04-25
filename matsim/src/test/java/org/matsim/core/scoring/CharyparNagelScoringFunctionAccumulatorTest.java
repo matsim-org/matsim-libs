@@ -10,6 +10,6 @@ public class CharyparNagelScoringFunctionAccumulatorTest extends CharyparNagelSc
 
 		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.config.charyparNagelScoring());
 
-		return charyparNagelScoringFunctionFactory.getNewScoringFunction(somePlan);
+		return charyparNagelScoringFunctionFactory.createNewScoringFunction(somePlan);
 	}
 }

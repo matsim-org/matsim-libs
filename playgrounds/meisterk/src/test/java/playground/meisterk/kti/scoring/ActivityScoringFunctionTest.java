@@ -325,7 +325,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 				this.ktiConfigGroup,
 				emptyFacilityPenalties,
 				this.facilities);
-		ScoringFunction testee = factory.getNewScoringFunction(this.plan);
+		ScoringFunction testee = factory.createNewScoringFunction(this.plan);
 
 		assertTrue(testee instanceof ScoringFunctionAccumulator);
 		assertEquals(1, ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().size());

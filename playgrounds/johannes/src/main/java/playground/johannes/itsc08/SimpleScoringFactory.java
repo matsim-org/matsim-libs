@@ -35,7 +35,7 @@ public class SimpleScoringFactory implements ScoringFunctionFactory {
 
 	private SimpleScoring scoring = new SimpleScoring();
 	
-	public ScoringFunction getNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Plan plan) {
 		return new SimpleScoring();
 	}
 

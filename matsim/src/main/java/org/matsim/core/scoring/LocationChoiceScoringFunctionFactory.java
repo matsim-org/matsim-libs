@@ -51,7 +51,7 @@ public class LocationChoiceScoringFunctionFactory implements ScoringFunctionFact
 		this.facilities = facilities;
 	}
 	
-	public ScoringFunction getNewScoringFunction(final Plan plan) {
+	public ScoringFunction createNewScoringFunction(final Plan plan) {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new LocationChoiceScoringFunction(plan, params, facilityPenalties, this.facilities));

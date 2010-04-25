@@ -30,7 +30,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  */
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
-	public playground.jhackney.scoring.CharyparNagelReportingScoringFunction getNewScoringFunction(final Plan plan) {
+	public playground.jhackney.scoring.CharyparNagelReportingScoringFunction createNewScoringFunction(final Plan plan) {
 		return new playground.jhackney.scoring.CharyparNagelReportingScoringFunction(plan);
 	}
 

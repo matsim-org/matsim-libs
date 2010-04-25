@@ -23,9 +23,9 @@ public class EventSocScoringFactory implements ScoringFunctionFactory {
 
 	}
 
-	public ScoringFunction getNewScoringFunction(final Plan plan) {
+	public ScoringFunction createNewScoringFunction(final Plan plan) {
 //		return new SNScoringMaxFriendFoeRatio(plan, this.factype, this.scorer);
-		return new EventSocScoringFunction(plan, this.factory.getNewScoringFunction(plan), factype, actStats);
+		return new EventSocScoringFunction(plan, this.factory.createNewScoringFunction(plan), factype, actStats);
 	}
 
 

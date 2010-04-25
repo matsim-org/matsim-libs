@@ -47,7 +47,7 @@ public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory
 		this.hhdb = hhmapping;
 	}
 
-	public ScoringFunction getNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Plan plan) {
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 

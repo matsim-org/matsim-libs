@@ -18,8 +18,8 @@ public class PlanSocScoringFactory implements ScoringFunctionFactory {
 
 	}
 
-	public ScoringFunction getNewScoringFunction(final Plan plan) {
-		return new PlanSocScoringFunction(plan, this.factory.getNewScoringFunction(plan), factype, scorer);
+	public ScoringFunction createNewScoringFunction(final Plan plan) {
+		return new PlanSocScoringFunction(plan, this.factory.createNewScoringFunction(plan), factype, scorer);
 	}
 
 

@@ -52,7 +52,7 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 		this.network = network;
 	}
 
-	public ScoringFunction getNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Plan plan) {
 
 		Person person = plan.getPerson();
 		double householdIncomePerDay = getHouseholdIncomePerDay(person, hhdb);

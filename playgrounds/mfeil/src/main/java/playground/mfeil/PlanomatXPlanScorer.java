@@ -48,7 +48,7 @@ public class PlanomatXPlanScorer extends PlanScorer {
 	
 	@Override
 	public double getScore(final Plan plan) {
-		ScoringFunction function = this.factory.getNewScoringFunction(plan);
+		ScoringFunction function = this.factory.createNewScoringFunction(plan);
 		org.matsim.core.population.LegImpl leg;
 		org.matsim.core.population.ActivityImpl act;
 		for (int i = 1; i < plan.getPlanElements().size(); i++) {

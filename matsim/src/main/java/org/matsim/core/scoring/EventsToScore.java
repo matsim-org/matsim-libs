@@ -199,7 +199,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 			if (person == null) {
 				return null;
 			}
-			data = new Tuple<Plan, ScoringFunction>(person.getSelectedPlan(), this.sfFactory.getNewScoringFunction(person.getSelectedPlan()));
+			data = new Tuple<Plan, ScoringFunction>(person.getSelectedPlan(), this.sfFactory.createNewScoringFunction(person.getSelectedPlan()));
 			this.agentScorers.put(agentId, data);
 		}
 		return data;
