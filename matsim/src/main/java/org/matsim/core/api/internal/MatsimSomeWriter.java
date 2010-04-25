@@ -20,13 +20,10 @@
 
 package org.matsim.core.api.internal;
 
-/**
- * @author nagel
+/**Marker interface that marks writers that do not use the syntax defined my MatsimWriter.
  * 
- * @deprecated this is just there to mark the other writers
- *
+ * @author nagel
  */
-@Deprecated
 public interface MatsimSomeWriter {
 
 }
