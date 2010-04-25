@@ -27,7 +27,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-
+import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Module;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
@@ -443,7 +443,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 
 	/* complex classes */
 
-	public static class ActivityParams {
+	public static class ActivityParams implements MatsimParameters {
 		private String type;
 		private double priority = 1.0;
 		private double typicalDuration = Time.UNDEFINED_TIME;
