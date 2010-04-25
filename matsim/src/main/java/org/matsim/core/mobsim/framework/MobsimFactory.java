@@ -21,13 +21,14 @@ package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.MatsimFactory;
 
 
 /**
  * @author dgrether
  *
  */
-public interface MobsimFactory {
+public interface MobsimFactory extends MatsimFactory {
   
   public Simulation createMobsim(Scenario sc, EventsManager eventsManager);
 
