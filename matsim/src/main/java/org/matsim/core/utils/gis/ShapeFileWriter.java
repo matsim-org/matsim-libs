@@ -30,13 +30,14 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.Feature;
+import org.matsim.core.api.internal.MatsimSomeWriter;
 /**
  * This is a simple utility class that provides methods to write Feature instances
  * of the geotools framework to an ESRI shape file.
  *
  * @author glaemmel
  */
-public class ShapeFileWriter {
+public class ShapeFileWriter implements MatsimSomeWriter {
 
 	public static void writeGeometries(final Collection<Feature> features, final String filename) throws IOException {
 
