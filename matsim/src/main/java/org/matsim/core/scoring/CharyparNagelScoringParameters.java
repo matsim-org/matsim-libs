@@ -22,10 +22,11 @@ package org.matsim.core.scoring;
 
 import java.util.TreeMap;
 
+import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 
-public class CharyparNagelScoringParameters {
+public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final TreeMap<String, ActivityUtilityParameters> utilParams = new TreeMap<String, ActivityUtilityParameters>();
 	public final double marginalUtilityOfWaiting;
 	public final double marginalUtilityOfLateArrival;
