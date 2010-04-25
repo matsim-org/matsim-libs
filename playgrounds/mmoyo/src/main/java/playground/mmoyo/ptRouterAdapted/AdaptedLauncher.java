@@ -89,21 +89,19 @@ public class AdaptedLauncher {
 		myTransitRouterConfig.compressPlan = true;
 
 		//once
-		/*
 		myTransitRouterConfig.scenarioName = "_costLineSwitch" + myTransitRouterConfig.costLineSwitch ;
 		System.out.println(myTransitRouterConfig.scenarioName) ;
 		AdaptedLauncher adaptedLauncher	= new AdaptedLauncher();
 		adaptedLauncher.route(configFile);
-		*/
 		
 		//many times
-		for ( double costLineSwitchInSecs = 0 ; costLineSwitchInSecs <= 1200 ; costLineSwitchInSecs += 60 ) {
-			myTransitRouterConfig.costLineSwitch = round2dec(costLineSwitchInSecs * -myTransitRouterConfig.marginalUtilityOfTravelTimeTransit) ;
-			myTransitRouterConfig.scenarioName = "_costLineSwitch" + myTransitRouterConfig.costLineSwitch ;
-			System.out.println(myTransitRouterConfig.scenarioName) ;
-			AdaptedLauncher adaptedLauncher	= new AdaptedLauncher();
-			adaptedLauncher.route(configFile);
-		}
+//		for ( double costLineSwitchInSecs = 0 ; costLineSwitchInSecs <= 1200 ; costLineSwitchInSecs += 60 ) {
+//			myTransitRouterConfig.costLineSwitch = round2dec(costLineSwitchInSecs * -myTransitRouterConfig.marginalUtilityOfTravelTimeTransit) ;
+//			myTransitRouterConfig.scenarioName = "_costLineSwitch" + myTransitRouterConfig.costLineSwitch ;
+//			System.out.println(myTransitRouterConfig.scenarioName) ;
+//			AdaptedLauncher adaptedLauncher	= new AdaptedLauncher();
+//			adaptedLauncher.route(configFile);
+//		}
 	}	
 }
 

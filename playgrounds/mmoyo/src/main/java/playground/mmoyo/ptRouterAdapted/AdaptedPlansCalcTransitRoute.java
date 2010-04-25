@@ -86,6 +86,11 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 
 	@Override
 	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+		// yyyy this is, in fact, a misnomer, since it handles a pt leg, not a pt plan.  kai, apr'10
+		// yy also, I would like a design explanation of why there is a "TransitRouter" between "plansCalcRoute" and
+		// "LeastCostPathAlgo"?  kai, apr'10
+		// yyyy but first step really is to remove code duplication as much as possible.  kai, apr'10
+		
 		List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
 //		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 		super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, legs));
