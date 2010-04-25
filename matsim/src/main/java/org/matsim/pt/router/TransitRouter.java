@@ -66,13 +66,21 @@ public class TransitRouter {
 	}
 
 	public TransitRouter(final TransitSchedule schedule, final TransitRouterConfig config) {
+		this( schedule, config, new TransitRouterNetworkTravelTimeCost(config) ) ;
+	}
+
+	// I added a constructor so that Manuel can pass his own TravelCost Object.  Given the calling 
+	// syntax for MultiNodeDijkstra, might make more sense to pass this in a more segmented way. 
+	// kai, apr'10
+	
+	public TransitRouter(final TransitSchedule schedule, final TransitRouterConfig config, 
+			TransitRouterNetworkTravelTimeCost ttCalculator ) {
 		this.schedule = schedule;
 		this.config = config;
 		this.linkMappings = new HashMap<TransitRouterNetworkLink, Tuple<TransitLine, TransitRoute>>();
 		this.nodeMappings = new HashMap<TransitRouterNetworkNode, TransitStopFacility>();
 		this.transitNetwork = buildNetwork();
-
-		this.ttCalculator = new TransitRouterNetworkTravelTimeCost(this.config);
+		this.ttCalculator = ttCalculator ;
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.ttCalculator, this.ttCalculator);
 	}
 
@@ -128,6 +136,12 @@ public class TransitRouter {
 			legs.add(leg);
 			return legs;
 		}
+		
+		return convert( departureTime, p, fromCoord, toCoord ) ;
+	}
+	
+	protected List<Leg> convert( double departureTime, Path p, Coord fromCoord, Coord toCoord ) {
+		// yy there could be a better name for this method.  kai, apr'10
 
 		// now convert the path back into a series of legs with correct routes
 		double time = departureTime;
@@ -199,7 +213,9 @@ public class TransitRouter {
 			TransitStopFacility egressStop = this.nodeMappings.get(((TransitRouterNetworkLink) prevLink).getToNode());
 			ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 			leg.setRoute(ptRoute);
-			double arrivalOffset = (((TransitRouterNetworkLink) prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? ((TransitRouterNetworkLink) prevLink).toNode.stop.getArrivalOffset() : ((TransitRouterNetworkLink) prevLink).toNode.stop.getDepartureOffset();
+			double arrivalOffset = (((TransitRouterNetworkLink) prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? 
+					((TransitRouterNetworkLink) prevLink).toNode.stop.getArrivalOffset() 
+					: ((TransitRouterNetworkLink) prevLink).toNode.stop.getDepartureOffset();
 			double arrivalTime = this.ttCalculator.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 			leg.setTravelTime(arrivalTime - time);
 
@@ -229,7 +245,7 @@ public class TransitRouter {
 		return legs;
 	}
 
-	private TransitRouterNetwork buildNetwork() {
+	protected TransitRouterNetwork buildNetwork() {
 		final TransitRouterNetwork network = new TransitRouterNetwork();
 
 		// build nodes and links connecting the nodes according to the transit routes
@@ -248,6 +264,9 @@ public class TransitRouter {
 			}
 		}
 		network.finishInit(); // not nice to call "finishInit" here before we added all links...
+		// in my view, it would be possible to completely do without finishInit: do the 
+		// additions to the central data structures as items come in, not near the end.  I would
+		// prefer that because nobody could forget the "finishInit".  kai, apr'10
 
 		List<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>> toBeAdded = new LinkedList<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>>();
 		// connect all stops with walking links if they're located less than beelineWalkConnectionDistance from each other
@@ -276,6 +295,34 @@ public class TransitRouter {
 
 	public TransitRouterNetwork getTransitRouterNetwork() {
 		return this.transitNetwork;
+	}
+
+	protected TransitSchedule getSchedule() {
+		return schedule;
+	}
+
+	protected TransitRouterNetwork getTransitNetwork() {
+		return transitNetwork;
+	}
+
+	protected Map<TransitRouterNetworkLink, Tuple<TransitLine, TransitRoute>> getLinkMappings() {
+		return linkMappings;
+	}
+
+	protected Map<TransitRouterNetworkNode, TransitStopFacility> getNodeMappings() {
+		return nodeMappings;
+	}
+
+	protected MultiNodeDijkstra getDijkstra() {
+		return dijkstra;
+	}
+
+	protected TransitRouterConfig getConfig() {
+		return config;
+	}
+
+	protected TransitRouterNetworkTravelTimeCost getTtCalculator() {
+		return ttCalculator;
 	}
 
 }

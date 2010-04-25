@@ -24,8 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.TravelTimeAndGeneralizedCost;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
@@ -38,7 +37,7 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
  *
  * @author mrieser
  */
-public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTime {
+public class TransitRouterNetworkTravelTimeCost implements TravelTimeAndGeneralizedCost {
 
 	private final static double MIDNIGHT = 24.0*3600;
 
