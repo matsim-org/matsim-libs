@@ -20,7 +20,9 @@
 
 package org.matsim.pt.router;
 
-public class TransitRouterConfig {
+import org.matsim.core.api.internal.MatsimParameters;
+
+public class TransitRouterConfig implements MatsimParameters {
 
 	/**
 	 * The distance in meters in which stop facilities should be searched for
