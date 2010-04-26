@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.gui;
 
-//import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -31,8 +30,6 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 
-//import org.matsim.vis.otfvis.OTFClientControl;
-//import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 
 
 /**
@@ -46,8 +43,6 @@ public class OTFHostConnectionManager {
 	private OTFServerRemote host = null;
 
 	protected OTFLiveServerRemote liveHost = null;
-
-	protected Object blockReading = new Object();
 
 	protected int controllerStatus = 0;
 
@@ -114,62 +109,5 @@ public class OTFHostConnectionManager {
 	public Map<String, OTFDrawer> getDrawer() {
 		return drawer;
 	}
-
-//	public void finishedInitialisition() {
-//		try {
-//			if(!getOTFServer().isLive() && OTFClientControl.getInstance().getOTFVisConfig().isCachingAllowed()) {
-//				new PreloadHelper().start();
-//			}
-//		} catch (RemoteException e) {
-//			e.printStackTrace();
-//		}
-//	}
-
-//	private boolean preCacheCurrentTime(int time, OTFTimeLine timeLine) throws IOException {
-//		boolean result = getOTFServer().requestNewTime(time, OTFServerRemote.TimePreference.LATER);
-//
-//		for(OTFDrawer handler : getDrawer().values()) {
-//			if(handler != timeLine) {
-//			  handler.getQuad().getSceneGraphNoCache(getOTFServer().getLocalTime(), null, handler);
-//			}
-//		}
-//		return result;
-//	}
-
-
-//	private class PreloadHelper extends Thread {
-//
-//		public void preloadCache() {
-//			boolean hasNext = true;
-//			OTFTimeLine timeLine = (OTFTimeLine)drawer.get("timeline");
-//
-//			try {
-////				int	time = getOTFServer().getLocalTime();
-//
-//				while (hasNext && !(timeLine.isCancelCaching)) {
-//					int time;
-//					synchronized(blockReading) {
-//						// remember time the block had before caching next step
-////						int	origtime = getOTFServer().getLocalTime();
-//						time = getOTFServer().getLocalTime() + 1;
-//						hasNext = preCacheCurrentTime(time,timeLine);
-//						time = getOTFServer().getLocalTime();
-//					}
-//					timeLine.setCachedTime(time); // add this to the cached times in the time line drawer
-//				}
-//				if (timeLine != null) timeLine.setCachedTime(-1);
-//			} catch (RemoteException e) {
-//				e.printStackTrace();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//
-////			((OTFQuadFileHandler.Reader)host).closeFile();
-//		}
-//		@Override
-//		public void run() {
-//			preloadCache();
-//		}
-//	}
 
 }

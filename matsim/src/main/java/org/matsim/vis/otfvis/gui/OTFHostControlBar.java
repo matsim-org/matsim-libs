@@ -109,6 +109,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	
 	private transient OTFAbortGoto progressBar = null;
 	
+	private Object blockReading = new Object();
+	
 	public OTFHostControlBar(OTFHostConnectionManager masterHostControl, JFrame frame)  {
 		this.masterHostControl = masterHostControl;
 		this.hostControls.add(this.masterHostControl);
@@ -356,7 +358,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private void gotoTime(int gotoTime) {
 		boolean restart = gotoTime < simTime;
 		try {
-			synchronized(masterHostControl.blockReading) {
+			synchronized(blockReading) {
 			if (restart){
 				requestTimeStep(gotoTime, OTFServerRemote.TimePreference.RESTART);
 			} else if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER)) {
@@ -515,7 +517,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				try {
 					delay = OTFClientControl.getInstance().getOTFVisConfig().getDelay_ms();
 					sleep(delay);
-					synchronized (masterHostControl.blockReading) {
+					synchronized (blockReading) {
 						if (synchronizedPlay
 								&& ((simTime >= loopEnd) || !masterHostControl
 										.getOTFServer()
