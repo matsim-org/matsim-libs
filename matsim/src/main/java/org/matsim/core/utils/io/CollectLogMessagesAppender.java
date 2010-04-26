@@ -34,7 +34,7 @@ import org.apache.log4j.spi.LoggingEvent;
 public class CollectLogMessagesAppender extends AppenderSkeleton {
 
 	private List<LoggingEvent> logEvents = new LinkedList<LoggingEvent>();
-	
+
 	/**
 	 * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
 	 */
@@ -48,6 +48,8 @@ public class CollectLogMessagesAppender extends AppenderSkeleton {
 	 */
 	public void close() {
 		this.logEvents.clear();
+		this.logEvents = null;
+		this.closed = true;
 	}
 
 	/**
@@ -60,5 +62,5 @@ public class CollectLogMessagesAppender extends AppenderSkeleton {
 	public List<LoggingEvent> getLogEvents() {
 		return this.logEvents;
 	}
-	
+
 }

@@ -541,6 +541,7 @@ public class Controler {
 		try {
 			IOUtils.initOutputDirLogging(this.config.controler().getOutputDirectory(), this.collectLogMessagesAppender
 					.getLogEvents(), this.config.controler().getRunId());
+			this.collectLogMessagesAppender.close();
 			this.collectLogMessagesAppender = null;
 		} catch (IOException e) {
 			log.error("Cannot create logfiles: " + e.getMessage());
