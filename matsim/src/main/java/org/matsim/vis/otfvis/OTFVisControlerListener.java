@@ -57,7 +57,7 @@ public class OTFVisControlerListener implements StartupListener, ShutdownListene
 		this.otfserver = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), e.getControler().getEvents());
 		otfserver.setControllerStatus(STARTUP);
 		OTFClientLive client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), new DefaultConnectionManagerFactory().createConnectionManager());
-		client.start();
+		new Thread(client).start();
 	}
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent e) {

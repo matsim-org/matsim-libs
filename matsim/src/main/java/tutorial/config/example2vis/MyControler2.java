@@ -21,7 +21,6 @@
 package tutorial.config.example2vis;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.run.Controler;
@@ -30,7 +29,7 @@ import org.matsim.vis.otfvis.OTFClientSwing;
 
 /**
  * runs a mobsim and writes events and visualizer files.  See the config file for configuration details.
- * 
+ *
  * @author nagel
  *
  */
@@ -39,12 +38,12 @@ public class MyControler2 {
 
 	public static void main(final String[] args) {
 		String configFile = "examples/tutorial/config/example2-config.xml" ;
-		
+
 		Controler controler = new Controler( configFile ) ;
-		
+
 		controler.setOverwriteFiles(true) ;
 		controler.run() ;
-		
+
 		// the following lines are there to start the non-hardware-accelerated visualizer.  This is NOT the recommended
 		// way of doing this; it is just here to produce some visible output at an early stage of the tutorial.
 		Scenario sc = controler.getScenario() ;
@@ -53,7 +52,7 @@ public class MyControler2 {
 		log.info("The following should bring up the slow gui.  This sometimes hangs ..." );
 		log.info("There is also kmz output in " + dir + "/ITERS/it.0" ) ;
 		log.warn("However, if you want to run larger scenarios, you HAVE to learn how to use the graphics-hardware-accelerated otfvis." ) ;
-		new OTFClientSwing(dir + "/ITERS/it.0/0.otfvis.mvi").start();
+		new OTFClientSwing(dir + "/ITERS/it.0/0.otfvis.mvi").run();
 
 	}
 

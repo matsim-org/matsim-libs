@@ -51,22 +51,22 @@ import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
  * @author dgrether
  *
  */
-public abstract class OTFClient extends Thread {
+public abstract class OTFClient implements Runnable {
 
   private static final Logger log = Logger.getLogger(OTFClient.class);
-	
+
 	protected String url;
-	
+
 	protected OTFFrame frame;
-	
+
 	protected JSplitPane pane = null;
 
 	protected OTFHostControlBar hostControlBar = null;
-	
+
 	protected SettingsSaver saver;
 
 	protected OTFHostConnectionManager masterHostControl;
-	
+
 	public OTFClient(String url) {
 		this.url = url;
 	}
@@ -119,7 +119,7 @@ public abstract class OTFClient extends Thread {
 		log.info("Created OTFClientQuad!");
 		return clientQ;
 	}
-	
+
 	protected void createHostControlBar() {
 		this.hostControlBar = new OTFHostControlBar(masterHostControl, frame);
 		frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
@@ -185,7 +185,7 @@ public abstract class OTFClient extends Thread {
 		frame.setJMenuBar(menuBar);
 		SwingUtilities.updateComponentTreeUI(frame);
 	}
-	
+
 	protected void createMainFrame(){
 		this.frame = new OTFFrame("MATSim OTFVis");
 		this.pane = frame.getSplitPane();

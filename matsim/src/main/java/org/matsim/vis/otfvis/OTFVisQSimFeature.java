@@ -11,8 +11,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
@@ -36,21 +36,21 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
 public class OTFVisQSimFeature implements QSimFeature {
 
 	protected OnTheFlyServer otfServer = null;
-	
+
 	private boolean ownServer = true;
-	
+
 	private boolean doVisualizeTeleportedAgents = false;
-	
+
 	private OTFConnectionManager connectionManager = new DefaultConnectionManagerFactory().createConnectionManager();
-	
+
 	private OTFTeleportAgentsDataWriter teleportationWriter;
-	
+
 	private QSim queueSimulation;
-	
+
 	private final LinkedHashMap<Id, TeleportationVisData> visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
-	
+
 	private final LinkedHashMap<Id, Integer> currentActivityNumbers = new LinkedHashMap<Id, Integer>();
-	
+
 	private final LinkedHashMap<Id, PersonAgent> agents = new LinkedHashMap<Id, PersonAgent>();
 
 	public OTFVisQSimFeature(QSim queueSimulation) {
@@ -128,7 +128,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 
 			OTFClientLive client = null;
 			client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
-			client.start();
+			new Thread(client).start();
 
 			try {
 				this.otfServer.pause();
@@ -214,5 +214,5 @@ public class OTFVisQSimFeature implements QSimFeature {
 	public void agentCreated(PersonAgent agent) {
 		agents.put(agent.getPerson().getId(), agent);
 	}
-	
+
 }

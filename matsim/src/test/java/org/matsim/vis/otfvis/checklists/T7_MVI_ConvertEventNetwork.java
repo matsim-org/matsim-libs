@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -28,11 +28,11 @@ import org.matsim.vis.otfvis.OTFClientFile;
  */
 public class T7_MVI_ConvertEventNetwork {
 
-	
+
 	private static String event = "./output/OTFVisTestsQSim/ITERS/it.1/1.events.txt.gz";
 	private static String network = "./output/OTFVisTestsQSim/output_network.xml.gz";
 	private static String mviFile = "./output/OTFVisTestsQSim/OTFVis.mvi";
-	
+
 	public static void main(String[] args) {
 		String[] files = new String[5];
 		files[1] = event;
@@ -40,6 +40,6 @@ public class T7_MVI_ConvertEventNetwork {
 		files[3] = mviFile;
 		files[4] = "60";
 		OTFVis.convert(files);
-		new OTFClientFile(files[3]).start();		
+		new OTFClientFile(files[3]).run();
 	}
 }

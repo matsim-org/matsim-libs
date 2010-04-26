@@ -102,7 +102,7 @@ public class OTFDoubleMVI extends OTFClientFile {
 		}
 
 		OTFDoubleMVI client = new OTFDoubleMVI(filename, filename2);
-		client.start();
+		client.run();
 	}
 
 }
