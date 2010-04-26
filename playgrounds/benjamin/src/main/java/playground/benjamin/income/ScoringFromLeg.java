@@ -33,14 +33,14 @@ import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
  * @author bkick
  * @author michaz
  * 
- *
  */
+
 public class ScoringFromLeg extends LegScoringFunction {
 
 	private static final Logger log = Logger.getLogger(ScoringFromLeg.class);
 
-	//setting these parameters differently, will cause problems when converting utils into money terms
-	//also see ScoringFromDailyIncom, ScoringFromToll or other money related parts of the scoring function
+/*	setting these parameters different from each other, will cause problems when converting utils into money terms.
+	Also see ScoringFromDailyIncome, ScoringFromToll or other money related parts of the scoring function*/
 	private static double betaIncomeCar = 4.58;
 	private static double betaIncomePt = 4.58;
 

@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*																															*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.benjamin.income;
 
 import org.matsim.api.core.v01.network.Network;
@@ -28,16 +29,15 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
-import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 import org.matsim.households.Income;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.households.Income.IncomePeriod;
-
 
 /**
  * @author dgrether
  *
  */
+
 public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private CharyparNagelScoringConfigGroup configGroup;

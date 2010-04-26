@@ -85,9 +85,9 @@ public class BkControlerIncome extends BkControler {
 	
 	public static void main(String[] args) {
 		
-//			String config = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
-//			String[] args2 = {config};
-//			args = args2;
+			String config = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
+			String[] args2 = {config};
+			args = args2;
 			
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
@@ -96,7 +96,7 @@ public class BkControlerIncome extends BkControler {
 		} else {
 			final BkControlerIncome controler = new BkControlerIncome(args);
 			
-//			controler.setOverwriteFiles(true);
+			controler.setOverwriteFiles(true);
 			
 			controler.addInstallTravelCostCalculatorFactoryControlerListener();
 			controler.run();
