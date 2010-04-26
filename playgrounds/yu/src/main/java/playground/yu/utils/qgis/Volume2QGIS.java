@@ -80,8 +80,8 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		// String netFilename = "test/yu/test/equil_net.xml";
 		// String netFilename =
 		// "../swiss-advest/ch.cut.640000.200000.740000.310000.xml";
-		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
+		String netFilename = "../shared-svn/projects/detailedEval/Net/network.xml.gz";
+		String tollFilename = "../shared-svn/projects/detailedEval/toll/Muenchen.xml";
 
 		// String eventsFilenameA = "../runs/r145_20/1000.events.txt.gz";
 		// String eventsFilenameB =
@@ -99,7 +99,7 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		 */
 		NetworkLayer net = mn2q.getNetwork();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2q.readEvents("../runs-svn/run669/it.1000/1000.events.txt.gz",
+		mn2q.readEvents("../runs-svn/run950/it.1000/950.1000.events.txt.gz",
 				new EventHandler[] { va });
 		RoadPricingScheme rps = new RoadPricingScheme();
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(rps);
