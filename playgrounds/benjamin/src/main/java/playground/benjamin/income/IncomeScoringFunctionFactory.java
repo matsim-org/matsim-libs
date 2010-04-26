@@ -61,18 +61,15 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		//utility earned from daily income
-		//income dependent!
 		scoringFunctionAccumulator.addScoringFunction(new ScoringFromDailyIncome(householdIncomePerDay));
 
 		//utility earned from activities
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));
 
 		//utility spend for traveling (in this case: travel time and distance costs)
-		//income dependent!
 		scoringFunctionAccumulator.addScoringFunction(new ScoringFromLeg(plan, params, this.network, householdIncomePerDay ));
 
 		//utility spend for traveling (toll costs)
-		//income dependent!
 		scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll(params, householdIncomePerDay));
 
 		//utility spend for being stuck
