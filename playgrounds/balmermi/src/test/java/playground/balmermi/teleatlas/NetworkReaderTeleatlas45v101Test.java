@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -43,7 +44,7 @@ public class NetworkReaderTeleatlas45v101Test {
 		log.info(new NwElement());
 	}
 
-	@Test
+	@Test @Ignore("missing test files")
 	public void testJunctionParser() throws IOException {
 		TeleatlasData data = new TeleatlasData();
 		NetworkReaderTeleatlas45v101 reader = new NetworkReaderTeleatlas45v101(data);
@@ -52,7 +53,7 @@ public class NetworkReaderTeleatlas45v101Test {
 		Assert.assertTrue(data.junctionElements.size() > 0);
 	}
 
-	@Test
+	@Test @Ignore("missing test files")
 	public void testNetworkParser() throws IOException {
 		TeleatlasData data = new TeleatlasData();
 		NetworkReaderTeleatlas45v101 reader = new NetworkReaderTeleatlas45v101(data);
