@@ -56,8 +56,11 @@ public class OTFClientSwing extends OTFClient {
 
 	private OTFConnectionManager connectionManager = new OTFConnectionManager();
 
+	/**
+	 * @param url path to a file including a marker "file:" or "net:" at the very beginning.
+	 */
 	public OTFClientSwing(String url) {
-		super("file:" + url);
+		super(url);
 		/*
 		 * If I got it right: The following entries to the connection manager are really needed to
 		 * get otfvis running with the current matsim version. The other entries added
