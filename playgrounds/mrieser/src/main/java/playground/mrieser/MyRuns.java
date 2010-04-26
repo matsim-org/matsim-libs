@@ -20,14 +20,9 @@
 
 package playground.mrieser;
 
-import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -743,23 +738,8 @@ public class MyRuns {
 //		new NetworkWriter(scenario.getNetwork()).writeFile("/Users/mrieser/Downloads/switzerland.xml");
 //		OTFVis.main(new String[]{"/Users/mrieser/Downloads/switzerland.xml"});
 
-		final int BUFFERSIZE = 50 * 1024 * 1024;
-		final int SIZE2 = 10 * 1024 * 1024;
 
-		try {
-			ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
-			BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream("test.bin"), SIZE2);
-			DataOutputStream outFile = new DataOutputStream(stream);
-
-			outFile.write(buf.array(), 0, BUFFERSIZE);
-
-			outFile.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		new MatsimPopulationReader(new ScenarioImpl()).readFile("/data/coding/eclipse35/MATSim/examples/equil/plans100.xml");
 
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();

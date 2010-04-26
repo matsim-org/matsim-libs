@@ -18,7 +18,6 @@ import org.matsim.evacuation.otfvis.readerwriter.PolygonDataReader;
 import org.matsim.evacuation.otfvis.readerwriter.PolygonDataWriter;
 import org.matsim.evacuation.otfvis.readerwriter.TextureDataWriter;
 import org.matsim.evacuation.otfvis.readerwriter.TextutreDataReader;
-import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -96,7 +95,7 @@ public class Controller2D extends Controler {
 
 		OTFClientLive client = null;
 		client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
-		client.start();
+		new Thread(client).start();
 
 		try {
 			this.myOTFServer.pause();

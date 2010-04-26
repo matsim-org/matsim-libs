@@ -91,9 +91,12 @@ public class OTFDemo {
 //
 //		org.matsim.vis.otfvis.OTFClientSwing.main(new String[] {"../../MATSim/output/example2/ITERS/it.0/0.otfvis.mvi"});
 //		org.matsim.vis.otfvis.OTFClientSwing.main(new String[] {"../../MATSim/output/example2/output_network.xml.gz"});
+//		org.matsim.vis.otfvis.OTFClientFile.main(new String[] {"output/equil/ITERS/it.0/0.otfvis.mvi"});
+//		org.matsim.vis.otfvis.OTFClientSwing.main(new String[] {"/data/coding/eclipse35/MATSim/output/equil/ITERS/it.0/0.otfvis.mvi"});
+		org.matsim.vis.otfvis.OTFClientSwing.main(new String[] {"/data/coding/eclipse35/MATSim/output/equil/output_network.xml.gz"});
 
 //		org.matsim.run.OTFVis.main(new String[] {"test/scenarios/berlin/config.xml"});
-		org.matsim.run.OTFVis.main(new String[] {"/data/dissVis/network.filtered.falsified.xml.gz"});
+//		org.matsim.run.OTFVis.main(new String[] {"/data/dissVis/network.filtered.falsified.xml.gz"});
 
 //		OTFDemo.ptConnect("OTFServer_Transit");
 	}
@@ -121,7 +124,7 @@ public class OTFDemo {
 		connect.connectReaderToReceiver(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
 
 //		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_Transit", connect).start();
-		new OTFClientLive("rmi:127.0.0.1:4019:" + servername, connect).start();
+		new OTFClientLive("rmi:127.0.0.1:4019:" + servername, connect).run();
 //		new OnTheFlyClientQuad("rmi:127.0.0.1:4019", connect).start();
 
 
