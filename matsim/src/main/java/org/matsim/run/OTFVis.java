@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Locale;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
@@ -43,6 +44,8 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFClientSwing;
+import org.matsim.vis.otfvis.OTFDoubleMVI;
 import org.matsim.vis.otfvis.OTFVisQSim;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
@@ -62,27 +65,33 @@ public class OTFVis {
 		System.out.println("OTFVis");
 		System.out.println("Starts the MATSim OnTheFly-Visualizer.");
 		System.out.println();
-		System.out.println("usage 1: OTFVis mvi-file");
-		System.out.println("usage 2: OTFVis veh-file network-file");
-		System.out.println("usage 3: OTFVis config-file");
-		System.out.println("usage 4: OTFVis network-file");
-		System.out.println("usage 5: OTFVis -convert event-file network-file mvi-file [snapshot-period]");
+		System.out.println("usage 1: OTFVis [-swing] mvi-file");
+		System.out.println("usage 2: OTFVis mvi-file1 mvi-file2");
+		System.out.println("usage 3: OTFVis veh-file network-file");
+		System.out.println("usage 4: OTFVis config-file");
+		System.out.println("usage 5: OTFVis [-swing] network-file");
+		System.out.println("usage 6: OTFVis -convert event-file network-file mvi-file [snapshot-period]");
 		System.out.println();
-		System.out.println("Usages 1-4: Starts the Visualizer");
+		System.out.println("Usages 1-5: Starts the Visualizer");
 		System.out.println("mvi-file:      A MATSim visualizer file that contains a pre-recorder state");
 		System.out.println("               to be visualized (*.mvi).");
+		System.out.println("mvi-file1,2:   Loads two mvi-files in parallel and shows them next to each");
+		System.out.println("               other. Good way to compare results from similar scenarios.");
 		System.out.println("veh-file:      A TRANSIMS vehicle file to be visualized (*.veh).");
 		System.out.println("network-file:  A MATSim network file (*.xml).");
 		System.out.println("config-file:   A complete MATSim config file to run a simulation. In that case,");
 		System.out.println("               a QueueSimulation will be started and visualized in real-time, ");
 		System.out.println("               allowing to interactively query the state of single agents");
+		System.out.println("-swing         Use an alternative GUI built with Swing. This will be slower,");
+		System.out.println("               not support all featuers, and not be able to visualize large");
+		System.out.println("               scenarios.");
 		System.out.println();
-		System.out.println("Usage 5: Convert events into a mvi-file");
+		System.out.println("Usage 6: Convert events into a mvi-file");
 		System.out.println("snapshot-period:  Optional. Specify how often a snapshot should be taken when");
 		System.out.println("                  reading the events, in seconds. Default: 600 seconds");
 		System.out.println();
 		System.out.println("---------------------");
-		System.out.println("2008-2009, matsim.org");
+		System.out.println("2008-2010, matsim.org");
 		System.out.println();
 	}
 
@@ -96,12 +105,37 @@ public class OTFVis {
 			printUsage();
 			return;
 		}
-		String arg0l = args2[0].toLowerCase();
+		String arg0l = args2[0].toLowerCase(Locale.ROOT);
 
-		if (arg0l.endsWith(".veh.gz") || arg0l.toLowerCase().endsWith(".veh")) {
+		boolean useSwing = false;
+		if ("-swing".equals(arg0l)) {
+			useSwing = true;
+			// pop that argument from the list
+			String[] tmp = new String[args2.length - 1];
+			System.arraycopy(args, 1, tmp, 0, tmp.length);
+			args2 = tmp;
+			// start over, kind of
+			arg0l = args2[0].toLowerCase(Locale.ROOT);
+		}
+
+		if (arg0l.endsWith(".veh.gz") || arg0l.endsWith(".veh")) {
 			playVEH(args2);
 		} else if (arg0l.endsWith(".mvi")) {
-			playMVI(args2);
+			if (args2.length > 1) {
+				String arg1l = args2[1].toLowerCase(Locale.ROOT);
+				if (arg1l.endsWith(".mvi")) {
+					playDoubleMVI(args2[0], args2[1]);
+				} else {
+					System.out.println("unrecognized input: " + args2[1]);
+					printUsage();
+				}
+			} else {
+				if (useSwing) {
+					playMVI_Swing(args2[0]);
+				} else {
+					playMVI(args2);
+				}
+			}
 		} else if ((arg0l.endsWith(".xml") || arg0l.endsWith(".xml.gz"))) {
 			FileType type;
 			try {
@@ -113,7 +147,11 @@ public class OTFVis {
 			if (FileType.Config.equals(type)) {
 				playConfig(args2);
 			} else if (FileType.Network.equals(type)) {
-				playNetwork(args2);
+				if (useSwing) {
+					playNetwork_Swing(args2[0]);
+				} else {
+					playNetwork(args2);
+				}
 			} else {
 				printUsage();
 			}
@@ -156,6 +194,14 @@ public class OTFVis {
 
 	public static void playMVI(String file) {
 		new OTFClientFile(file).run();
+	}
+
+	public static void playDoubleMVI(final String file1, final String file2) {
+		new OTFDoubleMVI(file1, file2).run();
+	}
+
+	public static void playMVI_Swing(String file) {
+		new OTFClientSwing("file:" + file).run();
 	}
 
 	/* @deprecated this currently does not work; may be fixed if needed.  kai, jan'10 */
@@ -214,6 +260,10 @@ public class OTFVis {
 		EventsManagerImpl events = new EventsManagerImpl();
 		OTFVisQSim queueSimulation = new OTFVisQSim(scenario, events);
 		queueSimulation.run();
+	}
+
+	public static final void playNetwork_Swing(final String filename) {
+		new OTFClientSwing("net:" + filename).run();
 	}
 
 	public static final void convert(final String[] args) {

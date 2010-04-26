@@ -20,7 +20,7 @@
 
 package org.matsim.vis.otfvis.checklists;
 
-import org.matsim.vis.otfvis.OTFClientSwing;
+import org.matsim.run.OTFVis;
 
 /**
  * @author florian ostermann
@@ -29,7 +29,8 @@ public class T6_Swing_QSim {
 	private static final String mviFile = "./output/OTFVisTestsQSim/ITERS/it.1/1.otfvis.mvi";
 
 	public static void main(String[] args) {
-		new OTFClientSwing("file:" + mviFile).run();
+		OTFVis.main(new String[] {"-swing", mviFile});
+//		new OTFClientSwing("file:" + mviFile).run();
 	}
 
 }

@@ -20,7 +20,7 @@
 
 package org.matsim.vis.otfvis.checklists;
 
-import org.matsim.vis.otfvis.OTFDoubleMVI;
+import org.matsim.run.OTFVis;
 /**
  * @author florian ostermann
  */
@@ -30,7 +30,8 @@ public class T8_DoubleMVI {
 	private static String mviFile2 = "./output/OTFVisTestsQSim/ITERS/it.1/1.otfvis.mvi";
 
 	public static void main(String[] args) {
-		new OTFDoubleMVI(mviFile1, mviFile2).run();
+		OTFVis.main(new String[] {mviFile1, mviFile2});
+//		new OTFDoubleMVI(mviFile1, mviFile2).run();
 	}
 
 }
