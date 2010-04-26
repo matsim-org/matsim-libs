@@ -35,36 +35,36 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 
 import playground.mfeil.ActChainEqualityCheck;
 
 
 /**
- * Simple class to analyze the selected plans of a plans (output) file. Extracts the 
+ * Simple class to analyze the selected plans of a plans (output) file. Extracts the
  * activity chains and their number of occurrences.
  *
  * @author mfeil
  */
 public class ASPActivityChains {
 
-	protected final PopulationImpl population;
+	protected final Population population;
 	protected String outputDir;
 	protected ArrayList<List<PlanElement>> activityChains;
 	protected ArrayList<ArrayList<Plan>> plans;
 	protected Map<String,Double> minimumTime;
 	protected Knowledges knowledges;
 	private static final Logger log = Logger.getLogger(ASPActivityChains.class);
-	
 
 
-	public ASPActivityChains(final PopulationImpl population, Knowledges knowledges, final String outputDir) {
+
+	public ASPActivityChains(final Population population, Knowledges knowledges, final String outputDir) {
 		this.population = population;
 		this.outputDir = outputDir;
 		this.knowledges = knowledges;
@@ -85,25 +85,25 @@ public class ASPActivityChains {
 		this.minimumTime.put("w", 3600.0);
 		this.minimumTime.put("h", 7200.0);
 	}
-	
-	public ASPActivityChains(final PopulationImpl population) {
+
+	public ASPActivityChains(final Population population) {
 		this.population = population;
 	}
-	
+
 	public void run(){
 		this.initAnalysis();
 	}
-	
+
 	public ArrayList<List<PlanElement>> getActivityChains (){
 		return this.activityChains;
 	}
-	
+
 	public ArrayList<ArrayList<Plan>> getPlans (){
 		return this.plans;
 	}
-	
+
 	private void initAnalysis(){
-		
+
 		this.activityChains = new ArrayList<List<PlanElement>>();
 		this.plans = new ArrayList<ArrayList<Plan>>();
 		ActChainEqualityCheck ac = new ActChainEqualityCheck();
@@ -123,14 +123,14 @@ public class ASPActivityChains {
 			}
 		}
 	}
-	
+
 /*
 	private void initAnalysisForMZ(String attributesInputFile){
-		
+
 		AgentsAttributesAdder aaa = new AgentsAttributesAdder();
 		aaa.runMZ(attributesInputFile);
-		this.agentsWeight = aaa.getAgentsWeight(); 
-		
+		this.agentsWeight = aaa.getAgentsWeight();
+
 		log.info("Dropping persons from population...");
 		// Quite strange coding but throws ConcurrentModificationException otherwise...
 		Object [] a = this.populationMZ.getPersons().values().toArray();
@@ -139,7 +139,7 @@ public class ASPActivityChains {
 			if (!this.agentsWeight.containsKey(person.getId())) this.populationMZ.getPersons().remove(person.getId());
 		}
 		log.info("done... Size of population is "+this.populationMZ.getPersons().size()+".");
-		
+
 		this.plansMZ = new ArrayList<ArrayList<Plan>>();
 		ActChainEqualityCheck ac = new ActChainEqualityCheck();
 		for (Person person : this.populationMATSim.getPersons().values()) {
@@ -159,8 +159,8 @@ public class ASPActivityChains {
 		}
 	}
 */
-	
-	
+
+
 	protected void checkCorrectness(){
 		for (int i=0;i<this.plans.size();i++){
 			for (int j=0;j<this.plans.get(i).size();j++){
@@ -178,7 +178,7 @@ public class ASPActivityChains {
 						}
 						if (((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getType().equalsIgnoreCase("home") &&
 								(((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k-2))).getType().equalsIgnoreCase("home") ||
-								((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k+2))).getType().equalsIgnoreCase("home"))) { 
+								((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k+2))).getType().equalsIgnoreCase("home"))) {
 							log.warn("Consecutive home acts found in plan of "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2));
 							break;
 						}
@@ -195,11 +195,11 @@ public class ASPActivityChains {
 					}
 					if (notIn) log.warn("Prim act error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" for prim act "+this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(k));
 				}
-				
+
 				IdImpl homeId = new IdImpl(0);
 				for (int z=0;z<this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).size();z++){
 					if (this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(z).getType().equalsIgnoreCase("home")){
-						homeId = (IdImpl) this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(z).getFacility().getId();
+						homeId = (IdImpl) this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(z).getFacilityId();
 					}
 				}
 				for (int k=0;k<this.plans.get(i).get(j).getPlanElements().size()-2;k+=2){
@@ -213,9 +213,9 @@ public class ASPActivityChains {
 			}
 		}
 	}
-	
+
 	protected void analyze(){
-	
+
 		PrintStream stream1;
 		try {
 			stream1 = new PrintStream (new File(this.outputDir + "/analysis.xls"));
@@ -223,7 +223,7 @@ public class ASPActivityChains {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		/* Analysis of activity chains */
 		double averageACLength=0;
 		stream1.println("Number of occurrences\tActivity chain");
@@ -239,7 +239,7 @@ public class ASPActivityChains {
 		}
 		stream1.println((averageACLength/this.population.getPersons().size())+"\tAverage number of activities");
 		stream1.println();
-		
+
 		double[] kpis= this.analyzeActTypes(null);
 		stream1.println(kpis[0]+"\tAverage number of same consecutive acts per plan");
 		stream1.println(kpis[1]+"\tPercentage of same consecutive acts");
@@ -248,38 +248,38 @@ public class ASPActivityChains {
 		stream1.println(kpis[4]+"\tAverage maximum number of same acts per plan");
 		stream1.println(kpis[5]+"\tShare of plans in which same acts occur");
 	}
-	
+
 	public double[] analyzeActTypes (final Map<Id, Double> personsWeights){
-		
+
 		double overall = 0;
 		for (int i=0; i<this.plans.size();i++){
-			if (personsWeights!=null) 
+			if (personsWeights!=null)
 				for (int j=0;j<this.plans.get(i).size();j++){
-					overall += personsWeights.get(((Plan)this.plans.get(i).get(j)).getPerson().getId());
+					overall += personsWeights.get((this.plans.get(i).get(j)).getPerson().getId());
 				}
 			else overall += this.plans.get(i).size();
 		}
-		
+
 		int sameCon = 0;
 		int sumActs = 0;
 		int occSame = 0;
 		int occSeveral = 0;
 		double numSame = 0;
 		double maxSame = 0;
-		
+
 		ArrayList<String> takenActTypes = new ArrayList<String>();
-		
+
 		for (int i=0; i<this.activityChains.size();i++){
 			for (int j=0; j<this.plans.get(i).size();j++){
-				
+
 				double weight = -1;
 				Plan plan = this.plans.get(i).get(j);
 				if (personsWeights!=null) weight = personsWeights.get(plan.getPerson().getId());
 				else weight = 1;
 				if (weight<0) log.warn("An invalid weight of "+weight+" has been assigned to person "+plan.getPerson().getId());
-				
+
 				takenActTypes.clear();
-						
+
 				boolean occ = false;
 				boolean occSev = false;
 				double numPlanSame = 0;
@@ -305,7 +305,7 @@ public class ASPActivityChains {
 									numPlanSame++;
 								}
 								foundSth = true;
-							}							
+							}
 						}
 						if (foundSth) occSev = true;
 						if (max>maxPlanSame) maxPlanSame = max;
@@ -319,7 +319,7 @@ public class ASPActivityChains {
 				}
 			}
 		}
-		
+
 		double [] kpis = new double[6];
 		kpis[0] = Double.parseDouble(sameCon+"")/overall;
 		kpis[1] = Double.parseDouble(sameCon+"")/sumActs;
@@ -337,13 +337,13 @@ public class ASPActivityChains {
 		stream1.println(Double.parseDouble(occSeveral+"")/this.population.getPersons().size()+"\tShare of plans in which same acts occur");
 		*/
 	}
-	
+
 
 	public static void main(final String [] args) {
 /*		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it1/run151/output_plans.xml";
-		final String outputDir = "/home/baug/mfeil/data/choiceSet/it1/run151";		
+		final String outputDir = "/home/baug/mfeil/data/choiceSet/it1/run151";
 */
 		final String populationFilename = "./plans/output_plans.xml";
 		final String networkFilename = "./plans/network.xml";
@@ -359,7 +359,7 @@ public class ASPActivityChains {
 		sp.run();
 		sp.analyze();
 		sp.checkCorrectness();
-		
+
 		log.info("Analysis of plan finished.");
 	}
 

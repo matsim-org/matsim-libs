@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -38,7 +39,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.xml.sax.SAXException;
 
@@ -48,7 +48,7 @@ import playground.msieg.structure.Commodity;
 public class CMCFDemandWriter{
 
 	private final NetworkLayer network;
-	private final PopulationImpl plans;
+	private final Population plans;
 	private final PopulationReader popReader;
 	private final ScenarioImpl scenario;
 	//The input tag has to be specified before converting starts,
@@ -64,7 +64,7 @@ public class CMCFDemandWriter{
 	public CMCFDemandWriter(final String configPath){
 		this( 	Gbl.createConfig(new String[] { configPath, "config_v1.dtd" }));
 	}
-	
+
 	private CMCFDemandWriter(final Config config) {
 		this(config.network().getInputFile(), config.plans().getInputFile());
 	}

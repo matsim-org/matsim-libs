@@ -23,12 +23,12 @@ package org.matsim.core.router;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -114,7 +114,7 @@ public class RoutingTest extends MatsimTestCase {
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 
 		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(inPlansName);
 		long referenceChecksum = CRCChecksum.getCRCFromFile(inPlansName);
 		log.info("Reference checksum = " + referenceChecksum + " file: " + inPlansName);
@@ -128,7 +128,7 @@ public class RoutingTest extends MatsimTestCase {
 		assertEquals("different plans files.", referenceChecksum, routerChecksum);
 	}
 
-	private void calcRoute(final RouterProvider provider, final NetworkImpl  network, final PopulationImpl population, final Config config) {
+	private void calcRoute(final RouterProvider provider, final NetworkImpl  network, final Population population, final Config config) {
 		log.info("### calcRoute with router " + provider.getName());
 
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(config.charyparNagelScoring());

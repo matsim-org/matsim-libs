@@ -42,7 +42,6 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.Location;
@@ -74,9 +73,9 @@ import edu.uci.ics.jung.utils.UserData;
  * Collections jar (at least 3.1) and Cern Colt jar externally linked.
  *
  * Could be tailored to the network object in MATSim instead of causing overhead by using JUNG
- * 
+ *
  * Should be static -jh 9/2008
- *  
+ *
  * @author jhackney
  *
  */
@@ -244,8 +243,8 @@ public class SocialNetworkStatistics {
 		} catch (IOException ex) {
 		}
 	}
-	
-	private void runEdgeStatistics(int iter, PopulationImpl plans) {
+
+	private void runEdgeStatistics(int iter, Population plans) {
 		StatisticalMoments smDD = new StatisticalMoments();
 		StatisticalMoments smDur = new StatisticalMoments();
 		StatisticalMoments smNum = new StatisticalMoments();
@@ -293,7 +292,7 @@ public class SocialNetworkStatistics {
 		}
 	}
 
-	private Vector<Person> getEdgePersons(Edge e, PopulationImpl plans) {
+	private Vector<Person> getEdgePersons(Edge e, Population plans) {
 		Vector<Person> persons = new Vector<Person>(2);
 		Vertex v1 = (Vertex) e.getEndpoints().getFirst();
 		Person p1 = plans.getPersons().get(v1.getUserDatum("personId"));
@@ -315,7 +314,7 @@ public class SocialNetworkStatistics {
 		dist = CoordUtils.calcDistance(fromCoord, toCoord);
 		return dist;
 	}
-	private double getDyadDistance(Edge myEdge, PopulationImpl plans) {
+	private double getDyadDistance(Edge myEdge, Population plans) {
 		double dist = 0.;
 		Vertex vFrom = (Vertex) myEdge.getEndpoints().getFirst();
 		Person pFrom = plans.getPersons().get(vFrom.getUserDatum("personId"));
@@ -561,7 +560,7 @@ public class SocialNetworkStatistics {
 		} catch (IOException ex2) {
 		}
 		log.info("Social network output files closed.");
-		
+
 	}
 
 }

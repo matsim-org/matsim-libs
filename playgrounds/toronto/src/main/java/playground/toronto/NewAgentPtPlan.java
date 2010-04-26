@@ -27,10 +27,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.newPlans.NewPopulation;
 
@@ -49,11 +49,11 @@ public class NewAgentPtPlan extends NewPopulation {
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentPtPlan(final Network network, final PopulationImpl plans) {
+	public NewAgentPtPlan(final Network network, final Population plans) {
 		super(network, plans);
 	}
 
-	public NewAgentPtPlan(final Network network, final PopulationImpl population, final String filename) {
+	public NewAgentPtPlan(final Network network, final Population population, final String filename) {
 		super(network, population, filename);
 	}
 

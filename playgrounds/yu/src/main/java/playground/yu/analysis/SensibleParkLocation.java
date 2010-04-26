@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -31,12 +31,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -45,7 +45,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- * 
+ *
  */
 public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -159,7 +159,7 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		System.out.println("-----> begins \"read population\"");
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 		System.out.println("-----> done \"read population\"");
 

@@ -27,9 +27,9 @@ import junit.framework.TestCase;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 
 /**
  * Tests the class {@link ParallelPersonAlgorithmRunner}.
@@ -44,7 +44,7 @@ public class ParallelPersonAlgorithmRunnerTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testNumberOfThreads() {
-		PopulationImpl population = new ScenarioImpl().getPopulation();
+		Population population = new ScenarioImpl().getPopulation();
 		PersonAlgorithmTester algo = new PersonAlgorithmTester();
 		PersonAlgoProviderTester tester = new PersonAlgoProviderTester(algo);
 		ParallelPersonAlgorithmRunner.run(population, 2, tester);
@@ -62,7 +62,7 @@ public class ParallelPersonAlgorithmRunnerTest extends TestCase {
 	 */
 	public void testNofPersons() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		for (int i = 0; i < 100; i++) {
 			PersonImpl person = new PersonImpl(new IdImpl(i));
 			population.addPerson(person);

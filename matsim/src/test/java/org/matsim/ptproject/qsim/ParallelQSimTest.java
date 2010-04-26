@@ -69,7 +69,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -119,7 +118,7 @@ public class ParallelQSimTest extends TestCase {
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -162,7 +161,7 @@ public class ParallelQSimTest extends TestCase {
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -200,11 +199,11 @@ public class ParallelQSimTest extends TestCase {
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EventsCollector collector = new EventsCollector();
 		synchronizedEvents.addHandler(collector);
-		
+
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -252,7 +251,7 @@ public class ParallelQSimTest extends TestCase {
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -306,7 +305,7 @@ public class ParallelQSimTest extends TestCase {
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -338,7 +337,7 @@ public class ParallelQSimTest extends TestCase {
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -374,7 +373,7 @@ public class ParallelQSimTest extends TestCase {
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -433,11 +432,11 @@ public class ParallelQSimTest extends TestCase {
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		synchronizedEvents.addHandler(vAnalyzer);
-		
+
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -499,7 +498,7 @@ public class ParallelQSimTest extends TestCase {
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -573,7 +572,7 @@ public class ParallelQSimTest extends TestCase {
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -621,7 +620,7 @@ public class ParallelQSimTest extends TestCase {
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -670,11 +669,11 @@ public class ParallelQSimTest extends TestCase {
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EventsCollector collector = new EventsCollector();
 		synchronizedEvents.addHandler(collector);
-		
+
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.setTeleportVehicles(false);
@@ -687,9 +686,9 @@ public class ParallelQSimTest extends TestCase {
 
 		/* finish */
 		List<Event> allEvents = collector.getEvents();
-		
+
 		for (Event event : allEvents) System.out.println(event.toString());
-		
+
 		assertEquals("wrong number of events.", 6, allEvents.size());
 		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
 		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
@@ -727,7 +726,7 @@ public class ParallelQSimTest extends TestCase {
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		QNetwork qnet = sim.getQNetwork();
@@ -789,11 +788,11 @@ public class ParallelQSimTest extends TestCase {
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EventsCollector collector = new EventsCollector();
 		synchronizedEvents.addHandler(collector);
-		
+
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -847,11 +846,11 @@ public class ParallelQSimTest extends TestCase {
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EventsCollector collector = new EventsCollector();
 		synchronizedEvents.addHandler(collector);
-		
+
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		sim.run();
@@ -1008,11 +1007,11 @@ public class ParallelQSimTest extends TestCase {
 		/* run sim with special logger */
 		LogCounter logger = new LogCounter();
 		Logger.getRootLogger().addAppender(logger);
-		
+
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) f.scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		new ParallelQSimulation(f.scenario, events).run();
 		Logger.getRootLogger().removeAppender(logger);
@@ -1037,7 +1036,7 @@ public class ParallelQSimTest extends TestCase {
 		network.getLinks().put(link.getId(), link);
 
 		// build simple population with 1 person with 1 plan with 1 leg
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
 		Person person = pb.createPerson(scenario.createId("1"));
 		Plan plan = pb.createPlan();
@@ -1062,7 +1061,7 @@ public class ParallelQSimTest extends TestCase {
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		// first test without special settings
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(scenario, synchronizedEvents);
@@ -1076,7 +1075,7 @@ public class ParallelQSimTest extends TestCase {
 		config.getQSimConfigGroup().setEndTime(11.0*3600);
 		/* run parallelQSim */
 		new ParallelQSimulation(scenario, synchronizedEvents).run();
-		
+
 		assertEquals(8.0*3600, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 	}
@@ -1111,7 +1110,7 @@ public class ParallelQSimTest extends TestCase {
 		network.addLink(link2);
 
 		// build simple population with 3 persons with 1 plan with 1 leg
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
 		// person 1 : on the road when simulation ends
 		Person person1 = pb.createPerson(scenario.createId("1"));
@@ -1170,7 +1169,7 @@ public class ParallelQSimTest extends TestCase {
 		/* use two parallel Threads */
 		QSimConfigGroup conf = (QSimConfigGroup) scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		conf.setNumberOfThreads(2);
-		
+
 		/* run parallelQSim */
 		QSim sim = new ParallelQSimulation(scenario, synchronizedEvents);
 		sim.run();

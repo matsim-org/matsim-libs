@@ -43,7 +43,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -59,9 +58,9 @@ import playground.yu.utils.io.SimpleWriter;
  * This class can only be used with plansfile, in that all <code>Leg</code>s in
  * a <code>Plan</code> muss be equiped with the same {@code Mode}
  * {@link org.matsim.api.core.v01.TransportMode} in a day.
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, Analysis {
@@ -86,9 +85,6 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 	 */
 	protected final HashMap<String, Double> tmpDptTimes = new HashMap<String, Double>();
 
-	/**
-	 *
-	 */
 	public LegTravelTimeModalSplit(final int binSize, final int nofBins,
 			final Population plans) {
 		this.plans = plans;
@@ -118,7 +114,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		this(300, plans);
 	}
 
-	public LegTravelTimeModalSplit(PopulationImpl ppl, RoadPricingScheme toll) {
+	public LegTravelTimeModalSplit(Population ppl, RoadPricingScheme toll) {
 		this(ppl);
 		this.toll = toll;
 	}
@@ -337,7 +333,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 

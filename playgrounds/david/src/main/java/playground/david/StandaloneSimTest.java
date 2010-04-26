@@ -29,6 +29,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
@@ -36,7 +37,6 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.Time;
@@ -44,7 +44,7 @@ import org.matsim.core.utils.misc.Time;
 public class StandaloneSimTest {
 
 	public static void outputFile(String netFileName, String popFileName, String outFile){
-		
+
 	}
 	public static void main(final String[] args) {
 //		String netFileName = "test/simple/equil_net.xml";
@@ -65,7 +65,7 @@ public class StandaloneSimTest {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(popFileName);
 
@@ -74,12 +74,12 @@ public class StandaloneSimTest {
 //				try {
 ////					fos = new FileOutputStream("t.tmp");
 ////					ObjectOutputStream oos = new ObjectOutputStream(fos);
-////					
+////
 ////					oos.writeInt(12345);
 ////					//oos.writeObject("Today");
 ////					oos.writeObject(network);
 ////					oos.writeObject(population);
-////				
+////
 ////					oos.close();
 //					Gbl.startMeasurement();
 //					BufferedInputStream fin = new BufferedInputStream(new FileInputStream("t.tmp"),500000);
@@ -97,7 +97,7 @@ public class StandaloneSimTest {
 //					// TODO Auto-generated catch block
 //					e.printStackTrace();
 //				}
-//				
+//
 
 			ZipOutputStream zos = null;
 			ObjectOutputStream outFile;
@@ -117,8 +117,8 @@ public class StandaloneSimTest {
 				zos.close();
 				// END HERE
 				System.exit(0);
-				
-//				
+
+//
 //				Gbl.startMeasurement();
 //				File sourceZipFile = new File("testpop.zip");
 //				// Open Zip file for reading

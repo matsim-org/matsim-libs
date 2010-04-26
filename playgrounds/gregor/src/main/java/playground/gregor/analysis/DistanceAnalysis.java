@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -53,7 +54,6 @@ import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
@@ -109,7 +109,7 @@ public class DistanceAnalysis {
 	private final FeatureSource featureSourcePolygon;
 	private ArrayList<Polygon> polygons;
 
-	private final PopulationImpl population;
+	private final Population population;
 	private Envelope envelope = null;
 	private QuadTree<Person> personTree;
 	private final Network network;
@@ -121,7 +121,7 @@ public class DistanceAnalysis {
 	private static double CATCH_RADIUS;
 //	private TreeMap<Double, Feature> ft_tree;
 
-	public DistanceAnalysis(final FeatureSource features, final PopulationImpl population, final Network network, final Config config) throws Exception {
+	public DistanceAnalysis(final FeatureSource features, final Population population, final Network network, final Config config) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
 		this.network = network;
@@ -137,20 +137,13 @@ public class DistanceAnalysis {
 		handlePlans();
 		iteratePolygons();
 		writePolygons();
-
-
-
-
-
-
-
-
 	}
+
+
 	private void writePolygons() {
 		try {
 			ShapeFileWriter.writeGeometries(this.features, "./padang/evac_classification.shp");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -203,7 +196,6 @@ public class DistanceAnalysis {
 			try {
 				this.features.add(getFeature(polygon, meanDeviance, length_shortest, length_selected, num_pers, id++, evac_time,varK, dest));
 			} catch (IllegalAttributeException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			toGo--;
@@ -380,7 +372,7 @@ public class DistanceAnalysis {
 
 
 		log.info("loading population from " + config.plans().getInputFile());
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(config.plans().getInputFile());
 //		plansReader.readFile("./badPersons.xml");

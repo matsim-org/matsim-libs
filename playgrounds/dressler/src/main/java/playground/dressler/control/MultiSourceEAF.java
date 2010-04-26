@@ -37,13 +37,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
 import playground.dressler.Interval.EdgeIntervals;
@@ -162,8 +162,8 @@ public class MultiSourceEAF {
 
 		return allnodes;
 	}
-	
-	
+
+
 	public static void readShelterFile(NetworkLayer network,final String filename,
 			final int totaldemands,HashMap<Node, Integer> demands,final boolean addshelterlinks) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
@@ -177,7 +177,7 @@ public class MultiSourceEAF {
 				String nodeid = line[0].trim();
 				double flowcapacity = Double.valueOf(line[1].trim());
 				int sheltercapacity = Integer.valueOf(line[2]);
-				
+
 				if(addshelterlinks){
 					//create and add new shelternode
 					Id shelterid = new IdImpl("shelter"+nodeid);
@@ -199,7 +199,7 @@ public class MultiSourceEAF {
 					//set new demands
 					int olddemand = demands.get(shelter);
 					int newdemand = olddemand - sheltercapacity;
-					
+
 					demands.put(shelter, newdemand);
 				} else {
 					int olddemand = 0;
@@ -212,7 +212,7 @@ public class MultiSourceEAF {
 			}
 		}
 		in.close();
-		
+
 	}
 	public static List<TimeExpandedPath> readPathFlow(NetworkLayer network, String filename ) throws IOException{
 		List<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
@@ -269,7 +269,7 @@ public class MultiSourceEAF {
 		in.close();
 		return result;
 	}
-	
+
 	/**
 	 * THE ONLY FUNCTION WHICH REALLY CALCULATES A FLOW
 	 *
@@ -278,7 +278,7 @@ public class MultiSourceEAF {
 	 */
 	public static Flow calcEAFlow(FlowCalculationSettings settings,List<TimeExpandedPath> paths) {
 		Flow fluss;
-		
+
 		List<TimeExpandedPath> result = null;
 		fluss = new Flow(settings);
 		if(paths!=null){
@@ -365,8 +365,8 @@ public class MultiSourceEAF {
 			// DEBUG
 			//System.out.println("Returned paths");
 			//System.out.println(result);
-			
-			
+
+
 			boolean trySuccessfulPaths = false;
 			tempstr = "";
 			int zeroaugment = 0;
@@ -382,7 +382,7 @@ public class MultiSourceEAF {
 					trySuccessfulPaths = true; // before we do the forward search, we can simply repeat paths!
 				} else {
 					// forward or mixed search didn't find anything
-					// that's it, we are done.					
+					// that's it, we are done.
 					break;
 				}
 			} else {
@@ -489,7 +489,7 @@ public class MultiSourceEAF {
 
 			// BIG DEBUG
 			//System.out.println(result);
-			
+
 			if (result != null && !result.isEmpty()) {
 				for(TimeExpandedPath path : result){
 					String tempstr2 = "";
@@ -498,7 +498,7 @@ public class MultiSourceEAF {
 
 					// DEBUG
 					//fluss.displayBottleNeckCapacity(path);
-					
+
 					int augment = fluss.augment(path);
 
 					if (augment > 0) {
@@ -760,10 +760,10 @@ public class MultiSourceEAF {
 			sinkid = "en1";  //padang, line, swissold .. en1 fuer forward
 
 		}
-		
+
 		// outputplansfile = "/homes/combi/dressler/V/code/meine_EA/tempplans.xml";
 		//flowfile = "/homes/combi/dressler/V/vnotes/statistik_2010_04_april/bug_shelters_implicit.pathflow";
-		
+
 
 		if(_debug){
 			System.out.println("starting to read input");
@@ -828,13 +828,13 @@ public class MultiSourceEAF {
 				}
 			}
 		}
-		
+
 		int totaldemands = 0;
 		for (int i : demands.values()) {
 			if (i > 0)
 			  totaldemands += i;
 		}
-		
+
 		if (shelterfile != null) {
 			try {
 				readShelterFile(network,shelterfile,totaldemands,demands,true);
@@ -852,10 +852,10 @@ public class MultiSourceEAF {
 						System.out.println("NEGATIVE DEMAND SHELTER :"+demands.get(node)+" at "+ node);
 					}
 			}
-			
+
 		}
-		
-		
+
+
 		// TODO parse shelterfile
 		// Careful, padang has shelters AND a supersink.
 		// so take care of the supersink here and don't tell the settings about it.
@@ -922,20 +922,20 @@ public class MultiSourceEAF {
 				e.printStackTrace();
 				return;
 			}
-			
+
 		}
 
 		//settings.writeLP();
 		//settings.writeSimpleNetwork(true);
 		//settings.writeNET(false);
 		//if(true)return;
-		
+
 		fluss = MultiSourceEAF.calcEAFlow(settings, flowpaths);
-		
+
 		fluss.writePathflow();
 
 		/* --------- the actual work is done --------- */
-		
+
 
 		int[] arrivals = fluss.arrivals();
 		long totalcost = 0;
@@ -957,13 +957,10 @@ public class MultiSourceEAF {
 			}
 		}
 
-
 		if (outputplansfile != null) {
-			PopulationImpl output = fluss.createPopulation(scenario);
+			Population output = fluss.createPopulation(scenario);
 			new PopulationWriter(output, network).writeFile(outputplansfile);
 		}
-
-
 
 		if(_debug){
 			System.out.println("done");

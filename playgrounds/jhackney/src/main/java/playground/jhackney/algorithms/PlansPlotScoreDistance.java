@@ -1,10 +1,29 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.jhackney.algorithms;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -13,7 +32,7 @@ public class PlansPlotScoreDistance extends AbstractPersonAlgorithm {
 	double[] score=null;
 	int i=0;
 
-	public PlansPlotScoreDistance(PopulationImpl plans) {
+	public PlansPlotScoreDistance(Population plans) {
 		super();
 		this.dist= new double[plans.getPersons().size()];
 		this.score= new double[plans.getPersons().size()];
@@ -43,7 +62,7 @@ public class PlansPlotScoreDistance extends AbstractPersonAlgorithm {
 		String plotname="Distance vs. Score"+name;
 		createXYScatterChart(filename, plotname, "Distance m", "Score", dist, score);
 	}
-	
+
 	private void createXYScatterChart(final String filename, final String title, final String xname, final String yname, double[] x, double[] y) {
 		XYScatterChart chart = new XYScatterChart(title, xname, yname);
 		chart.addSeries(xname, x, y);

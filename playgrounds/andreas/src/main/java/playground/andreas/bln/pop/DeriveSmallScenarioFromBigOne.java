@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -65,12 +66,12 @@ public class DeriveSmallScenarioFromBigOne {
 		new MatsimNetworkReader(smallNetScenario).readFile(smallNetworkFile);
 
 		log.info("Reading routed population: " + wholeRoutedPlansFile);
-		PopulationImpl wholeRoutedPop = new ScenarioImpl().getPopulation();
+		Population wholeRoutedPop = new ScenarioImpl().getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, wholeRoutedPop));
 		popReader.readFile(wholeRoutedPlansFile);
 
 		log.info("Reading unrouted population: " + unroutedWholePlansFile);
-		PopulationImpl unroutedWholePop = new ScenarioImpl().getPopulation();
+		Population unroutedWholePop = new ScenarioImpl().getPopulation();
 		PopulationReader origPopReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, unroutedWholePop));
 		origPopReader.readFile(unroutedWholePlansFile);
 
@@ -87,7 +88,7 @@ public class DeriveSmallScenarioFromBigOne {
 
 		log.info("Start SetPersonCoordsToBoundingBox");
 
-		PopulationImpl inPop = smallNetScenario.getPopulation();
+		Population inPop = smallNetScenario.getPopulation();
 		popReader = new MatsimPopulationReader(smallNetScenario);
 		popReader.readFile(popGeoFilterOut);
 
@@ -110,7 +111,7 @@ public class DeriveSmallScenarioFromBigOne {
 		Network network = sl.getScenario().getNetwork();
 		config = sl.getScenario().getConfig();
 
-		final PopulationImpl plans = sl.getScenario().getPopulation();
+		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);

@@ -42,7 +42,7 @@ public class PrepareModeChoicePlans {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
-		PopulationImpl population = scenario.getPopulation();
+		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 		NewAgentPtPlan planGenerator = new NewAgentPtPlan(network, population, outputPlansFile);
 		population.addAlgorithm(planGenerator);

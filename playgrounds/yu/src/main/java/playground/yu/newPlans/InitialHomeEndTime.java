@@ -7,11 +7,11 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -25,7 +25,7 @@ public class InitialHomeEndTime extends NewPopulation implements PlanAlgorithm {
 	 * @param population
 	 * @param filename
 	 */
-	public InitialHomeEndTime(final Network network, final PopulationImpl population, final String filename) {
+	public InitialHomeEndTime(final Network network, final Population population, final String filename) {
 		super(network, population, filename);
 	}
 
@@ -52,7 +52,7 @@ public class InitialHomeEndTime extends NewPopulation implements PlanAlgorithm {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
 

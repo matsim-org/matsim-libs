@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
@@ -37,7 +38,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -51,8 +51,8 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class CreateSelectedPlansTables {
 
-	private PopulationImpl plans0;
-	private PopulationImpl plans1;
+	private Population plans0;
+	private Population plans1;
 
 	private final static String outfileTable="./output/analyseSelectedPlansTable.txt";
 	private final static String outfileAverages="./output/analyseSelectedPlansTableAverages.txt";
@@ -105,7 +105,7 @@ public class CreateSelectedPlansTables {
 
 	private void init(final String networkPath) {
 		this.scenario = new ScenarioImpl();
-		
+
 		this.plans0=new ScenarioImpl().getPopulation();
 		this.plans1=new ScenarioImpl().getPopulation();
 
@@ -113,7 +113,7 @@ public class CreateSelectedPlansTables {
 		new MatsimNetworkReader(this.scenario).readFile(networkPath);
 	}
 
-	private void readPlansFile(final String plansfilePath, final PopulationImpl plans) {
+	private void readPlansFile(final String plansfilePath, final Population plans) {
 		System.out.println("  reading file "+plansfilePath);
 		final PopulationReader plansReader = new MatsimPopulationReader(new PseudoScenario(this.scenario, plans));
 		plansReader.readFile(plansfilePath);
@@ -303,25 +303,25 @@ public class CreateSelectedPlansTables {
 	public void setTwoPlans(final boolean twoPlans) {
 		this.twoPlans=twoPlans;
 	}
-	
+
 	/**
 	 * Provides a real scenario, but exchanges the population.
 	 * Still, network and facilities can be reused that way.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	private static class PseudoScenario extends ScenarioImpl {
-		
+
 		private final ScenarioImpl scenario;
-		private final PopulationImpl myPopulation;
-		
-		public PseudoScenario(final ScenarioImpl scenario, final PopulationImpl population) {
+		private final Population myPopulation;
+
+		public PseudoScenario(final ScenarioImpl scenario, final Population population) {
 			this.scenario = scenario;
 			this.myPopulation = population;
 		}
 
 		@Override
-		public PopulationImpl getPopulation() {
+		public Population getPopulation() {
 			return this.myPopulation;
 		}
 
@@ -344,11 +344,11 @@ public class CreateSelectedPlansTables {
 		public NetworkLayer getNetwork() {
 			return this.scenario.getNetwork();
 		}
-		
+
 		@Override
 		public ActivityFacilitiesImpl getActivityFacilities() {
 			return this.scenario.getActivityFacilities();
 		}
-		
+
 	}
 }

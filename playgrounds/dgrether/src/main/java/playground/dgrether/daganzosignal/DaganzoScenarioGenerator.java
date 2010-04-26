@@ -24,9 +24,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -36,7 +36,6 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityPar
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -197,11 +196,11 @@ public class DaganzoScenarioGenerator {
 
 	private void createPlans(ScenarioImpl scenario) {
 		Network network = scenario.getNetwork();
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		double firstHomeEndTime =  600.0;
 		double homeEndTime = firstHomeEndTime;
-		Link l1 = network.getLinks().get(scenario.createId("1"));
-		Link l7 = network.getLinks().get(scenario.createId("7"));
+//		Link l1 = network.getLinks().get(scenario.createId("1"));
+//		Link l7 = network.getLinks().get(scenario.createId("7"));
 		PopulationFactory factory = population.getFactory();
 
 		for (int i = 1; i <= 2000; i++) {

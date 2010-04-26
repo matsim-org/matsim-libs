@@ -23,6 +23,7 @@ package playground.dgrether.cmcf;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -33,7 +34,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -90,7 +90,7 @@ public class CMCFScenarioGeneratorNoReroute {
 
 	// private static final int iterations = 1;
 
-	private PopulationImpl plans;
+	private Population plans;
 
 	private Config config;
 

@@ -45,7 +45,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.KnowledgeImpl;
@@ -61,7 +60,7 @@ public class PlansCreateFromDataPuls2010 {
 	private final static Logger log = Logger.getLogger(PlansCreateFromDataPuls2010.class);
 	private final String infile;
 	private final Random random = MatsimRandom.getRandom();
-	private final PopulationImpl censusPopulation;
+	private final Population censusPopulation;
 	private final ArrayList<QuadTree<Person>> censusPersonGroups;
 	private final Knowledges censusKnowledges;
 	private final ActivityFacilitiesImpl datapulsFacilities;
@@ -104,7 +103,7 @@ public class PlansCreateFromDataPuls2010 {
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 		log.info("    => xrange("+ minx+","+maxx+"); yrange("+miny+","+maxy+")");
 		log.info("    done.");
-		
+
 		ArrayList<QuadTree<Person>> qts = new ArrayList<QuadTree<Person>>(20);
 		for (int i=0; i<20; i++) { qts.add(new QuadTree<Person>(minx,miny,maxx,maxy)); }
 
@@ -192,7 +191,7 @@ public class PlansCreateFromDataPuls2010 {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void parse(PopulationImpl population, Knowledges kn) {
+	private final void parse(Population population, Knowledges kn) {
 		log.info("  creating plans from "+infile+"...");
 		int line_cnt = 1;
 		try {
@@ -234,20 +233,20 @@ public class PlansCreateFromDataPuls2010 {
 				if ((jobClass==1) || (jobClass==2)) { employed = "yes"; }
 				else if ((jobClass==3) || (jobClass==4) || (jobClass==5)) { employed = "no"; }
 				else { throw new RuntimeException("line "+line_cnt+": jobClass="+jobClass+" not known!"); }
-				
+
 				Id fid = new IdImpl(entries[1].trim());
 				ActivityFacilityImpl af = datapulsFacilities.getFacilities().get(fid);
 				if (af == null) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" not found in facilities."); }
 				if (af.getActivityOptions().size() != 1) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" must have only one activity option."); }
 				ActivityOptionImpl a = af.getActivityOptions().get("home");
 				if (a == null) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" does not contain 'home'."); }
-				
+
 				PersonImpl p = (PersonImpl)population.getFactory().createPerson(id);
 				KnowledgeImpl k = kn.getKnowledgesByPersonId().get(p.getId());
 				if (k != null) { throw new RuntimeException("pid="+p.getId()+": knowledge already exist."); }
 				k = kn.getFactory().createKnowledge(p.getId(),null);
 				kn.getKnowledgesByPersonId().put(p.getId(),k);
-				k.addActivity(a,true);
+				k.addActivityOption(a,true);
 				population.addPerson(p);
 				p.setAge(age);
 				p.setSex(sex);
@@ -262,7 +261,7 @@ public class PlansCreateFromDataPuls2010 {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void assignCensus2datapuls(PopulationImpl population, Knowledges kn) {
+	private final void assignCensus2datapuls(Population population, Knowledges kn) {
 		log.info("  assing Census demand to datapuls population...");
 		double maxDistance = 0;
 		for (Person pp : population.getPersons().values()) {
@@ -302,7 +301,7 @@ public class PlansCreateFromDataPuls2010 {
 					else { personGroup = censusPersonGroups.get(19); }
 				}
 			}
-			
+
 			double distance = 100;
 			List<Person> censusPersons = (List<Person>)personGroup.get(c.getX(),c.getY(),distance);
 			while (censusPersons.isEmpty()) {
@@ -311,13 +310,13 @@ public class PlansCreateFromDataPuls2010 {
 			}
 			// some logging info
 			if (maxDistance < distance) { maxDistance = distance; log.info("    pid="+p.getId()+": censusHome2datapulsHome distance="+distance); }
-			
+
 			Person censusPerson = censusPersons.get(random.nextInt(censusPersons.size()));
 			mapDemand(p,kn.getKnowledgesByPersonId().get(p.getId()),(PersonImpl) censusPerson,this.censusKnowledges.getKnowledgesByPersonId().get(censusPerson.getId()));
 		}
 		log.info("  done.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private final void mapDemand(PersonImpl dPerson, KnowledgeImpl dKnowledge, PersonImpl cPerson, KnowledgeImpl cKnowledge) {
@@ -344,7 +343,7 @@ public class PlansCreateFromDataPuls2010 {
 					log.warn("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+", dfid="+dFacility.getId()+", acttype="+cActivityOption.getType()+": distance="+distance+" > 500 meters.");
 				}
 				ActivityOptionImpl dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),dFacility);
-				dKnowledge.addActivity(dActivityOption,true);
+				dKnowledge.addActivityOption(dActivityOption,true);
 			}
 		}
 		for (ActivityOptionImpl cActivityOption : cKnowledge.getActivities(false)) {
@@ -357,7 +356,7 @@ public class PlansCreateFromDataPuls2010 {
 					log.warn("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+", dfid="+dFacility.getId()+", acttype="+cActivityOption.getType()+": distance="+distance+" > 500 meters.");
 				}
 				ActivityOptionImpl dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),dFacility);
-				dKnowledge.addActivity(dActivityOption,false);
+				dKnowledge.addActivityOption(dActivityOption,false);
 			}
 		}
 		// plan
@@ -377,12 +376,12 @@ public class PlansCreateFromDataPuls2010 {
 			}
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(PopulationImpl population, Knowledges kn) {
+	public void run(Population population, Knowledges kn) {
 		log.info("running " + this.getClass().getName() + " module...");
 		parse(population,kn);
 		assignCensus2datapuls(population,kn);

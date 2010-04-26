@@ -12,7 +12,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
 /*
@@ -38,7 +37,7 @@ public class KeepOnlyMIVPlans extends NewPopulation {
 
 		new MatsimFacilitiesReader(sc).readFile(facilitiesPath);
 
-		PopulationImpl inPop = sc.getPopulation();
+		Population inPop = sc.getPopulation();
 
 		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(networkFile);

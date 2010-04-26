@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.xml.sax.SAXException;
@@ -97,10 +98,11 @@ public class TransportModeAnalysis extends AbstractPersonAlgorithm {
 			log.info("analyzing plans");
 			BufferedWriter infoFile = IOUtils.getBufferedWriter("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/coords.txt");
 			infoFile.write("X\tY\tID\tTYPE\n");
-			scenario.getPopulation().setIsStreaming(true);
-			scenario.getPopulation().addAlgorithm(new TransportModeAnalysis(infoFile));
+			PopulationImpl pImpl = (PopulationImpl) scenario.getPopulation();
+			pImpl.setIsStreaming(true);
+			pImpl.addAlgorithm(new TransportModeAnalysis(infoFile));
 			new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_plans.xml.gz");
-			scenario.getPopulation().printPlansCount();
+			pImpl.printPlansCount();
 			infoFile.close();
 			log.info("done");
 		} catch (SAXException e) {

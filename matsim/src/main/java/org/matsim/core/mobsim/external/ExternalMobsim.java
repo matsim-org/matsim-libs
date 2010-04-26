@@ -123,7 +123,7 @@ public class ExternalMobsim {
 
 	protected void writePlans(final String iterationPlansFile) throws FileNotFoundException, IOException {
 		log.info("writing plans for external mobsim");
-		PopulationImpl pop = new ScenarioImpl().getPopulation();
+		PopulationImpl pop = (PopulationImpl) new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork());
 		PopulationWriterHandler handler = plansWriter.getHandler();

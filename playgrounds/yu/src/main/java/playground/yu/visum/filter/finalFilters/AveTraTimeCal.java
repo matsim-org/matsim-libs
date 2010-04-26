@@ -2,11 +2,11 @@ package playground.yu.visum.filter.finalFilters;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.visum.writer.UserDefAtt;
 
@@ -38,14 +38,14 @@ public class AveTraTimeCal extends LinkAveCalA {
 
 	/* ---------------------CONSTRUCTOR-------------------- */
 	/**
-	 * @attention the complete Information of some events can not be read
+	 * the complete Information of some events can not be read
 	 *            regularly without the constructor
 	 * @param plans -
 	 *            contains useful information from plans-file
 	 * @param network -
 	 *            contains useful information from network-file
 	 */
-	public AveTraTimeCal(PopulationImpl plans, NetworkLayer network) {
+	public AveTraTimeCal(Population plans, Network network) {
 		super(plans, network);
 	}
 
@@ -95,7 +95,7 @@ public class AveTraTimeCal extends LinkAveCalA {
 	@Override
 	protected double atxCal(String linkID, String s0) {
 		double att = getLinkTraTime(linkID, Integer.parseInt(s0) * 900);
-		LinkImpl l = network.getLinks().get(new IdImpl(linkID));
+		Link l = network.getLinks().get(new IdImpl(linkID));
 		if (l == null)
 			return 0.0;
 		att = (att != 0) ? att : l.getLength() / l.getFreespeed();

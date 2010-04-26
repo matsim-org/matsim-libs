@@ -48,7 +48,7 @@ public class EventFilterTestAveTraTimeCalOrWithToll {
 	public static void testRunAveTraTimeCal(Config config) throws IOException {
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		
+
 		// network
 		System.out.println("  reading network file... ");
 		NetworkLayer network = scenario.getNetwork();
@@ -58,7 +58,7 @@ public class EventFilterTestAveTraTimeCalOrWithToll {
 
 		// plans
 		System.out.println("  creating plans object... ");
-		PopulationImpl plans = scenario.getPopulation();
+		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		System.out.println("  done.");
 

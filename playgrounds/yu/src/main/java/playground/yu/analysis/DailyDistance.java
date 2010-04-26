@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -17,7 +18,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -33,9 +33,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * compute modal split of through distance
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyDistance extends DailyAnalysis {
 	protected double carDist, ptDist, wlkDist, bikeDist// TODO
@@ -162,10 +162,10 @@ public class DailyDistance extends DailyAnalysis {
 				else {
 					dist/* [km] */= CoordUtils.calcDistance(this.network
 							.getLinks().get(
-									((PlanImpl) plan).getPreviousActivity(bl)
+									(plan).getPreviousActivity(bl)
 											.getLinkId()).getCoord(),
 							this.network.getLinks().get(
-									((PlanImpl) plan).getNextActivity(bl)
+									(plan).getNextActivity(bl)
 											.getLinkId()).getCoord()) * 1.5 / 1000.0;
 				}
 
@@ -547,7 +547,7 @@ public class DailyDistance extends DailyAnalysis {
 			e.printStackTrace();
 		}
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		DailyDistance dd = new DailyDistance(scenario.getRoadPricingScheme(),

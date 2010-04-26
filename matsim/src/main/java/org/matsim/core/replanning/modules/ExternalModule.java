@@ -99,7 +99,7 @@ public class ExternalModule implements PlanStrategyModule {
 
 	public void prepareReplanning() {
 		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
-		PopulationImpl pop = new ScenarioImpl().getPopulation();
+		PopulationImpl pop = (PopulationImpl) new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
 		this.plansWriter = new PopulationWriter(pop, scenario.getNetwork());
 
@@ -195,14 +195,14 @@ public class ExternalModule implements PlanStrategyModule {
 	}
 
 	private void reReadPlans() {
-		PopulationImpl plans = new ScenarioImpl().getPopulation();
+		Population plans = new ScenarioImpl().getPopulation();
 		PopulationReader plansReader = getPlansReader(plans);
 		plansReader.readFile(this.outFileRoot + this.moduleId + ExternalOutFileName);
 		new PersonCalcTimes().run(plans);
 		new UpdatePlansAlgo(this.persons).run(plans);
 	}
 
-	private PopulationReader getPlansReader(final PopulationImpl plans) {
+	private PopulationReader getPlansReader(final Population plans) {
 		PopulationReader plansReader = new MatsimPopulationReader(new PseudoScenario(this.scenario, plans));
 		return plansReader;
 	}
@@ -246,7 +246,7 @@ public class ExternalModule implements PlanStrategyModule {
 		private final Scenario scenario;
 		private Population myPopulation;
 
-		public PseudoScenario(final Scenario scenario, final PopulationImpl population) {
+		public PseudoScenario(final Scenario scenario, final Population population) {
 			this.scenario = scenario;
 			this.myPopulation = population;
 		}

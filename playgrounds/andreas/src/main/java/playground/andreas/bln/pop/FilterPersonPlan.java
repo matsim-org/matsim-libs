@@ -12,7 +12,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
 /**
@@ -71,7 +70,7 @@ public class FilterPersonPlan extends NewPopulation {
 		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(networkFile);
 
-		PopulationImpl inPop = sc.getPopulation();
+		Population inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inPlansFile);
 

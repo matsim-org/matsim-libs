@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
-import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.ActivityOption;
 
 /**
  * @author anhorni
@@ -52,9 +52,9 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 		log.info("facilities size: " + facilities.getFacilities().values().size());
 		for (ActivityFacility f : facilities.getFacilities().values()) {
 			double capacity = Double.MAX_VALUE;
-			Iterator<? extends ActivityOptionImpl> iter_act = f.getActivityOptions().values().iterator();
+			Iterator<? extends ActivityOption> iter_act = f.getActivityOptions().values().iterator();
 			while (iter_act.hasNext()){
-				ActivityOptionImpl act = iter_act.next();
+				ActivityOption act = iter_act.next();
 				if (act.getCapacity() < capacity) {
 					capacity = act.getCapacity();
 				}

@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 
@@ -46,13 +47,13 @@ public class ActivityOptionImpl implements ActivityOption {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	
+
 	public ActivityOptionImpl(final String type, final ActivityFacilityImpl facility) {
 		this.type = type;
 		this.facility = facility;
 		if (this.facility == null) { Gbl.errorMsg("facility=null not allowed!"); }
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// add methods
 	//////////////////////////////////////////////////////////////////////
@@ -136,7 +137,7 @@ public class ActivityOptionImpl implements ActivityOption {
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public BasicLocation getLocation() {
 		return this.getFacility();
 	}
@@ -149,6 +150,12 @@ public class ActivityOptionImpl implements ActivityOption {
 		return this.facility;
 	}
 
+	@Override
+	public Id getFacilityId() {
+		return this.facility.getId();
+	}
+
+	@Override
 	public final Double getCapacity() {
 		return this.capacity;
 	}
@@ -157,6 +164,7 @@ public class ActivityOptionImpl implements ActivityOption {
 		return this.opentimes;
 	}
 
+	@Override
 	public final SortedSet<OpeningTime> getOpeningTimes(final DayType day) {
 		return this.opentimes.get(day);
 	}

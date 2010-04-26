@@ -22,10 +22,10 @@ import org.geotools.referencing.CRS;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -38,12 +38,12 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- * 
+ *
  */
 public class RouteCompare2QGIS extends Route2QGIS {
 	private final Map<List<Id>, Integer> routeCountersB;
 
-	public RouteCompare2QGIS(PopulationImpl population,
+	public RouteCompare2QGIS(Population population,
 			final CoordinateReferenceSystem crs, final String outputDir,
 			final NetworkLayer network,
 			final Map<List<Id>, Integer> routeCountersA,
@@ -155,7 +155,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		// ------------------------RouteSummaryA--------------------------------
 		ScenarioImpl scenarioA = new ScenarioImpl();
 		scenarioA.setNetwork(network);
-		PopulationImpl populationA = scenarioA.getPopulation();
+		Population populationA = scenarioA.getPopulation();
 
 		RouteSummary rsA = new RouteSummary(outputDir + "/routeCompareA.txt.gz");
 
@@ -168,7 +168,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		// ------------------------RouteSummaryB---------------------------------
 		ScenarioImpl scenarioB = new ScenarioImpl();
 		scenarioB.setNetwork(network);
-		PopulationImpl populationB = scenarioB.getPopulation();
+		Population populationB = scenarioB.getPopulation();
 
 		RouteSummary rsB = new RouteSummary(outputDir + "/routeCompareB.txt.gz");
 

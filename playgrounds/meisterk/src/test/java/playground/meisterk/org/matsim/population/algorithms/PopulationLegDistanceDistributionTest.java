@@ -74,7 +74,7 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 
 		act = testPlan.createAndAddActivity("endActivity", endLink.getId());
 
-		PopulationImpl pop = scenario.getPopulation();
+		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 		pop.setIsStreaming(true);
 
 		PrintStream out = null;

@@ -43,11 +43,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -148,13 +148,13 @@ public class PlanScoreAnalysis {
 
 		ScenarioImpl scenario1 = new ScenarioImpl();
 		scenario1.setNetwork(net);
-		PopulationImpl plans = scenario1.getPopulation();
+		Population plans = scenario1.getPopulation();
 		new MatsimPopulationReader(scenario1).readFile(PLANS);
 
 
 		ScenarioImpl scenario2 = new ScenarioImpl();
 		scenario2.setNetwork(net);
-		PopulationImpl plans2 = scenario2.getPopulation();
+		Population plans2 = scenario2.getPopulation();
 		new MatsimPopulationReader(scenario2).readFile(PLANS2);
 
 

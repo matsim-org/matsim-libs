@@ -129,7 +129,7 @@ public class ScenarioIO {
 
 		System.out.println("loading population...");
 		sl.loadPopulation();
-		PopulationImpl population = sl.getScenario().getPopulation();
+		PopulationImpl population = (PopulationImpl) sl.getScenario().getPopulation();
 		population.setIsStreaming(false);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (loading population)");

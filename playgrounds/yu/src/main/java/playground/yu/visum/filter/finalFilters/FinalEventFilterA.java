@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.visum.filter.finalFilters;
 
 import java.util.ArrayList;
@@ -8,9 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.visum.filter.EventFilterA;
 import playground.yu.visum.writer.UserDefAtt;
@@ -18,14 +34,14 @@ import playground.yu.visum.writer.UserDefAtt;
 /**
  * offers some important possibility to export attributs defined by VISUM-user
  * und their corresponding value
- * 
+ *
  * @author ychen
  */
 public abstract class FinalEventFilterA extends EventFilterA {
 	/*-----------------------MEMBER VARIABLES---------------------*/
-	protected PopulationImpl plans;
+	protected Population plans;
 
-	protected NetworkLayer network;
+	protected Network network;
 
 	protected List<UserDefAtt> udas = new ArrayList<UserDefAtt>();
 
@@ -38,13 +54,13 @@ public abstract class FinalEventFilterA extends EventFilterA {
 	/*-----------------------CONSTRUCTOR-----------------------*/
 	/**
 	 * builds a FinalEventFilterA
-	 * 
+	 *
 	 * @param plans
 	 *            - the Plans, which will be created in test
 	 * @param network
 	 *            - the NetworkLayer, which will be created in test
 	 */
-	public FinalEventFilterA(PopulationImpl plans, NetworkLayer network) {
+	public FinalEventFilterA(Population plans, Network network) {
 		this.plans = plans;
 		this.network = network;
 	}
@@ -52,7 +68,7 @@ public abstract class FinalEventFilterA extends EventFilterA {
 	/*-----------------------NORMAL METHOD---------------------*/
 //	/**
 //	 * rebuilds a real LinkEnterEvent-event.
-//	 * 
+//	 *
 //	 * @param enter
 //	 *            - the event, that a Person enters in a link.
 //	 * @return a real LinkEnterEvent-event.
@@ -69,14 +85,14 @@ public abstract class FinalEventFilterA extends EventFilterA {
 	/*-----------------------ABSTRACT METHODS-----------------------*/
 	/**
 	 * Returns the list of attributs defined by VISUM9.3-user
-	 * 
+	 *
 	 * @return the set of attributs defined by VISUM9.3-user
 	 */
 	public abstract List<UserDefAtt> UDAexport();
 
 	/**
 	 * Returns the TreeMap of values of attributs defined by VISUM9.3-user
-	 * 
+	 *
 	 * @return the TreeMap of values of attributs defined by VISUM9.3-user
 	 */
 	public abstract Map<String, List<Double>> UDAWexport();

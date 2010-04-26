@@ -29,7 +29,6 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
 /*
@@ -44,7 +43,7 @@ public class PopulationSplitter {
 	private ScenarioImpl scenario;
 	private NetworkLayer network;
 	private ActivityFacilitiesImpl facilities;
-	private PopulationImpl population;
+	private Population population;
 
 	private int personsPerSplitFile = 65536;
 	private int fileCounter = 0;

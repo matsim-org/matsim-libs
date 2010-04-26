@@ -22,10 +22,10 @@ package playground.yu.test;
 
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.analysis.MyCalcAverageTripLength;
 
@@ -42,7 +42,7 @@ public class CalcAvgTripLengthTest {
 		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl pop = scenario.getPopulation();
+		Population pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(popFilename);
 
 		CalcAverageTripLength catl = new MyCalcAverageTripLength(net);

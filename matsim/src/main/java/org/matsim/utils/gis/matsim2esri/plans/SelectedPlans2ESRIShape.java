@@ -43,12 +43,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -72,7 +72,7 @@ import com.vividsolutions.jts.geom.Point;
 public class SelectedPlans2ESRIShape {
 
 	private final CoordinateReferenceSystem crs;
-	private final PopulationImpl population;
+	private final Population population;
 	private double outputSample = 1;
 	private double actBlurFactor = 0;
 	private double legBlurFactor = 0;
@@ -85,7 +85,7 @@ public class SelectedPlans2ESRIShape {
 	private final GeometryFactory geofac;
 	private final Network network;
 
-	public SelectedPlans2ESRIShape(final PopulationImpl population, final Network network, final CoordinateReferenceSystem crs, final String outputDir) {
+	public SelectedPlans2ESRIShape(final Population population, final Network network, final CoordinateReferenceSystem crs, final String outputDir) {
 		this.population = population;
 		this.network = network;
 		this.crs = crs;

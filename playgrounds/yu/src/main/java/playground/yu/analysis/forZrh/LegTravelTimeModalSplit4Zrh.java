@@ -1,10 +1,11 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis.forZrh;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -12,7 +13,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -23,9 +23,9 @@ import playground.yu.utils.io.SimpleWriter;
 /**
  * compute average leg travel Time of Zurich and Kanton Zurich respectively with
  * through traffic
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 
@@ -33,22 +33,22 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 	private final int[] throughArrCount;
 
 	public LegTravelTimeModalSplit4Zrh(int binSize, int nofBins,
-			PopulationImpl plans) {
+			Population plans) {
 		super(binSize, nofBins, plans);
 		throughTravelTimes = new double[nofBins + 1];
 		throughArrCount = new int[nofBins + 1];
 	}
 
-	public LegTravelTimeModalSplit4Zrh(int binSize, PopulationImpl plans) {
+	public LegTravelTimeModalSplit4Zrh(int binSize, Population plans) {
 		this(binSize, 30 * 3600 / binSize + 1, plans);
 	}
 
-	public LegTravelTimeModalSplit4Zrh(PopulationImpl ppl, RoadPricingScheme toll) {
+	public LegTravelTimeModalSplit4Zrh(Population ppl, RoadPricingScheme toll) {
 		this(ppl);
 		this.toll = toll;
 	}
 
-	public LegTravelTimeModalSplit4Zrh(PopulationImpl plans) {
+	public LegTravelTimeModalSplit4Zrh(Population plans) {
 		this(300, plans);
 	}
 
@@ -172,7 +172,7 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 

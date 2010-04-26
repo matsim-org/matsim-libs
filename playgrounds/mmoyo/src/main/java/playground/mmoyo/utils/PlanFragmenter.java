@@ -21,8 +21,8 @@ public class PlanFragmenter {
 
 	public PlanFragmenter() {
 	}
-	
-	public PopulationImpl run(Population population){
+
+	public Population run(Population population){
 		ScenarioImpl tempScenario =new ScenarioImpl();
 		PopulationImpl newPopulation = new PopulationImpl(tempScenario);
 
@@ -75,13 +75,13 @@ public class PlanFragmenter {
 		ScenarioImpl scenario = scenarioLoader.getScenario();
 		scenarioLoader.loadScenario();
 		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));
-		
+
 		String outputFile = "../playgrounds/mmoyo/output/Berlin5x_20_moyo85_15Fragmented.xml";
 		System.out.println("writing output plan file..." + outputFile);
 		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write(outputFile) ;
 		System.out.println("done");
-		
+
 	}
 
 }

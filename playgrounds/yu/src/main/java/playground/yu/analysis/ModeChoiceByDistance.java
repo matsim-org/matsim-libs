@@ -34,17 +34,17 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 	private final Map<Double, Double> carLegs = new TreeMap<Double, Double>(),
@@ -74,7 +74,7 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl ppl = scenario.getPopulation();
+		Population ppl = scenario.getPopulation();
 		System.out.println("->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 		ModeChoiceByDistance mcbd;

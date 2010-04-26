@@ -31,19 +31,19 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 
 import playground.mfeil.ActChainEqualityCheck;
 
 
 /**
- * Simple class to analyze the selected plans of a plans (output) file. Extracts the 
+ * Simple class to analyze the selected plans of a plans (output) file. Extracts the
  * activity chains per modes and their number of occurrences.
  *
  * @author mfeil
@@ -51,27 +51,28 @@ import playground.mfeil.ActChainEqualityCheck;
 public class ASPActivityChainsModes extends ASPActivityChains{
 
 	private static final Logger log = Logger.getLogger(ASPActivityChainsModes.class);
-	
 
 
-	public ASPActivityChainsModes(final PopulationImpl population, Knowledges knowledges, final String outputDir) {
+
+	public ASPActivityChainsModes(final Population population, Knowledges knowledges, final String outputDir) {
 		super (population, knowledges, outputDir);
 	}
-	
-	public ASPActivityChainsModes(final PopulationImpl population) {
+
+	public ASPActivityChainsModes(final Population population) {
 		super (population);
 	//	this.outputDir = "/home/baug/mfeil/data/largeSet";
 		this.outputDir = "./plans";
 	}
-	
-	
+
+
+	@Override
 	public void run(){
 		this.initAnalysis();
 		this.analyze();
 	}
-	
+
 	private void initAnalysis(){
-		
+
 		this.activityChains = new ArrayList<List<PlanElement>>();
 		this.plans = new ArrayList<ArrayList<Plan>>();
 		ActChainEqualityCheck ac = new ActChainEqualityCheck();
@@ -91,10 +92,10 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 			}
 		}
 	}
-	
+
 	@Override
 	protected void analyze(){
-	
+
 		PrintStream stream1;
 		try {
 			stream1 = new PrintStream (new File(this.outputDir + "/analysis_Zurich10_accumulated.xls"));
@@ -102,7 +103,7 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 			e.printStackTrace();
 			return;
 		}
-		
+
 		/* Analysis of activity chains */
 		double averageACLength=0;
 		stream1.println("Number of occurrences\tActivity chain");
@@ -119,8 +120,8 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 		}
 		stream1.println((averageACLength/this.population.getPersons().size())+"\tAverage number of activities");
 		stream1.println();
-	}		
-	
+	}
+
 
 	public static void main(final String [] args) {
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
@@ -140,7 +141,7 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 
 		ASPActivityChainsModes sp = new ASPActivityChainsModes(scenario.getPopulation(), scenario.getKnowledges(), outputDir);
 		sp.run();
-		
+
 		log.info("Analysis of plan finished.");
 	}
 

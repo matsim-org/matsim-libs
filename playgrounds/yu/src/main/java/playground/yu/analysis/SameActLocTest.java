@@ -31,17 +31,17 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class SameActLocTest {
 	public static class SameActLoc extends AbstractPersonAlgorithm {
@@ -130,9 +130,6 @@ public class SameActLocTest {
 		}
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../data/ivtch/input/network.xml";
@@ -149,7 +146,7 @@ public class SameActLocTest {
 
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 
 		SameActLoc alt = new SameActLoc(outFilename);
 

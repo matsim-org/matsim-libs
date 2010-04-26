@@ -36,13 +36,13 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.ArgumentParser;
@@ -97,7 +97,7 @@ public class NetworkCutter {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 
-		final PopulationImpl pop = scenario.getPopulation();
+		final Population pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFile);
 
 		run(network, pop);
@@ -105,7 +105,7 @@ public class NetworkCutter {
 		new NetworkWriter(network).writeFile(outputNetworkFile);
 	}
 
-	public void run(Network net, PopulationImpl pop) {
+	public void run(Network net, Population pop) {
 		for (Person person : pop.getPersons().values())
 			for (Plan plan : person.getPlans())
 				for (PlanElement pe : plan.getPlanElements())

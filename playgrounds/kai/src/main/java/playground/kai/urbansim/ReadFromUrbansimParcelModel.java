@@ -18,6 +18,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -27,7 +28,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.world.Location;
@@ -131,11 +131,11 @@ public class ReadFromUrbansimParcelModel {
 
 	}
 
-	public void readPersons(final PopulationImpl oldPop, final PopulationImpl newPop, final ActivityFacilitiesImpl facilities, final NetworkLayer network, final double samplingRate ) {
+	public void readPersons(final Population oldPop, final Population newPop, final ActivityFacilitiesImpl facilities, final NetworkLayer network, final double samplingRate ) {
 		String filename = this.PATH_TO_OPUS_MATSIM+"tmp/person__dataset_table__exported_indicators__" + this.year + ".tab" ;
 		log.info( "Starting to read persons from " + filename ) ;
 
-		PopulationImpl backupPop = new ScenarioImpl().getPopulation() ;
+		Population backupPop = new ScenarioImpl().getPopulation() ;
 		long NUrbansimPersons=0 ;
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );

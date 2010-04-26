@@ -8,32 +8,27 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ArgumentParser;
 
 /**
  * Use this tool, if you want to find out the travel times for certain routes for a previous run.
- * 
+ *
  * input: network, events file, plans (only those, which you want to find out the route/distance/estimated travel time)
- * output: plans file with the route, distance and estimated tavel time filled in. 
- * 
+ * output: plans file with the route, distance and estimated tavel time filled in.
+ *
  * ===============
  * inorder to set it up for a different user:
  * 1.) change root path (and package it as a jar file)
  * 2.) place all files (network, config, events, input (plan) there
  * 3.) change the path of the network in the config file accordingly
- * 
- * 
+ *
+ *
  * @author wrashid
  *
  *
@@ -44,7 +39,7 @@ public class MyLoadedNetworkRouter {
 
 	Config config;
 	String configfile = null;
-	
+
 	/**
 	 * @param args
 	 */
@@ -75,7 +70,7 @@ public class MyLoadedNetworkRouter {
 			}
 		}
 	}
-	
+
 	public void run(final String[] args) {
 		//String rootPath="/home/erathal/MatSimRouting/";
 		String rootPathOut="/home/ciarif/Car_Travel_Script/output/";
@@ -84,22 +79,22 @@ public class MyLoadedNetworkRouter {
 		String eventsFile=rootPath + "50.events.txt.gz";
 		String inputPlansFile=rootPath + "inputPlanFile.xml";
 		String outputPlansFile=rootPathOut + "outputPlanFile.xml";
-		
+
 		parseArguments(args);
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
 		sl.loadNetwork();
 		NetworkImpl network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();
 
-		final PopulationImpl plans = sl.getScenario().getPopulation();
+		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(outputPlansFile);
-		
+
 		// add algorithm to map coordinates to links
 		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
-		
+
 		// add algorithm to estimate travel cost
 		// and which performs routing based on that
 		TravelTimeCalculator travelTimeCalculator= Events2TTCalculator.getTravelTimeCalculator(sl.getScenario(), eventsFile);
@@ -107,7 +102,7 @@ public class MyLoadedNetworkRouter {
 		PersonalizableTravelCost travelCostCalculator = travelCostCalculatorFactory.createTravelCostCalculator(travelTimeCalculator, this.config
 				.charyparNagelScoring());
 		plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, travelCostCalculator, travelTimeCalculator));
-		
+
 		// add algorithm to write out the plans
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(inputPlansFile);
@@ -116,6 +111,6 @@ public class MyLoadedNetworkRouter {
 
 		System.out.println("done.");
 	}
-	
+
 }
 

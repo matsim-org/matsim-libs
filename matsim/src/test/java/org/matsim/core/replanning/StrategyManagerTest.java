@@ -23,10 +23,10 @@ package org.matsim.core.replanning;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -43,7 +43,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testChangeRequests() {
 
-		PopulationImpl population = new ScenarioImpl().getPopulation();
+		Population population = new ScenarioImpl().getPopulation();
 		for (int i = 0; i < 1000; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));
 			population.addPerson(p);
@@ -123,7 +123,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testRemoveStrategy() {
 
-		PopulationImpl population = new ScenarioImpl().getPopulation();
+		Population population = new ScenarioImpl().getPopulation();
 		for (int i = 0; i < 100; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));
 			population.addPerson(p);
@@ -180,7 +180,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testOptimisticBehavior() {
 
-		PopulationImpl population = new ScenarioImpl().getPopulation();
+		Population population = new ScenarioImpl().getPopulation();
 		PersonImpl person = null;
 		PlanImpl[] plans = new PlanImpl[10];
 		// create a person with 4 unscored plans
@@ -226,12 +226,12 @@ public class StrategyManagerTest extends MatsimTestCase {
 		}
 
 	}
-	
+
 	public void testSetPlanSelectorForRemoval() {
 		// init StrategyManager
 		StrategyManager manager = new StrategyManager();
 		manager.addStrategy(new PlanStrategy(new RandomPlanSelector()), 1.0);
-		
+
 		// init Population
 		PersonImpl p = new PersonImpl(new IdImpl(1));
 		PlanImpl[] plans = new PlanImpl[7];
@@ -239,13 +239,13 @@ public class StrategyManagerTest extends MatsimTestCase {
 			plans[i] = p.createAndAddPlan(false);
 			plans[i].setScore(Double.valueOf(i*10));
 		}
-		PopulationImpl pop = new ScenarioImpl().getPopulation();
+		Population pop = new ScenarioImpl().getPopulation();
 		pop.addPerson(p);
-		
+
 		// run with default settings
 		manager.setMaxPlansPerAgent(plans.length - 2);
 		manager.run(pop);
-		
+
 		assertEquals("wrong number of plans.", 5, p.getPlans().size());
 		// default of StrategyManager is to remove worst plans:
 		assertFalse("plan should have been removed.", p.getPlans().contains(plans[0]));
@@ -256,7 +256,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		manager.setPlanSelectorForRemoval(new BestPlanSelector());
 		manager.setMaxPlansPerAgent(plans.length - 4);
 		manager.run(pop);
-		
+
 		assertEquals("wrong number of plans.", 3, p.getPlans().size());
 		// default of StrategyManager is to remove worst plans:
 		assertFalse("plan should have been removed.", p.getPlans().contains(plans[plans.length - 1]));

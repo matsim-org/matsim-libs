@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.locationChoice;
 
@@ -34,11 +34,11 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -46,7 +46,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ActsLocComp {
 	public static class ActsLocRecorder extends AbstractPersonAlgorithm
@@ -124,7 +124,7 @@ public class ActsLocComp {
 
 		new MatsimFacilitiesReader(scenarioA).readFile(facFile);
 
-		PopulationImpl popA = scenarioA.getPopulation();
+		Population popA = scenarioA.getPopulation();
 		new MatsimPopulationReader(scenarioA).readFile(popFileA);
 
 		ActsLocRecorder alrA = new ActsLocRecorder();
@@ -137,7 +137,7 @@ public class ActsLocComp {
 
 		new MatsimFacilitiesReader(scenarioB).readFile(facFile);
 
-		PopulationImpl popB = scenarioB.getPopulation();
+		Population popB = scenarioB.getPopulation();
 		new MatsimPopulationReader(scenarioB).readFile(popFileB);
 
 		ActsLocRecorder alrB = new ActsLocRecorder();

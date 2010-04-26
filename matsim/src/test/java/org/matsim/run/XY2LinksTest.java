@@ -25,6 +25,7 @@ import java.io.File;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -35,7 +36,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -62,7 +62,7 @@ public class XY2LinksTest extends MatsimTestCase {
 		new MatsimNetworkReader(scenario).parse(NETWORK_FILE);
 
 		// create one person with missing link in act
-		PopulationImpl population = new ScenarioImpl().getPopulation();
+		Population population = new ScenarioImpl().getPopulation();
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		PlanImpl plan = person.createAndAddPlan(true);
@@ -87,7 +87,7 @@ public class XY2LinksTest extends MatsimTestCase {
 
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
-		PopulationImpl population2 = scenario.getPopulation();
+		Population population2 = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).parse(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
 		Person person2 = population2.getPersons().get(new IdImpl("1"));

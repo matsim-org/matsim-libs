@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
@@ -46,7 +46,7 @@ public class PlansScenarioCut {
 
 	private final Coord min;
 	private final Coord max;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -66,8 +66,8 @@ public class PlansScenarioCut {
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
-	
-	public final void run(PopulationImpl plans) {
+
+	public final void run(Population plans) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		Set<Id> removeids = new TreeSet<Id>();
 		Map<Id, ? extends Person> persons = plans.getPersons();

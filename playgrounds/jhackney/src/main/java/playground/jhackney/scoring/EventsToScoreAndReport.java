@@ -29,6 +29,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
@@ -42,7 +43,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
@@ -62,7 +62,7 @@ import org.matsim.core.scoring.ScoringFunction;
  */
 public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler {
 
-	private PopulationImpl population = null;
+	private Population population = null;
 	private playground.jhackney.scoring.EventSocScoringFactory sfFactory = null;
 	private final TreeMap<String, playground.jhackney.scoring.EventSocScoringFunction> agentScorers = new TreeMap<String, playground.jhackney.scoring.EventSocScoringFunction>();
 	private double scoreSum = 0.0;
@@ -70,11 +70,11 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 	private final double learningRate;
 	boolean report=true;
 
-	public EventsToScoreAndReport(final PopulationImpl population, final playground.jhackney.scoring.EventSocScoringFactory factory) {
+	public EventsToScoreAndReport(final Population population, final playground.jhackney.scoring.EventSocScoringFactory factory) {
 		this(population, factory, Gbl.getConfig().charyparNagelScoring().getLearningRate());
 	}
 
-	public EventsToScoreAndReport(final PopulationImpl population, final playground.jhackney.scoring.EventSocScoringFactory factory, final double learningRate) {
+	public EventsToScoreAndReport(final Population population, final playground.jhackney.scoring.EventSocScoringFactory factory, final double learningRate) {
 		super();
 		this.population = population;
 		this.sfFactory = factory;

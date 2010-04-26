@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -90,7 +91,7 @@ public class PlansPrepare {
 		log.info("creating diluted dpopulation:");
 		log.info("  input-file:  " + fromFile);
 		log.info("  output-file: " + toFile);
-		PopulationImpl pop = new ScenarioImpl().getPopulation();
+		PopulationImpl pop = (PopulationImpl) new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
 
 		PopulationWriter writer = new PopulationWriter(pop, this.scenario.getNetwork());
@@ -109,7 +110,7 @@ public class PlansPrepare {
 	}
 
 	public void createSamplePopulation(final String fromFile, final String toFile, final double percentage) {
-		PopulationImpl pop = new ScenarioImpl().getPopulation();
+		PopulationImpl pop = (PopulationImpl) new ScenarioImpl().getPopulation();
 		pop.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork(), percentage);
 		plansWriter.startStreaming(toFile);
@@ -127,11 +128,10 @@ public class PlansPrepare {
 
 	public void filterMode(final String fromFile, final String toFile, final TransportMode mode) {
 
-		PopulationImpl pop = new ScenarioImpl().getPopulation();
+		Population pop = new ScenarioImpl().getPopulation();
 
 		log.info("reading plans from file: " + fromFile);
 		new MatsimPopulationReader(new PseudoScenario(this.scenario, pop)).readFile(fromFile);
-		pop.printPlansCount();
 
 		log.info("filter plans with " + mode + "-legs");
 		new PlansFilterByLegMode(mode, false).run(pop);

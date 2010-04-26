@@ -12,7 +12,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 
@@ -100,11 +99,11 @@ public class GeoFilterPersonPlan extends NewPopulation {
 		Network targetNet = targetScenario.getNetwork();
 		new MatsimNetworkReader(targetScenario).readFile(targetNetworkFile);
 
-		PopulationImpl inPop = new ScenarioImpl().getPopulation();
+		Population inPop = new ScenarioImpl().getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, inPop));
 		popReader.readFile(inPlansFile);
 
-		PopulationImpl origPop = new ScenarioImpl().getPopulation();
+		Population origPop = new ScenarioImpl().getPopulation();
 		PopulationReader origPopReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, origPop));
 		origPopReader.readFile(origPlansFile);
 

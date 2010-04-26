@@ -23,6 +23,7 @@ package org.matsim.core.population;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -37,7 +38,7 @@ public class PersonImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetRandomUnscoredPlan() {
-		PopulationImpl population = new ScenarioImpl().getPopulation();
+		Population population = new ScenarioImpl().getPopulation();
 		PersonImpl person = null;
 		PlanImpl[] plans = new PlanImpl[10];
 		// create a person with 4 unscored plans
@@ -97,7 +98,7 @@ public class PersonImplTest extends MatsimTestCase {
 		assertEquals("person should have 1 plan.", 1, person.getPlans().size());
 		assertEquals("remaining plan should be selPlan.", selPlan, person.getPlans().get(0));
 	}
-	
+
 	public void testRemovePlan() {
 		PersonImpl person = new PersonImpl(new IdImpl(5));
 		PlanImpl p1 = person.createAndAddPlan(false);
@@ -105,7 +106,7 @@ public class PersonImplTest extends MatsimTestCase {
 		PlanImpl p3 = person.createAndAddPlan(false);
 		PlanImpl p4 = person.createAndAddPlan(false);
 		PlanImpl p5 = new PlanImpl(null);
-		
+
 		assertEquals("wrong number of plans.", 4, person.getPlans().size());
 		assertEquals("expected different selected plan.", p2, person.getSelectedPlan());
 		assertTrue(person.removePlan(p3));
@@ -122,7 +123,7 @@ public class PersonImplTest extends MatsimTestCase {
 		assertTrue(person.removePlan(p4));
 		assertEquals("wrong number of plans.", 0, person.getPlans().size());
 	}
-	
+
 	public void testSetSelectedPlan() {
 		PersonImpl person = new PersonImpl(new IdImpl(11));
 		PlanImpl p1 = person.createAndAddPlan(false);

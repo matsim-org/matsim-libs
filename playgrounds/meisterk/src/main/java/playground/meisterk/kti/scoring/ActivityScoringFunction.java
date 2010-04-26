@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
@@ -48,9 +48,9 @@ import org.matsim.locationchoice.facilityload.ScoringPenalty;
 
 /**
  * This class implements the activity scoring as used in Year 3 of the KTI project.
- * 
+ *
  * It has the following features:
- * 
+ *
  * <ul>
  * <li>use opening times from facilities, not from config. scoring function can process multiple opening time intervals per activity option</li>
  * <li>use typical durations from agents' desires, not from config</li>
@@ -58,7 +58,7 @@ import org.matsim.locationchoice.facilityload.ScoringPenalty;
  * <li>use facility load penalties from LocationChoiceScoringFunction</li>
  * <li>no penalties for late arrival and early departure are computed</li>
  * </ul>
- * 
+ *
  * @author meisterk
  *
  */
@@ -104,7 +104,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			ActivityImpl act) {
 
 		double fromArrivalToDeparture = departureTime - arrivalTime;
-		
+
 		// technical penalty: negative activity durations are penalized heavily
 		// so that 24 hour plans are enforced (home activity must not start later than it ended)
 		// also: negative duration is also too short
@@ -121,9 +121,9 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		else {
 
 			SortedSet<OpeningTime> openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
-			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element, 
+			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element,
 			// assume facility is always open
-			ActivityOptionImpl actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
+			ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
 			if (actOpt != null) {
 				openTimes = actOpt.getOpeningTimes(ActivityScoringFunction.DEFAULT_DAY);
 				if (openTimes == null) {
@@ -169,8 +169,8 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 							accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
 						}
 
-						scoreImprovement = 
-							this.getPerformanceScore(act.getType(), accumulatedDuration + duration) - 
+						scoreImprovement =
+							this.getPerformanceScore(act.getType(), accumulatedDuration + duration) -
 							this.getPerformanceScore(act.getType(), accumulatedDuration);
 
 						// lazy init of penalty data structure
@@ -178,13 +178,13 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 							this.penalty = new Vector<ScoringPenalty>();
 						}
 						/* Penalty due to facility load:
-						 * Store the temporary score to reduce it in finish() proportionally 
+						 * Store the temporary score to reduce it in finish() proportionally
 						 * to score and dep. on facility load.
 						 */
 						this.penalty.add(new ScoringPenalty(
-								activityStart, 
-								activityEnd, 
-								this.facilityPenalties.get(act.getFacilityId()), 
+								activityStart,
+								activityEnd,
+								this.facilityPenalties.get(act.getFacilityId()),
 								scoreImprovement));
 					}
 

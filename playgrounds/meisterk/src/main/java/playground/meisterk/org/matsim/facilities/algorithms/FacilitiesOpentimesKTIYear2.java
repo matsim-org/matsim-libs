@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.OpeningTime;
@@ -88,11 +89,11 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 		} else {
 			log.info("shop activity object of closest shop facility is null.");
 		}
-		Map<String, ActivityOptionImpl> activities = facility.getActivityOptions();
+		Map<String, ? extends ActivityOption> activities = facility.getActivityOptions();
 
 		// remove all existing opentimes
-		for (ActivityOptionImpl a : activities.values()) {
-			a.setOpeningTimes(new TreeMap<DayType, SortedSet<OpeningTime>>());
+		for (ActivityOption a : activities.values()) {
+			((ActivityOptionImpl) a).setOpeningTimes(new TreeMap<DayType, SortedSet<OpeningTime>>());
 		}
 
 		// if only presence code and work are present
@@ -139,8 +140,8 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 				for (String activityType : activities.keySet()) {
 					if (
 							Pattern.matches(FacilitiesProductionKTI.ACT_TYPE_SHOP + ".*", activityType)) {
-						activities.get(activityType).setOpeningTimes(closestShopOpentimes);
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).setOpeningTimes(closestShopOpentimes);
+						((ActivityOptionImpl) activities.get(activityType)).setOpeningTimes(closestShopOpentimes);
+						((ActivityOptionImpl) activities.get(FacilitiesProductionKTI.WORK_SECTOR3)).setOpeningTimes(closestShopOpentimes);
 					} else if (
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_KINDERGARTEN, activityType) ||
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_PRIMARY, activityType)) {

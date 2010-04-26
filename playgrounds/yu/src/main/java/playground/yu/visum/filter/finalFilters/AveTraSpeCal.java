@@ -1,11 +1,30 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.visum.filter.finalFilters;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.visum.writer.UserDefAtt;
 
@@ -20,14 +39,14 @@ public class AveTraSpeCal extends LinkAveCalA {
 
 	/* ---------------------CONSTRUCTOR-------------------- */
 	/**
-	 * @attention the complete Information of some events can not be read
+	 * the complete Information of some events can not be read
 	 *            regularly without the constructor
 	 * @param plans -
 	 *            contains useful information from plans-file
 	 * @param network -
 	 *            contains useful information from network-file
 	 */
-	public AveTraSpeCal(final PopulationImpl plans, final NetworkLayer network) {
+	public AveTraSpeCal(final Population plans, final Network network) {
 		super(plans, network);
 	}
 

@@ -101,7 +101,8 @@ public class XY2Links {
 		NetworkImpl network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();
 
-		final PopulationImpl plans = sl.getScenario().getPopulation();		plans.setIsStreaming(true);
+		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
+		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(this.config.plans().getOutputFile());

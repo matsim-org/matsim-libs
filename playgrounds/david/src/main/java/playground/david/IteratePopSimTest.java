@@ -22,6 +22,7 @@ package playground.david;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -29,10 +30,8 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.Time;
@@ -48,10 +47,9 @@ public class IteratePopSimTest {
 		ScenarioImpl scenario = sl.getScenario();
 		final Config config = scenario.getConfig();
 
-		NetworkLayer network = scenario.getNetwork();
 				// Read network file with special Reader Implementation
 		new MatsimNetworkReader(scenario).readFile(netFileName);
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		// Read plans file with special Reader Implementation
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(popFileName);

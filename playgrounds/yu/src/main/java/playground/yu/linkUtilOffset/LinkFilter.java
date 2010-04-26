@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.linkUtilOffset;
 
@@ -32,10 +32,10 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -44,7 +44,7 @@ import playground.yu.analysis.LegAlgorithm;
 
 /**
  * @author yu
- * 
+ *
  */
 public class LinkFilter extends AbstractPersonAlgorithm implements
 		PlanAlgorithm, LegAlgorithm {
@@ -85,7 +85,7 @@ public class LinkFilter extends AbstractPersonAlgorithm implements
 		// NetworkImpl net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);
 
-		PopulationImpl pop = sc.getPopulation();
+		Population pop = sc.getPopulation();
 		new MatsimPopulationReader(sc).readFile(popFilename);
 
 		LinkFilter lf = new LinkFilter();

@@ -115,7 +115,7 @@ public class InitRoutes {
 		Network network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();
 
-		final PopulationImpl plans = sl.getScenario().getPopulation();
+		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);

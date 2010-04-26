@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB09;
 
 import java.util.Iterator;
@@ -5,16 +24,16 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Counter;
 
 public class FacilitiesV3Modifier extends Modifier {
 
 	private final static Logger log = Logger.getLogger(FacilitiesV3Modifier.class);
 
-	public FacilitiesV3Modifier(PopulationImpl plans, NetworkLayer network, ActivityFacilitiesImpl  facilities){
+	public FacilitiesV3Modifier(Population plans, NetworkLayer network, ActivityFacilitiesImpl  facilities){
 		super(plans, network, facilities);
 	}
 

@@ -21,6 +21,7 @@
 package playground.jhackney.algorithms;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -57,7 +58,7 @@ public class EgoNetMakeActivitySpaces {
 		System.out.println("  reading plans xml file... ");
 		System.out.println(config.plans().getInputFile());
 		new MatsimPopulationReader(Scenario.getScenarioImpl()).readFile(config.plans().getInputFile());
-		PopulationImpl plans = Scenario.getScenarioImpl().getPopulation();
+		Population plans = Scenario.getScenarioImpl().getPopulation();
 		Knowledges knowledges = Scenario.getScenarioImpl().getKnowledges();
 		System.out.println("  done.");
 
@@ -122,7 +123,7 @@ public class EgoNetMakeActivitySpaces {
 //		new PersonsRandomizeId(plans);
 		Person ego=plans.getPersons().get(new IdImpl("21924270"));
 
-		PopulationImpl socialPlans = new PersonGetEgoNetGetPlans().extract(ego);
+		PopulationImpl socialPlans = (PopulationImpl) new PersonGetEgoNetGetPlans().extract(ego);
 //		// make the set of plans to use as EgoNet
 		socialPlans.addAlgorithm(new PersonCalcActivitySpace("all", knowledges));
 //		plans.addAlgorithm(new PersonCalcActivitySpace("leisure"));

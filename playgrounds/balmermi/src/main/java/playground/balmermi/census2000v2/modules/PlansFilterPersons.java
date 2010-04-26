@@ -25,10 +25,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 
 import playground.balmermi.census2000v2.data.CAtts;
@@ -62,9 +62,9 @@ public class PlansFilterPersons {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final PopulationImpl plans) {
+	public void run(final Population plans) {
 		log.info("    running " + this.getClass().getName() + " module...");
-		
+
 		// remove persons which are only part of the 'zivilrechtliche' population
 		Set<Person> persons = new HashSet<Person>();
 		for (Person p : plans.getPersons().values()) {
@@ -76,7 +76,7 @@ public class PlansFilterPersons {
 			((Household)o).removePersonZ(p.getId());
 		}
 		log.info("      "+persons.size()+" persons without '"+CAtts.HH_W+"' household.");
-		
+
 		// remove 'zivilrechtliche' data from the population
 		for (Person p : plans.getPersons().values()) {
 			Object o = p.getCustomAttributes().get(CAtts.HH_Z);
@@ -111,7 +111,7 @@ public class PlansFilterPersons {
 				Gbl.errorMsg("pid="+p.getId()+": "+ this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).size() + " home acts!");
 			}
 		}
-		
+
 		log.info("    done.");
 	}
 }

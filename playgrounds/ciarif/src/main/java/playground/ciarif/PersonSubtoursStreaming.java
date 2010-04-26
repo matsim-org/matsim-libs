@@ -70,7 +70,7 @@ public class PersonSubtoursStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		PopulationImpl plans = scenario.getPopulation();
+		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans, scenario.getNetwork());
 		plansWriter.startStreaming(config.plans().getOutputFile());

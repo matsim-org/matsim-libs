@@ -5,10 +5,12 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
@@ -16,7 +18,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
@@ -35,7 +36,7 @@ public class CreatePlans1 {
 		config.plans().setOutputFile("C:/data/SandboxCVS/ivt/studies/triangle/plans/100Kplans/plans_hwsh.xml");
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		PopulationImpl plans = scenario.getPopulation();
+		Population plans = scenario.getPopulation();
 		Knowledges knowledges = scenario.getKnowledges();
 
 		// read facilities
@@ -74,15 +75,15 @@ public class CreatePlans1 {
 
 
 			KnowledgeImpl k = knowledges.getFactory().createKnowledge(person.getId(), "");
-			k.addActivity(home,false);
-			k.addActivity(work,false);
-			k.addActivity(shop,false);
+			k.addActivityOption(home,false);
+			k.addActivityOption(work,false);
+			k.addActivityOption(shop,false);
 
 			PlanImpl plan = person.createAndAddPlan(true);
 			ActivityFacilityImpl home_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("home").get(0).getFacility();
 			ActivityFacilityImpl work_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("work").get(0).getFacility();
 			ActivityFacilityImpl shop_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("shop").get(0).getFacility();
-			ArrayList<ActivityOptionImpl> acts = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities();
+			ArrayList<? extends ActivityOption> acts = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities();
 
 			double depTimeHome=3600*8;
 			double depTimeWork=3600*16;

@@ -39,10 +39,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -58,9 +58,9 @@ import com.vividsolutions.jts.geom.Point;
  * Parameters as defined in the population xml file will be added as attributes
  * to the shape files. There are also some parameters to configure this
  * converter, please consider the corresponding setters in this class."
- * 
+ *
  * @author laemmel
- * 
+ *
  *         this a changed copy of
  *         org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape.java
  *         of Mr. Laemmel with some changes.
@@ -79,7 +79,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 	private FeatureType featureTypeLeg;
 	protected GeometryFactory geofac;
 	private Network network;
-	
+
 	//
 	// public SelectedPlans2ESRIShape() {
 	// this.crs = null;
@@ -88,7 +88,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 	// this.geofac = null;
 	// }
 
-	public SelectedPlans2ESRIShapeChanged(PopulationImpl population, Network network,
+	public SelectedPlans2ESRIShapeChanged(Population population, Network network,
 			CoordinateReferenceSystem crs, String outputDir) {
 		super(population, network, crs, outputDir);
 		this.outputDir = outputDir;

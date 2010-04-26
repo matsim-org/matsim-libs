@@ -35,7 +35,6 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.jhackney.socialnetworks.algorithms.CompareActs;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -70,24 +69,24 @@ public class SpatialInteractorActs {
 	 * The first Act and all the Persons having visited that Facility Id are recorded in activityMap
 	 * The Plan/Person must be recorded rather than the Act because there is no pointer from Act to Plan/Person.
 	 * Also, the Facility Id is recorded separately in an ArrayList.
-	 * 
+	 *
 	 * To use this information, iterate through the ArrayList of Facilities and the table of Acts to
 	 * find the agents who passed through the Facility. Call up the list of agents and process their
 	 * Plans according to the spatial interaction desired.
-	 * 
+	 *
 	 * Note that one list records Facilities and the other records Acts. There could be several Acts
 	 * matching a given Facility, thus if it is desired to ascertain all spatial encounters at a
-	 * Facilit, it will be necessary to test all Acts. 
-	 * 
+	 * Facilit, it will be necessary to test all Acts.
+	 *
 	 * @param plans
 	 * @param rndEncounterProb
 	 * @param iteration
 	 */
-	public void interact(PopulationImpl plans, LinkedHashMap<String, Double> rndEncounterProb, int iteration) {
+	public void interact(Population plans, LinkedHashMap<String, Double> rndEncounterProb, int iteration) {
 
 		System.out.println(" "+ this.getClass()+" Looking through plans and tracking which Persons could interact "+iteration);
 
-			activityMap = new LinkedHashMap<ActivityOptionImpl,ArrayList<Person>>(); 
+			activityMap = new LinkedHashMap<ActivityOptionImpl,ArrayList<Person>>();
 			activityMap= makeActivityMap(plans);
 
 		// Activity-(facility)-based interactions
@@ -116,12 +115,12 @@ public class SpatialInteractorActs {
 	 * Makes a list of Activity (== Facility + activity type) and the Persons (Plans --> Acts) carrying
 	 * out an Act there. Only Acts need be stored, but since there is no way to link to a Person from
 	 * an Act, we store the Plan.
-	 * 
+	 *
 	 * Note that a single Person may have multiple Acts which take place at a Facility (e.g. Morning Home,
 	 * Evening Home). Thus storing the Person is a way to store all of these Acts.
-	 * 
+	 *
 	 *  We search through the Acts at a later stage when using this Map.
-	 *  
+	 *
 	 * @param plans
 	 * @return
 	 */
@@ -135,14 +134,14 @@ public class SpatialInteractorActs {
 					ActivityImpl act1 = (ActivityImpl) pe;
 					ActivityOptionImpl activity1=((ActivityFacilityImpl) this.facilities.getFacilities().get(act1.getFacilityId())).getActivityOptions().get(act1.getType());
 					ArrayList<Person> actList=new ArrayList<Person>();
-					
+
 					if(!activityMap.keySet().contains(activity1)){
-						activityMap.put(activity1,actList);	
+						activityMap.put(activity1,actList);
 					}
 					if(activityMap.keySet().contains(activity1)){
 						ArrayList<Person> myList=activityMap.get(activity1);
 						myList.add(p1);
-					}	
+					}
 				}
 			}
 		}
@@ -152,7 +151,7 @@ public class SpatialInteractorActs {
 	 * Based on Marchal and Nagel 2007, TRR 1935
 	 * Person p1 meets and befriends the person who arrived just before him, if
 	 * this person is still at the SocialAct.
-	 * 
+	 *
 	 * Cycle through all the agents who were co-present with p1 at the SocialAct
 	 * and find the agent whose arrival time is closest to and less than that of p1
 	 * Subject to the likelihood of a meeting taking place in a given facility type
@@ -183,10 +182,10 @@ public class SpatialInteractorActs {
 	}
 	/**
 	 * Time-independent chance of spatial encounter during each activity:
-	 * 
+	 *
 	 * This is not actually a "spatial" interaction but a test of shared
 	 * knowledge and could be accomplished via a search of Knowledge.Activities().
-	 * 
+	 *
 	 * Each person visiting a Facility to perform an Activity has a chance
 	 * to meet every other person who was at that Facility doing the same thing.
 	 * <br><br>
@@ -203,7 +202,7 @@ public class SpatialInteractorActs {
 	 * <br><br>
 	 * The conditions of adding network links apply:
 	 * {@link org.matsim.socialnetworks.socialnet.SocialNetwork.makeSocialContact}
-	 * 
+	 *
 	 * @param plans
 	 * @param rndEncounterProbability
 	 * @param iteration
@@ -244,10 +243,10 @@ public class SpatialInteractorActs {
 
 	/**
 	 * Time-independent chance of spatial encounter at each activity.
-	 * 
+	 *
 	 * This is not actually a "spatial" interaction but a test of shared
 	 * knowledge and could be accomplished via a search of Knowledge.Activities().
-	 * 
+	 *
 	 * Each person visiting a Facility to perform an Activity has a chance
 	 * to meet ONE other person who was at that Facility doing the same thing.
 	 * <br><br>
@@ -257,11 +256,11 @@ public class SpatialInteractorActs {
 	 * If they know each other, their friendship is reinforced.
 	 * <br><br>
 	 * If they do not, they befriend with probability <code>pBecomeFriends</code>.
-	 * 
+	 *
 	 * The conditions of "becoming friends" apply:
 	 * {@link org.matsim.socialnetworks.socialnet.SocialNetwork.makeSocialContact}
-	 * 
-	 * 
+	 *
+	 *
 	 * @param p1
 	 * @param p2
 	 * @param rndEncounterProbability
@@ -278,7 +277,7 @@ public class SpatialInteractorActs {
 			while(ait.hasNext()) {
 				ActivityOptionImpl myActivity=ait.next();
 			ArrayList<Person> visitors=activityMap.get(myActivity);
-			
+
 			// Go through the list of Persons and for each one pick one friend randomly
 			// Must be double loop
 			Iterator<Person> vIt1=visitors.iterator();
@@ -309,11 +308,11 @@ public class SpatialInteractorActs {
 	 * This interaction is based on Acts and as such counts things like the Morning Home and
 	 * Evening Home activity as separate social phenomena. To avoid this, use the interactions
 	 * based on Activity.
-	 * 
+	 *
 	 * Each agent may randomly encounter (and have the chance to befriend) ONE other agent during
 	 * an Act in which they are both present. Uses a time window. The duration of the time
 	 * window is not relevant in this method.
-	 * 
+	 *
 	 * @param plans
 	 * @param rndEncounterProbability
 	 * @param iteration
@@ -373,11 +372,11 @@ public class SpatialInteractorActs {
 			}
 		}
 //
-//		// Using the two TreeMaps of Who did What and Who Else Did It, for each Person, randomly pick 
+//		// Using the two TreeMaps of Who did What and Who Else Did It, for each Person, randomly pick
 //		// ONE other Person at each act and make them have an encounter.
-//		
+//
 //		Iterator<Person> pIt=personList.keySet().iterator();
-//		
+//
 //		while(pIt.hasNext()){
 //			Person p1=pIt.next();
 //			if(othersList.get(p1).size()>0){
@@ -410,9 +409,9 @@ public class SpatialInteractorActs {
 	 * <code>rndEncounterProbability(activity type)</code>. If the agents were already linked,
 	 * their link is reinforced.
 	 * <br><br>
-	 * 
+	 *
 	 * There is no other probability adjustment in this method.
-	 * 
+	 *
 	 * @param plans
 	 * @param rndEncounterProbability
 	 * @param iteration
@@ -440,17 +439,17 @@ public class SpatialInteractorActs {
 									if(CompareActs.overlapTimePlaceType(act1,act2, this.facilities)&& !p1.equals(p2)){
 										//agents encoutner and may befriend
 										if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(myActivity.getType())){
-											
+
 											// If they know each other, probability is 1.0 that the relationship is reinforced
 											if (((EgoNet)p1.getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
 												net.makeSocialContact(p1,p2,iteration,"renew_"+myActivity.getType());
 //										System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 											} else {
 												// If the two do not already know each other,
-												
+
 												net.makeSocialContact(p1,p2,iteration,"new_"+myActivity.getType());
 //										System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
-												
+
 											}
 										}
 									}

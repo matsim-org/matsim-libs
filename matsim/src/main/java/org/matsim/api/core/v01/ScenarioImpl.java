@@ -27,6 +27,7 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -68,7 +69,7 @@ public class ScenarioImpl implements Scenario {
 	//mandatory attributes
 	private final Config config;
 	private NetworkImpl network;
-	private PopulationImpl population;
+	private Population population;
 	private ActivityFacilitiesImpl facilities;
 
 	private final ConcurrentHashMap<String, Id> idMap = new ConcurrentHashMap<String, Id>();
@@ -175,7 +176,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Override
-	public PopulationImpl getPopulation() {
+	public Population getPopulation() {
 		return this.population;
 	}
 
@@ -249,7 +250,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Deprecated
-	public void setPopulation(PopulationImpl population2) {
+	public void setPopulation(Population population2) {
 		this.population = population2;
 	}
 

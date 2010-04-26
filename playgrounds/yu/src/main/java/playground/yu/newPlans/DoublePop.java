@@ -24,20 +24,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
 /**
  * increases the amount of Agents in a new MATSim plansfile, by copying the old
  * agents in the file and change only the Ids.
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class DoublePop extends NewPopulation {
 	// private String newPersonId;
@@ -46,11 +45,11 @@ public class DoublePop extends NewPopulation {
 
 	/**
 	 * Construcktor
-	 * 
+	 *
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public DoublePop(Network network, PopulationImpl plans, String filename) {
+	public DoublePop(Network network, Population plans, String filename) {
 		super(network, plans, filename);
 	}
 
@@ -104,7 +103,7 @@ public class DoublePop extends NewPopulation {
 		NetworkLayer network = s.getNetwork();
 		new MatsimNetworkReader(s).readFile(networkFilename);
 
-		PopulationImpl population = s.getPopulation();
+		Population population = s.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(s);
 		plansReader.readFile(plansFilename);
 

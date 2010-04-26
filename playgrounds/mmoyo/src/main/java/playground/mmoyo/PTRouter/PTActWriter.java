@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -24,7 +25,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -43,7 +43,7 @@ import playground.mmoyo.TransitSimulation.TransitRouteFinder;
  */
 public class PTActWriter {
 	private PTValues ptValues;
-	private final PopulationImpl population;
+	private final Population population;
 	private final String outputFile;
 	private NodeImpl originNode;
 	private NodeImpl destinationNode;
@@ -117,7 +117,7 @@ public class PTActWriter {
 	}
 
 	public void findRouteForActivities(){
-		PopulationImpl newPopulation = new ScenarioImpl().getPopulation();
+		Population newPopulation = new ScenarioImpl().getPopulation();
 
 		int numPlans=0;
 		int found =0;

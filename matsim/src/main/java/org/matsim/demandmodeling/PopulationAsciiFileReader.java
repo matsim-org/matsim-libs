@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -61,7 +61,7 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 
 	private final TabularFileParserConfig tabFileParserConfig;
 
-	private final PopulationImpl plans;
+	private final Population plans;
 
 	private boolean isFirstLine = true;
 
@@ -127,7 +127,7 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 		}
 	}
 
-	public PopulationImpl readFile(final String filename) throws IOException {
+	public Population readFile(final String filename) throws IOException {
 		log.warn("#######################################################################");
 		log.warn("This tool is not able to check the semantical correctness of data a better solution would be usage of xml.");
 		log.warn("The correctnes of the resulting plans file depends on the correct usage of the input format, that will not be checked by this tool, please take care");

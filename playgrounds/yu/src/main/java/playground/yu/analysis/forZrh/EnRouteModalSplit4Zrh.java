@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis.forZrh;
 
@@ -9,12 +9,12 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -28,9 +28,9 @@ import playground.yu.utils.TollTools;
 /**
  * compute daily En Route/ departures/ arrivals of Zurich and Kanton Zurich
  * respectively with through traffic
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	private double[] throughDep = null, throughArr = null, throughStuck = null,
@@ -43,7 +43,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	 * @param plans
 	 */
 	public EnRouteModalSplit4Zrh(String scenario, int binSize, int nofBins,
-			PopulationImpl plans) {
+			Population plans) {
 		super(scenario, binSize, nofBins, plans);
 		if (scenario.equals("Zurich") || scenario.equals("Kanton_Zurich")) {
 			// through traffic
@@ -59,7 +59,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	 * @param binSize
 	 * @param plans
 	 */
-	public EnRouteModalSplit4Zrh(String scenario, int binSize, PopulationImpl plans) {
+	public EnRouteModalSplit4Zrh(String scenario, int binSize, Population plans) {
 		super(scenario, binSize, plans);
 	}
 
@@ -67,7 +67,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	 * @param scenario
 	 * @param plans
 	 */
-	public EnRouteModalSplit4Zrh(String scenario, PopulationImpl plans) {
+	public EnRouteModalSplit4Zrh(String scenario, Population plans) {
 		super(scenario, plans);
 	}
 
@@ -76,7 +76,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	 * @param ppl
 	 * @param toll
 	 */
-	public EnRouteModalSplit4Zrh(String scenario, PopulationImpl ppl,
+	public EnRouteModalSplit4Zrh(String scenario, Population ppl,
 			RoadPricingScheme toll) {
 		super(scenario, ppl, toll);
 	}
@@ -153,7 +153,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 
 	/**
 	 * Writes the gathered data tab-separated into a text stream.
-	 * 
+	 *
 	 * @param bw
 	 *            The data stream where to write the gathered data.
 	 */
@@ -223,7 +223,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 
 	/**
 	 * Writes the gathered data tab-separated into a text file.
-	 * 
+	 *
 	 * @param filename
 	 *            The name of a file where to write the gathered data.
 	 */

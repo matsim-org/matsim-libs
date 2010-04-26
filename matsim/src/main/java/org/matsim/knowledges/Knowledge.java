@@ -29,10 +29,10 @@ import org.matsim.core.facilities.ActivityOption;
 public interface Knowledge<A extends ActivityOption> {
 
 	public void setDescription(String desc);
-	
+
 	public String getDescription();
-	
+
 	public List<A> getActivities();
-	
-	public void addActivity(A activity);
+
+	public void addActivityOption(A activity);
 }

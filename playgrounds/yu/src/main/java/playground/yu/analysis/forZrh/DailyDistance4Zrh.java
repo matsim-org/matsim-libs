@@ -32,13 +32,13 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -54,9 +54,9 @@ import playground.yu.utils.io.SimpleWriter;
 /**
  * compute daily distance of Zurich and Kanton Zurich respectively with through
  * traffic
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 
@@ -483,7 +483,7 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 			e.printStackTrace();
 		}
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		DailyDistance4Zrh dd = new DailyDistance4Zrh(scenario

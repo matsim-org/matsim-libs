@@ -24,11 +24,11 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -36,7 +36,6 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -59,7 +58,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		toll.addLink(scenario.createId("5"));
 		toll.addLink(scenario.createId("11"));
 		Fixture.createPopulation2(scenario);
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		PersonalizableTravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
@@ -113,7 +112,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		toll.addLink(scenario.createId("5"));
 		toll.addLink(scenario.createId("11"));
 		Fixture.createPopulation2(scenario);
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		PersonalizableTravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
@@ -157,7 +156,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 	 *
 	 * @param population
 	 */
-	private void clearRoutes(final PopulationImpl population) {
+	private void clearRoutes(final Population population) {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {

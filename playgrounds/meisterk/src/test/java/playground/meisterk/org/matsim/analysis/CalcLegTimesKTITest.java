@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
@@ -35,7 +36,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.misc.Time;
@@ -46,18 +46,18 @@ import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFr
 public class CalcLegTimesKTITest extends MatsimTestCase {
 
 	public static final double[] timeBins = new double[]{
-		0.0 * 60.0, 
-		5.0 * 60.0, 
-		10.0 * 60.0, 
-		15.0 * 60.0, 
-		20.0 * 60.0, 
-		25.0 * 60.0, 
-		30.0 * 60.0, 
-		60.0 * 60.0, 
-		120.0 * 60.0, 
-		240.0 * 60.0, 
-		480.0 * 60.0, 
-		960.0 * 60.0, 
+		0.0 * 60.0,
+		5.0 * 60.0,
+		10.0 * 60.0,
+		15.0 * 60.0,
+		20.0 * 60.0,
+		25.0 * 60.0,
+		30.0 * 60.0,
+		60.0 * 60.0,
+		120.0 * 60.0,
+		240.0 * 60.0,
+		480.0 * 60.0,
+		960.0 * 60.0,
 	};
 
 	@Override
@@ -66,13 +66,13 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 	}
 
 	public void testGenerateDistribution() {
-		
+
 		ScenarioImpl scenario = new ScenarioImpl();
-		PopulationImpl pop = scenario.getPopulation();
+		Population pop = scenario.getPopulation();
 		PersonImpl testPerson = new PersonImpl(new IdImpl("1"));
 		pop.addPerson(testPerson);
 		Id personId = testPerson.getId();
-		
+
 		PrintStream out = null;
 		try {
 			out = new PrintStream(this.getOutputDirectory() + "actualOutput.txt");
@@ -81,7 +81,7 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		}
 
 		CalcLegTimesKTI testee = new CalcLegTimesKTI(pop, out);
-		
+
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(testee);
 
@@ -91,10 +91,10 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		Link link = testNetwork.createAndAddLink(new IdImpl("200"), node1, node2, 0, 0, 0, 0);
 		LegImpl leg = new LegImpl(TransportMode.car);
 		Id linkId = link.getId();
-		
+
 		events.processEvent(new AgentDepartureEventImpl(Time.parseTime("06:00:00"), personId, linkId, leg.getMode()));
 		events.processEvent(new AgentArrivalEventImpl(Time.parseTime("06:30:00"), personId, linkId, leg.getMode()));
-		
+
 		assertEquals(1, testee.getNumberOfModes());
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, timeBins[5], timeBins[6]));
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, timeBins[6], timeBins[5]));
@@ -114,12 +114,12 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		assertEquals(3, testee.getNumberOfLegs());
 		assertEquals(2, testee.getNumberOfLegs(TransportMode.car));
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt));
-		
+
 		assertEquals(1, testee.getNumberOfLegs(-1000.0, timeBins[0]));
 		assertEquals(0, testee.getNumberOfLegs(timeBins[5], timeBins[4]));
 		assertEquals(1, testee.getNumberOfLegs(timeBins[5], timeBins[6]));
 		assertEquals(1, testee.getNumberOfLegs(timeBins[0], timeBins[1]));
-		
+
 		for (boolean isCumulative : new boolean[]{false, true}) {
 			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
 				testee.printClasses(crosstabFormat, isCumulative, timeBins, out);
@@ -137,5 +137,5 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		assertEquals(expectedChecksum, actualChecksum);
 
 	}
-	
+
 }

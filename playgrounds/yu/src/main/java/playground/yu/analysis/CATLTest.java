@@ -21,10 +21,10 @@
 package playground.yu.analysis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 
 public class CATLTest {
 
@@ -36,9 +36,8 @@ public class CATLTest {
 		NetworkImpl ni = si.getNetwork();
 		new MatsimNetworkReader(si)
 				.readFile("../matsim/examples/equil/network.xml");
-		PopulationImpl pop = si.getPopulation();
-		new MatsimPopulationReader(si)
-				.readFile("../matsim/output/equil_P2/ITERS/it.10/10.plans.xml.gz");
+		Population pop = si.getPopulation();
+		new MatsimPopulationReader(si).readFile("../matsim/output/equil_P2/ITERS/it.10/10.plans.xml.gz");
 
 		new MyCalcAverageTripLength(ni).run(pop);
 	}

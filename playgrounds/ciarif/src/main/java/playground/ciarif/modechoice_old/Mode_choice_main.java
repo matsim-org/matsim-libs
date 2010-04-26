@@ -21,6 +21,7 @@
 package playground.ciarif.modechoice_old;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -30,7 +31,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkSummary;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
@@ -91,7 +91,7 @@ public class Mode_choice_main {
 		System.out.println();
 
 		System.out.println("  creating plans object... ");
-		PopulationImpl plans = scenario.getPopulation();
+		Population plans = scenario.getPopulation();
 		Knowledges knowledges = new KnowledgesImpl();
 		System.out.println("  done.");
 

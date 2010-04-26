@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -54,7 +55,7 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 	public TransportModeGeoAnalysis(final BufferedWriter out) {
 		this.out = out;
 	}
-	
+
 	public void readGemeindegrenzen(final String filename) {
 		try {
 			FeatureSource fs = ShapeFileReader.readDataFile(filename);
@@ -73,7 +74,7 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 
 		GeometryFactory gf = new GeometryFactory();
 		Point p = gf.createPoint(new Coordinate(x, y));
-		
+
 		for (Feature f : this.featuers) {
 			if (f.getBounds().contains(x, y)) {
 				if (f.getDefaultGeometry().contains(p)) {
@@ -83,7 +84,7 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void run(final Person person) {
 		boolean hasCarLeg = false;
@@ -141,12 +142,13 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 			log.info("analyzing plans");
 			BufferedWriter infoFile = IOUtils.getBufferedWriter("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/coordsGmde.txt");
 			infoFile.write("X\tY\tID\tTYPE\tGID\tGNAME\n");
-			scenario.getPopulation().setIsStreaming(true);
+			PopulationImpl pImpl = (PopulationImpl) scenario.getPopulation();
+			pImpl.setIsStreaming(true);
 			TransportModeGeoAnalysis analysis = new TransportModeGeoAnalysis(infoFile);
 			analysis.readGemeindegrenzen("/Users/cello/Desktop/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp");
-			scenario.getPopulation().addAlgorithm(analysis);
+			pImpl.addAlgorithm(analysis);
 			new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/output_plans.xml.gz");
-			scenario.getPopulation().printPlansCount();
+			pImpl.printPlansCount();
 			infoFile.close();
 			log.info("done");
 		} catch (SAXException e) {

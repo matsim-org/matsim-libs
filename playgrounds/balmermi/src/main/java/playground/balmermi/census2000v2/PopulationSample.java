@@ -91,7 +91,7 @@ public class PopulationSample {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up population objects...");
-		PopulationImpl pop = scenario.getPopulation();
+		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop, scenario.getNetwork());
 		pop_writer.startStreaming(config.plans().getOutputFile());

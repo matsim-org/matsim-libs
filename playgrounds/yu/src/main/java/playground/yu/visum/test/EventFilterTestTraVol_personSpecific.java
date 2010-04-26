@@ -50,7 +50,7 @@ import playground.yu.visum.writer.PrintStreamUDANET;
  * (EventFilterAlgorithm, EventFilterPersonSpecific, TraVolCal)] [to read events
  * file] [to run events algorithms] [to print additiv netFile of Visum...] [to
  * print attributsFile of link...]
- * 
+ *
  * @author ychen
  */
 public class EventFilterTestTraVol_personSpecific {
@@ -69,7 +69,7 @@ public class EventFilterTestTraVol_personSpecific {
 	public static void testRunAveTraSpeCal(Config config) throws IOException {
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		
+
 		// network
 		System.out.println("  reading network file... ");
 		NetworkLayer network = scenario.getNetwork();
@@ -79,7 +79,7 @@ public class EventFilterTestTraVol_personSpecific {
 
 		// plans
 		System.out.println("  creating plans object... ");
-		PopulationImpl plans = scenario.getPopulation();
+		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		System.out.println("  done.");
 

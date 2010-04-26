@@ -99,7 +99,7 @@ public class MyRuns {
 		sl.loadNetwork();
 		ScenarioImpl scenario = sl.getScenario();
 
-		final PopulationImpl plans = scenario.getPopulation();
+		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		plans.addAlgorithm(new PersonFilterSelectedPlan());
 		final PopulationWriter plansWriter = new PopulationWriter(plans, scenario.getNetwork());
@@ -241,7 +241,7 @@ public class MyRuns {
 		final Config config = sl.getScenario().getConfig();
 
 		System.out.println("  setting up plans objects...");
-		final PopulationImpl plans = sl.getScenario().getPopulation();
+		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, sl.getScenario().getNetwork());
 		plansWriter.startStreaming(config.plans().getOutputFile());
@@ -267,7 +267,7 @@ public class MyRuns {
 		sl.loadNetwork();
 		Config config = sl.getScenario().getConfig();
 
-		final PopulationImpl plans = sl.getScenario().getPopulation();
+		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, sl.getScenario().getNetwork());
 		plansWriter.startStreaming(config.plans().getOutputFile());
@@ -368,7 +368,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  processing plans...");
-		final PopulationImpl population = scenario.getPopulation();
+		final PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(population, network);
 		plansWriter.startStreaming(scenario.getConfig().plans().getOutputFile());
@@ -428,7 +428,7 @@ public class MyRuns {
 
 		if (useVolumes) {
 			System.out.println("  reading plans...");
-			final PopulationImpl plans = sl.getScenario().getPopulation();
+			final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 			plans.setIsStreaming(true);
 			final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 			plans.addAlgorithm(

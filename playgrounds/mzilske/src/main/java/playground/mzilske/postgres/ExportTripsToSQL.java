@@ -72,7 +72,7 @@ public class ExportTripsToSQL {
 			final PrintWriter out = new PrintWriter(IOUtils.getBufferedWriter(outputFile, false));
 			scenario = sl.getScenario();
 			this.config = scenario.getConfig();
-			final PopulationImpl plans = scenario.getPopulation();		
+			final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 			plans.setIsStreaming(true);
 			final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 			plans.addAlgorithm(new PersonAlgorithm() {
@@ -90,7 +90,7 @@ public class ExportTripsToSQL {
 							Leg l = (Leg) i.next();
 							a2 = (Activity) i.next();
 							String line = nLeg + ","
-									+ person.getId() + "," 
+									+ person.getId() + ","
 									+ plan.getPlanElements().indexOf(l) + ","
 									+ a1.getCoord().getX() + ","
 									+ a1.getCoord().getY() + ","
@@ -124,5 +124,5 @@ public class ExportTripsToSQL {
 	public static void main(final String[] args) {
 		new ExportTripsToSQL().run(args);
 	}
-	
+
 }

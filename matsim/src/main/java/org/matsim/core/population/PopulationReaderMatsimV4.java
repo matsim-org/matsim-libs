@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -92,7 +93,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private KnowledgeImpl currknowledge = null;
 	private String curracttype = null;
 	private ActivityFacility currfacility = null;
-	private ActivityOptionImpl curractivity = null;
+	private ActivityOption curractivity = null;
 	private PlanImpl currplan = null;
 	private ActivityImpl curract = null;
 	private LegImpl currleg = null;
@@ -180,8 +181,8 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			this.currfacility = null;
 			this.curractivity = null;
 		} else if (PLAN.equals(name)) {
-			if (this.currplan.getPlanElements() instanceof ArrayList) {
-				((ArrayList) this.currplan.getPlanElements()).trimToSize();
+			if (this.currplan.getPlanElements() instanceof ArrayList<?>) {
+				((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
 			}
 			this.currplan = null;
 		} else if (ACT.equals(name)) {
@@ -270,7 +271,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		if (this.currfacility == null) { Gbl.errorMsg("facility id=" + id + " does not exist!"); }
 		this.curractivity = this.currfacility.getActivityOptions().get(this.curracttype);
 		if (this.curractivity == null) { Gbl.errorMsg("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!"); }
-		this.currknowledge.addActivity(this.curractivity,isPrimary);
+		this.currknowledge.addActivityOption((ActivityOptionImpl) this.curractivity,isPrimary);
 	}
 
 	private void startPlan(final Attributes atts) {

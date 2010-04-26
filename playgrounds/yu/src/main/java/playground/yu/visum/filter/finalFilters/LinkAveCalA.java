@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.yu.visum.writer.UserDefAtt;
@@ -22,7 +22,7 @@ import playground.yu.visum.writer.UserDefAtt;
 public abstract class LinkAveCalA extends FinalEventFilterA {
 	// -------------------------PRIVATE CLASS------------------
 	/**
-	 * 
+	 *
 	 * contains the function to compute the average traveltime or -speed.
 	 */
 	private static class BinAttcUnit {
@@ -60,7 +60,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 
 		// * -----------------------------SETTER---------------------------
 		/**
-		 * 
+		 *
 		 * @param sum
 		 *            The sum to set.
 		 * @uml.property name="sum"
@@ -103,7 +103,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	 * @param network -
 	 *            a NetworkLayer-object of the simulation
 	 */
-	public LinkAveCalA(PopulationImpl plans, NetworkLayer network) {
+	public LinkAveCalA(Population plans, Network network) {
 		super(plans, network);
 	}
 
@@ -143,7 +143,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	// -----------------------NORMAL MOTHODS--------------------------
 	/**
 	 * accumulates the average traveltime or travelspeed.
-	 * 
+	 *
 	 * @param tt -
 	 *            any input variable for example: average traveltime, average
 	 *            travelspeed,...
@@ -172,7 +172,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	// ----------------------------------GETTER--------------------------------
 	/**
 	 * gets the result of the calculating of average traveltime or -speed.
-	 * 
+	 *
 	 * @param linkId -
 	 *            an ID of the link, whose result man wants to have
 	 * @param time_s -
@@ -209,7 +209,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 
 	/**
 	 * returns a protected List of UserDefAtt-objects.
-	 * 
+	 *
 	 * @param attName -
 	 *            the name of "benutzerdefiniertes Attribut" in VISUM
 	 * @param attID -
@@ -248,7 +248,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	/**
 	 * this abstract function does nothing. It should accumulate the average
 	 * traveltime or travelspeed, if it is overridden by subclasses.
-	 * 
+	 *
 	 * @param enter
 	 *            a event called "entering a link"
 	 * @param leaveTime_s
@@ -260,7 +260,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	/**
 	 * This function does nothing and must be overridden by subclasses and
 	 * determines the average traveltime or travelspeed.
-	 * 
+	 *
 	 * @param linkID -
 	 *            the linkID of a link for VISUM 9.3.
 	 * @param timeBin -

@@ -11,10 +11,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -76,7 +76,7 @@ public class LogicIntoPlainTranslator {
 	}
 
 	/**translates the plans of a whole population*/
-	public void convertToPlain(PopulationImpl population){
+	public void convertToPlain(Population population){
 		for (Person person: population.getPersons().values()) {
 			Plan plan = person.getPlans().get(0);
 			for (PlanElement pe : plan.getPlanElements()) {

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis.forMuc;
 
@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentEvent;
@@ -23,7 +24,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -38,9 +38,9 @@ import playground.yu.utils.TollTools;
 /**
  * compute daily En Route/ departures/ arrivals of Munich Network and Munich
  * Region respectively with through traffic
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 		Analysis4Muc {
@@ -54,7 +54,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 	 * @param plans
 	 */
 	public EnRouteModalSplit4Muc(String scenario, int binSize, int nofBins,
-			PopulationImpl plans) {
+			Population plans) {
 		super(scenario, binSize, nofBins, plans);
 		if (scenario.equals(MUNICH) || scenario.equals(ONLY_MUNICH)) {
 			this.rideDep = new double[nofBins + 1];
@@ -70,7 +70,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 	 * @param plans
 	 */
 	public EnRouteModalSplit4Muc(String scenario, int binSize,
-			PopulationImpl plans) {
+			Population plans) {
 		this(scenario, binSize, 30 * 3600 / binSize + 1, plans);
 	}
 
@@ -78,7 +78,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 	 * @param scenario
 	 * @param plans
 	 */
-	public EnRouteModalSplit4Muc(String scenario, PopulationImpl plans) {
+	public EnRouteModalSplit4Muc(String scenario, Population plans) {
 		this(scenario, 300, plans);
 	}
 
@@ -87,7 +87,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 	 * @param ppl
 	 * @param toll
 	 */
-	public EnRouteModalSplit4Muc(String scenario, PopulationImpl ppl,
+	public EnRouteModalSplit4Muc(String scenario, Population ppl,
 			RoadPricingScheme toll) {
 		this(scenario, ppl);
 		this.toll = toll;
@@ -173,7 +173,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 
 	/**
 	 * Writes the gathered data tab-separated into a text stream.
-	 * 
+	 *
 	 * @param bw
 	 *            The data stream where to write the gathered data.
 	 */
@@ -216,7 +216,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 
 	/**
 	 * Writes the gathered data tab-separated into a text file.
-	 * 
+	 *
 	 * @param filename
 	 *            The name of a file where to write the gathered data.
 	 */
@@ -309,7 +309,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		RoadPricingScheme toll = scenario.getRoadPricingScheme();

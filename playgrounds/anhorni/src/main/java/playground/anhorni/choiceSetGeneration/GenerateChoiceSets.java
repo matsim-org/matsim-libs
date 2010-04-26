@@ -17,7 +17,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
 import playground.anhorni.choiceSetGeneration.choicesetextractors.ExtractChoiceSetsRouting;
@@ -270,9 +269,9 @@ public class GenerateChoiceSets {
 		this.output();
 	}
 
-	private PopulationImpl createChoiceSetPopulationFromMZ() {
+	private Population createChoiceSetPopulationFromMZ() {
 
-		PopulationImpl temporaryPopulation = new ScenarioImpl().getPopulation();
+		Population temporaryPopulation = new ScenarioImpl().getPopulation();
 
 		try {
 			new PlansCreateFromMZ(this.choiceSetPopulationFile,this.outdir+"/output_wegeketten.dat",1,7).run(temporaryPopulation);

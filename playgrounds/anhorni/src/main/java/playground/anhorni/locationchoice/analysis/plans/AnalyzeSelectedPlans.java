@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
@@ -35,14 +36,13 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class AnalyzeSelectedPlans {
 
 	private final ScenarioImpl scenario = new ScenarioImpl();
-	private final PopulationImpl plans = scenario.getPopulation();
+	private final Population plans = scenario.getPopulation();
 	private final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 	private final NetworkImpl network = scenario.getNetwork();
 	private String outfile = "output/plans/plan_analysis.txt";

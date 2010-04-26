@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.newPlans;
 
@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -37,7 +38,7 @@ import org.matsim.core.population.PopulationImpl;
 
 /**
  * @author yu
- * 
+ *
  */
 public class PlansExchanger {
 
@@ -89,8 +90,8 @@ public class PlansExchanger {
 			System.exit(0);
 		}
 
-		List<PopulationImpl> oldPops = new ArrayList<PopulationImpl>()//
-		, newPops = new ArrayList<PopulationImpl>();
+		List<Population> oldPops = new ArrayList<Population>()//
+		, newPops = new ArrayList<Population>();
 
 		// read old popFilenames
 		for (int i = 0; i < oldPopFilenames.length; i++) {
@@ -98,7 +99,7 @@ public class PlansExchanger {
 			NetworkImpl net = sc.getNetwork();
 			new MatsimNetworkReader(sc).readFile(netFilename);
 
-			PopulationImpl pop = sc.getPopulation();
+			Population pop = sc.getPopulation();
 			new MatsimPopulationReader(sc).readFile(oldPopFilenames[i]);
 			oldPops.add(pop);
 			newPops.add(new PopulationImpl(sc));
@@ -111,7 +112,7 @@ public class PlansExchanger {
 				PersonImpl personCopy = new PersonImpl(personId);
 				// set the each "i."th plan of the persons from oldPops to the
 				// person in newPop
-				for (PopulationImpl pop : oldPops) {
+				for (Population pop : oldPops) {
 					personCopy.addPlan(pop.getPersons().get(personId)
 							.getPlans().get(i));
 				}

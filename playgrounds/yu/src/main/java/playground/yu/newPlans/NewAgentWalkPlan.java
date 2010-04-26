@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -48,9 +47,9 @@ import playground.yu.analysis.PlanModeJudger;
  *
  */
 public class NewAgentWalkPlan extends NewPopulation {
-	
+
 	private final Network network;
-	
+
 	/**
 	 * Constructor, writes file-head
 	 *
@@ -62,7 +61,7 @@ public class NewAgentWalkPlan extends NewPopulation {
 		this.network = network;
 	}
 
-	public NewAgentWalkPlan(final Network network, final PopulationImpl population, final String filename) {
+	public NewAgentWalkPlan(final Network network, final Population population, final String filename) {
 		super(network, population, filename);
 		this.network = network;
 	}

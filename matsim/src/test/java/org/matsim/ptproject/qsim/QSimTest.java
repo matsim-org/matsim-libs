@@ -69,7 +69,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -951,7 +950,7 @@ public class QSimTest {
 
 		return logger;
 	}
-	
+
 	@Test
 	public void testStartAndEndTime() {
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -970,7 +969,7 @@ public class QSimTest {
 		network.getLinks().put(link.getId(), link);
 
 		// build simple population with 1 person with 1 plan with 1 leg
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
 		Person person = pb.createPerson(scenario.createId("1"));
 		Plan plan = pb.createPlan();
@@ -1038,7 +1037,7 @@ public class QSimTest {
 		network.addLink(link2);
 
 		// build simple population with 3 persons with 1 plan with 1 leg
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
 		// person 1 : on the road when simulation ends
 		Person person1 = pb.createPerson(scenario.createId("1"));

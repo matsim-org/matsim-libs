@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.jhackney.postprocessing;
 
 /* *********************************************************************** *
@@ -21,11 +40,11 @@ package playground.jhackney.postprocessing;
  * *********************************************************************** */
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
@@ -43,11 +62,11 @@ public class AnalyzeTimeCorrelations {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	static PopulationImpl plans;
+	static Population plans;
 	static ActivityFacilitiesImpl facilities;
 	static Knowledges knowledges;
 	static Network network;
-	
+
 	public static void run() throws Exception {
 
 		System.out.println("Make friend face to face scores each 10 iters:");
@@ -70,7 +89,7 @@ public class AnalyzeTimeCorrelations {
 		System.out.println(" Initializing agent knowledge about geography ...");
 		initializeKnowledge();
 		System.out.println("... done");
-		
+
 		// read in events
 		EventsManagerImpl events = new EventsManagerImpl();
 //		TrackEventsOverlap teo = new TrackEventsOverlap();
@@ -82,7 +101,7 @@ public class AnalyzeTimeCorrelations {
 		System.out.println("... done");
 
 		System.out.println("  Handling events");
-		
+
 		System.out.println(" ... done");
 
 		//read in social network
@@ -97,7 +116,7 @@ public class AnalyzeTimeCorrelations {
 
 //		LinkedHashMap<Act,ArrayList<Double>> actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
 // loop through timeWindowMap
-		// for each Activity 
+		// for each Activity
 //		new MakeTimeWindowsFromEvents(epp);
 		String out2=Scenario.getOut2();
 		String out1=Scenario.getOut1();

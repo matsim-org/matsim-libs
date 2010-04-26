@@ -30,11 +30,11 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Municipality;
@@ -70,11 +70,11 @@ public class Households {
 	public final Household getHousehold(final Id id) {
 		return this.households.get(id);
 	}
-	
+
 	public final HashMap<Id,Household> getHouseholds() {
 		return this.households;
 	}
-	
+
 	public final Municipalities getMunicipalities() {
 		return this.municipalities;
 	}
@@ -82,7 +82,7 @@ public class Households {
 	//////////////////////////////////////////////////////////////////////
 	// set/create methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public final void addHH(Household hh) {
 		this.households.put(hh.getId(),hh);
 	}
@@ -90,8 +90,8 @@ public class Households {
 	//////////////////////////////////////////////////////////////////////
 	// public methods
 	//////////////////////////////////////////////////////////////////////
-	
-	public final void parse(String infile, PopulationImpl plans, ActivityFacilitiesImpl facilities) {
+
+	public final void parse(String infile, Population plans, ActivityFacilitiesImpl facilities) {
 		int line_cnt = 0;
 		try {
 			FileReader fr = new FileReader(infile);
@@ -111,15 +111,15 @@ public class Households {
 				Id fid = new IdImpl(entries[2]);
 				int hhtpw = Integer.parseInt(entries[3]);
 				int hhtpz = Integer.parseInt(entries[4]);
-				
+
 				Municipality m = this.municipalities.getMunicipality(mid);
 				ActivityFacilityImpl f = facilities.getFacilities().get(fid);
-				
+
 				Household hh = new Household(hhid,m,f);
 				if (hhtpw != Integer.MIN_VALUE) { hh.setHHTPW(hhtpw); }
 				if (hhtpz != Integer.MIN_VALUE) { hh.setHHTPZ(hhtpz); }
 				this.addHH(hh);
-				
+
 				String p_w_list = entries[5];
 				String p_z_list = entries[6];
 				entries = p_w_list.split(";",-1);
@@ -159,7 +159,7 @@ public class Households {
 		}
 		System.out.println("------- printing households done. -------");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	public final void writeTable(String outfile) {

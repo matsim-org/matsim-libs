@@ -40,7 +40,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -122,12 +121,12 @@ public class RandomPlansGenerator {
 		this.routingAlgo = new Dijkstra(this.network, costFunction, costFunction, preProcessData);
 	}
 
-	public PopulationImpl createPlans(final int numberOfAgents){
+	public Population createPlans(final int numberOfAgents){
 		return this.createPlans(numberOfAgents, 6*3600, 7*3600);
 	}
 
-	public PopulationImpl createPlans(final int numberOfAgents, final int startTime, final int endTime){
-		PopulationImpl pop = new ScenarioImpl().getPopulation();
+	public Population createPlans(final int numberOfAgents, final int startTime, final int endTime){
+		Population pop = new ScenarioImpl().getPopulation();
 		this.initDijkstra();
 
 		for(int i=1; i <= numberOfAgents; i++){
@@ -210,7 +209,7 @@ public class RandomPlansGenerator {
 
 		RandomPlansGenerator rpg = new RandomPlansGenerator(inFile);
 
-		PopulationImpl pop = rpg.createPlans(number, start, end);
+		Population pop = rpg.createPlans(number, start, end);
 
 		String outFile = "";
 		if(inFile.lastIndexOf('/') != -1)

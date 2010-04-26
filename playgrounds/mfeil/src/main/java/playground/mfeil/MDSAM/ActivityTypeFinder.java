@@ -27,11 +27,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
@@ -43,38 +43,38 @@ import playground.mfeil.config.PlanomatXConfigGroup;
 
 
 /**
- * Class that searches all facilities of a given facilities layer (e.g., the facilities of a scenario) 
+ * Class that searches all facilities of a given facilities layer (e.g., the facilities of a scenario)
  * for activity options. Returns a list of all found activity options.
- * 
+ *
  * @author Matthias Feil
  */
 public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
-	
+
 	private List<String> actTypes;
 	private static final Logger log = Logger.getLogger(ActivityTypeFinder.class);
 	private final Controler controler;
-	
+
 	public ActivityTypeFinder (Controler controler){
 		this.controler = controler;
 		this.actTypes = new ArrayList<String>();
 		this.run(controler.getFacilities());
 	}
-	
+
 	@Override
 	public void run (final ActivityFacilities facilities) {
 		for (ActivityFacility f : facilities.getFacilities().values()) {
 			run(f);
 		}
-		/* TODO Removing tta activity type but needs clarification! */ 
+		/* TODO Removing tta activity type but needs clarification! */
 		if (this.actTypes.remove("tta")) log.info("tta act type found and removed.");
 		else log.info("No tta act type found.");
 		log.info("Searching available activity types done.");
 	}
-	
+
 	public void run(ActivityFacility facility){
-		Collection<ActivityOptionImpl> facActTypes = facility.getActivityOptions().values();
-		for (Iterator<ActivityOptionImpl> iterator = facActTypes.iterator();iterator.hasNext();){
-			ActivityOptionImpl act = iterator.next();
+		Collection<? extends ActivityOption> facActTypes = facility.getActivityOptions().values();
+		for (Iterator<? extends ActivityOption> iterator = facActTypes.iterator();iterator.hasNext();){
+			ActivityOption act = iterator.next();
 			if (!this.actTypes.contains(act.getType())){
 				this.actTypes.add(act.getType());
 			}
@@ -83,12 +83,12 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 	public List<String> getActTypes (){
 		return this.actTypes;
 	}
-	
+
 	public List<String> getActTypes (Person agent){
 		if (PlanomatXConfigGroup.getActTypes().equals("knowledge")){
 			return this.getKnActTypes(agent);
 		}
-		
+
 		else if (PlanomatXConfigGroup.getActTypes().equals("customized")){
 			List<String> agentKnActTypes = this.getKnActTypes(agent);
 			if (((PersonImpl) agent).getAge()<6){
@@ -121,13 +121,13 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 				return agentCuActTypes;
 			}
 		}
-		
+
 		else return this.actTypes;
 	}
-	
+
 	private List<String> getKnActTypes (Person agent){
 		// get act options of agent
-		Collection<ActivityOptionImpl> agentActOptions = ((ScenarioImpl)(this.controler.getScenario())).getKnowledges().getKnowledgesByPersonId().get(agent.getId()).getActivities();
+		Collection<ActivityOptionImpl> agentActOptions = ((this.controler.getScenario())).getKnowledges().getKnowledgesByPersonId().get(agent.getId()).getActivities();
 		// convert them into act types
 		List<String> agentActTypes = new ArrayList<String>();
 		for (Iterator<ActivityOptionImpl> iterator = agentActOptions.iterator();iterator.hasNext();){
@@ -138,5 +138,5 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 		}
 		return agentActTypes;
 	}
-	
+
 }

@@ -25,17 +25,16 @@ package playground.yu.test;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class PersonCounter extends AbstractPersonAlgorithm {
 	private int cnt, nullCnt;
@@ -68,14 +67,13 @@ public class PersonCounter extends AbstractPersonAlgorithm {
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		final String plansFilename = "./test/yu/test/input/10pctZrhCarPtPlans.xml.gz";
-		
+
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimConfigReader(scenario.getConfig()).readFile("./test/yu/test/configTest.xml");
 
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
 

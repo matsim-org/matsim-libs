@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -53,7 +54,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
@@ -79,7 +79,7 @@ public class EgressAnalysis {
 	private final FeatureSource featureSourcePolygon;
 	private ArrayList<Polygon> polygons;
 
-	private final PopulationImpl population;
+	private final Population population;
 	private final Envelope envelope = null;
 	private QuadTree<PersonImpl> personTree;
 	private final Network network;
@@ -93,7 +93,7 @@ public class EgressAnalysis {
 	private final Map<Id, EgressNode> egressNodes;
 
 
-	public EgressAnalysis(final FeatureSource features, final PopulationImpl population,
+	public EgressAnalysis(final FeatureSource features, final Population population,
 			final Network network, final Config config) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
@@ -255,7 +255,7 @@ public class EgressAnalysis {
 
 
 		log.info("loading population from " + config.plans().getInputFile());
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(config.plans().getInputFile());
 		log.info("done.");
@@ -264,7 +264,6 @@ public class EgressAnalysis {
 		try {
 			new EgressAnalysis(features,population,network,config);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

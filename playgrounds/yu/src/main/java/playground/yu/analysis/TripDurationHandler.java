@@ -29,6 +29,7 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -39,18 +40,17 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author yu
- * 
+ *
  */
 public class TripDurationHandler implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
 	// private final NetworkLayer network;
 
-	private final PopulationImpl plans;
+	private final Population plans;
 
 	private double travelTimes, carTravelTimes, ptTravelTimes,
 			otherTravelTimes;
@@ -66,7 +66,7 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 
 	public TripDurationHandler(
 	// final NetworkLayer network,
-			final PopulationImpl plans) {
+			final Population plans) {
 		// this.network = network;
 		this.plans = plans;
 	}
@@ -155,7 +155,7 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 

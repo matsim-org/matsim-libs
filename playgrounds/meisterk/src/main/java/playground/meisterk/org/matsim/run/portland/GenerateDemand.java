@@ -67,7 +67,7 @@ public class GenerateDemand {
 		System.out.println("Reading facilities...done.");
 
 		System.out.println("Setting up plans objects...");
-		PopulationImpl plans = scenario.getPopulation();
+		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans, networkLayer);
 		plansWriter.startStreaming(config.plans().getOutputFile());

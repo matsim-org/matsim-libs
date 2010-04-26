@@ -26,11 +26,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 public class MicroCensus {
@@ -53,7 +53,7 @@ public class MicroCensus {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public MicroCensus(PopulationImpl pop) {
+	public MicroCensus(Population pop) {
 		for (int i=0; i<groups.length; i++) { groups[i] = null; }
 		this.create(pop);
 		MatsimRandom.getRandom().nextDouble();
@@ -140,7 +140,7 @@ public class MicroCensus {
 		return "e("+has_educ+");w("+has_work+");lic("+lic+");sex("+sex+");age("+age+")";
 	}
 
-	private final void create(PopulationImpl pop) {
+	private final void create(Population pop) {
 		double weight_sum = 0.0;
 		for (Person p : pop.getPersons().values()) {
 			weight_sum += p.getSelectedPlan().getScore().doubleValue();

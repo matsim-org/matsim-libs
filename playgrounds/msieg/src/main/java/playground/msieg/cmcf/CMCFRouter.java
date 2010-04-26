@@ -33,11 +33,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.xml.sax.SAXException;
 
@@ -52,7 +52,7 @@ public abstract class CMCFRouter {
 
 	private final ScenarioImpl scenario;
 	protected NetworkLayer network;
-	protected PopulationImpl population;
+	protected Population population;
 	protected PathFlow<Node, Link> pathFlow;
 
 

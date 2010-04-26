@@ -56,7 +56,7 @@ public class CBPopulationPreparation {
 		if (args.length != 3) { printUsage(); return; }
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		final PopulationImpl population = scenario.getPopulation();
+		final PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		PopulationWriter plansWriter = new PopulationWriter(population, scenario.getNetwork());

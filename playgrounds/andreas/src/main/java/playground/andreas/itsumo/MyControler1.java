@@ -38,7 +38,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -317,7 +316,7 @@ public class MyControler1 extends Controler {
 		}
 	}
 
-	private void generatePerson(final int ii, final LinkImpl sourceLink, final LinkImpl destLink, final PopulationImpl population){
+	private void generatePerson(final int ii, final Link sourceLink, final Link destLink, final Population population){
 		PersonImpl p = new PersonImpl(new IdImpl(ii));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 		try {

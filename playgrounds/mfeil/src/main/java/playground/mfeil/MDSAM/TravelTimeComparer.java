@@ -29,44 +29,44 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 
 
 /**
- * Compares two plans files with respect to the car travel times. If the population sizes are different 
+ * Compares two plans files with respect to the car travel times. If the population sizes are different
  * (census data and extracted census file) all modes are compared.
  *
  * @author mfeil
  */
 public class TravelTimeComparer {
 
-	private final PopulationImpl populationOrig, populationNew;
+	private final Population populationOrig, populationNew;
 	private static final Logger log = Logger.getLogger(TravelTimeComparer.class);
 	private final String outputFile;
 
 
-	public TravelTimeComparer(final PopulationImpl populationOrig, final PopulationImpl populationNew) {
+	public TravelTimeComparer(final Population populationOrig, final Population populationNew) {
 		this.populationOrig = populationOrig;
 		this.populationNew = populationNew;
-	//	this.outputFile = "./plans/plans_similarity.xls";	
-		this.outputFile = "/home/baug/mfeil/data/largeSet/it1/ttcompare1929.xls";	
+	//	this.outputFile = "./plans/plans_similarity.xls";
+		this.outputFile = "/home/baug/mfeil/data/largeSet/it1/ttcompare1929.xls";
 	}
-	
+
 	public void run(){
 		log.info("Calculating travel time differences...");
 		log.info("populationOrig: "+this.populationOrig.getPersons().size());
 		log.info("populationNew: "+this.populationNew.getPersons().size());
-		
+
 		if (this.populationNew.getPersons().size()!=this.populationOrig.getPersons().size()){
 			log.warn("Different populations! Using the latter iteration's population.");
 			this.runSpecial();
 			return;
-		}		
-		
+		}
+
 		PrintStream stream;
 		try {
 			stream = new PrintStream (new File(this.outputFile));
@@ -74,7 +74,7 @@ public class TravelTimeComparer {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		// First row
 		int counter=0;
 		stream.print("Id\tChoice\t");
@@ -88,10 +88,10 @@ public class TravelTimeComparer {
 			}
 		}
 		stream.println("increase\tdecrease\tsame\tsum_delta");
-		
+
 		double [][] stats = new double[this.populationNew.getPersons().size()][counter];
 		counter = 0;
-		
+
 		// Filling plans
 		double value=0;
 		double valueSelected=0;
@@ -99,9 +99,9 @@ public class TravelTimeComparer {
 		int numberSelected=0;
 		for (Person personOrig : this.populationOrig.getPersons().values()) {
 			int counterIn=0;
-			
+
 			Person personNew = this.populationNew.getPersons().get(personOrig.getId());
-			
+
 			stream.print(personOrig.getId()+"\t");
 			int position = -1;
 			for (int i=0;i<personOrig.getPlans().size();i++){
@@ -111,7 +111,7 @@ public class TravelTimeComparer {
 				}
 			}
 			stream.print(position+"\t");
-			
+
 			for (int i=0;i<personOrig.getPlans().size();i++){
 				Plan planOrig = personOrig.getPlans().get(i);
 				Plan planNew = personNew.getPlans().get(i);
@@ -123,7 +123,7 @@ public class TravelTimeComparer {
 							valueSelected+=((LegImpl)(planOrig.getPlanElements().get(j))).getTravelTime();
 							diffSelected+=diff;
 							numberSelected++;
-						}						
+						}
 						stream.print(diff+"\t");
 						stats[counter][counterIn]=diff;
 						counterIn++;
@@ -141,7 +141,7 @@ public class TravelTimeComparer {
 				delta+=stats[counter][i];
 			}
 			stream.println(increase+"\t"+decrease+"\t"+same+"\t"+delta);
-			
+
 			counter++;
 		}
 		//Analysis
@@ -155,7 +155,7 @@ public class TravelTimeComparer {
 			stream.print(increase+"\t");
 		}
 		stream.println();
-		
+
 		//Decrease
 		stream.print("\tdecrease\t");
 		for (int j=0;j<stats[0].length;j++){
@@ -166,7 +166,7 @@ public class TravelTimeComparer {
 			stream.print(decrease+"\t");
 		}
 		stream.println();
-		
+
 		//Same
 		stream.print("\tsame\t");
 		for (int j=0;j<stats[0].length;j++){
@@ -177,7 +177,7 @@ public class TravelTimeComparer {
 			stream.print(same+"\t");
 		}
 		stream.println();
-		
+
 		//Delta
 		stream.print("\tsumDeltaPerCarTrip\t");
 		double deltaPerTrip=0;
@@ -190,16 +190,16 @@ public class TravelTimeComparer {
 			deltaPerTrip += delta;
 		}
 		stream.println();
-		stream.println("\taveValuePerCarTrip\t"+(value/(stats.length*stats[0].length)));	
-		stream.println("\taveDeltaPerCarTrip\t"+(deltaPerTrip/(stats.length*stats[0].length)));	
+		stream.println("\taveValuePerCarTrip\t"+(value/(stats.length*stats[0].length)));
+		stream.println("\taveDeltaPerCarTrip\t"+(deltaPerTrip/(stats.length*stats[0].length)));
 		stream.println();
-		stream.println("\taveValuePerSelectedCarTrip\t"+(valueSelected/numberSelected));	
-		stream.println("\taveDeltaPerSelectedCarTrip\t"+(diffSelected/numberSelected));	
-		
+		stream.println("\taveValuePerSelectedCarTrip\t"+(valueSelected/numberSelected));
+		stream.println("\taveDeltaPerSelectedCarTrip\t"+(diffSelected/numberSelected));
+
 		stream.close();
 		log.info("done.");
 	}
-	
+
 	private void runSpecial(){
 		PrintStream stream;
 		try {
@@ -208,21 +208,21 @@ public class TravelTimeComparer {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		// get maximum number of legs
 		int size = 0;
 		for (Person person : this.populationNew.getPersons().values()) {
 			int sizeIn = person.getSelectedPlan().getPlanElements().size()/2;
 			if (sizeIn>size) size= sizeIn;
-		}		
+		}
 		stream.print("PersonI\t");
 		for (int i=1;i<size+1;i++){
 			stream.print("x'x'"+(i*2)+"\t");
 		}
 		stream.println("increase\tdecrease\tsame\tsum_delta");
-		
+
 		int counter = 0;
-		
+
 		double Car=0;
 		int increaseCar=0;
 		int decreaseCar=0;
@@ -243,40 +243,40 @@ public class TravelTimeComparer {
 		int decreaseBike=0;
 		int sameBike=0;
 		double valueBike=0;
-		
+
 		// compare populations
 		for (Person person : this.populationNew.getPersons().values()) {
 			Plan planNew = person.getSelectedPlan();
 			Plan planOrig = this.populationOrig.getPersons().get(person.getId()).getSelectedPlan();
-			
+
 			stream.print(person.getId()+"\t");
 			/*
 			for (int i=0;i<planOrig.getPlanElements().size();i++){
 				if (i%2==0) log.info("Orig Act"+i+": "+((ActivityImpl)(planOrig.getPlanElements().get(i))).getType());
 				else log.info("Orig Act"+i+": "+((LegImpl)(planOrig.getPlanElements().get(i))).getMode());
 			}
-			
+
 			for (int i=0;i<planNew.getPlanElements().size();i++){
 				if (i%2==0) log.info("New Act"+i+": "+((ActivityImpl)(planNew.getPlanElements().get(i))).getType());
 				else log.info("New Act"+i+": "+((LegImpl)(planNew.getPlanElements().get(i))).getMode());
 			}
 			*/
-			
+
 			int increase=0;
 			int decrease=0;
 			int same=0;
 			double delta=0;
-			
+
 			if (planOrig.getPlanElements().size()>1){
 				for (int j=1;j<planOrig.getPlanElements().size();j+=2){
 					double value = ((LegImpl)(planOrig.getPlanElements().get(j))).getTravelTime();
 					double diff = (((LegImpl)(planNew.getPlanElements().get(j))).getTravelTime()-((LegImpl)(planOrig.getPlanElements().get(j))).getTravelTime());
-					stream.print(diff+"\t");	
+					stream.print(diff+"\t");
 					if (diff>0)increase++;
 					else if (diff<0)decrease++;
 					else same++;
 					delta+=diff;
-					
+
 					if (((LegImpl)(planNew.getPlanElements().get(j))).getMode().equals(TransportMode.car)){
 						if (diff>0)increaseCar++;
 						else if (diff<0)decreaseCar++;
@@ -317,7 +317,7 @@ public class TravelTimeComparer {
 				stream.print("\t");
 			}
 
-			stream.println(increase+"\t"+decrease+"\t"+same+"\t"+delta);			
+			stream.println(increase+"\t"+decrease+"\t"+same+"\t"+delta);
 			counter++;
 		}
 		stream.println();
@@ -349,13 +349,13 @@ public class TravelTimeComparer {
 		stream.println("valuePerTrip\t"+(Bike/(increaseBike+decreaseBike+sameBike)));
 		stream.println("deltaPerTrip\t"+(valueBike/(increaseBike+decreaseBike+sameBike)));
 
-		
+
 		stream.close();
 		log.info("done.");
-		
-		
+
+
 	}
-	
+
 	public static void main(final String [] args) {
 				final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
@@ -369,12 +369,12 @@ public class TravelTimeComparer {
 				new MatsimNetworkReader(scenarioOrig).readFile(networkFilename);
 				new MatsimFacilitiesReader(scenarioOrig).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioOrig).readFile(populationFilenameOrig);
-				
+
 				ScenarioImpl scenarioNew = new ScenarioImpl();
 				scenarioNew.setNetwork(scenarioOrig.getNetwork());
 				new MatsimFacilitiesReader(scenarioNew).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioNew).readFile(populationFilenameNew);
-								
+
 				TravelTimeComparer ttc = new TravelTimeComparer(scenarioOrig.getPopulation(), scenarioNew.getPopulation());
 				ttc.run();
 				log.info("Process finished.");

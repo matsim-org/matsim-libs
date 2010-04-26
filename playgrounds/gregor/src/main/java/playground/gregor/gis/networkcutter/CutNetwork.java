@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -49,7 +50,6 @@ import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.evacuation.base.EvacuationAreaFileReader;
@@ -66,7 +66,7 @@ public class CutNetwork {
 	private final static double MIN_Y = 9892816.;
 
 	private static void cutIt(final NetworkLayer net,
-			final List<NetworkChangeEvent> events, final PopulationImpl pop, final HashMap<Id,EvacuationAreaLink> eal) {
+			final List<NetworkChangeEvent> events, final Population pop, final HashMap<Id,EvacuationAreaLink> eal) {
 
 		max_x = 652000.;
 		max_y = 9894780.;
@@ -176,17 +176,14 @@ public class CutNetwork {
 		net.setNetworkChangeEvents(parser.getEvents());
 
 
-		PopulationImpl pop = scenario.getPopulation();
+		Population pop = scenario.getPopulation();
 		try {
 			new MatsimPopulationReader(scenario).parse(c.plans().getInputFile());
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -195,13 +192,10 @@ public class CutNetwork {
 		try {
 			new EvacuationAreaFileReader(evacuationAreaLinks).readFile(evacuationAreaLinksFile);
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -215,7 +209,6 @@ public class CutNetwork {
 		try {
 			new EvacuationAreaFileWriter(evacuationAreaLinks).writeFile("tmp2/evacuationArea.xml");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

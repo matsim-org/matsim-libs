@@ -129,7 +129,7 @@ public class ScenarioDilute {
 		System.out.println("=> aoi contains: " + areaOfInterest.size() + " links.");
 		System.out.println(" done. " + (new Date()));
 
-		final PopulationImpl population = sl.getScenario().getPopulation();
+		final PopulationImpl population = (PopulationImpl) sl.getScenario().getPopulation();
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		PopulationWriter plansWriter = new PopulationWriter(population,network, sl.getScenario().getKnowledges());

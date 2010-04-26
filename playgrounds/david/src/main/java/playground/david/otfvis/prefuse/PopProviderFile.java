@@ -33,18 +33,18 @@ import java.util.zip.ZipFile;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.data.fileio.OTFObjectInputStream;
 
 
 public class PopProviderFile implements PopulationProvider {
 
 	String filename;
-	PopulationImpl population;
+	Population population;
 	NetworkLayer network;
-	
+
 	public PopProviderFile(String filename) {
 		this.filename = filename;
 		try {
@@ -56,15 +56,12 @@ public class PopProviderFile implements PopulationProvider {
 			ObjectInputStream inFile = new OTFObjectInputStream(is);
 
 			network = (NetworkLayer)inFile.readObject();
-			population = (PopulationImpl)inFile.readObject();
+			population = (Population)inFile.readObject();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -85,4 +82,3 @@ public class PopProviderFile implements PopulationProvider {
 	}
 
 }
-

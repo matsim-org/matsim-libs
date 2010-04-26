@@ -1,13 +1,13 @@
 package org.matsim.evacuation.base;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
@@ -25,7 +25,7 @@ public class EvacuationPlansGeneratorAndNetworkTrimmerTest extends MatsimTestCas
 		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(c.network().getInputFile());
 
-		PopulationImpl pop = scenario.getPopulation();
+		Population pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(c.plans().getInputFile());
 
 		new EvacuationNetGenerator(net,c).run();

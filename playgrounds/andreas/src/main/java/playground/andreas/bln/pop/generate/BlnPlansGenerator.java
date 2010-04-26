@@ -13,12 +13,12 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -368,7 +368,7 @@ public class BlnPlansGenerator {
 	}
 
 	private void writePopulationToFile(Collection<PersonImpl> personList, String filename){
-		PopulationImpl pop = new ScenarioImpl().getPopulation();
+		Population pop = new ScenarioImpl().getPopulation();
 		int numberOfPersonWithPlans = 0;
 		for (PersonImpl person : personList) {
 			pop.addPerson(person);

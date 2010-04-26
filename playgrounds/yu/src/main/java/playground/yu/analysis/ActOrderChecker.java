@@ -13,11 +13,11 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -25,7 +25,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ActOrderChecker extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -77,14 +77,14 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl populationA = scenario.getPopulation();
+		Population populationA = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilenameA);
 		ActOrderChecker aocA = new ActOrderChecker();
 		aocA.run(populationA);
 
 		ScenarioImpl scenarioB = new ScenarioImpl();
 		scenarioB.setNetwork(scenario.getNetwork());
-		PopulationImpl populationB = scenarioB.getPopulation();
+		Population populationB = scenarioB.getPopulation();
 		ActOrderChecker aocB = new ActOrderChecker();
 		new MatsimPopulationReader(scenarioB).readFile(plansFilenameB);
 		aocB.run(populationB);

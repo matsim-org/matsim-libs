@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -44,7 +45,6 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.xml.sax.SAXException;
 /**
@@ -56,9 +56,9 @@ public class CMCFPopulationConverter {
 
 
 	@SuppressWarnings("unchecked")
-	public static PopulationImpl readCMCFDemands(String filename, ScenarioImpl scenario, boolean coordinates) throws JDOMException, IOException{
+	public static Population readCMCFDemands(String filename, ScenarioImpl scenario, boolean coordinates) throws JDOMException, IOException{
 		NetworkLayer network = scenario.getNetwork();
-		PopulationImpl result = scenario.getPopulation();
+		Population result = scenario.getPopulation();
 		PopulationFactory pb = result.getFactory() ;
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfdemands = builder.build(filename);
@@ -154,7 +154,7 @@ public class CMCFPopulationConverter {
 			NetworkLayer network = scenario.getNetwork();
 			NetworkReaderMatsimV1 netreader = new NetworkReaderMatsimV1(scenario);
 			netreader.parse(netfile);
-			PopulationImpl population = readCMCFDemands(inputfile,scenario,coordinates);
+			Population population = readCMCFDemands(inputfile,scenario,coordinates);
 			new PopulationWriter(population, network).writeFile(outfile);
 //			PopulationWriterV5 writer = new PopulationWriterV5( population);
 			System.out.println(inputfile+"conveted "+"output written in :"+outfile);

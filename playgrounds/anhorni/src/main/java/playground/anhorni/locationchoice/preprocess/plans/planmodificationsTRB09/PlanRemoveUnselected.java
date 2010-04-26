@@ -3,13 +3,13 @@ package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB0
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.Counter;
@@ -18,7 +18,7 @@ import org.matsim.world.algorithms.WorldConnectLocations;
 
 public class PlanRemoveUnselected {
 
-	private PopulationImpl plans=null;
+	private Population plans=null;
 	private NetworkLayer network=null;
 	private ActivityFacilitiesImpl  facilities =null;
 	private String outputpath="";

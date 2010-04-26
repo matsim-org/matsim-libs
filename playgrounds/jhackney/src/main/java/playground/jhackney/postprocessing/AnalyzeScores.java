@@ -1,4 +1,3 @@
-package playground.jhackney.postprocessing;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AnalyzeSocialNets.java
@@ -18,6 +17,7 @@ package playground.jhackney.postprocessing;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.jhackney.postprocessing;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,11 +25,11 @@ import java.util.LinkedHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.World;
@@ -55,11 +55,11 @@ public class AnalyzeScores {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	static PopulationImpl plans;
+	static Population plans;
 	static ActivityFacilitiesImpl facilities;
 	static Knowledges knowledges;
 	static Network network;
-	
+
 	public static void run() throws Exception {
 
 		System.out.println("Make friend face to face scores each 10 iters:");
@@ -74,21 +74,21 @@ public class AnalyzeScores {
 		new WorldConnectLocations().run(world);
 		int iplans=500;
 		int isoc=500;
-		knowledges = new KnowledgesImpl();		
+		knowledges = new KnowledgesImpl();
 		plans = ScenarioConfig.readPlansAndKnowledges(network, knowledges);
-		
+
 		System.out.println(" Initializing the social network ...");
-		
+
 		System.out.println(" Initializing agent knowledge about geography ...");
 		initializeKnowledge();
 		System.out.println("... done");
-		
+
 		// Override the config to take the last iteration
 		config.socnetmodule().setReadMentalMap("true");
 		config.socnetmodule().setSocNetGraphAlgo("read");
 		config.socnetmodule().setInitIter(Integer.toString(isoc));
 		config.socnetmodule().setInDirName(ScenarioConfig.getSNInDir());
-		
+
 		SocialNetwork snet=new SocialNetwork(plans, facilities);
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventsMapStartEndTimes epp;
@@ -97,9 +97,9 @@ public class AnalyzeScores {
 		LinkedHashMap<Id,ArrayList<TimeWindow>> twm=null;
 		playground.jhackney.scoring.EventsToScoreAndReport scoring =null;
 //		EventsToScore scoring=null;
-		
+
 		//Register scoring function and other events handlers
-		
+
 		System.out.println(" ... Instantiation of events overlap tracking done");
 		epp=new EventsMapStartEndTimes();
 		teo=new MakeTimeWindowsFromEvents(plans);
@@ -127,10 +127,10 @@ public class AnalyzeScores {
 //		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
 //		scoring = new EventsToScore(plans, factory);
 		scoring.finish();
-		
+
 //		System.out.println("writing out output plans");
 //		ScenarioConfig.writePlans(plans);
-//		
+//
 		System.out.println(" ... done");
 
 //		for(int i=0; i<501; i+=10){
@@ -175,7 +175,7 @@ public class AnalyzeScores {
 //			double avgscore=totaliterationscore/((double) numplans);
 //			System.out.println("##Result "+i+" "+avgfriendscore+" "+avgscore);
 //		}
-		
+
 		System.out.println("TEST SUCCEEDED.");
 		System.out.println();
 	}

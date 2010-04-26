@@ -25,12 +25,10 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationImpl;
 
 public class PlansActChainReduction {
 
@@ -54,12 +52,12 @@ public class PlansActChainReduction {
 		// fill up the chains TreeMap
 		for (Person p : plans.getPersons().values()) {
 			if (p.getPlans().size() != 1) {
-				Gbl.errorMsg("[person_id=" + p.getId() + " does not have exactly one plan. not allowed.]");
+				throw new RuntimeException("[person_id=" + p.getId() + " does not have exactly one plan. not allowed.]");
 			}
 			String chain = "";
 			Plan plan = p.getPlans().get(0);
 			for (int i=0; i<plan.getPlanElements().size(); i+=2) {
-				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
+				Activity act = (Activity)plan.getPlanElements().get(i);
 				chain = chain.concat(act.getType());
 			}
 			if (!chains.containsKey(chain)) {
@@ -102,7 +100,7 @@ public class PlansActChainReduction {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(PopulationImpl plans) {
+	public void run(Population plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// TreeMap(String chain, ArrayList(Person person))

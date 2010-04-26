@@ -109,7 +109,7 @@ public class IIDMGenerationPart2 {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up population objects...");
-		PopulationImpl pop = scenario.getPopulation();
+		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 		Knowledges knowledges =  scenario.getKnowledges();
 		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop, scenario.getNetwork(), knowledges);

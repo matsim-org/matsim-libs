@@ -62,6 +62,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -69,7 +70,6 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
@@ -170,11 +170,11 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			// Change the knowledge of the person
 			if( overwriteKnowledge )
 				knowledge.removeActivities( primaryActivityName );
-			knowledge.addActivity(new ActivityOptionImpl(primaryActivityName, workplace), true);
+			knowledge.addActivityOption(new ActivityOptionImpl(primaryActivityName, workplace), true);
 		}
 	}
 
-	public void setup( World world, PopulationImpl population ){
+	public void setup( World world, Population population ){
 
 		random = new Random(this.cfg.global().getRandomSeed());
 
@@ -284,7 +284,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 
 	}
 
-	private void setupNumberHomesPerZone( PopulationImpl population ){
+	private void setupNumberHomesPerZone( Population population ){
 		// Setup the number of originating trips.
 		// In this case it corresponds to the number of Persons which will
 		// make at least one trip with activity type = primaryActivityName

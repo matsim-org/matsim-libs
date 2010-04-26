@@ -12,11 +12,11 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -30,9 +30,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * daily en route time analysis only for Berlin or for Berlin & Brandenburg
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyEnRouteTime4Muc extends DailyEnRouteTime implements
 		Analysis4Muc {
@@ -746,7 +746,7 @@ public class DailyEnRouteTime4Muc extends DailyEnRouteTime implements
 			e.printStackTrace();
 		}
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 

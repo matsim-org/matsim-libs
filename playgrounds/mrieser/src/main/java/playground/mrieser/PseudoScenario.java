@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PopulationImpl;
 
 /**
  * Provides a real scenario, but exchanges the population.
@@ -20,7 +19,7 @@ public class PseudoScenario implements Scenario {
 	private final ScenarioImpl scenario;
 	private Population myPopulation;
 
-	public PseudoScenario(final ScenarioImpl scenario, final PopulationImpl population) {
+	public PseudoScenario(final ScenarioImpl scenario, final Population population) {
 		this.scenario = scenario;
 		this.myPopulation = population;
 	}

@@ -17,7 +17,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
@@ -36,7 +35,7 @@ public class Sim2D {
 
 
 	private final Config config;
-	private final PopulationImpl population;
+	private final Population population;
 	private final NetworkLayer network;
 	private static EventsManager events;
 	private double stopTime;
@@ -73,7 +72,7 @@ public class Sim2D {
 //		new StaticForceFieldToShape(q).createShp();
 		this.network2D = new Network2D(this.network,f,sff);
 
-		this.population = (PopulationImpl) plans;
+		this.population = plans;
 		setEvents(events);
 		SimulationTimer.reset(1);
 	}

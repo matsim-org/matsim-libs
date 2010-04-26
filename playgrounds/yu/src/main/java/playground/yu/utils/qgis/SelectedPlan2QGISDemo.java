@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.utils.qgis;
 
 import java.io.IOException;
@@ -5,10 +24,10 @@ import java.io.IOException;
 import org.geotools.referencing.CRS;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -17,9 +36,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * This class is a copy of main() from
  * org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape and can
  * convert a MATSim-population to a QGIS .shp-file (acts or legs)
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class SelectedPlan2QGISDemo implements X2QGIS {
 	public static void main(final String[] args) throws FactoryException {
@@ -42,9 +61,8 @@ public class SelectedPlan2QGISDemo implements X2QGIS {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
-		PopulationImpl population = scenario.getPopulation();
-		new MatsimPopulationReader(scenario)
-				.readFile(populationFilename);
+		Population population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(populationFilename);
 		/*
 		 * ----------------------------------------------------------------------
 		 */

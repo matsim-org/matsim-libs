@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
@@ -23,7 +24,6 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -31,27 +31,27 @@ import org.matsim.core.utils.misc.IntegerCache;
 
 public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBeforeCleanupListener, BeforeMobsimListener, LinkEnterEventHandler, AgentStuckEventHandler{
 
-	
+
 	private final NetworkLayer network;
 	private final int binSize;
 	private final TravelTimeCalculator travelTimeCalculator;
-	private final PopulationImpl population;
-	
+	private final Population population;
+
 	private Integer maxK;
 	private final int minK;
-	
+
 	Map<Id,LinkInfo> linkInfos = new HashMap<Id,LinkInfo>();
 	Set<Id> stuckedAgents = new HashSet<Id>();
-	
 
-	public SocialCostCalculatorMultiLinkII(NetworkLayer network, int binSize, TravelTimeCalculator travelTimeCalculator, PopulationImpl population) {
+
+	public SocialCostCalculatorMultiLinkII(NetworkLayer network, int binSize, TravelTimeCalculator travelTimeCalculator, Population population) {
 		this.network = network;
 		this.binSize = binSize;
 		this.minK = (int)(3 * 3600 / (double)binSize); //just a HACK needs to be fixed
 		this.travelTimeCalculator = travelTimeCalculator;
 		this.population = population;
 	}
-	
+
 	public double getLinkTravelCost(Link link, double time) {
 		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li == null) {
@@ -62,22 +62,22 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 		if (ltc == null) {
 			return 0.;
 		}
-		 
+
 		return ltc.cost;
 	}
 
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	
+
 	public void notifySimulationBeforeCleanup(
 			SimulationBeforeCleanupEvent e) {
 		recalculateSocialCosts();
 
 	}
-	
+
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		System.out.println("cleanup");
 		this.stuckedAgents.clear();
@@ -95,9 +95,9 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 			Plan plan = pers.getSelectedPlan();
 			List<Id> links = ((NetworkRoute) ((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity()).getRoute()).getLinkIds();
 			traceAgentsRoute(links,pers.getId());
-			
+
 		}
-		
+
 //		scorePlans();
 	}
 
@@ -117,7 +117,7 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 //			AgentMoneyEvent e = new AgentMoneyEvent(this.maxK * this.binSize,pers.getId(),cost/-600);
 //			QueueSimulation.getEvents().processEvent(e);
 //		}
-//		
+//
 //	}
 
 	private void calcLinkTimeCosts() {
@@ -134,7 +134,7 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 				if (tauAk <= tauAFree) {
 					kE = k;
 					continue;
-				} 
+				}
 				LinkTimeCostInfo ltc = li.getLinkTimeCostInfo(kInteger);
 				ltc.linkDelay = Math.max(0, (kE-k)*this.binSize - tauAFree);
 			}
@@ -151,19 +151,19 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 			LinkTimeCostInfo ltc = li.getLinkTimeCostInfo(timeBin);
 			agentDelay += ltc.linkDelay;
 			ltc.cost += agentDelay / ltc.in;
-			
-		
+
+
 		}
 		AgentMoneyEventImpl e = new AgentMoneyEventImpl(this.maxK * this.binSize,agentId,agentDelay/-600);
 		QueueSimulation.getEvents().processEvent(e);
-		
+
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
 		LinkInfo li = getLinkInfo(event.getLinkId());
 		li.incrementInFlow(getTimeBin(event.getTime()));
 		li.setAgentEnterTime(event.getPersonId(), event.getTime());
-		
+
 		this.maxK = getTimeBin(event.getTime()) + 1; //FIXME!!
 	}
 
@@ -174,9 +174,9 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 
 	public void handleEvent(AgentStuckEvent event) {
 		this.stuckedAgents.add(event.getPersonId());
-		
+
 	}
-	
+
 	private LinkInfo getLinkInfo(Id id) {
 		LinkInfo li = this.linkInfos.get(id);
 		if (li == null) {
@@ -185,16 +185,16 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 		}
 		return li;
 	}
-	
+
 	private Integer getTimeBin(double time) {
 		int slice = ((int) time)/this.binSize;
 		return IntegerCache.getInteger(slice);
 	}
-	
+
 	private static class LinkInfo {
 		HashMap<Integer,LinkTimeCostInfo> linkTimeCosts = new HashMap<Integer, LinkTimeCostInfo>();
 		HashMap<Id,Double> agentEnterInfos = new HashMap<Id, Double>();
-		
+
 		public void incrementInFlow(Integer timeBin) {
 			LinkTimeCostInfo ltc = this.linkTimeCosts.get(timeBin);
 			if (ltc == null) {
@@ -212,23 +212,23 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 //			}
 //			ltc.out++;
 //		}
-		
+
 //		public LinkTimeFlowInfo getLinkTimeFlowInfo(Integer timeBin) {
 //			 LinkTimeFlowInfo ltf = this.flowInfos.get(timeBin);
 //			 if (ltf == null) {
 //				 ltf = new LinkTimeFlowInfo();
 //				 this.flowInfos.put(timeBin, ltf);
 //			 }
-//			 return ltf; 
+//			 return ltf;
 //		}
 		public void setAgentEnterTime(Id agentId, double enterTime) {
 			this.agentEnterInfos.put(agentId, enterTime);
 		}
-		
+
 		public double getAgentEnterTime(Id agentId) {
 			return this.agentEnterInfos.get(agentId);
 		}
-		
+
 		public LinkTimeCostInfo getLinkTimeCostInfo(Integer timeBin) {
 			LinkTimeCostInfo ltc = this.linkTimeCosts.get(timeBin);
 			if (ltc == null) {
@@ -237,11 +237,11 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 			}
 			return ltc;
 		}
-		
+
 		public HashMap<Integer,LinkTimeCostInfo> getLinkTimeCostInfos() {
 			return this.linkTimeCosts;
 		}
-		
+
 		public void cleanUp() {
 			this.agentEnterInfos.clear();
 			this.linkTimeCosts.clear();
@@ -260,7 +260,7 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 
 
 
-	
+
 
 
 

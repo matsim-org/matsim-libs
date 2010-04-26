@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -37,7 +38,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQSimulation;
@@ -207,7 +207,7 @@ public class TwoLinesDemo {
 
 	private void createPopulation() {
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
-		PopulationImpl population = this.scenario.getPopulation();
+		Population population = this.scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
 
 		TransitLine tLine1 = schedule.getTransitLines().get(this.ids[1]);

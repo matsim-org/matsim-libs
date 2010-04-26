@@ -20,25 +20,25 @@
 
 package playground.mfeil;
 
-import org.matsim.testcases.MatsimTestCase;
-import org.matsim.core.population.PopulationWriter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import playground.mfeil.MDSAM.ActivityTypeFinder;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.testcases.MatsimTestCase;
+
 import playground.mfeil.FilesForTests.Initializer;
+import playground.mfeil.MDSAM.ActivityTypeFinder;
 
 
 
 public class PlanomatXTest extends MatsimTestCase{
-	
+
 	private static final Logger log = Logger.getLogger(PlanomatXTest.class);
 	private Initializer initializer;
 	final String TEST_PERSON_ID = "1";
@@ -51,42 +51,42 @@ public class PlanomatXTest extends MatsimTestCase{
 	protected void setUp() throws Exception {
 
 		super.setUp();
-		
+
 		this.initializer = new Initializer();
-		this.initializer.init(this); 
+		this.initializer.init(this);
 		this.initializer.run();
-		
+
 		this.scenario_input = this.initializer.getControler().getScenario();
 
 		// no events are used, hence an empty road network
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario_input.getNetwork(), 900);
-       	
+
 		LocationMutatorwChoiceSet locator = new LocationMutatorwChoiceSet (this.scenario_input.getNetwork(), this.initializer.getControler(), this.initializer.getControler().getScenario().getKnowledges());
 		ActivityTypeFinder finder = new ActivityTypeFinder (this.initializer.getControler());
-		
+
 		this.testee = new PlanomatX (this.initializer.getControler(), locator, tDepDelayCalc, finder);
 	}
-	
-	
+
+
 	public void testRun (){
 		log.info("Running PlX testRun...");
-		
+
 		/*
 		log.info("Writing reference plan...");
 		this.testee.run(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
 		new PopulationWriter(this.scenario_input.getPopulation()).writeFile("D:/Documents and Settings/Matthias Feil/Desktop/test_plans.xml");
 		log.info("done.");
 		*/
-		
+
 		PlanImpl plan = new PlanImpl (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
 		plan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
-		
+
 		this.testee.run(plan);
-		
+
 		// Import expected output plan into population
 		this.scenario_input.getPopulation().getPersons().clear();
-		new MatsimPopulationReader(this.scenario_input).readFile("mfeil/"+this.getPackageInputDirectory()+"PLX_expected_output.xml");
-				
+		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"PLX_expected_output.xml");
+
 		// Compare the two plans; <1 because of double rounding errors
 		for (int i=0;i<plan.getPlanElements().size();i++){
 			if (i%2==0){
@@ -99,14 +99,14 @@ public class PlanomatXTest extends MatsimTestCase{
 				assertEquals(Math.floor(((LegImpl)(plan.getPlanElements().get(i))).getDepartureTime()), Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getDepartureTime()));
 				assertEquals(Math.floor(((LegImpl)(plan.getPlanElements().get(i))).getArrivalTime()),  Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getArrivalTime()));
 			}
-		}	
+		}
 		log.info("... done.");
 	}
-	
+
 	public void testCreateNeighbourhood (){
-		
+
 	}
 	//(PlanomatXPlan [] neighbourhood, int[][]infoOnNeighbourhood, List<String> actTypes, ArrayList<ActivityOption> primActs) {
-	
-	
+
+
 }

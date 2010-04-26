@@ -29,8 +29,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -61,10 +59,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		PopulationImpl population = scenario.getPopulation();
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		plansReader.readFile(popFileName);
-		population.printPlansCount();
+		new MatsimPopulationReader(scenario).readFile(popFileName);
 
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventWriterTXT writer = new EventWriterTXT(eventsFileName);

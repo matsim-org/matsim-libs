@@ -55,7 +55,7 @@ public class EventFilterTestLaerm {
 		System.out.println("  done.");
 		// plans
 		System.out.println("  creating plans object... ");
-		PopulationImpl plans = scenario.getPopulation();
+		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		System.out.println("  done.");
 		// events

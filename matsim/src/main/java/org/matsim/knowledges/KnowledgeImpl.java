@@ -49,7 +49,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public KnowledgeImpl() {
 	}
 
@@ -65,7 +65,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 	private static class KActivity {
 		/*package*/ boolean isPrimary;
 		/*package*/ final ActivityOptionImpl activity;
-		
+
 		/*package*/ KActivity(ActivityOptionImpl activity, boolean isPrimary) {
 			this.activity = activity;
 			this.isPrimary = isPrimary;
@@ -85,7 +85,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 			return this.activity.hashCode();
 		}
 	}
-	
+
 
 	//////////////////////////////////////////////////////////////////////
 	// create methods
@@ -99,24 +99,25 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 	 * <p>Adds an {@link ActivityOptionImpl} to a {@link PersonImpl Persons} {@link KnowledgeImpl}.
 	 * It leaves the list of activities unchanged, if the given {@link ActivityOptionImpl} is already present,
 	 * independent of the {@code isPrimary} flag.</p>
-	 * 
+	 *
 	 * <p> Use {@link #setPrimaryFlag(ActivityOptionImpl, boolean)} to change the {@code isPrimary} flag of an already present {@link ActivityOptionImpl}.</p>
-	 * 
+	 *
 	 * @param activity The {@link ActivityOptionImpl} to add to the {@link PersonImpl}s {@link KnowledgeImpl}.
 	 * @param isPrimary To define if the {@code activity} is a primary activity
 	 * @return <code>true</code> if the {@code activity} is not already present in the list (independent of the {@code isPrimary} flag)
 	 */
-	public final boolean addActivity(ActivityOptionImpl activity, boolean isPrimary) {
+	public final boolean addActivityOption(ActivityOptionImpl activity, boolean isPrimary) {
 		if (activity == null) { return false; }
 		if (activities == null) { activities = new LinkedHashSet<KActivity>(INIT_ACTIVITY_CAPACITY); }
 		KActivity ka = new KActivity(activity,isPrimary);
 		return activities.add(ka);
 	}
 
-	public void addActivity(ActivityOptionImpl activity) {
-		this.addActivity(activity, false);
+	@Override
+	public void addActivityOption(ActivityOptionImpl activity) {
+		this.addActivityOption(activity, false);
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
@@ -142,7 +143,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Removes an {@link ActivityOptionImpl} from the {@link KnowledgeImpl}, independent of the {@code isPrimary} flag.
 	 * @param activity The {@link ActivityOptionImpl} to remove
@@ -155,7 +156,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		if (activities.isEmpty()) { activities = null; }
 		return b;
 	}
-	
+
 	/**
 	 * Removes all {@link ActivityOptionImpl Activities} that are equal to the given {@code isPrimary}
 	 * @param isPrimary To define which of the {@link ActivityOptionImpl Activities} should be removed
@@ -175,7 +176,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		if (activities.isEmpty()) { activities = null; }
 		return b;
 	}
-	
+
 	/**
 	 * Removes all existing {@link ActivityOptionImpl Activities}.
 	 * @return <code>true</code> if there was at least one {@link ActivityOptionImpl} given.
@@ -239,12 +240,12 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>(INIT_ACTIVITY_CAPACITY);
 		for (KActivity ka : activities) {
 			if (ka.isPrimary == isPrimary) {
-				acts.add((ActivityOptionImpl) ka.activity);
+				acts.add(ka.activity);
 			}
 		}
 		return acts;
 	}
-	
+
 	/**
 	 * Returns all {@link ActivityOptionImpl Activities}.
 	 * @return The list of {@link ActivityOptionImpl Activities}. The list may be empty.
@@ -274,7 +275,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		}
 		return acts;
 	}
-	
+
 	/**
 	 * Returns all {@link ActivityOptionImpl Activities} of a given activity type
 	 * @param act_type The activity type of the {@link ActivityOptionImpl Activities} should be returned
@@ -290,7 +291,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		}
 		return acts;
 	}
-	
+
 	/**
 	 * Returns the set of activity types of the {@link ActivityOptionImpl Activities} with the given flag.
 	 * @param isPrimary To define which of the activity types should be returned
@@ -319,16 +320,16 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		}
 		return types;
 	}
-	
-	
+
+
 	/**
 	 * Returns if a specific activity of a specific facility is primary
 	 * @param act_type The activity type of the {@link ActivityOptionImpl Activities}
 	 * @param facilityId The {@link Id} of a {@link ActivityFacilityImpl}
 	 */
 	public final boolean isPrimary(String act_type, Id facilityId) {
-		if (activities == null) { 
-			return false; 
+		if (activities == null) {
+			return false;
 		}
 		for (KActivity ka : activities) {
 			if ((ka.isPrimary) &&  (ka.activity.getType().equals(act_type)) &&
@@ -338,14 +339,14 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Returns if act_type is defined as primary somewhere
 	 * @param act_type The activity type of the {@link ActivityOptionImpl Activities}
 	 */
 	public final boolean isSomewherePrimary(String act_type) {
-		if (activities == null) { 
-			return false; 
+		if (activities == null) {
+			return false;
 		}
 		for (KActivity ka : activities) {
 			if ((ka.isPrimary) &&  (ka.activity.getType().equals(act_type))) {
@@ -354,9 +355,10 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		}
 		return false;
 	}
-	
-	
 
+
+
+	@Override
 	public final String getDescription() {
 		return this.desc;
 	}
@@ -378,7 +380,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 //	public final void resetActivitySpaces(){
 //		this.activitySpaces = null;
 //	}
-//	
+//
 	/**
 	 * Sets the {@code isPrimary} flag for the given {@link ActivityOptionImpl}
 	 * @param activity the {@link ActivityOptionImpl} to set the flag
@@ -409,7 +411,8 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		}
 		return true;
 	}
-	
+
+	@Override
 	public void setDescription(String desc) {
 		this.desc = desc;
 	}

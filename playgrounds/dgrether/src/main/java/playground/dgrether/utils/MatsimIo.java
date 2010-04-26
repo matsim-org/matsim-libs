@@ -33,7 +33,6 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.xml.sax.SAXException;
@@ -71,10 +70,10 @@ public class MatsimIo {
 	}
 
 
-	public static PopulationImpl loadPlans(final String filename, final NetworkLayer network) {
+	public static Population loadPlans(final String filename, final NetworkLayer network) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.setNetwork(network);
-		PopulationImpl plans = scenario.getPopulation();
+		Population plans = scenario.getPopulation();
 		log.info("  reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(filename);

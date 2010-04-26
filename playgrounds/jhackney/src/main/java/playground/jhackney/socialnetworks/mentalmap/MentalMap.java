@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -56,7 +57,7 @@ import playground.jhackney.socialnetworks.io.ActivityActReader;
  *
  */
 public class MentalMap {
-	
+
 	public static final String NAME = "MentalMap";
 
 	// Class to manage the knowledge.
@@ -108,10 +109,10 @@ public class MentalMap {
 						myActivity=this.knowledge.getActivities(myAct.getType()).get(MatsimRandom.getRandom().nextInt(this.knowledge.getActivities(myAct.getType()).size()));
 						myAct.setFacilityId(myActivity.getFacility().getId());
 						//TODO JH add logic to label this activity primary or secondary
-						this.knowledge.addActivity(myActivity, false);
+						this.knowledge.addActivityOption(myActivity, false);
 //					learnActsActivities(myAct,myActivity);
 					}
-					
+
 					// Else the activity is null and we choose an activity to assign to the act
 					Link myLink = this.network.getLinks().get(myAct.getLinkId());
 					// These Locations are facilities by the new convention
@@ -127,7 +128,7 @@ public class MentalMap {
 						if(myActivity!=null){
 							myAct.setFacilityId(myActivity.getFacility().getId());
 							//TODO JH add logic to label this activity primary or secondary
-							this.knowledge.addActivity(myActivity,false);
+							this.knowledge.addActivityOption(myActivity,false);
 						}
 					}
 				}
@@ -143,18 +144,18 @@ public class MentalMap {
 		for (PlanElement pe : myPlan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl myAct = (ActivityImpl) pe;
-				
+
 				TreeMap<Id,String> nextFac = aar.getNextPoint();
 				Id myFacilityId = nextFac.firstKey();
 //			String myActivityType=nextFac.get(myFacilityId);
 				String myActivityType=myAct.getType();
-				
+
 				ActivityFacility fac = facilities.getFacilities().get(myFacilityId);
 //			myAct.setFacility(fac);
 //			this.knowledge.addActivity(fac.getActivity(myActivityType));
 				//TODO JH apply some logic to label this a primary or secondary location
-				ActivityOptionImpl myActivity=fac.getActivityOptions().get(myActivityType);
-				this.knowledge.addActivity(myActivity,false);
+				ActivityOption myActivity=fac.getActivityOptions().get(myActivityType);
+				this.knowledge.addActivityOption((ActivityOptionImpl) myActivity,false);
 			}
 		}
 	}
@@ -169,7 +170,7 @@ public class MentalMap {
 		for (PlanElement pe : myPlan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl myAct = (ActivityImpl) pe;
-				
+
 				String type="none";
 				char typechar=myAct.getType().charAt(0);
 				if(typechar=='h'){
@@ -203,7 +204,7 @@ public class MentalMap {
 	/**
 	 * ManageMemory is an algorithm that could be written to serve many purposes. Here, it tags
 	 * activities in excess of what is needed by an agent and deletes them from the agent's knowledge.
-	 *  
+	 *
 	 * @param max
 	 * @param myPlans
 	 */
@@ -244,7 +245,7 @@ public class MentalMap {
 			ArrayList<ActivityOptionImpl> forgetList=new ArrayList<ActivityOptionImpl>();
 			int counter=0;
 
-			// If there are too many activities 
+			// If there are too many activities
 //			for (Enumeration<Activity> e = sortedScores.keys() ; e.hasMoreElements() ;) {
 //				Activity myactivity=e.nextElement();
 				Set<ActivityOptionImpl> myActivities=sortedScores.keySet();
@@ -272,7 +273,7 @@ public class MentalMap {
 	public void addActivity(ActivityOptionImpl myActivity){
 		// Adds unmapped activity to mental map without associating it with an act
 		//TODO JH add logic to label this activity primary or secondary
-		this.knowledge.addActivity(myActivity,false);
+		this.knowledge.addActivityOption(myActivity,false);
 		setActivityScore(myActivity);
 	}
 

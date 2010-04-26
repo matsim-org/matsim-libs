@@ -29,35 +29,35 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 
 
 
 /**
- * Simple class to analyze the activity timings of selected plans. Calculates the average timings and 
+ * Simple class to analyze the activity timings of selected plans. Calculates the average timings and
  * number of modes used.
  * @author mfeil
  */
 public class ASPTimingsModes extends ASPActivityChains {
 
 	private final static Logger log = Logger.getLogger(ASPTimingsModes.class);
-	
-	public ASPTimingsModes(final PopulationImpl population, final Knowledges knowledges, final String outputDir) {
+
+	public ASPTimingsModes(final Population population, final Knowledges knowledges, final String outputDir) {
 		super (population, knowledges, outputDir);
 	}
-	
+
 	@Override
 	protected void analyze(){
-		
+
 		ArrayList<List<PlanElement>> legs = new ArrayList<List<PlanElement>>();
 		ArrayList<Integer> numberOccurrence = new ArrayList<Integer>();
-	
+
 		PrintStream stream1;
 		try {
 			stream1 = new PrintStream (new File(this.outputDir + "/analysis.xls"));
@@ -65,14 +65,14 @@ public class ASPTimingsModes extends ASPActivityChains {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		/* Analysis of activity chains */
 		double averageACLength=0;
 		stream1.println("Number of occurrences\tAverage activity timings");
 		for (int i=0; i<this.activityChains.size();i++){
 			legs.clear();
 			numberOccurrence.clear();
-			
+
 			double weight = this.plans.get(i).size();
 			stream1.print(weight+"\t");
 			double length = this.activityChains.get(i).size();
@@ -110,37 +110,37 @@ public class ASPTimingsModes extends ASPActivityChains {
 				stream1.print(numberOccurrence.get(j).intValue()+"\t");
 				for (int k=1;k<legs.get(j).size();k+=2){
 					stream1.print(((LegImpl)(legs.get(j).get(k))).getMode()+"\t");
-				}		
+				}
 				stream1.println();
 			}
 			stream1.println();
-			
-			
+
+
 		}
 		stream1.println((averageACLength/this.population.getPersons().size())+"\tAverage number of activities");
 		stream1.println();
 		stream1.close();
 	}
-	
+
 	private boolean checkLegsForEquality (List<PlanElement> in, List<PlanElement> out){
-		
+
 		if (in.size()!=out.size()){
-		
+
 			return false;
 		}
 		else{
 			ArrayList<String> in1 = new ArrayList<String> ();
 			ArrayList<String> out1 = new ArrayList<String> ();
 			for (int i = 1;i<in.size();i=i+2){
-				in1.add(((LegImpl)(in.get(i))).getMode().toString());				
+				in1.add(((LegImpl)(in.get(i))).getMode().toString());
 			}
 			for (int i = 1;i<out.size();i=i+2){
-				out1.add(((LegImpl)(out.get(i))).getMode().toString());				
-			}		
+				out1.add(((LegImpl)(out.get(i))).getMode().toString());
+			}
 			return (in1.equals(out1));
 		}
-	}	
-		
+	}
+
 
 	public static void main(final String [] args) {
 //		final String populationFilename = "./examples/equil/plans100.xml";
@@ -160,7 +160,7 @@ public class ASPTimingsModes extends ASPActivityChains {
 		ASPTimingsModes sp = new ASPTimingsModes(scenario.getPopulation(), scenario.getKnowledges(), outputDir);
 		sp.analyze();
 		sp.checkCorrectness();
-		
+
 		log.info("Analysis of plan finished.");
 	}
 

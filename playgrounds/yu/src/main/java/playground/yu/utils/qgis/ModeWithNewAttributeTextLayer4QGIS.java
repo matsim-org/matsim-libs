@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -7,19 +7,19 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.analysis.PlanModeJudger;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 	private int count, car6hCount, pt6hCount;
@@ -101,7 +101,7 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		ModeWithNewAttributeTextLayer4QGIS mwnatl = new ModeWithNewAttributeTextLayer4QGIS(

@@ -12,13 +12,13 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -33,9 +33,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * compute modal split of en route time
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyEnRouteTime extends DailyAnalysis {
 	protected int count;
@@ -499,7 +499,7 @@ public class DailyEnRouteTime extends DailyAnalysis {
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario

@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -45,7 +46,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 
@@ -56,16 +56,16 @@ public class Getagentcoords {
 		//final String netFilename = "./examples/meine_EA/siouxfalls_network_5s.xml";
 		//final String netFilename = "./examples/meine_EA/swissold_network_5s.xml";
 		final String netFilename = "/homes/combi/dressler/V/Project/padang/network/padang_net_evac.xml";
-		
+
 		//final String plansFilename = "/homes/combi/dressler/V/Project/padang/plans/padang_plans_100p_flow_10s_test.xml";
 		final String plansFilename = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padang_plans_100p_flow_10s_test.xml";
 		//final String plansFilename = "./examples/meine_EA/siouxfalls_plans_5s_demand_100.xml";
 		//final String plansFilename = "./output/siouxfalls_5s_eaf/plans_iter100.xml";
 		//final String plansFilename = "./examples/meine_EA/swissold_plans_5s_demands_100.xml";
-		
+
 		final String outputPngFilename = "./output/exitmap_padang_100p_flow_10s.png";
 		boolean planstats = true;
-		
+
 		final float alpha = 0.01f; // transparency factor. depends on maximum demands.
 
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -73,13 +73,13 @@ public class Getagentcoords {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 
 		// get evac links
 		Node evac1node = network.getNodes().get(new IdImpl("en1"));
-		Map<Id,? extends Link> evaclinks = null;		
+		Map<Id,? extends Link> evaclinks = null;
 		if (evac1node != null) {
 			evaclinks = evac1node.getInLinks();
 			/*for (Link link : evaclinks.values()) {
@@ -105,7 +105,7 @@ public class Getagentcoords {
 			Double maxx = -500000000d;
 			Double miny = +500000000d;
 			Double maxy = -500000000d;
-			
+
 			int width = 2000;
 			int height = 2000;
 			BufferedImage image = new BufferedImage(width,
@@ -174,9 +174,9 @@ public class Getagentcoords {
 				//System.out.println(x + " " + y);
 
 
-				boolean found = false; 
+				boolean found = false;
 				if (leg.getRoute() != null) if (leg.getRoute() instanceof NetworkRoute) if (((NetworkRoute) leg.getRoute()).getLinkIds() != null)
-				for (Id id : ((NetworkRoute) leg.getRoute()).getLinkIds()) {			      
+				for (Id id : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 					if (evaclinks.containsKey(id)) {
 						found = true;
 						//System.out.println("Juhu " + id);

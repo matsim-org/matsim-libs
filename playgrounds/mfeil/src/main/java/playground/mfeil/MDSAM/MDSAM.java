@@ -21,24 +21,24 @@
 package playground.mfeil.MDSAM;
 
 import java.io.File;
-import java.util.TreeMap;
-import java.util.Map;
-import org.matsim.api.core.v01.Id;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationImpl;
 
 
 /**
- * Determines similarity of plans, based on 
+ * Determines similarity of plans, based on
  * - act chain sequence
  * - mode choice
  * - location choice.
@@ -47,9 +47,9 @@ import org.matsim.core.population.PopulationImpl;
  */
 public class MDSAM {
 
-	private final PopulationImpl population;
+	private final Population population;
 	private Map<Id,List<Double>> sims;
-	private final double GWtime, GWact, GWmode, GWlocation; 
+	private final double GWtime, GWact, GWmode, GWlocation;
 	private static final Logger log = Logger.getLogger(MDSAM.class);
 	private final String outputFile;
 	private boolean printing;
@@ -57,33 +57,33 @@ public class MDSAM {
 	private int counter;
 
 
-	public MDSAM(final PopulationImpl population, final String mdsamOutputFile) {
+	public MDSAM(final Population population, final String mdsamOutputFile) {
 		this.population=population;
 		this.GWtime = 0.0;
 		this.GWact = 2.0;
 		this.GWmode = 1.0;
 		this.GWlocation = 1.0;
-		this.outputFile = mdsamOutputFile;	
+		this.outputFile = mdsamOutputFile;
 		this.printing = true;
 		this.unidimensional = 0;
 		this.multidimensional = 0;
 		this.counter = 0;
 	}
-	
+
 	public Map<Id, List<Double>> runPopulation () {
 		long overall = System.currentTimeMillis();
 		log.info("Calculating similarity of plans of population...");
-		
+
 		PrintStream stream;
 		try {
 			stream = new PrintStream (new File(outputFile));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return null;
-		}	
-		
+		}
+
 		this.sims = new TreeMap<Id,List<Double>>();
-		
+
 		int counter=0;
 		for (Person person : this.population.getPersons().values()) {
 			counter++;
@@ -91,16 +91,16 @@ public class MDSAM {
 
 			ArrayList<Double> intermediateList = new ArrayList<Double>();
 			double [][] matrix = new double [person.getPlans().size()][person.getPlans().size()]; //store a person's similarities among plans
-			
+
 			// Needed for printing
 			int longestPlan = -1;
 			for (int z=0;z<person.getPlans().size();z++){
 				if (person.getPlans().get(z).getPlanElements().size()>longestPlan) longestPlan = person.getPlans().get(z).getPlanElements().size();
 			}
 			longestPlan = longestPlan/2;
-			
+
 			for (int i=0;i<person.getPlans().size();i++){
-				Plan plan = person.getPlans().get(i);				
+				Plan plan = person.getPlans().get(i);
 				if (this.printing){
 					stream.println("Person "+person.getId());
 					stream.println("origPlan");
@@ -123,7 +123,7 @@ public class MDSAM {
 					stream.print("Home\t"+timings[0]+"Work\t"+timings[1]+"Education\t"+timings[2]+"Leisure\t"+timings[3]+"Shop\t"+timings[4]);
 					stream.println();
 				}
-				
+
 				double sim = 0;
 				for (int j=0;j<person.getPlans().size();j++){
 					if (i>j) sim += matrix[j][i];
@@ -155,7 +155,7 @@ public class MDSAM {
 					}
 				}
 				intermediateList.add(sim/person.getPlans().size());
-			//	this.sims.get(this.sims.size()-1).add(sim/person.getPlans().size());	
+			//	this.sims.get(this.sims.size()-1).add(sim/person.getPlans().size());
 			}
 			this.sims.put(person.getId(),intermediateList); // store overall similarities of all persons' plans
 		}
@@ -167,17 +167,17 @@ public class MDSAM {
 		log.info("done...");
 		return this.sims;
 	}
-	
+
 	public double runPlans(Plan origPlan, Plan comparePlan, PrintStream stream){
-		
+
 		long runStartTime = System.currentTimeMillis();
 		this.counter++;
-		
+
 		// Calculate tables per attribute dimension
 		// Length is number of acts minus last home plus 0th position, or number of legs respectively
-		
+
 		double [][][] table = new double [3][origPlan.getPlanElements().size()/2+1][comparePlan.getPlanElements().size()/2+1];
-		
+
 		for (int k=0;k<table.length;k++){
 			double GW = 0;
 			if (k==0) GW = this.GWact;
@@ -206,9 +206,9 @@ public class MDSAM {
 				}
 			}
 		}
-		
+
 		// Print tables
-		if (this.printing){			
+		if (this.printing){
 			for (int i=0;i<table[0].length;i++){
 				for (int k=0;k<table.length;k++){
 					if (k!=2) stream.print("\t");
@@ -224,16 +224,16 @@ public class MDSAM {
 			}
 			stream.println();
 		}
-		
+
 		this.unidimensional += System.currentTimeMillis()-runStartTime;
 		long trajectoryTime = System.currentTimeMillis();
-	
+
 		// Find one optimal trajectory close to the diagonal, for each attribute dimension
 		ArrayList<int[]> oset = new ArrayList<int[]>();	// contains the operation and position
 		ArrayList<ArrayList<Integer>> dimensions = new ArrayList<ArrayList<Integer>>(); // contains the attribute dimensions of operation and position
-		
-		
-		
+
+
+
 		for (int k=0;k<table.length;k++){
 			double GW = 0;
 			if (k==0) GW = this.GWact;
@@ -257,9 +257,9 @@ public class MDSAM {
 					else {
 						orig = ((ActivityImpl)(origPlan.getPlanElements().get((i-1)*2))).getLinkId().toString();
 						compare = ((ActivityImpl)(comparePlan.getPlanElements().get((j-1)*2))).getLinkId().toString();
-					}	
+					}
 				}
-				// if identity possible, always to prefer. Note that, according to Joh, the identity moves is disregarded in the 
+				// if identity possible, always to prefer. Note that, according to Joh, the identity moves is disregarded in the
 				// similarity sum although the position-sensitive MDSAM allocates a weight to identity moves.
 				if (i>0 && j>0 && table[k][i-1][j-1]>=table[k][i][j]-GW && orig.equals(compare)){
 					//System.out.println("Identity.");
@@ -298,7 +298,7 @@ public class MDSAM {
 					goLeft = true;
 					//System.out.println("New deletion.");
 				}
-				// go new path (insertion) 
+				// go new path (insertion)
 				else if (j>0 && Math.abs(table[k][i][j-1]-(table[k][i][j]-GW))<0.001) {
 					oset.add(new int[]{1,j});
 					ArrayList<Integer> l = new ArrayList<Integer>();
@@ -316,20 +316,20 @@ public class MDSAM {
 					i--;
 					//System.out.println("New deletion.");
 				}
-				else log.warn("Cannot find my way at i = "+i+" and j = "+j+" for person "+origPlan.getPerson().getId());					
+				else log.warn("Cannot find my way at i = "+i+" and j = "+j+" for person "+origPlan.getPerson().getId());
 			}
 		}
-		
+
 		// Print arrays
-		if (this.printing){ 
+		if (this.printing){
 			for (int m=0;m<oset.size();m++){
 				stream.print("("+oset.get(m)[0]+","+oset.get(m)[1]+")");
 				for (int n=0;n<dimensions.get(m).size();n++) stream.print(", "+dimensions.get(m).get(n));
 				stream.println();
 			}
 		}
-		
-		// Timings		
+
+		// Timings
 		double[] origTimings = this.calculateTimings(origPlan);
 		double[] compareTimings = this.calculateTimings(comparePlan);
 		double diff = 0;
@@ -345,18 +345,18 @@ public class MDSAM {
 			}
 		}
 		if (this.printing)stream.println();
-		
-		
+
+
 		double sum=0;
 		for (int m=0;m<oset.size();m++){
 			double GW=0;
-			if (dimensions.get(m).contains(0)) GW = this.GWact; 
+			if (dimensions.get(m).contains(0)) GW = this.GWact;
 			if (dimensions.get(m).contains(1)) GW = java.lang.Math.max(GW, this.GWmode);
 			if (dimensions.get(m).contains(2)) GW = java.lang.Math.max(GW, this.GWlocation);
 			sum += GW;
 		}
 		sum += this.GWtime*diff;
-		
+
 		if (this.printing){
 			stream.println("Sum is "+sum);
 			stream.println();
@@ -364,7 +364,7 @@ public class MDSAM {
 		this.multidimensional += System.currentTimeMillis()-trajectoryTime;
 		return sum;
 	}
-	
+
 	private boolean osetContains (ArrayList<int[]> oset, ArrayList<ArrayList<Integer>> dimensions ,int k, int operation, int position){
 		for (int m=0;m<oset.size();m++){
 			if (oset.get(m)[0]==operation && oset.get(m)[1]==position){
@@ -374,25 +374,25 @@ public class MDSAM {
 		}
 		return false;
 	}
-	
+
 	private double minPath(Object orig, Object compare, double[][]table, int i, int j, double GW){
 		double del = table[i-1][j]+GW;
 		double ins = table[i][j-1]+GW;
 		double sub = Double.MAX_VALUE;
-		
+
 		// identity (position-sensitive)
 		if (orig.equals(compare)){
 			sub =  table[i-1][j-1] + GW/java.lang.Math.max(table.length-1, table[0].length-1)*java.lang.Math.abs(i-j);
 		}
 		// substitution
 		else {
-			sub = table[i-1][j-1] + 2 * GW;	
+			sub = table[i-1][j-1] + 2 * GW;
 		}
 		// return minimum of ins, del, sub
-		del = java.lang.Math.min(del, ins);		
+		del = java.lang.Math.min(del, ins);
 		return java.lang.Math.min(del, sub);
 	}
-	
+
 	private double[] calculateTimings(Plan plan){
 		double home = 0;
 		double work = 0;
@@ -416,6 +416,6 @@ public class MDSAM {
 		return timings;
 	}
 }
-	
-	
+
+
 

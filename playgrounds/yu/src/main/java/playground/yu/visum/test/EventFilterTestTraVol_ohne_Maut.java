@@ -48,7 +48,7 @@ public class EventFilterTestTraVol_ohne_Maut {
 			throws IOException {
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		
+
 		// network
 		System.out.println("  reading network file... ");
 		NetworkLayer network = scenario.getNetwork();
@@ -58,7 +58,7 @@ public class EventFilterTestTraVol_ohne_Maut {
 
 		// plans
 		System.out.println("  creating plans object... ");
-		PopulationImpl plans = scenario.getPopulation();
+		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		System.out.println("  done.");
 

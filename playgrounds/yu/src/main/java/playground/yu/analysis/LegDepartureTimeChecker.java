@@ -9,11 +9,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -22,9 +21,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * check, whether the departure time of leg is later than 24:00
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -71,10 +70,9 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 		final String outputFilename = "output/legDepTime_669.1000.txt";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		LegDepartureTimeChecker fldtc = new LegDepartureTimeChecker(outputFilename);

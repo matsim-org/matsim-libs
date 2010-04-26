@@ -34,13 +34,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.demandmodeling.primloc.CumulativeDistribution;
@@ -122,7 +122,7 @@ public class MyCommercialDemandGeneratorOld {
 		for(int sampleNumber = 1; sampleNumber <= numberOfSamples; sampleNumber++){
 			// Initiate the population builder
 			ScenarioImpl sc = new ScenarioImpl();
-			PopulationImpl population = sc.getPopulation();
+			Population population = sc.getPopulation();
 			PopulationFactory pb = population.getFactory();
 
 			//TODO Check if it is 'better' to create 'i' truck agents, and split them into dummy agents

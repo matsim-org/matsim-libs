@@ -30,12 +30,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
@@ -189,7 +189,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		assertEquals(expectedToll, scoreWithoutToll - scoreWithToll, 1e-8);
 	}
 
-	private PopulationImpl runTollSimulation(final String tollFile, final String tollType, final CharyparNagelScoringConfigGroup config) {
+	private Population runTollSimulation(final String tollFile, final String tollType, final CharyparNagelScoringConfigGroup config) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Fixture.createNetwork1(scenario);
 		scenario.getConfig().scenario().setUseRoadpricing(true);

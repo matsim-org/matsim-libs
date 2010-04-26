@@ -31,12 +31,11 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.utils.misc.Time;
 
 import playground.mfeil.attributes.AgentsAttributesAdder;
 
@@ -48,7 +47,7 @@ import playground.mfeil.attributes.AgentsAttributesAdder;
  * @author mfeil
  */
 public class TravelStatsMZMATSim {
-	
+
 	private static final Logger log = Logger.getLogger(TravelStatsMZMATSim.class);
 
 	private PrintStream initiatePrinter(String outputFile){
@@ -61,26 +60,26 @@ public class TravelStatsMZMATSim {
 		}
 		return stream;
 	}
-	
+
 	public void printHeader(PrintStream stream){
 		stream.println("Trips");
 		stream.println("\taveTripDistance\t\t\t\taveTripTravelTime\t\t\t\taveAgents\t\t\t\t\t\tPopSize");
-		stream.println("\tCar\tPT\tWalk\tBike\tCar\tPT\tWalk\tBike\tplanDistance\tplanTime\tnoOfCar\tnoOfPT\tnoOfWalk\tnoOfBike");	
+		stream.println("\tCar\tPT\tWalk\tBike\tCar\tPT\tWalk\tBike\tplanDistance\tplanTime\tnoOfCar\tnoOfPT\tnoOfWalk\tnoOfBike");
 	}
-	
-	public void run(PopulationImpl populationMZ, PopulationImpl populationMATSim, PrintStream stream, final String attributesInputFile){
-				
+
+	public void run(Population populationMZ, Population populationMATSim, PrintStream stream, final String attributesInputFile){
+
 		AgentsAttributesAdder aaa = new AgentsAttributesAdder();
 		aaa.runMZ(attributesInputFile);
 		Map<Id, Double> personsWeights = aaa.getAgentsWeight();
-		
+
 		this.runAggregateStats("MZ_weighted", populationMZ, stream, personsWeights);
 		this.runAggregateStats("MZ_unweighted", populationMZ, stream, null);
 		this.runAggregateStats("MATSim", populationMATSim, stream, null);
 	}
-		
-	public void runAggregateStats (String name, PopulationImpl population, PrintStream stream, final Map<Id, Double> personsWeights){
-		
+
+	public void runAggregateStats (String name, Population population, PrintStream stream, final Map<Id, Double> personsWeights){
+
 		// Initiate output
 		double aveTripDistanceCarPop1 = 0;
 		double aveTripDistancePTPop1 = 0;
@@ -95,18 +94,18 @@ public class TravelStatsMZMATSim {
 		double counterWalk = 0;
 		double counterBike = 0;
 		double counterAll = 0;
-		
+
 		stream.print(name+"\t");
-		
+
 		for (Person person : population.getPersons().values()) {
-			
+
 			double weight = -1;
 			if (personsWeights!=null) weight = personsWeights.get(person.getId());
 			else weight = 1;
 			counterAll += weight;
-			
+
 			double duration = 0;
-			
+
 			Plan plan = person.getSelectedPlan();
 			for (int i=1;i<plan.getPlanElements().size();i+=2){
 				LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
@@ -157,22 +156,22 @@ public class TravelStatsMZMATSim {
 		stream.print(Double.parseDouble(counterWalk+"")/counterAll+"\t");
 		stream.print(Double.parseDouble(counterBike+"")/counterAll+"\t");
 		stream.println(counterAll);
-	}		
-	
-	public void runDisaggregateStats (String name, PopulationImpl population, PrintStream stream, final Map<Id, Double> personsWeights){
-		
+	}
+
+	public void runDisaggregateStats (String name, Population population, PrintStream stream, final Map<Id, Double> personsWeights){
+
 		double[][]stats = new double[14][5]; // 14 distance classes, 4 modes and 1 count
 		double counterAll = 0;
-		
+
 		stream.println("Distance stats");
-		
+
 		for (Person person : population.getPersons().values()) {
-			
+
 			double weight = -1;
 			if (personsWeights!=null) weight = personsWeights.get(person.getId());
 			else weight = 1;
 			counterAll += weight;
-			
+
 			Plan plan = person.getSelectedPlan();
 			for (int i=1;i<plan.getPlanElements().size();i+=2){
 				LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
@@ -215,13 +214,13 @@ public class TravelStatsMZMATSim {
 				else log.warn("Undefined transport mode for person "+plan.getPerson().getId()+": "+leg.getMode());
 			}
 		}
-		for (int i=0;i<14;i++){ 
+		for (int i=0;i<14;i++){
 			if (i==0) stream.println(name+"\t0\t"+stats[0][0]+"\t"+stats[0][1]+"\t"+stats[0][2]+"\t"+stats[0][3]+"\t"+stats[0][4]);
 			else stream.println("\t"+i+"\t"+stats[i][0]+"\t"+stats[i][1]+"\t"+stats[i][2]+"\t"+stats[i][3]+"\t"+stats[i][4]);
 		}
-	
-	}		
-	
+
+	}
+
 	private int getClass (double distance){
 		if (distance == 0) return 0;
 		if (distance < 100) return 1;
@@ -238,28 +237,28 @@ public class TravelStatsMZMATSim {
 		if (distance < 500000) return 12;
 		else return 13;
 	}
-		
-	
+
+
 	public static void main(final String [] args) {
 				final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 				final String populationFilenameMATSim = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
 				final String populationFilenameMZ = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
 				final String outputFile = "/home/baug/mfeil/data/choiceSet/trip_stats_mz05.xls";
-				
+
 				// Special MZ file so that weights of MZ persons can be read
 				final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
-	
+
 				ScenarioImpl scenarioMZ = new ScenarioImpl();
 				new MatsimNetworkReader(scenarioMZ).readFile(networkFilename);
 				new MatsimFacilitiesReader(scenarioMZ).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioMZ).readFile(populationFilenameMZ);
-				
+
 				ScenarioImpl scenarioMATSim = new ScenarioImpl();
 				scenarioMATSim.setNetwork(scenarioMZ.getNetwork());
 				new MatsimFacilitiesReader(scenarioMATSim).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioMATSim).readFile(populationFilenameMATSim);
-								
+
 				TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
 				PrintStream stream = ts.initiatePrinter(outputFile);
 				ts.printHeader(stream);

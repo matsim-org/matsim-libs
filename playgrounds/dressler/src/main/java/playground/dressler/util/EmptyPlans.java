@@ -28,12 +28,12 @@ package playground.dressler.util;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
@@ -97,7 +97,7 @@ public class EmptyPlans {
 		networkReader.readFile(networkfile);
 	//	Node sink = network.getNode(sinkid);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 
 		new MatsimPopulationReader(scenario).readFile(plansfile);
 		network.connect();

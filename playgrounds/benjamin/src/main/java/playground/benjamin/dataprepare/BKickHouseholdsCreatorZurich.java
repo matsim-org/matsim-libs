@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -57,9 +56,9 @@ import playground.dgrether.DgPaths;
  *
  */
 public class BKickHouseholdsCreatorZurich {
-	
+
 	private static final Logger log = Logger.getLogger(BKickHouseholdsCreatorZurich.class);
-	
+
 	public BKickHouseholdsCreatorZurich() throws IOException{
 		/*
 		 * This file has the following attributes:
@@ -71,55 +70,55 @@ public class BKickHouseholdsCreatorZurich {
      * FLAECHE_HA
 		 */
 		String quartiereZurichShapeFile = DgPaths.WORKBASE + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/quartiergrenzen2006/quart06_shp_070824/quart06.shp";
-		
+
 		String gemeindenKantonZurichShapeFile = DgPaths.WORKBASE + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp";
-		
+
 		String plansZurichWoTransit = DgPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_10pct.xml.gz";
-	
+
 		String plansZurichWTransit = DgPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
-		
-		
+
+
 		String einkommenZurichTextfile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/einkommenKantonZurichPlainDataEditedFinalUTF8.txt";
 
 		String householdsWTransitXmlFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
-		
+
 		String householdsWTransitTxtFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.txt";
 
 		String householdsWoTransitXmlFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_10pct.xml.gz";
-		
+
 		String householdsWoTransitTxtFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_10pct.txt";
 
-		
+
 		String plansZurich = plansZurichWoTransit;
-		
+
     String householdsTxtFile = householdsWoTransitTxtFile;
-    
+
     String householdsXmlFile = householdsWoTransitXmlFile;
-		
-		
+
+
 		Map<String, Double> gemeindeIncome = this.readMedianIncomeFile(einkommenZurichTextfile);
 		FeatureSource fts = ShapeFileReader.readDataFile(gemeindenKantonZurichShapeFile);
 
-		
+
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().network().setInputFile(DgPaths.IVTCHNET);
 		scenario.getConfig().plans().setInputFile(plansZurich);
 		scenario.getConfig().scenario().setUseHouseholds(true);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
-		
-		Households households = ((ScenarioImpl) scenario).getHouseholds();
-		
-		
+
+		Households households = (scenario).getHouseholds();
+
+
 		IncomeCalculatorGesamtschweiz incomeCalcSchweiz = new IncomeCalculatorGesamtschweiz();
 		IncomeCalculatorKantonZurich incomeCalcZurichKanton = new IncomeCalculatorKantonZurich();
-		
+
 		int personCounter = 0;
-		
+
 		BufferedWriter hhTxtWriter = IOUtils.getBufferedWriter(householdsTxtFile);
 		hhTxtWriter.write("personId\thomeX\thomeY\tincomePerYear");
 		hhTxtWriter.newLine();
-		
+
 		Population pop = scenario.getPopulation();
 		for (Person p : pop.getPersons().values()){
 			//create the households
@@ -151,11 +150,11 @@ public class BKickHouseholdsCreatorZurich {
 	    		}
 	    	}
 	    }
-	    
+
 	    hh.setIncome(b.createIncome(income, Income.IncomePeriod.year));
 	    hh.getIncome().setCurrency("SFr");
-	   
-	    
+
+
 	    StringBuffer sb = new StringBuffer();
 	    sb.append(p.getId());
 	    sb.append("\t");
@@ -167,7 +166,7 @@ public class BKickHouseholdsCreatorZurich {
 	    sb.append(income);
 	    hhTxtWriter.write(sb.toString());
 	    hhTxtWriter.newLine();
-	    
+
 	    personCounter++;
 	    if (personCounter % 100 == 0){
 	    	log.info("processed " + personCounter + " persons...");
@@ -178,19 +177,19 @@ public class BKickHouseholdsCreatorZurich {
 		HouseholdsWriterV10 hhwriter = new HouseholdsWriterV10(households);
     hhwriter.writeFile(householdsXmlFile);
 		System.out.println("Households written!");
-		
-		
+
+
 		//######################
-		
+
 //		checkGemeindenForPop(scenario.getPopulation(), fts);
-		
+
 //		findFeatureForGemeinde(gemeindeIncome, createFeaturesByName(fts));
 	}
 
 	private Map<String, Double> readMedianIncomeFile(String filename) throws FileNotFoundException, IOException{
 		Map<String, Double> gemeindeIncome = new HashMap<String, Double>();
 		BufferedReader reader = IOUtils.getBufferedReader(filename);
-		String line = reader.readLine();	
+		String line = reader.readLine();
 		while (line != null) {
 //			System.out.println(line);
 			String[] columns = line.split("\t");
@@ -201,7 +200,7 @@ public class BKickHouseholdsCreatorZurich {
 		}
 		return gemeindeIncome;
 	}
-	
+
 
 	private Map<String, Feature> createFeaturesByName(FeatureSource fts) throws IOException {
 		Map<String, Feature> featuresByName = new HashMap<String, Feature>();
@@ -225,15 +224,15 @@ public class BKickHouseholdsCreatorZurich {
 		}
 		return featuresByName;
 	}
-	
-	
-	
-	
-	
-	private void checkGemeindenForPop(PopulationImpl population, FeatureSource fsource) throws IOException {
+
+
+
+
+
+	private void checkGemeindenForPop(Population population, FeatureSource fsource) throws IOException {
 		Plan plan;
 		int personsWithGemeinde = 0;
-		
+
 		for (Person p : population.getPersons().values()) {
 			plan = p.getPlans().get(0);
 			if (plan == null) {
@@ -257,7 +256,7 @@ public class BKickHouseholdsCreatorZurich {
 		log.info("Persons with Gemeinde: " + personsWithGemeinde + " Population total: " + population.getPersons().size());
 	}
 
-	
+
 	private Feature getGemeindeFeatureForPerson(Person person, FeatureSource fsource) throws IOException {
 		Plan plan;
 		plan = person.getPlans().get(0);
@@ -279,7 +278,7 @@ public class BKickHouseholdsCreatorZurich {
 		}
 		return null;
 	}
-	
+
 	private static void findFeatureForGemeinde(Map<String, Double> gemeindeIncome, Map<String, Feature> featuresByName){
 		int gemeindeNotFound = 0;
 		for (Entry<String, Double> entry : gemeindeIncome.entrySet()){
@@ -292,14 +291,14 @@ public class BKickHouseholdsCreatorZurich {
 //					searchName = gemeindeName.replace("ü", "");
 //					searchName = searchName.concat(" (ZH)");
 //				}
-				
+
 
 				if (searchName != null) {
 					System.out.println("Trying " + searchName + " instead of " + gemeindeName);
 					ft = featuresByName.get(searchName);
 
 				}
-				
+
 				if (ft == null) {
 					gemeindeNotFound++;
 					System.err.println("Can not find feature for " + entry.getKey());
@@ -313,7 +312,7 @@ public class BKickHouseholdsCreatorZurich {
 		System.err.println("Gemeinden mit Einkommen: "+ gemeindeIncome.size());
 	}
 
-	
+
 	public static void main(String[] args) throws IOException {
 		new BKickHouseholdsCreatorZurich();
 	}

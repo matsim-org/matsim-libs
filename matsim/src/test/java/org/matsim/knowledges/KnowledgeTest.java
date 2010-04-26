@@ -150,7 +150,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  ---------- add ----------");
 
 		log.info("  adding all activities of facility 1...");
-		assertTrue(k.addActivity(f1.getActivityOptions().get(H),true));
+		assertTrue(k.addActivityOption(f1.getActivityOptions().get(H),true));
 		actsF1.add(f1.getActivityOptions().get(H));
 		actsPrim.add(f1.getActivityOptions().get(H));
 		actsAll.add(f1.getActivityOptions().get(H));
@@ -158,7 +158,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		actsHAll.add(f1.getActivityOptions().get(H));
 		typesPrim.add(H);
 		typesAll.add(H);
-		assertTrue(k.addActivity(f1.getActivityOptions().get(W),true));
+		assertTrue(k.addActivityOption(f1.getActivityOptions().get(W),true));
 		actsF1.add(f1.getActivityOptions().get(W));
 		actsPrim.add(f1.getActivityOptions().get(W));
 		actsAll.add(f1.getActivityOptions().get(W));
@@ -166,7 +166,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		actsWAll.add(f1.getActivityOptions().get(W));
 		typesPrim.add(W);
 		typesAll.add(W);
-		assertTrue(k.addActivity(f1.getActivityOptions().get(E),false));
+		assertTrue(k.addActivityOption(f1.getActivityOptions().get(E),false));
 		actsF1.add(f1.getActivityOptions().get(E));
 		actsSec.add(f1.getActivityOptions().get(E));
 		actsAll.add(f1.getActivityOptions().get(E));
@@ -174,7 +174,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		actsEAll.add(f1.getActivityOptions().get(E));
 		typesSec.add(E);
 		typesAll.add(E);
-		assertTrue(k.addActivity(f1.getActivityOptions().get(S),false));
+		assertTrue(k.addActivityOption(f1.getActivityOptions().get(S),false));
 		actsF1.add(f1.getActivityOptions().get(S));
 		actsSec.add(f1.getActivityOptions().get(S));
 		actsAll.add(f1.getActivityOptions().get(S));
@@ -182,7 +182,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		actsSAll.add(f1.getActivityOptions().get(S));
 		typesSec.add(S);
 		typesAll.add(S);
-		assertTrue(k.addActivity(f1.getActivityOptions().get(L),false));
+		assertTrue(k.addActivityOption(f1.getActivityOptions().get(L),false));
 		actsF1.add(f1.getActivityOptions().get(L));
 		actsSec.add(f1.getActivityOptions().get(L));
 		actsAll.add(f1.getActivityOptions().get(L));
@@ -194,17 +194,17 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  done. prim(h1,w1); sec(e1,s1,l1)");
 		
 		log.info("  adding again activity 'h' of facility 1...");
-		assertFalse(k.addActivity(f1.getActivityOptions().get(H),true));
+		assertFalse(k.addActivityOption(f1.getActivityOptions().get(H),true));
 		check(k,f1,f2);
 		log.info("  done. prim(h1,w1); sec(e1,s1,l1)");
 		
 		log.info("  adding again activity 'h' of facility 1 with isPrimary=false...");
-		assertFalse(k.addActivity(f1.getActivityOptions().get(H),false));
+		assertFalse(k.addActivityOption(f1.getActivityOptions().get(H),false));
 		check(k,f1,f2);
 		log.info("  done. prim(h1,w1); sec(e1,s1,l1)");
 		
 		log.info("  adding again activity 'h' of facility 2...");
-		assertTrue(k.addActivity(f2.getActivityOptions().get(H),true));
+		assertTrue(k.addActivityOption(f2.getActivityOptions().get(H),true));
 		actsF2.add(f2.getActivityOptions().get(H));
 		actsPrim.add(f2.getActivityOptions().get(H));
 		actsAll.add(f2.getActivityOptions().get(H));
@@ -216,7 +216,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  done. prim(h1,w1,h2); sec(e1,s1,l1)");
 		
 		log.info("  adding again activity 'w' of facility 2 with isPrimary=false...");
-		assertTrue(k.addActivity(f2.getActivityOptions().get(W),false));
+		assertTrue(k.addActivityOption(f2.getActivityOptions().get(W),false));
 		actsF2.add(f2.getActivityOptions().get(W));
 		actsSec.add(f2.getActivityOptions().get(W));
 		actsAll.add(f2.getActivityOptions().get(W));
@@ -228,7 +228,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  done. prim(h1,w1,h2); sec(e1,s1,l1,w2)");
 		
 		log.info("  adding 'null'...");
-		assertFalse(k.addActivity(null,false));
+		assertFalse(k.addActivityOption(null,false));
 		check(k,f1,f2);
 		log.info("  done. prim(h1,w1,h2); sec(e1,s1,l1,w2)");
 		

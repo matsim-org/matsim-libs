@@ -97,13 +97,13 @@ public class ScenarioStreaming {
 		exTxpes.add("0");  // motorway
 		exTxpes.add("-1"); // not defined
 		exTxpes.add("-2"); // ferry
-		exTxpes.add("-3"); 
-		exTxpes.add("-4"); 
-		exTxpes.add("-5"); 
-		exTxpes.add("-6"); 
-		exTxpes.add("-7"); 
-		exTxpes.add("-8"); 
-		exTxpes.add("-9"); 
+		exTxpes.add("-3");
+		exTxpes.add("-4");
+		exTxpes.add("-5");
+		exTxpes.add("-6");
+		exTxpes.add("-7");
+		exTxpes.add("-8");
+		exTxpes.add("-9");
 
 		// teleatlas
 //		exTxpes.add("0-4110-0"); // motorway
@@ -140,7 +140,7 @@ public class ScenarioStreaming {
 		new NetworkWriter(network).writeFile(config.network().getOutputFile());
 		System.out.println("done. (writing network)");
 
-		final PopulationImpl population = sl.getScenario().getPopulation();
+		final PopulationImpl population = (PopulationImpl) sl.getScenario().getPopulation();
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		PopulationWriter plansWriter = new PopulationWriter(population,network, sl.getScenario().getKnowledges());

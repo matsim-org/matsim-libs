@@ -29,12 +29,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -54,7 +54,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class AnalysisTest4Bln implements Analysis4Bln {
 	private static boolean withToll = false;
@@ -130,7 +130,7 @@ public class AnalysisTest4Bln implements Analysis4Bln {
 		LegDistance ld = null;
 		// only PersonAlgorithm begins.
 		if (plansFilename != null) {
-			PopulationImpl population = sc.getPopulation();
+			Population population = sc.getPopulation();
 
 			catl = new MyCalcAverageTripLength(network);
 			ms = new ModeSplit(toll);

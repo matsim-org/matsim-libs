@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -43,7 +44,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class MyControler2 {
 	private static final Logger log = Logger.getLogger(MyControler2.class);
 
-	private static PopulationImpl createPlansFromShp(final FeatureSource n, final PopulationImpl population) {
+	private static Population createPlansFromShp(final FeatureSource n, final Population population) {
 		List<Coord> workPlaces = new ArrayList<Coord>() ;
 
 		int popCnt = 0 ;

@@ -77,7 +77,7 @@ public class ModeChoiceNavteqMain {
 //		System.out.println("3. CREATING A POPULATION BASED ON THE NETWORK");
 //		System.out.println();
 //		System.out.println("  creating plans object... ");
-		PopulationImpl plans = scenario.getPopulation();
+		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 //		System.out.println("  done.");
 //		System.out.println("  running plans algorithms... ");

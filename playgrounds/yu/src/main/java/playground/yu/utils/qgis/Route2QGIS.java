@@ -19,11 +19,11 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -38,9 +38,9 @@ import com.vividsolutions.jts.geom.Polygon;
  * This class is a copy of main() from
  * org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape of Mr.
  * Laemmeland can convert a MATSim-population to a QGIS .shp-file (acts or legs)
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		X2QGIS {
@@ -49,7 +49,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 	private FeatureType featureTypeRoute;
 	private boolean writeRoutes = true;
 
-	public Route2QGIS(PopulationImpl population,
+	public Route2QGIS(Population population,
 			final CoordinateReferenceSystem crs, final String outputDir,
 			final NetworkLayer network,
 			final Map<List<Id>, Integer> routeCounters) {
@@ -169,7 +169,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 
 		RouteSummary rs = new RouteSummary(outputDir + "/routeCompare.txt.gz");
 

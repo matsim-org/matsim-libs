@@ -34,13 +34,13 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.rost.eaflow.Intervall.src.Intervalls.EdgeIntervalls;
@@ -610,7 +610,7 @@ public class Flow {
 
 	@SuppressWarnings("unchecked")
 
-	public PopulationImpl createPoulation(String oldfile){
+	public Population createPoulation(String oldfile){
 		//check whether oldfile exists
 		//boolean org = (oldfile!=null);
 		//HashMap<Node,LinkedList<Person>> orgpersons = new  HashMap<Node,LinkedList<Person>>();
@@ -637,7 +637,7 @@ public class Flow {
 		}*/
 
 		//construct Population
-		PopulationImpl result =new ScenarioImpl().getPopulation();
+		Population result =new ScenarioImpl().getPopulation();
 		int id =1;
 		for (TimeExpandedPath path : this._TimeExpandedPaths){
 			if(path.isforward()){

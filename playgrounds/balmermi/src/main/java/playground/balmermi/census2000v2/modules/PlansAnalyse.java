@@ -25,11 +25,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 
 public class PlansAnalyse {
 
@@ -48,7 +48,7 @@ public class PlansAnalyse {
 	private static final String E = "e";
 	private static final String S = "s";
 	private static final String L = "l";
-	
+
 	private static final String CAR = "car";
 	private static final String PT = "pt";
 	private static final String BIKE = "bike";
@@ -71,9 +71,9 @@ public class PlansAnalyse {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final PopulationImpl plans) {
+	public void run(final Population plans) {
 		log.info("    running " + this.getClass().getName() + " module...");
-		
+
 		double[] lic_cnt = new double[2]; // yes,no
 		for (int i=0; i<lic_cnt.length; i++) { lic_cnt[i]=0; }
 		double[] mt_cnt = new double[6]; // nev_no,som_no,alw_no,nev_yes,som_yes,alw_yes,
@@ -84,10 +84,10 @@ public class PlansAnalyse {
 		double leg_cnt = 0; // all modes
 		double[] mtype_cnt = new double[4]; // car,pt,bike,walk
 		for (int i=0; i<mtype_cnt.length; i++) { mtype_cnt[i]=0; }
-		
+
 		double[] trip_dist = new double[30];
 		for (int i=0; i<trip_dist.length; i++) { trip_dist[i]=0; }
-		
+
 		for (Person pp : plans.getPersons().values()) {
 			PersonImpl p = (PersonImpl) pp;
 			// license
@@ -161,7 +161,7 @@ public class PlansAnalyse {
 		for (int i=0; i<trip_dist.length; i++) {
 			log.info(i + ":\t" + trip_dist[i] + "\t" + ((int)(100*trip_dist[i]/nump)));
 		}
-		
+
 		log.info("    done.");
 	}
 }

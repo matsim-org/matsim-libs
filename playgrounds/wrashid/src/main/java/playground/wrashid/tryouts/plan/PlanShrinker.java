@@ -29,7 +29,7 @@ public class PlanShrinker {
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
-		PopulationImpl population = scenario.getPopulation();
+		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 
 		System.out.println("reading plans xml file... ");

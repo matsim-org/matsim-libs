@@ -21,6 +21,7 @@
 package playground.balmermi.census2000v2;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -28,7 +29,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.Layer;
@@ -96,7 +96,7 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object...");
-		PopulationImpl plans = scenario.getPopulation();
+		Population plans = scenario.getPopulation();
 		Knowledges knowledges = scenario.getKnowledges();
 		System.out.println("  done.");
 

@@ -11,13 +11,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.ActivityImpl;
 
 /**
  * Writes the correspondence table between the facilities and the acts in the plans
  * for all plans of all agents and all iterations.
- * 
+ *
  * @author jhackney
  *
  */
@@ -57,10 +57,10 @@ public class ActivityActWriter {
 
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
 					ActivityImpl myAct= (ActivityImpl) actsLegs.get(j);
-					ActivityOptionImpl myActivity=this.facilities.getFacilities().get(myAct.getFacilityId()).getActivityOptions().get(myAct.getType());
+					ActivityOption myActivity=this.facilities.getFacilities().get(myAct.getFacilityId()).getActivityOptions().get(myAct.getType());
 //					System.out.println(" AAW DEBUG J=: "+j);
 					try {
-						out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+myActivity.getType());
+						out.write(iter+" "+myPerson.getId()+" "+myAct.getFacilityId()+" "+myActivity.getType());
 						out.newLine();
 
 					} catch (IOException e) {

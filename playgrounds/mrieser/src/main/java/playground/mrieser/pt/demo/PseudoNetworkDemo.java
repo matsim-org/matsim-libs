@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
@@ -37,7 +38,6 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreatePseudoNetwork;
@@ -105,7 +105,7 @@ public class PseudoNetworkDemo {
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		LinkImpl link1 = network.getLinks().values().iterator().next();//getLink(scenario.createId("1"));
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		Person person = population.getFactory().createPerson(new IdImpl(1));
 		population.addPerson(person);
 		Plan plan = population.getFactory().createPlan();

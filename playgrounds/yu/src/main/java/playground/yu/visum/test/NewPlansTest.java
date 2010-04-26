@@ -37,7 +37,7 @@ public class NewPlansTest {
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		PopulationImpl plans = scenario.getPopulation();
+		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		System.out.println("  done.");
 

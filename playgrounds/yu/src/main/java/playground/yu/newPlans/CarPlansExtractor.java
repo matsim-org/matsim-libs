@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.newPlans;
 
 import java.util.ArrayList;
@@ -10,6 +26,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -27,18 +44,11 @@ public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
 	private Person person = null;
 	private final List<Plan> tmpPersonPlans = new ArrayList<Plan>();
 
-	/**
-	 * @param plans
-	 */
-	public CarPlansExtractor(Network network, PopulationImpl plans) {
+	public CarPlansExtractor(Network network, Population plans) {
 		super(network, plans);
 	}
 
-	/**
-	 * @param population
-	 * @param filename
-	 */
-	public CarPlansExtractor(Network network, PopulationImpl population, String filename) {
+	public CarPlansExtractor(Network network, Population population, String filename) {
 		super(network, population, filename);
 	}
 
@@ -74,7 +84,7 @@ public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 
 		CarPlansExtractor cpe = new CarPlansExtractor(network, population,

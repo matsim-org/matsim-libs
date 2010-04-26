@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -43,7 +44,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteWRefs;
@@ -62,7 +62,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 	private final static Id TEST_PERSON_ID = new IdImpl("123");
 
-	private PopulationImpl population;
+	private Population population;
 	private PlanImpl plan;
 	private Config config;
 	private KtiConfigGroup ktiConfigGroup;

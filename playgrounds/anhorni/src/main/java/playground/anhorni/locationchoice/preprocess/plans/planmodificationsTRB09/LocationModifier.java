@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB09;
 
 import java.util.ArrayList;
@@ -11,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -18,7 +38,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
@@ -32,13 +51,13 @@ public class LocationModifier extends Modifier {
 
 	private final static Logger log = Logger.getLogger(LocationModifier.class);
 
-	public LocationModifier(PopulationImpl plans, NetworkLayer network, ActivityFacilitiesImpl  facilities) {
+	public LocationModifier(Population plans, NetworkLayer network, ActivityFacilitiesImpl  facilities) {
 		super(plans, network, facilities);
 		this.initShopLeisure();
 	}
 
 	private void initShopLeisure(){
-		
+
 		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_gt2500sqm"));
 		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_get1000sqm"));
 		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_get400sqm"));
@@ -52,10 +71,10 @@ public class LocationModifier extends Modifier {
 
 		this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities);
 		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities);
-		
+
 		log.info("Total number of ch shop facilities:" + this.shop_facilities.size());
 		log.info("Total number of ch leisure facilities:" + this.leisure_facilities.size());
-		
+
 	}
 
 	@Override
@@ -76,7 +95,7 @@ public class LocationModifier extends Modifier {
 		ArrayList<ActivityFacilityImpl> zhLeisureFacilities = (ArrayList<ActivityFacilityImpl>)this.leisFacQuadTree.get(coords.getX(), coords.getY(), radius);
 		log.info("Total number of zh shop facilities:" + zhShopFacilities.size());
 		log.info("Total number of zh leisure facilities:" + zhLeisureFacilities.size());
-		
+
 
 		while (person_iter.hasNext()) {
 			Person person = person_iter.next();

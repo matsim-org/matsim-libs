@@ -1,4 +1,3 @@
-package playground.jhackney;
 /* *********************************************************************** *
  * project: org.matsim.*
  * Scenario.java
@@ -19,11 +18,13 @@ package playground.jhackney;
  *                                                                         *
  * *********************************************************************** */
 
+package playground.jhackney;
 
 import java.io.IOException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -34,7 +35,6 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -151,7 +151,7 @@ public abstract class ScenarioConfig {
 		config.getModule("kml21").addParam("outputEgoNetPlansKMLMainFile","egoNetKML" );
 		config.getModule("kml21").addParam("outputKMLDemoColoredLinkFile", "egoNetLinkColorFile");
 		config.getModule("kml21").addParam("useCompression", "true");
-		
+
 //		scoring.setBrainExpBeta(2.0);
 //		scoring.setLateArrival(-18.0);
 //		scoring.setEarlyDeparture(0.0);
@@ -166,7 +166,7 @@ public abstract class ScenarioConfig {
 //		params.setTypicalDuration(12.*3600);
 //		params.setMinimalDuration(8.*3600);
 //		scoring.addActivityParams(params);
-//		
+//
 //		new CharyparNagelScoringConfigGroup.ActivityParams("work");
 //		params.setTypicalDuration(8.*3600);
 //		params.setMinimalDuration(6.*3600);
@@ -182,21 +182,21 @@ public abstract class ScenarioConfig {
 //		params.setLatestStartTime(9.*3600);
 //		params.setClosingTime(18.*3600);
 //		scoring.addActivityParams(params);
-//		
+//
 //		params = new CharyparNagelScoringConfigGroup.ActivityParams("shop");
 //		params.setTypicalDuration(2.*3600);
 //		params.setMinimalDuration(1.*3600);
 //		params.setOpeningTime(8.*3600);
 //		params.setClosingTime(20.*3600);
 //		scoring.addActivityParams(params);
-//		
+//
 //		params = new CharyparNagelScoringConfigGroup.ActivityParams("leisure");
 //		params.setTypicalDuration(2.*3600);
 //		params.setMinimalDuration(1.*3600);
 //		params.setOpeningTime(6.*3600);
 //		params.setClosingTime(24.*3600);
 //		scoring.addActivityParams(params);
-//		
+//
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -279,10 +279,10 @@ public abstract class ScenarioConfig {
 //		System.out.println("  done.");
 //		return scenario.getPopulation();
 //	}
-	
-	public static final PopulationImpl readPlansAndKnowledges(final Network network, Knowledges kn) {
+
+	public static final Population readPlansAndKnowledges(final Network network, Knowledges kn) {
 		System.out.println("  reading plans xml file... ");
-		PopulationImpl plans = scenario.getPopulation();
+		Population plans = scenario.getPopulation();
 		String filename=input_directory +popFileName;
 		System.out.println(filename);
 		new MatsimPopulationReader(scenario).readFile(filename);

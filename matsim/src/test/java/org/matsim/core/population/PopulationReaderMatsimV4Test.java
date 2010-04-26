@@ -56,7 +56,7 @@ public class PopulationReaderMatsimV4Test {
 	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
 		final ScenarioImpl scenario = new ScenarioImpl();
 		final Network network = scenario.getNetwork();
-		final PopulationImpl population = scenario.getPopulation();
+		final Population population = scenario.getPopulation();
 		new MatsimNetworkReader(scenario).parse("test/scenarios/equil/network.xml");
 
 		MatsimXmlParser parser = new PopulationReaderMatsimV4(scenario);
@@ -148,7 +148,7 @@ public class PopulationReaderMatsimV4Test {
 	@Test
 	public void testReadRouteWithoutActivityLinks() {
 		final ScenarioImpl scenario = new ScenarioImpl();
-		final PopulationImpl population = scenario.getPopulation();
+		final Population population = scenario.getPopulation();
 
 		PopulationReaderMatsimV4 parser = new PopulationReaderMatsimV4(scenario);
 

@@ -97,7 +97,7 @@ public class RoutePopulation {
 		scenario = sl.getScenario();
 		final NetworkImpl network = scenario.getNetwork();
 		this.config = scenario.getConfig();
-		final PopulationImpl plans = scenario.getPopulation();
+		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());

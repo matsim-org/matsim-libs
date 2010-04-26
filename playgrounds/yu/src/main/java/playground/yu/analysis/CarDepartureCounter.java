@@ -29,6 +29,7 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -38,16 +39,15 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author yu
- * 
+ *
  */
 public class CarDepartureCounter implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
-	private final PopulationImpl ppl;
+	private final Population ppl;
 
 	private int cdc = 0, cac = 0;
 
@@ -55,7 +55,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		return this.cac;
 	}
 
-	public CarDepartureCounter(final PopulationImpl ppl) {
+	public CarDepartureCounter(final Population ppl) {
 		this.ppl = ppl;
 	}
 

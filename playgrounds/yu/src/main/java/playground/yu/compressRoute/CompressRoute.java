@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -49,9 +50,9 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
  * this Class counts and writes the amount of "new" filtered links as well as
  * that of "old" links by reading "old" plansfile, gets compression ratio of the
  * sparely new network with sparely linkroute.
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class CompressRoute extends AbstractPersonAlgorithm {
 	/**
@@ -68,7 +69,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 	/** Counter of "new" filtered links */
 	private int newLinksNr;
 
-	public CompressRoute(Map<String, String> ssLinks, PopulationImpl plans,
+	public CompressRoute(Map<String, String> ssLinks, Population plans,
 			String fileName) throws IOException {
 		this.ssLinks = ssLinks;
 		this.out = new DataOutputStream(new BufferedOutputStream(
@@ -158,7 +159,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 
 	/**
 	 * writes the count of "old" links and "new" links
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void writeEnd() throws IOException {
@@ -184,7 +185,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 		System.out.println("-->done.");
 
 		System.out.println("  setting up plans objects...");
-		final PopulationImpl plans = scenario.getPopulation();
+		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		// compress routes

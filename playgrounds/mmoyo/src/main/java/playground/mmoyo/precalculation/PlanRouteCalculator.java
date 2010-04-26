@@ -11,12 +11,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
@@ -30,11 +30,11 @@ public class PlanRouteCalculator {
 	private Map <Id, List<StaticConnection>> connectionMap = new TreeMap <Id, List<StaticConnection>>();;
 	private TransitSchedule transitSchedule;
 	private NetworkLayer net;
-	private PopulationImpl population;
+	private Population population;
 	private KroutesCalculator kRoutesCalculator;
 	PlainTimeTable plainTimeTable;
 
-	public PlanRouteCalculator(final TransitSchedule transitSchedule, final NetworkLayer net, Map <Id, List<StaticConnection>> connectionMap, PopulationImpl population, KroutesCalculator kRoutesCalculator){
+	public PlanRouteCalculator(final TransitSchedule transitSchedule, final NetworkLayer net, Map <Id, List<StaticConnection>> connectionMap, Population population, KroutesCalculator kRoutesCalculator){
 		this.transitSchedule = transitSchedule;
 		this.net = net;
 		this.connectionMap = connectionMap;
@@ -86,7 +86,7 @@ public class PlanRouteCalculator {
 
 	/** sets the most appropriate route for plans from the precalculated static routes*/
 	public void findRoutes(){
-		PopulationImpl newPopulation = new ScenarioImpl().getPopulation();
+		Population newPopulation = new ScenarioImpl().getPopulation();
 
 		for (Person person: population.getPersons().values()) {
 				//if ( true ) {

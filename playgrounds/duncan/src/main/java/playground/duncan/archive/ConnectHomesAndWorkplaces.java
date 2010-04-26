@@ -83,7 +83,7 @@ public class ConnectHomesAndWorkplaces {
 		Knowledges knowledges = scenario.getKnowledges() ;
 		LocationMutator locachoice = new RandomLocationMutator(controler.getNetwork(), controler, knowledges) ;
 
-		final PopulationImpl plans = scenario.getPopulation() ;
+		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation() ;
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, scenario.getNetwork(), knowledges);

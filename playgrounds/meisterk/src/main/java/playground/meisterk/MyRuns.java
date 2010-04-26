@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -103,36 +104,36 @@ public class MyRuns {
 
 		MyRuns myRuns = new MyRuns();
 		myRuns.doSUEStudySensitivityAnalysis(args);
-		
+
 	}
 
 	/**
 	 * Generates the results of the sensitivity analysis of the SUE study.
 	 */
 	void doSUEStudySensitivityAnalysis(final String[] args) {
-		
+
 		final double[] VARY_BETA = new double[]{2.0, 0.1, 1.0, 4.0, 10.0, Double.MAX_VALUE};
 		final double[] VARY_LEARNING_RATE = new double[]{1.0, 0.1};
 		final String[] VARY_TIME_MODULE = new String[]{"TimeAllocationMutator", "Planomat"};
 		final String OUTPUT_PARENT_DIRECTORY_NAME = "sueStudy";
-		
+
 		for (double beta : VARY_BETA) {
 			for (double learningRate : VARY_LEARNING_RATE) {
-				
+
 				for (String timingModule : VARY_TIME_MODULE) {
 					Controler testee = new PhDControler(args);
-					
+
 					StrategySettings timingStrategy = new StrategySettings(new IdImpl(3));
 					timingStrategy.setModuleName(timingModule);
 					timingStrategy.setProbability(0.1);
 					testee.getConfig().strategy().addStrategySettings(timingStrategy);
-					
+
 					if (timingModule.equals("Planomat")) {
 						testee.getConfig().plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarOnly/expected_plans.xml.gz");
 					} else if (timingModule.equals("TimeAllocationMutator")) {
 						testee.getConfig().plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateAll6AM/expected_plans.xml.gz");
 					}
-					
+
 					testee.getConfig().controler().setOutputDirectory(
 							"output/"
 									+ OUTPUT_PARENT_DIRECTORY_NAME
@@ -140,7 +141,7 @@ public class MyRuns {
 									+ this.getRunOutputDirectoryName(timingModule, beta, learningRate));
 					testee.getConfig().charyparNagelScoring().setBrainExpBeta(beta);
 					testee.getConfig().charyparNagelScoring().setLearningRate(learningRate);
-					
+
 					testee.setCreateGraphs(false);
 					testee.setWriteEventsInterval(10);
 					testee.run();
@@ -148,18 +149,18 @@ public class MyRuns {
 
 			}
 		}
-		
+
 	}
-	
+
 	String getRunOutputDirectoryName(final String timingModule, final double beta, final double learningRate) {
-		
-		return 
-		"timingModule_" + timingModule + "/" + 
-		"brainExpBeta_" + Double.toString(beta) + "/" + 
+
+		return
+		"timingModule_" + timingModule + "/" +
+		"brainExpBeta_" + Double.toString(beta) + "/" +
 		"learningRate_" + Double.toString(learningRate);
-		
+
 	}
-	
+
 	/**
 	 * @param config
 	 *
@@ -257,7 +258,7 @@ public class MyRuns {
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
-		PopulationImpl matsimAgentPopulation = scenario.getPopulation();
+		PopulationImpl matsimAgentPopulation = (PopulationImpl) scenario.getPopulation();
 		matsimAgentPopulation.setIsStreaming(true);
 		matsimAgentPopulation.addAlgorithm(pa);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
@@ -336,7 +337,7 @@ public class MyRuns {
 		loader.loadScenario();
 
 		ScenarioImpl scenario = loader.getScenario();
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 
 		PersonSetFirstActEndTime psfaet = new PersonSetFirstActEndTime(24.0 * 3600);
 		psfaet.run(population);
@@ -346,9 +347,9 @@ public class MyRuns {
 		logger.info("Writing plans file...DONE.");
 	}
 
-	public static PopulationImpl initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, ScenarioImpl scenario) {
+	public static Population initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, ScenarioImpl scenario) {
 
-		PopulationImpl population = scenario.getPopulation();
+		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 
 		System.out.println("  reading plans xml file... ");
 		population.setIsStreaming(isStreaming);
@@ -403,7 +404,7 @@ public class MyRuns {
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
-		PopulationImpl matsimAgentPopulation = scenario.getPopulation();
+		PopulationImpl matsimAgentPopulation = (PopulationImpl) scenario.getPopulation();
 		matsimAgentPopulation.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());

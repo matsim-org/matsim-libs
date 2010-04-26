@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -18,7 +19,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -35,7 +35,7 @@ public class InsertActPlan2Pop extends NewPopulation implements PlanAlgorithm {
 	 * @param population
 	 * @param filename
 	 */
-	public InsertActPlan2Pop(Network network, PopulationImpl population, String filename) {
+	public InsertActPlan2Pop(Network network, Population population, String filename) {
 		super(network, population, filename);
 	}
 
@@ -68,7 +68,7 @@ public class InsertActPlan2Pop extends NewPopulation implements PlanAlgorithm {
 		NetworkLayer network = s.getNetwork();
 		new MatsimNetworkReader(s).readFile(netFilename);
 
-		PopulationImpl population = s.getPopulation();
+		Population population = s.getPopulation();
 		new MatsimPopulationReader(s).readFile(plansFilename);
 
 		InsertActPlan2Pop npwp = new InsertActPlan2Pop(network, population, outputFilename);

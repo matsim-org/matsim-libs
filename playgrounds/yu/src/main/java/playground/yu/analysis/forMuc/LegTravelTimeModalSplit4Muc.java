@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis.forMuc;
 
@@ -10,14 +10,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -29,9 +28,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * compute average leg travel Time of Munich network and/or Munich city Region
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class LegTravelTimeModalSplit4Muc extends LegTravelTimeModalSplit
 		implements Analysis4Muc {
@@ -40,23 +39,23 @@ public class LegTravelTimeModalSplit4Muc extends LegTravelTimeModalSplit
 	private final int[] rideArrCount;
 
 	public LegTravelTimeModalSplit4Muc(int binSize, int nofBins,
-			PopulationImpl plans) {
+			Population plans) {
 		super(binSize, nofBins, plans);
 		rideTravelTimes = new double[nofBins + 1];
 		rideArrCount = new int[nofBins + 1];
 	}
 
-	public LegTravelTimeModalSplit4Muc(int binSize, PopulationImpl plans) {
+	public LegTravelTimeModalSplit4Muc(int binSize, Population plans) {
 		this(binSize, 30 * 3600 / binSize + 1, plans);
 	}
 
-	public LegTravelTimeModalSplit4Muc(PopulationImpl ppl,
+	public LegTravelTimeModalSplit4Muc(Population ppl,
 			RoadPricingScheme toll) {
 		this(ppl);
 		this.toll = toll;
 	}
 
-	public LegTravelTimeModalSplit4Muc(PopulationImpl plans) {
+	public LegTravelTimeModalSplit4Muc(Population plans) {
 		this(300, plans);
 	}
 
@@ -195,10 +194,9 @@ public class LegTravelTimeModalSplit4Muc extends LegTravelTimeModalSplit
 		// Gbl.createConfig(null);
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 

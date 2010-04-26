@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -17,7 +18,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.io.IOUtils;
@@ -27,12 +27,12 @@ import playground.yu.analysis.PlanModeJudger;
 /**
  * it is a copy of <class>org.matsim.run.CompareSelectedPlansTable</class>, only
  * some small changes were taken.
- * 
+ *
  */
 public class CompareSelectedPlansTable {
 
-	private PopulationImpl plans0;
-	private PopulationImpl plans1;
+	private Population plans0;
+	private Population plans1;
 	private static final String HEADER = "personid;sex;age;license;caravail;employed;homex;homey;homelink;"
 			+ "score0;score1;s1-s0;relativScoreDiff;"
 			+ "plantraveltime0;plantraveltime1;t1-t0;"

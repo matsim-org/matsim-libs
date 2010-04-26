@@ -28,14 +28,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.mfeil.attributes.AgentsAttributesAdder;
@@ -48,7 +47,7 @@ import playground.mfeil.attributes.AgentsAttributesAdder;
  * @author mfeil
  */
 public class ActTimingsMZMATSim {
-	
+
 	private static final Logger log = Logger.getLogger(ActTimingsMZMATSim.class);
 
 	private PrintStream initiatePrinter(String outputFile){
@@ -61,26 +60,26 @@ public class ActTimingsMZMATSim {
 		}
 		return stream;
 	}
-	
+
 	public void printHeader(PrintStream stream){
 		stream.println("Activity timings and frequencies");
 		stream.println("\tHome\t\t\tInnerHome\t\tWork\t\tEducations\t\tLeisure\t\tShop\t\tPopSize");
-		stream.println("\tStart\tEnd\tFrequency\tDuration\tFrequency\tDuration\tFrequency\tDuration\tFrequency\tDuration\tFrequency\tDuration\tFrequency");	
+		stream.println("\tStart\tEnd\tFrequency\tDuration\tFrequency\tDuration\tFrequency\tDuration\tFrequency\tDuration\tFrequency\tDuration\tFrequency");
 	}
-	
-	public void run(PopulationImpl populationMZ, PopulationImpl populationMATSim, PrintStream stream, final String attributesInputFile){
-				
+
+	public void run(Population populationMZ, Population populationMATSim, PrintStream stream, final String attributesInputFile){
+
 		AgentsAttributesAdder aaa = new AgentsAttributesAdder();
 		aaa.runMZ(attributesInputFile);
 		Map<Id, Double> personsWeights = aaa.getAgentsWeight();
-		
+
 		this.runPopulation("MZ_weighted", populationMZ, stream, personsWeights);
 		this.runPopulation("MZ_unweighted", populationMZ, stream, null);
 		this.runPopulation("MATSim", populationMATSim, stream, null);
 	}
-		
-	public void runPopulation (String name, PopulationImpl population, PrintStream stream, final Map<Id, Double> personsWeights){
-		
+
+	public void runPopulation (String name, Population population, PrintStream stream, final Map<Id, Double> personsWeights){
+
 		// Initiate output
 		double startHome = 0;
 		double endHome = 0;
@@ -88,8 +87,8 @@ public class ActTimingsMZMATSim {
 		double durationWork = 0;
 		double durationEducation = 0;
 		double durationLeisure = 0;
-		double durationShop = 0;		
-		
+		double durationShop = 0;
+
 		double counterHome = 0;
 		double counterInnerHome = 0;
 		double counterWork = 0;
@@ -97,15 +96,15 @@ public class ActTimingsMZMATSim {
 		double counterLeisure = 0;
 		double counterShop = 0;
 		double size = population.getPersons().size();
-		
+
 		for (Person person : population.getPersons().values()) {
-			
+
 			double weight = -1;
 			if (personsWeights!=null) weight = personsWeights.get(person.getId());
 			else weight = 1;
-			
+
 			double duration = 0;
-			
+
 			Plan plan = person.getSelectedPlan();
 			for (int i=0;i<plan.getPlanElements().size();i+=2){
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
@@ -119,7 +118,7 @@ public class ActTimingsMZMATSim {
 				else {
 					if (i==0) { // first home act
 						if (act.getEndTime()!=Time.UNDEFINED_TIME){
-							endHome += weight*act.getEndTime(); 
+							endHome += weight*act.getEndTime();
 							duration += act.getEndTime();
 							counterHome+=weight;
 						}
@@ -127,7 +126,7 @@ public class ActTimingsMZMATSim {
 					}
 					else if (i==plan.getPlanElements().size()-1) { // last home act
 						if (act.getStartTime()!=Time.UNDEFINED_TIME){
-							startHome += weight*act.getStartTime(); 
+							startHome += weight*act.getStartTime();
 							duration += (86400-act.getStartTime());
 						}
 						else log.warn("The start time of person's "+person.getId()+" last home act is undefined!");
@@ -173,29 +172,29 @@ public class ActTimingsMZMATSim {
 		stream.print((endHome/counterHome)+"\t"+(startHome/counterHome)+"\t"+1+"\t");
 		stream.print((durationInnerHome/counterInnerHome)+"\t"+counterInnerHome/counterHome+"\t"+(durationWork/counterWork)+"\t"+counterWork/counterHome+"\t"+(durationEducation/counterEducation)+"\t"+counterEducation/counterHome+"\t"+(durationLeisure/counterLeisure)+"\t"+counterLeisure/counterHome+"\t"+(durationShop/counterShop)+"\t"+counterShop/counterHome+"\t");
 		stream.println(counterHome);
-	}		
-		
-	
+	}
+
+
 	public static void main(final String [] args) {
 				final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 				final String populationFilenameMATSim = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
 				final String populationFilenameMZ = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
 				final String outputFile = "/home/baug/mfeil/data/choiceSet/trip_stats_mz05.xls";
-				
+
 				// Special MZ file so that weights of MZ persons can be read
 				final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
-	
+
 				ScenarioImpl scenarioMZ = new ScenarioImpl();
 				new MatsimNetworkReader(scenarioMZ).readFile(networkFilename);
 				new MatsimFacilitiesReader(scenarioMZ).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioMZ).readFile(populationFilenameMZ);
-				
+
 				ScenarioImpl scenarioMATSim = new ScenarioImpl();
 				scenarioMATSim.setNetwork(scenarioMZ.getNetwork());
 				new MatsimFacilitiesReader(scenarioMATSim).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioMATSim).readFile(populationFilenameMATSim);
-								
+
 				ActTimingsMZMATSim ts = new ActTimingsMZMATSim();
 				PrintStream stream = ts.initiatePrinter(outputFile);
 				ts.printHeader(stream);

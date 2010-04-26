@@ -30,17 +30,16 @@ import java.io.IOException;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class LegCountTest {
 	public static class LegCount extends AbstractPersonAlgorithm {
@@ -139,10 +138,9 @@ public class LegCountTest {
 		Gbl.startMeasurement();
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 
 		LegCount lc = new LegCount(outFilename);
 

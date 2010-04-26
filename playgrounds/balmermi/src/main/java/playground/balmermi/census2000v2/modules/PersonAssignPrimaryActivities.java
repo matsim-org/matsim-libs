@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -72,9 +73,9 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 		for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			String curr_type = act.getType();
-			ActivityOptionImpl a = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(curr_type);
+			ActivityOption a = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(curr_type);
 			if (a == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacilityId()+"!"); }
-			if (!prim_acts.contains(a)) { k.addActivity(a,false); }
+			if (!prim_acts.contains(a)) { k.addActivityOption((ActivityOptionImpl) a,false); }
 		}
 	}
 }

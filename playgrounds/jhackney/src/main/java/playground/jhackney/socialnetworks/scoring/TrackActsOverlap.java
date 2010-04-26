@@ -35,7 +35,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.jhackney.socialnetworks.algorithms.CompareActs;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -49,11 +48,11 @@ public class TrackActsOverlap {
 	static final private Logger log = Logger.getLogger(TrackActsOverlap.class);
 
 	private final ActivityFacilities facilities;
-	
+
 	public TrackActsOverlap(final ActivityFacilities facilities) {
 		this.facilities = facilities;
 	}
-	
+
 	/**
 	 * The Plans contain all agents who are chosen to get scores for social interactions.
 	 * Generally all agents in the population get scored.
@@ -64,24 +63,24 @@ public class TrackActsOverlap {
 	 * The first Act and all the Persons having visited that Facility Id are recorded in activityMap.
 	 * The Plan/Person must be recorded rather than the Act because there is no pointer from Act to Plan/Person.
 	 * Also, the Facility Id is recorded separately in an ArrayList.
-	 * 
+	 *
 	 * To use this information, iterate through the ArrayList of Facilities and the table of Acts to
 	 * find the agents who passed through the Facility. Call up the list of agents and process their
 	 * Plans according to the spatial interaction desired.
-	 * 
+	 *
 	 * Note that there could be several Acts
 	 * matching a given Facility, thus if it is desired to ascertain all spatial encounters at a
-	 * Facility, it will be necessary to test all Acts. 
-	 * 
+	 * Facility, it will be necessary to test all Acts.
+	 *
 	 * @param plans
 	 * @param iteration
-	 * 
+	 *
 	 */
-	public void trackActs(PopulationImpl plans, int iteration) {
+	public void trackActs(Population plans, int iteration) {
 
 		log.info(" Looking through plans and mapping social interactions for scoring "+iteration);
 
-		activityMap = new LinkedHashMap<ActivityOptionImpl,ArrayList<Person>>(); 
+		activityMap = new LinkedHashMap<ActivityOptionImpl,ArrayList<Person>>();
 		activityMap= makeActivityMap(plans);
 
 		log.info("...finished");
@@ -91,12 +90,12 @@ public class TrackActsOverlap {
 	 * Makes a list of Activity (== Facility + activity type) and the Persons (Plans --> Acts) carrying
 	 * out an Act there. Only Acts need be stored, but since there is no way to link to a Person from
 	 * an Act, we store the Plan.
-	 * 
+	 *
 	 * Note that a single Person may have multiple Acts which take place at a Facility (e.g. Morning Home,
 	 * Evening Home). Thus storing the Person is a way to store all of these Acts.
-	 * 
+	 *
 	 *  We search through the Acts at a later stage when using this Map.
-	 *  
+	 *
 	 * @param plans
 	 * @return activityMap
 	 */
@@ -109,15 +108,15 @@ public class TrackActsOverlap {
 					ActivityImpl act1 = (ActivityImpl) pe;
 					ActivityOptionImpl activity1=((ActivityFacilityImpl) this.facilities.getFacilities().get(act1.getFacilityId())).getActivityOptions().get(act1.getType());
 					ArrayList<Person> actList=new ArrayList<Person>();
-					
+
 					if(!activityMap.keySet().contains(activity1)){
 						actList.add(p1);
-						activityMap.put(activity1,actList);	
+						activityMap.put(activity1,actList);
 					}
 					if(activityMap.keySet().contains(activity1)){
 						ArrayList<Person> myList=activityMap.get(activity1);
 						myList.add(p1);
-					}	
+					}
 				}
 			}
 		}
@@ -126,10 +125,10 @@ public class TrackActsOverlap {
 
 	/**
 	 * Time-independent spatial collocation:
-	 * 
+	 *
 	 * This is not actually a "spatial" interaction but a test of shared
 	 * knowledge and could be accomplished via a search of Knowledge.Activities().
-	 * 
+	 *
 	 * Each person visiting a Facility to perform an Activity has a chance
 	 * to meet every other person who was at that Facility doing the same thing.
 	 * <br><br>
@@ -140,7 +139,7 @@ public class TrackActsOverlap {
 	 * For every two people, person1 and person2, who visited the same facility
 	 * and performed the same activity there, regardless of when, there is a score
 	 * <br><br>
-	 * 
+	 *
 	 * @param plan
 	 * @return score
 	 */
@@ -167,8 +166,8 @@ public class TrackActsOverlap {
 	 * at the Activity to see if they are in the same place at the same time (Act overlap). If so,
 	 * the agent is scored accordingly.
 	 * <br><br>
-	 * 
-	 * 
+	 *
+	 *
 	 * @param plan
 	 */
 	public double calculateFriendtoFoeInTimeWindow(PlanImpl plan) {
@@ -267,7 +266,7 @@ public class TrackActsOverlap {
 
 		return stats;
 	}
-	
+
 	/**
 	 * Calculates a set of statistics about the face to face interactions
 	 * at a social event
@@ -284,11 +283,11 @@ public class TrackActsOverlap {
 		for (PlanElement pe1 : plan.getPlanElements()) {
 			if (pe1 instanceof ActivityImpl) {
 				ActivityImpl act1 = (ActivityImpl) pe1;
-				
+
 				double friend=0.;
 				double foe=0.;
 				double totalTimeWithFriends=0;
-				
+
 				ActivityOptionImpl myActivity=((ActivityFacilityImpl) this.facilities.getFacilities().get(act1.getFacilityId())).getActivityOptions().get(act1.getType());
 				ArrayList<Person> visitors=activityMap.get(myActivity);
 				if(!activityMap.keySet().contains(myActivity)){
@@ -323,8 +322,8 @@ public class TrackActsOverlap {
 					}
 					stats.add(friend);
 					stats.add(totalTimeWithFriends);
-					
-					actStats.put(act1,stats);	
+
+					actStats.put(act1,stats);
 				}
 				if(actStats.keySet().contains(act1)){
 					ArrayList<Double> stats=actStats.get(act1);
@@ -335,13 +334,13 @@ public class TrackActsOverlap {
 					}
 					stats.add(friend);
 					stats.add(totalTimeWithFriends);
-				}	
+				}
 			}
 		}
 
 		return actStats;
-	}	
-	
+	}
+
 	private double getTimeWindowDuration(ActivityImpl act1, ActivityImpl act2) {
 		double duration=0.;
 		duration = Math.min(act1.getEndTime(),act2.getEndTime())-Math.max(act1.getStartTime(),act2.getStartTime());

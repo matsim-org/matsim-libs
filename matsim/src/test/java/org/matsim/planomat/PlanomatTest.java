@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -41,12 +42,10 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -183,7 +182,7 @@ public class PlanomatTest extends MatsimTestCase {
 		testee.run(testPlan);
 
 		// write out the test person and the modified plan into a file
-		PopulationImpl outputPopulation = new ScenarioImpl().getPopulation();
+		Population outputPopulation = new ScenarioImpl().getPopulation();
 		outputPopulation.addPerson(testPerson);
 
 		log.info("Writing plans file...");
@@ -310,7 +309,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 
 		// write out the test person and the modified plan into a file
-		PopulationImpl outputPopulation = new ScenarioImpl().getPopulation();
+		Population outputPopulation = new ScenarioImpl().getPopulation();
 		outputPopulation.addPerson(testPerson);
 
 		System.out.println("Writing plans file...");

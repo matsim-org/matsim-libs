@@ -24,11 +24,11 @@ package playground.mfeil.analysis;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 
 
 /**
@@ -38,21 +38,21 @@ import org.matsim.core.population.PopulationImpl;
  */
 public class AssignFacs {
 
-	
+
 	protected final String outputDir;
 	protected static final Logger log = Logger.getLogger(AssignFacs.class);
-	
 
 
-	public AssignFacs(ActivityFacilitiesImpl facs, PopulationImpl population, final String outputDir) {
+
+	public AssignFacs(ActivityFacilitiesImpl facs, Population population, final String outputDir) {
 		this.outputDir = outputDir;
 		PersonSetNearestFacCoord f = new PersonSetNearestFacCoord(facs);
-		
+
 		for (Person person : population.getPersons().values()) {
 			f.run(person);
 		}
 	}
-	
+
 
 	public static void main(final String [] args) {
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
@@ -70,7 +70,7 @@ public class AssignFacs {
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		new AssignFacs(scenario.getActivityFacilities(), scenario.getPopulation(), outputDir);
-		
+
 //		new PopulationWriter(scenario.getPopulation(), outputDir);
 		log.info("Analysis of plan finished.");
 	}

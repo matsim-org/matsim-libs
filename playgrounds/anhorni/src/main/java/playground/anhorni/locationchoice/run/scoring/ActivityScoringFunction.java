@@ -29,7 +29,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
@@ -41,25 +41,25 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
 /**
  * This class implements the activity scoring as used in Year 3 of the KTI project.
- * 
+ *
  * It has the following features:
- * 
+ *
  * <ul>
- * <li>use opening times from facilities, not from config. scoring function can process multiple 
+ * <li>use opening times from facilities, not from config. scoring function can process multiple
  * 		opening time intervals per activity option</li>
  * <li>use typical durations from agents' desires, not from config</li>
- * <li>typical duration applies to the sum of all instances of an activity type, 
+ * <li>typical duration applies to the sum of all instances of an activity type,
  * 		not to single instances (so agent finds out itself how much time to spend in which instance)</li>
  * <li>no penalties for late arrival and early departure are computed</li>
  * </ul>
- * 
+ *
  * @author meisterk
  *
  */
 public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	static final Logger log = Logger.getLogger(ActivityScoringFunction.class);
-	
+
 	public static final double MINIMUM_DURATION = 0.5 * 3600;
 
 	private final HashMap<String, Double> accumulatedTimeSpentPerforming = new HashMap<String, Double>();
@@ -74,14 +74,14 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 				ActivityScoringFunction.DEFAULT_DAY, Double.MIN_VALUE, Double.MAX_VALUE);
 		ActivityScoringFunction.DEFAULT_OPENING_TIME.add(defaultOpeningTime);
 	}
-	
-	private double sign = 1.0;						
-	private boolean sizeScore = false;							
-	private boolean densityScore = false;						
+
+	private double sign = 1.0;
+	private boolean sizeScore = false;
+	private boolean densityScore = false;
 	private boolean shoppingCentersScore = false;
 	private ShoppingScoreAdditionals shoppingScoreAdditionals;
 	private final ActivityFacilities facilities;
-	
+
 	public ActivityScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
 		super(plan, params);
 		this.facilities = facilities;
@@ -91,7 +91,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 	protected double calcActScore(double arrivalTime, double departureTime,	ActivityImpl act) {
 
 		double fromArrivalToDeparture = departureTime - arrivalTime;
-		
+
 		///////////////////////////////////////////////////////////////////
 		// technical penalty: negative activity durations are penalized heavily
 		// so that 24 hour plans are enforced (home activity must not start later than it ended)
@@ -109,7 +109,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 		///////////////////////////////////////////////////////////////////
 		else {
 			SortedSet<OpeningTime> openTimes = null;
-			ActivityOptionImpl actOpt = null;
+			ActivityOption actOpt = null;
 			if (act.getType().startsWith("leisure")) {
 				actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get("leisure");
 			}
@@ -121,7 +121,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 			}
 			if (actOpt != null) {
 				openTimes = actOpt.getOpeningTimes(ActivityScoringFunction.DEFAULT_DAY);
-			} else {				
+			} else {
 				if (!act.getType().equals("tta")) {
 					log.error("Agent wants to perform an activity whose type is not available in the planned facility.");
 					log.error("facility id: " + act.getFacilityId());
@@ -130,7 +130,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 					Gbl.errorMsg("Agent wants to perform an activity whose type is not available in the planned facility.");
 				}
 			}
-			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element, 
+			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element,
 			// assume facility is always open
 			if (openTimes == null) {
 				openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
@@ -140,7 +140,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 			double timeSpentPerforming = 0.0; // accumulates performance intervals for this activity
 			double activityStart, activityEnd; // hold effective activity start and end due to facility opening times
 			double openingTime, closingTime; // hold time information of an opening time interval
-			
+
 			for (OpeningTime openTime : openTimes) {
 				// see explanation comments for processing opening time intervals in super class
 				openingTime = openTime.getStartTime();
@@ -183,7 +183,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 		this.score += this.getEarlyDepartureScore();
 		this.score += this.getPerformanceScore();
 		this.score += this.getLateArrivalScore();
-		
+
 		if (this.sizeScore) {
 			this.score += this.sign * this.shoppingScoreAdditionals.getScoreElementForSize(this.plan);
 		}
@@ -202,7 +202,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 	public double getWaitingTimeScore() {
 		return this.params.marginalUtilityOfWaiting * this.timeSpentWaiting;
 	}
-	
+
 	public double getPerformanceScore() {
 		double performanceScore = 0.0;
 		for (String actType : this.accumulatedTimeSpentPerforming.keySet()) {
@@ -210,7 +210,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 		}
 		return performanceScore;
 	}
-	
+
 	// ---------------------------------------------------------------------------------------------------
 	protected double getPerformanceScore(String actType, double duration) {
 
@@ -236,9 +236,9 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 		}
 		return tmpScore;
 	}
-	
+
 	// ---------------------------------------------------------------------------------------------------
-	
+
 	@Override
 	public void reset() {
 		super.reset();

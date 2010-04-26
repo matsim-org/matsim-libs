@@ -30,11 +30,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -46,7 +46,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class AnalysisTest {
 	private static boolean withToll = false;
@@ -124,7 +124,7 @@ public class AnalysisTest {
 		LegDistance ld = null;
 		// only PersonAlgorithm begins.
 		if (plansFilename != null) {
-			PopulationImpl population = scenario2.getPopulation();
+			Population population = scenario2.getPopulation();
 
 			catl = new MyCalcAverageTripLength(network);
 			ms = new ModeSplit(toll);
@@ -219,7 +219,7 @@ public class AnalysisTest {
 			}
 			sr.close();
 			sw2.close();
-			
+
 			QSim qsim = new QSim(scenario2, new EventsManagerImpl());
 			new OTFEvent2MVI(qsim.getQNetwork(), eventsOutputFilename,
 					args[2] + "../" + args[args.length - 1] + "."

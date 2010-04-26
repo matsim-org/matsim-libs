@@ -6,17 +6,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.visum.writer.UserDefAtt;
 
 /**
  * @author ychen
- * 
  */
 public class TraVolCal extends FinalEventFilterA {
 	// --------------------------MEMBER VARIABLES------------------------
@@ -69,7 +68,7 @@ public class TraVolCal extends FinalEventFilterA {
 	 * @param network -
 	 *            a NetworkLayer-object in the simulation
 	 */
-	public TraVolCal(final PopulationImpl plans, final NetworkLayer network) {
+	public TraVolCal(final Population plans, final NetworkLayer network) {
 		super(plans, network);
 	}
 
@@ -93,7 +92,7 @@ public class TraVolCal extends FinalEventFilterA {
 	 * a function like
 	 * org.matsim.demandmodeling.filters.filter.finalFilters.FinalEventFilterA#UDAexport()for
 	 * Noise evaluation
-	 * 
+	 *
 	 * @return a list of UserDefAtt for Noise evaluation
 	 */
 	public List<UserDefAtt> lmUDAexport() {
@@ -129,7 +128,7 @@ public class TraVolCal extends FinalEventFilterA {
 	 * a function like
 	 * org.matsim.demandmodeling.filters.filter.finalFilters.FinalEventFilterA#UDAWexport()
 	 * for noise evaluation
-	 * 
+	 *
 	 * @return the TreeMap of values of attributs defined by VISUM9.3-user, but
 	 *         only for noise evaluation
 	 */

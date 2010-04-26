@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.meisterk.org.matsim.run.westumfahrung;
 
 import java.io.File;
@@ -17,6 +36,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
@@ -51,12 +71,12 @@ public class CompareScenarios {
 	static class CaseStudyResult {
 
 		private final String name;
-		private final PopulationImpl plans;
+		private final Population plans;
 		private final CalcLegTimes calcLegTimes;
 		private final PlanAverageScore planAverageScore;
 		private final CalcAverageTripLength calcAverageTripLength;
 
-		public CaseStudyResult(final String name, final PopulationImpl plans,
+		public CaseStudyResult(final String name, final Population plans,
 				final CalcLegTimes calcLegTimes, final PlanAverageScore planAverageScore,
 				final CalcAverageTripLength calcAverageTripLength) {
 			super();
@@ -71,7 +91,7 @@ public class CompareScenarios {
 			return this.name;
 		}
 
-		public PopulationImpl getRouteSwitchers() {
+		public Population getRouteSwitchers() {
 			return this.plans;
 		}
 
@@ -318,7 +338,7 @@ public class CompareScenarios {
 		for (Integer analysis : this.analysisNames.keySet()) {
 			personIdRecorders.put(analysis, new TreeMap<String, PersonIdRecorder>());
 		}
-		TreeMap<String, PopulationImpl> scenarioPlans = new TreeMap<String, PopulationImpl>();
+		TreeMap<String, Population> scenarioPlans = new TreeMap<String, Population>();
 		TreeMap<String, NetworkLayer> scenarioNetworks = new TreeMap<String, NetworkLayer>();
 
 		PersonIdRecorder personIdRecorder = null;
@@ -332,7 +352,7 @@ public class CompareScenarios {
 			scenarioNetworks.put(scenarioName, network);
 
 			//Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(plansInputFilenames.get(scenarioName), false, null, network);
-			PopulationImpl plans = scenario.getPopulation();
+			PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 			PopulationReader plansReader = new MatsimPopulationReader(scenario);
 			plansReader.readFile(this.plansInputFilenames.get(scenarioName));
 			plans.printPlansCount();
@@ -402,7 +422,7 @@ public class CompareScenarios {
 
 				ScenarioImpl subScenario = new ScenarioImpl();
 				subScenario.setNetwork(scenarioNetworks.get(scenarioName));
-				PopulationImpl plansSubPop = subScenario.getPopulation();
+				Population plansSubPop = subScenario.getPopulation();
 				switch(analysis.intValue()) {
 				case TRANSIT_AGENTS_ANALYSIS_NAME:
 					personIterator = transitAgentsIds.iterator();

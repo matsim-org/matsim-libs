@@ -13,11 +13,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -49,13 +47,13 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 
 	private int planswritten = 0;
 	private int personshandled = 0;
-	private PopulationImpl unRoutedPlans;
+	private Population unRoutedPlans;
 	private Coord xyMin;
 	private Coord xyMax;
 	private ArrayList<String> ptLinesToKeep;
 	private final Network network;
 
-	public PopGeoFilter(PopulationImpl wholeRoutedPop, String outPlansFile, PopulationImpl unroutedWholePop, Network network, Coord xyMin, Coord xyMax) {
+	public PopGeoFilter(Population wholeRoutedPop, String outPlansFile, Population unroutedWholePop, Network network, Coord xyMin, Coord xyMax) {
 		super(network, wholeRoutedPop, outPlansFile);
 		this.unRoutedPlans = unroutedWholePop;
 		this.xyMin = xyMin;
@@ -140,12 +138,12 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 //		new MatsimNetworkReader(bigScenario).readFile(wholeBigNetworkFile);
 
 		System.out.println("Reading routed population: " + wholeRoutedPlansFile);
-		PopulationImpl wholeRoutedPop = new ScenarioImpl().getPopulation();
+		Population wholeRoutedPop = new ScenarioImpl().getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(new SharedNetScenario(bigScenario, wholeRoutedPop));
 		popReader.readFile(wholeRoutedPlansFile);
 
 		System.out.println("Reading unrouted population: " + unroutedWholePlansFile);
-		PopulationImpl unroutedWholePop = new ScenarioImpl().getPopulation();
+		Population unroutedWholePop = new ScenarioImpl().getPopulation();
 		PopulationReader origPopReader = new MatsimPopulationReader(new SharedNetScenario(bigScenario, unroutedWholePop));
 		origPopReader.readFile(unroutedWholePlansFile);
 

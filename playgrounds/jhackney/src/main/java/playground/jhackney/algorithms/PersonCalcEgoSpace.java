@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -103,23 +104,23 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 		if(egoNet == null){
 			throw new RuntimeException("EgoNet is not defined!");
 		}
-		
+
 		// make an arraylist called activities of all the home activities of the ego and his alters
-		ArrayList<ActivityOptionImpl> activities=new ArrayList<ActivityOptionImpl>();
+		ArrayList<ActivityOption> activities=new ArrayList<ActivityOption>();
 		// use morning home, the first act in each selected plan
 		Iterator<Person> e_it=egoNet.getAlters().iterator();
 		while(e_it.hasNext()){
 			activities.add(this.facilities.getFacilities().get(((ActivityImpl)(e_it.next().getSelectedPlan().getPlanElements().get(0))).getFacilityId()).getActivityOptions().get("home"));
 		}
-		
-		Iterator<ActivityOptionImpl> a_it = null;
+
+		Iterator<ActivityOption> a_it = null;
 		// get all home activities of the alters and the ego
 		a_it = activities.iterator();
-		
-		
+
+
 		// Creating coordinate list
 		ArrayList<Coord> coords = new ArrayList<Coord>();
-		while (a_it.hasNext()) { coords.add(a_it.next().getFacility().getCoord()); }
+		while (a_it.hasNext()) { coords.add(((ActivityOptionImpl) a_it.next()).getFacility().getCoord()); }
 
 		System.out.println("----------------------------------------------------------------------");
 		System.out.println("Person id           = " + person.getId());
@@ -132,7 +133,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 			// Calculating the center and the distance of the given coorinates
 
 			double cenX;
-			double cenY; // CENTER 
+			double cenY; // CENTER
 			int k;
 
 			double min_x = Double.POSITIVE_INFINITY;
@@ -172,7 +173,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 				if (activity_shape.equals("ellipse")) {
 					theta_start = Math.PI / 4.0;
 					theta_end = -1.0 * Math.PI / 4.0;
-					objFunc = new EllipseObjective(coords, coverage, theta_start);			
+					objFunc = new EllipseObjective(coords, coverage, theta_start);
 
 					ParamPoint p0 = objFunc.getNewParamPoint();
 					p0.setValue(EllipseObjective.X_idx,cenX);
@@ -202,7 +203,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 				else if (activity_shape.equals("cassini")) {
 					theta_start = Math.PI/2.0;
 					theta_end = -Math.PI/2.0;
-					objFunc = new CassiniObjective(coords, coverage, theta_start);			
+					objFunc = new CassiniObjective(coords, coverage, theta_start);
 
 					ParamPoint p0 = objFunc.getNewParamPoint();
 					p0.setValue(CassiniObjective.X_idx,cenX);
@@ -232,7 +233,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 				else if (activity_shape.equals("superellipse")) {
 					theta_start = Math.PI / 4.0;
 					theta_end = -1.0 * Math.PI / 4.0;
-					objFunc = new SuperEllipseObjective(coords, coverage, theta_start);			
+					objFunc = new SuperEllipseObjective(coords, coverage, theta_start);
 
 					ParamPoint p0 = objFunc.getNewParamPoint();
 					p0.setValue(SuperEllipseObjective.X_idx, cenX);
@@ -274,7 +275,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 				else if (activity_shape.equals("bean")) {
 					theta_start = Math.PI/2.0;
 					theta_end = -Math.PI/2.0;
-					objFunc = new BeanObjective(coords, coverage, theta_start);			
+					objFunc = new BeanObjective(coords, coverage, theta_start);
 
 					ParamPoint p0 = objFunc.getNewParamPoint();
 					p0.setValue(BeanObjective.X_idx, cenX);
@@ -300,7 +301,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 					p3.setValue(BeanObjective.RATIO_idx, 0.5);
 					objFunc.setInitParamPoint(p3, 3);
 
-				}	
+				}
 				else {
 					throw new RuntimeException("Activity space type unknown!");
 				}
@@ -450,7 +451,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 
 //	double thetaStep = Math.PI/8.0;
 //	double cenX;
-//	double cenY; // CENTER 
+//	double cenY; // CENTER
 //	int k;
 
 //	double min_x = Double.MAX_VALUE;
@@ -622,11 +623,11 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 //	double best_theta = Double.MAX_VALUE;
 //	double best_x = Double.MIN_VALUE;
 //	double best_y = Double.MAX_VALUE;
-//	ArrayList tempalist = new ArrayList(); 
+//	ArrayList tempalist = new ArrayList();
 
 //	double thetaStep = Math.PI/8.0;
 //	double cenX;
-//	double cenY; // CENTER 
+//	double cenY; // CENTER
 //	int k;
 
 //	double min_x = Double.MAX_VALUE;
@@ -804,7 +805,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 
 //	double thetaStep = Math.PI/8.0;
 //	double cenX;
-//	double cenY; // CENTER 
+//	double cenY; // CENTER
 //	int k;
 
 //	double min_x = Double.MAX_VALUE;
@@ -992,7 +993,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 
 //	double thetaStep = Math.PI/8.0;
 //	double cenX;
-//	double cenY; // CENTER 
+//	double cenY; // CENTER
 //	int k;
 
 //	double min_x = Double.MAX_VALUE;

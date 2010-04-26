@@ -28,8 +28,6 @@ import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.utils.misc.Time;
 
-import visad.UnimplementedException;
-
 public class Desires implements MatsimToplevelContainer {
 	// yyyy this is an unfinished matsim toplevel container since
 	// (1) the factory method is not there
@@ -65,23 +63,23 @@ public class Desires implements MatsimToplevelContainer {
 		if (dur <= 0.0) { return false; }
 		return this.putActivityDuration(act_type,dur);
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// put methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public final boolean putActivityDuration(final String act_type, final double duration) {
 		if (duration <= 0.0) { log.fatal("duration=" + duration + " not allowed!"); return false; }
 		if (this.act_durs == null) { this.act_durs = new HashMap<String, Double>(); }
 		this.act_durs.put(act_type,duration);
 		return true;
 	}
-	
+
 	public final boolean putActivityDuration(final String act_type, final String duration) {
 		double dur = Time.parseTime(duration);
 		return this.putActivityDuration(act_type,dur);
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
@@ -91,7 +89,7 @@ public class Desires implements MatsimToplevelContainer {
 		if (this.act_durs.isEmpty()) { this.act_durs = null; }
 		return true;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
@@ -103,14 +101,14 @@ public class Desires implements MatsimToplevelContainer {
 	public final String getDesc() {
 		return this.desc;
 	}
-	
+
 	public final double getActivityDuration(final String act_type) {
 		if (this.act_durs == null) { return Time.UNDEFINED_TIME; }
 		Double d = this.act_durs.get(act_type);
 		if (d == null) { return Time.UNDEFINED_TIME; }
 		return d;
 	}
-	
+
 	public final Map<String,Double> getActivityDurations() {
 		return this.act_durs;
 	}

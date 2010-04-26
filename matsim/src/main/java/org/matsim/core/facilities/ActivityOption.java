@@ -21,6 +21,7 @@ package org.matsim.core.facilities;
 
 import java.util.SortedSet;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFacilitiesObject;
 import org.matsim.core.facilities.OpeningTime.DayType;
 
@@ -28,15 +29,17 @@ import org.matsim.core.facilities.OpeningTime.DayType;
  * @author dgrether
  */
 public interface ActivityOption extends MatsimFacilitiesObject {
-	
+
 	public Double getCapacity();
-	
+
 	public void setCapacity(Double cap);
 
 	public void addOpeningTime(OpeningTime openingTime);
 
 	public SortedSet<OpeningTime> getOpeningTimes(DayType day);
-	
+
 	public String getType();
+
+	public Id getFacilityId();
 
 }

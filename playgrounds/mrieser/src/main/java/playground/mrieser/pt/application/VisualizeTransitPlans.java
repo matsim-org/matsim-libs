@@ -91,7 +91,7 @@ public class VisualizeTransitPlans {
 		}
 		this.realScenario.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		new MatsimPopulationReader(this.realScenario).readFile(POPULATION_FILE);
-		this.realScenario.getPopulation().printPlansCount();
+//		this.realScenario.getPopulation().printPlansCount();
 	}
 
 	private void convertData() {

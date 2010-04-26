@@ -22,6 +22,7 @@ package playground.balmermi.census2000v2;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -30,7 +31,6 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.knowledges.Knowledges;
@@ -114,7 +114,7 @@ public class IIDMGeneration {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading plans xml file... ");
-		PopulationImpl pop = scenario.getPopulation();
+		Population pop = scenario.getPopulation();
 		Knowledges knowledges =  scenario.getKnowledges();
 		new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());
 		log.info("  done.");
@@ -158,7 +158,7 @@ public class IIDMGeneration {
 
 		log.info("  reding mz plans xml file... ");
 		ScenarioImpl mzScenario = new ScenarioImpl();
-		PopulationImpl mz_pop = mzScenario.getPopulation();
+		Population mz_pop = mzScenario.getPopulation();
 		new MatsimPopulationReader(mzScenario).readFile(indir+"/mz.plans.xml.gz");
 		log.info("  done.");
 

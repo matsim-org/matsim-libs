@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
@@ -33,7 +34,6 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 
 @SuppressWarnings("unused")
 public class MyModule implements
@@ -49,9 +49,9 @@ ActivityStartEventHandler
 {
 	private static final Logger log = Logger.getLogger(MyModule.class);
 
-	ScenarioImpl sc ;
-	NetworkLayer net ;
-	PopulationImpl pop ;
+	ScenarioImpl sc;
+	NetworkLayer net;
+	Population pop;
 
 	public MyModule(Controler controler) {
 

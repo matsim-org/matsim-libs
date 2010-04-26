@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.utils.qgis;
 
 import java.io.IOException;
@@ -11,12 +27,12 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -30,7 +46,7 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 
 	private final Network network;
 
-	public SelectedLegs2QGIS(PopulationImpl population, Network network,
+	public SelectedLegs2QGIS(Population population, Network network,
 			CoordinateReferenceSystem crs, String outputDir) {
 		super(population, network, crs, outputDir);
 		this.network = network;
@@ -69,9 +85,8 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
-		PopulationImpl population = scenario.getPopulation();
-		new MatsimPopulationReader(scenario)
-				.readFile(populationFilename);
+		Population population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShapeChanged sp = new SelectedPlans2ESRIShapeChanged(

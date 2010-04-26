@@ -22,11 +22,10 @@ package playground.balmermi.census2000.modules;
 
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.balmermi.census2000.data.Persons;
 
@@ -37,7 +36,7 @@ public class PlansCreatePopulation {
 	//////////////////////////////////////////////////////////////////////
 
 	private final Persons persons;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -53,7 +52,7 @@ public class PlansCreatePopulation {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final PopulationImpl plans) {
+	public void run(final Population plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		if (plans.getName() == null) {

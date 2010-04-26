@@ -22,6 +22,7 @@ package playground.jhackney;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsManagerImpl;
@@ -33,7 +34,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.knowledges.Knowledges;
@@ -197,32 +197,30 @@ public abstract class Scenario {
 //		return Matrices.getSingleton();
 //	}
 
-	public static final PopulationImpl readPlans() {
+	public static final Population readPlans() {
 		System.out.println("  reading plans xml file... ");
-		PopulationImpl plans = scenario.getPopulation();
+		Population plans = scenario.getPopulation();
 		System.out.println(scenario.getConfig().plans().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 		System.out.println("  done.");
 		return plans;
 	}
 
+//	public static final Population readPlans(final int i) {
+//		System.out.println("  reading plans xml file... ");
+//		Population plans = scenario.getPopulation();
+////		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
+//		String filename=input_directory +scenario.getConfig().plans().getInputFile();
+//		System.out.println(filename);
+//		new MatsimPopulationReader(scenario).readFile(filename);
+//
+//		System.out.println("  done.");
+//		return plans;
+//	}
 
-
-	public static final PopulationImpl readPlans(final int i) {
+	public static final Population readPlansAndKnowledges() {
 		System.out.println("  reading plans xml file... ");
-		PopulationImpl plans = scenario.getPopulation();
-//		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
-		String filename=input_directory +scenario.getConfig().plans().getInputFile();
-		System.out.println(filename);
-		new MatsimPopulationReader(scenario).readFile(filename);
-
-		System.out.println("  done.");
-		return plans;
-	}
-
-	public static final PopulationImpl readPlansAndKnowledges() {
-		System.out.println("  reading plans xml file... ");
-		PopulationImpl plans = scenario.getPopulation();
+		Population plans = scenario.getPopulation();
 		System.out.println(scenario.getConfig().plans().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 		System.out.println("  done.");
@@ -260,7 +258,7 @@ public abstract class Scenario {
 	// write output
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void writePlans(final PopulationImpl plans, final Network network) {
+	public static final void writePlans(final Population plans, final Network network) {
 		System.out.println("  writing plans xml file... ");
 		new PopulationWriter(plans, network).writeFile(scenario.getConfig().plans().getOutputFile());
 		System.out.println("  done.");

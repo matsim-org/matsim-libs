@@ -26,12 +26,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanCalcType;
@@ -42,21 +42,21 @@ import playground.dgrether.analysis.population.DgPlanData;
 
 
 public class DgAnalysisPopulationReader {
-	
+
 	private static final Logger log = Logger.getLogger(DgAnalysisPopulationReader.class);
 
 	private ScenarioImpl sc;
 
 	private Map<String, NetworkLayer> loadedNetworks = new HashMap<String, NetworkLayer>();
-	
+
 	private boolean isExcludeTransit = false;
-	
+
 	public DgAnalysisPopulationReader(ScenarioImpl sc) {
 		this.sc = sc;
 	}
-	
+
 	public DgAnalysisPopulation readAnalysisPopulation(DgAnalysisPopulation analysisPopulation, final Id runId, final String networkPath, final String firstPlanPath) {
-		PopulationImpl population;
+		Population population;
 		NetworkLayer net;
 		if (this.loadedNetworks.containsKey(networkPath)){
 			net = loadedNetworks.get(networkPath);
@@ -82,7 +82,7 @@ public class DgAnalysisPopulationReader {
 			}
 			plan = population.getPersons().get(id).getSelectedPlan();
 			act = ((PlanImpl) plan).getFirstActivity();
-			
+
 			DgPersonData personData;
 			personData = analysisPopulation.getPersonData().get(id);
 			if (personData == null) {
@@ -102,8 +102,8 @@ public class DgAnalysisPopulationReader {
 		return analysisPopulation;
 	}
 
-	
-	
+
+
 	private boolean isTransitPerson(Id id) {
 		int idi = Integer.parseInt(id.toString());
 		return (idi >= 1000000000);
@@ -112,7 +112,7 @@ public class DgAnalysisPopulationReader {
 	/**
    * Creates the object and computes the resulting comparison
    *setActivity
-   * @deprecated 
+   * @deprecated
    * @param firstPlanPath
    * @param secondPlanPath
    * @param outpath
@@ -126,16 +126,16 @@ public class DgAnalysisPopulationReader {
 	@Deprecated
 	public DgAnalysisPopulation doPopulationAnalysis(final String networkPath, final String firstPlanPath,
 			final String secondPlanPath, final String whichPlan ) {
-		PopulationImpl population;
+		Population population;
 		DgAnalysisPopulation analysisPopulation;
-		
+
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
 		sc.getConfig().network().setInputFile(networkPath);
 		sl.loadNetwork();
 		// load first plans file
 		population = loadPopulationFile(firstPlanPath, sc);
 		new PlanCalcType().run(population);
-		
+
 		analysisPopulation = new DgAnalysisPopulation();
 		Plan plan = null ;
 		ActivityImpl act;
@@ -176,7 +176,7 @@ public class DgAnalysisPopulationReader {
 	}
 
 
-	
+
 	/**
    * Load the plan file with the given path.
    *
@@ -184,8 +184,8 @@ public class DgAnalysisPopulationReader {
    *          the path to the filename
    * @return the Plans object containing the population
    */
-	protected PopulationImpl loadPopulationFile(final String filename, ScenarioImpl sc) {
-		PopulationImpl plans = sc.getPopulation();
+	protected Population loadPopulationFile(final String filename, ScenarioImpl sc) {
+		Population plans = sc.getPopulation();
 
 		log.info("  reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(sc);

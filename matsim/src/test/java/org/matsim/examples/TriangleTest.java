@@ -22,6 +22,7 @@ package org.matsim.examples;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -32,7 +33,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkSummary;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.facilities.algorithms.FacilitiesDefineCapAndOpentime;
@@ -144,7 +144,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 
 		log.info("  creating plans object... ");
-		PopulationImpl plans = scenario.getPopulation();
+		Population plans = scenario.getPopulation();
 		log.info("  done.");
 
 		log.info("  running plans modules... ");

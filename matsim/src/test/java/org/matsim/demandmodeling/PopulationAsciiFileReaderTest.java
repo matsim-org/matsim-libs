@@ -23,11 +23,11 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;
@@ -47,7 +47,7 @@ public class PopulationAsciiFileReaderTest extends MatsimTestCase {
 
 		String f = this.getClassInputDirectory() + filename;
 		PopulationAsciiFileReader p = new PopulationAsciiFileReader(zoneLayer);
-		PopulationImpl plans = p.readFile(f);
+		Population plans = p.readFile(f);
 		assertNotNull(plans);
 		assertEquals(2, plans.getPersons().size());
 		Person p1 = plans.getPersons().get(new IdImpl("1"));

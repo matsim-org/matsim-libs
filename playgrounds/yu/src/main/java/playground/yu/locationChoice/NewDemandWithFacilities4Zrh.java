@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -41,7 +42,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
@@ -106,7 +106,7 @@ public class NewDemandWithFacilities4Zrh {
 			if (ao == null)
 				ao = af.createActivityOption(type);
 			// 3 primary type in Zurich scenario
-			currentKnowledge.addActivity(ao, (type.startsWith("h")
+			currentKnowledge.addActivityOption(ao, (type.startsWith("h")
 					|| type.startsWith("w") || type.startsWith("e")));
 
 		}
@@ -138,7 +138,7 @@ public class NewDemandWithFacilities4Zrh {
 
 		Knowledges knowledges = scenario.getKnowledges();
 
-		PopulationImpl pop = scenario.getPopulation();
+		Population pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(inputPopFilename);
 
 		ActivityFacilitiesImpl afs = scenario.getActivityFacilities();

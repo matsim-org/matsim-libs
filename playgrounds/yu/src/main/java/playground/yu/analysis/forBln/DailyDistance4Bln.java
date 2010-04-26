@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis.forBln;
 
@@ -9,12 +9,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -27,9 +27,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * daily distance analysis only for Berlin or for Berlin & Brandenburg
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 	private double carBusinessDist, carEinkaufSonstigesDist,
@@ -628,7 +628,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 		// e.printStackTrace();
 		// }
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		DailyDistance4Bln dd = new DailyDistance4Bln(null);

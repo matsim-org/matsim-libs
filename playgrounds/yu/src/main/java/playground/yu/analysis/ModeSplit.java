@@ -12,12 +12,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -30,13 +30,13 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ModeSplit extends AbstractPersonAlgorithm implements
 		PlanAlgorithm, Analysis {
 	protected int carLegs = 0, ptLegs = 0, wlkLegs = 0,
 			bikeLegs = 0,
-			othersLegs = 0,// 
+			othersLegs = 0,//
 			tollCarLegs = 0, tollPtLegs = 0, tollWlkLegs = 0, tollBikeLegs = 0,
 			tollOthersLegs = 0;
 	protected RoadPricingScheme toll = null;
@@ -161,7 +161,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);

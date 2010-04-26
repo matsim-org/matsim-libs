@@ -19,10 +19,10 @@ package playground.jhackney.postprocessing;
  *                                                                         *
  * *********************************************************************** */
 
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
@@ -47,7 +47,7 @@ public class AnalyzeActivitySpaces {
 		NetworkLayer network =Scenario.readNetwork();
 		new WorldConnectLocations().run(world);
 
-		PopulationImpl plans = Scenario.readPlans();
+		Population plans = Scenario.readPlans();
 			//read in social network
 //		System.out.println(" Initializing the social network ...");
 //		SocialNetwork snet=new SocialNetwork(plans);

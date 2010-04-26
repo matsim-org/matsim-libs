@@ -22,10 +22,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.MatsimIo;
@@ -53,8 +53,8 @@ public class CMCFFirstActPlansMerger {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer net = scenario.getNetwork();
 		MatsimIo.loadNetwork(DgPaths.IVTCHNET, scenario);
-		PopulationImpl plansCmcf = MatsimIo.loadPlans(cmcfPlansFile, net);
-		PopulationImpl plans = MatsimIo.loadPlans(plansFile, net);
+		Population plansCmcf = MatsimIo.loadPlans(cmcfPlansFile, net);
+		Population plans = MatsimIo.loadPlans(plansFile, net);
 		for (Person p : plans.getPersons().values()) {
 			Plan pl = p.getSelectedPlan();
 			LegImpl l = ((PlanImpl) pl).getNextLeg(((PlanImpl) pl).getFirstActivity());

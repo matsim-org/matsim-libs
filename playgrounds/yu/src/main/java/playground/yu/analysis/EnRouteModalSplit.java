@@ -40,11 +40,9 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -55,7 +53,7 @@ import playground.yu.utils.TollTools;
 
 /**
  * @author mrieser
- * 
+ *
  *         Counts the number of vehicles departed, arrived or got stuck per time
  *         bin based on events.
  * @author yu This class can only be used with plansfile, in that all
@@ -90,7 +88,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 	/**
 	 * Creates a new LegHistogram with the specified binSize and the specified
 	 * number of bins.
-	 * 
+	 *
 	 * @param binSize
 	 *            The size of a time bin in seconds.
 	 * @param nofBins
@@ -136,7 +134,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 	/**
 	 * Creates a new LegHistogram with the specified binSize and a default
 	 * number of bins, such that 30 hours are analyzed.
-	 * 
+	 *
 	 * @param binSize
 	 *            The size of a time bin in seconds.
 	 */
@@ -231,7 +229,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 
 	/**
 	 * Writes the gathered data tab-separated into a text file.
-	 * 
+	 *
 	 * @param filename
 	 *            The name of a file where to write the gathered data.
 	 */
@@ -280,7 +278,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 
 	/**
 	 * Writes the gathered data tab-separated into a text stream.
-	 * 
+	 *
 	 * @param bw
 	 *            The data stream where to write the gathered data.
 	 */
@@ -431,10 +429,9 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		// String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		// RoadPricingReaderXMLv1 tollReader = new

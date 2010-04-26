@@ -16,14 +16,13 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author yu
- * 
+ *
  */
 public class LinkTravelTimeExtractor {
 	/**
@@ -42,7 +41,7 @@ public class LinkTravelTimeExtractor {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		PopulationImpl population = scenario.getPopulation();
+//		Population population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
@@ -50,7 +49,7 @@ public class LinkTravelTimeExtractor {
 
 		Config config = new ScenarioImpl().getConfig();
 		config.travelTimeCalculator().setTraveltimeBinSize(timeBin);
-		
+
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config.travelTimeCalculator());
 		events.addHandler(ttc);
 

@@ -34,7 +34,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class PlansGeneratorControler extends Controler {
@@ -61,7 +60,7 @@ public class PlansGeneratorControler extends Controler {
 	private Population generate4wPersons(){
 
 		int numberOfPlans = 1;
-		PopulationImpl pop = new ScenarioImpl().getPopulation();
+		Population pop = new ScenarioImpl().getPopulation();
 		log.info("  generating plans... ");
 
 		for (int i = 0; i < 314; i++) {
@@ -125,7 +124,7 @@ public class PlansGeneratorControler extends Controler {
 		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 
-		PopulationImpl pop = new ScenarioImpl().getPopulation();
+		Population pop = new ScenarioImpl().getPopulation();
 		log.info("  generating plans... ");
 
 		LinkedList <LinkImpl> fromLinks = new LinkedList<LinkImpl>();
@@ -160,7 +159,7 @@ public class PlansGeneratorControler extends Controler {
 
 
 	/** Generates one Person a time */
-	private void generatePerson(final int ii, final LinkImpl fromLink, final LinkImpl toLink, final PopulationImpl population) {
+	private void generatePerson(final int ii, final LinkImpl fromLink, final LinkImpl toLink, final Population population) {
 		PersonImpl p = new PersonImpl(new IdImpl(String.valueOf(ii)));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 		try {
@@ -177,7 +176,6 @@ public class PlansGeneratorControler extends Controler {
 			p.addPlan(plan);
 			population.addPerson(p);
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
