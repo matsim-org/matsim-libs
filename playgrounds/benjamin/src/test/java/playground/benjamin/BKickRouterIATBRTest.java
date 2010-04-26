@@ -33,7 +33,7 @@ import playground.benjamin.income.BkControlerIncome;
 import playground.dgrether.utils.LogOutputEventHandler;
 
 /**
- * Tests the routing of the BKickIncomeControler2
+ * Tests the routing of the BkControlerIncome
  *
  * @author dgrether
  */

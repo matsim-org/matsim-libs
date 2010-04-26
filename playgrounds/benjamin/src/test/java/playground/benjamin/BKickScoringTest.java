@@ -33,7 +33,7 @@ import playground.benjamin.old.income.BKickIncomeControler;
 
 
 /**
- * Tests the scoring of the BKickControler2
+ * Tests the scoring of the BkControlerDistance
  * @author dgrether
  *
  */
