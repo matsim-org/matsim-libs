@@ -8,31 +8,35 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.matsim.core.utils.collections.Tuple;
+import javax.management.RuntimeErrorException;
+
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 /**
  * acquires the Wege/{@code Leg} distance and travel distination information
- * from MZ05
+ * from MZ05 with unusual statistic method
  * 
  * @author yu
  * 
  */
-public class MZ05WegeReader2 implements TabularFileHandler {
+public class MZ05WegeReader2Test implements TabularFileHandler {
 	private SimpleWriter writer = null;
 	private double personCnt = 0d, lineCnt = 0d, w_dist_obj2Sum = 0d,
-			w_dist_obj2Cnt = 0d, WP;
+			w_dist_obj2Cnt = 0d, WP, personCntWeigted = 0d;
 	private int wmittela = 0;
-	/** Map<zweck,Tuple<w_dist_obj2Summe,Cnt>[]> */
-	private Map<String, Tuple<Double, Double>[]> w_dist_obj2Map = new HashMap<String, Tuple<Double, Double>[]>();
+	/**
+	 * Map<zweck,Tuple<w_dist_obj2Summe,Cnt>>
+	 */
+	private Map<String, double[]> w_dist_obj2Map = new HashMap<String, double[]>();
 	final String outputBase;
 	private String personId = "";
+	private String[] rows;
 
 	// private boolean justChangedPerson = false;
 
-	public MZ05WegeReader2(final String outputBase) {
+	public MZ05WegeReader2Test(final String outputBase) {
 		this.outputBase = outputBase;
 		writer = new SimpleWriter(outputBase + ".txt");
 		// writer.writeln("Wegezwecke\tw_dist_obj2 [km]");
@@ -41,19 +45,18 @@ public class MZ05WegeReader2 implements TabularFileHandler {
 	public void startRow(final String[] row) {
 		int W_KANTON = Integer.parseInt(row[9]);// 1-ZH-Zuerich
 		if (W_KANTON == 1) {// only for inhabitants in Kanton Zuerich
+			this.rows = row;
 			lineCnt++;
 			String tmpPersonId = row[0] + "+" + row[1];
 			if (!this.personId.equals(tmpPersonId)) {
 				this.personId = tmpPersonId;
 				this.personCnt++;
-				// this.justChangedPerson = true;
-			} else {
-				// this.justChangedPerson = false;
+				this.WP = Double.parseDouble(row[2]);
+				this.personCntWeigted += this.WP;
 			}
 			wmittela = Integer.parseInt(row[44]);// 1-LV, 2-MIV, 3-OeV,
 			// 4-Andere
 			int wzweck1 = Integer.parseInt(row[46]);
-			this.WP = Double.parseDouble(row[2]);
 
 			double w_dist_obj2 = Double.parseDouble(row[48]);
 
@@ -108,16 +111,16 @@ public class MZ05WegeReader2 implements TabularFileHandler {
 	private void handleZweck(String zweck, double w_dist_obj2) {
 		if (w_dist_obj2 == -99d)
 			return;
-		Tuple<Double, Double>[] tuple = this.w_dist_obj2Map.get(zweck);
-		if (tuple == null) {
-			tuple = new Tuple[4];
-			for (int i = 0; i < tuple.length; i++)
-				tuple[i] = new Tuple<Double, Double>(0d, 0d);
+		double[] w_dist_obj2Local = this.w_dist_obj2Map.get(zweck);
+		if (w_dist_obj2Local == null) {
+			w_dist_obj2Local = new double[4];
 		}
-		tuple[this.wmittela - 1] = new Tuple<Double, Double>(
-				tuple[this.wmittela - 1].getFirst() + w_dist_obj2 * WP,
-				tuple[this.wmittela - 1].getSecond() + WP);
-		this.w_dist_obj2Map.put(zweck, tuple);
+		if (w_dist_obj2 < 0 || WP < 0)
+			throw new RuntimeErrorException(new Error(), "dist =\t"
+					+ w_dist_obj2 + " < 0 oder WP =\t" + WP + " < 0\nrow:\t"
+					+ rows.toString());// TODO ...
+		w_dist_obj2Local[this.wmittela - 1] += w_dist_obj2 * WP;
+		this.w_dist_obj2Map.put(zweck, w_dist_obj2Local);
 	}
 
 	public void write() {
@@ -131,13 +134,12 @@ public class MZ05WegeReader2 implements TabularFileHandler {
 		writer
 				.writeln("wegezwecke\tmittlere w_dist_obj2(LV)\tmittlere w_dist_obj2(MIV)\tmittlere w_dist_obj2(OeV)\tmittlere w_dist_obj2(Andere)");
 
-		for (Entry<String, Tuple<Double, Double>[]> entry : this.w_dist_obj2Map
-				.entrySet()) {
-			Tuple<Double, Double>[] tuple = entry.getValue();
+		for (Entry<String, double[]> entry : this.w_dist_obj2Map.entrySet()) {
+			double[] w_dist_obj2local = entry.getValue();
 			StringBuffer line = new StringBuffer(entry.getKey());
-			for (int i = 0; i < tuple.length; i++) {
+			for (int i = 0; i < w_dist_obj2local.length; i++) {
 				line.append('\t');
-				line.append(tuple[i].getFirst() / tuple[i].getSecond());
+				line.append(w_dist_obj2local[i] / this.personCnt);
 			}
 			writer.writeln(line);
 		}
@@ -158,7 +160,7 @@ public class MZ05WegeReader2 implements TabularFileHandler {
 		String wegeFilename = "D:/fromNB04/Archieve/MikroZensus2005/4_DB_ASCII(Sep_TAB)/Wege.dat";
 		// String wegeFilename =
 		// "D:/fromNB04/Archieve/MikroZensus2005/4_DB_ASCII(Sep_TAB)/Wegeinland.dat";
-		String outputBase = "../matsimTests/MZComp/test";
+		String outputBase = "../matsimTests/MZComp/test2Test";
 		// String outputBase = "../matsimTests/MZComp/testInland";
 
 		TabularFileParserConfig tfpc = new TabularFileParserConfig();
@@ -166,7 +168,7 @@ public class MZ05WegeReader2 implements TabularFileHandler {
 		tfpc.setDelimiterRegex("\t");
 		tfpc.setFileName(wegeFilename);
 
-		MZ05WegeReader2 mz05wr = new MZ05WegeReader2(outputBase);
+		MZ05WegeReader2Test mz05wr = new MZ05WegeReader2Test(outputBase);
 
 		try {
 			new TabularFileParser().parse(tfpc, mz05wr);

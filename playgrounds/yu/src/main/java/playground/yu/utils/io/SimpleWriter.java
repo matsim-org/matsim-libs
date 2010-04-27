@@ -97,4 +97,8 @@ public class SimpleWriter implements Closeable, Flushable {
 			e.printStackTrace();
 		}
 	}
+
+	public void writeln(StringBuffer line) {
+		writeln(line.toString());
+	}
 }
