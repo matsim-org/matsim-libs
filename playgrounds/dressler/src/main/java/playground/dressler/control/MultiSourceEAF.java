@@ -56,6 +56,7 @@ import playground.dressler.ea_flow.StepEdge;
 import playground.dressler.ea_flow.StepSinkFlow;
 import playground.dressler.ea_flow.StepSourceFlow;
 import playground.dressler.ea_flow.TimeExpandedPath;
+import playground.dressler.util.CPUTimer;
 import playground.dressler.util.ImportSimpleNetwork;
 
 /**
@@ -162,8 +163,8 @@ public class MultiSourceEAF {
 
 		return allnodes;
 	}
-
-
+	
+	
 	public static void readShelterFile(NetworkLayer network,final String filename,
 			final int totaldemands,HashMap<Node, Integer> demands,final boolean addshelterlinks) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
@@ -177,7 +178,7 @@ public class MultiSourceEAF {
 				String nodeid = line[0].trim();
 				double flowcapacity = Double.valueOf(line[1].trim());
 				int sheltercapacity = Integer.valueOf(line[2]);
-
+				
 				if(addshelterlinks){
 					//create and add new shelternode
 					Id shelterid = new IdImpl("shelter"+nodeid);
@@ -199,7 +200,7 @@ public class MultiSourceEAF {
 					//set new demands
 					int olddemand = demands.get(shelter);
 					int newdemand = olddemand - sheltercapacity;
-
+					
 					demands.put(shelter, newdemand);
 				} else {
 					int olddemand = 0;
@@ -212,7 +213,7 @@ public class MultiSourceEAF {
 			}
 		}
 		in.close();
-
+		
 	}
 	public static List<TimeExpandedPath> readPathFlow(NetworkLayer network, String filename ) throws IOException{
 		List<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
@@ -269,7 +270,7 @@ public class MultiSourceEAF {
 		in.close();
 		return result;
 	}
-
+	
 	/**
 	 * THE ONLY FUNCTION WHICH REALLY CALCULATES A FLOW
 	 *
@@ -277,8 +278,15 @@ public class MultiSourceEAF {
 	 * @return a Flow object
 	 */
 	public static Flow calcEAFlow(FlowCalculationSettings settings,List<TimeExpandedPath> paths) {
+		CPUTimer Tsearch = new CPUTimer("Search ");
+		CPUTimer Taugment = new CPUTimer("Augment ");;
+		CPUTimer Tgarbage = new CPUTimer("Garbage Collection ");;
+		CPUTimer Tall = new CPUTimer("Total ");
+		CPUTimer Tcheck = new CPUTimer("Checks ");
+		Tall.onoff();
+		
 		Flow fluss;
-
+		
 		List<TimeExpandedPath> result = null;
 		fluss = new Flow(settings);
 		if(paths!=null){
@@ -298,11 +306,7 @@ public class MultiSourceEAF {
 
 		//int lastArrival = 0;
 
-		long timeMBF = 0;
-		long timeAugment = 0;
-		long timer1, timer2, timer3;
-		long timeStart = System.currentTimeMillis();
-
+		
 		BellmanFordIntervalBased routingAlgo;
 		if (settings.useSinkCapacities) {
 			routingAlgo = new BellmanFordIntervalBasedWithCost(settings, fluss);
@@ -323,14 +327,34 @@ public class MultiSourceEAF {
 		LinkedList<TimeExpandedPath> successfulPaths = new LinkedList<TimeExpandedPath>();
 
 		tryReverse = (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
+		
+		Runtime runtime = Runtime.getRuntime();		
 
 		for (i=1; i<=settings.MaxRounds; i++){
-			timer1 = System.currentTimeMillis();
 
 			//System.out.println("Iteration " + i);
 
-			// THE IMPORTANT FUNCTION CALL HAPPENS HERE //
+			Tall.newiter();
+			Tsearch.newiter();
+			Tcheck.newiter();
+			Tgarbage.newiter();
+						
+			Tsearch.onoff();
 			routingAlgo.startNewIter(lasttime);
+			Tsearch.onoff();
+			
+			// call the garbage collection now that we have deleted most data structures
+			if (settings.doGarbageCollection > 0) {								
+				if (i % settings.doGarbageCollection == 0) {
+					Tgarbage.onoff();
+					runtime.gc();
+					Tgarbage.onoff();
+				}
+			}
+			    
+
+			// THE IMPORTANT FUNCTION CALL HAPPENS HERE //
+			Tsearch.onoff();
 			switch (settings.searchAlgo) {
 	            case FlowCalculationSettings.SEARCHALGO_FORWARD: {
 	            	result = routingAlgo.doCalculationsForward();
@@ -358,15 +382,17 @@ public class MultiSourceEAF {
 	            	throw new RuntimeException("Unkown search algorithm!");
 	            }
 	        }
+			Tsearch.onoff();
 
-			timer2 = System.currentTimeMillis();
-			timeMBF += timer2 - timer1;
-
+			
 			// DEBUG
 			//System.out.println("Returned paths");
 			//System.out.println(result);
-
-
+			
+			
+			Taugment.newiter();
+			Taugment.onoff();
+			
 			boolean trySuccessfulPaths = false;
 			tempstr = "";
 			int zeroaugment = 0;
@@ -382,7 +408,7 @@ public class MultiSourceEAF {
 					trySuccessfulPaths = true; // before we do the forward search, we can simply repeat paths!
 				} else {
 					// forward or mixed search didn't find anything
-					// that's it, we are done.
+					// that's it, we are done.					
 					break;
 				}
 			} else {
@@ -489,7 +515,7 @@ public class MultiSourceEAF {
 
 			// BIG DEBUG
 			//System.out.println(result);
-
+			
 			if (result != null && !result.isEmpty()) {
 				for(TimeExpandedPath path : result){
 					String tempstr2 = "";
@@ -498,7 +524,7 @@ public class MultiSourceEAF {
 
 					// DEBUG
 					//fluss.displayBottleNeckCapacity(path);
-
+					
 					int augment = fluss.augment(path);
 
 					if (augment > 0) {
@@ -529,25 +555,16 @@ public class MultiSourceEAF {
 			if (_debug) {
 				System.out.println(tempstr);
 			}
-
-			timer3 = System.currentTimeMillis();
+			
 			EdgeGain += fluss.cleanUp();
-
-			timeAugment += timer3 - timer2;
-
-			if (i % VERBOSITY == 0) {
-				long timecurrent = System.currentTimeMillis();
-				System.out.println();
-				System.out.println("Iterations: " + i + " flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + " Time: Total " + (timecurrent - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-				System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
-				//System.out.println("removed on the fly:" + VertexIntervalls.rem);
-				System.out.println("last path: " + tempstr);
-				System.out.println(routingAlgo.measure());
-				System.out.println(fluss.measure());
-				System.out.println();
-			}
+			
+			Taugment.onoff();
+			// store iteration timing
+			Tall.onoff(); 
+			Tall.onoff();
 
 			if (settings.checkConsistency > 0) {
+				Tcheck.onoff();
 				if (i % settings.checkConsistency == 0) {
 					System.out.println("Checking consistency once in a while ...");
 					if (!fluss.checkTEPsAgainstFlow()) {
@@ -555,9 +572,13 @@ public class MultiSourceEAF {
 					}
 					System.out.println("Everything seems to be okay.");
 				}
+				Tcheck.onoff();
 			}
+			
+			
 
 			// DEBUG
+			Tcheck.onoff();
 			int[] arrivals = fluss.arrivals();
 			long totalcost = 0;
 			long totalflow = 0;
@@ -566,20 +587,34 @@ public class MultiSourceEAF {
 				totalcost += ii*arrivals[ii];
 			}
 			System.out.println("Iter " + i + " , total flow: " + totalflow + " , total cost: " + totalcost);
+			Tcheck.onoff();
+			
+			if (i % VERBOSITY == 0) {				
+				System.out.println();
+				System.out.println("Iterations: " + i + " flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + " Time: " + Tall + ", " + Tsearch + ", " + Taugment + ".");
+				System.out.println(Tgarbage + ", " + Tcheck);
+				System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
+
+				//System.out.println("removed on the fly:" + VertexIntervalls.rem);
+				System.out.println("last path: " + tempstr);
+				System.out.println(routingAlgo.measure());
+				System.out.println(fluss.measure());
+				System.out.println();				
+			}
 		}
-
-
-		long timeStop = System.currentTimeMillis();
+		
+		Tall.onoff();
+		
 		System.out.println("");
 		System.out.println("");
-		System.out.println("Iterations: " + i + " flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + " Time: Total " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+		System.out.println("Iterations: " + i + " flow: " + fluss.getTotalFlow() + " of " + settings.getTotalDemand() + " Time: " + Tall + ", " + Tsearch + ", " + Taugment + ".");
+		System.out.println(Tgarbage + ", " + Tcheck);
 		System.out.println("CleanUp got rid of " + EdgeGain + " edge intervalls so far.");
 		//System.out.println("removed on the fly:" + VertexIntervalls.rem);
 		System.out.println("last path: " + tempstr);
 		System.out.println(routingAlgo.measure());
 		System.out.println(fluss.measure());
 		System.out.println();
-
 
 		return fluss;
 	}
@@ -619,7 +654,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 43;
+		int instance = 2;
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -760,10 +795,10 @@ public class MultiSourceEAF {
 			sinkid = "en1";  //padang, line, swissold .. en1 fuer forward
 
 		}
-
+		
 		// outputplansfile = "/homes/combi/dressler/V/code/meine_EA/tempplans.xml";
 		//flowfile = "/homes/combi/dressler/V/vnotes/statistik_2010_04_april/bug_shelters_implicit.pathflow";
-
+		
 
 		if(_debug){
 			System.out.println("starting to read input");
@@ -828,13 +863,13 @@ public class MultiSourceEAF {
 				}
 			}
 		}
-
+		
 		int totaldemands = 0;
 		for (int i : demands.values()) {
 			if (i > 0)
 			  totaldemands += i;
 		}
-
+		
 		if (shelterfile != null) {
 			try {
 				readShelterFile(network,shelterfile,totaldemands,demands,true);
@@ -852,10 +887,10 @@ public class MultiSourceEAF {
 						System.out.println("NEGATIVE DEMAND SHELTER :"+demands.get(node)+" at "+ node);
 					}
 			}
-
+			
 		}
-
-
+		
+		
 		// TODO parse shelterfile
 		// Careful, padang has shelters AND a supersink.
 		// so take care of the supersink here and don't tell the settings about it.
@@ -880,13 +915,14 @@ public class MultiSourceEAF {
 		settings.flowFactor = flowFactor; // default 1.0
 
 		// set additional parameters
-		settings.TimeHorizon = 400;
+		//settings.TimeHorizon = 400;
 		//settings.MaxRounds = 2;
 		//settings.checkConsistency = 100;
+		settings.doGarbageCollection = 10;
 		//settings.useVertexCleanup = false;
-		//settings.useSinkCapacities = false;
+		settings.useSinkCapacities = false;
 		settings.useImplicitVertexCleanup = true;
-		settings.useShadowFlow = true;
+		settings.useShadowFlow = true;		
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
@@ -922,20 +958,20 @@ public class MultiSourceEAF {
 				e.printStackTrace();
 				return;
 			}
-
+			
 		}
 
 		//settings.writeLP();
 		//settings.writeSimpleNetwork(true);
 		//settings.writeNET(false);
 		//if(true)return;
-
+		
 		fluss = MultiSourceEAF.calcEAFlow(settings, flowpaths);
-
-		fluss.writePathflow();
+		
+		//fluss.writePathflow();
 
 		/* --------- the actual work is done --------- */
-
+		
 
 		int[] arrivals = fluss.arrivals();
 		long totalcost = 0;
@@ -957,10 +993,13 @@ public class MultiSourceEAF {
 			}
 		}
 
+
 		if (outputplansfile != null) {
 			Population output = fluss.createPopulation(scenario);
 			new PopulationWriter(output, network).writeFile(outputplansfile);
 		}
+
+
 
 		if(_debug){
 			System.out.println("done");

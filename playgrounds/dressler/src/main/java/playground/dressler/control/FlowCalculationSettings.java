@@ -56,7 +56,8 @@ public class FlowCalculationSettings {
 	public boolean useShadowFlow = false; // use arrays and shadow flows for storing the edge flow 
 	public int checkConsistency = 0; // after how many iterations should consistency be checked? 0 = off
 	public boolean checkTouchedNodes = true; // should Flow.UnfoldAndAugment() try to shortcut the search for suitable forward steps?
-
+    public int doGarbageCollection = 0; // after how many iterations should the GC be called? 0 = off
+	
 	public boolean sortPathsBeforeAugmenting = true; // try to augment shorter (#steps) first?
 	public boolean keepPaths = true; // should TEPs be stored at all?
 	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
@@ -294,6 +295,7 @@ public class FlowCalculationSettings {
 		System.out.println("Keep paths at all: " + this.keepPaths);
 		System.out.println("Unfold stored paths: " + this.unfoldPaths);
 		System.out.println("Check consistency every: " + this.checkConsistency + " rounds (0 = off)");
+		System.out.println("Garbage collection every: " + this.doGarbageCollection + " round (0 = off)");
 
 		System.out.println("===================================");
 	}
