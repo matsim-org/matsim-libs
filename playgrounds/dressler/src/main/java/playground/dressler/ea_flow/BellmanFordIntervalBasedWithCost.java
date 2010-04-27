@@ -202,7 +202,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		
 		this.Tpickintervaltime.onoff();
 		
-		Interval inter;	
+		VertexIntervalWithCost inter;			
 
 		if (this._settings.useImplicitVertexCleanup) {
 			Pair<Boolean, Interval> todo = getUnscannedInterSetScanned(v, t, false);
@@ -212,7 +212,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				System.out.println("getUnscannedInter returned " + todo);
 			}*/
 			
-			inter = todo.second;
+			inter = (VertexIntervalWithCost) todo.second;
+			
 			if (!todo.first) { // we don't have anything todo
 				this._totalnonpolls++;
 				this._roundnonpolls++;
@@ -220,31 +221,29 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				this.Tpickintervaltime.onoff(); // don't forget that ...
 				return new Pair<List<BFTask>, Interval>(null, inter);
 			}
+			
 		} else {
-			VertexIntervalWithCost temp = (VertexIntervalWithCost) this._labels.get(v).getIntervalAt(t);
+			inter = (VertexIntervalWithCost) this._labels.get(v).getIntervalAt(t);
 
-			if (!temp.getReachable() || temp.getPredecessor() == null) {
+			if (!inter.getReachable() || inter.getPredecessor() == null) {
 				System.out.println("Node " + v.getId() + " was not reachable or had no predecessor!");
-				return new Pair<List<BFTask>, Interval>(null, temp);
+				return new Pair<List<BFTask>, Interval>(null, inter);
 			}
 			
-			if (temp.isScanned()) {
+			if (inter.isScanned()) {
 				// don't scan again ... can happen with vertex cleanup
 				this._totalnonpolls++;
 				this._roundnonpolls++;
 				
 				this.Tpickintervaltime.onoff(); // don't forget that ...
-				return new Pair<List<BFTask>, Interval>(null, temp);
+				return new Pair<List<BFTask>, Interval>(null, inter);
 			}
-			temp.setScanned(true);
-			inter = temp;
+			
+			inter.setScanned(true); // set scanned			
 		}
 
 		List<BFTask> queue = new ArrayList<BFTask>();
 		
-		// we need a representative of the interval to determine the cost
-		VertexIntervalWithCost label = (VertexIntervalWithCost) this._labels.get(v).getIntervalAt(inter.getLowBound());		
-
 		this.Tpickintervaltime.onoff();
 		this.Tforwardtime.onoff();
 		
@@ -252,7 +251,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		// link is outgoing edge of v => forward edge
 		for (Link link : v.getOutLinks().values()) {
 			Node w = link.getToNode();
-			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, true, false, this._settings.TimeHorizon, label.cost, label.costIsRelative);
+			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, true, false, this._settings.TimeHorizon, inter.cost, inter.costIsRelative);
 			if (changed == null)
 				continue;
 
@@ -272,7 +271,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		// link is incoming edge of v => backward edge
 		for (Link link : v.getInLinks().values()) {
 			Node w = link.getFromNode();
-			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, false, false, this._settings.TimeHorizon,label.cost, label.costIsRelative);
+			ArrayList<VertexInterval> changed = relabel(v, inter, w, link, false, false, this._settings.TimeHorizon, inter.cost, inter.costIsRelative);
 			if (changed == null)
 				continue;
 
@@ -309,7 +308,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				// If the cost is relative, we can take any point.
 				// If it is absolute, using the latest time in the interval is best!
 				// So we always take the latest point in time.
-				temp.cost = label.getAbsoluteCost(timetosource) - timetosource;
+				temp.cost = inter.getAbsoluteCost(timetosource) - timetosource;
 
 				VertexIntervalWithCost sourcelabel = (VertexIntervalWithCost) this._sourcelabels.get(v);
 
@@ -363,14 +362,10 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	 */
 	@Override
 	Pair<Boolean, Interval> getUnscannedInterSetScanned(Node v, int t, boolean reverse) {
-		
-		// TODO
-		// For length 1 intervals, cost is not treated perfectly.
-		// A better implementation would try both settings and pick the better output. 
 
 		VertexIntervalsWithCost label = (VertexIntervalsWithCost) this._labels.get(v);
 		VertexIntervalWithCost inter = (VertexIntervalWithCost) label.getIntervalAt(t);
-
+		
 		// safety check, should not happen
 		if (!reverse) {
 			if (!inter.getReachable() || inter.getPredecessor() == null) {
@@ -396,20 +391,72 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 
 		int low = inter.getLowBound();
 		int high = inter.getHighBound();
-
+		
+		// The slope is chosen to fit if inter has length 1.
+		// Otherwise there is no choice anyway.
+		// Even then, as soon as two intervals are merged, the slope is determined.
+		int effectivecost = -99;		
+		boolean effectiverel = false;
+		
+		boolean slopedecided = (inter.length() > 1);
+		
+		if (slopedecided) {
+			effectiverel = inter.costIsRelative;
+			effectivecost = inter.cost;
+		}
+		
 		VertexIntervalWithCost tempi;
+		
 		while (low > 0) {
 			tempi = (VertexIntervalWithCost) label.getIntervalAt(low - 1);
 			if (tempi.getReachable()
 					&& !tempi.isScanned()
 					&& ((!reverse && tempi.getPredecessor() != null) 
 						|| (reverse && tempi.getSuccessor() != null))) {
-				if (tempi.isSameCost(inter.cost, inter.costIsRelative)) {					
-					tempi.setScanned(true);
-					low = tempi.getLowBound();
-				} else {
-					break;
-				}
+				
+				if (slopedecided) {
+					if (tempi.isSameCost(effectivecost, effectiverel)) {					
+						tempi.setScanned(true);
+						low = tempi.getLowBound();
+					} else { 
+						break; 
+					}
+				} else { 
+					// we have to try both options
+					// first try the one that is defined in the interval
+					if (tempi.isSameCost(inter.cost, inter.costIsRelative)) {					
+						tempi.setScanned(true);
+						low = tempi.getLowBound();
+						
+						slopedecided = true;
+						effectiverel = inter.costIsRelative;
+						effectivecost = inter.cost;
+					} else {
+						int c;
+						boolean rel;
+						
+						if (inter.costIsRelative) {
+							// make absolute
+							c = inter.cost + inter.getLowBound();
+							rel = false;
+						} else {
+							// make relative
+							c = inter.cost - inter.getLowBound();
+							rel = true;
+						}
+						
+						if (tempi.isSameCost(c, rel)) {					
+							tempi.setScanned(true);
+							low = tempi.getLowBound();
+							
+							slopedecided = true;
+							effectiverel = rel;
+							effectivecost = c;
+						} else {
+							break;
+						}						
+					}
+				}				
 			} else {
 				break;
 			}
@@ -422,19 +469,68 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 			if (tempi.getReachable()
 					&& !tempi.isScanned()
 					&& ((!reverse && tempi.getPredecessor() != null) 
-						|| (reverse && tempi.getSuccessor() != null))) {
-				if (tempi.isSameCost(inter.cost, inter.costIsRelative)) {
-					tempi.setScanned(true);
-					high = tempi.getHighBound();
-				} else {
-					break;
-				}				
+							|| (reverse && tempi.getSuccessor() != null))) {
+				if (slopedecided) {
+					if (tempi.isSameCost(effectivecost, effectiverel)) {					
+						tempi.setScanned(true);
+						high = tempi.getHighBound();
+					} else { 
+						break; 
+					}
+				} else { 
+					// we have to try both options
+					// first try the one that is defined in the interval
+					if (tempi.isSameCost(inter.cost, inter.costIsRelative)) {					
+						tempi.setScanned(true);
+						high = tempi.getHighBound();
+
+						slopedecided = true;
+						effectiverel = inter.costIsRelative;
+						effectivecost = inter.cost;
+					} else {
+						int c;
+						boolean rel;
+
+						if (inter.costIsRelative) {
+							// make absolute
+							c = inter.cost + inter.getLowBound();
+							rel = false;
+						} else {
+							// make relative
+							c = inter.cost - inter.getLowBound();
+							rel = true;
+						}
+
+						if (tempi.isSameCost(c, rel)) {					
+							tempi.setScanned(true);
+							high = tempi.getHighBound();
+
+							slopedecided = true;
+							effectiverel = rel;
+							effectivecost = c;
+						} else {
+							break;
+						}						
+					}
+				}		
 			} else {
 				break;
 			}
 		}
-
-		return new Pair<Boolean, Interval>(true, new Interval(low, high));
+		
+		// we need to return the cost as well, as it might not be what it looks like in
+		// the label structure!
+		VertexIntervalWithCost VI = new VertexIntervalWithCost(low, high);
+		
+		if (slopedecided) {
+			VI.cost = effectivecost;
+			VI.costIsRelative = effectiverel;
+		} else {
+			VI.cost = inter.cost;
+			VI.costIsRelative = inter.costIsRelative;
+		}
+		
+		return new Pair<Boolean, Interval>(true, VI);
 	}
 
 	@Override
@@ -785,16 +881,18 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				
 				this.Tsinktime.onoff();
 				
-				// TODO check ... is this still okay with costs (due to capacitated sinks)?
-				// Should be. For active sinks we can ensure that the network is empty afterwards. 
-				// we always lower the best arrival time when we reach an active sink
+				// Cutoff is more difficult with costs.
+				// We only set it under the conditions of no costs:
+				// If cost = 0 and the sink is active, then we have reached
+				// a sink in the usual way.
 				if (task.time < cutofftime && this._flow.isActiveSink(v)) {
-					// FIXME
-					// DEBUG scan the full thing
-					//cutofftime = task.time;
-					if (_debug > 0) {
-						System.out.println("Setting new cutoff time: "
-								+ cutofftime);
+					VertexIntervalWithCost label = (VertexIntervalWithCost) this._sinklabels.get(v);
+					if (label.getReachable() && label.getAbsoluteCost(0) == 0) { 
+						cutofftime = task.time;
+						if (_debug > 0) {
+							System.out.println("Setting new cutoff time: "
+									+ cutofftime);
+						}
 					}
 				}
 				
@@ -901,9 +999,9 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		}
 		
 		// big debug function
-		if (!checkAllLabels()) {
+		/*if (!checkAllLabels()) {
 			throw new RuntimeException("Labels not okay!");
-		}
+		}*/
 				
 		/*System.out.println("final labels: \n");
 		printStatus();*/
@@ -1886,7 +1984,8 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				while (pred != null) {
 					debugcount++;
 					// BIG DBEUG
-					if (debugcount % 300 == 0) {
+					// FIXME
+					if (debugcount % 1000 == 0) {
 						System.out.println("Arggh! Infinite loop! debugcount = " + debugcount);
 						System.out.println("Offending TEP:");
 						System.out.println(TEP);
@@ -2038,6 +2137,16 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		}
 
 		return result;
+	}
+	
+	/**
+	 *  reset status information of the algo for the next iter 
+	 */
+	public void startNewIter(int lastArrival) {
+		super.startNewIter(lastArrival);
+		
+		// "free" some more data structures
+		this._sinklabels = null;	
 	}
 	
 

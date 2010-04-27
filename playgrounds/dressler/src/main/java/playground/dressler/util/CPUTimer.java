@@ -52,6 +52,19 @@ public class CPUTimer {
 		return totalCPU / 1000000;
 	}
 	
+	public String formatMs(long ms) {		
+		if (ms < 10 * 1000) { // up to 9999 ms
+			return ms + "ms";
+		} else { // now in h:m:s
+		   long sec = ms / 1000;
+		   long min = sec / 60;
+		   long hour = min / 60;
+		   sec = sec % 60;
+		   min = min % 60;
+		   return hour + ":" + (min < 10? "0" : "") + min + ":" + (sec < 10? "0" : "") + sec;  
+		}
+	}
+	
 	/** Get CPU time in nanoseconds. */
 	long getCpuTime( ) {
 	    
@@ -79,6 +92,6 @@ public class CPUTimer {
 	}
 	
 	public String toString() {
-	  return name + getLastMs() + " , " + getIterMs() + " , " + getTotalMs() + " ms (last,iter,total)";
+	  return name + formatMs(getLastMs()) + " , " + formatMs(getIterMs()) + " , " + formatMs(getTotalMs()) + " (last,iter,total)";
 	}
 }

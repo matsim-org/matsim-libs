@@ -1238,7 +1238,7 @@ public class BellmanFordIntervalBased {
 		
 		if (this._settings.trackUnreachableVertices) {
 			for (Node node : this._network.getNodes().values()) {
-				VertexInterval iv =this._labels.get(node).getFirstPossibleForward();
+				VertexInterval iv = this._labels.get(node).getFirstPossibleForward();
 				int t;
 				if (iv != null) {
 				  t = iv.getLowBound() - 1; // lowbound is just reachable, -1 is not
@@ -1738,6 +1738,11 @@ public class BellmanFordIntervalBased {
 	 *  reset status information of the algo for the next iter 
 	 */
 	public void startNewIter(int lastArrival) {
+		// "free" some data structures
+		this._labels = null;
+		this._sourcelabels = null;
+		
+		// reset statistics
 		this._vertexGain = 0;
 		this._roundpolls=0;
 		this._roundnonpolls = 0;
@@ -1756,7 +1761,6 @@ public class BellmanFordIntervalBased {
 		this.Tsettrue.newiter();
 		
 		if (lastArrival > this._oldLastArrival) {
-			// reset some status information
 			// nothing needed currently
 		}
 		

@@ -297,7 +297,13 @@ public class VertexIntervalWithCost extends VertexInterval {
 		return k;
 	}
 	
-	public boolean isSameCost(int c, boolean rel) {
+	/**
+	 * Does this VertexIntervalWithCost match the given cost?
+	 * Or could it be represented as such?
+	 * @param c the constant part
+	 * @param rel if the cost is relative (increasing with slope 1) 
+	 */
+	public boolean isSameCost(int c, boolean rel) {		
 		if (this.costIsRelative == rel) {
 		  return cost == c;
 		} else {
