@@ -35,6 +35,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.rmi.RemoteException;
@@ -45,6 +47,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
 import org.matsim.vis.netvis.renderers.ValueColorizer;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
@@ -315,6 +318,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	 */
 	public static class SimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQuadReceiver{
 		protected final Point2D.Float[] quad = new Point2D.Float[4];
+		protected String id = "noId";
 		//		protected float coloridx = 0;
 
 
@@ -352,7 +356,8 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		@Override
 		public void onDraw(Graphics2D display) {
 			Polygon poly = new Polygon();
-
+		
+			
 			poly.addPoint((int)(quad[0].x), (int)(quad[0].y));
 			poly.addPoint((int)(quad[1].x), (int)(quad[1].y));
 			poly.addPoint((int)(quad[3].x), (int)(quad[3].y));
@@ -360,10 +365,31 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			display.setColor(netColor);
 			display.fill(poly);
 			
-//			Line2D line = new Line2D.Float(quad[0].x, quad[0].y, quad[1].x, quad[1].y);
-//			display.setColor(Color.RED);
-//			display.draw(line);
-//			display.fill(poly);
+			
+			// Show LinkIds
+			if (OTFClientControl.getInstance().getOTFVisConfig().drawLinkIds()){
+			    float linksize = 4*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
+			    int fontSize = (int)linksize; 
+			    float middleX = (float)(0.5*this.quad[0].x + (0.5)*this.quad[3].x);
+			    float middleY = (float)(0.5*this.quad[0].y + (0.5)*this.quad[3].y);
+				Line2D line = new Line2D.Float(middleX, middleY, (float)(middleX + linksize),(float)(middleY + linksize));
+				display.setColor(Color.blue);
+				display.draw(line);
+				java.awt.Font font_old = display.getFont();
+				AffineTransform tx = new AffineTransform(1,0,0,-1,0,0);
+				display.transform(tx);
+				java.awt.Font font = new java.awt.Font("Arial Unicode MS", java.awt.Font.PLAIN, fontSize);
+				display.setFont(font);
+				display.drawString(this.id,(float)(middleX + 1.25*linksize),-(float)(middleY + 0.75*linksize));
+				try {
+					tx.invert();
+				} catch (NoninvertibleTransformException e) {
+					e.printStackTrace();
+				}
+				display.transform(tx);
+				display.setFont(font_old);
+			}
+		    
 			
 			//display.setColor(Color.BLUE);
 			//display.draw(poly);
@@ -371,6 +397,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 		@Override
 		public void setId(char[] idBuffer) {
+			this.id = String.valueOf(idBuffer);
 		}
 	}
 
