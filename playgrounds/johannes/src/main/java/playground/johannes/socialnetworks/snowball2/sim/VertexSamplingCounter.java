@@ -69,11 +69,11 @@ public class VertexSamplingCounter implements SamplerListener {
 			probaTable.put(v, new double[15]);
 		}
 		
-		estimator = new Estimator7(graph.getVertices().size());
 	}
 	
-	public void reset() {
+	public void reset(Graph graph) {
 		lastIteration = 0;
+		estimator = new Estimator11(graph.getVertices().size());
 	}
 	
 	@Override
@@ -118,7 +118,7 @@ public class VertexSamplingCounter implements SamplerListener {
 		for(int i = 0; i < nSims; i++) {
 			Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>();
 			sampler.setSeedGenerator(new RandomSeedGenerator(10, (long) (Math.random() * nSims)));
-			counter.reset();
+			counter.reset(graph);
 			sampler.setListener(counter);
 			sampler.run(graph);
 		}

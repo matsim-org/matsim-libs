@@ -93,10 +93,10 @@ public class Loader {
 		Map<String, EstimatorSet> estimators = new HashMap<String, EstimatorSet>();
 		Set<BiasedDistribution> estimatorSet = new HashSet<BiasedDistribution>();
 		
-//		BiasedDistribution estim1 = new Estimator1(N);
-//		estimatorSet.add(estim1);
-//		estimators.put("estim1a", new EstimatorSet(estim1, null, null));
-//		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
+		BiasedDistribution estim1 = new Estimator1(N);
+		estimatorSet.add(estim1);
+		estimators.put("estim1a", new EstimatorSet(estim1, null, null));
+		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
 		
 //		BiasedDistribution estim2 = new Estimator2(N);
 //		estimatorSet.add(estim2);
@@ -123,10 +123,10 @@ public class Loader {
 //		estimators.put("estim6a", new EstimatorSet(estim6, null, null));
 //		estimators.put("estim6b", new EstimatorSet(estim6, new HTEstimator(N), new HTEstimator(M)));
 		
-		BiasedDistribution estim7 = new Estimator7(N);
-		estimatorSet.add(estim7);
-		estimators.put("estim7a", new EstimatorSet(estim7, null, null));
-		estimators.put("estim7b", new EstimatorSet(estim7, new HTEstimator(N), new HTEstimator(M)));
+//		BiasedDistribution estim7 = new Estimator7(N);
+//		estimatorSet.add(estim7);
+//		estimators.put("estim7a", new EstimatorSet(estim7, null, null));
+//		estimators.put("estim7b", new EstimatorSet(estim7, new HTEstimator(N), new HTEstimator(M)));
 		
 //		BiasedDistribution estim8 = new Estimator8(N);
 //		estimatorSet.add(estim8);
@@ -142,6 +142,11 @@ public class Loader {
 //		estimatorSet.add(estim10);
 //		estimators.put("estim10a", new EstimatorSet(estim10, null, null));
 //		estimators.put("estim10b", new EstimatorSet(estim10, new HTEstimator(N), new HTEstimator(M)));
+		
+		BiasedDistribution estim11 = new Estimator11(N);
+		estimatorSet.add(estim11);
+		estimators.put("estim11a", new EstimatorSet(estim11, null, null));
+		estimators.put("estim11b", new EstimatorSet(estim11, new HTEstimator(N), new HTEstimator(M)));
 		/*
 		 * Load analyzers.
 		 */

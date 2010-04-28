@@ -57,7 +57,7 @@ public class EstimatorTask extends AnalyzerTask {
 				double p = estimator.getProbability((SampledVertex) vertex);
 				probas.put(k, p);
 				
-				p_sum += estimator.getWeight((SampledVertex) vertex);
+//				p_sum += estimator.getWeight((SampledVertex) vertex);
 			}
 		}
 		System.out.println("Proba sum = " + p_sum);
