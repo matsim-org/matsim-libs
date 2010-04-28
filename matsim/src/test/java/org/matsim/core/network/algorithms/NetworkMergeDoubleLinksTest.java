@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -41,7 +40,7 @@ public class NetworkMergeDoubleLinksTest {
 	public void testRun_remove() {
 		Fixture f = new Fixture();
 		NetworkMergeDoubleLinks merger = new NetworkMergeDoubleLinks(NetworkMergeDoubleLinks.MergeType.REMOVE);
-		merger.run((NetworkImpl) f.network);
+		merger.run(f.network);
 
 		Assert.assertEquals("wrong number of links.", 3, f.network.getLinks().size());
 		Assert.assertNotNull(f.network.getLinks().get(f.ids[0]));
@@ -72,7 +71,7 @@ public class NetworkMergeDoubleLinksTest {
 	public void testRun_additive() {
 		Fixture f = new Fixture();
 		NetworkMergeDoubleLinks merger = new NetworkMergeDoubleLinks(NetworkMergeDoubleLinks.MergeType.ADDITIVE);
-		merger.run((NetworkImpl) f.network);
+		merger.run(f.network);
 
 		Assert.assertEquals("wrong number of links.", 3, f.network.getLinks().size());
 		Assert.assertNotNull(f.network.getLinks().get(f.ids[0]));
@@ -103,7 +102,7 @@ public class NetworkMergeDoubleLinksTest {
 	public void testRun_maximum() {
 		Fixture f = new Fixture();
 		NetworkMergeDoubleLinks merger = new NetworkMergeDoubleLinks(NetworkMergeDoubleLinks.MergeType.MAXIMUM);
-		merger.run((NetworkImpl) f.network);
+		merger.run(f.network);
 
 		Assert.assertEquals("wrong number of links.", 3, f.network.getLinks().size());
 		Assert.assertNotNull(f.network.getLinks().get(f.ids[0]));

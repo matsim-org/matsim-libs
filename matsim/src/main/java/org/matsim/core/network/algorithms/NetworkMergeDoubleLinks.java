@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -112,12 +111,12 @@ public class NetworkMergeDoubleLinks implements NetworkRunnable {
 
 	public void run(Network network) {
 		for (Node n : network.getNodes().values()) {
-			Iterator<?> l1_it = n.getOutLinks().values().iterator();
+			Iterator<? extends Link> l1_it = n.getOutLinks().values().iterator();
 			while (l1_it.hasNext()) {
-				LinkImpl l1 = (LinkImpl)l1_it.next();
-				Iterator<?> l2_it = n.getOutLinks().values().iterator();
+				Link l1 = l1_it.next();
+				Iterator<? extends Link> l2_it = n.getOutLinks().values().iterator();
 				while (l2_it.hasNext()) {
-					LinkImpl l2 = (LinkImpl)l2_it.next();
+					Link l2 = l2_it.next();
 					if (!l2.equals(l1)) {
 						if (l2.getToNode().equals(l1.getToNode())) {
 							System.out.println("      Node id=" + n.getId());

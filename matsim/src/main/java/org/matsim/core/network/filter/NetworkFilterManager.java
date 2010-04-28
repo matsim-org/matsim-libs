@@ -27,40 +27,39 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 
 /**
- * Add several filter instances to this class and create a new 
- * network containing only the links and nodes that passed 
+ * Add several filter instances to this class and create a new
+ * network containing only the links and nodes that passed
  * the filters.
- * 
+ *
  * @author dgrether
  */
 public class NetworkFilterManager {
-	
+
 	private static final Logger log = Logger
 			.getLogger(NetworkFilterManager.class);
-	
+
 	private final Network network;
-	
+
 	private List<NetworkLinkFilter> linkFilters;
-	
+
 	private List<NetworkNodeFilter> nodeFilters;
-	
+
 	public NetworkFilterManager(final Network net) {
 		this.network = net;
 		this.linkFilters = new ArrayList<NetworkLinkFilter>();
 		this.nodeFilters = new ArrayList<NetworkNodeFilter>();
 	}
-	
+
 	public void addLinkFilter(NetworkLinkFilter f) {
 		this.linkFilters.add(f);
 	}
-	
+
 	public void addNodeFilter(NetworkNodeFilter f) {
 		this.nodeFilters.add(f);
 	}
-	
+
 	/**
 	 * Call this method to filter the network.
 	 * @return
@@ -98,19 +97,19 @@ public class NetworkFilterManager {
 					Node from = l.getFromNode();
 					Node to = l.getToNode();
 					if (!net.getNodes().containsKey(from.getId())) {
-						net.getNodes().put(from.getId(), (NodeImpl) from);
+						net.getNodes().put(from.getId(), from);
 					}
 					if (!net.getNodes().containsKey(to.getId())){
-						net.getNodes().put(to.getId(), (NodeImpl) to);
+						net.getNodes().put(to.getId(), to);
 					}
 					net.addLink(l);
 					linkCount++;
 				}
-			}			
+			}
 		}
 		log.info("filtered " + nodeCount + " of " + network.getNodes().size() + " nodes...");
 		log.info("filtered " + linkCount + " of " + network.getLinks().size() + " links.");
 		return net;
 	}
-	
+
 }

@@ -31,9 +31,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
 
 import playground.rost.controller.map.BasicMap;
 import playground.rost.controller.uicontrols.TimeControl;
@@ -45,13 +45,13 @@ import playground.rost.eaflow.ea_flow.TimeExpandedPath;
 
 public class TimeExpandedPathVisModule extends AbstractVisModuleImpl {
 
-	protected NetworkLayer network;
+	protected Network network;
 	protected final Flow flow;
 	protected final TimeControl tControl;
 	protected final Map<Integer, Set<TimeExpandedPath>> timeExpandedPathsStartAtMap = new HashMap<Integer, Set<TimeExpandedPath>>();
 	protected final Node sink;
 
-	public TimeExpandedPathVisModule(VisModuleContainer vMContainer, NetworkLayer network, TimeControl timeControl, Flow flow)
+	public TimeExpandedPathVisModule(VisModuleContainer vMContainer, Network network, TimeControl timeControl, Flow flow)
 	{
 		super(vMContainer, "FlowLinkView");
 		sink = network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId));

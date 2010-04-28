@@ -27,13 +27,13 @@ import junit.framework.TestCase;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -142,11 +142,11 @@ import org.matsim.core.utils.misc.Time;
 		Population population = scenario.getPopulation();
 		NetworkLayer network = scenario.getNetwork();
 
-		LinkImpl link0 = network.getLinks().get(new IdImpl(0));
-		LinkImpl link1 = network.getLinks().get(new IdImpl(1));
-		LinkImpl link2 = network.getLinks().get(new IdImpl(2));
-		LinkImpl link3 = network.getLinks().get(new IdImpl(3));
-		LinkImpl link4 = network.getLinks().get(new IdImpl(4));
+		Link link0 = network.getLinks().get(new IdImpl(0));
+		Link link1 = network.getLinks().get(new IdImpl(1));
+		Link link2 = network.getLinks().get(new IdImpl(2));
+		Link link3 = network.getLinks().get(new IdImpl(3));
+		Link link4 = network.getLinks().get(new IdImpl(4));
 		Fixture.addPersonToPopulation(Fixture.createPerson1( 1, "07:00"   , link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 1st time slot
 		Fixture.addPersonToPopulation(Fixture.createPerson1( 2, "11:00"   , link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 2nd time slot
 		Fixture.addPersonToPopulation(Fixture.createPerson1( 3, "16:00"   , link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 3rd time slot
@@ -187,7 +187,7 @@ import org.matsim.core.utils.misc.Time;
 		return person;
 	}
 
-	private static PersonImpl createPerson2(final int personId, final String startTime, final LinkImpl homeLink, final LinkImpl workLink, final LinkImpl finishLink) {
+	private static PersonImpl createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
 		PersonImpl person = new PersonImpl(new IdImpl(personId));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);

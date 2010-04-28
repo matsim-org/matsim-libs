@@ -25,9 +25,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
 
 import playground.rost.controller.map.BasicMap;
 import playground.rost.controller.uicontrols.TimeControl;
@@ -40,13 +40,13 @@ import playground.rost.graph.visnetwork.OneWayVisNetwork;
 
 public class FlowLinkVisModule extends AbstractVisModuleImpl {
 
-	protected NetworkLayer network;
+	protected Network network;
 	protected OneWayVisNetwork oWVN;
 	protected final Flow flow;
 	protected final TimeControl tControl;
 	protected final Node sink;
 
-	public FlowLinkVisModule(VisModuleContainer vMContainer, NetworkLayer network, OneWayVisNetwork oWVN, TimeControl timeControl, Flow flow)
+	public FlowLinkVisModule(VisModuleContainer vMContainer, Network network, OneWayVisNetwork oWVN, TimeControl timeControl, Flow flow)
 	{
 		super(vMContainer, "FlowLinkView");
 		this.flow = flow;

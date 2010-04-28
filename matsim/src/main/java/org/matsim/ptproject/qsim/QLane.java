@@ -74,7 +74,7 @@ public class QLane implements QBufferItem {
 	/*package*/ private final LinkedList<QVehicle> vehQueue = new LinkedList<QVehicle>();
 
 	private final Map<QVehicle, Double> vehQueueEnterTimeMap = new HashMap<QVehicle, Double>();
-	
+
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
@@ -408,7 +408,7 @@ public class QLane implements QBufferItem {
 		// }
 		// might be easier to read?  In fact, I think even more could be done in terms of readability.  kai, nov'09
 		moveBufferToNextLane(now);
-		
+
 		return this.isActive();
 	}
 
@@ -593,7 +593,7 @@ public class QLane implements QBufferItem {
 		Simulation.decLiving(this.buffer.size());
 		Simulation.incLost(this.buffer.size());
 		this.buffer.clear();
-		
+
 	}
 
 	// search for vehicleId..
@@ -630,7 +630,7 @@ public class QLane implements QBufferItem {
 	protected void setFireLaneEvents(final boolean fireLaneEvents) {
 		this.fireLaneEvents = fireLaneEvents;
 	}
-	
+
   protected void addToLane(final QLane lane) {
     if (this.toLanes == null) {
       this.toLanes = new LinkedList<QLane>();
@@ -703,15 +703,15 @@ public class QLane implements QBufferItem {
     public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
     	AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLane.this.queueLink.getQSimEngine().getAgentSnapshotInfoBuilder();
     	//the offset of this lane
-    	double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLength(); 
-    	
-      agentSnapshotInfoBuilder.addVehiclePositionsAsQueue(positions, time, QLane.this.queueLink.getLink(), QLane.this.buffer, QLane.this.vehQueue, 
-      		QLane.this.inverseSimulatedFlowCapacity, QLane.this.inverseSimulatedFlowCapacity, 
+    	double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
+
+      agentSnapshotInfoBuilder.addVehiclePositionsAsQueue(positions, time, QLane.this.queueLink.getLink(), QLane.this.buffer, QLane.this.vehQueue,
+      		QLane.this.inverseSimulatedFlowCapacity, QLane.this.inverseSimulatedFlowCapacity,
       		QLane.this.bufferStorageCapacity, QLane.this.length, offset, QLane.this.visualizerLane*3, QLane.this.transitQueueLaneFeature);
-    	      
+
       return positions;
     }
-  };
+  }
 
 	public static class FromLinkEndComparator implements Comparator<QLane>, Serializable {
     private static final long serialVersionUID = 1L;
@@ -724,5 +724,5 @@ public class QLane implements QBufferItem {
         return 0;
       }
     }
-  };
+  }
 }

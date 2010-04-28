@@ -25,9 +25,9 @@ import java.nio.channels.FileChannel;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderTeleatlas;
 
@@ -77,7 +77,7 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Reading and assigning speed restrictions to the {@link LinkImpl links} of a {@link NetworkLayer network}.
+	 * Reading and assigning speed restrictions to the {@link Link links} of a {@link NetworkLayer network}.
 	 *
 	 * <p>It uses the following attributes from the Tele Atlas MultiNet speed restriction DBF file:
 	 * <ul>
@@ -103,8 +103,8 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 	 * <ul>
 	 *   <li>speed restrictions that are not verified will be ignored.</li>
 	 *   <li>speed restrictions will be assigned in given directions ({@link #SR_VALDIR_NAME})</li>
-	 *   <li>speed restrictions will be ignored if the corresponding {@link LinkImpl link} is not found (produces a trace message).</li>
-	 *   <li>speed restrictions will not be assigned to the {@link LinkImpl link} if it already contains a speed that
+	 *   <li>speed restrictions will be ignored if the corresponding {@link Link link} is not found (produces a trace message).</li>
+	 *   <li>speed restrictions will not be assigned to the {@link Link link} if it already contains a speed that
 	 *   is lower then the one from the speed restrictions file.</li>
 	 * </ul></p>
 	 *
@@ -147,8 +147,8 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 				String id = entries[srIdNameIndex].toString();
 				if (valdir == 1) {
 					// Valid in Both Directions
-					LinkImpl ftLink = network.getLinks().get(new IdImpl(id+"FT"));
-					LinkImpl tfLink = network.getLinks().get(new IdImpl(id+"TF"));
+					Link ftLink = network.getLinks().get(new IdImpl(id+"FT"));
+					Link tfLink = network.getLinks().get(new IdImpl(id+"TF"));
 					if ((ftLink == null) || (tfLink == null)) { log.trace("  linkid="+id+", valdir="+valdir+": at least one link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
@@ -159,7 +159,7 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 				}
 				else if (valdir == 2) {
 					// Valid Only in Positive Direction
-					LinkImpl ftLink = network.getLinks().get(new IdImpl(id+"FT"));
+					Link ftLink = network.getLinks().get(new IdImpl(id+"FT"));
 					if (ftLink == null) { log.trace("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
@@ -169,7 +169,7 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 				}
 				else if (valdir == 3) {
 					// Valid Only in Negative Direction
-					LinkImpl tfLink = network.getLinks().get(new IdImpl(id+"TF"));
+					Link tfLink = network.getLinks().get(new IdImpl(id+"TF"));
 					if (tfLink == null) { log.trace("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;

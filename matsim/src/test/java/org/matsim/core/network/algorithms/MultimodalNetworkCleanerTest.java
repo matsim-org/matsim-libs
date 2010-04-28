@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
 
 /**
  * @author mrieser
@@ -42,7 +41,7 @@ public class MultimodalNetworkCleanerTest {
 	public void testRun_singleMode() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
 		cleaner.run(EnumSet.of(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
@@ -66,7 +65,7 @@ public class MultimodalNetworkCleanerTest {
 		network.getLinks().get(f.ids[10]).setAllowedModes(f.modesW);
 		network.getLinks().get(f.ids[11]).setAllowedModes(f.modesC);
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
 		cleaner.run(EnumSet.of(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 9, network.getLinks().size());
@@ -102,7 +101,7 @@ public class MultimodalNetworkCleanerTest {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
 		cleaner.run(EnumSet.of(TransportMode.other));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
@@ -128,7 +127,7 @@ public class MultimodalNetworkCleanerTest {
 		network.getLinks().get(f.ids[10]).setAllowedModes(f.modesC);
 		network.getLinks().get(f.ids[11]).setAllowedModes(f.modesW);
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 10, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 8, network.getNodes().size());
 
@@ -167,7 +166,7 @@ public class MultimodalNetworkCleanerTest {
 		network.getLinks().get(f.ids[1]).setAllowedModes(f.modesCW); // integrate the sinks into the existing network
 		network.getLinks().get(f.ids[8]).setAllowedModes(f.modesCW);
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 
@@ -211,7 +210,7 @@ public class MultimodalNetworkCleanerTest {
 		network.getLinks().get(f.ids[12]).setAllowedModes(f.modesW);
 		network.getLinks().get(f.ids[13]).setAllowedModes(f.modesW);
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 8, network.getNodes().size());
 
@@ -259,7 +258,7 @@ public class MultimodalNetworkCleanerTest {
 		network.getLinks().get(f.ids[10]).setAllowedModes(f.modesC);
 		network.getLinks().get(f.ids[11]).setAllowedModes(f.modesW);
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 10, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 8, network.getNodes().size());
 
@@ -306,7 +305,7 @@ public class MultimodalNetworkCleanerTest {
 		network.getLinks().get(f.ids[12]).setAllowedModes(f.modesW);
 		network.getLinks().get(f.ids[13]).setAllowedModes(f.modesW);
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 8, network.getNodes().size());
 
@@ -347,7 +346,7 @@ public class MultimodalNetworkCleanerTest {
 		Fixture f = new MultimodeFixture();
 		Network network = f.scenario.getNetwork();
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
 		cleaner.run(EnumSet.of(TransportMode.car, TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
@@ -378,7 +377,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals("wrong number of links.", 14, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 10, network.getNodes().size());
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
 		cleaner.run(EnumSet.of(TransportMode.car, TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
@@ -409,7 +408,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals("wrong number of links.", 14, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 10, network.getNodes().size());
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
 		cleaner.run(EnumSet.of(TransportMode.car, TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
@@ -433,7 +432,7 @@ public class MultimodalNetworkCleanerTest {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
 		cleaner.run(EnumSet.noneOf(TransportMode.class));
 		// nothing should have changed from the initialization
@@ -454,7 +453,7 @@ public class MultimodalNetworkCleanerTest {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner((NetworkImpl) network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
 		cleaner.run(EnumSet.of(TransportMode.pt));
 		// nothing should have changed from the initialization
@@ -484,7 +483,7 @@ public class MultimodalNetworkCleanerTest {
 		network.addLink(factory.createLink(id1, id1, id2));
 		network.getLinks().get(id1).setAllowedModes(EnumSet.of(TransportMode.car));
 
-		new MultimodalNetworkCleaner((NetworkImpl) network).run(EnumSet.of(TransportMode.car));
+		new MultimodalNetworkCleaner(network).run(EnumSet.of(TransportMode.car));
 		/* a single link is no complete network, as the link's
 		 * from-node cannot be reached by the link's to-node
 		 * */

@@ -24,14 +24,14 @@ package org.matsim.vehicles;
  */
 public interface BasicEngineInformation {
 
-	public enum FuelType {diesel, gasoline, electricity, biodiesel};
-	
+	public enum FuelType {diesel, gasoline, electricity, biodiesel}
+
 	public FuelType getFuelType();
-	
+
 	public double getGasConsumption();
-	
+
 	public void setFuelType(FuelType fueltype);
-	
+
 	public void setGasConsumption(double literPerMeter);
-	
+
 }

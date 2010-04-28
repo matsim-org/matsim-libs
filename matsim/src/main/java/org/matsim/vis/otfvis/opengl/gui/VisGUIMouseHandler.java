@@ -253,7 +253,7 @@ implements MouseWheelListener{
 	}
 
 	private float alpha = 1.0f;
-	public float getAlpha() {return alpha;};
+	public float getAlpha() {return alpha;}
 
 	public void setAlpha(float a){
 		alpha = a;

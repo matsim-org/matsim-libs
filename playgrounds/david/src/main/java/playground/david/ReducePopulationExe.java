@@ -28,6 +28,8 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,9 +37,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -164,7 +164,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 }
 
 public class ReducePopulationExe {
-	public static NetworkLayer network;
+	public static Network network;
 	public static String outpopFileName = "../../tmp/studies/ivtch/Diss/input/plans";
 
 	public static PopulationImpl relevantPopulation;
@@ -223,10 +223,10 @@ public class ReducePopulationExe {
 		plansWriter50.writeEndPlans();
 		plansWriter100.writeEndPlans();
 
-		List<LinkImpl> nolinkList = new LinkedList<LinkImpl>();
-		for(LinkImpl link : network.getLinks().values()) if(!filter.usedlinkList.contains(link.getId())) nolinkList.add(link);
+		List<Link> nolinkList = new LinkedList<Link>();
+		for(Link link : network.getLinks().values()) if(!filter.usedlinkList.contains(link.getId())) nolinkList.add(link);
 
-		for(LinkImpl link : nolinkList) {
+		for(Link link : nolinkList) {
 			network.removeLink(link.getId());
 		}
 

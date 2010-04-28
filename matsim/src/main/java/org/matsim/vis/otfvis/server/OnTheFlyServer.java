@@ -83,23 +83,23 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private static Registry registry;
 
 	private final Object paused = new Object();
-	
+
 	private final Object stepDone = new Object();
-	
+
 	private final Object updateFinished = new Object();
-	
+
 	private int localTime = 0;
 
 	private final Map<String, OTFServerQuad2> quads = new HashMap<String, OTFServerQuad2>();
-	
+
 	private final List<OTFDataWriter<?>> additionalElements= new LinkedList<OTFDataWriter<?>>();
 
 	private int controllerStatus = OTFVisControlerListener.NOCONTROL;
-	
+
 	private int controllerIteration = 0;
-	
+
 	private int stepToIteration = 0;
-	
+
 	private int requestStatus = 0;
 
 	private EventsManager events;
@@ -218,7 +218,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			status = Status.STEP;
 		}else 		synchronized (stepDone) {
 			stepDone.notifyAll();
-		};
+		}
 	}
 
 	public void cleanup() {
@@ -479,5 +479,5 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			return new OTFVisConfig();
 		}
 	}
-	
+
 }

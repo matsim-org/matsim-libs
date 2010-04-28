@@ -60,7 +60,6 @@ import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -605,18 +604,16 @@ public class TransitQueueSimulationTest {
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
 		network.getNodes().put(node3.getId(), node3);
-		LinkImpl link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
 		link1.setFreespeed(10.0);
 		link1.setCapacity(2000.0);
 		link1.setLength(1000.0);
-		LinkImpl link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
 		link2.setFreespeed(10.0);
 		link2.setCapacity(2000.0);
 		link2.setLength(1000.0);
-		network.getLinks().put(link1.getId(), link1);
-		network.getLinks().put(link2.getId(), link2);
-		node2.addInLink(link1);
-		node2.addOutLink(link2);
+		network.addLink(link1);
+		network.addLink(link2);
 
 		// build simple schedule with a single line
 		config.scenario().setUseTransit(true);
@@ -696,18 +693,16 @@ public class TransitQueueSimulationTest {
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
 		network.getNodes().put(node3.getId(), node3);
-		LinkImpl link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
 		link1.setFreespeed(10.0);
 		link1.setCapacity(2000.0);
 		link1.setLength(1000.0);
-		LinkImpl link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
 		link2.setFreespeed(10.0);
 		link2.setCapacity(2000.0);
 		link2.setLength(1000.0);
-		network.getLinks().put(link1.getId(), link1);
-		network.getLinks().put(link2.getId(), link2);
-		node2.addInLink(link1);
-		node2.addOutLink(link2);
+		network.addLink(link1);
+		network.addLink(link2);
 
 		// build simple schedule with a single line
 		config.scenario().setUseTransit(true);

@@ -28,8 +28,8 @@ import junit.framework.TestCase;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -409,14 +409,14 @@ public class TransitRouterTest extends TestCase {
 			network.getNodes().put(node5.getId(), node5);
 			network.getNodes().put(node6.getId(), node6);
 			network.getNodes().put(node7.getId(), node7);
-			LinkImpl link1 = network.getFactory().createLink(this.scenario.createId("1"), node1.getId(), node2.getId());
-			LinkImpl link2 = network.getFactory().createLink(this.scenario.createId("2"), node3.getId(), node4.getId());
-			LinkImpl link3 = network.getFactory().createLink(this.scenario.createId("3"), node4.getId(), node5.getId());
-			LinkImpl link4 = network.getFactory().createLink(this.scenario.createId("4"), node6.getId(), node7.getId());
-			network.getLinks().put(link1.getId(), link1);
-			network.getLinks().put(link2.getId(), link2);
-			network.getLinks().put(link3.getId(), link3);
-			network.getLinks().put(link4.getId(), link4);
+			Link link1 = network.getFactory().createLink(this.scenario.createId("1"), node1.getId(), node2.getId());
+			Link link2 = network.getFactory().createLink(this.scenario.createId("2"), node3.getId(), node4.getId());
+			Link link3 = network.getFactory().createLink(this.scenario.createId("3"), node4.getId(), node5.getId());
+			Link link4 = network.getFactory().createLink(this.scenario.createId("4"), node6.getId(), node7.getId());
+			network.addLink(link1);
+			network.addLink(link2);
+			network.addLink(link3);
+			network.addLink(link4);
 
 			// schedule
 			this.schedule = this.scenario.getTransitSchedule();

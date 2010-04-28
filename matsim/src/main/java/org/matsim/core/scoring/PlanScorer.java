@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 
 /**
  * @author dgrether
@@ -38,7 +37,7 @@ public class PlanScorer {
 	}
 
 	public double getScore(final Plan plan) {
-		ScoringFunction function = this.factory.createNewScoringFunction((PlanImpl) plan);
+		ScoringFunction function = this.factory.createNewScoringFunction(plan);
 		boolean firstActivityDone = false;
 
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -48,7 +47,7 @@ public class PlanScorer {
 					function.startActivity(act.getStartTime(), act);
 					firstActivityDone = true;
 				}
-				function.endActivity(act.getEndTime());					
+				function.endActivity(act.getEndTime());
 			} else if (pe instanceof LegImpl) {
 				LegImpl leg = (LegImpl) pe;
 				function.startLeg(leg.getDepartureTime(), leg);

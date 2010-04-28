@@ -29,6 +29,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -54,7 +56,7 @@ public class TeleatlasIvtcheuMerger {
 	// methods
 	//////////////////////////////////////////////////////////////////////
 
-	private static final void deleteLinks(NetworkLayer networkIvtcheu, String il2deletefile) {
+	private static final void deleteLinks(Network networkIvtcheu, String il2deletefile) {
 		log.info("deleteLinks...");
 		log.info("  init number of links: "+networkIvtcheu.getLinks().size());
 		log.info("  init number of nodes: "+networkIvtcheu.getNodes().size());
@@ -69,7 +71,7 @@ public class TeleatlasIvtcheuMerger {
 				// ivtchLID
 				// 0
 				Id lid = new IdImpl(entries[0].trim());
-				LinkImpl l = networkIvtcheu.getLinks().get(lid);
+				Link l = networkIvtcheu.getLinks().get(lid);
 				if (l == null) { throw new RuntimeException(lineCnt+": link with id="+lid+" not found."); }
 				if (networkIvtcheu.removeLink(l.getId()) != null) { throw new RuntimeException(lineCnt+": could not remove link with id="+lid+"."); }
 				lineCnt++;

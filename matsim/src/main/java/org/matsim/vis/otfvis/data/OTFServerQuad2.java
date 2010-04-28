@@ -37,14 +37,14 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 /**
  * OTFServerQuad is the quad representation of all elements of the network on the server
  * side. This QuadTree is mirrored on the client side by OTFClientQuad.
- * 
+ *
  * @author dstrippgen
  *
  */
 public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements OTFServerQuadI {
-  
+
 	private static final Logger log = Logger.getLogger(OTFServerQuad2.class);
-	
+
 	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();
 
 	private static final long serialVersionUID = 1L;
@@ -54,7 +54,7 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 	protected double maxNorthing;
 	protected double easting;
 	protected double northing;
-	
+
 	// Change this, find better way to transport this info into Writers
 	public static double offsetEast;
 	public static double offsetNorth;
@@ -63,14 +63,14 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 		super(0,0,0,0);
 		this.setBoundingBoxFromNetwork(network);
 	}
-	
+
 	/**
 	 * This method should be abstract as it has to be overwritten in subclasses.
 	 * Due to deserialization backwards compatibility this is not possible. dg dez 09
 	 */
 	public abstract void initQuadTree(final OTFConnectionManager connect);
 
-	
+
 	protected void setBoundingBoxFromNetwork(Network n){
 		this.minEasting = Double.POSITIVE_INFINITY;
 		this.maxEasting = Double.NEGATIVE_INFINITY;
@@ -101,13 +101,12 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 		this.additionalElements.add(element);
 	}
 
-	@SuppressWarnings("unchecked")
 	public OTFClientQuad convertToClient(String id, final OTFServerRemote host, final OTFConnectionManager connect) {
 		final OTFClientQuad client = new OTFClientQuad(id, host, 0.,0., this.easting, this.northing);
 		client.offsetEast = this.minEasting;
 		client.offsetNorth = this.minNorthing;
 
-		//int colls = 
+		//int colls =
 		this.execute(0.,0.,this.easting, this.northing,
 				new ConvertToClientExecutor(connect,client));
 
@@ -130,7 +129,7 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 	}
 
 	public void writeConstData(ByteBuffer out) {
-		
+
 		for (OTFDataWriter element : this.values()) {
 			try {
 				element.writeConstData(out);
@@ -138,7 +137,7 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 				e.printStackTrace();
 			}
 		}
-		
+
 		for (OTFDataWriter element : this.additionalElements) {
 			try {
 				element.writeConstData(out);

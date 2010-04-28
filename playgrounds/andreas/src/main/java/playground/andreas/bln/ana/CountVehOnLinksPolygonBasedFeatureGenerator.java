@@ -11,7 +11,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.WidthCalculator;
@@ -67,7 +67,8 @@ public class CountVehOnLinksPolygonBasedFeatureGenerator implements FeatureGener
 	}
 
 
-	public Feature getFeature(final LinkImpl link) {
+	@Override
+	public Feature getFeature(final Link link) {
 		double width = this.widthCalculator.getWidth(link);
 		width += 0;
 

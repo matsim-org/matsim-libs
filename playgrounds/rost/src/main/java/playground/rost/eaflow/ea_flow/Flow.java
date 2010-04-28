@@ -33,10 +33,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -60,7 +60,7 @@ public class Flow {
 	 * The network on which we find routes. We expect the network to change
 	 * between runs!
 	 */
-	private final NetworkLayer _network;
+	private final Network _network;
 
 	/**
 	 * used to calculate the length of every edge in the network
@@ -129,7 +129,7 @@ public class Flow {
 	 * @param sink the sink for all the flow
 	 * @param horizon the time horizon in which flow is allowed
 	 */
-	public Flow(final NetworkLayer network, Map<Node, Integer> demands, final Node sink, final int horizon, EdgeTypeEnum edgeTypeToUse) {
+	public Flow(final Network network, Map<Node, Integer> demands, final Node sink, final int horizon, EdgeTypeEnum edgeTypeToUse) {
 		this._network = network;
 		this._flow = new HashMap<Link,EdgeIntervalls>();
 		this.edgeType = edgeTypeToUse;
@@ -861,7 +861,7 @@ public class Flow {
 	/**
 	 * @return the network
 	 */
-	public NetworkLayer getNetwork() {
+	public Network getNetwork() {
 		return this._network;
 	}
 

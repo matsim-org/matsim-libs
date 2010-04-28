@@ -61,7 +61,6 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -1030,10 +1029,10 @@ public class ParallelQSimTest extends TestCase {
 		NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
-		LinkImpl link = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
 		link.setFreespeed(10.0);
 		link.setCapacity(2000.0);
-		network.getLinks().put(link.getId(), link);
+		network.addLink(link);
 
 		// build simple population with 1 person with 1 plan with 1 leg
 		Population population = scenario.getPopulation();
@@ -1100,11 +1099,11 @@ public class ParallelQSimTest extends TestCase {
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
-		LinkImpl link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
 		link1.setFreespeed(10.0); // freespeed-traveltime = 100s
 		link1.setCapacity(2000.0);
 		network.addLink(link1);
-		LinkImpl link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
 		link2.setFreespeed(10.0); // freespeed-traveltime = 100s
 		link2.setCapacity(2000.0);
 		network.addLink(link2);

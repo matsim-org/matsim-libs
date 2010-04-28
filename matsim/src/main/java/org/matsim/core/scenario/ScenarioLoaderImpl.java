@@ -52,14 +52,14 @@ import org.xml.sax.SAXException;
 /**
  * Loads elements of Scenario from file. Non standardized elements
  * can also be loaded however they require a specific instance of
- * Scenario. 
+ * Scenario.
  * {@link #loadScenario()} reads the complete scenario from files while the
  * other load...() methods only load specific parts
- * of the scenario assuming that required parts are already 
+ * of the scenario assuming that required parts are already
  * loaded or created by the user.
- * 
+ *
  * @see org.matsim.api.core.v01.ScenarioImpl
- * 
+ *
  * @author dgrether
  */
 public class ScenarioLoaderImpl implements ScenarioLoader {
@@ -88,7 +88,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		Gbl.setConfig(this.config);
 		MatsimRandom.reset(config.global().getRandomSeed());
 	}
-	
+
 	@Override
 	public ScenarioImpl getScenario() {
 		return (ScenarioImpl)this.scenario;
@@ -96,7 +96,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 
 	/**
 	 * Loads all mandatory Scenario elements and
-	 * if activated in config's scenario module/group 
+	 * if activated in config's scenario module/group
 	 * optional elements.
 	 * @return the Scenario
 	 */
@@ -110,7 +110,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		this.loadActivityFacilities();
 		this.loadPopulation();
 		this.loadHouseholds();
-		
+
 		if (this.config.scenario().isUseLanes()) {
 			this.loadLanes();
 		}
@@ -165,7 +165,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		}
 	}
 
-	
+
 	private void loadHouseholds() {
 			if ((this.getScenario().getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
 				String hhFileName = this.config.households().getInputFile();
@@ -227,7 +227,6 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 			}
 	}
 
-	@SuppressWarnings("deprecation")
 	private void loadWorld() {
 		String worldFileName = null;
 		if (this.config.world() != null) {

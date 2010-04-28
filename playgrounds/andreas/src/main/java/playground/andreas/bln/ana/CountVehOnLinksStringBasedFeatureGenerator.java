@@ -11,6 +11,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGenerator;
@@ -70,7 +71,8 @@ public class CountVehOnLinksStringBasedFeatureGenerator implements FeatureGenera
 	}
 
 
-	public Feature getFeature(final LinkImpl link) {
+	@Override
+	public Feature getFeature(final Link link) {
 		double width = this.widthCalculator.getWidth(link);
 		LineString ls = this.geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),
 				MGC.coord2Coordinate(link.getToNode().getCoord())});
@@ -85,7 +87,7 @@ public class CountVehOnLinksStringBasedFeatureGenerator implements FeatureGenera
 		attribs[6] = link.getCapacity();
 		attribs[7] = link.getNumberOfLanes();
 		attribs[8] = width;
-		attribs[9] = link.getType();
+		attribs[9] = ((LinkImpl) link).getType();
 
 		if(this.compareResultMap.get(link.getId().toString()) != null){
 			attribs[10] = this.compareResultMap.get(link.getId().toString());

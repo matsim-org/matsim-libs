@@ -39,6 +39,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -200,7 +201,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 	 * @param demands
 	 * @return
 	 */
-	public Flow calcEAFlow(NetworkLayer network, Map<Node, Integer> demands)
+	public Flow calcEAFlow(Network network, Map<Node, Integer> demands)
 	{
 		Set<Link> toRemove = new HashSet<Link>();
 		for(Link link : network.getLinks().values())

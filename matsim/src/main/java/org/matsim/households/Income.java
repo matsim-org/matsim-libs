@@ -24,15 +24,15 @@ package org.matsim.households;
  * @author dgrether
  */
 public interface Income {
-	
-	public enum IncomePeriod {year, week, month, day, hour, second};
+
+	public enum IncomePeriod {year, week, month, day, hour, second}
 
 	public String getCurrency();
-	
+
 	public IncomePeriod getIncomePeriod();
-	
+
   public double getIncome();
 
-	public void setCurrency(String currency);	
+	public void setCurrency(String currency);
 
 }

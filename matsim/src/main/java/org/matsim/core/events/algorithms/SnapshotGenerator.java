@@ -44,7 +44,6 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -186,7 +185,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	}
 
 	private static class EventLink {
-		private final LinkImpl link;
+		private final Link link;
 		protected final List<EventAgent> drivingQueue;
 		private final List<EventAgent> parkingQueue;
 		private final List<EventAgent> waitingQueue;
@@ -203,7 +202,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		private final double effectiveCellSize;
 
 		protected EventLink(final Link link2, final double capCorrectionFactor, final double effectiveCellSize, final double storageCapFactor) {
-			this.link = (LinkImpl) link2;
+			this.link = link2;
 			this.drivingQueue = new ArrayList<EventAgent>();
 			this.parkingQueue = new ArrayList<EventAgent>();
 			this.waitingQueue = new ArrayList<EventAgent>();

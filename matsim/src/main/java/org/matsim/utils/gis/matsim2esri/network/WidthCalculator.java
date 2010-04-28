@@ -20,11 +20,11 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 
 public interface WidthCalculator {
 
 
-	public double getWidth(LinkImpl link);
+	public double getWidth(Link link);
 
 }

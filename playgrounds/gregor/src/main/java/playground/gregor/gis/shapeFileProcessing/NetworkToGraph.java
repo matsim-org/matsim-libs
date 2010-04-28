@@ -35,7 +35,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -85,7 +85,7 @@ public class NetworkToGraph {
 				new AttributeType[] { geom, id, fromNode, toNode, length, minWidth, effectiveWidth }, "link");
 
 
-		for (LinkImpl link : this.network.getLinks().values()){
+		for (Link link : this.network.getLinks().values()){
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] {p},this.geofac);
@@ -97,11 +97,11 @@ public class NetworkToGraph {
 		return features;
 	}
 
-	private LinearRing getLinearRing(LinkImpl link) {
+	private LinearRing getLinearRing(Link link) {
 		double minWidth = link.getCapacity() / GISToMatsimConverter.CAPACITY_COEF;
 		minWidth = Math.min(minWidth,20);
 //		minWidth = 10;
-		Coordinate zero = new Coordinate(0,0);
+//		Coordinate zero = new Coordinate(0,0);
 		Coordinate  from = new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()) ;
 
 		Coordinate  to = new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY()) ;

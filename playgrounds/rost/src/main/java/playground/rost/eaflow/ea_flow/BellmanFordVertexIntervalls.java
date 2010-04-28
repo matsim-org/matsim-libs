@@ -30,8 +30,8 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
 
 import playground.rost.eaflow.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.rost.eaflow.Intervall.src.Intervalls.Intervall;
@@ -81,7 +81,7 @@ public class BellmanFordVertexIntervalls {
 	 * The network on which we find routes. We expect the network not to change
 	 * between runs!
 	 */
-	private final NetworkLayer network;
+	private final Network network;
 
 	/**
 	 * data structure to to represent the flow on a network

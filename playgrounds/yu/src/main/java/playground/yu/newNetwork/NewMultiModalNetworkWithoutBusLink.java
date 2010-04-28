@@ -24,7 +24,7 @@ import org.xml.sax.SAXException;
 public class NewMultiModalNetworkWithoutBusLink {
 	private static Set<Link> busLinks2delete = new HashSet<Link>();
 
-	public static NetworkLayer excludeBusLinks(NetworkLayer mmNet,
+	public static Network excludeBusLinks(Network mmNet,
 			TransitSchedule schedule) {
 		for (TransitLine tl : schedule.getTransitLines().values()) {
 			for (TransitRoute tr : tl.getRoutes().values()) {

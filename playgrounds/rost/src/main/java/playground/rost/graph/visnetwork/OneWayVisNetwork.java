@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
 
 import playground.rost.eaflow.ea_flow.Flow;
 import playground.rost.eaflow.ea_flow.TimeExpandedPath;
@@ -16,13 +16,13 @@ import playground.rost.eaflow.ea_flow.TimeExpandedPath.PathEdge;
 
 public class OneWayVisNetwork {
 
-	protected NetworkLayer network;
+	protected Network network;
 	protected Flow flow;
 
 	protected Map<Link, OneWayLink> forwardLinks = new HashMap<Link, OneWayLink>();
 	protected Map<Link, OneWayLink> backwardLinks = new HashMap<Link, OneWayLink>();
 
-	public OneWayVisNetwork(NetworkLayer network, Flow flow)
+	public OneWayVisNetwork(Network network, Flow flow)
 	{
 		this.network = network;
 		this.flow = flow;

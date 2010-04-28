@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -66,7 +67,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// tNodeCost = baseCost - 60 * fromNodeTime = 8817.05792581994
 		// linkLength = 318.075861755381
 		// linkCost = 8667.081123237946 * linkLength / 100 = 28044.9329790229
-		LinkImpl l0 = sc.getNetwork().getLinks().get(new IdImpl("11288"));
+		Link l0 = sc.getNetwork().getLinks().get(new IdImpl("11288"));
 		double l0Cost = rcf.getLinkTravelCost(l0,Time.UNDEFINED_TIME);
 		assertEquals(28044.9329790229,l0Cost,delta);
 
@@ -74,7 +75,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// fromNodeTime = 33.04903456966766666666
 		// toNodeTime = 35.54864794603423333333
 		// fromNodeTime < toNodeTime --> linkCost = 0
-		LinkImpl l0Inverse = sc.getNetwork().getLinks().get(new IdImpl("111288"));
+		Link l0Inverse = sc.getNetwork().getLinks().get(new IdImpl("111288"));
 		double l0InverseCost = rcf.getLinkTravelCost(l0Inverse,Time.UNDEFINED_TIME);
 		assertEquals(0,l0InverseCost,delta);
 

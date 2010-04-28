@@ -33,7 +33,6 @@ import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -56,7 +55,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 
 	private final static Logger log = Logger.getLogger(NetworkExpandNode.class);
 
-	private NodeImpl node = null;
+	private Node node = null;
 	private ArrayList<Tuple<Id,Id>> turns = null;
 	private double radius = Double.NaN;
 	private double offset = Double.NaN;
@@ -74,7 +73,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void setNode(NodeImpl node) {
+	public final void setNode(Node node) {
 		this.node = node;
 	}
 
@@ -111,16 +110,16 @@ public class NetworkExpandNode implements NetworkRunnable {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Expands the {@link NodeImpl node} that is part of the {@link NetworkLayer network} and holds
+	 * Expands the {@link Node node} that is part of the {@link NetworkLayer network} and holds
 	 * {@link Id nodeId}.
 	 *
 	 * <p>It is done in the following way:
 	 * <ol>
-	 * <li>creates for each in- and out-{@link LinkImpl link} a new {@link NodeImpl node} with
+	 * <li>creates for each in- and out-{@link Link link} a new {@link Node node} with
 	 * <ul>
 	 * <li><code>{@link Id new_nodeId} = {@link Id nodeId+"-"+index}; index=[0..#incidentLinks]</code></li>
-	 * <li><code>{@link Coord new_coord}</code> with distance <code>r</code> to the given {@link NodeImpl node}
-	 * in direction of the corresponding incident {@link LinkImpl link} of the given {@link NodeImpl node} with
+	 * <li><code>{@link Coord new_coord}</code> with distance <code>r</code> to the given {@link Node node}
+	 * in direction of the corresponding incident {@link Link link} of the given {@link Node node} with
 	 * offset <code>e</code>.</li>
 	 * </ul>
 	 * <pre>
@@ -139,8 +138,8 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 *               v       |
 	 * </pre>
 	 * </li>
-	 * <li>connects each incident {@link LinkImpl link} of the given {@link NodeImpl node} with the corresponding
-	 * {@link NodeImpl new_node}
+	 * <li>connects each incident {@link Link link} of the given {@link Node node} with the corresponding
+	 * {@link Node new_node}
 	 * <pre>
 	 * <-----12------ o     o <----21-------
 	 *                   O
@@ -154,7 +153,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 *                 v   |
 	 * </pre>
 	 * </li>
-	 * <li>removes the given {@link NodeImpl node} from the {@link NetworkLayer network}
+	 * <li>removes the given {@link Node node} from the {@link NetworkLayer network}
 	 * <pre>
 	 * <-----12------ o     o <----21-------
 	 *
@@ -168,7 +167,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 *                 v   |
 	 * </pre>
 	 * </li>
-	 * <li>inter-connects the {@link NodeImpl new_nodes} with {@link LinkImpl new_links} as defined in the
+	 * <li>inter-connects the {@link Node new_nodes} with {@link Link new_links} as defined in the
 	 * <code>turns</code> list, with:<br>
 	 * <ul>
 	 * <li><code>{@link Id new_linkId} = {@link Id fromLinkId+"-"+index}; index=[0..#turn-tuples]</code></li>
@@ -196,16 +195,16 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 * </p>
 	 *
 	 * @param network MATSim {@link NetworkLayer network} DB
-	 * @param nodeId the {@link Id} of the {@link NodeImpl} to expand
+	 * @param nodeId the {@link Id} of the {@link Node} to expand
 	 * @param turns The {@link ArrayList} of {@link Tuple tuples} of {@link Id linkIds}
-	 * of the incident {@link LinkImpl links} of the given {@link NodeImpl node} that define
-	 * which driving direction is allowed on that {@link NodeImpl node}.
+	 * of the incident {@link Link links} of the given {@link Node node} that define
+	 * which driving direction is allowed on that {@link Node node}.
 	 * @param r the expansion radius. If zero, all new nodes have the same coordinate
 	 * and the new links with have length equals zero
 	 * @param e the offset between a link pair with the same incident nodes. If zero, the two new
 	 * nodes created for that link pair will have the same coordinates
 	 * @return The {@link Tuple} of {@link ArrayList array lists} containing the new
-	 * {@link NodeImpl nodes}, new {@link LinkImpl links} resp.
+	 * {@link Node nodes}, new {@link Link links} resp.
 	 */
 	public final Tuple<ArrayList<Node>,ArrayList<Link>> expandNode(final NetworkLayer network, final Id nodeId, final ArrayList<Tuple<Id,Id>> turns, final double r, final double e) {
 		// check the input

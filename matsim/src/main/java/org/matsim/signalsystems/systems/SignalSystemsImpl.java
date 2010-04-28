@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.																																* 
+ * project: org.matsim.																																*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -34,9 +34,9 @@ import org.matsim.api.core.v01.Id;
 public class SignalSystemsImpl implements SignalSystems {
 
 	private final SignalSystemsFactory builder = new SignalSystemsFactory();
-	
+
 	private final SortedMap<Id, SignalSystemDefinition> signalSystemDefinitions = new TreeMap<Id, SignalSystemDefinition>();
-	private final SortedMap<Id, SignalGroupDefinition> signalGroupDefinitions = new TreeMap<Id, SignalGroupDefinition>();;
+	private final SortedMap<Id, SignalGroupDefinition> signalGroupDefinitions = new TreeMap<Id, SignalGroupDefinition>();
 
 	/**
 	 * @see org.matsim.signalsystems.systems.SignalSystems#getSignalSystemDefinitionsList()
@@ -48,7 +48,7 @@ public class SignalSystemsImpl implements SignalSystems {
 		return Collections.unmodifiableList(r);
 	}
 
-	
+
 	/**
 	 * @see org.matsim.signalsystems.systems.SignalSystems#getSignalGroupDefinitionsList()
 	 */
@@ -66,7 +66,7 @@ public class SignalSystemsImpl implements SignalSystems {
 			SignalSystemDefinition lssdef) {
 		this.signalSystemDefinitions.put(lssdef.getId(), lssdef);
 	}
-	
+
 	/**
 	 * @see org.matsim.signalsystems.systems.SignalSystems#addSignalGroupDefinition(org.matsim.signalsystems.systems.SignalGroupDefinition)
 	 */
@@ -89,5 +89,5 @@ public class SignalSystemsImpl implements SignalSystems {
 		return this.signalGroupDefinitions;
 	}
 
-	
+
 }

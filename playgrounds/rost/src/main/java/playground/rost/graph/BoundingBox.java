@@ -23,9 +23,9 @@ package playground.rost.graph;
 
 import java.util.Collection;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
 
 import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings;
 
@@ -35,13 +35,13 @@ public class BoundingBox {
 	private double minY = Double.POSITIVE_INFINITY;
 	private double maxX = Double.NEGATIVE_INFINITY;
 	private double maxY = Double.NEGATIVE_INFINITY;
-	
+
 	protected void clear()
 	{
 		minX = Double.POSITIVE_INFINITY;
 		minY = Double.POSITIVE_INFINITY;
 		maxX = Double.NEGATIVE_INFINITY;
-		maxY = Double.NEGATIVE_INFINITY;		
+		maxY = Double.NEGATIVE_INFINITY;
 	}
 
 	public void run(Collection<Node> collection) {
@@ -55,16 +55,16 @@ public class BoundingBox {
 			if (n.getCoord().getY() > this.maxY) { this.maxY = n.getCoord().getY(); }
 		}
 	}
-	
+
 	public void add(Node n)
 	{
 		if (n.getCoord().getX() < this.minX) { this.minX = n.getCoord().getX(); }
 		if (n.getCoord().getY() < this.minY) { this.minY = n.getCoord().getY(); }
 		if (n.getCoord().getX() > this.maxX) { this.maxX = n.getCoord().getX(); }
-		if (n.getCoord().getY() > this.maxY) { this.maxY = n.getCoord().getY(); }	
+		if (n.getCoord().getY() > this.maxY) { this.maxY = n.getCoord().getY(); }
 	}
-	
-	public void run(NetworkLayer network)
+
+	public void run(Network network)
 	{
 		this.clear();
 		Node sink = network.getNodes().get(new IdImpl(GlobalFlowCalculationSettings.superSinkId));
@@ -94,12 +94,12 @@ public class BoundingBox {
 	public double getMaxY() {
 		return this.maxY;
 	}
-	
+
 	public boolean outOfBox(Node node)
 	{
 		return outOfBox(node.getCoord().getX(), node.getCoord().getY());
 	}
-	
+
 	public boolean outOfBox(double x, double y)
 	{
 		if(x < minX ||
@@ -111,27 +111,27 @@ public class BoundingBox {
 		}
 		return false;
 	}
-	
+
 	public boolean boxIntersects(BoundingBox other)
 	{
 		boolean hor = false;
 		boolean ver = false;
 		//test1
 		double x0,x1,x2,x3,y0,y1,y2,y3;
-		
+
 		x0 = this.maxX;
 		y0 = this.maxY;
-		
+
 		x1 = this.minX;
 		y1 = this.maxY;
-		
+
 		x2 = this.maxX;
 		y2 = this.minY;
-		
+
 		x3 = this.minX;
 		y3 = this.minY;
-		
-		if(!outOfBox(x0,y0) || 
+
+		if(!outOfBox(x0,y0) ||
 				!outOfBox(x1,y1) ||
 				!outOfBox(x2,y2) ||
 				!outOfBox(x3,y3))

@@ -24,25 +24,25 @@ package playground.rost.controller.vismodule.implementations;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
 
 import playground.rost.controller.map.BasicMap;
 import playground.rost.controller.vismodule.AbstractVisModuleImpl;
 import playground.rost.controller.vismodule.VisModuleContainer;
 
 public class NodeVisModule extends AbstractVisModuleImpl {
-	
-	protected NetworkLayer network;
-	
-	public NodeVisModule(VisModuleContainer vMContainer, NetworkLayer network)
+
+	protected Network network;
+
+	public NodeVisModule(VisModuleContainer vMContainer, Network network)
 	{
 		super(vMContainer, "NodeView");
 		this.network = network;
 		this.attributes.put("color", "0xFF0000");
 		this.attributes.put("show", "true");
 		this.attributes.put("ids", "false");
-		
+
 	}
 
 	@Override

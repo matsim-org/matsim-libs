@@ -33,13 +33,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
@@ -65,7 +65,7 @@ public class CutNetwork {
 	private final static double MIN_X = 650473.;
 	private final static double MIN_Y = 9892816.;
 
-	private static void cutIt(final NetworkLayer net,
+	private static void cutIt(final Network net,
 			final List<NetworkChangeEvent> events, final Population pop, final HashMap<Id,EvacuationAreaLink> eal) {
 
 		max_x = 652000.;
@@ -122,14 +122,14 @@ public class CutNetwork {
 			NetworkChangeEvent e = eq.poll();
 			events.remove(e);
 		}
-		ConcurrentLinkedQueue<LinkImpl> lq = new ConcurrentLinkedQueue<LinkImpl>();
-		for (LinkImpl l : net.getLinks().values()) {
+		ConcurrentLinkedQueue<Link> lq = new ConcurrentLinkedQueue<Link>();
+		for (Link l : net.getLinks().values()) {
 			if (!isWithin(l.getCoord())) {
 				lq.add(l);
 			}
 		}
 		while (lq.size() > 0) {
-			LinkImpl l = lq.poll();
+			Link l = lq.poll();
 			net.removeLink(l.getId());
 		}
 		new NetworkCleaner().run(net);
