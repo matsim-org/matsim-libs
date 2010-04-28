@@ -31,11 +31,10 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -44,7 +43,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private final Network network;
-	
+
 	public FromToSummary(final Network network) {
 		super();
 		this.network = network;
@@ -54,7 +53,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 				this.comparator);
 	}
 
-	public FromToSummary(final Network network, NodeImpl fromNode, NodeImpl toNode, int startTime) {
+	public FromToSummary(final Network network, Node fromNode, Node toNode, int startTime) {
 		this(network);
 
 		addStartTimeOccurrence(fromNode, toNode, startTime);
@@ -129,11 +128,11 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 
 	public void run(Plan plan) {
 		List<PlanElement> actslegs = plan.getPlanElements();
-		ActivityImpl fromAct = (ActivityImpl) actslegs.get(0);
+		Activity fromAct = (Activity) actslegs.get(0);
 		Node fromNode = this.network.getLinks().get(fromAct.getLinkId()).getToNode();
 
 		for (int j = 2; j < actslegs.size(); j = j + 2) {
-			ActivityImpl toAct = (ActivityImpl) actslegs.get(j);
+			Activity toAct = (Activity) actslegs.get(j);
 
 			if (fromAct.getEndTime() >= 0) {
 				Node toNode = this.network.getLinks().get(toAct.getLinkId()).getFromNode();
@@ -142,9 +141,9 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 						.getY());
 				this.travelZone.add(toNode.getCoord().getX(), toNode.getCoord()
 						.getY());
-			} else if (fromAct.getDuration() < 0) {
-				System.out.println("act " + (j - 2)
-						+ " has neither end-time nor duration.");
+//			} else if (fromAct.getDuration() < 0) {
+//				System.out.println("act " + (j - 2)
+//						+ " has neither end-time nor duration.");
 			}
 
 			fromAct = toAct;
@@ -230,7 +229,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			}
 			return false;
 		}
-		
+
 		@Override
 		public int hashCode() {
 			return getFirst().hashCode() & getSecond().hashCode();
@@ -281,7 +280,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	public Rectangle2D.Double getTravelZone() {
 		return this.travelZone;
 	}
-	
+
 	/**
 	 * @author lnicolas
 	 * Compares two NodePairs.

@@ -25,13 +25,13 @@ import org.matsim.testcases.MatsimTestCase;
 
 /**
  * Test for convenience methods of Act.
- * 
+ *
  * @author dgrether
  */
 public class ActivityTest extends MatsimTestCase {
 
 	public void testCalculateDuration() {
-		ActivityImpl testee = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(0, 0));
+		ActivityImpl testee = new ActivityImpl("h", new CoordImpl(0, 0));
 		testee.setStartTime(0.0);
 		testee.setDuration(0.0);
 		testee.setEndTime(0.0);

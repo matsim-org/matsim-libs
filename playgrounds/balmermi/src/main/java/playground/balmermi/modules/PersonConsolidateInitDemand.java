@@ -27,12 +27,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.knowledges.Knowledges;
@@ -65,7 +65,7 @@ public class PersonConsolidateInitDemand extends AbstractPersonAlgorithm impleme
 
 		// get the activity options of the plan
 		List<ActivityOption> actOptions = new ArrayList<ActivityOption>();
-		ActivityImpl act = plan.getFirstActivity();
+		Activity act = plan.getFirstActivity();
 		while (act != plan.getLastActivity()) {
 			String actType = act.getType();
 			ActivityOption ao = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(actType);

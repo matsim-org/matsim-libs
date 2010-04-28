@@ -19,10 +19,10 @@
 
 package org.matsim.locationchoice.constrained;
 
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.locationchoice.Initializer;
 import org.matsim.testcases.MatsimTestCase;
@@ -35,8 +35,8 @@ public class ManageSubchainsTest extends MatsimTestCase {
 		ManageSubchains manager = new ManageSubchains();
 
 		Plan plan = initializer.getControler().getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan();
-		ActivityImpl act = ((PlanImpl) plan).getFirstActivity();
-		LegImpl leg = ((PlanImpl) plan).getNextLeg(act);
+		Activity act = ((PlanImpl) plan).getFirstActivity();
+		Leg leg = ((PlanImpl) plan).getNextLeg(act);
 		manager.primaryActivityFound(act, leg);
 		assertEquals(act, manager.getSubChains().get(0).getFirstPrimAct());
 

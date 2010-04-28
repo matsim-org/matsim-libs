@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -215,8 +216,8 @@ public class ReadFromUrbansimParcelModel {
 						newPop.addPerson(newPerson) ;
 						break ;
 					}
-					ActivityImpl oldHomeAct = ((PlanImpl) oldPerson.getSelectedPlan()).getFirstActivity();
-					ActivityImpl newHomeAct =    ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity() ;
+					Activity oldHomeAct = ((PlanImpl) oldPerson.getSelectedPlan()).getFirstActivity();
+					Activity newHomeAct =    ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity() ;
 					if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // act changed.  Accept new person:
 						newPop.addPerson(newPerson) ;
 						break ;
@@ -269,7 +270,7 @@ public class ReadFromUrbansimParcelModel {
 		log.info( "Done with reading persons." ) ;
 	}
 
-	private boolean actHasChanged ( final ActivityImpl oldAct, final ActivityImpl newAct, final NetworkLayer network ) {
+	private boolean actHasChanged ( final Activity oldAct, final Activity newAct, final NetworkLayer network ) {
 		if ( !oldAct.getCoord().equals( newAct.getCoord() ) ) {
 //			log.info( "act location changed" ) ;
 			return true ;

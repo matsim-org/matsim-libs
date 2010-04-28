@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -87,9 +88,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 		// test with only one plan...
 		PersonImpl person = new PersonImpl(new IdImpl(1));
-		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
-		ActivityImpl a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
-		ActivityImpl b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
+		PlanImpl p1 = new PlanImpl(person);
+		Activity a = new ActivityImpl("h", l6.getId());
+		Activity b = new ActivityImpl("w", l7.getId());
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);

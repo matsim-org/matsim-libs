@@ -85,7 +85,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 		String factype=null;// facility type to switch out
 		Person person = plan.getPerson();
 
-		//COPY THE SELECTED PLAN		    
+		//COPY THE SELECTED PLAN
 		Plan newPlan = ((PersonImpl) person).copySelectedPlan();
 
 		// Note that it is not changed, yet
@@ -148,7 +148,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
 				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLinkId().equals(((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLinkId()))){
-					ActivityImpl firstAct = ((PlanImpl) newPlan).getFirstActivity();
+					ActivityImpl firstAct = (ActivityImpl) ((PlanImpl) newPlan).getFirstActivity();
 					firstAct.setLinkId(fFromKnowledge.getLinkId());
 					firstAct.setCoord(fFromKnowledge.getCoord());
 					firstAct.setFacilityId(fFromKnowledge.getId());
@@ -209,7 +209,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 		s = longString.split(patternStr);
 		double[] w = new double[s.length];
 		w[0]=Double.parseDouble(s[0]);
-		double sum = w[0];	
+		double sum = w[0];
 		for (int i = 1; i < s.length; i++) {
 			w[i] = Double.parseDouble(s[i])+w[i-1];
 			sum=sum+Double.parseDouble(s[i]);

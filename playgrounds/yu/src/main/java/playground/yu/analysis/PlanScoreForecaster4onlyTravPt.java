@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -46,9 +46,9 @@ import playground.yu.utils.DebugTools;
 /**
  * approximately forecasts the score of a plan, that was newly created by e.g.
  * ReRoute or TimeAllocationMutator
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class PlanScoreForecaster4onlyTravPt {
 	private PlanImpl plan, oldSelected;
@@ -109,7 +109,7 @@ public class PlanScoreForecaster4onlyTravPt {
 
 	/**
 	 * believes only legDepartureTime of newly created Plans
-	 * 
+	 *
 	 * @param leg
 	 */
 	private void handleLeg(LegImpl leg) {
@@ -131,7 +131,7 @@ public class PlanScoreForecaster4onlyTravPt {
 						.getEndTime();
 
 			if (departTime < 0) {
-				ActivityImpl oldPreAct = oldSelected
+				ActivityImpl oldPreAct = (ActivityImpl) oldSelected
 						.getPreviousActivity(oldLeg);
 				departTime = oldPreAct.getStartTime() + oldPreAct.getDuration();
 			}
@@ -193,9 +193,9 @@ public class PlanScoreForecaster4onlyTravPt {
 
 		LegImpl preLeg = null, nextLeg = null;
 		if (!plan.getFirstActivity().equals(act))// not the first one
-			preLeg = plan.getPreviousLeg(act);
+			preLeg = (LegImpl) plan.getPreviousLeg(act);
 		if (!plan.getLastActivity().equals(act))// not the last one
-			nextLeg = plan.getNextLeg(act);
+			nextLeg = (LegImpl) plan.getNextLeg(act);
 
 		double actStartTime = act.getStartTime(), actEndTime = act.getEndTime();
 		if (actStartTime == Double.NEGATIVE_INFINITY)

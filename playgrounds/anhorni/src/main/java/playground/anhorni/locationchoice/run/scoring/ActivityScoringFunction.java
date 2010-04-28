@@ -27,6 +27,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -34,7 +35,6 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
@@ -88,7 +88,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 	}
 
 	@Override
-	protected double calcActScore(double arrivalTime, double departureTime,	ActivityImpl act) {
+	protected double calcActScore(double arrivalTime, double departureTime,	Activity act) {
 
 		double fromArrivalToDeparture = departureTime - arrivalTime;
 

@@ -2,9 +2,8 @@ package playground.ciarif.carpooling;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 
 public class WorkTrip {
 	private Id tripId;
@@ -15,9 +14,9 @@ public class WorkTrip {
 	private double travelTime;
 	private double travelDistance;
 	private boolean homeWork;
-	
-	public WorkTrip (Integer tripNumber, Id personId, Coord homeCoord, Coord workCoord, LegImpl homeWorkLeg, boolean homework){
-		
+
+	public WorkTrip (Integer tripNumber, Id personId, Coord homeCoord, Coord workCoord, Leg homeWorkLeg, boolean homework){
+
 		this.tripId = new IdImpl(tripNumber.toString());
 		this.personId = personId;
 		this.homeCoord = homeCoord;
@@ -35,11 +34,11 @@ public class WorkTrip {
 	public Coord getHomeCoord() {
 		return this.homeCoord;
 	}
-	
+
 	public Coord getWorkCoord() {
 		return this.workCoord;
 	}
-	
+
 	public double getDepartureTime() {
 		return this.departureTime;
 	}
@@ -52,7 +51,7 @@ public class WorkTrip {
 	public Id getTripId() {
 		return this.tripId;
 	}
-	
+
 	public boolean getHomeWork () {
 		return this.homeWork;
 	}

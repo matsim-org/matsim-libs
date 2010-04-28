@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -507,13 +508,13 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 	 *
 	 */
 	public static class ParkLocation {
-		private final ActivityImpl act;
+		private final Activity act;
 		private final Network network;
 
 		// private Coord coord=null;
 		// private Link link=null;
 
-		public ParkLocation(final ActivityImpl act, Network network) {
+		public ParkLocation(final Activity act, Network network) {
 			this.act = act;
 			this.network = network;
 			// coord=act.getCoord();

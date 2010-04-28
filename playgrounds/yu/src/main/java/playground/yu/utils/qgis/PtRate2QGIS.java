@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -39,12 +39,12 @@ import playground.yu.analysis.PlanModeJudger;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class PtRate2QGIS implements X2QGIS {
 
 	/**
-	 * 
+	 *
 	 */
 	public static class LinkPtRate extends AbstractPersonAlgorithm implements
 			PlanAlgorithm {
@@ -62,7 +62,7 @@ public class PtRate2QGIS implements X2QGIS {
 		}
 
 		public void run(Plan plan) {
-			ActivityImpl fa = ((PlanImpl) plan).getFirstActivity();
+			Activity fa = ((PlanImpl) plan).getFirstActivity();
 			Id linkId = fa.getLinkId();
 			if (fa.getType().startsWith("h")) {
 				Integer a = agents.get(linkId);
@@ -84,7 +84,7 @@ public class PtRate2QGIS implements X2QGIS {
 			Map<Id, Double> ptRates = new TreeMap<Id, Double>();
 			for (Id linkId : ptUsers.keySet()) {
 				double a = agents.get(linkId).intValue();
-				double ptRate = ((double) ptUsers.get(linkId).intValue()) / a;
+				double ptRate = (ptUsers.get(linkId).intValue()) / a;
 				ptRates.put(linkId, Double.valueOf(ptRate));
 			}
 			return ptRates;

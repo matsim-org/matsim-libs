@@ -25,6 +25,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
@@ -37,8 +40,6 @@ import org.matsim.core.utils.misc.RouteUtils;
  */
 public class PopulationFactoryImpl implements PopulationFactory {
 
-//	private static final Logger log = Logger.getLogger(PopulationBuilderImpl.class);
-
 	private final Scenario scenario;
 
 	public PopulationFactoryImpl(final Scenario scenario) {
@@ -46,7 +47,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	}
 
 	@Override
-	public PersonImpl createPerson(final Id id) {
+	public Person createPerson(final Id id) {
 		PersonImpl p = new PersonImpl(id);
 		return p;
 	}
@@ -57,25 +58,25 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	}
 
 	@Override
-	public ActivityImpl createActivityFromCoord(final String actType, final Coord coord) {
+	public Activity createActivityFromCoord(final String actType, final Coord coord) {
 		ActivityImpl act = new ActivityImpl(actType, coord);
 		return act;
 	}
 
-	public ActivityImpl createActivityFromFacilityId(final String actType, final Id facilityId) {
+	public Activity createActivityFromFacilityId(final String actType, final Id facilityId) {
 		ActivityImpl act = new ActivityImpl(actType);
 		act.setFacilityId(facilityId);
 		return act;
 	}
 
 	@Override
-	public ActivityImpl createActivityFromLinkId(final String actType, final Id linkId) {
+	public Activity createActivityFromLinkId(final String actType, final Id linkId) {
 		ActivityImpl act = new ActivityImpl(actType, linkId);
 		return act;
 	}
 
 	@Override
-	public LegImpl createLeg(final TransportMode legMode) {
+	public Leg createLeg(final TransportMode legMode) {
 		return new LegImpl(legMode);
 	}
 

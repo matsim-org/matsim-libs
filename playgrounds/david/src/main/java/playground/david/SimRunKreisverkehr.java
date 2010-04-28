@@ -34,6 +34,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.NetVis;
 
 public class SimRunKreisverkehr {
@@ -50,21 +51,21 @@ public class SimRunKreisverkehr {
 		Config config = scenario.getConfig();
 		String localDtdBase = "./dtd/";
 		config.global().setLocalDtdBase(localDtdBase);
-		
+
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		int cellcount = 0;
 		int cellcount2 = 0;
 		for (LinkImpl link : network.getLinks().values()) {
-			double length = link.getLength()*NetworkUtils.getNumberOfLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME, link);
+			double length = link.getLength()*NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link);
 			cellcount += Math.ceil(length/7.5);
 			cellcount2 += link.getLength();
 		}
 		System.out.println("Summarized Cell count is " + cellcount +" on a net of length " + cellcount2/1000 +" km");
 		int buffercount = 0;
 		for (LinkImpl link : network.getLinks().values()) {
-			double cap = link.getFlowCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+			double cap = link.getFlowCapacity();
 			buffercount += Math.ceil(cap);
 		}
 		System.out.println("Summarized buffer count is " + buffercount);

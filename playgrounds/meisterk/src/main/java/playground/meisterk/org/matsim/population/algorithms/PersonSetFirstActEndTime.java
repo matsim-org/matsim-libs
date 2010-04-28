@@ -20,10 +20,10 @@
 
 package playground.meisterk.org.matsim.population.algorithms;
 
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -31,7 +31,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class PersonSetFirstActEndTime extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private double firstActEndTime = Double.MIN_VALUE;
-	
+
 	public PersonSetFirstActEndTime(double firstActEndTime) {
 		super();
 		this.firstActEndTime = firstActEndTime;
@@ -45,12 +45,10 @@ public class PersonSetFirstActEndTime extends AbstractPersonAlgorithm implements
 	}
 
 	public void run(Plan plan) {
-
-		ActivityImpl firstAct = ((PlanImpl) plan).getFirstActivity();
+		Activity firstAct = ((PlanImpl) plan).getFirstActivity();
 		firstAct.setEndTime(this.firstActEndTime);
-		LegImpl firstLeg = ((PlanImpl) plan).getNextLeg(firstAct);
+		Leg firstLeg = ((PlanImpl) plan).getNextLeg(firstAct);
 		firstLeg.setDepartureTime(this.firstActEndTime);
-	
 	}
 
 }

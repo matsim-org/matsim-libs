@@ -9,6 +9,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -26,8 +28,6 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -110,11 +110,11 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 			Plan plan = p.getSelectedPlan();
 			int index = 0;
 
-			ActivityImpl act = null;
-			LegImpl leg = null;
+			Activity act = null;
+			Leg leg = null;
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					act = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					act = (Activity) pe;
 
 					if (leg != null) {
 						// each leg ends with enter on act link
@@ -138,8 +138,8 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 						assertEquals(act.getLinkId(), ((ActivityStartEventImpl) list.get(index)).getLinkId());
 						index++;
 					}
-				} else if (pe instanceof LegImpl) {
-					leg = (LegImpl) pe;
+				} else if (pe instanceof Leg) {
+					leg = (Leg) pe;
 
 					// act end event
 					assertTrue(list.get(index) instanceof ActivityEndEventImpl);

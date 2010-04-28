@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
@@ -53,12 +52,12 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 	private static final int INITIAL_INDEX = 0;
 	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
-	
+
 	private static int firstLastActWarning = 0;
 
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
-	
+
 	private static final Logger log = Logger.getLogger(ActivityScoringFunction.class);
 
 	public ActivityScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
@@ -86,11 +85,6 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		this.lastTime = time;
 	}
 
-
-
-
-
-
 	public void finish() {
 		if (this.index == this.lastActIndex) {
 			handleAct(24*3600); // handle the last act
@@ -101,7 +95,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		return this.score;
 	}
 
-	protected double calcActScore(final double arrivalTime, final double departureTime, final ActivityImpl act) {
+	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
 		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
@@ -205,7 +199,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		return tmpScore;
 	}
 
-	protected double[] getOpeningInterval(final ActivityImpl act) {
+	protected double[] getOpeningInterval(final Activity act) {
 
 		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
@@ -224,12 +218,12 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 	}
 
 	protected void handleAct(final double time) {
-		ActivityImpl act = (ActivityImpl)this.plan.getPlanElements().get(this.index);
+		Activity act = (Activity)this.plan.getPlanElements().get(this.index);
 		if (this.index == 0) {
 			this.firstActTime = time;
 		} else if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
-			if (lastActType.equals(((ActivityImpl) this.plan.getPlanElements().get(0)).getType())) {
+			if (lastActType.equals(((Activity) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 			} else {
@@ -240,10 +234,10 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 				            log.warn("Additional warnings of this type are suppressed.");
 				        }
 				        firstLastActWarning++;
-				    }					
-					
+				    }
+
 					// score first activity
-					ActivityImpl firstAct = (ActivityImpl)this.plan.getPlanElements().get(0);
+					Activity firstAct = (Activity)this.plan.getPlanElements().get(0);
 					this.score += calcActScore(0.0, this.firstActTime, firstAct);
 					// score last activity
 					this.score += calcActScore(this.lastTime, 24*3600, act); // SCENARIO_DURATION

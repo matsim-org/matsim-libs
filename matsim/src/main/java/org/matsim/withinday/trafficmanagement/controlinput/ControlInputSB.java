@@ -140,7 +140,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 
 			Link l = this.network.getLinks().get(linkId);
 			if (!this.capacities.containsKey(linkId)) {
-				double capacity = ((LinkImpl)l).getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
+				double capacity = ((LinkImpl)l).getFlowCapacity() * this.simulationConfig.getFlowCapFactor()
 					/ this.simulationConfig.getTimeStepSize();
 				this.capacities.put(linkId, capacity);
 			}

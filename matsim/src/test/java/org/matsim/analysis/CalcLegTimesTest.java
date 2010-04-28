@@ -31,7 +31,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -54,7 +53,8 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		super.setUp();
 		super.loadConfig(null);
 
-		this.population = new ScenarioImpl().getPopulation();
+		ScenarioImpl s = new ScenarioImpl();
+		this.population = s.getPopulation();
 		PersonImpl person = new PersonImpl(DEFAULT_PERSON_ID);
 		this.population.addPerson(person);
 		PlanImpl plan = person.createAndAddPlan(true);
@@ -67,7 +67,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		plan.createAndAddActivity("act4", new CoordImpl(200.0, 200.0));
 		plan.createAndAddLeg(TransportMode.undefined);
 		plan.createAndAddActivity("act5", new CoordImpl(200.0, 200.0));
-		this.network = new NetworkLayer();
+		this.network = s.getNetwork();
 		Node fromNode = this.network.getFactory().createNode(new IdImpl("123456"), new CoordImpl(100.0, 100.0));
 		this.network.addNode(fromNode);
 		Node toNode = this.network.getFactory().createNode(new IdImpl("789012"), new CoordImpl(200.0, 200.0));

@@ -11,7 +11,7 @@ import net.opengis.kml._2.StyleType;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -41,7 +41,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 
 
 	@Override
-	public AbstractFeatureType createActFeature(ActivityImpl act, StyleType style) {
+	public AbstractFeatureType createActFeature(Activity act, StyleType style) {
 
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		p.setName(act.getType() + " act");
@@ -191,7 +191,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		return buffer.toString();
 	}
 
-	private String createActDescription(ActivityImpl act) {
+	private String createActDescription(Activity act) {
 		StringBuilder buffer = new StringBuilder(100);
 //		buffer.append(NetworkFeatureFactory.STARTCDATA);
 //		buffer.append(NetworkFeatureFactory.STARTH2);
@@ -212,10 +212,10 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		buffer.append("StartTime: ");
 		buffer.append(Time.writeTime(act.getStartTime()));
 		buffer.append(ENDLI);
-		buffer.append(STARTLI);
-		buffer.append("Duration: ");
-		buffer.append(Time.writeTime(act.getDuration()));
-		buffer.append(ENDLI);
+//		buffer.append(STARTLI);
+//		buffer.append("Duration: ");
+//		buffer.append(Time.writeTime(act.getDuration()));
+//		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("EndTime: ");
 		buffer.append(Time.writeTime(act.getEndTime()));

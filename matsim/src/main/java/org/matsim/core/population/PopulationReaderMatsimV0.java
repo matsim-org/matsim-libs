@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -74,7 +75,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	private final Scenario scenario;
 	private NetworkRoute currroute = null;
 
-	private ActivityImpl prevAct = null;
+	private Activity prevAct = null;
 	private String routeNodes = null;
 
 	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);

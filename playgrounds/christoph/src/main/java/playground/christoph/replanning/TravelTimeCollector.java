@@ -58,15 +58,15 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	SimulationBeforeSimStepListener, SimulationAfterSimStepListener{
 
 	private Network network;
-	
+
 	// Trips with no Activity on the current Link
 	private Map<Id, TripBin> regulatActiveTrips;	// PersonId
-	
+
 	/*
 	 * We may have to sort / order the Trips to get deterministic results!
 	 */
 	private LinkedList<TripBin> finishedTrips;	// LinkId
-	
+
 	/*
 	 * For parallel Execution
 	 */
@@ -74,13 +74,13 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	private CyclicBarrier endBarrier;
 	private UpdateMeanTravelTimesThread[] updateMeanTravelTimesThreads;
 	private int numOfThreads = 2;
-	
+
 	private MyLinkImpl[][] parallelArrays;
-	
+
 	public TravelTimeCollector(Network network)
 	{
 		this.network = network;
-		
+
 		init();
 		init(this.numOfThreads);
 	}
@@ -89,40 +89,40 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	{
 		regulatActiveTrips = new HashMap<Id, TripBin>();
 		finishedTrips = new LinkedList<TripBin>();
-		
+
 		for (Link link : this.network.getLinks().values())
 		{
 			MyLinkImpl myLink = (MyLinkImpl)link;
 			myLink.cacheFreeSpeedTravelTime();
-			myLink.setTravelTime(Math.ceil(myLink.getFreespeedTravelTime(Time.UNDEFINED_TIME)));
+			myLink.setTravelTime(Math.ceil(myLink.getFreespeedTravelTime()));
 			myLink.updateMeanTravelTime(Time.UNDEFINED_TIME);
 		}
 	}
-	
+
 	public double getLinkTravelTime(Link link, double time)
 	{
 		if (link instanceof SubLink) link = ((SubLink) link).getParentLink();
-		
+
 		MyLinkImpl myLink = (MyLinkImpl)link;
 		return myLink.getTravelTime();
 	}
-	
+
 	public void reset(int iteration)
 	{
 		// TODO Auto-generated method stub
 	}
-	
+
 	public void handleEvent(LinkEnterEvent event)
 	{
 		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();
 		double time = event.getTime();
-		
+
 		TripBin tripBin = new TripBin();
 		tripBin.enterTime = time;
 		tripBin.personId = personId;
 		tripBin.linkId = linkId;
-		
+
 		this.regulatActiveTrips.put(personId, tripBin);
 	}
 
@@ -131,16 +131,16 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();
 		double time = event.getTime();
-		
+
 		TripBin tripBin = this.regulatActiveTrips.remove(personId);
 		if (tripBin != null)
 		{
 			tripBin.leaveTime = time;
-			
+
 			this.finishedTrips.add(tripBin);
 		}
 	}
-	
+
 	/*
 	 * We don't have to count Stuck Events. The MobSim creates
 	 * LeaveLink Events before throwing Stuck Events.
@@ -153,15 +153,15 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	/*
 	 * If an Agent performs an Activity on a Link we have
 	 * to remove his current Trip. Otherwise we would have a
-	 * Trip with the Duration of the Trip itself and the Activity. 
+	 * Trip with the Duration of the Trip itself and the Activity.
 	 */
 	public void handleEvent(AgentArrivalEvent event)
 	{
 		Id personId = event.getPersonId();
-		
+
 		TripBin tripBin = this.regulatActiveTrips.remove(personId);
 	}
-	
+
 	public void handleEvent(AgentDepartureEvent event)
 	{
 
@@ -169,17 +169,17 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 
 	// Add Link TravelTimes
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e)
-	{		
+	{
 		TripBin tripBin;
 		while ((tripBin = finishedTrips.pollFirst()) != null)
-		{	
+		{
 			double travelTime = tripBin.leaveTime - tripBin.enterTime;
-			
+
 			MyLinkImpl myLink = (MyLinkImpl)network.getLinks().get(tripBin.linkId);
 			myLink.addTravelTime(travelTime, e.getSimulationTime());
 		}
 	}
-	
+
 	// Update Link TravelTimes
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e)
 	{
@@ -188,11 +188,11 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 //			MyLinkImpl myLink = (MyLinkImpl)link;
 //			myLink.updateMeanTravelTime(e.getSimulationTime());
 //		}
-		
+
 		// parallel Execution
 		this.run(e.getSimulationTime());
 	}
-	
+
 	private class TripBin {
 		Id personId;
 		Id linkId;
@@ -200,12 +200,12 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 		double leaveTime;
 	}
 
-	/* 
+	/*
 	 * ----------------------------------------------------------------
 	 * Methods for parallel Execution
 	 * ----------------------------------------------------------------
 	 */
-	
+
 	/*
 	 * The Threads are waiting at the TimeStepStartBarrier.
 	 * We trigger them by reaching this Barrier. Now the
@@ -217,18 +217,18 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	 * this Method does, it should work anyway.
 	 */
 	private void run(double time)
-	{	
+	{
 		try
 		{
 			// set current Time
-			for (UpdateMeanTravelTimesThread updateMeanTravelTimesThread : updateMeanTravelTimesThreads) 
-			{				
+			for (UpdateMeanTravelTimesThread updateMeanTravelTimesThread : updateMeanTravelTimesThreads)
+			{
 				updateMeanTravelTimesThread.setTime(time);
 			}
-			
+
 			this.startBarrier.await();
-				
-			this.endBarrier.await();		
+
+			this.endBarrier.await();
 		}
 		catch (InterruptedException e)
 		{
@@ -239,18 +239,18 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	      	Gbl.errorMsg(e);
 		}
 	}
-	
+
 	/*
 	 * Create equal sized Arrays.
 	 */
 	private void createArrays()
-	{	
+	{
 		List<List<MyLinkImpl>> links = new ArrayList<List<MyLinkImpl>>();
 		for (int i = 0; i < numOfThreads; i++)
 		{
 			links.add(new ArrayList<MyLinkImpl>());
 		}
-		
+
 		int roundRobin = 0;
 		for (Link link : this.network.getLinks().values())
 		{
@@ -258,7 +258,7 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 			links.get(roundRobin % numOfThreads).add(myLink);
 			roundRobin++;
 		}
-		
+
 		/*
 		 * Now we create Arrays out of our Lists because iterating over them
 		 * is much faster.
@@ -267,26 +267,26 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 		for (int i = 0; i < links.size(); i++)
 		{
 			List<MyLinkImpl> list = links.get(i);
-			
+
 			MyLinkImpl[] array = new MyLinkImpl[list.size()];
 			list.toArray(array);
 			parallelArrays[i] = array;
 		}
 	}
-		
+
 	public void init(int numOfThreads)
 	{
 		this.numOfThreads = numOfThreads;
 
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
-		
+
 		createArrays();
-		
+
 		updateMeanTravelTimesThreads = new UpdateMeanTravelTimesThread[numOfThreads];
-						
+
 		// setup threads
-		for (int i = 0; i < numOfThreads; i++) 
+		for (int i = 0; i < numOfThreads; i++)
 		{
 			UpdateMeanTravelTimesThread updateMeanTravelTimesThread = new UpdateMeanTravelTimesThread();
 			updateMeanTravelTimesThread.setName("UpdateMeanTravelTimes" + i);
@@ -295,24 +295,24 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 			updateMeanTravelTimesThread.setEndBarrier(this.endBarrier);
 			updateMeanTravelTimesThread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
 			updateMeanTravelTimesThreads[i] = updateMeanTravelTimesThread;
-			
+
 			updateMeanTravelTimesThread.start();
 		}
-		
+
 		/*
 		 * After initialization the Threads are waiting at the
-		 * endBarrier. We trigger this Barrier once so 
+		 * endBarrier. We trigger this Barrier once so
 		 * they wait at the startBarrier what has to be
 		 * their state if the run() method is called.
 		 */
 		try
 		{
 			this.endBarrier.await();
-		} 
-		catch (InterruptedException e) 
+		}
+		catch (InterruptedException e)
 		{
 			Gbl.errorMsg(e);
-		} 
+		}
 		catch (BrokenBarrierException e)
 		{
 			Gbl.errorMsg(e);
@@ -325,10 +325,10 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	{
 		private CyclicBarrier startBarrier;
 		private CyclicBarrier endBarrier;
-		
+
 		private double time = 0.0;
 		private MyLinkImpl[] myLinks;
-		
+
 		public UpdateMeanTravelTimesThread()
 		{
 		}
@@ -342,39 +342,39 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 		{
 			this.endBarrier = cyclicBarrier;
 		}
-		
+
 		public void setMyLinkImplsArray(MyLinkImpl[] myLinks)
 		{
 			this.myLinks = myLinks;
 		}
-		
+
 		public void setTime(final double t)
 		{
 			time = t;
 		}
-				
+
 		@Override
 		public void run()
-		{	
+		{
 			while(true)
 			{
 				try
 				{
 					/*
-					 * The End of the Moving is synchronized with 
+					 * The End of the Moving is synchronized with
 					 * the endBarrier. If all Threads reach this Barrier
 					 * the main run() Thread can go on.
-					 * 
+					 *
 					 * The Threads wait now at the startBarrier until
 					 * they are triggered again in the next TimeStep by the main run()
 					 * method.
 					 */
 					endBarrier.await();
-						
+
 					startBarrier.await();
 
 					for (MyLinkImpl myLink : myLinks)
-					{	
+					{
 						myLink.updateMeanTravelTime(this.time);
 					}
 				}
@@ -388,7 +388,7 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	            }
 			}
 		}	// run()
-		
+
 	}	// ReplannerThread
-	
+
 }

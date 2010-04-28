@@ -22,7 +22,6 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -34,19 +33,19 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 
 public class LMwCSCustomized extends LocationMutatorwChoiceSet {
-	
+
 //	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
 
-	
+
 	public LMwCSCustomized(final Network network, Controler controler, Knowledges kn) {
 		super(network, controler, kn);
 	}
 
 	@Override
 	protected boolean modifyLocation(ActivityImpl act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
-		
+
 		ArrayList<ActivityFacility> choiceSet = this.computeChoiceSetCircle(startCoord, endCoord, radius, act.getType());
-		
+
 		for (ActivityFacility fac: choiceSet){
 			if (fac.getCoord().equals(startCoord)) {
 				choiceSet.remove(fac);
@@ -61,16 +60,16 @@ public class LMwCSCustomized extends LocationMutatorwChoiceSet {
 				break;
 			}
 		}
-		
+
 		if (choiceSet.size()>1) {
 			final ActivityFacility facility = choiceSet.get(MatsimRandom.getRandom().nextInt(choiceSet.size()));
-			
+
 			act.setFacilityId(facility.getId());
        		act.setLinkId(((NetworkImpl) this.network).getNearestLink(facility.getCoord()).getId());
        		act.setCoord(facility.getCoord());
        		return true;
 		}
 		// else ...
-		return false; 			
+		return false;
 	}
 }

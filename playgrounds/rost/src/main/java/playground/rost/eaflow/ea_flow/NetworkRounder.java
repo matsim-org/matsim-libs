@@ -85,7 +85,7 @@ public class NetworkRounder {
 			double newcapacity =Math.round(link.getCapacity()/divisor*flowCapacityFactor);
 
 			if (newcapacity == 0d && link.getCapacity() != 0d) roundedtozerocap++;
-			if (Math.round(link.getLength()/link.getFreespeed(0)) == 0) {
+			if (Math.round(link.getLength()/link.getFreespeed()) == 0) {
 				System.out.println(link.getId());
 				roundedtozerotime++;
 			}

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -33,7 +34,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.locationchoice.utils.QuadTreeRing;
@@ -125,7 +125,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		this.controler = controler;
 	}
 
-	protected List<ActivityImpl>  defineMovablePrimaryActivities(final Plan plan) {
+	protected List<Activity>  defineMovablePrimaryActivities(final Plan plan) {
 		return this.defineFlexibleActivities.getMovablePrimaryActivities(plan);
 	}
 

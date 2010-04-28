@@ -21,6 +21,7 @@
 package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -89,7 +90,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
 	public void testGetOpeningInterval() {
 		final Config config = loadConfig(null);
-		ActivityImpl act = this.plan.getFirstActivity();
+		Activity act = this.plan.getFirstActivity();
 
 		CharyparNagelOpenTimesScoringFunction testee = new CharyparNagelOpenTimesScoringFunction(this.plan, new CharyparNagelScoringParameters(config.charyparNagelScoring()), this.facilities);
 

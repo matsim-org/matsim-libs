@@ -44,7 +44,6 @@ import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
-import org.matsim.core.mobsim.queuesim.QueueLink.AgentOnLink;
 
 /**
  * @author dstrippgen
@@ -145,7 +144,7 @@ public class DBSimLink {
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
 		this.calculateCapacities();
 	}
-	
+
 	//TODO public setShape(RoadShape shape);
 
 	/** Is called after link has been read completely */
@@ -266,7 +265,7 @@ public class DBSimLink {
 		updateBufferCapacity();
 
 		//TODO if width>0 moveLaneToBufferRectangle(now);
-		
+
 		// move vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
 		// if this is the original lane.
 		moveLaneToBuffer(now);
@@ -711,7 +710,7 @@ public class DBSimLink {
 				int lane = 1 + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, DBSimLink.this.getLink()));
 
 				int cmp = (int) (veh.getEarliestLinkExitTime() + DBSimLink.this.inverseSimulatedFlowCapacity + 2.0);
-				double speed = (now > cmp) ? 0.0 : link.getFreespeed(Time.UNDEFINED_TIME);
+				double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
 
 				PositionInfo position = new PositionInfo(this.linkScale, veh.getDriver().getPerson().getId(), link, queueEnd,
 						lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);

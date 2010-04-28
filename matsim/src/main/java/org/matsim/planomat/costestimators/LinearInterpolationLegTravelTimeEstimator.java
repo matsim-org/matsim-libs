@@ -29,10 +29,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -41,12 +42,12 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.world.Location;
 
 /**
- * 
+ *
  * Travel times for modes with variable travel times are approximated via a linear interpolation with sampling points at the full hours,
  * based on the travel times approximated by a routing algorithm.
- * 
+ *
  * @author meisterk
- * 
+ *
  * @deprecated This class is marked as deprecated because the algorithm has too a long computation time to be useful.
  *
  */
@@ -58,11 +59,11 @@ LegTravelTimeEstimator {
 	/**
 	 * Modes whose optimal routes and travel times are variable throughout the day, and therefore have to be approximated.
 	 * They are in opposite to modes whose optimal routes and travel times are constant can be computed once and be cached afterwards.
-	 * 
+	 *
 	 * TODO possibly a MATSim config parameter
 	 */
 	public static final EnumSet<TransportMode> MODES_WITH_VARIABLE_TRAVEL_TIME = EnumSet.of(TransportMode.car);
-	
+
 	protected final TravelTime linkTravelTimeEstimator;
 	protected final DepartureDelayAverageCalculator tDepDelayCalc;
 	private final PlansCalcRoute plansCalcRoute;
@@ -142,9 +143,9 @@ LegTravelTimeEstimator {
 	}
 
 	private final HashMap<DynamicODMatrixEntry, Double> dynamicODMatrix = new HashMap<DynamicODMatrixEntry, Double>();
-	private final HashMap<LegImpl, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<LegImpl, HashMap<TransportMode, Double>>();
+	private final HashMap<Leg, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<Leg, HashMap<TransportMode, Double>>();
 
-	protected double getInterpolation(Person person, double departureTime, ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
+	protected double getInterpolation(Person person, double departureTime, Activity actOrigin, Activity actDestination, Leg legIntermediate) {
 
 		// get values at sampling points
 		double samplingPoint = Double.MIN_VALUE;
@@ -205,13 +206,13 @@ LegTravelTimeEstimator {
 		this.doLogging = doLogging;
 	}
 
-	protected double simulateLegAndGetTravelTime(Person person, double departureTime, ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
+	protected double simulateLegAndGetTravelTime(Person person, double departureTime, Activity actOrigin, Activity actDestination, Leg legIntermediate) {
 
 		double legTravelTimeEstimation = 0.0;
 		// TODO clarify usage of departure delay calculator
 
 		if (MODES_WITH_VARIABLE_TRAVEL_TIME.contains(legIntermediate.getMode())) {
-			
+
 			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
 				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(this.network.getLinks().get(actOrigin.getLinkId()), departureTime);
 			}
@@ -219,10 +220,10 @@ LegTravelTimeEstimator {
 			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
 				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(this.network.getLinks().get(actDestination.getLinkId()), departureTime + legTravelTimeEstimation);
 			}
-			
+
 		} else {
-			
-			HashMap<TransportMode, Double> legInformation = null; 
+
+			HashMap<TransportMode, Double> legInformation = null;
 			if (this.travelTimeCache.containsKey(legIntermediate)) {
 				legInformation = this.travelTimeCache.get(legIntermediate);
 			} else {
@@ -235,24 +236,25 @@ LegTravelTimeEstimator {
 				legTravelTimeEstimation = this.plansCalcRoute.handleLeg(person, legIntermediate, actOrigin, actDestination, departureTime);
 				legInformation.put(legIntermediate.getMode(), legTravelTimeEstimation);
 			}
-			
+
 		}
-		
+
 		return legTravelTimeEstimation;
 
 	}
 
+	@Override
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
-			ActivityImpl actOrigin, ActivityImpl actDestination,
-			LegImpl legIntermediate, boolean doModifyLeg) {
+			Activity actOrigin, Activity actDestination,
+			Leg legIntermediate, boolean doModifyLeg) {
 
 		// TODO: get person from population
 		Person person = null;
-		
+
 		double legTravelTimeEstimation = 0.0;
 
 		if (
-				doModifyLeg || 
+				doModifyLeg ||
 				(!MODES_WITH_VARIABLE_TRAVEL_TIME.contains(legIntermediate.getMode()))
 				) {
 			legTravelTimeEstimation = this.simulateLegAndGetTravelTime(person, departureTime, actOrigin, actDestination, legIntermediate);
@@ -264,8 +266,9 @@ LegTravelTimeEstimator {
 
 	}
 
-	public LegImpl getNewLeg(TransportMode mode, ActivityImpl actOrigin,
-			ActivityImpl actDestination, int legPlanElementIndex, double departureTime) {
+	@Override
+	public LegImpl getNewLeg(TransportMode mode, Activity actOrigin,
+			Activity actDestination, int legPlanElementIndex, double departureTime) {
 		// not implemented here
 		return null;
 	}

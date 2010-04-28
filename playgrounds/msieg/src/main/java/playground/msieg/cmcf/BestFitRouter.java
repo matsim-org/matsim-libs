@@ -26,9 +26,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -53,7 +53,7 @@ public class BestFitRouter extends CMCFRouter {
 		}
 		int routedPersons = 0;
 		for(Person p: pop.getPersons().values()){
-			LegImpl leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(((PlanImpl) p.getSelectedPlan()).getFirstActivity());
+			Leg leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(((PlanImpl) p.getSelectedPlan()).getFirstActivity());
 			Node from = network.getLinks().get(leg.getRoute().getStartLinkId()).getToNode(),
 					to = network.getLinks().get(leg.getRoute().getEndLinkId()).getFromNode();
 			// now search path for rerouting

@@ -23,6 +23,7 @@ package org.matsim.core.scoring;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -30,28 +31,27 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 import org.matsim.core.utils.misc.Time;
 
 /**
  * Same as CharyparNagelScoringFunction, but retrieves opening time information
  * from facility object of an activity instead of the config file.
- * 
+ *
  * @author meisterk
  *
  */
 public class CharyparNagelOpenTimesScoringFunction extends ActivityScoringFunction {
 
 	private final ActivityFacilities facilities;
-	
+
 	public CharyparNagelOpenTimesScoringFunction(Plan plan, final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
 		super(plan, params);
 		this.facilities = facilities;
 	}
 
 	@Override
-	protected double[] getOpeningInterval(ActivityImpl act) {
+	protected double[] getOpeningInterval(Activity act) {
 
 		// openInterval has two values
 		// openInterval[0] will be the opening time
@@ -84,13 +84,13 @@ public class CharyparNagelOpenTimesScoringFunction extends ActivityScoringFuncti
 					// if there are two or more, use the earliest start time and the latest end time
 					openInterval[0] = Double.MAX_VALUE;
 					openInterval[1] = Double.MIN_VALUE;
-					
+
 					for (OpeningTime opentime : opentimes) {
 
 						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
 						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
 					}
-					
+
 				}
 
 			}
@@ -105,6 +105,6 @@ public class CharyparNagelOpenTimesScoringFunction extends ActivityScoringFuncti
 
 	}
 
-	
-	
+
+
 }

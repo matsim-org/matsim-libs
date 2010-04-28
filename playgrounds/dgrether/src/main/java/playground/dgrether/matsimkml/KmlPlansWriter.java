@@ -29,10 +29,10 @@ import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.kml.KMZWriter;
@@ -55,7 +55,7 @@ public class KmlPlansWriter {
 	private NetworkFeatureFactory featureFactory;
 
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
-	
+
 	private StyleType networkLinkStyle;
 
 	private StyleType networkNodeStyle;
@@ -67,17 +67,17 @@ public class KmlPlansWriter {
 	}
 
 	public FolderType getPlansFolder(Set<Plan> planSet) throws IOException {
-		
+
 		FolderType folder = this.kmlObjectFactory.createFolderType();
-		
+
 		folder.setName("MATSIM Plans, quantity: " + planSet.size());
 		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
 		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
 //		folder.addStyle(this.networkLinkStyle);
 //		folder.addStyle(this.networkNodeStyle);
-		ActivityImpl act;
+		Activity act;
 		FolderType planFolder;
-		LegImpl leg;
+		Leg leg;
 		AbstractFeatureType abstractFeature;
 		for (Plan plan : planSet) {
 			planFolder = kmlObjectFactory.createFolderType();
@@ -86,11 +86,11 @@ public class KmlPlansWriter {
 			do {
 				abstractFeature = this.featureFactory.createActFeature(act, this.networkNodeStyle);
 				if (abstractFeature.getClass().equals(PlacemarkType.class)) {
-					planFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature)); 
+					planFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
 				} else {
 					log.warn("Not yet implemented: Adding act KML features of type " + abstractFeature.getClass());
 				}
-				
+
 				leg = ((PlanImpl) plan).getNextLeg(act);
 				abstractFeature = this.featureFactory.createLegFeature(leg, this.networkLinkStyle);
 				if (abstractFeature.getClass().equals(FolderType.class)) {
@@ -104,9 +104,9 @@ public class KmlPlansWriter {
 			while (((PlanImpl) plan).getNextLeg(act) != null);
 			folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(planFolder));
 		}
-		
+
 		return folder;
-		
+
 	}
 
 }

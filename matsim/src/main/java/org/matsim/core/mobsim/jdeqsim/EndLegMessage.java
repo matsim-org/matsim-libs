@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.jdeqsim;
 import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.ActivityStartEventImpl;
@@ -109,14 +110,14 @@ public class EndLegMessage extends EventMessage {
 
 			SimulationParameters.getProcessEventThread().processEvent(event);
 		}
-		
+
 		// schedule AgentArrivalEvent
 		event = new AgentArrivalEventImpl(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), this.vehicle.getCurrentLeg().getMode());
 
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 		// schedule ActStartEvent
-		ActivityImpl nextAct = this.vehicle.getNextActivity();
+		Activity nextAct = this.vehicle.getNextActivity();
 		double actStartEventTime = nextAct.getStartTime();
 
 		if (this.getMessageArrivalTime() > actStartEventTime) {

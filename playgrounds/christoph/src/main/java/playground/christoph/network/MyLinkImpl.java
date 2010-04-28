@@ -26,13 +26,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.misc.Time;
 
 /*
  *  This extended Version of a LinkImpl contains some
  *  additional Information like the VehicleCount, the
  *  TravelTimes and TravelCosts.
- *  
+ *
  *  A Time/CostCalculator can use this Data for its
  *  calculations without the need of searching trough
  *  Maps over and over again.
@@ -42,33 +41,33 @@ public class MyLinkImpl extends LinkImpl{
 	protected int vehiclesCount;
 	protected double travelTime = Double.NaN;
 	protected double travelCost;
-	
+
 	// for TravelTimeEstimator
 	private float[] linkVehicleCounts;
 	private int[] linkEnterCounts;
 	private int[] linkLeaveCounts;
-	
+
 	private LinkedList<TripInfo> tripInfos = new LinkedList<TripInfo>();
-		
+
 	private boolean fadingTravelTimes = true;
 	private boolean binTravelTimes = false;
-	
+
 	private double fadingFactor = 1.0015;	// How much does the weight of a previous TravelTime decrease per SimStep?
 //	private double fadingFactor = 1.0025;	// How much does the weight of a previous TravelTime decrease per SimStep?
 	private double storedTravelTimes = 0.0;
 	private int addedTrips = 0;
-	
+
 	private double storedTravelTimesBinSize = 600;
-	
+
 	private double addedTravelTimes = 0.0;
 	private double sumTravelTimes = 0.0;	// We cache the sum of the TravelTimes
 	private double freeSpeedTravelTime = Double.MAX_VALUE;	// We cache the FreeSpeedTravelTimes
-	
+
 	public MyLinkImpl(Id id, Node from, Node to, NetworkLayer network, double length, double freespeed, double capacity, double lanes)
 	{
 		super(id, from, to, network, length, freespeed, capacity, lanes);
 	}
-		
+
 	public int getVehiclesCount() {
 		return vehiclesCount;
 	}
@@ -116,7 +115,7 @@ public class MyLinkImpl extends LinkImpl{
 	public void setLinkLeaveCounts(int[] linkLeaveCounts) {
 		this.linkLeaveCounts = linkLeaveCounts;
 	}
-	
+
 	/*
 	 * Caches the freeSpeedTravel Time.
 	 * We round the value to the next Integer because that is what happens
@@ -127,11 +126,11 @@ public class MyLinkImpl extends LinkImpl{
 	 */
 	public void cacheFreeSpeedTravelTime()
 	{
-		this.freeSpeedTravelTime = Math.ceil(this.getFreespeedTravelTime(Time.UNDEFINED_TIME));
-		
+		this.freeSpeedTravelTime = Math.ceil(this.getFreespeedTravelTime());
+
 //		if (this.travelTime == Double.NaN) this.travelTime = this.freeSpeedTravelTime;
 	}
-	
+
 	public void updateMeanTravelTime(double time)
 	{
 		if (fadingTravelTimes)
@@ -143,30 +142,30 @@ public class MyLinkImpl extends LinkImpl{
 			calcBinTravelTime(time);
 		}
 	}
-	
+
 	private void calcFadingMeanTravelTimes(double time)
 	{
 		this.storedTravelTimes = this.storedTravelTimes / this.fadingFactor;
 		this.sumTravelTimes = this.sumTravelTimes / this.fadingFactor;
-		
+
 		/*
 		 * We don't need an update if no Trips have been added.
 		 */
 		if (this.addedTrips == 0) return;
-		
+
 		this.sumTravelTimes = this.sumTravelTimes + this.addedTravelTimes;
 		this.storedTravelTimes = this.storedTravelTimes + this.addedTrips;
-		
+
 		this.addedTravelTimes = 0.0;
 		this.addedTrips = 0;
-		
-		/* 
+
+		/*
 		 * Ensure, that we don't allow TravelTimes shorter than the
 		 * FreeSpeedTravelTime.
 		 */
 		double meanTravelTime = freeSpeedTravelTime;
 		if (this.tripInfos.size() > 0) meanTravelTime = sumTravelTimes / this.storedTravelTimes;
-		
+
 		if (meanTravelTime * this.fadingFactor < freeSpeedTravelTime)
 		{
 			System.out.println("Warning: Mean TravelTime to short?");
@@ -174,11 +173,11 @@ public class MyLinkImpl extends LinkImpl{
 		}
 		else this.setTravelTime(meanTravelTime);
 	}
-	
+
 	private void calcBinTravelTime(double time)
-	{		
+	{
 		double removedTravelTimes = 0.0;
-				
+
 		// first remove old TravelTimes
 //		Iterator<TripInfo> iter = this.tripInfos.iterator();
 //		while (iter.hasNext())
@@ -191,7 +190,7 @@ public class MyLinkImpl extends LinkImpl{
 //			}
 //			else break;
 //		}
-		
+
 		//Is this faster?
 		TripInfo tripInfo;
 		while((tripInfo = this.tripInfos.peek()) != null)
@@ -203,26 +202,26 @@ public class MyLinkImpl extends LinkImpl{
 			}
 			else break;
 		}
-		
+
 		/*
-		 * We don't need an update if no Trips have been added or 
+		 * We don't need an update if no Trips have been added or
 		 * removed within the current SimStep.
 		 * The initial FreeSpeedTravelTime has to be set correctly via
 		 * setTravelTime!
 		 */
 		if (removedTravelTimes == 0.0 && this.addedTravelTimes == 0.0) return;
-		
+
 		this.sumTravelTimes = this.sumTravelTimes - removedTravelTimes + this.addedTravelTimes;
-		
+
 		this.addedTravelTimes = 0.0;
-		
-		/* 
+
+		/*
 		 * Ensure, that we don't allow TravelTimes shorter than the
 		 * FreeSpeedTravelTime.
 		 */
 		double meanTravelTime = freeSpeedTravelTime;
 		if (this.tripInfos.size() > 0) meanTravelTime = sumTravelTimes / this.tripInfos.size();
-		
+
 		if (meanTravelTime < freeSpeedTravelTime)
 		{
 			System.out.println("Warning: Mean TravelTime to short?");
@@ -230,18 +229,18 @@ public class MyLinkImpl extends LinkImpl{
 		}
 		else this.setTravelTime(meanTravelTime);
 	}
-	
+
 	public void addTravelTime(double travelTime, double time)
 	{
 		TripInfo tripInfo = new TripInfo();
 		tripInfo.travelTime = travelTime;
 		tripInfo.leaveTime = time;
 		this.tripInfos.add(tripInfo);
-		
+
 		this.addedTravelTimes = this.addedTravelTimes + travelTime;
 		this.addedTrips++;
 	}
-	
+
 	private class TripInfo
 	{
 		double travelTime;

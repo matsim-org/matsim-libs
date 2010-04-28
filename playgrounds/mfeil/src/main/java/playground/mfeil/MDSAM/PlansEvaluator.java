@@ -34,7 +34,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 
@@ -44,53 +43,53 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
  * Class that reads a file of plans (with or without varied plans) and evaluates them.
  */
 public class PlansEvaluator extends PlansConstructor implements PlanStrategyModule {
-		
+
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
-	private static final Logger log = Logger.getLogger(PlansEvaluator.class);	
-	                      
+	private static final Logger log = Logger.getLogger(PlansEvaluator.class);
+
 	public PlansEvaluator (Controler controler) {
 		super (controler);
-		this.inputFile = "/home/baug/mfeil/data/fullSet/it0/output_plans_mz01.xml";	
-		this.outputFile = "/home/baug/mfeil/data/fullSet/it1/output_plans_mz11.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/fullSet/it1/output_plans11.dat";	
+		this.inputFile = "/home/baug/mfeil/data/fullSet/it0/output_plans_mz01.xml";
+		this.outputFile = "/home/baug/mfeil/data/fullSet/it1/output_plans_mz11.xml.gz";
+		this.outputFileBiogeme = "/home/baug/mfeil/data/fullSet/it1/output_plans11.dat";
 		this.attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
-		
+
 	}
-	
+
 	@Override
 	public void prepareReplanning() {
 		// Read the external plans file.
-		new MatsimPopulationReader(this.controler.getScenario()).readFile(this.inputFile);		
+		new MatsimPopulationReader(this.controler.getScenario()).readFile(this.inputFile);
 		log.info("Reading population done.");
 	}
 
 	@Override
 	public void finishReplanning(){
-		
-	// 	Needs to always run		
+
+	// 	Needs to always run
 		this.evaluatePlans();
 		this.writePlans(this.outputFile);
-		
-		
+
+
 	// 	Only if similarity attribute is desired
 		//this.sims = new MDSAM(this.population).runPopulation();
-		
-		
-	// 	Type of writing the Biogeme file		
+
+
+	// 	Type of writing the Biogeme file
 		//this.writePlansForBiogeme(this.outputFileBiogeme);
-		//this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
+		//this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile,
 		//		super.similarity, super.incomeConstant, super.incomeDivided, super.incomeDividedLN, super.incomeBoxCox, super.age, super.gender, super.employed, super.license, super.carAvail, super.seasonTicket, super.travelDistance, super.travelCost, super.travelConstant, super.bikeIn);
-		this.writePlansForBiogemeWithRandomSelectionAccumulated(this.outputFileBiogeme, this.attributesInputFile, 
-				super.beta, super.gamma, super.similarity, super.incomeConstant, super.incomeDivided, 
-				super.incomeDividedLN, super.incomeBoxCox, super.age, super.gender, super.income, 
-				super.license, super.carAvail, super.seasonTicket, super.travelDistance, super.travelCost, 
+		this.writePlansForBiogemeWithRandomSelectionAccumulated(this.outputFileBiogeme, this.attributesInputFile,
+				super.beta, super.gamma, super.similarity, super.incomeConstant, super.incomeDivided,
+				super.incomeDividedLN, super.incomeBoxCox, super.age, super.gender, super.income,
+				super.license, super.carAvail, super.seasonTicket, super.travelDistance, super.travelCost,
 				super.travelConstant, super.beta_travel, super.bikeIn, super.munType, super.innerHome);
 	}
-	
-	
+
+
 	private void evaluatePlans (){
 		log.info("Evaluating plans...");
 		int counter=0;
@@ -101,14 +100,14 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 				Gbl.printMemoryUsage();
 			}
 			for (Plan plan : person.getPlans()) {
-				
-				LegTravelTimeEstimator estimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+
+				LegTravelTimeEstimator estimator = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 						plan,
-						PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+						PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
 						PlanomatConfigGroup.RoutingCapability.fixedRoute,
 						this.router,
 						this.network);
-				
+
 				// Start from first leg
 				for (int i=1;i<plan.getPlanElements().size();i++){
 					if (i%2==1){
@@ -120,7 +119,7 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 					}
 					else{
 						ActivityImpl act = ((ActivityImpl)(plan.getPlanElements().get(i)));
-						act.setStartTime(((PlanImpl) plan).getPreviousLeg(act).getArrivalTime());
+						act.setStartTime(((LegImpl) ((PlanImpl) plan).getPreviousLeg(act)).getArrivalTime());
 						try {
 							act.setDuration(act.getEndTime()-act.getStartTime());
 							if (act.getDuration()<=0) {

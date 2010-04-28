@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.world.Location;
 
@@ -73,7 +73,7 @@ public interface Link extends Identifiable, Serializable, Location {
 	 * in the network file (the capperiod attribute).
 	 * @return the capacity per network's capperiod timestep
 	 *
-	 * @see NetworkLayer#getCapacityPeriod()
+	 * @see NetworkImpl#getCapacityPeriod()
 	 */
 	public double getCapacity();
 
@@ -84,7 +84,7 @@ public interface Link extends Identifiable, Serializable, Location {
 	 * @param time the time at which the capacity is requested. Use {@link Time#UNDEFINED_TIME} to get the default value.
 	 * @return the capacity per network's capperiod timestep
 	 *
-	 * @see NetworkLayer#getCapacityPeriod()
+	 * @see NetworkImpl#getCapacityPeriod()
 	 */
 	public double getCapacity(double time);
 

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.dgrether.analysis.population;
 
 import java.util.HashMap;
@@ -5,7 +24,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.households.Income;
 
 /**
@@ -13,34 +32,34 @@ import org.matsim.households.Income;
  *
  */
 public class DgPersonData {
-	
+
 	private static final Logger log = Logger.getLogger(DgPersonData.class);
-	
-	private ActivityImpl homeActivity;
+
+	private Activity homeActivity;
 
 	private Map<Id, DgPlanData> planData;
-	
+
 	private Id personId;
 
 	private Income income;
-	
+
 	public DgPersonData() {
 		this.planData = new HashMap<Id, DgPlanData>();
 	}
-	
+
 /**
-	 * 
+	 *
 	 * @return the home location
 	 */
-	public ActivityImpl getFirstActivity() {
+	public Activity getFirstActivity() {
 		return homeActivity;
 	}
-	
-	public void setFirstActivity(ActivityImpl a) {
+
+	public void setFirstActivity(Activity a) {
 		this.homeActivity = a;
 	}
 
-	
+
 	public Map<Id, DgPlanData> getPlanData() {
 		return planData;
 	}
@@ -49,7 +68,7 @@ public class DgPersonData {
 		return personId;
 	}
 
-	
+
 	public void setPersonId(Id personId) {
 		this.personId = personId;
 	}
@@ -57,7 +76,7 @@ public class DgPersonData {
 	public void setIncome(Income income) {
 		this.income = income;
 	}
-	
+
 	public Income getIncome() {
 		return this.income;
 	}
@@ -72,12 +91,12 @@ public class DgPersonData {
 			return plan2.getScore() - plan1.getScore();
 		}
 		else if (plan1 == null) {
-			log.error("Person id " + personId + " has no plan (null) for runId " + runId1); 
+			log.error("Person id " + personId + " has no plan (null) for runId " + runId1);
 		}
 		else if (plan2 == null) {
-			log.error("Person id " + personId + " has no plan (null) for runId " + runId2); 
+			log.error("Person id " + personId + " has no plan (null) for runId " + runId2);
 		}
 		return 0.0;
 	}
-	
+
 }

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.sims.evacuationdelay;
 
 import java.io.IOException;
@@ -7,8 +26,8 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -44,19 +63,20 @@ public class DelayedEvacuationStartTimeCalculator implements EvacuationStartTime
 			Coord c = MGC.coordinate2Coord(f.getDefaultGeometry().getCentroid().getCoordinate());
 			this.coordQuadTree.put(c.getX(), c.getY(), f);
 		}
-		
+
 	}
 
-	public double getEvacuationStartTime(ActivityImpl act) {
+	@Override
+	public double getEvacuationStartTime(Activity act) {
 		Coord c = act.getCoord();
 		if (c == null) {
 			c = this.network.getLinks().get(act.getLinkId()).getCoord();
 		}
 		Feature ft = this.coordQuadTree.get(c.getX(), c.getY());
-		
+
 		Geometry geo = ft.getDefaultGeometry();
 		Point p = MGC.coord2Point(c);
-		
+
 		try {
 			if (!geo.contains(p)) {
 				ft = getFt(p);
@@ -65,8 +85,8 @@ public class DelayedEvacuationStartTimeCalculator implements EvacuationStartTime
 		} catch (Exception e) {
 			return this.baseTime;
 		}
-			
-		
+
+
 	}
 
 
@@ -86,7 +106,7 @@ public class DelayedEvacuationStartTimeCalculator implements EvacuationStartTime
 		double rand = MatsimRandom.getRandom().nextDouble();
 		if (rand <= immed) {
 			return 0;
-		} 
+		}
 		rand -= immed;
 		if (rand < delay) {
 			return 60 * 20;
@@ -111,7 +131,7 @@ public class DelayedEvacuationStartTimeCalculator implements EvacuationStartTime
 //				return 15 * 60;
 //			} else {
 //				return .0;
-//			}			
+//			}
 //		}
 //	}
 

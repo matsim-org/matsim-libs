@@ -723,7 +723,7 @@ public class QueueLink {
         int lane = 1 + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QueueLink.this.getLink()));
 
         int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
-        double speed = (now > cmp) ? 0.0 : link.getFreespeed(Time.UNDEFINED_TIME);
+        double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
 
         AgentSnapshotInfo position = new PositionInfo(this.linkScale, veh.getDriver().getPerson().getId(), link, queueEnd,
             lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);

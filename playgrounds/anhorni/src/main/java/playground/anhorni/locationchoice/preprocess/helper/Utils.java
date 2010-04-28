@@ -11,53 +11,53 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 
 public abstract class Utils {
-	
+
 	private final static Logger log = Logger.getLogger(Utils.class);
-	
+
 	public static double median(double [] values) {
 		List<Double> list = new Vector<Double>();
-		
+
 		for (int i = 0; i < values.length; i++) {
 			list.add(values[i]);
 		}
 		return median(list);
 	}
-	
+
 	public static double getVariance(List<Double> values) {
 		double mean = Utils.mean(values);
-		
+
 		double sum = 0.0;
 		for (Double v : values) {
 			sum += (v-mean) * (v-mean);
 		}
-		return sum / values.size();	
+		return sum / values.size();
 	}
-	
-	public static double getMin(List<Double> values) {		
+
+	public static double getMin(List<Double> values) {
 		double minVal = 9999999999999999999.0;
 		for (Double v : values) {
 			if (v < minVal) {
 				minVal = v;
 			}
 		}
-		return minVal;	
+		return minVal;
 	}
-	
-	public static double getMax(List<Double> values) {		
+
+	public static double getMax(List<Double> values) {
 		double maxVal = 0.0;
 		for (Double v : values) {
 			if (v > maxVal) {
 				maxVal = v;
 			}
 		}
-		return maxVal;	
+		return maxVal;
 	}
-	
-	
+
+
 	public static double median(List<Double> values) {
-		
-		if (values.size() == 0) return 0.0;	
-		
+
+		if (values.size() == 0) return 0.0;
+
 	    Collections.sort(values);
 	    if (values.size() % 2 == 1) {
 	    	return values.get((values.size()+1)/2-1);
@@ -66,23 +66,23 @@ public abstract class Utils {
 	    	double lower = values.get(values.size()/2-1);
 	    	double upper = values.get(values.size()/2);
 	    	return (lower + upper) / 2.0;
-	    }	
+	    }
 	}
-	
+
 	public static double mean(List<Double> values) {
 		double sum = 0.0;
 		int cnt = 0;
-		if (values.size() == 0) return 0.0;	
+		if (values.size() == 0) return 0.0;
 		for (Double value : values) {
 			sum += value;
 			cnt++;
 		}
 		return sum / cnt;
 	}
-	
+
 	// dirty hack in a weak minute. Cast problems.
 	public static double [] divideAndConvert(List<Double> divisorList, List<Double> denominatorList) {
-		
+
 		double [] array = new double[divisorList.size()];
 		if (divisorList.size() != denominatorList.size()) {
 			log.error("list do not have the same size!");
@@ -94,7 +94,7 @@ public abstract class Utils {
 		}
 		return array;
 	}
-	
+
 	// dirty hack in a weak minute. Cast problems.
 	public static double [] convert(List<Double> list) {
 		double [] array = new double[list.size()];
@@ -103,7 +103,7 @@ public abstract class Utils {
 		}
 		return array;
 	}
-	
+
 	public static String [] convert2String(List<Double> list) {
 		String [] array = new String[list.size()];
 		for (int i = 0; i < list.size(); i++) {
@@ -111,7 +111,7 @@ public abstract class Utils {
 		}
 		return array;
 	}
-	
+
 	public static double [] convert2double(int input[]) {
 		double [] array = new double[input.length];
 		for (int i = 0; i < input.length; i++) {
@@ -119,9 +119,9 @@ public abstract class Utils {
 		}
 		return array;
 	}
-	
+
 	public static String convertModeMZ2Plans(int wmittel) {
-					
+
 			 //2: Bahn 3: Postauto 5: Tram 6: Bus
 			if (wmittel == 2 || wmittel == 3 || wmittel == 5 || wmittel == 6) {
 				return "pt";
@@ -140,9 +140,9 @@ public abstract class Utils {
 				return "walk";
 			}
 			return "undefined";
-	}	
-	
-	public static String getActType(Plan plan, Activity act) {		
+	}
+
+	public static String getActType(Plan plan, Activity act) {
 		if (!act.getType().startsWith("h")) {
 			return act.getType();
 		}
@@ -156,17 +156,17 @@ public abstract class Utils {
 			}
 		}
 	}
-	
-	private static String getLongestActivityForRoundTrip(final PlanImpl plan, ActivityImpl act) {
+
+	private static String getLongestActivityForRoundTrip(final PlanImpl plan, Activity act) {
 		double maxActDur = - 1.0;
-		
+
 		// set it to home in case of home-based round trips
 		String longestActivity = "home";
-		
-		// home_pre <- ... act (== home) 
-		ActivityImpl actTemp = act;
+
+		// home_pre <- ... act (== home)
+		ActivityImpl actTemp = (ActivityImpl) act;
 		while (actTemp != null && !actTemp.getType().startsWith("h")) {
-			actTemp = plan.getPreviousActivity(plan.getPreviousLeg(actTemp));
+			actTemp = (ActivityImpl) plan.getPreviousActivity(plan.getPreviousLeg(actTemp));
 			if (actTemp.getDuration() > maxActDur && !actTemp.getType().startsWith("h")) {
 				maxActDur = actTemp.getDuration();
 				longestActivity = actTemp.getType();

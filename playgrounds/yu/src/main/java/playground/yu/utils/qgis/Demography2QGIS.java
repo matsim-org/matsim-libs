@@ -28,11 +28,11 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -46,9 +46,9 @@ import playground.yu.utils.CompareSelectedPlansTable;
  * this class quote codes from
  * <class>org.matsim.run.CompareSelectedPlansTable</class> offered a simplified
  * function
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class Demography2QGIS extends CompareSelectedPlansTable {
 	private final ScenarioImpl scenario = new ScenarioImpl();
@@ -96,7 +96,7 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 			out.newLine();
 
 			for (Person p : this.scenario.getPopulation().getPersons().values()) {
-				
+
 				PersonImpl person = (PersonImpl) p;
 				// method person.toString() not appropriate
 				out.write(person.getId().toString() + ";");
@@ -107,8 +107,8 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 				out.write(person.isEmployed() + ";");
 
 				Plan sp = person.getSelectedPlan();
-				ActivityImpl fa = ((PlanImpl) sp).getFirstActivity();
-				if (fa.getType().substring(0, 1).equals("h")) {
+				Activity fa = ((PlanImpl) sp).getFirstActivity();
+				if (fa.getType().startsWith("h")) {
 					Coord coord = fa.getCoord();
 					out.write(coord.getX() + ";");
 					out.write(coord.getY() + ";");

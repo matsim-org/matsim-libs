@@ -136,7 +136,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 			Link l = this.network.getLinks().get(linkId);
 			if (!this.capacities.containsKey(linkId)) {
-				double capacity = ((LinkImpl)l).getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor() / this.simulationConfig.getTimeStepSize();
+				double capacity = ((LinkImpl)l).getFlowCapacity() * this.simulationConfig.getFlowCapFactor() / this.simulationConfig.getTimeStepSize();
 				this.capacities.put(l.getId(), capacity);
 			}
 
@@ -384,7 +384,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 		if (bottleNeckList.isEmpty()) {
 			double agentsOnRoute = getAgents(route);
-			double currentBottleNeckCapacity = ((LinkImpl)bottleNeck).getFlowCapacity(time) * this.simulationConfig.getFlowCapFactor() 
+			double currentBottleNeckCapacity = ((LinkImpl)bottleNeck).getFlowCapacity(time) * this.simulationConfig.getFlowCapFactor()
 				/ this.simulationConfig.getTimeStepSize();
 			double ttQueue = agentsOnRoute / currentBottleNeckCapacity;
 			double ttFreeSpeed = getFreeSpeedRouteTravelTime(route);

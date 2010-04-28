@@ -25,10 +25,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -73,7 +73,7 @@ public class DgAnalysisPopulationReader {
 		population = loadPopulationFile(firstPlanPath, sc);
 		new PlanCalcType().run(population);
 		Plan plan;
-		ActivityImpl act;
+		Activity act;
 		for (Id id : population.getPersons().keySet()) {
 			if (isExcludeTransit){
 				if (isTransitPerson(id)){
@@ -138,7 +138,7 @@ public class DgAnalysisPopulationReader {
 
 		analysisPopulation = new DgAnalysisPopulation();
 		Plan plan = null ;
-		ActivityImpl act;
+		Activity act;
 		for (Id id : population.getPersons().keySet()) {
 			if ( whichPlan.equals( "selected" ) ) {
 				plan = population.getPersons().get(id).getSelectedPlan();

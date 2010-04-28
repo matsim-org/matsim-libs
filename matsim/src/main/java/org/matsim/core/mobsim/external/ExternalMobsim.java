@@ -27,8 +27,11 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -36,8 +39,6 @@ import org.matsim.core.config.Module;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandler;
@@ -139,13 +140,13 @@ public class ExternalMobsim {
 				handler.startPlan(plan, writer);
 
 				// act/leg
-				for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
-					if (jj % 2 == 0) {
-						ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(jj);
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
 						handler.startAct(act, writer);
 						handler.endAct(writer);
-					} else {
-						LegImpl leg = (LegImpl)plan.getPlanElements().get(jj);
+					} else if (pe instanceof Leg) {
+						Leg leg = (Leg) pe;
 						handler.startLeg(leg, writer);
 						// route
 						if (leg.getRoute() != null) {

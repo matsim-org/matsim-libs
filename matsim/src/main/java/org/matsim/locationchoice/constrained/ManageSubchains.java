@@ -23,8 +23,8 @@ package org.matsim.locationchoice.constrained;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 
 public class ManageSubchains {
 
@@ -35,20 +35,20 @@ public class ManageSubchains {
 
 	private double ttBudget = 0.0;
 	private double totalTravelDistance = 0.0;
-		
-	public void secondaryActivityFound(ActivityImpl act, LegImpl leg) {
-		/* 
+
+	public void secondaryActivityFound(Activity act, Leg leg) {
+		/*
 		 * No plan starts with secondary activity!
 		 */
 		this.subChains.get(subChainIndex).defineMode(leg.getMode());
 		this.subChains.get(subChainIndex).addAct(act);
-		this.secondaryActFound = true;	
+		this.secondaryActFound = true;
 		this.ttBudget += leg.getTravelTime();
-		this.totalTravelDistance += leg.getRoute().getDistance();	
+		this.totalTravelDistance += leg.getRoute().getDistance();
 	}
-	
-	public void primaryActivityFound(ActivityImpl act, LegImpl leg) {
-		/* 
+
+	public void primaryActivityFound(Activity act, Leg leg) {
+		/*
 		 * close chain
 		 */
 		if (chainStarted) {
@@ -63,7 +63,7 @@ public class ManageSubchains {
 				this.subChainIndex--;
 			}
 		}
-		
+
 		// it is not the second home act
 		if (!(leg == null)) {
 			//open chain
@@ -76,7 +76,7 @@ public class ManageSubchains {
 			this.ttBudget = leg.getTravelTime();
 			this.totalTravelDistance = leg.getRoute().getDistance();
 			this.subChains.get(subChainIndex).defineMode(leg.getMode());
-		}			
+		}
 	}
 
 	public List<SubChain> getSubChains() {
@@ -85,5 +85,5 @@ public class ManageSubchains {
 
 	public void setSubChains(List<SubChain> subChains) {
 		this.subChains = subChains;
-	}		
+	}
 }

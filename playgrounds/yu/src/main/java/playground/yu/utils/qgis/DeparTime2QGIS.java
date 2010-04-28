@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -28,16 +28,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author yu
- * 
+ *
  */
 public class DeparTime2QGIS implements X2QGIS {
 	public static class LinkDeparTime extends AbstractPersonAlgorithm implements
@@ -69,7 +69,7 @@ public class DeparTime2QGIS implements X2QGIS {
 
 		public void run(Plan p) {
 			PlanImpl plan = (PlanImpl) p;
-			ActivityImpl fa = plan.getFirstActivity();
+			Activity fa = plan.getFirstActivity();
 			if (fa.getType().startsWith("h")) {
 				Id linkId = fa.getLinkId();
 				Integer c = dpCnt.get(linkId);

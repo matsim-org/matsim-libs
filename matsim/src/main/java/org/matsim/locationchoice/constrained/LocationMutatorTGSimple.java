@@ -28,7 +28,9 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -60,15 +62,15 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	@Override
 	public void handlePlan(final Plan plan){
 
-		List<ActivityImpl> flexibleActivities = this.getFlexibleActivities(plan);
+		List<Activity> flexibleActivities = this.getFlexibleActivities(plan);
 
 		if (flexibleActivities.size() == 0) {
 			this.unsuccessfullLC++;
 			return;
 		}
 		Collections.shuffle(flexibleActivities);
-		ActivityImpl actToMove = flexibleActivities.get(0);
-		List<?> actslegs = plan.getPlanElements();
+		Activity actToMove = flexibleActivities.get(0);
+		List<? extends PlanElement> actslegs = plan.getPlanElements();
 		int indexOfActToMove = actslegs.indexOf(actToMove);
 
 		// starting home and ending home are never flexible
@@ -99,15 +101,15 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			return;
 		}
 
-		if (!this.modifyLocation(actToMove, actPre.getCoord(), actPost.getCoord(), radius)) {
+		if (!this.modifyLocation((ActivityImpl) actToMove, actPre.getCoord(), actPost.getCoord(), radius)) {
 			this.unsuccessfullLC++;
 			return;
 		}
 		super.resetRoutes(plan);
 	}
 
-	private List<ActivityImpl> getFlexibleActivities(final Plan plan) {
-		List<ActivityImpl> flexibleActivities;
+	private List<Activity> getFlexibleActivities(final Plan plan) {
+		List<Activity> flexibleActivities;
 		if (!super.locationChoiceBasedOnKnowledge) {
 			flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
 		}

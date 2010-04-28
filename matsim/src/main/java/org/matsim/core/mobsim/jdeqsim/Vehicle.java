@@ -23,23 +23,24 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * Represents a vehicle.
- * 
+ *
  * @author rashid_waraich
  */
 public class Vehicle extends SimUnit {
 
 	private static final Logger log = Logger.getLogger(Vehicle.class);
 	private Person ownerPerson = null;
-	private LegImpl currentLeg = null;
+	private Leg currentLeg = null;
 	private int legIndex;
 	private Id currentLinkId = null;
 	private int linkIndex;
@@ -77,7 +78,7 @@ public class Vehicle extends SimUnit {
 		 * the whole day (e.g. stays at home), because no event needs to be
 		 * scheduled for this person.
 		 */
-		
+
 		if (actsLegs.size()==1){
 			return;
 		}
@@ -85,7 +86,7 @@ public class Vehicle extends SimUnit {
 		// actsLegs(0) is the first activity, actsLegs(1) is the first leg
 		legIndex = 1;
 		setCurrentLeg((LegImpl) actsLegs.get(legIndex));
-		ActivityImpl firstAct = (ActivityImpl) actsLegs.get(0);
+		Activity firstAct = (Activity) actsLegs.get(0);
 		// an agent starts the first leg at the end_time of the fist act
 		double departureTime = firstAct.getEndTime();
 
@@ -100,16 +101,16 @@ public class Vehicle extends SimUnit {
 	/**
 	 * based on the current Leg, the previous activity is computed; this could
 	 * be implemented more efficiently in future.
-	 * 
+	 *
 	 * @return
 	 */
-	public ActivityImpl getPreviousActivity() {
+	public Activity getPreviousActivity() {
 		Plan plan = ownerPerson.getSelectedPlan();
 		List<? extends PlanElement> actsLegs = plan.getPlanElements();
 
 		for (int i = 0; i < actsLegs.size(); i++) {
 			if (actsLegs.get(i) == currentLeg) {
-				return ((ActivityImpl) actsLegs.get(i - 1));
+				return ((Activity) actsLegs.get(i - 1));
 			}
 		}
 		return null;
@@ -118,22 +119,22 @@ public class Vehicle extends SimUnit {
 	/**
 	 * based on the current Leg, the next activity is computed; this could be
 	 * implemented more efficiently in future.
-	 * 
+	 *
 	 * @return
 	 */
-	public ActivityImpl getNextActivity() {
+	public Activity getNextActivity() {
 		Plan plan = ownerPerson.getSelectedPlan();
 		List<? extends PlanElement> actsLegs = plan.getPlanElements();
 
 		for (int i = 0; i < actsLegs.size(); i++) {
 			if (actsLegs.get(i) == currentLeg) {
-				return ((ActivityImpl) actsLegs.get(i + 1));
+				return ((Activity) actsLegs.get(i + 1));
 			}
 		}
 		return null;
 	}
 
-	public void setCurrentLeg(LegImpl currentLeg) {
+	public void setCurrentLeg(Leg currentLeg) {
 		this.currentLeg = currentLeg;
 		if (currentLeg.getRoute() instanceof NetworkRoute) {
 			List<Id> linkIds = ((NetworkRoute) currentLeg.getRoute()).getLinkIds();
@@ -155,7 +156,7 @@ public class Vehicle extends SimUnit {
 		return ownerPerson;
 	}
 
-	public LegImpl getCurrentLeg() {
+	public Leg getCurrentLeg() {
 		return currentLeg;
 	}
 
@@ -197,14 +198,14 @@ public class Vehicle extends SimUnit {
 	public void moveToFirstLinkInNextLeg() {
 		Plan plan = getOwnerPerson().getSelectedPlan();
 		List<? extends PlanElement> actsLegs = plan.getPlanElements();
-		setCurrentLinkId(((ActivityImpl) actsLegs.get(getLegIndex() + 1)).getLinkId());
+		setCurrentLinkId(((Activity) actsLegs.get(getLegIndex() + 1)).getLinkId());
 	}
 
 	/**
 	 * find out, if the vehicle is in endingLegMode this means, that the vehicle
 	 * is just waiting until it can enter the last link (without entering it)
 	 * and then ends the leg
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isEndingLegMode() {
@@ -250,7 +251,7 @@ public class Vehicle extends SimUnit {
 		if (this.getLinkIndex() == 0) {
 			Plan plan = ownerPerson.getSelectedPlan();
 			List<? extends PlanElement> actsLegs = plan.getPlanElements();
-			previousLinkId = ((ActivityImpl) actsLegs.get(legIndex - 1)).getLinkId();
+			previousLinkId = ((Activity) actsLegs.get(legIndex - 1)).getLinkId();
 			previousRoad = Road.getRoad(previousLinkId);
 		} else if (this.getLinkIndex() >= 1) {
 			previousLinkId = this.getCurrentLinkRoute()[this.getLinkIndex() - 1];

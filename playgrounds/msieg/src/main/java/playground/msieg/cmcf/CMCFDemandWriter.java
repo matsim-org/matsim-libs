@@ -29,14 +29,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
@@ -192,8 +192,8 @@ public class CMCFDemandWriter{
 		Commodities<Node> com = new Commodities<Node>();
 
 		Plan plan;
-		ActivityImpl act1, act2;
-		LegImpl leg;
+		Activity act1, act2;
+		Leg leg;
 		for (Id id : this.plans.getPersons().keySet()) {
 			plan = this.plans.getPersons().get(id).getSelectedPlan();
 			act1 = ((PlanImpl) plan).getFirstActivity();

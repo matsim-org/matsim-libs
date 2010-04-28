@@ -35,6 +35,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -477,8 +478,8 @@ public class PlansConstructor implements PlanStrategyModule{
 						}
 					}
 
-					plan.getFirstActivity().setCoord(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord());
-					plan.getLastActivity().setCoord(((PlanImpl) person.getSelectedPlan()).getLastActivity().getCoord());
+					((ActivityImpl) plan.getFirstActivity()).setCoord(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord());
+					((ActivityImpl) plan.getLastActivity()).setCoord(((PlanImpl) person.getSelectedPlan()).getLastActivity().getCoord());
 
 					this.linker.run(plan);
 
@@ -585,8 +586,8 @@ public class PlansConstructor implements PlanStrategyModule{
 					else {
 						List<SubChain> subChains = this.getSubChains(plan);
 						for (Iterator<SubChain> iteratorSubChain = subChains.iterator(); iteratorSubChain.hasNext();){
-							for (Iterator<ActivityImpl> iteratorActs = iteratorSubChain.next().getSlActs().iterator(); iteratorActs.hasNext();){
-								this.modifyLocationCoord(iteratorActs.next());
+							for (Iterator<Activity> iteratorActs = iteratorSubChain.next().getSlActs().iterator(); iteratorActs.hasNext();){
+								this.modifyLocationCoord((ActivityImpl) iteratorActs.next());
 							}
 						}
 					}
@@ -595,13 +596,13 @@ public class PlansConstructor implements PlanStrategyModule{
 
 					for (int j=0;j<plan.getPlanElements().size();j++){
 						if (j%2==1){
-							this.router.handleLeg(person, (LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
+							this.router.handleLeg(person, (LegImpl)plan.getPlanElements().get(j), (Activity)plan.getPlanElements().get(j-1), (Activity)plan.getPlanElements().get(j+1), ((Activity)plan.getPlanElements().get(j-1)).getEndTime());
 						}
 						else {
-							if (j!=0)((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
+							if (j!=0)((Activity)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
 							if (j!=plan.getPlanElements().size()-1){
-								((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
-								((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
+								((Activity)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((Activity)(plan.getPlanElements().get(j))).getEndTime()));
+								((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((Activity)(plan.getPlanElements().get(j))).getEndTime()-((Activity)(plan.getPlanElements().get(j))).getStartTime());
 							}
 						}
 					}

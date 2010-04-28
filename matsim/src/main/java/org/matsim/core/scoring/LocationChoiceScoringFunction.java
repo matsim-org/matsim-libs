@@ -26,13 +26,13 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
 
-/* 
+/*
  * Scoring function factoring in capacity restraints
  */
 public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoringFunction {
@@ -45,7 +45,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 		this.penalty = new Vector<ScoringPenalty>();
 		this.facilityPenalties = facilityPenalties;
 	}
-	
+
 	@Override
 	public void finish() {
 
@@ -61,7 +61,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 	}
 
 	@Override
-	protected double calcActScore(final double arrivalTime, final double departureTime, final ActivityImpl act) {
+	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
 		ActivityUtilityParameters params = this.params.utilParams.get(act.getType());
 		if (params == null) {
@@ -88,36 +88,36 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 			activityEnd = departureTime;
 		}
 		double duration = activityEnd - activityStart;
-	
+
 		// utility of performing an action, duration is >= 1, thus log is no problem ----------------
 		double typicalDuration = params.getTypicalDuration();
 
 		if (duration > 0) {
 			double utilPerf = this.params.marginalUtilityOfPerforming * typicalDuration
 					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
-			
-			
+
+
 
 			double utilWait = this.params.marginalUtilityOfWaiting * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
-					
+
 			/* Penalty due to facility load: --------------------------------------------
-			 * Store the temporary score to reduce it in finish() proportionally 
+			 * Store the temporary score to reduce it in finish() proportionally
 			 * to score and dep. on facility load.
 			 * TODO: maybe checking if activity is movable for this person (discussion)
 			 */
 			if (!act.getType().startsWith("h")) {
-				this.penalty.add(new ScoringPenalty(activityStart, activityEnd, 
+				this.penalty.add(new ScoringPenalty(activityStart, activityEnd,
 						this.facilityPenalties.get(act.getFacilityId()), tmpScore));
 			}
 			//---------------------------------------------------------------------------
-				
+
 		} else {
 			tmpScore += 2*this.params.marginalUtilityOfLateArrival*Math.abs(duration);
 		}
-		
-				
-		// DISUTILITIES: ==============================================================================	
+
+
+		// DISUTILITIES: ==============================================================================
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
@@ -145,7 +145,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 		double minimalDuration = params.getMinimalDuration();
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
 			tmpScore += this.params.marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
-		}	
+		}
 		return tmpScore;
 	}
 

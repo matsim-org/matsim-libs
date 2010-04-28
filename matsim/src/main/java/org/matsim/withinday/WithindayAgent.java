@@ -29,11 +29,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.AgentReplanEventImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -154,7 +154,7 @@ public class WithindayAgent extends QPersonAgent {
 			log.trace("time: " + hours + ":" + min);
 		}
 		Link currentLink = this.network.getLinks().get(this.getCurrentLinkId());
-		ActivityImpl nextAct = ((PlanImpl) this.getPerson().getSelectedPlan()).getNextActivity(this.getCurrentLeg());
+		Activity nextAct = ((PlanImpl) this.getPerson().getSelectedPlan()).getNextActivity(this.getCurrentLeg());
 		Link destinationLink = this.network.getLinks().get(nextAct.getLinkId());
 		NetworkRoute alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, this.getQSimulation().getSimTimer().getTimeOfDay());
 		Plan oldPlan = this.getPerson().getSelectedPlan();

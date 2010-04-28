@@ -28,13 +28,13 @@ package playground.jhackney.algorithms;
  * chosen type is not in the Plan, or if there are no other locations of this type
  * in the facilities. If the Act is changed, both the old and new plans
  * are retained and the new plan is selected.
- * 
+ *
  * TODO: facility types are hard-coded in the conroler! No checks are made whether
  * the facility types in "activities", "acts", and config are identical! They must
  * be or else this code won't work. No warnings will be given. If the facility types
  * do not match perfectly, errors may occur, or the code may run but the result
  * may be buggy.
- * 
+ *
  * @author jhackney
  */
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 	private final PersonalizableTravelCost tcost;
 	private final TravelTime ttime;
 	private final String[] factypes;
-	
+
 	private final ActivityFacilitiesImpl facilities;
 
 	private final Knowledges knowledges;
@@ -103,9 +103,9 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 		String factype=null;// facility type to switch out
 		Person person = plan.getPerson();
 
-		//COPY THE SELECTED PLAN		    
+		//COPY THE SELECTED PLAN
 		Plan newPlan = ((PersonImpl) person).copySelectedPlan();
-		
+
 		// Note that it is not changed, yet
 		boolean changed = false;
 
@@ -154,7 +154,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 //			Id facId=new Id(Gbl.random.nextInt(facs.getFacilities().size()));
 			int facId=MatsimRandom.getRandom().nextInt(facilities.getFacilitiesForActivityType(factype).size());
 			ActivityFacilityImpl f= (ActivityFacilityImpl) facilities.getFacilitiesForActivityType(factype).values().toArray()[facId];
-			
+
 //			Facility f = facs.getFacilities().get(new Id(Gbl.random.nextInt(facs.getFacilities().size())));
 //			And replace the activity in the chain with it (only changes the facility)
 
@@ -169,7 +169,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
 				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLinkId().equals(((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLinkId()))){
-					ActivityImpl firstAct = ((PlanImpl) newPlan).getFirstActivity();
+					ActivityImpl firstAct = (ActivityImpl) ((PlanImpl) newPlan).getFirstActivity();
 					firstAct.setLinkId(f.getLinkId());
 					firstAct.setCoord(f.getCoord());
 					firstAct.setFacilityId(f.getId());
@@ -192,7 +192,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 				}
 //				Reset the score to Undefined. Helps to see if the plan was really changed
 				newPlan.setScore(Double.NaN);
-				
+
 				new PersonPrepareForSim(new PlansCalcRoute(null, network, tcost, ttime, new DijkstraFactory()), network).run(newPlan.getPerson());
 
 //				Not needed with new change to Act --> Facility JH 7.2008
@@ -214,7 +214,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 		s = longString.split(patternStr);
 		double[] w = new double[s.length];
 		w[0]=Double.valueOf(s[0]).doubleValue();
-		double sum = w[0];	
+		double sum = w[0];
 		for (int i = 1; i < s.length; i++) {
 			w[i] = Double.valueOf(s[i]).doubleValue()+w[i-1];
 			sum=sum+Double.valueOf(s[i]).doubleValue();

@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -30,84 +31,84 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 public class Counts2Plans {
-	
+
 	private static final Logger log = Logger.getLogger(Counts2Plans.class);
 	private static final Random rnd = new Random(4711);
-	
+
 	private Counts access = new Counts();
 	private Counts egress = new Counts();
 	private TransitSchedule transitSchedule;
-	
+
 	private HashMap<String, LinkedList<Id>> lines = new HashMap<String, LinkedList<Id>>();
-	
+
 	private int runningID = 1;
 	private int numberOfPersonsWithValidPlan = 0;
 	private int numberOfPersonsLeftInBusAtEndOfLine = 0;
 	private int numberOfPersonsCouldNotLeaveTheBusWhenSupposedTo = 0;
-	
+
 	private LinkedList<PersonImpl> completedAgents = new LinkedList<PersonImpl>();
-	
-	
+
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
+
 		Counts2Plans counts2plans = new Counts2Plans();
 		counts2plans.access = Counts2Plans.readCountsFile("d:/Berlin/BVG/berlin-bvg09/counts/pt/counts_boarding_M44_344.xml");
 		counts2plans.egress = Counts2Plans.readCountsFile("d:/Berlin/BVG/berlin-bvg09/counts/pt/counts_alighting_M44_344.xml");
-		
+
 		counts2plans.transitSchedule = Counts2Plans.readTransitSchedule("d:/Berlin/BVG/berlin-bvg09/pt/m4_demand/transitSchedule.xml", "d:/Berlin/BVG/berlin-bvg09/pt/m4_demand/network.xml");
-		
+
 //		counts2plans.addLine("344  ");
 
 		counts2plans.addM44_H();
 		counts2plans.addM44_R();
 		counts2plans.add344_H();
 		counts2plans.add344_R();
-		
+
 		counts2plans.createPlans();
 		counts2plans.printLog();
 		counts2plans.addTouristGroup(100, Time.parseTime("08:30:00"), new IdImpl("812030.1"), new IdImpl("806520.1"));
 		counts2plans.createPopulation("E:/_out/plans.xml.gz");
-		
+
 		Counts2Plans.log.info("Finished");
 
 	}
 
 	private void addTouristGroup(int number, double time, Id from, Id to) {
-		
+
 		for (int i = 1; i <= number; i++) {
-			
+
 			PersonImpl person = createPerson();
-			((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.transitSchedule.getFacilities().get(from).getLinkId());
-			((PlanImpl) person.getSelectedPlan()).getFirstActivity().setCoord(this.transitSchedule.getFacilities().get(from).getCoord());
+			ActivityImpl a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.transitSchedule.getFacilities().get(from).getLinkId());
+			a.setCoord(this.transitSchedule.getFacilities().get(from).getCoord());
 
 			((PlanImpl) person.getSelectedPlan()).createAndAddLeg(TransportMode.pt);
 			((PlanImpl) person.getSelectedPlan()).getFirstActivity().setEndTime(time);
-						
-			((PlanImpl) person.getSelectedPlan()).createAndAddActivity("finish", this.transitSchedule.getFacilities().get(to).getLinkId());
-			((PlanImpl) person.getSelectedPlan()).getLastActivity().setCoord(this.transitSchedule.getFacilities().get(to).getCoord());
+
+			a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivity("finish", this.transitSchedule.getFacilities().get(to).getLinkId());
+			a.setCoord(this.transitSchedule.getFacilities().get(to).getCoord());
 
 			this.completedAgents.add(person);
 			this.numberOfPersonsWithValidPlan++;
 		}
-		
+
 		log.info(this.numberOfPersonsWithValidPlan + " persons after creating additional 'tourists'");
-		
+
 	}
 
 	private void printLog() {
 		log.info(this.numberOfPersonsWithValidPlan + " persons were created according to counts files");
 		log.info(this.numberOfPersonsCouldNotLeaveTheBusWhenSupposedTo + " persons were supposed to leave the bus, but the vehicle didn't contain any");
-		log.info(this.numberOfPersonsLeftInBusAtEndOfLine + " persons where sitting in the bus at the end of line, because they never got the possibility to leave the vehicle");		
+		log.info(this.numberOfPersonsLeftInBusAtEndOfLine + " persons where sitting in the bus at the end of line, because they never got the possibility to leave the vehicle");
 	}
 
 	private void createPlans() {
 
 		for (int hour = 1; hour <= 24; hour++) {
 
-			log.info("Hour: " + hour);				
+			log.info("Hour: " + hour);
 			LinkedList<PersonImpl> passengersInVehicle = new LinkedList<PersonImpl>();
 
 			for (Entry<String, LinkedList<Id>> entry : this.lines.entrySet()) {
@@ -125,8 +126,8 @@ public class Counts2Plans {
 									log.warn("StopID: " + stopID + ", Passenger should leave the vehicle, but none is there");
 									this.numberOfPersonsCouldNotLeaveTheBusWhenSupposedTo++;
 								} else {
-									((PlanImpl) person.getSelectedPlan()).createAndAddActivity("finish", this.transitSchedule.getFacilities().get(stopID).getLinkId());
-									((PlanImpl) person.getSelectedPlan()).getLastActivity().setCoord(this.transitSchedule.getFacilities().get(stopID).getCoord());
+									ActivityImpl a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivity("finish", this.transitSchedule.getFacilities().get(stopID).getLinkId());
+									a.setCoord(this.transitSchedule.getFacilities().get(stopID).getCoord());
 									//									((PlanImpl) person.getSelectedPlan()).createAndAddActivity("finish", this.egress.getCount(stopID).getCoord());
 									this.completedAgents.add(person);
 									this.numberOfPersonsWithValidPlan++;
@@ -140,11 +141,11 @@ public class Counts2Plans {
 
 							for (int i = 0; i < this.access.getCount(stopID).getVolume(hour).getValue(); i++) {
 								PersonImpl person = createPerson();
-								((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.transitSchedule.getFacilities().get(stopID).getLinkId());
-								((PlanImpl) person.getSelectedPlan()).getFirstActivity().setCoord(this.transitSchedule.getFacilities().get(stopID).getCoord());
+								ActivityImpl a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.transitSchedule.getFacilities().get(stopID).getLinkId());
+								a.setCoord(this.transitSchedule.getFacilities().get(stopID).getCoord());
 								//								((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.access.getCount(stopID).getCoord());
 								((PlanImpl) person.getSelectedPlan()).createAndAddLeg(TransportMode.pt);
-								
+
 								// Verlegen der Nachfrage auf die Zeit des OEV-Angebots. Dieses geht von 3:30 bis 27:30 Uhr.
 								if(hour < 4){
 									((PlanImpl) person.getSelectedPlan()).getFirstActivity().setEndTime((hour + 24 - 1 + rnd.nextDouble()) * 3600);
@@ -177,36 +178,36 @@ public class Counts2Plans {
 	}
 
 	private void createPopulation(String filename) {
-				
+
 		PopulationImpl pop = new PopulationImpl(new ScenarioImpl());
-		
+
 		for (PersonImpl person : this.completedAgents) {
 			pop.addPerson(person);
 		}
-		
+
 		PopulationWriter popWriter = new PopulationWriter(pop, null);
 		popWriter.writeStartPlans(filename);
 		popWriter.writePersons();
 		popWriter.writeEndPlans();
-		
+
 	}
 
-	private static Counts readCountsFile(String filename) {		
-		Counts counts = new Counts();		
+	private static Counts readCountsFile(String filename) {
+		Counts counts = new Counts();
 		MatsimCountsReader matsimCountsReader = new MatsimCountsReader(counts);
 		matsimCountsReader.readFile(filename);
-		return counts;		
+		return counts;
 	}
-	
+
 	private static TransitSchedule readTransitSchedule(String transitScheduleFile, String networkFile) {
-		
+
 		ScenarioImpl scenario = new ScenarioImpl();
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
 		matsimNetReader.readFile(networkFile);
-		
+
 		TransitSchedule transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, scenario.getNetwork());
-		
+
 		try {
 			transitScheduleReaderV1.readFile(transitScheduleFile);
 		} catch (SAXException e) {
@@ -216,14 +217,14 @@ public class Counts2Plans {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	
+
 		return transitSchedule;
 	}
 
 	private void add344_H() {
 		LinkedList<Id> b344_H = new LinkedList<Id>();
 		this.lines.put("344_H", b344_H);
-		
+
 		b344_H.add(new IdImpl("792040.1"));
 		b344_H.add(new IdImpl("792200.1"));
 		b344_H.add(new IdImpl("792013.1"));
@@ -231,13 +232,13 @@ public class Counts2Plans {
 		b344_H.add(new IdImpl("792023.1"));
 		b344_H.add(new IdImpl("792910.1"));
 		b344_H.add(new IdImpl("781060.1"));
-		b344_H.add(new IdImpl("781040.1"));			
+		b344_H.add(new IdImpl("781040.1"));
 	}
 
 	private void add344_R() {
 		LinkedList<Id> b344_R = new LinkedList<Id>();
 		this.lines.put("344_R", b344_R);
-		
+
 		b344_R.add(new IdImpl("781015.2"));
 		b344_R.add(new IdImpl("792910.2"));
 		b344_R.add(new IdImpl("792023.2"));
@@ -246,11 +247,11 @@ public class Counts2Plans {
 		b344_R.add(new IdImpl("792200.2"));
 		b344_R.add(new IdImpl("792040.2"));
 	}
-	
+
 	private void addM44_H() {
 		LinkedList<Id> m44_H = new LinkedList<Id>();
 		this.lines.put("m44_H", m44_H);
-		
+
 		m44_H.add(new IdImpl("812020.1"));
 		m44_H.add(new IdImpl("812550.1"));
 		m44_H.add(new IdImpl("812030.1"));
@@ -270,11 +271,11 @@ public class Counts2Plans {
 		m44_H.add(new IdImpl("792050.1"));
 		m44_H.add(new IdImpl("792200.3"));
 	}
-	
+
 	private void addM44_R() {
 		LinkedList<Id> m44_R = new LinkedList<Id>();
 		this.lines.put("m44_R", m44_R);
-		
+
 		m44_R.add(new IdImpl("792200.4"));
 		m44_R.add(new IdImpl("792050.2"));
 		m44_R.add(new IdImpl("801040.2"));
@@ -292,14 +293,14 @@ public class Counts2Plans {
 		m44_R.add(new IdImpl("812560.2"));
 		m44_R.add(new IdImpl("812030.2"));
 		m44_R.add(new IdImpl("812550.2"));
-		m44_R.add(new IdImpl("812020.2"));		
+		m44_R.add(new IdImpl("812020.2"));
 	}
 
 	private void addLine(String lineID) {
-		
+
 		TransitLine transitLine = this.transitSchedule.getTransitLines().get(new IdImpl(lineID));
-		LinkedList<Id> routeStops = new LinkedList<Id>();		
-		
+		LinkedList<Id> routeStops = new LinkedList<Id>();
+
 		for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
 			if(transitRoute.getStops().size() > routeStops.size()){
 				routeStops = new LinkedList<Id>();
@@ -308,9 +309,9 @@ public class Counts2Plans {
 				}
 			}
 		}
-		
+
 		this.lines.put("344_H", routeStops);
-		
+
 	}
 
 }

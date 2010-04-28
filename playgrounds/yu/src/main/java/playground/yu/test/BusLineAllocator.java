@@ -90,7 +90,7 @@ public class BusLineAllocator {
 	private class TravelTimeFunctionFree implements TravelTime {
 		/** returns only freespeedtraveltime */
 		public double getLinkTravelTime(Link link, double time) {
-			return ((LinkImpl) link).getFreespeedTravelTime(0);
+			return ((LinkImpl) link).getFreespeedTravelTime();
 		}
 	}
 

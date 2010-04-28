@@ -25,20 +25,20 @@ import java.util.Vector;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.api.core.v01.population.Activity;
 
 public class SubChain {
-	
-	private ActivityImpl firstPrimAct = null;
-	private ActivityImpl lastPrimAct = null;
-	
-	private List<ActivityImpl> secondaryActs = null;
+
+	private Activity firstPrimAct = null;
+	private Activity lastPrimAct = null;
+
+	private List<Activity> secondaryActs = null;
 	private double ttBudget = 0.0;
 	private double totalTravelDistance = 0.0;
-	
+
 	private Coord startCoord = null;
 	private Coord endCoord = null;
-	
+
 	//car, walk, mixed
 	private String mode = null;
 
@@ -52,14 +52,14 @@ public class SubChain {
 		}
 		if (!this.mode.equals(mode.toString())) {
 			this.mode = "mixed";
-		}	
+		}
 	}
-	
+
 	public SubChain() {
-		secondaryActs = new Vector<ActivityImpl>();		
+		secondaryActs = new Vector<Activity>();
 	}
-	
-	public void addAct(ActivityImpl act) {
+
+	public void addAct(Activity act) {
 		this.secondaryActs.add(act);
 	}
 
@@ -89,27 +89,27 @@ public class SubChain {
 		this.endCoord = endCoord;
 	}
 
-	public List<ActivityImpl> getSlActs() {
+	public List<Activity> getSlActs() {
 		return secondaryActs;
 	}
 
-	public void setSlActs(List<ActivityImpl> slActs) {
+	public void setSlActs(List<Activity> slActs) {
 		this.secondaryActs = slActs;
 	}
 
-	public ActivityImpl getFirstPrimAct() {
+	public Activity getFirstPrimAct() {
 		return firstPrimAct;
 	}
 
-	public void setFirstPrimAct(ActivityImpl firstPrimAct) {
+	public void setFirstPrimAct(Activity firstPrimAct) {
 		this.firstPrimAct = firstPrimAct;
 	}
 
-	public ActivityImpl getLastPrimAct() {
+	public Activity getLastPrimAct() {
 		return lastPrimAct;
 	}
 
-	public void setLastPrimAct(ActivityImpl lastPrimAct) {
+	public void setLastPrimAct(Activity lastPrimAct) {
 		this.lastPrimAct = lastPrimAct;
 	}
 
@@ -128,5 +128,5 @@ public class SubChain {
 	public void setMode(String mode) {
 		this.mode = mode;
 	}
-		
+
 }

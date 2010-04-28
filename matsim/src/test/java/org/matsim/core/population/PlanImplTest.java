@@ -93,7 +93,7 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		ActivityImpl a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
+		ActivityImpl a = new ActivityImpl("l", new CoordImpl(200, 100));
 		LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		plan.insertLegAct(1, l, a);
 
@@ -119,7 +119,7 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		ActivityImpl a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
+		ActivityImpl a = new ActivityImpl("l", new CoordImpl(200, 100));
 		LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		plan.insertLegAct(3, l, a);
 
@@ -145,7 +145,7 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		ActivityImpl a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
+		ActivityImpl a = new ActivityImpl("l", new CoordImpl(200, 100));
 		LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		try {
 			plan.insertLegAct(2, l, a);
@@ -168,7 +168,7 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		ActivityImpl a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
+		ActivityImpl a = new ActivityImpl("l", new CoordImpl(200, 100));
 		LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		try {
 			plan.insertLegAct(0, l, a);
@@ -192,7 +192,7 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		ActivityImpl a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
+		ActivityImpl a = new ActivityImpl("l", new CoordImpl(200, 100));
 		LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		try {
 			plan.insertLegAct(4, l, a);

@@ -283,10 +283,10 @@ public class PlanImpl implements Plan {
 	 * @param act the act to insert, following the leg
 	 * @throws IllegalArgumentException If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
 	 */
-	public void insertLegAct(final int pos, final LegImpl leg, final ActivityImpl act) throws IllegalArgumentException {
+	public void insertLegAct(final int pos, final Leg leg, final Activity act) throws IllegalArgumentException {
 		if (pos < getPlanElements().size()) {
 			Object o = getPlanElements().get(pos);
-			if (!(o instanceof LegImpl)) {
+			if (!(o instanceof Leg)) {
 				throw new IllegalArgumentException("Position to insert leg and act is not valid (act instead of leg at position).");
 			}
 		} else if (pos > getPlanElements().size()) {
@@ -297,7 +297,7 @@ public class PlanImpl implements Plan {
 		getPlanElements().add(pos, leg);
 	}
 
-	public LegImpl getPreviousLeg(final Activity act) {
+	public Leg getPreviousLeg(final Activity act) {
 		int index = this.getActLegIndex(act);
 		if (index != -1) {
 			return (LegImpl) getPlanElements().get(index-1);
@@ -305,32 +305,32 @@ public class PlanImpl implements Plan {
 		return null;
 	}
 
-	public ActivityImpl getPreviousActivity(final Leg leg) {
+	public Activity getPreviousActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
-			return (ActivityImpl) getPlanElements().get(index-1);
+			return (Activity) getPlanElements().get(index-1);
 		}
 		return null;
 	}
 
-	public LegImpl getNextLeg(final Activity act) {
+	public Leg getNextLeg(final Activity act) {
 		int index = this.getActLegIndex(act);
 		if ((index < getPlanElements().size() - 1) && (index != -1)) {
-			return (LegImpl) getPlanElements().get(index+1);
+			return (Leg) getPlanElements().get(index+1);
 		}
 		return null;
 	}
 
-	public ActivityImpl getNextActivity(final Leg leg) {
+	public Activity getNextActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
-			return (ActivityImpl) getPlanElements().get(index+1);
+			return (Activity) getPlanElements().get(index+1);
 		}
 		return null;
 	}
 
 	public int getActLegIndex(final Object o) {
-		if ((o instanceof LegImpl) || (o instanceof ActivityImpl)) {
+		if ((o instanceof Leg) || (o instanceof Activity)) {
 			for (int i = 0; i < getPlanElements().size(); i++) {
 				if (getPlanElements().get(i).equals(o)) {
 					return i;
@@ -341,12 +341,12 @@ public class PlanImpl implements Plan {
 		throw new IllegalArgumentException("Method call only valid with a Leg or Act instance as parameter!");
 	}
 
-	public ActivityImpl getFirstActivity() {
-		return (ActivityImpl) getPlanElements().get(0);
+	public Activity getFirstActivity() {
+		return (Activity) getPlanElements().get(0);
 	}
 
-	public ActivityImpl getLastActivity() {
-		return (ActivityImpl) getPlanElements().get(getPlanElements().size() - 1);
+	public Activity getLastActivity() {
+		return (Activity) getPlanElements().get(getPlanElements().size() - 1);
 	}
 
 	@Override

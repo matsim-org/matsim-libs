@@ -22,6 +22,8 @@ package playground.dressler.util;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -29,8 +31,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -81,13 +81,13 @@ public class DDcontroller {
 					System.out.println("Person " + person.getId() + " has no plan.");
 					continue;
 				}
-				ActivityImpl act = ((PlanImpl) plan).getFirstActivity();
+				Activity act = ((PlanImpl) plan).getFirstActivity();
 				if (act == null) {
 					System.out.println("Person " + person.getId() + " has no act.");
 					continue;
 				}
 
-				LegImpl leg = ((PlanImpl) plan).getNextLeg(act);
+				Leg leg = ((PlanImpl) plan).getNextLeg(act);
 				if (leg == null) {
 					System.out.println("Person " + person.getId() + " has no leg.");
 					continue;

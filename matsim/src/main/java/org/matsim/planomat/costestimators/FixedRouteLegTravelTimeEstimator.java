@@ -28,10 +28,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -78,8 +79,8 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 	@Override
 	public LegImpl getNewLeg(
 			TransportMode mode,
-			ActivityImpl actOrigin,
-			ActivityImpl actDestination,
+			Activity actOrigin,
+			Activity actDestination,
 			int legPlanElementIndex,
 			double departureTime) {
 
@@ -140,8 +141,8 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 
 	@Override
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
-			ActivityImpl actOrigin, ActivityImpl actDestination,
-			LegImpl legIntermediate, boolean doModifyLeg) {
+			Activity actOrigin, Activity actDestination,
+			Leg legIntermediate, boolean doModifyLeg) {
 
 		double legTravelTimeEstimation = 0.0;
 

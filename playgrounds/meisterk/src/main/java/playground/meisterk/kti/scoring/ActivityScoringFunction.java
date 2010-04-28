@@ -32,6 +32,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityOption;
@@ -39,7 +40,6 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
@@ -100,8 +100,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	private double accumulatedNegativeDuration;
 
 	@Override
-	protected double calcActScore(double arrivalTime, double departureTime,
-			ActivityImpl act) {
+	protected double calcActScore(double arrivalTime, double departureTime, Activity act) {
 
 		double fromArrivalToDeparture = departureTime - arrivalTime;
 

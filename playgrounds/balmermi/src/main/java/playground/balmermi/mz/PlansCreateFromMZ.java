@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -279,9 +280,9 @@ public class PlansCreateFromMZ {
 	private final void setHomeLocations(final Population plans, final Map<Id,String> person_strings) {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			ActivityImpl home = ((PlanImpl) plan).getFirstActivity();
+			Activity home = ((PlanImpl) plan).getFirstActivity();
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
-				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
+				Activity act = (ActivityImpl)plan.getPlanElements().get(i);
 				if ((act.getCoord().getX() == home.getCoord().getX()) && (act.getCoord().getY() == home.getCoord().getY())) {
 					if (!act.getType().equals(HOME)) {
 						act.setType(HOME);

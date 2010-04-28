@@ -26,6 +26,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
@@ -33,8 +35,6 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -43,21 +43,21 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private static final Logger log = Logger.getLogger(LinkTablesEventHandler.class);
-	
+
 	private int currentBin = -1;
 	private final int timeBinSize;
 	private final String outdir;
 	private BufferedWriter out = null;
-	
+
 	private final Population population;
-	private final Map<Id,ActivityImpl> fromActs = new TreeMap<Id, ActivityImpl>();
+	private final Map<Id,Activity> fromActs = new TreeMap<Id, Activity>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public LinkTablesEventHandler(final String outdir, final Population population) {
 		this(60*15,outdir, population);
 	}
@@ -74,11 +74,11 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// event handlers
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public void handleEvent(LinkLeaveEvent event) {
 		try {
 			if ((currentBin+1)*timeBinSize<=event.getTime()) {
@@ -89,9 +89,9 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 				out.write("lid\tpid\tfromActType\tfromActFid\ttoActType\ttoActFid\n");
 			}
 			Person p = population.getPersons().get(event.getPersonId());
-			ActivityImpl fromAct = fromActs.get(p.getId());
-			LegImpl leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(fromAct);
-			ActivityImpl toAct = ((PlanImpl) p.getSelectedPlan()).getNextActivity(leg);
+			Activity fromAct = fromActs.get(p.getId());
+			Leg leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(fromAct);
+			Activity toAct = ((PlanImpl) p.getSelectedPlan()).getNextActivity(leg);
 
 			out.write(event.getLinkId().toString()+"\t"+p.getId()+"\t");
 			out.write(fromAct.getType()+"\t"+fromAct.getFacilityId()+"\t");
@@ -105,13 +105,13 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 			fromActs.put(p.getId(),((PlanImpl) p.getSelectedPlan()).getFirstActivity());
 		}
 		else {
-			ActivityImpl fromAct = fromActs.get(p.getId());
-			LegImpl leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(fromAct);
-			ActivityImpl toAct = ((PlanImpl) p.getSelectedPlan()).getNextActivity(leg);
+			Activity fromAct = fromActs.get(p.getId());
+			Leg leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(fromAct);
+			Activity toAct = ((PlanImpl) p.getSelectedPlan()).getNextActivity(leg);
 			fromActs.put(p.getId(),toAct);
 		}
 	}
-	
+
 	public void reset(int iteration) {
 		currentBin = -1;
 		fromActs.clear();

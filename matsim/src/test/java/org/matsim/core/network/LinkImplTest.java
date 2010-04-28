@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
 public class LinkImplTest extends MatsimTestCase {
@@ -148,11 +147,11 @@ public class LinkImplTest extends MatsimTestCase {
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(50, 50));
 		LinkImpl link1 = (LinkImpl) network.createAndAddLink(new IdImpl(1), node1, node2, 500.0, 10.0, 1000.0, 1.0);
-		assertEquals("wrong freespeed traveltime.", 50.0, link1.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON);
+		assertEquals("wrong freespeed traveltime.", 50.0, link1.getFreespeedTravelTime(), EPSILON);
 		link1.setLength(1000.0);
-		assertEquals("wrong freespeed traveltime.", 100.0, link1.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON);
+		assertEquals("wrong freespeed traveltime.", 100.0, link1.getFreespeedTravelTime(), EPSILON);
 		link1.setFreespeed(20.0);
-		assertEquals("wrong freespeed traveltime.", 50.0, link1.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON);
+		assertEquals("wrong freespeed traveltime.", 50.0, link1.getFreespeedTravelTime(), EPSILON);
 	}
-	
+
 }

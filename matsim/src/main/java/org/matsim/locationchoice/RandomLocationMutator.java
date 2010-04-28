@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
@@ -70,11 +71,11 @@ public class RandomLocationMutator extends LocationMutator {
 
 	private void handlePlanBasedOnKnowldge(final Plan plan) {
 
-		List<ActivityImpl> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
+		List<Activity> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 
 		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+			final Activity act = (Activity)actslegs.get(j);
 
 			boolean	isPrimary = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId());
 			boolean	movable = movablePrimaryActivities.contains(act);
@@ -84,7 +85,7 @@ public class RandomLocationMutator extends LocationMutator {
 				int length = this.facilitiesOfType.get(act.getType()).length;
 				// only one facility: do not need to do location choice
 				if (length > 1) {
-					this.setNewLocationForAct(act, length);
+					this.setNewLocationForAct((ActivityImpl) act, length);
 				}
 			}
 		}

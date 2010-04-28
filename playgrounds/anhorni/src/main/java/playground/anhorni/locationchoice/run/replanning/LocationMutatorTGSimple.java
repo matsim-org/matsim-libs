@@ -41,7 +41,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.knowledges.Knowledges;
@@ -85,14 +84,14 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	}
 
 	private boolean handleShopActs(final PlanImpl plan) {
-		List<ActivityImpl> flexibleActivities = this.getFlexibleActivities(plan);
+		List<Activity> flexibleActivities = this.getFlexibleActivities(plan);
 
 		if (flexibleActivities.size() == 0) {
 			return false;
 		}
 		Collections.shuffle(flexibleActivities);
-		ActivityImpl actToMove = flexibleActivities.get(0);
-		List<?> actslegs = plan.getPlanElements();
+		Activity actToMove = flexibleActivities.get(0);
+		List<? extends PlanElement> actslegs = plan.getPlanElements();
 		int indexOfActToMove = actslegs.indexOf(actToMove);
 
 		// starting home and ending home are never flexible
@@ -122,14 +121,14 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			return false;
 		}
 
-		if (!this.modifyLocationShop(actToMove, actPre.getCoord(), actPost.getCoord(), radius)) {
+		if (!this.modifyLocationShop((ActivityImpl) actToMove, actPre.getCoord(), actPost.getCoord(), radius)) {
 			return false;
 		}
 		return true;
 	}
 
-	private List<ActivityImpl> getFlexibleActivities(final PlanImpl plan) {
-		List<ActivityImpl> flexibleActivities = new Vector<ActivityImpl>();
+	private List<Activity> getFlexibleActivities(final PlanImpl plan) {
+		List<Activity> flexibleActivities = new ArrayList<Activity>();
 		if (!super.locationChoiceBasedOnKnowledge) {
 			flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
 		}
@@ -137,7 +136,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			flexibleActivities = defineMovablePrimaryActivities(plan);
 			List<?> actslegs = plan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
-				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+				final Activity act = (Activity)actslegs.get(j);
 				if (!this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId()) &&
 						!(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
 					flexibleActivities.add(act);
@@ -170,21 +169,21 @@ public class LocationMutatorTGSimple extends LocationMutator {
 
 	private boolean handleLeisureActs(final PlanImpl plan) {
 
-		ActivityImpl actToMove = this.getRandomLeisureActivitiy(plan);
+		Activity actToMove = this.getRandomLeisureActivitiy(plan);
 
 		if (actToMove == null) return false;
 
-		LegImpl legPre = plan.getPreviousLeg(actToMove);
-		ActivityImpl actPre = plan.getPreviousActivity(legPre);
-		return this.modifyLeisureLocation(actToMove, (CoordImpl)actPre.getCoord());
+		Leg legPre = plan.getPreviousLeg(actToMove);
+		Activity actPre = plan.getPreviousActivity(legPre);
+		return this.modifyLeisureLocation((ActivityImpl) actToMove, (CoordImpl)actPre.getCoord());
 	}
 
-	public ActivityImpl getRandomLeisureActivitiy(final Plan plan) {
-		List<ActivityImpl> flexibleActivities = new Vector<ActivityImpl>();
+	public Activity getRandomLeisureActivitiy(final Plan plan) {
+		List<Activity> flexibleActivities = new Vector<Activity>();
 
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
-				final ActivityImpl act = (ActivityImpl) pe;
+				final Activity act = (Activity) pe;
 				if (act.getType().startsWith("leisure")) {
 					flexibleActivities.add(act);
 				}
@@ -194,7 +193,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			Collections.shuffle(flexibleActivities);
 			return flexibleActivities.get(0);
 		}
-		else return null;
+		return null;
 	}
 
 	private boolean modifyLeisureLocation(ActivityImpl act, CoordImpl coordActPre) {

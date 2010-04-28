@@ -35,7 +35,7 @@ import playground.jhackney.socialnetworks.socialnet.EgoNet;
  * The new location is chosen from the combined Knowledge about Facilities of Ego and Alters.
  * The activity to re-locate is chosen randomly based on a user-defined
  * probability for changing the location of activities.<br><br>
- * 
+ *
  * <li>1) The choice of location is made using a multi-nomial Logit implementation in which the
  * alternatives are weighted by the frequency with which the location appears
  * in the Ego and Alters' Knowledge.</li>
@@ -51,13 +51,13 @@ import playground.jhackney.socialnetworks.socialnet.EgoNet;
  * based on his own Knowledge, and the module reduces to
  * {@link playground.jhackney.socialnetworks.replanning.RandomFacilitySwitcherK}.
  * The difference between the two modules is that this one REQUIRES a social network
- * to be defined (it can be empty) and the other does not require a social network.<br><br>  
- * 
+ * to be defined (it can be empty) and the other does not require a social network.<br><br>
+ *
  * Required objects:<br>
  * <li>Facilities: as a "location choice" strategy, the module works explicitly with facilities</li>
  * <li>SocialNetwork: {@link playground.jhackney.socialnetworks.socialnet.SocialNetwork} must be non-null</li>
  * <li>weights: string of weights from [0,1] indicating the probability of
- * switching location of each type of facility that exists in the model.<br><br>  
+ * switching location of each type of facility that exists in the model.<br><br>
  *
  * @author jhackney
  *
@@ -92,7 +92,7 @@ public class SNPickFacility implements PlanAlgorithm {
 		String factype=null;// facility type to switch out
 		Person person = plan.getPerson();
 
-		//COPY THE SELECTED PLAN		    
+		//COPY THE SELECTED PLAN
 		Plan newPlan = ((PersonImpl) person).copySelectedPlan();
 
 		// Note that it is not changed, yet
@@ -150,7 +150,7 @@ public class SNPickFacility implements PlanAlgorithm {
 					facMap.put(activity,m);
 				}
 			}
-			
+
 //			Pick a new facility for it from the knowledge of alters and ego (LOGIT)
 //For each alter append its facList to existing facList
 			EgoNet egoNet = (EgoNet)person.getCustomAttributes().get(EgoNet.NAME);
@@ -173,10 +173,10 @@ public class SNPickFacility implements PlanAlgorithm {
 				}
 			}
 			ActivityFacilityImpl f = getFacByLogit(facMap);
-			
-			
+
+
 //----------
-			
+
 //			And replace the activity in the chain with it (only changes the facility)
 
 			if(!newAct.getLinkId().equals(f.getLinkId())){
@@ -189,7 +189,7 @@ public class SNPickFacility implements PlanAlgorithm {
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
 				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLinkId().equals(((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLinkId()))){
-					ActivityImpl firstAct = ((PlanImpl) newPlan).getFirstActivity();
+					ActivityImpl firstAct = (ActivityImpl) ((PlanImpl) newPlan).getFirstActivity();
 					firstAct.setLinkId(f.getLinkId());
 					firstAct.setCoord(f.getCoord());
 					firstAct.setFacilityId(f.getId());
@@ -264,7 +264,7 @@ public class SNPickFacility implements PlanAlgorithm {
 		s = longString.split(patternStr);
 		double[] w = new double[s.length];
 		w[0]=Double.parseDouble(s[0]);
-		double sum = w[0];	
+		double sum = w[0];
 		for (int i = 1; i < s.length; i++) {
 			w[i] = Double.parseDouble(s[i])+w[i-1];
 			sum=sum+Double.parseDouble(s[i]);

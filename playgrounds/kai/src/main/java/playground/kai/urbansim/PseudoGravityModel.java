@@ -11,11 +11,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -104,7 +104,7 @@ public class PseudoGravityModel {
 		// compute the extent of the coordinates for persons:
 		for ( Person person : population.getPersons().values() ) {
 			Plan plan = person.getSelectedPlan() ;
-			ActivityImpl act = ((PlanImpl) plan).getFirstActivity();
+			Activity act = ((PlanImpl) plan).getFirstActivity();
 			Coord homeCoord = act.getCoord() ;
 			checkMax( homeCoord ) ;
 		}

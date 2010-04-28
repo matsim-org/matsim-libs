@@ -3,12 +3,12 @@ package org.matsim.core.mobsim.jdeqsim.parallel;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.jdeqsim.Scheduler;
 import org.matsim.core.mobsim.jdeqsim.Vehicle;
-import org.matsim.core.population.ActivityImpl;
 
 
 
@@ -16,7 +16,7 @@ public class PVehicle extends Vehicle {
 
 	public PVehicle(Scheduler scheduler, Person ownerPerson) {
 		super(scheduler, ownerPerson);
-		
+
 	}
 
 
@@ -36,7 +36,7 @@ public class PVehicle extends Vehicle {
 
 			Plan plan = getOwnerPerson().getSelectedPlan();
 			List<? extends PlanElement> actsLegs = plan.getPlanElements();
-			return ((ActivityImpl) actsLegs.get(getLegIndex() + 1)).getLinkId();
+			return ((Activity) actsLegs.get(getLegIndex() + 1)).getLinkId();
 
 		} else {
 			// return normal next link in leg
@@ -64,7 +64,7 @@ public class PVehicle extends Vehicle {
 
 			Plan plan = getOwnerPerson().getSelectedPlan();
 			List<? extends PlanElement> actsLegs = plan.getPlanElements();
-			return ((ActivityImpl) actsLegs.get(getLegIndex() - 1)).getLinkId();
+			return ((Activity) actsLegs.get(getLegIndex() - 1)).getLinkId();
 
 		} else {
 			// return normal next link in leg

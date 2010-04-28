@@ -44,6 +44,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -216,7 +217,7 @@ public class DistanceAnalysis {
 
 
 		for (Person person : persons) {
-			LegImpl leg = ((PlanImpl) person.getSelectedPlan()).getNextLeg(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
+			Leg leg = ((PlanImpl) person.getSelectedPlan()).getNextLeg(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
 			double l1 = leg.getRoute().getDistance();
 			List<Id> ls = ((NetworkRoute) leg.getRoute()).getLinkIds();
 			Id lId = ls.get(ls.size()-1);
@@ -235,7 +236,7 @@ public class DistanceAnalysis {
 			plan.addLeg(ll);
 			plan.addActivity(((PlanImpl) person.getSelectedPlan()).getNextActivity(leg));
 			this.router.run(plan);
-			LegImpl leg2 = plan.getNextLeg(plan.getFirstActivity());
+			Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
 			double l2 = leg2.getRoute().getDistance();
 			dist[1] = l2;
 

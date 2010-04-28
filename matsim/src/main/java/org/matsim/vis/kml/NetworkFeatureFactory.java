@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -117,7 +117,7 @@ public class NetworkFeatureFactory {
 		return p;
 	}
 
-	public AbstractFeatureType createActFeature(ActivityImpl act, StyleType style) {
+	public AbstractFeatureType createActFeature(Activity act, StyleType style) {
 
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		p.setName("Activity on link: " + act.getLinkId().toString());
@@ -131,7 +131,7 @@ public class NetworkFeatureFactory {
 		return p;
 	}
 
-	public AbstractFeatureType createLegFeature(LegImpl leg, StyleType style) {
+	public AbstractFeatureType createLegFeature(Leg leg, StyleType style) {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		folder.setName(leg.getMode().toString() + "_" + Time.writeTime(leg.getDepartureTime()));
 

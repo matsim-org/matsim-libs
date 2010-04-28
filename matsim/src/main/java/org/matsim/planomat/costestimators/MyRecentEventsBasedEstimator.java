@@ -24,11 +24,12 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -123,16 +124,18 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 		this.legTravelTimeEstimations.put(newLtte, travelTime);
 	}
 
+	@Override
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
-			ActivityImpl actOrigin, ActivityImpl actDestination,
-			LegImpl legIntermediate, boolean doModifyLeg) {
+			Activity actOrigin, Activity actDestination,
+			Leg legIntermediate, boolean doModifyLeg) {
 		return this.legTravelTimeEstimations.get(new LegTravelTimeEntry(personId, actOrigin.getLinkId(), actDestination.getLinkId(), "car"));
 	}
 
+	@Override
 	public LegImpl getNewLeg(
 			TransportMode mode,
-			ActivityImpl actOrigin,
-			ActivityImpl actDestination,
+			Activity actOrigin,
+			Activity actDestination,
 			int legPlanElementIndex,
 			double departureTime) {
 		// not implemented here

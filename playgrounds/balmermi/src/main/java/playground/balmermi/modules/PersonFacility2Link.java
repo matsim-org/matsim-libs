@@ -32,7 +32,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class PersonFacility2Link extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private final ActivityFacilities facilities;
-	
+
 	public PersonFacility2Link(final ActivityFacilities facilities) {
 		this.facilities = facilities;
 	}
@@ -45,10 +45,10 @@ public class PersonFacility2Link extends AbstractPersonAlgorithm implements Plan
 	}
 
 	public void run(final Plan plan) {
-		ActivityImpl act = ((PlanImpl) plan).getFirstActivity();
+		ActivityImpl act = (ActivityImpl) ((PlanImpl) plan).getFirstActivity();
 		while (act != ((PlanImpl) plan).getLastActivity()) {
 			act.setLinkId(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLinkId());
-			act = ((PlanImpl) plan).getNextActivity(((PlanImpl) plan).getNextLeg(act));
+			act = (ActivityImpl) ((PlanImpl) plan).getNextActivity(((PlanImpl) plan).getNextLeg(act));
 		}
 		act.setLinkId(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLinkId());
 	}

@@ -44,6 +44,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -182,7 +183,7 @@ public class EgressAnalysis {
 	private void handlePlans() {
 			log.info("handle plans");
 			for (Person person : this.population.getPersons().values()) {
-				LegImpl leg = ((PlanImpl) person.getSelectedPlan()).getNextLeg(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
+				Leg leg = ((PlanImpl) person.getSelectedPlan()).getNextLeg(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
 				List<Node> route = RouteUtils.getNodes((NetworkRoute) leg.getRoute(), this.network);
 				Node node = route.get(route.size()-2);
 				this.egressNodes.get(node.getId()).num_current++;
@@ -195,7 +196,7 @@ public class EgressAnalysis {
 				plan.addLeg(l);
 				plan.addActivity(((PlanImpl) person.getSelectedPlan()).getNextActivity(leg));
 				this.router.run(plan);
-				LegImpl leg2 = plan.getNextLeg(plan.getFirstActivity());
+				Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
 				List<Node> route2 = RouteUtils.getNodes((NetworkRoute) leg2.getRoute(), this.network);
 				Node node2 = route2.get(route2.size()-2);
 				this.egressNodes.get(node2.getId()).num_shortest++;

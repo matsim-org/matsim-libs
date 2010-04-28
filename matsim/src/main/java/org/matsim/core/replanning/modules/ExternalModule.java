@@ -29,16 +29,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -121,13 +122,13 @@ public class ExternalModule implements PlanStrategyModule {
 			this.handler.startPlan(plan, this.writer);
 
 			// act/leg
-			for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
-				if (jj % 2 == 0) {
-					ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(jj);
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
 					this.handler.startAct(act, this.writer);
 					this.handler.endAct(this.writer);
-				} else {
-					LegImpl leg = (LegImpl)plan.getPlanElements().get(jj);
+				} else if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
 					this.handler.startLeg(leg, this.writer);
 					// route
 					if (leg.getRoute() != null) {

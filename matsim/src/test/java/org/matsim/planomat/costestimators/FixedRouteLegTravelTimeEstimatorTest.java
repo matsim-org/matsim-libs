@@ -47,7 +47,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -153,14 +152,14 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			double expectedLegEndTime = departureTime;
 
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
-				expectedLegEndTime += ((LinkImpl) this.scenario.getNetwork().getLinks().get(this.originAct.getLinkId())).getFreespeedTravelTime(Time.UNDEFINED_TIME);
+				expectedLegEndTime += ((LinkImpl) this.scenario.getNetwork().getLinks().get(this.originAct.getLinkId())).getFreespeedTravelTime();
 			}
 			for (Id linkId : linkIds) {
 				Link link = this.scenario.getNetwork().getLinks().get(linkId);
 				expectedLegEndTime += link.getLength()/link.getFreespeed();
 			}
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-				expectedLegEndTime += ((LinkImpl) this.scenario.getNetwork().getLinks().get(this.destinationAct.getLinkId())).getFreespeedTravelTime(Time.UNDEFINED_TIME);
+				expectedLegEndTime += ((LinkImpl) this.scenario.getNetwork().getLinks().get(this.destinationAct.getLinkId())).getFreespeedTravelTime();
 			}
 			assertEquals(expectedLegEndTime, departureTime + legTravelTime, MatsimTestCase.EPSILON);
 
@@ -390,14 +389,14 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		startTime = Time.parseTime("05:59:00");
 		routeEndTime = testee.processRouteTravelTime(NetworkUtils.getLinks(this.scenario.getNetwork(), route.getLinkIds()), startTime);
 		assertEquals(
-				testee.processLink(this.scenario.getNetwork().getLinks().get(linkIds.get(1)), startTime + ((LinkImpl) this.scenario.getNetwork().getLinks().get(linkIds.get(0))).getFreespeedTravelTime(Time.UNDEFINED_TIME)),
+				testee.processLink(this.scenario.getNetwork().getLinks().get(linkIds.get(1)), startTime + ((LinkImpl) this.scenario.getNetwork().getLinks().get(linkIds.get(0))).getFreespeedTravelTime()),
 				routeEndTime, EPSILON);
 
 		// test a start time in the second bin, having second departure in the free speed bin
 		startTime = Time.parseTime("06:28:00");
 		routeEndTime = testee.processRouteTravelTime(NetworkUtils.getLinks(this.scenario.getNetwork(), route.getLinkIds()), startTime);
 		assertEquals(
-				testee.processLink(this.scenario.getNetwork().getLinks().get(linkIds.get(0)), startTime) + ((LinkImpl) this.scenario.getNetwork().getLinks().get(linkIds.get(1))).getFreespeedTravelTime(Time.UNDEFINED_TIME),
+				testee.processLink(this.scenario.getNetwork().getLinks().get(linkIds.get(0)), startTime) + ((LinkImpl) this.scenario.getNetwork().getLinks().get(linkIds.get(1))).getFreespeedTravelTime(),
 				routeEndTime, EPSILON);
 
 	}

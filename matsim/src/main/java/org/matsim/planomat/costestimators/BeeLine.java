@@ -22,7 +22,8 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -49,8 +50,8 @@ public class BeeLine implements LegTravelTimeEstimator {
 
 	@Override
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
-			ActivityImpl actOrigin, ActivityImpl actDestination,
-			LegImpl legIntermediate, boolean doModifyLeg) {
+			Activity actOrigin, Activity actDestination,
+			Leg legIntermediate, boolean doModifyLeg) {
 
 		double distance = CoordUtils.calcDistance(actOrigin.getCoord(), actDestination.getCoord());
 
@@ -61,8 +62,8 @@ public class BeeLine implements LegTravelTimeEstimator {
 	@Override
 	public LegImpl getNewLeg(
 			TransportMode mode,
-			ActivityImpl actOrigin,
-			ActivityImpl actDestination,
+			Activity actOrigin,
+			Activity actDestination,
 			int legPlanElementIndex,
 			double departureTime) {
 		// not implemented here

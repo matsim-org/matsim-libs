@@ -31,6 +31,7 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -213,8 +214,8 @@ public class Planomat implements PlanAlgorithm {
 		double positionInTimeInterval = 0.5;
 
 		LegImpl leg = null;
-		ActivityImpl origin = null;
-		ActivityImpl destination = null;
+		Activity origin = null;
+		Activity destination = null;
 
 		List<? extends PlanElement> actslegs = plan.getPlanElements();
 		int numLegs = actslegs.size() / 2;
@@ -255,7 +256,7 @@ public class Planomat implements PlanAlgorithm {
 			}
 			now = Math.max(oldNow + 1.0, now);
 			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
-				origin.setDuration(now - oldNow);
+				((ActivityImpl) origin).setDuration(now - oldNow);
 				origin.setEndTime(now);
 			}
 			///////////////////////////////////////////////////////////////////////////////////////////

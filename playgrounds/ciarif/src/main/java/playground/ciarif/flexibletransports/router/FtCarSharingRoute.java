@@ -1,14 +1,11 @@
 package playground.ciarif.flexibletransports.router;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.matrices.Entry;
-import org.matsim.world.Location;
 
 import playground.meisterk.kti.router.KtiPtRoute;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
-import playground.meisterk.kti.router.SwissHaltestelle;
 
 public class FtCarSharingRoute extends KtiPtRoute{
 
@@ -60,12 +57,12 @@ public class FtCarSharingRoute extends KtiPtRoute{
 
 	}
 
-	public double calcCarDistance(ActivityImpl activityImpl, ActivityImpl activityImpl2) {
+	public double calcCarDistance(Activity activityImpl, Activity activityImpl2) {
 		return CoordUtils.calcDistance(this.getFromStation().getCoord(), activityImpl2.getCoord());
 	}
 
 	protected double calcCarTime() {
-		
+
 		double travelTime = 0;
 		//TODO: compute travel time in the loaded network
 
@@ -73,7 +70,7 @@ public class FtCarSharingRoute extends KtiPtRoute{
 
 	}
 
-	public double calcAccessDistance(final ActivityImpl fromAct, final ActivityImpl toAct) {
+	public double calcAccessDistance(final Activity fromAct, final Activity toAct) {
 
 		return
 		(CoordUtils.calcDistance(fromAct.getCoord(), this.getFromStop().getCoord()) +
@@ -86,6 +83,7 @@ public class FtCarSharingRoute extends KtiPtRoute{
 		return this.fromStation;
 	}
 
+	@Override
 	public Double getInVehicleTime() {
 		return this.carTime;
 	}
