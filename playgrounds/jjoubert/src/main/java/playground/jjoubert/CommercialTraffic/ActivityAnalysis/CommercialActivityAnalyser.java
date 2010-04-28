@@ -63,7 +63,6 @@ public class CommercialActivityAnalyser {
 	private BufferedWriter majorOutput;
 	
 	/**
-	 * 
 	 * @param signalFilename
 	 * @param fromCoordinateSystem
 	 * @param toCoordinateSystem
