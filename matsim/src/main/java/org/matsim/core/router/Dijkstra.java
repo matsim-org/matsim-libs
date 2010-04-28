@@ -475,7 +475,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		return r;
 	}
 
-	PreProcessDijkstra.DeadEndData getPreProcessData(final Node n) {
+	protected PreProcessDijkstra.DeadEndData getPreProcessData(final Node n) {
 		return this.preProcessData.getNodeData(n);
 	}
 

@@ -63,9 +63,9 @@ import org.matsim.core.utils.misc.Time;
  */
 public class AStarLandmarks extends AStarEuclidean {
 
-	private int[] activeLandmarkIndexes;
+	protected int[] activeLandmarkIndexes;
 
-	private final Node[] landmarks;
+	protected final Node[] landmarks;
 
 	private static final int controlInterval = 40;
 	private int controlCounter = 0;
@@ -174,11 +174,8 @@ public class AStarLandmarks extends AStarEuclidean {
 		}
 	}
 
-	/**
-	 * @see org.matsim.core.router.Dijkstra#getPreProcessData(org.matsim.core.network.Node)
-	 */
 	@Override
-	PreProcessLandmarks.LandmarksData getPreProcessData(final Node n) {
+	protected PreProcessLandmarks.LandmarksData getPreProcessData(final Node n) {
 		return (PreProcessLandmarks.LandmarksData) super.getPreProcessData(n);
 	}
 
@@ -190,7 +187,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @return The travel cost when traveling between the two given nodes.
 	 */
 	@Override
-	double estimateRemainingTravelCost(final Node fromNode, final Node toNode) {
+	protected double estimateRemainingTravelCost(final Node fromNode, final Node toNode) {
 
 		PreProcessLandmarks.LandmarksData fromRole = getPreProcessData(fromNode);
 		PreProcessLandmarks.LandmarksData toRole = getPreProcessData(toNode);
@@ -294,17 +291,14 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * the estimation of the travel cost.
 	 * @return The travel cost when traveling between the two given nodes.
 	 */
-	private double estimateRemainingTravelCost(
+	protected double estimateRemainingTravelCost(
 			final PreProcessLandmarks.LandmarksData fromRole,
 			final PreProcessLandmarks.LandmarksData toRole, final int index) {
 		double tmpTravTime;
-		if (fromRole.getMinLandmarkTravelTime(index) > toRole
-				.getMaxLandmarkTravelTime(index)) {
-			tmpTravTime = fromRole.getMinLandmarkTravelTime(index)
-					- toRole.getMaxLandmarkTravelTime(index);
+		if (fromRole.getMinLandmarkTravelTime(index) > toRole.getMaxLandmarkTravelTime(index)) {
+			tmpTravTime = fromRole.getMinLandmarkTravelTime(index) - toRole.getMaxLandmarkTravelTime(index);
 		} else {
-			tmpTravTime = toRole.getMinLandmarkTravelTime(index)
-					- fromRole.getMaxLandmarkTravelTime(index);
+			tmpTravTime = toRole.getMinLandmarkTravelTime(index) - fromRole.getMaxLandmarkTravelTime(index);
 		}
 		if (tmpTravTime < 0) {
 			return 0;

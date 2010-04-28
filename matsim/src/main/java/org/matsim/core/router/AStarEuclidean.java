@@ -78,10 +78,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class AStarEuclidean extends Dijkstra {
 
-	double overdoFactor;
+	protected final double overdoFactor;
 
 	private double minTravelCostPerLength;
-	final private HashMap<Id, AStarNodeData> nodeData;
+	private final HashMap<Id, AStarNodeData> nodeData;
 
 	/**
 	 * Default constructor; sets the overdo factor to 1.
@@ -209,7 +209,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @param toNode The second node.
 	 * @return The travel cost when traveling between the two given nodes.
 	 */
-	double estimateRemainingTravelCost(final Node fromNode, final Node toNode) {
+	protected double estimateRemainingTravelCost(final Node fromNode, final Node toNode) {
 		double dist = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord())
 				* getMinTravelCostPerLength();
 		return dist * this.overdoFactor;
@@ -265,7 +265,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * Holds AStarEuclidean specific information used during routing
 	 * associated with each node in the network.
 	 */
-	class AStarNodeData extends DijkstraNodeData {
+	protected class AStarNodeData extends DijkstraNodeData {
 
 		private double expectedRemainingCost;
 

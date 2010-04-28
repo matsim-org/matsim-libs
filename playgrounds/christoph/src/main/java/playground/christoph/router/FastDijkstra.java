@@ -528,7 +528,8 @@ public class FastDijkstra extends Dijkstra {
 		return dijkstraNode.getCost();
 	}
 
-	PreProcessDijkstra.DeadEndData getPreProcessData(final Node n) {
+	@Override
+	protected PreProcessDijkstra.DeadEndData getPreProcessData(final Node n) {
 		return this.preProcessData.getNodeData(n);
 	}
 
