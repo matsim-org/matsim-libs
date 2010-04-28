@@ -23,6 +23,8 @@ package org.matsim.core.network;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.io.WriterHandler;
 
@@ -32,7 +34,7 @@ public interface NetworkWriterHandler extends WriterHandler {
 	// <network ... > ... </network>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startNetwork(final NetworkLayer network, final BufferedWriter out) throws IOException;
+	public void startNetwork(final Network network, final BufferedWriter out) throws IOException;
 
 	public void endNetwork(final BufferedWriter out) throws IOException;
 
@@ -40,7 +42,7 @@ public interface NetworkWriterHandler extends WriterHandler {
 	// <nodes ... > ... </nodes>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startNodes(final NetworkLayer network, final BufferedWriter out) throws IOException;
+	public void startNodes(final Network network, final BufferedWriter out) throws IOException;
 
 	public void endNodes(final BufferedWriter out) throws IOException;
 
@@ -48,7 +50,7 @@ public interface NetworkWriterHandler extends WriterHandler {
 	// <links ... > ... </links>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLinks(final NetworkLayer network, final BufferedWriter out) throws IOException;
+	public void startLinks(final Network network, final BufferedWriter out) throws IOException;
 
 	public void endLinks(final BufferedWriter out) throws IOException;
 
@@ -64,7 +66,7 @@ public interface NetworkWriterHandler extends WriterHandler {
 	// <link ... > ... </link>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLink(final LinkImpl link, final BufferedWriter out) throws IOException;
+	public void startLink(final Link link, final BufferedWriter out) throws IOException;
 
 	public void endLink(final BufferedWriter out) throws IOException;
 }
