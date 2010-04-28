@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
@@ -38,6 +39,8 @@ import org.matsim.vis.otfvis.opengl.gl.Point3f;
  *
  */
 public class OTFVisConfig extends Module {
+	private static final Logger log = Logger.getLogger(OTFVisConfig.class);
+	
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "otfvis";
@@ -252,6 +255,7 @@ public class OTFVisConfig extends Module {
 	 * @param fileVersion the fileVersion to set
 	 */
 	public void setFileVersion(int fileVersion) {
+		log.info("File (major) version is: " + fileVersion ) ;
 		this.fileVersion = fileVersion;
 	}
 
@@ -266,6 +270,7 @@ public class OTFVisConfig extends Module {
 	 * @param fileMinorVersion the fileMinorVersion to set
 	 */
 	public void setFileMinorVersion(int fileMinorVersion) {
+		log.info("File minor version is: " + fileMinorVersion ) ;
 		this.fileMinorVersion = fileMinorVersion;
 	}
 
