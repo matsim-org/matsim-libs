@@ -28,27 +28,25 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QLinkLanesImpl;
 import org.matsim.ptproject.qsim.QNetwork;
-import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 /**
+ * This class is calculating CarLocator instances for every vehicle on every link. For performance reasons it would
+ * be sufficient to calculate this information only on required links dg April 2010
+ * 
  * @author droeder
  *
  */
@@ -58,7 +56,6 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	private static final Logger log = Logger
 			.getLogger(CarsOnLinkLaneHandler.class);
 	
-	private Map<Id, Integer> vehOnLink = new HashMap<Id, Integer>();
 	private Map<Id, Map<Id, Integer>> vehOnLinkLanes = new HashMap<Id, Map<Id, Integer>>(); 
 	
 	private Map<Id, Map<Id, CarLocator>> locateCars =  new HashMap<Id, Map<Id, CarLocator>>();

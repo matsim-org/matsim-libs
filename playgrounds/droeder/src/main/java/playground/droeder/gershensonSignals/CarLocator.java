@@ -44,6 +44,8 @@ public class CarLocator {
 		this.checkD();
 		this.earliestD();
 	}
+	
+	//wieso jedes mal D checken
 	private void checkD(){
 		if (this.link instanceof QLinkLanesImpl){
 			for (QLane ql : ((QLinkLanesImpl)link).getQueueLanes()){

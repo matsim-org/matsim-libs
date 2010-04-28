@@ -36,6 +36,8 @@ import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 /**
+ * 
+ * Is this class needed? dg April 2010
  * @author droeder
  *
  */

@@ -74,6 +74,9 @@ public class DaAdaptiveController extends
 		private double switchedGreen = 0;
 		private Map<Id, Double> switchedToRed;
 		
+		/**
+		 * this map is only used for analysis -> move to separate object
+		 */
 		private Map<Id, SortedMap<Double, Double>> demandOnRefLink = new HashMap<Id, SortedMap<Double,Double>>();
 		
 		
@@ -139,6 +142,7 @@ public class DaAdaptiveController extends
 			this.oldState = this.getSignalGroupStates().get(signalGroup);
 
 			// check if competing groups are green
+			//TODO what the fuck is this, remove the label syntax and programm in a better way
 			out : 
 			for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
 				if(!(e.getValue().contains(signalGroup))){
@@ -238,6 +242,7 @@ public class DaAdaptiveController extends
 			//switch RedLights first
 			if (maxRedTimeActive == true){
 				Id id = new IdImpl("null");
+				//dg soll das Double.positiveInfinity sein?
 				double redTime = 99999;
 				for (Entry<Id, Double> ee : switchedToRed.entrySet()){
 					if ((e.getSimulationTime() - ee.getValue()) > maxRedTime && ee.getValue()<redTime){

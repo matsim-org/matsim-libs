@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,9 +36,8 @@ import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
-import playground.droeder.ValueComparator;
-
 /**
+ * What is the difference of this class and the DaAdapativeController class
  * @author droeder
  *
  */
