@@ -22,6 +22,7 @@ package org.matsim.analysis;
 
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -39,6 +40,7 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
  * @author mrieser
  */
 public class CalcAverageTolledTripLength implements LinkEnterEventHandler, AgentArrivalEventHandler {
+	private static final Logger log = Logger.getLogger(CalcAverageTolledTripLength.class);
 
 	private double sumLength = 0.0;
 	private int cntTrips = 0;
@@ -55,27 +57,49 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
+		
+		// getting the (monetary? generalized?) cost of the link
 		Cost cost = this.scheme.getLinkCost(event.getLinkId(), event.getTime());
+		
 		if (cost != null) {
+			// i.e. if there is a toll on the link
+			
 			Link link = this.network.getLinks().get(event.getLinkId());
 			if (link != null) {
+				
+				// get some distance that has been accumulated (how?) up to this point:
 				Double length = this.agentDistance.get(event.getPersonId());
+				
+				// if nothing has been accumlated so far, initialize this at zero:
 				if (length == null) {
 					length = zero;
 				}
+				
+				// add the new length to the already accumulated length:
 				length = Double.valueOf(length.doubleValue() + link.getLength());
+				
+				// put the result again in the "memory":
 				this.agentDistance.put(event.getPersonId(), length);
 			}
 		}
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
+		// at arrival of the agent ...
+		
+		// get the accumulated "tolled" length from the agent
 		Double length = this.agentDistance.get(event.getPersonId());
 		if (length != null) {
+			// if this is not zero, accumulate it into some global accumulated length ...
 			this.sumLength += length.doubleValue();
+			
+			// ... and reset the agent-individual accumlated length to zero:
 			this.agentDistance.put(event.getPersonId(), zero);
+			this.cntTrips++;
 		}
-		this.cntTrips++;
+
+		// count _all_ finished trips (independent off toll payment):
+//		this.cntTrips++;
 	}
 
 	public void reset(final int iteration) {
@@ -85,6 +109,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 
 	public double getAverageTripLength() {
 		if (this.cntTrips == 0) return 0;
+		log.warn("NOTE: The result of this calculation has been changed from 'av over all trips' to 'av over tolled trips'.  kai/benjamin, apr'10") ;
 		return (this.sumLength / this.cntTrips);
 	}
 }
