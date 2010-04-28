@@ -25,6 +25,7 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -38,7 +39,7 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
  *
  * @author mrieser
  */
-public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelCost {
+public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMinCost, TravelCost {
 
 	private final static double MIDNIGHT = 24.0*3600;
 
@@ -59,9 +60,34 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelCos
 		} else {
 			cost = -getLinkTravelTime(link, time) * this.config.marginalUtilityOfTravelTimeTransit - link.getLength() * this.config.marginalUtilityOfTravelDistanceTransit;
 		}
-//		System.out.println(((LinkWrapper)link).link.fromNode.stop.getStopFacility().getId() + " c " + ((LinkWrapper)link).link.toNode.stop.getStopFacility().getId() + " = " + cost);
 		return cost;
 	}
+
+	@Override
+	public double getLinkMinimumTravelCost(Link link) {
+		double cost;
+		if (((TransitRouterNetworkLink) link).route == null) {
+			// it's a transfer link (walk)
+			cost = -getMinLinkTravelTime(link) * this.config.marginalUtilityOfTravelTimeWalk + this.config.costLineSwitch;
+		} else {
+			cost = -getMinLinkTravelTime(link) * this.config.marginalUtilityOfTravelTimeTransit - link.getLength() * this.config.marginalUtilityOfTravelDistanceTransit;
+		}
+		return cost;
+	}
+
+	private double getMinLinkTravelTime(final Link link) {
+		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
+		if (wrapped.route != null) {
+			// agent stays on the same route, so use transit line travel time
+			double arrivalOffset = (wrapped.toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? wrapped.toNode.stop.getArrivalOffset() : wrapped.toNode.stop.getDepartureOffset();
+			return arrivalOffset - wrapped.fromNode.stop.getDepartureOffset();
+		}
+		// different transit routes, so it must be a line switch
+		double distance = CoordUtils.calcDistance(wrapped.fromNode.stop.getStopFacility().getCoord(), wrapped.toNode.stop.getStopFacility().getCoord());
+		double time2 = distance / this.config.beelineWalkSpeed;
+		return time2;
+	}
+
 
 	public double getLinkTravelTime(final Link link, final double time) {
 		if ((link == this.previousLink) && (time == this.previousTime)) {
@@ -80,15 +106,12 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelCos
 			if (time2 < 0) {
 				time2 += MIDNIGHT;
 			}
-//			System.out.print(wrapped.link.fromNode.stop.getStopFacility().getId() + " > " + wrapped.link.toNode.stop.getStopFacility().getId() + " = " + (int) time2 + "\t@ " + Time.writeTime(time));
-//			System.out.println(" wait-time: " + (int) (bestDepartureTime - earliestDepartureTime) + " travel-time: " + (int) (arrivalOffset - wrapped.link.fromNode.stop.getDepartureOffset()));
 			this.cachedTravelTime = time2;
 			return time2;
 		}
 		// different transit routes, so it must be a line switch
 		double distance = CoordUtils.calcDistance(wrapped.fromNode.stop.getStopFacility().getCoord(), wrapped.toNode.stop.getStopFacility().getCoord());
 		double time2 = distance / this.config.beelineWalkSpeed;
-//		System.out.println(wrapped.link.fromNode.stop.getStopFacility().getId() + "..." + wrapped.link.toNode.stop.getStopFacility().getId() + " = " + (int) time2 + "\t@ " + Time.writeTime(time));
 		this.cachedTravelTime = time2;
 		return time2;
 	}
