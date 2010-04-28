@@ -32,14 +32,15 @@ public class RunCommercialActivityAnalyser {
 	 * 		- Mac																	|
 	 * 		- IVT-Sim0																|
 	 * 		- Satawal																|
+	 * 		- IE-Calvin														  		|
 	 *=============================================================================*/
 //	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
 //	private static String root = "/home/jjoubert/";										// IVT-Sim0
-	private static String root = "/home/jjoubert/data/";								// Satawal
+//	private static String root = "/home/jjoubert/data/";								// Satawal
+	private static String root = "/home/jwjoubert/MATSim/MATSimData/";					// IE-Calvin
 
 	 /*=============================================================================
-	 * String value that must be set. Allowed study areas are:						|
-	 * 																				|
+	 * String value that must be set. Allowed study areas are:						|																		|
 	 * 		- SouthAfrica															|
 	 * 		- Gauteng																|
 	 * 		- KZN																	|
@@ -60,7 +61,7 @@ public class RunCommercialActivityAnalyser {
 	private static float clusterRadius = 15;
 	private static int clusterCount = 30;
 	private static int numberOfSamples = 1;
-	private static int sampleSize = 32000;
+	private static int sampleSize = 100;
 
 	 /*=============================================================================
 	 * Double array with all the minor/major thresholds that should be considered. 	|
@@ -77,7 +78,7 @@ public class RunCommercialActivityAnalyser {
 	 * vehicle types. Vehicles that spend more than the threshold of their 			|
 	 * activities in the study area are considered `within' vehicles. Those with 	|
 	 * fewer of their activities in the study area are considered to be `through'	|
-	 * traffic vehicles.
+	 * traffic vehicles.															|
 	 *=============================================================================*/	
 	private static double withinThreshold = 0.60;
 	
@@ -88,7 +89,7 @@ public class RunCommercialActivityAnalyser {
 	 * 		  extracted since the objective is to plot merely the activity 			|
 	 * 		  of all activities, both minor and major.								|
 	 * 		- extractChains: As the name implies, extract activities, and then 		|
-	 * 		  also extract the activity chains.
+	 * 		  also extract the activity chains.										|
 	 *=============================================================================*/
 	private static boolean analyseForR = false;
 	private static boolean extractChains = true;
