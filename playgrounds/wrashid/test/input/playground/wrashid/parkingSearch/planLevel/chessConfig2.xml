@@ -76,6 +76,11 @@
 		<param name="activityLatestStartTime_3" value="" />
 		<param name="activityEarliestEndTime_3" value="" />
 		<param name="activityClosingTime_3"     value="18:00:00" />
+		
+		<param name="activityType_4"            value="parking" /> <!-- home -->
+		<param name="activityPriority_4"        value="1" />
+		<param name="activityTypicalDuration_4" value="12:00:00" />
+		<param name="activityMinimalDuration_4" value="08:00:00" />
 	</module>
 	
 	<module name="strategy">
