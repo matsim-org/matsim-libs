@@ -27,16 +27,16 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
  * @author dgrether
  */
 public interface VisData {
-	/**
-	 * Returns a measure for how many vehicles on the link have a travel time
-	 * higher than freespeedTraveltime on a scale from 0 to 2. When more then half
-	 * of the possible vehicles are delayed, the value 1 will be returned, which
-	 * depicts the worst case on a (traditional) scale from 0 to 1.
-	 *
-	 * @return A measure for the number of vehicles being delayed on this link.
-	 */
-	@Deprecated // this was used for netvis, but I don't think that we support netvis any more. kai, apr'10
-	public double getDisplayableTimeCapValue(double time);
+//	/**
+//	 * Returns a measure for how many vehicles on the link have a travel time
+//	 * higher than freespeedTraveltime on a scale from 0 to 2. When more then half
+//	 * of the possible vehicles are delayed, the value 1 will be returned, which
+//	 * depicts the worst case on a (traditional) scale from 0 to 1.
+//	 *
+//	 * @return A measure for the number of vehicles being delayed on this link.
+//	 */
+//	@Deprecated // this was used for netvis, but I don't think that we support netvis any more. kai, apr'10
+//	public double getDisplayableTimeCapValue(double time);
 
 	public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions);
 

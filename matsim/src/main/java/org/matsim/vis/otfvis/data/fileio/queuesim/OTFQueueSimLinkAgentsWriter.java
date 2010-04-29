@@ -38,13 +38,21 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 /**
  * @author dgrether
  */
+@Deprecated 
 public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implements OTFWriterFactory<QueueLink> {
+	// yyyy this class should not be used since it is not clear where the corresponding reader is, and so that last possibility
+	// to fix the binary channel has gotten lost.  kai, apr'10
 
 	private static final long serialVersionUID = -7916541567386865404L;
 
 	public static final boolean showParked = false;
 
 	protected static final transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+	
+	private OTFQueueSimLinkAgentsWriter() {
+		// this class should not be used since it is not clear where the corresponding reader is, and so that last possibility
+		// to fix the binary channel has gotten lost.  kai, apr'10
+	}
 
 	protected void writeAllAgents(ByteBuffer out) {
 		// Write additional agent data
@@ -92,7 +100,8 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 
 	@Override
 	public void writeDynData(ByteBuffer out) throws IOException {
-		out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue(SimulationTimer.getTime()));
+//		out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue(SimulationTimer.getTime()));
+		out.putFloat((float)0.) ; // yy I don't know where the corresponding reader is so I don't know how to delete this. kai, apr'10
 		writeAllAgents(out);
 	}
 

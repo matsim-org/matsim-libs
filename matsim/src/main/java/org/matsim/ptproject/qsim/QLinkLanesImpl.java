@@ -520,9 +520,9 @@ public class QLinkLanesImpl implements QLink {
 	 */
 	class VisDataImpl implements VisData {
 
-		public double getDisplayableTimeCapValue(double time) {
-			return originalLane.visdata.getDisplayableTimeCapValue(time);
-		}
+//		public double getDisplayableTimeCapValue(double time) {
+//			return originalLane.visdata.getDisplayableTimeCapValue(time);
+//		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();

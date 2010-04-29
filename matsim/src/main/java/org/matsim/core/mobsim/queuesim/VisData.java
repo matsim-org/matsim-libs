@@ -33,15 +33,15 @@ public interface VisData {
 //	 */
 //	public double getDisplayableSpaceCapValue();
 
-	/**
-	 * Returns a measure for how many vehicles on the link have a travel time
-	 * higher than freespeedTraveltime on a scale from 0 to 2. When more then half
-	 * of the possible vehicles are delayed, the value 1 will be returned, which
-	 * depicts the worst case on a (traditional) scale from 0 to 1.
-	 *
-	 * @return A measure for the number of vehicles being delayed on this link.
-	 */
-	public double getDisplayableTimeCapValue(double now);
+//	/**
+//	 * Returns a measure for how many vehicles on the link have a travel time
+//	 * higher than freespeedTraveltime on a scale from 0 to 2. When more then half
+//	 * of the possible vehicles are delayed, the value 1 will be returned, which
+//	 * depicts the worst case on a (traditional) scale from 0 to 1.
+//	 *
+//	 * @return A measure for the number of vehicles being delayed on this link.
+//	 */
+//	public double getDisplayableTimeCapValue(double now);
 
 //	public Collection<AgentOnLink> getDrawableCollection();
 

@@ -71,7 +71,8 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
-			out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue(this.src.getQSimEngine().getQSim().getSimTimer().getTimeOfDay()));
+//			out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue(this.src.getQSimEngine().getQSim().getSimTimer().getTimeOfDay()));
+			out.putFloat((float)0.) ; // yy this should be fixed in the binary channel but I am not sure if it is worth it.  kai, apr'10
 		}
 
 		public OTFDataWriter<QLink> getWriter() {
