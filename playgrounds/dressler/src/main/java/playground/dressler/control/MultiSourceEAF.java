@@ -578,16 +578,18 @@ public class MultiSourceEAF {
 			
 
 			// DEBUG
-			Tcheck.onoff();
-			int[] arrivals = fluss.arrivals();
-			long totalcost = 0;
-			long totalflow = 0;
-			for (int ii = 0; ii < arrivals.length; ii++) {
-				totalflow += arrivals[ii];
-				totalcost += ii*arrivals[ii];
+			if(_debug) {
+				Tcheck.onoff();
+				int[] arrivals = fluss.arrivals();
+				long totalcost = 0;
+				long totalflow = 0;
+				for (int ii = 0; ii < arrivals.length; ii++) {
+					totalflow += arrivals[ii];
+					totalcost += ii*arrivals[ii];
+				}
+				System.out.println("Iter " + i + " , total flow: " + totalflow + " , total cost: " + totalcost);
+				Tcheck.onoff();
 			}
-			System.out.println("Iter " + i + " , total flow: " + totalflow + " , total cost: " + totalcost);
-			Tcheck.onoff();
 			
 			if (i % VERBOSITY == 0) {				
 				System.out.println();
@@ -654,7 +656,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 2;
+		int instance = 5;
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -665,6 +667,7 @@ public class MultiSourceEAF {
 		// 44 = padang, v2010, with 100% plans, 5s steps (no shelters yet)
 		//421-441 same as above only Manuel
 		// 5 = probeevakuierung telefunken
+		// 1024 = xmas network
 		// else = custom ...
 
 		if (instance == 1) {
@@ -710,7 +713,7 @@ public class MultiSourceEAF {
 			timeStep = 10;
 			flowFactor = 1.0;
 			sinkid = "en1";
-			shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
+			//shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
 		} else if (instance == 44) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
@@ -731,15 +734,22 @@ public class MultiSourceEAF {
 			flowFactor = 1.0;
 			sinkid = "en1";
 		} else if (instance == 441) {
-				networkfile  = "/Users/manuel/testdata/padang/network/padang_net_evac_v20100317.xml.gz";
-				plansfile = "/Users/manuel/testdata/padang/plans/padang_plans_v20100317.xml.gz";
-				timeStep = 5;
-				flowFactor = 1.0;
-				sinkid = "en1";
+			networkfile  = "/Users/manuel/testdata/padang/network/padang_net_evac_v20100317.xml.gz";
+			plansfile = "/Users/manuel/testdata/padang/plans/padang_plans_v20100317.xml.gz";
+			timeStep = 5;
+			flowFactor = 1.0;
+			sinkid = "en1";
 		} else if (instance == 5) {
 			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
 			timeStep = 1;
 			flowFactor = 1.0;
+		} else if (instance == 1024) {
+			networkfile  = "/homes/combi/dressler/V/code/meine_EA/xmas_network.xml";
+			plansfile =  "/homes/combi/dressler/V/code/meine_EA/xmas_plans.xml";
+			uniformDemands = 1;
+			timeStep = 60;
+			flowFactor = 1.0;
+			sinkid = "5_Nordpol";
 		} else {
 			// custom instance
 
@@ -796,8 +806,9 @@ public class MultiSourceEAF {
 
 		}
 		
-		// outputplansfile = "/homes/combi/dressler/V/code/meine_EA/tempplans.xml";
+		//outputplansfile = "/homes/combi/dressler/V/code/meine_EA/tempplans.xml";
 		//flowfile = "/homes/combi/dressler/V/vnotes/statistik_2010_04_april/bug_shelters_implicit.pathflow";
+		//flowfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_250k_10s_no_shelters.pathflow";
 		
 
 		if(_debug){
@@ -891,11 +902,6 @@ public class MultiSourceEAF {
 		}
 		
 		
-		// TODO parse shelterfile
-		// Careful, padang has shelters AND a supersink.
-		// so take care of the supersink here and don't tell the settings about it.
-
-
 		//check if demands and sink are set
 		if (demands.isEmpty()) {
 			System.out.println("demands not found");
@@ -915,24 +921,24 @@ public class MultiSourceEAF {
 		settings.flowFactor = flowFactor; // default 1.0
 
 		// set additional parameters
-		//settings.TimeHorizon = 400;
-		//settings.MaxRounds = 2;
+		//settings.TimeHorizon = 810;
+		//settings.MaxRounds = 1;
 		//settings.checkConsistency = 100;
-		settings.doGarbageCollection = 10;
-		//settings.useVertexCleanup = false;
+		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.
 		settings.useSinkCapacities = false;
+		//settings.useVertexCleanup = false;
 		settings.useImplicitVertexCleanup = true;
 		settings.useShadowFlow = true;		
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
-		//settings.useRepeatedPaths = true; // not compatible with costs!
+		settings.useRepeatedPaths = true; // not compatible with costs!
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
 		//settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		//settings.sortPathsBeforeAugmenting = true;
 		//settings.checkTouchedNodes = true;
-		//settings.keepPaths = true; // do not store paths at all!
-		settings.unfoldPaths = true; // unfold stored paths into forward paths
+		//settings.keepPaths = true; // store paths at all!
+		//settings.unfoldPaths = true; // unfold stored paths into forward paths
 
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
@@ -964,6 +970,7 @@ public class MultiSourceEAF {
 		//settings.writeLP();
 		//settings.writeSimpleNetwork(true);
 		//settings.writeNET(false);
+		//settings.writeLodyfa();
 		//if(true)return;
 		
 		fluss = MultiSourceEAF.calcEAFlow(settings, flowpaths);
@@ -995,7 +1002,10 @@ public class MultiSourceEAF {
 
 
 		if (outputplansfile != null) {
-			Population output = fluss.createPopulation(scenario);
+			// fix the final link
+			HashMap<Id,Id> sinkreplacement = new HashMap<Id,Id>();
+			sinkreplacement.put(new IdImpl("en1"), new IdImpl("el1"));
+			Population output = fluss.createPopulation(scenario, sinkreplacement);
 			new PopulationWriter(output, network).writeFile(outputplansfile);
 		}
 

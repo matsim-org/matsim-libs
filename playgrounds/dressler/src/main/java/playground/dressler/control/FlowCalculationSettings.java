@@ -295,7 +295,7 @@ public class FlowCalculationSettings {
 		System.out.println("Keep paths at all: " + this.keepPaths);
 		System.out.println("Unfold stored paths: " + this.unfoldPaths);
 		System.out.println("Check consistency every: " + this.checkConsistency + " rounds (0 = off)");
-		System.out.println("Garbage collection every: " + this.doGarbageCollection + " round (0 = off)");
+		System.out.println("Garbage collection every: " + this.doGarbageCollection + " rounds (0 = off)");
 
 		System.out.println("===================================");
 	}
@@ -849,5 +849,175 @@ public class FlowCalculationSettings {
 
 
         System.out.println("ENDNETWORK");
+	}
+	
+	/**
+	 * Writes a single-sink EAF problem as .lod network file for LODYFA EAF to standard out
+	 * This might be a big file.
+	 * The network looks like this:
+	 * supersource s* -> source s with capacity == demand but only at t = 0
+	 * source s has links with travel time 0 to the real node and infinite holdover
+	 * No holdover anywhere else.  
+	 * The sink nodes have travel time 0 directly to the supersink and there is no intermediate node. 
+	 */
+	public void writeLodyfa() {		
+		HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
+		
+		// - 1 seems to be what Lodyfa does ...T = 10 gives 11 time steps there
+		System.out.println(this.TimeHorizon - 1);
+		
+		// the supersource has to be 0, the supersink n - 1
+		// We give up on keeping names here.
+        int nnodes = this._network.getNodes().size();
+
+        // We always want a supersource so that we can limit the supply,
+        // even if there is just one source.
+        // We need additional source nodes, as well.
+        nnodes += this._numsources + 1;
+        
+        // do we need a supersink?
+        if (this._numsinks > 1) {
+        	nnodes++;
+        }
+        
+        System.out.println(nnodes);
+
+        // skip the supersource
+        int currentnode = 1;
+        
+        for (Node node : this._network.getNodes().values()) {
+        	Integer d = this._demands.get(node);
+        	if (this._numsinks == 1 && d != null && d < 0) {
+        		// this is the only sink! make it the supersink
+        		newNodeNames.put(node, nnodes - 1);
+        	} else {
+        		newNodeNames.put(node, currentnode);
+        		currentnode++;
+        	}
+        }
+
+        int narcs = this._network.getLinks().size();
+        
+        // two more for each source
+        narcs += 2 * this._numsources;
+
+    	// and 1 more for each sink, if we need a supersink
+        if (this._numsinks > 1) { 
+        	narcs += this._numsinks;
+        }
+        
+        System.out.println(narcs);
+        
+        // the time-expanded arcs
+        for (Link link : this._network.getLinks().values()) {
+        	StringBuilder S = new StringBuilder();
+        	S.append(newNodeNames.get(link.getFromNode()));
+        	S.append("\t");
+        	S.append(newNodeNames.get(link.getToNode()));        	
+        	S.append("\t");
+        	
+        	int l = getLength(link);
+        	int c = getCapacity(link);
+        	
+        	String constant = l + "\t" + c + "\t";
+        	
+        	for (int t = 0; t < this.TimeHorizon; t++) {
+        		S.append(constant);
+        	}
+    		System.out.println(S);
+        }
+        
+        
+        int sourcesstartat = currentnode;
+        
+        // the arcs from and to the virtual sources
+        // and to the supersink        
+        for (Node node : this._network.getNodes().values()) {
+        	int d = 0;
+        	if (this._demands.containsKey(node)) {
+        		d = this._demands.get(node);
+        	}
+        	if (d == 0)
+        		continue;
+
+        	        
+        	if (d < 0) {
+        		// sinks
+        		
+        		// nothing to do if there is no supersink
+        		if (this._numsinks == 1) continue;
+
+        		StringBuilder sb = new StringBuilder();
+            	sb.append(newNodeNames.get(node));
+            	sb.append("\t");
+            	sb.append(nnodes - 1); // the supersink
+            	sb.append("\t");
+            	
+            	String constant = "0\t654321\t"; // hopefully enough capacity ...           
+        		
+        		for (int t = 0; t < this.TimeHorizon; t++) {
+        			sb.append(constant);
+        		}
+    		    System.out.println(sb);
+
+        	} else {
+        		StringBuilder sb = new StringBuilder();
+        		// the link from the supersource
+        		sb.append("0\t");
+        		sb.append(currentnode); // to the virtual source
+        		
+        		sb.append("\t0\t");
+        		sb.append(d);
+        		sb.append("\t");
+        		
+        		String constant = "0\t0\t"; // link disappears
+        		
+        		// NB: start is t = 1
+        		for (int t = 1; t < this.TimeHorizon; t++) {
+        			sb.append(constant);
+        		}
+        		
+        		System.out.println(sb);
+        		
+        		sb = new StringBuilder();
+        		sb.append(currentnode);
+        		sb.append("\t");
+        		sb.append(newNodeNames.get(node));    
+        		sb.append("\t");
+        		
+        		constant = "0\t654321\t"; // hopefully enough capacity ...        		
+        		
+        		for (int t = 0; t < this.TimeHorizon; t++) {
+        			sb.append(constant);
+        		}
+
+        		System.out.println(sb);
+        		
+        		// we created a node
+        		currentnode++;
+        	}
+        }
+        
+        // create holdover ... only at the virtual sources
+        // NB: node 0 and node n - 1 must be omitted!
+        
+        for (int i = 1; i < sourcesstartat; i++) {
+        	StringBuilder sb = new StringBuilder();
+        	String constant = "0\t0\t";
+        	for (int t = 0; t < this.TimeHorizon; t++) {
+    			sb.append(constant);
+    		}
+        	System.out.println(sb);
+        }
+        
+        for (int i = sourcesstartat; i < nnodes - 1; i++) {
+        	StringBuilder sb = new StringBuilder();
+        	String constant = "654321\t654321\t";        	
+        	for (int t = 0; t < this.TimeHorizon; t++) {
+    			sb.append(constant);
+    		}
+        	System.out.println(sb);
+        }
+        
 	}
 }
