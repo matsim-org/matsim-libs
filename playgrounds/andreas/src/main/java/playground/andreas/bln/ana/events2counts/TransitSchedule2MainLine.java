@@ -54,7 +54,8 @@ public class TransitSchedule2MainLine {
 					} else if(chain2.size() == 0){
 						chainToUse = chain2;								
 					} else {
-						log.error("There is a third chain. Don't know what to do.");
+						log.error("There is a third chain for line " + transitLineEntry.getKey() + ". Skipping addtional chains. Please check.");
+						continue;
 					}
 					for (TransitRouteStop stop : route.getStops()) {
 						chainToUse.add(stop.getStopFacility().getId());									
@@ -85,44 +86,49 @@ public class TransitSchedule2MainLine {
 			}
 				
 			// find point zero and sort chains accordingly				
-			double distanceFirstFirst = calculateDistanceBetweenCoords(transitSchedule.getFacilities().get(chain1.getFirst()).getCoord(), transitSchedule.getFacilities().get(chain2.getFirst()).getCoord());
-			double distanceLastLast = calculateDistanceBetweenCoords(transitSchedule.getFacilities().get(chain1.getLast()).getCoord(), transitSchedule.getFacilities().get(chain2.getLast()).getCoord());
-			double distanceFirstLast = calculateDistanceBetweenCoords(transitSchedule.getFacilities().get(chain1.getFirst()).getCoord(), transitSchedule.getFacilities().get(chain2.getLast()).getCoord());
-			double distanceLastFirst = calculateDistanceBetweenCoords(transitSchedule.getFacilities().get(chain1.getLast()).getCoord(), transitSchedule.getFacilities().get(chain2.getFirst()).getCoord());
+//			double distanceFirstFirst = calculateDistanceBetweenCoords(transitSchedule.getFacilities().get(chain1.getFirst()).getCoord(), transitSchedule.getFacilities().get(chain2.getFirst()).getCoord());
+//			double distanceLastLast = calculateDistanceBetweenCoords(transitSchedule.getFacilities().get(chain1.getLast()).getCoord(), transitSchedule.getFacilities().get(chain2.getLast()).getCoord());
+//			double distanceFirstLast = calculateDistanceBetweenCoords(transitSchedule.getFacilities().get(chain1.getFirst()).getCoord(), transitSchedule.getFacilities().get(chain2.getLast()).getCoord());
+//			double distanceLastFirst = calculateDistanceBetweenCoords(transitSchedule.getFacilities().get(chain1.getLast()).getCoord(), transitSchedule.getFacilities().get(chain2.getFirst()).getCoord());
 
-			if(distanceFirstLast <= Math.min(distanceLastFirst, Math.min(distanceFirstFirst, distanceLastLast))){
+//			if(distanceFirstLast <= Math.min(distanceLastFirst, Math.min(distanceFirstFirst, distanceLastLast))){
 //				chain2 = reverseOrder(chain2);
-			} else 	if(distanceLastFirst <= Math.min(distanceFirstLast, Math.min(distanceFirstFirst, distanceLastLast))){
+//			} else 	if(distanceLastFirst <= Math.min(distanceFirstLast, Math.min(distanceFirstFirst, distanceLastLast))){
 //				chain1 = reverseOrder(chain1);
-			} else if(distanceFirstFirst <= Math.min(distanceLastLast, Math.min(distanceFirstLast, distanceLastFirst))){
+//			} else if(distanceFirstFirst <= Math.min(distanceLastLast, Math.min(distanceFirstLast, distanceLastFirst))){
 				// Do nothing
-			} else if(distanceLastLast <= Math.min(distanceFirstFirst, Math.min(distanceFirstLast, distanceLastFirst))){
+//			} else if(distanceLastLast <= Math.min(distanceFirstFirst, Math.min(distanceFirstLast, distanceLastFirst))){
 //				chain1 = reverseOrder(chain1);
 //				chain2 = reverseOrder(chain2);
-			}					
+//			}					
 
 			// Get distance from the end				
-			double distanceFromStart = 0.0;
-			Coord lastCoord = transitSchedule.getFacilities().get(chain1.getFirst()).getCoord();
-			
-			for (int i = 0; i < chain1.size(); i++) {
-				distanceFromStart += calculateDistanceBetweenCoords(lastCoord, transitSchedule.getFacilities().get(chain1.get(i)).getCoord());
-				resultingStopDistanceMap.put(chain1.get(i), Double.valueOf(distanceFromStart));
-				lastCoord = transitSchedule.getFacilities().get(chain1.get(i)).getCoord();
-			}
-
-			distanceFromStart = 0.0;
-			lastCoord = transitSchedule.getFacilities().get(chain2.getFirst()).getCoord();
-
-			for (int i = 0; i < chain2.size(); i++) {
-				distanceFromStart += calculateDistanceBetweenCoords(lastCoord, transitSchedule.getFacilities().get(chain2.get(i)).getCoord());
-				resultingStopDistanceMap.put(chain2.get(i), Double.valueOf(distanceFromStart));
-				lastCoord = transitSchedule.getFacilities().get(chain2.get(i)).getCoord();
-			}			
+//			double distanceFromStart = 0.0;
+//			Coord lastCoord = transitSchedule.getFacilities().get(chain1.getFirst()).getCoord();
+//			
+//			for (int i = 0; i < chain1.size(); i++) {
+//				distanceFromStart += calculateDistanceBetweenCoords(lastCoord, transitSchedule.getFacilities().get(chain1.get(i)).getCoord());
+//				resultingStopDistanceMap.put(chain1.get(i), Double.valueOf(distanceFromStart));
+//				lastCoord = transitSchedule.getFacilities().get(chain1.get(i)).getCoord();
+//			}
+//
+//			distanceFromStart = 0.0;
+//			lastCoord = transitSchedule.getFacilities().get(chain2.getFirst()).getCoord();
+//
+//			for (int i = 0; i < chain2.size(); i++) {
+//				distanceFromStart += calculateDistanceBetweenCoords(lastCoord, transitSchedule.getFacilities().get(chain2.get(i)).getCoord());
+//				resultingStopDistanceMap.put(chain2.get(i), Double.valueOf(distanceFromStart));
+//				lastCoord = transitSchedule.getFacilities().get(chain2.get(i)).getCoord();
+//			}			
 
 			List<List<Id>> chainLists = new LinkedList<List<Id>>();
-			chainLists.add(chain1);
-			chainLists.add(chain2);
+			if(!chain1.isEmpty()){
+				chainLists.add(chain1);
+			}
+			if(!chain2.isEmpty()){
+				chainLists.add(chain2);
+			}
+			
 //			resultingStopDistanceMap
 			line2MainLinesMap.put(transitLineEntry.getKey(), chainLists);
 			
