@@ -58,7 +58,7 @@ public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 //			// this needs to stay in spite of the fact that "writeAgent" does not seem to support it ...
 //			// ... since the byte stream can come from a file.
 //			// (In fact it proably comes from a file, since the "live" version uses the OTFLinkAgentsHandler.  kai, apr'10)
-//			// yyyyyy Unfortunately, I don't know if this should be minorVersion<=3 or <=4 or <=5 or <=6.  kai, apr'10
+//			// yy Unfortunately, I don't know if this should be minorVersion<=3 or <=4 or <=5 or <=6.  kai, apr'10
 //			this.readConstDataV1_4( in) ;
 //		} else {
 			String id = ByteBufferUtils.getString(in);
