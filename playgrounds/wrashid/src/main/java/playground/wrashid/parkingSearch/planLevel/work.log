@@ -1,6 +1,6 @@
 1.) A facilities file was generated at 
 /playgrounds/wrashid/test/input/playground/wrashid/parkingSearch/planLevel/berlinFacilities.xml
-(each node was assigned a parking lot of capacitiy 67). => 2 times the number of links (no problem). 
+(each node was assigned a parking lot of capacity 67). => 2 times the number of links (no problem). 
 These parkings are all assigned a constant capacity.
 
 
