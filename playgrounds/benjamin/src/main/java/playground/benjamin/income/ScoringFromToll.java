@@ -66,7 +66,7 @@ public class ScoringFromToll implements MoneyScoring, BasicScoring {
 		//Attention: negative income could cause utility gains due to toll!
 		this.score += (betaIncomeCar / incomePerDay) * amount;
 		
-		log.info("toll paid: " + amount + " CHF; resulting utility loss: " + this.score );
+//		log.info("toll paid: " + amount + " CHF; resulting utility change: " + this.score );
 	}
 
 	public void finish() {
