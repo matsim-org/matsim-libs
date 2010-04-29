@@ -23,13 +23,15 @@ package org.matsim.vis.otfvis.handler;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.ptproject.qsim.QLink;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 
 public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
-
+	private static final Logger log = Logger.getLogger(OTFLinkLanesAgentsNoParkingHandler.class);
 	static public class Writer extends  OTFLinkAgentsHandler.Writer {
 
 		private static final long serialVersionUID = 6541770536927233851L;
@@ -51,10 +53,23 @@ public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 	
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
-		String id = ByteBufferUtils.getString(in);
-		this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
-		this.quadReceiver.setId(id.toCharArray());
+//		if ( OTFClientControl.getInstance().getOTFVisConfig().getFileVersion()<=1 
+//				&& OTFClientControl.getInstance().getOTFVisConfig().getFileMinorVersion()<=4 ) {
+//			// this needs to stay in spite of the fact that "writeAgent" does not seem to support it ...
+//			// ... since the byte stream can come from a file.
+//			// (In fact it proably comes from a file, since the "live" version uses the OTFLinkAgentsHandler.  kai, apr'10)
+//			// yyyyyy Unfortunately, I don't know if this should be minorVersion<=3 or <=4 or <=5 or <=6.  kai, apr'10
+//			this.readConstDataV1_4( in) ;
+//		} else {
+			String id = ByteBufferUtils.getString(in);
+			this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
+			this.quadReceiver.setId(id.toCharArray());
+//		}
 	}
+	
+//	private void readConstDataV1_4(ByteBuffer in) throws IOException {
+//		this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());		
+//	}
 	
 	/***
 	 * PREVIOUS VERSION of the reader
