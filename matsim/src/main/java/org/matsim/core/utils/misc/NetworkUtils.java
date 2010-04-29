@@ -161,10 +161,17 @@ public class NetworkUtils {
 	}
 
 	/**
-	 * @return the maximum of 1 and the mathematically rounded number of lanes attribute's value at time "time" of the link given as parameter
+	 * @return formerly, the maximum of 1 and the mathematically rounded number of lanes attribute's value at time "time" of the link given as parameter
+	 *	now, the number is truncated, but 0 is never returned.
+	 *	sorry, math.round is way, way too slow.
 	 */
 	public static int getNumberOfLanesAsInt(final double time, final Link link) {
-		return Math.round((float)Math.max(link.getNumberOfLanes(time), 1.0d));
+		int numberOfLanes = (int) link.getNumberOfLanes(time);
+		if (numberOfLanes == 0) {
+			return 1;
+		} else {
+			return numberOfLanes;
+		}
 	}
 
 	public static Map<Id, Link> getIncidentLinks(final Node n) {

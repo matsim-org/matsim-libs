@@ -58,6 +58,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	private int lastSnapshotIndex = -1;
 	private final double snapshotPeriod;
 	protected final HashMap<Id, EventLink> eventLinks;
+	private final ArrayList<EventLink> linkList;
 	private final HashMap<Id, EventAgent> eventAgents;
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 	private final double capCorrectionFactor;
@@ -66,7 +67,9 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 
 	public SnapshotGenerator(final Network network, final double snapshotPeriod, final SimulationConfigGroup config) {
 		this.network = network;
-		this.eventLinks = new HashMap<Id, EventLink>((int)(network.getLinks().size()*1.1), 0.95f);
+		int initialCapacity = (int)(network.getLinks().size()*1.1);
+		this.eventLinks = new HashMap<Id, EventLink>(initialCapacity, 0.95f);
+		this.linkList = new ArrayList<EventLink>(initialCapacity);
 		this.eventAgents = new HashMap<Id, EventAgent>(1000, 0.95f);
 		this.snapshotPeriod = snapshotPeriod;
 		this.capCorrectionFactor = config.getFlowCapFactor() / network.getCapacityPeriod();
@@ -118,6 +121,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		for (Link link : this.network.getLinks().values()) {
 			this.eventLinks.put(link.getId(), new EventLink(link, this.capCorrectionFactor, ((NetworkImpl)this.network).getEffectiveCellSize(), this.storageCapFactor));
 		}
+		this.linkList.clear();
+		this.linkList.addAll(eventLinks.values());
 		this.eventAgents.clear();
 		this.lastSnapshotIndex = -1;
 	}
@@ -161,11 +166,11 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	private Collection<PositionInfo> getVehiclePositions(final double time) {
 		Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
 		if ("queue".equals(this.snapshotStyle)) {
-			for (EventLink link : this.eventLinks.values()) {
+			for (EventLink link : this.linkList) {
 				link.getVehiclePositionsQueue(positions, time);
 			}
 		} else if ("equiDist".equals(this.snapshotStyle)) {
-			for (EventLink link : this.eventLinks.values()) {
+			for (EventLink link : this.linkList) {
 				link.getVehiclePositionsEquil(positions, time);
 			}
 		} else {
@@ -182,21 +187,21 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 
 	private static class EventLink {
 		private final Link link;
-		protected final List<EventAgent> drivingQueue;
+		private final List<EventAgent> drivingQueue;
 		private final List<EventAgent> parkingQueue;
 		private final List<EventAgent> waitingQueue;
-		protected final List<EventAgent> buffer;
+		private final List<EventAgent> buffer;
 
 		private final double euklideanDist;
 		private final double freespeedTravelTime;
-		protected final double spaceCap;
+		private final double spaceCap;
 		private final double timeCap;
 		private final double storageCapFactor;
 		private final double inverseTimeCap;
 
 		private final double effectiveCellSize;
 
-		protected EventLink(final Link link2, final double capCorrectionFactor, final double effectiveCellSize, final double storageCapFactor) {
+		private EventLink(final Link link2, final double capCorrectionFactor, final double effectiveCellSize, final double storageCapFactor) {
 			this.link = link2;
 			this.drivingQueue = new ArrayList<EventAgent>();
 			this.parkingQueue = new ArrayList<EventAgent>();
@@ -211,7 +216,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			this.spaceCap = (this.link.getLength() * this.link.getNumberOfLanes()) / this.effectiveCellSize * storageCapFactor;
 		}
 
-		protected void enter(final EventAgent agent) {
+		private void enter(final EventAgent agent) {
 			if (agent.currentLink != null) {
 				agent.currentLink.stuck(agent); // use stuck to remove it from wherever it is
 			}
@@ -219,30 +224,30 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			this.drivingQueue.add(agent);
 		}
 
-		protected void leave(final EventAgent agent) {
+		private void leave(final EventAgent agent) {
 			this.drivingQueue.remove(agent);
 			this.buffer.remove(agent);
 			agent.currentLink = null;
 		}
 
-		protected void arrival(final EventAgent agent) {
+		private void arrival(final EventAgent agent) {
 			this.buffer.remove(agent);
 			this.drivingQueue.remove(agent);
 			this.parkingQueue.add(agent);
 		}
 
-		protected void departure(final EventAgent agent) {
+		private void departure(final EventAgent agent) {
 			agent.currentLink = this;
 			this.parkingQueue.remove(agent);
 			this.waitingQueue.add(agent);
 		}
 
-		protected void wait2link(final EventAgent agent) {
+		private void wait2link(final EventAgent agent) {
 			this.waitingQueue.remove(agent);
 			this.buffer.add(agent);
 		}
 
-		protected void stuck(final EventAgent agent) {
+		private void stuck(final EventAgent agent) {
 			// vehicles can be anywhere when they get stuck
 			this.drivingQueue.remove(agent);
 			this.parkingQueue.remove(agent);
@@ -259,7 +264,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		 * @param positions A collection where the calculated positions can be stored.
 		 * @param time The current timestep
 		 */
-		protected void getVehiclePositionsQueue(final Collection<PositionInfo> positions, final double time) {
+		private void getVehiclePositionsQueue(final Collection<PositionInfo> positions, final double time) {
 			double queueEnd = this.link.getLength(); // the length of the queue jammed vehicles build at the end of the link
 			double vehLen = Math.min(	// the length of a vehicle in visualization
 					this.euklideanDist / this.spaceCap, // all vehicles must have place on the link
@@ -345,72 +350,77 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		 * @param positions A collection where the calculated positions can be stored.
 		 * @param time The current timestep
 		 */
-		protected void getVehiclePositionsEquil(final Collection<PositionInfo> positions, final double time) {
-			int cnt = this.buffer.size() + this.drivingQueue.size();
-			int nLanes = NetworkUtils.getNumberOfLanesAsInt(time, this.link);
-			if (cnt > 0) {
-				double cellSize = this.link.getLength() / cnt;
-				double distFromFromNode = this.link.getLength() - cellSize / 2.0;
-				double freespeed = this.link.getFreespeed(time);
+		private void getVehiclePositionsEquil(final Collection<PositionInfo> positions, final double time) {
+			int bufferSize = this.buffer.size();
+			int drivingQueueSize = this.drivingQueue.size();
+			int waitingQueueSize = this.waitingQueue.size();
+			int parkingQueueSize = this.parkingQueue.size();
+			if (bufferSize + drivingQueueSize + waitingQueueSize + parkingQueueSize > 0 ) {
+				int cnt = bufferSize + drivingQueueSize;
+				int nLanes = NetworkUtils.getNumberOfLanesAsInt(time, this.link);
+				double linkLength = this.link.getLength();
+				if (cnt > 0) {
+					double cellSize = linkLength / cnt;
+					double distFromFromNode = linkLength - cellSize / 2.0;
+					double freespeed = this.link.getFreespeed(time);
 
-				// the cars in the buffer
-				for (EventAgent agent : this.buffer) {
-					agent.lane = 1 + agent.intId % nLanes;
-					int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
-					if (time > cmp) {
-						agent.speed = 0.0;
-					} else {
-						agent.speed = freespeed;
+					// the cars in the buffer
+					for (EventAgent agent : this.buffer) {
+						agent.lane = 1 + agent.intId % nLanes;
+						int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
+						if (time > cmp) {
+							agent.speed = 0.0;
+						} else {
+							agent.speed = freespeed;
+						}
+						PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+						positions.add(position);
+						distFromFromNode -= cellSize;
 					}
-					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
-					positions.add(position);
-					distFromFromNode -= cellSize;
-				}
 
-				// the cars in the drivingQueue
-				for (EventAgent agent : this.drivingQueue) {
-					agent.lane = 1 + agent.intId % nLanes;
-					int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
-					if (time > cmp) {
-						agent.speed = 0.0;
-					} else {
-						agent.speed = freespeed;
+					// the cars in the drivingQueue
+					for (EventAgent agent : this.drivingQueue) {
+						agent.lane = 1 + agent.intId % nLanes;
+						int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
+						if (time > cmp) {
+							agent.speed = 0.0;
+						} else {
+							agent.speed = freespeed;
+						}
+						PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+						positions.add(position);
+						distFromFromNode -= cellSize;
 					}
-					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
-					positions.add(position);
-					distFromFromNode -= cellSize;
 				}
-			}
 
-			// the cars in the waitingQueue
-			// the actual position doesn't matter, so they're just placed next to the link at the end
-			cnt = this.waitingQueue.size();
-			if (cnt > 0) {
-				int lane = nLanes + 2;
-				double cellSize = Math.min(this.effectiveCellSize, this.link.getLength() / cnt);
-				double distFromFromNode = this.link.getLength() - cellSize / 2.0;
-				for (EventAgent agent : this.waitingQueue) {
-					agent.lane = lane;
-					agent.speed = 0.0;
-					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
-					positions.add(position);
-					distFromFromNode -= cellSize;
+				// the cars in the waitingQueue
+				// the actual position doesn't matter, so they're just placed next to the link at the end
+				if (waitingQueueSize > 0) {
+					int lane = nLanes + 2;
+					double cellSize = Math.min(this.effectiveCellSize, linkLength / waitingQueueSize);
+					double distFromFromNode = linkLength - cellSize / 2.0;
+					for (EventAgent agent : this.waitingQueue) {
+						agent.lane = lane;
+						agent.speed = 0.0;
+						PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
+						positions.add(position);
+						distFromFromNode -= cellSize;
+					}
 				}
-			}
 
-			// the cars in the parkingQueue
-			// the actual position  doesn't matter, so they're distributed next to the link
-			cnt = this.parkingQueue.size();
-			if (cnt > 0) {
-				int lane = nLanes + 4;
-				double cellSize = this.link.getLength() / cnt;
-				double distFromFromNode = this.link.getLength() - cellSize / 2.0;
-				for (EventAgent agent : this.parkingQueue) {
-					agent.lane = lane;
-					agent.speed = 0.0;
-					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
-					positions.add(position);
-					distFromFromNode -= cellSize;
+				// the cars in the parkingQueue
+				// the actual position  doesn't matter, so they're distributed next to the link
+				if (parkingQueueSize > 0) {
+					int lane = nLanes + 4;
+					double cellSize = linkLength / parkingQueueSize;
+					double distFromFromNode = linkLength - cellSize / 2.0;
+					for (EventAgent agent : this.parkingQueue) {
+						agent.lane = lane;
+						agent.speed = 0.0;
+						PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
+						positions.add(position);
+						distFromFromNode -= cellSize;
+					}
 				}
 			}
 		}
