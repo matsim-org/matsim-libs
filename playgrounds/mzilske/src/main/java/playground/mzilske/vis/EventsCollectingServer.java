@@ -1,17 +1,21 @@
 package playground.mzilske.vis;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -19,15 +23,21 @@ import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFServerQuadI;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 
+import com.sleepycat.je.DatabaseException;
+
+
 public final class EventsCollectingServer implements OTFServerRemote {
 	
-	public static class TimeStep {
-		
+	private static Logger logger = Logger.getLogger(EventsCollectingServer.class);
+	
+	public static class TimeStep implements Serializable {
+
+		private static final long serialVersionUID = 1L;
+
 		public Collection<AgentSnapshotInfo> agentPositions = new ArrayList<AgentSnapshotInfo>();
 		
 	}
@@ -38,13 +48,17 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	
 	private MyQuadTree quadTree;
 	
-	private final ByteBuffer byteBuffer = ByteBuffer.allocate(20000000);
+	private final ByteBuffer byteBuffer = ByteBuffer.allocate(80000000);
 	
 	private double nextTime = -1;
 	
-	private TreeMap<Double, TimeStep> timeSteps = new TreeMap<Double, TimeStep>();
+	private SortedMap<Double, TimeStep> timeSteps;
 
 	private TimeStep nextTimeStep;
+
+	private MovieDatabase db;
+
+	private File tempFile;
 
 	private class MyQuadTree extends OTFServerQuad2 {
 
@@ -63,7 +77,8 @@ public final class EventsCollectingServer implements OTFServerRemote {
 			for (Link link : network.getLinks().values()) {
 				double middleEast = (link.getToNode().getCoord().getX() + link.getFromNode().getCoord().getX()) * 0.5 - this.minEasting;
 				double middleNorth = (link.getToNode().getCoord().getY() + link.getFromNode().getCoord().getY()) * 0.5 - this.minNorthing;
-				OTFDefaultLinkHandler.Writer linkWriter = new OTFDefaultLinkHandler.Writer();
+				LinkHandler.Writer linkWriter = new LinkHandler.Writer();
+				linkWriter.setSrc(link);
 				this.put(middleEast, middleNorth, linkWriter);
 			}
 			this.addAdditionalElement(agentWriter);
@@ -73,22 +88,25 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	
 	private class SnapshotReceiver implements SnapshotWriter {
 
+		double time;
 		TimeStep currentTimeStep;
 		
 		@Override
 		public void addAgent(AgentSnapshotInfo position) {
+			if (position.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) return;
 			currentTimeStep.agentPositions.add(position);
 		}
 
 		@Override
 		public void beginSnapshot(double time) {
-			currentTimeStep = new TimeStep();
-			timeSteps.put(time, currentTimeStep);
+			this.time = time;
+			this.currentTimeStep = new TimeStep();
+
 		}
 
 		@Override
 		public void endSnapshot() {
-			
+			timeSteps.put(time, currentTimeStep);
 		}
 
 		@Override
@@ -98,18 +116,31 @@ public final class EventsCollectingServer implements OTFServerRemote {
 		
 	}
 	
-	public EventsCollectingServer(Network network, double snapshotPeriod, SimulationConfigGroup simulationConfigGroup) {
+	public EventsCollectingServer(Network network, EventsManager eventsManager, double snapshotPeriod, SimulationConfigGroup simulationConfigGroup) {
 		this.network = network;
 		SnapshotGenerator snapshotGenerator = new SnapshotGenerator(network, snapshotPeriod, simulationConfigGroup);
 		SnapshotReceiver snapshotReceiver = new SnapshotReceiver();
 		snapshotGenerator.addSnapshotWriter(snapshotReceiver);
-		EventsManager eventsManager = new EventsManagerImpl();
 		eventsManager.addHandler(snapshotGenerator);
 		quadTree = new MyQuadTree();
+		quadTree.initQuadTree();
+		try {
+			tempFile = createTempDirectory();
+			db = new MovieDatabase(tempFile);
+			MovieView view = new MovieView(db);
+			timeSteps = view.getTimeStepMap();
+		} catch (DatabaseException e) {
+			throw new RuntimeException(e);
+		}
+		
 	}
 
 	@Override
 	public int getLocalTime() throws RemoteException {
+		if (nextTimeStep == null) {
+			nextTime = timeSteps.firstKey();
+			nextTimeStep = timeSteps.get(nextTime);
+		}
 		return (int) nextTime;
 	}
 
@@ -135,7 +166,9 @@ public final class EventsCollectingServer implements OTFServerRemote {
 		byte[] result;
 		byteBuffer.position(0);
 		agentWriter.positions.clear();
-		agentWriter.positions.addAll(nextTimeStep.agentPositions);
+		if (nextTimeStep != null) {
+			agentWriter.positions.addAll(nextTimeStep.agentPositions);
+		}
 		quadTree.writeDynData(bounds, byteBuffer);
 		int pos = byteBuffer.position();
 		result = new byte[pos];
@@ -152,19 +185,20 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	@Override
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
 		Double dTime = (double) time;
-		Map.Entry<Double, TimeStep> entry;
-		if (searchDirection == TimePreference.EARLIER) {
-			entry = timeSteps.floorEntry(dTime);
+		Double foundTime;
+		if (searchDirection == TimePreference.EARLIER || searchDirection == TimePreference.RESTART) {
+			foundTime = timeSteps.headMap(dTime + 1).lastKey();
 		} else if (searchDirection == TimePreference.LATER) {
-			entry = timeSteps.ceilingEntry(dTime);
+			foundTime = timeSteps.tailMap(dTime).firstKey();
 		} else {
 			throw new IllegalArgumentException();
 		}
-		if (entry == null) {
+		
+		if (foundTime == null) {
 			return false;
 		} else {
-			this.nextTime = entry.getKey();
-			this.nextTimeStep = entry.getValue();
+			this.nextTime = foundTime;
+			this.nextTimeStep = timeSteps.get(foundTime);
 			return true;
 		}
 	}
@@ -182,6 +216,48 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	@Override
 	public OTFVisConfig getOTFVisConfig() throws RemoteException {
 		return new OTFVisConfig();
+	}
+
+	public static File createTempDirectory() {
+		final File temp;
+
+		try {
+			temp = File.createTempFile("otfvis", Long.toString(System.nanoTime()));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		if (!(temp.delete())) {
+			throw new RuntimeException("Could not delete temp file: "
+					+ temp.getAbsolutePath());
+		}
+
+		if (!(temp.mkdir())) {
+			throw new RuntimeException("Could not create temp directory: "
+					+ temp.getAbsolutePath());
+		}
+
+		return (temp);
+	}
+	
+	static public boolean deleteDirectory(File path) {
+	    if( path.exists() ) {
+	      File[] files = path.listFiles();
+	      for(int i=0; i<files.length; i++) {
+	         if(files[i].isDirectory()) {
+	           deleteDirectory(files[i]);
+	         }
+	         else {
+	           files[i].delete();
+	         }
+	      }
+	    }
+	    return( path.delete() );
+	  }
+
+	public void close() {
+		db.close();
+		deleteDirectory(tempFile);
 	}
 
 }

@@ -49,6 +49,10 @@ public class OTFHostConnectionManager {
 	private final Map <String,OTFClientQuad> quads = new HashMap<String,OTFClientQuad>();
 
 	private final Map <String,OTFDrawer> drawer = new HashMap<String,OTFDrawer>();
+	
+	public OTFHostConnectionManager(String address, OTFServerRemote server) {
+		setAddressAndServer(address, server);
+	}
 
 	public OTFHostConnectionManager(String url) {
 		try {
@@ -65,13 +69,23 @@ public class OTFHostConnectionManager {
 	public OTFServerRemote getOTFServer(){
 		return this.host;
 	}
+	
 	private void openAddress(final String address) throws RemoteException, InterruptedException, NotBoundException {
+		OTFServerRemote createdHost = new OTFHostConnectionBuilder().createRemoteServerConnection(address);
+		setAddressAndServer(address, createdHost);
+	}
+
+	private void setAddressAndServer(final String address, OTFServerRemote server) {
 		this.address = address;
-		this.host = new OTFHostConnectionBuilder().createRemoteServerConnection(address);
+		this.host = server;
 		if (host != null) {
-			if (host.isLive()){
-				liveHost = (OTFLiveServerRemote)host;
-				controllerStatus = liveHost.getControllerStatus();
+			try {
+				if (host.isLive()){
+					liveHost = (OTFLiveServerRemote)host;
+					controllerStatus = liveHost.getControllerStatus();
+				}
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
 			}
 		}
 	}

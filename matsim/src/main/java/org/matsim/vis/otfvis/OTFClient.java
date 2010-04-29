@@ -70,10 +70,16 @@ public abstract class OTFClient implements Runnable {
 	public OTFClient(String url) {
 		this.url = url;
 	}
+	
+	protected OTFClient() {
+		
+	}
 
 	@Override
 	public void run() {
-		this.masterHostControl = new OTFHostConnectionManager(this.url);
+		if (this.masterHostControl == null) {
+			setHostConnectionManager(new OTFHostConnectionManager(this.url));
+		}
 		createMainFrame();
 		log.info("created MainFrame");
 		OTFVisConfig visconf = createOTFVisConfig();
@@ -93,7 +99,12 @@ public abstract class OTFClient implements Runnable {
 			e.printStackTrace();
 		}
 		frame.setVisible(true);
+		
 		log.info("OTFVis finished init");
+	}
+
+	public void setHostConnectionManager(OTFHostConnectionManager otfHostConnectionManager) {
+		this.masterHostControl = otfHostConnectionManager;
 	}
 
 	protected JPanel createDrawerPanel(String url, OTFDrawer drawer){

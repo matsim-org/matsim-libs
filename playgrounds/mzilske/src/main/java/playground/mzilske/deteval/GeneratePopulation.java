@@ -61,7 +61,7 @@ public class GeneratePopulation {
 
 	private static final String CLONED_HOUSEHOLDS_FILE = "../detailedEval/pop/140k-synthetische-personen/households.xml";
 	
-	private static final Integer NUMBER_OF_SIMULATED_PEOPLE = 140000;
+	private static final Integer NUMBER_OF_SIMULATED_PEOPLE = 2000;
 	
 	private Random random = new Random();
 

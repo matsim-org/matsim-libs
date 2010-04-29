@@ -142,22 +142,25 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		}
 		Double[] dsteps = steps.toArray(new Double[steps.size()]);
 
-		times = new MyJSlider(JSlider.HORIZONTAL,  dsteps[0].intValue(), dsteps[dsteps.length-1].intValue(), (int)hostControl.getOTFHostControl().getTime());
+		int min = dsteps[0].intValue();
+		int max = dsteps[dsteps.length-1].intValue();
+		int value = (int)hostControl.getOTFHostControl().getTime();
+		times = new MyJSlider(JSlider.HORIZONTAL, min, max, value);
 
 		times.addChangeListener(this);
-		times.setMajorTickSpacing((dsteps[0].intValue()-dsteps[dsteps.length-1].intValue())/10);
+		times.setMajorTickSpacing((min-max)/10);
 		times.setPaintTicks(true);
 
 		//Create the label table.
 		//PENDING: could use images, but we don't have any good ones.
-		labelTable.put(Integer.valueOf( dsteps[0].intValue() ),
+		labelTable.put(Integer.valueOf( min ),
 				new JLabel(Time.writeTime(dsteps[0], Time.TIMEFORMAT_HHMM)));
 		//new JLabel(createImageIcon("images/stop.gif")) );
-		labelTable.put(Integer.valueOf( dsteps[dsteps.length-1].intValue() ),
+		labelTable.put(Integer.valueOf( max ),
 				new JLabel(Time.writeTime(dsteps[dsteps.length-1], Time.TIMEFORMAT_HHMM)) );
 		//new JLabel(createImageIcon("images/fast.gif")) );
 
-		int n = dsteps.length/10;
+		int n = dsteps.length/10 + 1;
 
 		for(int i= n; i< dsteps.length-1; i+=n) {
 			labelTable.put(Integer.valueOf( dsteps[i].intValue() ),
