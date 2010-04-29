@@ -57,7 +57,7 @@ public class GapDensityAnalyser {
 		this.root = root;
 		
 		// Read the study area files.
-		MyActivityAnalysisStringBuilder sb = new MyActivityAnalysisStringBuilder(this.root, version, threshold, sample, studyAreaName);
+		MyActivityAnalysisStringBuilder sb = new MyActivityAnalysisStringBuilder(this.root, version, threshold, sample, studyAreaName, 2008);
 //		MyStringBuilder msb = new MyStringBuilder(this.root);
 		String gapShapefileName = sb.getGapShapefilename();
 		MyGapReader mgr = new MyGapReader(this.studyAreaName, gapShapefileName);

@@ -10,9 +10,10 @@ public class MyActivityAnalysisStringBuilder extends MyStringBuilder{
 	private String threshold;
 	private String sample;
 	private String studyAreaName;
+	private int year;
 	private String prefix;
 	
-	public MyActivityAnalysisStringBuilder(String root, String version, String threshold, String sample, String studyAreaName){
+	public MyActivityAnalysisStringBuilder(String root, String version, String threshold, String sample, String studyAreaName, int year){
 		super(root);
 		this.prefix = root + studyAreaName + "/" + version + "/" + threshold 
 							+ "/Sample" + sample + "/Activities/" + studyAreaName + "_";
@@ -20,6 +21,7 @@ public class MyActivityAnalysisStringBuilder extends MyStringBuilder{
 		this.threshold = threshold;
 		this.sample = sample;
 		this.studyAreaName = studyAreaName;		
+		this.year = year;
 	}
 	
 	public String getGapInputMinor(){
@@ -46,11 +48,11 @@ public class MyActivityAnalysisStringBuilder extends MyStringBuilder{
 	 * @return {@code ROOT + /DigiCore/Signals.txt}
 	 */
 	public String getSignalFilename(){
-		return super.getRoot() + "/DigiCore/Signals.txt";
+		return super.getRoot() + "/DigiCore/" + String.valueOf(year) + "/Signals.txt";
 	}
 
 	public String getXmlFoldername() {
-		return super.getRoot() + "/DigiCore/XML/" + version + "/" + threshold + "/Sample" + sample + "/";
+		return super.getRoot() + "/DigiCore/" + String.valueOf(year) + "/XML/" + version + "/" + threshold + "/Sample" + sample + "/";
 	}
 
 	public String getOutputFoldername() {

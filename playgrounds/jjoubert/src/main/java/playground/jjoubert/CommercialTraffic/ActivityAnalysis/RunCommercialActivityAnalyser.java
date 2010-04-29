@@ -48,6 +48,13 @@ public class RunCommercialActivityAnalyser {
 	 * 		- TODO CityDeep															|
 	 *=============================================================================*/
 	private static String studyAreaName = "Gauteng";
+	 /*=============================================================================
+	 * The year for which the DigiCore analysis is being done. Available years are:	|
+	 * 		- 2008																	|														|
+	 *=============================================================================*/
+	
+	
+	private static int year = 2008;
 
 	 /*=============================================================================
 	 * Cluster parameters that must be set. These include: 							|
@@ -111,7 +118,7 @@ public class RunCommercialActivityAnalyser {
 			for(int sample = 1; sample <= numberOfSamples; sample++){
 				
 				String theSample = String.format("%02d", sample);
-				MyActivityAnalysisStringBuilder sb = new MyActivityAnalysisStringBuilder(root, ds.toString(), theThreshold, theSample, studyAreaName);
+				MyActivityAnalysisStringBuilder sb = new MyActivityAnalysisStringBuilder(root, ds.toString(), theThreshold, theSample, studyAreaName, year);
 				CommercialActivityAnalyser caa = new CommercialActivityAnalyser(sb, sb.getWgs84(), sb.getUtm35S(), studyAreaName, ds);
 				if(extractChains){
 					caa.extractChains(sample, sampleSize, threshold, withinThreshold, clusterRadius, clusterCount, true);
