@@ -48,7 +48,7 @@ public class PTNetFitObjectiveN implements Objective{
 		this.rnd = MatsimRandom.getLocalInstance();
 		this.initPPoints = new ParamPoint[this.DIMENSION+1];
 		try {
-			this.allWriter = new BufferedWriter(new FileWriter(new File(this.tmpDir + iteration +  ".all_results.txt")));
+			this.allWriter = new BufferedWriter(new FileWriter(new File(this.tmpDir + "results/" + iteration +  ".all_results.txt")));
 			StringBuffer stringbuffer = new StringBuffer();
 			for (int i = 0; i < this.DIMENSION / 2; i++) {
 				stringbuffer.append(", time " + i);
@@ -58,7 +58,7 @@ public class PTNetFitObjectiveN implements Objective{
 			this.allWriter.newLine();
 			this.allWriter.flush();
 			
-			this.bestWriter = new BufferedWriter(new FileWriter(new File(this.tmpDir + iteration + ".best_results.txt")));
+			this.bestWriter = new BufferedWriter(new FileWriter(new File(this.tmpDir + "results/"  + iteration + ".best_results.txt")));
 			this.bestWriter.write("Iteration, Score" + stringbuffer);
 			this.bestWriter.newLine();
 			this.bestWriter.flush();
@@ -72,7 +72,7 @@ public class PTNetFitObjectiveN implements Objective{
 	@Override
 	public ParamPoint getInitialParamPoint(int index) {
 		if (index > this.DIMENSION) {
-			log.warn("Initial paramPoint " + index + " was requested, but we only have 10 Dimensions. Returning Initial paramPoint 0.");
+			log.warn("Initial paramPoint " + index + " was requested, but we only have " + this.DIMENSION + " dimensions. Returning initial paramPoint 0.");
 			return this.initPPoints[0];
 	  }
 		return this.initPPoints[index];		
@@ -124,12 +124,32 @@ public class PTNetFitObjectiveN implements Objective{
 			}		
 			delHandler.readEvents(this.tmpDir + "output/ITERS/it.0/0.events.xml.gz");
 
+			// Preprocessing eval data
+			int nPostiveEntries = 0;
+			double sumPositiveEntries = 0;
+			
+			int nNegativeEntries = 0;
+			double sumNegativeEntries = 0;	
+			
 			// Most important part - calculating the score	
 			double score = 0.0;
 			
 			for (DelayHandler handler : delHandler.getHandler()) {
-				score += Math.pow(handler.negArrivalDelay.getAverageDelay(),2 ) + Math.pow(handler.posDepartureDelay.getAverageDelay(), 2);
+//				nPostiveEntries += handler.posDepartureDelay.getNumberOfEntries();
+//				sumPositiveEntries += handler.posDepartureDelay.getAccumulatedDelay();
+//				
+//				nNegativeEntries += handler.negArrivalDelay.getNumberOfEntries();
+//				sumNegativeEntries += handler.negArrivalDelay.getAccumulatedDelay();
+//				
+////			score += Math.sqrt(Math.pow(handler.negArrivalDelay.getAverageDelay(), 2) + Math.pow(handler.posDepartureDelay.getAverageDelay(), 2));
+				score += Math.pow(handler.posDepartureDelay.getAverageDelay(), 2) + Math.pow(handler.negArrivalDelay.getAverageDelay(), 2);
 			}
+			
+//			
+//			score = 0.5 * (Math.abs(sumPositiveEntries) / nPostiveEntries + Math.abs(sumNegativeEntries) / nNegativeEntries);
+			score = Math.sqrt(score / (delHandler.getHandler().size() * 2.0));
+			
+			// end of scoring
 			
 			this.knownPoints.put(p, Double.valueOf(score));
 									

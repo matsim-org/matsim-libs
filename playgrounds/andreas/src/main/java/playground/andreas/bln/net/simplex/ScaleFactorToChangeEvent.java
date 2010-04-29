@@ -43,7 +43,11 @@ public class ScaleFactorToChangeEvent {
 		for (Entry<String, Double> entry : this.timeScaleFactorMap.entrySet()) {
 			this.writer.write("<networkChangeEvent startTime=\"" + entry.getKey() + "\">"); this.writer.newLine();
 			for (Link link : this.network.getLinks().values()) {
-				this.writer.write("<link refId=\"" + link.getId().toString() + "\"/>"); this.writer.newLine();
+				if(link.getId().toString().contains("miv_")){
+					// ignore miv link
+				} else {
+					this.writer.write("<link refId=\"" + link.getId().toString() + "\"/>"); this.writer.newLine();
+				}
 			}
 			this.writer.write("<freespeed type=\"scaleFactor\" value=\"" + (entry.getValue().doubleValue() / lastScaleFactor) + "\"/>"); this.writer.newLine();
 			this.writer.write("</networkChangeEvent>"); this.writer.newLine();
