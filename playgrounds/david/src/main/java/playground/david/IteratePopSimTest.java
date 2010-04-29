@@ -35,7 +35,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.netvis.NetVis;
 
 public class IteratePopSimTest {
 
@@ -87,7 +86,7 @@ public class IteratePopSimTest {
 		Gbl.printElapsedTime();
 
 		String[] visargs = {"testWrite"};
-		NetVis.main(visargs);
+	//	NetVis.main(visargs);
 	}
 
 }

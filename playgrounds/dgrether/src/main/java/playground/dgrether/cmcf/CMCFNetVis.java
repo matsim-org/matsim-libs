@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.dgrether.cmcf;
 
-import org.matsim.vis.netvis.NetVis;
 
 
 /**
@@ -31,7 +30,7 @@ public class CMCFNetVis {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		NetVis.main(new String[] {});
+		// NetVis.main(new String[] {});
 	}
 
 }

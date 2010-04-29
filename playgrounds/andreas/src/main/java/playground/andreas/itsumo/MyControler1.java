@@ -45,7 +45,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.run.Events2Snapshot;
-import org.matsim.vis.netvis.NetVis;
 
 
 public class MyControler1 extends Controler {
@@ -307,7 +306,7 @@ public class MyControler1 extends Controler {
 			// Run NetVis if possible
 			if (this.config.getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){
 				String[] visargs = {"./output/vis/Snapshot"};
-				NetVis.main(visargs);
+				// NetVis.main(visargs);
 			}
 
 		} else {

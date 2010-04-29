@@ -24,7 +24,6 @@ package playground.kai.evacTest;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.evacuation.run.EvacuationQSimControler;
-import org.matsim.vis.netvis.NetVis;
 
 
 
@@ -52,7 +51,7 @@ public class MyControler1 extends EvacuationQSimControler {
 
 		// Visualize
 		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
-		NetVis.main(visargs);
+		// NetVis.main(visargs);
 
 	}
 

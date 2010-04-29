@@ -24,7 +24,6 @@ package playground.kai.test;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.vis.netvis.NetVis;
 
 
 public class MyControler1 {

@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
-import org.matsim.vis.netvis.NetVis;
 
 import playground.mrieser.pt.utils.MergeNetworks;
 
@@ -17,7 +16,7 @@ public class CreateMultimodalNet {
 		MergeNetworks.merge(scenario.getNetwork(), "", ptNetwork, "", scenario.getNetwork());
 		new NetworkWriter(scenario.getNetwork()).writeFile(outputFile);
 		System.out.println("done writting:" + outputFile);
-		NetVis.displayNetwork(outputFile);
+		// NetVis.displayNetwork(outputFile);
 	}
 
 	public static void main(String[] args) {

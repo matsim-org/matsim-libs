@@ -23,7 +23,6 @@ package playground.david;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.vis.netvis.NetVis;
 
 
 public class OneSimRunWithConfig {
@@ -45,7 +44,7 @@ public class OneSimRunWithConfig {
 		controler.run();
 
 		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
-		NetVis.main(visargs);
+		// NetVis.main(visargs);
 
 
 	}

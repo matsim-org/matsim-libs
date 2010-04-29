@@ -47,7 +47,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.netvis.DrawableAgentI;
 
 import playground.gregor.snapshots.postprocessors.PostProcessorI;
 
@@ -449,7 +448,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		}
 	}
 
-	private static class EventAgent implements Comparable<EventAgent>, DrawableAgentI {
+	private static class EventAgent implements Comparable<EventAgent> {
 		protected final Id id;
 		protected final int intId;
 		protected double time;

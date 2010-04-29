@@ -35,7 +35,6 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.netvis.NetVis;
 
 public class SimRunKreisverkehr {
 
@@ -103,7 +102,7 @@ public class SimRunKreisverkehr {
 		Gbl.printElapsedTime();
 
 		String[] visargs = {"../../tmp/testWrite"};
-		NetVis.main(visargs);
+		// NetVis.main(visargs);
 	}
 
 }

@@ -15,8 +15,8 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.evacuation.otfvis.drawer.OTFTimeDependentDrawer;
-import org.matsim.vis.netvis.renderers.ValueColorizer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
+import org.matsim.vis.otfvis.opengl.gui.ValueColorizer;
 
 import com.sun.opengl.util.j2d.TextRenderer;
 import com.vividsolutions.jts.geom.Coordinate;

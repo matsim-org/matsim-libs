@@ -101,7 +101,6 @@ public final class EventsCollectingServer implements OTFServerRemote {
 		public void beginSnapshot(double time) {
 			this.time = time;
 			this.currentTimeStep = new TimeStep();
-
 		}
 
 		@Override

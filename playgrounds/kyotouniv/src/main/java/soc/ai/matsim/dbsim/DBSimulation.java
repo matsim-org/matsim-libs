@@ -20,7 +20,6 @@
 
 package soc.ai.matsim.dbsim;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,10 +62,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
-import org.matsim.vis.netvis.streaming.SimStateWriterI;
-import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
-import org.matsim.vis.otfvis.data.fileio.queuesim.OTFFileWriterQueueSimConnectionManagerFactory;
-import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimServerQuadBuilder;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -99,7 +94,6 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 	protected Network networkLayer;
 
 	private static EventsManager events = null;
-	protected  SimStateWriterI netStateWriter = null;
 
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 
@@ -350,14 +344,6 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 			writer.finish();
 		}
 
-		if (this.netStateWriter != null) {
-			try {
-				this.netStateWriter.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			this.netStateWriter = null;
-		}
 		this.simEngine = null;
 		DBSimulation.events = null; // delete events object to free events handlers, if they are nowhere else referenced
 	}
@@ -412,13 +398,6 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 			}
 		}
 
-		if (this.netStateWriter != null) {
-			try {
-				this.netStateWriter.dump((int)time);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	public static final EventsManager getEvents() {

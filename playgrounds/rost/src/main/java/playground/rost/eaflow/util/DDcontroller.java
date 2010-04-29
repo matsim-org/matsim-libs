@@ -37,7 +37,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
-import org.matsim.vis.netvis.NetVis;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 
 
@@ -144,7 +143,7 @@ public class DDcontroller {
 
 		if (netvis) {
 			String[] visargs = {"./output/simout"};
-			NetVis.main(visargs);
+			// NetVis.main(visargs);
 		}
 
 		System.out.println("Done.");
