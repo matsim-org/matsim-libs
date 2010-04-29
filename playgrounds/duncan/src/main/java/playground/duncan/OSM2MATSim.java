@@ -54,7 +54,7 @@ public class OSM2MATSim {
 			e.printStackTrace();
 		}
 //		new NetworkWriter(network, "../mystudies/zueri-net.xml").write();
-		new NetworkWriter(network).writeFile("../shared-svn/studies/north-america/ca/vancouver/network/net.xml");
+		new NetworkWriter(network).write("../shared-svn/studies/north-america/ca/vancouver/network/net.xml");
 		Gbl.printElapsedTime();
 	}
 

@@ -312,7 +312,7 @@ public class NullFallFacilityRollout {
 			FileNotFoundException {
 		NetworkLayer network = outScenario.getNetwork();
 		log.info("writing network to file.");
-		new NetworkWriter(network).writeFile(OutNetworkFile);
+		new NetworkWriter(network).write(OutNetworkFile);
 		log.info("writing TransitSchedule to file.");
 		new TransitScheduleWriterV1(outScenario.getTransitSchedule()).write(OutTransitScheduleFile);
 		log.info("writing vehicles to file.");

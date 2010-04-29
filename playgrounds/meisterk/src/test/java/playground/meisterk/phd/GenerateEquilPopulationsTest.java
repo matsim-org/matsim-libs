@@ -91,7 +91,7 @@ public class GenerateEquilPopulationsTest extends MatsimTestCase {
 
 		// write population out
 		logger.info("Writing plans file...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(this.getOutputDirectory() + "actual_plans.xml.gz");
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.getOutputDirectory() + "actual_plans.xml.gz");
 		logger.info("Writing plans file...DONE.");
 
 		// compare to expected population

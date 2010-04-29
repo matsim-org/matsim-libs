@@ -122,7 +122,7 @@ public class RoutingTest extends MatsimTestCase {
 		String outPlansName = getOutputDirectory() + provider.getName() + ".plans.xml.gz";
 
 		calcRoute(provider, network, population, config);
-		new PopulationWriter(population, network).writeFile(outPlansName);
+		new PopulationWriter(population, network).write(outPlansName);
 		final long routerChecksum = CRCChecksum.getCRCFromFile(outPlansName);
 		log.info("routerChecksum = " + routerChecksum + " file: " + outPlansName);
 		assertEquals("different plans files.", referenceChecksum, routerChecksum);

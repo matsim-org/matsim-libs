@@ -77,7 +77,7 @@ public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{
 	
 	
 	@Override
-	public void writeFile(final String filename) {
+	public void write(final String filename) {
   	JAXBContext jc;
 		try {
 			jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystemsconfig11.ObjectFactory.class);

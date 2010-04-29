@@ -74,13 +74,13 @@ public class InitRoutesTest extends MatsimTestCase {
 		plan.createAndAddActivity("w", new IdImpl("20"));
 
 		// write person to file
-		new PopulationWriter(population, network).writeFile(PLANS_FILE_TESTINPUT);
+		new PopulationWriter(population, network).write(PLANS_FILE_TESTINPUT);
 
 		// prepare config for test
 		config.network().setInputFile(NETWORK_FILE);
 		config.plans().setInputFile(PLANS_FILE_TESTINPUT);
 		config.plans().setOutputFile(PLANS_FILE_TESTOUTPUT);
-		new ConfigWriter(config).writeFile(CONFIG_FILE);
+		new ConfigWriter(config).write(CONFIG_FILE);
 		Gbl.reset(); // needed to delete the global config etc for the test
 
 		// some pre-tests

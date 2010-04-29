@@ -162,7 +162,7 @@ public class BkIncomeTestScenarioCreator {
 
 		BkIncomeTestScenarioCreator pc = new BkIncomeTestScenarioCreator(scenario);
 		Population pop = pc.createPlans();
-		new PopulationWriter(pop, uselessNetwork).writeFile(outfile);
+		new PopulationWriter(pop, uselessNetwork).write(outfile);
 		log.info("plans written");
 		log.info("finished!");
 	}

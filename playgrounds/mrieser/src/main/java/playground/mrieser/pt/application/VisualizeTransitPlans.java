@@ -156,13 +156,13 @@ public class VisualizeTransitPlans {
 		}
 
 		new PopulationWriter(visPop, this.visScenario.getNetwork()).write("vis.plans.xml");
-		new NetworkWriter(this.visScenario.getNetwork()).writeFile("vis.network.xml");
+		new NetworkWriter(this.visScenario.getNetwork()).write("vis.network.xml");
 		Config visConfig = new Config();
 		visConfig.addCoreModules();
 		visConfig.network().setInputFile("vis.network.xml");
 		visConfig.plans().setInputFile("vis.plans.xml");
 		visConfig.simulation().setSnapshotStyle("queue");
-		new ConfigWriter(visConfig).writeFile("vis.config.xml");
+		new ConfigWriter(visConfig).write("vis.config.xml");
 
 	}
 

@@ -1,12 +1,12 @@
 package playground.ciarif.retailers.IO;
 
 
-import org.matsim.core.api.internal.MatsimFileWriter;
+import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class RetailersWriter extends MatsimXmlWriter implements MatsimFileWriter {
+public class RetailersWriter extends MatsimXmlWriter implements MatsimWriter {
 
-	public void writeFile(final String filename) {
+	public void write(final String filename) {
 		// TODO Auto-generated method stub
 		
 	}

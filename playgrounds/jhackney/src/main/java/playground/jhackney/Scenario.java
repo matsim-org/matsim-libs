@@ -260,7 +260,7 @@ public abstract class Scenario {
 
 	public static final void writePlans(final Population plans, final Network network) {
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans, network).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(plans, network).write(scenario.getConfig().plans().getOutputFile());
 		System.out.println("  done.");
 	}
 //
@@ -278,25 +278,25 @@ public abstract class Scenario {
 
 	public static final void writeNetwork(final NetworkLayer network) {
 		System.out.println("  writing network xml file... ");
-		new NetworkWriter(network).writeFile(scenario.getConfig().network().getOutputFile());
+		new NetworkWriter(network).write(scenario.getConfig().network().getOutputFile());
 		System.out.println("  done.");
 	}
 
 	public static final void writeFacilities(final ActivityFacilitiesImpl facilities) {
 		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).writeFile(scenario.getConfig().facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(scenario.getConfig().facilities().getOutputFile());
 		System.out.println("  done.");
 	}
 
 	public static final void writeWorld(final World world) {
 		System.out.println("  writing world xml file... ");
-		new WorldWriter(world).writeFile(scenario.getConfig().world().getOutputFile());
+		new WorldWriter(world).write(scenario.getConfig().world().getOutputFile());
 		System.out.println("  done.");
 	}
 
 	public static final void writeConfig() {
 		System.out.println("  writing config xml file... ");
-		new ConfigWriter(scenario.getConfig()).writeFile(scenario.getConfig().config().getOutputFile());
+		new ConfigWriter(scenario.getConfig()).write(scenario.getConfig().config().getOutputFile());
 		System.out.println("  done.");
 	}
 	public static Config getConfig(){

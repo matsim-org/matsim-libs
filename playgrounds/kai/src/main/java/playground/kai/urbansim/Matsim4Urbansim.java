@@ -89,7 +89,7 @@ public class Matsim4Urbansim {
 		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("urbansim zones");
 		readFromUrbansim.readFacilities( facilities, zones ) ;
 
-		new FacilitiesWriter(facilities).writeFile(PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;
+		new FacilitiesWriter(facilities).write(PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;
 
 		Population oldPop ;
 		if ( config.plans().getInputFile() != null ) {
@@ -110,7 +110,7 @@ public class Matsim4Urbansim {
 		oldPop=null ;
 		System.gc() ;
 
-		new PopulationWriter(newPop,network).writeFile(PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz");
+		new PopulationWriter(newPop,network).write(PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz");
 
 		log.info("### DONE with demand generation from urbansim ###") ;
 

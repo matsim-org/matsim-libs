@@ -97,16 +97,16 @@ public class PopulationClipping {
 		for(Person p : remove)
 			pop.getPersons().remove(p.getId());
 
-		new PopulationWriter(pop, data.getNetwork()).writeFile(outputDir + "plans.xml");
+		new PopulationWriter(pop, data.getNetwork()).write(outputDir + "plans.xml");
 
 		for(double f = 0.001; f < 0.01; f += 0.001) {
 			String file = String.format("%1$splans.%2$.3f.xml", outputDir, f);
-			new PopulationWriter(pop, data.getNetwork(), f).writeFile(file);
+			new PopulationWriter(pop, data.getNetwork(), f).write(file);
 		}
 
 		for(double f = 0.01; f <= 0.1; f += 0.01) {
 			String file = String.format("%1$splans.%2$.2f.xml", outputDir, f);
-			new PopulationWriter(pop, data.getNetwork(), f).writeFile(file);
+			new PopulationWriter(pop, data.getNetwork(), f).write(file);
 		}
 	}
 

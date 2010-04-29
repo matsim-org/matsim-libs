@@ -84,7 +84,7 @@ public class GeneralLib {
 	 * Write the facilities to the specified file.
 	 */
 	public static void writeActivityFacilities(ActivityFacilitiesImpl facilities, String facilitiesFile) {
-		new FacilitiesWriter(facilities).writeFile(facilitiesFile);
+		new FacilitiesWriter(facilities).write(facilitiesFile);
 	}
 
 	/**

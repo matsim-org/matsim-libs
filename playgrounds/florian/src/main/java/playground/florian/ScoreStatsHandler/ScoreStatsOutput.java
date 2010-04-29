@@ -42,7 +42,7 @@ public class ScoreStatsOutput implements ShutdownListener{
 			int it = i + firstIt;
 			out.addScore(it, history[INDEX_AVERAGE][it], history[INDEX_BEST][it],history[INDEX_WORST][it], history[INDEX_EXECUTED][it]);
 		}
-		out.writeFile(filename);
+		out.write(filename);
 		if (createChart){
 			JFreeChart chart = ScoreToChartTest.createChartFromXMLScore(filename);
 			try {

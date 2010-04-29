@@ -78,11 +78,11 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-			new NetworkWriter(getScenario().getNetwork()).writeFile(getScenario().getConfig().network().getInputFile());
+			new NetworkWriter(getScenario().getNetwork()).write(getScenario().getConfig().network().getInputFile());
 		} else {
 			NetworkLoader loader = new NetworkLoaderImplII(getScenario().getNetwork());
 			loader.loadNetwork();
-			new NetworkWriter(getScenario().getNetwork()).writeFile(getScenario().getConfig().network().getInputFile());
+			new NetworkWriter(getScenario().getNetwork()).write(getScenario().getConfig().network().getInputFile());
 			loadMps();
 		}
 		loadStaticForceField();

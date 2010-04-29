@@ -47,7 +47,7 @@ public class ShapeFile2ZoneLayerTest extends MatsimTestCase {
 		ShapeFile2ZoneLayer shp2zl = new ShapeFile2ZoneLayer();
 		shp2zl.shp2ZoneLayer(shpFileName, layer);
 		world.complete();
-		new WorldWriter(world).writeFile(worldFileName);
+		new WorldWriter(world).write(worldFileName);
 		
 		assertEquals("Created world does not match reference file.", 
 				CRCChecksum.getCRCFromFile(worldFileName), CRCChecksum.getCRCFromFile(referenceFileName));

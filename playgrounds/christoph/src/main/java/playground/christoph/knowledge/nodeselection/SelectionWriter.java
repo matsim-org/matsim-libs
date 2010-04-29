@@ -29,14 +29,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.internal.MatsimFileWriter;
+import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
 
-public class SelectionWriter extends MatsimXmlWriter implements MatsimFileWriter {
+public class SelectionWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	private boolean fileOpened = false;
 	private String description = "";
@@ -180,7 +180,7 @@ public class SelectionWriter extends MatsimXmlWriter implements MatsimFileWriter
 	/*
 	 * Write a single file containing all data.
 	 */
-	public void writeFile(final String filename) 
+	public void write(final String filename) 
 	{
 		this.outfile = filename;
 		this.writeStartSelection(description);

@@ -186,7 +186,7 @@ public class PlanomatTest extends MatsimTestCase {
 		outputPopulation.addPerson(testPerson);
 
 		log.info("Writing plans file...");
-		new PopulationWriter(outputPopulation, this.scenario.getNetwork()).writeFile(this.getOutputDirectory() + "output_plans.xml.gz");
+		new PopulationWriter(outputPopulation, this.scenario.getNetwork()).write(this.getOutputDirectory() + "output_plans.xml.gz");
 		log.info("Writing plans file...DONE.");
 
 		// actual test: compare checksums of the files
@@ -313,7 +313,7 @@ public class PlanomatTest extends MatsimTestCase {
 		outputPopulation.addPerson(testPerson);
 
 		System.out.println("Writing plans file...");
-		new PopulationWriter(outputPopulation, this.scenario.getNetwork()).writeFile(this.getOutputDirectory() + "output_plans.xml.gz");
+		new PopulationWriter(outputPopulation, this.scenario.getNetwork()).write(this.getOutputDirectory() + "output_plans.xml.gz");
 		System.out.println("Writing plans file...DONE.");
 
 		// actual test: compare checksums of the files

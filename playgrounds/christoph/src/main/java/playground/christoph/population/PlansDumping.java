@@ -60,7 +60,7 @@ public class PlansDumping {
 			person.getSelectedPlan().setScore(null);
 		}
 
-		new PopulationWriter(population, network).writeFile(populationOutFile);
+		new PopulationWriter(population, network).write(populationOutFile);
 		System.out.println("Done");
 	}
 

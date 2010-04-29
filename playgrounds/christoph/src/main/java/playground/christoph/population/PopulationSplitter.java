@@ -126,6 +126,6 @@ public class PopulationSplitter {
 		fileCounter++;
 
 		log.info("Writing split File.");
-		new PopulationWriter(pop, net).writeFile(outputFileName + fileCounter + ".xml.gz");
+		new PopulationWriter(pop, net).write(outputFileName + fileCounter + ".xml.gz");
 	}
 }

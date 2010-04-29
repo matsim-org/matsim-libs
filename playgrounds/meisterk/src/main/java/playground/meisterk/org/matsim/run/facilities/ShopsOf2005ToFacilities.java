@@ -265,7 +265,7 @@ public class ShopsOf2005ToFacilities {
 
 		System.out.println("Writing facilities xml file... ");
 		FacilitiesWriter facilities_writer = new FacilitiesWriter(shopsOf2005);
-		facilities_writer.writeFile(config.facilities().getOutputFile());
+		facilities_writer.write(config.facilities().getOutputFile());
 		System.out.println("Writing facilities xml file...done.");
 
 	}
@@ -1727,7 +1727,7 @@ public class ShopsOf2005ToFacilities {
 		facilitiesOpentimesKTIYear2.run(facilities_input);
 
 		System.out.println("Writing Facilities KTI Year 2 file...");
-		new FacilitiesWriter(facilities_input).writeFile(config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities_input).write(config.facilities().getOutputFile());
 
 	}
 

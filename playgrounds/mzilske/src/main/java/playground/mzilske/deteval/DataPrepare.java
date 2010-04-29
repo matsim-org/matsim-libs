@@ -137,7 +137,7 @@ public class DataPrepare {
 			FileNotFoundException {
 		NetworkLayer network = scenario.getNetwork();
 		log.info("writing network to file.");
-		new NetworkWriter(network).writeFile(OutNetworkFile);
+		new NetworkWriter(network).write(OutNetworkFile);
 	}
 
 	public static void main(final String[] args) {

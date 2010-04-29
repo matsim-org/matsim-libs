@@ -145,8 +145,8 @@ public class NewDemandWithFacilities4Zrh {
 
 		new CreateActFacility(afs, knowledges).run(pop);
 
-		new PopulationWriter(pop, net, knowledges).writeFile(outputPopFilename);
-		new FacilitiesWriter(afs).writeFile(outputFacilitiesFilename);
+		new PopulationWriter(pop, net, knowledges).write(outputPopFilename);
+		new FacilitiesWriter(afs).write(outputFacilitiesFilename);
 
 		System.out.println("----->done.");
 	}

@@ -431,17 +431,17 @@ public class Controler {
 			}
 			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 			// dump plans
-			new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges()).writeFile(this.controlerIO.getOutputFilename(FILENAME_POPULATION));
+			new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges()).write(this.controlerIO.getOutputFilename(FILENAME_POPULATION));
 			// dump network
-			new NetworkWriter(this.network).writeFile(this.controlerIO.getOutputFilename(FILENAME_NETWORK));
+			new NetworkWriter(this.network).write(this.controlerIO.getOutputFilename(FILENAME_NETWORK));
 			// dump world
-			new WorldWriter(this.getScenario().getWorld()).writeFile(this.controlerIO.getOutputFilename("output_world.xml.gz"));
+			new WorldWriter(this.getScenario().getWorld()).write(this.controlerIO.getOutputFilename("output_world.xml.gz"));
 			// dump config
-			new ConfigWriter(this.config).writeFile(this.controlerIO.getOutputFilename(FILENAME_CONFIG));
+			new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(FILENAME_CONFIG));
 			// dump facilities
 			ActivityFacilities facilities = this.getFacilities();
 			if (facilities != null) {
-				new FacilitiesWriter((ActivityFacilitiesImpl) facilities).writeFile(this.controlerIO.getOutputFilename("output_facilities.xml.gz"));
+				new FacilitiesWriter((ActivityFacilitiesImpl) facilities).write(this.controlerIO.getOutputFilename("output_facilities.xml.gz"));
 			}
 			if (this.network.getFactory().isTimeVariant()) {
 				new NetworkChangeEventsWriter().write(this.controlerIO.getOutputFilename("output_change_events.xml.gz"), this.network.getNetworkChangeEvents());
@@ -456,11 +456,11 @@ public class Controler {
         }
 			}
 			if (this.config.scenario().isUseLanes()){
-			  new LaneDefinitionsWriter11(this.scenarioData.getLaneDefinitions()).writeFile(this.controlerIO.getOutputFilename(FILENAME_LANES));
+			  new LaneDefinitionsWriter11(this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
 			}
 			if (this.config.scenario().isUseSignalSystems()){
-			  new SignalSystemsWriter11(this.scenarioData.getSignalSystems()).writeFile(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS));
-			  new SignalSystemConfigurationsWriter11(this.scenarioData.getSignalSystemConfigurations()).writeFile(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS_CONFIG));
+			  new SignalSystemsWriter11(this.scenarioData.getSignalSystems()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS));
+			  new SignalSystemConfigurationsWriter11(this.scenarioData.getSignalSystemConfigurations()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS_CONFIG));
 			}
 
 			if (unexpected) {

@@ -183,11 +183,11 @@ public class RandomPlansGenerator {
 	}
 
 	public void writePlans(final Population plans) {
-		new PopulationWriter(plans, this.network).writeFile(Gbl.getConfig().plans().getOutputFile());
+		new PopulationWriter(plans, this.network).write(Gbl.getConfig().plans().getOutputFile());
 	}
 
 	public void writePlans(final Population plans, final String file) {
-		new PopulationWriter(plans, this.network).writeFile(file);
+		new PopulationWriter(plans, this.network).write(file);
 	}
 
 	public static void main(final String[] args) {

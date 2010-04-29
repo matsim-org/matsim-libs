@@ -182,7 +182,7 @@ public class PtPlansFileCreator {
 		pfc.setPop(scenario.getPopulation());
 		pfc.createPersons();
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork())
-				.writeFile(newPlansFilename);
+				.write(newPlansFilename);
 		System.out.println("done.");
 	}
 }

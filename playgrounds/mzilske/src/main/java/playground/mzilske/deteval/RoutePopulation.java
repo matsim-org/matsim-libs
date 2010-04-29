@@ -126,7 +126,7 @@ public class RoutePopulation {
 				scenario.getNetwork().removeNode(node.getId());
 			}
 		}
-		new NetworkWriter(scenario.getNetwork()).writeFile(scenario.getConfig().network().getOutputFile());
+		new NetworkWriter(scenario.getNetwork()).write(scenario.getConfig().network().getOutputFile());
 	}
 
 	/**

@@ -343,7 +343,7 @@ public class MyRuns {
 		psfaet.run(population);
 
 		logger.info("Writing plans file...");
-		new PopulationWriter(population, scenario.getNetwork()).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(population, scenario.getNetwork()).write(scenario.getConfig().plans().getOutputFile());
 		logger.info("Writing plans file...DONE.");
 	}
 

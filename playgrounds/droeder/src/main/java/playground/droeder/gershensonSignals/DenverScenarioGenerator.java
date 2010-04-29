@@ -99,7 +99,7 @@ public class DenverScenarioGenerator {
 		
 		//create and write config
 		createConfig(conf);
-		new ConfigWriter(conf).writeFile(CONFIGOUTPUTFILE);
+		new ConfigWriter(conf).write(CONFIGOUTPUTFILE);
 	}
 	
 	private void createSignalSystemsConfig (ScenarioImpl sc){

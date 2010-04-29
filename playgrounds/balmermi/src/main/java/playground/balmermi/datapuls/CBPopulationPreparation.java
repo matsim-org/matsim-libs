@@ -77,7 +77,7 @@ public class CBPopulationPreparation {
 		System.out.println("done. (stream population)");
 
 		System.out.println("writing facilities...");
-		new FacilitiesWriter(afs).writeFile(args[2].trim());
+		new FacilitiesWriter(afs).write(args[2].trim());
 		System.out.println("done. (writing facilities)");
 	}
 }

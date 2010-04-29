@@ -24,11 +24,11 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.internal.MatsimFileWriter;
+import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
-public class NetworkWriterHandlerImplTNodes implements MatsimFileWriter {
+public class NetworkWriterHandlerImplTNodes implements MatsimWriter {
 
 	private final NetworkLayer network;
 
@@ -36,7 +36,7 @@ public class NetworkWriterHandlerImplTNodes implements MatsimFileWriter {
 		this.network = network;
 	}
 
-	public void writeFile(String filename) {
+	public void write(String filename) {
 		try {
 
 			BufferedWriter out = IOUtils.getBufferedWriter(filename);

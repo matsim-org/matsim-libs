@@ -205,7 +205,7 @@ public class IncomeAttacher {
 
 	protected void writePop(String populationOutput){
 		log.info("   Writing plans...");
-		new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork()).writeFile(populationOutput);
+		new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork()).write(populationOutput);
 		log.info("   done.");
 	}
 

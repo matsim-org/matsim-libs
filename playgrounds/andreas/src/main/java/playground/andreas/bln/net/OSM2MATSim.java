@@ -121,7 +121,7 @@ public class OSM2MATSim {
 		
 		System.out.println("...done");
 		
-		new NetworkWriter(network).writeFile(outputFile + ".xml.gz");
+		new NetworkWriter(network).write(outputFile + ".xml.gz");
 		new NetworkCleaner().run(new String[] {outputFile + ".xml.gz", outputFile + "_cl.xml.gz"});
 		System.out.println("NetworkCleaner...done");
 
@@ -137,12 +137,12 @@ public class OSM2MATSim {
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 //		nsimply.setMergeLinkStats(true);
 		nsimply.run(network);
-		new NetworkWriter(network).writeFile(outputFile + "_cl_simple.xml.gz");
+		new NetworkWriter(network).write(outputFile + "_cl_simple.xml.gz");
 		System.out.println("NetworkSimplifier...done");
 		
 		NetworkSegmentDoubleLinks networkDoubleLinks = new NetworkSegmentDoubleLinks();
 		networkDoubleLinks.run(network);
-		new NetworkWriter(network).writeFile(outputFile + "_cl_simple_dl.xml.gz");
+		new NetworkWriter(network).write(outputFile + "_cl_simple_dl.xml.gz");
 		System.out.println("NetworkDoubleLinks...done");
 		System.out.println("Converting...done");
 

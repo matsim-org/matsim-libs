@@ -133,7 +133,7 @@ public class DataPrepare {
 	protected void createNetworkFromSchedule() {
 		NetworkLayer network = new NetworkLayer();
 		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), network, "tr_").createNetwork();
-		new NetworkWriter(network).writeFile(TRANSIT_NETWORK_FILE);
+		new NetworkWriter(network).write(TRANSIT_NETWORK_FILE);
 		try {
 			new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(TRANSIT_SCHEDULE_WITH_NETWORK_FILE);
 		} catch (IOException e) {
@@ -150,7 +150,7 @@ public class DataPrepare {
 			new MatsimNetworkReader(transitScenario).parse(TRANSIT_NETWORK_FILE);
 			new MatsimNetworkReader(streetScenario).parse(NETWORK_FILE);
 			MergeNetworks.merge(streetNetwork, "", transitNetwork, "", this.scenario.getNetwork());
-			new NetworkWriter(this.scenario.getNetwork()).writeFile(MULTIMODAL_NETWORK_FILE);
+			new NetworkWriter(this.scenario.getNetwork()).write(MULTIMODAL_NETWORK_FILE);
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -205,7 +205,7 @@ public class DataPrepare {
 		}
 
 		log.info("write routerNet.xml");
-		new NetworkWriter(visNet).writeFile("visNet.xml");
+		new NetworkWriter(visNet).write("visNet.xml");
 
 		log.info("start visualizer");
 		EventsManagerImpl events = new EventsManagerImpl();

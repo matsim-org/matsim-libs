@@ -52,7 +52,7 @@ public class NetworkCapacityReducer {
 				link.setFreespeed(link.getFreespeed()*0.9);
 			}
 		}
-		new NetworkWriter(this.network).writeFile(output);
+		new NetworkWriter(this.network).write(output);
 	}
 
 

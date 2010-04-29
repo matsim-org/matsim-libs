@@ -109,7 +109,7 @@ public class PrimaryLocationDrawing {
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), this.network,timeCostCalc, timeCostCalc, new DijkstraFactory());
 		router.run(pop);
-		new PopulationWriter(pop, this.network).writeFile(this.demandFilename);
+		new PopulationWriter(pop, this.network).write(this.demandFilename);
 	}
 
 

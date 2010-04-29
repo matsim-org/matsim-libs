@@ -128,7 +128,7 @@ public class MATSimConfigurationManager {
 			log.info("Start writing new MATSim config file.");
 			matimConfigFilePath = Constants.MATSIM_CONFIG_DIRECTORY + Constants.GENERATED_MATSIM_CONFIG_FILE_NAME;
 			ConfigWriter configWriter = new ConfigWriter(currentConfig);
-			configWriter.writeFile(matimConfigFilePath);
+			configWriter.write(matimConfigFilePath);
 			log.info("Writing new MATSim config file finished.");
 			
 			return true;

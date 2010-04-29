@@ -25,10 +25,10 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.SortedSet;
 
-import org.matsim.core.api.internal.MatsimFileWriter;
+import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class FacilitiesWriter extends MatsimXmlWriter implements MatsimFileWriter {
+public class FacilitiesWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	private FacilitiesWriterHandler handler = null;
 	private final ActivityFacilitiesImpl facilities;
@@ -55,7 +55,7 @@ public class FacilitiesWriter extends MatsimXmlWriter implements MatsimFileWrite
 	// write methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void writeFile(final String filename) {
+	public final void write(final String filename) {
 		this.writeOpenAndInit(filename);
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
 			this.writeFacility(f);

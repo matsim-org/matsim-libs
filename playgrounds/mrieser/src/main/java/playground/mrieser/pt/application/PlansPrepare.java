@@ -138,7 +138,7 @@ public class PlansPrepare {
 		log.info("# persons remaining: " + pop.getPersons().size());
 
 		log.info("writing plans to file: " + toFile);
-		new PopulationWriter(pop, this.scenario.getNetwork()).writeFile(toFile);
+		new PopulationWriter(pop, this.scenario.getNetwork()).write(toFile);
 	}
 
 	public static void main(final String[] args) {

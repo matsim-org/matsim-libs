@@ -51,7 +51,7 @@ public class MatsimSignalSystemConfigurationsWriter {
 	
 	
 	public void writeFile(String filename){
-		this.writerDelegate.writeFile(filename);
+		this.writerDelegate.write(filename);
 	}
 
 }

@@ -103,7 +103,7 @@ public class CMCFNetworkConverter {
 		}
 		try {
 			NetworkLayer network = readCMCFNetwork(inputfile);
-			new NetworkWriter(network).writeFile(outfile);
+			new NetworkWriter(network).write(outfile);
 			System.out.println(inputfile+"  converted successfully \n"+"output written in: "+outfile);
 		} catch (JDOMException e) {
 			e.printStackTrace();

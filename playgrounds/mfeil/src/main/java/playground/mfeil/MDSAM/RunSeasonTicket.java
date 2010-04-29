@@ -173,7 +173,7 @@ public class RunSeasonTicket {
 		log.info("No of assignments: "+nothing+" agents without any card, "+ht+" agents with Halbtax or similar, and "+ga+" agents with GA.");
 		log.info("No of assignments with key = "+withkey+", and without key "+nokey+".");
 
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scenario.getKnowledges()).writeFile(output_populationFilename);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scenario.getKnowledges()).write(output_populationFilename);
 
 		log.info("Process finished.");
 	}

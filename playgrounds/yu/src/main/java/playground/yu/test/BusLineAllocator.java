@@ -805,12 +805,12 @@ public class BusLineAllocator {
 				}
 			}
 		}
-		new PopulationWriter(pop, this.carNet).writeFile(newPopFile);
+		new PopulationWriter(pop, this.carNet).write(newPopFile);
 	}
 
 	private void generateNewNetwork(String newNetFilename) {
 		/*-----------carNetwork with only Bus----------*/
-		new NetworkWriter(this.carNet).writeFile(newNetFilename);
+		new NetworkWriter(this.carNet).write(newNetFilename);
 	}
 
 	/**

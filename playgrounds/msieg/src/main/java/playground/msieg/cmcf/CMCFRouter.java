@@ -137,7 +137,7 @@ public abstract class CMCFRouter {
 
 	public void writePlans(final String outPlansFile){
 		//MatsimIo.writePlans(this.population, outPlansFile);
-		new PopulationWriter(this.population, this.network).writeFile(outPlansFile);
+		new PopulationWriter(this.population, this.network).write(outPlansFile);
 	}
 
 	abstract public void route();

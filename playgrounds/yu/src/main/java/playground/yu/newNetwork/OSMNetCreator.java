@@ -118,6 +118,6 @@ public class OSMNetCreator {
 		}
 		System.out.println(down + " links should be degraded.");
 		System.out.println(degraded + " links were degraded.");
-		new NetworkWriter(network).writeFile(outputNetFilename);
+		new NetworkWriter(network).write(outputNetFilename);
 	}
 }

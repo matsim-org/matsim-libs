@@ -330,7 +330,7 @@ public class NullFallDataPrepare {
 			FileNotFoundException {
 		NetworkLayer network = scenario.getNetwork();
 		log.info("writing network to file.");
-		new NetworkWriter(network).writeFile(OutNetworkFile);
+		new NetworkWriter(network).write(OutNetworkFile);
 		log.info("writing TransitSchedule to file.");
 		new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(OutTransitScheduleFile);
 		log.info("writing vehicles to file.");

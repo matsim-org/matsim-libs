@@ -106,7 +106,7 @@ public class ScenarioFilter {
 				this.scenario.getNetwork().removeNode(node.getId());
 			}
 		}
-		new NetworkWriter(this.scenario.getNetwork()).writeFile(this.networkFileOut);
+		new NetworkWriter(this.scenario.getNetwork()).write(this.networkFileOut);
 
 		log.info("done.");
 	}

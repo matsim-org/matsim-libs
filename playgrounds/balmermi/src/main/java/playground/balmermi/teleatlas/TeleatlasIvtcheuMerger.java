@@ -186,6 +186,6 @@ public class TeleatlasIvtcheuMerger {
 		NetworkWriteAsTable nwat = new NetworkWriteAsTable("../../output/");
 		nwat.run(networkTeleatlas);
 
-		new NetworkWriter(networkTeleatlas).writeFile(outNetFile);
+		new NetworkWriter(networkTeleatlas).write(outNetFile);
 	}
 }

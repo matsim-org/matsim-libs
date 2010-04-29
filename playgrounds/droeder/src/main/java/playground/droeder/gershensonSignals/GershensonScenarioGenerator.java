@@ -119,7 +119,7 @@ public class GershensonScenarioGenerator {
 
 		//create the plans and write them
 		createPlans(scenario);
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(POPULATIONOUTPUTFILE);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(POPULATIONOUTPUTFILE);
 
 		if (isUseLanes) {
 			config.scenario().setUseLanes(true);
@@ -154,7 +154,7 @@ public class GershensonScenarioGenerator {
 
 		//create and write the config
 		createConfig(config);
-		new ConfigWriter(config).writeFile(CONFIGOUTPUTFILE);
+		new ConfigWriter(config).write(CONFIGOUTPUTFILE);
 
 
 

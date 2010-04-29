@@ -58,7 +58,7 @@ public class DoublePermlanesNetwork {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetFilename);
-		new NetworkWriter(network).writeFile(outputNetFilename);
+		new NetworkWriter(network).write(outputNetFilename);
 	}
 
 }

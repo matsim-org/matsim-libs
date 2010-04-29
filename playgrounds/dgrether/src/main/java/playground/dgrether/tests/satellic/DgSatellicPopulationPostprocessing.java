@@ -73,7 +73,7 @@ public class DgSatellicPopulationPostprocessing {
     
     //write the result
     PopulationWriter writer = new PopulationWriter(pop, network);
-    writer.writeFile(POPOUT);
+    writer.write(POPOUT);
     
   }
   

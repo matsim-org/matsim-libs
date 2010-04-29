@@ -143,7 +143,7 @@ public class IncreasingDemandRunner {
 
 			Gbl.getConfig().controler().setOutputDirectory(topDir+File.separatorChar+"out"+agents+"random");
 			Gbl.getConfig().plans().setInputFile(popFile);
-			new ConfigWriter(Gbl.getConfig()).writeFile(topDir+File.separatorChar+"config"+agents+"rand.xml");
+			new ConfigWriter(Gbl.getConfig()).write(topDir+File.separatorChar+"config"+agents+"rand.xml");
 
 			//Step 3: create demand file for cmcf
 			CMCFDemandWriter cdw = new CMCFDemandWriter(netFile, popFile);
@@ -201,7 +201,7 @@ public class IncreasingDemandRunner {
 			//Step 6: create new config File
 			Gbl.getConfig().controler().setOutputDirectory(topDir+File.separatorChar+"out"+agents+"routed");
 			Gbl.getConfig().plans().setInputFile(popFile);
-			new ConfigWriter(Gbl.getConfig()).writeFile(topDir+File.separatorChar+"config"+agents+"rout.xml");
+			new ConfigWriter(Gbl.getConfig()).write(topDir+File.separatorChar+"config"+agents+"rout.xml");
 		}
 	}
 }

@@ -189,8 +189,8 @@ public class LogicFactory{
 	}
 
 	public void writeLogicElements(final String outPlainNetFile, final String outTransitScheduleFile, final String outLogicNetFile ){
-		new NetworkWriter(logicNet).writeFile(outLogicNetFile);
-		new NetworkWriter(plainNet).writeFile(outPlainNetFile);
+		new NetworkWriter(logicNet).write(outLogicNetFile);
+		new NetworkWriter(plainNet).write(outPlainNetFile);
 		System.out.println("done.");
 	}
 

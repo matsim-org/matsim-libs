@@ -61,7 +61,7 @@ public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 	}	
 	
 	@Override
-	public void writeFile(final String filename) {
+	public void write(final String filename) {
 		log.info("writing file: " + filename);
   	JAXBContext jc;
 		try {

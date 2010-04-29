@@ -102,10 +102,10 @@ public class AssignShopAndLeisure {
 
 	private void writePlans(String variant) {
 		if (variant.equals("0")) {
-			new PopulationWriter(this.plans, this.network).writeFile(this.outpath + "plans0.xml.gz");
+			new PopulationWriter(this.plans, this.network).write(this.outpath + "plans0.xml.gz");
 		}
 		else {
-			new PopulationWriter(this.plans, this.network).writeFile(this.outpath + "plans1.xml.gz");
+			new PopulationWriter(this.plans, this.network).write(this.outpath + "plans1.xml.gz");
 		}
 	}
 }

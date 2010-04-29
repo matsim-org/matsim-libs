@@ -97,7 +97,7 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		}
 		testee.finishReplanning();
 
-		new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork()).writeFile(this.getOutputDirectory() + "output_plans.xml.gz");
+		new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork()).write(this.getOutputDirectory() + "output_plans.xml.gz");
 
 		// actual test: compare checksums of the files
 		final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + "plans.xml.gz");

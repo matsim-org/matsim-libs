@@ -47,7 +47,7 @@ public class OSM2MATSim {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		new NetworkWriter(network).writeFile("../mystudies/osmnet/switzerland-20090313.xml");
+		new NetworkWriter(network).write("../mystudies/osmnet/switzerland-20090313.xml");
 //		new NetworkWriter(network, "../mystudies/osmnet/zueri-20080410.xml").write();
 	}
 

@@ -120,7 +120,7 @@ public class CountsCreator {
 
 
 		CountsWriter cw = new CountsWriter(counts);
-		cw.writeFile("./output/counts.xml");
+		cw.write("./output/counts.xml");
 		log.info("counts written successfully to: ./output/counts.xml");
 	}
 

@@ -81,20 +81,20 @@ public class ScenarioCreation {
 
 		System.out.println("  writing matrices xml file... ");
 		MatricesWriter mat_writer = new MatricesWriter(matrices);
-		mat_writer.writeFile(config.matrices().getOutputFile());
+		mat_writer.write(config.matrices().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).writeFile(config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(scenario.getWorld());
-		world_writer.writeFile(config.world().getOutputFile());
+		world_writer.write(config.world().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		new ConfigWriter(config).writeFile(config.config().getOutputFile());
+		new ConfigWriter(config).write(config.config().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("TEST SUCCEEDED.");

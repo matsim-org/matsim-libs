@@ -70,7 +70,7 @@ public class Shp2Facilities {
 
 		}
 		
-		new FacilitiesWriter(facilities).writeFile("/home/nagel/landuse.xml.gz") ;
+		new FacilitiesWriter(facilities).write("/home/nagel/landuse.xml.gz") ;
 
 		return polygons; // not needed
 	}

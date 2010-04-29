@@ -71,7 +71,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 	 * {@link org.matsim.core.population.PopulationWriter}
 	 */
 	private void writePlans() {
-		new PopulationWriter(this.plans, this.network).writeFile(this.filename);
+		new PopulationWriter(this.plans, this.network).write(this.filename);
 	}
 
 	public void addAgent(final AgentSnapshotInfo position) {

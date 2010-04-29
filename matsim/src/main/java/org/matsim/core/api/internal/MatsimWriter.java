@@ -21,13 +21,11 @@
 package org.matsim.core.api.internal;
 
 /**
- * standardization interface.  Unfortunately, there is write(String) (this interface) and write() (MatsimWriter interface).
- * 
  * @author nagel
  *
  */
 public interface MatsimWriter extends MatsimSomeWriter {
 	
-	void write( String filename ) ;
+	public void write( String filename ) ;
 
 }

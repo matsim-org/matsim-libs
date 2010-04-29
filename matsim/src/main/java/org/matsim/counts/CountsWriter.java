@@ -28,11 +28,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.core.api.internal.MatsimFileWriter;
+import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class CountsWriter extends MatsimXmlWriter implements MatsimFileWriter {
+public class CountsWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	private CountsWriterHandler handler = null;
 	private final Counts counts;
@@ -44,7 +44,7 @@ public class CountsWriter extends MatsimXmlWriter implements MatsimFileWriter {
 		this.handler = new CountsWriterHandlerImplV1();
 	}
 
-	public final void writeFile(final String filename) {
+	public final void write(final String filename) {
 		try {
 			openFile(filename);
 

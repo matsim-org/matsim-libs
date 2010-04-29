@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.internal.MatsimFileWriter;
+import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -42,7 +42,7 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Desires;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
-public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWriter, PersonAlgorithm {
+public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, PersonAlgorithm {
 
 	private final double write_person_fraction;
 	private boolean fileOpened = false;
@@ -254,7 +254,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWrite
 	/**
 	 * Writes all plans to the file. If plans-streaming is on, this will end the writing and close the file.
 	 */
-	private void write(final String filename) {
+	public void write(final String filename) {
 //		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
 //			log.info("PlansStreaming is on -- plans already written, just closing file if it's open.");
 //			if (this.fileOpened) {
@@ -265,6 +265,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWrite
 			this.writePersons();
 			this.writeEndPlans();
 //		}
+			log.info("Population written to: " + filename);
 	}
 
 	public void writeFileV0(final String filename) {
@@ -277,15 +278,15 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWrite
 		write(filename);
 	}
 
-	/**
-	 * Writes all plans to the file.
-	 *
-	 * @param filename path to the file.
-	 */
-	public void writeFile(final String filename){
-		write(filename);
-		log.info("Population written to: " + filename);
-	}
+//	/**
+//	 * Writes all plans to the file.
+//	 *
+//	 * @param filename path to the file.
+//	 */
+//	public void writeFile(final String filename){
+//		write(filename);
+//		log.info("Population written to: " + filename);
+//	}
 
 	public PopulationWriterHandler getHandler() {
 		return this.handler;

@@ -182,7 +182,7 @@ public class ExternalModule implements PlanStrategyModule {
 	}
 
 	private void writeExternalExeConfig() {
-		new ConfigWriter(this.extConfig).writeFile(this.outFileRoot + this.moduleId + ExternalConfigFileName);
+		new ConfigWriter(this.extConfig).write(this.outFileRoot + this.moduleId + ExternalConfigFileName);
 	}
 
 	private boolean callExe() {

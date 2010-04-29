@@ -75,6 +75,6 @@ public class FacilitiesCreation {
 		new FacilitiesAddDataPulsBuildings(args[2]).run(facilities);
 		log.info("number of facilities ec2000 & tta & datapuls: "+facilities.getFacilities().size());
 
-		new FacilitiesWriter(facilities).writeFile(args[3]);
+		new FacilitiesWriter(facilities).write(args[3]);
 	}
 }

@@ -25,11 +25,11 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.internal.MatsimFileWriter;
+import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class WorldWriter extends MatsimXmlWriter implements MatsimFileWriter {
+public class WorldWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -113,7 +113,7 @@ public class WorldWriter extends MatsimXmlWriter implements MatsimFileWriter {
 	// write methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void writeFile(final String filename) {
+	public final void write(final String filename) {
 		try {
 			openFile(filename);
 			writeXmlHead();

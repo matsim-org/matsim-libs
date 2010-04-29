@@ -44,7 +44,7 @@ public class PlansDumping implements BeforeMobsimListener {
 			controler.stopwatch.beginOperation("dump all plans");
 			log.info("dumping plans...");
 			new PopulationWriter(controler.getPopulation(), controler.getNetwork(), controler.getScenario().getKnowledges())
-				.writeFile(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "plans.xml.gz"));
+				.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "plans.xml.gz"));
 			log.info("finished plans dump.");
 			controler.stopwatch.endOperation("dump all plans");
 		}

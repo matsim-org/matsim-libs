@@ -145,16 +145,16 @@ public class IIDMGenerationPart2 {
 		log.info("  done.");
 
 		log.info("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).writeFile(config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.writeFile(config.world().getOutputFile());
+		world_writer.write(config.world().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");
-		new ConfigWriter(config).writeFile(config.config().getOutputFile());
+		new ConfigWriter(config).write(config.config().getOutputFile());
 		log.info("  done.");
 
 		log.info("done.");

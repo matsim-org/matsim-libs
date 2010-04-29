@@ -438,7 +438,7 @@ public class TeleatlasConverter45v101 {
 		outputDir.mkdir();
 		data = null;
 		reader = null;
-		new NetworkWriter(scenario.getNetwork()).writeFile(outputDir.toString()+"/network.xml");
+		new NetworkWriter(scenario.getNetwork()).write(outputDir.toString()+"/network.xml");
 		new NetworkWriteAsTable(outputDir.toString()).run((NetworkLayer) scenario.getNetwork());
 
 		log.info("clean network...");
@@ -447,7 +447,7 @@ public class TeleatlasConverter45v101 {
 		log.info("write cleaned network...");
 		outputDir = new File(outdir+"/cleaned");
 		outputDir.mkdir();
-		new NetworkWriter(scenario.getNetwork()).writeFile(outputDir.toString()+"/network.xml");
+		new NetworkWriter(scenario.getNetwork()).write(outputDir.toString()+"/network.xml");
 		new NetworkWriteAsTable(outputDir.toString()).run((NetworkLayer) scenario.getNetwork());
 
 		log.info("fix double links...");
@@ -456,7 +456,7 @@ public class TeleatlasConverter45v101 {
 		log.info("write final version of network...");
 		outputDir = new File(outdir+"/final");
 		outputDir.mkdir();
-		new NetworkWriter(scenario.getNetwork()).writeFile(outputDir.toString()+"/network.xml");
+		new NetworkWriter(scenario.getNetwork()).write(outputDir.toString()+"/network.xml");
 		new NetworkWriteAsTable(outputDir.toString()).run((NetworkLayer) scenario.getNetwork());
 
 		log.info("done.");

@@ -64,7 +64,7 @@ public class CountsParserWriterTest extends MatsimTestCase {
 
 		String filename = this.getOutputDirectory() + "output_counts.xml";
 		CountsWriter counts_writer = new CountsWriter(fixture.counts);
-		counts_writer.writeFile(filename);
+		counts_writer.write(filename);
 		File f = new File(filename);
 		assertTrue(f.length() > 0.0);
 	}

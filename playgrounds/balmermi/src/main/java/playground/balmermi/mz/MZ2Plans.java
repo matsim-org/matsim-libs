@@ -67,7 +67,7 @@ public class MZ2Plans {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans, null).writeFile(config.plans().getOutputFile());
+		new PopulationWriter(plans, null).write(config.plans().getOutputFile());
 		System.out.println("  done.");
 
 //		System.out.println("  writing config xml file... ");

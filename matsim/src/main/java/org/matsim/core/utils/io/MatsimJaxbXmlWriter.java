@@ -22,7 +22,7 @@ package org.matsim.core.utils.io;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 
-import org.matsim.core.api.internal.MatsimFileWriter;
+import org.matsim.core.api.internal.MatsimWriter;
 
 
 
@@ -35,7 +35,7 @@ import org.matsim.core.api.internal.MatsimFileWriter;
  * @author dgrether
  *
  */
-public abstract class MatsimJaxbXmlWriter implements MatsimFileWriter {
+public abstract class MatsimJaxbXmlWriter implements MatsimWriter {
 
 	public void setMarshallerProperties(String schemaLocation, Marshaller m) throws PropertyException  {
 		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, 
@@ -44,6 +44,6 @@ public abstract class MatsimJaxbXmlWriter implements MatsimFileWriter {
 	}
 
 	
-	public abstract void writeFile(String filename);
+	public abstract void write(String filename);
 	
 }

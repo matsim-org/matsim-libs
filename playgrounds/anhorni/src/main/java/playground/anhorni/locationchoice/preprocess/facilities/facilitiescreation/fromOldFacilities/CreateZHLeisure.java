@@ -81,6 +81,6 @@ public class CreateZHLeisure {
 	
 	private void writeFacilities() {
 		log.info("Number of facilities: " + this.facilities.getFacilities().size());
-		new FacilitiesWriter(this.facilities).writeFile("output/facilitiesgeneration/facilities.xml.gz");
+		new FacilitiesWriter(this.facilities).write("output/facilitiesgeneration/facilities.xml.gz");
 	}
 }

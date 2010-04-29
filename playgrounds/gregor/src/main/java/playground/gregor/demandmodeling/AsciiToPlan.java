@@ -156,7 +156,7 @@ public class AsciiToPlan {
 		} while(zeile!=null);
 
 		//Alles fertig --- Ergebnis ausgeben.
-		new PopulationWriter(pop, sc.getNetwork()).writeFile(OUTPUT_FILE);
+		new PopulationWriter(pop, sc.getNetwork()).write(OUTPUT_FILE);
 		System.out.println("Ausgabe erzeugt");
 
 

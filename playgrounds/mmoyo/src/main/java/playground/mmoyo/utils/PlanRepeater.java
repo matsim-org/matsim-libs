@@ -56,7 +56,7 @@ public class PlanRepeater {
 		
 		//write this strange population in output
 		System.out.println("writing output plan file...");
-		new PopulationWriter(population, scenarioImpl.getNetwork()).writeFile(scenarioImpl.getConfig().controler().getOutputDirectory() + repetitions + ".xml");
+		new PopulationWriter(population, scenarioImpl.getNetwork()).write(scenarioImpl.getConfig().controler().getOutputDirectory() + repetitions + ".xml");
 		System.out.println("Done");
 	
 	}

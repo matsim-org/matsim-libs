@@ -53,7 +53,7 @@ public class ImportCounts {
 		counts.setYear(666);
 		counts.setName("Uwe");
 		counts.setLayer("7");
-		countsWriter.writeFile(COUNTS_FILE);
+		countsWriter.write(COUNTS_FILE);
 	}
 	
 	private void rereadCounts() throws SAXException, ParserConfigurationException, IOException {

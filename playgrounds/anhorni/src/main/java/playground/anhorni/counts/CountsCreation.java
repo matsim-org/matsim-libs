@@ -53,13 +53,13 @@ public class CountsCreation {
 		converter.convert(stations.getCountStations());
 		
 		CountsWriter writer = new CountsWriter(converter.getCountsIVTCH());
-		writer.writeFile("output/counts/countsIVTCH.xml");
+		writer.write("output/counts/countsIVTCH.xml");
 		writer = new CountsWriter(converter.getCountsAre());
-		writer.writeFile("output/counts/countsAre.xml");
+		writer.write("output/counts/countsAre.xml");
 		writer = new CountsWriter(converter.getCountsTeleatlas());
-		writer.writeFile("output/counts/countsTeleatlas.xml");
+		writer.write("output/counts/countsTeleatlas.xml");
 		writer = new CountsWriter(converter.getCountsNavteq());
-		writer.writeFile("output/counts/countsNAVTEQ.xml");
+		writer.write("output/counts/countsNAVTEQ.xml");
 
 		
 		// Summary:
@@ -74,24 +74,24 @@ public class CountsCreation {
 		MatsimCountsReader countsReaderTele = new MatsimCountsReader(countsTele);
 		countsReaderTele.readFile("input/counts/original/countsTele.xml");
 		CountsWriter countsWriterTele = new CountsWriter(countsTele);
-		countsWriterTele.writeFile("output/counts/original/countsTele_original.xml");
+		countsWriterTele.write("output/counts/original/countsTele_original.xml");
 		
 		Counts countsIVTCH = new Counts();
 		MatsimCountsReader countsReaderIVTCH = new MatsimCountsReader(countsIVTCH);
 		countsReaderIVTCH.readFile("input/counts/original/countsIVTCH.xml");
 		CountsWriter countsWriterIVTCH = new CountsWriter(countsIVTCH);
-		countsWriterIVTCH.writeFile("output/counts/original/countsIVTCH_original.xml");	
+		countsWriterIVTCH.write("output/counts/original/countsIVTCH_original.xml");	
 		
 		Counts countsARE = new Counts();
 		MatsimCountsReader countsReaderARE = new MatsimCountsReader(countsARE);
 		countsReaderARE.readFile("input/counts/original/countsARE.xml");
 		CountsWriter countsWriterAre = new CountsWriter(countsARE);
-		countsWriterAre.writeFile("output/counts/original/countsAre_original.xml");
+		countsWriterAre.write("output/counts/original/countsAre_original.xml");
 		
 		Counts countsNAVTEQ = new Counts();
 		MatsimCountsReader countsReaderNAVTEQ = new MatsimCountsReader(countsNAVTEQ);
 		countsReaderNAVTEQ.readFile("input/counts/original/countsNAVTEQ.xml");
 		CountsWriter countsWriterNAVTEQ = new CountsWriter(countsNAVTEQ);
-		countsWriterNAVTEQ.writeFile("output/counts/original/countsNavteq_original.xml");
+		countsWriterNAVTEQ.write("output/counts/original/countsNavteq_original.xml");
 	}
 }

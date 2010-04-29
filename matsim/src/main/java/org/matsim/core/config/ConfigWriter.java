@@ -24,11 +24,11 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.matsim.core.api.internal.MatsimFileWriter;
+import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class ConfigWriter extends MatsimXmlWriter implements MatsimFileWriter {
+public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -64,7 +64,7 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimFileWriter {
 		}
 	}
 
-	public final void writeFile(final String filename) {
+	public final void write(final String filename) {
 		try {
 			openFile(filename);
 			write();

@@ -292,9 +292,9 @@ public class ScenarioCut {
 			reducePopulation(scenario);
 		}
 		calcExtent(scenario);
-		new NetworkWriter(scenario.getNetwork()).writeFile(scenario.getConfig().network().getOutputFile());
-		new FacilitiesWriter(scenario.getActivityFacilities()).writeFile(scenario.getConfig().facilities().getOutputFile());
-		new PopulationWriter(scenario.getPopulation(),scenario.getNetwork(), scenario.getKnowledges()).writeFile(scenario.getConfig().plans().getOutputFile());
+		new NetworkWriter(scenario.getNetwork()).write(scenario.getConfig().network().getOutputFile());
+		new FacilitiesWriter(scenario.getActivityFacilities()).write(scenario.getConfig().facilities().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(),scenario.getNetwork(), scenario.getKnowledges()).write(scenario.getConfig().plans().getOutputFile());
 	}
 
 	//////////////////////////////////////////////////////////////////////

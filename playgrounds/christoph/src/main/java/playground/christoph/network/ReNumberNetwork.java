@@ -97,7 +97,7 @@ public class ReNumberNetwork {
 		for (Node node : newNodes) network.addNode(node);
 		for (Node node : oldNodes) network.getNodes().remove(node.getId());
 		
-		new NetworkWriter(network).writeFile(outputNetworkFile);
+		new NetworkWriter(network).write(outputNetworkFile);
 			
 		log.info("done!");
 	}

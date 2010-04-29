@@ -83,9 +83,9 @@ public class CreateTransimsNetwork {
 		}
 
 		System.out.println("writing links to " + linksFileName);
-		new NetworkWriterHandlerImplTLinks(network).writeFile(linksFileName);
+		new NetworkWriterHandlerImplTLinks(network).write(linksFileName);
 		System.out.println("writing nodes to " + nodesFileName);
-		new NetworkWriterHandlerImplTNodes(network).writeFile(nodesFileName);
+		new NetworkWriterHandlerImplTNodes(network).write(nodesFileName);
 	}
 
 	private boolean chooseFile() {

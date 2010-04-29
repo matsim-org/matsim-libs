@@ -102,7 +102,7 @@ public class NetworkCutter {
 
 		run(network, pop);
 
-		new NetworkWriter(network).writeFile(outputNetworkFile);
+		new NetworkWriter(network).write(outputNetworkFile);
 	}
 
 	public void run(Network net, Population pop) {

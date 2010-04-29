@@ -63,10 +63,10 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter {
 	}
 
 	/**
-	 * @see org.matsim.core.utils.io.MatsimJaxbXmlWriter#writeFile(java.lang.String)
+	 * @see org.matsim.core.utils.io.MatsimJaxbXmlWriter#write(java.lang.String)
 	 */
 	@Override
-	public void writeFile(String filename) {
+	public void write(String filename) {
 		log.info("writing to file: " + filename);
   	JAXBContext jc;
 		try {

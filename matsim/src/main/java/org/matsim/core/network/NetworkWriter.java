@@ -25,11 +25,11 @@ import java.io.IOException;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.internal.MatsimFileWriter;
+import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class NetworkWriter extends MatsimXmlWriter implements MatsimFileWriter {
+public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	private final Network network;
 
@@ -38,7 +38,7 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimFileWriter {
 		this.network = network;
 	}
 
-	public void writeFile(final String filename) {
+	public void write(final String filename) {
 		// always write out in newest version, currently v1
 		writeFileV1(filename);
 	}

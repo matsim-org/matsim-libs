@@ -34,7 +34,7 @@ public class NetworkWriterReaderV1Test extends AbstractNetworkWriterReaderTest {
 
 	@Override
 	protected void writeNetwork(final NetworkLayer network, final String filename) {
-		new NetworkWriter(network).writeFile(filename);
+		new NetworkWriter(network).write(filename);
 	}
 	
 	@Override

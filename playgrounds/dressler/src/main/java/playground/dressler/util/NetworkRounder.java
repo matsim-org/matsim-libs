@@ -155,12 +155,12 @@ public class NetworkRounder {
 
 		if (outputfile_forEAF != null) {
 		  NetworkLayer network = roundNetwork(inputfile,cap, flowCapacityFactor, lengthFactor, true);
-		  new NetworkWriter(network).writeFile(outputfile_forEAF);
+		  new NetworkWriter(network).write(outputfile_forEAF);
 		}
 		if (outputfile_forMatsim != null) {
 			  // Matsim needs the real transit time ("false") & capacity ("1.0d")
 			  NetworkLayer network = roundNetwork(inputfile,cap, 1.0d, lengthFactor, false);
-			  new NetworkWriter(network).writeFile(outputfile_forMatsim);
+			  new NetworkWriter(network).write(outputfile_forMatsim);
 		}
 	}
 }

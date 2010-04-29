@@ -41,7 +41,7 @@ public class ConnectHomesAndWorkplacesSimple {
 
 		// program locachoice here
 
-		new PopulationWriter(population, scenario.getNetwork()).writeFile("newfilename");
+		new PopulationWriter(population, scenario.getNetwork()).write("newfilename");
 
 	}
 

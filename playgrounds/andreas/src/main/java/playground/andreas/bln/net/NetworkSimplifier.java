@@ -209,7 +209,7 @@ public class NetworkSimplifier {
 //		nsimply.setMergeLinkStats(true);
 		nsimply.run(network);
 
-		new NetworkWriter(network).writeFile("./bb_5.out.xml.gz");
+		new NetworkWriter(network).write("./bb_5.out.xml.gz");
 
 	}
 }

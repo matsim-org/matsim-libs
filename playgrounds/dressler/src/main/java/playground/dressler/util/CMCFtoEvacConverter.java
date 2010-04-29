@@ -174,10 +174,10 @@ public class CMCFtoEvacConverter {
 
 		try {
 			NetworkLayer network = constructNetwork(networkfile, demandfile);
-			new NetworkWriter(network).writeFile(networkfileout);
+			new NetworkWriter(network).write(networkfileout);
 			System.out.println(networkfile+"  converted successfully \n"+"output written in: "+networkfileout);
 			Population population = readCMCFDemands(demandfile, network, false);
-			new PopulationWriter(population, network).writeFile(plansfileout);
+			new PopulationWriter(population, network).write(plansfileout);
 			System.out.println(demandfile+"converted succssfully \n"+"output written in :\n"+plansfileout);
 		} catch (JDOMException e) {
 			e.printStackTrace();

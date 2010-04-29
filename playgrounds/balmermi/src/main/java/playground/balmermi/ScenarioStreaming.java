@@ -133,11 +133,11 @@ public class ScenarioStreaming {
 		System.out.println("done. (complete world)");
 
 		System.out.println("writing facilities...");
-		new FacilitiesWriter(af).writeFile(config.facilities().getOutputFile());
+		new FacilitiesWriter(af).write(config.facilities().getOutputFile());
 		System.out.println("done. (writing facilities)");
 
 		System.out.println("writing network...");
-		new NetworkWriter(network).writeFile(config.network().getOutputFile());
+		new NetworkWriter(network).write(config.network().getOutputFile());
 		System.out.println("done. (writing network)");
 
 		final PopulationImpl population = (PopulationImpl) sl.getScenario().getPopulation();

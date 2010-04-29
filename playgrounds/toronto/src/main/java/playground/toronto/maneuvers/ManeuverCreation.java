@@ -66,7 +66,7 @@ public class ManeuverCreation {
 		new NetworkCleaner().run(network);
 
 		System.out.println("writing xml file...");
-		new NetworkWriter(network).writeFile(outputdir+"/output_network.xml.gz");
+		new NetworkWriter(network).write(outputdir+"/output_network.xml.gz");
 		System.out.println("done.");
 
 //		System.out.println("writing txt files...");

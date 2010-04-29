@@ -105,7 +105,7 @@ public class CountsWithUpdatedNetwork {
 		counts
 				.setDescription(counts.getDescription()
 						+ "This countsfile was also fitted to the new openStreetMap-network");
-		new CountsWriter(counts).writeFile(newCountsFilename);
+		new CountsWriter(counts).write(newCountsFilename);
 	}
 	/*
 	 * //old counts --> old links --> old coords --> nearest links --> new links

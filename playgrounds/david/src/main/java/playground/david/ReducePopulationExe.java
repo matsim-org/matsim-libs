@@ -230,7 +230,7 @@ public class ReducePopulationExe {
 			network.removeLink(link.getId());
 		}
 
-		new NetworkWriter(network).writeFile(outnetFileName);
+		new NetworkWriter(network).write(outnetFileName);
 
 	}
 

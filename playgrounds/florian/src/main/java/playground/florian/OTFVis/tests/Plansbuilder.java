@@ -123,7 +123,7 @@ public class Plansbuilder {
 		// Output
 		Long size = Math.round((KONT_PLAENE+RUSH_PLAENE) * SAMPLE_SIZE);
 		String OUTPUT = OUTPUT_FOLDER + "/plans" + size.toString() + ".xml";
-		new PopulationWriter(pop,net,SAMPLE_SIZE).writeFile(OUTPUT);
+		new PopulationWriter(pop,net,SAMPLE_SIZE).write(OUTPUT);
 		System.out.println("Output in " + OUTPUT + " is done");
 
 	}

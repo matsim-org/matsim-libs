@@ -119,7 +119,7 @@ public class ExternalMobsim {
 		module.addParam("startTime", simConfig.getParam(CONFIG_MODULE, "startTime"));
 		module.addParam("endTime", simConfig.getParam(CONFIG_MODULE, "endTime"));
 
-		new ConfigWriter(extConfig).writeFile(iterationConfigFile);
+		new ConfigWriter(extConfig).write(iterationConfigFile);
 	}
 
 	protected void writePlans(final String iterationPlansFile) throws FileNotFoundException, IOException {

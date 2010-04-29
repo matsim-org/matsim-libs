@@ -127,7 +127,7 @@ public class MATSim4Urbansim {
 		readFromUrbansim.readFacilities(facilities, zones);
 
 		// write the facilities from the urbansim parcel model as a compressed locations.xml file into the temporary directory as input for ???
-		new FacilitiesWriter(facilities).writeFile( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "locations.xml.gz" );
+		new FacilitiesWriter(facilities).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "locations.xml.gz" );
 
 		// read urbansim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
@@ -150,7 +150,7 @@ public class MATSim4Urbansim {
 		oldPopulation=null ;
 		System.gc() ;
 
-		new PopulationWriter(newPopulation,network).writeFile( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "pop.xml.gz" );
+		new PopulationWriter(newPopulation,network).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "pop.xml.gz" );
 
 		log.info("### DONE with demand generation from urbansim ###") ;
 

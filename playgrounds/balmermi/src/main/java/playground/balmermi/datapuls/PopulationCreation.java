@@ -91,7 +91,7 @@ public class PopulationCreation {
 		System.out.println("done. (running modules)");
 
 		System.out.println("writing population...");
-		new PopulationWriter(datapulsPopulation,sl.getScenario().getNetwork(), datapulsKnowledges).writeFile(args[3]);
+		new PopulationWriter(datapulsPopulation,sl.getScenario().getNetwork(), datapulsKnowledges).write(args[3]);
 		System.out.println("done. (writing population)");
 	}
 }

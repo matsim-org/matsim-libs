@@ -75,6 +75,6 @@ public class NetworkCleaner {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		new NetworkWriter(network).writeFile(outputNetFilename);
+		new NetworkWriter(network).write(outputNetFilename);
 	}
 }

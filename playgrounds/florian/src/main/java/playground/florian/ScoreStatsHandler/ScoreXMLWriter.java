@@ -23,7 +23,7 @@ public class ScoreXMLWriter extends MatsimJaxbXmlWriter {
 	
 
 	@Override
-	public void writeFile(String filename) {
+	public void write(String filename) {
 		JAXBContext jc;
 		try {
 			jc = JAXBContext.newInstance(playground.florian.jaxb.scores01.ObjectFactory.class);

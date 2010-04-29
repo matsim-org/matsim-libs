@@ -121,7 +121,7 @@ public class EmptyPlans {
 			router.run(plan);
 		}
 
-		new PopulationWriter(population, network).writeFile(outputplansfile);
+		new PopulationWriter(population, network).write(outputplansfile);
 
 		if(_debug){
 			System.out.println("done");

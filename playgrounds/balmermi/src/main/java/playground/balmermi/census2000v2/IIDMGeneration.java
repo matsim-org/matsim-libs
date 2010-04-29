@@ -189,7 +189,7 @@ public class IIDMGeneration {
 		log.info("  done.");
 
 		log.info("  writing plans xml file... ");
-		new PopulationWriter(pop, scenario.getNetwork()).writeFile(config.plans().getOutputFile());
+		new PopulationWriter(pop, scenario.getNetwork()).write(config.plans().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing f2z_mapping... ");
@@ -197,16 +197,16 @@ public class IIDMGeneration {
 		log.info("  done.");
 
 		log.info("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).writeFile(config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.writeFile(config.world().getOutputFile());
+		world_writer.write(config.world().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");
-		new ConfigWriter(config).writeFile(config.config().getOutputFile());
+		new ConfigWriter(config).write(config.config().getOutputFile());
 		log.info("  done.");
 
 		log.info("done.");

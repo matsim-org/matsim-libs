@@ -201,7 +201,7 @@ public class GenerateChoiceSets {
 		}
 		else {
 			this.choiceSetPopulation = this.createChoiceSetPopulationFromMZ();
-			new PopulationWriter(this.choiceSetPopulation, this.network).writeFile(this.outdir+"/MZPopulation.txt");
+			new PopulationWriter(this.choiceSetPopulation, this.network).write(this.outdir+"/MZPopulation.txt");
 
 			// TODO: maybe also optimize area?
 			this.choiceSets.setCarChoiceSets(this.filter.apply(this.choiceSetPopulation, "car"));

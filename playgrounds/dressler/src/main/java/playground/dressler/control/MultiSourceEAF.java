@@ -1006,7 +1006,7 @@ public class MultiSourceEAF {
 			HashMap<Id,Id> sinkreplacement = new HashMap<Id,Id>();
 			sinkreplacement.put(new IdImpl("en1"), new IdImpl("el1"));
 			Population output = fluss.createPopulation(scenario, sinkreplacement);
-			new PopulationWriter(output, network).writeFile(outputplansfile);
+			new PopulationWriter(output, network).write(outputplansfile);
 		}
 
 

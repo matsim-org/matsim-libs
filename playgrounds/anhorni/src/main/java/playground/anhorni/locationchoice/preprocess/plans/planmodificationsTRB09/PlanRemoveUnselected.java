@@ -90,7 +90,7 @@ public class PlanRemoveUnselected {
 	}
 
 	private void writePlans() {
-		new PopulationWriter(this.plans, this.network).writeFile(this.outputpath);
+		new PopulationWriter(this.plans, this.network).write(this.outputpath);
 		log.info("plans written to: " + this.outputpath);
 	}
 

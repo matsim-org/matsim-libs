@@ -112,7 +112,7 @@ public class CreatePlans {
 
 
 
-		new PopulationWriter(plans, scenario.getNetwork()).writeFile(config.plans().getOutputFile());
+		new PopulationWriter(plans, scenario.getNetwork()).write(config.plans().getOutputFile());
 	}
 
 }

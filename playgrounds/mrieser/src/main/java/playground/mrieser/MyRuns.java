@@ -160,7 +160,7 @@ public class MyRuns {
 		new PlansFilterByLegMode(TransportMode.car, false).run(scenario.getPopulation());
 
 		System.out.println("  writing plans...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(scenario.getConfig().plans().getOutputFile());
 
 		System.out.println("RUN: filterCars finished.");
 		System.out.println();
@@ -183,7 +183,7 @@ public class MyRuns {
 		new PlansFilterByLegMode(TransportMode.pt, true).run(plans);
 
 		System.out.println("  writing plans...");
-		new PopulationWriter(plans, scenario.getNetwork()).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(plans, scenario.getNetwork()).write(scenario.getConfig().plans().getOutputFile());
 
 		System.out.println("RUN: filterPt finished.");
 		System.out.println();
@@ -205,7 +205,7 @@ public class MyRuns {
 		new PersonRemovePlansWithoutLegs().run(scenario.getPopulation());
 		new PlansFilterPersonHasPlans().run(scenario.getPopulation());
 
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(scenario.getConfig().plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("RUN: filterWork finished.");
@@ -221,7 +221,7 @@ public class MyRuns {
 		new PlanFilterActTypes(new String[] {"work1", "work2", "work3", "edu", "uni"}).run(scenario.getPopulation());
 		new PlansFilterPersonHasPlans().run(scenario.getPopulation());
 
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(scenario.getConfig().plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("RUN: filterWorkEdu finished.");
@@ -297,7 +297,7 @@ public class MyRuns {
 
 		System.out.println("  writing the network...");
 		final NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.writeFile(sl.getScenario().getConfig().network().getOutputFile());
+		network_writer.write(sl.getScenario().getConfig().network().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("RUN: calcNofLanes finished.");
@@ -364,7 +364,7 @@ public class MyRuns {
 
 		System.out.println("  writing the falsified network...");
 		final NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.writeFile(sl.getScenario().getConfig().network().getOutputFile());
+		network_writer.write(sl.getScenario().getConfig().network().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  processing plans...");

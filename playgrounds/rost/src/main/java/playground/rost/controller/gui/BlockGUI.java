@@ -82,7 +82,7 @@ public class BlockGUI extends AbstractBasicMapGUIImpl {
 	protected void writeNetworkAndBlocks()
 	{
 		//write Network
-		new NetworkWriter(network).writeFile(PathTracker.resolve("flatNetwork"));
+		new NetworkWriter(network).write(PathTracker.resolve("flatNetwork"));
 		Blocks blockCollection = new Blocks(blockCreator.blocks);
 		try {
 			blockCollection.writeXMLFile(PathTracker.resolve("flatNetworkBlocks"));

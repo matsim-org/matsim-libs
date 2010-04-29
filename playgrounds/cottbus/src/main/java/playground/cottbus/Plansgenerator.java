@@ -81,7 +81,7 @@ public class Plansgenerator {
 			createPortland(HOME_END_TIME);
 		}
 
-		new PopulationWriter(this.plans, this.network).writeFile(plansOut);
+		new PopulationWriter(this.plans, this.network).write(plansOut);
 	}
 
 	/**

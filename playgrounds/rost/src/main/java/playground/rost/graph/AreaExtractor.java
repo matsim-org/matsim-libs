@@ -139,7 +139,7 @@ public class AreaExtractor {
 		Set<String> nodeIdsBorder = new HashSet<String>();
 		extractNetwork(border, network, nodeIdsInArea, nodeIdsBorder);
 		//write Network
-		new NetworkWriter(network).writeFile(networkFile);
+		new NetworkWriter(network).write(networkFile);
 		//write EvacArea
 		EvacArea eArea = new EvacArea(nodeIdsInArea, nodeIdsBorder, border.getDistHull());
 		try

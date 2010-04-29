@@ -181,23 +181,23 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 
 		log.info("  writing plans xml file... ");
-		new PopulationWriter(plans, network, kn).writeFile(this.config.plans().getOutputFile());
+		new PopulationWriter(plans, network, kn).write(this.config.plans().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing network xml file... ");
-		new NetworkWriter(network).writeFile(this.config.network().getOutputFile());
+		new NetworkWriter(network).write(this.config.network().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).writeFile(this.config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(this.config.facilities().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing world xml file... ");
-		new WorldWriter(world).writeFile(this.config.world().getOutputFile());
+		new WorldWriter(world).write(this.config.world().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");
-		new ConfigWriter(this.config).writeFile(this.config.config().getOutputFile());
+		new ConfigWriter(this.config).write(this.config.config().getOutputFile());
 		log.info("  done.");
 
 		this.compareOutputNetwork();

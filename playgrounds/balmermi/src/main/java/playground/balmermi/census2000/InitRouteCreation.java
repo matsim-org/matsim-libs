@@ -81,11 +81,11 @@ public class InitRouteCreation {
 
 		System.out.println("  writing network xml file... ");
 		NetworkWriter net_writer = new NetworkWriter(network);
-		net_writer.writeFile(config.network().getOutputFile());
+		net_writer.write(config.network().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		new ConfigWriter(config).writeFile(config.config().getOutputFile());
+		new ConfigWriter(config).write(config.config().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("done.");
