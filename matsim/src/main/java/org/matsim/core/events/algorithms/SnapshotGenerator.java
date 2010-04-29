@@ -20,7 +20,6 @@
 
 package org.matsim.core.events.algorithms;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -48,9 +47,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.netvis.DisplayNetStateWriter;
-import org.matsim.vis.netvis.DrawableAgentI;
-import org.matsim.vis.netvis.VisConfig;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
@@ -198,7 +194,6 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		private final double storageCapFactor;
 		private final double inverseTimeCap;
 
-		private final double ratioLengthToEuklideanDist; // ratio of link.length / euklideanDist
 		private final double effectiveCellSize;
 
 		protected EventLink(final Link link2, final double capCorrectionFactor, final double effectiveCellSize, final double storageCapFactor) {
@@ -208,7 +203,6 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			this.waitingQueue = new ArrayList<EventAgent>();
 			this.buffer = new ArrayList<EventAgent>();
 			this.euklideanDist = CoordUtils.calcDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord());
-			this.ratioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
 			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed();
 			this.timeCap = this.link.getCapacity() * capCorrectionFactor;
 			this.storageCapFactor = storageCapFactor;
@@ -283,7 +277,6 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 				PositionInfo position = new PositionInfo(agent.id,
 						this.link, queueEnd/* + NetworkLayer.CELL_LENGTH*/,
 						lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
-				agent.linkPosition = queueEnd * this.ratioLengthToEuklideanDist;
 				positions.add(position);
 				queueEnd -= vehLen;
 			}
@@ -320,7 +313,6 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 						this.link, distanceOnLink/* + NetworkLayer.CELL_LENGTH*/,
 						lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 				positions.add(position);
-				agent.linkPosition = distanceOnLink * this.ratioLengthToEuklideanDist;
 				lastDistance = distanceOnLink;
 			}
 
@@ -364,7 +356,6 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 				// the cars in the buffer
 				for (EventAgent agent : this.buffer) {
 					agent.lane = 1 + agent.intId % nLanes;
-					agent.linkPosition = distFromFromNode;
 					int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 					if (time > cmp) {
 						agent.speed = 0.0;
@@ -379,7 +370,6 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 				// the cars in the drivingQueue
 				for (EventAgent agent : this.drivingQueue) {
 					agent.lane = 1 + agent.intId % nLanes;
-					agent.linkPosition = distFromFromNode;
 					int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 					if (time > cmp) {
 						agent.speed = 0.0;
@@ -401,7 +391,6 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 				double distFromFromNode = this.link.getLength() - cellSize / 2.0;
 				for (EventAgent agent : this.waitingQueue) {
 					agent.lane = lane;
-					agent.linkPosition = distFromFromNode;
 					agent.speed = 0.0;
 					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
 					positions.add(position);
@@ -418,7 +407,6 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 				double distFromFromNode = this.link.getLength() - cellSize / 2.0;
 				for (EventAgent agent : this.parkingQueue) {
 					agent.lane = lane;
-					agent.linkPosition = distFromFromNode;
 					agent.speed = 0.0;
 					PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
 					positions.add(position);
@@ -428,15 +416,13 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		}
 	}
 
-	private static class EventAgent implements Comparable<EventAgent>, DrawableAgentI {
+	private static class EventAgent implements Comparable<EventAgent> {
 		protected final Id id;
 		protected final int intId;
 		protected double time;
 		protected EventLink currentLink = null;
 		protected double speed = 0.0;
 		protected int lane = 1;
-		protected double linkPosition = 0.0;
-
 		protected EventAgent(final Id id, final double time) {
 			this.id = id;
 			this.time = time;
@@ -460,75 +446,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			return this.id.hashCode();
 		}
 
-		/* implementation of DrawableAgentI */
-
-		public int getLane() {
-			return this.lane;
-		}
-
-		public double getPosInLink_m() {
-			return this.linkPosition;
-		}
 	}
 
-	private class NetStateWriter extends DisplayNetStateWriter implements SnapshotWriter {
-
-		public NetStateWriter(final Network network, final String networkFileName,
-				final VisConfig visConfig, final String filePrefix, final int timeStepLength_s, final int bufferSize) {
-			super(network, networkFileName, visConfig, filePrefix, timeStepLength_s, bufferSize);
-		}
-
-		/* implementation of SnapshotWriter */
-		public void addAgent(final AgentSnapshotInfo position) {
-		}
-
-		public void beginSnapshot(final double time) {
-			try {
-				dump((int)time);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		public void endSnapshot() {
-		}
-
-		public void finish() {
-			try {
-				close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		/* methods for DisplayNetStateWriter */
-
-		@Override
-		protected String getLinkDisplLabel(final Link link) {
-			return link.getId().toString();
-		}
-
-		@Override
-		protected double getLinkDisplValue(final Link link, final int index) {
-			EventLink mylink = SnapshotGenerator.this.eventLinks.get(link.getId());
-			return (mylink.buffer.size() + mylink.drivingQueue.size()) / mylink.spaceCap;
-		}
-
-		@Override
-		protected Collection<? extends DrawableAgentI> getAgentsOnLink(final Link link) {
-			EventLink mylink = SnapshotGenerator.this.eventLinks.get(link.getId());
-			Collection<EventAgent> agents = new ArrayList<EventAgent>(mylink.buffer.size() + mylink.drivingQueue.size());
-			agents.addAll(mylink.buffer);
-			agents.addAll(mylink.drivingQueue);
-			return agents;
-		}
-	}
-
-	public void addNetStateWriter(final String networkFileName, final VisConfig visConfig,
-			final String filePrefix, final int timeStepLength_s, final int bufferSize) {
-		NetStateWriter netStateWriter = new NetStateWriter(this.network, networkFileName, visConfig, filePrefix, timeStepLength_s, bufferSize);
-		netStateWriter.open();
-		this.addSnapshotWriter(netStateWriter);
-	}
 
 }

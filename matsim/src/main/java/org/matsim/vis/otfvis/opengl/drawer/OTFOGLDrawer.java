@@ -82,7 +82,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.netvis.renderers.ValueColorizer;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.ClassCountExecutor;
@@ -95,6 +94,7 @@ import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.vis.otfvis.opengl.gui.OTFScaleBarDrawer;
+import org.matsim.vis.otfvis.opengl.gui.ValueColorizer;
 import org.matsim.vis.otfvis.opengl.gui.VisGUIMouseHandler;
 
 import com.sun.opengl.util.ImageUtil;

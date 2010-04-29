@@ -40,7 +40,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -798,23 +797,6 @@ public class QueueLink {
         positions.add(position);
       }
       return lane;
-    }
-  }
-
-  // //////////////////////////////////////////////////////////
-  // For NetStateWriter
-  // /////////////////////////////////////////////////////////
-
-  static public class AgentOnLink implements DrawableAgentI {
-
-    public double posInLink_m;
-
-    public double getPosInLink_m() {
-      return this.posInLink_m;
-    }
-
-    public int getLane() {
-      return 1;
     }
   }
 

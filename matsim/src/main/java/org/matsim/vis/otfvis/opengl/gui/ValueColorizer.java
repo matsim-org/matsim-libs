@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.netvis.renderers;
+package org.matsim.vis.otfvis.opengl.gui;
 
 import java.awt.Color;
 import java.io.Serializable;

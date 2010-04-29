@@ -20,7 +20,6 @@
 
 package org.matsim.core.mobsim.queuesim;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,9 +49,9 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -64,7 +63,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
-import org.matsim.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFFileWriterQueueSimConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimServerQuadBuilder;
@@ -100,7 +98,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	protected Network networkLayer;
 
 	private static EventsManager events = null;
-	protected  SimStateWriterI netStateWriter = null;
 
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 
@@ -343,14 +340,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 			writer.finish();
 		}
 
-		if (this.netStateWriter != null) {
-			try {
-				this.netStateWriter.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			this.netStateWriter = null;
-		}
 		this.simEngine = null;
 		QueueSimulation.events = null; // delete events object to free events handlers, if they are nowhere else referenced
 	}
@@ -405,13 +394,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 			}
 		}
 
-		if (this.netStateWriter != null) {
-			try {
-				this.netStateWriter.dump((int)time);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	public static final EventsManager getEvents() {

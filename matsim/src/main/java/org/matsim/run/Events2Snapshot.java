@@ -31,7 +31,6 @@ import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ArgumentParser;
-import org.matsim.vis.netvis.VisConfig;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
@@ -213,21 +212,6 @@ public class Events2Snapshot {
 			String coordSystem = this.config.global().getCoordinateSystem();
 			this.visualizer.addSnapshotWriter(new KmlSnapshotWriter(snapshotFile,
 					TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84)));
-		}
-		if (snapshotFormat.contains("netvis")) {
-			String snapshotFile = outputDir + "/Snapshot";
-			File networkFile = new File(this.config.network().getInputFile());
-			VisConfig visConfig = VisConfig.newDefaultConfig();
-			String[] params = {VisConfig.LOGO, VisConfig.DELAY, VisConfig.LINK_WIDTH_FACTOR, VisConfig.SHOW_NODE_LABELS, VisConfig.SHOW_LINK_LABELS};
-			for (String param : params) {
-				String value = this.config.findParam("vis", param);
-				if (value != null) {
-					visConfig.set(param, value);
-				}
-			}
-			int buffers = this.network.getLinks().size();
-			buffers = Math.max(5, Math.min(5000000/buffers, 1000));
-			this.visualizer.addNetStateWriter(networkFile.getAbsolutePath(), visConfig, snapshotFile, (int)this.config.simulation().getSnapshotPeriod(), buffers);
 		}
 	}
 

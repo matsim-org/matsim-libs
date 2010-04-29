@@ -1,7 +1,9 @@
 package tutorial.programming.example7ControlerListener;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.vis.netvis.NetVis;
+import org.matsim.vis.otfvis.OTFClientSwing;
 
 
 
@@ -22,8 +24,11 @@ public class MyMainClass {
 		//call run() to start the simulation
 		controler.run();
 		//open snapshot of the 10th iteration
-		String[] visargs = {"output/ITERS/it.10/Snapshot"};
-		NetVis.main(visargs);
+		
+		Scenario sc = controler.getScenario() ;
+		Config cf = sc.getConfig() ;
+		String dir = cf.controler().getOutputDirectory();
+		new OTFClientSwing(dir + "/ITERS/it.10/10.otfvis.mvi").run();
 	}
 
 
