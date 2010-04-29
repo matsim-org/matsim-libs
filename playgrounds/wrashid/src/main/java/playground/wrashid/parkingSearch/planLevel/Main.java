@@ -13,6 +13,12 @@ public class Main {
 		
 		controler.setOverwriteFiles(true);
 		
+		EventHandlerAtStartupAdder eventHandlerAdder=new EventHandlerAtStartupAdder();
+		eventHandlerAdder.addEventHandler(new ParkingBookKeeper(controler));
+		controler.addControlerListener(eventHandlerAdder);
+		
+		
+		
 		controler.run();
 	}
 }
