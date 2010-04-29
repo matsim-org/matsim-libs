@@ -51,6 +51,12 @@ public class RunActivityClusterBuilder {
 	 *=============================================================================*/
 	private static String studyAreaName = "Gauteng";
 
+	/*=============================================================================
+	 * The year for which the DigiCore analysis is being done. Available years are:	|
+	 * 		- 2008																	|														|
+	 *=============================================================================*/
+	private static int year = 2008;
+
 	 /*=============================================================================
 	 * String value that must be set. Allowed activity types are:					|
 	 * 		- Minor																	|
@@ -134,7 +140,7 @@ public class RunActivityClusterBuilder {
 						log.info("");
 						
 						MyCommercialClusterStringBuilder sb = new MyCommercialClusterStringBuilder(root, version, threshold, 
-								sample, studyAreaName, radius, minimumPoints, activityType);
+								sample, studyAreaName, year, minimumPoints, radius, activityType);
 						
 						ActivityClusterBuilder acb = new ActivityClusterBuilder(sb);
 						acb.clusterActivities(radius, minimumPoints, activityType);

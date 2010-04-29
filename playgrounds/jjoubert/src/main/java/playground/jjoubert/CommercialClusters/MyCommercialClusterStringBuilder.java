@@ -33,9 +33,9 @@ public class MyCommercialClusterStringBuilder extends MyStringBuilder{
 	 * 		and <code>major</code> activities.
 	 */
 	public MyCommercialClusterStringBuilder(String root, String version, String threshold, 
-											String sample, String studyAreaName, float radius, 
-											int minimumPoints, String activityType){
-		super(root);
+											String sample, String studyAreaName, int year,
+											float radius, int minimumPoints, String activityType){
+		super(root, year);
 		this.version = version;
 		this.threshold = threshold;
 		this.sample = sample;

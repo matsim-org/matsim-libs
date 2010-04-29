@@ -10,18 +10,18 @@ public class MyActivityAnalysisStringBuilder extends MyStringBuilder{
 	private String threshold;
 	private String sample;
 	private String studyAreaName;
-	private int year;
 	private String prefix;
+	private int year;
 	
 	public MyActivityAnalysisStringBuilder(String root, String version, String threshold, String sample, String studyAreaName, int year){
-		super(root);
+		super(root, year);
 		this.prefix = root + studyAreaName + "/" + version + "/" + threshold 
 							+ "/Sample" + sample + "/Activities/" + studyAreaName + "_";
 		this.version = version;
 		this.threshold = threshold;
 		this.sample = sample;
 		this.studyAreaName = studyAreaName;		
-		this.year = year;
+		this.year=year;
 	}
 	
 	public String getGapInputMinor(){

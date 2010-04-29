@@ -22,9 +22,11 @@ package playground.jjoubert.Utilities;
 
 public class MyStringBuilder {
 	private final String root;
+	private final int year;
 	
-	public MyStringBuilder(String root) {
+	public MyStringBuilder(String root, int year) {
 		this.root = root;
+		this.year = year;
 	}
 	
 	public String getRoot(){
@@ -43,7 +45,7 @@ public class MyStringBuilder {
 	 * @return {@code ROOT + /DigiCore/SortedVehicles/}
 	 */
 	public String getSortedVehicleFoldername(){
-		return root + "DigiCore/SortedVehicles/";
+		return root + "DigiCore/" + String.valueOf(year) + "/SortedVehicles/";
 	}
 	
 	/**
