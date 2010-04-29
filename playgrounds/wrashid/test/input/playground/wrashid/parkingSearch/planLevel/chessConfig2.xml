@@ -9,15 +9,15 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/scenarios/chessboard/network.xml" />
+		<param name="inputNetworkFile" value="../playgrounds/wrashid/test/scenarios/chessboard/network.xml" />
 	</module>
 
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="test/input/playground/wrashid/parkingSearch/planLevel/chessFacilities.xml" />
+		<param name="inputFacilitiesFile" value="../playgrounds/wrashid/test/input/playground/wrashid/parkingSearch/planLevel/chessFacilities.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/input/playground/wrashid/parkingSearch/planLevel/chessPlans2.xml" />
+		<param name="inputPlansFile" value="../playgrounds/wrashid/test/input/playground/wrashid/parkingSearch/planLevel/chessPlans2.xml" />
 	</module>
 
 	<module name="controler">
