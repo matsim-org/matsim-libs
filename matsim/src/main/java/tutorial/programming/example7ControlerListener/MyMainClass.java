@@ -28,7 +28,7 @@ public class MyMainClass {
 		Scenario sc = controler.getScenario() ;
 		Config cf = sc.getConfig() ;
 		String dir = cf.controler().getOutputDirectory();
-		new OTFClientSwing(dir + "/ITERS/it.10/10.otfvis.mvi").run();
+		new OTFClientSwing("file:" + dir + "/ITERS/it.10/10.otfvis.mvi").run();
 	}
 
 

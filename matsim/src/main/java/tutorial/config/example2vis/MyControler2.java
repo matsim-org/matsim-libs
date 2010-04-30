@@ -52,7 +52,7 @@ public class MyControler2 {
 		log.info("The following should bring up the slow gui.  This sometimes hangs ..." );
 		log.info("There is also kmz output in " + dir + "/ITERS/it.0" ) ;
 		log.warn("However, if you want to run larger scenarios, you HAVE to learn how to use the graphics-hardware-accelerated otfvis." ) ;
-		new OTFClientSwing(dir + "/ITERS/it.0/0.otfvis.mvi").run();
+		new OTFClientSwing("file:" + dir + "/ITERS/it.0/0.otfvis.mvi").run();
 
 	}
 
