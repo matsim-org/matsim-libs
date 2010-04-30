@@ -109,7 +109,9 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
-		this.loadHouseholds();
+		if (this.config.scenario().isUseHouseholds()) {
+			this.loadHouseholds();
+		}
 
 		if (this.config.scenario().isUseLanes()) {
 			this.loadLanes();
