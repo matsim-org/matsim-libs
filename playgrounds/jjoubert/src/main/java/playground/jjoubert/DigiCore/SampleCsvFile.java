@@ -59,36 +59,40 @@ public class SampleCsvFile {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		int n = Integer.parseInt(args[0]);
-		
-		MyStringBuilder sb = new MyStringBuilder(root, year);
-		log.info("Reading " + n + " lines from " + sb.getDigiCoreCsvFilename());
-		
-		try {
-			File f = new File(sb.getDigiCoreCsvFilename());
-			Scanner s = new Scanner(new BufferedReader(new FileReader(f)));
-			
-			DateString ds = new DateString();
-			File o = new File(f.getParent() + "Sample_" + String.valueOf(n) + "_" + ds.toString() + ".csv");
-			
-			BufferedWriter bw = new BufferedWriter(new FileWriter(o));
+		if(args.length > 0){
+			int n = Integer.parseInt(args[0]);
 
-			try{
-				for(int i = 0; i < n; i++){
-					if(s.hasNextLine()){
-						String line = s.nextLine();
-						bw.write(line);
-						bw.newLine();
-					} else{
-						log.warn("Input file does not have sufficient lines. Only " + String.valueOf(i+1) + " read.");
+			MyStringBuilder sb = new MyStringBuilder(root, year);
+			log.info("Reading " + n + " lines from " + sb.getDigiCoreCsvFilename());
+
+			try {
+				File f = new File(sb.getDigiCoreCsvFilename());
+				Scanner s = new Scanner(new BufferedReader(new FileReader(f)));
+
+				DateString ds = new DateString();
+				File o = new File(f.getParent() + "/Sample_" + String.valueOf(n) + "_" + ds.toString() + ".csv");
+
+				BufferedWriter bw = new BufferedWriter(new FileWriter(o));
+
+				try{
+					for(int i = 0; i < n; i++){
+						if(s.hasNextLine()){
+							String line = s.nextLine();
+							bw.write(line);
+							bw.newLine();
+						} else{
+							log.warn("Input file does not have sufficient lines. Only " + String.valueOf(i+1) + " read.");
+						}
 					}
+				} finally{
+					bw.close();
 				}
-			} finally{
-				bw.close();
+
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
+		} else{
+			throw new RuntimeException("Must provide the number of lines to read!");
 		}
 
 	}
