@@ -48,7 +48,7 @@ import org.matsim.households.HouseholdsFactory;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
 
-import playground.dgrether.BkPaths;
+import playground.benjamin.BkPaths;
 
 
 /**
@@ -69,9 +69,9 @@ public class BKickHouseholdsCreatorZurich {
      * GMDE
      * FLAECHE_HA
 		 */
-		String quartiereZurichShapeFile = BkPaths.WORKBASE + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/quartiergrenzen2006/quart06_shp_070824/quart06.shp";
+		String quartiereZurichShapeFile = BkPaths.DATA + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/quartiergrenzen2006/quart06_shp_070824/quart06.shp";
 
-		String gemeindenKantonZurichShapeFile = BkPaths.WORKBASE + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp";
+		String gemeindenKantonZurichShapeFile = BkPaths.DATA + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp";
 
 		String plansZurichWoTransit = BkPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_10pct.xml.gz";
 

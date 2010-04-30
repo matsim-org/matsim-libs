@@ -39,7 +39,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
-import playground.dgrether.BkPaths;
+import playground.benjamin.BkPaths;
 
 
 /**

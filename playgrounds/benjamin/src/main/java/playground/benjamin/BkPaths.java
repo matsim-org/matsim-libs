@@ -37,12 +37,14 @@ public interface BkPaths {
 	final String RUNSSVN = REPOS + "runs-svn/";
 	
 	final String STUDIESBK = SHAREDSVN + "studies/bkick/";
+	
+	
 
-//	final String IVTCHNET = SHAREDSVN + "studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
+	final String IVTCHNET = SHAREDSVN + "studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
 //  
 //	final String IVTCHROADPRICING = SHAREDSVN + "studies/schweiz-ivtch/baseCase/roadpricing/zurichCityArea/zurichCityAreaWithoutHighwaysPricingScheme.xml";
 //  
 //	final String IVTCHCOUNTS = SHAREDSVN + "studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml";
 //
-//	final String IVTCHBASE = SHAREDSVN + "studies/schweiz-ivtch/";
+	final String IVTCHBASE = SHAREDSVN + "studies/schweiz-ivtch/";
 }

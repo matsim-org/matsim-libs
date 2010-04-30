@@ -33,7 +33,7 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
-import playground.dgrether.BkPaths;
+import playground.benjamin.BkPaths;
 import playground.dgrether.analysis.charts.utils.DgChartWriter;
 
 
@@ -131,7 +131,7 @@ public class IncomeStats {
 	public static void main(String[] args) {
 //	  String outdir = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/";
 //	  String hhFile = outdir + "households.xml";
-	  String outdir = BkPaths.STUDIESDG + "einkommenSchweiz/";
+	  String outdir = BkPaths.SHAREDSVN + "studies/bkick/einkommenSchweiz/";
 	  String hhFile = outdir + "households_all_zrh30km_10pct.xml.gz";
 //	  String hhFile = outdir + "households_all_zrh30km_transitincl_10pct.xml.gz";
 		Households hhs = new HouseholdsImpl();
