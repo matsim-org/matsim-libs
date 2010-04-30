@@ -61,7 +61,7 @@ public class MyNetworkGenerator {
 			e.printStackTrace();
 		}
 		new NetworkCleaner().run(net);
-		new NetworkWriter(net).write("/Users/johanwjoubert/Desktop/Temp/network.xml");
+		new NetworkWriter(net).writeFile("/Users/johanwjoubert/Desktop/Temp/network.xml");
 		
 		Config c = new ScenarioImpl().getConfig();
 		c.global().setCoordinateSystem(UTM35S);
