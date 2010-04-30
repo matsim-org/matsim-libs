@@ -20,10 +20,10 @@
 
 package org.matsim.population.algorithms;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -97,8 +97,8 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 		Plan plan = person.getPlans().get(0);
 
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				String actType = act.getType().substring(0, 1);
 				double depTime = act.getEndTime();
 				if (depTime != Time.UNDEFINED_TIME) {
@@ -143,8 +143,8 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 		Plan plan = person.getPlans().get(0);
 
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				String actType = act.getType().substring(0, 1);
 				double arrTime = act.getStartTime();
 				if (arrTime != 0.0) {
@@ -202,10 +202,10 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 
 		for (Object o : plan.getPlanElements()) {
 
-			if (o instanceof ActivityImpl) {
+			if (o instanceof Activity) {
 
 				if (depTime != -1.0) {
-					actType = ((ActivityImpl) o).getType().substring(0, 1);
+					actType = ((Activity) o).getType().substring(0, 1);
 //					System.out.println(actType);
 					actIndex = Activities.valueOf(actType).getPosition();
 

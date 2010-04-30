@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
@@ -35,6 +35,7 @@ import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.functors.OrPredicate;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
@@ -44,7 +45,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -55,23 +55,23 @@ import org.matsim.core.utils.io.IOUtils;
  *
  */
 public class TraversedRiskyLink implements StartupListener, ShutdownListener, IterationEndsListener {
-	
+
 	private Population population;
-	
+
 	private Predicate personPredicate;
-	
+
 	private BufferedWriter writer;
-	
+
 	private List<Integer> samples = new LinkedList<Integer>();
-	
+
 	private SummaryWriter summaryWriter;
-	
+
 	private Collection<Person> persons = null;
-	
+
 	public TraversedRiskyLink(Population population, List<Link> riskyLinks, SummaryWriter summaryWriter) {
 		this.summaryWriter = summaryWriter;
 		this.population = population;
-		
+
 		if (!riskyLinks.isEmpty()) {
 			List<Predicate> linkPlanPredicates = new LinkedList<Predicate>();
 			for (Link link : riskyLinks) {
@@ -91,11 +91,11 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 			personPredicate = new LinkPersonPredicate(predicate1);
 		}
 	}
-	
+
 	public Collection<Person> getPersons() {
 		return persons;
 	}
-	
+
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Collection subCollection = CollectionUtils.select(population.getPersons().values(), personPredicate);
 		persons = subCollection;
@@ -114,31 +114,31 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 	private class LinkPersonPredicate implements Predicate {
 
 		private Predicate linkPlanPredicat;
-	
+
 		public LinkPersonPredicate(Predicate linkPlanPredicate) {
 			this.linkPlanPredicat = linkPlanPredicate;
 		}
-		
+
 		public boolean evaluate(Object arg0) {
 			PersonImpl person = (PersonImpl)arg0;
 			return linkPlanPredicat.evaluate(person.getSelectedPlan());
 		}
-		
+
 	}
-	
+
 	private class LinkPlanPredicate implements Predicate {
 
 		private Link predicateLink;
-		
+
 		public LinkPlanPredicate(Link link) {
 			predicateLink = link;
 		}
-		
+
 		public boolean evaluate(Object arg0) {
 			PlanImpl plan = (PlanImpl)arg0;
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof LegImpl) {
-					LegImpl leg = (LegImpl) pe;
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
 					for(Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 						if(linkId.equals(predicateLink.getId()))
 							return true;
@@ -148,7 +148,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 			}
 			return false;
 		}
-		
+
 	}
 
 	public void notifyStartup(StartupEvent event) {
@@ -175,6 +175,6 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 }

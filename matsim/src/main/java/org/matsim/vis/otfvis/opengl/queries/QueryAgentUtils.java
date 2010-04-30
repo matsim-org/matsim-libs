@@ -12,14 +12,12 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 public class QueryAgentUtils {
-	
+
 
 	public static void buildRoute(Plan plan, QueryAgentPlan.Result result, Id agentId, Network net) {
 		int count = countLines(plan);
@@ -48,7 +46,7 @@ public class QueryAgentUtils {
 					coord = new CoordImpl(pi.getEasting(), pi.getNorthing());
 				}
 				setCoord(pos++, coord, col, result);
-			} else if (o instanceof LegImpl) {
+			} else if (o instanceof Leg) {
 				Leg leg = (Leg) o;
 				if (leg.getMode().equals(TransportMode.car)) {
 					Node last = null;
@@ -74,7 +72,7 @@ public class QueryAgentUtils {
 			} // end leg handling
 		}
 	}
-	
+
 	private static void setColor(int pos, Color col, QueryAgentPlan.Result result) {
 		result.colors[pos * 4 + 0] = (byte) col.getRed();
 		result.colors[pos * 4 + 1] = (byte) col.getGreen();
@@ -92,10 +90,10 @@ public class QueryAgentUtils {
 	private static int countLines(Plan plan) {
 		int count = 0;
 		for (Object o : plan.getPlanElements()) {
-			if (o instanceof ActivityImpl) {
+			if (o instanceof Activity) {
 				count++;
-			} else if (o instanceof LegImpl) {
-				LegImpl leg = (LegImpl) o;
+			} else if (o instanceof Leg) {
+				Leg leg = (Leg) o;
 				if (leg.getMode().equals(TransportMode.car)) {
 					List<Id> route = ((NetworkRoute) leg.getRoute())
 							.getLinkIds();

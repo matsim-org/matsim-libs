@@ -32,13 +32,13 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.events.AgentReplanEventImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
@@ -127,7 +127,6 @@ public class WithindayAgent extends QPersonAgent {
 				//as replanning is rerouting agents will only replan if they are on the road and not on the link of the next activity
 				if (isEnRoute()) {
 					//only reroute if the RouteProvider provides a route
-//					NetworkRouteWRefs subRoute = ((NetworkRouteWRefs) this.getCurrentLeg().getRoute()).getSubRoute(currentToNode, currentDestinationNode);
 					NetworkRoute subRoute = ((NetworkRoute) this.getCurrentLeg().getRoute()).getSubRoute(currentLinkId, this.getDestinationLinkId());
 					if (this.desireGenerationFunction.providesRoute(currentLinkId, subRoute)) {
 						this.reroute();
@@ -159,7 +158,7 @@ public class WithindayAgent extends QPersonAgent {
 		NetworkRoute alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, this.getQSimulation().getSimTimer().getTimeOfDay());
 		Plan oldPlan = this.getPerson().getSelectedPlan();
 		LegImpl currentLeg = (LegImpl) this.getCurrentLeg();
-		RouteWRefs oldRoute = currentLeg.getRoute();
+		Route oldRoute = currentLeg.getRoute();
 
 		//create Route of already passed Nodes
 		//TODO dg use Route.getSubroute method

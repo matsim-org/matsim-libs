@@ -27,6 +27,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -38,12 +39,11 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.core.network.NetworkImpl;
 
 /**
  *
@@ -211,7 +211,7 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		try {
 			this.outTime.write(event.getIteration() + "\t" + (sumAvgPlanLegTravelTimeExecuted / nofLegTravelExecuted) + "\t" +
 					(sumAvgPlanLegTravelTimeWorst / nofLegTravelWorst) + "\t" + (sumAvgPlanLegTravelTimeAll / nofLegTravelAvg) + "\t" + (sumAvgPlanLegTravelTimeBest / nofLegTravelBest) + "\n");
@@ -251,7 +251,7 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 				this.historyDistance = null;
 			}
 		}
-		
+
 		if (this.historyTime != null) {
 			int index = event.getIteration() - this.minIteration;
 			this.historyTime[INDEX_WORST][index] = (sumAvgPlanLegTravelTimeWorst / nofLegTravelWorst);
@@ -283,7 +283,7 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 				this.historyTime = null;
 			}
 		}
-		
+
 		if (this.controler.getIterationNumber()>0 && this.controler.getIterationNumber()%10==0) new ASPGeneral (this.controler.getIterationNumber(), this.controler.getLastIteration(), this.controler.getControlerIO().getOutputPath(), (NetworkImpl) this.network);
 	}
 
@@ -315,8 +315,8 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 		int numberOfLegs=0;
 
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				final LegImpl leg = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				final Leg leg = (Leg) pe;
 				if (!leg.getMode().toString().equals(TransportMode.car.toString())) {
 					planTravelDistance+= leg.getRoute().getDistance();
 				}

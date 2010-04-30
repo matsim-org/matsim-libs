@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 /**
@@ -85,7 +84,7 @@ public class Vehicle extends SimUnit {
 
 		// actsLegs(0) is the first activity, actsLegs(1) is the first leg
 		legIndex = 1;
-		setCurrentLeg((LegImpl) actsLegs.get(legIndex));
+		setCurrentLeg((Leg) actsLegs.get(legIndex));
 		Activity firstAct = (Activity) actsLegs.get(0);
 		// an agent starts the first leg at the end_time of the fist act
 		double departureTime = firstAct.getEndTime();

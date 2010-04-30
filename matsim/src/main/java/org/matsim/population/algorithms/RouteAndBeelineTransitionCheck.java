@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -70,26 +71,26 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 		Iterator<PlanElement> itPlan = plan.getPlanElements().iterator();
 		Iterator<PlanElement> itBeeline = beeline.getPlanElements().iterator();
 
-		LegImpl planLeg = getNextLeg(itPlan);
+		Leg planLeg = getNextLeg(itPlan);
 		while (planLeg != null) {
-			LegImpl beelineLeg = getNextLeg(itBeeline);
+			Leg beelineLeg = getNextLeg(itBeeline);
 			int type = 2 * intersectAOI(beelineLeg) + intersectAOI(planLeg);
 			this.count[type]++;
 			planLeg = getNextLeg(itPlan);
 		}
 	}
-	
-	private LegImpl getNextLeg(Iterator<PlanElement> iterator) {
+
+	private Leg getNextLeg(Iterator<PlanElement> iterator) {
 		while (iterator.hasNext()) {
 			PlanElement pe = iterator.next();
-			if (pe instanceof LegImpl) {
-				return (LegImpl) pe;
+			if (pe instanceof Leg) {
+				return (Leg) pe;
 			}
 		}
 		return null;
 	}
 
-	private int intersectAOI(final LegImpl leg) {
+	private int intersectAOI(final Leg leg) {
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		for (Id linkId : route.getLinkIds()) {
 			if (this.aOI.contains(linkId))

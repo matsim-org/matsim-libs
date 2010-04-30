@@ -29,25 +29,25 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.world.MappedLocation;
 
 /**
- * Feasible mode chain analysis according to section 3.2 of 
- * 
+ * Feasible mode chain analysis according to section 3.2 of
+ *
  * Miller, E. J., M. J. Roorda and J. A. Carrasco (2005) A tour-based model of travel mode choice,
- * Transportation, 32 (4) 399–422, pp. 404 and 405.
- * 
+ * Transportation, 32 (4) 399-422, pp. 404 and 405.
+ *
  * For more information, see documentation <a href=http://matsim.org/node/267">here</a>.
- * 
+ *
  * @author meisterk
  *
  */
@@ -59,9 +59,9 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 	private final PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer;
 	private final ActivityFacilities facilities;
 	private final Network network;
-	
+
 	public PlanAnalyzeTourModeChoiceSet(
-			final EnumSet<TransportMode> chainBasedModes, 
+			final EnumSet<TransportMode> chainBasedModes,
 			final PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer,
 			final ActivityFacilities facilities, final Network network) {
 		super();
@@ -88,7 +88,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 	}
 
 	public void run(Plan plan) {
-		
+
 		// how many mode combinations are possible?
 		int numLegs = plan.getPlanElements().size() / 2;
 
@@ -98,7 +98,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
 		for (int numCombination = 0; numCombination < numCombinations; numCombination++) {
 
-			TransportMode[] candidate = new TransportMode[numLegs]; 
+			TransportMode[] candidate = new TransportMode[numLegs];
 
 			/*
 			 * TODO Replace this way to generate a permutation over modes by something without strings, but with Enum ordinals.
@@ -114,15 +114,15 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			/*
 			 * Replace end.
 			 */
-			
+
 			int legNum = PlanAnalyzeTourModeChoiceSet.analyzeModeChainFeasability(
-					plan, 
-					candidate, 
-					this.chainBasedModes, 
+					plan,
+					candidate,
+					this.chainBasedModes,
 					this.tripStructureAnalysisLayer,
 					this.facilities,
 					this.network);
-			
+
 			if (this.doLogging) {
 				log.info(numCombination + "\t");
 				for (TransportMode mode : candidate) {
@@ -133,7 +133,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			if (legNum >= 0) {
 				if (legNum == numLegs) {
 					this.choiceSet.add(candidate);
-				} 
+				}
 				numCombination += ((int) Math.pow(this.modeSet.size(), numLegs - legNum)) - 1;
 			}
 
@@ -142,43 +142,43 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
 	/**
 	 * Determines whether a particular set of modes is a feasible combination for a given sequence of activity locations in an activity plan.
-	 * 
+	 *
 	 * @param plan contains the activities and their locations
 	 * @param candidate the mode chain whose feasibility is checked
 	 * @param chainBasedModes the set of chain based modes
 	 * @param tripStructureAnalysisLayer indicating whether facility or link is used as the location
-	 * @return true if the mode chain is feasible, false if it is not 
+	 * @return true if the mode chain is feasible, false if it is not
 	 */
 	public static boolean isModeChainFeasible(
-			Plan plan, 
-			TransportMode[] candidate, 
+			Plan plan,
+			TransportMode[] candidate,
 			EnumSet<TransportMode> chainBasedModes,
 			PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer,
 			ActivityFacilities facilities,
 			Network network) {
-		
+
 		int numLegs = plan.getPlanElements().size() / 2;
 		int lastFeasibleLegNum = analyzeModeChainFeasability(plan, candidate, chainBasedModes, tripStructureAnalysisLayer, facilities, network);
-		
+
 		return (numLegs == lastFeasibleLegNum);
-		
+
 	}
-	
+
 	/**
 	 * Determines whether a particular set of modes is a feasible combination for a given sequence of activity locations in an activity plan.
-	 * 
+	 *
 	 * @param plan contains the activities and their locations
 	 * @param candidate the mode chain whose feasibility is checked
 	 * @param chainBasedModes the set of chain based modes
 	 * @param tripStructureAnalysisLayer indicating whether facility or link is used as the location
-	 * @return An integer value in the range [-numLegs; numLegs]. 
-	 * The absolute of the return value indicates the leg number which is not feasible because the chain based mode is not available. 
-	 * The sign indicates whether the chain based modes are at the location of the first or the last activity if the plan is completed, 
-	 * thus if the mode chain is feasible or not. 
+	 * @return An integer value in the range [-numLegs; numLegs].
+	 * The absolute of the return value indicates the leg number which is not feasible because the chain based mode is not available.
+	 * The sign indicates whether the chain based modes are at the location of the first or the last activity if the plan is completed,
+	 * thus if the mode chain is feasible or not.
 	 */
 	public static int analyzeModeChainFeasability(
-			Plan plan, 
-			TransportMode[] candidate, 
+			Plan plan,
+			TransportMode[] candidate,
 			EnumSet<TransportMode> chainBasedModes,
 			PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer,
 			ActivityFacilities facilities,
@@ -187,7 +187,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 		boolean isModeChainFeasible = true;
 
 		MappedLocation currentLocation = null, requiredLocation = null, nextLocation = null;
-		
+
 		// setup the trackers for all chain-based modes, set all chain-based modes starting at the first location (usually home)
 		HashMap<TransportMode, MappedLocation> modeTracker = new HashMap<TransportMode, MappedLocation>();
 		for (TransportMode mode : candidate) {
@@ -202,16 +202,16 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 				}
 			}
 		}
-		
+
 		int legNum = 0;
 		Iterator<PlanElement> peIterator = plan.getPlanElements().iterator();
 		while (isModeChainFeasible && peIterator.hasNext()) {
 			PlanElement pe = peIterator.next();
-			if (pe instanceof LegImpl) {
-				LegImpl currentLeg = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				Leg currentLeg = (Leg) pe;
 
 				TransportMode legMode = candidate[legNum];
-				
+
 				if (chainBasedModes.contains(legMode)) {
 					currentLocation = modeTracker.get(legMode);
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
@@ -230,15 +230,15 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 						isModeChainFeasible = false;
 					}
 
-				} 
+				}
 				if (isModeChainFeasible) {
 					legNum++;
 				}
 			}
 		}
-		
+
 		if (isModeChainFeasible) {
-			
+
 			// chain-based modes must finish at the location of the last activity of the plan
 			HashSet<MappedLocation> allowedLocations = new HashSet<MappedLocation>();
 			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility
@@ -250,7 +250,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 				allowedLocations.add((LinkImpl) network.getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId()));
 				allowedLocations.add((LinkImpl) network.getLinks().get(((PlanImpl) plan).getLastActivity().getLinkId()));
 			}
-			
+
 			Iterator<TransportMode> modeTrackerCheck = modeTracker.keySet().iterator();
 			while (isModeChainFeasible && modeTrackerCheck.hasNext()) {
 				TransportMode mode = modeTrackerCheck.next();
@@ -259,21 +259,21 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 					isModeChainFeasible = false;
 				}
 			}
-			
+
 		}
-		
+
 		if (!isModeChainFeasible) {
 			legNum = -legNum;
 		}
-		
+
 		return legNum;
-		
+
 	}
 
 	private boolean doLogging = false;
-	
+
 	public void setDoLogging(boolean doLogging) {
 		this.doLogging = doLogging;
 	}
-	
+
 }

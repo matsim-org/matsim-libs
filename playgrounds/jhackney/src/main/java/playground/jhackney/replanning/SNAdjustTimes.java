@@ -5,10 +5,10 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -32,21 +32,21 @@ public class SNAdjustTimes implements PlanAlgorithm {
 	private void adjustDepartureTimes(Plan plan) {
 		Person person = plan.getPerson();
 
-		//COPY THE SELECTED PLAN		    
+		//COPY THE SELECTED PLAN
 		Plan newPlan = ((PersonImpl) person).copySelectedPlan();
 
 		for (PlanElement pe : newPlan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl thisAct=(ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity thisAct=(Activity) pe;
 				// Ideally,
 				// last Act new departure time =
 				// last Act current departure time +
 				// average arrival time of friends at thisAct -
 				// this Act current arrival time
-				
+
 				// Might be easier to set start time of thisAct to the
 				// average arrival time of friends at thisAct
-				
+
 //			this.log.info("old "+thisAct.getStartTime());
 				thisAct.setStartTime(getAvgFriendArrTime(thisAct));
 //			this.log.info("new "+thisAct.getStartTime());
@@ -56,7 +56,7 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		newPlan.setScore(null);
 		((PersonImpl) person).setSelectedPlan(newPlan);
 	}
-	private double getAvgFriendArrTime(ActivityImpl act) {
+	private double getAvgFriendArrTime(Activity act) {
 		LinkedHashMap<Id,ArrayList<TimeWindow>> twm = controler.getTwm();
 		int count=0;
 		double avgStartTime=0;

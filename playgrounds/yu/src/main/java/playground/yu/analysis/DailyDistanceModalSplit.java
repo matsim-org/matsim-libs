@@ -1,17 +1,33 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.analysis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.charts.XYScatterChart;
@@ -79,9 +95,9 @@ public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 		int age = this.person.getAge();
 		String carAvail = this.person.getCarAvail();
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof LegImpl) {
+			if (pe instanceof Leg) {
 
-				LegImpl leg = (LegImpl) pe;
+				Leg leg = (Leg) pe;
 				double legDist = leg.getRoute().getDistance() / 1000.0;
 				if (Integer.parseInt(this.person.getId().toString()) < 1000000000
 						&& leg.getDepartureTime() < 86400) {

@@ -22,9 +22,9 @@ package playground.benjamin.income;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteWRefs;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
@@ -32,7 +32,7 @@ import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
  * @author dgrether
  * @author bkick
  * @author michaz
- * 
+ *
  */
 
 public class ScoringFromLeg extends LegScoringFunction {
@@ -59,15 +59,15 @@ public class ScoringFromLeg extends LegScoringFunction {
 
 	@Override
 	public void finish() {
-		
+
 	}
 
 	@Override
-	protected double calcLegScore(double departureTime, double arrivalTime, LegImpl leg) {
+	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg) {
 		return calculateLegScore(departureTime, arrivalTime, leg);
 	}
 
-	private double calculateLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
+	private double calculateLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double dist = calculateLegDistance(leg);
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		if (TransportMode.car.equals(leg.getMode())) {
@@ -87,13 +87,13 @@ public class ScoringFromLeg extends LegScoringFunction {
 		}
 	}
 
-	private double calculateLegDistance(final LegImpl leg) {
-		RouteWRefs route = leg.getRoute();
+	private double calculateLegDistance(final Leg leg) {
+		Route route = leg.getRoute();
 		double dist = route.getDistance();
 		if (TransportMode.car.equals(leg.getMode())) {
 			dist += this.network.getLinks().get(route.getEndLinkId()).getLength();
 		}
-		
+
 		if (Double.isNaN(dist)){
 			throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
 		}
@@ -104,10 +104,10 @@ public class ScoringFromLeg extends LegScoringFunction {
 		double betaCost = betaIncome / this.incomePerDay;
 		double distanceCostScore = betaCost * distanceCost;
 		double travelTimeScore = travelTime * betaTravelTime;
-		
+
 		//this is the actual (negative) utility from distance costs and travel time
 		double score = distanceCostScore + travelTimeScore;
-		
+
 		if (Double.isNaN(score)){
 			throw new IllegalStateException("Leg score is NaN for person: " + this.plan.getPerson().getId());
 		}

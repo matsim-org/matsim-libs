@@ -26,11 +26,11 @@ import org.geotools.feature.Feature;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -60,8 +60,8 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 			if (plan.getFirstActivity().getEndTime() == 21600.0) {
 				String id = plan.getPerson().getId().toString();
 				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof LegImpl) {
-						LegImpl leg = (LegImpl) pe;
+					if (pe instanceof Leg) {
+						Leg leg = (Leg) pe;
 						double dist = (leg.getRoute() instanceof NetworkRoute ? RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network) : 0.0);
 						if (dist > 0) {
 							fts.add(getLegFeature(leg, id));

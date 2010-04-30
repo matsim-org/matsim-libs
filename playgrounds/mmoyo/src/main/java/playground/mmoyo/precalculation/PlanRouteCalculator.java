@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mmoyo.precalculation;
 
 import java.util.List;
@@ -7,13 +26,13 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -56,13 +75,13 @@ public class PlanRouteCalculator {
 			int foundConns=0;
 			boolean first =true;
 
-			ActivityImpl lastAct = null;
-			ActivityImpl thisAct= null;
+			Activity lastAct = null;
+			Activity thisAct= null;
 
 			for (PlanElement pe : plan.getPlanElements()) {   		//temporarily commented in order to find only the first leg
 
-				if (pe instanceof ActivityImpl) {
-					thisAct= (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					thisAct= (Activity) pe;
 					if (!first) {
 						Coord lastActCoord = lastAct.getCoord();
 			    		Coord actCoord = thisAct.getCoord();
@@ -94,15 +113,15 @@ public class PlanRouteCalculator {
 			PlanImpl newPlan = new PlanImpl(person);
 			Plan plan = person.getPlans().get(0);
 			boolean first =true;
-			ActivityImpl lastAct = null;
-			ActivityImpl thisAct= null;
+			Activity lastAct = null;
+			Activity thisAct= null;
 
 			//for (PlanElement pe : plan.getPlanElements()) {   		//temporarily commented in order to find only the first leg
 			for	(int elemIndex=0; elemIndex<3; elemIndex++){
 				PlanElement pe= plan.getPlanElements().get(elemIndex);
 
-				if (pe instanceof ActivityImpl) {
-					thisAct= (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					thisAct= (Activity) pe;
 					if (!first) {
 			    		//StaticConnection bestStatConnection  = dynamicConnection.getBestConnection(lastAct, thisAct);
 

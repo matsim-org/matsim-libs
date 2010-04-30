@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -46,7 +47,6 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
@@ -337,13 +337,13 @@ public class CreateDijkstraKnowledge4MultiFactors {
 				Plan plan = person.getSelectedPlan();
 
 				// get all Acts of the selected Plan
-				List<ActivityImpl> acts = new ArrayList<ActivityImpl>();
+				List<Activity> acts = new ArrayList<Activity>();
 
 				for (PlanElement pe : plan.getPlanElements())
 				{
-					if (pe instanceof ActivityImpl)
+					if (pe instanceof Activity)
 					{
-						acts.add((ActivityImpl) pe);
+						acts.add((Activity) pe);
 					}
 				}
 

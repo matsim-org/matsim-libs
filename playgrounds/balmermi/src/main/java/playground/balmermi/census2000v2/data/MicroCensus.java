@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -153,8 +153,8 @@ public class MicroCensus {
 			boolean has_work = false;
 			boolean has_educ = false;
 			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl a = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity a = (Activity) pe;
 					if (a.getType().equals(WORK)) { has_work = true; }
 					if (a.getType().equals(EDUC)) { has_educ = true; }
 				}

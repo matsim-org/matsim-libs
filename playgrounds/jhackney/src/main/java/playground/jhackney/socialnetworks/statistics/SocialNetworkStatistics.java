@@ -33,6 +33,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -410,8 +411,8 @@ public class SocialNetworkStatistics {
 			if ((planType == null) || (planType == PlanImpl.Type.UNDEFINED)) {
 				planTypeString = new StringBuilder();
 				for (PlanElement pe : thisPlan.getPlanElements()) {
-					if (pe instanceof ActivityImpl) {
-						ActivityImpl nextAct = (ActivityImpl) pe;
+					if (pe instanceof Activity) {
+						Activity nextAct = (Activity) pe;
 						planTypeString.append(nextAct.getType().charAt(0));
 					}
 				}

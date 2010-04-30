@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.analysis;
 
 import java.io.IOException;
@@ -9,13 +25,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -145,8 +161,8 @@ public class DailyEnRouteTime extends DailyAnalysis {
 		double bikeDayTime = 0.0;
 		double othersDayTime = 0.0;
 		for (PlanElement pe : plan.getPlanElements())
-			if (pe instanceof LegImpl) {
-				LegImpl bl = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				Leg bl = (Leg) pe;
 
 				ActTypeZrh legIntent = (ActTypeZrh) this.getLegIntent(plan, bl);
 
@@ -529,7 +545,7 @@ public class DailyEnRouteTime extends DailyAnalysis {
 	}
 
 	@Override
-	protected ActType getLegIntent(PlanImpl plan, LegImpl currentLeg) {
+	protected ActType getLegIntent(PlanImpl plan, Leg currentLeg) {
 		ActType legIntent = null;
 		String tmpActTypeStartsWith = plan.getNextActivity(currentLeg)
 				.getType().substring(0, 1);

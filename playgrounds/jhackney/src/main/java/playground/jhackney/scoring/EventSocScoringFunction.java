@@ -29,8 +29,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 
@@ -59,8 +57,8 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	private double betaNFriends= Double.parseDouble(socnetConfig.getBeta2());
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
-	LinkedHashMap<ActivityImpl,Double> usoc=new LinkedHashMap<ActivityImpl,Double>();
-	LinkedHashMap<ActivityImpl,Double> dusoc=new LinkedHashMap<ActivityImpl,Double>();
+	LinkedHashMap<Activity,Double> usoc=new LinkedHashMap<Activity,Double>();
+	LinkedHashMap<Activity,Double> dusoc=new LinkedHashMap<Activity,Double>();
 
 //	public SocScoringFunctionEvent(final Plan plan, final playground.jhackney.scoring.CharyparNagelScoringFunction scoringFunction, String factype, final LinkedHashMap<Act,ArrayList<Double>> actStats) {
 	public EventSocScoringFunction(final Plan plan, String factype, final LinkedHashMap<Activity,ArrayList<Double>> actStats) {
@@ -74,82 +72,17 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 			log.warn("Utility function values linear AND log number of Friends in spatial meeting");
 		}
 	}
-	public double getUsoc(ActivityImpl a){
+	public double getUsoc(Activity a){
 //		if(usoc.size()>0&&usoc.contains(a)){
 			return usoc.get(a);
 //			}else{
 //				return 0;
 //			}
 	}
-	@Override
-	public double getUdur(ActivityImpl a){
-		return super.getUdur(a);
-	}
-	@Override
-	public double getUw(ActivityImpl a){
-		return super.getUw(a);
-	}
-	@Override
-	public double getUs(ActivityImpl a){
-		return super.getUs(a);
-	}
-	@Override
-	public double getUla(ActivityImpl a){
-		return super.getUla(a);
-	}
-	@Override
-	public double getUed(ActivityImpl a){
-		return super.getUed(a);
-	}
-	@Override
-	public double getUld(ActivityImpl a){
-		return super.getUld(a);
-	}
-	@Override
-	public double getUlegt(LegImpl l){
-		return super.getUlegt(l);
-	}
-	@Override
-	public double getUlegd(LegImpl l){
-		return super.getUlegd(l);
-	}
-
-	public double getDusoc(ActivityImpl a){
+	public double getDusoc(Activity a){
 		return dusoc.get(a);
 	}
-	@Override
-	public double getDudur(ActivityImpl a){
-		return super.getDudur(a);
-	}
-	@Override
-	public double getDuw(ActivityImpl a){
-		return super.getDuw(a);
-	}
-	@Override
-	public double getDus(ActivityImpl a){
-		return super.getDus(a);
-	}
-	@Override
-	public double getDula(ActivityImpl a){
-		return super.getDula(a);
-	}
-	@Override
-	public double getDued(ActivityImpl a){
-		return super.getDued(a);
-	}
-	@Override
-	public double getDuld(ActivityImpl a){
-		return super.getDuld(a);
-	}
-	@Override
-	public double getDulegt(LegImpl l){
-		return super.getDulegt(l);
-	}
-	@Override
-	public double getDulegd(LegImpl l){
-		return super.getDulegd(l);
-	}
-	
+
 	/**
 	 * Totals the act scores, including socializing during acts, for the entire plan
 	 *
@@ -159,20 +92,20 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	public void finish() {
 		super.finish();
 		for (PlanElement pe : this.plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				double temp=0;
 				double dtemp=0;
 				if(act.getType().equals(factype)){
 //				this.friendFoeRatio+=actStats.get(act).get(0);
 //				this.nFriends+=actStats.get(act).get(1);
 //				this.timeWithFriends+=actStats.get(act).get(2);
-//				
+//
 					temp=betaFriendFoe*actStats.get(act).get(0)+
 					betaNFriends *actStats.get(act).get(1)+
 					betaLogNFriends * Math.log(actStats.get(act).get(1)+1)+
 					betaTimeWithFriends * Math.log(actStats.get(act).get(2)/3600.+1);
-					
+
 					dtemp=betaFriendFoe+
 					betaNFriends+
 					betaLogNFriends/(actStats.get(act).get(1)+1)+
@@ -188,7 +121,7 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 
 	@Override
 	public double getScore() {
-		
+
 //		usoc.add(betaFriendFoe*this.friendFoeRatio+
 //				betaNFriends * this.nFriends +
 //				betaLogNFriends * Math.log(this.nFriends+1) +

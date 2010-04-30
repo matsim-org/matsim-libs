@@ -21,6 +21,7 @@
 package org.matsim.roadpricing;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -160,8 +161,8 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof LegImpl) {
-						((LegImpl) pe).setRoute(null);
+					if (pe instanceof Leg) {
+						((Leg) pe).setRoute(null);
 					}
 				}
 			}

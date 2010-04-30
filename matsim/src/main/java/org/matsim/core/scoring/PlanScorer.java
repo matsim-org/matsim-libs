@@ -20,9 +20,9 @@
 
 package org.matsim.core.scoring;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
 /**
@@ -41,8 +41,8 @@ public class PlanScorer {
 		boolean firstActivityDone = false;
 
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				if (firstActivityDone) {
 					function.startActivity(act.getStartTime(), act);
 					firstActivityDone = true;

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
@@ -32,6 +32,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -43,7 +44,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
@@ -55,24 +55,24 @@ import org.matsim.core.utils.io.IOUtils;
 public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener, IterationStartsListener, StartupListener {
 
 	private TripAndScoreStats tripStats;
-	
+
 //	private EUTRouterAnalyzer routerAnalyzer;
-	
+
 //	private TravelTimeMemory ttKnowledge;
 	private TwoStateTTKnowledge ttKnowledge;
-	
+
 	private ArrowPrattRiskAversionI utilFunc;
-	
+
 	private Map<Person, Double> ceMap;
-	
+
 	private Map<Person, Double> expTTMap;
-	
+
 	private List<Double> samplesCE;
-	
+
 	private List<Double> samplesExpTT;
-	
+
 	private BufferedWriter writer;
-	
+
 	private SummaryWriter summaryWriter;
 
 	private final Network network;
@@ -90,19 +90,19 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 	 * of the queue sim.
 	 */
 	public void addGuidedPerson(Person p) {
-		
+
 			Plan plan = p.getSelectedPlan();
 			double cesum = 0;
 			double expTTSum = 0;
 			int tripcounts = 0;
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof LegImpl) {
+				if (pe instanceof Leg) {
 					tripcounts++;
-					LegImpl leg = ((LegImpl) pe);
+					Leg leg = ((Leg) pe);
 					NetworkRoute route = (NetworkRoute) leg.getRoute();
 					double totaltravelcosts = 0;
 					double totaltraveltime = 0;
-					
+
 //				for (TravelTime traveltimes : ttKnowledge.getTravelTimes()) {
 //					double traveltime = calcTravTime(traveltimes, route, leg.getDepTime());
 //					totaltraveltime += traveltime;
@@ -120,18 +120,18 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 //						/ (double) ttKnowledge.getTravelTimes().size();
 //				double avttime = totaltraveltime/ (double) ttKnowledge.getTravelTimes().size();
 					double avttime = totaltraveltime;
-					
+
 					cesum += utilFunc.getTravelTime(avrcosts);
 					expTTSum += avttime;
 				}
 			}
-			
+
 			double ceavr = cesum/tripcounts;
 			ceMap.put(p, ceavr);
-			
+
 			expTTMap.put(p, expTTSum/tripcounts);
 	}
-	
+
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		/*
 		 * Get the experienced trip duration from the tripstats
@@ -155,9 +155,9 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 		try {
 			writer.write(String.valueOf(event.getIteration()));
 			writer.write("\t");
-			writer.write(String.valueOf(benefitsumCE/(double)ceMap.size()));
+			writer.write(String.valueOf(benefitsumCE/ceMap.size()));
 			writer.write("\t");
-			writer.write(String.valueOf(benefitsumExpTT/(double)expTTMap.size()));
+			writer.write(String.valueOf(benefitsumExpTT/expTTMap.size()));
 			writer.newLine();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -173,7 +173,7 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 				sumCE += d;
 			for(Double d : samplesExpTT)
 				sumExpTT += d;
-			
+
 			double avrCE = sumCE/samplesCE.size();
 			summaryWriter.setTt_benefitPerIter(avrCE);
 			writer.write(String.valueOf(avrCE));
@@ -210,7 +210,7 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		samplesCE = new LinkedList<Double>();
 		samplesExpTT = new LinkedList<Double>();
 	}

@@ -23,6 +23,7 @@ package org.matsim.core.scoring;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -94,7 +95,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.plan = this.person.createAndAddPlan(true);
 		try {
 			this.plan.createAndAddActivity("h", link1.getId());
-			LegImpl leg = this.plan.createAndAddLeg(TransportMode.car);
+			Leg leg = this.plan.createAndAddLeg(TransportMode.car);
 			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1.getId(), link3.getId());
 			leg.setRoute(route);
 			route.setDistance(25000.0);
@@ -123,11 +124,11 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	private double calcScore() {
 		ScoringFunction testee = getScoringFunctionInstance(this.plan);
 		testee.endActivity(07*3600);
-		testee.startLeg(07*3600, (LegImpl) this.plan.getPlanElements().get(1));
+		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
 		testee.startActivity(07*3600 + 30*60, (ActivityImpl) this.plan.getPlanElements().get(2));
 		testee.endActivity(16*3600);
-		testee.startLeg(16*3600, (LegImpl) this.plan.getPlanElements().get(3));
+		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
 		testee.endLeg(16*3600 + 15*60);
 		testee.startActivity(16*3600 + 15*60, (ActivityImpl) this.plan.getPlanElements().get(4));
 		testee.finish();
@@ -335,11 +336,11 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 
 		ScoringFunction testee = getScoringFunctionInstance(this.plan);
 		testee.endActivity(07*3600);
-		testee.startLeg(07*3600, (LegImpl) this.plan.getPlanElements().get(1));
+		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
 		testee.startActivity(07*3600 + 30*60, (ActivityImpl) this.plan.getPlanElements().get(2));
 		testee.endActivity(16*3600);
-		testee.startLeg(16*3600, (LegImpl) this.plan.getPlanElements().get(3));
+		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
 		testee.agentStuck(16*3600 + 7.5*60);
 		testee.finish();
 		testee.getScore();

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mmoyo.analysis.tools;
 
 import java.text.DecimalFormat;
@@ -8,12 +27,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -27,51 +46,51 @@ public class TravParameterAnalysis {
 	private List<Path> pathListA = new ArrayList<Path>();
 	private List<Path> pathListB = new ArrayList<Path>();
 	List<PopulationResult> populationResultList = new ArrayList<PopulationResult>();
-	
+
 	public TravParameterAnalysis(final ScenarioImpl scenario){
-		
+
 		///iterate with all coefficient values
 		for (double x= 0; x<=1.01; x = x + 0.05 ){
 			DecimalFormat twoDForm = new DecimalFormat("#.##");
 			PTValues.timeCoefficient = Double.valueOf(twoDForm.format(x));
 			PTValues.distanceCoefficient= Math.abs(Double.valueOf(twoDForm.format(1-x)));
-			PTValues.scenarioName =  "dist" + PTValues.distanceCoefficient + "_time" + PTValues.timeCoefficient ; 
+			PTValues.scenarioName =  "dist" + PTValues.distanceCoefficient + "_time" + PTValues.timeCoefficient ;
 
 			System.out.println("\nScenario:" + PTValues.scenarioName);
 			routePopulation(scenario);
 		}
-		
+
 		System.out.println("Time Coefficient\tDistance Coefficient\tTimeAvg\tDistanceAvg\tTransfers\tDetTransfer\tWalkDistance");
 		for (PopulationResult popResult : populationResultList){
 			System.out.println(PTValues.timeCoefficient + "\t+" + PTValues.distanceCoefficient + "\t+" + popResult.getTimeAvg() + "\t+" + popResult.getDistanceAvg() + "\t+" + popResult.getTransferNum() + "\t+" + popResult.getDetTransferNum() + "\t+" + popResult.getWalkDistanceAvg());
-		} 
+		}
 	}
-	
+
 	public List<Path> routePopulation(ScenarioImpl scenario){
 		LogicFactory logicFactory = new LogicFactory (scenario.getTransitSchedule());
 		NetworkLayer logicNet = logicFactory.getLogicNet();
 		PTRouter ptRouter = new PTRouter(logicNet);
-		
+
 		List<Path> pathList = new ArrayList<Path>();
 		int numPlans=0;
 		PopulationResult populationResult= new PopulationResult();
 
 		for (Person person: scenario.getPopulation().getPersons().values()) {
 			//if ( true ) {
-			//PersonImpl person = population.getPersons().get(new IdImpl("905449")); // 5228308   5636428  2949483 
+			//PersonImpl person = population.getPersons().get(new IdImpl("905449")); // 5228308   5636428  2949483
  			System.out.println(PTValues.timeCoefficient + " " + (numPlans++) + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
 
 			boolean first =true;
-			ActivityImpl lastAct = null;
-			ActivityImpl thisAct= null;
-			
+			Activity lastAct = null;
+			Activity thisAct= null;
+
 			//double startTime=0;
 			//double duration=0;
-			
+
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl){
-					thisAct= (ActivityImpl) pe;
+				if (pe instanceof Activity){
+					thisAct= (Activity) pe;
 					if (!first) {
 						Coord lastActCoord = lastAct.getCoord();
 			    		Coord actCoord = thisAct.getCoord();
@@ -83,17 +102,17 @@ public class TravParameterAnalysis {
 			    		}else{
 				    		//startTime = System.currentTimeMillis();
 				    		Path path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime());
-				    		
+
 				    		//duration= System.currentTimeMillis()-startTime;
 				    		if(path!=null){
 					    		if (path.nodes.size()>1){
 					    			//found++;
 					    			populationResult.addPath(person.getId(), path);
-					    			
+
 					    			//18 sep
 					    			pathList.add(path);
-					    			
-					    			//System.out.println("travelTime:" + path.travelTime);		    			
+
+					    			//System.out.println("travelTime:" + path.travelTime);
 					    			//durations.add(duration);
 				    			}else{
 				    				//lessThan2Node++;
@@ -103,7 +122,7 @@ public class TravParameterAnalysis {
 				    		}
 			    		}
 					}
-		
+
 					lastAct = thisAct;
 					first=false;
 				}
@@ -116,7 +135,7 @@ public class TravParameterAnalysis {
 	}
 
 }
-	
+
 class ConnectionResult{
 	Id agentId;
 	double distance=0;
@@ -131,18 +150,18 @@ class ConnectionResult{
 		this.agentId = agentId;
 		this.tTime = path.travelTime;
 		this.tCost = path.travelCost;
-		
+
 		for (Link link : path.links){
 			distance += link.getLength();
 
-			String type  = ((LinkImpl)link).getType();  
+			String type  = ((LinkImpl)link).getType();
 			if (type.equals(PTValues.DETTRANSFER_STR)){    //type.equals("Egress") || type.equals("Access") || <- we don't want to count the access and egress walk time until the radius search be defined.
 				walkDistance += link.getLength();
 				detTransfers++;
 			}else if (type.equals(PTValues.TRANSFER_STR)){
 				transfers++;
 			}
-		}	
+		}
 	}
 
 	public Id getAgentId(){
@@ -152,52 +171,52 @@ class ConnectionResult{
 	public double getDistance() {
 		return this.distance;
 	}
-	
+
 	public int getTransfers() {
 		return this.transfers;
 	}
-	
+
 	public int getDetTransfers() {
 		return this.detTransfers;
 	}
-	
+
 	public double getWalkDistance() {
 		return this.walkDistance;
 	}
-	
+
 	public double getWalkTime() {
 		return this.walkTime;
 	}
-	
+
 	public double getTravelCost() {
 		return this.tCost;
 	}
-	
+
 	public double getTravelTime() {
 		return this.tTime;
 	}
-	
+
 }
-	
+
 class PopulationResult {
 	private List<ConnectionResult> connectionResultList = new ArrayList<ConnectionResult>();
 	private int connectionNumber=0;
-	
+
 	private double travelDistance =0;
 	private double travelTime =0;
 	private double transfers =0;
 	private double detTransfers =0;
 	private double walkDistance=0;
-	
-	
+
+
 	public PopulationResult(){
 	}
-		
+
 	public void addPath(final Id id, final Path path){
 		ConnectionResult connectionResult = new ConnectionResult(id, path);
 		this.connectionResultList.add(connectionResult);
-		connectionNumber = connectionResultList.size(); 
-		
+		connectionNumber = connectionResultList.size();
+
 		travelTime 	   += connectionResult.getTravelTime();
 		travelDistance += connectionResult.getDistance();
 		transfers 	   += connectionResult.getTransfers();
@@ -208,24 +227,24 @@ class PopulationResult {
 	public List<ConnectionResult> getConnectionResultList() {
 		return this.connectionResultList;
 	}
-	
+
 	public double getDistanceAvg() {
-		return this.travelDistance / connectionNumber; 
+		return this.travelDistance / connectionNumber;
 	}
-	
+
 	public double getTimeAvg() {
-		return this.travelTime / connectionNumber; 
+		return this.travelTime / connectionNumber;
 	}
-	
+
 	public double getTransferNum() {
 		return this.transfers / connectionNumber;
 	}
-	
+
 	public double getDetTransferNum() {
 		return this.detTransfers / connectionNumber;
 	}
-	
+
 	public double getWalkDistanceAvg() {
 		return this.walkDistance / connectionNumber;
 	}
-}	
+}

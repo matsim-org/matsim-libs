@@ -21,9 +21,9 @@ package playground.benjamin.old.income;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteWRefs;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.households.Income;
@@ -32,7 +32,7 @@ import org.matsim.households.Income.IncomePeriod;
 
 /**
  * @author dgrether
- * 
+ *
  */
 public class BKickLegScoring extends LegScoringFunction {
 
@@ -48,24 +48,24 @@ public class BKickLegScoring extends LegScoringFunction {
 		super(plan, params);
 		Income income = hhdb.getHousehold(plan.getPerson().getId()).getIncome();
 		this.incomePerTrip = this.calculateIncomePerTrip(income);
-		
+
 //		log.info("Using BKickLegScoring...");
 	}
 
 	@Override
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in
 		// seconds
 		double dist = 0.0; // distance in meters
 
 		if (TransportMode.car.equals(leg.getMode())) {
-			RouteWRefs route = leg.getRoute();
+			Route route = leg.getRoute();
 			dist = route.getDistance();
 			if (Double.isNaN(dist)){
 				throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
 			}
-			
+
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist
 					* betaIncomeCar / this.incomePerTrip + betaIncomeCar * Math.log(this.incomePerTrip);
 		}

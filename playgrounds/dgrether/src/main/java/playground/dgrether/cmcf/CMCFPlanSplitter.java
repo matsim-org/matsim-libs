@@ -20,13 +20,13 @@ package playground.dgrether.cmcf;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -61,14 +61,14 @@ public class CMCFPlanSplitter {
 			Plan pl = p.getSelectedPlan();
 		  int i = 0;
 		  for (PlanElement pe : pl.getPlanElements()) {
-		  	if (pe instanceof LegImpl) {
+		  	if (pe instanceof Leg) {
 		  		StringBuffer idStringBuffer = new StringBuffer(p.getId().toString());
 		  		idStringBuffer.append("leg");
 		  		idStringBuffer.append(Integer.toString(i));
 
 		  		PersonImpl pNew = new PersonImpl(new IdImpl(idStringBuffer.toString()));
 		  		PlanImpl planNew = new PlanImpl(pNew);
-		  		LegImpl leg = (LegImpl) pe;
+		  		Leg leg = (Leg) pe;
 
 		  		planNew.addActivity(((PlanImpl) pl).getPreviousActivity(leg));
 		  		planNew.addLeg(leg);

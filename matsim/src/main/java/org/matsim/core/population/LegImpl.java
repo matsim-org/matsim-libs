@@ -27,9 +27,9 @@ import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
 public class LegImpl implements Leg {
-	
+
 	protected Route route = null;
-	
+
 	private double depTime = Time.UNDEFINED_TIME;
 	private double travTime = Time.UNDEFINED_TIME;
 	private TransportMode mode;
@@ -50,31 +50,37 @@ public class LegImpl implements Leg {
 		this.setDepartureTime(leg.getDepartureTime());
 		this.setTravelTime(leg.getTravelTime());
 		this.setArrivalTime(leg.getArrivalTime());
-		if (leg.getRoute() != null) {
-			this.setRoute(leg.getRoute().clone());
+		if (leg.getRoute() != null && leg.getRoute() instanceof RouteWRefs) {
+			this.setRoute(((RouteWRefs) leg.getRoute()).clone());
 		}
 	}
-	
+
+	@Override
 	public final TransportMode getMode() {
 		return this.mode;
 	}
 
+	@Override
 	public final void setMode(TransportMode mode) {
 		this.mode = mode;
 	}
 
+	@Override
 	public final double getDepartureTime() {
 		return this.depTime;
 	}
 
+	@Override
 	public final void setDepartureTime(final double depTime) {
 		this.depTime = depTime;
 	}
 
+	@Override
 	public final double getTravelTime() {
 		return this.travTime;
 	}
 
+	@Override
 	public final void setTravelTime(final double travTime) {
 		this.travTime = travTime;
 	}
@@ -87,10 +93,12 @@ public class LegImpl implements Leg {
 		this.arrTime = arrTime;
 	}
 
-	public RouteWRefs getRoute() {
-		return (RouteWRefs) this.route;
+	@Override
+	public Route getRoute() {
+		return this.route;
 	}
-	
+
+	@Override
 	public final void setRoute(Route route) {
 		this.route = route;
 	}

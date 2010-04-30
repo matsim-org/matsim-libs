@@ -30,13 +30,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.charts.BarChart;
@@ -92,8 +92,8 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		double throughDayDist = 0.0;
 
 		for (PlanElement pe : plan.getPlanElements())
-			if (pe instanceof LegImpl) {
-				LegImpl bl = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				Leg bl = (Leg) pe;
 				ActTypeZrh ats = null;
 				String tmpActType = ((PlanImpl) plan).getNextActivity(bl)
 						.getType();

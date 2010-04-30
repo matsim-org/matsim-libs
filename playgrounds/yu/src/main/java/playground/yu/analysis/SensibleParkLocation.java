@@ -28,6 +28,7 @@ import java.util.List;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -119,8 +120,8 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 		sb.append(plan.getPerson().getId());
 		sb.append('\n');
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				// if(act.getType())
 				sb.append(act.getType());
 				sb.append("\tlinkId :\t");

@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -55,7 +55,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		return p;
 	}
 
-	public AbstractFeatureType createPTLinkFeature(final Coord from, final Coord to, LegImpl leg, StyleType networkStyle) {
+	public AbstractFeatureType createPTLinkFeature(final Coord from, final Coord to, Leg leg, StyleType networkStyle) {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		double dist = (leg.getRoute() instanceof NetworkRoute ? RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network) : Double.NaN);
 		folder.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + dist);
@@ -118,7 +118,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		return folder;
 	}
 
-	public AbstractFeatureType createWalkLinkFeature(final Coord from, final Coord to, LegImpl leg, StyleType networkStyle) {
+	public AbstractFeatureType createWalkLinkFeature(final Coord from, final Coord to, Leg leg, StyleType networkStyle) {
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		double dist = (leg.getRoute() instanceof NetworkRoute ? RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network) : Double.NaN);
 		p.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + dist);

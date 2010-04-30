@@ -28,13 +28,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -91,8 +91,8 @@ public class SameActLocTest {
 				if (p != null) {
 					// Plan.Type planType = p.getType();
 					for (PlanElement pe : p.getPlanElements()) {
-						if (pe instanceof ActivityImpl) {
-							ActivityImpl act = (ActivityImpl) pe;
+						if (pe instanceof Activity) {
+							Activity act = (Activity) pe;
 							nextTmpLinkId = act.getLinkId().toString();
 							if (tmpLinkId != null && nextTmpLinkId != null)
 								if (tmpLinkId.equals(nextTmpLinkId)) {

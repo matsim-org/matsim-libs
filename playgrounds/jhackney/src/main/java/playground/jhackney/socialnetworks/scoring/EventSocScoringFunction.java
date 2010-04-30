@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 
@@ -82,8 +81,8 @@ public class EventSocScoringFunction implements ScoringFunction{
 		this.scoringFunction.finish();
 
 		for (PlanElement pe : this.plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				if(act.getType().equals(factype)){
 					this.friendFoeRatio+=actStats.get(act).get(0);
 					this.nFriends+=actStats.get(act).get(1);

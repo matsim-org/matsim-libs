@@ -11,6 +11,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -156,8 +157,8 @@ public class Converter {
 				PlanImpl nonCarPlan = new org.matsim.core.population.PlanImpl(p);
 				nonCarPlan.copyPlan(tmpPl);
 				for (PlanElement pe : nonCarPlan.getPlanElements()) {
-					if (pe instanceof LegImpl) {
-						((LegImpl) pe).setMode(TransportMode.pt);
+					if (pe instanceof Leg) {
+						((Leg) pe).setMode(TransportMode.pt);
 					}
 				}
 				p.addPlan(nonCarPlan);

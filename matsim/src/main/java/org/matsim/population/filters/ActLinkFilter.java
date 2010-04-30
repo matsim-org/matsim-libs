@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
@@ -33,7 +34,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 /**
  * Filters all plans where activities of the same type take place at the same link or set of links.
  * For example: Filter all agents who are neighbors (have their home location on the same link)
- * 
+ *
  * @author meisterk
  */
 public class ActLinkFilter extends AbstractPlanFilter {
@@ -54,7 +55,7 @@ public class ActLinkFilter extends AbstractPlanFilter {
 	@Override
 	public boolean judge(final Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
+			if (pe instanceof Activity) {
 				ActivityImpl act = (ActivityImpl) pe;
 				if (Pattern.matches(actTypePattern, act.getType())) {
 					if (this.linkIds.contains(act.getLinkId())) {

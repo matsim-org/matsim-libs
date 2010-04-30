@@ -1,15 +1,31 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.test;
 
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -71,8 +87,8 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
 			for (PlanElement pe : plan.getPlanElements())
-				if (pe instanceof LegImpl)
-					legChainModes.append(((LegImpl) pe).getMode() + "|");
+				if (pe instanceof Leg)
+					legChainModes.append(((Leg) pe).getMode() + "|");
 
 			assertEquals("different legChainModes?", criterion, legChainModes
 					.toString());
@@ -126,8 +142,8 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
 			for (PlanElement pe : plan.getPlanElements())
-				if (pe instanceof LegImpl)
-					legChainModes.append(((LegImpl) pe).getMode() + "|");
+				if (pe instanceof Leg)
+					legChainModes.append(((Leg) pe).getMode() + "|");
 
 			assertEquals("different legChainModes?", criterion, legChainModes
 					.toString());
@@ -181,19 +197,13 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
 			for (PlanElement pe : plan.getPlanElements())
-				if (pe instanceof LegImpl)
-					legChainModes.append(((LegImpl) pe).getMode() + "|");
+				if (pe instanceof Leg)
+					legChainModes.append(((Leg) pe).getMode() + "|");
 
 			assertEquals("different legChainModes?", criterion, legChainModes
 					.toString());
 		}
 	}
-
-	// @Override
-	// protected void tearDown() throws Exception {
-	// super.tearDown();
-	// Gbl.reset();
-	// }
 
 	public void testLegChainModes1() {
 		// the agent in the initial plan has only "walk" legs.

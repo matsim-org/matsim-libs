@@ -19,14 +19,14 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis.forMuc;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -37,7 +37,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ModeSplit4Muc extends ModeSplit implements Analysis4Muc {
 	private int rideLegs = 0,//
@@ -50,14 +50,15 @@ public class ModeSplit4Muc extends ModeSplit implements Analysis4Muc {
 		super(toll);
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		boolean inRange = false;
 		if (toll != null)
 			inRange = TollTools.isInRange(((PlanImpl) plan).getFirstActivity()
 					.getLinkId(), toll);
 		for (PlanElement pe : plan.getPlanElements())
-			if (pe instanceof LegImpl) {
-				TransportMode m = ((LegImpl) pe).getMode();
+			if (pe instanceof Leg) {
+				TransportMode m = ((Leg) pe).getMode();
 				switch (m) {
 				case car:
 					carLegs++;
@@ -126,6 +127,7 @@ public class ModeSplit4Muc extends ModeSplit implements Analysis4Muc {
 		return sb.toString();
 	}
 
+	@Override
 	public void write(final String outputPath) {
 		SimpleWriter sw = new SimpleWriter(outputPath + "modalSplitLegs.txt");
 		sw.write(toString());

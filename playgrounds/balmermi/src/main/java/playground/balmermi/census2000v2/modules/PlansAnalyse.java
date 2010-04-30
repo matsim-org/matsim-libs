@@ -22,13 +22,13 @@ package playground.balmermi.census2000v2.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
 public class PlansAnalyse {
@@ -105,8 +105,8 @@ public class PlansAnalyse {
 			if (p.getPlans().size() != 1) { Gbl.errorMsg("pid="+p.getId()+": There must be exactly one plan per person!"); }
 			Plan plan = p.getPlans().get(0);
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl a = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity a = (Activity) pe;
 					if (a.getType().substring(0,1).equals(H))      { at_cnt[0]++; }
 					else if (a.getType().substring(0,1).equals(W)) { at_cnt[1]++; }
 					else if (a.getType().substring(0,1).equals(E)) { at_cnt[2]++; }
@@ -119,8 +119,8 @@ public class PlansAnalyse {
 			// mode types
 			int cnt = 0;
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof LegImpl) {
-					LegImpl l = (LegImpl) pe;
+				if (pe instanceof Leg) {
+					Leg l = (Leg) pe;
 					cnt++;
 					if (l.getMode().equals(TransportMode.car))       { mtype_cnt[0]++; }
 					else if (l.getMode().equals(TransportMode.pt))   { mtype_cnt[1]++; }

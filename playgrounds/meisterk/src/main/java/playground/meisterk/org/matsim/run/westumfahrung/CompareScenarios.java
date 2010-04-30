@@ -34,6 +34,7 @@ import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
@@ -42,7 +43,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -448,14 +448,14 @@ public class CompareScenarios {
 					}
 				}
 
-				ActivityImpl homeActivity = null;
+				Activity homeActivity = null;
 				if (analysis.intValue() == ROUTE_SWITCHERS_ANALYSIS_NAME) {
 					if (scenarioName.equals(this.scenarioNames[0])) {
 						this.routeSwitchersLines.add("person\thome_link\thome_x\thome_y");
 						for (Person person : plansSubPop.getPersons().values()) {
 							for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-								if (pe instanceof ActivityImpl) {
-									homeActivity = (ActivityImpl) pe;
+								if (pe instanceof Activity) {
+									homeActivity = (Activity) pe;
 									if (Pattern.matches(".*h.*", homeActivity.getType())) {
 										continue;
 									}

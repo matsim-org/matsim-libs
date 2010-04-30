@@ -28,10 +28,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.population.routes.RouteWRefs;
 
 /**
  * @author dgrether
@@ -79,7 +79,7 @@ public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 	 *
 	 * @see #setRouteFactory(TransportMode, RouteFactory)
 	 */
-	public RouteWRefs createRoute(final TransportMode mode, final Id startLinkId, final Id endLinkId) {
+	public Route createRoute(final TransportMode mode, final Id startLinkId, final Id endLinkId) {
 		RouteFactory factory = this.routeFactories.get(mode);
 		if (factory == null) {
 			factory = this.defaultFactory;

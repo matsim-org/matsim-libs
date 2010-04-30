@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -186,7 +187,7 @@ public class KMLPersonPlanWriter {
 
 			if (planElement instanceof LegImpl) {
 
-				LegImpl leg = (LegImpl) planElement;
+				Leg leg = (LegImpl) planElement;
 
 				if (leg.getMode() == TransportMode.car) {
 
@@ -305,7 +306,7 @@ public class KMLPersonPlanWriter {
 		}
 	}
 
-	private ArrayList<Id> getLinkIdsOfCarLeg(LegImpl leg) {
+	private ArrayList<Id> getLinkIdsOfCarLeg(Leg leg) {
 
 		ArrayList<Id> linkIds = new ArrayList<Id>();
 			if (leg.getMode() == TransportMode.car) {

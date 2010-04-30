@@ -32,12 +32,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.testcases.utils.AttributesBuilder;
 import org.xml.sax.Attributes;
@@ -113,27 +114,27 @@ public class PopulationReaderMatsimV4Test {
 		Assert.assertEquals("population size.", 2, population.getPersons().size());
 		Person person1 = population.getPersons().get(scenario.createId("1"));
 		Plan plan1 = person1.getPlans().get(0);
-		LegImpl leg1a = (LegImpl) plan1.getPlanElements().get(1);
-		RouteWRefs route1a = leg1a.getRoute();
+		Leg leg1a = (Leg) plan1.getPlanElements().get(1);
+		Route route1a = leg1a.getRoute();
 		Assert.assertEquals("different startLink for first leg.", network.getLinks().get(scenario.createId("1")).getId(), route1a.getStartLinkId());
 		Assert.assertEquals("different endLink for first leg.", network.getLinks().get(scenario.createId("20")).getId(), route1a.getEndLinkId());
-		LegImpl leg1b = (LegImpl) plan1.getPlanElements().get(3);
-		RouteWRefs route1b = leg1b.getRoute();
+		Leg leg1b = (Leg) plan1.getPlanElements().get(3);
+		Route route1b = leg1b.getRoute();
 		Assert.assertEquals("different startLink for second leg.", network.getLinks().get(scenario.createId("20")).getId(), route1b.getStartLinkId());
 		Assert.assertEquals("different endLink for second leg.", network.getLinks().get(scenario.createId("20")).getId(), route1b.getEndLinkId());
-		LegImpl leg1c = (LegImpl) plan1.getPlanElements().get(5);
-		RouteWRefs route1c = leg1c.getRoute();
+		Leg leg1c = (Leg) plan1.getPlanElements().get(5);
+		Route route1c = leg1c.getRoute();
 		Assert.assertEquals("different startLink for third leg.", network.getLinks().get(scenario.createId("20")).getId(), route1c.getStartLinkId());
 		Assert.assertEquals("different endLink for third leg.", network.getLinks().get(scenario.createId("1")).getId(), route1c.getEndLinkId());
 
 		Person person2 = population.getPersons().get(scenario.createId("2"));
 		Plan plan2 = person2.getPlans().get(0);
-		LegImpl leg2a = (LegImpl) plan2.getPlanElements().get(1);
-		RouteWRefs route2a = leg2a.getRoute();
+		Leg leg2a = (Leg) plan2.getPlanElements().get(1);
+		Route route2a = leg2a.getRoute();
 		Assert.assertEquals("different startLink for first leg.", network.getLinks().get(scenario.createId("2")).getId(), route2a.getStartLinkId());
 		Assert.assertEquals("different endLink for first leg.", network.getLinks().get(scenario.createId("20")).getId(), route2a.getEndLinkId());
-		LegImpl leg2b = (LegImpl) plan2.getPlanElements().get(3);
-		RouteWRefs route2b = leg2b.getRoute();
+		Leg leg2b = (Leg) plan2.getPlanElements().get(3);
+		Route route2b = leg2b.getRoute();
 		Assert.assertEquals("different startLink for third leg.", network.getLinks().get(scenario.createId("20")).getId(), route2b.getStartLinkId());
 		Assert.assertEquals("different endLink for third leg.", network.getLinks().get(scenario.createId("1")).getId(), route2b.getEndLinkId());
 	}
@@ -171,8 +172,8 @@ public class PopulationReaderMatsimV4Test {
 		Assert.assertEquals("population size.", 1, population.getPersons().size());
 		Person person1 = population.getPersons().get(scenario.createId("981"));
 		Plan plan1 = person1.getPlans().get(0);
-		LegImpl leg1 = (LegImpl) plan1.getPlanElements().get(1);
-		RouteWRefs route1 = leg1.getRoute();
+		Leg leg1 = (Leg) plan1.getPlanElements().get(1);
+		Route route1 = leg1.getRoute();
 		Assert.assertNotNull(route1);
 	}
 

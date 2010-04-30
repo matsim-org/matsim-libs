@@ -24,13 +24,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -86,7 +87,7 @@ public class PlanImplTest extends MatsimTestCase {
 	public void testInsertActLeg_Between() {
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		ActivityImpl homeAct = plan.createAndAddActivity("h", new CoordImpl(0, 0));
-		LegImpl leg1 = plan.createAndAddLeg(TransportMode.car);
+		Leg leg1 = plan.createAndAddLeg(TransportMode.car);
 		ActivityImpl workAct = plan.createAndAddActivity("w", new CoordImpl(100, 200));
 
 		// precondition
@@ -94,7 +95,7 @@ public class PlanImplTest extends MatsimTestCase {
 
 		// modification
 		ActivityImpl a = new ActivityImpl("l", new CoordImpl(200, 100));
-		LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
+		Leg l = new LegImpl(TransportMode.car);
 		plan.insertLegAct(1, l, a);
 
 		// test
@@ -112,7 +113,7 @@ public class PlanImplTest extends MatsimTestCase {
 	public void testInsertActLeg_AtEnd() {
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		ActivityImpl homeAct = plan.createAndAddActivity("h", new CoordImpl(0, 0));
-		LegImpl leg1 = plan.createAndAddLeg(TransportMode.car);
+		Leg leg1 = plan.createAndAddLeg(TransportMode.car);
 		ActivityImpl workAct = plan.createAndAddActivity("w", new CoordImpl(100, 200));
 
 		// precondition
@@ -120,7 +121,7 @@ public class PlanImplTest extends MatsimTestCase {
 
 		// modification
 		ActivityImpl a = new ActivityImpl("l", new CoordImpl(200, 100));
-		LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
+		Leg l = new LegImpl(TransportMode.car);
 		plan.insertLegAct(3, l, a);
 
 		// test
@@ -146,7 +147,7 @@ public class PlanImplTest extends MatsimTestCase {
 
 		// modification
 		ActivityImpl a = new ActivityImpl("l", new CoordImpl(200, 100));
-		LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
+		Leg l = new LegImpl(TransportMode.car);
 		try {
 			plan.insertLegAct(2, l, a);
 			fail("expected Exception because of wrong act/leg-index.");
@@ -169,7 +170,7 @@ public class PlanImplTest extends MatsimTestCase {
 
 		// modification
 		ActivityImpl a = new ActivityImpl("l", new CoordImpl(200, 100));
-		LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
+		Leg l = new LegImpl(TransportMode.car);
 		try {
 			plan.insertLegAct(0, l, a);
 			fail("expected Exception because of wrong act/leg-index.");
@@ -193,7 +194,7 @@ public class PlanImplTest extends MatsimTestCase {
 
 		// modification
 		ActivityImpl a = new ActivityImpl("l", new CoordImpl(200, 100));
-		LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
+		Leg l = new LegImpl(TransportMode.car);
 		try {
 			plan.insertLegAct(4, l, a);
 			fail("expected Exception because of wrong act/leg-index.");
@@ -220,9 +221,9 @@ public class PlanImplTest extends MatsimTestCase {
 
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("w", new CoordImpl(100, 200));
-		RouteWRefs route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
+		Route route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
 
@@ -231,7 +232,7 @@ public class PlanImplTest extends MatsimTestCase {
 
 		assertEquals("person must not be copied.", new IdImpl(2), plan2.getPerson().getId());
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
-		RouteWRefs route2 = ((LegImpl) plan.getPlanElements().get(1)).getRoute();
+		Route route2 = ((Leg) plan.getPlanElements().get(1)).getRoute();
 		assertTrue(route2 instanceof NetworkRoute);
 		assertEquals(98.76, route2.getTravelTime(), EPSILON);
 	}
@@ -246,9 +247,9 @@ public class PlanImplTest extends MatsimTestCase {
 
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("w", new CoordImpl(100, 200));
-		RouteWRefs route = new GenericRouteImpl(link1.getId(), link2.getId());
+		Route route = new GenericRouteImpl(link1.getId(), link2.getId());
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
 
@@ -257,7 +258,7 @@ public class PlanImplTest extends MatsimTestCase {
 
 		assertEquals("person must not be copied.", new IdImpl(2), plan2.getPerson().getId());
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
-		RouteWRefs route2 = ((LegImpl) plan.getPlanElements().get(1)).getRoute();
+		Route route2 = ((Leg) plan.getPlanElements().get(1)).getRoute();
 		assertTrue(route2 instanceof GenericRoute);
 		assertEquals(98.76, route2.getTravelTime(), EPSILON);
 	}

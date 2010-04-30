@@ -1,15 +1,34 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.ciarif.flexibletransports.scoring;
 
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
@@ -35,8 +54,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 	}
 
 	@Override
-	protected double calcLegScore(double departureTime, double arrivalTime,
-			LegImpl leg) {
+	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg) {
 
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
@@ -50,7 +68,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			tmpScore += this.ftConfigGroup.getConstCar();
 
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
-				RouteWRefs route = leg.getRoute();
+				Route route = leg.getRoute();
 				dist = route.getDistance();
 				tmpScore += this.params.marginalUtilityOfDistanceCar * ftConfigGroup.getDistanceCostCar()/1000d * dist;
 			}
@@ -70,7 +88,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			}
 
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
-				RouteWRefs route = leg.getRoute();
+				Route route = leg.getRoute();
 				dist = ((FtCarSharingRoute) leg.getRoute()).calcCarDistance(actPrev, actNext);
 				tmpScore += this.params.marginalUtilityOfDistanceCar * ftConfigGroup.getDistanceCostCar()/1000d * dist;
 			}

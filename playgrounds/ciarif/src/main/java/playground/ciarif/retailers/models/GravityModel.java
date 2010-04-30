@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.ciarif.retailers.models;
 
 import java.util.ArrayList;
@@ -8,6 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -16,10 +36,10 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+
 import playground.ciarif.retailers.data.PersonRetailersImpl;
 import playground.ciarif.retailers.data.RetailZone;
 import playground.ciarif.retailers.data.RetailZones;
@@ -27,7 +47,7 @@ import playground.ciarif.retailers.data.RetailZones;
 public class GravityModel
 {
   private static final Logger log = Logger.getLogger(GravityModel.class);
-  
+
   public final static String CONFIG_GROUP = "GravityModel";
   public final static String CONFIG_ZONES = "zones";
   public final static String CONFIG_PARTITION = "partition";
@@ -45,8 +65,8 @@ public class GravityModel
   private final Map<Id, PersonImpl> persons = new TreeMap<Id,PersonImpl>();
   private int counter=0;
   private int nextCounterMsg =1;
-  
- 
+
+
   public GravityModel(Controler controler, Map<Id, ActivityFacilityImpl> retailerFacilities)
   {
     this.controler = controler;
@@ -54,15 +74,15 @@ public class GravityModel
     this.controlerFacilities = controler.getFacilities();
     this.shops = this.findScenarioShops(this.controlerFacilities.getFacilities().values());
     for (Person p:controler.getPopulation().getPersons().values()){
-    	
+
     	PersonImpl pi = (PersonImpl)p;
     	this.persons.put(pi.getId(), pi);
-    }    
- 
+    }
+
   }
- 
+
 	public void init() {
-		  
+
 		//String type_of_partition = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_PARTITION);
 		int number_of_zones =0;
 		int n = (int)Double.parseDouble(controler.getConfig().findParam(CONFIG_GROUP,CONFIG_ZONES));
@@ -76,7 +96,7 @@ public class GravityModel
 		//this.createZonesFromFacilities(n);
 		this.findScenarioShops(this.controlerFacilities.getFacilities().values());
 		Gbl.printMemoryUsage();
-		
+
 		for  (PersonImpl pi:this.persons.values()) {
 			PersonRetailersImpl pr = new PersonRetailersImpl(pi);
 			this.retailersPersons.put(pr.getId(), pr);
@@ -84,42 +104,42 @@ public class GravityModel
 	}
 
 	public double computePotential(ArrayList<Integer> solution){
-		
+
 		double global_likelihood = 0;
 	    int a = 0;
-	    
+
 	    for (ActivityFacility c : this.retailersFacilities.values()) {
 	    String linkId = this.first.get(solution.get(a));
 	    Coord coord = this.controler.getNetwork().getLinks().get(new IdImpl(linkId)).getCoord();
 		++a;
 		double loc_likelihood = 0.0D;
-		
+
 			for (PersonRetailersImpl pr : this.retailersPersons.values()) {
-	        
+
 				double pers_sum_potential = 0.0D;
 				double pers_potential = 0.0D;
 				double pers_likelihood = 0.0D;
-	        
+
 				ActivityFacility firstFacility = this.controlerFacilities.getFacilities().get(((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacilityId());
 				double dist1 = ((ActivityFacilityImpl) firstFacility).calcDistance(coord);
 				if (dist1 == 0.0D) {
 	        	dist1 = 10.0D;
 				}
 				pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOptions().get("shop").getCapacity().doubleValue(), this.betas[1]);
-	        
+
 	        	if (pr.getGlobalShopsUtility()==0) {
 	        		this.processPerson();
-	        	
+
 	        		for (ActivityFacility s : this.shops.values()) {
 	        			double dist = 0.0D;
 	        			int count=0;
-		         
+
 	        			for (ActivityFacility af: this.retailersFacilities.values()){
-			          
+
 	        				if (af.equals(s)){
 	        					int index = count;
 	        					Coord coord1 = this.controler.getNetwork().getLinks().get(new IdImpl(this.first.get(solution.get(index)))).getCoord();
-			            
+
 	        					dist = ((ActivityFacilityImpl) firstFacility).calcDistance(coord1);
 	        					if (dist == 0.0D) {
 	        						dist = 10.0D;
@@ -127,33 +147,33 @@ public class GravityModel
 	        				}
 	        				else if (CoordUtils.calcDistance(s.getCoord(), ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord()) == 0.0D) {
 			        	  dist = 10.0D;
-	        				} 
-			          
+	        				}
+
 	        				else {
 	        					dist = CoordUtils.calcDistance(s.getCoord(), ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord());
 	        				}
 	        				++count;
-	        			} 
-		
+	        			}
+
 		          double potential = Math.pow(dist, this.betas[0]) + Math.pow(s.getActivityOptions().get("shop").getCapacity().doubleValue(), this.betas[1]);
 		          ;
 		          pers_sum_potential += potential;
 	        	}
 	        	pr.setGlobalShopsUtility(pers_sum_potential);
-	        }    
+	        }
 	        pers_likelihood = pers_potential / pr.getGlobalShopsUtility();
 	        loc_likelihood += pers_likelihood;
 	      }
-	
+
 	      global_likelihood += loc_likelihood;
-	     
+
 	    }
-	    
+
 	    return global_likelihood;
 	  }
-  
+
   private Map<Id,ActivityFacilityImpl> findScenarioShops (Collection<? extends ActivityFacility> controlerFacilities) {
-	  
+
 		Map<Id,ActivityFacilityImpl> shops = new TreeMap<Id,ActivityFacilityImpl>();
 		for (ActivityFacility f : controlerFacilities) {
 			if (f.getActivityOptions().entrySet().toString().contains("shop")) {
@@ -194,7 +214,7 @@ public class GravityModel
 			double y_width = (maxy - miny)/n;
 			int a = 0;
 			int i = 0;
-			
+
 			while (i<n) {
 				int j = 0;
 				while (j<n) {
@@ -206,32 +226,32 @@ public class GravityModel
 					RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
 					for (PersonImpl p : persons.values() ) {
 						Coord c = this.controlerFacilities.getFacilities().get(((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacilityId()).getCoord();
-						if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
+						if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) {
 							rz.addPersonToQuadTree(c,p);
-						}		
-					} 
+						}
+					}
 					for (ActivityFacility af : shops.values()) {
 						Coord c = af.getCoord();
 						if (c.getX()< x2 & c.getX()>=x1 & c.getY()<y2 & c.getY()>=y1) {
 							rz.addShopToQuadTree(c,af);
 						}
-					}	
+					}
 					this.retailZones.addRetailZone(rz);
 					a=a+1;
 					j=j+1;
 				}
 				i=i+1;
-			} 
+			}
   }
-  
+
   //This version of the method uses only facilities in order to define the zones
   private void createZonesFromFacilities (int n) {
-		
+
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		
+
 		for (ActivityFacility af : this.controlerFacilities.getFacilities().values()) {
 			if (af.getCoord().getX() < minx) { minx = af.getCoord().getX(); }
 			if (af.getCoord().getY() < miny) { miny = af.getCoord().getY(); }
@@ -243,12 +263,12 @@ public class GravityModel
 		log.info("Min y = " + miny );
 		log.info("Max x = " + maxx );
 		log.info("Max y = " + maxy );
-		
+
 		double x_width = (maxx - minx)/n;
 		double y_width = (maxy - miny)/n;
 		int a = 0;
 		int i = 0;
-		
+
 		while (i<n) {
 			int j = 0;
 			while (j<n) {
@@ -262,24 +282,24 @@ public class GravityModel
 					// like it is now it is not needed to go through all zones again in order to assign them persons and shops
 					// the other way is probably cleaner and this part below doesn't need to appear twice
 					Coord c = this.controlerFacilities.getFacilities().get(((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacilityId()).getCoord();
-					if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
+					if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) {
 						rz.addPersonToQuadTree(c,p);
-					}		
-				} 
+					}
+				}
 				for (ActivityFacility af : shops.values()) {
 					Coord c = af.getCoord();
 					if (c.getX()< x2 & c.getX()>=x1 & c.getY()<y2 & c.getY()>=y1) {
 						rz.addShopToQuadTree(c,af);
 					}
-				}	
+				}
 				this.retailZones.addRetailZone(rz);
 				a=a+1;
 				j=j+1;
 			}
 			i=i+1;
-		} 
+		}
 	}
-  
+
   private void createZonesFromPersonsActivitiesShops (int n) {
 		log.info("Zones are created");
 		double minx = Double.POSITIVE_INFINITY;
@@ -303,12 +323,12 @@ public class GravityModel
 		log.info("Min y = " + miny );
 		log.info("Max x = " + maxx );
 		log.info("Max y = " + maxy );
-		
+
 			double x_width = (maxx - minx)/n;
 			double y_width = (maxy - miny)/n;
 			int a = 0;
 			int i = 0;
-			
+
 			while (i<n) {
 				int j = 0;
 				while (j<n) {
@@ -320,32 +340,32 @@ public class GravityModel
 					RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
 					for (Person p : persons.values() ) {
 						for (PlanElement pe:p.getSelectedPlan().getPlanElements()){
-							if (pe instanceof ActivityImpl) {
-								ActivityImpl act = (ActivityImpl) pe;
+							if (pe instanceof Activity) {
+								Activity act = (Activity) pe;
 								if (act.getType().equals("work") || act.getType().equals("home") || act.getType().equals("education")) {
-									Coord c = this.controlerFacilities.getFacilities().get(act.getFacilityId()).getCoord();	
+//									Coord c = this.controlerFacilities.getFacilities().get(act.getFacilityId()).getCoord();
 								}
-							}	
+							}
 						}
 						Coord c = this.controlerFacilities.getFacilities().get(((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacilityId()).getCoord();
-						if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
+						if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) {
 							rz.addPersonToQuadTree(c,p);
-						}		
-					} 
+						}
+					}
 					for (ActivityFacility af : shops.values()) {
 						Coord c = af.getCoord();
 						if (c.getX()< x2 & c.getX()>=x1 & c.getY()<y2 & c.getY()>=y1) {
 							rz.addShopToQuadTree(c,af);
 						}
-					}	
+					}
 					this.retailZones.addRetailZone(rz);
 					a=a+1;
 					j=j+1;
 				}
 				i=i+1;
-			} 
+			}
   }
-  
+
   public void processPerson() {
 		this.counter++;
 		if (this.counter == this.nextCounterMsg) {
@@ -370,7 +390,7 @@ public class GravityModel
 		  log.info("Betas = " + betas[0] + " " + betas[1]);
 		  return true;
 	  }
-	  
+
 	  public boolean setFirst (TreeMap<Integer, String> first){
 		  this.first=first;
 		  return true;

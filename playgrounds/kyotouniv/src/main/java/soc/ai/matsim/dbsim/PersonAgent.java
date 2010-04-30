@@ -28,12 +28,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -43,7 +43,7 @@ import org.matsim.core.utils.misc.Time;
 public class PersonAgent implements DriverAgent {
 	//TODO DriverModel driverModel = null; setter, getter;
 	//TODO VehicleEmulator vehEmu = null; setter, getter;
-	
+
 	private static final Logger log = Logger.getLogger(PersonAgent.class);
 
 	private final Person person;
@@ -60,7 +60,7 @@ public class PersonAgent implements DriverAgent {
 
 	private transient Id destinationLinkId;
 
-	private LegImpl currentLeg;
+	private Leg currentLeg;
 	private List<Id> cachedRouteLinkIds = null;
 
 	private int currentLinkIdIndex;
@@ -129,8 +129,8 @@ public class PersonAgent implements DriverAgent {
 		return false; // the agent has no leg, so nothing more to do
 	}
 
-	private void initNextLeg(double now, final LegImpl leg) {
-		RouteWRefs route = leg.getRoute();
+	private void initNextLeg(double now, final Leg leg) {
+		Route route = leg.getRoute();
 		if (route == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
 			AbstractSimulation.decLiving();
@@ -192,8 +192,8 @@ public class PersonAgent implements DriverAgent {
 				AbstractSimulation.decLiving();
 			}
 
-		} else if (pe instanceof LegImpl) {
-			initNextLeg(now, (LegImpl) pe);
+		} else if (pe instanceof Leg) {
+			initNextLeg(now, (Leg) pe);
 		} else {
 			throw new RuntimeException("Unknown PlanElement of type " + pe.getClass().getName());
 		}

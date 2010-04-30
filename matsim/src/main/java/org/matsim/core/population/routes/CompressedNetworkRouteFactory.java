@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 
 public class CompressedNetworkRouteFactory implements RouteFactory {
@@ -43,7 +44,7 @@ public class CompressedNetworkRouteFactory implements RouteFactory {
 	}
 
 	@Override
-	public RouteWRefs createRoute(Id startLinkId, Id endLinkId) {
+	public Route createRoute(Id startLinkId, Id endLinkId) {
 		if (this.subsequentLinks == null) {
 			this.subsequentLinks = new SubsequentLinksAnalyzer(this.network).getSubsequentLinks();
 		}

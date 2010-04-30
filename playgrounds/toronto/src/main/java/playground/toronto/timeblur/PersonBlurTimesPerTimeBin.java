@@ -22,11 +22,11 @@ package playground.toronto.timeblur;
 
 import java.util.Random;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -40,9 +40,9 @@ public class PersonBlurTimesPerTimeBin extends AbstractPersonAlgorithm implement
 
 	private final int mutationRange;
 	private final int binSize;
-	
+
 	private final Random rd = MatsimRandom.getLocalInstance();
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -69,15 +69,15 @@ public class PersonBlurTimesPerTimeBin extends AbstractPersonAlgorithm implement
 	public void run(Plan plan) {
 		int now = 0;
 		for (PlanElement e : plan.getPlanElements()) {
-			if (e instanceof ActivityImpl) {
-				ActivityImpl a = (ActivityImpl)e;
+			if (e instanceof Activity) {
+				Activity a = (Activity)e;
 				if (!a.equals(((PlanImpl) plan).getLastActivity())) {
 					a.setStartTime(now);
 					int min = now;
 					int endTime = (int)Math.round(a.getEndTime());
-					int max = (((int)(endTime/binSize))+1)*binSize;
+					int max = (((endTime/binSize))+1)*binSize;
 					if ((endTime-mutationRange) > min) {min = endTime-mutationRange; }
-					if (((int)(endTime/binSize))*binSize > min) { min = ((int)(endTime/binSize))*binSize; }
+					if (((endTime/binSize))*binSize > min) { min = ((endTime/binSize))*binSize; }
 					if ((endTime+mutationRange) < max) { max = endTime+mutationRange; }
 					a.setEndTime(rd.nextInt(max-min)+min);
 					now = (int)Math.round(a.getEndTime());

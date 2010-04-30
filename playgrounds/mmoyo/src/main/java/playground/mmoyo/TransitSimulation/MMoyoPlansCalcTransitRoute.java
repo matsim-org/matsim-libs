@@ -16,20 +16,16 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.TransitActsRemover;
-import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
@@ -122,7 +118,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 						Link lastActLink = fromLink;
 						Link toLink = null;
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							toLink = this.network.getLinks().get(((RouteWRefs) currentTuple.getSecond().get(1).getRoute()).getStartLinkId());
+							toLink = this.network.getLinks().get((currentTuple.getSecond().get(1).getRoute()).getStartLinkId());
 						} else {
 							toLink = this.network.getLinks().get(((Activity) planElements.get(i+1)).getLinkId());
 						}
@@ -132,7 +128,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 						Leg lastLeg = currentTuple.getSecond().get(currentTuple.getSecond().size() - 1);
 						toLink = this.network.getLinks().get(((Activity) planElements.get(i+1)).getLinkId());
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							fromLink = this.network.getLinks().get(((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLinkId());   //fromLink es el ultimo link de los pt legs
+							fromLink = this.network.getLinks().get((currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLinkId());   //fromLink es el ultimo link de los pt legs
 						}
 
 						//remove legs between a same link

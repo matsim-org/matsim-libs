@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.utils;
 
 import java.io.BufferedWriter;
@@ -8,13 +27,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -206,8 +225,8 @@ public class CompareSelectedPlansTable {
 
 		double travelTime = 0.0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				LegImpl leg = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 				travelTime += leg.getTravelTime();
 			}
 		}
@@ -218,8 +237,8 @@ public class CompareSelectedPlansTable {
 
 		double travelDist = 0.0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				LegImpl leg = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 				travelDist += leg.getRoute().getDistance();
 			}
 		}
@@ -230,7 +249,7 @@ public class CompareSelectedPlansTable {
 
 		int numberOfLegs = 0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof LegImpl) {
+			if (pe instanceof Leg) {
 				numberOfLegs++;
 			}
 		}

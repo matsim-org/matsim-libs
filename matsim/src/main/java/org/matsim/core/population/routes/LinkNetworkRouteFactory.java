@@ -21,6 +21,7 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Route;
 
 /**
  * @author mrieser
@@ -30,7 +31,7 @@ public class LinkNetworkRouteFactory implements RouteFactory {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public RouteWRefs createRoute(Id startLinkId, Id endLinkId) {
+	public Route createRoute(Id startLinkId, Id endLinkId) {
 		return new LinkNetworkRouteImpl(startLinkId, endLinkId);
 	}
 

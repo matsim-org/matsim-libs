@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis.forMuc;
 
@@ -11,11 +11,11 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -33,9 +33,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * daily distance analysis only for Berlin or for Berlin & Brandenburg
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 	private double carBusinessDist, carUnknownDist, carPrivateDist,
@@ -124,7 +124,7 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 		this.toll = toll;
 	}
 
-	protected ActType getLegIntent(PlanImpl plan, LegImpl currentLeg) {
+	protected ActType getLegIntent(PlanImpl plan, Leg currentLeg) {
 		ActType intent = null;
 		String tmpActType = plan.getNextActivity(currentLeg).getType();
 		for (ActTypeMuc actType : ActTypeMuc.values())
@@ -141,9 +141,9 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 	public void run(final Plan plan) {
 		double dayDist = 0.0, carDayDist = 0.0, ptDayDist = 0.0, wlkDayDist = 0.0, bikeDayDist = 0.0, rideDayDist = 0.0, othersDayDist = 0.0;
 		for (PlanElement pe : plan.getPlanElements())
-			if (pe instanceof LegImpl) {
+			if (pe instanceof Leg) {
 
-				LegImpl bl = (LegImpl) pe;
+				Leg bl = (Leg) pe;
 				ActTypeMuc legIntent = (ActTypeMuc) this.getLegIntent(
 						(PlanImpl) plan, bl);
 				Route route = bl.getRoute();
@@ -465,12 +465,12 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 		double sum = carDist + ptDist + wlkDist + bikeDist + rideDist
 				+ othersDist;
 
-		double avgCarDist = carDist / (int) count, //
-		avgPtDist = ptDist / (int) count, //
-		avgWlkDist = wlkDist / (int) count, //
-		avgBikeDist = bikeDist / (int) count, //
-		avgRideDist = rideDist / (int) count, //
-		avgOthersDist = othersDist / (int) count;
+		double avgCarDist = carDist / count, //
+		avgPtDist = ptDist / count, //
+		avgWlkDist = wlkDist / count, //
+		avgBikeDist = bikeDist / count, //
+		avgRideDist = rideDist / count, //
+		avgOthersDist = othersDist / count;
 
 		SimpleWriter sw = new SimpleWriter(outputFilename + "dailyDistance.txt");
 		sw.writeln("\tDaily Distance\tn_agents\t" + count);

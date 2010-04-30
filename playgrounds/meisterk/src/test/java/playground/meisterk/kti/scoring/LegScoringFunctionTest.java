@@ -22,6 +22,7 @@ package playground.meisterk.kti.scoring;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -31,7 +32,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -158,7 +158,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		RouteFactory ptRouteFactory = new KtiPtRouteFactory(this.plansCalcRouteKtiInfo);
 		this.network.getFactory().setRouteFactory(TransportMode.pt, ptRouteFactory);
 
-		RouteWRefs route = network.getFactory().createRoute(mode, startLink.getId(), endLink.getId());
+		Route route = network.getFactory().createRoute(mode, startLink.getId(), endLink.getId());
 		testLeg.setRoute(route);
 		route.setDistance(10000.0);
 		if (route instanceof KtiPtRoute) {

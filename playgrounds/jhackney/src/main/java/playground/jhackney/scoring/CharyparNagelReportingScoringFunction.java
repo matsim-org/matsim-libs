@@ -27,12 +27,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
@@ -43,7 +43,7 @@ import org.matsim.core.utils.misc.Time;
  * <blockquote>
  *  <p>Charypar, D. und K. Nagel (2005) <br>
  *  Generating complete all-day activity plans with genetic algorithms,<br>
- *  Transportation, 32 (4) 369–397.</p>
+ *  Transportation, 32 (4) 369-397.</p>
  * </blockquote>
  *
  * The scoring function takes
@@ -173,118 +173,102 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 	public double getScore() {
 		return this.score;
 	}
-	public double getDudur(ActivityImpl a){
-		if((dudur.size()>0)&&dudur.keySet().contains(a)){
+	public double getDudur(Activity a){
+		if(dudur.containsKey(a)){
 			return dudur.get(a);
-			}else{
-				return -999;
 			}
+			return -999;
 	}
-	public double getDuw(ActivityImpl a){
-		if((duw.size()>0)&&duw.keySet().contains(a)){
+	public double getDuw(Activity a){
+		if(duw.containsKey(a)){
 			return duw.get(a);
-			}else{
-				return 0;
-			}
+		}
+		return 0;
 	}
-	public double getDus(ActivityImpl a){
-		if((dus.size()>0)&&dus.keySet().contains(a)){
+	public double getDus(Activity a){
+		if(dus.containsKey(a)){
 			return dus.get(a);
-			}else{
-				return 0;
-			}
-	}
-	public double getDula(ActivityImpl a){
-		if((dula.size()>0)&&dula.keySet().contains(a)){
-		return dula.get(a);
-		}else
-			return 0;
-	}
-	public double getDued(ActivityImpl a){
-		if((dued.size()>0)&&dued.keySet().contains(a)){
-		return dued.get(a);
-		}else{
-			return 0;
 		}
-		
+		return 0;
 	}
-	public double getDuld(ActivityImpl a){
-		if((duld.size()>0)&&duld.keySet().contains(a)){
+	public double getDula(Activity a){
+		if(dula.containsKey(a)){
+			return dula.get(a);
+		}
+		return 0;
+	}
+	public double getDued(Activity a){
+		if(dued.containsKey(a)){
+			return dued.get(a);
+		}
+		return 0;
+	}
+	public double getDuld(Activity a){
+		if(duld.containsKey(a)){
 			return duld.get(a);
-			}else{
-				return 0;
-			}
-	}
-	public double getDulegt(LegImpl l){
-		if((dulegt.size()>0)&&dulegt.keySet().contains(l)){
-			return dulegt.get(l);
-			}else{
-				return 0;
-			}
-	}
-	public double getDulegd(LegImpl l){
-		if((dulegd.size()>0)&&dulegd.keySet().contains(l)){
-			return dulegd.get(l);
-			}else{
-				return 0;
-			}
-	}
-	
-	public double getUdur(ActivityImpl a){
-		if((udur.size()>0)&&udur.keySet().contains(a)){
-			return udur.get(a);
-			}else{
-				return -999;
-			}
-	}
-	public double getUw(ActivityImpl a){
-		if((uw.size()>0)&&uw.keySet().contains(a)){
-			return uw.get(a);
-			}else{
-				return 0;
-			}
-	}
-	public double getUs(ActivityImpl a){
-		if((us.size()>0)&&us.keySet().contains(a)){
-			return us.get(a);
-			}else{
-				return 0;
-			}
-	}
-	public double getUla(ActivityImpl a){
-		if((ula.size()>0)&&ula.keySet().contains(a)){
-		return ula.get(a);
-		}else
-			return 0;
-	}
-	public double getUed(ActivityImpl a){
-		if((ued.size()>0)&&ued.keySet().contains(a)){
-		return ued.get(a);
-		}else{
-			return 0;
 		}
-		
+		return 0;
 	}
-	public double getUld(ActivityImpl a){
-		if((uld.size()>0)&&uld.keySet().contains(a)){
+	public double getDulegt(Leg l){
+		if(dulegt.containsKey(l)){
+			return dulegt.get(l);
+		}
+		return 0;
+	}
+	public double getDulegd(Leg l){
+		if(dulegd.containsKey(l)){
+			return dulegd.get(l);
+		}
+		return 0;
+	}
+
+	public double getUdur(Activity a){
+		if(udur.containsKey(a)){
+			return udur.get(a);
+		}
+		return -999;
+	}
+	public double getUw(Activity a){
+		if(uw.containsKey(a)){
+			return uw.get(a);
+		}
+		return 0;
+	}
+	public double getUs(Activity a){
+		if(us.containsKey(a)){
+			return us.get(a);
+		}
+		return 0;
+	}
+	public double getUla(Activity a){
+		if(ula.containsKey(a)){
+			return ula.get(a);
+		}
+		return 0;
+	}
+	public double getUed(Activity a){
+		if(ued.containsKey(a)){
+		return ued.get(a);
+		}
+		return 0;
+	}
+	public double getUld(Activity a){
+		if(uld.containsKey(a)){
 			return uld.get(a);
-			}else{
-				return 0;
-			}
+		}
+		return 0;
 	}
-	public double getUlegt(LegImpl l){
-		if((ulegt.size()>0)&&ulegt.keySet().contains(l)){
+	public double getUlegt(Leg l){
+		if(ulegt.containsKey(l)){
 			return ulegt.get(l);
-			}else{
-				return 0;
-			}
+		}
+		return 0;
 	}
-	public double getUlegd(LegImpl l){
-		if((ulegd.size()>0)&&ulegd.keySet().contains(l)){
+	public double getUlegd(Leg l){
+		if(ulegd.containsKey(l)){
 			return ulegd.get(l);
-			}else{
-				return 0;
-			}
+		}
+		return 0;
 	}
 	/* At the moment, the following values are all static's. But in the longer run,
 	 * they should be agent-specific or facility-specific values...
@@ -299,7 +283,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 	private static double marginalUtilityOfPerforming = Double.NaN;
 	private static double marginalUtilityOfDistance = Double.NaN;
 	private static double abortedPlanScore = Double.NaN;
-	
+
 	private LinkedHashMap<ActivityImpl,Double> udur=new LinkedHashMap<ActivityImpl,Double>();
 	private LinkedHashMap<ActivityImpl,Double> uw=new LinkedHashMap<ActivityImpl,Double>();
 	private LinkedHashMap<ActivityImpl,Double> us=new LinkedHashMap<ActivityImpl,Double>();
@@ -316,7 +300,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 	private LinkedHashMap<ActivityImpl,Double> duld=new LinkedHashMap<ActivityImpl,Double>();
 	private LinkedHashMap<LegImpl,Double> dulegt=new LinkedHashMap<LegImpl,Double>();
 	private LinkedHashMap<LegImpl,Double> dulegd = new LinkedHashMap<LegImpl,Double>();
-	
+
 	private static void init() {
 		if (initialized) return;
 
@@ -335,7 +319,6 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),
 				Math.min(marginalUtilityOfTraveling, marginalUtilityOfWaiting)) * 3600.0 * 24.0; // SCENARIO_DURATION
-		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
 
 		readUtilityValues();
 		scoreActs = ((marginalUtilityOfPerforming != 0) || (marginalUtilityOfWaiting != 0) ||
@@ -389,7 +372,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		double activityEnd = departureTime;
 
 		//
-				
+
 		if ((openingTime >=  0) && (arrivalTime < openingTime)) {
 			activityStart = openingTime;
 		}
@@ -411,7 +394,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 			uw.put(act,marginalUtilityOfWaiting * (activityStart - arrivalTime));
 		}else uw.put(act,0.);
 		duw.put(act, marginalUtilityOfWaiting);
-		
+
 		// disutility if too late
 
 		double latestStartTime = params.getLatestStartTime();
@@ -420,7 +403,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 			ula.put(act,marginalUtilityOfLateArrival * (activityStart - latestStartTime));
 		}else ula.put(act,0.);
 		dula.put(act,marginalUtilityOfLateArrival);
-		
+
 		// utility of performing an action, duration is >= 1, thus log is no problem
 		double typicalDuration = params.getTypicalDuration();
 
@@ -431,14 +414,14 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 			double dutilPerf =marginalUtilityOfPerforming * typicalDuration/duration;
 			double dutilWait =marginalUtilityOfWaiting;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
-			udur.put(act,Math.max(0, Math.max(utilPerf, utilWait)));			
+			udur.put(act,Math.max(0, Math.max(utilPerf, utilWait)));
 			dudur.put(act,Math.max(0, Math.max(dutilPerf, dutilWait)));
 		} else {
 			tmpScore += 2*marginalUtilityOfLateArrival*Math.abs(duration);
 			udur.put(act,2*marginalUtilityOfLateArrival*Math.abs(duration));
 			dudur.put(act,2*marginalUtilityOfLateArrival);
 		}
-				
+
 		// disutility if stopping too early
 		double earliestEndTime = params.getEarliestEndTime();
 		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
@@ -446,14 +429,14 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 			ued.put(act,marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd));
 		}else ued.put(act,0.);
 		dued.put(act,marginalUtilityOfEarlyDeparture);
-		
+
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
 			tmpScore += marginalUtilityOfWaiting * (departureTime - activityEnd);
 			uld.put(act,marginalUtilityOfWaiting * (departureTime - activityEnd));
 		}else uld.put(act, 0.);
 		duld.put(act,marginalUtilityOfWaiting);
-		
+
 		// disutility if duration was too short
 		double minimalDuration = params.getMinimalDuration();
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
@@ -489,24 +472,17 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		double dtmpScore=0.;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
-		
+
 		if (marginalUtilityOfDistance != 0.0) {
 			/* we only as for the route when we have to calculate a distance cost,
 			 * because route.getDist() may calculate the distance if not yet
 			 * available, which is quite an expensive operation
 			 */
-			RouteWRefs route = leg.getRoute();
+			Route route = leg.getRoute();
 			dist = route.getDistance();
-			/* TODO the route-distance does not contain the length of the first or
-			 * last link of the route, because the route doesn't know those. Should
-			 * be fixed somehow, but how? MR, jan07
-			 */
-			/* TODO in the case of within-day replanning, we cannot be sure that the
-			 * distance in the leg is the actual distance driven by the agent.
-			 */
 		}
 		if (TransportMode.car.equals(leg.getMode())) {
-			tmpScore=travelTime * marginalUtilityOfTraveling - marginalUtilityOfDistance * dist; 
+			tmpScore=travelTime * marginalUtilityOfTraveling - marginalUtilityOfDistance * dist;
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 			tmpScore= travelTime * marginalUtilityOfTravelingPT - marginalUtilityOfDistance * dist;
 		} else if (TransportMode.walk.equals(leg.getMode())) {

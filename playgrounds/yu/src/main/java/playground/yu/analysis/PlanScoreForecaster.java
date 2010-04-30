@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -44,7 +45,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -101,11 +101,11 @@ public class PlanScoreForecaster {
 	public double getPlanScore() {
 		// boolean fistActDone = false;
 		for (PlanElement pe : this.plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				this.handleAct(act);
-			} else if (pe instanceof LegImpl) {
-				LegImpl leg = (LegImpl) pe;
+			} else if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 				this.handleLeg(leg);
 			}
 		}
@@ -129,16 +129,16 @@ public class PlanScoreForecaster {
 	 *
 	 * @param leg
 	 */
-	private void handleLeg(LegImpl leg) {
+	private void handleLeg(Leg leg) {
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		double travelTime_s = 0.0, departTime = leg.getDepartureTime(), legDist = route
 				.getDistance();
 		if (departTime < 0) {
-			Activity preAct = this.plan.getPreviousActivity(leg);
+			Activity preAct = (this.plan).getPreviousActivity(leg);
 			departTime = preAct.getEndTime();
 			if (departTime < 0 && oldSelected != null) {
-				LegImpl oldLeg = (LegImpl) oldSelected.getPlanElements().get(
-						plan.getActLegIndex(leg));
+				Leg oldLeg = (Leg) oldSelected.getPlanElements().get(
+						(plan).getActLegIndex(leg));
 				departTime = oldLeg.getDepartureTime();
 			}
 		}
@@ -170,10 +170,10 @@ public class PlanScoreForecaster {
 					+ "\t" + DebugTools.getLineNumber(new Exception())
 					+ "\tutil/score is a NaN.");
 
-		leg.setArrivalTime(departTime + travelTime_s);
+		((LegImpl) leg).setArrivalTime(departTime + travelTime_s);
 	}
 
-	private void handleAct(ActivityImpl act) {
+	private void handleAct(Activity act) {
 		ActivityParams actParams = this.scoring
 				.getActivityParams(act.getType());
 

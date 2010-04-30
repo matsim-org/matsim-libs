@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.LegImpl;
 
 /**
  * Changes the transportation mode of all legs in a plan to a randomly chosen
@@ -136,8 +135,8 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 
 	private void changeLegModeTo(List<PlanElement> tour, TransportMode newMode) {
 		for (PlanElement pe : tour) {
-			if (pe instanceof LegImpl) {
-				((LegImpl) pe).setMode(newMode);
+			if (pe instanceof Leg) {
+				((Leg) pe).setMode(newMode);
 			}
 		}
 	}
@@ -163,6 +162,6 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 	public void setChangeOnlyOneSubtour(boolean changeOnlyOneSubtour) {
 		this.changeOnlyOneSubtour = changeOnlyOneSubtour;
 	}
-	
+
 
 }

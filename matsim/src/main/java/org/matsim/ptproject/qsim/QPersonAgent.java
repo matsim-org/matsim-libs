@@ -25,16 +25,17 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -58,7 +59,7 @@ public class QPersonAgent implements PersonDriverAgent {
 
 	private transient Id destinationLinkId;
 
-	private LegImpl currentLeg;
+	private Leg currentLeg;
 	private List<Id> cachedRouteLinkIds = null;
 
 	private int currentLinkIdIndex;
@@ -91,12 +92,12 @@ public class QPersonAgent implements PersonDriverAgent {
 		 * we update the Reference to the currentLeg Object.
 		 */
 		PlanElement currentPlanElement = this.getPlanElements().get(this.currentPlanElementIndex);
-		if (currentPlanElement instanceof LegImpl)
+		if (currentPlanElement instanceof Leg)
 		{
-			this.setCurrentLeg((LegImpl) currentPlanElement);
+			this.setCurrentLeg((Leg) currentPlanElement);
 		}
 
-		RouteWRefs route = currentLeg.getRoute();
+		Route route = currentLeg.getRoute();
 		if (route == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
 			Simulation.decLiving();
@@ -138,7 +139,7 @@ public class QPersonAgent implements PersonDriverAgent {
 		return this.currentLeg;
 	}
 
-	protected void setCurrentLeg(final LegImpl leg) {
+	protected void setCurrentLeg(final Leg leg) {
 		this.currentLeg  = leg;
 		this.cachedRouteLinkIds = null;
 	}
@@ -155,7 +156,7 @@ public class QPersonAgent implements PersonDriverAgent {
 	public boolean initialize() {
 		List<? extends PlanElement> planElements = this.getPlanElements();
 		this.currentPlanElementIndex = 0;
-		ActivityImpl firstAct = (ActivityImpl) planElements.get(0);
+		Activity firstAct = (Activity) planElements.get(0);
 		double departureTime = firstAct.getEndTime();
 
 		this.currentLinkId = firstAct.getLinkId();
@@ -168,8 +169,8 @@ public class QPersonAgent implements PersonDriverAgent {
 		return false; // the agent has no leg, so nothing more to do
 	}
 
-	private void initNextLeg(double now, final LegImpl leg) {
-		RouteWRefs route = leg.getRoute();
+	private void initNextLeg(double now, final Leg leg) {
+		Route route = leg.getRoute();
 		if (route == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
 			Simulation.decLiving();
@@ -194,7 +195,7 @@ public class QPersonAgent implements PersonDriverAgent {
 	 * @param now the current time
 	 */
 	public void activityEnds(final double now) {
-		ActivityImpl act = (ActivityImpl) this.getPlanElements().get(this.currentPlanElementIndex);
+		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
 		this.simulation.getEventsManager().processEvent(new ActivityEndEventImpl(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 		advancePlanElement(now);
 	}
@@ -224,7 +225,7 @@ public class QPersonAgent implements PersonDriverAgent {
 		this.currentPlanElementIndex++;
 
 		PlanElement pe = this.getPlanElements().get(this.currentPlanElementIndex);
-		if (pe instanceof ActivityImpl) {
+		if (pe instanceof Activity) {
 			reachActivity(now, (ActivityImpl) pe);
 
 			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
@@ -235,8 +236,8 @@ public class QPersonAgent implements PersonDriverAgent {
 				Simulation.decLiving();
 			}
 
-		} else if (pe instanceof LegImpl) {
-			initNextLeg(now, (LegImpl) pe);
+		} else if (pe instanceof Leg) {
+			initNextLeg(now, (Leg) pe);
 		} else {
 			throw new RuntimeException("Unknown PlanElement of type " + pe.getClass().getName());
 		}
@@ -334,7 +335,7 @@ public class QPersonAgent implements PersonDriverAgent {
 		log.warn(this + " [no link to next routenode found: routeindex= " + this.currentLinkIdIndex + " ]");
 		return null;
 	}
-	
+
 	protected QSim getQSimulation(){
 		return this.simulation;
 	}

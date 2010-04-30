@@ -29,14 +29,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
@@ -97,7 +95,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		Link toLink = this.network.getLinks().get(toAct.getLinkId());
 		if (fromLink.equals(toLink)) {
 			// create an empty route == staying on place if toLink == endLink
-			RouteWRefs route = this.getRouteFactory().createRoute(mode, fromLink.getId(), toLink.getId());
+			Route route = this.getRouteFactory().createRoute(mode, fromLink.getId(), toLink.getId());
 			route.setTravelTime(travelTime);
 			if (Double.isNaN(route.getDistance())) {
 				route.setDistance(0.0);

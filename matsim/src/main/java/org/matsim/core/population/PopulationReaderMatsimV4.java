@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
@@ -43,7 +44,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -97,7 +97,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private PlanImpl currplan = null;
 	private ActivityImpl curract = null;
 	private LegImpl currleg = null;
-	private RouteWRefs currRoute = null;
+	private Route currRoute = null;
 	private String routeDescription = null;
 
 	private ActivityImpl prevAct = null;

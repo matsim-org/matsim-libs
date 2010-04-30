@@ -32,6 +32,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -50,8 +52,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -285,8 +285,8 @@ public class MyRuns {
 
 			ArrayList<TransportMode> modeChain = new ArrayList<TransportMode>();
 			for (PlanElement pe : selectedPlan.getPlanElements()) {
-				if (pe instanceof LegImpl) {
-					LegImpl leg = (LegImpl) pe;
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
 					modeChain.add(leg.getMode());
 				}
 			}
@@ -309,13 +309,13 @@ public class MyRuns {
 
 				for (PlanElement pe : selectedPlan.getPlanElements()) {
 
-					if (pe instanceof ActivityImpl) {
-						ActivityImpl act = (ActivityImpl) pe;
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
 						logger.info("\t" + act.getFacilityId());
 					}
 
-					if (pe instanceof LegImpl) {
-						LegImpl leg = (LegImpl) pe;
+					if (pe instanceof Leg) {
+						Leg leg = (Leg) pe;
 						modeChain.add(leg.getMode());
 						logger.info("\t" + leg.getMode());
 					}

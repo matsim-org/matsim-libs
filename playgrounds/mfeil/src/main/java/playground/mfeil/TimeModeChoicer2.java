@@ -29,17 +29,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.PlanScorer;
-import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
@@ -75,7 +73,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 	// TODO: this is bad programming style... needs to be improved!
 	@Override
 	public void run (Plan basePlan){
-		
+
 	//	log.info("Tmc2 person "+basePlan.getPerson().getId());
 	//	if (basePlan.getPerson().getId().toString().equals("1062251") ||
 	//			basePlan.getPerson().getId().toString().equals("4773280")) this.printing = true;
@@ -125,7 +123,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		 * Do this in any case as the car routes are required in the setTimes() method. */
 		ArrayList <LinkNetworkRouteImpl> routes = new ArrayList<LinkNetworkRouteImpl>();
 		for (int i=1;i<plan.getPlanElements().size();i=i+2){
-			RouteWRefs oldRoute = ((LegImpl)(plan.getPlanElements().get(i))).getRoute();
+			Route oldRoute = ((LegImpl)(plan.getPlanElements().get(i))).getRoute();
 			LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
 		/*	List<Id> l = new ArrayList<Id>();
 			for (int j=0;j<((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++){
@@ -322,7 +320,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 				((LegImpl)al.get(i)).setArrivalTime(time);
 				((LegImpl)al.get(i)).setMode(((LegImpl)(bestSolution.get(i))).getMode());
 
-				RouteWRefs oldRoute = ((LegImpl)(bestSolution.get(i))).getRoute();
+				Route oldRoute = ((LegImpl)(bestSolution.get(i))).getRoute();
 				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
 				List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
 				r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
@@ -332,7 +330,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		}
 		this.cleanRoutes(basePlan);
 	}
-	
+
 	public double getHomeMinimumTime (){
 		return this.minimumTime.get("home");
 	}

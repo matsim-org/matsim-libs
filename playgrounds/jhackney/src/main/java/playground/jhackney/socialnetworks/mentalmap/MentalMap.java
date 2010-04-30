@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -142,8 +143,8 @@ public class MentalMap {
 		if(aar==null) return;
 //		this.log.info("READING ACT-ACTIVITY MAP FROM FILE PERSON "+myPlan.getPerson().getId());
 		for (PlanElement pe : myPlan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl myAct = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity myAct = (Activity) pe;
 
 				TreeMap<Id,String> nextFac = aar.getNextPoint();
 				Id myFacilityId = nextFac.firstKey();
@@ -168,8 +169,8 @@ public class MentalMap {
 //		or else a standard MATSim "type" when this becomes established
 
 		for (PlanElement pe : myPlan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl myAct = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity myAct = (Activity) pe;
 
 				String type="none";
 				char typechar=myAct.getType().charAt(0);
@@ -222,8 +223,8 @@ public class MentalMap {
 			ArrayList<Id> currentActivities = new ArrayList<Id>();
 			for (Plan myPlan : myPlans) {
 				for (PlanElement pe : myPlan.getPlanElements()) {
-					if (pe instanceof ActivityImpl) {
-						ActivityImpl act = (ActivityImpl) pe;
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
 						currentActivities.add(act.getFacilityId());
 					}
 				}
@@ -293,13 +294,13 @@ public class MentalMap {
 			}
 	}
 
-	public ActivityImpl getActFromActivity (PersonImpl person, ActivityOptionImpl myActivity){
-		ActivityImpl myAct=null;
+	public Activity getActFromActivity (PersonImpl person, ActivityOptionImpl myActivity){
+		Activity myAct=null;
 		for (Plan myPlan : person.getPlans()) {
 			for (PlanElement pe : myPlan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe;
-					if(act.getFacilityId()==myActivity.getFacility().getId()){
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+					if(act.getFacilityId()==myActivity.getFacilityId()){
 						myAct=act;
 					}
 				}

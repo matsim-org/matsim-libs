@@ -38,10 +38,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -127,8 +127,8 @@ public class SelectedPlans2ESRIShapeChanged extends
 		for (PlanImpl plan : this.getOutputSamplePlans()) {
 			String id = plan.getPerson().getId().toString();
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof LegImpl) {
-					LegImpl leg = (LegImpl) pe;
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
 					if (leg.getRoute().getDistance() > 0) {
 						fts.add(getLegFeature(leg, id));
 					}
@@ -159,11 +159,10 @@ public class SelectedPlans2ESRIShapeChanged extends
 	// return null;
 	// }
 
-	protected Feature getLegFeature(final LegImpl leg, final String id) {
+	protected Feature getLegFeature(final Leg leg, final String id) {
 		TransportMode mode = leg.getMode();
 		Double depTime = leg.getDepartureTime();
 		Double travTime = leg.getTravelTime();
-		Double arrTime = leg.getArrivalTime();
 		Double dist = leg.getRoute().getDistance();
 
 		List<Id> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
@@ -189,8 +188,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 
 		try {
 			return this.getFeatureTypeLeg().create(
-					new Object[] { ls, id, mode, depTime, travTime, arrTime,
-							dist });
+					new Object[] { ls, id, mode, depTime, travTime, dist });
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
@@ -199,7 +197,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 	}
 
 	protected void initFeatureType() {
-		AttributeType[] attrAct = new AttributeType[7];
+		AttributeType[] attrAct = new AttributeType[6];
 		attrAct[0] = DefaultAttributeTypeFactory.newAttributeType("Point",
 				Point.class, true, null, null, this.getCrs());
 		attrAct[1] = AttributeTypeFactory.newAttributeType("PERS_ID",
@@ -210,11 +208,10 @@ public class SelectedPlans2ESRIShapeChanged extends
 				String.class);
 		attrAct[4] = AttributeTypeFactory.newAttributeType("START_TIME",
 				Double.class);
-		attrAct[5] = AttributeTypeFactory.newAttributeType("DUR", Double.class);
-		attrAct[6] = AttributeTypeFactory.newAttributeType("END_TIME",
+		attrAct[5] = AttributeTypeFactory.newAttributeType("END_TIME",
 				Double.class);
 
-		AttributeType[] attrLeg = new AttributeType[7];
+		AttributeType[] attrLeg = new AttributeType[6];
 		attrLeg[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",
 				LineString.class, true, null, null, this.getCrs());
 		attrLeg[1] = AttributeTypeFactory.newAttributeType("PERS_ID",
@@ -225,9 +222,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 				Double.class);
 		attrLeg[4] = AttributeTypeFactory.newAttributeType("TRAV_TIME",
 				Double.class);
-		attrLeg[5] = AttributeTypeFactory.newAttributeType("ARR_TIME",
-				Double.class);
-		attrLeg[6] = AttributeTypeFactory
+		attrLeg[5] = AttributeTypeFactory
 				.newAttributeType("DIST", Double.class);
 
 		try {

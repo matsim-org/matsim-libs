@@ -23,12 +23,12 @@ package org.matsim.core.scoring;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
@@ -45,8 +45,8 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 
 	/**
 	 * Sets up the configuration to be useful for scoring plans. This implementation
-	 * sets the parameters for scoring functions returned by 
-	 * {@link CharyparNagelScoringFunctionFactory}, overwrite it to test your own 
+	 * sets the parameters for scoring functions returned by
+	 * {@link CharyparNagelScoringFunctionFactory}, overwrite it to test your own
 	 * custom scoring function.
 	 *
 	 * @param config
@@ -86,9 +86,9 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 		// score the same plan twice
 		PersonImpl person1 = new PersonImpl(new IdImpl(1));
 		PlanImpl plan1 = person1.createAndAddPlan(true);
-		ActivityImpl act1a = plan1.createAndAddActivity("home", (Id)null);//, 0, 7.0*3600, 7*3600, false);
-		LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
-		ActivityImpl act1b = plan1.createAndAddActivity("work", (Id)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+		Activity act1a = plan1.createAndAddActivity("home", (Id)null);//, 0, 7.0*3600, 7*3600, false);
+		Leg leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
+		Activity act1b = plan1.createAndAddActivity("work", (Id)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
 		ScoringFunction sf1 = getScoringFunctionInstance(plan1);
 		sf1.startActivity(0, act1a);
 		sf1.endActivity(7*3600);

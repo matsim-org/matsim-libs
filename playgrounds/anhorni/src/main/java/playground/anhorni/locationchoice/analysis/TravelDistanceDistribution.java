@@ -22,7 +22,10 @@ package playground.anhorni.locationchoice.analysis;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -30,9 +33,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.locationchoice.preprocess.plans.modifications.DistanceBins;
@@ -56,19 +56,19 @@ public class TravelDistanceDistribution implements StartupListener, IterationEnd
 		leisureDistanceBins = new DistanceBins(1000.0, 100.0 * 1000.0, "car");
 
 		for (Person person : this.population.getPersons().values()) {
-			PlanImpl selectedPlan = (PlanImpl) person.getSelectedPlan();
+			Plan selectedPlan = person.getSelectedPlan();
 
 			final List<?> actslegs = selectedPlan.getPlanElements();
 			for (int j = 1; j < actslegs.size(); j=j+2) {
-				if (actslegs.get(j) instanceof LegImpl) {
-					LegImpl leg = (LegImpl) actslegs.get(j);
-					ActivityImpl act = (ActivityImpl)actslegs.get(j+1);
+				if (actslegs.get(j) instanceof Leg) {
+					Leg leg = (Leg) actslegs.get(j);
+					Activity act = (Activity)actslegs.get(j+1);
 
 					if (!leg.getMode().toString().equals("car")) {
 						continue;
 					}
 
-					double dist = ((CoordImpl)act.getCoord()).calcDistance(((ActivityImpl)actslegs.get(j-1)).getCoord()) / 1000.0;
+					double dist = ((CoordImpl)act.getCoord()).calcDistance(((Activity)actslegs.get(j-1)).getCoord()) / 1000.0;
 
 					// act type
 					String actType = act.getType();

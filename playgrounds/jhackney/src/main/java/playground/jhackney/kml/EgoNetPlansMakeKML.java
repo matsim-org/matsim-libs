@@ -53,6 +53,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -61,8 +62,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -94,7 +93,7 @@ public class EgoNetPlansMakeKML {
 //	, coloredLinkKML;
 	private static DocumentType myKMLDocument;
 //	, coloredLinkKMLDocument;
-	private static ActivityFacilities facilities; 
+	private static ActivityFacilities facilities;
 
 	private static StyleType workStyle, leisureStyle, blueLineStyle,
 	educStyle, shopStyle, homeStyle;//, agentLinkStyle;
@@ -342,22 +341,22 @@ public class EgoNetPlansMakeKML {
 		makeActKML(myPerson, act0, agentFolder, agentLinkStyle, network);
 		while(actLegIter.hasNext()){//alternates Act-Leg-Act-Leg and ends with Act
 			Object o = actLegIter.next();
-			if (o instanceof LegImpl) {
-				LegImpl leg = (LegImpl) o;
-	
+			if (o instanceof Leg) {
+				Leg leg = (Leg) o;
+
 				for (Id routeLinkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 					Link routeLink = network.getLinks().get(routeLinkId);
 					PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo);
-	
+
 					boolean linkExists = false;
 					ListIterator<JAXBElement<? extends AbstractFeatureType>> li = agentFolder.getAbstractFeatureGroup().listIterator();
 					while (li.hasNext() && (linkExists == false)) {
-	
+
 						JAXBElement<? extends AbstractFeatureType> abstractFeature = li.next();
 						if (abstractFeature.getName().equals(agentLinkL.getName())) {
 							linkExists = true;
 						}
-	
+
 					}
 					if (!linkExists) {
 						agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(agentLinkL));
@@ -374,38 +373,38 @@ public class EgoNetPlansMakeKML {
 		// Fill the facilities folder
 
 		for (PlanElement pe : myPlan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl myAct = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity myAct = (Activity) pe;
 				StyleType myStyle=facStyle.get(myAct.getType());
-				
+
 				PlacemarkType aFacility = kmlObjectFactory.createPlacemarkType();
 				aFacility.setName(myAct.getType()+" facility");
 				aFacility.setDescription(facilities.getFacilities().get(myAct.getFacilityId()).getActivityOptions().get(myAct.getType()).toString());
 				aFacility.setAddress("address");
 				aFacility.setStyleUrl(myStyle.getId());
-				
+
 				// Get the coordinates of the facility associated with the Act and transform
 				// to WGS84 for GoogleEarth
-				
+
 				Coord geometryCoord = trafo.transform(myAct.getCoord());
 				PointType myPoint = kmlObjectFactory.createPointType();
 				myPoint.getCoordinates().add(Double.toString(geometryCoord.getX()) + "," + Double.toString(geometryCoord.getY()) + ",0.0");
 				aFacility.setAbstractGeometryGroup(kmlObjectFactory.createPoint(myPoint));
-				
+
 				LookAtType lookAt = kmlObjectFactory.createLookAtType();
 				lookAt.setLongitude(geometryCoord.getX());
 				lookAt.setLatitude(geometryCoord.getY());
 				aFacility.setAbstractViewGroup(kmlObjectFactory.createLookAt(lookAt));
-				
+
 				boolean facilityExists = false;
 				ListIterator<JAXBElement<? extends AbstractFeatureType>> li = agentFolder.getAbstractFeatureGroup().listIterator();
 				while (li.hasNext() && (facilityExists == false)) {
-					
+
 					JAXBElement<? extends AbstractFeatureType> abstractFeature = li.next();
 					if (abstractFeature.getName().equals(aFacility.getName())) {
 						facilityExists = true;
 					}
-					
+
 				}
 				if (!facilityExists) {
 					agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(aFacility));
@@ -627,11 +626,11 @@ public class EgoNetPlansMakeKML {
 				e.printStackTrace();
 			}
 		} else {
-			
+
 			KMZWriter kmzWriter = new KMZWriter(mainKMLFilename);
 			kmzWriter.writeMainKml(myKML);
 			kmzWriter.close();
-			
+
 		}
 //		myKMLDocumentWriter = new KMLWriter(coloredLinkKML, coloredLinkKMLFilename, KMLWriter.DEFAULT_XMLNS, useCompression);
 //		myKMLDocumentWriter.write();

@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.world.Layer;
@@ -46,10 +45,10 @@ public class TestsUtil {
 	 *
 	 */
 	static boolean equals(PlanElement o1, PlanElement o2) {
-		if (o1 instanceof LegImpl) {
-			if (o2 instanceof LegImpl) {
-				Leg leg1 = (LegImpl) o1;
-				Leg leg2 = (LegImpl) o2;
+		if (o1 instanceof Leg) {
+			if (o2 instanceof Leg) {
+				Leg leg1 = (Leg) o1;
+				Leg leg2 = (Leg) o2;
 				if (leg1.getDepartureTime() != leg2.getDepartureTime()) {
 					return false;
 				}
@@ -62,10 +61,10 @@ public class TestsUtil {
 			} else {
 				return false;
 			}
-		} else if (o1 instanceof ActivityImpl) {
-			if (o2 instanceof ActivityImpl) {
-				Activity activity1 = (ActivityImpl) o1;
-				Activity activity2 = (ActivityImpl) o2;
+		} else if (o1 instanceof Activity) {
+			if (o2 instanceof Activity) {
+				Activity activity1 = (Activity) o1;
+				Activity activity2 = (Activity) o2;
 				if (activity1.getEndTime() != activity2.getEndTime()) {
 					return false;
 				}

@@ -24,13 +24,13 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
@@ -40,16 +40,16 @@ import playground.meisterk.kti.router.PlansCalcRouteKti;
 
 /**
  * This class contains modifications of the standard leg scoring function for the KTI project.
- * 
- * It is similar to the leg scoring function described in Kickhöfers master thesis (see also his playground), 
+ *
+ * It is similar to the leg scoring function described in Kickhöfers master thesis (see also his playground),
  * but with some extensions regarding the handling of travel cards and bike legs.
- * 
+ *
  * Reference:
  * Kickhöfer, B. (2009) Die Methodik der ökonomischen Bewertung von Verkehrsmaßnahmen
  * in Multiagentensimulationen, Master Thesis, Technical University Berlin, Berlin,
  * https://svn.vsp.tu-berlin.de/repos/public-svn/publications/
  * vspwp/2009/09-10/DAKickhoefer19aug09.pdf.
- * 
+ *
  * @author meisterk
  *
  */
@@ -70,8 +70,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 	}
 
 	@Override
-	protected double calcLegScore(double departureTime, double arrivalTime,
-			LegImpl leg) {
+	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg) {
 
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
@@ -79,36 +78,36 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 		double dist = 0.0; // distance in meters
 
 		if (TransportMode.car.equals(leg.getMode())) {
-			
+
 			tmpScore += this.ktiConfigGroup.getConstCar();
-			
+
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
-				RouteWRefs route = leg.getRoute();
+				Route route = leg.getRoute();
 				dist = route.getDistance();
 				tmpScore += this.params.marginalUtilityOfDistanceCar * ktiConfigGroup.getDistanceCostCar()/1000d * dist;
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling;
-			
+
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 
 			KtiPtRoute ktiPtRoute = (KtiPtRoute) leg.getRoute();
-			
+
 			if (ktiPtRoute.getFromStop() != null) {
 
 //				String nanoMsg = "Scoring kti pt:\t";
-				
+
 //				long nanos = System.nanoTime();
 				dist = ((KtiPtRoute) leg.getRoute()).calcAccessEgressDistance(((PlanImpl) this.plan).getPreviousActivity(leg), ((PlanImpl) this.plan).getNextActivity(leg));
 //				nanos = System.nanoTime() - nanos;
 //				nanoMsg += Long.toString(nanos) + "\t";
-				
+
 //				nanos = System.nanoTime();
 				travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
 //				nanos = System.nanoTime() - nanos;
 //				nanoMsg += Long.toString(nanos) + "\t";
 
 				tmpScore += this.getWalkScore(dist, travelTime);
-				
+
 //				nanos = System.nanoTime();
 				dist = ((KtiPtRoute) leg.getRoute()).calcInVehicleDistance();
 //				nanos = System.nanoTime() - nanos;
@@ -130,39 +129,39 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			}
 
 		} else if (TransportMode.walk.equals(leg.getMode())) {
-			
+
 			if (this.params.marginalUtilityOfDistanceWalk != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += this.getWalkScore(dist, travelTime);
-			
+
 		} else if (TransportMode.bike.equals(leg.getMode())) {
-			
+
 			tmpScore += this.ktiConfigGroup.getConstBike();
-			
+
 			tmpScore += travelTime * this.ktiConfigGroup.getTravelingBike() / 3600d;
-			
+
 		} else {
-			
+
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			// use the same values as for "car"
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist;
-			
+
 		}
 
 		return tmpScore;
 	}
 
 	private double getWalkScore(double distance, double travelTime) {
-		
+
 		double score = 0.0;
-		
+
 		score += travelTime * this.params.marginalUtilityOfTravelingWalk + this.params.marginalUtilityOfDistanceWalk * distance;
-		
+
 		return score;
-		
+
 	}
 
 	private double getPtScore(double distance, double travelTime) {
@@ -182,7 +181,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 		score += travelTime * this.params.marginalUtilityOfTravelingPT;
 
 		return score;
-		
+
 	}
-	
+
 }

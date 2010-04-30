@@ -25,17 +25,17 @@ import java.io.PrintStream;
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * Generates a crosstab of the absolute number of legs in a population, by leg mode and route distance.
  * Leg distances are classified.
  * Only selected plans are considered.
- * 
+ *
  * @author meisterk
  *
  */
@@ -44,7 +44,7 @@ public class PopulationLegDistanceDistribution extends AbstractClassifiedFrequen
 	public PopulationLegDistanceDistribution(PrintStream out) {
 		super(out);
 	}
-	
+
 	@Override
 	public void run(Person person) {
 		this.run(person.getSelectedPlan());
@@ -53,8 +53,8 @@ public class PopulationLegDistanceDistribution extends AbstractClassifiedFrequen
 	public void run(Plan plan) {
 
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				LegImpl leg = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 				TransportMode mode = leg.getMode();
 
 				Frequency frequency = null;

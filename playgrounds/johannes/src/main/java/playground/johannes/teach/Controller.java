@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -64,7 +65,6 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -143,7 +143,7 @@ public class Controller extends Controler {
 				for(Plan plan : p.getPlans()) {
 					double tt = 0;
 					LegImpl leg = (LegImpl)plan.getPlanElements().get(1);
-					RouteWRefs route = leg.getRoute();
+					Route route = leg.getRoute();
 					for(Id id : ((NetworkRoute) route).getLinkIds()) {
 						if(id.toString().equals("4")) {
 

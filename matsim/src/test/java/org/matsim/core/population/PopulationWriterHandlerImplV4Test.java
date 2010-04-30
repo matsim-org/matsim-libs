@@ -23,15 +23,16 @@ package org.matsim.core.population;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
@@ -51,8 +52,8 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		PlanImpl plan = (PlanImpl) pb.createPlan();
 		plan.setPerson(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", link1.getId()));
-		LegImpl leg = (LegImpl) pb.createLeg(TransportMode.undefined);
-		RouteWRefs route = new GenericRouteImpl(link1.getId(), link2.getId());
+		Leg leg = pb.createLeg(TransportMode.undefined);
+		Route route = new GenericRouteImpl(link1.getId(), link2.getId());
 		route.setTravelTime(123);
 		leg.setRoute(route);
 		plan.addLeg(leg);
@@ -66,8 +67,8 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		Population pop2 = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(filename);
 		Person person2 = pop2.getPersons().get(new IdImpl(1));
-		LegImpl leg2 = (LegImpl) person2.getPlans().get(0).getPlanElements().get(1);
-		RouteWRefs route2 = leg2.getRoute();
+		Leg leg2 = (Leg) person2.getPlans().get(0).getPlanElements().get(1);
+		Route route2 = leg2.getRoute();
 		assertEquals(123, route2.getTravelTime(), EPSILON); // if this succeeds, we know that writing/reading the data works
 	}
 

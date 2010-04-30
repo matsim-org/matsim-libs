@@ -34,10 +34,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -144,7 +144,7 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 						Id fromLinkId = ((ActivityImpl) planElements.get(i-1)).getLinkId();
 						Id toLinkId = null;
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							toLinkId = ((RouteWRefs) currentTuple.getSecond().get(1).getRoute()).getStartLinkId();
+							toLinkId = (currentTuple.getSecond().get(1).getRoute()).getStartLinkId();
 						} else {
 							toLinkId = ((ActivityImpl) planElements.get(i+1)).getLinkId();
 						}
@@ -153,7 +153,7 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 						Leg lastLeg = currentTuple.getSecond().get(currentTuple.getSecond().size() - 1);
 						toLinkId = ((ActivityImpl) planElements.get(i+1)).getLinkId();
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							fromLinkId = ((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLinkId();
+							fromLinkId = ((Route) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLinkId();
 						}
 						lastLeg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
 
@@ -190,8 +190,8 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 		}
 
 	}
-	
-	// inserting a bunch of protected getters so that derived methods do not need to store their own copies of these elements.  
+
+	// inserting a bunch of protected getters so that derived methods do not need to store their own copies of these elements.
 	// Just providing getters means that these cannot be modified by the subclass.  Don't know if this is sufficient. kai, apr'10
 
 	protected TransitActsRemover getTransitLegsRemover() {

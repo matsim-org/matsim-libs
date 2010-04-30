@@ -26,12 +26,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
@@ -79,8 +79,8 @@ public class BkScoringFunction implements ScoringFunction {
 	private static double abortedPlanScore = Double.NaN;
   private static double marginalUtilityOfPtFare = - 0.0535d;
 
-	
-	
+
+
 	public BkScoringFunction(final Plan plan, CharyparNagelScoringConfigGroup config) {
 		configGroup = config;
 		init();
@@ -137,7 +137,7 @@ public class BkScoringFunction implements ScoringFunction {
 		return this.score;
 	}
 
-	
+
 	protected static void init() {
 		if (initialized) return;
 
@@ -151,7 +151,7 @@ public class BkScoringFunction implements ScoringFunction {
 		marginalUtilityOfPerforming = configGroup.getPerforming() / 3600.0;
 
 //		marginalUtilityOfPtFare = marginalUtilityOfPtFare;
-		
+
 		marginalUtilityOfFuel = configGroup.getMarginalUtlOfDistanceCar();
 
 		abortedPlanScore = Math.min(
@@ -299,7 +299,7 @@ public class BkScoringFunction implements ScoringFunction {
 				 * because route.getDist() may calculate the distance if not yet
 				 * available, which is quite an expensive operation
 				 */
-				RouteWRefs route = leg.getRoute();
+				Route route = leg.getRoute();
 				dist = route.getDistance();
 				/* TODO the route-distance does not contain the length of the first or
 				 * last link of the route, because the route doesn't know those. Should
@@ -310,18 +310,18 @@ public class BkScoringFunction implements ScoringFunction {
 				 */
 			}
 			tmpScore += travelTime * marginalUtilityOfTraveling + marginalUtilityOfFuel * 0.12d/1000.0d * dist;
-		
-		} 
+
+		}
 		else if (TransportMode.pt.equals(leg.getMode())) {
 			if (marginalUtilityOfPtFare != 0.0) {
-				RouteWRefs route = leg.getRoute();
+				Route route = leg.getRoute();
 				dist = route.getDistance();
 			}
 			tmpScore = tmpScore + travelTime * marginalUtilityOfTravelingPT + marginalUtilityOfPtFare * 0.28d/1000.0d * dist;
-		} 
+		}
 		else if (TransportMode.walk.equals(leg.getMode())) {
 			tmpScore += travelTime * marginalUtilityOfTravelingWalk;
-		} 
+		}
 		else {
 			// use the same values as for "car"
 			tmpScore += travelTime * marginalUtilityOfTraveling + marginalUtilityOfFuel * dist;

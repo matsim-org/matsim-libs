@@ -19,14 +19,14 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis.forZrh;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -40,9 +40,9 @@ import playground.yu.utils.io.SimpleWriter;
 /**
  * compute daily En Route Time of Zurich and Kanton Zurich respectively with
  * through traffic
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 		Analysis4Zrh {
@@ -71,8 +71,8 @@ public class DailyEnRouteTime4Zrh extends DailyEnRouteTime implements
 		double wlkDayTime = 0.0;
 		double otherDayTime = 0.0;
 		for (PlanElement pe : plan.getPlanElements())
-			if (pe instanceof LegImpl) {
-				LegImpl bl = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				Leg bl = (Leg) pe;
 				ActTypeZrh ats = null;
 				String tmpActType = ((PlanImpl) plan).getNextActivity(bl).getType();
 				if (tmpActType.startsWith("h"))

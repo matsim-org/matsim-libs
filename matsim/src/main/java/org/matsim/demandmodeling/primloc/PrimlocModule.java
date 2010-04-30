@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -69,7 +70,6 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
@@ -308,8 +308,8 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 	private boolean agentHasPrimaryActivityInPlan(Person guy) {
 		for (Plan plan : guy.getPlans()) {
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					if (((ActivityImpl) pe).getType().equals(primaryActivityName)) {
+				if (pe instanceof Activity) {
+					if (((Activity) pe).getType().equals(primaryActivityName)) {
 						return true;
 					}
 				}

@@ -1,20 +1,37 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.ciarif.retailers.utils;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.ActivityImpl;
 
 import playground.ciarif.retailers.data.Retailer;
 
 public class CountRetailerCustomers {
-	
+
 	private Retailer retailer;
-	
+
 	public CountRetailerCustomers (Retailer retailer) {
 		this.retailer = retailer;
 	}
@@ -23,15 +40,15 @@ public class CountRetailerCustomers {
 		// TODO Auto-generated method stub
 		int customersCount = 0;
 		for (Person p:persons.values()) {
-			
+
 			for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
-				
-				if (pe2 instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe2;
+
+				if (pe2 instanceof Activity) {
+					Activity act = (Activity) pe2;
 					Id f_Id = act.getFacilityId();
-					
+
 					if (act.getType().equals("shop") && this.retailer.getFacilities().containsKey(f_Id)) {
-							
+
 						customersCount = customersCount+1;
 					}
 				}

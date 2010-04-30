@@ -27,12 +27,12 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -105,8 +105,8 @@ public class PathSizeLogitSelector implements PlanSelector {
 			double pathSize = 0;
 			double currentEndTime = 0.0;
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof LegImpl) {
-					LegImpl leg = (LegImpl) pe;
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
 					currentEndTime = leg.getDepartureTime();
 					NetworkRoute r = (NetworkRoute) leg.getRoute();
 					pathSize += RouteUtils.calcDistance(r, this.network);
@@ -129,8 +129,8 @@ public class PathSizeLogitSelector implements PlanSelector {
 
 			double tmp = 0;
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof LegImpl) {
-					LegImpl leg = (LegImpl) pe;
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
 					double currentTime = leg.getDepartureTime();
 					NetworkRoute route = (NetworkRoute) leg.getRoute();
 					for (Id linkId : route.getLinkIds()){

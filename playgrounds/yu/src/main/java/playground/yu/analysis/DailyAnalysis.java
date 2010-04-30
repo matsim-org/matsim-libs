@@ -19,20 +19,20 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author yu
- * 
+ *
  */
 public abstract class DailyAnalysis extends AbstractPersonAlgorithm implements
 		PlanAlgorithm, Analysis {
-	protected abstract ActType getLegIntent(PlanImpl plan, LegImpl currentLeg);
+	protected abstract ActType getLegIntent(PlanImpl plan, Leg currentLeg);
 }

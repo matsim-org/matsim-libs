@@ -50,10 +50,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QNetwork;
@@ -326,15 +323,15 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 	protected void collectLinks(List<Plan> actPersons) {
 		for (Plan plan : actPersons) {
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
 					addLink(act.getLinkId());
-				} else if (pe instanceof LegImpl) {
-					LegImpl leg = (LegImpl) pe;
-					RouteWRefs route = leg.getRoute() ;
-					if ( route instanceof NetworkRoute ) {
+				} else if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					Route route = leg.getRoute() ;
+					if (route instanceof NetworkRoute) {
 						NetworkRoute nr = (NetworkRoute) route ;
-						for (Id linkId : nr.getLinkIds() ) {
+						for (Id linkId : nr.getLinkIds()) {
 							addLink(linkId);
 						}
 					}

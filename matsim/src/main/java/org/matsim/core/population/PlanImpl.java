@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
@@ -268,8 +269,8 @@ public class PlanImpl implements Plan {
 				l2.setDepartureTime(l.getDepartureTime());
 				l2.setTravelTime(l.getTravelTime());
 				l2.setArrivalTime(l.getArrivalTime());
-				if (l.getRoute() != null) {
-					l2.setRoute(l.getRoute().clone());
+				if (l.getRoute() != null && l.getRoute() instanceof RouteWRefs) {
+					l2.setRoute(((RouteWRefs) l.getRoute()).clone());
 				}
 			}
 		}
@@ -300,7 +301,7 @@ public class PlanImpl implements Plan {
 	public Leg getPreviousLeg(final Activity act) {
 		int index = this.getActLegIndex(act);
 		if (index != -1) {
-			return (LegImpl) getPlanElements().get(index-1);
+			return (Leg) getPlanElements().get(index-1);
 		}
 		return null;
 	}

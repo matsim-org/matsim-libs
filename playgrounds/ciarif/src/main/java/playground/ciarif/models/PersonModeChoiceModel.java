@@ -22,13 +22,13 @@ package playground.ciarif.models;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -75,15 +75,15 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		int mainpurpose = 3; // 0 := w; 1 := e; 2 := s 3:=l
 		Coord home_coord = null;
 		Coord work_coord = null;
-		ActivityImpl prevAct = null;
+		Activity prevAct = null;
 		boolean isFirst = true;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
+			if (pe instanceof Activity) {
 				if (isFirst) {
 					isFirst = false;
 					// first is always 'home', ignore it
 				} else {
-					ActivityImpl act = (ActivityImpl) pe;
+					Activity act = (Activity) pe;
 					if (prevAct != null) {
 						if (H.equals(act.getType())) { home_coord = act.getCoord(); }
 						else if (W.equals(act.getType())) { work_coord = act.getCoord(); }
@@ -154,8 +154,8 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 
 		// setting mode to plan
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				((LegImpl) pe).setMode(mode);
+			if (pe instanceof Leg) {
+				((Leg) pe).setMode(mode);
 			}
 		}
 	}

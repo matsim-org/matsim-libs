@@ -28,7 +28,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -41,7 +44,6 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
@@ -151,8 +153,8 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 				String agentId = entry.getKey();
 				playground.jhackney.scoring.EventSocScoringFunction sf = entry.getValue();
 				Plan plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
-				Iterator actLegIter = plan.getPlanElements().iterator();
-				ActivityImpl act = (ActivityImpl) actLegIter.next(); // assume first plan element is always an Activity
+				Iterator<? extends PlanElement> actLegIter = plan.getPlanElements().iterator();
+				Activity act = (ActivityImpl) actLegIter.next(); // assume first plan element is always an Activity
 
 				int actNumber=0;
 				int legNumber=-1;
@@ -170,8 +172,8 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 
 				while(actLegIter.hasNext()){//alternates Act-Leg-Act-Leg and ends with Act
 					Object o = actLegIter.next();
-					if (o instanceof LegImpl ) {
-						LegImpl leg = (LegImpl) o;
+					if (o instanceof Leg ) {
+						Leg leg = (Leg) o;
 //						if(act.equals(plan.getFirstActivity())){
 //							try {
 //								muout.write("\t"+0.0);
@@ -196,8 +198,8 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 								e.printStackTrace();
 							}
 							legNumber++;
-					}else if (o instanceof ActivityImpl && !(act.equals(((PlanImpl) plan).getLastActivity()))) {
-						act = (ActivityImpl) o;
+					}else if (o instanceof Activity && !(act.equals(((PlanImpl) plan).getLastActivity()))) {
+						act = (Activity) o;
 						try {
 							muout.write("\t"+actNumber+"\t"+act.getType()+"\t"+sf.getDudur(act)+"\t"+sf.getDued(act)+"\t"+sf.getDula(act)+"\t"+sf.getDuld(act)+"\t"+sf.getDus(act)+"\t"+sf.getDuw(act)+"\t"+sf.getDusoc(act));
 							muout.newLine();

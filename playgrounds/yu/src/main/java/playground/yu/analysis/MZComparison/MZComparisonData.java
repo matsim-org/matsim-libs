@@ -1,13 +1,29 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.analysis.MZComparison;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -17,9 +33,9 @@ import org.matsim.roadpricing.RoadPricingScheme;
 /**
  * prepares the data to compare with "BFS/ARE: Mikrozensus zum Verkehrsverhalten
  * 2005" (Kanton Zurich)
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class MZComparisonData extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -65,17 +81,17 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 	public void run(Plan p) {
 		PlanImpl plan = (PlanImpl) p;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				double legDist = ((LegImpl) pe).getRoute().getDistance();// leg
+			if (pe instanceof Leg) {
+				double legDist = ((Leg) pe).getRoute().getDistance();// leg
 				// distance
 				// [m]
-				String legMode = ((LegImpl) pe).getMode().name();
-				double legTime = ((LegImpl) pe).getTravelTime() / 60.0;// travel
+				String legMode = ((Leg) pe).getMode().name();
+				double legTime = ((Leg) pe).getTravelTime() / 60.0;// travel
 				// time
 				// [min]
 				double legLinearDist = CoordUtils.calcDistance(plan
-						.getPreviousActivity((LegImpl) pe).getCoord(), plan
-						.getNextActivity((LegImpl) pe).getCoord());// leg linear
+						.getPreviousActivity((Leg) pe).getCoord(), plan
+						.getNextActivity((Leg) pe).getCoord());// leg linear
 				// distance [m]
 				/*
 				 * linearDist += legLinearDist; if (inTollRange) linearDist_toll
@@ -162,13 +178,13 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 	/*
 	 * // getter -- Leg Linear Distance public double
 	 * getAvgLegLinearDistance_m() { return linearDist / count; }
-	 * 
+	 *
 	 * public double getAvgTollLegLinearDistance_m() { return linearDist_toll /
 	 * count_toll; }
-	 * 
+	 *
 	 * // getter -- Work Home Linear Distance public double
 	 * getAvgWorkHomeLinearDistance_m() { return 0.0; }
-	 * 
+	 *
 	 * public double getAvgTollWorkHomeLinearDistance_m() { return 0.0; }
 	 */
 }

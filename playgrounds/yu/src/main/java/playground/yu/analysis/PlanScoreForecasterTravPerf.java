@@ -46,7 +46,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -98,8 +97,8 @@ public class PlanScoreForecasterTravPerf {
 	public double getPlanScore() {
 		// boolean fistActDone = false;
 		for (PlanElement pe : this.plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				this.handleAct(act);
 			} else if (pe instanceof LegImpl) {
 				LegImpl leg = (LegImpl) pe;
@@ -186,7 +185,7 @@ public class PlanScoreForecasterTravPerf {
 		leg.setArrivalTime(departTime + travelTime_s);
 	}
 
-	private void handleAct(ActivityImpl act) {
+	private void handleAct(Activity act) {
 		ActivityParams actParams = this.scoring
 				.getActivityParams(act.getType());
 

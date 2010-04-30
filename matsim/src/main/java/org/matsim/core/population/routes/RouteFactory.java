@@ -23,6 +23,7 @@ package org.matsim.core.population.routes;
 import java.io.Serializable;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimFactory;
 
 /**
@@ -33,5 +34,5 @@ import org.matsim.core.api.internal.MatsimFactory;
  * @author mrieser
  */
 public interface RouteFactory extends Serializable, MatsimFactory {
-	public RouteWRefs createRoute(Id startLinkId, Id endLinkId);
+	public Route createRoute(Id startLinkId, Id endLinkId);
 }

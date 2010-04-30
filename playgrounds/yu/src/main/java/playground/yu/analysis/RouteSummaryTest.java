@@ -35,13 +35,13 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -142,9 +142,9 @@ public class RouteSummaryTest {
 			if (p != null)
 				if (PlanModeJudger.useCar(p)) {
 					for (PlanElement pe : p.getPlanElements()) {
-						if (pe instanceof LegImpl) {
+						if (pe instanceof Leg) {
 
-							LegImpl l = (LegImpl) pe;
+							Leg l = (Leg) pe;
 
 							Id previousActLinkId = ((PlanImpl) p).getPreviousActivity(l).getLinkId();
 							Id nextActLinkId = ((PlanImpl) p).getNextActivity(l).getLinkId();

@@ -21,15 +21,15 @@
 package playground.meisterk.kti.population.algorithms;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * Deletes all routes from a plans file which are not compatible with the routes used in the kti runs.
- * 
+ *
  * @author meisterk
  *
  */
@@ -49,8 +49,8 @@ public class PersonDeleteNonKtiCompatibleRoutes extends AbstractPersonAlgorithm 
 		 */
 		for (Plan plan : person.getPlans()) {
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof LegImpl) {
-					LegImpl leg = (LegImpl) pe;
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
 					if (leg.getMode().equals(TransportMode.pt)) {
 						leg.setRoute(null);
 					} else if (leg.getMode().equals(TransportMode.car)) {
@@ -64,7 +64,7 @@ public class PersonDeleteNonKtiCompatibleRoutes extends AbstractPersonAlgorithm 
 				}
 			}
 		}
-		
+
 	}
 
 }

@@ -31,6 +31,8 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -43,8 +45,6 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -83,8 +83,8 @@ public class ScenarioCut {
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement e : plan.getPlanElements()) {
-					if (e instanceof ActivityImpl) {
-						ActivityImpl a = (ActivityImpl)e;
+					if (e instanceof Activity) {
+						Activity a = (Activity)e;
 						if (a.getCoord() != null) {
 							if (a.getCoord().getX() < min.getX()) { min.setX(a.getCoord().getX()); }
 							if (a.getCoord().getY() < min.getY()) { min.setY(a.getCoord().getY()); }
@@ -231,13 +231,13 @@ public class ScenarioCut {
 			boolean removeIt = false;
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement e : plan.getPlanElements()) {
-					if (e instanceof ActivityImpl) {
-						ActivityImpl a = (ActivityImpl)e;
+					if (e instanceof Activity) {
+						Activity a = (Activity)e;
 						if ((a.getLinkId() != null) && (!linkIds.contains(a.getLinkId()))) { removeIt = true; }
 						if ((a.getFacilityId() != null) && (!facIds.contains(a.getFacilityId()))) { removeIt = true; }
 					}
-					else if (e instanceof LegImpl) {
-						LegImpl l = (LegImpl)e;
+					else if (e instanceof Leg) {
+						Leg l = (Leg)e;
 						l.setRoute(null);
 					}
 				}

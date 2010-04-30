@@ -22,11 +22,11 @@ package org.matsim.core.network;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -38,10 +38,10 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		NetworkFactoryImpl factory = new NetworkFactoryImpl(null);
 
 		// test default
-		RouteWRefs carRoute = factory.createRoute(TransportMode.car, null, null);
+		Route carRoute = factory.createRoute(TransportMode.car, null, null);
 		assertTrue(carRoute instanceof LinkNetworkRouteImpl);
 
-		RouteWRefs route = factory.createRoute(TransportMode.pt, null, null);
+		Route route = factory.createRoute(TransportMode.pt, null, null);
 		assertTrue(route instanceof GenericRoute);
 
 		// overwrite car-mode
@@ -54,7 +54,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		assertTrue(carRoute instanceof CarRouteMock);
 
 		// add pt-mode
-		RouteWRefs ptRoute = factory.createRoute(TransportMode.pt, null, null);
+		Route ptRoute = factory.createRoute(TransportMode.pt, null, null);
 		assertTrue(ptRoute instanceof PtRouteMock);
 
 		// remove pt-mode
@@ -90,7 +90,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 	/*package*/ static class CarRouteMockFactory implements RouteFactory {
 		private static final long serialVersionUID = 1L;
 		@Override
-		public RouteWRefs createRoute(final Id startLinkId, final Id endLinkId) {
+		public Route createRoute(final Id startLinkId, final Id endLinkId) {
 			return new CarRouteMock(startLinkId, endLinkId);
 		}
 
@@ -99,7 +99,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 	/*package*/ static class PtRouteMockFactory implements RouteFactory {
 		private static final long serialVersionUID = 1L;
 		@Override
-		public RouteWRefs createRoute(final Id startLinkId, final Id endLinkId) {
+		public Route createRoute(final Id startLinkId, final Id endLinkId) {
 			return new PtRouteMock(startLinkId, endLinkId);
 		}
 

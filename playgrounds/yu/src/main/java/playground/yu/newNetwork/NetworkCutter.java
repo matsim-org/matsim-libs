@@ -33,18 +33,18 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.ArgumentParser;
 
 /**
@@ -109,10 +109,10 @@ public class NetworkCutter {
 		for (Person person : pop.getPersons().values())
 			for (Plan plan : person.getPlans())
 				for (PlanElement pe : plan.getPlanElements())
-					if (pe instanceof ActivityImpl)
-						resetBoundary(((ActivityImpl) pe).getCoord());
+					if (pe instanceof Activity)
+						resetBoundary(((Activity) pe).getCoord());
 					else {
-						RouteWRefs route = ((LegImpl) pe).getRoute();
+						Route route = ((Leg) pe).getRoute();
 						if (route != null
 								&& (route instanceof NetworkRoute))
 							resetBoundary((NetworkRoute) route, net);

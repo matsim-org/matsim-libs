@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -59,7 +59,7 @@ public class ChangeLegModeTest extends MatsimTestCase {
 
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAndAddActivity("home", new CoordImpl(0, 0));
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("work", new CoordImpl(0, 0));
 
 		HashMap<TransportMode, Integer> counter = new HashMap<TransportMode, Integer>();

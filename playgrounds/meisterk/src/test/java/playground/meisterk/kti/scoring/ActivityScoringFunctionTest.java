@@ -29,8 +29,10 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -46,7 +48,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -149,7 +150,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		act.setLinkId(link.getId());
 		act.setCoord(link.getCoord());
 		LegImpl leg = this.plan.createAndAddLeg(TransportMode.car);
-		RouteWRefs route = network.getFactory().createRoute(TransportMode.car, new IdImpl("2030"), new IdImpl("3040"));
+		Route route = network.getFactory().createRoute(TransportMode.car, new IdImpl("2030"), new IdImpl("3040"));
 		leg.setRoute(route);
 
 		act = plan.createAndAddActivity("work_sector3");
@@ -455,8 +456,8 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		// score legs
 		for (PlanElement pe : this.plan.getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				LegImpl leg = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 				if (leg.getMode().equals(TransportMode.bike)) {
 					expectedScore += this.ktiConfigGroup.getConstBike();
 				}

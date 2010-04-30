@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
@@ -42,7 +43,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -205,7 +205,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 
 
 	public void run (Plan basePlan){
-		
+
 	//	if (basePlan.getPerson().getId().toString().equals("1062251") ||
 	//			basePlan.getPerson().getId().toString().equals("4773280")) this.printing = true;
 	//	else this.printing = false;
@@ -253,7 +253,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		 * Do this in any case as the car routes are required in the setTimes() method. */
 		ArrayList <LinkNetworkRouteImpl> routes = new ArrayList<LinkNetworkRouteImpl>();
 		for (int i=1;i<plan.getPlanElements().size();i=i+2){
-			RouteWRefs oldRoute = ((LegImpl)(plan.getPlanElements().get(i))).getRoute();
+			Route oldRoute = ((LegImpl)(plan.getPlanElements().get(i))).getRoute();
 			LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
 		/*	List<Id> l = new ArrayList<Id>();
 			for (int j=0;j<((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++){
@@ -450,7 +450,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				((LegImpl)al.get(i)).setArrivalTime(time);
 				((LegImpl)al.get(i)).setMode(((LegImpl)(bestSolution.get(i))).getMode());
 
-				RouteWRefs oldRoute = ((LegImpl)(bestSolution.get(i))).getRoute();
+				Route oldRoute = ((LegImpl)(bestSolution.get(i))).getRoute();
 				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
 				List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
 				r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
@@ -1026,7 +1026,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		return out;
 	}
 
-	/** 
+	/**
 	 * This method calculates the leg timings according to the move that is given by outer, inner, start, and stop.
 	 * Start and stop indicate the first and last leg that has to be handled. When the mode choice is activated
 	 * start can be "before" outer since the outer and inner's whole trip chains must be checked. Inner and stop viceversa.
@@ -1098,7 +1098,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				((LegImpl)(actslegs.get(i))).setRoute(this.routes.get((i-1)/2));
 				if (plan.getPerson().getId().toString().equals("1062251"))		log.info("setting route back to car 2");
 			}
-			
+
 			// write  arrival and travel time of leg
 			if (plan.getPerson().getId().toString().equals("1062251"))	log.info("arrivalTime davor = "+((LegImpl)(actslegs.get(i))).getArrivalTime());
 			((LegImpl)(actslegs.get(i))).setArrivalTime(now+travelTime);
@@ -1106,7 +1106,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			((LegImpl)(actslegs.get(i))).setTravelTime(travelTime);
 			now+=travelTime;
 			if (plan.getPerson().getId().toString().equals("1062251"))	log.info("now 2 = "+now);
-			
+
 			// calculate duration of next activity (either till original end time + offset, or minimum duration)
 			if (i!=inner-1){
 				now = java.lang.Math.max(now+this.minimumTime.get(((ActivityImpl)(actslegs.get(i+1))).getType()), (((ActivityImpl)(actslegs.get(i+1))).getEndTime()+offset));
@@ -1230,14 +1230,14 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	//	log.info("vor scoring.");
 	//	for (int x=1;x<actslegs.size();x+=2){
 	//		log.info("departure time = "+((LegImpl)(actslegs.get(x))).getDepartureTime()+" und arrival time = "+((LegImpl)(actslegs.get(x))).getArrivalTime());
-	//	}		
+	//	}
 		plan.setActsLegs(actslegs);
 	//	log.info("scoring");
-		double score = scorer.getScore(plan); 
+		double score = scorer.getScore(plan);
 	//	log.info("nach scoring.");
 	//	for (int x=1;x<actslegs.size();x+=2){
 	//		log.info("departure time = "+((LegImpl)(actslegs.get(x))).getDepartureTime()+" und arrival time = "+((LegImpl)(actslegs.get(x))).getArrivalTime());
-	//	}	
+	//	}
 		return score;
 	}
 	/*

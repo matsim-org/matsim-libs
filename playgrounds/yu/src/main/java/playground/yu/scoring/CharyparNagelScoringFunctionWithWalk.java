@@ -1,20 +1,36 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.scoring;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
 /**
  * change scoring function, because "walk"-mode will be implemented
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class CharyparNagelScoringFunctionWithWalk extends LegScoringFunction {
 	private double offsetWlk = Double.parseDouble(Gbl.getConfig().findParam(
@@ -26,8 +42,7 @@ public class CharyparNagelScoringFunctionWithWalk extends LegScoringFunction {
 	}
 
 	@Override
-	protected double calcLegScore(double departureTime, double arrivalTime,
-			LegImpl leg) {
+	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in
 		// seconds

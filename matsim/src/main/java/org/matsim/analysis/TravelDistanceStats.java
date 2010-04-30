@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -37,7 +38,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
@@ -240,8 +240,8 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		int numberOfLegs=0;
 
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				final LegImpl leg = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				final Leg leg = (Leg) pe;
 				if (leg.getRoute() instanceof NetworkRoute) {
 					planTravelDistance += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
 					numberOfLegs++;

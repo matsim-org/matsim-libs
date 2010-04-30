@@ -23,8 +23,8 @@ package org.matsim.core.scoring.charyparNagel;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
@@ -80,7 +80,7 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 		return this.score;
 	}
 
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in
 															// seconds
@@ -94,7 +94,7 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 
 		if (TransportMode.car.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
-				RouteWRefs route = leg.getRoute();
+				Route route = leg.getRoute();
 				dist = route.getDistance();
 				/*
 				 * TODO the route-distance does not contain the length of the
@@ -113,7 +113,7 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistancePt * dist;
-		} else if (TransportMode.walk.equals(leg.getMode()) 
+		} else if (TransportMode.walk.equals(leg.getMode())
 				|| TransportMode.transit_walk.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceWalk != 0.0) {
 				dist = leg.getRoute().getDistance();

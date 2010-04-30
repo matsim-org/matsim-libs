@@ -22,9 +22,9 @@ package playground.meisterk.kti.router;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.population.routes.RouteWRefs;
 
 public class KtiLinkNetworkRouteFactory implements RouteFactory {
 
@@ -38,7 +38,7 @@ public class KtiLinkNetworkRouteFactory implements RouteFactory {
 	}
 
 	@Override
-	public RouteWRefs createRoute(Id startLinkId, Id endLinkId) {
+	public Route createRoute(Id startLinkId, Id endLinkId) {
 		return new KtiLinkNetworkRouteImpl(startLinkId, endLinkId, this.network, this.planomatConfigGroup.getSimLegInterpretation());
 	}
 

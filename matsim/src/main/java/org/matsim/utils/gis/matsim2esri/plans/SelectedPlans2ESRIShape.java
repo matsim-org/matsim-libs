@@ -40,14 +40,14 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -139,8 +139,8 @@ public class SelectedPlans2ESRIShape {
 		for (Plan plan : this.outputSamplePlans) {
 			String id = plan.getPerson().getId().toString();
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
 					fts.add(getActFeature(id, act));
 				}
 			}
@@ -155,8 +155,8 @@ public class SelectedPlans2ESRIShape {
 		for (Plan plan : this.outputSamplePlans) {
 			String id = plan.getPerson().getId().toString();
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof LegImpl) {
-					LegImpl leg = (LegImpl) pe;
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
 					if (leg.getRoute() instanceof NetworkRoute) {
 						if (RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network) > 0) {
 							fts.add(getLegFeature(leg, id));
@@ -170,18 +170,17 @@ public class SelectedPlans2ESRIShape {
 		ShapeFileWriter.writeGeometries(fts, outputFile);
 	}
 
-	private Feature getActFeature(final String id, final ActivityImpl act) {
+	private Feature getActFeature(final String id, final Activity act) {
 		String type = act.getType();
 		String linkId = act.getLinkId().toString();
 		Double startTime = act.getStartTime();
-		Double dur = act.getDuration();
 		Double endTime = act.getEndTime();
 		double rx = MatsimRandom.getRandom().nextDouble() * this.actBlurFactor;
 		double ry = MatsimRandom.getRandom().nextDouble() * this.actBlurFactor;
 		Coord cc = this.network.getLinks().get(act.getLinkId()).getCoord();
 		Coord c = new CoordImpl(cc.getX()+rx,cc.getY()+ry);
 		try {
-			return this.featureTypeAct.create(new Object [] {MGC.coord2Point(c),id, type, linkId, startTime, dur, endTime});
+			return this.featureTypeAct.create(new Object [] {MGC.coord2Point(c),id, type, linkId, startTime, endTime});
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
@@ -189,14 +188,13 @@ public class SelectedPlans2ESRIShape {
 		return null;
 	}
 
-	private Feature getLegFeature(final LegImpl leg, final String id) {
+	private Feature getLegFeature(final Leg leg, final String id) {
 		if (!(leg.getRoute() instanceof NetworkRoute)) {
 			return null;
 		}
 		TransportMode mode = leg.getMode();
 		Double depTime = leg.getDepartureTime();
 		Double travTime = leg.getTravelTime();
-		Double arrTime = leg.getArrivalTime();
 		Double dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
 
 		List<Id> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
@@ -220,7 +218,7 @@ public class SelectedPlans2ESRIShape {
 		LineString ls = this.geofac.createLineString(coords);
 
 		try {
-			return this.featureTypeLeg.create(new Object[] {ls,id,mode,depTime,travTime,arrTime,dist});
+			return this.featureTypeLeg.create(new Object[] {ls,id,mode,depTime,travTime,dist});
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
@@ -230,23 +228,21 @@ public class SelectedPlans2ESRIShape {
 
 
 	private void initFeatureType() {
-		AttributeType[] attrAct = new AttributeType[7];
+		AttributeType[] attrAct = new AttributeType[6];
 		attrAct[0] = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, this.crs);
 		attrAct[1] = AttributeTypeFactory.newAttributeType("PERS_ID", String.class);
 		attrAct[2] = AttributeTypeFactory.newAttributeType("TYPE", String.class);
 		attrAct[3] = AttributeTypeFactory.newAttributeType("LINK_ID", String.class);
 		attrAct[4] = AttributeTypeFactory.newAttributeType("START_TIME", Double.class);
-		attrAct[5] = AttributeTypeFactory.newAttributeType("DUR", Double.class);
-		attrAct[6] = AttributeTypeFactory.newAttributeType("END_TIME", Double.class);
+		attrAct[5] = AttributeTypeFactory.newAttributeType("END_TIME", Double.class);
 
-		AttributeType[] attrLeg = new AttributeType[7];
+		AttributeType[] attrLeg = new AttributeType[6];
 		attrLeg[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, this.crs);
 		attrLeg[1] = AttributeTypeFactory.newAttributeType("PERS_ID", String.class);
 		attrLeg[2] = AttributeTypeFactory.newAttributeType("MODE", String.class);
 		attrLeg[3] = AttributeTypeFactory.newAttributeType("DEP_TIME", Double.class);
 		attrLeg[4] = AttributeTypeFactory.newAttributeType("TRAV_TIME", Double.class);
-		attrLeg[5] = AttributeTypeFactory.newAttributeType("ARR_TIME", Double.class);
-		attrLeg[6] = AttributeTypeFactory.newAttributeType("DIST", Double.class);
+		attrLeg[5] = AttributeTypeFactory.newAttributeType("DIST", Double.class);
 
 		try {
 			this.featureTypeAct = FeatureTypeBuilder.newFeatureType(attrAct, "activity");
