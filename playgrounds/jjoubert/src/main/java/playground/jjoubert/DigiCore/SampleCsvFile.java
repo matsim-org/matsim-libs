@@ -34,7 +34,7 @@ import playground.jjoubert.Utilities.MyStringBuilder;
 
 public class SampleCsvFile {
 
-	private static final java.util.logging.Logger log = Logger.getLogger(SampleCsvFile.class);
+	private static final Logger log = Logger.getLogger(SampleCsvFile.class);
 
 	/*=============================================================================
 	 * String value indicating where the root where job is executed. 				|
@@ -80,7 +80,7 @@ public class SampleCsvFile {
 						bw.write(line);
 						bw.newLine();
 					} else{
-						log.warning("Input file does not have sufficient lines. Only " + String.valueOf(i+1) + " read.");
+						log.warn("Input file does not have sufficient lines. Only " + String.valueOf(i+1) + " read.");
 					}
 				}
 			} finally{
