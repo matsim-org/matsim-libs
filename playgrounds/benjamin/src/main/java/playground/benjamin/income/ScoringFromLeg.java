@@ -66,7 +66,7 @@ public class ScoringFromLeg extends LegScoringFunction {
 	}
 
 	private double calculateLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
-		double dist = calculateLegDistance(leg);
+		double distance = calculateLegDistance(leg);
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		if (TransportMode.car.equals(leg.getMode())) {
 			double betaIncome = betaIncomeCar;
