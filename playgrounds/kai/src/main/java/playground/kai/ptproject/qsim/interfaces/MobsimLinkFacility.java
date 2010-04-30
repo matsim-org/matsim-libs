@@ -27,6 +27,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
@@ -44,7 +45,7 @@ public class MobsimLinkFacility implements Updateable {
 	private Queue<PersonAgent> agentsAtActivities = new PriorityQueue<PersonAgent>(1, new DepartureTimeComparator() ) ;
 
 	// buses somehow via the "feature" --???
-
+	
 	/** Plain "add" of a person, normally during initialization */
 	void addPerson( PersonAgent person ) {
 		agentsAtActivities.add( person ) ;
@@ -62,13 +63,19 @@ public class MobsimLinkFacility implements Updateable {
 		PersonAgent person = agentsAtActivities.peek();
 		if ( person.getDepartureTime() <= now() ) {
 			agentsAtActivities.remove();
+			person.activityEnds( now() ) ;
 			// call departure handler
 			// how does the departure handler get access to the vehicle?
 			// or to the bus stop?
-			Id vehId = new IdImpl("13") ; // dummy
-			MobsimVehicle veh = (MobsimVehicle) parking.get( vehId ) ;
-			veh.setDriver( person ) ;
-			link.addVehicleFromParkingNormal(veh) ;
+			if ( person.getCurrentLeg().getMode().equals( TransportMode.car )) {
+				Id vehId = new IdImpl("13") ; // dummy
+				MobsimVehicle veh = (MobsimVehicle) parking.get( vehId ) ;
+				veh.setDriver( person ) ;
+				link.addVehicleFromParkingNormal(veh) ;
+			} else {
+				Id destLinkId = person.getCurrentLeg().getRoute().getEndLinkId() ;
+				// teleport there
+			}
 		}
 	}
 
