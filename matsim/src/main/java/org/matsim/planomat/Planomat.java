@@ -153,7 +153,7 @@ public class Planomat implements PlanAlgorithm {
 			jgapConfiguration.setFitnessFunction( fitnessFunction );
 			population = Genotype.randomInitialGenotype( jgapConfiguration );
 		} catch (InvalidConfigurationException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		if (this.doLogging) {
 			logger.info("Initialization of JGAP configuration...done.");
