@@ -19,24 +19,41 @@
 
 package playground.kai.ptproject.qsim.interfaces;
 
-import org.matsim.vehicles.BasicVehicle;
 
 /**
  * @author nagel
  *
  */
-public class QLink implements Updateable {
+public class MobsimLink implements Updateable {
+	MobsimLinkFacility linkFac = new MobsimLinkFacility() ; // dummy
+	MobsimVehicle veh = new MobsimVehicle() ;
 	
-	void addVehicleFromIntersection( BasicVehicle veh ) {
-		
+	/**
+	 * @param veh
+	 * @return true if accepted, false if not
+	 */
+	boolean addVehicleFromIntersection( MobsimVehicle veh ) {
+		return true ;
 	}
 	
-	void addVehicleFromParking( BasicVehicle veh ) {
+	/**
+	 * @param veh
+	 * @return true if accepted, false if not
+	 */
+	boolean addVehicleFromParkingNormal( MobsimVehicle veh ) {
+		return true ;
+	}
 	
+	boolean addVehicleFromParkingForced( MobsimVehicle veh ) {
+		return true ;
 	}
 	
 	public void update() {
 		// queue2xxx (buffer or parking)
+		/* if vehicle arrival */
+		{
+			linkFac.addOccupiedVehicle(veh) ;
+		}
 		
 		// wait2buffer
 	}

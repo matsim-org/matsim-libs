@@ -29,20 +29,22 @@ class Teleportation implements Updateable {
 public class UseCase {
 
 	void run() {
-		Teleportation teleportation = null ;
+		Teleportation teleportation = new Teleportation() ;
 		PersonAgent person = null ; // dummy
 		BasicVehicle veh = null ; // dummy
-		LinkFacility linkFac = null ; // dummy
-		QLink link = new QLink() ;
-		QNode node = new QNode() ;
+		MobsimLinkFacility linkFac = new MobsimLinkFacility() ; // dummy
+		MobsimLink link = new MobsimLink() ;
+		MobsimNode node = new MobsimNode() ;
 
-		// add a person to an ActivityFacility (initialization):
+		// INITIALIZATION:
+		
+		// add a person to an ActivityFacility:
 		linkFac.addPerson( person ) ;
 		
-		// add an empty vehicle to a parking (initialization):
+		// add an empty vehicle to a parking:
 		linkFac.addEmptyVehicle( veh ) ;
 		
-		// move everything one time step forward:
+		// UPDATES
 		/* for all links */ {
 			link.update() ;  // link facility update included here ?!
 		}
@@ -56,7 +58,7 @@ public class UseCase {
 	}
 
 	public static void main( String[] args ) {
-		UseCase usecase = null ; // dummy
+		UseCase usecase = new UseCase() ; // dummy
 		usecase.run() ;
 	}
 

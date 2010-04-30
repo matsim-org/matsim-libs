@@ -28,46 +28,50 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.vehicles.BasicVehicle;
 
-public class LinkFacility implements Updateable {
-	final private static Logger log = Logger.getLogger( LinkFacility.class ) ;
+public class MobsimLinkFacility implements Updateable {
+	final private static Logger log = Logger.getLogger( MobsimLinkFacility.class ) ;
 	
+	MobsimLink link = new MobsimLink() ; // dummy
+
 	/** data structure for parking needs to be searchable by vehicle id */
 	private Map<Id,BasicVehicle> parking = new TreeMap<Id,BasicVehicle>() ;
-	
+
 	/** data structure for activities needs to be sorted by departure time */
 	private Queue<PersonAgent> agentsAtActivities = new PriorityQueue<PersonAgent>(1, new DepartureTimeComparator() ) ;
 
-	/** data structure for buses ??? */
-//	private BusStop busStop = null ;
-	
+	// buses somehow via the "feature" --???
+
 	/** Plain "add" of a person, normally during initialization */
 	void addPerson( PersonAgent person ) {
 		agentsAtActivities.add( person ) ;
 	}
-	
+
 	/**Receives the occupied vehicle.  In this situation, it contains at least a driver, and possibly passengers. */
-	void addOccupiedVehicle( QVehicle veh ) {}
-	
+	void addOccupiedVehicle( MobsimVehicle veh ) {}
+
 	/**Receives an empty vehicle.  Normally during initialization. */
 	void addEmptyVehicle( BasicVehicle veh ) {
 		parking.put( veh.getId(), veh ) ;
 	}
-	
+
 	public void update() {
 		PersonAgent person = agentsAtActivities.peek();
-	    if ( person.getDepartureTime() <= now() ) {
-	        agentsAtActivities.remove();
-	        // call departure handler
-	        // how does the departure handler get access to the vehicle?
-	        // or to the bus stop?
-	    }
+		if ( person.getDepartureTime() <= now() ) {
+			agentsAtActivities.remove();
+			// call departure handler
+			// how does the departure handler get access to the vehicle?
+			// or to the bus stop?
+			Id vehId = new IdImpl("13") ; // dummy
+			MobsimVehicle veh = (MobsimVehicle) parking.get( vehId ) ;
+			veh.setDriver( person ) ;
+			link.addVehicleFromParkingNormal(veh) ;
+		}
 	}
-	
+
 	static double nextDepartureTime( Person pp ) {
 		return 0. ; // dummy
 	}
@@ -80,7 +84,7 @@ public class LinkFacility implements Updateable {
 		public int compare(PersonAgent o1, PersonAgent o2) {
 			return 0 ; // dummy
 		}
-		
+
 	}
-	
+
 }

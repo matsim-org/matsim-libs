@@ -23,7 +23,7 @@ package playground.kai.ptproject.qsim.interfaces;
  * @author nagel
  *
  */
-public class QNode implements Updateable {
+public class MobsimNode implements Updateable {
 
 	public void update() {
 
