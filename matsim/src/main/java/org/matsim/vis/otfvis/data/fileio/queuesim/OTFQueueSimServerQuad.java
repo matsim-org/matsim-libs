@@ -39,12 +39,12 @@ import org.matsim.vis.otfvis.data.OTFWriterFactory;
 public class OTFQueueSimServerQuad extends OTFServerQuad2 {
 
 	private static final long serialVersionUID = 24L;
-	
+
   private static final Logger log = Logger.getLogger(OTFQueueSimServerQuad.class);
-	
+
   transient private QueueNetwork net;
   /**
-	 * 
+	 *
 	 */
 	public OTFQueueSimServerQuad(QueueNetwork net) {
 		super(net.getNetworkLayer());
@@ -61,7 +61,7 @@ public class OTFQueueSimServerQuad extends OTFServerQuad2 {
 		Collection<Class<OTFWriterFactory<QueueLink>>> linkFactories = connect.getQueueLinkEntries();
 		List<OTFWriterFactory<QueueLink>> linkWriterFactoryObjects = new ArrayList<OTFWriterFactory<QueueLink>>(linkFactories.size());
 		try {
-			OTFWriterFactory<QueueLink> linkWriterFac = null;			
+			OTFWriterFactory<QueueLink> linkWriterFac = null;
 			for (Class linkFactory : linkFactories ) {
 				if(linkFactory != Object.class) {
 					linkWriterFac = (OTFWriterFactory<QueueLink>)linkFactory.newInstance();
@@ -69,9 +69,9 @@ public class OTFQueueSimServerQuad extends OTFServerQuad2 {
 				}
 			}
 		} catch (InstantiationException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
     	if(!linkWriterFactoryObjects.isEmpty()) {
@@ -96,5 +96,5 @@ public class OTFQueueSimServerQuad extends OTFServerQuad2 {
    	}
 	}
 
-	
+
 }
