@@ -39,7 +39,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
-import playground.dgrether.DgPaths;
+import playground.dgrether.BkPaths;
 
 
 /**
@@ -155,8 +155,8 @@ public class BkIncomeTestScenarioCreator {
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		ScenarioImpl scenario = new ScenarioImpl();
-		String outfile = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/plans.xml";
-		String networkFile = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/network.xml";
+		String outfile = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/plans.xml";
+		String networkFile = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/network.xml";
 		NetworkImpl uselessNetwork = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 

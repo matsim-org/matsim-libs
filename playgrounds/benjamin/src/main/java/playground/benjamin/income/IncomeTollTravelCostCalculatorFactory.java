@@ -26,34 +26,43 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.households.PersonHouseholdMapping;
+import org.matsim.roadpricing.RoadPricingScheme;
 
 
 /**
  * @author bkick after dgrether
  *
  */
-public class IncomeTravelCostCalculatorFactory implements TravelCostCalculatorFactory {
+public class IncomeTollTravelCostCalculatorFactory implements TravelCostCalculatorFactory {
 
 	private PersonHouseholdMapping personHouseholdMapping;
+	
+	private RoadPricingScheme scheme;
 
-	public IncomeTravelCostCalculatorFactory(PersonHouseholdMapping personHouseholdMapping) {
+	public IncomeTollTravelCostCalculatorFactory(PersonHouseholdMapping personHouseholdMapping, RoadPricingScheme roadPricingScheme) {
 		this.personHouseholdMapping = personHouseholdMapping;
+		this.scheme = roadPricingScheme;
 	}
 	
 	public PersonalizableTravelCost createTravelCostCalculator(TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
 		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
+		final IncomeTollTravelCostCalculator incomeTollTravelCostCalculator = new IncomeTollTravelCostCalculator(personHouseholdMapping, scheme);
 		
 		return new PersonalizableTravelCost() {
 
 			@Override
 			public void setPerson(Person person) {
 				incomeTravelCostCalculator.setPerson(person);
+				incomeTollTravelCostCalculator.setPerson(person);
 			}
 
+			//somehow summing up the income related generalized travel costs and the income related toll costs for the router...
+			//remark: this method should be named "getLinkGeneralizedTravelCosts" or "getLinkDisutilityFromTraveling"
 			@Override
 			public double getLinkTravelCost(Link link, double time) {
 				double generalizedTravelCost = incomeTravelCostCalculator.getLinkTravelCost(link, time);
-				return generalizedTravelCost;
+				double additionalGeneralizedTollCost = incomeTollTravelCostCalculator.getLinkTravelCost(link, time);
+				return generalizedTravelCost + additionalGeneralizedTollCost;
 			}
 			
 		};

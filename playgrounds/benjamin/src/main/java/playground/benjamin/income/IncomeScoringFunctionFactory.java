@@ -22,6 +22,7 @@ package playground.benjamin.income;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
@@ -40,13 +41,15 @@ import org.matsim.households.Income.IncomePeriod;
 
 public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 
+	private Config config;
 	private CharyparNagelScoringConfigGroup configGroup;
 	private CharyparNagelScoringParameters params;
 	private PersonHouseholdMapping hhdb;
 	private final Network network;
 
-	public IncomeScoringFunctionFactory(CharyparNagelScoringConfigGroup charyparNagelScoring, PersonHouseholdMapping hhmapping, Network network) {
-		this.configGroup = charyparNagelScoring;
+	public IncomeScoringFunctionFactory(Config config, PersonHouseholdMapping hhmapping, Network network) {
+		this.config = config;
+		this.configGroup = config.charyparNagelScoring();
 		this.params = new CharyparNagelScoringParameters(configGroup);
 		this.hhdb = hhmapping;
 		this.network = network;
@@ -69,9 +72,11 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 		//utility spend for traveling (in this case: travel time and distance costs)
 		scoringFunctionAccumulator.addScoringFunction(new ScoringFromLeg(plan, params, this.network, householdIncomePerDay ));
 
-		//utility spend for traveling (toll costs)
-		scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll(params, householdIncomePerDay));
-
+		//utility spend for traveling (toll costs) if there is a toll
+		if(config.scenario().isUseRoadpricing()){
+			scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll(params, householdIncomePerDay));
+		}
+		
 		//utility spend for being stuck
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
 

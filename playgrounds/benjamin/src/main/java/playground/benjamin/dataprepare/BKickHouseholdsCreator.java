@@ -34,7 +34,7 @@ import org.matsim.households.HouseholdsFactory;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
 
-import playground.dgrether.DgPaths;
+import playground.dgrether.BkPaths;
 
 
 /**
@@ -63,12 +63,12 @@ public class BKickHouseholdsCreator {
     hhs.getHouseholds().put(id2, hh);
 
     HouseholdsWriterV10 hhwriter = new HouseholdsWriterV10(hhs);
-    hhwriter.writeFile(DgPaths.SHAREDSVN + "test/input/playground/benjamin/BKickScoringTest/households.xml");
+    hhwriter.writeFile(BkPaths.SHAREDSVN + "test/input/playground/benjamin/BKickScoringTest/households.xml");
     System.out.println("Households written!");
 	}
 
 	public static void createHHForTestScenario() throws FileNotFoundException, IOException {
-		String outdir = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/";
+		String outdir = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/";
 		String plansFile = outdir + "plans.xml";
 		String networkFile =outdir + "../oneRouteNoModeTest/network.xml";
 

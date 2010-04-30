@@ -48,7 +48,7 @@ import org.matsim.households.HouseholdsFactory;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
 
-import playground.dgrether.DgPaths;
+import playground.dgrether.BkPaths;
 
 
 /**
@@ -69,24 +69,24 @@ public class BKickHouseholdsCreatorZurich {
      * GMDE
      * FLAECHE_HA
 		 */
-		String quartiereZurichShapeFile = DgPaths.WORKBASE + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/quartiergrenzen2006/quart06_shp_070824/quart06.shp";
+		String quartiereZurichShapeFile = BkPaths.WORKBASE + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/quartiergrenzen2006/quart06_shp_070824/quart06.shp";
 
-		String gemeindenKantonZurichShapeFile = DgPaths.WORKBASE + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp";
+		String gemeindenKantonZurichShapeFile = BkPaths.WORKBASE + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp";
 
-		String plansZurichWoTransit = DgPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_10pct.xml.gz";
+		String plansZurichWoTransit = BkPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_10pct.xml.gz";
 
-		String plansZurichWTransit = DgPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
+		String plansZurichWTransit = BkPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
 
 
-		String einkommenZurichTextfile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/einkommenKantonZurichPlainDataEditedFinalUTF8.txt";
+		String einkommenZurichTextfile = BkPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/einkommenKantonZurichPlainDataEditedFinalUTF8.txt";
 
-		String householdsWTransitXmlFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
+		String householdsWTransitXmlFile = BkPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
 
-		String householdsWTransitTxtFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.txt";
+		String householdsWTransitTxtFile = BkPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.txt";
 
-		String householdsWoTransitXmlFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_10pct.xml.gz";
+		String householdsWoTransitXmlFile = BkPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_10pct.xml.gz";
 
-		String householdsWoTransitTxtFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_10pct.txt";
+		String householdsWoTransitTxtFile = BkPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_10pct.txt";
 
 
 		String plansZurich = plansZurichWoTransit;
@@ -101,7 +101,7 @@ public class BKickHouseholdsCreatorZurich {
 
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().network().setInputFile(DgPaths.IVTCHNET);
+		scenario.getConfig().network().setInputFile(BkPaths.IVTCHNET);
 		scenario.getConfig().plans().setInputFile(plansZurich);
 		scenario.getConfig().scenario().setUseHouseholds(true);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);

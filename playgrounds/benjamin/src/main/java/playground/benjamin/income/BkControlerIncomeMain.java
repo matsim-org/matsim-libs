@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.income;
 
-import playground.dgrether.DgPaths;
+import playground.dgrether.BkPaths;
 
 
 public class BkControlerIncomeMain {
@@ -29,7 +29,7 @@ public class BkControlerIncomeMain {
 //		String config = DgPaths.RUNBASE + "run724/resumeConfig.xml";
 //		new BKickIncomeControler(config).run();
 		
-		String config = DgPaths.RUNBASE + "run734/resumeConfig.xml";
+		String config = BkPaths.RUNBASE + "run734/resumeConfig.xml";
 		new BkControlerIncome(config).run();
 	}
 

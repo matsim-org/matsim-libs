@@ -56,20 +56,30 @@ public class BkControlerIncome extends BkControler {
 		this.scenarioData.getConfig().global().setNumberOfThreads(1);
 		this.personHouseholdMapping = new PersonHouseholdMapping(this.getScenario().getHouseholds());
 		
-		//setting the needed scoring function
-		ScoringFunctionFactory scoringFactory = new IncomeScoringFunctionFactory(this.getScenario().getConfig().charyparNagelScoring(), personHouseholdMapping, this.getNetwork());
-		
+/*		Setting the needed scoring function.
+		Remark: parameters must be set in several classes and independently for scoring and router!*/
+		ScoringFunctionFactory scoringFactory = new IncomeScoringFunctionFactory(this.getScenario().getConfig(), personHouseholdMapping, this.getNetwork());
 		
 		this.setScoringFunctionFactory(scoringFactory);
 		super.setUp();
 	}
 
 	private void installTravelCostCalculatorFactory() {
-		RoadPricingScheme roadPricingScheme = super.getRoadPricing().getRoadPricingScheme();
-		
-		//setting the travel cost calculator for the router
-		TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme);
-		setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+		//returns null, if there is no road pricing
+		if (config.scenario().isUseRoadpricing()){
+			RoadPricingScheme roadPricingScheme = super.getRoadPricing().getRoadPricingScheme();
+			
+			/*		Setting travel cost calculator for the router.
+			Remark: parameters must be set in several classes and independently for scoring and router!*/
+			TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme);
+			setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+		}
+		else{
+			/*		Setting travel cost calculator for the router.
+			Remark: parameters must be set in several classes and independently for scoring and router!*/
+			TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
+			setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+		}
 	}
 	
 	private void addInstallTravelCostCalculatorFactoryControlerListener() {
@@ -85,7 +95,8 @@ public class BkControlerIncome extends BkControler {
 	
 	public static void main(String[] args) {
 		
-			String config = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
+			//these lines can also be included in runConfigurations/arguments/programArguments
+			String config = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; 
 			String[] args2 = {config};
 			args = args2;
 			
@@ -97,7 +108,7 @@ public class BkControlerIncome extends BkControler {
 			final BkControlerIncome controler = new BkControlerIncome(args);
 			
 			controler.setOverwriteFiles(true);
-			
+	
 			controler.addInstallTravelCostCalculatorFactoryControlerListener();
 			controler.run();
 		}

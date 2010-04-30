@@ -56,7 +56,7 @@ public class Iatbr09Analysis {
 			String plans1file = BkPaths.RUNSSVN + runid1 + "/" + runNumber1 + ".output_plans.xml.gz";
 //			String plans2file = BkPaths.RUNBASE + runid2 + "/" + runiddot2 + "output_plans.xml.gz";
 			String plans2file = BkPaths.RUNSSVN + runid2 + "/" + runNumber2 + ".output_plans.xml.gz";
-			String housholdsfile = BkPaths.RUNSSVN + "dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
+			String housholdsfile = BkPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
 //			String housholdsfile = BkPaths.RUNBASE+ "bkick/oneRouteTwoModeIncomeTest/households.xml";
 
 			String deltaScoreChartFile = BkPaths.RUNSSVN + runid2 + "/deltaScoreSingleColorIncomeChart"+runNumber1+"vs"+runNumber2+".png";

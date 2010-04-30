@@ -55,11 +55,9 @@ public class ScoringFromLeg extends LegScoringFunction {
 		log.trace("Using BKickLegScoring...");
 	}
 
-
-
 	@Override
 	public void finish() {
-
+		
 	}
 
 	@Override
@@ -72,16 +70,18 @@ public class ScoringFromLeg extends LegScoringFunction {
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		if (TransportMode.car.equals(leg.getMode())) {
 			double betaIncome = betaIncomeCar;
-			double distanceCostCar = this.params.marginalUtilityOfDistanceCar * dist;
+			double distanceCostCar = this.params.marginalUtilityOfDistanceCar * distance;
 			double distanceCost = distanceCostCar;
 			double betaTravelTime = this.params.marginalUtilityOfTraveling;
-			return calculateScore(betaIncome, distanceCost, betaTravelTime, travelTime);
+			double legScore = calculateScore(betaIncome, distanceCost, betaTravelTime, travelTime);
+			return legScore;
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 			double betaIncome = betaIncomePt;
-			double distanceCostPt = this.params.marginalUtilityOfDistancePt * dist;
+			double distanceCostPt = this.params.marginalUtilityOfDistancePt * distance;
 			double distanceCost = distanceCostPt;
 			double betaTravelTime = this.params.marginalUtilityOfTravelingPT;
-			return calculateScore(betaIncome, distanceCost, betaTravelTime, travelTime);
+			double legScore = calculateScore(betaIncome, distanceCost, betaTravelTime, travelTime);
+			return legScore;
 		} else {
 			throw new IllegalStateException("Scoring funtion not defined for other modes than pt and car!");
 		}
@@ -93,7 +93,7 @@ public class ScoringFromLeg extends LegScoringFunction {
 		if (TransportMode.car.equals(leg.getMode())) {
 			dist += this.network.getLinks().get(route.getEndLinkId()).getLength();
 		}
-
+		
 		if (Double.isNaN(dist)){
 			throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
 		}
@@ -102,12 +102,12 @@ public class ScoringFromLeg extends LegScoringFunction {
 
 	private double calculateScore(double betaIncome, double distanceCost, double betaTravelTime, double travelTime) {
 		double betaCost = betaIncome / this.incomePerDay;
-		double distanceCostScore = betaCost * distanceCost;
-		double travelTimeScore = travelTime * betaTravelTime;
-
+		double distanceCostScore = betaCost       * distanceCost;
+		double travelTimeScore   = betaTravelTime * travelTime ;
+		
 		//this is the actual (negative) utility from distance costs and travel time
 		double score = distanceCostScore + travelTimeScore;
-
+		
 		if (Double.isNaN(score)){
 			throw new IllegalStateException("Leg score is NaN for person: " + this.plan.getPerson().getId());
 		}

@@ -34,6 +34,7 @@ import org.matsim.roadpricing.TollTravelCostCalculator;
  * 
  */
 
+// a dummy class in order to meet the framework
 public class IncomeTollTravelCostCalculator implements PersonalizableTravelCost {
 
 	public class NullTravelCostCalculator implements PersonalizableTravelCost {
@@ -50,15 +51,23 @@ public class IncomeTollTravelCostCalculator implements PersonalizableTravelCost 
 
 	}
 
-	private static final double betaIncomeCar = 4.58;
-	private TollTravelCostCalculator tollTravelCostCalculator;
+	/*	this parameter has to be equal to the one appearing several times in the scoring function, e.g.
+	 * 	ScoringFromDailyIncome, ScoringFromLeg and ScoringFromToll and eventually other money related parts of the scoring function.
+	 * 	Also see IncomeTravelCostCalculator!
+	 *  "Car" in the parameter name is not relevant.*/
+	private static double betaIncomeCar = 4.58;
+	
 	private double incomePerDay;
+	
 	private PersonHouseholdMapping hhdb;
+	
+	private TollTravelCostCalculator tollTravelCostCalculator;
+	
 	
 	public IncomeTollTravelCostCalculator(PersonHouseholdMapping hhdb, RoadPricingScheme scheme) {
 		this.hhdb = hhdb;
 		PersonalizableTravelCost nullTravelCostCalculator = new NullTravelCostCalculator();
-		this.tollTravelCostCalculator = new TollTravelCostCalculator(nullTravelCostCalculator , scheme);
+		this.tollTravelCostCalculator = new TollTravelCostCalculator(nullTravelCostCalculator, scheme);
 	}
 
 	@Override
@@ -66,10 +75,12 @@ public class IncomeTollTravelCostCalculator implements PersonalizableTravelCost 
 		this.incomePerDay = getHouseholdIncomePerDay(person, hhdb);
 	}
 
+	//calculating additional generalized toll costs
 	@Override
 	public double getLinkTravelCost(Link link, double time) {
 		double amount = tollTravelCostCalculator.getLinkTravelCost(link, time);
-		return (betaIncomeCar / incomePerDay) * amount;
+		double additionalGeneralizedTollCost = (betaIncomeCar / incomePerDay) * amount;
+		return additionalGeneralizedTollCost;
 	}
 
 	private double getHouseholdIncomePerDay(Person person, PersonHouseholdMapping hhdb) {
