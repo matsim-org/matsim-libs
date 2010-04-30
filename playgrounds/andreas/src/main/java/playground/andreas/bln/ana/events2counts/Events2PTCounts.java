@@ -27,6 +27,8 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
@@ -53,16 +55,15 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 	Map<Id, Id> veh2CurrentStopMap = new HashMap<Id, Id>();
 	Map<Id, List<List<Id>>> line2MainLinesMap;
 
-	public Events2PTCounts(String inDir, String countsOutFile, String eventsInFile, String stopIDMapFile, String networkFile, String transitScheduleFile) throws IOException {
-		this(inDir, countsOutFile, eventsInFile, ReadStopIDNamesMap.readFile(inDir + stopIDMapFile), ReadTransitSchedule.readTransitSchedule(inDir + networkFile, inDir + transitScheduleFile));
+	public Events2PTCounts(String outDir, String eventsInFile, String stopIDMapFile, String networkFile, String transitScheduleFile) throws IOException {
+		this(outDir, eventsInFile, ReadStopIDNamesMap.readFile(stopIDMapFile), ReadTransitSchedule.readTransitSchedule(networkFile, transitScheduleFile));
 	}
 	
-	public Events2PTCounts(String inDir, String countsOutFile , String eventsInFile, HashMap<Id, String> stopIDMap, TransitSchedule transitSchedule){
-		this.countsOutFile = inDir + countsOutFile;
-		this.eventsInFile = inDir + eventsInFile;
+	public Events2PTCounts(String outDir, String eventsInFile, HashMap<Id, String> stopIDMap, TransitSchedule transitSchedule){
+		this.eventsInFile = eventsInFile;
 		this.stopIDMap = stopIDMap;
 		this.transitSchedule = transitSchedule;
-		this.outDir = inDir + "out/";		
+		this.outDir = outDir;		
 	}
 
 	public void run() {
@@ -83,50 +84,40 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 		
 			for (Id lineId : this.line2StopCountMap.keySet()) {
 				
-				String direction = null;
-				
-				for (List<Id> stopsOfRouteList : this.line2MainLinesMap.get(lineId)) {
-
-					if(direction == null){
-						direction = "_H";
-					} else if(direction.equalsIgnoreCase("_H")){
-						direction = "_R";
-					} else if(direction.equalsIgnoreCase("_R")){
-						log.error("Got more than two directions for line " + lineId + ". Don't know what to do.");
-					}
+				for (TransitRoute transitRoute : this.transitSchedule.getTransitLines().get(lineId).getRoutes().values()) {
 					
 					// prepare occupancy
 					
 					TreeMap<Id, ArrayList<Integer>> stop2OccuMap = new TreeMap<Id, ArrayList<Integer>>();
 					
 					for (int i = 0; i < new StopCountBox(null, null).accessCount.length; i++) {
-						for (Id stopId : stopsOfRouteList) {
-							if(stop2OccuMap.get(stopId) == null){
-								stop2OccuMap.put(stopId, new ArrayList<Integer>(new StopCountBox(null, null).accessCount.length));
+						for (TransitRouteStop routeStop : transitRoute.getStops()) {
+							if(stop2OccuMap.get(routeStop.getStopFacility().getId()) == null){
+								stop2OccuMap.put(routeStop.getStopFacility().getId(), new ArrayList<Integer>(new StopCountBox(null, null).accessCount.length));
 							}
-							StopCountBox stopCountBox = this.line2StopCountMap.get(lineId).get(stopId);
-							stop2OccuMap.get(stopId).add(i, new Integer(stopCountBox.accessCount[i] - stopCountBox.egressCount[i]));							
+							StopCountBox stopCountBox = this.line2StopCountMap.get(lineId).get(routeStop.getStopFacility().getId());
+							stop2OccuMap.get(routeStop.getStopFacility().getId()).add(i, new Integer(stopCountBox.accessCount[i] - stopCountBox.egressCount[i]));							
 						}
 					}
 					
 					for (int i = 0; i < new StopCountBox(null, null).accessCount.length; i++) {
 						int occu = 0;
-						for (Id stopId : stopsOfRouteList) {
-							occu = occu + stop2OccuMap.get(stopId).get(i).intValue();
-							stop2OccuMap.get(stopId).set(i, new Integer(occu));							
+						for (TransitRouteStop routeStop : transitRoute.getStops()) {
+							occu = occu + stop2OccuMap.get(routeStop.getStopFacility().getId()).get(i).intValue();
+							stop2OccuMap.get(routeStop.getStopFacility().getId()).set(i, new Integer(occu));							
 						}
 					}
 					
 
 					
-					writer = new BufferedWriter(new FileWriter(new File(this.outDir + lineId.toString().trim() + direction + ".txt")));
+					writer = new BufferedWriter(new FileWriter(new File(this.outDir + lineId.toString().trim() + "_" + transitRoute.getId().toString().trim() + ".txt")));
 					writer.write(new StopCountBox(null, null).getHeader()); writer.newLine();
 					
-					for (Id stopId : stopsOfRouteList) {
-						writer.write(this.stopIDMap.get(new IdImpl(stopId.toString().split("\\.")[0])) + "; ");
-						StopCountBox stopCountBox = this.line2StopCountMap.get(lineId).get(stopId);
+					for (TransitRouteStop routeStop : transitRoute.getStops()) {
+						writer.write(this.stopIDMap.get(new IdImpl(routeStop.getStopFacility().getId().toString().split("\\.")[0])) + "; ");
+						StopCountBox stopCountBox = this.line2StopCountMap.get(lineId).get(routeStop.getStopFacility().getId());
 						for (int i = 0; i < new StopCountBox(null, null).accessCount.length; i++) {
-							writer.write(stopCountBox.accessCount[i] + "; " + stopCountBox.egressCount[i] + "; " + stop2OccuMap.get(stopId).get(i) + "; ");
+							writer.write(stopCountBox.accessCount[i] + "; " + stopCountBox.egressCount[i] + "; " + stop2OccuMap.get(routeStop.getStopFacility().getId()).get(i) + "; ");
 						}
 						writer.newLine();
 						writer.flush();
@@ -134,7 +125,7 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 				}
 			}
 			
-			new GnuFileWriter(this.outDir).write(this.line2MainLinesMap);
+			new GnuFileWriter(this.outDir).write(this.transitSchedule);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -159,9 +150,9 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 	}
 
 	public static void main(String[] args) {
-		String inDir = "e:/_out/countsTest/";
+		String outDir = "e:/_out/countsTest/";
 		try {
-			new Events2PTCounts(inDir, "countsFile.txt", "750.events.xml.gz", "stopareamap.txt", "network.xml.gz", "transitSchedule.xml.gz").run();
+			new Events2PTCounts(outDir, "750.events.xml.gz", "stopareamap.txt", "network.xml.gz", "transitSchedule.xml.gz").run();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -179,6 +170,10 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 		Id vehId = event.getVehicleId();
 		Id stopId = event.getFacilityId();
 		Id lineId = this.vehID2LineMap.get(vehId);
+		
+		if(lineId == null){
+			log.error("Veh id == null");
+		}
 		
 		if(this.line2StopCountMap.get(lineId) == null){
 			this.line2StopCountMap.put(lineId, new HashMap<Id, StopCountBox>());
