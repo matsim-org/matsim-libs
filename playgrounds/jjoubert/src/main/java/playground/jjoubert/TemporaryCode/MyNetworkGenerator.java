@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -61,8 +62,8 @@ public class MyNetworkGenerator {
 		}
 		new NetworkCleaner().run(net);
 		new NetworkWriter(net).write("/Users/johanwjoubert/Desktop/Temp/network.xml");
-
-		Config c = Gbl.createConfig(null);
+		
+		Config c = new ScenarioImpl().getConfig();
 		c.global().setCoordinateSystem(UTM35S);
 		
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(net);
