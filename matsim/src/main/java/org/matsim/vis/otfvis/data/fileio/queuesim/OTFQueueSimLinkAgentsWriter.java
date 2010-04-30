@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -38,21 +37,17 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 /**
  * @author dgrether
  */
-@Deprecated 
 public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implements OTFWriterFactory<QueueLink> {
 	// yyyy this class should not be used since it is not clear where the corresponding reader is, and so that last possibility
 	// to fix the binary channel has gotten lost.  kai, apr'10
+	// by default, binary output of this class is linked to OTFLinkLanesAgentsNoParkingHandler
+	// so the class can be continued to be used. marcel, apr'10
 
 	private static final long serialVersionUID = -7916541567386865404L;
 
 	public static final boolean showParked = false;
 
 	protected static final transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-	
-	private OTFQueueSimLinkAgentsWriter() {
-		// this class should not be used since it is not clear where the corresponding reader is, and so that last possibility
-		// to fix the binary channel has gotten lost.  kai, apr'10
-	}
 
 	protected void writeAllAgents(ByteBuffer out) {
 		// Write additional agent data
