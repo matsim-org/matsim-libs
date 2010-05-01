@@ -26,7 +26,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -41,14 +40,14 @@ import org.xml.sax.SAXException;
 
 public class MyNetworkGenerator {
 	public static final String UTM35S = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
-	
-	
+
+
 	public static void main(String [] args) {
 		String osm = "/Users/johanwjoubert/Downloads/map.osm";
-				
+
 		NetworkLayer net = new NetworkLayer();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, UTM35S);
-		
+
 		OsmNetworkReader onr = new OsmNetworkReader(net,ct);
 		onr.setHierarchyLayer(-25.8875, 28.1204, -25.9366, 28.1612, 6);
 		try {
@@ -61,17 +60,17 @@ public class MyNetworkGenerator {
 			e.printStackTrace();
 		}
 		new NetworkCleaner().run(net);
-		new NetworkWriter(net).writeFile("/Users/johanwjoubert/Desktop/Temp/network.xml");
-		
+		new NetworkWriter(net).write("/Users/johanwjoubert/Desktop/Temp/network.xml");
+
 		Config c = new ScenarioImpl().getConfig();
 		c.global().setCoordinateSystem(UTM35S);
-		
+
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(net);
 		builder.setWidthCoefficient(0.01);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		new Links2ESRIShape(net,"/Users/johanwjoubert/Desktop/Temp/network.shp", builder).write();
-		
+
 	}
 
 }
