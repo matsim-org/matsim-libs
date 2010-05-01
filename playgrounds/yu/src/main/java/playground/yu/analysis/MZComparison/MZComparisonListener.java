@@ -3,7 +3,9 @@
  */
 package playground.yu.analysis.MZComparison;
 
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -25,13 +27,23 @@ public class MZComparisonListener implements IterationEndsListener,
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		int iter = event.getIteration();
 		if (iter % 100 == 0) {
+
 			Controler ctl = event.getControler();
+			ControlerIO ctlIO = ctl.getControlerIO();
+			Population pop = ctl.getPopulation();
+
 			MZComparisonData mzcd = new MZComparisonData(ctl.getScenario()
 					.getRoadPricingScheme());
-			mzcd.run(ctl.getPopulation());
+			mzcd.run(pop);
 			mzcdi.setData2Compare(mzcd);
-			mzcdi.write(ctl.getControlerIO().getIterationFilename(iter,
-					"MZ05Comparison"));
+			mzcdi.write(ctlIO.getIterationFilename(iter, "MZ05Comparison"));
+
+			// GeometricDistanceExtractor lde = new
+			// GeometricDistanceExtractor(ctl
+			// .getRoadPricing().getRoadPricingScheme(), ctlIO
+			// .getIterationFilename(iter, "geoDistKanton"));
+			// lde.run(pop);
+			// lde.write();
 		}
 	}
 

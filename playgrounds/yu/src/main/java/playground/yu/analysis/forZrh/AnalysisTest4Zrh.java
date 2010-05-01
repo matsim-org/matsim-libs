@@ -45,6 +45,7 @@ import org.xml.sax.SAXException;
 import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
+import playground.yu.analysis.GeometricDistanceExtractor;
 import playground.yu.analysis.LegDistance;
 import playground.yu.analysis.ModeSplit;
 import playground.yu.analysis.MyCalcAverageTripLength;
@@ -52,7 +53,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class AnalysisTest4Zrh implements Analysis4Zrh {
 
@@ -83,8 +84,8 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 	private static void runIntern(final String[] args, final String scenario) {
 		final String netFilename = args[2];
 
-		String[] tmp = args[3]/* iterationPaht */.split("it.");
-		String outputBase = args[3]/* iterationPaht */+ "/" + args[1]/* runId */
+		String[] tmp = args[3]/* iterationPath */.split("it.");
+		String outputBase = args[3]/* iterationPath */+ "/" + args[1]/* runId */
 				+ "." + tmp[tmp.length - 1] + ".";
 		final String eventsFilename = outputBase + "events.txt.gz";
 
@@ -146,6 +147,7 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 		DailyEnRouteTime4Zrh dert = null;
 		ModeSplit ms = null;
 		LegDistance ld = null;
+		GeometricDistanceExtractor gde = null;
 		// only PersonAlgorithm begins.
 		if (plansFilename != null) {
 			Population population = s.getPopulation();
@@ -157,6 +159,8 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 			dd = new DailyDistance4Zrh(toll, network);
 			dert = new DailyEnRouteTime4Zrh(toll);
 			ld = new LegDistance(network, toll, population);
+			gde = new GeometricDistanceExtractor(toll, outputBase
+					+ "geoDistKanton");
 			// in future, add some PersonAlgorithm and EventsHandler
 
 			new MatsimPopulationReader(s).readFile(plansFilename);
@@ -165,6 +169,7 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 			dd.run(population);
 			dert.run(population);
 			ms.run(population);
+			gde.run(population);
 		} else {
 			ld = new LegDistance(network);
 		}
@@ -227,6 +232,8 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 			dert.write(outputBase4analysis);
 		if (ms != null)
 			ms.write(outputBase4analysis);
+		if (gde != null)
+			gde.write();
 		System.out.println("done.");
 	}
 

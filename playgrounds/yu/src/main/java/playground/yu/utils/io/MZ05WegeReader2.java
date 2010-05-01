@@ -131,16 +131,24 @@ public class MZ05WegeReader2 implements TabularFileHandler {
 		writer
 				.writeln("wegezwecke\tmittlere w_dist_obj2(LV)\tmittlere w_dist_obj2(MIV)\tmittlere w_dist_obj2(OeV)\tmittlere w_dist_obj2(Andere)");
 
+		double w_dist_obj2Sum[] = new double[4], w_dist_obj2Cnt[] = new double[4];
 		for (Entry<String, Tuple<Double, Double>[]> entry : this.w_dist_obj2Map
 				.entrySet()) {
 			Tuple<Double, Double>[] tuple = entry.getValue();
 			StringBuffer line = new StringBuffer(entry.getKey());
 			for (int i = 0; i < tuple.length; i++) {
 				line.append('\t');
-				line.append(tuple[i].getFirst() / tuple[i].getSecond());
+				double sum = tuple[i].getFirst(), cnt = tuple[i].getSecond();
+				line.append(sum / cnt);
+				w_dist_obj2Sum[i] += sum;
+				w_dist_obj2Cnt[i] += cnt;
 			}
+
 			writer.writeln(line);
 		}
+		writer.write("total\t");
+		for (int i = 0; i < w_dist_obj2Sum.length; i++)
+			writer.write(w_dist_obj2Sum[i] / w_dist_obj2Cnt[i] + "\t");
 
 		writer.close();
 

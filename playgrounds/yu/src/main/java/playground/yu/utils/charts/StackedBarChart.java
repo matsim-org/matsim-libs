@@ -110,14 +110,20 @@ public class StackedBarChart extends ChartUtil {
 		StackedBarChart chart = new StackedBarChart("TITLE", "category",
 				"values", PlotOrientation.VERTICAL);
 		chart.addSeries(new String[] { "subCtgyIdxA+rowIdxA",
-				"subCtgyIdxA+rowIdxB", "subCtgyIdxA+rowIdxC",
-				"subCtgyIdxB+rowIdxA", "subCtgyIdxB+rowIdxB",
-				"subCtgyIdxB+rowIdxC" },// rowKeys
+		// "subCtgyIdxA+rowIdxB", "subCtgyIdxA+rowIdxC",
+				"subCtgyIdxB+rowIdxA",
+		// "subCtgyIdxB+rowIdxB",
+				// "subCtgyIdxB+rowIdxC"
+				},// rowKeys
 				new String[] { "ctgrA", "ctgrB", "ctgrC", "ctgrD" },// columnKeys
 				new String[] { "subCtgyIdxA", "subCtgyIdxB" },// subCategoryKeys
-				new double[][] { { 1, 2, 3, 4 }, { 8, 7, 6, 5 },
-						{ 1.9, 2.9, 1.9, 2.9 }, { 2, 3, 4, 1 }, { 3, 4, 5, 6 },
-						{ 1, 5, 2, 6 } });
+				new double[][] {
+				// { 1, 2, 3, 4 },
+						// { 8, 7, 6, 5 },
+						{ 1.9, 2.9, 1.9, 2.9 }, { 2, 3, 4, 1 }
+				// { 3, 4, 5, 6 },
+				// { 1, 5, 2, 6 }
+				});
 		// chart.addValue(7.2, "rowKeySpecialA", "ctgrB");
 		// chart.addValue(2.5, "rowKeySpecialB", "ctgrD");
 		// chart.addValue(3.3, "rowIdxB", "ctgrSpecial");
