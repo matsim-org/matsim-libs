@@ -22,6 +22,7 @@ package org.matsim.core.network;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -30,7 +31,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
-
+	
+	private static final Logger log = Logger.getLogger(NetworkWriter.class);
+	
 	private final Network network;
 
 	public NetworkWriter(final Network network) {
@@ -39,8 +42,10 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 	}
 
 	public void write(final String filename) {
+		log.info("Writing network to file: " + filename  + "...");
 		// always write out in newest version, currently v1
 		writeFileV1(filename);
+		log.info("done.");
 	}
 
 	public void writeFileV1(final String filename) {
