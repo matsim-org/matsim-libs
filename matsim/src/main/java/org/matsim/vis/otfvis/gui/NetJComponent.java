@@ -319,6 +319,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	public static class SimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQuadReceiver{
 		protected final Point2D.Float[] quad = new Point2D.Float[4];
 		protected String id = "noId";
+		private float oldResizer = 1;
 		//		protected float coloridx = 0;
 
 
@@ -356,7 +357,13 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		@Override
 		public void onDraw(Graphics2D display) {
 			Polygon poly = new Polygon();
-		
+			
+			float resizer = (float) ((2*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth())/(1*linkWidth) + 0.5);
+			quad[2].x = resizer/this.oldResizer * (quad[2].x - quad[0].x) + quad[0].x;
+			quad[2].y = resizer/this.oldResizer * (quad[2].y - quad[0].y) + quad[0].y;
+			quad[3].x = resizer/this.oldResizer * (quad[3].x - quad[1].x) + quad[1].x;
+			quad[3].y = resizer/this.oldResizer * (quad[3].y - quad[1].y) + quad[1].y;
+			this.oldResizer=resizer;
 			
 			poly.addPoint((int)(quad[0].x), (int)(quad[0].y));
 			poly.addPoint((int)(quad[1].x), (int)(quad[1].y));
@@ -368,11 +375,11 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			
 			// Show LinkIds
 			if (OTFClientControl.getInstance().getOTFVisConfig().drawLinkIds()){
-			    float linksize = 4*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
-			    int fontSize = (int)linksize; 
+			    float idSize = 4*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
+			    int fontSize = (int)idSize; 
 			    float middleX = (float)(0.5*this.quad[0].x + (0.5)*this.quad[3].x);
 			    float middleY = (float)(0.5*this.quad[0].y + (0.5)*this.quad[3].y);
-				Line2D line = new Line2D.Float(middleX, middleY, (float)(middleX + linksize),(float)(middleY + linksize));
+				Line2D line = new Line2D.Float(middleX, middleY, (float)(middleX + idSize),(float)(middleY + idSize));
 				display.setColor(Color.blue);
 				display.draw(line);
 				java.awt.Font font_old = display.getFont();
@@ -380,7 +387,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 				display.transform(tx);
 				java.awt.Font font = new java.awt.Font("Arial Unicode MS", java.awt.Font.PLAIN, fontSize);
 				display.setFont(font);
-				display.drawString(this.id,(float)(middleX + 1.25*linksize),-(float)(middleY + 0.75*linksize));
+				display.drawString(this.id,(float)(middleX + 1.25*idSize),-(float)(middleY + 0.75*idSize));
 				try {
 					tx.invert();
 				} catch (NoninvertibleTransformException e) {
