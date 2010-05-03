@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgRunId
+ * LaneLayoutTestConvertTo20
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis;
+package playground.dgrether.lanes.laneLayoutTest;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.lanes.LaneDefinitonsV11ToV20Converter;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgRunId {
+public class LaneLayoutTestConvertTo20 {
 
-	private String runNumber;
-
-	public DgRunId(String n) {
-		this.runNumber = n;
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		new LaneDefinitonsV11ToV20Converter().convert(LaneLayoutTestFileNames.LANEDEFINITIONS, 
+				LaneLayoutTestFileNames.LANEDEFINITIONSV2, LaneLayoutTestFileNames.NETWORK);
 	}
-	
-  @Override
-	public String toString(){
-  	return this.runNumber;
-  }
-
-  public String toDotString(){
-  	return this.runNumber + ".";
-  }
-  
-  
-  public Id toId(){
-  	return new IdImpl(this.runNumber);
-  }
 
 }

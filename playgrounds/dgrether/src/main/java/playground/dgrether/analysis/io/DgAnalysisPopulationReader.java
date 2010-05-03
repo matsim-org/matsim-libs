@@ -24,13 +24,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -45,22 +45,20 @@ public class DgAnalysisPopulationReader {
 
 	private static final Logger log = Logger.getLogger(DgAnalysisPopulationReader.class);
 
-	private ScenarioImpl sc;
-
 	private Map<String, NetworkLayer> loadedNetworks = new HashMap<String, NetworkLayer>();
 
 	private boolean isExcludeTransit = false;
 
-	public DgAnalysisPopulationReader(ScenarioImpl sc) {
-		this.sc = sc;
+	public DgAnalysisPopulationReader() {
 	}
 
 	public DgAnalysisPopulation readAnalysisPopulation(DgAnalysisPopulation analysisPopulation, final Id runId, final String networkPath, final String firstPlanPath) {
+		ScenarioImpl sc = new ScenarioImpl();
 		Population population;
 		NetworkLayer net;
 		if (this.loadedNetworks.containsKey(networkPath)){
 			net = loadedNetworks.get(networkPath);
-			this.sc.setNetwork(net);
+			sc.setNetwork(net);
 		}
 		else {
 			ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
@@ -94,7 +92,7 @@ public class DgAnalysisPopulationReader {
 			DgPlanData pd = new DgPlanData();
 			pd.setScore(plan.getScore());
 			plan.setPerson(null);
-//			pd.setPlan(plan);
+			pd.setPlan(plan);
 			personData.getPlanData().put(runId, pd);
 		}
 		population = null;
@@ -110,81 +108,13 @@ public class DgAnalysisPopulationReader {
 	}
 
 	/**
-   * Creates the object and computes the resulting comparison
-   *setActivity
-   * @deprecated
-   * @param firstPlanPath
-   * @param secondPlanPath
-   * @param outpath
-   *          if null the output is written to the console
-   */
-	@Deprecated
-	public DgAnalysisPopulation doPopulationAnalysis(final String networkPath, final String firstPlanPath,
-			final String secondPlanPath) {
-		return doPopulationAnalysis( networkPath, firstPlanPath, secondPlanPath, "selected" ) ;
-	}
-	@Deprecated
-	public DgAnalysisPopulation doPopulationAnalysis(final String networkPath, final String firstPlanPath,
-			final String secondPlanPath, final String whichPlan ) {
-		Population population;
-		DgAnalysisPopulation analysisPopulation;
-
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
-		sc.getConfig().network().setInputFile(networkPath);
-		sl.loadNetwork();
-		// load first plans file
-		population = loadPopulationFile(firstPlanPath, sc);
-		new PlanCalcType().run(population);
-
-		analysisPopulation = new DgAnalysisPopulation();
-		Plan plan = null ;
-		Activity act;
-		for (Id id : population.getPersons().keySet()) {
-			if ( whichPlan.equals( "selected" ) ) {
-				plan = population.getPersons().get(id).getSelectedPlan();
-			} else if ( whichPlan.equals( "best" ) ) {
-				plan = ((PersonImpl) population.getPersons().get(id)).getBestPlan();
-			} else {
-				log.error( " whichPlan not recognized; aborting ... " ) ;
-				System.exit( -1 ) ;
-			}
-			act = ((PlanImpl) plan).getFirstActivity();
-			DgPersonData personData = new DgPersonData();
-			personData.setFirstActivity(act);
-			DgPlanData pd = new DgPlanData();
-			pd.setScore(plan.getScore());
-			pd.setPlan(plan);
-			personData.getPlanData().put(DgAnalysisPopulation.RUNID1, pd);
-			personData.setPersonId(id);
-			analysisPopulation.getPersonData().put(id, personData);
-		}
-		// many people can be in one pop -> care about memory
-		population = null;
-		System.gc();
-		// load second population
-		population = loadPopulationFile(secondPlanPath, sc);
-		new PlanCalcType().run(population);
-		for (Id id : population.getPersons().keySet()) {
-			plan = population.getPersons().get(id).getSelectedPlan();
-			DgPersonData personData = analysisPopulation.getPersonData().get(id);
-			DgPlanData pd = new DgPlanData();
-			pd.setScore(plan.getScore());
-			pd.setPlan(plan);
-			personData.getPlanData().put(DgAnalysisPopulation.RUNID2, pd);
-		}
-		return analysisPopulation;
-	}
-
-
-
-	/**
    * Load the plan file with the given path.
    *
    * @param filename
    *          the path to the filename
    * @return the Plans object containing the population
    */
-	protected Population loadPopulationFile(final String filename, ScenarioImpl sc) {
+	protected Population loadPopulationFile(final String filename, Scenario sc) {
 		Population plans = sc.getPopulation();
 
 		log.info("  reading plans xml file... ");

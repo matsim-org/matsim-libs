@@ -21,6 +21,7 @@
 package playground.dgrether.analysis.population;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 
 
 /**
@@ -34,11 +35,11 @@ public class PlanComparisonStringWriter {
 	 */
 	private StringBuffer _buffer;
 
-	public PlanComparisonStringWriter(DgAnalysisPopulation pop) {
-		write(pop);
+	public PlanComparisonStringWriter(DgAnalysisPopulation pop, Id runId1, Id runId2) {
+		write(pop, runId1, runId2);
 	}
 
-	private void write(DgAnalysisPopulation pc) {
+	private void write(DgAnalysisPopulation pc, Id runId1, Id runId2) {
 		double score1, score2;
 		String linesep = System.getProperty("line.separator");
 		Coord coordinates;
@@ -61,8 +62,8 @@ public class PlanComparisonStringWriter {
 		
 		
 		for (DgPersonData pd : pc.getPersonData().values()) {
-			score1 = pd.getPlanData().get(DgAnalysisPopulation.RUNID1).getScore();
-			score2 = pd.getPlanData().get(DgAnalysisPopulation.RUNID2).getScore();
+			score1 = pd.getPlanData().get(runId1).getScore();
+			score2 = pd.getPlanData().get(runId2).getScore();
 			if ( !Double.isNaN(score1) && !Double.isNaN(score2) ) {
 				coordinates = pd.getFirstActivity().getCoord();
 				_buffer.append(pd.getPersonId().toString());

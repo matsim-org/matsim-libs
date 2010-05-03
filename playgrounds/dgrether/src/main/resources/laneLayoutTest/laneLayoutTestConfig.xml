@@ -9,8 +9,8 @@
 <config>
 
   <module name="network">
-    <param name="inputNetworkFile" value="&INPUTBASE;/network.xml.gz" />
-    <param name="laneDefinitionsFile" value="&INPUTBASE;/testLaneDefinitions_v1.1.xml" />
+    <param name="inputNetworkFile" value="&INPUTBASE;/network.xml" />
+    <param name="laneDefinitionsFile" value="&INPUTBASE;/lanedefinitions.xml" />
   </module>
 
   <module name="plans">
@@ -26,7 +26,7 @@
     <!-- Set this parameter to true if lanes should be used, false if not. -->
     <param name="useLanes" value="true" />
     <!-- Set this parameter to true if signal systems should be used, false if not. -->
-    <param name="useSignalsystems" value="true" />
+    <param name="useSignalsystems" value="false" />
   </module>
 
   <module name="planCalcScore">

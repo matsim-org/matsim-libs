@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<laneDefinitions xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
+    <lanesToLinkAssignment linkIdRef="1">
+        <lane id="1">
+            <toLink refId="3"/>
+            <toLink refId="4"/>
+            <representedLanes number="1"/>
+            <length meter="200.0"/>
+        </lane>
+        <lane id="2">
+            <toLink refId="2"/>
+            <representedLanes number="2"/>
+            <length meter="200.0"/>
+        </lane>
+    </lanesToLinkAssignment>
+</laneDefinitions>

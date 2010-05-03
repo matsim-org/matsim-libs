@@ -68,7 +68,7 @@ public class DgAnalysisTest extends MatsimTestCase {
 		assertTrue("no output population with default name written!", new File(outputPlansFilename).exists());
 		
 		
-		DgAnalysisPopulationReader reader = new DgAnalysisPopulationReader(sc);
+		DgAnalysisPopulationReader reader = new DgAnalysisPopulationReader();
 //		reader.readPopulationFile();
 	}
 }

@@ -20,10 +20,10 @@
 
 package playground.dgrether.analysis.population;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.analysis.DgRunId;
 import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
 
 
@@ -62,24 +62,25 @@ public class PlanComparator {
 	public static void main(String[] args) {
 		String runNumber1 = "749";
 		String runNumber2 = "869";
-		DgRunId runid1 = new DgRunId(runNumber1);
-		DgRunId runid2 = new DgRunId(runNumber2);
-		String netfile = DgPaths.RUNBASE + "run" +  runid1.toString() + "/" + runid1.toDotString() + "output_network.xml.gz";
-		String plans1file = DgPaths.RUNBASE + "run" +runid1.toString() + "/" + runid1.toDotString() + "output_plans.xml.gz";
-		String plans2file = DgPaths.RUNBASE + "run" +runid2.toString() + "/" + runid2.toDotString() + "output_plans.xml.gz";
+		Id runid1 = new IdImpl(runNumber1);
+		Id runid2 = new IdImpl(runNumber2);
+		String netfile = DgPaths.RUNBASE + "run" +  runid1.toString() + "/" + runid1.toString() + "." + "output_network.xml.gz";
+		String plans1file = DgPaths.RUNBASE + "run" +runid1.toString() + "/" + runid1.toString()  + "." + "output_plans.xml.gz";
+		String plans2file = DgPaths.RUNBASE + "run" +runid2.toString() + "/" + runid2.toString()  + "." + "output_plans.xml.gz";
 		args = new String[4];
 		args[0] = netfile;
 		args[1] = plans1file;
 		args[2] = plans2file;
 		args[3] = DgPaths.RUNBASE + "run" +runid2.toString() + "/" + runid1.toString() + "vs" + runid2.toString()+ "plansCompare.txt";
-		DgAnalysisPopulation pop;
-		ScenarioImpl sc = new ScenarioImpl();
-		pop = new DgAnalysisPopulationReader(sc).doPopulationAnalysis(args[0], args[1], args[2]);
+		DgAnalysisPopulation pop = new DgAnalysisPopulation();
+		DgAnalysisPopulationReader reader = new DgAnalysisPopulationReader();
+		reader.readAnalysisPopulation(pop, runid1, netfile, args[1]);
+		reader.readAnalysisPopulation(pop, runid2, netfile, args[2]);
 		if (args.length == 3) {
-			System.out.println(new PlanComparisonStringWriter(pop).getResult());
+			System.out.println(new PlanComparisonStringWriter(pop, runid1, runid2).getResult());
 		}
 		else if (args.length == 4) {
-			new PlanComparisonFileWriter(pop).write(args[3]);
+			new PlanComparisonFileWriter(pop).write(args[3], runid1, runid2);
 		}
 		else
 			printHelp();

@@ -46,11 +46,11 @@ import playground.dgrether.utils.LogOutputEventHandler;
  * @author dgrether
  *
  */
-public class DgLiveVisEquil {
+public class DgTeleportationVisEquil {
 
-	private static final Logger log = Logger.getLogger(DgLiveVisEquil.class);
+	private static final Logger log = Logger.getLogger(DgTeleportationVisEquil.class);
 
-	public DgLiveVisEquil(){
+	public DgTeleportationVisEquil(){
 		Scenario scenario = new ScenarioImpl();
 		scenario.getConfig().network().setInputFile("../matsim/examples/equil/network.xml");
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
@@ -99,6 +99,6 @@ public class DgLiveVisEquil {
 
 
 	public static void main(String[] args){
-		new DgLiveVisEquil();
+		new DgTeleportationVisEquil();
 	}
 }

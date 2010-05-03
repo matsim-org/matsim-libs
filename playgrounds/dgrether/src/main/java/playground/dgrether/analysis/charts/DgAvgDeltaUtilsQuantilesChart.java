@@ -32,6 +32,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.analysis.charts.utils.DgColorScheme;
@@ -58,13 +59,13 @@ public class DgAvgDeltaUtilsQuantilesChart {
 
 	private DgXYLabelGenerator labelGenerator;
 	
-	public DgAvgDeltaUtilsQuantilesChart(DgAnalysisPopulation ana) {
+	public DgAvgDeltaUtilsQuantilesChart(DgAnalysisPopulation ana, Id runId1, Id runId2) {
 		this.ana = ana;
 		this.labelGenerator = new DgXYLabelGenerator();
-		this.dataset = this.createDatasets();
+		this.dataset = this.createDatasets(runId1, runId2);
 	}
 	
-	private Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop) {
+	private Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop, Id runId1, Id runId2) {
 		List<DgAnalysisPopulation> quantiles = pop.getQuantiles(this.nQuantiles, new DgPersonDataIncomeComparator());
 		XYSeries series = new XYSeries(title, false, true);
 		List<String> labels = new ArrayList<String>();
@@ -72,7 +73,7 @@ public class DgAvgDeltaUtilsQuantilesChart {
 		double i = -0.5;
 		for (DgAnalysisPopulation p : quantiles){
 			i++;
-			Double avgScore = p.calcAverageScoreDifference(DgAnalysisPopulation.RUNID1, DgAnalysisPopulation.RUNID2);
+			Double avgScore = p.calcAverageScoreDifference(runId1, runId2);
 			p.calculateIncomeData();
 			income += p.getTotalIncome();
 			double incomeLocation = 100.0 * i/this.nQuantiles;
@@ -84,9 +85,9 @@ public class DgAvgDeltaUtilsQuantilesChart {
 	
 
 	
-	private XYSeriesCollection createDatasets() {
+	private XYSeriesCollection createDatasets(Id runId1, Id runId2) {
 		XYSeriesCollection ds = new XYSeriesCollection();
-		Tuple<XYSeries, List<String>> seriesLabels = this.createXYSeries("Mean "+  '\u0394' + "Utility", this.ana);
+		Tuple<XYSeries, List<String>> seriesLabels = this.createXYSeries("Mean "+  '\u0394' + "Utility", this.ana, runId1, runId2);
 		ds.addSeries(seriesLabels.getFirst());
 		this.labelGenerator.setLabels(0, seriesLabels.getSecond());
 		return ds;

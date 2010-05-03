@@ -37,6 +37,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.analysis.charts.utils.DgColorScheme;
@@ -66,15 +67,15 @@ public class DgAvgDeltaUtilsGroupChart {
 
 	private LabelGenerator labelGenerator;
 	
-	public DgAvgDeltaUtilsGroupChart(DgAnalysisPopulation ana, int threshold) {
+	public DgAvgDeltaUtilsGroupChart(DgAnalysisPopulation ana, int threshold,  Id runId1, Id runId2) {
 		this.ana = ana;
 		this.groupThreshold = threshold;
 		this.labelGenerator = new LabelGenerator();
 		this.ana.calculateMinMaxIncome();
-		this.dataset = this.createDatasets();
+		this.dataset = this.createDatasets(runId1, runId2);
 	}
 	
-	protected Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop) {
+	protected Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop,  Id runId1, Id runId2) {
 		// calculate thresholds for income classes
 		DgIncomeClass[] incomeThresholds = new DgIncomeClass[this.numberOfClasses];
 		DgAnalysisPopulation[] groups = new DgAnalysisPopulation[this.numberOfClasses];
@@ -101,7 +102,7 @@ public class DgAvgDeltaUtilsGroupChart {
 //			groupDescriptions[i] = incomeThresholds[i].title;
 //			xvalues[i] = incomeThresholds[i].max;
 //			yvalues[i] = calcAverageScoreDifference(groups[i]);
-			Double avgScore = calcAverageScoreDifference(groups[i]);
+			Double avgScore = calcAverageScoreDifference(groups[i], runId1, runId2);
 			if (avgScore != null) {
 			  double incomeLocation = incomeThresholds[i].getMin() + (deltaY / 2.0);
 			  series.add(incomeLocation, avgScore);
@@ -111,11 +112,11 @@ public class DgAvgDeltaUtilsGroupChart {
 		return new Tuple<XYSeries, List<String>>(series, labels);
 	}
 	
-	protected Double calcAverageScoreDifference(DgAnalysisPopulation group) {
+	protected Double calcAverageScoreDifference(DgAnalysisPopulation group, Id runId1, Id runId2) {
 		Double deltaScoreSum = 0.0;
 		for (DgPersonData d : group.getPersonData().values()){
-			DgPlanData planDataRun1 = d.getPlanData().get(DgAnalysisPopulation.RUNID1);
-			DgPlanData planDataRun2 = d.getPlanData().get(DgAnalysisPopulation.RUNID2);
+			DgPlanData planDataRun1 = d.getPlanData().get(runId1);
+			DgPlanData planDataRun2 = d.getPlanData().get(runId2);
 			deltaScoreSum += (planDataRun2.getScore() - planDataRun1.getScore());
 		}
 		Double avg = null;
@@ -125,9 +126,9 @@ public class DgAvgDeltaUtilsGroupChart {
 		return avg;
 	}
 	
-	protected XYSeriesCollection createDatasets() {
+	protected XYSeriesCollection createDatasets(Id runId1, Id runId2) {
 		XYSeriesCollection ds = new XYSeriesCollection();
-		Tuple<XYSeries, List<String>> seriesLabels = this.createXYSeries("Mean "+  '\u0394' + "Utility", this.ana);
+		Tuple<XYSeries, List<String>> seriesLabels = this.createXYSeries("Mean "+  '\u0394' + "Utility", this.ana, runId1, runId2);
 		ds.addSeries(seriesLabels.getFirst());
 		this.labelGenerator.setLabels(0, seriesLabels.getSecond());
 		return ds;

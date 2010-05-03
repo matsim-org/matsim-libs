@@ -31,6 +31,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl.Type;
 import org.matsim.core.utils.collections.Tuple;
@@ -53,12 +54,12 @@ public class DgDeltaUtilsModeGroupChart implements DgChart {
 	
 	private XYSeriesCollection dataset;
 	
-	public DgDeltaUtilsModeGroupChart(DgAnalysisPopulation ana) {
+	public DgDeltaUtilsModeGroupChart(DgAnalysisPopulation ana,  Id runId1, Id runId2) {
 		this.ana = ana;
-		this.dataset = createDeltaScoreIncomeModeChoiceDataset();
+		this.dataset = createDeltaScoreIncomeModeChoiceDataset(runId1, runId2);
 	}
 
-	public XYSeriesCollection createDeltaScoreIncomeModeChoiceDataset() {
+	public XYSeriesCollection createDeltaScoreIncomeModeChoiceDataset(Id runId1, Id runId2) {
 		List<Tuple<Double, Double>> valuesCarCar = new ArrayList<Tuple<Double, Double>>();
 		List<Tuple<Double, Double>> valuesPtPt = new ArrayList<Tuple<Double, Double>>();
 		List<Tuple<Double, Double>> valuesPtCar = new ArrayList<Tuple<Double, Double>>();
@@ -73,8 +74,8 @@ public class DgDeltaUtilsModeGroupChart implements DgChart {
 		for (DgPersonData d : sortedPop) {
 			i++;
 //			currentIncome += d.getIncome().getIncome();
-			DgPlanData planDataRun1 = d.getPlanData().get(DgAnalysisPopulation.RUNID1);
-			DgPlanData planDataRun2 = d.getPlanData().get(DgAnalysisPopulation.RUNID2);
+			DgPlanData planDataRun1 = d.getPlanData().get(runId1);
+			DgPlanData planDataRun2 = d.getPlanData().get(runId2);
 			Double scoreDiff = planDataRun2.getScore() - planDataRun1.getScore();
 			Tuple<Double, Double> t = new Tuple<Double, Double>(100.0*i/size, scoreDiff);
 			

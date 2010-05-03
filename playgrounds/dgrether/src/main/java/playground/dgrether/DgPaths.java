@@ -58,4 +58,6 @@ public interface DgPaths {
   final String GERSHENSONINPUT = STUDIESDG + "gershenson/input/";
 
   final String GERSHENSONOUTPUT = STUDIESDG + "gershenson/output/";
+
+	final String RUNSSVN = RUNBASE;
 }

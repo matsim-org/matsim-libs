@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneLayoutTestFileNames
+ * LaneLayoutTestShowNetwork
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,21 +19,45 @@
  * *********************************************************************** */
 package playground.dgrether.lanes.laneLayoutTest;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.vis.otfvis.OTFVisQSim;
+
 
 /**
  * @author dgrether
  *
  */
-public interface LaneLayoutTestFileNames {
+public class LaneLayoutTestShowLanes {
 
-	public final static String BASEDIR = "./src/main/resources/laneLayoutTest/";
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Scenario sc = new ScenarioImpl();
+		sc.getConfig().network().setInputFile(LaneLayoutTestFileNames.NETWORK);
+		sc.getConfig().network().setLaneDefinitionsFile(LaneLayoutTestFileNames.LANEDEFINITIONS);
+		sc.getConfig().scenario().setUseLanes(true);
+		sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		sc.getConfig().otfVis().setLinkWidth(50.0f);
+		sc.getConfig().otfVis().setDrawLinkIds(true);
+		
+		
+		ScenarioLoader loader = new ScenarioLoaderImpl(sc);
+		loader.loadScenario();
+		EventsManagerImpl events = new EventsManagerImpl();
+		
+		ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
+		OTFVisQSim queueSimulation = new OTFVisQSim(sc, events);
+		queueSimulation.setControlerIO(controlerIO);
+		queueSimulation.setIterationNumber(sc.getConfig().controler().getLastIteration());
+		queueSimulation.run();
 	
-	public final static String NETWORK = BASEDIR + "network.xml";
-	
-	public final static String LANEDEFINITIONS = BASEDIR + "lanedefinitions.xml";
+	}
 
-	public final static String LANEDEFINITIONSV2 = BASEDIR + "lanedefinitionsV2.0.xml";
-
-	public final static String CONFIG = BASEDIR + "laneLayoutTestConfig.xml";
-	
 }

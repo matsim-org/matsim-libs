@@ -34,7 +34,9 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -44,7 +46,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.DgGrid;
-import playground.dgrether.analysis.DgRunId;
 import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
 import playground.dgrether.analysis.io.DgHouseholdsAnalysisReader;
 
@@ -62,12 +63,12 @@ public class DgIncomeDistributionAnalysis {
 		//run number creation
 		String runNumber1 = "749";
 		String runNumber2 = "869";
-		DgRunId runid1 = new DgRunId(runNumber1);
-		DgRunId runid2 = new DgRunId(runNumber2);
+		Id runid1 = new IdImpl(runNumber1);
+		Id runid2 = new IdImpl(runNumber2);
 		// scenario files
-		String netfile = DgPaths.RUNBASE + "run" +  runid1.toString() + "/" + runid1.toDotString() + "output_network.xml.gz";
-		String plans1file = DgPaths.RUNBASE + "run" +runid1.toString() + "/" + runid1.toDotString() + "output_plans.xml.gz";
-		String plans2file = DgPaths.RUNBASE + "run" +runid2.toString() + "/" + runid2.toDotString() + "output_plans.xml.gz";
+		String netfile = DgPaths.RUNBASE + "run" +  runid1.toString() + "/" + runid1 + "." + "output_network.xml.gz";
+		String plans1file = DgPaths.RUNBASE + "run" +runid1.toString() + "/" + runid1 + "."  + "output_plans.xml.gz";
+		String plans2file = DgPaths.RUNBASE + "run" +runid2.toString() + "/" + runid2 + "."  + "output_plans.xml.gz";
 		//		String housholdsfile = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/households.xml";
 		String housholdsfile = DgPaths.STUDIESDG + "einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
 		String gridFile = DgPaths.RUNBASE + "run" + runid2.toString() + "/" + runid1.toString() + "vs" + runid2.toString()+ "grid450x375.shp";
@@ -75,10 +76,10 @@ public class DgIncomeDistributionAnalysis {
 		//file io
 		ScenarioImpl sc = new ScenarioImpl();
 		DgAnalysisPopulation pop = new DgAnalysisPopulation();
-		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader(sc);
+		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader();
 		pc.setExcludeTransit(true);
-		pc.readAnalysisPopulation(pop, runid1.toId(), netfile, plans1file);
-		pc.readAnalysisPopulation(pop, runid2.toId(), netfile, plans2file);
+		pc.readAnalysisPopulation(pop, runid1, netfile, plans1file);
+		pc.readAnalysisPopulation(pop, runid2, netfile, plans2file);
 		//households io
 		DgHouseholdsAnalysisReader hhr = new DgHouseholdsAnalysisReader(pop);
 		hhr.readHousholds(housholdsfile);
@@ -88,7 +89,7 @@ public class DgIncomeDistributionAnalysis {
 		log.info("ya esta");
 	}
 
-	private static void writePersons(DgAnalysisPopulation pop, String file, DgRunId runid1, DgRunId runid2) throws FactoryConfigurationError, SchemaException, IllegalAttributeException, IOException {
+	private static void writePersons(DgAnalysisPopulation pop, String file, Id runid1, Id runid2) throws FactoryConfigurationError, SchemaException, IllegalAttributeException, IOException {
 		//create features 
 		List<Feature> features = new ArrayList<Feature>();
 	  CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.CH1903_LV03_GT);
@@ -104,7 +105,7 @@ public class DgIncomeDistributionAnalysis {
 	  		Coordinate coord = new Coordinate(pd.getFirstActivity().getCoord().getX(), pd.getFirstActivity().getCoord().getY());
 	  		Point point = geofac.createPoint(coord);
 //	  	String mode = pd.getPlanData().get(runid1).getPlan().getType() + "->" + pd.getPlanData().get(runid2).getPlan().getType();
-	  		Feature feature = ftPolygon.create(new Object[]{point, pd.getIncome().getIncome(), pd.getDeltaScore(runid1.toId(), runid2.toId()), /*mode*/});
+	  		Feature feature = ftPolygon.create(new Object[]{point, pd.getIncome().getIncome(), pd.getDeltaScore(runid1, runid2), /*mode*/});
 	  		//add to collection
 	  		features.add(feature);
 	  	}
@@ -116,7 +117,7 @@ public class DgIncomeDistributionAnalysis {
 
 	
 	
-	private static void writeGrid(DgAnalysisPopulation pop, String file, DgRunId runid1, DgRunId runid2) throws FactoryConfigurationError, SchemaException, IllegalAttributeException, IOException {
+	private static void writeGrid(DgAnalysisPopulation pop, String file, Id runid1, Id runid2) throws FactoryConfigurationError, SchemaException, IllegalAttributeException, IOException {
 		//create grid
 		DgGrid grid = new DgGrid(450, 375, pop.getBoundingBox());
 		//fill quad tree
@@ -151,7 +152,7 @@ public class DgIncomeDistributionAnalysis {
 		  double avgDeltaUtility = 0.0;
 		  for (DgPersonData pd : results){
 		  	avgIncome += pd.getIncome().getIncome();
-		  	avgDeltaUtility = pd.getDeltaScore(runid1.toId(), runid2.toId());
+		  	avgDeltaUtility = pd.getDeltaScore(runid1, runid2);
 		  }
 		  if (!results.isEmpty()){
 		  	int numberOfPersons = results.size();

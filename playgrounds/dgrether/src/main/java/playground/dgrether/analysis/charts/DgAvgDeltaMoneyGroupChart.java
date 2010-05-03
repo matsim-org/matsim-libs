@@ -37,6 +37,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.analysis.charts.utils.DgColorScheme;
@@ -65,15 +66,15 @@ public class DgAvgDeltaMoneyGroupChart {
 
 	private LabelGenerator labelGenerator;
 	
-	public DgAvgDeltaMoneyGroupChart(DgAnalysisPopulation ana, int threshold) {
+	public DgAvgDeltaMoneyGroupChart(DgAnalysisPopulation ana, int threshold,  Id runId1, Id runId2) {
 		this.ana = ana;
 		this.labelGenerator = new LabelGenerator();
 		this.groupThreshold = threshold;
 		this.ana.calculateMinMaxIncome();
-		this.dataset = this.createDatasets();
+		this.dataset = this.createDatasets(runId1, runId2);
 	}
 	
-	protected Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop) {
+	protected Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop,  Id runId1, Id runId2) {
 		// calculate thresholds for income classes
 		DgIncomeClass[] incomeThresholds = new DgIncomeClass[this.numberOfClasses];
 		DgAnalysisPopulation[] groups = new DgAnalysisPopulation[this.numberOfClasses];
@@ -101,7 +102,7 @@ public class DgAvgDeltaMoneyGroupChart {
 			if (groupSize < this.groupThreshold){
 				continue;
 			}
-			Double avgScore = IncomeChartUtils.calcAverageMoneyDifference(groups[i], 0);
+			Double avgScore = IncomeChartUtils.calcAverageMoneyDifference(groups[i], 0, runId1, runId2);
 			if (avgScore != null) {
 			  double incomeLocation = incomeThresholds[i].getMin() + (deltaY / 2.0);
 			  series.add(incomeLocation, avgScore);
@@ -113,9 +114,9 @@ public class DgAvgDeltaMoneyGroupChart {
 	
 
 	
-	protected XYSeriesCollection createDatasets() {
+	protected XYSeriesCollection createDatasets(Id runId1, Id runId2) {
 		XYSeriesCollection ds = new XYSeriesCollection();
-		Tuple<XYSeries, List<String>> seriesLabels = this.createXYSeries("Mean "+  '\u0394' + "Delta Money", this.ana);
+		Tuple<XYSeries, List<String>> seriesLabels = this.createXYSeries("Mean "+  '\u0394' + "Delta Money", this.ana, runId1, runId2);
 		ds.addSeries(seriesLabels.getFirst());
 		this.labelGenerator.setLabels(0, seriesLabels.getSecond());
 		return ds;

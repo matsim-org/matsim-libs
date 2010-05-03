@@ -22,6 +22,7 @@ package playground.dgrether.analysis.population;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl.Type;
 import org.matsim.core.utils.collections.Tuple;
@@ -37,16 +38,16 @@ public class DgModeSwitchPlanTypeAnalyzer {
 	
 	private Map<Tuple<Type, Type>, DgAnalysisPopulation> classifiedPops;
 
-	public DgModeSwitchPlanTypeAnalyzer(DgAnalysisPopulation ana){
+	public DgModeSwitchPlanTypeAnalyzer(DgAnalysisPopulation ana, Id runId1, Id runId2){
 		this.pop = ana;
 		this.classifiedPops = new HashMap<Tuple<Type, Type>, DgAnalysisPopulation>();
-		this.classifyPopulationByPlanType();
+		this.classifyPopulationByPlanType(runId1, runId2);
 	}
 	
-	private void classifyPopulationByPlanType(){		
+	private void classifyPopulationByPlanType(Id runId1, Id runId2){		
 		for (DgPersonData d : pop.getPersonData().values()) {
-			DgPlanData planDataRun1 = d.getPlanData().get(DgAnalysisPopulation.RUNID1);
-			DgPlanData planDataRun2 = d.getPlanData().get(DgAnalysisPopulation.RUNID2);
+			DgPlanData planDataRun1 = d.getPlanData().get(runId1);
+			DgPlanData planDataRun2 = d.getPlanData().get(runId2);
 
 			Tuple<Type, Type> modeSwitchTuple = new Tuple<Type, Type>(((PlanImpl) planDataRun1.getPlan()).getType(), ((PlanImpl) planDataRun2.getPlan()).getType());
 

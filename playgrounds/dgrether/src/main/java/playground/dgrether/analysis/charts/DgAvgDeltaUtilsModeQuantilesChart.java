@@ -31,6 +31,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -58,14 +59,14 @@ public class DgAvgDeltaUtilsModeQuantilesChart implements DgXYChart {
 	private DgXYLabelGenerator labelGenerator;
 	private int threshold;
 
-	public DgAvgDeltaUtilsModeQuantilesChart(DgAnalysisPopulation ana, int threshold) {
+	public DgAvgDeltaUtilsModeQuantilesChart(DgAnalysisPopulation ana, int threshold, Id runId1, Id runId2) {
 		this.ana = ana;
 		this.threshold = threshold;
 		this.labelGenerator = new DgXYLabelGenerator();
-		this.dataset = this.createDatasets();
+		this.dataset = this.createDatasets(runId1, runId2);
 	}
 	
-	private XYSeriesCollection createDatasets() {
+	private XYSeriesCollection createDatasets(Id runId1, Id runId2) {
 		List<DgAnalysisPopulation> quantiles = this.ana.getQuantiles(this.nQuantiles, new DgPersonDataIncomeComparator());
 		XYSeries car2carSeries = new XYSeries("Mean "+  '\u0394' + "Utility Car2Car", false, true);
 		XYSeries pt2ptSeries = new XYSeries("Mean "+  '\u0394' + "Utility Pt2Pt", false, true);
@@ -78,25 +79,25 @@ public class DgAvgDeltaUtilsModeQuantilesChart implements DgXYChart {
 			quantile++;
 			xLoc = quantile /this.nQuantiles;
 			xLoc*=100.0;
-			DgModeSwitchPlanTypeAnalyzer modeSwitchAnalysis = new DgModeSwitchPlanTypeAnalyzer(p);
+			DgModeSwitchPlanTypeAnalyzer modeSwitchAnalysis = new DgModeSwitchPlanTypeAnalyzer(p, runId1, runId2);
 			DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.CAR, PlanImpl.Type.CAR));
 			DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.PT, PlanImpl.Type.PT));
 			DgAnalysisPopulation pt2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.PT, PlanImpl.Type.CAR));
 			DgAnalysisPopulation car2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.CAR, PlanImpl.Type.PT));
 			if ((car2carPop  != null) && (car2carPop.getPersonData().size() >= threshold)) {
-				avgUtil = car2carPop.calcAverageScoreDifference(DgAnalysisPopulation.RUNID1, DgAnalysisPopulation.RUNID2);
+				avgUtil = car2carPop.calcAverageScoreDifference(runId1, runId2);
 				car2carSeries.add(xLoc, avgUtil);
 			}
 			if ((pt2ptPop != null) && (pt2ptPop.getPersonData().size() >= threshold)){
-				avgUtil = pt2ptPop.calcAverageScoreDifference(DgAnalysisPopulation.RUNID1, DgAnalysisPopulation.RUNID2);
+				avgUtil = pt2ptPop.calcAverageScoreDifference(runId1, runId2);
 				pt2ptSeries.add(xLoc, avgUtil);
 			}
 			if ((pt2carPop != null) && (pt2carPop.getPersonData().size() >= threshold)){
-				avgUtil = pt2carPop.calcAverageScoreDifference(DgAnalysisPopulation.RUNID1, DgAnalysisPopulation.RUNID2);
+				avgUtil = pt2carPop.calcAverageScoreDifference(runId1, runId2);
 				pt2carSeries.add(xLoc, avgUtil);
 			}
 			if ((car2ptPop != null) && (car2ptPop.getPersonData().size() >= threshold)) {
-				avgUtil = car2ptPop.calcAverageScoreDifference(DgAnalysisPopulation.RUNID1, DgAnalysisPopulation.RUNID2);
+				avgUtil = car2ptPop.calcAverageScoreDifference(runId1, runId2);
 				car2ptSeries.add(xLoc, avgUtil);
 			}
 		}

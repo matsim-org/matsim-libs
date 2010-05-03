@@ -30,7 +30,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -43,9 +42,6 @@ import com.vividsolutions.jts.geom.Envelope;
 public class DgAnalysisPopulation {
 	
 	private static final Logger log = Logger.getLogger(DgAnalysisPopulation.class);
-	
-	public static final Id RUNID1 = new IdImpl("run1");
-	public static final Id RUNID2 = new IdImpl("run2");
 	
 	private Double minIncome = null; 
 	private Double maxIncome = null; 
