@@ -21,163 +21,130 @@ package org.matsim.utils.eventsfilecomparison;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
 
 /**
  * This class checks if two events files are semantic equivalent. The order of the events does not matter as long as
- * they are chronological sorted.
- * @author laemmel
+ * they are chronologically sorted.
  *
+ * @author mrieser
+ * @author laemmel
  */
-public class EventsFileComparator {
+public abstract class EventsFileComparator {
 
 	private static final Logger log = Logger.getLogger(EventsFileComparator.class);
 
-	private final String eFile1;
-	private final String eFile2;
+	public static final int CODE_FILES_ARE_EQUAL = 0;
+	public static final int CODE_DIFFERENT_NUMBER_OF_TIMESTEPS = -1;
+	public static final int CODE_DIFFERENT_TIMESTEPS = -2;
+	public static final int CODE_MISSING_EVENT = -3;
+	public static final int CODE_WRONG_EVENT_COUNT = -4;
 
-	private boolean finishedWorkerTimeStep = false;
-	private boolean finishedWorker = false;
-	private Worker w1;
-	private Worker w2;
+	/**
+	 * Compares two Events files. This method is thread-safe.
+	 *
+	 * @param filename1
+	 * @param filename2
+	 * @return <code>0</code> if the events files are equal, or some error code (see constants) if not.
+	 */
+	public static int compare(final String filename1, final String filename2) {
+		EventsComparator comparator = new EventsComparator();
+		CyclicBarrier doComparison = new CyclicBarrier(2, comparator);
+		Worker w1 = new Worker(filename1, doComparison);
+		Worker w2 = new Worker(filename2, doComparison);
+		comparator.setWorkers(w1, w2);
+		w1.start();
+		w2.start();
 
-	private int retCode = -1;
-
-	private boolean run = true;
-
-	private boolean abort = false;
-	public EventsFileComparator(String eFile1, String eFile2) {
-		this.eFile1 = eFile1;
-		this.eFile2 = eFile2;
-	}
-
-	public void run() {
-
-		this.w1 = new Worker(this.eFile1,this);
-		this.w2 = new Worker(this.eFile2,this);
-		this.w1.start();
-		this.w2.start();
-
-		while (this.run) {
-			try {
-				Thread.sleep(250);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		try {
+			w1.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		try {
+			w2.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
-
-		if (this.retCode == 0) {
+		int retCode = comparator.retCode;
+		if (retCode == CODE_FILES_ARE_EQUAL) {
 			log.info("Event files are semantic equivalent.");
-
 		} else {
 			log.warn("Event files differ.");
 		}
+		return retCode;
 	}
 
-	public int compareEvents() {
-		this.run();
-		return this.retCode;
-	}
+	/*package*/ static class EventsComparator implements Runnable {
 
+		private Worker worker1 = null;
+		private Worker worker2 = null;
+		/*package*/ volatile int retCode = -99;
 
-	synchronized boolean timeStepFinished(boolean evFinished){
-		if (this.abort) {
-			return false;
+		/*package*/ void setWorkers(final Worker w1, final Worker w2) {
+			this.worker1 = w1;
+			this.worker2 = w2;
 		}
 
-
-		if (evFinished) {
-			eventsFinished();
-			return true;
-		}
-
-
-		if (this.finishedWorker) {
-			log.warn("Events files have different number of time steps! Aborting!");
-			abort(-1);
-			return false;
-		}
-
-
-
-		if (this.finishedWorkerTimeStep) {
-			if (this.w1.getCurrentTime() != this.w2.getCurrentTime()) {
+		@Override
+		public void run() {
+			if (this.worker1.getCurrentTime() != this.worker2.getCurrentTime()) {
 				log.warn("Differnt time steps in event files! Aborting!");
-				abort(-2);
-				return false;
-			}
-			compareTimeStep();
-			this.finishedWorkerTimeStep = false;
-			return false;
-		} else {
-			this.finishedWorkerTimeStep = true;
-		}
-		return true;
-	}
-
-	private void compareTimeStep() {
-
-		//we do not abort here because we want to know which event is missing
-		if (this.w1.getNumEvents() < this.w2.getNumEvents()) {
-			compare(this.w2,this.w1);
-		} else  {
-			compare(this.w1,this.w2);
-		}
-	}
-
-	private void compare(Worker w1, Worker w2) {
-		Map<String, Counter> map1 = w1.getEventsMap();
-		Map<String, Counter> map2 = w2.getEventsMap();
-		for (Entry<String, Counter> e : map1.entrySet()) {
-
-			Counter c = map2.get(e.getKey());
-			if (c == null) {
-				log.warn("Missing event:" + e.getKey() + "\nin events file:" + w2.getEFile());
-				abort(-3);
+				setExitCode(CODE_DIFFERENT_TIMESTEPS);
 				return;
 			}
-			if (c.getCount() != e.getValue().getCount()) {
-				log.warn("Wrong event count for: " + e.getKey() + "\n" + e.getValue().getCount() + " times in file:" + w1.getEFile()
-						+ "\n" + c.getCount() + " times in file:" + w2.getEFile());
-				abort(-4);
+
+			System.out.println(this.worker1.isFinished());
+			System.out.println(this.worker2.isFinished());
+			if (this.worker1.isFinished() != this.worker2.isFinished()) {
+				log.warn("Events files have different number of time steps! Aborting!");
+				setExitCode(CODE_DIFFERENT_NUMBER_OF_TIMESTEPS);
 				return;
 			}
-		}
-		map1.clear();
-		map2.clear();
-		this.w1.cont();
-		this.w2.cont();
-	}
 
+			Map<String, Counter> map1 = this.worker1.getEventsMap();
+			Map<String, Counter> map2 = this.worker2.getEventsMap();
 
-
-	synchronized void abort(int errCode) {
-		this.abort = true;
-		this.retCode = errCode;
-		this.run = false;
-		this.w1.abort();
-		this.w2.abort();
-	}
-	private void eventsFinished(){
-		if ( this.finishedWorkerTimeStep) {
-			log.warn("Events files have different number of time steps! Aborting!");
-			abort(-1);
-			return;
-		}
-
-		if (this.finishedWorker) {
-			if (this.w1.getCurrentTime() != this.w2.getCurrentTime()) {
-				log.warn("Differnt time steps in event files! Aborting!");
-				abort(-2);
-				return;
+			// check that map2 contains all keys of map1, with the same values
+			for (Entry<String, Counter> e : map1.entrySet()) {
+				Counter c = map2.get(e.getKey());
+				if (c == null) {
+					log.warn("Missing event:" + e.getKey() + "\nin events file:" + worker2.getEventsFile());
+					setExitCode(CODE_MISSING_EVENT);
+					return;
+				}
+				if (c.getCount() != e.getValue().getCount()) {
+					log.warn("Wrong event count for: " + e.getKey() + "\n" + e.getValue().getCount() + " times in file:" + worker1.getEventsFile()
+							+ "\n" + c.getCount() + " times in file:" + worker2.getEventsFile());
+					setExitCode(CODE_WRONG_EVENT_COUNT);
+					return;
+				}
 			}
-			compareTimeStep();
-			this.retCode = 0;
-			this.run = false;
-		} else {
-			this.finishedWorker = true;
+
+			// also check that map1 contains all keys of map2
+			for (Entry<String, Counter> e : map2.entrySet()) {
+				Counter c = map1.get(e.getKey());
+				if (c == null) {
+					log.warn("Missing event:" + e.getKey() + "\nin events file:" + worker2.getEventsFile());
+					setExitCode(CODE_MISSING_EVENT);
+					return;
+				}
+			}
+
+			if (this.worker1.isFinished()) {
+				setExitCode(CODE_FILES_ARE_EQUAL);
+			}
+		}
+
+		private void setExitCode(final int errCode) {
+			this.retCode= errCode;
+			if (errCode != CODE_FILES_ARE_EQUAL) {
+				this.worker1.interrupt();
+				this.worker2.interrupt();
+			}
 		}
 	}
 

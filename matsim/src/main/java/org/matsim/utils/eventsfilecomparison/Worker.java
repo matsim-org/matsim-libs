@@ -25,11 +25,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.EventsManagerFactoryImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
 
@@ -39,46 +41,46 @@ public class Worker extends Thread implements BasicEventHandler{
 
 	private final EventsManager e;
 	private final String eFile;
-	private double time = -1;
-	private final EventsFileComparator eFC;
+	private final CyclicBarrier doComparison;
 
 	private final Map<String,Counter> events = new HashMap<String,Counter>();
-	private int numEvents = 0;
-	private boolean abort = false;
 
-	public Worker(String eFile1, EventsFileComparator eventsFileComparator) {
-		this.e = new EventsManagerFactoryImpl().createEventsManager();
-		this.e.addHandler(this);
+	private volatile double time = -1;
+	private volatile boolean finished = false;
+	private volatile int numEvents = 0;
+
+	public Worker(String eFile1, final CyclicBarrier doComparison) {
 		this.eFile = eFile1;
-		this.eFC = eventsFileComparator;
+		this.doComparison = doComparison;
+
+		this.e = new EventsManagerImpl();
+		this.e.addHandler(this);
 	}
 
-	public synchronized void abort() {
-		this.abort = true;
-		this.cont();
-
-	}
-
-	public synchronized boolean isAborted(boolean toggle) {
-		if (toggle) {
-			this.abort = this.abort == true ? false : true;
-		}
-		return this.abort;
-	}
-	public synchronized void cont() {
-		if (this.isAlive() ) {
-			this.notify();
-		}
-	}
-
-	public String getEFile() {
+	/*package*/ String getEventsFile() {
 		return this.eFile;
 	}
 
 	@Override
-	public void run(){
-		new MatsimEventsReader(this.e).readFile(this.eFile);
-		this.eFC.timeStepFinished(true);
+	public void run() {
+		try {
+			new MatsimEventsReader(this.e).readFile(this.eFile);
+			this.finished = true;
+			try {
+				System.out.println("finishing " + this.eFile + " " + this.finished);
+				this.doComparison.await();
+			} catch (InterruptedException e1) {
+				throw new ComparatorInterruptedException(e1);
+			} catch (BrokenBarrierException e1) {
+				throw new ComparatorInterruptedException(e1);
+			}
+		} catch (ComparatorInterruptedException e1) {
+			log.info("events-comparator got interrupted", e1);
+		}
+	}
+
+	public boolean isFinished() {
+		return this.finished;
 	}
 
 	public Map<String, Counter> getEventsMap() {
@@ -95,31 +97,30 @@ public class Worker extends Thread implements BasicEventHandler{
 
 	@Override
 	public void handleEvent(Event event) {
-		if (this.isAborted(false)) {
-			log.warn("Stopping thread with Thread.stop()");
-			this.stop();
-		}
-
 		if (this.time != event.getTime()) {
-			if (this.eFC.timeStepFinished(false)) {
-				try {
-					this.wait();
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
+			try {
+				System.out.println("next Event in " + this.eFile + ": " + toLexicographicSortedString(event));
+				doComparison.await();
+			} catch (InterruptedException e1) {
+				throw new ComparatorInterruptedException(e1);
+			} catch (BrokenBarrierException e1) {
+				throw new ComparatorInterruptedException(e1);
 			}
+
+			this.events.clear();
 			this.time = event.getTime();
 			this.numEvents = 0;
 		}
 
-		this.numEvents++;
 		addEvent(event);
 	}
-	public int getNumEvents(){
+
+	public int getNumEvents() {
 		return this.numEvents;
 	}
 
-	private void addEvent(Event event){
+	private void addEvent(Event event) {
+		this.numEvents++;
 		String lexString = toLexicographicSortedString(event);
 		Counter counter = this.events.get(lexString);
 		if (counter == null) {
@@ -128,8 +129,8 @@ public class Worker extends Thread implements BasicEventHandler{
 		}
 		counter.increment();
 	}
-	private String toLexicographicSortedString(Event event) {
 
+	private String toLexicographicSortedString(Event event) {
 		List<String> strings = new ArrayList<String>();
 		for (Entry<String, String> e : event.getAttributes().entrySet()) {
 			StringBuilder tmp = new StringBuilder();
@@ -137,21 +138,26 @@ public class Worker extends Thread implements BasicEventHandler{
 			tmp.append("=");
 			tmp.append(e.getValue());
 			strings.add(tmp.toString());
-
 		}
 		Collections.sort(strings);
 		StringBuilder eventStr = new StringBuilder();
 		for (String str : strings) {
 			eventStr.append("_");
 			eventStr.append(str);
-
 		}
 		return eventStr.toString();
 	}
 
-
+	/**
+	 * An exception that signals that the comparison-thread was interrupted but which
+	 * does not need to be declared, thus extending from RuntimeException.
+	 *
+	 * @author mrieser
+	 */
+	private static class ComparatorInterruptedException extends RuntimeException {
+		public ComparatorInterruptedException(final Exception e) {
+			super(e);
+		}
+	}
 
 }
-
-
-

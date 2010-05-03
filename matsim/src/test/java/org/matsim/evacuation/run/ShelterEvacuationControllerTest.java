@@ -44,15 +44,13 @@ public class ShelterEvacuationControllerTest extends MatsimTestCase{
 		log.info("comparing events files: ");
 		log.info(refEventsFileIt0);
 		log.info(testEventsFileIt0);
-		EventsFileComparator e = new EventsFileComparator(refEventsFileIt0, testEventsFileIt0);
-		int i = e.compareEvents();
+		int i = EventsFileComparator.compare(refEventsFileIt0, testEventsFileIt0);
 		assertEquals("different events-files.",0, i);
 		//it 10
 		log.info("comparing events files: ");
 		log.info(refEventsFile);
 		log.info(testEventsFile);
-		e= new EventsFileComparator(refEventsFile, testEventsFile);
-		i = e.compareEvents();
+		i = EventsFileComparator.compare(refEventsFile, testEventsFile);
 		assertEquals("different events-files.",0, i);
 	}
 
