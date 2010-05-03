@@ -12,7 +12,6 @@ import java.util.Random;
 
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.teach.telematics.Homework2;
 
 /**
  * @author fearonni
@@ -146,7 +145,7 @@ public class FindNashGG {
 		/*
 		 * run matsim
 		 */
-		Homework2.main(new String[]{baseDir + "matsim/config.ha2.xml"});
+		Controller.main(new String[]{baseDir + "matsim/config.ha2.xml"});
 		/*
 		 * read results
 		 */

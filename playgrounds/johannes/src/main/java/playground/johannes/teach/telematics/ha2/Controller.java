@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.johannes.teach.telematics;
+package playground.johannes.teach.telematics.ha2;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TIntObjectHashMap;
@@ -77,7 +77,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author illenberger
  *
  */
-public class Homework2 extends Controler {
+public class Controller extends Controler {
 
 	private double route1Prediction;
 
@@ -87,7 +87,7 @@ public class Homework2 extends Controler {
 
 	private NonSelectedPlanScorer scorer;
 
-	public Homework2(String[] args) {
+	public Controller(String[] args) {
 		super(args);
 		setOverwriteFiles(true);
 	}
@@ -96,7 +96,7 @@ public class Homework2 extends Controler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Homework2 c = new Homework2(args);
+		Controller c = new Controller(args);
 		c.setCreateGraphs(false);
 		c.setWriteEventsInterval(0);
 		c.run();
@@ -174,7 +174,7 @@ public class Homework2 extends Controler {
 
 
 		public void notifyIterationStarts(IterationStartsEvent event) {
-			((Homework2)event.getControler()).triggerScoringAndReplanning();
+			((Controller)event.getControler()).triggerScoringAndReplanning();
 		}
 
 	}
