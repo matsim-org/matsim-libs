@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.dgrether.DgPaths;
@@ -120,11 +119,6 @@ public class Trb09Analysis {
 		String avgDeltaUtilsModeQuantilesChartFile = DgPaths.RUNBASE + runid2String + "/avgDeltaUtilsModeQuantilesChart"+runNumber1+"vs"+runNumber2;
 
 		String avgDeltaMoneyQuantilesChartFile = DgPaths.RUNBASE + runid2String + "/avgDeltaMoneyQuantilesChart"+runNumber1+"vs"+runNumber2;
-
-		
-
-		ScenarioImpl sc = new ScenarioImpl();
-
 
 		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader();
 		DgAnalysisPopulation ana = new DgAnalysisPopulation();
