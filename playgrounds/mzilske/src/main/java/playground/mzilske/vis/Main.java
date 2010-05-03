@@ -12,16 +12,16 @@ import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 public class Main {
 	
 	public static void main(String[] args) throws InterruptedException, InvocationTargetException {
-//		 String fileName = "../../detailedEval/Net/network.xml.gz";
-//		 String eventsFileName = "../../run950/it.1000/950.1000.events.txt.gz";
+		 String fileName = "../../detailedEval/Net/network.xml.gz";
+		 String eventsFileName = "../../run950/it.1000/950.1000.events.txt.gz";
 //		
 //		 String fileName = "../../run749/749.output_network.xml.gz";
 //		 String eventsFileName = "../../run749/it.1000/749.1000.events.txt.gz";
+//		
+//		String fileName = "../../matsim/output/example5/output_network.xml.gz";
+//		String eventsFileName = "../../matsim/output/example5/ITERS/it.10/10.events.xml.gz";
 		
-		String fileName = "../../matsim/output/example5/output_network.xml.gz";
-		String eventsFileName = "../../matsim/output/example5/ITERS/it.10/10.events.xml.gz";
-		
-		double snapshotPeriod = 60;
+		double snapshotPeriod = 600;
 		SimulationConfigGroup simulationConfigGroup = new SimulationConfigGroup();
 		ScenarioImpl scenario = new ScenarioImpl();
 		
@@ -29,6 +29,7 @@ public class Main {
 		
 		EventsManagerImpl events = new EventsManagerImpl();
 		
+		// final BintreeServer server = new BintreeServer(scenario.getNetwork(), events, snapshotPeriod, simulationConfigGroup);
 		final EventsCollectingServer server = new EventsCollectingServer(scenario.getNetwork(), events, snapshotPeriod, simulationConfigGroup);
 		
 		new MatsimEventsReader(events).readFile(eventsFileName);

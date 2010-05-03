@@ -25,19 +25,18 @@ class MovieDatabase {
     	System.out.println("Opening environment in: " + tempFile);
 
         EnvironmentConfig envConfig = new EnvironmentConfig();
-        envConfig.setTransactional(true);
+        envConfig.setTransactional(false);
+        envConfig.setLocking(false);
         envConfig.setAllowCreate(true);
-
+        
         env = new Environment(tempFile, envConfig);
         
         DatabaseConfig dbConfig = new DatabaseConfig();
-        dbConfig.setTransactional(true);
         dbConfig.setAllowCreate(true);
-
         Database catalogDb = env.openDatabase(null, CLASS_CATALOG, dbConfig);
-        
         javaCatalog = new StoredClassCatalog(catalogDb);
         
+        dbConfig.setSortedDuplicates(true);
         timestepDb = env.openDatabase(null, TIMESTEP_STORE, dbConfig);
         
     }

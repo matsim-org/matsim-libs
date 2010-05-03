@@ -1,14 +1,15 @@
 package playground.mzilske.vis;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -21,15 +22,15 @@ import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.SnapshotWriter;
+import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
-import com.sleepycat.collections.StoredSortedMap;
-import com.sleepycat.je.DatabaseException;
+import playground.mzilske.vis.BintreeGenerator.Trajectory;
 
 
-public final class EventsCollectingServer implements OTFServerRemote {
+public final class BintreeServer implements OTFServerRemote {
 	
-	private static Logger logger = Logger.getLogger(EventsCollectingServer.class);
+	private static Logger logger = Logger.getLogger(BintreeServer.class);
 	
 	public static class TimeStep implements Serializable {
 
@@ -48,14 +49,16 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	private final ByteBuffer byteBuffer = ByteBuffer.allocate(80000000);
 	
 	private double nextTime = -1;
-	
-	private StoredSortedMap<Double, AgentSnapshotInfo> timeSteps;
 
 	private TimeStep nextTimeStep;
 
-	private MovieDatabase db;
+	private BintreeGenerator bintreeGenerator;
 
-	private File tempFile;
+	private double snapshotPeriod;
+
+	private double lastTime = 86400.0;
+
+	private TreeSet<Double> timeSteps;
 
 	private class MyQuadTree extends OTFServerQuad2 {
 
@@ -83,64 +86,38 @@ public final class EventsCollectingServer implements OTFServerRemote {
 		
 	}
 	
-	private class SnapshotReceiver implements SnapshotWriter {
-
-		double time;
-		
-		@Override
-		public void addAgent(AgentSnapshotInfo position) {
-			if (position.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) return;
-			timeSteps.put(time, position);
-		}
-
-		@Override
-		public void beginSnapshot(double time) {
-			this.time = time;
-		}
-
-		@Override
-		public void endSnapshot() {
-			
-		}
-
-		@Override
-		public void finish() {
-			
-		}
-		
-	}
-	
-	public EventsCollectingServer(Network network, EventsManager eventsManager, double snapshotPeriod, SimulationConfigGroup simulationConfigGroup) {
+	public BintreeServer(Network network, EventsManager eventsManager, double snapshotPeriod, SimulationConfigGroup simulationConfigGroup) {
 		this.network = network;
-		QueuelessSnapshotGenerator snapshotGenerator = new QueuelessSnapshotGenerator(network, (int) snapshotPeriod); 
-		SnapshotReceiver snapshotReceiver = new SnapshotReceiver();
-		snapshotGenerator.addSnapshotWriter(snapshotReceiver);
-		eventsManager.addHandler(snapshotGenerator);
+		bintreeGenerator = new BintreeGenerator(network);
 		quadTree = new MyQuadTree();
 		quadTree.initQuadTree();
-		try {
-			tempFile = createTempDirectory();
-			db = new MovieDatabase(tempFile);
-			MovieView view = new MovieView(db);
-			timeSteps = view.getTimeStepMap();
-		} catch (DatabaseException e) {
-			throw new RuntimeException(e);
-		}
-		
+		eventsManager.addHandler(bintreeGenerator);
+		this.snapshotPeriod = snapshotPeriod;
 	}
 
 	@Override
 	public int getLocalTime() throws RemoteException {
 		if (nextTimeStep == null) {
-			nextTime = timeSteps.firstKey();
-			nextTimeStep = getTimeStep(nextTime);
+			nextTime = snapshotPeriod;
+			nextTimeStep = getTimeStep((int) nextTime);
 		}
 		return (int) nextTime;
 	}
 
-	private TimeStep getTimeStep(double time) {
+	private TimeStep getTimeStep(int time) {
 		TimeStep timeStep = new TimeStep();
-		timeStep.agentPositions = timeSteps.duplicates(time);
+		List<Integer> candidates = bintreeGenerator.getBintree().query(time);
+		for (Integer id : candidates) {
+			Trajectory trajectory = bintreeGenerator.getTrajectory(id);
+			if (trajectory.startTime <= time && time < trajectory.endTime) {
+				Id personId = trajectory.personId;
+				double easting = trajectory.x + (time - trajectory.startTime) * trajectory.dx;
+				double northing = trajectory.y + (time - trajectory.startTime) * trajectory.dy; 
+				PositionInfo agentPositionInfo = new PositionInfo(personId, easting, northing, 0.0d, 0.0d);
+				agentPositionInfo.setAgentState(AgentState.PERSON_DRIVING_CAR);
+				timeStep.agentPositions.add(agentPositionInfo);
+			}
+		}
 		return timeStep;
 	}
 
@@ -178,27 +155,29 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	}
 
 	@Override
-	public Collection<Double> getTimeSteps() throws RemoteException {
-		return this.timeSteps.keySet();
+	public Collection<Double> getTimeSteps() {
+		timeSteps = new TreeSet<Double>();
+		for (double timeStep = 0.0; timeStep < lastTime; timeStep += snapshotPeriod) {
+			timeSteps.add(timeStep);
+		}
+		return timeSteps;
 	}
 
 	@Override
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
-		Double dTime = (double) time;
 		Double foundTime;
 		if (searchDirection == TimePreference.EARLIER || searchDirection == TimePreference.RESTART) {
-			foundTime = timeSteps.headMap(dTime + 1).lastKey();
+			foundTime = timeSteps.floor((double) time);
 		} else if (searchDirection == TimePreference.LATER) {
-			foundTime = timeSteps.tailMap(dTime).firstKey();
+			foundTime = timeSteps.ceiling((double) time);
 		} else {
 			throw new IllegalArgumentException();
 		}
-		
 		if (foundTime == null) {
 			return false;
 		} else {
 			this.nextTime = foundTime;
-			this.nextTimeStep = getTimeStep(foundTime);
+			this.nextTimeStep = getTimeStep(time);
 			return true;
 		}
 	}
@@ -218,46 +197,8 @@ public final class EventsCollectingServer implements OTFServerRemote {
 		return new OTFVisConfig();
 	}
 
-	public static File createTempDirectory() {
-		final File temp;
-
-		try {
-			temp = File.createTempFile("otfvis", Long.toString(System.nanoTime()));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		if (!(temp.delete())) {
-			throw new RuntimeException("Could not delete temp file: "
-					+ temp.getAbsolutePath());
-		}
-
-		if (!(temp.mkdir())) {
-			throw new RuntimeException("Could not create temp directory: "
-					+ temp.getAbsolutePath());
-		}
-
-		return (temp);
-	}
-	
-	static public boolean deleteDirectory(File path) {
-	    if( path.exists() ) {
-	      File[] files = path.listFiles();
-	      for(int i=0; i<files.length; i++) {
-	         if(files[i].isDirectory()) {
-	           deleteDirectory(files[i]);
-	         }
-	         else {
-	           files[i].delete();
-	         }
-	      }
-	    }
-	    return( path.delete() );
-	  }
-
 	public void close() {
-		db.close();
-		deleteDirectory(tempFile);
+		
 	}
 
 }
