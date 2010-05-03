@@ -16,6 +16,7 @@ import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
 import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
+
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
@@ -34,7 +35,7 @@ public class Compare2PTCounts extends Events2PTCounts{
 	public static void main(String[] args) {
 		String inDir = "f:/counts/";
 		try {
-			new Compare2PTCounts(inDir, "f:/counts/767.events.xml.gz", 
+			new Compare2PTCounts(inDir, "f:/counts/767.380.events.xml.gz", 
 					"f:/counts/stopareamap.txt", 
 					"f:/counts/network.xml.gz", 
 					"f:/counts/transitSchedule.xml.gz").compare();
@@ -50,14 +51,14 @@ public class Compare2PTCounts extends Events2PTCounts{
 			
 			// compare counts 2 minus counts 1
 			String parentDir = this.outDir;
-			this.outDir = parentDir + "count767/";
+			this.outDir = parentDir + "767/";
 			this.run();
 			Map<Id, Map<Id, StopCountBox>> countsMap1 = this.getLine2StopCountMap();
 			
 			reset();
-			this.eventsInFile = "f:/counts/768.events.xml.gz";
+			this.eventsInFile = "f:/counts/768.380.events.xml.gz";
 			this.transitSchedule = ReadTransitSchedule.readTransitSchedule("f:/counts/network.xml.gz", "f:/counts/transitSchedule_long.xml.gz");
-			this.outDir = parentDir + "count768/";
+			this.outDir = parentDir + "768/";
 			this.run();
 			Map<Id, Map<Id, StopCountBox>> countsMap2 = this.getLine2StopCountMap();
 //			countsMap2.put(new IdImpl("344  "), null);
@@ -93,7 +94,7 @@ public class Compare2PTCounts extends Events2PTCounts{
 				}				
 			}
 			
-			this.outDir = parentDir + "count768-767/";
+			this.outDir = parentDir + "768-767/";
 			this.line2StopCountMap = mergedMap;
 			this.dump();
 			
@@ -112,6 +113,13 @@ public class Compare2PTCounts extends Events2PTCounts{
 	
 	private void createSimpleKMZ(Map<Id, Map<Id, StopCountBox>> line2StopCountMap1, Map<Id, Map<Id, StopCountBox>> line2StopCountMap2, TransitSchedule transitSchedule) {
 	
+		HashMap<String, String> stringStopNameMap = new HashMap<String, String>();
+		for (Entry<Id, String> stopEntry : this.stopIDMap.entrySet()) {
+			stringStopNameMap.put(stopEntry.getKey().toString(), stopEntry.getValue());
+		}
+		
+		Map<String, TreeSet<String>> stopID2lineIdMap = new HashMap<String, TreeSet<String>>();
+		
 		Map<Id, StopCountBox> stopCounts1 = new HashMap<Id, StopCountBox>();	
 		for (Id lineId : line2StopCountMap1.keySet()) {			
 			for (Entry<Id, StopCountBox> stopBox : line2StopCountMap1.get(lineId).entrySet()) {				
@@ -124,6 +132,12 @@ public class Compare2PTCounts extends Events2PTCounts{
 						stopCounts1.get(stopId).egressCount[i] = stopCounts1.get(stopId).egressCount[i] + stopBox.getValue().egressCount[i];
 					}
 				}
+				
+				// add line to its stops
+				if(stopID2lineIdMap.get(stopId.toString()) == null){
+					stopID2lineIdMap.put(stopId.toString(), new TreeSet<String>());
+				}				
+				stopID2lineIdMap.get(stopId.toString()).add(lineId.toString());
 			}
 		}
 		
@@ -139,6 +153,12 @@ public class Compare2PTCounts extends Events2PTCounts{
 						stopCounts2.get(stopId).egressCount[i] = stopCounts2.get(stopId).egressCount[i] + stopBox.getValue().egressCount[i];
 					}
 				}
+				
+				// add line to its stops
+				if(stopID2lineIdMap.get(stopId.toString()) == null){
+					stopID2lineIdMap.put(stopId.toString(), new TreeSet<String>());
+				}				
+				stopID2lineIdMap.get(stopId.toString()).add(lineId.toString());
 			}
 		}		
 		
@@ -197,8 +217,9 @@ public class Compare2PTCounts extends Events2PTCounts{
 			
 		}		
 		
-		PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(boardCountSimCompList, alightCountSimCompList,
-				TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84), boardCounts, alightCounts);
+		PtCountCountComparisonKMLWriter kmlWriter = new PtCountCountComparisonKMLWriter(boardCountSimCompList, alightCountSimCompList,
+				TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84),
+				boardCounts, alightCounts, stringStopNameMap, stopID2lineIdMap);
 		kmlWriter.setIterationNumber(0);
 		kmlWriter.writeFile(this.outDir + "out.kmz");
 		
