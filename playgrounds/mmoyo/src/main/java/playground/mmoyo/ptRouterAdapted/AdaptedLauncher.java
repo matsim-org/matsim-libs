@@ -19,8 +19,12 @@ import playground.mmoyo.utils.TransScenarioLoader;
 
 /**routes scenario based on the values of the transitRouterConfig**/
 public class AdaptedLauncher {
-	static MyTransitRouterConfig myTransitRouterConfig = new MyTransitRouterConfig();
+	MyTransitRouterConfig myTransitRouterConfig;
 	
+	public AdaptedLauncher(MyTransitRouterConfig myTransitRouterConfig) {
+		this.myTransitRouterConfig = myTransitRouterConfig;
+	}
+
 	public void route(String configFile) throws FileNotFoundException {
 		
 		//load scenario
@@ -46,10 +50,10 @@ public class AdaptedLauncher {
 		// yy The following comes from PlansCalcRoute; in consequence, one can configure the car router attributes.  In addition, one can configure _some_
 		// of the transit attributes from here (transitSchedule, transitConfig), but not some others.  Please describe the design reason for this.  kai, apr'10
 		// The design reason is, I guess, that these are the arguments that are used for the constructor of the super-class (designed by others)?  kai, apr'10
-		AdaptedPlansCalcTransitRoute adaptedRouter = new AdaptedPlansCalcTransitRoute(scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getNetwork(), 
+		AdaptedPlansCalcTransitRoute adaptedPlansCalcTransitRoute = new AdaptedPlansCalcTransitRoute(scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getNetwork(), 
 				freespeedTravelTimeCost, freespeedTravelTimeCost, dijkstraFactory, scenarioImpl.getTransitSchedule(), transitConfig, myTransitRouterConfig);
 
-		adaptedRouter.run(scenarioImpl.getPopulation());
+		adaptedPlansCalcTransitRoute.run(scenarioImpl.getPopulation());
 
 		//fragment plans
 		if (myTransitRouterConfig.fragmentPlans){
@@ -73,11 +77,12 @@ public class AdaptedLauncher {
 	
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
 		String configFile = null;
+		MyTransitRouterConfig myTransitRouterConfig = new MyTransitRouterConfig();
 		
 		if (args.length>0){
 			configFile = args[0];
 		}else{
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/20plans/config_20plans_Berlin5x.xml";
+			configFile = "../playgrounds/mmoyo/output/seventh/config.xml";
 		}
 		
 		myTransitRouterConfig.searchRadius = 600.0;
@@ -89,19 +94,23 @@ public class AdaptedLauncher {
 		myTransitRouterConfig.compressPlan = true;
 
 		//once
+		/*
 		myTransitRouterConfig.scenarioName = "_costLineSwitch" + myTransitRouterConfig.costLineSwitch ;
 		System.out.println(myTransitRouterConfig.scenarioName) ;
-		AdaptedLauncher adaptedLauncher	= new AdaptedLauncher();
+		AdaptedLauncher adaptedLauncher	= new AdaptedLauncher(myTransitRouterConfig);
 		adaptedLauncher.route(configFile);
+		*/
 		
 		//many times
-//		for ( double costLineSwitchInSecs = 0 ; costLineSwitchInSecs <= 1200 ; costLineSwitchInSecs += 60 ) {
-//			myTransitRouterConfig.costLineSwitch = round2dec(costLineSwitchInSecs * -myTransitRouterConfig.marginalUtilityOfTravelTimeTransit) ;
-//			myTransitRouterConfig.scenarioName = "_costLineSwitch" + myTransitRouterConfig.costLineSwitch ;
-//			System.out.println(myTransitRouterConfig.scenarioName) ;
-//			AdaptedLauncher adaptedLauncher	= new AdaptedLauncher();
-//			adaptedLauncher.route(configFile);
-//		}
+		for ( double dUtility = 0; dUtility <= 0.001 ; dUtility += 0.0001 ) {
+			//myTransitRouterConfig.marginalUtilityOfTravelDistanceTransit = -distanceUtility / 1000.0; ????
+			myTransitRouterConfig.marginalUtilityOfTravelDistanceTransit = -dUtility;
+			myTransitRouterConfig.scenarioName = "_dis" + dUtility ;
+			System.out.println(myTransitRouterConfig.scenarioName) ;
+			AdaptedLauncher adaptedLauncher	= new AdaptedLauncher(myTransitRouterConfig);
+			adaptedLauncher.route(configFile);
+			System.out.println(myTransitRouterConfig.marginalUtilityOfTravelDistanceTransit);
+		}
 	}	
 }
 

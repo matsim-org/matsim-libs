@@ -63,7 +63,7 @@ public class CountsComparingGraph2 {
 			System.out.println(CREATING + key);
 
 			//find out type (
-			String type = null;
+			String type = "";
 			int sufPos = key.lastIndexOf(POINT)-1;
 			String suffix = key.substring(sufPos, sufPos+1);
 			if (suffix.equals(A_SUF)){
@@ -109,7 +109,7 @@ public class CountsComparingGraph2 {
 				posx += 400;
 			}
 			compGraphic.dispose();
-			File outputFile = new File("../playgrounds/mmoyo/output/fouth/comparingGraphs" + key);
+			File outputFile = new File("../playgrounds/mmoyo/output/sixth/comparingGraphs/" + key);
 			ImageIO.write(compImg,"png", outputFile);	
 		}
 	
@@ -125,7 +125,7 @@ public class CountsComparingGraph2 {
 			this.filePath =  filePath;
 			this.coeffCombination = coeffCombination;
 	
-			if (coeffCombination.startsWith("time")){ //make sure that the time combination starts with "time"
+			if (coeffCombination.startsWith("sec_")){ //make sure that the time combination starts with a prefix
 				timePriority = Double.parseDouble(coeffCombination.substring(4));
 			}
 		}
@@ -138,19 +138,19 @@ public class CountsComparingGraph2 {
 			return filePath;
 		}
 
-		private double getTimePriotity(){
+		private double getTimePriority(){
 			return this.timePriority;	
 		}
 		
 		@Override
 		public int compareTo(GraphData otherGraphData) {
-		    return Double.compare(timePriority, otherGraphData.getTimePriotity());
+		    return Double.compare(timePriority, otherGraphData.getTimePriority());
 		}
 	}
 	
 	public static void main(String[] args) {
 		//String dir = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/KMZ_counts_scalefactor50";
-		String dir = "../playgrounds/mmoyo/output/fouth/output";
+		String dir = "../playgrounds/mmoyo/output/sixth/output";
 		try {
 			new CountsComparingGraph2().createComparingGraphs(dir);
 		} catch (IOException e) {

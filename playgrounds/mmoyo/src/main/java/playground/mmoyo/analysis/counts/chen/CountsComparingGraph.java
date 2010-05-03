@@ -13,6 +13,7 @@ public class CountsComparingGraph {
 	String dirPath;
 	String SEPARATOR = "/";
 	
+	@Deprecated
 	public CountsComparingGraph(String dirPath) {
 		this.dirPath = dirPath;
 	}

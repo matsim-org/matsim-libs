@@ -16,29 +16,28 @@ public class Counter {
 			throw new FileNotFoundException("the resource folder -res- does not exist");
 		}
 		
+		/*
 		String configFile;
 		if(args.length>0){ 
 			configFile = args[0];
 		}else{	
-			configFile ="../playgrounds/mmoyo/output/fouth/configs/config_95.xml";
+			configFile ="../playgrounds/mmoyo/output/sixth/configs";
 		}
 		TrCtl.main(new String[]{configFile});
-		
-		
+		*/
 		
 		//read many configs:  
-		/*
-		String configsDir = "../playgrounds/mmoyo/output/fouth/configs"; 
+		String configsDir = "../playgrounds/mmoyo/output/sixth/configs"; 
 		File dir = new File(configsDir);
 		for (String configName : dir.list()){
 			String completePath= configsDir + "/" + configName;
 			System.out.println("\n\n  procesing: " + completePath);
 			TrCtl.main(new String[]{completePath});
 		}
-		*/
+		
 		 
 		//shut down ms-windows
-		//Runtime runtime = Runtime.getRuntime();
-		//runtime.exec("shutdown -s -t 60 -f");
+		Runtime runtime = Runtime.getRuntime();
+		runtime.exec("shutdown -s -t 300 -f");
 	}
 }
