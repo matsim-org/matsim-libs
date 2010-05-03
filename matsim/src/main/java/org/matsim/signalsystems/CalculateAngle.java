@@ -33,7 +33,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
  */
 public class CalculateAngle {
 	/**
-	 * Calculates the most 'left' outLink for a given inLink.
+	 * Calculates the most 'left' outLink for a given inLink (oriented from north to south).
 	 * That's the link a driver would refer to when turning left (no u-turn),
 	 * even if there is only one link going to the right.
 	 * 
@@ -52,7 +52,8 @@ public class CalculateAngle {
 	
 	/**
 	 * Calculates the orientation of the outLinks for a given inLink
-	 * beginning from the right. The most 'left' outLink comes last.
+	 * beginning from the right if the inLink goes north to south. 
+	 * The most 'left' outLink comes last.
 	 * backLink is ignored
 	 * 
 	 * @param inLink The inLink given
