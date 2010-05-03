@@ -25,9 +25,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import playground.benjamin.BkPaths;
 import playground.dgrether.analysis.charts.DgMixedDeltaUtilsModeGroupChart;
 import playground.dgrether.analysis.charts.utils.DgChartWriter;
-import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
-import playground.dgrether.analysis.io.DgHouseholdsAnalysisReader;
-import playground.dgrether.analysis.population.DgAnalysisPopulation;
 
 
 public class Iatbr09Analysis {
@@ -73,11 +70,11 @@ public class Iatbr09Analysis {
 			ScenarioImpl sc = new ScenarioImpl();
 
 			
-			DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader(sc);
-			DgAnalysisPopulation ana = pc.doPopulationAnalysis(netfile, plans1file, plans2file);
+//			DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader(sc);
+//			DgAnalysisPopulation ana = pc.doPopulationAnalysis(netfile, plans1file, plans2file);
 			
-			DgHouseholdsAnalysisReader hhr = new DgHouseholdsAnalysisReader(ana);
-			hhr.readHousholds(housholdsfile);
+//			DgHouseholdsAnalysisReader hhr = new DgHouseholdsAnalysisReader(ana);
+//			hhr.readHousholds(housholdsfile);
 			
 //			DgDeltaScoreIncomeChart incomeChart;
 //			incomeChart = new DgDeltaScoreIncomeChart(ana);
