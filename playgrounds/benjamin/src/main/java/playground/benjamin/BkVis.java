@@ -32,14 +32,28 @@ public class BkVis {
 	 */
 	public static void main(String[] args) {
 
-//		String otffile = "../matsim/test/input/playground/benjamin/BKickRouterTestIATBR/network.xml";
-//		String otffile = "../matsim/output/singleIteration/ITERS/it.0/0.otfvis.mvi";
-//		String otffile = BkPaths.RUNSSVN + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
-		String otffile = BkPaths.RUNSSVN + "run950/it.1000/950.1000.events.mvi";
+//===========================================================================================================		
+//		Für den mvi-modus:
+//			String otffile = "../matsim/test/input/playground/benjamin/BKickRouterTestIATBR/network.xml";
+//			String otffile = "../matsim/output/singleIteration/ITERS/it.0/0.otfvis.mvi";
+//			String otffile = BkPaths.RUNSSVN + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
+//			String otffile = BkPaths.RUNSSVN + "run950/it.1000/950.1000.events.mvi";
 
-
-//	Für den interactiven Modus: Hier die config übergeben und in der config:
-//		1. QSim-Modul einschalten ("qsim" statt "simulation")!
+//===========================================================================================================		
+//	Für den interactiven Modus: Unten die config übergeben und in der config:
+//		
+//		1. QSim-Modul einschalten ("qsim" statt "simulation"):
+//			<module name="qsim">
+//			<param name="startTime" value="00:00:00" />
+//			<param name="endTime" value="24:00:00" />
+//	
+//			<param name="flowCapacityFactor" value="0.1" />
+//			<param name="storageCapacityFactor" value="0.30" />
+//	
+//			<param name="stuckTime" value="10" />
+//			<param name="removeStuckVehicles" value="no" />
+//		</module>
+			
 //		2. Snapshot-Period auf 0 setzen!
 		
 //	output-config kann benutzt werden. Dafür:
@@ -49,7 +63,8 @@ public class BkVis {
 		
 //		String otffile = "../matsim/examples/tutorial/singleIteration.xml";
 //		String otffile = BkPaths.RUNSSVN + "run749/TestOTFVis_interactive/749.output_config.xml";
-//		String otffile = "../detailedEval/140k-synthetische-personen/config-for-visualisation.xml";
+//		String otffile = "../detailedEval/pop/140k-synthetische-personen/config-for-visualisation.xml";
+		String otffile = BkPaths.RUNSSVN + "run950/950.output_config.xml";
 
 		
 		OTFVis.main(new String[] {otffile});
