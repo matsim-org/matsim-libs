@@ -90,11 +90,11 @@ public class ErgmSimulator {
 		String outputDir = config.getParam(MODULE_NAME, "output");
 		
 		double totalCost = Double.parseDouble(config.getParam(MODULE_NAME, "totalCost"));
-		double beta = Double.parseDouble(config.getParam(MODULE_NAME, "beta"));
-		boolean onlyCost = Boolean.parseBoolean(config.getParam(MODULE_NAME, "onlyCost"));
-		boolean linear = Boolean.parseBoolean(config.getParam(MODULE_NAME, "linear"));
-		boolean adjustCost = Boolean.parseBoolean(config.getParam(MODULE_NAME, "adjustCost"));
-		double descretization = Double.parseDouble(config.getParam(MODULE_NAME, "descretization"));
+//		double beta = Double.parseDouble(config.getParam(MODULE_NAME, "beta"));
+//		boolean onlyCost = Boolean.parseBoolean(config.getParam(MODULE_NAME, "onlyCost"));
+//		boolean linear = Boolean.parseBoolean(config.getParam(MODULE_NAME, "linear"));
+//		boolean adjustCost = Boolean.parseBoolean(config.getParam(MODULE_NAME, "adjustCost"));
+//		double descretization = Double.parseDouble(config.getParam(MODULE_NAME, "descretization"));
 		
 		logger.info("Creating random graph...");
 		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten()));
@@ -112,21 +112,9 @@ public class ErgmSimulator {
 		 */
 		ArrayList<ErgmTerm> terms = new ArrayList<ErgmTerm>();
 		
-		if(!onlyCost) {
-			ErgmDistance ergmDistance = new ErgmDistance(y, -1.6, k_mean);
-			terms.add(ergmDistance);
-		}
-		
-		ErgmTotalDistance totalDistance = new ErgmTotalDistance(y, totalCost, adjustCost, descretization);
-		terms.add(totalDistance);
-		
-//		ErgmDensity density = new ErgmDensity();
-//		
-//		density.setTheta(Math.log(p));
-//		terms.add(density);
-		
-//		ErgmTotalCost ergmTotalCost = new ErgmTotalCost(beta, totalCost);
-//		terms.add(ergmTotalCost);
+		EdgeCostFunction costFunction = new GravityCostFunction(-1.6, 1.0);
+		ErgmEdgeCost edgeCost = new ErgmEdgeCost(y, costFunction, totalCost);
+		terms.add(edgeCost);
 		
 		Ergm ergm = new Ergm();
 		ergm.setErgmTerms(terms.toArray(new ErgmTerm[1]));
