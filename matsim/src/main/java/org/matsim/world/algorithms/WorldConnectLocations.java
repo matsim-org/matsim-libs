@@ -42,7 +42,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.world.Layer;
-import org.matsim.world.LayerImpl;
 import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
@@ -82,7 +81,7 @@ public class WorldConnectLocations {
 		this(new HashSet<String>());
 	}
 
-	public WorldConnectLocations(Set<String> excludingLinkTypes) {
+	public WorldConnectLocations(final Set<String> excludingLinkTypes) {
 		this.excludingLinkTypes = excludingLinkTypes;
 	}
 
@@ -107,7 +106,7 @@ public class WorldConnectLocations {
 		// get all links from the network with specified link types
 		ArrayList<Link> remainingLinks = new ArrayList<Link>();
 		for (Link l : network.getLinks().values()) {
-			if (!this.excludingLinkTypes.contains(((LayerImpl) l).getType())) { remainingLinks.add(l); }
+			if (!this.excludingLinkTypes.contains(((LinkImpl) l).getType())) { remainingLinks.add(l); }
 		}
 		if (remainingLinks.isEmpty()) {
 			StringBuffer str = new StringBuffer();
@@ -134,7 +133,7 @@ public class WorldConnectLocations {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void connect(ActivityFacilitiesImpl facilities, NetworkLayer network, World world, String file, Set<Id> remainingFacilities) {
+	private final void connect(final ActivityFacilitiesImpl facilities, final NetworkLayer network, final World world, final String file, final Set<Id> remainingFacilities) {
 		log.info("    connecting facilities with links via "+CONFIG_F2L_INPUTF2LFile+"="+file);
 		BufferedReader br = null;
 		try {
@@ -178,7 +177,7 @@ public class WorldConnectLocations {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void writeF2LFile(ActivityFacilitiesImpl facilities, String file) {
+	private final void writeF2LFile(final ActivityFacilitiesImpl facilities, final String file) {
 		log.info("    writing f<-->l connections to  "+CONFIG_F2L_OUTPUTF2LFile+"="+file);
 		BufferedWriter bw = null;
 		try {
@@ -217,7 +216,7 @@ public class WorldConnectLocations {
 	 * @param network either a layer of the world or a network created with {@link #extractSubNetwork(NetworkLayer)} from a network layer of the world.
 	 * @param world the world in which the facility and the network layer will be mapped
 	 */
-	private final void connect(ActivityFacilitiesImpl facilities, NetworkLayer network, World world) {
+	private final void connect(final ActivityFacilitiesImpl facilities, final NetworkLayer network, final World world) {
 		log.info("  connecting facilities with links...");
 		log.info("    remove all given connections f<==>l...");
 		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
@@ -269,7 +268,7 @@ public class WorldConnectLocations {
 	 * @param facilities a layer of the world
 	 * @param world the world in which the zone and the facility layer will be mapped
 	 */
-	private final void connect(ZoneLayer zones, ActivityFacilitiesImpl facilities, World world) {
+	private final void connect(final ZoneLayer zones, final ActivityFacilitiesImpl facilities, final World world) {
 		log.info("  connecting zones with facilities...");
 		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			// remove previous mappings for facility f
@@ -302,7 +301,7 @@ public class WorldConnectLocations {
 	 * @param network a layer of the world
 	 * @param world the world in which the zone and the network layer will be mapped
 	 */
-	private final void connect(ZoneLayer zones, NetworkLayer network, World world) {
+	private final void connect(final ZoneLayer zones, final NetworkLayer network, final World world) {
 		log.info("  connecting zones with links...");
 		for (Link l2 : network.getLinks().values()) {
 			LinkImpl l = (LinkImpl) l2;
@@ -327,7 +326,7 @@ public class WorldConnectLocations {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(World world) {
+	public void run(final World world) {
 		log.info("running " + this.getClass().getName() + " module (MATSim-FUSION)...");
 
 		if (world.getLayers().size() > 1) {
