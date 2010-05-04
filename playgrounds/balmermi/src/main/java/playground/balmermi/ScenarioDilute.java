@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -119,7 +118,7 @@ public class ScenarioDilute {
 
 		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 		System.out.println("=> area of interest (aoi): center=" + center + "; radius=" + radius);
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {

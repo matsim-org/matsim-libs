@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 
@@ -38,7 +37,7 @@ public class OutFlowCapacity {
 	private static Logger log = Logger.getLogger(OutFlowCapacity.class);
 	private final NetworkLayer network;
 	private double outFlowCapcity = 0;
-	private final Set<LinkImpl> outFlowLinks = new HashSet<LinkImpl>();
+	private final Set<Link> outFlowLinks = new HashSet<Link>();
 
 	public OutFlowCapacity(NetworkLayer network) {
 		this.network = network;
@@ -66,7 +65,7 @@ public class OutFlowCapacity {
 
 	private void parseOutLinks() {
 		outFlowCapcity = 0;
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			if (this.outFlowLinks.contains(link)) {
 				continue;
 			}

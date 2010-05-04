@@ -31,9 +31,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 
@@ -69,7 +69,7 @@ public class PrivateVehicleSpeedEvaluator {
 
 	/**
 	 * This file determines the average speed travelled across all links in a given zone
-	 * over multiple runs. 
+	 * over multiple runs.
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -79,7 +79,7 @@ public class PrivateVehicleSpeedEvaluator {
 
 		/*
 		 * Determine which link Ids are associated with the given GAP mesozone. That means
-		 * that GAP file must be read first. 
+		 * that GAP file must be read first.
 		 */
 		String shapefile = root + "ShapeFiles/" + province + "/" + province + "GAP_UTM35S.shp";
 		MyGapReader mgr = new MyGapReader(province, shapefile);
@@ -98,13 +98,13 @@ public class PrivateVehicleSpeedEvaluator {
 
 		Map<Id, SAZone> zoneTree = new HashMap<Id, SAZone>();
 
-		Map<Id, LinkImpl> map = nl.getLinks();
+		Map<Id, Link> map = nl.getLinks();
 		for (Id key : map.keySet()) {
-			LinkImpl link = map.get(key);
+			Link link = map.get(key);
 
 			Coordinate fromPoint = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 			Coordinate toPoint = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
-			LineSegment ls = new LineSegment(fromPoint, toPoint); 
+			LineSegment ls = new LineSegment(fromPoint, toPoint);
 			Coordinate c = ls.pointAlong(0.5);
 			Point midPoint = gf.createPoint(c);
 
@@ -185,10 +185,10 @@ public class PrivateVehicleSpeedEvaluator {
 						Integer statsKey = Integer.parseInt(zone.getName());
 						Double[] statsList = statsMap.get(statsKey);
 						for(int i = 0; i < statsList.length; i++){
-							statsList[i] += zone.getSpeedDetail()[i];						
+							statsList[i] += zone.getSpeedDetail()[i];
 						}
 						/*
-						 * Clear the SAZone's speed details, otherwise it just keeps adding up across the multiple runs. 
+						 * Clear the SAZone's speed details, otherwise it just keeps adding up across the multiple runs.
 						 */
 						zone.clearSAZone();
 					}
@@ -202,7 +202,7 @@ public class PrivateVehicleSpeedEvaluator {
 			EventsManagerImpl events = new EventsManagerImpl();
 			MyPrivateVehicleSpeedAnalyser handler = new MyPrivateVehicleSpeedAnalyser(zoneTree, nl, lowerId, upperId, numberOfHourBins);
 			events.addHandler(handler);
-	
+
 			/*
 			 * Read the events file.
 			 */
@@ -220,21 +220,21 @@ public class PrivateVehicleSpeedEvaluator {
 				Integer statsKey = Integer.parseInt(zone.getName());
 				Double[] statsList = statsMap.get(statsKey);
 				for(int i = 0; i < statsList.length; i++){
-					statsList[i] += zone.getSpeedDetail()[i];						
+					statsList[i] += zone.getSpeedDetail()[i];
 				}
 				/*
-				 * Clear the SAZone's speed details, otherwise it just keeps adding up across the multiple runs. 
+				 * Clear the SAZone's speed details, otherwise it just keeps adding up across the multiple runs.
 				 */
 				zone.clearSAZone();
 			}
 
-			
+
 		}
 
 		/*
-		 * Write the analyses to file. To make sure the mesozones appear in the same order as 
+		 * Write the analyses to file. To make sure the mesozones appear in the same order as
 		 * in the original list, I use the original list as source, find the associated key
-		 * from the GAP_ID name, and retrieve the statistics from the map. 
+		 * from the GAP_ID name, and retrieve the statistics from the map.
 		 */
 		log.info("Writing the statistics to file.");
 		DateString ds = new DateString();
@@ -242,10 +242,10 @@ public class PrivateVehicleSpeedEvaluator {
 		String outputFile;
 		if(simulated){
 			divider = runs.length;
-			outputFile = root + "Commercial/PostProcess/AveragePrivateVehicleSpeed-" + ds.toString() + ".txt";			
+			outputFile = root + "Commercial/PostProcess/AveragePrivateVehicleSpeed-" + ds.toString() + ".txt";
 		} else{
 			divider = 1;
-			outputFile = root + "Commercial/PostProcess/OriginalPrivateVehicleSpeed-" + ds.toString() + ".txt";	
+			outputFile = root + "Commercial/PostProcess/OriginalPrivateVehicleSpeed-" + ds.toString() + ".txt";
 		}
 		try {
 			BufferedWriter output = new BufferedWriter(new FileWriter(new File(outputFile)));
@@ -261,7 +261,7 @@ public class PrivateVehicleSpeedEvaluator {
 				output.write("H");
 				output.write(String.valueOf(numberOfHourBins-1));
 				output.newLine();
-				
+
 				// Write the stats.
 				for (SAZone zone : mgr.getAllZones()) {
 					Integer key = Integer.parseInt(zone.getName());
@@ -275,7 +275,7 @@ public class PrivateVehicleSpeedEvaluator {
 					output.write(String.valueOf(stats[stats.length-1] / divider));
 					output.newLine();
 				}
-				
+
 			} finally{
 				output.close();
 			}

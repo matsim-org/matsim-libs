@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.visum.writer;
 
@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -15,7 +16,7 @@ import playground.yu.visum.filter.finalFilters.FinalEventFilterA;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class PrintStreamLinkATT extends PrintStreamATTA {
 	/*------------------------MEMBER VARIABLE-----------------*/
@@ -34,10 +35,10 @@ public class PrintStreamLinkATT extends PrintStreamATTA {
 	@Override
 	public void printRow(String linkID) throws IOException {
 		try {
-			LinkImpl link = network.getLinks().get(new IdImpl(linkID));
+			Link link = network.getLinks().get(new IdImpl(linkID));
 			if (link == null)
 				return;
-			out.writeBytes(link.getOrigId() + SPRT + link.getFromNode().getId()
+			out.writeBytes(((LinkImpl) link).getOrigId() + SPRT + link.getFromNode().getId()
 					+ SPRT + link.getToNode().getId());
 			int i = 0;
 			List<Double> udawList = udaws.get(linkID);

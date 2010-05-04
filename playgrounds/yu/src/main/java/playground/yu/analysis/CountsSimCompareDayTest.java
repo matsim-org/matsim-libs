@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -11,9 +11,9 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
@@ -23,9 +23,9 @@ import org.matsim.counts.MatsimCountsReader;
 
 /**
  * quote from playground.balmermi.Scenario
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class CountsSimCompareDayTest {
 
@@ -62,7 +62,7 @@ public class CountsSimCompareDayTest {
 							+ "X\tY\tcountValue\tsimValue\tdeviation((sim-count)/count)\n");
 			for (Id linkId : counts.getCounts().keySet()) {
 				Count count = counts.getCount(linkId);
-				LinkImpl link = network.getLinks().get(linkId);
+				Link link = network.getLinks().get(linkId);
 				if (link != null) {
 					Coord toCoord = link.getToNode().getCoord();
 					Coord fromCoord = link.getFromNode().getCoord();

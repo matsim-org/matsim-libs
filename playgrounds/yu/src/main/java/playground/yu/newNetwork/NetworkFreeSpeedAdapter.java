@@ -24,7 +24,7 @@
 package playground.yu.newNetwork;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -50,7 +50,7 @@ public class NetworkFreeSpeedAdapter {
 		// try {
 		// BufferedWriter writer = IOUtils.getBufferedWriter(logFilename);
 		// writer.write("Id of nodes removed from Toronto network\n");
-		for (LinkImpl l : network.getLinks().values()) {
+		for (Link l : network.getLinks().values()) {
 			l.setFreespeed(l.getFreespeed() / 3.6);
 		}
 		// writer.close();

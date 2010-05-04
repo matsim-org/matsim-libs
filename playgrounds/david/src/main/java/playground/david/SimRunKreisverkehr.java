@@ -21,6 +21,7 @@
 package playground.david;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -56,15 +57,15 @@ public class SimRunKreisverkehr {
 
 		int cellcount = 0;
 		int cellcount2 = 0;
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			double length = link.getLength()*NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link);
 			cellcount += Math.ceil(length/7.5);
 			cellcount2 += link.getLength();
 		}
 		System.out.println("Summarized Cell count is " + cellcount +" on a net of length " + cellcount2/1000 +" km");
 		int buffercount = 0;
-		for (LinkImpl link : network.getLinks().values()) {
-			double cap = link.getFlowCapacity();
+		for (Link link : network.getLinks().values()) {
+			double cap = ((LinkImpl) link).getFlowCapacity();
 			buffercount += Math.ceil(cap);
 		}
 		System.out.println("Summarized buffer count is " + buffercount);
@@ -109,7 +110,6 @@ public class SimRunKreisverkehr {
 
 ///////////////////////////////////////////////////////////////////////////
 // REMARKS etc
-// TODO:
 
 // Ich finde, so etwas wie new XYZSimulation ( plans, network/world, events ) macht sehr viel Sinn.
 

@@ -261,9 +261,9 @@ public class NetworkExpandNode implements NetworkRunnable {
 		// add virtual links for the turn restrictions
 		for (int i=0; i<turns.size(); i++) {
 			Tuple<Id,Id> turn = turns.get(i);
-			LinkImpl fromLink = network.getLinks().get(turn.getFirst());
-			LinkImpl toLink = network.getLinks().get(turn.getSecond());
-			LinkImpl l = network.createAndAddLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(),fromLink.getCapacity(),fromLink.getNumberOfLanes(),fromLink.getOrigId(),fromLink.getType());
+			Link fromLink = network.getLinks().get(turn.getFirst());
+			Link toLink = network.getLinks().get(turn.getSecond());
+			Link l = network.createAndAddLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(),fromLink.getCapacity(),fromLink.getNumberOfLanes(),((LinkImpl) fromLink).getOrigId(),((LinkImpl) fromLink).getType());
 			newLinks.add(l);
 		}
 		return new Tuple<ArrayList<Node>, ArrayList<Link>>(newNodes,newLinks);

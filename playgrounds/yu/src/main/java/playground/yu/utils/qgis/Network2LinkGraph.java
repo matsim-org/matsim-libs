@@ -31,7 +31,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -66,14 +66,12 @@ public class Network2LinkGraph extends X2GraphImpl implements X2Graph {
 				Double.class);
 		AttributeType cap = AttributeTypeFactory.newAttributeType("capacity",
 				Double.class);
-		AttributeType type = AttributeTypeFactory.newAttributeType("type",
-				Integer.class);
 		AttributeType freespeed = AttributeTypeFactory.newAttributeType(
 				"freespeed", Double.class);
 		defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
 		defaultFeatureTypeFactory.setName("link");
 		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id,
-				fromNode, toNode, length, cap, type, freespeed });
+				fromNode, toNode, length, cap, freespeed });
 	}
 
 	// ////////////////////////////////////////////
@@ -88,7 +86,7 @@ public class Network2LinkGraph extends X2GraphImpl implements X2Graph {
 		for (int i = 0; i < attrTypes.size(); i++)
 			defaultFeatureTypeFactory.addType(attrTypes.get(i));
 		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			LineString ls = new LineString(
 					new CoordinateArraySequence(
 							new Coordinate[] {
@@ -104,8 +102,7 @@ public class Network2LinkGraph extends X2GraphImpl implements X2Graph {
 			o[3] = link.getToNode().getId().toString();
 			o[4] = link.getLength();
 			o[5] = link.getCapacity() / network.getCapacityPeriod() * 3600.0;
-			o[6] = Integer.parseInt(link.getType());
-			o[7] = link.getFreespeed();
+			o[6] = link.getFreespeed();
 			for (int i = 0; i < parameters.size(); i++) {
 				o[i + 8] = parameters.get(i).get(link.getId().toString());
 			}

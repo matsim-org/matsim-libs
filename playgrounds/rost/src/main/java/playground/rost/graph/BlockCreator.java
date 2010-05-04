@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
@@ -277,7 +276,7 @@ public class BlockCreator {
 
 		Long maxLinkId = Long.MIN_VALUE;
 		Long tmp;
-		for(LinkImpl l : network.getLinks().values())
+		for(Link l : network.getLinks().values())
 		{
 			tmp = Long.parseLong(l.getId().toString());
 			if(tmp > maxLinkId)

@@ -317,7 +317,7 @@ public class FlatNetwork {
 
 		Long maxLinkId = Long.MIN_VALUE;
 		Long tmp;
-		for(LinkImpl l : input.getLinks().values())
+		for(Link l : input.getLinks().values())
 		{
 			tmp = Long.parseLong(l.getId().toString());
 			if(tmp > maxLinkId)

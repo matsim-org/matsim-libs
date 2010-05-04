@@ -33,7 +33,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -119,8 +118,8 @@ public class AccessEgressDemo {
 			TransitRouteStop stop = builder.createTransitRouteStop(stops[i], i * 50, i * 50 + 10);
 			stopList.add(stop);
 		}
-		LinkImpl startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
-		LinkImpl endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks - 1]);
+		Link startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
+		Link endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks - 1]);
 		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
 		ArrayList<Id> linkList = new ArrayList<Id>(nOfLinks - 2);
 		for (int i = 1; i < nOfLinks -1; i++) {

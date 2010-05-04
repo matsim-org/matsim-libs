@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -36,7 +37,6 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -45,20 +45,20 @@ import playground.johannes.eut.EstimReactiveLinkTT;
 public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHandler, IterationStartsListener, IterationEndsListener {
 
 	private EstimReactiveLinkTT linktt;
-	
+
 	private Map<Id, LinkEnterEvent> events; // personId
-	
+
 	private BufferedWriter realTTWriter;
-	
+
 	private BufferedWriter estimTTWriter;
-	
-	private LinkImpl link;
-	
+
+	private Link link;
+
 	public LinkTTObserver(NetworkLayer network, EstimReactiveLinkTT linktt) {
 		link = network.getLinks().get(new IdImpl("2"));
 		this.linktt = linktt;
 	}
-	
+
 	public void handleEvent(LinkLeaveEvent event) {
 		if(event.getLinkId().toString().equals("2")) {
 			LinkEnterEvent enter = events.remove(event.getPersonId());
@@ -69,12 +69,11 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 				realTTWriter.write(String.valueOf(realTT));
 				realTTWriter.newLine();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
-		
+
 	}
 
 	public void reset(int iteration) {
@@ -83,7 +82,7 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 
 	public void handleEvent(LinkEnterEvent event) {
 		events.put(event.getPersonId(), event);
-		
+
 		double estimTT = linktt.getLinkTravelTime(link, event.getTime());
 		try {
 			estimTTWriter.write(String.valueOf(event.getTime()));
@@ -91,10 +90,9 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 			estimTTWriter.write(String.valueOf(estimTT));
 			estimTTWriter.newLine();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public void notifyIterationStarts(IterationStartsEvent event) {
@@ -102,18 +100,16 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 			realTTWriter = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "realTTs.txt"));
 			realTTWriter.write("time\ttraveltime");
 			realTTWriter.newLine();
-			
+
 			estimTTWriter = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "estimTTs.txt"));
 			estimTTWriter.write("time\ttraveltime");
 			estimTTWriter.newLine();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
@@ -121,10 +117,9 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 			realTTWriter.close();
 			estimTTWriter.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }

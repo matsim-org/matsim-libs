@@ -38,6 +38,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -45,7 +46,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
@@ -184,7 +184,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 	public void run() {
 
 		Coordinate superSink = MGC.coord2Coordinate(this.network.getNodes().get(new IdImpl("en1")).getCoord());
-		
+
 		EventsManagerImpl events = new EventsManagerImpl();
 		DestinationDependentColorizer ddc = new DestinationDependentColorizer();
 		events.addHandler(ddc);
@@ -192,37 +192,35 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 		new EventsReaderTXTv1(events).readFile(this.eventsfile);
 
 		for (String key : this.dests.keySet()) {
-			
-			
+
+
 			String eId = "el" + ddc.getColor(key);
-			LinkImpl link = this.network.getLinks().get(new IdImpl(eId));
-			
+			Link link = this.network.getLinks().get(new IdImpl(eId));
+
 			if (link == null) {
 				continue;
 			}
-			
+
 			Coordinate from = MGC.coord2Coordinate(link.getFromNode().getCoord());
-			
+
 			String c = getColor(ddc.getColor(key));
 			Point p = this.dests.get(key);
-			
-			
+
+
 			double dy1 = from.y - superSink.y;
 			double dist1 = superSink.distance(from);
 			double angle1 = 360 * Math.asin(dy1/dist1)/ (2*Math.PI) ;
-			
+
 			double dy2 = p.getY() - from.y;
 			double dist2 = from.distance(p.getCoordinate());
 			double angle2 = 360 * Math.asin(dy2/dist2)/ (2*Math.PI) + 90 ;
 			double angle3 = 360 * Math.asin(dy2/dist2)/ (2*Math.PI);
-			
+
 			try {
 				this.features.add(this.ft.create(new Object [] {p,Integer.parseInt(c),"-->",0, angle1, angle2, angle3}));
 			} catch (NumberFormatException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalAttributeException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -252,7 +250,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 			return;
 		}
 		String lID = event.getLinkId().toString();
-		LinkImpl l = this.network.getLinks().get(new IdImpl(lID));
+		Link l = this.network.getLinks().get(new IdImpl(lID));
 		Point p = this.geofac.createPoint(MGC.coord2Coordinate(l.getCoord()));
 		if (this.tree.get(p.getX(), p.getY(), 1).size() <= 0) {
 			this.dests.put(id,p);

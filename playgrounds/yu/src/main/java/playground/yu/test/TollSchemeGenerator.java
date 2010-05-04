@@ -33,11 +33,11 @@ import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -63,9 +63,9 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 /**
  * it's only a copy of Grether's
  * codes:playground.dgrether.roadpricing.TollSchemeGenerator
- * 
+ *
  * @author dgrether
- * 
+ *
  */
 public class TollSchemeGenerator {
 
@@ -1322,7 +1322,7 @@ public class TollSchemeGenerator {
 	private RoadPricingScheme createRoadPricingScheme(
 			final NetworkLayer tollNetwork) {
 		RoadPricingScheme scheme = new RoadPricingScheme();
-		for (LinkImpl l : tollNetwork.getLinks().values())
+		for (Link l : tollNetwork.getLinks().values())
 			scheme.addLink(l.getId());
 		scheme.addCost(usedStart, usedStop, usedAmount);
 		return scheme;
@@ -1442,7 +1442,7 @@ public class TollSchemeGenerator {
 		LinearRing shell = new LinearRing(coordsequence, geofac);
 		Polygon ppp = new Polygon(shell, new LinearRing[] {}, geofac);
 
-		for (LinkImpl l : net.getLinks().values()) {
+		for (Link l : net.getLinks().values()) {
 			Coordinate fromCord = MGC.coord2Coordinate(l.getFromNode()
 					.getCoord());
 			Coordinate toCord = MGC.coord2Coordinate(l.getToNode().getCoord());

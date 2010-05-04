@@ -124,7 +124,7 @@ public class TeleatlasIvtcheuMerger {
 		}
 		if (nodeMapCnt != nodeMapping.size()) { throw new RuntimeException("Something is wrong!"); }
 
-		for (LinkImpl l : networkIvtcheu.getLinks().values()) {
+		for (Link l : networkIvtcheu.getLinks().values()) {
 			Id fromNodeId = l.getFromNode().getId();
 			Id toNodeId = l.getToNode().getId();
 			if (nodeMapping.keySet().contains(fromNodeId) && nodeMapping.keySet().contains(toNodeId)) {
@@ -148,8 +148,8 @@ public class TeleatlasIvtcheuMerger {
 					l.getFreespeed(),
 					l.getCapacity()/10.0,
 					l.getNumberOfLanes(),
-					l.getOrigId(),
-					l.getType());
+					((LinkImpl) l).getOrigId(),
+					((LinkImpl) l).getType());
 		}
 
 		log.info("  number of lines processed: "+lineCnt);

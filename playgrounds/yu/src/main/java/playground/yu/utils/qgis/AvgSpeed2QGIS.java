@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -29,15 +29,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
 
 /**
  * @author yu
- * 
+ *
  */
 public class AvgSpeed2QGIS implements X2QGIS {
 
@@ -50,17 +50,17 @@ public class AvgSpeed2QGIS implements X2QGIS {
 		for (int i = 0; i < 24; i++) {
 			Map<Id, Double> aSpeeds = speeds.get(i);
 			if (aSpeeds != null)
-				for (LinkImpl link : (net.getLinks()).values()) {
+				for (Link link : (net.getLinks()).values()) {
 					Id linkId = link.getId();
 					aSpeeds.put(linkId, clas.getAvgSpeed(linkId,
-							(double) i * 3600.0));
+							i * 3600.0));
 				}
 			else
-				for (LinkImpl link : (net.getLinks()).values()) {
+				for (Link link : (net.getLinks()).values()) {
 					Id linkId = link.getId();
 					aSpeeds = new HashMap<Id, Double>();
 					aSpeeds.put(linkId, clas.getAvgSpeed(linkId,
-							(double) i * 3600.0));
+							i * 3600.0));
 					speeds.add(i, aSpeeds);
 				}
 		}

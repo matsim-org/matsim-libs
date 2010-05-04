@@ -33,6 +33,7 @@ import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -72,7 +73,7 @@ public class PrimaryLocationDrawing {
 	private final String zonesFilename;
 	private final String demandFilename;
 	private final String districts;
-	private QuadTree<LinkImpl> linksTree;
+	private QuadTree<Link> linksTree;
 
 	private int sumOpportunities;
 
@@ -95,8 +96,8 @@ public class PrimaryLocationDrawing {
 
 	public void init() {
 
-		this.linksTree = new QuadTree<LinkImpl>(646000,9800000,674000,9999000);
-		for (final LinkImpl link : this.network.getLinks().values()) {
+		this.linksTree = new QuadTree<Link>(646000,9800000,674000,9999000);
+		for (final Link link : this.network.getLinks().values()) {
 			this.linksTree.put(link.getCoord().getX(), link.getCoord().getY(), link);
 		}
 
@@ -121,14 +122,14 @@ public class PrimaryLocationDrawing {
 		final Envelope e = zone.getBounds();
 		final long inhabitants = (Long)zone.getAttribute(6);
 		this.inhabitants  += inhabitants;
-		Collection<LinkImpl> links = new ArrayList<LinkImpl>();
+		Collection<Link> links = new ArrayList<Link>();
 		this.linksTree.get(e.getMinX()-300, e.getMinY()-300,e.getMaxX()+300, e.getMaxY()+300,links);
 		if (links.size() == 0) {
 			log.warn("no link found!");
 		}
 
-		final ArrayList<LinkImpl> tmp = new ArrayList<LinkImpl>();
-		for (final LinkImpl link : links) {
+		final ArrayList<Link> tmp = new ArrayList<Link>();
+		for (final Link link : links) {
 			final Point point = this.geofac.createPoint(new Coordinate(link.getCoord().getX(),link.getCoord().getY()));
 			if (p.contains(point)) {
 				tmp.add(link);
@@ -136,7 +137,7 @@ public class PrimaryLocationDrawing {
 		}
 
 		if (tmp.size() == 0) {
-			for (final LinkImpl link : links) {
+			for (final Link link : links) {
 				LineString ls = this.geofac.createLineString(new Coordinate[] {new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY()),
 						new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY())});
 
@@ -148,7 +149,7 @@ public class PrimaryLocationDrawing {
 		}
 
 		if (tmp.size() == 0) {
-			for (final LinkImpl link : links) {
+			for (final Link link : links) {
 				tmp.add(link);
 			}
 		}
@@ -163,7 +164,7 @@ public class PrimaryLocationDrawing {
 		links = tmp;
 		final double overalllength = getOALength(links);
 		int all = 0;
-		for (final LinkImpl link : links) {
+		for (final Link link : links) {
 			final double fraction = link.getLength() / overalllength;
 			final int li = (int) Math.round(inhabitants * fraction);
 			all += li;
@@ -185,9 +186,9 @@ public class PrimaryLocationDrawing {
 		return ret;
 	}
 
-	private double getOALength(final Collection<LinkImpl> links) {
+	private double getOALength(final Collection<Link> links) {
 		double l = 0;
-		for (final LinkImpl link : links) {
+		for (final Link link : links) {
 			l += link.getLength();
 		}
 		return l;

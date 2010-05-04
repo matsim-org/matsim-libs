@@ -21,6 +21,7 @@
 package playground.balmermi.modules;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
@@ -47,7 +48,7 @@ public class NetworkShiftFreespeed {
 
 	public void run(NetworkLayer network) {
 		log.info("running "+this.getClass().getName()+" module...");
-		for (LinkImpl l : network.getLinks().values()) {
+		for (Link l : network.getLinks().values()) {
 			double fs = l.getFreespeed();
 			// set standard speeds
 			if (fs < 10/3.6) { l.setFreespeed(5/3.6); }
@@ -60,7 +61,7 @@ public class NetworkShiftFreespeed {
 
 			// reduce standard speeds by 10km/h except Major highways
 			fs = l.getFreespeed();
-			if ((!l.getType().equals("0-4110-0")) && (fs > 20/3.6)) { l.setFreespeed(fs-(10/3.6)); }
+			if ((!((LinkImpl) l).getType().equals("0-4110-0")) && (fs > 20/3.6)) { l.setFreespeed(fs-(10/3.6)); }
 		}
 		log.info("done. ("+this.getClass().getName()+")");
 	}

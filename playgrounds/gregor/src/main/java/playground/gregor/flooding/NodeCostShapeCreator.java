@@ -35,15 +35,13 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData.LinkInfo;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -92,7 +90,7 @@ public class NodeCostShapeCreator {
 		this.pointFeatures = new ArrayList<Feature>();
 		for (Entry<Id, LinkInfo> e : this.links.entrySet()) {
 			Id id = e.getKey();
-			LinkImpl l = this.network.getLinks().get(id);
+			Link l = this.network.getLinks().get(id);
 			Coordinate[] coords = {
 					MGC.coord2Coordinate(l.getFromNode().getCoord()),
 					MGC.coord2Coordinate(l.getToNode().getCoord()) };

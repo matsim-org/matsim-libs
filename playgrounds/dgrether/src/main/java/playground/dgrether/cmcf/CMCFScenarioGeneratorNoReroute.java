@@ -23,12 +23,12 @@ package playground.dgrether.cmcf;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -175,8 +175,8 @@ public class CMCFScenarioGeneratorNoReroute {
 		this.plans = new ScenarioImpl().getPopulation();
 		int firstHomeEndTime = 0;// 6 * 3600;
 		int homeEndTime = firstHomeEndTime;
-		LinkImpl l1 = this.network.getLinks().get(IdFactory.get(1));
-		LinkImpl l6 = this.network.getLinks().get(IdFactory.get(6));
+		Link l1 = this.network.getLinks().get(IdFactory.get(1));
+		Link l6 = this.network.getLinks().get(IdFactory.get(6));
 
 		for (int i = 1; i <= 7200; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));

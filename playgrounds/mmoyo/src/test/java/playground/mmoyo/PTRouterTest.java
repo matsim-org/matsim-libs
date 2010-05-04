@@ -7,12 +7,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -59,7 +59,7 @@ public class PTRouterTest extends MatsimTestCase {
 		/**Tests transfer times*/
 		//	System.out.println("links size of logicNet: " + logicNet.getLinks().size());
 
-		LinkImpl transferLink = logicNet.getLinks().get(new IdImpl("0"));  //checck this actually the purpose is to test the transfers								 // first departure: 09:00 ,  last departure is at 19:00
+		Link transferLink = logicNet.getLinks().get(new IdImpl("0"));  //checck this actually the purpose is to test the transfers								 // first departure: 09:00 ,  last departure is at 19:00
 
 		/*
 		System.out.println("Printing network links");

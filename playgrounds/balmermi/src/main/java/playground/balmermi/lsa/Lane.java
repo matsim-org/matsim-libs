@@ -23,8 +23,8 @@ package playground.balmermi.lsa;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 
 public class Lane implements Comparable<Lane> {
 
@@ -36,7 +36,7 @@ public class Lane implements Comparable<Lane> {
 	protected final Integer nr;
 	protected final HashMap<Integer,Lane> tolanes = new HashMap<Integer, Lane>();
 	protected final HashMap<Integer,LSA> lsas = new HashMap<Integer, LSA>();
-	protected final HashMap<Id,LinkImpl> links = new HashMap<Id, LinkImpl>();
+	protected final HashMap<Id,Link> links = new HashMap<Id, Link>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -61,7 +61,7 @@ public class Lane implements Comparable<Lane> {
 		this.lsas.put(lsa.nr,lsa);
 	}
 
-	public final void addLink(LinkImpl link) {
+	public final void addLink(Link link) {
 		if (this.links.containsKey(link.getId())) { Gbl.errorMsg("Intersection_id=" + this.intersection.id + ", lane_nr=" + this.nr + ": link_id=" + link.getId().toString() + " already exists!"); }
 		this.links.put(link.getId(),link);
 	}

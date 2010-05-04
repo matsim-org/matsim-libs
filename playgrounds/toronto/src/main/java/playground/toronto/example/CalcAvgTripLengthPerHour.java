@@ -24,13 +24,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
 /**
@@ -44,7 +44,7 @@ public class CalcAvgTripLengthPerHour implements AgentDepartureEventHandler, Age
 
 	private double[] travelDistanceSum = new double[NUM_OF_HOURS];
 	private int[] travelDistanceCnt = new int[NUM_OF_HOURS];
-	
+
 	private Map<Id, Double> travelStartPerAgent = new HashMap<Id, Double>(1000);
 	private Map<Id, Double> travelDistancePerAgent = new HashMap<Id, Double>(1000);
 
@@ -53,12 +53,12 @@ public class CalcAvgTripLengthPerHour implements AgentDepartureEventHandler, Age
 	public CalcAvgTripLengthPerHour(final NetworkLayer network) {
 		this.network = network;
 	}
-	
+
 	public void handleEvent(final AgentDepartureEvent event) {
 		this.travelStartPerAgent.put(event.getPersonId(), event.getTime());
 		this.travelDistancePerAgent.put(event.getPersonId(), 0.0);
 	}
-	
+
 	public void handleEvent(final AgentArrivalEvent event) {
 		Double distance = this.travelDistancePerAgent.remove(event.getPersonId());
 
@@ -72,7 +72,7 @@ public class CalcAvgTripLengthPerHour implements AgentDepartureEventHandler, Age
 
 	public void handleEvent(final LinkEnterEvent event) {
 		Double distance = this.travelDistancePerAgent.get(event.getPersonId());
-		LinkImpl link = this.network.getLinks().get(event.getLinkId());
+		Link link = this.network.getLinks().get(event.getLinkId());
 		distance = distance + link.getLength();
 		this.travelDistancePerAgent.put(event.getPersonId(), distance);
 	}

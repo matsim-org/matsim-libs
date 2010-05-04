@@ -44,7 +44,7 @@ public class NetworkWriterHandlerImplTLinks implements MatsimWriter {
 			BufferedWriter out = IOUtils.getBufferedWriter(filename);
 
 			startLinks(out);
-			for (LinkImpl l : this.network.getLinks().values()) {
+			for (Link l : this.network.getLinks().values()) {
 				writeLink(l, out);
 			}
 			out.close();

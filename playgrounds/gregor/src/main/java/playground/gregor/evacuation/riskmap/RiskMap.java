@@ -19,11 +19,11 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -44,10 +44,10 @@ import com.vividsolutions.jts.geom.Point;
 
 public class RiskMap {
 	private static final Logger log = Logger.getLogger(RiskMap.class);
-	
+
 	private static final double PI_HALF = Math.PI / 2.0;
 	private static final double TWO_PI = 2.0 * Math.PI;
-	
+
 	private List<FloodingReader> netcdfReaders = null;
 	private final ScenarioImpl scenarioData;
 	private HashMap<Id, Feature> streetMap;
@@ -62,15 +62,15 @@ public class RiskMap {
 	private FeatureType ftPoint;
 	private static final String network = "/net/ils/data/countries/id/padang/gis/network_v20080618/links_v20090728.shp";
 //	private static final String network = "/home/laemmel/arbeit/svn/shared-svn/studies/countries/id/padang/gis/network_v20080618/links_v20090728.shp";
-	
+
 	public RiskMap(ScenarioImpl scenario, String outfile, String outfile2, CoordinateReferenceSystem crs) {
 		this.scenarioData = scenario;
 		this.crs = crs;
 		this.outfile = outfile;
 		this.outfile2 = outfile2;
-		
+
 	}
-	
+
 	private void run() {
 		loadNetcdfReaders();
 		this.rc = new RiskCostFromFloodingData(this.scenarioData.getNetwork(), this.netcdfReaders, null, this.scenarioData.getConfig().evacuation().getBufferSize());
@@ -82,18 +82,18 @@ public class RiskMap {
 		initFeatures();
 		createRiskCostMap();
 		createRiskCostDirections();
-				
+
 	}
-	
+
 	private void createRiskCostDirections() {
 		FreespeedTravelTimeCost tt = new FreespeedTravelTimeCost(-6,0,0);
 		PluggableTravelCostCalculator tc = new PluggableTravelCostCalculator(tt);
 		tc.addTravelCost(this.rc);
     	LeastCostPathCalculator router = new Dijkstra(this.scenarioData.getNetwork(),tc,tt);
-    	Node saveNode = this.scenarioData.getNetwork().getNodes().get(new IdImpl("en2")); 
+    	Node saveNode = this.scenarioData.getNetwork().getNodes().get(new IdImpl("en2"));
 		List<Feature> fts = new ArrayList<Feature>();
 		log.info("directions!!");
-		for (LinkImpl l : this.scenarioData.getNetwork().getLinks().values()) {
+		for (Link l : this.scenarioData.getNetwork().getLinks().values()) {
 			if (l.getId().toString().contains("l")) {
 				continue;
 			}
@@ -118,14 +118,14 @@ public class RiskMap {
 					continue;
 				}
 				Point p = ft.getDefaultGeometry().getCentroid();
-				
+
 				try {
 					fts.add(this.ftPoint.create(new Object[]{p,angle,cost,l.getLength()}));
 				} catch (IllegalAttributeException e) {
 					e.printStackTrace();
 				}
 			}
-			
+
 		}
 		try {
 			log.info("going to save!!");
@@ -135,11 +135,11 @@ public class RiskMap {
 			e.printStackTrace();
 		}
 	}
-	
-	private double getAngle(LinkImpl l) {
+
+	private double getAngle(Link l) {
 		final double dx = -l.getFromNode().getCoord().getX()   + l.getToNode().getCoord().getX();
-		final double dy = -l.getFromNode().getCoord().getY()   + l.getToNode().getCoord().getY();		
-		
+		final double dy = -l.getFromNode().getCoord().getY()   + l.getToNode().getCoord().getY();
+
 
 		double theta = 0.0;
 		if (dx > 0) {
@@ -160,7 +160,7 @@ public class RiskMap {
 	}
 
 	private void createRiskCostMap() {
-		for (LinkImpl l : this.scenarioData.getNetwork().getLinks().values()) {
+		for (Link l : this.scenarioData.getNetwork().getLinks().values()) {
 			if (l.getId().toString().contains("l")) {
 				continue;
 			}
@@ -173,24 +173,24 @@ public class RiskMap {
 				continue;
 			}
 			IdImpl id2 = new IdImpl(id + 100000);
-			LinkImpl l2 = this.scenarioData.getNetwork().getLinks().get(id2);
+			Link l2 = this.scenarioData.getNetwork().getLinks().get(id2);
 			double rc1 = this.rc.getLinkTravelCost(l, Time.UNDEFINED_TIME);
 			double rc2 = this.rc.getLinkTravelCost(l2, Time.UNDEFINED_TIME);
-			
+
 			try {
 				this.features.add(this.ftRunCompare.create(new Object [] {ft.getDefaultGeometry(),Math.max(rc1, rc2)/l.getLength()}));
 			} catch (IllegalAttributeException e) {
 				e.printStackTrace();
 			}
-			
-			
+
+
 		}
 		try {
 			ShapeFileWriter.writeGeometries(this.features, this.outfile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	private void initFeatures() {
@@ -198,7 +198,7 @@ public class RiskMap {
 
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon",MultiPolygon.class, true, null, null, this.crs);
 		AttributeType risk = AttributeTypeFactory.newAttributeType("risk", Double.class);
-		
+
 		AttributeType geom2 = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, this.crs);
 		AttributeType angle = AttributeTypeFactory.newAttributeType("angle", Double.class);
 		AttributeType nodeDiff = AttributeTypeFactory.newAttributeType("nodeDiff", Double.class);
@@ -210,8 +210,8 @@ public class RiskMap {
 		} catch (SchemaException e) {
 			e.printStackTrace();
 		}
-		
-		
+
+
 		try {
 			this.ftRunCompare = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, risk}, "links");
 		} catch (FactoryRegistryException e) {
@@ -220,9 +220,9 @@ public class RiskMap {
 			e.printStackTrace();
 		}
 
-		
+
 	}
-	
+
 	private void buildStreetMap() throws IOException {
 		this.streetMap = new HashMap<Id,Feature>();
 		FeatureSource fts = ShapeFileReader.readDataFile(network);
@@ -237,8 +237,8 @@ public class RiskMap {
 			this.streetMap.put(id, ft);
 		}
 	}
-	
-	
+
+
 	private void loadNetcdfReaders() {
 		if (this.netcdfReaders != null) {
 			return;
@@ -263,27 +263,27 @@ public class RiskMap {
 	}
 
 	public static void main(String [] args) {
-		
+
 		String config = "./output/output_config.xml.gz";
 		String network = "./output/output_network.xml.gz";
 //		String config = "/home/laemmel/devel/inputs/configs/shapeFileEvac.xml";
 //		String network = "/home/laemmel/arbeit/svn/runs-svn/run1014/output/output_network.xml.gz";
 		String outfile = "./link_risk_costs.shp";
 		String outfile2 = "./link_risk_arrows.shp";
-		
-		
 
-		
+
+
+
 		ScenarioImpl scenario = new ScenarioImpl();
 		Config conf = scenario.getConfig();
 		new MatsimConfigReader(conf).readFile(config);
 		new MatsimNetworkReader(scenario).readFile(network);
 
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
-		
+
 		new RiskMap(scenario,outfile,outfile2,crs).run();
 	}
 
 
-	
+
 }

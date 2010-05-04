@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -41,6 +42,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.world.Layer;
+import org.matsim.world.LayerImpl;
 import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
@@ -103,9 +105,9 @@ public class WorldConnectLocations {
 	private final NetworkLayer extractSubNetwork(final NetworkLayer network) {
 		log.info("  extracting sub network...");
 		// get all links from the network with specified link types
-		ArrayList<LinkImpl> remainingLinks = new ArrayList<LinkImpl>();
-		for (LinkImpl l : network.getLinks().values()) {
-			if (!this.excludingLinkTypes.contains(l.getType())) { remainingLinks.add(l); }
+		ArrayList<Link> remainingLinks = new ArrayList<Link>();
+		for (Link l : network.getLinks().values()) {
+			if (!this.excludingLinkTypes.contains(((LayerImpl) l).getType())) { remainingLinks.add(l); }
 		}
 		if (remainingLinks.isEmpty()) {
 			StringBuffer str = new StringBuffer();
@@ -115,7 +117,7 @@ public class WorldConnectLocations {
 		}
 		NetworkLayer subNetwork = new NetworkLayer();
 		// add nodes and links to the subNetwork
-		for (LinkImpl l : remainingLinks) {
+		for (Link l : remainingLinks) {
 			Node fn = l.getFromNode();
 			Node nfn = subNetwork.getNodes().get(fn.getId());
 			if (nfn == null) { nfn = subNetwork.createAndAddNode(fn.getId(),fn.getCoord()); }
@@ -147,7 +149,7 @@ public class WorldConnectLocations {
 				Id fid = new IdImpl(entries[0].trim());
 				Id lid = new IdImpl(entries[1].trim());
 				ActivityFacilityImpl f = facilities.getFacilities().get(fid);
-				MappedLocation l = network.getLinks().get(lid);
+				MappedLocation l = (LinkImpl) network.getLinks().get(lid);
 				if ((f != null) && (l != null)) {
 					// add the nearest right entry link mapping to the facility f
 					// note: network could be a temporal copy of the one in the world. Therefore, get the original one.
@@ -302,7 +304,8 @@ public class WorldConnectLocations {
 	 */
 	private final void connect(ZoneLayer zones, NetworkLayer network, World world) {
 		log.info("  connecting zones with links...");
-		for (LinkImpl l : network.getLinks().values()) {
+		for (Link l2 : network.getLinks().values()) {
+			LinkImpl l = (LinkImpl) l2;
 			// remove previous mappings for link l
 			if (!l.removeAllUpMappings()) { throw new RuntimeException("could not remove old zone<-->link mappings");  }
 			// add the zone mapping to link l

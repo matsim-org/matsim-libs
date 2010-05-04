@@ -9,6 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -147,14 +148,14 @@ public class CMCFNetworkWriter {
 		while(tabs-- > 0)
 			tab += '\t';
 		log(tab+"<edges>", out);
-		for (LinkImpl l: this.netLayer.getLinks().values()){
+		for (Link l: this.netLayer.getLinks().values()){
 			log(tab+"\t<edge id=\""+l.getId()+"\">\n", out);
 			log(tab+"\t\t<from>"+l.getFromNode().getId()+"</from>\n", out);
 			log(tab+"\t\t<to>"+l.getToNode().getId()+"</to>\n", out);
 			//now read link parameters
 			double 	length = l.getLength(),
 					capacity = length/7.5 * l.getNumberOfLanes(),
-					alpha = l.getFreespeedTravelTime(),
+					alpha = ((LinkImpl) l).getFreespeedTravelTime(),
 					beta = 2.0,
 					gamma = capacity + 1;
 			//and write them

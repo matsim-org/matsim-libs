@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -224,8 +225,8 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 		LinkInfo ret = this.linkInfos.get(id);
 		if (ret == null) {
 			ret = new LinkInfo();
-			ret.t_free = Math.ceil(this.network.getLinks().get(new IdImpl(id)).getFreespeedTravelTime()); //TODO make this dynamic, since we have time variant networks
-			LinkImpl link = this.network.getLinks().get(new IdImpl(id));
+			ret.t_free = Math.ceil(((LinkImpl) this.network.getLinks().get(new IdImpl(id))).getFreespeedTravelTime()); //TODO make this dynamic, since we have time variant networks
+			Link link = this.network.getLinks().get(new IdImpl(id));
 			ret.storageCap = calcCapacity(link);
 			ret.id = id;
 			this.linkInfos.put(id, ret);
@@ -244,7 +245,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 	}
 
 
-	private int calcCapacity(final LinkImpl link) {
+	private int calcCapacity(final Link link) {
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 

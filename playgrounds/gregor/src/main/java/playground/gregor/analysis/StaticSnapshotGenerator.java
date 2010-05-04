@@ -38,13 +38,13 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -62,46 +62,46 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class StaticSnapshotGenerator implements LinkEnterEventHandler {
-	
+
 	private static final String CVSROOT = "../vsp-cvs";
 	private final static Logger log = Logger.getLogger(StaticSnapshotGenerator.class);
 	private final static double SNAPSHOT_PERIOD = 15 * 60;
-	
+
 	private final static double MAX_X = 657313;
 	private final static double MAX_Y = 9901062;
 	private final static double MIN_X = 650623;
 	private final static double MIN_Y = 9892835;
-	
-	
+
+
 	private final NetworkLayer network;
 	private final String eventsFile;
 	private double oldTime = 3 * 3600;
-	
-	private final HashMap<String,LinkImpl> agentsOnLink = new HashMap<String, LinkImpl>();
+
+	private final HashMap<String,Link> agentsOnLink = new HashMap<String, Link>();
 	private final String shapeFilePrefix;
 	private final GeometryFactory geofac;
 	private final CoordinateReferenceSystem targetCRS;
 	private FeatureType ft;
 	private final Concaver concaver;
-	
+
 	public StaticSnapshotGenerator(final NetworkLayer network, final String inputFile, final String shapeFilePrefix, final CoordinateReferenceSystem targetCRS) {
 		this.network = network;
 		this.eventsFile = inputFile;
 		this.shapeFilePrefix = shapeFilePrefix;
 		this.geofac = new GeometryFactory();
 		this.targetCRS = targetCRS;
-		
+
 		this.concaver = new Concaver();
 		initFeatureCollection();
 	}
 
-	
+
 	private void initFeatureCollection() {
 
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("Polygon",Polygon.class, true, null, null, this.targetCRS);
 		AttributeType dblTime = AttributeTypeFactory.newAttributeType("dblTime", Double.class);
 		AttributeType strgTime = AttributeTypeFactory.newAttributeType("strgTime", String.class);
-		
+
 		Exception ex;
 		try {
 			this.ft = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, dblTime, strgTime}, "EvacZone");
@@ -120,8 +120,8 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 		events.addHandler(this);
 		new EventsReaderTXTv1(events).readFile(this.eventsFile);
 	}
-	
-	
+
+
 
 
 	public void handleEvent(final LinkEnterEvent event) {
@@ -131,15 +131,15 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 			doSnapshot();
 		}
 		String agentId = event.getPersonId().toString();
-		LinkImpl link = this.network.getLinks().get(new IdImpl(event.getLinkId().toString()));
+		Link link = this.network.getLinks().get(new IdImpl(event.getLinkId().toString()));
 		this.agentsOnLink.put(agentId, link);
-		
+
 	}
 
 
 	private void doSnapshot() {
 		Collection<Feature> ft = new ArrayList<Feature>();
-		
+
 		String time = Time.writeTime(this.oldTime,'-');
 		String fileName = this.shapeFilePrefix + time + ".shp";
 		MultiPoint mp = getMultiPoint();
@@ -158,15 +158,15 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 
 
 	private MultiPoint getMultiPoint() {
-		HashSet<LinkImpl> links = new HashSet<LinkImpl>();
-		for (LinkImpl link : this.agentsOnLink.values()) {
+		HashSet<Link> links = new HashSet<Link>();
+		for (Link link : this.agentsOnLink.values()) {
 			if (isInBoundingBox(link.getCoord())) {
 				links.add(link);
 			}
 		}
 		Point [] points = new Point[links.size()];
 		int c = 0;
-		for (LinkImpl link : links) {
+		for (Link link : links) {
 			points[c++] = MGC.coord2Point(link.getCoord());
 		}
 
@@ -175,36 +175,36 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 
 
 	public void reset(final int iteration) {
-		
+
 	}
-	
+
 	public boolean isInBoundingBox(final Coord c) {
 		if (c.getX() < MIN_X || c.getX() > MAX_X) {
 			return false;
 		}
-		
+
 		if (c.getY() < MIN_Y || c.getY() > MAX_Y) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	public static void main(final String [] args) {
-		
+
 		if (args.length != 1) {
 			throw new RuntimeException("Error using StaticSnapshotGenerator!\n\tUsage:StaticSnapshotGenerator /path/to/configFile");
 		}
 		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).getScenario();
 		Config config = scenario.getConfig();
-		
+
 		final String shapeFilePrefix =  CVSROOT + "/runs/run314/qgis/evacProgress";
-		
+
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		
+
 		final CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
-		
+
 		new StaticSnapshotGenerator(network,config.events().getInputFile(),shapeFilePrefix,targetCRS).run();
 	}
 }

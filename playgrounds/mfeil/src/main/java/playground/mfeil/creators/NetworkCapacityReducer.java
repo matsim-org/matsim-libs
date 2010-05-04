@@ -24,7 +24,7 @@ package playground.mfeil.creators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -44,7 +44,7 @@ public class NetworkCapacityReducer {
 	}
 
 	private void run (double factor, double absoluteDelta, String output){
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 	//		link.setFreespeed(link.getFreespeed(0)*factor);
 			if (link.getFreespeed()+absoluteDelta>0) link.setFreespeed(link.getFreespeed()+absoluteDelta);
 			else {

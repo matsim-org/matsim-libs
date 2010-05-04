@@ -26,7 +26,6 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.dressler.Interval.Interval;
@@ -53,11 +52,11 @@ public class FlowCalculationSettings {
 	public int searchAlgo = SEARCHALGO_FORWARD;
 	public boolean useVertexCleanup = false;
 	public boolean useImplicitVertexCleanup = true; // unite vertex intervals before propagating?
-	public boolean useShadowFlow = false; // use arrays and shadow flows for storing the edge flow 
+	public boolean useShadowFlow = false; // use arrays and shadow flows for storing the edge flow
 	public int checkConsistency = 0; // after how many iterations should consistency be checked? 0 = off
 	public boolean checkTouchedNodes = true; // should Flow.UnfoldAndAugment() try to shortcut the search for suitable forward steps?
     public int doGarbageCollection = 0; // after how many iterations should the GC be called? 0 = off
-	
+
 	public boolean sortPathsBeforeAugmenting = true; // try to augment shorter (#steps) first?
 	public boolean keepPaths = true; // should TEPs be stored at all?
 	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
@@ -286,7 +285,7 @@ public class FlowCalculationSettings {
 		System.out.println("Sinks have finite capacity: " + this.useSinkCapacities);
 
 		System.out.println("Track unreachable vertices: " + this.trackUnreachableVertices);
-		System.out.println("Use vertex cleanup: " + this.useVertexCleanup);		
+		System.out.println("Use vertex cleanup: " + this.useVertexCleanup);
 		System.out.println("Use implicit vertex cleanup: " + this.useImplicitVertexCleanup);
 		System.out.println("Use Shadow Flow: " + this.useShadowFlow);
 		System.out.println("Use repeated paths: " + this.useRepeatedPaths);
@@ -411,7 +410,7 @@ public class FlowCalculationSettings {
         }
 
         System.out.println("% E from to capacity length");
-        for (LinkImpl link : this._network.getLinks().values()) {
+        for (Link link : this._network.getLinks().values()) {
         	System.out.println("E " + (newNodeNames.get(link.getFromNode())) + " " + (newNodeNames.get(link.getToNode())) + " " + getCapacity(link) + " " + getLength(link));
 
         }
@@ -638,7 +637,7 @@ public class FlowCalculationSettings {
 
         //System.out.println("% E from to capacity length");
         System.out.println("Bounds");
-        for (LinkImpl link : this._network.getLinks().values()) {
+        for (Link link : this._network.getLinks().values()) {
         	for (int t = 0; t < this.TimeHorizon; t++) {
         		String tmp = NameEdge(link, t, newNodeNames);
         		if (tmp != null)
@@ -815,7 +814,7 @@ public class FlowCalculationSettings {
 
         System.out.println("BOUNDS");
 
-        for (LinkImpl link : this._network.getLinks().values()) {
+        for (Link link : this._network.getLinks().values()) {
         	for (int t = 0; t < this.TimeHorizon; t++) {
         		String tmp = NameEdge(link, t, newNodeNames);
         		if (tmp != null)
@@ -850,22 +849,22 @@ public class FlowCalculationSettings {
 
         System.out.println("ENDNETWORK");
 	}
-	
+
 	/**
 	 * Writes a single-sink EAF problem as .lod network file for LODYFA EAF to standard out
 	 * This might be a big file.
 	 * The network looks like this:
 	 * supersource s* -> source s with capacity == demand but only at t = 0
 	 * source s has links with travel time 0 to the real node and infinite holdover
-	 * No holdover anywhere else.  
-	 * The sink nodes have travel time 0 directly to the supersink and there is no intermediate node. 
+	 * No holdover anywhere else.
+	 * The sink nodes have travel time 0 directly to the supersink and there is no intermediate node.
 	 */
-	public void writeLodyfa() {		
+	public void writeLodyfa() {
 		HashMap<Node,Integer> newNodeNames = new HashMap<Node,Integer>();
-		
+
 		// - 1 seems to be what Lodyfa does ...T = 10 gives 11 time steps there
 		System.out.println(this.TimeHorizon - 1);
-		
+
 		// the supersource has to be 0, the supersink n - 1
 		// We give up on keeping names here.
         int nnodes = this._network.getNodes().size();
@@ -874,17 +873,17 @@ public class FlowCalculationSettings {
         // even if there is just one source.
         // We need additional source nodes, as well.
         nnodes += this._numsources + 1;
-        
+
         // do we need a supersink?
         if (this._numsinks > 1) {
         	nnodes++;
         }
-        
+
         System.out.println(nnodes);
 
         // skip the supersource
         int currentnode = 1;
-        
+
         for (Node node : this._network.getNodes().values()) {
         	Integer d = this._demands.get(node);
         	if (this._numsinks == 1 && d != null && d < 0) {
@@ -897,41 +896,41 @@ public class FlowCalculationSettings {
         }
 
         int narcs = this._network.getLinks().size();
-        
+
         // two more for each source
         narcs += 2 * this._numsources;
 
     	// and 1 more for each sink, if we need a supersink
-        if (this._numsinks > 1) { 
+        if (this._numsinks > 1) {
         	narcs += this._numsinks;
         }
-        
+
         System.out.println(narcs);
-        
+
         // the time-expanded arcs
         for (Link link : this._network.getLinks().values()) {
         	StringBuilder S = new StringBuilder();
         	S.append(newNodeNames.get(link.getFromNode()));
         	S.append("\t");
-        	S.append(newNodeNames.get(link.getToNode()));        	
+        	S.append(newNodeNames.get(link.getToNode()));
         	S.append("\t");
-        	
+
         	int l = getLength(link);
         	int c = getCapacity(link);
-        	
+
         	String constant = l + "\t" + c + "\t";
-        	
+
         	for (int t = 0; t < this.TimeHorizon; t++) {
         		S.append(constant);
         	}
     		System.out.println(S);
         }
-        
-        
+
+
         int sourcesstartat = currentnode;
-        
+
         // the arcs from and to the virtual sources
-        // and to the supersink        
+        // and to the supersink
         for (Node node : this._network.getNodes().values()) {
         	int d = 0;
         	if (this._demands.containsKey(node)) {
@@ -940,10 +939,10 @@ public class FlowCalculationSettings {
         	if (d == 0)
         		continue;
 
-        	        
+
         	if (d < 0) {
         		// sinks
-        		
+
         		// nothing to do if there is no supersink
         		if (this._numsinks == 1) continue;
 
@@ -952,9 +951,9 @@ public class FlowCalculationSettings {
             	sb.append("\t");
             	sb.append(nnodes - 1); // the supersink
             	sb.append("\t");
-            	
-            	String constant = "0\t654321\t"; // hopefully enough capacity ...           
-        		
+
+            	String constant = "0\t654321\t"; // hopefully enough capacity ...
+
         		for (int t = 0; t < this.TimeHorizon; t++) {
         			sb.append(constant);
         		}
@@ -965,42 +964,42 @@ public class FlowCalculationSettings {
         		// the link from the supersource
         		sb.append("0\t");
         		sb.append(currentnode); // to the virtual source
-        		
+
         		sb.append("\t0\t");
         		sb.append(d);
         		sb.append("\t");
-        		
+
         		String constant = "0\t0\t"; // link disappears
-        		
+
         		// NB: start is t = 1
         		for (int t = 1; t < this.TimeHorizon; t++) {
         			sb.append(constant);
         		}
-        		
+
         		System.out.println(sb);
-        		
+
         		sb = new StringBuilder();
         		sb.append(currentnode);
         		sb.append("\t");
-        		sb.append(newNodeNames.get(node));    
+        		sb.append(newNodeNames.get(node));
         		sb.append("\t");
-        		
-        		constant = "0\t654321\t"; // hopefully enough capacity ...        		
-        		
+
+        		constant = "0\t654321\t"; // hopefully enough capacity ...
+
         		for (int t = 0; t < this.TimeHorizon; t++) {
         			sb.append(constant);
         		}
 
         		System.out.println(sb);
-        		
+
         		// we created a node
         		currentnode++;
         	}
         }
-        
+
         // create holdover ... only at the virtual sources
         // NB: node 0 and node n - 1 must be omitted!
-        
+
         for (int i = 1; i < sourcesstartat; i++) {
         	StringBuilder sb = new StringBuilder();
         	String constant = "0\t0\t";
@@ -1009,15 +1008,15 @@ public class FlowCalculationSettings {
     		}
         	System.out.println(sb);
         }
-        
+
         for (int i = sourcesstartat; i < nnodes - 1; i++) {
         	StringBuilder sb = new StringBuilder();
-        	String constant = "654321\t654321\t";        	
+        	String constant = "654321\t654321\t";
         	for (int t = 0; t < this.TimeHorizon; t++) {
     			sb.append(constant);
     		}
         	System.out.println(sb);
         }
-        
+
 	}
 }

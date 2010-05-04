@@ -35,7 +35,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -111,7 +110,7 @@ public class DilutedZurichFilter {
 		log.info("    => area of interest (aoi): center=" + center + "; radius=" + radius);
 
 		log.info("    extracting links of the aoi... " + (new Date()));
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {

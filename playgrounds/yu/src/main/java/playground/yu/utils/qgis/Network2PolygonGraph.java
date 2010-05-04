@@ -50,7 +50,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  */
 public class Network2PolygonGraph extends X2GraphImpl {
-	protected Set<LinkImpl> links2paint = null;
+	protected Set<Link> links2paint = null;
 
 	/**
 	 * @param network
@@ -74,8 +74,6 @@ public class Network2PolygonGraph extends X2GraphImpl {
 				Double.class);
 		AttributeType cap = AttributeTypeFactory.newAttributeType("capacity",
 				Double.class);
-		AttributeType type = AttributeTypeFactory.newAttributeType("type",
-				Integer.class);
 		AttributeType freespeed = AttributeTypeFactory.newAttributeType(
 				"freespeed", Double.class);
 		AttributeType transMode = AttributeTypeFactory.newAttributeType(
@@ -83,7 +81,7 @@ public class Network2PolygonGraph extends X2GraphImpl {
 		defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
 		defaultFeatureTypeFactory.setName("link");
 		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id,
-				fromNode, toNode, length, cap, type, freespeed, transMode });
+				fromNode, toNode, length, cap, freespeed, transMode });
 	}
 
 	@Override
@@ -124,7 +122,7 @@ public class Network2PolygonGraph extends X2GraphImpl {
 		return features;
 	}
 
-	public void setLinks2paint(Set<LinkImpl> links2paint) {
+	public void setLinks2paint(Set<Link> links2paint) {
 		this.links2paint = links2paint;
 	}
 }

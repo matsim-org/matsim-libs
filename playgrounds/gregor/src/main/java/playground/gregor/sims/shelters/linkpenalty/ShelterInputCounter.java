@@ -13,7 +13,6 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.evacuation.base.Building;
 import org.matsim.signalsystems.control.SignalSystemController;
@@ -25,12 +24,12 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 	private final HashMap<Id,Counter> counts = new HashMap<Id, Counter>();
 	private final HashMap<Id, Building> shelterLinkMapping;
 	private final HashMap<Id,LinkInfo> linkInfos = new HashMap<Id, LinkInfo>();
-	
+
 	public ShelterInputCounter(NetworkLayer network, HashMap<Id,Building> shelterLinkMapping) {
-		
+
 		this.shelterLinkMapping = shelterLinkMapping;
-		
-		for (LinkImpl link : network.getLinks().values()) {
+
+		for (Link link : network.getLinks().values()) {
 			if (link.getId().toString().contains("sl") && link.getId().toString().contains("a")) {
 				this.counts.put(link.getId(), new Counter());
 			}
@@ -38,7 +37,7 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		Counter c = this.counts.get(event.getLinkId()); 
+		Counter c = this.counts.get(event.getLinkId());
 		if (c != null) {
 			c.count++;
 			Building b = this.shelterLinkMapping.get(event.getLinkId());
@@ -53,15 +52,15 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 					this.linkInfos.put(event.getLinkId(), li);
 					li.penalties.put(0.0, new LinkPenalty());
 				}
-				
+
 				LinkPenalty p = new LinkPenalty();
 				li.penalties.put(event.getTime(), p);
 				p.penalty = 12*3600;
-				
+
 			}
 		}
 	}
-	
+
 
 	public void reset(int iteration) {
 		int c = 0;
@@ -95,7 +94,7 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		this.linkInfos.clear();
-		
+
 	}
 
 	public double getLinkPenalty(Link link, double time) {
@@ -107,7 +106,7 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 		return e.getValue().penalty;
 	}
 	private static class LinkInfo {
-		TreeMap<Double,LinkPenalty> penalties = new TreeMap<Double, LinkPenalty>(); 
+		TreeMap<Double,LinkPenalty> penalties = new TreeMap<Double, LinkPenalty>();
 	}
 
 	private static class LinkPenalty {

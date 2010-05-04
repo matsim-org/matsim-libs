@@ -12,7 +12,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigReaderMatsimV1;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.evacuation.flooding.FloodingReader;
@@ -93,7 +92,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// fromNodeCost < toNodeCost
 		// linkLength = 15.5646142300945
 		// linkCost = toNodeCost * linkLength / 100 = 124.44247096468449
-		LinkImpl l1 = sc.getNetwork().getLinks().get(new IdImpl("9204"));
+		Link l1 = sc.getNetwork().getLinks().get(new IdImpl("9204"));
 		double l1Cost = rcf.getLinkTravelCost(l1,Time.UNDEFINED_TIME);
 		assertEquals(124.44247096468449,l1Cost,delta);
 
@@ -103,7 +102,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// fromNodeDist = 212.985
 		// ffromNodeCost = 3 * 3600 / 2 * (1 -(223.125 /250)) --> ca. 799.5
 		// toNodeCost < fromNodeCost --> linkCost = 0
-		LinkImpl l1Inverse = sc.getNetwork().getLinks().get(new IdImpl("109204"));
+		Link l1Inverse = sc.getNetwork().getLinks().get(new IdImpl("109204"));
 		double l1InverseCost = rcf.getLinkTravelCost(l1Inverse,Time.UNDEFINED_TIME);
 		assertEquals(0,l1InverseCost,delta);
 
@@ -114,12 +113,12 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		// fromNode = null
 		// linkLength = 85.7201419982439
 		// linkCost = toNodeCost * linkLength / 100 = 497.60526643476226
-		LinkImpl l2 = sc.getNetwork().getLinks().get(new IdImpl("6798"));
+		Link l2 = sc.getNetwork().getLinks().get(new IdImpl("6798"));
 		double l2Cost = rcf.getLinkTravelCost(l2,Time.UNDEFINED_TIME);
 		assertEquals(497.60526643476226,l2Cost,delta);
 
 		//Link 106798 cost = 0. (opposite direction)
-		LinkImpl l2Inverse = sc.getNetwork().getLinks().get(new IdImpl("106798"));
+		Link l2Inverse = sc.getNetwork().getLinks().get(new IdImpl("106798"));
 		double l2InverseCost = rcf.getLinkTravelCost(l2Inverse,Time.UNDEFINED_TIME);
 		assertEquals(0,l2InverseCost,delta);
 

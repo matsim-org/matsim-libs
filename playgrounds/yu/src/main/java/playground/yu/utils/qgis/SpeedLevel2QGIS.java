@@ -43,9 +43,9 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -94,7 +94,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
 			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 			for (Id linkId : linkIds) {
-				LinkImpl link = network.getLinks().get(linkId);
+				Link link = network.getLinks().get(linkId);
 				LinearRing lr = getLinearRing(link);
 				Polygon p = new Polygon(lr, null, this.geofac);
 				MultiPolygon mp = new MultiPolygon(new Polygon[] { p },

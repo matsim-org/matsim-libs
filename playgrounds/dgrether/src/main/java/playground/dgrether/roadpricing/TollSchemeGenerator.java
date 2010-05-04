@@ -45,7 +45,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -267,7 +266,7 @@ public class TollSchemeGenerator {
 
 	private RoadPricingScheme createRoadPricingScheme(NetworkLayer tollNetwork) {
 		RoadPricingScheme scheme = new RoadPricingScheme();
-		for (LinkImpl l : tollNetwork.getLinks().values()) {
+		for (Link l : tollNetwork.getLinks().values()) {
 			scheme.addLink(l.getId());
 		}
 		scheme.addCost(this.usedStart, this.usedStop, this.usedAmount);
@@ -381,7 +380,7 @@ public class TollSchemeGenerator {
 		LinearRing shell = new LinearRing(coordsequence, geofac);
 		Polygon ppp = new Polygon(shell, new LinearRing[] {}, geofac);
 
-		for (LinkImpl l : net.getLinks().values()) {
+		for (Link l : net.getLinks().values()) {
 			Coordinate fromCord = MGC.coord2Coordinate(l.getFromNode().getCoord());
 			Coordinate toCord = MGC.coord2Coordinate(l.getToNode().getCoord());
 

@@ -26,6 +26,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -35,7 +36,6 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -63,9 +63,9 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
 
 		NetworkLayer network = createNetwork(scenario);
-		LinkImpl link1 = network.getLinks().get(new IdImpl("1"));
-		LinkImpl link2 = network.getLinks().get(new IdImpl("2"));
-		LinkImpl link3 = network.getLinks().get(new IdImpl("3"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link2 = network.getLinks().get(new IdImpl("2"));
+		Link link3 = network.getLinks().get(new IdImpl("3"));
 
 		// add a freespeed change to 20 at 8am.
 		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
@@ -105,9 +105,9 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
 
 		NetworkLayer network = createNetwork(scenario);
-		LinkImpl link1 = network.getLinks().get(new IdImpl("1"));
-		LinkImpl link2 = network.getLinks().get(new IdImpl("2"));
-		LinkImpl link3 = network.getLinks().get(new IdImpl("3"));
+		Link link1 = network.getLinks().get(new IdImpl("1"));
+		Link link2 = network.getLinks().get(new IdImpl("2"));
+		Link link3 = network.getLinks().get(new IdImpl("3"));
 		/*
 		 * Create a network change event that reduces the capacity.
 		 */
@@ -194,7 +194,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * @return a list of persons where the ordering corresponds to the departure times.
 	 * @author illenberger
 	 */
-	private List<PersonImpl> createPersons(final double depTime, final LinkImpl depLink, final LinkImpl destLink, final NetworkLayer network,
+	private List<PersonImpl> createPersons(final double depTime, final Link depLink, final Link destLink, final NetworkLayer network,
 			final int count) {
 		double departureTime = depTime;
 		List<PersonImpl> persons = new ArrayList<PersonImpl>(count);

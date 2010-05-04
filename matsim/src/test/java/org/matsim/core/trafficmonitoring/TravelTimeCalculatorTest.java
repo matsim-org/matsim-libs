@@ -40,7 +40,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -62,36 +61,36 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int endTime = 30*3600;
 		int binSize = 15*60;
 		int numSlots = (endTime / binSize) + 1;
-		
-		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots), 
+
+		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
 				new OptimisticTravelTimeAggregator(numSlots, binSize), binSize, compareFile, false);
 	}
 
 	public final void testTravelTimeCalculator_HashMap_Optimistic() throws IOException {
 		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
 		ScenarioImpl scenario = new ScenarioImpl();
-		
+
 		int endTime = 30*3600;
 		int binSize = 15*60;
 		int numSlots = (endTime / binSize) + 1;
-		
-		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()), 
+
+		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
 				new OptimisticTravelTimeAggregator(numSlots, binSize), binSize, compareFile, false);
 	}
-	
+
 	public final void testTravelTimeCalculator_HashMap_Pessimistic() throws IOException {
 		String compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic.txt";
 		ScenarioImpl scenario = new ScenarioImpl();
-		
+
 		int endTime = 12*3600;
 		int binSize = 1*60;
 		int numSlots = (endTime / binSize) + 1;
-		
+
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
 				new PessimisticTravelTimeAggregator(binSize, numSlots), binSize, compareFile, false);
 	}
 
-	private final void doTravelTimeCalculatorTest(final ScenarioImpl scenario, final TravelTimeDataFactory ttDataFactory, 
+	private final void doTravelTimeCalculatorTest(final ScenarioImpl scenario, final TravelTimeDataFactory ttDataFactory,
 			final AbstractTravelTimeAggregator aggregator, final int timeBinSize,
 			final String compareFile, final boolean generateNewData) throws IOException {
 		String networkFile = getClassInputDirectory() + "link10_network.xml";
@@ -105,9 +104,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		events.addHandler(collector);
 		new MatsimEventsReader(events).readFile(eventsFile);
 		events.printEventsCount();
-		
+
 		EventsManagerImpl events2 = new EventsManagerImpl();
-		
+
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, scenario.getConfig().travelTimeCalculator());
 		ttcalc.setTravelTimeAggregator(aggregator);
 		ttcalc.setTravelTimeDataFactory(ttDataFactory);
@@ -115,7 +114,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		for (Event e : collector.getEvents()) {
 			events2.processEvent(e);
 		}
-		
+
 		// read comparison data
 		BufferedReader infile = new BufferedReader(new FileReader(compareFile));
 		String line;
@@ -133,7 +132,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		}
 
 		// prepare comparison
-		LinkImpl link10 = network.getLinks().get(new IdImpl("10"));
+		Link link10 = network.getLinks().get(new IdImpl("10"));
 
 		if (generateNewData) {
 			BufferedWriter outfile = null;
@@ -160,7 +159,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 			assertEquals(compareData[i], Double.toString(ttime));
 		}
 	}
-	
+
 	/**
 	 * @author mrieser
 	 */
@@ -177,13 +176,13 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
 
 		PersonImpl person = new PersonImpl(new IdImpl(1));
-		
+
 		// generate some events that suggest a really long travel time
 		double linkEnterTime1 = 7.0 * 3600 + 10;
 		double linkTravelTime1 = 50.0 * 60; // 50minutes!
 		double linkEnterTime2 = 7.75 * 3600 + 10;
 		double linkTravelTime2 = 10.0 * 60; // 10minutes!
-		
+
 		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime1, person.getId(), link1.getId()));
 		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime1 + linkTravelTime1, person.getId(), link1.getId()));
 		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2, person.getId(), link1.getId()));
@@ -196,15 +195,15 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		assertEquals(10     , ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 4*timeBinSize), EPSILON);  // freespeedTravelTime > linkTravelTime2 - 1*timeBinSize
 		assertEquals(10     , ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 5*timeBinSize), EPSILON);  // freespeedTravelTime > linkTravelTime2 - 2*timeBinSize
 	}
-	
+
 	/**
 	 * Tests that calculating LinkTravelTimes works also without reading in a complete scenario including population.
-	 * 
+	 *
 	 * @author mrieser
-	 * 
-	 * @throws IOException 
-	 * @throws ParserConfigurationException 
-	 * @throws SAXException 
+	 *
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
 	 */
 	public void testReadFromFile_LargeScenarioCase() throws SAXException, ParserConfigurationException, IOException {
 		/* Assume, you have a big events file from a huge scenario and you want to do data-mining...
@@ -216,21 +215,21 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		 */
 		String eventsFilename = getClassInputDirectory() + "link10_events.txt";
 		String networkFile = "test/scenarios/equil/network.xml";
-		
+
 		Scenario scenario = new ScenarioImpl();
 		Config config = scenario.getConfig();
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).parse(networkFile);
-		
+
 		EventsManagerImpl events = new EventsManagerImpl(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
-		
+
 		TravelTimeCalculator ttCalc = new TravelTimeCalculator(network, config.travelTimeCalculator());
 		events.addHandler(ttCalc);
-		
+
 		new MatsimEventsReader(events).readFile(eventsFilename);
-		
+
 		Link link10 = network.getLinks().get(new IdImpl("10"));
-		
+
 		assertEquals("wrong link travel time at 06:00.", 110.0, ttCalc.getLinkTravelTime(link10, 6.0 * 3600), EPSILON);
 		assertEquals("wrong link travel time at 06:15.", 359.9712023038157, ttCalc.getLinkTravelTime(link10, 6.25 * 3600), EPSILON);
 	}

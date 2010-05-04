@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -42,7 +43,6 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -121,7 +121,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 
 	public void reset(final int iteration) {
 		this.eventLinks.clear();
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			this.eventLinks.put(link.getId(), new EventLink(link, this.capCorrectionFactor, this.network.getEffectiveCellSize(), this.storageCapFactor));
 		}
 		this.eventAgents.clear();
@@ -205,7 +205,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	}
 
 	private static class EventLink {
-		private final LinkImpl link;
+		private final Link link;
 		protected final List<EventAgent> drivingQueue;
 		private final List<EventAgent> parkingQueue;
 		private final List<EventAgent> waitingQueue;
@@ -221,7 +221,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		private final double ratioLengthToEuklideanDist; // ratio of link.length / euklideanDist
 		private final double effectiveCellSize;
 
-		protected EventLink(final LinkImpl link2, final double capCorrectionFactor, final double effectiveCellSize, final double storageCapFactor) {
+		protected EventLink(final Link link2, final double capCorrectionFactor, final double effectiveCellSize, final double storageCapFactor) {
 			this.link = link2;
 			this.drivingQueue = new ArrayList<EventAgent>();
 			this.parkingQueue = new ArrayList<EventAgent>();

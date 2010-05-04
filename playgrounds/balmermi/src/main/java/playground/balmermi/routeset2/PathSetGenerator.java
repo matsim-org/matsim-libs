@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.AStarLandmarks;
@@ -193,7 +192,7 @@ public class PathSetGenerator {
 
 	private final void initStreetSegments() {
 		log.info("init street segments...");
-		for (LinkImpl l : network.getLinks().values()) {
+		for (Link l : network.getLinks().values()) {
 
 			// find the beginning of the "oneway path" or "twoway path"
 			Link currLink = l;

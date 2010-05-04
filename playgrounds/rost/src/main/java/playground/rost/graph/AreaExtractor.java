@@ -30,7 +30,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 
@@ -52,7 +51,7 @@ public class AreaExtractor {
 		List<Node> hull = border.getDistHull();
 		BoundingBox bBox = new BoundingBox();
 		bBox.run(hull);
-		for(LinkImpl link : network.getLinks().values())
+		for(Link link : network.getLinks().values())
 		{
 			Node from = link.getFromNode();
 			Node to = link.getToNode();

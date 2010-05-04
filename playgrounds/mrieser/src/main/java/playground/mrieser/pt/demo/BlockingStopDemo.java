@@ -35,7 +35,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -133,8 +132,8 @@ public class BlockingStopDemo {
 			stopList.add(builder.createTransitRouteStop(stops[i], 100 + i*70, 120 + i*70));
 		}
 
-		LinkImpl startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
-		LinkImpl endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks-1]);
+		Link startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
+		Link endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks-1]);
 		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
 		ArrayList<Id> linkIdList = new ArrayList<Id>(nOfLinks);
 		for (int i = 1; i < nOfLinks-1; i++) {

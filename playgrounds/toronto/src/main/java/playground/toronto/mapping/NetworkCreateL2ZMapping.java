@@ -27,8 +27,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -100,7 +100,7 @@ public class NetworkCreateL2ZMapping {
 		try {
 			FileWriter fw = new FileWriter(outfile);
 			BufferedWriter out = new BufferedWriter(fw);
-			for (LinkImpl l : network.getLinks().values()) {
+			for (Link l : network.getLinks().values()) {
 				Node n = qt.get(l.getCoord().getX(),l.getCoord().getY());
 				out.write(l.getId().toString()+"\t"+n.getId().toString()+"\n");
 			}

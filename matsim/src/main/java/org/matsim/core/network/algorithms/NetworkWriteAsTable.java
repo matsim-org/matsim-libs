@@ -23,6 +23,7 @@ package org.matsim.core.network.algorithms;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.gbl.Gbl;
@@ -92,7 +93,7 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 			BufferedWriter out_et = IOUtils.getBufferedWriter(this.outdir + "/linksET.txt");
 			out_et.write("ID\tFROMID\tTOID\tLENGTH\tSPEED\tCAP\tLANES\tORIGID\tTYPE\tMODES\n");
 			out_et.flush();
-			for (LinkImpl l : network.getLinks().values()) {
+			for (Link l : network.getLinks().values()) {
 				Node f = l.getFromNode();
 				Node t = l.getToNode();
 				out_l.write(l.getId() + "\t" + f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
@@ -106,7 +107,7 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 				out_et.write(l.getId() + "\t" + l.getFromNode().getId() + "\t" + l.getToNode().getId() + "\t");
 				out_et.write(Math.round(l.getLength()) + "\t" + Math.round(l.getFreespeed()*3.6) + "\t");
 				out_et.write(Math.round(l.getCapacity()/capperiod) + "\t" + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, l) + "\t");
-				out_et.write(l.getOrigId() + "\t" + l.getType() + "\t"+l.getAllowedModes().toString()+"\n");
+				out_et.write(((LinkImpl) l).getOrigId() + "\t" + ((LinkImpl) l).getType() + "\t"+l.getAllowedModes().toString()+"\n");
 				out_et.write(f.getCoord().getX() + "\t" + f.getCoord().getY() + "\n");
 				out_et.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\n");
 				out_et.write("END\n");

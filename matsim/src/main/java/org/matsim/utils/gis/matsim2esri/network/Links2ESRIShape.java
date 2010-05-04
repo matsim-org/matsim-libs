@@ -27,8 +27,8 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -40,7 +40,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * as line strings or as polygons. Furthermore the width of the links could be calculated according to
  * freespeed, lanes or capacity. For some basic examples please have a look at the <code>main</code> method.
  * Can also be called as Links2ESRIShape inputNetwork.xml outputAsLines.shp outputAsPolygons.shp .
- *  
+ *
  * <p> <strong>Keywords:</strong> converter, network, links, esri, shp, matsim </p>
  *
  * @author laemmel
@@ -68,14 +68,14 @@ public class Links2ESRIShape {
 
 	public void write() {
 		Collection<Feature> features = new ArrayList<Feature>();
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			features.add(this.featureGenerator.getFeature(link));
 		}
 		try {
 			ShapeFileWriter.writeGeometries(features, this.filename);
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
 
 	public static void main(final String [] args) {
@@ -109,7 +109,7 @@ public class Links2ESRIShape {
 			log.error("Arguments cannot be interpreted.  Aborting ...") ;
 			System.exit(-1) ;
 		}
-		
+
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().global().setCoordinateSystem(defaultCRS);
 
@@ -121,7 +121,7 @@ public class Links2ESRIShape {
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
-		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
+		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		new Links2ESRIShape(network,outputFileLs, builder).write();
 
 		CoordinateReferenceSystem crs = MGC.getCRS(defaultCRS);
@@ -130,7 +130,7 @@ public class Links2ESRIShape {
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
-		
+
 	}
 
 }

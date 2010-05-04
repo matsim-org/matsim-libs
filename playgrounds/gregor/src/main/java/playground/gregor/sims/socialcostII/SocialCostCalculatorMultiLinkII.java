@@ -121,7 +121,7 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 //	}
 
 	private void calcLinkTimeCosts() {
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			LinkInfo li = this.linkInfos.get(link.getId());
 			if (li == null) { //Link has never been used by anny agent
 				continue;
@@ -130,7 +130,7 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 			for (int k = this.maxK; k >= this.minK; k--) {
 				Integer kInteger = IntegerCache.getInteger(k);
 				double tauAk = this.travelTimeCalculator.getLinkTravelTime(link, k*this.binSize);
-				double tauAFree = Math.ceil(link.getFreespeedTravelTime(k*this.binSize))+1;
+				double tauAFree = Math.ceil(((LinkImpl) link).getFreespeedTravelTime(k*this.binSize))+1;
 				if (tauAk <= tauAFree) {
 					kE = k;
 					continue;

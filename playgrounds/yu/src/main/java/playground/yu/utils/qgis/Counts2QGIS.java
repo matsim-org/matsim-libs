@@ -13,7 +13,6 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -51,11 +50,11 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
 			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 			for (Id linkId : linkIds) {
-				LinkImpl link = network.getLinks().get(linkId);
+				Link link = network.getLinks().get(linkId);
 				LinearRing lr = getLinearRing(link);
 				Polygon p = new Polygon(lr, null, geofac);
 				MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, geofac);
-				int size = 8 + parameters.size();
+				int size = 7 + parameters.size();
 				Object[] o = new Object[size];
 				o[0] = mp;
 				o[1] = link.getId().toString();
@@ -64,11 +63,9 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 				o[4] = link.getLength();
 				o[5] = link.getCapacity()
 						/ network.getCapacityPeriod() * 3600.0;
-				o[6] = link.getType() != null ? Integer
-						.parseInt(link.getType()) : 0;
-				o[7] = link.getFreespeed();
+				o[6] = link.getFreespeed();
 				for (int i = 0; i < parameters.size(); i++)
-					o[i + 8] = parameters.get(i).get(link.getId());
+					o[i + 7] = parameters.get(i).get(link.getId());
 				// parameters.get(link.getId().toString()) }
 				Feature ft = ftRoad.create(o, "network");
 				features.add(ft);

@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -118,7 +117,7 @@ public class Getagentcoords {
 				if (plan == null) continue;
 
 				 Id i = ((PlanImpl) plan).getFirstActivity().getLinkId();
-				 LinkImpl l = network.getLinks().get(i);
+				 Link l = network.getLinks().get(i);
 				 Coord c = l.getFromNode().getCoord();
 				//Coord c = plan.getFirstActivity().getCoord();
 				//if (c == null) continue; // why would this happen? but happens ...
@@ -155,7 +154,7 @@ public class Getagentcoords {
 				if (plan == null) {notfoundpeople++; continue;}
 
 				 Id i = ((PlanImpl) plan).getFirstActivity().getLinkId();
-				 LinkImpl l = network.getLinks().get(i);
+				 Link l = network.getLinks().get(i);
 				 Coord c = l.getFromNode().getCoord();
 
 				//if (c == null) continue; // why would this happen? but happens ...

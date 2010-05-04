@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.counts.Count;
@@ -67,7 +66,7 @@ public class CountsIdUpdater {
 		newCounts
 				.setDescription("extracted from vsp-cvs/studies/berlin-wip/external-data/counts/senstadt-hand/link_counts_PKW_hrs0-24.att, countIds also were changed according to the new OSM-network https://svn.vsp.tu-berlin.de/repos/shared-svn/studies/countries/de/berlin/network/bb_5_hermannstr.xml.gz");
 		for (Id oldCountId : oldCounts.getCounts().keySet()) {
-			LinkImpl oldLink = oldNet.getLinks().get(oldCountId);
+			Link oldLink = oldNet.getLinks().get(oldCountId);
 			System.out.println("oldCountId :\t" + oldCountId);
 			Id newLinkId = searchLinkPerNodeIdPair(oldLink.getFromNode()
 					.getId(), oldLink.getToNode().getId(), newNet);

@@ -299,8 +299,8 @@ public class SocialCostCalculatorNetworkIII implements TravelCost, IterationStar
 		LinkInfo ret = this.linkInfos.get(id);
 		if (ret == null) {
 			ret = new LinkInfo();
-			ret.t_free = Math.ceil(this.network.getLinks().get(new IdImpl(id)).getFreespeedTravelTime()); //TODO make this dynamic, since we have time variant networks
-			LinkImpl link = this.network.getLinks().get(new IdImpl(id));
+			ret.t_free = Math.ceil(((LinkImpl) this.network.getLinks().get(new IdImpl(id))).getFreespeedTravelTime()); //TODO make this dynamic, since we have time variant networks
+			Link link = this.network.getLinks().get(new IdImpl(id));
 			ret.storageCap = calcCapacity(link);
 			ret.id = id;
 			this.linkInfos.put(id, ret);
@@ -319,7 +319,7 @@ public class SocialCostCalculatorNetworkIII implements TravelCost, IterationStar
 	}
 
 
-	private int calcCapacity(final LinkImpl link) {
+	private int calcCapacity(final Link link) {
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 

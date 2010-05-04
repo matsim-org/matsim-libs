@@ -18,13 +18,13 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -36,9 +36,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArrivalEventHandler{
-	
+
 	private static final Logger log = Logger.getLogger(LostAgentsAnalyser.class);
-	
+
 	private final List<MultiPolygon> polygons;
 	private final String out;
 	private final String eventsFile;
@@ -55,13 +55,13 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 
 	public void run() {
 		buildQuad();
-		
+
 		EventsManagerImpl  ev = new EventsManagerImpl();
 		ev.addHandler(this);
 		new EventsReaderTXTv1(ev).readFile(this.eventsFile);
-		
+
 		writeFeature();
-		
+
 	}
 
 	private void writeFeature() {
@@ -132,7 +132,7 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 				minY = c.y;
 			}
 		}
-		
+
 		this.quad = new QuadTree<PolygonFeature>(minX,minY,maxX,maxY);
 		for (MultiPolygon p : this.polygons) {
 			Coordinate c = p.getCentroid().getCoordinate();
@@ -144,7 +144,7 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		LinkImpl link = this.network.getLinks().get(event.getLinkId());
+		Link link = this.network.getLinks().get(event.getLinkId());
 		PolygonFeature pf = this.quad.get(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 		if (!pf.p.contains(MGC.coord2Point(link.getToNode().getCoord()))) {
 			log.warn("got wrong polygon! check the quad tree! Performing linear search! this will slow done the programm significant!");
@@ -162,7 +162,7 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 
 	@Override
 	public void reset(int iteration) {
-		
+
 	}
 
 	@Override
@@ -170,16 +170,16 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 		PolygonFeature pf = this.agentPolygonMapping.get(event.getPersonId());
 		pf.agArr++;
 		pf.agLost--;
-		
+
 	}
-	
+
 	private static class PolygonFeature {
 		MultiPolygon p;
 		int agDepart = 0;
 		int agArr = 0;
 		int agLost = 0;
 	}
-	
-	
+
+
 
 }

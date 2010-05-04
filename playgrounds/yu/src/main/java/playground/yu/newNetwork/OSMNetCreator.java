@@ -23,6 +23,7 @@ package playground.yu.newNetwork;
 import java.util.Set;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -76,9 +77,9 @@ public class OSMNetCreator {
 		OSMNetCreator osmNC = new OSMNetCreator(network);
 
 		for (String linkId : linkIdsInCircle) {
-			LinkImpl l = network.getLinks().get(new IdImpl(linkId));
+			Link l = network.getLinks().get(new IdImpl(linkId));
 			if (l != null)
-				osmNC.resetCapacity(l);
+				osmNC.resetCapacity((LinkImpl) l);
 		}
 		// (3) ------patch primary road (red links) in OpenStreetMap.org-----
 		OSMPatchPaser osmP = new OSMPatchPaser();
@@ -87,7 +88,7 @@ public class OSMNetCreator {
 		for (String linkId : osmP.getUpgradeLinks()) {
 			up++;
 			upgraded++;
-			LinkImpl l = network.getLinks().get(new IdImpl(linkId));
+			Link l = network.getLinks().get(new IdImpl(linkId));
 			if (l != null)
 				if (l.getCapacity() / osmNC.capperiod < 2000.0) {
 					System.out.print("link "
@@ -104,7 +105,7 @@ public class OSMNetCreator {
 		for (String linkId : osmP.getDegradeLinks()) {
 			down++;
 			degraded++;
-			LinkImpl l = network.getLinks().get(new IdImpl(linkId));
+			Link l = network.getLinks().get(new IdImpl(linkId));
 			if (l != null)
 				if (l.getCapacity()
 						/ osmNC.capperiod > 600.0) {

@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
@@ -45,7 +44,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
  */
 public class SubsequentCapacity extends MatsimXmlWriter {
 
-	private final Map<Id, ? extends LinkImpl> links;
+	private final Map<Id, ? extends Link> links;
 
 	/**
 	 * (arg0) - ssLinkId (arg1) - linkId
@@ -72,7 +71,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 		Map<String, Double> caps = new TreeMap<String, Double>();
 		List<String> toCompareAngles = new ArrayList<String>();
 
-		for (LinkImpl l : links.values()) {
+		for (Link l : links.values()) {
 			caps.clear();
 			toCompareAngles.clear();
 			outLinksMap.clear();
@@ -131,7 +130,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 	 *            a list of outLinks with the same Capacity, size <= 2
 	 * @return the "default next" LinkId
 	 */
-	public String compareAngles(final LinkImpl l, final List<String> nextLinksIds) {
+	public String compareAngles(final Link l, final List<String> nextLinksIds) {
 		Map<String, Double> thetas = new TreeMap<String, Double>();
 		List<String> minThetas = new ArrayList<String>();
 		String resultLinkId = "";

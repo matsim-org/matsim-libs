@@ -25,10 +25,10 @@ import java.io.PrintStream;
 import java.text.NumberFormat;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -41,16 +41,16 @@ import playground.meisterk.phd.replanning.PhDStrategyManager;
 public class PhDControler extends Controler {
 
 	private static final Logger log;
-	private static final NumberFormat timeFormat; 
+	private static final NumberFormat timeFormat;
 
 	private final PopulationConvergenceConfigGroup populationConvergenceConfigGroup = new PopulationConvergenceConfigGroup();
-	
+
 	static {
 		log = Logger.getLogger(PhDControler.class);
 		timeFormat = NumberFormat.getInstance();
 		timeFormat.setMaximumFractionDigits(2);
 	}
-	
+
 	public PhDControler(String[] args) {
 		super(args);
 		super.config.addModule(PopulationConvergenceConfigGroup.GROUP_NAME, populationConvergenceConfigGroup);
@@ -87,8 +87,8 @@ public class PhDControler extends Controler {
 
 	public class LinkTravelTimeWriter implements IterationEndsListener {
 
-		private static final String FILENAME = "linkTravelTimes.txt"; 
-		
+		private static final String FILENAME = "linkTravelTimes.txt";
+
 		public LinkTravelTimeWriter() {
 			super();
 		}
@@ -99,7 +99,7 @@ public class PhDControler extends Controler {
 			NetworkImpl network = c.getNetwork();
 			TravelTime travelTime = c.getTravelTimeCalculator();
 			double binSize = c.getConfig().travelTimeCalculator().getTraveltimeBinSize();
-			
+
 			log.info("Writing results file...");
 			PrintStream out = null;
 			try {
@@ -107,26 +107,26 @@ public class PhDControler extends Controler {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
-			
+
 			out.print("#link");
 			for (double time=Time.parseTime("00:00:00"); time<Time.parseTime("24:00:00"); time+=binSize) {
 				out.print("\t" + time);
 			}
 			out.println();
-			
-			for (LinkImpl link : network.getLinks().values()) {
+
+			for (Link link : network.getLinks().values()) {
 				out.print(link.getId());
 				for (double time=Time.parseTime("00:00:00"); time<Time.parseTime("24:00:00"); time+=binSize) {
 					out.print("\t" + timeFormat.format(travelTime.getLinkTravelTime(link, time)));
 				}
 				out.println();
 			}
-			
+
 			out.close();
 			log.info("Writing results file...done.");
 
 		}
-		
+
 	}
-	
+
 }

@@ -27,8 +27,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -37,9 +37,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * this class is based on
  * playground.marcel.MyRuns.filterPlansWithRouteInArea(String[] args, double x,
  * double y, double radius)
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NetworkLinkIdsInCircle {
 	/**
@@ -58,7 +58,7 @@ public class NetworkLinkIdsInCircle {
 		CoordImpl center = new CoordImpl(x, y);
 		System.out.println("--> extracting area of interest... at "
 				+ (new Date()));
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
 			String linkId;

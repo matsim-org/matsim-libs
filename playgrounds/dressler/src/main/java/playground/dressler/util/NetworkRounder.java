@@ -22,7 +22,7 @@
 package playground.dressler.util;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -56,7 +56,7 @@ public class NetworkRounder {
 		if(_debug){
 			System.out.println(divisor);
 		}
-		for (LinkImpl link : network.getLinks().values()){
+		for (Link link : network.getLinks().values()){
 
 			link.setLength(link.getLength()*lengthFactor);
 			//link.setLength(link.getEuklideanDistance()*lengthFactor);

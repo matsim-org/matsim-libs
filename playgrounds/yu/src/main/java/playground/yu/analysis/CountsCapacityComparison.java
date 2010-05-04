@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -25,7 +24,7 @@ import playground.yu.utils.io.SimpleWriter;
  *
  */
 public class CountsCapacityComparison {
-	public static boolean isInRange(final LinkImpl link,
+	public static boolean isInRange(final Link link,
 			Coord distanceFilterCenter, double filterRadius) {
 		return CoordUtils.calcDistance(link.getCoord(), distanceFilterCenter) < filterRadius;
 	}
@@ -60,7 +59,7 @@ public class CountsCapacityComparison {
 
 		for (Id linkId : counts.getCounts().keySet()) {
 
-			LinkImpl link = network.getLinks().get(linkId);
+			Link link = network.getLinks().get(linkId);
 			if (link != null) {
 				if (isInRange(link, center, 30000.0)) {
 					n_countStations++;

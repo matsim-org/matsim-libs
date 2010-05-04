@@ -25,8 +25,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
@@ -65,7 +65,7 @@ public class NetworkCalibrationWithCounts {
 			double maxval = 0.0;
 			while (c_it.hasNext()) {
 				Count c = c_it.next();
-				LinkImpl l = network.getLinks().get(c.getLocId());
+				Link l = network.getLinks().get(c.getLocId());
 				if (l == null) { System.out.println("csid="+c.getCsId()+";locid="+c.getLocId()+": link not found"); }
 				else {
 					l.setFreespeed(360.0/3.6);
@@ -103,7 +103,7 @@ public class NetworkCalibrationWithCounts {
 	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 //		for (Link l : network.getLinks().values()) { l.setCapacity(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)*1.5); }
-		for (LinkImpl l : network.getLinks().values()) { l.setCapacity(10000.0); l.setNumberOfLanes(5.0); l.setFreespeed(36.0/3.6); }
+		for (Link l : network.getLinks().values()) { l.setCapacity(10000.0); l.setNumberOfLanes(5.0); l.setFreespeed(36.0/3.6); }
 		this.writeGTFfile(network);
 		System.out.println("    done.");
 	}

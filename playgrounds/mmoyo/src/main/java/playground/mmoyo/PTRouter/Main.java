@@ -27,13 +27,13 @@ import playground.mmoyo.Validators.TransitRouteValidator;
 
 
 /**
- * This class contains the options to route with a TransitSchedule object 
+ * This class contains the options to route with a TransitSchedule object
  */
 public class Main {
 	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
 	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
 	private static final String CONFIG =  				PATH + "config.xml";
-	private static final String PLANFILE = 				PATH + "_input_file.xml";  //"_input_file.xml"; // // "plans.xml"; 
+	private static final String PLANFILE = 				PATH + "_input_file.xml";  //"_input_file.xml"; // // "plans.xml";
 	private static final String OUTPUTPLANS = 			PATH + "output_plans.xml";
 	private static final String PLAINNETWORK = 			PATH + "plainNetwork.xml";
 	private static final String LOGICNETWORK = 			PATH + "logicNetwork.xml";
@@ -44,7 +44,7 @@ public class Main {
 	public static void main(String[] args) {
 		/** equil Network  */
 		/*
-		netWorkFile = "examples/equil/network.xml"; 
+		netWorkFile = "examples/equil/network.xml";
 		transitScheduleFile  = 	"src/playground/marcel/pt/demo/equilnet/transitSchedule.xml";
 		*/
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -52,7 +52,7 @@ public class Main {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		PTActWriter ptActWriter;
-		
+
 		/* **************reads the transitSchedule file********* */
 		new MatsimNetworkReader(scenario).readFile(netWorkFile);
 		try {
@@ -65,17 +65,17 @@ public class Main {
 			e.printStackTrace();
 		}
 		/*******************************************************/
-	
+
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		//03 dic noPlain Net NetworkLayer plainNetwork=logicFactory.getPlainNet();
-		
+
 		int option =10;
 		switch (option){
 			case 1:    //writes logicElement files
 				logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
 				break;
-			
-			case 2:  //searches and shows a PT path between two coordinates or nodes */  
+
+			case 2:  //searches and shows a PT path between two coordinates or nodes */
 				//03 dic no Plain net plainNetwork=logicFactory.getPlainNet();
 				PTRouter ptRouter = new PTRouter(logicFactory.getLogicNet());
 				Coord coord1 = new CoordImpl(686897, 250590);
@@ -89,7 +89,7 @@ public class Main {
 				}
 				System.out.println(path.travelTime);
 				break;
-				
+
 			case 3: //Routes a population/
 				double startTime = System.currentTimeMillis();
 				logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
@@ -109,7 +109,7 @@ public class Main {
 				ptActWriter = new PTActWriter(logicFactory, CONFIG, PATH + planToSimplify , PATH + simplifiedPlan);
 				ptActWriter.simplifyPtLegs();
 				break;
-			
+
 			case 7:
 				/*
 				Map <Id, List<StaticConnection>> connectionMap = new TreeMap <Id, List<StaticConnection>>();
@@ -135,30 +135,30 @@ public class Main {
 					}
 				}
 				System.out.println("trains: " + trains +  "   trams: "  + trams);
-				
+
 				break;
 			case 9:
 				/**Counts nodes, transfer links*/
 				NetworkLayer logicNetwork=logicFactory.getLogicNet();
-				
+
 				int transfers=0;
 				int standard=0;
-				for (LinkImpl linkImpl : logicNetwork.getLinks().values()){
-					if (linkImpl.getType().equals(PTValues.TRANSFER_STR)) transfers++;
-					if (linkImpl.getType().equals(PTValues.STANDARD_STR)) standard++;
+				for (Link link : logicNetwork.getLinks().values()){
+					if (((LinkImpl) link).getType().equals(PTValues.TRANSFER_STR)) transfers++;
+					if (((LinkImpl) link).getType().equals(PTValues.STANDARD_STR)) standard++;
 				}
-				
+
 				System.out.println("Transferlinks: " +  transfers);
 				System.out.println("Standard: " +  standard);
 				System.out.println("num of logic nodes:" + logicNetwork.getNodes().size());
 				//03 dic no plainNet System.out.println("num of plain nodes:" + plainNetwork.getNodes().size());
-				
+
 				break;
-			
+
 			case 11:
 				new TransitRouteValidator(transitSchedule);
 				break;
-				
+
 				/**Try the transitRouter class on equilnet*/
 			case 12:
 				ptRouter = new PTRouter(logicFactory.getLogicNet());

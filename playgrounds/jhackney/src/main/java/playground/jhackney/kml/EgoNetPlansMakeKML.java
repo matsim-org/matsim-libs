@@ -60,7 +60,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -163,7 +162,7 @@ public class EgoNetPlansMakeKML {
 
 		myKMLDocument.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(networkFolder));
 
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			networkFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(generateLinkPlacemark(link, linkStyle, trafo)));
 		}
 

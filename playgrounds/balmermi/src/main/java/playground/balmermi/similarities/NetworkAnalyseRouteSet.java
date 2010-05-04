@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
 public class NetworkAnalyseRouteSet {
@@ -325,7 +324,7 @@ public class NetworkAnalyseRouteSet {
 		double tunnel_av = 0.0;
 		double tunnel_nofl = 0.0;
 		double ampel_nofl = 0.0;
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			Node from = link.getFromNode();
 			Node to = link.getToNode();
 			double[] atts = this.link_atts.get(link.getId());

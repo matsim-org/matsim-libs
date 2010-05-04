@@ -7,8 +7,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -60,13 +60,13 @@ public class NetworkToCarNetwork {
 		int lanes=0;
 		int i = 0;
 		int g = 0;
-		Map<Id,LinkImpl> links = net.getLinks();
+		Map<Id,Link> links = net.getLinks();
 		for (Iterator<Id> it = links.keySet().iterator(); it.hasNext();){
 			Id id1 = it.next();
 			if (excludes.contains(id1.toString())) {
 				continue;
 			}
-			LinkImpl link = links.get(id1);
+			Link link = links.get(id1);
 			Id id2 = link.getId();
 			Node startNode = net3.getNodes().get(link.getFromNode().getId());
 			Node endNode = net3.getNodes().get(link.getToNode().getId());

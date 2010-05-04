@@ -47,13 +47,13 @@ import org.matsim.world.MappedLocation;
 public class NetworkImpl implements Network {
 	private final static Logger log = Logger.getLogger(NetworkImpl.class);
 
-	protected Layer layerDelegate = new LayerImpl( LAYER_TYPE, null ) ;
+	public static final Id LAYER_TYPE = new IdImpl("link");
 
 	// ////////////////////////////////////////////////////////////////////
 	// member variables
 	// ////////////////////////////////////////////////////////////////////
 
-	public static final Id LAYER_TYPE = new IdImpl("link");
+	protected Layer layerDelegate = new LayerImpl( LAYER_TYPE, null ) ;
 
 	private double capperiod = 3600.0 ;
 
@@ -198,7 +198,7 @@ public class NetworkImpl implements Network {
 					"Trying to set NetworkChangeEvents but NetworkFactory is not time variant");
 		}
 
-		for(LinkImpl link : getLinks().values()) {
+		for(Link link : getLinks().values()) {
 			((TimeVariantLinkImpl)link).clearEvents();
 		}
 
@@ -488,13 +488,12 @@ public class NetworkImpl implements Network {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Id, LinkImpl> getLinks() {
-		return (Map<Id, LinkImpl>) this.layerDelegate.getLocations();
+	public Map<Id, Link> getLinks() {
+		return (Map<Id, Link>) this.layerDelegate.getLocations();
 	}
 
 	public void setFactory(final NetworkFactoryImpl networkFactory) {
 		this.factory = networkFactory;
 	}
-
 
 }

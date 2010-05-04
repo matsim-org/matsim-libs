@@ -24,6 +24,7 @@ import java.util.EnumSet;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -44,28 +45,28 @@ public class CleanNetwork {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(args[0]);
-		
+
 //		Counts counts = new Counts();
 //		new MatsimCountsReader(counts).readFile("../../input/counts.xml.gz");
 
 		NetworkLayer subNet = new NetworkLayer();
-		
+
 		new TransportModeNetworkFilter(network).filter(subNet,EnumSet.of(TransportMode.car));
 //		new NetworkAdaptLength().run(network);
 //		new NetworkDoubleLinks("-dl").run(network);
 //		new NetworkThinner().run(network,counts);
 		new NetworkCleaner().run(subNet);
-		
-		for (LinkImpl l : network.getLinks().values()) {
-			LinkImpl l2 = subNet.getLinks().get(l.getId());
+
+		for (Link l : network.getLinks().values()) {
+			LinkImpl l2 = (LinkImpl) subNet.getLinks().get(l.getId());
 			if (l2 != null) {
-				l2.setOrigId(l.getOrigId());
-				l2.setType(l.getType());
+				l2.setOrigId(((LinkImpl) l).getOrigId());
+				l2.setType(((LinkImpl) l).getType());
 			}
 		}
 
 //		new NetworkShiftFreespeed().run(network);
-//		
+//
 //		for (LinkImpl l : network.getLinks().values()) {
 //			if (l.getType().startsWith("2-") || l.getType().startsWith("3-")) {
 //				if (l.getNumberOfLanes(Time.UNDEFINED_TIME) == 2) {
@@ -77,10 +78,10 @@ public class CleanNetwork {
 //				}
 //			}
 //		}
-		
+
 		NetworkWriteAsTable nwat = new NetworkWriteAsTable(args[1]);
 		nwat.run(subNet);
-		
+
 //		new CountsWriter(counts).writeFile("../../output/output_counts.xml.gz");
 		new NetworkWriter(subNet).write(args[1]+"/network.xml.gz");
 	}

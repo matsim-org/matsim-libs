@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.sims.shelters.linkpenaltyII;
 
 import java.util.HashMap;
@@ -11,7 +30,6 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.evacuation.base.Building;
 
@@ -20,12 +38,12 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 	private static final Logger log = Logger.getLogger(ShelterInputCounterLinkPenalty.class);
 
 	private static final double PENALTY_COEF = 5;
-	
+
 	private final HashMap<Id,LinkInfo> linkInfos = new HashMap<Id, LinkInfo>();
 	private final HashMap<Id, Building> shelterLinkMapping;
 
 	private final EventsManagerImpl events;
-	
+
 	private int it;
 
 
@@ -33,7 +51,7 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 
 		this.events = events;
 		this.shelterLinkMapping = shelterLinkMapping;
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			if (link.getId().toString().contains("sl") && link.getId().toString().contains("b")) {
 				Building b = this.shelterLinkMapping.get(link.getId());
 				this.linkInfos.put(link.getId(), new LinkInfo(b.getShelterSpace(),link.getId()));
@@ -41,9 +59,9 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 		}
 	}
 
-	
+
 	public double getLinkTravelCost(Link link, double time) {
-		LinkInfo li = this.linkInfos.get(link.getId()); 
+		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li != null) {
 			if (time > li.blockingTime) {
 //				return Math.pow((time - li.blockingTime),PENALTY_COEF);
@@ -54,7 +72,7 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		LinkInfo li = this.linkInfos.get(event.getLinkId()); 
+		LinkInfo li = this.linkInfos.get(event.getLinkId());
 		if (li != null) {
 			li.count++;
 			if (li.space == li.count && !li.init) {
@@ -73,12 +91,12 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 				AgentMoneyEventImpl e = new AgentMoneyEventImpl(event.getTime(),event.getPersonId(),pen);
 				this.events.processEvent(e);
 			}
-			
+
 		}
 	}
-	
+
 	public void handleEvent(LinkLeaveEvent event) {
-//		LinkInfo li = this.linkInfos.get(event.getLinkId()); 
+//		LinkInfo li = this.linkInfos.get(event.getLinkId());
 //		if (li != null) {
 //			li.count++;
 //			if (li.space == li.count) {
@@ -96,14 +114,14 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 //				AgentMoneyEvent e = new AgentMoneyEvent(event.getTime(),event.getPersonId(),pen);
 //				this.events.processEvent(e);
 //			}
-//			
+//
 //		}
 
 	}
 
 	public void reset(int iteration) {
 		this.it = iteration;
-		
+
 		double maxOverload = 0; LinkInfo mxLi = null;
 		for (LinkInfo li : this.linkInfos.values()) {
 			if (li.space > li.count) {
@@ -113,7 +131,7 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 //				if (li.blockingTime == 0) {
 //					System.err.println("!!!!!!!!!!!!!!!!!!!!!");
 //				}
-//				li.blockingTime = 30*3600;			
+//				li.blockingTime = 30*3600;
 			}
 			if (li.space < li.count) {
 				li.blockingTime -= 10.;

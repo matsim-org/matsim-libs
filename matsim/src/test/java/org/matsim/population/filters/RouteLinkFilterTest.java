@@ -22,10 +22,10 @@ package org.matsim.population.filters;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -59,8 +59,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
 
-		LinkImpl link1 = network.getLinks().get(new IdImpl(1));
-		LinkImpl link20 = network.getLinks().get(new IdImpl(20));
+		Link link1 = network.getLinks().get(new IdImpl(1));
+		Link link20 = network.getLinks().get(new IdImpl(20));
 
 		Population population = scenario.getPopulation();
 

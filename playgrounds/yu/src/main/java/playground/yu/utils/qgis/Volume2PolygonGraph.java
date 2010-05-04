@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -37,7 +37,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -48,7 +47,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Volume2PolygonGraph extends Network2PolygonGraph {
 	private Set<Id> linkIds;
@@ -71,7 +70,7 @@ public class Volume2PolygonGraph extends Network2PolygonGraph {
 	@Override
 	protected double getLinkWidth(Link link) {
 		Integer i = (Integer) parameters.get(0).get(link.getId());
-		return ((double) i.intValue()) / 20.0;
+		return (i.intValue()) / 20.0;
 	}
 
 	@Override
@@ -81,7 +80,7 @@ public class Volume2PolygonGraph extends Network2PolygonGraph {
 			defaultFeatureTypeFactory.addType(attrTypes.get(i));
 		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 		for (Id linkId : linkIds) {
-			LinkImpl link = network.getLinks().get(linkId);
+			Link link = network.getLinks().get(linkId);
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);

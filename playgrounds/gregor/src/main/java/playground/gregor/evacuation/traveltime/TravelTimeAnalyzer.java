@@ -18,13 +18,13 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -36,9 +36,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArrivalEventHandler{
-	
+
 	private static final Logger log = Logger.getLogger(TravelTimeAnalyzer.class);
-	
+
 	private final List<MultiPolygon> polygons;
 	private final String out;
 	private final String eventsFile;
@@ -55,13 +55,13 @@ public class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArri
 
 	public void run() {
 		buildQuad();
-		
+
 		EventsManagerImpl  ev = new EventsManagerImpl();
 		ev.addHandler(this);
 		new EventsReaderTXTv1(ev).readFile(this.eventsFile);
-		
+
 		writeFeature();
-		
+
 	}
 
 	private void writeFeature() {
@@ -92,8 +92,8 @@ public class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArri
 				} else if (evacTime > 40) {
 					g40P += pf.agDepart;
 				}
-					
-				
+
+
 				String label = pf.evacTime + "";
 				fts.add(ft.create(new Object[]{pf.p,evacTime,pf.agDepart, label}));
 			} catch (IllegalAttributeException e) {
@@ -106,7 +106,7 @@ public class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArri
 			e.printStackTrace();
 		}
 		System.out.println(g10 + "," + g20 + "," + g30 + "," + g40 + "," + g40P);
-		
+
 	}
 
 	private FeatureType initFeatureType() {
@@ -150,7 +150,7 @@ public class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArri
 				minY = c.y;
 			}
 		}
-		
+
 		this.quad = new QuadTree<PolygonFeature>(minX,minY,maxX,maxY);
 		for (MultiPolygon p : this.polygons) {
 			Coordinate c = p.getCentroid().getCoordinate();
@@ -162,7 +162,7 @@ public class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArri
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		LinkImpl link = this.network.getLinks().get(event.getLinkId());
+		Link link = this.network.getLinks().get(event.getLinkId());
 		PolygonFeature pf = this.quad.get(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 		if (!pf.p.contains(MGC.coord2Point(link.getToNode().getCoord()))) {
 			log.warn("got wrong polygon! check the quad tree! Performing linear search! this will slow done the programm significant!");
@@ -183,7 +183,7 @@ public class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArri
 
 	@Override
 	public void reset(int iteration) {
-		
+
 	}
 
 	@Override
@@ -192,18 +192,18 @@ public class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArri
 		pf.agArr++;
 		pf.agLost--;
 		pf.evacTime += (event.getTime() - pf.startTime);
-		
+
 	}
-	
+
 	private static class PolygonFeature {
-		
+
 		MultiPolygon p;
 		double startTime = -1;
 		double evacTime = 0;
 		int agDepart = 0;
 		int agArr = 0;
 		int agLost = 0;
-		
+
 	}
-	
+
 }

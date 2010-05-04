@@ -25,9 +25,9 @@ import java.util.Map;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 
@@ -49,7 +49,7 @@ public class VolumefromEventsTest {
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
 		Map<String, Double> vol7s = new HashMap<String, Double>();
-		for (LinkImpl ql : network.getLinks().values()) {
+		for (Link ql : network.getLinks().values()) {
 			int[] v = volumes.getVolumesForLink(ql.getId());
 			vol7s.put(ql.getId().toString(), Double.valueOf(v != null ? v[7] : 0));
 		}

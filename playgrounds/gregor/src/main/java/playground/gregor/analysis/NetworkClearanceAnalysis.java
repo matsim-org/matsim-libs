@@ -36,13 +36,13 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
@@ -59,9 +59,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class NetworkClearanceAnalysis {
-	
+
 	private static final Logger log = Logger.getLogger(NetworkClearanceAnalysis.class);
-	
+
 //	private static final String INPUT_BASE="../../arbeit/svn/shared-svn/runs/";
 	private static final String INPUT_BASE="../../outputs/";
 	private final String ev2;
@@ -69,21 +69,21 @@ public class NetworkClearanceAnalysis {
 	private final NetworkLayer network;
 	private final CoordinateReferenceSystem crs;
 	private final String outfile;
-	
+
 //	private ArrayList<Polygon> polygons;
 	private final GeometryFactory geofac;
-	
+
 	private ArrayList<Feature> features;
 
 	private FeatureType ftRunCompare;
-	
+
 	final static Envelope ENVELOPE = new Envelope(648815,655804,9888424,9902468);
 	final static double LENGTH = 500;
 	private final QuadTree<PolygonInfo> polygons1 = new QuadTree<PolygonInfo>(ENVELOPE.getMinX(),ENVELOPE.getMinY(),ENVELOPE.getMaxX(),ENVELOPE.getMaxY());
 	private final QuadTree<PolygonInfo> polygons2 = new QuadTree<PolygonInfo>(ENVELOPE.getMinX(),ENVELOPE.getMinY(),ENVELOPE.getMaxX(),ENVELOPE.getMaxY());
 	private final Map<String,PolygonInfo> linkMapping1 = new HashMap<String,PolygonInfo>();
 	private final Map<String,PolygonInfo> linkMapping2 = new HashMap<String,PolygonInfo>();
-	
+
 	public NetworkClearanceAnalysis(final String eventsFile1, final String eventsFile2,
 			final NetworkLayer network, final String outfile, final CoordinateReferenceSystem crs) {
 		this.ev1 = eventsFile1;
@@ -91,7 +91,7 @@ public class NetworkClearanceAnalysis {
 		this.network = network;
 		this.outfile = outfile;
 		this.crs = crs;
-		
+
 		this.geofac = new GeometryFactory();
 		initFeatures();
 	}
@@ -111,18 +111,18 @@ public class NetworkClearanceAnalysis {
 			e.printStackTrace();
 		}
 
-		
+
 	}
-	
+
 	private void run() {
 		createPolygons();
 		classifyLinks();
 		readEvents();
 		iteratePolygons();
 		writeFeatures();
-			
+
 	}
-	
+
 
 
 	private void writeFeatures() {
@@ -131,7 +131,7 @@ public class NetworkClearanceAnalysis {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	private void iteratePolygons() {
@@ -143,9 +143,9 @@ public class NetworkClearanceAnalysis {
 			} catch (IllegalAttributeException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
-		
+
 	}
 
 	private void readEvents() {
@@ -155,18 +155,18 @@ public class NetworkClearanceAnalysis {
 		EventsHandler e2 = new EventsHandler(this.linkMapping2);
 		events1.addHandler(e1);
 		events2.addHandler(e2);
-		
+
 		log.info("reading events file 1 from: " + this.ev1);
 		new EventsReaderTXTv1(events1).readFile(this.ev1);
 		log.info("done.");
 		log.info("reading events file 2 from: " + this.ev2);
 		new EventsReaderTXTv1(events2).readFile(this.ev2);
 		log.info("done.");
-		
+
 	}
 
 	private void classifyLinks() {
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			PolygonInfo pi1 = this.polygons1.get(link.getCoord().getX(),link.getCoord().getY());
 
 			this.linkMapping1.put(link.getId().toString(),pi1);
@@ -177,7 +177,7 @@ public class NetworkClearanceAnalysis {
 
 	private void createPolygons() {
 		GTH gth = new GTH(this.geofac);
-	
+
 		for (double x = ENVELOPE.getMinX(); x < ENVELOPE.getMaxX(); x += LENGTH) {
 			for (double y = ENVELOPE.getMinY(); y < ENVELOPE.getMaxY(); y+= LENGTH) {
 				Polygon p = gth.getSquare(new Coordinate(x,y), LENGTH);
@@ -189,7 +189,7 @@ public class NetworkClearanceAnalysis {
 
 
 	}
-	
+
 	private static class PolygonInfo {
 		Polygon p;
 		int agents = 0;
@@ -198,7 +198,7 @@ public class NetworkClearanceAnalysis {
 			this.p = p;
 		}
 	}
-	
+
 	private static class EventsHandler implements LinkEnterEventHandler, LinkLeaveEventHandler{
 
 		private final Map<String, PolygonInfo> linkMapping;
@@ -206,12 +206,12 @@ public class NetworkClearanceAnalysis {
 		public EventsHandler(final Map<String,PolygonInfo> linkMapping) {
 			this.linkMapping = linkMapping;
 		}
-		
+
 		public void handleEvent(final LinkEnterEvent event) {
 			if (event.getLinkId().toString().contains("el")) {
 				return;
 			}
-			
+
 			PolygonInfo pi = this.linkMapping.get(event.getLinkId().toString());
 			pi.agents++;
 			if (pi.agents > 1) {
@@ -233,9 +233,9 @@ public class NetworkClearanceAnalysis {
 				pi.clearanceTime = event.getTime();
 			}
 		}
-		
+
 	}
-	
+
 	public static void main (final String [] args) {
 //		String eventsFile1 = INPUT_BASE + "run316/output/ITERS/it.201/201.events.txt.gz";
 //		String eventsFile2 = INPUT_BASE + "run317/output/ITERS/it.200/200.events.txt.gz";
@@ -247,7 +247,7 @@ public class NetworkClearanceAnalysis {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(network);
-		
+
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
 		new NetworkClearanceAnalysis(eventsFile1, eventsFile2, net, outfile, crs).run();
 	}

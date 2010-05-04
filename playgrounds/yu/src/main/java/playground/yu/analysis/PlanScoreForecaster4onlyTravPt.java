@@ -27,12 +27,12 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -143,7 +143,7 @@ public class PlanScoreForecaster4onlyTravPt {
 		Route route = leg.getRoute();
 		if (route instanceof NetworkRoute) {
 			NetworkRoute netRoute = (NetworkRoute) route;
-			Map<Id, LinkImpl> links = this.net.getLinks();
+			Map<Id, Link> links = this.net.getLinks();
 			for (Id linkId : netRoute.getLinkIds()) {
 				travelTime_s += ttc.getLinkTravelTime(links.get(linkId),
 						departTime + travelTime_s);

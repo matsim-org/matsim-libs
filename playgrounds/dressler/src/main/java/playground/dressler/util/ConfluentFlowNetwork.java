@@ -29,9 +29,9 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 
@@ -65,7 +65,7 @@ public class ConfluentFlowNetwork {
 		if(_debug){
 			System.out.println(divisor);
 		}
-		for (LinkImpl link : network.getLinks().values()){
+		for (Link link : network.getLinks().values()){
 
 			link.setLength(link.getLength()*lengthFactor);
 			//link.setLength(link.getEuklideanDistance()*lengthFactor);
@@ -166,7 +166,7 @@ public class ConfluentFlowNetwork {
             	}
             }
 
-            for (LinkImpl link : network.getLinks().values()) {
+            for (Link link : network.getLinks().values()) {
                 out.write("E " + (newNodeNames.get(link.getFromNode())) + " " + (newNodeNames.get(link.getToNode())) + " " + (int) link.getCapacity());
                 out.newLine();
             }

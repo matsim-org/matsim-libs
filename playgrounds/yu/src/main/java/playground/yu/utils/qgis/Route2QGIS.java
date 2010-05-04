@@ -19,8 +19,8 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -110,7 +110,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 	protected Coordinate[] calculateCoordinates(Coordinate[] coordinates,
 			double width, List<Id> routeLinkIds) {
 		for (int i = 0; i < routeLinkIds.size(); i++) {
-			LinkImpl l = this.network.getLinks().get(routeLinkIds.get(i));
+			Link l = this.network.getLinks().get(routeLinkIds.get(i));
 			Coord c = l.getFromNode().getCoord();
 			Coordinate cdn = new Coordinate(c.getX(), c.getY());
 			coordinates[i] = cdn;
