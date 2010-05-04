@@ -33,8 +33,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.vehicles.BasicVehicle;
 
-public class MobsimLinkFacility implements Updateable {
-	final private static Logger log = Logger.getLogger( MobsimLinkFacility.class ) ;
+public class MobsimFacility implements Updateable {
+	final private static Logger log = Logger.getLogger( MobsimFacility.class ) ;
 	
 	MobsimLink link = new MobsimLink() ; // dummy
 
@@ -72,6 +72,9 @@ public class MobsimLinkFacility implements Updateable {
 				MobsimVehicle veh = (MobsimVehicle) parking.get( vehId ) ;
 				veh.setDriver( person ) ;
 				link.addVehicleFromParkingNormal(veh) ;
+			} else if ( true /* pt mode */ ) {
+				// der transit wait braucht eine Šhnliche Datenstruktur wie die wait queue bei den Autos.
+				// Frage ist allerdings, ob dies zur "LinkFacility" gehšrt, oder eher zum Link. 
 			} else {
 				Id destLinkId = person.getCurrentLeg().getRoute().getEndLinkId() ;
 				// teleport there

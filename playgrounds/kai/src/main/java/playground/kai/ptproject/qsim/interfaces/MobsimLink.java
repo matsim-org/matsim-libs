@@ -25,7 +25,7 @@ package playground.kai.ptproject.qsim.interfaces;
  *
  */
 public class MobsimLink implements Updateable {
-	MobsimLinkFacility linkFac = new MobsimLinkFacility() ; // dummy
+	MobsimFacility linkFac = new MobsimFacility() ; // dummy
 	MobsimVehicle veh = new MobsimVehicle() ;
 	
 	/**

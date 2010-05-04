@@ -32,7 +32,7 @@ public class UseCase {
 		Teleportation teleportation = new Teleportation() ;
 		PersonAgent person = null ; // dummy
 		BasicVehicle veh = null ; // dummy
-		MobsimLinkFacility linkFac = new MobsimLinkFacility() ; // dummy
+		MobsimFacility linkFac = new MobsimFacility() ; // dummy
 		MobsimLink link = new MobsimLink() ;
 		MobsimNode node = new MobsimNode() ;
 
