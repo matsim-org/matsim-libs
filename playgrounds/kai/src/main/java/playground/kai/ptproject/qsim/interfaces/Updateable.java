@@ -23,7 +23,7 @@ package playground.kai.ptproject.qsim.interfaces;
  * @author nagel
  *
  */
-public interface Updateable {
+interface Updateable {
 	
 	void update() ;
 

@@ -19,6 +19,9 @@
 
 package playground.kai.ptproject.qsim.interfaces;
 
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.vehicles.BasicVehicle;
 
@@ -26,7 +29,10 @@ class Teleportation implements Updateable {
 	public void update() {}
 }
 
-public class UseCase {
+public class Mobsim {
+	
+	Map<Id,MobsimNode> mobsimNodes = null ; // dummy
+	Map<Id,MobsimLink> mobsimLinks = null ; // dummy
 
 	void run() {
 		Teleportation teleportation = new Teleportation() ;
@@ -58,8 +64,16 @@ public class UseCase {
 	}
 
 	public static void main( String[] args ) {
-		UseCase usecase = new UseCase() ; // dummy
+		Mobsim usecase = new Mobsim() ; // dummy
 		usecase.run() ;
+	}
+
+	Map<Id, MobsimNode> getMobsimNodes() {
+		return mobsimNodes;
+	}
+
+	Map<Id, MobsimLink> getMobsimLinks() {
+		return mobsimLinks;
 	}
 
 }

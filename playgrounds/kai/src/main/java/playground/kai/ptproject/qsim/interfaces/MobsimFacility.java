@@ -27,6 +27,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
@@ -36,7 +37,8 @@ import org.matsim.vehicles.BasicVehicle;
 public class MobsimFacility implements Updateable {
 	final private static Logger log = Logger.getLogger( MobsimFacility.class ) ;
 	
-	MobsimLink link = new MobsimLink() ; // dummy
+	MobsimLink mobsimLink = null ; // dummy.  Pointer cheaper than id!
+	Mobsim mobsim = null ; // dummy
 
 	/** data structure for parking needs to be searchable by vehicle id */
 	private Map<Id,BasicVehicle> parking = new TreeMap<Id,BasicVehicle>() ;
@@ -71,13 +73,12 @@ public class MobsimFacility implements Updateable {
 				Id vehId = new IdImpl("13") ; // dummy
 				MobsimVehicle veh = (MobsimVehicle) parking.get( vehId ) ;
 				veh.setDriver( person ) ;
-				link.addVehicleFromParkingNormal(veh) ;
-			} else if ( true /* pt mode */ ) {
-				// der transit wait braucht eine Šhnliche Datenstruktur wie die wait queue bei den Autos.
-				// Frage ist allerdings, ob dies zur "LinkFacility" gehšrt, oder eher zum Link. 
+				mobsimLink.addVehicleFromFacilityNormal(veh) ;
+			} else if ( person.getCurrentLeg().getMode().equals( TransportMode.pt ) ) {
+				// transit wait queue ... where?
 			} else {
-				Id destLinkId = person.getCurrentLeg().getRoute().getEndLinkId() ;
-				// teleport there
+				// teleport.  In principle, I could teleport directly to the destination facility ...
+				// ... but I can't get the FacilityId :-(.
 			}
 		}
 	}

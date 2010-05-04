@@ -19,14 +19,20 @@
 
 package playground.kai.ptproject.qsim.interfaces;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.LinkImpl;
+
 
 /**
  * @author nagel
  *
  */
 public class MobsimLink implements Updateable {
+	Link link = null ; // underlying link; dummy
+	Link getLink() { return link ; }
+	
 	MobsimFacility linkFac = new MobsimFacility() ; // dummy
-	MobsimVehicle veh = new MobsimVehicle() ;
+	MobsimVehicle veh = new MobsimVehicle() ; // dummy
 	
 	/**
 	 * @param veh
@@ -40,11 +46,11 @@ public class MobsimLink implements Updateable {
 	 * @param veh
 	 * @return true if accepted, false if not
 	 */
-	boolean addVehicleFromParkingNormal( MobsimVehicle veh ) {
+	boolean addVehicleFromFacilityNormal( MobsimVehicle veh ) {
 		return true ;
 	}
 	
-	boolean addVehicleFromParkingForced( MobsimVehicle veh ) {
+	boolean addVehicleFromFacilityForced( MobsimVehicle veh ) {
 		return true ;
 	}
 	
