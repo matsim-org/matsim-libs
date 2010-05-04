@@ -35,6 +35,8 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 	// yyyy I would say that this should be moved to org.matsim.world.  Right now, however, it needs to be used quite a lot
 	// and so I leave it here for the time being.  kai, jul09
 
+	private String name = null;
+
 	// ////////////////////////////////////////////////////////////////////
 	// creational methods
 	// ////////////////////////////////////////////////////////////////////
@@ -90,6 +92,14 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 		return link;
 	}
 
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	// things below here are originally automatically generated.  kai, jul09
 
 	@Deprecated
@@ -106,11 +116,6 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 	@Override
 	public TreeMap<Id, ? extends MappedLocation> getLocations() {
 		return layerDelegate.getLocations();
-	}
-
-	@Override
-	public String getName() {
-		return layerDelegate.getName();
 	}
 
 	@Override
@@ -133,11 +138,6 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 	@Override
 	public Layer getUpLayer() {
 		return layerDelegate.getUpLayer();
-	}
-
-	@Override
-	public void setName(String name) {
-		layerDelegate.setName(name);
 	}
 
 	@Deprecated

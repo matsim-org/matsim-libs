@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.world;
 
 import java.util.ArrayList;
@@ -8,13 +27,9 @@ import org.matsim.api.core.v01.Id;
 
 public interface Layer {
 
-	public void setName(final String name);
-
 	@Deprecated
 	// a "type" that returns an "Id" ???
 	public Id getType();
-
-	public String getName();
 
 	@Deprecated
 	// use of mapping layers is discouraged
@@ -52,8 +67,6 @@ public interface Layer {
 	public ArrayList<MappedLocation> getNearestLocations(final Coord coord, final Location excludeLocation);
 
 	public TreeMap<Id, ? extends MappedLocation> getLocations();
-
-	public String toString();
 
 	@Deprecated
 	public boolean removeUpLayer();
