@@ -87,17 +87,17 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	private double infoTime = 0;
 	protected static final int INFO_PERIOD = 3600;
 
-	
+
 	protected QNetwork network;
 	private EventsManager events = null;
-	
+
 	private QSimEngine simEngine = null;
 	private NetworkChangeEventsEngine changeEventsEngine = null;
 
 	private CarDepartureHandler carDepartureHandler;
 
 	private QSimTimer simTimer;
-	
+
 	/**
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
@@ -128,21 +128,20 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public QSim(final Scenario scenario, final EventsManager events) {
 		this(scenario, events, new DefaultQSimEngineFactory());
 	}
-	
+
 	protected QSim(final Scenario sc, final EventsManager events, final QSimEngineFactory simEngineFac){
 		this.scenario = sc;
 		this.events = events;
 		init(this.scenario, events, simEngineFac);
 	}
-	
+
 	/**
 	 * extended constructor method that can also be
 	 * after assignments of another constructor
-	 * @param simEngineFac 
+	 * @param simEngineFac
 	 */
 	private void init(final Scenario sc, final EventsManager eventsManager, QSimEngineFactory simEngineFac){
     log.info("Using QSim...");
-    // In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
     this.listenerManager = new SimulationListenerManager<QSim>(this);
     Simulation.reset(sc.getConfig().getQSimConfigGroup().getStuckTime());
     this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
@@ -168,8 +167,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
       }
       this.setSignalSystems(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
     }
-
-
 
     this.agentFactory = new AgentFactory(this);
     this.notTeleportedModes.add(TransportMode.car);
@@ -264,15 +261,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 				queueSimulationFeature.agentCreated(agent);
 			}
 		}
-
-	}
-
-	/**
-	 * @deprecated Netvis is no longer supported by this QueueSimulation
-	 */
-	@Deprecated
-  public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
-		log.warn("NetVis is no longer supported by this simulation.");
 	}
 
 	private void initSimTimer() {
@@ -291,7 +279,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.simTimer.setSimStartTime(simStartTime);
 		this.simTimer.setTime(simStartTime);
 	}
-	
+
 
 	/**
 	 * Prepare the simulation and get all the settings from the configuration.
@@ -324,7 +312,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
     this.changeEventsEngine = new NetworkChangeEventsEngine(this);
     this.changeEventsEngine.onPrepareSim();
-    
+
 		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterPrepareSim();
 		}
@@ -377,7 +365,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	}
 
 	protected void beforeSimStep(final double time) {
-		
+
 		this.changeEventsEngine.onBeforeSimStep(time);
     if (this.signalEngine != null) {
       this.signalEngine.beforeSimStep(time);
@@ -459,7 +447,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 				PersonDriverAgent driver = entry.getSecond();
 				driver.teleportToLink(driver.getDestinationLinkId());
 				driver.legEnds(now);
-			} 
+			}
 			else {
 				break;
 			}
@@ -657,7 +645,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public QSimTimer getSimTimer() {
 		return this.simTimer ;
 	}
-	
+
 	public QSimEngine getQSimEngine() {
 	  return this.simEngine;
 	}
