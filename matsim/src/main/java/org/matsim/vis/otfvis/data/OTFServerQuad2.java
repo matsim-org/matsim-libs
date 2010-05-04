@@ -97,6 +97,19 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 	}
 
 
+	/**
+	 * Sets a new top node in case the extremities from the c'tor are not
+	 * good anymore, it also clear the QuadTree
+	 * @param minX The smallest x coordinate expected
+	 * @param minY The smallest y coordinate expected
+	 * @param maxX The largest x coordinate expected
+	 * @param maxY The largest y coordinate expected
+	 */
+	protected void setTopNode(final double minX, final double minY, final double maxX, final double maxY) {
+		this.top = new Node<OTFDataWriter>(minX, minY, maxX, maxY);
+	}
+
+
 	public void addAdditionalElement(OTFDataWriter element) {
 		this.additionalElements.add(element);
 	}

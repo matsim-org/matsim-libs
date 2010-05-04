@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * An implementation of a QuadTree to store data assigned to geometric points.
@@ -74,7 +73,7 @@ public class QuadTree<T> implements Serializable {
 	 * @param maxY The largest y coordinate (northing, latitude) expected
 	 */
 	public QuadTree(final double minX, final double minY, final double maxX, final double maxY) {
-		setTopNode(minX, minY, maxX, maxY);
+		this.top = new Node<T>(minX, minY, maxX, maxY);
 	}
 
 	/**
@@ -113,21 +112,6 @@ public class QuadTree<T> implements Serializable {
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * Get access to all values of this leaf
-	 *
-	 * @param x x-coordinate from which the specified values should be retrieves
-	 * @param y y-coordinate from which the specified values should be retrieves
-	 *
-	 * @return A list of T values, if this leaf has values,
-	 *         otherwise null.
-	 */
-	protected List<T> getLeafValues(final double x, final double y) {
-		Leaf<T> leaf =  this.top.getLeaf(x, y);
-		if(leaf != null) return leaf.values;
-		return null;
 	}
 
 	/** Clear the QuadTree. */
@@ -222,18 +206,6 @@ public class QuadTree<T> implements Serializable {
 	 */
 	public int size() {
 		return this.size;
-	}
-
-	/**
-	 * Sets a new top node in case the extremities from the c'tor are not
-	 * good anymore, it also clear the QuadTree
-	 * @param minX The smallest x coordinate expected
-	 * @param minY The smallest y coordinate expected
-	 * @param maxX The largest x coordinate expected
-	 * @param maxY The largest y coordinate expected
-	 */
-	protected void setTopNode(final double minX, final double minY, final double maxX, final double maxY) {
-		this.top = new Node<T>(minX, minY, maxX, maxY);
 	}
 
 	/** @return the minimum x coordinate (left-right, longitude, easting) of the bounds of the QuadTree. */
@@ -512,7 +484,7 @@ public class QuadTree<T> implements Serializable {
 		    }
 	}
 
-	private static class Leaf<T> implements Serializable {
+	protected static class Leaf<T> implements Serializable {
 		private static final long serialVersionUID = -6527830222532634476L;
 		final public double x;
 		final public double y;

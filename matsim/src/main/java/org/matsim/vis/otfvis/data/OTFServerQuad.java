@@ -41,16 +41,16 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 /**
  * OTFServerQuad is the quad representation of all elements of the network on the server
  * side. This QuadTree is mirrored on the client side by OTFClientQuad.
- * 
+ *
  * @author dstrippgen
  * @deprecated use OTFServerQuad2 this class is only in the code for correct
  * deserialization.
  */
 @Deprecated
 public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQuadI {
-  
+
 	private static final Logger log = Logger.getLogger(OTFServerQuad.class);
-	
+
 	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();
 
 	private static class ConvertToClientExecutor implements Executor<OTFDataWriter> {
@@ -109,7 +109,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 				QueueLink link = q.getLinks().get(((QueueLink) src).getLink().getId());
 				writer.setSrc(link);
 //			} else if(src instanceof QueueNode) {
-//				
+//
 			}
 		}
 	}
@@ -142,9 +142,20 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 		this.maxNorthing = maxY+1;
 	}
 
+
 	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#setBoundingBoxFromNetwork(org.matsim.core.mobsim.queuesim.QueueNetwork)
+	 * Sets a new top node in case the extremities from the c'tor are not
+	 * good anymore, it also clear the QuadTree
+	 * @param minX The smallest x coordinate expected
+	 * @param minY The smallest y coordinate expected
+	 * @param maxX The largest x coordinate expected
+	 * @param maxY The largest y coordinate expected
 	 */
+	private void setTopNode(final double minX, final double minY, final double maxX, final double maxY) {
+		this.top = new Node<OTFDataWriter>(minX, minY, maxX, maxY);
+	}
+
+
 	public void updateBoundingBox(QueueNetwork net){
 		this.minEasting = Double.POSITIVE_INFINITY;
 		this.maxEasting = Double.NEGATIVE_INFINITY;
@@ -168,9 +179,6 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 		offsetNorth = this.minNorthing;
 	}
 
-	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#fillQuadTree(org.matsim.vis.otfvis.data.OTFConnectionManager)
-	 */
 	public void fillQuadTree(final OTFConnectionManager connect) {
 		final double easting = this.maxEasting - this.minEasting;
 		final double northing = this.maxNorthing - this.minNorthing;
@@ -180,7 +188,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 		Collection<Class<OTFWriterFactory<QueueLink>>> linkFactories =  connect.getQueueLinkEntries();
 		List<OTFWriterFactory<QueueLink>> linkWriterFactoriyObjects = new ArrayList<OTFWriterFactory<QueueLink>>(linkFactories.size());
 		try {
-			OTFWriterFactory<QueueLink> linkWriterFac = null;			
+			OTFWriterFactory<QueueLink> linkWriterFac = null;
 			for (Class linkFactory : linkFactories ) {
 				if(linkFactory != Object.class) {
 					linkWriterFac = (OTFWriterFactory<QueueLink>)linkFactory.newInstance();
@@ -213,26 +221,22 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 //      		System.out.println("server link: " + link.getId().toString() + " coords " + middleEast + "," + middleNorth );
     			}
     		}
-    		
+
    	}
 	}
 
-	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#addAdditionalElement(org.matsim.vis.otfvis.data.OTFDataWriter)
-	 */
+	@Override
 	public void addAdditionalElement(OTFDataWriter element) {
 		this.additionalElements.add(element);
 	}
 
-	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#convertToClient(java.lang.String, org.matsim.vis.otfvis.interfaces.OTFServerRemote, org.matsim.vis.otfvis.data.OTFConnectionManager)
-	 */
+	@Override
 	public OTFClientQuad convertToClient(String id, final OTFServerRemote host, final OTFConnectionManager connect) {
 		final OTFClientQuad client = new OTFClientQuad(id, host, 0.,0.,this.maxEasting - this.minEasting, this.maxNorthing - this.minNorthing);
 		client.offsetEast = this.minEasting;
 		client.offsetNorth = this.minNorthing;
 
-		//int colls = 
+		//int colls =
 		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
 				new ConvertToClientExecutor(connect,client));
 //		System.out.print("server executor count: " +colls );
@@ -255,11 +259,9 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 		return client;
 	}
 
-	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#writeConstData(java.nio.ByteBuffer)
-	 */
+	@Override
 	public void writeConstData(ByteBuffer out) {
-		//int colls = 
+		//int colls =
 		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
 				new WriteDataExecutor(out,true));
 
@@ -272,11 +274,9 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 		}
 	}
 
-	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#writeDynData(org.matsim.core.utils.collections.QuadTree.Rect, java.nio.ByteBuffer)
-	 */
+	@Override
 	public void writeDynData(QuadTree.Rect bounds, ByteBuffer out) {
-		//int colls = 
+		//int colls =
 		this.execute(bounds, new WriteDataExecutor(out,false));
 		//System.out.print("# of Writes: " + colls + " -> ");
 
@@ -290,65 +290,46 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 	}
 
 	// Internally we hold the coordinates from 0,0 to max -min .. to optimize use of float in visualizer
-	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#getMaxEasting()
-	 */
 	@Override
 	public double getMaxEasting() {
 		return this.maxEasting;
 	}
 
-	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#getMaxNorthing()
-	 */
 	@Override
 	public double getMaxNorthing() {
 		return this.maxNorthing;
 	}
 
-	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#getMinEasting()
-	 */
 	@Override
 	public double getMinEasting() {
 		return this.minEasting;
 	}
 
-	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#getMinNorthing()
-	 */
 	@Override
 	public double getMinNorthing() {
 		return this.minNorthing;
 	}
-	
+
 	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#replace(double, double, int, java.lang.Class)
+	 * Get access to all values of this leaf
+	 *
+	 * @param x x-coordinate from which the specified values should be retrieves
+	 * @param y y-coordinate from which the specified values should be retrieves
+	 *
+	 * @return A list of T values, if this leaf has values,
+	 *         otherwise null.
 	 */
-	public void replace(double x, double y, int index, Class clazz) {
-		List<OTFDataWriter> writer = getLeafValues(x,y);
-		OTFDataWriter w = writer.get(index);
-		OTFDataWriter wnew;
-		try {
-			wnew = (OTFDataWriter) clazz.newInstance();
-			wnew.setSrc(w.getSrc());
-			writer.remove(index);
-			writer.add(index, wnew);
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+	private List<OTFDataWriter> getLeafValues(final double x, final double y) {
+		Leaf<OTFDataWriter> leaf =  this.top.getLeaf(x, y);
+		if(leaf != null) return leaf.values;
+		return null;
 	}
 
 	/**
 	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#replaceSrc(org.matsim.core.mobsim.queuesim.QueueNetwork)
 	 */
 	public void replaceSrc(QueueNetwork newNet) {
-		//int colls = 
+		//int colls =
 		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
 				new ReplaceSourceExecutor(newNet));
 	}
