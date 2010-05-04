@@ -24,10 +24,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -239,6 +241,17 @@ public class OsmNetworkReader {
 	private void convert() {
 		this.network.setCapacityPeriod(3600);
 
+		Iterator<Entry<String, OsmWay>> it = ways.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<String, OsmWay> entry = it.next();
+			for (String nodeId : entry.getValue().nodes) {
+				if (this.nodes.get(nodeId) == null) {
+					it.remove();
+					break;
+				}
+			}
+		}
+		
 		// check which nodes are used
 		for (OsmWay way : this.ways.values()) {
 			String highway = way.tags.get("highway");
@@ -517,7 +530,7 @@ public class OsmNetworkReader {
 		}
 	}
 
-	private static class OsmXmlParser extends MatsimXmlParser {
+	private class OsmXmlParser extends MatsimXmlParser {
 
 		private OsmWay currentWay = null;
 		private final Map<String, OsmNode> nodes;
@@ -544,8 +557,6 @@ public class OsmNetworkReader {
 				this.nodeCounter.incCounter();
 			} else if ("way".equals(name)) {
 				this.currentWay = new OsmWay(Long.parseLong(atts.getValue("id")));
-				this.ways.put(atts.getValue("id"), this.currentWay);
-				this.wayCounter.incCounter();
 			} else if ("nd".equals(name)) {
 				if (this.currentWay != null) {
 					this.currentWay.nodes.add(atts.getValue("ref"));
@@ -560,6 +571,29 @@ public class OsmNetworkReader {
 		@Override
 		public void endTag(final String name, final String content, final Stack<String> context) {
 			if ("way".equals(name)) {
+				boolean used = false;
+				OsmHighwayDefaults osmHighwayDefaults = highwayDefaults.get(this.currentWay.tags.get("highway"));
+				if (osmHighwayDefaults != null) {
+					System.out.println(osmHighwayDefaults.hierarchy);
+					int hierarchy = osmHighwayDefaults.hierarchy;
+					this.currentWay.hierarchy = hierarchy;
+				}  else {
+					this.currentWay.hierarchy = -1;
+				}
+				if (this.currentWay.hierarchy != -1) {
+					for (OsmFilter osmFilter : hierarchyLayers) {
+						for (String nodeId : this.currentWay.nodes) {
+							OsmNode node = nodes.get(nodeId);
+							if(node != null && osmFilter.coordInFilter(node.coord, this.currentWay.hierarchy)){
+								used = true;
+							}
+						}
+					}
+				}
+				if (used) {
+					this.ways.put(Long.toString(this.currentWay.id), this.currentWay);
+					this.wayCounter.incCounter();
+				}
 				this.currentWay = null;
 			}
 		}
