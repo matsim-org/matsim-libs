@@ -81,7 +81,7 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 			throw new IllegalArgumentException("Link id=" + id + " already exists in 'locations'!");
 		}
 
-		LinkImpl link = this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
+		LinkImpl link = (LinkImpl) this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
 		link.setType(type);
 		link.setOrigId(origId);
 

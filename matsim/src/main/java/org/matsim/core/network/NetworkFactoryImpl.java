@@ -26,6 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Route;
@@ -61,11 +62,11 @@ public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 	/**
 	 * TODO how to set other attributes of link consistently without invalidating time variant attributes
 	 */
-	public LinkImpl createLink(final Id id, final Id fromNodeId, final Id toNodeId) {
+	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId) {
 		return this.linkFactory.createLink(id, this.network.getNodes().get(fromNodeId), this.network.getNodes().get(toNodeId), this.network, 1.0, 1.0, 1.0, 1.0);
 	}
 
-	public LinkImpl createLink(final Id id, final Node from, final Node to,
+	public Link createLink(final Id id, final Node from, final Node to,
 			final NetworkLayer network, final double length, final double freespeedTT, final double capacity,
 			final double lanes) {
 		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);
