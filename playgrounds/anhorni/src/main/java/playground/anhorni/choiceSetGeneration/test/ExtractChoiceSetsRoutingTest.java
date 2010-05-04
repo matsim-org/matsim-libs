@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.anhorni.choiceSetGeneration.test;
 
 import org.apache.log4j.Logger;
@@ -6,7 +25,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -16,43 +34,43 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
-	
+
 	private final static Logger log = Logger.getLogger(ExtractChoiceSetsRoutingTest.class);
 
-	private Controler controler = null;
+//	private Controler controler = null;
 	public ExtractChoiceSetsRoutingTest(Controler controler) {
-		
-		this.controler = controler;
-		
+
+//		this.controler = controler;
+
 	}
-	public void notifyAfterMobsim(final AfterMobsimEvent event) {	
-		if (event.getIteration() < Gbl.getConfig().controler().getLastIteration()) {
+	public void notifyAfterMobsim(final AfterMobsimEvent event) {
+		if (event.getIteration() < event.getControler().getConfig().controler().getLastIteration()) {
 			return;
 		}
-		computeChoiceSet(this.controler);
+		computeChoiceSet(event.getControler());
 	}
-			
+
 	protected void computeChoiceSet(Controler controler) {
-			
+
 		NetworkImpl network = controler.getNetwork();
-		
+
 		LinkImpl link0 = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
 		ActivityImpl fromAct = new ActivityImpl("home", link0.getId());
-		
+
 		LinkImpl link1 = network.getNearestLink(new CoordImpl(695278.8125, 257607.125));
 		ActivityImpl toAct = new ActivityImpl("shop", link1.getId());
 		fromAct.setEndTime(0.0);
-		
-		LegImpl leg = computeLeg(fromAct, toAct, controler);	
-		log.info(leg.getTravelTime());					
+
+		LegImpl leg = computeLeg(fromAct, toAct, controler);
+		log.info(leg.getTravelTime());
 	}
-	
-	
-	private LegImpl computeLeg(ActivityImpl fromAct, ActivityImpl toAct, Controler controler) {	
+
+
+	private LegImpl computeLeg(ActivityImpl fromAct, ActivityImpl toAct, Controler controler) {
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
-		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);		
+		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		PlansCalcRoute router = (PlansCalcRoute)controler.createRoutingAlgorithm();
-		router.handleLeg(person, leg, fromAct, toAct, fromAct.getEndTime());	
+		router.handleLeg(person, leg, fromAct, toAct, fromAct.getEndTime());
 		return leg;
-	}	
+	}
 }

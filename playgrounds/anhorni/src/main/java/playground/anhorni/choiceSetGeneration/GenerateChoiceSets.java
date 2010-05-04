@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.anhorni.choiceSetGeneration;
 
 
@@ -13,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -43,6 +63,7 @@ public class GenerateChoiceSets {
 	//private static int idOffset = 20000000;
 	//private final static double epsilon = 0.01;
 	private Scenario scenario = new ScenarioImpl();
+	private Config config = null;
 	private Population choiceSetPopulation = scenario.getPopulation();
 
 	private final NetworkLayer network = (NetworkLayer) scenario.getNetwork();
@@ -189,7 +210,7 @@ public class GenerateChoiceSets {
 	public void run() {
 
 		String configArgs [] = {this.matsimRunConfigFile};
-		Gbl.createConfig(configArgs);
+		this.config = Gbl.createConfig(configArgs);
 
 		this.createChoiceSetFacilities();
 
@@ -214,7 +235,7 @@ public class GenerateChoiceSets {
 			throw new RuntimeException("Support for C++ DEQSim has been removed.");
 		}
 		else {
-			this.controler = new Controler(this.matsimRunConfigFile);
+			this.controler = new Controler(this.config);
 		}
 
 		int tt;
@@ -283,7 +304,7 @@ public class GenerateChoiceSets {
 
 	private void createChoiceSetFacilities() {
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(this.scenario);
-		networkReader.readFile(Gbl.getConfig().network().getInputFile());
+		networkReader.readFile(this.config.network().getInputFile());
 
 		ZHFacilitiesReader zhFacilitiesReader = new ZHFacilitiesReader(this.network);
 		zhFacilitiesReader.readFile(this.zhFacilitiesFile, this.zhFacilities);
