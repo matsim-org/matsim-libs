@@ -146,7 +146,7 @@ public class NetworkImpl implements Network {
 	}
 
 	@Override
-	public Link removeLink(Id linkId) {
+	public Link removeLink(final Id linkId) {
 		Link l = this.getLinks().remove(linkId);
 		if (l == null) {
 			return null;
@@ -489,7 +489,7 @@ public class NetworkImpl implements Network {
 
 	@SuppressWarnings("unchecked")
 	public Map<Id, Link> getLinks() {
-		return (Map<Id, Link>) this.layerDelegate.getLocations();
+		return (Map) this.layerDelegate.getLocations();
 	}
 
 	public void setFactory(final NetworkFactoryImpl networkFactory) {
