@@ -45,6 +45,8 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.jhackney.SocNetConfigGroup;
+
 /**
  * Sample replanning strategy to change activity location:
  * uses agent knowledge
@@ -64,8 +66,8 @@ public class RandomChangeLocationK  implements PlanAlgorithm{
 
 	private final Knowledges knowledges;
 
-	public RandomChangeLocationK(String[] factypes, Network network, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges knowledges) {
-		weights = Gbl.getConfig().socnetmodule().getSWeights();
+	public RandomChangeLocationK(String[] factypes, Network network, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges knowledges, SocNetConfigGroup snConfig) {
+		weights = snConfig.getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
 		this.tcost=tcost;

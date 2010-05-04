@@ -30,13 +30,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.socialnetworks.io.MakeSocialNetworkFromFile;
 /**
  * SocialNetwork is an object organizing the social ties between Persons. It serves two
@@ -50,8 +50,8 @@ import playground.jhackney.socialnetworks.io.MakeSocialNetworkFromFile;
  * <li>Edge type (edge parameter: directed, undirected)
  * <li>Saturation rate (node parameter: likelihood of adding more edges given current degree)
  * <li>Edge removal algorithm (multiple parameters)</li><br><br>
- * 
- * 
+ *
+ *
  * <p>
  * There are several initialization algorithms programmed in SocialNetwork.
  * @author jhackney
@@ -60,25 +60,33 @@ import playground.jhackney.socialnetworks.io.MakeSocialNetworkFromFile;
 public class SocialNetwork {
 
 	private boolean UNDIRECTED;
-	private final SocNetConfigGroup socnetConfig = Gbl.getConfig().socnetmodule();
-	String linkRemovalCondition= socnetConfig.getSocNetLinkRemovalAlgo();
-	String edge_type= socnetConfig.getEdgeType();
-	double remove_p= Double.parseDouble(socnetConfig.getSocNetLinkRemovalP());
-	double remove_age= Double.parseDouble(socnetConfig.getSocNetLinkRemovalAge());
-	private final double degree_saturation_rate= Double.parseDouble(socnetConfig.getDegSat());
+	private final SocNetConfigGroup socnetConfig;
+	String linkRemovalCondition;
+	String edge_type;
+	double remove_p;
+	double remove_age;
+	private final double degree_saturation_rate;
 	private final Collection<? extends Person> persons;
 
 	// a Collection of all the Links in the network
 	//public ArrayList<SocialNetEdge> linksList = new ArrayList<SocialNetEdge>();
 	public TreeSet<SocialNetEdge> linksList = new TreeSet<SocialNetEdge>();
 	private final ActivityFacilities facilities;
-	
+
 //	public int setupIter=0;
 	// public ArrayList<SocialNetNode> nodes;
 
 	private final static Logger log = Logger.getLogger(SocialNetwork.class);
 
-	public SocialNetwork(Population plans, ActivityFacilities facilities) {
+	public SocialNetwork(Population plans, ActivityFacilities facilities, SocNetConfigGroup snConfig) {
+
+		this.socnetConfig = snConfig;
+		this.linkRemovalCondition= socnetConfig.getSocNetLinkRemovalAlgo();
+		this.edge_type= socnetConfig.getEdgeType();
+		this.remove_p= Double.parseDouble(socnetConfig.getSocNetLinkRemovalP());
+		this.remove_age= Double.parseDouble(socnetConfig.getSocNetLinkRemovalAge());
+		this.degree_saturation_rate= Double.parseDouble(socnetConfig.getDegSat());
+
 
 		this.persons=plans.getPersons().values();
 		this.facilities = facilities;
@@ -134,7 +142,7 @@ public class SocialNetwork {
 	 * Generates a Bernoulli (Erdos/Renyi) network with link
 	 * probability modified by the distance between alters
 	 *
-	 * 
+	 *
 	 * Need to change this algorithm so that it doesn't choose to link to random people
 	 *  if the qualifications are met, but to choose two people given qualifications
 	 *  and to link them; stratified sampling.
@@ -148,7 +156,7 @@ public class SocialNetwork {
 		personList = plans.getPersons().values().toArray( personList );
 
 		int numLinks = (int) ((kbar * personList.length) / 2.);
-		
+
 		double p0=1.;
 		double rmin = Double.parseDouble(socnetConfig.getRmin());
 		double alpha=Double.parseDouble(socnetConfig.getAlpha());
@@ -177,10 +185,10 @@ public class SocialNetwork {
 	/**
 	 * Generates a Barabasi-Albert scale-free network with random spatial
 	 * distribution and fixed parameters gamma and initial core size, m0.
-	 * 
+	 *
 	 * Each agent enters the network and constructs on average kbar/2 new edges.
 	 * (average degree is kbar).
-	 * 
+	 *
 	 * 2-3 is typically observed in large growing social networks
 	 * where adding an additional link brings more benefit/cost ratio than adding the first link to
 	 * a node (citation of papers, airline routes, or internet routers, for example).
@@ -188,19 +196,19 @@ public class SocialNetwork {
 	 * dynamic in the "market" (say for example, the ease of citing a well-known author who
 	 * was already cited in a paper you've just read, versus searching all available literature for
 	 * the most relevant paper) make this economy of preferential attachment emerge.
-	 * 
+	 *
 	 * Gamma=2 is the minimum for scale-free percolation. Scale-free means that the minimum spanning
 	 * tree for the phase change to a discontinuous non-percolating network is null (zero nodes).
-	 * 
+	 *
 	 * M0 is a parameter for the initial number of nodes in the network, here set to 1.
 	 * M is a parameter for the number of links to add each step and must be < m0.
-	 * 
+	 *
 	 * @author jhackney
 	 */
 	private void initBASocialNetwork(Population plans) {
 
 		double gamma = 2.5; //
-		int kbar=Integer.parseInt(socnetConfig.getSocNetKbar()); 
+		int kbar=Integer.parseInt(socnetConfig.getSocNetKbar());
 		int m0= (int) ((kbar)/2.); // initial core size
 		int m=m0;// number of links to add each step, m< m0
 //		if(m>m0){
@@ -269,7 +277,7 @@ public class SocialNetwork {
 	/**
 	 * Generates a classical (Erdös/Renyi) undirected random graph of degree kbar
 	 * @author jhackney
-	 * 
+	 *
 	 */
 	void initRandomSocialNetwork( Population plans ){
 
@@ -288,7 +296,7 @@ public class SocialNetwork {
 			Coord home1=this.facilities.getFacilities().get(((ActivityImpl)person1.getSelectedPlan().getPlanElements().get(0)).getFacilityId()).getCoord();
 			Coord home2=this.facilities.getFacilities().get(((ActivityImpl)person2.getSelectedPlan().getPlanElements().get(0)).getFacilityId()).getCoord();
 			double distance = CoordUtils.calcDistance(home1, home2);
-			
+
 //			makeSocialContact( person1, person2, -1);
 			if(makeSocialContactNotify(person1, person2, 0, "random")==2){
 			log.info("new link made dist "+distance+" "+pdist);
@@ -330,7 +338,7 @@ public class SocialNetwork {
 	 * or else only at the end of a run, you are restricted to re-starting or loading a social network from these iterations).
 	 * Text file containing a mapping of activities to acts must be present for the corresponding plans file, if
 	 * indicated in the config.xml
-	 * 
+	 *
 	 * @author jhackney
 	 */
 	void initReadInNetwork(Population plans){
@@ -344,14 +352,14 @@ public class SocialNetwork {
 	 * Adds a single directed link from person1 to person2. If network is
 	 * UNDIRECTED, it adds two links, one link in each direction,
 	 * and records only one link in the links list,
-	 * thus "undirected" rather than "bidirectional" 
+	 * thus "undirected" rather than "bidirectional"
 	 * (symmetric network). Prevents
 	 * multiple links and self-linking. Does not impose any other conditions
 	 * on adding the link (do this upon calling the method).
 	 * If a link is altered in
 	 * one direction asymmetrically in another method, this method could cause
 	 * undetected bugs if called again.
-	 * 
+	 *
 	 * @param person1
 	 *                The Person from which the link originates
 	 * @param person2
@@ -379,8 +387,8 @@ public class SocialNetwork {
 				newLink.incrementNumberOfTimesMet();
 				newOpposingLink.setTimeLastUsed(iteration);
 				newOpposingLink.incrementNumberOfTimesMet();
-			} else 
-//				They do not know each other, make new link subject to saturation effects	
+			} else
+//				They do not know each other, make new link subject to saturation effects
 				if(MatsimRandom.getRandom().nextDouble()<Math.exp(this.degree_saturation_rate * ((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).getOutDegree())){
 					newLink = new SocialNetEdge(person1, person2);
 					addLink(newLink,iteration);
@@ -398,25 +406,25 @@ public class SocialNetwork {
 	 * If network is
 	 * UNDIRECTED, it adds two links, one link in each direction,
 	 * and records only one link in the links list,
-	 * thus "undirected" rather than "bidirectional" 
+	 * thus "undirected" rather than "bidirectional"
 	 * (symmetric network). Prevents
 	 * multiple links and self-linking. Does not impose any other conditions
 	 * on adding the link (do this upon calling the method).
 	 * If a link is altered in
 	 * one direction asymmetrically in another method, this method could cause
 	 * undetected bugs if called again.
-	 * 
+	 *
 	 * @param person1
 	 *                The Person from which the link originates
 	 * @param person2
 	 *                The Person at which the link terminates
-	 *                
+	 *
 	 * @param iteration
 	 *                The socializing iteration (iteration of the social network)
-	 *                
+	 *
 	 * @param linkType
 	 *                The type of social interaction
-	 *                
+	 *
 	 * @author jhackney
 	 */
 	public void makeSocialContact(Person person1, Person person2, int iteration, String linkType) {
@@ -437,8 +445,8 @@ public class SocialNetwork {
 				newOpposingLink.setTimeLastUsed(iteration);
 				newOpposingLink.setType(linkType);
 				newOpposingLink.incrementNumberOfTimesMet();
-			} else 
-//				They do not know each other, make new link subject to saturation effects	
+			} else
+//				They do not know each other, make new link subject to saturation effects
 				if(MatsimRandom.getRandom().nextDouble()<Math.exp(this.degree_saturation_rate * ((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).getOutDegree())){
 					newLink = new SocialNetEdge(person1, person2);
 					addLink(newLink,iteration, linkType);
@@ -456,32 +464,32 @@ public class SocialNetwork {
 	 * If network is
 	 * UNDIRECTED, it adds two links, one link in each direction,
 	 * and records only one link in the links list,
-	 * thus "undirected" rather than "bidirectional" 
+	 * thus "undirected" rather than "bidirectional"
 	 * (symmetric network). Prevents
 	 * multiple links and self-linking. Does not impose any other conditions
 	 * on adding the link (do this upon calling the method).
 	 * If a link is altered in
 	 * one direction asymmetrically in another method, this method could cause
 	 * undetected bugs if called again.
-	 * 
+	 *
 	 * @param person1
 	 *                The Person from which the link originates
 	 * @param person2
 	 *                The Person at which the link terminates
-	 *                
+	 *
 	 * @param iteration
 	 *                The socializing iteration (iteration of the social network)
-	 *                
+	 *
 	 * @param linkType
 	 *                The type of social interaction
-	 *   
-	 *                
+	 *
+	 *
 	 * @return int
 	 *              <li>status=0: means that person1=person2. No self-links are made</li>
 	 *              <li>status=1: means existing link was renewed</li>
 	 *              <li>status=2: means the new link was made</li>
 	 *              <li>status=3: means that the link was not made because the ego is saturated with links</li>
-	 *              
+	 *
 	 * @author jhackney
 	 */
 	public int makeSocialContactNotify(PersonImpl person1, PersonImpl person2, int iteration, String linkType) {
@@ -506,8 +514,8 @@ public class SocialNetwork {
 				newOpposingLink.setType(linkType);
 				newOpposingLink.incrementNumberOfTimesMet();
 				status=1; // status=1 means existing link was renewed
-			} else 
-//				They do not know each other, make new link subject to saturation effects	
+			} else
+//				They do not know each other, make new link subject to saturation effects
 				if(MatsimRandom.getRandom().nextDouble()<Math.exp(this.degree_saturation_rate * ((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).getOutDegree())){
 					newLink = new SocialNetEdge(person1, person2);
 					addLink(newLink,iteration, linkType);
@@ -537,7 +545,7 @@ public class SocialNetwork {
 		myLink.setTimeMade(iteration);
 		myLink.setTimeLastUsed(iteration);
 		myLink.setType(linkType);
-	}    
+	}
 
 	/**
 	 * Removes links each iteration of the socializing dynamic.
@@ -552,13 +560,13 @@ public class SocialNetwork {
 	 * Each algorithm uses the parameter remove_age (measured in iterations) as a threshold
 	 * under which no link is flagged and above which the algorithm begins processing links.
 	 * <br><br>
-	 * 
+	 *
 	 *  <li>"none": no removal</li>
 	 *  <li>"random": iterates through edges and removes each with a probability "remove_p"
 	 *  <li>"random_node_degree" iterates through edges and removes each with probability proportional to the normalized degree of the "From" person times the probability "remove_p". Degree is normalized by dividing by the graph maximimum degree.</li>
 	 *  <li>"random_link_age" iterates through edges and removes each with probability proportional to the normalized link age times probability remove_p. Link age is normalized by dividing by the iteration number.</li>
 	 *  <li>"random_constant_kbar" keeps average degree constant. First calculates the number of edges to remove, then randomly picks this number of random edge indices and removes these edges.
-	 *  </li> 
+	 *  </li>
 	 * <br><br>
 	 * @param iteration
 	 *                 The iteration of the socializing dynamic
@@ -569,7 +577,7 @@ public class SocialNetwork {
 		// method
 		ArrayList<SocialNetEdge> linksToRemove = new ArrayList<SocialNetEdge>();
 		Object [] linkarray = this.getLinks().toArray();
-		
+
 		log.info("  removeLinks() algorithm \"" + linkRemovalCondition + "\"");
 
 		if(linkRemovalCondition.equals("none")) return;

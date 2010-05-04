@@ -44,6 +44,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.socialnetworks.mentalmap.MentalMap;
 
 /**
@@ -64,8 +65,8 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 	private final String[] factypes;
 	private final ActivityFacilities facs;
 
-	public RandomChangeLocationF(String[] factypes, Network network, PersonalizableTravelCost tcost, TravelTime ttime, ActivityFacilities facs) {
-		weights = Gbl.getConfig().socnetmodule().getSWeights();
+	public RandomChangeLocationF(String[] factypes, Network network, PersonalizableTravelCost tcost, TravelTime ttime, ActivityFacilities facs, SocNetConfigGroup snConfig) {
+		weights = snConfig.getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
 		this.tcost=tcost;

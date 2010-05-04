@@ -28,9 +28,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.SocNetConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
+
+import playground.jhackney.SocNetConfigGroup;
 
 
 /**
@@ -52,15 +52,16 @@ public class EventSocScoringFunction implements ScoringFunction{
 	private double nFriends=0;
 	private double timeWithFriends=0;
 
-	private SocNetConfigGroup socnetConfig = Gbl.getConfig().socnetmodule();
+	private SocNetConfigGroup socnetConfig;
 
 	private double betaFriendFoe = Double.parseDouble(socnetConfig.getBeta1());
 	private double betaNFriends= Double.parseDouble(socnetConfig.getBeta2());
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
 
-	public EventSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, final LinkedHashMap<Activity,ArrayList<Double>> actStats) {
+	public EventSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, final LinkedHashMap<Activity,ArrayList<Double>> actStats, SocNetConfigGroup snConfig) {
 //		this.paidToll = paidToll;
+		this.socnetConfig = snConfig;
 		this.scoringFunction = scoringFunction;
 		this.plan = plan;
 //		this.teo=teo;

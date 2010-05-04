@@ -11,6 +11,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 import playground.jhackney.socialnetworks.scoring.MakeTimeWindowsFromEvents;
@@ -19,18 +20,18 @@ import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
 /**
  * Class to permit face-to-face agent interactions via Events after the Mobsim.
- * 
+ *
  * @author jhackney
  *
  */
 public class SpatialInteractorEvents {
 	SocialNetwork net;
 
-	double pBecomeFriends = Double.parseDouble(Gbl.getConfig().socnetmodule().getPBefriend());// [0.0,1.0]
+	double pBecomeFriends;// [0.0,1.0]
 
 //	double pct_interacting = Double.parseDouble(Gbl.getConfig().socnetmodule().getFractSInteract());// [0.0,1.0]
 
-	String interaction_type = Gbl.getConfig().socnetmodule().getSocNetInteractor2();
+	String interaction_type;
 
 //	LinkedHashMap<Activity,ArrayList<Person>> activityMap;
 //	LinkedHashMap<Act,ArrayList<Person>> actMap=new LinkedHashMap<Act,ArrayList<Person>>();
@@ -38,15 +39,22 @@ public class SpatialInteractorEvents {
 //	TrackEventsOverlap teo;
 	MakeTimeWindowsFromEvents teo;
 	private final Logger log = Logger.getLogger(SpatialInteractorEvents.class);
-	
+
 	private final ActivityFacilities facilities;
 
 //	public SpatialInteractorEvents(SocialNetwork snet, TrackEventsOverlap teo) {
-	public SpatialInteractorEvents(SocialNetwork snet, MakeTimeWindowsFromEvents teo, ActivityFacilities facilities) {
+	public SpatialInteractorEvents(SocialNetwork snet, MakeTimeWindowsFromEvents teo, ActivityFacilities facilities, SocNetConfigGroup snConfig) {
 		this.net = snet;
 		this.teo=teo;
 		this.facilities = facilities;
 		log.warn("Methods are only for Undirected social interactions");
+
+
+		this.pBecomeFriends = Double.parseDouble(snConfig.getPBefriend());// [0.0,1.0]
+
+//		double pct_interacting = Double.parseDouble(Gbl.getConfig().socnetmodule().getFractSInteract());// [0.0,1.0]
+
+		this.interaction_type = snConfig.getSocNetInteractor2();
 	}
 
 	public void interact(Population plans, LinkedHashMap<String, Double> rndEncounterProb, int iteration,
@@ -58,7 +66,7 @@ public class SpatialInteractorEvents {
 			this.log.info(" No spatial interactions "+iteration);
 			return;
 		}
-		
+
 //		this.timeWindowMap=teo.getTimeWindowMap();
 		this.timeWindowMap=twm;
 
@@ -89,7 +97,7 @@ public class SpatialInteractorEvents {
 	 * Based on Marchal and Nagel 2007, TRR 1935
 	 * Person p1 meets and befriends the person who arrived just before him, if
 	 * this person is still at the SocialAct.
-	 * 
+	 *
 	 * Cycle through all the agents who were co-present with p1 at the SocialAct
 	 * and find the agent whose arrival time is closest to and less than that of p1
 	 * Subject to the likelihood of a meeting taking place in a given facility type
@@ -120,7 +128,7 @@ public class SpatialInteractorEvents {
 	}
 	/**
 	 * Time-independent chance of spatial encounter during each activity:
-	 * 
+	 *
 	 * Each person visiting a Facility to perform an Activity has a chance
 	 * to meet every other person who was at that Facility doing the same thing.
 	 * <br><br>
@@ -130,7 +138,7 @@ public class SpatialInteractorEvents {
 	 * <br><br>
 	 * For every ordered pair, person1 and person2, who visited the same facility
 	 * and performed the same activity there, regardless of when, there is a probability
-	 * that they will be linked: p1 <-> p2. 
+	 * that they will be linked: p1 <-> p2.
 	 * <br><br>
 	 * To make this valid for directed networks, the loop over timeWindows would have
 	 * to be nested so that there is a chance that p1->p2 and then a second
@@ -141,7 +149,7 @@ public class SpatialInteractorEvents {
 	 * <br><br>
 	 * The conditions of adding network links apply:
 	 * {@link org.matsim.socialnetworks.socialnet.SocialNetwork.makeSocialContact}
-	 * 
+	 *
 	 * @param plans
 	 * @param rndEncounterProbability
 	 * @param iteration
@@ -177,13 +185,13 @@ public class SpatialInteractorEvents {
 
 	/**
 	 * Time-independent chance of spatial encounter at each activity.
-	 * 
+	 *
 	 * Each person visiting a Facility to perform an Activity has a chance
 	 * to meet ONE other person who was at that Facility doing the same thing.
 	 * <br><br>
 	 * For every ordered pair, person1 and person2, who visited the same facility
 	 * and performed the same activity there, regardless of when, there is a probability
-	 * that they will be linked: p1 <-> p2. 
+	 * that they will be linked: p1 <-> p2.
 	 * <br><br>
 	 * To make this valid for directed networks, the loop over timeWindows would have
 	 * to be nested so that there is a chance that p1->p2 and then a second
@@ -195,11 +203,11 @@ public class SpatialInteractorEvents {
 	 * If they know each other, their friendship is reinforced.
 	 * <br><br>
 	 * If they do not, they befriend with probability <code>pBecomeFriends</code>.
-	 * 
+	 *
 	 * The conditions of "becoming friends" apply:
 	 * {@link org.matsim.socialnetworks.socialnet.SocialNetwork.makeSocialContact}
-	 * 
-	 * 
+	 *
+	 *
 	 * @param p1
 	 * @param p2
 	 * @param rndEncounterProbability
@@ -238,14 +246,14 @@ public class SpatialInteractorEvents {
 	}
 
 	/**
-	 * 
+	 *
 	 * Each agent may randomly encounter (and have the chance to befriend) ONE other agent during
 	 * an Act in which they are both present. Uses a time window. The duration of the time
 	 * window is not relevant in this method.
 	 * <li>Construct a list of TimeWindows that overlap at a Facility, for each activity</li>
 	 * <li>If this list is empty, continue</li>
 	 * <li>If not, search this list for a random agent</li>
-	 * 
+	 *
 	 * @param plans
 	 * @param rndEncounterProbability
 	 * @param iteration
@@ -318,9 +326,9 @@ public class SpatialInteractorEvents {
 	 * <code>rndEncounterProbability(activity type)</code>. If the agents were already linked,
 	 * their link is reinforced.
 	 * <br><br>
-	 * 
+	 *
 	 * There is no other probability adjustment in this method.
-	 * 
+	 *
 	 * @param plans
 	 * @param rndEncounterProbability
 	 * @param iteration

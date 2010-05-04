@@ -36,6 +36,7 @@ import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.ScenarioConfig;
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.algorithms.InitializeKnowledge;
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
 import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
@@ -64,8 +65,7 @@ public class AnalyzeScores {
 
 		System.out.println("Make friend face to face scores each 10 iters:");
 
-
-		ScenarioConfig.setUpScenarioConfig();
+		SocNetConfigGroup snConfig = ScenarioConfig.setUpScenarioConfig();
 		Config config = ScenarioConfig.readConfig();
 
 		World world = ScenarioConfig.readWorld();
@@ -84,12 +84,12 @@ public class AnalyzeScores {
 		System.out.println("... done");
 
 		// Override the config to take the last iteration
-		config.socnetmodule().setReadMentalMap("true");
-		config.socnetmodule().setSocNetGraphAlgo("read");
-		config.socnetmodule().setInitIter(Integer.toString(isoc));
-		config.socnetmodule().setInDirName(ScenarioConfig.getSNInDir());
+		snConfig.setReadMentalMap("true");
+		snConfig.setSocNetGraphAlgo("read");
+		snConfig.setInitIter(Integer.toString(isoc));
+		snConfig.setInDirName(ScenarioConfig.getSNInDir());
 
-		SocialNetwork snet=new SocialNetwork(plans, facilities);
+		SocialNetwork snet=new SocialNetwork(plans, facilities, snConfig);
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventsMapStartEndTimes epp;
 		MakeTimeWindowsFromEvents teo=null;
@@ -106,7 +106,7 @@ public class AnalyzeScores {
 		teo.makeTimeWindows(epp);
 		twm=teo.getTimeWindowMap();
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm,facilities);
-		playground.jhackney.scoring.EventSocScoringFactory factory = new playground.jhackney.scoring.EventSocScoringFactory("leisure",actStats);
+		playground.jhackney.scoring.EventSocScoringFactory factory = new playground.jhackney.scoring.EventSocScoringFactory("leisure",actStats, snConfig);
 //		ScoringFunctionFactory cnfactory = new CharyparNagelScoringFunctionFactory(ScenarioConfig.getConfig().charyparNagelScoring());
 //		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", cnfactory,actStats);
 		scoring = new playground.jhackney.scoring.EventsToScoreAndReport(plans, factory);
@@ -126,7 +126,7 @@ public class AnalyzeScores {
 		actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm,facilities));
 //		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
 //		scoring = new EventsToScore(plans, factory);
-		scoring.finish();
+		scoring.finish(snConfig);
 
 //		System.out.println("writing out output plans");
 //		ScenarioConfig.writePlans(plans);

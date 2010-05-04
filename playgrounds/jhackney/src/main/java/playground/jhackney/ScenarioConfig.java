@@ -92,9 +92,11 @@ public abstract class ScenarioConfig {
 	// setup
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void setUpScenarioConfig() {
+	public static final SocNetConfigGroup setUpScenarioConfig() {
 //		config = Gbl.createConfig(null);
 		Config config = scenario.getConfig();
+		SocNetConfigGroup snConfig = new SocNetConfigGroup();
+		config.addModule(SocNetConfigGroup.GROUP_NAME, snConfig);
 		CharyparNagelScoringConfigGroup scoring = config.charyparNagelScoring();
 
 		configFileName = input_directory + "output_config.xml";
@@ -130,21 +132,21 @@ public abstract class ScenarioConfig {
 
 		config.events().setInputFile("events.txt");
 
-		config.socnetmodule().setInDirName(input_directory);
-		config.socnetmodule().setOutDir(output_directory);
+		snConfig.setInDirName(input_directory);
+		snConfig.setOutDir(output_directory);
 //		config.socnetmodule().setSocNetGraphAlgo("none");
-		config.socnetmodule().setSocNetGraphAlgo("read");//AnalyzeScores
-		config.socnetmodule().setSocNetLinkRemovalP("0");
-		config.socnetmodule().setSocNetLinkRemovalAge("0");
-		config.socnetmodule().setDegSat("0");
-		config.socnetmodule().setEdgeType("UNDIRECTED");
+		snConfig.setSocNetGraphAlgo("read");//AnalyzeScores
+		snConfig.setSocNetLinkRemovalP("0");
+		snConfig.setSocNetLinkRemovalAge("0");
+		snConfig.setDegSat("0");
+		snConfig.setEdgeType("UNDIRECTED");
 //		config.socnetmodule().setInitIter("0");
-		config.socnetmodule().setInitIter("0");
-		config.socnetmodule().setReadMentalMap("true");
-		config.socnetmodule().setBeta1("0");
-		config.socnetmodule().setBeta2("0");
-		config.socnetmodule().setBeta3("0");
-		config.socnetmodule().setBeta4("0");
+		snConfig.setInitIter("0");
+		snConfig.setReadMentalMap("true");
+		snConfig.setBeta1("0");
+		snConfig.setBeta2("0");
+		snConfig.setBeta3("0");
+		snConfig.setBeta4("0");
 
 		config.createModule("kml21");
 		config.getModule("kml21").addParam("outputDirectory", output_directory);
@@ -197,6 +199,7 @@ public abstract class ScenarioConfig {
 //		params.setClosingTime(24.*3600);
 //		scoring.addActivityParams(params);
 //
+		return snConfig;
 	}
 
 	//////////////////////////////////////////////////////////////////////

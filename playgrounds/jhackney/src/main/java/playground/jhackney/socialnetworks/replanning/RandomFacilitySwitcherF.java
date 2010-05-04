@@ -27,12 +27,14 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import playground.jhackney.SocNetConfigGroup;
 /**
  * A sample location choice replanning StrategyModule. The facility
  * (the place an activity takes place) is exchanged randomly for another
  * facility chosen randomly from all available facilities.
  * This is only performed for a given type(s) of activity.
- *  
+ *
  * @author jhackney
  *
  */
@@ -42,13 +44,14 @@ public class RandomFacilitySwitcherF extends AbstractMultithreadedModule {
 	private PersonalizableTravelCost tcost=null;
 	private TravelTime ttime=null;
 	private ActivityFacilities facs=null;
-	/** 
+	/**
 	 * TODO [JH] Activity types are hard-coded here but have to match the
 	 * standard facility types in the facilities object as well as plans object.
 	 * Need to make this change in the SNControllers, too.
 	 */
 	private String[] factypes={"home","work","shop","education","leisure"};
-	
+	private final SocNetConfigGroup snConfig;
+
     public RandomFacilitySwitcherF(Config config, Network network, PersonalizableTravelCost tcost, TravelTime ttime, ActivityFacilities facs) {
     	super(config.global());
 		System.out.println("initializing RandomFacilitySwitcher");
@@ -56,12 +59,13 @@ public class RandomFacilitySwitcherF extends AbstractMultithreadedModule {
     	this.tcost = tcost;
     	this.ttime = ttime;
     	this.facs = facs;
+    	this.snConfig = (SocNetConfigGroup) config.getModule(SocNetConfigGroup.GROUP_NAME);
     }
 
     @Override
 		public PlanAlgorithm getPlanAlgoInstance() {
 //	return new SNSecLocShortest(factypes, network, tcost, ttime);
-	return new RandomChangeLocationF(factypes, network, tcost, ttime, facs);
+	return new RandomChangeLocationF(factypes, network, tcost, ttime, facs, this.snConfig);
     }
 
 

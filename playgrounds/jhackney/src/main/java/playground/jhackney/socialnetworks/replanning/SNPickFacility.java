@@ -28,6 +28,7 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.socialnetworks.mentalmap.MentalMap;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
 /**
@@ -74,8 +75,8 @@ public class SNPickFacility implements PlanAlgorithm {
 	private final Logger log = Logger.getLogger(SNPickFacility.class);
 	private final Knowledges knowledges;
 
-	public SNPickFacility(String[] factypes, NetworkLayer network, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges knowledges){
-		weights = Gbl.getConfig().socnetmodule().getSWeights();
+	public SNPickFacility(String[] factypes, NetworkLayer network, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges knowledges, SocNetConfigGroup snConfig){
+		weights = snConfig.getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
 		this.tcost=tcost;

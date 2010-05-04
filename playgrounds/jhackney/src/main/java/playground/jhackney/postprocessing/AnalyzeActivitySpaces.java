@@ -40,7 +40,8 @@ public class AnalyzeActivitySpaces {
 		System.out.println("Make activity spaces for egoNet:");
 
 
-		Config config = Scenario.setUpScenarioConfig();
+		Scenario.setUpScenarioConfig();
+		Config config = Scenario.getConfig();
 
 		World world = Scenario.readWorld();
 		Scenario.readFacilities();

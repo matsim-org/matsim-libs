@@ -61,6 +61,8 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.jhackney.SocNetConfigGroup;
+
 
 public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 	private final String weights;
@@ -75,8 +77,8 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 
 	private final Knowledges knowledges;
 
-	public PlanRandomReplaceSecLoc(String[] factypes, NetworkLayer network, ActivityFacilitiesImpl facilities, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges knowledges) {
-		weights = Gbl.getConfig().socnetmodule().getSWeights();
+	public PlanRandomReplaceSecLoc(String[] factypes, NetworkLayer network, ActivityFacilitiesImpl facilities, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges knowledges, SocNetConfigGroup snConfig) {
+		weights = snConfig.getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
 		this.facilities=facilities;

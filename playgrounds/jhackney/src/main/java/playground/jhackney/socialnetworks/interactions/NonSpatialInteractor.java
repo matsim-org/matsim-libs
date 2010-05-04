@@ -24,10 +24,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.knowledges.Knowledges;
 
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.socialnetworks.socialnet.SocialNetEdge;
 import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
@@ -51,13 +51,13 @@ public class NonSpatialInteractor{
 
 	PersonExchangeKnowledge pxk; // the actual workhorse
 
-	public NonSpatialInteractor(SocialNetwork snet, Knowledges knowledges) {
+	public NonSpatialInteractor(SocialNetwork snet, Knowledges knowledges, SocNetConfigGroup snConfig) {
 		this.net=snet;
 
 		pxk = new PersonExchangeKnowledge(net, knowledges);
-		proportionOfLinksToActivate = Double.parseDouble(Gbl.getConfig().socnetmodule().getFractNSInteract());
-		numInteractionsPerLink = Integer.parseInt(Gbl.getConfig().socnetmodule().getSocNetNSInteractions());
-		fract_intro=Double.parseDouble(Gbl.getConfig().socnetmodule().getFriendIntroProb());
+		proportionOfLinksToActivate = Double.parseDouble(snConfig.getFractNSInteract());
+		numInteractionsPerLink = Integer.parseInt(snConfig.getSocNetNSInteractions());
+		fract_intro=Double.parseDouble(snConfig.getFriendIntroProb());
 	}
 
 	public void exchangeGeographicKnowledge(String facType, int iteration) {
@@ -65,12 +65,12 @@ public class NonSpatialInteractor{
 
 
 		links = net.getLinks().toArray();
-		final List<Object> list = (List<Object>) Arrays.asList( links );
-		
-		
+		final List<Object> list = Arrays.asList( links );
+
+
 		java.util.Collections.shuffle(list, MatsimRandom.getRandom());
 		links=list.toArray();
-		
+
 		int numPicks = (int) (proportionOfLinksToActivate * links.length);
 
 //		Pick a random link
@@ -112,16 +112,16 @@ public class NonSpatialInteractor{
 			this.log.info("No friends introduced");
 			return;
 		}
-		
+
 		this.log.info("FOF algorithm for Iteration "+iteration+". "+fract_intro*100.+"% of links will be tested.");
 		this.log.info(" For each there is the opportunity to close "+numInteractionsPerLink+" triangles.");
 
 		links = net.getLinks().toArray();
-		final List<Object> list = (List<Object>) Arrays.asList( links );
+		final List<Object> list = Arrays.asList( links );
 		java.util.Collections.shuffle(list, MatsimRandom.getRandom());
 		links=list.toArray();
-		
-		
+
+
 		int numPicks = (int) (fract_intro * links.length);
 
 		for(int i=0;i<numPicks;i++){

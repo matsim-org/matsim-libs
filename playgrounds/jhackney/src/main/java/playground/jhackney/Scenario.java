@@ -89,9 +89,11 @@ public abstract class Scenario {
 	// setup
 	//////////////////////////////////////////////////////////////////////
 
-	public static final Config setUpScenarioConfig() {
+	public static final SocNetConfigGroup setUpScenarioConfig() {
 //		config = Gbl.createConfig(null);
+		SocNetConfigGroup snConfig = new SocNetConfigGroup();
 		Config config = scenario.getConfig();
+		config.addModule(SocNetConfigGroup.GROUP_NAME, snConfig);
 
 		config.config().setOutputFile(output_directory + "output_config.xml");
 
@@ -119,17 +121,17 @@ public abstract class Scenario {
 
 		config.events().setInputFile("events.txt");
 
-		config.socnetmodule().setInDirName(input_directory);
-		config.socnetmodule().setOutDir(output_directory);
+		snConfig.setInDirName(input_directory);
+		snConfig.setOutDir(output_directory);
 //		config.socnetmodule().setSocNetGraphAlgo("none");
-		config.socnetmodule().setSocNetGraphAlgo("read");//AnalyzeScores
-		config.socnetmodule().setSocNetLinkRemovalP("0");
-		config.socnetmodule().setSocNetLinkRemovalAge("0");
-		config.socnetmodule().setDegSat("0");
-		config.socnetmodule().setEdgeType("UNDIRECTED");
+		snConfig.setSocNetGraphAlgo("read");//AnalyzeScores
+		snConfig.setSocNetLinkRemovalP("0");
+		snConfig.setSocNetLinkRemovalAge("0");
+		snConfig.setDegSat("0");
+		snConfig.setEdgeType("UNDIRECTED");
 //		config.socnetmodule().setInitIter("0");
-		config.socnetmodule().setInitIter("0");
-		config.socnetmodule().setReadMentalMap("true");
+		snConfig.setInitIter("0");
+		snConfig.setReadMentalMap("true");
 //		config.socnetmodule().setBeta1("0");
 //		config.socnetmodule().setBeta2("0");
 //		config.socnetmodule().setBeta3("0");
@@ -141,7 +143,7 @@ public abstract class Scenario {
 		config.getModule("kml21").addParam("outputKMLDemoColoredLinkFile", "egoNetLinkColorFile");
 		config.getModule("kml21").addParam("useCompression", "true");
 
-		return config;
+		return snConfig;
 	}
 
 	//////////////////////////////////////////////////////////////////////

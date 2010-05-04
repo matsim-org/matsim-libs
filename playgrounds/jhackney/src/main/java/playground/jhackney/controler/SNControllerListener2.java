@@ -41,6 +41,7 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.algorithms.InitializeKnowledge;
 import playground.jhackney.algorithms.ParamStringToStringArray;
 import playground.jhackney.algorithms.ParamStringsToStringDoubleMap;
@@ -88,6 +89,7 @@ import playground.jhackney.socialnetworks.statistics.SocialNetworkStatistics;
  */
 public class SNControllerListener2 implements StartupListener, BeforeMobsimListener, IterationEndsListener,  ScoringListener{
 
+	private SocNetConfigGroup snConfig;
 	private int reportInterval=50;
 	private static String SOCNET_OUT_DIR = null;
 	private SocialNetwork snet;// static? I just need one
@@ -115,6 +117,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
+		this.snConfig = (SocNetConfigGroup) this.controler.getConfig().getModule(SocNetConfigGroup.GROUP_NAME);
 		this.knowledges = (controler.getScenario()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
 		new WorldConnectLocations().run(controler.getScenario().getWorld());
@@ -173,7 +176,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 //			forget knowledge
 			this.log.info("Forgetting knowledge");
-			double multiple=Double.parseDouble(this.controler.getConfig().socnetmodule().getMemSize());
+			double multiple=Double.parseDouble(this.snConfig.getMemSize());
 			new PersonForgetKnowledge(multiple).run(controler.getPopulation());
 			this.log.info(" ... forgetting knowledge done");
 
@@ -276,28 +279,28 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 	private void snsetup() {
 
-		SOCNET_OUT_DIR = this.controler.getConfig().socnetmodule().getOutDirName();
+		SOCNET_OUT_DIR = this.snConfig.getOutDirName();
 		File snDir = new File(SOCNET_OUT_DIR);
 		if (!snDir.mkdir() && !snDir.exists()) {
 			Gbl.errorMsg("The iterations directory " + SOCNET_OUT_DIR + " could not be created.");
 		}
 
-		this.reportInterval = Integer.parseInt(this.controler.getConfig().socnetmodule().getReportInterval());
-		this.interact_interval = Integer.parseInt(this.controler.getConfig().socnetmodule().getRPInt());
-		String xchangeInfoString = this.controler.getConfig().socnetmodule().getXchange();
+		this.reportInterval = Integer.parseInt(this.snConfig.getReportInterval());
+		this.interact_interval = Integer.parseInt(this.snConfig.getRPInt());
+		String xchangeInfoString = this.snConfig.getXchange();
 		this.infoToExchange = new ParamStringToStringArray(xchangeInfoString).getArray();
-		this.rndEncounterProbs = new ParamStringsToStringDoubleMap(this.controler.getConfig().socnetmodule().getActTypes(), this.controler.getConfig().socnetmodule().getFacWt()).getMap();
+		this.rndEncounterProbs = new ParamStringsToStringDoubleMap(this.snConfig.getActTypes(), this.snConfig.getFacWt()).getMap();
 
 		this.log.info(" Instantiating the Pajek writer ...");
 		this.pjw = new PajekWriter(SOCNET_OUT_DIR, controler.getFacilities(), this.knowledges);
 		this.log.info("... done");
 
-		if(this.controler.getConfig().socnetmodule().getSocNetAlgo()==(null)){
+		if(this.snConfig.getSocNetAlgo()==(null)){
 			this.log.error("No social network is set. This controller requires you to configure a social network");
 		}
 
 		this.log.info(" Initializing the social network ...");
-		this.snet = new SocialNetwork(this.controler.getPopulation(), this.controler.getFacilities());
+		this.snet = new SocialNetwork(this.controler.getPopulation(), this.controler.getFacilities(), snConfig);
 		this.log.info("... done");
 
 		if(reportInterval>0){
@@ -314,11 +317,11 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		this.log.info("... done");
 
 		this.log.info(" Setting up the NonSpatial interactor ...");
-		this.plansInteractorNS=new NonSpatialInteractor(this.snet, this.knowledges);
+		this.plansInteractorNS=new NonSpatialInteractor(this.snet, this.knowledges, this.snConfig);
 		this.log.info("... done");
 
 		this.log.info(" Setting up the Spatial interactor ...");
-		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo, this.controler.getFacilities());
+		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo, this.controler.getFacilities(), this.snConfig);
 		this.log.info("... done");
 
 		this.snIter = this.controler.getFirstIteration();
@@ -337,7 +340,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 		this.log.info(" Setting up scoring factory ...");
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm,controler.getFacilities());
-		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", controler.getScoringFunctionFactory(),actStats);
+		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", controler.getScoringFunctionFactory(),actStats, this.snConfig);
 //		SocScoringFactoryEvent factory = new playground.jhackney.scoring.SocScoringFactoryEvent("leisure", actStats);
 		this.controler.setScoringFunctionFactory(factory);
 		this.log.info("... done");

@@ -29,6 +29,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.jhackney.SocNetConfigGroup;
+
 /**
  * A sample location choice replanning StrategyModule. The facility
  * (the place an activity takes place) is exchanged randomly for another
@@ -43,14 +45,15 @@ public class RandomFacilitySwitcherK extends AbstractMultithreadedModule {
 	private Network network=null;
 	private PersonalizableTravelCost tcost=null;
 	private TravelTime ttime=null;
-	/** 
+	/**
 	 * TODO [JH] Activity types are hard-coded here but have to match the
 	 * standard facility types in the facilities object as well as plans object.
 	 * Need to make this change in the SNControllers, too.
 	 */
 	private String[] factypes={"home","work","shop","education","leisure"};
 	private Knowledges knowledges;
-	
+	private final SocNetConfigGroup snConfig;
+
     public RandomFacilitySwitcherK(Config config, Network network, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges kn) {
     	super(config.global());
 		log.info("initializing SNRandomFacilitySwitcher");
@@ -58,12 +61,13 @@ public class RandomFacilitySwitcherK extends AbstractMultithreadedModule {
     	this.tcost = tcost;
     	this.ttime = ttime;
     	this.knowledges = kn;
+    	this.snConfig = (SocNetConfigGroup) config.getModule(SocNetConfigGroup.GROUP_NAME);
     }
 
     @Override
 		public PlanAlgorithm getPlanAlgoInstance() {
 //	return new SNSecLocShortest(factypes, network, tcost, ttime);
-	return new RandomChangeLocationK(factypes, network, tcost, ttime, this.knowledges);
+	return new RandomChangeLocationK(factypes, network, tcost, ttime, this.knowledges, this.snConfig);
     }
 
 

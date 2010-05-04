@@ -12,6 +12,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.socialnetworks.io.ActivityActReader;
 import playground.jhackney.socialnetworks.mentalmap.MentalMap;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -28,9 +29,9 @@ public class InitializeKnowledge {
 
 //		Attempt to open file of mental maps and read it in
 		System.out.println("  Opening the file to read in the map of Acts to Facilities");
-		aar = new ActivityActReader(Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue());
+		aar = new ActivityActReader(Integer.valueOf(((SocNetConfigGroup) Gbl.getConfig().getModule(SocNetConfigGroup.GROUP_NAME)).getInitIter()).intValue());
 
-		String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue()+".txt";
+		String fileName = ((SocNetConfigGroup) Gbl.getConfig().getModule(SocNetConfigGroup.GROUP_NAME)).getInDirName()+ "ActivityActMap"+Integer.valueOf(((SocNetConfigGroup) Gbl.getConfig().getModule(SocNetConfigGroup.GROUP_NAME)).getInitIter()).intValue()+".txt";
 
 		if (new File(fileName).exists()) {
 			// File or directory exists

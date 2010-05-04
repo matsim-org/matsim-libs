@@ -45,6 +45,8 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.jhackney.SocNetConfigGroup;
+
 public class RandomChangeLocShortestK implements PlanAlgorithm {
 
 	private final String weights;
@@ -58,8 +60,8 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 
 	private final Knowledges knowledges;
 
-	public RandomChangeLocShortestK(String[] factypes, NetworkLayer network, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges knowledges) {
-		weights = Gbl.getConfig().socnetmodule().getSWeights();
+	public RandomChangeLocShortestK(String[] factypes, NetworkLayer network, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges knowledges, SocNetConfigGroup snConfig) {
+		weights = snConfig.getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
 		this.tcost=tcost;

@@ -34,6 +34,7 @@ import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.activitySpaces.PersonCalcActivitySpace;
 import playground.jhackney.activitySpaces.PersonWriteActivitySpaceTable;
 import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
@@ -49,7 +50,8 @@ public class EgoNetMakeActivitySpaces {
 
 		System.out.println("Make activity spaces for egoNet:");
 
-		Config config = Scenario.setUpScenarioConfig();
+		SocNetConfigGroup snConfig = Scenario.setUpScenarioConfig();
+		Config config = Scenario.getConfig();
 
 		World world = Scenario.readWorld();
 		Scenario.readFacilities();
@@ -65,7 +67,7 @@ public class EgoNetMakeActivitySpaces {
 		ActivityFacilitiesImpl facilities = Scenario.readFacilities();
 		//read in social network
 		System.out.println(" Initializing the social network ...");
-		new SocialNetwork(plans, facilities);
+		new SocialNetwork(plans, facilities, snConfig);
 		System.out.println("... done");
 
 		//read in facilities knowledge

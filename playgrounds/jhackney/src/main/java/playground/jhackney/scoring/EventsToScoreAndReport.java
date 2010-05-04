@@ -47,6 +47,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
+import playground.jhackney.SocNetConfigGroup;
+
 /**
  * Continuously calculates the score of the selected plans of a given population
  * based on events, tracks the score components, and if "report" is set,
@@ -109,7 +111,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 	 * Finishes the calculation of the plans' scores and assigns the new scores
 	 * to the plans.
 	 */
-	public void finish() {
+	public void finish(SocNetConfigGroup snConfig) {
 
 		for (Map.Entry<String, playground.jhackney.scoring.EventSocScoringFunction> entry : this.agentScorers.entrySet()) {
 			String agentId = entry.getKey();
@@ -132,10 +134,10 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 		if(report){
 			//open marginal utility outfile
 			//open utility outfile
-			String ufname=Gbl.getConfig().socnetmodule().getInDirName()+"_UtilityComponents.txt";
+			String ufname=snConfig.getInDirName()+"_UtilityComponents.txt";
 			BufferedWriter uout = null;
 
-			String mufname=Gbl.getConfig().socnetmodule().getInDirName()+"_MarginalUtilityComponents.txt";
+			String mufname=snConfig.getInDirName()+"_MarginalUtilityComponents.txt";
 			BufferedWriter muout = null;
 			try {
 				uout = new BufferedWriter(new FileWriter(ufname));

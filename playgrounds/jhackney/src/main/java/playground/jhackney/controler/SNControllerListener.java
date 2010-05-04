@@ -48,6 +48,7 @@ import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.activitySpaces.ActivitySpaces;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
@@ -107,6 +108,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	private static final boolean CALCSTATS = true;
 	public static String SOCNET_OUT_DIR = null;
 
+	private SocNetConfigGroup snConfig = null;
 	SocialNetwork snet;
 	SocialNetworkStatistics snetstat;
 	ActivityActWriter aaw;
@@ -141,6 +143,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
+		this.snConfig = (SocNetConfigGroup) this.controler.getConfig().getModule(SocNetConfigGroup.GROUP_NAME);
 		this.knowledges = (controler.getScenario()).getKnowledges();
 		// Make a new zone layer (Raster)
 //		if(!(this.controler.getConfig().socnetmodule().getGridSpace().equals(null))){
@@ -182,7 +185,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info(" ... Instantiation of events overlap tracking done");
 //		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm,controler.getFacilities());
-		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", controler.getScoringFunctionFactory(),actStats);
+		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", controler.getScoringFunctionFactory(),actStats, this.snConfig);
 
 		this.controler.setScoringFunctionFactory(factory);
 		this.log.info("... done");
@@ -323,7 +326,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 			}
 
 			// Exchange of knowledge about people
-			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getFriendIntroProb());
+			double fract_intro=Double.parseDouble(this.snConfig.getFriendIntroProb());
 			if (fract_intro > 0) {
 				this.log.info("  Knowledge about other people is being exchanged ...");
 				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
@@ -361,9 +364,9 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 //		If the user has an existing file that maps activities to acts, open it and read it in
 //		Attempt to open file of mental maps and read it in
 		System.out.println("  Opening the file to read in the map of Acts to Facilities");
-		aar = new ActivityActReader(Integer.valueOf(controler.getConfig().socnetmodule().getInitIter()).intValue());
+		aar = new ActivityActReader(Integer.valueOf(this.snConfig.getInitIter()).intValue());
 
-		String fileName = controler.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+Integer.parseInt(controler.getConfig().socnetmodule().getInitIter())+".txt";
+		String fileName = this.snConfig.getInDirName()+ "ActivityActMap"+Integer.parseInt(this.snConfig.getInitIter())+".txt";
 		aar.openFile(fileName);
 		System.out.println(" ... done");
 
@@ -393,16 +396,16 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 //		Config config = Gbl.getConfig();
 
-		SOCNET_OUT_DIR = this.controler.getConfig().socnetmodule().getOutDirName();
+		SOCNET_OUT_DIR = this.snConfig.getOutDirName();
 		File snDir = new File(SOCNET_OUT_DIR);
 		if (!snDir.mkdir() && !snDir.exists()) {
 			Gbl.errorMsg("The iterations directory " + SOCNET_OUT_DIR + " could not be created.");
 		}
 
-		this.max_sn_iter = Integer.parseInt(this.controler.getConfig().socnetmodule().getNumIterations());
-		this.replan_interval = Integer.parseInt(this.controler.getConfig().socnetmodule().getRPInt());
-		String rndEncounterProbString = this.controler.getConfig().socnetmodule().getFacWt();
-		String xchangeInfoString = this.controler.getConfig().socnetmodule().getXchange();
+		this.max_sn_iter = Integer.parseInt(this.snConfig.getNumIterations());
+		this.replan_interval = Integer.parseInt(this.snConfig.getRPInt());
+		String rndEncounterProbString = this.snConfig.getFacWt();
+		String xchangeInfoString = this.snConfig.getXchange();
 		this.infoToExchange = getFacTypes(xchangeInfoString);
 		this.fractionS = toNumber(rndEncounterProbString);
 		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
@@ -412,7 +415,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("... done");
 
 		this.log.info(" Initializing the social network ...");
-		this.snet = new SocialNetwork(this.controler.getPopulation(), this.controler.getFacilities());
+		this.snet = new SocialNetwork(this.controler.getPopulation(), this.controler.getFacilities(), snConfig);
 		this.log.info("... done");
 
 		if(CALCSTATS){
@@ -438,13 +441,13 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("... done");
 
 		this.log.info(" Setting up the NonSpatial interactor ...");
-		this.plansInteractorNS=new NonSpatialInteractor(this.snet, this.knowledges);
+		this.plansInteractorNS=new NonSpatialInteractor(this.snet, this.knowledges, this.snConfig);
 		this.log.info("... done");
 
 		this.log.info(" Setting up the Spatial interactor ...");
 		//InteractorTest
 //		this.plansInteractorS=new SpatialInteractorActs(this.snet);
-		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo, controler.getFacilities());
+		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo, controler.getFacilities(), this.snConfig);
 		this.log.info("... done");
 
 		this.snIter = this.controler.getFirstIteration();

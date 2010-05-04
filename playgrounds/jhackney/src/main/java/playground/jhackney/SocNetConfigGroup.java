@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 
-package org.matsim.core.config.groups;
+package playground.jhackney;
 
 import java.util.TreeMap;
 

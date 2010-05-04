@@ -50,6 +50,7 @@ import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.algorithms.InitializeKnowledge;
 import playground.jhackney.algorithms.TimeWindowCalcTimeCorrelations;
 import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
@@ -71,7 +72,7 @@ public class AnalyzeTimeCorrelations {
 
 		System.out.println("Make friend face to face scores each 10 iters:");
 
-		Scenario.setUpScenarioConfig();
+		SocNetConfigGroup snConfig = Scenario.setUpScenarioConfig();
 		Config config = Scenario.getConfig();
 
 		World world = Scenario.readWorld();
@@ -105,9 +106,9 @@ public class AnalyzeTimeCorrelations {
 		System.out.println(" ... done");
 
 		//read in social network
-		config.socnetmodule().setInitIter(Integer.toString(isoc));
+		snConfig.setInitIter(Integer.toString(isoc));
 		System.out.println(" Initializing the social network ...");
-		SocialNetwork snet=new SocialNetwork(plans, facilities);
+		SocialNetwork snet=new SocialNetwork(plans, facilities, snConfig);
 		System.out.println("... done");
 
 //		double totaliterationfriendscore=0;

@@ -36,6 +36,7 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.socialnetworks.algorithms.CompareActs;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
 import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
@@ -45,19 +46,21 @@ public class SpatialInteractorActs {
 
 	SocialNetwork net;
 
-	double pBecomeFriends = Double.parseDouble(Gbl.getConfig().socnetmodule().getPBefriend());// [0.0,1.0]
+	double pBecomeFriends;// [0.0,1.0]
 
 //	double pct_interacting = Double.parseDouble(Gbl.getConfig().socnetmodule().getFractSInteract());// [0.0,1.0]
 
-	String interaction_type = Gbl.getConfig().socnetmodule().getSocNetInteractor2();
+	String interaction_type;
 
 	LinkedHashMap<ActivityOptionImpl,ArrayList<Person>> activityMap;
 //	LinkedHashMap<Activity,ArrayList<Person>> actMap=new LinkedHashMap<Activity,ArrayList<Person>>();
 	ActivityFacilities facilities;
 
-	public SpatialInteractorActs(SocialNetwork snet, ActivityFacilities facilities) {
+	public SpatialInteractorActs(SocialNetwork snet, ActivityFacilities facilities, SocNetConfigGroup snConfig) {
 		this.net = snet;
 		this.facilities = facilities;
+		this.pBecomeFriends = Double.parseDouble(snConfig.getPBefriend());
+		this.interaction_type = snConfig.getSocNetInteractor2();
 	}
 	/**
 	 * The Plans contain all agents who are chosen to participate in social interactions.

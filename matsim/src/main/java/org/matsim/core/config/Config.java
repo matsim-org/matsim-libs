@@ -46,7 +46,6 @@ import org.matsim.core.config.groups.RoadPricingConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.WithindayConfigGroup;
@@ -70,7 +69,7 @@ public class Config {
 	protected final TreeMap<String, Module> modules = new TreeMap<String,Module>();
 
 	/* the following members are for the direct access to the core config groups. */
-	
+
 	private GlobalConfigGroup global = null;
 	private ConfigConfigGroup config = null;
 	private ControlerConfigGroup controler = null;
@@ -89,7 +88,6 @@ public class Config {
 	private RoadPricingConfigGroup roadpricing = null;
 	private EvacuationConfigGroup evacuation = null;
 	private StrategyConfigGroup strategy = null;
-	private SocNetConfigGroup socnetmodule = null;
 	private LocationChoiceConfigGroup locationchoice = null;
 	private SignalSystemsConfigGroup signalSystemConfigGroup = null;
 	private ScenarioConfigGroup scenarioConfigGroup = null;
@@ -101,7 +99,7 @@ public class Config {
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
 
 	private HouseholdsConfigGroup households;
-	
+
 	private OTFVisConfig otfVis ;
 
 	/** static Logger-instance. */
@@ -150,13 +148,13 @@ public class Config {
 
 		this.plans = new PlansConfigGroup();
 		this.modules.put(PlansConfigGroup.GROUP_NAME, this.plans);
-		
+
 		this.households = new HouseholdsConfigGroup();
 		this.modules.put(HouseholdsConfigGroup.GROUP_NAME, this.households);
 
 		this.planomat = new PlanomatConfigGroup();
 		this.modules.put(PlanomatConfigGroup.GROUP_NAME, this.planomat);
-		
+
 		this.facilities = new FacilitiesConfigGroup();
 		this.modules.put(FacilitiesConfigGroup.GROUP_NAME, this.facilities);
 
@@ -175,30 +173,27 @@ public class Config {
 		this.evacuation = new EvacuationConfigGroup();
 		this.modules.put(EvacuationConfigGroup.GROUP_NAME, this.evacuation);
 
-		this.socnetmodule = new SocNetConfigGroup();
-		this.modules.put(SocNetConfigGroup.GROUP_NAME, this.socnetmodule);
-		
 		this.locationchoice = new LocationChoiceConfigGroup();
 		this.modules.put(LocationChoiceConfigGroup.GROUP_NAME, this.locationchoice);
-		
+
 		this.signalSystemConfigGroup = new SignalSystemsConfigGroup();
 		this.modules.put(SignalSystemsConfigGroup.GROUPNAME, this.signalSystemConfigGroup);
 
 		this.travelTimeCalculatorConfigGroup = new TravelTimeCalculatorConfigGroup();
 		this.modules.put(TravelTimeCalculatorConfigGroup.GROUPNAME, this.travelTimeCalculatorConfigGroup);
-		
+
 		this.scenarioConfigGroup = new ScenarioConfigGroup();
 		this.modules.put(ScenarioConfigGroup.GROUP_NAME, this.scenarioConfigGroup);
-		
+
 		this.plansCalcRoute = new PlansCalcRouteConfigGroup();
 		this.modules.put(PlansCalcRouteConfigGroup.GROUP_NAME, this.plansCalcRoute);
-		
+
 		this.vspExperimentalGroup = new VspExperimentalConfigGroup();
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, this.vspExperimentalGroup);
-		
+
 		this.otfVis = new OTFVisConfig() ;
 		this.modules.put( OTFVisConfig.GROUP_NAME, this.otfVis ) ;
-		
+
 	}
 
 	/** Checks each module for consistency, e.g. if the parameters that are currently set make sense
@@ -210,7 +205,7 @@ public class Config {
 		for (ConfigConsistencyChecker c : this.consistencyCheckers){
 			c.checkConsistency(this);
 		}
-		
+
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -219,7 +214,7 @@ public class Config {
 
 	/** Creates a new module / config-group with the specified name.
 	 * @param name The name of the config-group to be created.
-	 * 
+	 *
 	 * @return the newly created config group
 	 * @throws IllegalArgumentException if a config-group with the specified name already exists.
 	 */
@@ -234,10 +229,10 @@ public class Config {
 
 	/**
 	 * Adds the specified module / config-group with the specified name to the configuration.
-	 * 
+	 *
 	 * @param name
 	 * @param module
-	 * 
+	 *
 	 * @throws IllegalArgumentException if a config-group with the specified name already exists.
 	 */
 	public final void addModule(final String name, final Module module) {
@@ -250,10 +245,10 @@ public class Config {
 	/**
 	 * Removes the specified module / config-group with the specified name from the configuration.
 	 * Does nothing if this module was not existing.
-	 * 
+	 *
 	 * @param name
 	 * @param module
-	 * 
+	 *
 	 */
 	public final void removeModule(final String name) {
 		if (this.modules.containsKey(name)) {
@@ -344,11 +339,11 @@ public class Config {
 	// is used for using Config without a config-file given
 	//////////////////////////////////////////////////////////////////////
 	/**
-	 * Sets the parameter <code>paramName</code> in the module/config-group 
+	 * Sets the parameter <code>paramName</code> in the module/config-group
 	 * <code>moduleName</code> to the specified value.
 	 * If there is no config-group with the specified name, a new group will
-	 * be created. 
-	 * 
+	 * be created.
+	 *
 	 * @param moduleName
 	 * @param paramName
 	 * @param value
@@ -407,7 +402,7 @@ public class Config {
 	public final PlansConfigGroup plans() {
 		return this.plans;
 	}
-	
+
 	public final HouseholdsConfigGroup households(){
 		return this.households;
 	}
@@ -436,10 +431,6 @@ public class Config {
 		return this.strategy;
 	}
 
-	public final SocNetConfigGroup socnetmodule() {
-		return this.socnetmodule;
-	}
-	
 	public final LocationChoiceConfigGroup locationchoice() {
 		return this.locationchoice;
 	}
@@ -451,11 +442,11 @@ public class Config {
 	public SignalSystemsConfigGroup signalSystems() {
 		return this.signalSystemConfigGroup;
 	}
-	
+
 	public TravelTimeCalculatorConfigGroup travelTimeCalculator(){
 		return this.travelTimeCalculatorConfigGroup;
 	}
-	
+
 	public ScenarioConfigGroup scenario(){
 		return this.scenarioConfigGroup;
 	}
@@ -468,16 +459,16 @@ public class Config {
 	public PlansCalcRouteConfigGroup plansCalcRoute() {
 		return this.plansCalcRoute;
 	}
-	
+
 	public VspExperimentalConfigGroup vspExperimental() {
 		return this.vspExperimentalGroup;
 	}
-	
+
 	public OTFVisConfig otfVis() {
 		return this.otfVis ;
 	}
 
-  
+
   public QSimConfigGroup getQSimConfigGroup() {
     return qSimConfigGroup;
   }

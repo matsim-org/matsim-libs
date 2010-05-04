@@ -30,6 +30,7 @@ import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
 import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
@@ -44,7 +45,7 @@ public class CreateKMZFromOutput {
 		System.out.println("Make friend face to face scores each 10 iters:");
 
 
-		Scenario.setUpScenarioConfig();
+		SocNetConfigGroup snConfig = Scenario.setUpScenarioConfig();
 		Config config = Scenario.getConfig();
 
 //		config.plans().setInputFile(Scenario.getSNInDir() + "output_plans"+i+".xml");
@@ -64,13 +65,13 @@ public class CreateKMZFromOutput {
 		System.out.println("... done");
 
 		for(int i=0; i<501; i+=50){
-			config.socnetmodule().setInitIter(Integer.toString(i));
+			snConfig.setInitIter(Integer.toString(i));
 //			config.socnetmodule().setInitIter(Integer.toString(0));
 //			Knowledges kn = new KnowledgesImpl();
 			Population plans = Scenario.readPlansAndKnowledges();
 			//read in social network
 			System.out.println(" Initializing the social network ...");
-			SocialNetwork snet=new SocialNetwork(plans, facilities);
+			SocialNetwork snet=new SocialNetwork(plans, facilities, snConfig);
 
 			System.out.println("... done");
 

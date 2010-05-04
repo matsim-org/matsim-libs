@@ -27,9 +27,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.SocNetConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
+
+import playground.jhackney.SocNetConfigGroup;
 
 
 /**
@@ -51,7 +51,7 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	private double nFriends=0;
 	private double timeWithFriends=0;
 
-	private SocNetConfigGroup socnetConfig = Gbl.getConfig().socnetmodule();
+	private SocNetConfigGroup socnetConfig;
 
 	private double betaFriendFoe = Double.parseDouble(socnetConfig.getBeta1());
 	private double betaNFriends= Double.parseDouble(socnetConfig.getBeta2());
@@ -61,9 +61,10 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	LinkedHashMap<Activity,Double> dusoc=new LinkedHashMap<Activity,Double>();
 
 //	public SocScoringFunctionEvent(final Plan plan, final playground.jhackney.scoring.CharyparNagelScoringFunction scoringFunction, String factype, final LinkedHashMap<Act,ArrayList<Double>> actStats) {
-	public EventSocScoringFunction(final Plan plan, String factype, final LinkedHashMap<Activity,ArrayList<Double>> actStats) {
+	public EventSocScoringFunction(final Plan plan, String factype, final LinkedHashMap<Activity,ArrayList<Double>> actStats, SocNetConfigGroup snConfig) {
 //		this.paidToll = paidToll;
 		super(plan);
+		this.socnetConfig = snConfig;
 		this.plan = plan;
 //		this.teo=teo;
 		this.factype=factype;
