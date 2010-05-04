@@ -47,13 +47,16 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
+import playground.yu.utils.io.SimpleWriter;
+
 /**
  * @author ychen
- *
+ * 
  */
 public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	/**
@@ -95,7 +98,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 	/**
 	 * support the speed calculation only for the links in a circle area
-	 *
+	 * 
 	 * @param network
 	 * @param x
 	 *            -abscissa of the center of the circle area
@@ -296,6 +299,15 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 				"avg. speed (car) [km/h]");
 		avgSpeedChart.addSeries("avg. speed of all agents (car)", xs, ySpeed);
 		avgSpeedChart.saveAsPng(chartFilename, 1024, 768);
+
+		SimpleWriter writer = new SimpleWriter(chartFilename.replace(".png",
+				".txt"));
+		writer.write("time\tavg. speed (car) in "
+				+ ((toll == null) ? "cityarea" : "toll range") + " [km/h");
+
+		for (int i = 0; i < xs.length; i++)
+			writer.writeln(Time.writeTime(xs[i] * 3600.0) + "\t" + ySpeed[i]);
+		writer.close();
 	}
 
 	public Set<Id> getInterestLinkIds() {
@@ -374,9 +386,11 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		EventsManagerImpl events = new EventsManagerImpl();
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario
+				.getRoadPricingScheme());
 		tollReader.parse(roadPricingFilename);
-		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, scenario.getRoadPricingScheme());
+		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, scenario
+				.getRoadPricingScheme());
 		events.addHandler(clas);
 
 		new MatsimEventsReader(events).readFile(eventsFilename);
