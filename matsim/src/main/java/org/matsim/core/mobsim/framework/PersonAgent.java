@@ -31,7 +31,9 @@ import org.matsim.api.core.v01.population.Person;
  *
  */
 public interface PersonAgent {
-
+	
+	public Id getDestinationLinkId();
+	
 	/**
 	 * The time the agent wants to depart from an Activity. If the agent is currently driving,
 	 * the return value cannot be interpreted (e.g. it is not defined if it is the departure time

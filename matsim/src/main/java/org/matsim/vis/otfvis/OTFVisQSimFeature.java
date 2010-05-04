@@ -145,7 +145,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 		this.otfServer = null;
 	}
 
-	public void beforeHandleAgentArrival(PersonDriverAgent agent) {
+	public void beforeHandleAgentArrival(PersonAgent agent) {
 		this.visTeleportationData.remove(agent.getPerson().getId());
 	}
 
@@ -154,7 +154,14 @@ public class OTFVisQSimFeature implements QSimFeature {
 		this.otfServer.updateStatus(time);
 	}
 
+	/**
+	 * @deprecated Use {@link #beforeHandleUnknownLegMode(double,PersonAgent,Link)} instead
+	 */
 	public void beforeHandleUnknownLegMode(double now, final PersonDriverAgent agent, Link link) {
+		beforeHandleUnknownLegMode(now, agent, link);
+	}
+
+	public void beforeHandleUnknownLegMode(double now, final PersonAgent agent, Link link) {
 		this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getQNetwork().getNetwork().getLinks().get(agent.getDestinationLinkId())));
 	}
 
@@ -180,7 +187,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 	}
 
 	@Override
-	public void afterActivityBegins(PersonDriverAgent agent, int planElementIndex) {
+	public void afterActivityBegins(PersonAgent agent, int planElementIndex) {
 		currentActivityNumbers.put(agent.getPerson().getId(), planElementIndex);
 	}
 
@@ -189,7 +196,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 	}
 
 	@Override
-	public void afterActivityEnds(PersonDriverAgent agent, double time) {
+	public void afterActivityEnds(PersonAgent agent, double time) {
 		currentActivityNumbers.remove(agent.getPerson().getId());
 	}
 

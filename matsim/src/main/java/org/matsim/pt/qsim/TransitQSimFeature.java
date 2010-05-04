@@ -177,11 +177,11 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 		return drivers;
 	}
 
-	public void beforeHandleAgentArrival(PersonDriverAgent agent) {
+	public void beforeHandleAgentArrival(PersonAgent agent) {
 
 	}
 
-	private void handleAgentPTDeparture(final PersonDriverAgent agent, Id linkId, Leg leg) {
+	private void handleAgentPTDeparture(final PersonAgent agent, Id linkId, Leg leg) {
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + agent.getPerson().getId().toString());
 			log.info("route: "
@@ -213,7 +213,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 	}
 	
 	@Override
-	public void beforeHandleUnknownLegMode(double now, final PersonDriverAgent agent, Link link) {
+	public void beforeHandleUnknownLegMode(double now, final PersonAgent agent, Link link) {
 
 	}
 
@@ -223,7 +223,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 	}
 
 	@Override
-	public void handleDeparture(double now, PersonDriverAgent agent, Id linkId, Leg leg) {
+	public void handleDeparture(double now, PersonAgent agent, Id linkId, Leg leg) {
 		if (leg.getMode() == TransportMode.pt) {
 			handleAgentPTDeparture(agent, linkId, leg);
 		}
@@ -232,12 +232,12 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 
 
 	@Override
-	public void afterActivityBegins(PersonDriverAgent agent, int planElementIndex) {
+	public void afterActivityBegins(PersonAgent agent, int planElementIndex) {
 
 	}
 
 	@Override
-	public void afterActivityEnds(PersonDriverAgent agent, double time) {
+	public void afterActivityEnds(PersonAgent agent, double time) {
 
 	}
 

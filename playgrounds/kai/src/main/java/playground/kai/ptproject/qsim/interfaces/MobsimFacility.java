@@ -76,9 +76,10 @@ public class MobsimFacility implements Updateable {
 				mobsimLink.addVehicleFromFacilityNormal(veh) ;
 			} else if ( person.getCurrentLeg().getMode().equals( TransportMode.pt ) ) {
 				// transit wait queue ... where?
+				// Departure Handler ???
 			} else {
 				// teleport.  In principle, I could teleport directly to the destination facility ...
-				// ... but I can't get the FacilityId :-(.
+				// ... but I can't get the FacilityId.  And maybe we don't want that???
 			}
 		}
 	}

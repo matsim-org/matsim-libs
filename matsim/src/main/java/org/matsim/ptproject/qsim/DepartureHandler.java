@@ -22,10 +22,10 @@ package org.matsim.ptproject.qsim;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 
 public interface DepartureHandler {
 	
-	public void handleDeparture(double now, PersonDriverAgent agent, Id linkId, Leg leg);
+	public void handleDeparture(double now, PersonAgent agent, Id linkId, Leg leg);
 
 }
