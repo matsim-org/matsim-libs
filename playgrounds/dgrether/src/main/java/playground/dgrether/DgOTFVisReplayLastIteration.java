@@ -1,5 +1,9 @@
 package playground.dgrether;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -8,6 +12,7 @@ import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -17,6 +22,7 @@ import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vis.otfvis.OTFVisQSim;
 
 
@@ -49,25 +55,36 @@ public class DgOTFVisReplayLastIteration {
   private static final Logger log = Logger.getLogger(DgOTFVisReplayLastIteration.class);
 
 
-  private void playOutputConfig(String configfile) {
-    Config config = new Config();
-    config.addCoreModules();
-    MatsimConfigReader configReader = new MatsimConfigReader(config);
-    configReader.readFile(configfile);
+  private void playOutputConfig(String configfile) throws FileNotFoundException, IOException {
     String currentDirectory = configfile.substring(0, configfile.lastIndexOf("/") + 1);
     if (currentDirectory == null ) {
       currentDirectory = configfile.substring(0, configfile.lastIndexOf("\\") + 1);
     }
     log.info("using " + currentDirectory + " as base directory...");
-    config.network().setInputFile(currentDirectory + Controler.FILENAME_NETWORK);
-    config.plans().setInputFile(currentDirectory + Controler.FILENAME_POPULATION);
+  	String newConfigFile = currentDirectory + "lastItLiveConfig.xml";
+  	this.handleNoLongerSupportedParameters(configfile, newConfigFile);
+    Config config = new Config();
+    config.addCoreModules();
+    MatsimConfigReader configReader = new MatsimConfigReader(config);
+    configReader.readFile(newConfigFile);
+    ControlerIO oldConfControlerIO;
+    if (config.controler().getRunId() != null){
+      oldConfControlerIO = new ControlerIO(currentDirectory, new IdImpl(config.controler().getRunId()));   
+    }
+    else {
+    	oldConfControlerIO = new ControlerIO(currentDirectory);
+    }
+    config.network().setInputFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
+    config.plans().setInputFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
     if (config.scenario().isUseLanes()){
-      config.network().setLaneDefinitionsFile(currentDirectory + Controler.FILENAME_LANES);
+      config.network().setLaneDefinitionsFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_LANES));
     }
     if (config.scenario().isUseSignalSystems()){
-      config.signalSystems().setSignalSystemFile(currentDirectory + Controler.FILENAME_SIGNALSYSTEMS);
-      config.signalSystems().setSignalSystemConfigFile(currentDirectory + Controler.FILENAME_SIGNALSYSTEMS_CONFIG);
+      config.signalSystems().setSignalSystemFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_SIGNALSYSTEMS));
+      config.signalSystems().setSignalSystemConfigFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_SIGNALSYSTEMS_CONFIG));
     }
+    
+    
     log.info("Complete config dump:");
     StringWriter writer = new StringWriter();
     new ConfigWriter(config).writeStream(new PrintWriter(writer));
@@ -96,7 +113,30 @@ public class DgOTFVisReplayLastIteration {
 
 
 
-  public static final String chooseFile() {
+  private void handleNoLongerSupportedParameters(String configfile, String liveConfFile) throws FileNotFoundException, IOException {
+  	BufferedReader reader = IOUtils.getBufferedReader(configfile);
+  	String line = reader.readLine();
+  	BufferedWriter writer = IOUtils.getBufferedWriter(liveConfFile);
+  	while (line != null) {
+  		if (line.contains("bikeSpeedFactor")){
+  			line = line.replaceAll("bikeSpeedFactor", "bikeSpeed");
+  		}
+  		else if (line.contains("undefinedModeSpeedFactor")){
+  			line = line.replaceAll("undefinedModeSpeedFactor", "undefinedModeSpeed");
+  		}
+  		else if (line.contains("walkSpeedFactor")){
+  			line = line.replaceAll("walkSpeedFactor", "walkSpeed");
+  		}
+ 			writer.write(line);
+  		line = reader.readLine();
+  	}
+  	reader.close();
+  	writer.close();
+	}
+
+
+
+	public static final String chooseFile() {
     JFileChooser fc = new JFileChooser();
 
     fc.setFileFilter( new FileFilter() { 
@@ -125,10 +165,13 @@ public class DgOTFVisReplayLastIteration {
 
   /**
    * @param args
+   * @throws IOException 
+   * @throws FileNotFoundException 
    */
-  public static void main(String[] args) {
-//    args = new String[1];
+  public static void main(String[] args) throws FileNotFoundException, IOException {
+    args = new String[1];
 //    args[0] = "/home/dgrether/data/work/matsimOutput/equil/output_config.xml.gz";
+  	args[0] = "/home/dgrether/runs-svn/run749/749.output_config.xml.gz";
     String configfile = null;
     if (args.length == 0){
       configfile = chooseFile();

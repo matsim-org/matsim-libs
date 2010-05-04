@@ -18,6 +18,9 @@
  * *********************************************************************** */
 package playground.dgrether;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -34,8 +37,10 @@ public class DgEquilController {
 
 	/**
 	 * @param args
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException, IOException {
 		
 	  final boolean useQSim = true;
 	  
