@@ -28,15 +28,15 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
-import org.matsim.ptproject.qsim.QNetwork;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
-import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
+import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -45,14 +45,19 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * This is a standalone executable to convert T.veh.gz files to .mvi files.
  *
  * @author dstrippgen
+ * 
+ * @deprecated When I found this in may'10, it did not work.  I made it operational again by replacing the QSim
+ * by the QueueSimulation, but it seems that it is currently unmaintained.  Thus --> deprecated (i.e. use with 
+ * even greater care than usual).  kai, may'10
  */
+@Deprecated
 public class OTFTVeh2MVI extends OTFFileWriter {
 	private  String vehFileName = "";
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
-	public OTFTVeh2MVI(QNetwork net, String vehFileName, double interval_s, String outFileName) {
-		super(interval_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterQSimConnectionManagerFactory());
+	public OTFTVeh2MVI(QueueNetwork net, String vehFileName, double interval_s, String outFileName) {
+		super(interval_s, new OTFQueueSimServerQuadBuilder(net), outFileName, new OTFFileWriterQSimConnectionManagerFactory());
 		this.vehFileName = vehFileName;
 	}
 
@@ -162,15 +167,21 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 //		String vehFileName = "./output/colorizedT.veh.txt.gz";
 		String vehFileName = "../../tmp/studies/padang/run301.it100.colorized.T.veh.gz";
 		String outFileName = "./output/testrun301.mvi";
-		int intervall_s = 60;
+		
+		netFileName = "./output/net.xml" ;
+		vehFileName = "./output/T.veh" ;
+		outFileName = "./output/out.mvi" ;
+		
+		int intervall_s = 1;
 
 		Gbl.createConfig(null);
 
 		Scenario scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
-		QSim qsim = new QSim(scenario, new EventsManagerImpl());
+//		QSim qsim = new QSim(scenario, new EventsManagerImpl());
+		QueueSimulation qsim = new QueueSimulation(scenario, new EventsManagerImpl());
 
-		new OTFTVeh2MVI(qsim.getQNetwork(), vehFileName, intervall_s, outFileName).convert();
+		new OTFTVeh2MVI(qsim.getQueueNetwork(), vehFileName, intervall_s, outFileName).convert();
 	}
 
 }
