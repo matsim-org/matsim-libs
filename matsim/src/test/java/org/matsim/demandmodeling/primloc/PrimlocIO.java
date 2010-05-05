@@ -68,8 +68,13 @@ public class PrimlocIO {
 		try{
 			lnr = new LineNumberReader( IOUtils.getBufferedReader(filename) );
 			for( int i=0; i<nrow; i++ )
-				for( int j=0; j<ncol; j++ )
-					cij.set( i, j, Double.parseDouble(lnr.readLine()) );
+				for( int j=0; j<ncol; j++ ) {
+					String line = lnr.readLine();
+					if (line == null) {
+						throw new NullPointerException("Missing entry for matrix cell. i=" + i + " j=" + j);
+					}
+					cij.set( i, j, Double.parseDouble(line) );
+				}
 
 		}
 		catch( IOException xc){
