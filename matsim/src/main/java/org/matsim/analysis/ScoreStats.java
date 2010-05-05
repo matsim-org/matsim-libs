@@ -85,14 +85,12 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	}
 
 	public void notifyStartup(final StartupEvent event) {
-		if (this.createPNG) {
-			Controler controler = event.getControler();
-			this.minIteration = controler.getFirstIteration();
-			int maxIter = controler.getLastIteration();
-			int iterations = maxIter - this.minIteration;
-			if (iterations > 10000) iterations = 1000; // limit the history size
-			this.history = new double[4][iterations+1];
-		}
+		Controler controler = event.getControler();
+		this.minIteration = controler.getFirstIteration();
+		int maxIter = controler.getLastIteration();
+		int iterations = maxIter - this.minIteration;
+		if (iterations > 10000) iterations = 1000; // limit the history size
+		this.history = new double[4][iterations+1];
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
@@ -194,7 +192,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 			this.history[INDEX_AVERAGE][index] = (sumAvgScores / nofAvgScores);
 			this.history[INDEX_EXECUTED][index] = (sumExecutedScores / nofExecutedScores);
 
-			if (event.getIteration() != this.minIteration) {
+			if (this.createPNG && event.getIteration() != this.minIteration) {
 				// create chart when data of more than one iteration is available.
 				XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");
 				double[] iterations = new double[index + 1];
@@ -233,6 +231,9 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	 * @return the history of scores in last iterations
 	 */
 	public double[][] getHistory() {
+		if (this.history == null) {
+			return null;
+		}
 		return this.history.clone();
 	}
 }

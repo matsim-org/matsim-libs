@@ -37,8 +37,8 @@ public class PTRouterTest extends MatsimTestCase {
 	public void testRouter() throws SAXException, ParserConfigurationException, IOException {
 
 		//final String PATH= getInputDirectory();
-		final String PATH="../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/transfer_det/";
-		final String NETWORK = "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/network.xml";
+		final String PATH="src/main/java/playground/mmoyo/demo/X5/transfer_det/";
+		final String NETWORK = "src/main/java/playground/mmoyo/demo/X5/network.xml";
 		final String TRANSITSCHEDULE= PATH + "simple1TransitSchedule.xml";
 		final String PLANFILE = PATH +  "output_plans.xml";
 

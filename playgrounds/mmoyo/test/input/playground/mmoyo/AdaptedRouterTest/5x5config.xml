@@ -9,15 +9,15 @@
 	</module>
 	
 	<module name="network">
-		<param name="inputNetworkFile" value="../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/network.xml" />
+		<param name="inputNetworkFile" value="src/main/java/playground/mmoyo/demo/X5/network.xml" />
 	</module>
 	
 	<module name="plans">
-		<param name="inputPlansFile" value="../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/plansFile.xml" />
+		<param name="inputPlansFile" value="src/main/java/playground/mmoyo/demo/X5/simplePlan1/plansFile.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="../playgrounds/mmoyo/test/input/playground/mmoyo/AdaptedRouterTest" />
+		<param name="outputDirectory" value="test/output/playground/mmoyo/AdaptedRouterTest" />
 		<param name="firstIteration" value="-1" />
 		<param name="lastIteration" value="0" />
 		<param name="writeEventsInterval" value="1" />
@@ -83,8 +83,8 @@
 	</module>
 
 	<module name="transit">
-		<param name="transitScheduleFile" value="../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/simple1TransitSchedule.xml" />
-		<param name="vehiclesFile" value="../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/vehicles.xml" />
+		<param name="transitScheduleFile" value="src/main/java/playground/mmoyo/demo/X5/simplePlan1/simple1TransitSchedule.xml" />
+		<param name="vehiclesFile" value="src/main/java/playground/mmoyo/demo/X5/vehicles.xml" />
 		<param name="transitModes" value="pt" />
 	</module>
 
@@ -193,15 +193,7 @@
 		<param name="activityClosingTime_11"     value="24:00:00" />
 		<param name="activityClosingTime_12"     value="24:00:00" />
 	</module>
-	
-	<module name="vis">
-		<param name="logo"		value = "(c) 2009 TUB-VSP"/>
-		<param name="delay"		value = "200"/>
-		<param name="linkwidthfactor"	value = "15"/>
-		<param name="shownodelabels"	value = "false"/>
-		<param name="showlinklabels"  	value = "true"/>
-	</module>	
-	
+
 	<!--  
 	<module name="ptCounts">
   		<param name="inputBoardCountsFile" value="&COUNTS;counts_boarding_M44_344.xml" /> 

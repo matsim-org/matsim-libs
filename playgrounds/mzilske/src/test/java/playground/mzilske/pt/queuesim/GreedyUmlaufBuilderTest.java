@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
@@ -40,6 +41,7 @@ public class GreedyUmlaufBuilderTest {
 	public void testGreedyUmlaufBuilder() {
 		createIds();
 		Config config = this.scenario.getConfig();
+		config.setQSimConfigGroup(new QSimConfigGroup());
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");

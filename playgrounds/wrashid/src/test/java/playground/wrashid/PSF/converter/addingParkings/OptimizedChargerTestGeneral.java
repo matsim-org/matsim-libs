@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.PSF.converter.addingParkings;
 
 import java.util.HashMap;
@@ -18,7 +37,7 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 /*
  * Just testing, that the scenario runs without errors.
  */
-public class OptimizedChargerTestGeneral extends MatsimTestCase implements
+/*package*/ class OptimizedChargerTestGeneral extends MatsimTestCase implements
 		ParametersPSFMutator {
 
 	Controler controler;
@@ -27,6 +46,7 @@ public class OptimizedChargerTestGeneral extends MatsimTestCase implements
 		this.controler = controler;
 	}
 
+	@Override
 	public void mutateParameters() {
 
 	}
@@ -61,6 +81,6 @@ public class OptimizedChargerTestGeneral extends MatsimTestCase implements
 		// per link is set very low in the scenario and there is no need to
 		// charge during peak time.
 		assertEquals(1, chargingTimesOfAgentOne.getChargingTimes().size());
-	}  
+	}
 
-} 
+}
