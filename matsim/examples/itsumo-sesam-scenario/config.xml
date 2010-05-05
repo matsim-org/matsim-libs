@@ -65,12 +65,4 @@
 		<param name="Module_2" value="ReRoute" />
 	</module>
 
-	<module name="vis">
-		<param name="logo"		value = "(c) 2007 TUB-VSP"/>
-		<param name="delay"		value = "50"/>
-		<param name="linkwidthfactor"	value = "7"/>
-		<param name="shownodelabels"	value = "false"/>
-		<param name="showlinklabels"  	value = "false"/>
-	</module>
-
 </config>

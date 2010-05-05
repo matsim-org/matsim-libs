@@ -58,11 +58,4 @@
 		<param name="Module_2" value="TimeAllocationMutator" />
 	</module>
 
-	<module name="vis">
-		<param name="delay"		value = "50"/>
-		<param name="linkwidthfactor"	value = "7"/>
-		<param name="shownodelabels"	value = "false"/>
-		<param name="showlinklabels"  	value = "false"/>
-	</module>
-
 </config>

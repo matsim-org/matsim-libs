@@ -129,13 +129,5 @@
 		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="ReRoute" />
 	</module>
-
-	<module name="vis">
-		<param name="logo"		value = "(c) 2009 TUB-VSP"/>
-		<param name="delay"		value = "200"/>
-		<param name="linkwidthfactor"	value = "15"/>
-		<param name="shownodelabels"	value = "false"/>
-		<param name="showlinklabels"  	value = "true"/>
-	</module>	
 	
 </config>
