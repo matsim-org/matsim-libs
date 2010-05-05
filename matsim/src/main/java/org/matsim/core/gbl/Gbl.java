@@ -30,10 +30,12 @@ import java.net.URL;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReaderMatsimV1;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.xml.sax.SAXException;
 
 /* The usage of Gbl.getConfig() all throughout the code makes it very hard
@@ -60,9 +62,9 @@ public abstract class Gbl {
 	/**
 	 * @param args
 	 * @return
-	 * @deprecated use "ScenarioLoader(filename).loadScenario() to read
-	 * a complete Scenario from file. If a Config instance with already created core modules
-	 * is needed use BasicScenario sc = new BasicScenarioImpl(); sc.getConfig();"
+	 * @deprecated use {@link ScenarioLoaderImpl#loadScenario()} to read
+	 * a complete Scenario from file. If only a default Config instance
+	 * is needed, use <code>Scenario sc = new {@link ScenarioImpl}(); Config config = sc.getConfig();</code>.
 	 */
 	@Deprecated
 	public static final Config createConfig(final String[] args) {
