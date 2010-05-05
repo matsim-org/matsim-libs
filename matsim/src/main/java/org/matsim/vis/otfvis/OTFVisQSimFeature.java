@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
@@ -152,13 +151,6 @@ public class OTFVisQSimFeature implements QSimFeature {
 	public void afterAfterSimStep(final double time) {
 		this.visualizeTeleportedAgents(time);
 		this.otfServer.updateStatus(time);
-	}
-
-	/**
-	 * @deprecated Use {@link #beforeHandleUnknownLegMode(double,PersonAgent,Link)} instead
-	 */
-	public void beforeHandleUnknownLegMode(double now, final PersonDriverAgent agent, Link link) {
-		beforeHandleUnknownLegMode(now, agent, link);
 	}
 
 	public void beforeHandleUnknownLegMode(double now, final PersonAgent agent, Link link) {
