@@ -62,4 +62,8 @@ public class TransitStopAgentTracker {
 		}
 		return Collections.unmodifiableList(agents);
 	}
+	
+	public Map<TransitStopFacility, List<PassengerAgent>> getAgentsAtStop(){
+		return this.agentsAtStops;
+	}
 }
