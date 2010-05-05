@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.counts.pt;
 
@@ -31,7 +31,7 @@ import playground.yu.analysis.pt.OccupancyAnalyzer;
 
 /**
  * @author yu
- * 
+ *
  */
 public class PtAlightCountComparisonAlgorithm extends
 		PtCountsComparisonAlgorithm {
@@ -41,8 +41,8 @@ public class PtAlightCountComparisonAlgorithm extends
 	 * @param network
 	 */
 	public PtAlightCountComparisonAlgorithm(OccupancyAnalyzer oa,
-			Counts counts, Network network) {
-		super(oa, counts, network);
+			Counts counts, Network network, double countsScaleFactor) {
+		super(oa, counts, network, countsScaleFactor);
 	}
 
 	@Override

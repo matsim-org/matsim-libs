@@ -22,7 +22,6 @@ package playground.yu.scoring;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
@@ -33,12 +32,12 @@ import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
  *
  */
 public class CharyparNagelScoringFunctionWithWalk extends LegScoringFunction {
-	private double offsetWlk = Double.parseDouble(Gbl.getConfig().findParam(
-			"subTourModeChoice", "offsetWalk"));
+	private final double offsetWlk;
 
 	public CharyparNagelScoringFunctionWithWalk(Plan plan,
-			final CharyparNagelScoringParameters params) {
+			final CharyparNagelScoringParameters params, double offsetWalk) {
 		super(plan, params);
+		this.offsetWlk = offsetWalk;
 	}
 
 	@Override

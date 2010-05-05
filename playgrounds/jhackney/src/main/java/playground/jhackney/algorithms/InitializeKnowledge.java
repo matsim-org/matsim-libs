@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.jhackney.algorithms;
 
 import java.io.File;
@@ -8,7 +27,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 
@@ -18,7 +36,7 @@ import playground.jhackney.socialnetworks.mentalmap.MentalMap;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
 
 public class InitializeKnowledge {
-	public InitializeKnowledge(final Population plans, final ActivityFacilities facilities, Knowledges knowledges, Network network){
+	public InitializeKnowledge(final Population plans, final ActivityFacilities facilities, Knowledges knowledges, Network network, SocNetConfigGroup config){
 
 		ActivityActReader aar = null;
 
@@ -29,9 +47,9 @@ public class InitializeKnowledge {
 
 //		Attempt to open file of mental maps and read it in
 		System.out.println("  Opening the file to read in the map of Acts to Facilities");
-		aar = new ActivityActReader(Integer.valueOf(((SocNetConfigGroup) Gbl.getConfig().getModule(SocNetConfigGroup.GROUP_NAME)).getInitIter()).intValue());
+		aar = new ActivityActReader(Integer.valueOf(config.getInitIter()).intValue());
 
-		String fileName = ((SocNetConfigGroup) Gbl.getConfig().getModule(SocNetConfigGroup.GROUP_NAME)).getInDirName()+ "ActivityActMap"+Integer.valueOf(((SocNetConfigGroup) Gbl.getConfig().getModule(SocNetConfigGroup.GROUP_NAME)).getInitIter()).intValue()+".txt";
+		String fileName = config.getInDirName()+ "ActivityActMap"+Integer.valueOf(config.getInitIter()).intValue()+".txt";
 
 		if (new File(fileName).exists()) {
 			// File or directory exists
@@ -55,7 +73,6 @@ public class InitializeKnowledge {
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				Plan plan = person.getPlans().get(ii);
 
-				// TODO balmermi: double check if this is the right place to create the MentalMap and the EgoNet
 				if (person.getCustomAttributes().get(MentalMap.NAME) == null) { person.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k, network)); }
 				if (person.getCustomAttributes().get(EgoNet.NAME) == null) { person.getCustomAttributes().put(EgoNet.NAME,new EgoNet()); }
 

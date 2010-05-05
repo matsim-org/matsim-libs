@@ -25,6 +25,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.knowledges.Knowledges;
 
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.algorithms.InitializeKnowledge;
 
 public class StandardControlerListener implements StartupListener {
@@ -45,6 +46,6 @@ public class StandardControlerListener implements StartupListener {
 
 	}
 	protected void initializeKnowledge() {
-		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges, this.controler.getNetwork());
+		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges, this.controler.getNetwork(), (SocNetConfigGroup) this.controler.getConfig().getModule(SocNetConfigGroup.GROUP_NAME));
 	}
 }

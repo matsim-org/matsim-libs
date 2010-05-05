@@ -20,6 +20,7 @@
 
 package playground.kai.oevTest;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 
@@ -31,13 +32,14 @@ public class OevTest {
 
 	public static void main(final String[] args) {
 
+		Config config;
 		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./test/shared/oev-test-network/configs/config1.xml"});
+			config = Gbl.createConfig(new String[] {"./test/shared/oev-test-network/configs/config1.xml"});
 		} else {
-			Gbl.createConfig(args) ;
+			config = Gbl.createConfig(args) ;
 		}
 
-		final Controler controler = new Controler(Gbl.getConfig());
+		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true) ;
 		controler.run();
 

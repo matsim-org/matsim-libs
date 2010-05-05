@@ -164,7 +164,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 
 	private void initializeKnowledge() {
 		// TODO Auto-generated method stub
-		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges, this.controler.getNetwork());
+		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges, this.controler.getNetwork(), this.snConfig);
 	}
 
 	public void notifyScoring(final ScoringEvent event){

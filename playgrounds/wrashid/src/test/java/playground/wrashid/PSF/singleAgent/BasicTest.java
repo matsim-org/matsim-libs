@@ -1,6 +1,5 @@
 package playground.wrashid.PSF.singleAgent;
 
-import java.io.File;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
@@ -25,18 +24,18 @@ import playground.wrashid.PSF.parking.ParkingTimes;
 public class BasicTest extends MatsimTestCase {
 
 	Controler controler;
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		Config config = loadConfig("test/input/playground/wrashid/PSF/singleAgent/config.xml");
-		
+
 		controler = new Controler(config);
 		controler.setCreateGraphs(false);
-		
+
 		controler.addControlerListener(new AddEnergyScoreListener());
 	}
-	
+
 	/*
 	 * The agent drives to work and arrives still before the start of peak hour
 	 * energy. Therefore the agent charges fully immediately. When arriving at
@@ -56,7 +55,7 @@ public class BasicTest extends MatsimTestCase {
 		controler.run();
 
 		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
-				.getParkingTimes());
+				.getParkingTimes(), Double.parseDouble(controler.getConfig().findParam("PSF", "default.maxBatteryCapacity")));
 		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
 
 		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(new IdImpl("1"));
@@ -73,22 +72,22 @@ public class BasicTest extends MatsimTestCase {
 		// immediately, but waits until low tariff starts)
 		assertEquals(72000, chargeLogOfAgentOne.getStartChargingTime(),  1);
 		assertEquals(72085, chargeLogOfAgentOne.getEndChargingTime(),  1);
-		
-		
+
+
 		// after charging the battery of the agent is full (allow for small rounding error)
 		assertEquals(ParametersPSF.getDefaultMaxBatteryCapacity(), chargeLogOfAgentOne.getEndSOC(),  0.1);
-		
-		
+
+
 		// the agent should charge twice.
 		assertEquals(2, chargingTimesOfAgentOne.getChargingTimes().size());
-		
+
 		// check, if charging events are written out
 		// the charging log output is not performed anymore during the tests.
 		//File outputChargingLog= new File(ParametersPSF.getMainChargingTimesOutputFilePath());
 		//assertTrue("output charging log does not exist. expected at " + outputChargingLog.getPath(), outputChargingLog.exists());
 	}
-	 
-	
+
+
 
 	public void testLogParkingTime() {
 		LogParkingTimes logParkingTimes = new LogParkingTimes(controler);

@@ -45,8 +45,8 @@ public class AvoidOldNodes extends NewPopulation {
 	private final Set<String> nodeIds;
 	private final Network network;
 
-	public AvoidOldNodes(final Network network, final Population plans) {
-		super(network, plans);
+	public AvoidOldNodes(final Network network, final Population plans, final String filename) {
+		super(network, plans, filename);
 		this.network = network;
 		this.nodeIds = new HashSet<String>();
 	}
@@ -97,7 +97,7 @@ public class AvoidOldNodes extends NewPopulation {
 
 		Population population = scenario.getPopulation();
 
-		AvoidOldNodes aon = new AvoidOldNodes(scenario.getNetwork(), population);
+		AvoidOldNodes aon = new AvoidOldNodes(scenario.getNetwork(), population, scenario.getConfig().plans().getOutputFile());
 		aon.addNode("100000");
 		aon.addLink("3000000");
 		aon.addLink("3000001");

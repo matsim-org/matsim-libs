@@ -143,11 +143,6 @@ public abstract class AbstractLocation implements MappedLocation {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	// TODO [balmermi] I do not like that (see above why)
-	public final void setId(final Id id) {
-		this.id = id;
-	}
-
 	public void setCoord(Coord coord) {
 		throw new UnsupportedOperationException( " derived classes need to implement their own setCoord methods if desired " ) ;
 	}

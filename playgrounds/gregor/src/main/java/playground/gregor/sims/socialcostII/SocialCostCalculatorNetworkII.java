@@ -37,7 +37,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -59,23 +58,25 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 
 	private final static int MSA_OFFSET = 20;
 	private final static double CONGESTION_RATION_THRESHOLD = 0.9;
+	private final double storageCapFactor;
 
 	static double oldCoef = 0;
 	static double newCoef = 1;
 	static int iteration = 0;
 
-	public SocialCostCalculatorNetworkII(final NetworkLayer network) {
-		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
+	public SocialCostCalculatorNetworkII(final NetworkLayer network, final double storageCapFactor) {
+		this(network, 15*60, 30*3600, storageCapFactor);	// default timeslot-duration: 15 minutes
 	}
 
-	public SocialCostCalculatorNetworkII(final NetworkLayer network, final int timeslice) {
-		this(network, timeslice, 30*3600); // default: 30 hours at most
+	public SocialCostCalculatorNetworkII(final NetworkLayer network, final int timeslice, final double storageCapFactor) {
+		this(network, timeslice, 30*3600, storageCapFactor); // default: 30 hours at most
 	}
 
-	public SocialCostCalculatorNetworkII(final NetworkLayer network, final int timeslice,	final int maxTime) {
+	public SocialCostCalculatorNetworkII(final NetworkLayer network, final int timeslice,	final int maxTime, final double storageCapFactor) {
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
 		this.network = network;
+		this.storageCapFactor = storageCapFactor;
 	}
 
 	public double getLinkTravelCost(final Link link, final double time) {
@@ -313,7 +314,6 @@ public class SocialCostCalculatorNetworkII implements TravelCost, IterationStart
 
 	private int calcCapacity(final Link link) {
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
-		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 
 //		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 //		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);

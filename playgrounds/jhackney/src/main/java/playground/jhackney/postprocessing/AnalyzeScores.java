@@ -80,7 +80,7 @@ public class AnalyzeScores {
 		System.out.println(" Initializing the social network ...");
 
 		System.out.println(" Initializing agent knowledge about geography ...");
-		initializeKnowledge();
+		initializeKnowledge(snConfig);
 		System.out.println("... done");
 
 		// Override the config to take the last iteration
@@ -109,7 +109,7 @@ public class AnalyzeScores {
 		playground.jhackney.scoring.EventSocScoringFactory factory = new playground.jhackney.scoring.EventSocScoringFactory("leisure",actStats, snConfig);
 //		ScoringFunctionFactory cnfactory = new CharyparNagelScoringFunctionFactory(ScenarioConfig.getConfig().charyparNagelScoring());
 //		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", cnfactory,actStats);
-		scoring = new playground.jhackney.scoring.EventsToScoreAndReport(plans, factory);
+		scoring = new playground.jhackney.scoring.EventsToScoreAndReport(plans, factory, config.charyparNagelScoring().getLearningRate());
 		System.out.println("  Instantiating social network EventsToScore for scoring the plans");
 //		scoring = new EventsToScore(plans, factory);
 
@@ -192,8 +192,8 @@ public class AnalyzeScores {
 
 		Gbl.printElapsedTime();
 	}
-	protected static void initializeKnowledge() {
-		new InitializeKnowledge(plans, facilities, knowledges, network);
+	protected static void initializeKnowledge(SocNetConfigGroup snConfig) {
+		new InitializeKnowledge(plans, facilities, knowledges, network, snConfig);
 	}
 }
 

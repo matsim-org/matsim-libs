@@ -18,11 +18,9 @@
  * *********************************************************************** */
 
 package playground.kai.usecases.mentalmodule;
-/*
- * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
- */
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.PlanStrategy;
@@ -30,30 +28,31 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 
 public class MyStrategy extends PlanStrategy {
-	
-	
+
+
 
 	public MyStrategy(Controler controler) {
 		super(new RandomPlanSelector());
-		
+
 		MyModule mod = new MyModule( controler ) ;
-		
+
 		addStrategyModule(mod) ;
-		
+
 		EventsManager events = controler.getEvents() ;
 		events.addHandler( mod ) ;
-		
+
 	}
 
 	public static void main(final String[] args) {
 
+		Config config;
 		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
+			config = Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
 		} else {
-			Gbl.createConfig(args) ;
+			config = Gbl.createConfig(args) ;
 		}
 
-		final Controler controler = new Controler(Gbl.getConfig());
+		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		controler.run();
 

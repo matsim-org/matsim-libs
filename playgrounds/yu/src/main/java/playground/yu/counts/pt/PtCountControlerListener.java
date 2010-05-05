@@ -108,7 +108,7 @@ public class PtCountControlerListener implements StartupListener,
 				PtCountsComparisonAlgorithm ccaBoard = null;
 				if (this.boardCounts != null) {
 					ccaBoard = new PtBoardCountComparisonAlgorithm(this.oa,
-							this.boardCounts, net);
+							this.boardCounts, net, Double.parseDouble(config.findParam("ptCounts", "countsScaleFactor")));
 					ccaBoard.setDistanceFilter(distanceFilter,
 							distanceFilterCenterNodeId);
 					ccaBoard.setCountsScaleFactor(countsScaleFac);
@@ -118,7 +118,7 @@ public class PtCountControlerListener implements StartupListener,
 				PtCountsComparisonAlgorithm ccaAlight = null;
 				if (this.alightCounts != null) {
 					ccaAlight = new PtAlightCountComparisonAlgorithm(this.oa,
-							this.alightCounts, net);
+							this.alightCounts, net, Double.parseDouble(config.findParam("ptCounts", "countsScaleFactor")));
 					ccaAlight.setDistanceFilter(distanceFilter,
 							distanceFilterCenterNodeId);
 					ccaAlight.setCountsScaleFactor(countsScaleFac);
@@ -128,7 +128,7 @@ public class PtCountControlerListener implements StartupListener,
 				PtCountsComparisonAlgorithm ccaOccupancy = null;
 				if (this.occupancyCounts != null) {
 					ccaOccupancy = new PtOccupancyCountComparisonAlgorithm(
-							this.oa, this.occupancyCounts, net);
+							this.oa, this.occupancyCounts, net, Double.parseDouble(config.findParam("ptCounts", "countsScaleFactor")));
 					ccaOccupancy.setDistanceFilter(distanceFilter,
 							distanceFilterCenterNodeId);
 					ccaOccupancy.setCountsScaleFactor(countsScaleFac);

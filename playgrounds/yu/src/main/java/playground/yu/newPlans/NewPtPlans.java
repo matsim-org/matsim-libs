@@ -54,17 +54,6 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 	private Person person;
 	private List<PlanImpl> copyPlans = new ArrayList<PlanImpl>();
 
-	// copyPlans: the copy of the plans.
-	/**
-	 * Constructor, writes file-head
-	 *
-	 * @param plans
-	 *            - a Plans Object, which derives from MATSim plansfile
-	 */
-	public NewPtPlans(final Network network, final Population plans) {
-		super(network, plans);
-	}
-
 	public NewPtPlans(final Network network, final Population population, final String filename) {
 		super(network, population, filename);
 	}

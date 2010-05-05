@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.scoring;
 
@@ -9,14 +9,14 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**
  * @author yu
- * 
+ *
  */
 public class WalkScoringTest {
 
 	/**
 	 * test for the change of scoring function, because "walk"-mode will be
 	 * implemented
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(final String[] args) {
@@ -30,7 +30,8 @@ public class WalkScoringTest {
 			final Controler controler = new Controler(args);
 			controler
 					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-							config.charyparNagelScoring()));
+							config.charyparNagelScoring(), Double.parseDouble(config.findParam(
+									"subTourModeChoice", "offsetWalk"))));
 			controler.setWriteEventsInterval(100);
 			controler.run();
 		}

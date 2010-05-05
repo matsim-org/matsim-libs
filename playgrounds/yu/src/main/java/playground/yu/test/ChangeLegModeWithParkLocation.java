@@ -111,10 +111,9 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		ctl.addControlerListener(new LegChainModesListener());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(100);
-		ctl
-				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						new ScenarioLoaderImpl(args[0]).loadScenario().getConfig()
-								.charyparNagelScoring()));
+		Config config = new ScenarioLoaderImpl(args[0]).getScenario().getConfig();
+		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+						config.charyparNagelScoring(), Double.parseDouble(config.findParam("subTourModeChoice", "offsetWalk"))));
 		ctl.run();
 	}
 

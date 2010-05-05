@@ -146,7 +146,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		this.log.info(" Initializing agent knowledge about geography ...");
 
 //		initializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
-		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges, this.controler.getNetwork());
+		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges, this.controler.getNetwork(), this.snConfig);
 		this.log.info("... done");
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");

@@ -69,7 +69,7 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 
 		OptimizedCharger optimizedCharger = new OptimizedCharger(
 				logEnergyConsumption.getEnergyConsumption(), logParkingTimes
-						.getParkingTimes());
+						.getParkingTimes(), Double.parseDouble(controler.getConfig().findParam("PSF", "default.maxBatteryCapacity")));
 		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger
 				.getChargingTimes();
 

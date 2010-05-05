@@ -88,7 +88,7 @@ public class AnalyzeTimeCorrelations {
 		System.out.println("... done");
 
 		System.out.println(" Initializing agent knowledge about geography ...");
-		initializeKnowledge();
+		initializeKnowledge(snConfig);
 		System.out.println("... done");
 
 		// read in events
@@ -142,8 +142,8 @@ public class AnalyzeTimeCorrelations {
 
 		Gbl.printElapsedTime();
 	}
-	protected static void initializeKnowledge() {
-		new InitializeKnowledge(plans, facilities, knowledges, network);
+	protected static void initializeKnowledge(SocNetConfigGroup snConfig) {
+		new InitializeKnowledge(plans, facilities, knowledges, network, snConfig);
 	}
 }
 

@@ -44,9 +44,9 @@ public class AfterSimulationListener implements AfterMobsimListener {
 	// after each execution, do charging of the cars and add the score
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 
-		optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes.getParkingTimes());
+		optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes.getParkingTimes(), Double.parseDouble(event.getControler().getConfig().findParam("PSF", "default.maxBatteryCapacity")));
 		optimizedCharger.outputOptimizationData(event);
-		
+
 		chargingTimes = optimizedCharger.getChargingTimes();
 
 		ChargingTimes.printEnergyUsageStatistics(chargingTimes, ParametersPSF.getHubLinkMapping());
@@ -70,7 +70,7 @@ public class AfterSimulationListener implements AfterMobsimListener {
 				double negativeUtilitiesForCharging = -1 * chargingPrice * energyCharged
 						* ParametersPSF.getMainChargingPriceScalingFactor();
 
-				
+
 				// add price to score.
 				ParametersPSF.getEvents().processEvent(
 						new AgentMoneyEventImpl(chargingStartTime, personId, negativeUtilitiesForCharging));

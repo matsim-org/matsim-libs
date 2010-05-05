@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.config.Config;
 
 public class EnterpriseCensusParser {
 
@@ -36,7 +36,7 @@ public class EnterpriseCensusParser {
 	//////////////////////////////////////////////////////////////////////
 
 //	public static final int FIRST_DATA_COL_INDEX = 3;
-	
+
 	private static Logger log = Logger.getLogger(EnterpriseCensusParser.class);
 
 	//////////////////////////////////////////////////////////////////////
@@ -46,20 +46,20 @@ public class EnterpriseCensusParser {
 	public EnterpriseCensusParser(EnterpriseCensus ec) {
 	}
 
-	public void parse(EnterpriseCensus ec) {
-		this.readPresenceCodes(ec);
-		this.readHectareAggregations(ec);
+	public void parse(EnterpriseCensus ec, Config config) {
+		this.readPresenceCodes(ec, config);
+		this.readHectareAggregations(ec, config);
 	}
 
-	private final void readPresenceCodes(EnterpriseCensus ec) {
+	private final void readPresenceCodes(EnterpriseCensus ec, final Config config) {
 
 		log.info("Reading the presence code file...");
 
 		int lineCounter = 0;
 		int skip = 1;
 
-		String filename = Gbl.getConfig().getParam(EnterpriseCensus.EC_MODULE, EnterpriseCensus.EC_PRESENCECODEFILE);
-		String separator = Gbl.getConfig().getParam(EnterpriseCensus.EC_MODULE, EnterpriseCensus.EC_PRESENCECODESEPARATOR);
+		String filename = config.getParam(EnterpriseCensus.EC_MODULE, EnterpriseCensus.EC_PRESENCECODEFILE);
+		String separator = config.getParam(EnterpriseCensus.EC_MODULE, EnterpriseCensus.EC_PRESENCECODESEPARATOR);
 
 		File file = new File(filename);
 
@@ -94,7 +94,7 @@ public class EnterpriseCensusParser {
 									reli,
 									ec.getPresenceCodeNOGAType(pos));
 						}
-					}					
+					}
 				}
 
 				lineCounter++;
@@ -113,12 +113,12 @@ public class EnterpriseCensusParser {
 
 	}
 
-	private final void readHectareAggregations(EnterpriseCensus ec) {
+	private final void readHectareAggregations(EnterpriseCensus ec, Config config) {
 
 		log.info("Reading the hectare aggregation file...");
 
-		String filename = Gbl.getConfig().getParam(EnterpriseCensus.EC_MODULE, EnterpriseCensus.EC_INPUTHECTAREAGGREGATIONFILE);
-		String separator = Gbl.getConfig().getParam(EnterpriseCensus.EC_MODULE, EnterpriseCensus.EC_INPUTHECTAREAGGREGATIONSEPARATOR);
+		String filename = config.getParam(EnterpriseCensus.EC_MODULE, EnterpriseCensus.EC_INPUTHECTAREAGGREGATIONFILE);
+		String separator = config.getParam(EnterpriseCensus.EC_MODULE, EnterpriseCensus.EC_INPUTHECTAREAGGREGATIONSEPARATOR);
 		File file = new File(filename);
 
 		LineIterator it = null;
@@ -154,7 +154,7 @@ public class EnterpriseCensusParser {
 									ec.getHectareAggregationNOGAType(pos),
 									Double.parseDouble(tokens[pos]));
 						}
-					}					
+					}
 				}
 
 				lineCounter++;

@@ -28,6 +28,7 @@ import java.io.Writer;
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
@@ -105,10 +106,10 @@ public class IncreasingDemandRunner {
 		String topDir = cfgFile.lastIndexOf(File.separatorChar) == -1 ?
 						"." : cfgFile.substring(0, cfgFile.lastIndexOf(File.separatorChar));
 
-		Gbl.createConfig(new String[] { cfgFile, "config_v1.dtd" });
+		Config config = Gbl.createConfig(new String[] { cfgFile, "config_v1.dtd" });
 
 		String  //cfgFile = args[0],
-				netFile = new File(Gbl.getConfig().network().getInputFile()).getAbsolutePath(),
+				netFile = new File(config.network().getInputFile()).getAbsolutePath(),
 				popFile = null;
 
 		String 	cmcfNetwork = new File(netFile).getAbsolutePath(),
@@ -141,9 +142,9 @@ public class IncreasingDemandRunner {
 			popFile = topDir+File.separatorChar+"plans"+agents+"random.xml";
 			rpg.writePlans(randPop, popFile);
 
-			Gbl.getConfig().controler().setOutputDirectory(topDir+File.separatorChar+"out"+agents+"random");
-			Gbl.getConfig().plans().setInputFile(popFile);
-			new ConfigWriter(Gbl.getConfig()).write(topDir+File.separatorChar+"config"+agents+"rand.xml");
+			config.controler().setOutputDirectory(topDir+File.separatorChar+"out"+agents+"random");
+			config.plans().setInputFile(popFile);
+			new ConfigWriter(config).write(topDir+File.separatorChar+"config"+agents+"rand.xml");
 
 			//Step 3: create demand file for cmcf
 			CMCFDemandWriter cdw = new CMCFDemandWriter(netFile, popFile);
@@ -199,9 +200,9 @@ public class IncreasingDemandRunner {
 			bft.writePlans(popFile);
 
 			//Step 6: create new config File
-			Gbl.getConfig().controler().setOutputDirectory(topDir+File.separatorChar+"out"+agents+"routed");
-			Gbl.getConfig().plans().setInputFile(popFile);
-			new ConfigWriter(Gbl.getConfig()).write(topDir+File.separatorChar+"config"+agents+"rout.xml");
+			config.controler().setOutputDirectory(topDir+File.separatorChar+"out"+agents+"routed");
+			config.plans().setInputFile(popFile);
+			new ConfigWriter(config).write(topDir+File.separatorChar+"config"+agents+"rout.xml");
 		}
 	}
 }

@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.BasicVehicleType;
@@ -51,8 +50,8 @@ public class Sim2D {
 	private ForceArrowWriter forceArrowWriter;
 	protected final PriorityBlockingQueue<Agent2D>  agentsToRemoveList  = new PriorityBlockingQueue<Agent2D>(500, new Agent2DDepartureTimeComparator());
 
-	public Sim2D(final Network network, final Map<MultiPolygon,List<Link>> floors, final Population plans, final EventsManager events, final StaticForceField sff){
-		this.config = Gbl.getConfig();
+	public Sim2D(final Network network, final Map<MultiPolygon,List<Link>> floors, final Population plans, final EventsManager events, final StaticForceField sff, final Config config){
+		this.config = config;
 //		this.endTime = this.config.simulation().getEndTime();
 		this.endTime = 10*3600+20*60;
 		this.network = (NetworkLayer) network;

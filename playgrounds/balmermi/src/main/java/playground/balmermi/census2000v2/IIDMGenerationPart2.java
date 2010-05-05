@@ -123,7 +123,7 @@ public class IIDMGenerationPart2 {
 		pop.addAlgorithm(new PersonSetLocationsFromKnowledge(knowledges, facilities));
 		pop.addAlgorithm(new PersonAssignShopLeisureLocations(facilities));
 		pop.addAlgorithm(new PersonAssignAndNormalizeTimes());
-		PersonAssignModeChoiceModel pamcm = new PersonAssignModeChoiceModel(municipalities,outdir+"/subtours.txt", knowledges, facilities);
+		PersonAssignModeChoiceModel pamcm = new PersonAssignModeChoiceModel(municipalities,outdir+"/subtours.txt", knowledges, facilities, config.planomat());
 		pop.addAlgorithm(pamcm);
 		pop.addAlgorithm(new PersonAssignPrimaryActivities(knowledges, facilities));
 		log.info("  done.");

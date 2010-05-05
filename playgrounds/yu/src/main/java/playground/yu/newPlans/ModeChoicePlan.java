@@ -42,11 +42,8 @@ import playground.yu.analysis.PlanModeJudger;
 public class ModeChoicePlan extends NewPopulation {
 	private boolean addNewPlan = false;
 
-	/**
-	 * @param plans
-	 */
-	public ModeChoicePlan(final Network network, final Population plans) {
-		super(network, plans);
+	public ModeChoicePlan(final Network network, final Population plans, final String filename) {
+		super(network, plans, filename);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -111,7 +108,7 @@ public class ModeChoicePlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 
-		ModeChoicePlan mcp = new ModeChoicePlan(scenario.getNetwork(), scenario.getPopulation());
+		ModeChoicePlan mcp = new ModeChoicePlan(scenario.getNetwork(), scenario.getPopulation(), scenario.getConfig().plans().getOutputFile());
 		mcp.run(scenario.getPopulation());
 		mcp.writeEndPlans();
 	}

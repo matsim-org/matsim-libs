@@ -48,7 +48,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -370,14 +369,14 @@ public class MyRuns {
 		return population;
 	}
 
-	public static void readEvents(final EventsManagerImpl events, final NetworkLayer network) {
+	public static void readEvents(final EventsManagerImpl events, final NetworkLayer network, final String eventsInputFile) {
 
 		// load test events
 		long startTime, endTime;
 
 		System.out.println("  reading events file and (probably) running events algos");
 		startTime = System.currentTimeMillis();
-		new MatsimEventsReader(events).readFile(Gbl.getConfig().events().getInputFile());
+		new MatsimEventsReader(events).readFile(eventsInputFile);
 		endTime = System.currentTimeMillis();
 		System.out.println("  done.");
 		System.out.println("  reading events from file and processing them took " + (endTime - startTime) + " ms.");
@@ -390,13 +389,12 @@ public class MyRuns {
 	 * plot of number of deps, arrs by activity type to visualize
 	 * the time distribution from microcensus.
 	 */
-	public static void analyseInitialTimes() {
+	public static void analyseInitialTimes(Config config) {
 
-		ScenarioImpl scenario = new ScenarioImpl(Gbl.getConfig());
+		ScenarioImpl scenario = new ScenarioImpl(config);
 		// initialize scenario with events from a given events file
 		// - network
 		logger.info("Reading network xml file...");
-		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		logger.info("Reading network xml file...done.");
 		// - population

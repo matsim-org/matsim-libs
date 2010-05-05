@@ -29,13 +29,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriterHandlerImplTLinks;
 import org.matsim.core.network.NetworkWriterHandlerImplTNodes;
 
 public class CreateTransimsNetwork {
+
+	private final static Logger log = Logger.getLogger(CreateTransimsNetwork.class);
 
 	private String networkFileName;
 
@@ -73,14 +74,10 @@ public class CreateTransimsNetwork {
 		new MatsimNetworkReader(scenario).readFile(this.networkFileName);
 
 		if (network.getNodes().get(new IdImpl("0")) != null) {
-			Logger.getLogger(CreateTransimsNetwork.class).error("The network contains a node with id 0. Transims is likely to have problems with that!");
+			log.warn("The network contains a node with id 0. Transims is likely to have problems with that!");
 		}
 		if (network.getLinks().get(new IdImpl(0)) != null) {
-			Logger.getLogger(CreateTransimsNetwork.class).error("The network contains a link with id 0. Transims is likely to have problems with that!");
-			if (network.getLinks().get(new IdImpl(999999)) == null) {
-				((LinkImpl) network.getLinks().get(new IdImpl(0))).setId(new IdImpl("999999"));
-				Logger.getLogger(CreateTransimsNetwork.class).error("Changed link 0 to link 999999.");
-			}
+			log.warn("The network contains a link with id 0. Transims is likely to have problems with that!");
 		}
 
 		System.out.println("writing links to " + linksFileName);

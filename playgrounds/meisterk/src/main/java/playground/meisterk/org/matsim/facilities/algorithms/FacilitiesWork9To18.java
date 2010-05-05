@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -42,12 +43,12 @@ public class FacilitiesWork9To18 {
 		super();
 	}
 
-	public void run(ActivityFacilitiesImpl facilities) {
+	public void run(ActivityFacilitiesImpl facilities, Config config) {
 
 		int hectareCnt = 0, facilityCnt = 0;
 		int skip = 1;
 		int B01S2, B01S3, B01EQTS2, B01EQTS3, jobsPerFacility;
-		Integer reli; 
+		Integer reli;
 		String X, Y;
 		ActivityFacilityImpl f;
 		ActivityOptionImpl a;
@@ -59,7 +60,7 @@ public class FacilitiesWork9To18 {
 		System.out.println("  reading enterprise census files into EnterpriseCensus object... ");
 		EnterpriseCensusParser myCensusParser = new EnterpriseCensusParser(this.myCensus);
 		try {
-			myCensusParser.parse(this.myCensus);
+			myCensusParser.parse(this.myCensus, config);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -139,6 +139,11 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated
+	public final void setId(final Id id) {
+		this.id = id;
+	}
+
 	public void setDesc(String desc) {
 		if (desc == null) { this.desc = null; }
 		else { this.desc = desc.intern(); }

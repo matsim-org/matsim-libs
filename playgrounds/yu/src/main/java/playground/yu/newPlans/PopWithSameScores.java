@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.newPlans;
 
@@ -35,19 +35,10 @@ import org.matsim.core.population.MatsimPopulationReader;
 
 /**
  * @author yu
- * 
+ *
  */
 public class PopWithSameScores extends NewPopulation {
 	private double score;
-
-	/**
-	 * @param network
-	 * @param plans
-	 */
-	public PopWithSameScores(Network network, Population plans, double score) {
-		super(network, plans);
-		this.score = score;
-	}
 
 	/**
 	 * @param network

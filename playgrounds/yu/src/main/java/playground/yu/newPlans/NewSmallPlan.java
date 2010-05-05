@@ -35,19 +35,19 @@ import org.matsim.core.population.MatsimPopulationReader;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewSmallPlan extends NewPopulation {
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewSmallPlan(final Network network, Population plans) {
-		super(network, plans);
+	public NewSmallPlan(final Network network, Population plans, String filename) {
+		super(network, plans, filename);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class NewSmallPlan extends NewPopulation {
 
 		new MatsimPopulationReader(s).readFile(inputPopFilename);
 
-		NewSmallPlan nsp = new NewSmallPlan(network, population);
+		NewSmallPlan nsp = new NewSmallPlan(network, population, outputPopFilename);
 		nsp.run(population);
 		nsp.writeEndPlans();
 	}

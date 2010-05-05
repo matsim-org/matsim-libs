@@ -51,17 +51,6 @@ public class NewAgentWalkPlan extends NewPopulation {
 
 	private final Network network;
 
-	/**
-	 * Constructor, writes file-head
-	 *
-	 * @param plans
-	 *            - a Plans Object, which derives from MATSim plansfile
-	 */
-	public NewAgentWalkPlan(final Network network, final Population plans) {
-		super(network, plans);
-		this.network = network;
-	}
-
 	public NewAgentWalkPlan(final Network network, final Population population, final String filename) {
 		super(network, population, filename);
 		this.network = network;
@@ -130,7 +119,7 @@ public class NewAgentWalkPlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 
-		NewAgentWalkPlan nawp = new NewAgentWalkPlan(scenario.getNetwork(), scenario.getPopulation());
+		NewAgentWalkPlan nawp = new NewAgentWalkPlan(scenario.getNetwork(), scenario.getPopulation(), scenario.getConfig().plans().getOutputFile());
 		nawp.run(scenario.getPopulation());
 		nawp.writeEndPlans();
 	}

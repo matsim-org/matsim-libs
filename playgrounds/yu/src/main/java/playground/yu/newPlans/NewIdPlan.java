@@ -35,8 +35,8 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
  */
 public class NewIdPlan extends NewPopulation {
 
-	public NewIdPlan(final Network network, final Population plans) {
-		super(network, plans);
+	public NewIdPlan(final Network network, final Population plans, final String filename) {
+		super(network, plans, filename);
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class NewIdPlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 
-		NewIdPlan nip = new NewIdPlan(scenario.getNetwork(), scenario.getPopulation());
+		NewIdPlan nip = new NewIdPlan(scenario.getNetwork(), scenario.getPopulation(), scenario.getConfig().plans().getOutputFile());
 		nip.run(scenario.getPopulation());
 		nip.writeEndPlans();
 	}

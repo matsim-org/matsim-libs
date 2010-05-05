@@ -122,7 +122,7 @@ public class Controller2D extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		Sim2D sim = new Sim2D(this.network,this.mps,this.population,this.events,this.sff);
+		Sim2D sim = new Sim2D(this.network,this.mps,this.population,this.events,this.sff, this.config);
 		sim.setOTFStuff(this.myOTFServer,this.agentWriter,this.forceArrowWriter);
 		sim.run();
 	}

@@ -22,9 +22,9 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 /**
  * Note: Cannot simply inherit from class TestCase, but must inherit from
  * MatsimTestCase, because else there are some errors.
- * 
+ *
  * @author rashid_waraich
- * 
+ *
  */
 public class AdvancedTest extends MatsimTestCase {
 
@@ -104,7 +104,7 @@ public class AdvancedTest extends MatsimTestCase {
 		controler.run();
 
 		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
-				.getParkingTimes());
+				.getParkingTimes(), Double.parseDouble(controler.getConfig().findParam("PSF", "default.maxBatteryCapacity")));
 		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
 
 		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(new IdImpl("1"));
@@ -188,7 +188,7 @@ public class AdvancedTest extends MatsimTestCase {
 
 		// the first charging duration should be till 23400 (because of 900
 		// second bins)
-		// 
+		//
 		assertEquals(22989, chargeLogOfAgentOne.getStartChargingTime(),  1);
 		assertEquals(23400, chargeLogOfAgentOne.getEndChargingTime(),  1);
 
@@ -238,11 +238,11 @@ public class AdvancedTest extends MatsimTestCase {
 
 	/*
 	 * The agent has now three activities (two times work and once time home).
-	 * 
+	 *
 	 * - The agent will not reach the second parking if he does not charge at
 	 * the first parking.
-	 * 
-	 * 
+	 *
+	 *
 	 * - The vehicle should charge at the first facility enough energy, that he
 	 * can reach home again (e.g.) . This means, he will charge 1.2M Joule. The
 	 * vehicle will not charge at the second facility, because the charging
@@ -280,7 +280,7 @@ public class AdvancedTest extends MatsimTestCase {
 
 		// the first charging duration should be till 23400 (because of 900
 		// second bins)
-		// 
+		//
 		assertEquals(22989, chargeLogOfAgentOne.getStartChargingTime(),  1);
 		assertEquals(23400, chargeLogOfAgentOne.getEndChargingTime(),  1);
 
@@ -347,7 +347,7 @@ public class AdvancedTest extends MatsimTestCase {
 
 	public ChargingTimes getChargingTimesOfAgent(String agentId) {
 		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
-				.getParkingTimes());
+				.getParkingTimes(), Double.parseDouble(controler.getConfig().findParam("PSF", "default.maxBatteryCapacity")));
 		chargingTimes = optimizedCharger.getChargingTimes();
 
 		ChargingTimes chargingTimesOfAgent = chargingTimes.get(new IdImpl(agentId));
@@ -383,15 +383,15 @@ public class AdvancedTest extends MatsimTestCase {
 		//assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 30492.901121572733, 1);
 
 		// chargingTimesOfAgentOne.print();
-		
+
 		// check the statistics about the battery for usage of the V2G concept.
 		double[][] gridConnectedEnergy = BatteryStatistics.getGridConnectedEnergy(chargingTimes,logParkingTimes.getParkingTimes());
 		double[][] getGridConnectedPower=BatteryStatistics.getGridConnectedPower(logParkingTimes.getParkingTimes(), ParametersPSF.getDefaultChargingPowerAtParking());
 		assertEquals(3500.0, getGridConnectedPower[(int) Math.round(Math.floor(22989/900))][0]);
 		assertEquals(0.0, getGridConnectedPower[(int) Math.round(Math.floor((22989-1000)/900))][0]);
-		
+
 		assertEquals(36000000.0, gridConnectedEnergy[0][0], 1);
-		
+
 		assertEquals(36000000.0, gridConnectedEnergy[(int) Math.round(Math.floor((22989-1000)/900))][0],1);
 		assertEquals(1.117484607449543E7, gridConnectedEnergy[(int) Math.round(Math.floor(22989/900))][0],1);
 	}
@@ -402,7 +402,7 @@ public class AdvancedTest extends MatsimTestCase {
 	 * berlin 1% scenario (agentId="193077"). But his does not cause the error. The error is caused,
 	 * because the car arrives at work very fast (within the first charging bin, available at work).
 	 * => This caused a negative energy value. => bug resolved now in FacilityChargingPrice.getEndTimeOfCharge(...)
-	 * 
+	 *
 	 * As the peak is during the night, the agent should start charging immediately upon arriving.
 	 */
 	public void test7OptimizedCharger() {
@@ -425,19 +425,19 @@ public class AdvancedTest extends MatsimTestCase {
 		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
 		assertEquals(21721.0, chargeLogOfAgentOne.getStartChargingTime(),  1.0);
 		assertEquals("20", chargeLogOfAgentOne.getLinkId().toString());
-		
+
 		// after charging, the battery of the agent is full (allow for small
 		// rounding error)
 		assertEquals(chargingTimesOfAgentOne.getChargingTimes().getLast().getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity(), 0.1);
-	}  
-  
+	}
+
 	/**
 	 * This covers a fixed bug, which occurs during charging in the night.
-	 * 
-	 * This also tests the method ChargingTimes.getEnergyUsageStatistics 
+	 *
+	 * This also tests the method ChargingTimes.getEnergyUsageStatistics
 	 */
 	public void test8OptimizedCharger() {
-		initTest("test/input/playground/wrashid/PSF/singleAgent/config8.xml"); 
+		initTest("test/input/playground/wrashid/PSF/singleAgent/config8.xml");
 
 		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
 			public void mutateParameters() {
@@ -452,20 +452,20 @@ public class AdvancedTest extends MatsimTestCase {
 
 		ChargingTimes chargingTimesOfAgentOne = getChargingTimesOfAgent("1");
 		ChargeLog chargeLogOfAgentOne;
-		
+
 		// fully charged in the end
 		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(11);
 		assertEquals(ParametersPSF.getDefaultMaxBatteryCapacity(), chargeLogOfAgentOne.getEndSOC(), 1.0);
-		
+
 		// also test energy Usage Statistics
-		
-		double[][] energyUsageStatistics = ChargingTimes.getEnergyUsageStatistics(chargingTimes,ParametersPSF.getHubLinkMapping()); 
-		
-		// the vehicle charges between 
-		
+
+		double[][] energyUsageStatistics = ChargingTimes.getEnergyUsageStatistics(chargingTimes,ParametersPSF.getHubLinkMapping());
+
+		// the vehicle charges between
+
 		//energy charged between 150 and 165 min:  3150000
 		//energy charged between 165 and 180 min:  1350000
 		assertEquals(3150000.0, energyUsageStatistics[10][0], 1.0);
 		assertEquals(1350000.0, energyUsageStatistics[11][0], 1.0);
 	}
-} 
+}

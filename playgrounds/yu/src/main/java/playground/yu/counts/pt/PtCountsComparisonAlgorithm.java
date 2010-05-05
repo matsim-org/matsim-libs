@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
@@ -43,7 +42,7 @@ import playground.yu.utils.io.SimpleWriter;
 /**
  * This algorithm can be used to obtain a List of CountSimComparison objects
  * from the LinkAttributes of a run. A time filter can be specified.
- * 
+ *
  * @author dgrether
  */
 public abstract class PtCountsComparisonAlgorithm {
@@ -73,17 +72,12 @@ public abstract class PtCountsComparisonAlgorithm {
 	protected StringBuffer content = new StringBuffer();
 
 	public PtCountsComparisonAlgorithm(final OccupancyAnalyzer oa,
-			final Counts counts, final Network network) {
+			final Counts counts, final Network network, final double countsScaleFactor) {
 		this.oa = oa;
 		this.counts = counts;
 		this.countSimComp = new ArrayList<CountSimComparison>();
 		this.network = network;
-		if (Gbl.getConfig() != null) {
-			this.countsScaleFactor = Double.parseDouble(Gbl.getConfig()
-					.findParam("ptCounts", "countsScaleFactor"));
-		} else {
-			this.countsScaleFactor = 1.0;
-		}
+		this.countsScaleFactor = countsScaleFactor;
 	}
 
 	/**
@@ -148,7 +142,7 @@ public abstract class PtCountsComparisonAlgorithm {
 	protected abstract int[] getVolumesForStop(Id stopId);
 
 	/**
-	 * 
+	 *
 	 * @param stopCoord
 	 * @return
 	 *         <code>true</true> if the Link with the given Id is not farther away than the
@@ -165,7 +159,7 @@ public abstract class PtCountsComparisonAlgorithm {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return the result list
 	 */
 	public List<CountSimComparison> getComparison() {
@@ -179,7 +173,7 @@ public abstract class PtCountsComparisonAlgorithm {
 	/**
 	 * Set a distance filter, dropping everything out which is not in the
 	 * distance given in meters around the given Node Id.
-	 * 
+	 *
 	 * @param distance
 	 * @param nodeId
 	 */

@@ -36,7 +36,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -59,19 +58,21 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 	static double oldCoef = 0;
 	static double newCoef = 1;
 	static int iteration = 0;
+	private final double storageCapFactor;
 
-	public SocialCostCalculatorNetwork(final NetworkLayer network) {
-		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
+	public SocialCostCalculatorNetwork(final NetworkLayer network, final double storageCapFactor) {
+		this(network, 15*60, 30*3600, storageCapFactor);	// default timeslot-duration: 15 minutes
 	}
 
-	public SocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice) {
-		this(network, timeslice, 30*3600); // default: 30 hours at most
+	public SocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice, final double storageCapFactor) {
+		this(network, timeslice, 30*3600, storageCapFactor); // default: 30 hours at most
 	}
 
-	public SocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice,	final int maxTime) {
+	public SocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice,	final int maxTime, final double storageCapFactor) {
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
 		this.network = network;
+		this.storageCapFactor = storageCapFactor;
 	}
 
 	public double getSocialCost(final LinkImpl link, final double time) {
@@ -247,7 +248,6 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 
 	private int calcCapacity(final Link link) {
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
-		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 
 //		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 //		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);

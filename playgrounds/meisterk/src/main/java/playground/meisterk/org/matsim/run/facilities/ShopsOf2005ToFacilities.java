@@ -192,7 +192,7 @@ public class ShopsOf2005ToFacilities {
 	private static StyleType dennerStyle = null;
 
 	private static HashMap<String, String> icons = null;
-	
+
 	private static ShopId shopId = null;
 
 
@@ -204,7 +204,7 @@ public class ShopsOf2005ToFacilities {
 
 		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
 //		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities(config);
-//		ShopsOf2005ToFacilities.shopsToTXT();
+//		ShopsOf2005ToFacilities.shopsToTXT(config);
 //		ShopsOf2005ToFacilities.shopsToOpentimesKML();
 //		ShopsOf2005ToFacilities.applyOpentimesToEnterpriseCensus(config);
 
@@ -234,7 +234,7 @@ public class ShopsOf2005ToFacilities {
 
 			JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.kml._2");
 			Unmarshaller unMarshaller = jaxbContext.createUnmarshaller();
-			kmlElement = (JAXBElement<KmlType>) unMarshaller.unmarshal(new FileInputStream(Gbl.getConfig().facilities().getInputFile()));
+			kmlElement = (JAXBElement<KmlType>) unMarshaller.unmarshal(new FileInputStream(config.facilities().getInputFile()));
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
@@ -299,9 +299,9 @@ public class ShopsOf2005ToFacilities {
 		icons.put("pickpay", "icons/shopsOf2005/P.png");
 		icons.put("migros", "icons/shopsOf2005/M.png");
 		icons.put("denner", "icons/shopsOf2005/D.png");
-		
+
 		for (String retailer : icons.keySet()) {
-			
+
 			StyleType style = kmlObjectFactory.createStyleType();
 			style.setId(retailer + "Style");
 			myKMLDocument.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(coopStyle));
@@ -310,12 +310,12 @@ public class ShopsOf2005ToFacilities {
 			IconStyleType icon = kmlObjectFactory.createIconStyleType();
 			icon.setIcon(basicLink);
 			style.setIconStyle(icon);
-			
+
 			styles.put(retailer, style);
 			myKMLDocument.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(style));
-			
+
 		}
-		
+
 		System.out.println("Setting up KML styles...done.");
 
 	}
@@ -328,7 +328,7 @@ public class ShopsOf2005ToFacilities {
 		aFolder.setName("Denner TG ZH");
 		aFolder.setDescription("Alle Denner TG ZH Läden");
 		mainKMLFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(aFolder));
-		
+
 		List<String> lines = null;
 		String[] tokens = null;
 
@@ -649,7 +649,7 @@ public class ShopsOf2005ToFacilities {
 
 		KMZWriter writer;
 		writer = new KMZWriter(kmlFilename);
-		
+
 		for (String icon : icons.values()) {
 			try {
 				writer.addNonKMLFile(MatsimResource.getAsInputStream(icon), icon);
@@ -657,7 +657,7 @@ public class ShopsOf2005ToFacilities {
 				e.printStackTrace();
 			}
 		}
-		
+
 		writer.writeMainKml(myKML);
 		writer.close();
 
@@ -1444,7 +1444,7 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
-	private static void shopsToTXT() {
+	private static void shopsToTXT(Config config) {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		ActivityFacilitiesImpl shopsOf2005 = scenario.getActivityFacilities();
@@ -1482,7 +1482,7 @@ public class ShopsOf2005ToFacilities {
 
 		System.out.println("Reading facilities xml file... ");
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(scenario);
-		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
+		facilities_reader.readFile(config.facilities().getInputFile());
 		System.out.println("Reading facilities xml file...done.");
 
 		Iterator<ActivityFacilityImpl> facilityIterator = shopsOf2005.getFacilities().values().iterator();
@@ -1550,7 +1550,7 @@ public class ShopsOf2005ToFacilities {
 		System.out.println("Writing txt file...");
 		try {
 			FileUtils.writeLines(
-					new File(Gbl.getConfig().facilities().getOutputFile()),
+					new File(config.facilities().getOutputFile()),
 					"UTF-8",
 					txtLines
 			);

@@ -42,7 +42,6 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -67,18 +66,14 @@ import playground.jhackney.SocNetConfigGroup;
 public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler {
 
 	private Population population = null;
-	private playground.jhackney.scoring.EventSocScoringFactory sfFactory = null;
+	private EventSocScoringFactory sfFactory = null;
 	private final TreeMap<String, playground.jhackney.scoring.EventSocScoringFunction> agentScorers = new TreeMap<String, playground.jhackney.scoring.EventSocScoringFunction>();
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 	private final double learningRate;
 	boolean report=true;
 
-	public EventsToScoreAndReport(final Population population, final playground.jhackney.scoring.EventSocScoringFactory factory) {
-		this(population, factory, Gbl.getConfig().charyparNagelScoring().getLearningRate());
-	}
-
-	public EventsToScoreAndReport(final Population population, final playground.jhackney.scoring.EventSocScoringFactory factory, final double learningRate) {
+	public EventsToScoreAndReport(final Population population, final EventSocScoringFactory factory, final double learningRate) {
 		super();
 		this.population = population;
 		this.sfFactory = factory;

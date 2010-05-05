@@ -43,16 +43,6 @@ import playground.yu.newPlans.NewPopulation;
  *
  */
 public class NewAgentPtPlan extends NewPopulation {
-	/**
-	 * Constructor, writes file-head
-	 *
-	 * @param plans
-	 *            - a Plans Object, which derives from MATSim plansfile
-	 */
-	public NewAgentPtPlan(final Network network, final Population plans) {
-		super(network, plans);
-	}
-
 	public NewAgentPtPlan(final Network network, final Population population, final String filename) {
 		super(network, population, filename);
 	}

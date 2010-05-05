@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.test;
 
@@ -33,7 +33,7 @@ import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
 
 /**
  * @author yu
- * 
+ *
  */
 public class SubTourModeChoiceControler extends Controler {
 
@@ -41,6 +41,7 @@ public class SubTourModeChoiceControler extends Controler {
 		super(args);
 	}
 
+	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManager();
 		MyStrategyManagerConfigLoader.load(this, manager);
@@ -53,7 +54,8 @@ public class SubTourModeChoiceControler extends Controler {
 		Controler controler = new SubTourModeChoiceControler(args[0]);
 		controler
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring()));
+						config.charyparNagelScoring(), Double.parseDouble(config.findParam(
+								"subTourModeChoice", "offsetWalk"))));
 		controler.addControlerListener(new MZComparisonListener());
 		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
 		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));

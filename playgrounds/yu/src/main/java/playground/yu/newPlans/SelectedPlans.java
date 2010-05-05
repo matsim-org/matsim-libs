@@ -45,8 +45,8 @@ public class SelectedPlans extends NewPopulation {
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public SelectedPlans(final Network network, Population plans) {
-		super(network, plans);
+	public SelectedPlans(final Network network, Population plans, String filename) {
+		super(network, plans, filename);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class SelectedPlans extends NewPopulation {
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
 
-		SelectedPlans sp = new SelectedPlans(network, population);
+		SelectedPlans sp = new SelectedPlans(network, population, scenario.getConfig().plans().getOutputFile());
 		sp.run(population);
 		sp.writeEndPlans();
 	}

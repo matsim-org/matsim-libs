@@ -30,8 +30,8 @@ public class PtOccupancyCountComparisonAlgorithm extends
 		PtCountsComparisonAlgorithm {
 
 	public PtOccupancyCountComparisonAlgorithm(OccupancyAnalyzer oa,
-			Counts counts, Network net) {
-		super(oa, counts, net);
+			Counts counts, Network net, double countsScaleFactor) {
+		super(oa, counts, net, countsScaleFactor);
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -64,14 +65,14 @@ public class FacilitiesAllActivitiesFTE {
 
 	}
 
-	private void loadCensus() {
+	private void loadCensus(Config config) {
 
 		log.info("Reading enterprise census files into EnterpriseCensus object...");
 		this.myCensus = new EnterpriseCensus();
 
 		EnterpriseCensusParser myCensusParser = new EnterpriseCensusParser(this.myCensus);
 		try {
-			myCensusParser.parse(this.myCensus);
+			myCensusParser.parse(this.myCensus, config);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -82,9 +83,9 @@ public class FacilitiesAllActivitiesFTE {
 		log.info("Reading enterprise census files into EnterpriseCensus object...done.");
 	}
 
-	private void createThem(ActivityFacilitiesImpl facilities) {
+	private void createThem(ActivityFacilitiesImpl facilities, Config config) {
 
-		Random random = new Random(Gbl.getConfig().global().getRandomSeed());
+		Random random = new Random(config.global().getRandomSeed());
 
 		// see http://www.matsim.org/node/36 for the next step
 		random.nextInt();
@@ -138,7 +139,7 @@ public class FacilitiesAllActivitiesFTE {
 		ActivityFacilityImpl f;
 		ActivityOptionImpl a;
 
-		loadCensus();
+		loadCensus(config);
 
 		System.out.println("  creating facilities... ");
 		Set<Integer> ecHectares = this.myCensus.getHectareAggregation().keySet();
@@ -153,7 +154,7 @@ public class FacilitiesAllActivitiesFTE {
 
 				numSectorFTE = (int) Math.round(this.myCensus.getHectareAggregationInformation(reli, sector.getFteItem()));
 				attributeIds_it = this.myCensus.getHectareAttributeIdentifiersBySector(sector).iterator();
-					
+
 				if (numSectorFTE == Integer.MAX_VALUE) {
 					Gbl.errorMsg("numFTE was not correctly set.");
 				}
@@ -341,72 +342,72 @@ public class FacilitiesAllActivitiesFTE {
 			// education
 			for (String str : new String[]{"B018010A"}) {
 				this.facilityActivities.put(
-						str, 
+						str,
 						FacilitiesProductionKTI.EDUCATION_KINDERGARTEN);
 			}
 
 			for (String str : new String[]{"B018010B"}) {
 				this.facilityActivities.put(
-						str, 
+						str,
 						FacilitiesProductionKTI.EDUCATION_PRIMARY);
 			}
 
 			for (String str : new String[]{"B018021A", "B018021B", "B018021C", "B018022A"}) {
 				this.facilityActivities.put(
-						str, 
+						str,
 						FacilitiesProductionKTI.EDUCATION_SECONDARY);
 			}
 
 			for (String str : new String[]{"B018030A", "B018030B", "B018030C", "B018030D"}) {
 				this.facilityActivities.put(
-						str, 
+						str,
 						FacilitiesProductionKTI.EDUCATION_HIGHER);
 			}
 
 			for (String str : new String[]{"B018041A", "B018042A", "B018042B", "B018042C", "B018042D", "B018042E"}) {
 				this.facilityActivities.put(
-						str, 
+						str,
 						FacilitiesProductionKTI.EDUCATION_OTHER);
 			}
 
 			// shopping
 			for (String str : new String[]{"11A"}) {
 				this.facilityActivities.put(
-						EnterpriseCensus.EC01_PREFIX + 
-						EnterpriseCensus.SHOP_NOGA_SECTION + 
-						str, 
+						EnterpriseCensus.EC01_PREFIX +
+						EnterpriseCensus.SHOP_NOGA_SECTION +
+						str,
 						FacilitiesProductionKTI.SHOP_RETAIL_GT2500);
 			}
 
 			for (String str : new String[]{"11B"}) {
 				this.facilityActivities.put(
-						EnterpriseCensus.EC01_PREFIX + 
-						EnterpriseCensus.SHOP_NOGA_SECTION + 
-						str, 
+						EnterpriseCensus.EC01_PREFIX +
+						EnterpriseCensus.SHOP_NOGA_SECTION +
+						str,
 						FacilitiesProductionKTI.SHOP_RETAIL_GET1000);
 			}
 
 			for (String str : new String[]{"11C"}) {
 				this.facilityActivities.put(
-						EnterpriseCensus.EC01_PREFIX + 
-						EnterpriseCensus.SHOP_NOGA_SECTION + 
-						str, 
+						EnterpriseCensus.EC01_PREFIX +
+						EnterpriseCensus.SHOP_NOGA_SECTION +
+						str,
 						FacilitiesProductionKTI.SHOP_RETAIL_GET400);
 			}
 
 			for (String str : new String[]{"11D"}) {
 				this.facilityActivities.put(
-						EnterpriseCensus.EC01_PREFIX + 
-						EnterpriseCensus.SHOP_NOGA_SECTION + 
-						str, 
+						EnterpriseCensus.EC01_PREFIX +
+						EnterpriseCensus.SHOP_NOGA_SECTION +
+						str,
 						FacilitiesProductionKTI.SHOP_RETAIL_GET100);
 			}
 
 			for (String str : new String[]{"11E"}) {
 				this.facilityActivities.put(
-						EnterpriseCensus.EC01_PREFIX + 
-						EnterpriseCensus.SHOP_NOGA_SECTION + 
-						str, 
+						EnterpriseCensus.EC01_PREFIX +
+						EnterpriseCensus.SHOP_NOGA_SECTION +
+						str,
 						FacilitiesProductionKTI.SHOP_RETAIL_LT100);
 			}
 
@@ -419,33 +420,33 @@ public class FacilitiesAllActivitiesFTE {
 					"61A","62A","63A",
 					"71A","72A","73A","74A"}) {
 				this.facilityActivities.put(
-						EnterpriseCensus.EC01_PREFIX + 
-						EnterpriseCensus.SHOP_NOGA_SECTION + 
-						str, 
+						EnterpriseCensus.EC01_PREFIX +
+						EnterpriseCensus.SHOP_NOGA_SECTION +
+						str,
 						FacilitiesProductionKTI.SHOP_OTHER);
 			}
 
 			// leisure
 			for (String str : new String[]{"30A", "40A", "51A", "52A"}) {
 				this.facilityActivities.put(
-						EnterpriseCensus.EC01_PREFIX + 
-						EnterpriseCensus.HOSPITALITY_NOGA_SECTION + 
-						str, 
+						EnterpriseCensus.EC01_PREFIX +
+						EnterpriseCensus.HOSPITALITY_NOGA_SECTION +
+						str,
 						FacilitiesProductionKTI.LEISURE_GASTRO);
 			}
 
 			for (String str : new String[]{"11A","12A","21A","22A","23A","23B","23C"}) {
 				this.facilityActivities.put(
 						EnterpriseCensus.EC01_PREFIX +
-						EnterpriseCensus.HOSPITALITY_NOGA_SECTION + 
-						str, 
-//						FacilitiesProductionKTI.LEISURE_HOSPITALITY);	
+						EnterpriseCensus.HOSPITALITY_NOGA_SECTION +
+						str,
+//						FacilitiesProductionKTI.LEISURE_HOSPITALITY);
 						FacilitiesProductionKTI.LEISURE_GASTRO);
 			}
 
 			for (String str : new String[]{"B019261A", "B019262A", "B019262B"}) {
 				this.facilityActivities.put(
-						str, 
+						str,
 						FacilitiesProductionKTI.LEISURE_SPORTS);
 			}
 
@@ -456,9 +457,9 @@ public class FacilitiesAllActivitiesFTE {
 					"40A","40B",
 					"51A","52A","53A"}) {
 				this.facilityActivities.put(
-						EnterpriseCensus.EC01_PREFIX + 
-						EnterpriseCensus.CULTURE_NOGA_SECTION + 
-						str, 
+						EnterpriseCensus.EC01_PREFIX +
+						EnterpriseCensus.CULTURE_NOGA_SECTION +
+						str,
 						FacilitiesProductionKTI.LEISURE_CULTURE);
 			}
 		}

@@ -44,10 +44,6 @@ public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
 	private Person person = null;
 	private final List<Plan> tmpPersonPlans = new ArrayList<Plan>();
 
-	public CarPlansExtractor(Network network, Population plans) {
-		super(network, plans);
-	}
-
 	public CarPlansExtractor(Network network, Population population, String filename) {
 		super(network, population, filename);
 	}

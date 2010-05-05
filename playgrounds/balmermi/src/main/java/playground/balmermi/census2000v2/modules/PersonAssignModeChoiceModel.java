@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -64,18 +65,19 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	private FileWriter fw = null;
 	private BufferedWriter out = null;
 
-	private final PlanAnalyzeSubtours past = new PlanAnalyzeSubtours(Gbl.getConfig().planomat());
+	private final PlanAnalyzeSubtours past;
 	private final Municipalities municipalities;
 
 	private final Knowledges knowledges;
 	private final ActivityFacilities facilities;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignModeChoiceModel(final Municipalities municipalities, String outfile, Knowledges knowledges, final ActivityFacilities facilities) {
+	public PersonAssignModeChoiceModel(final Municipalities municipalities, String outfile, Knowledges knowledges, final ActivityFacilities facilities, final PlanomatConfigGroup planomatConfig) {
 		log.info("    init " + this.getClass().getName() + " module...");
+		this.past = new PlanAnalyzeSubtours(planomatConfig);
 		this.municipalities = municipalities;
 		this.knowledges = knowledges;
 		this.facilities = facilities;
@@ -106,7 +108,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		}
 		else { return false; }
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private final boolean isPtPossible(PersonImpl person) {
@@ -118,7 +120,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		else if (r < 0.90) { return true; }
 		else { return false; }
 	}
-	
+
 	private final int getPrevMode(int s_act_idx, Plan p) {
 		// prev_mode; // 0= car; 1= Pt; 2= Car passenger; 3= Bike; 4= Walk; -1: subtour is starting from home;
 		ActivityImpl act = (ActivityImpl)p.getPlanElements().get(s_act_idx);
@@ -131,7 +133,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		else if (leg.getMode().equals(TransportMode.walk)) { return 4; }
 		else { Gbl.errorMsg("pid="+p.getPerson().getId()+": leg_mode="+leg.getMode()+" not known!"); return -2; }
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private final int getUrbanDegree(ArrayList<Integer> act_indices, Plan p) {
@@ -139,7 +141,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		Zone zone = (Zone)((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getUpMapping().values().iterator().next();
 		return this.municipalities.getMunicipality(zone.getId()).getRegType();
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private final double calcTourDistance(ArrayList<Integer> act_indices, Plan p) {
@@ -169,7 +171,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 //		}
 //		return m;
 //	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private final int getMainPurpose(ArrayList<Integer> act_indices, Plan p) {
@@ -208,7 +210,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		Plan p = person.getSelectedPlan();
 		past.run(p);
 		int[] subtour_leg_indices = past.getSubtourIndexation();
-		
+
 		// GET the maximal index
 		int max_subtour_leg_indices = -1;
 		for (int i=0; i<subtour_leg_indices.length; i++) {
@@ -230,16 +232,16 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			for (int j=0; j<leg_indices.size(); j++) {
 				act_indices.add(leg_indices.get(j)+1);
 			}
-			
+
 			// CREATE the model
 			int mainpurpose = this.getMainPurpose(act_indices,p);
 			throw new RuntimeException("ModeChoiceModel deactivated, see Source Code.");
-			/* I (mrieser) had to disable the inclusion of the mode choice model in this place 
-			 * because of a circular dependency between the playgrounds of balmermi and ciarif. 
+			/* I (mrieser) had to disable the inclusion of the mode choice model in this place
+			 * because of a circular dependency between the playgrounds of balmermi and ciarif.
 			 */
 			/* ***** disable mode choice -- begin ****
 			ModelModeChoice model = this.createModel(mainpurpose,p);
-			
+
 			// SET variables
 			// age; // 0-[unlimited]
 			model.setAge(person.getAge());
@@ -264,7 +266,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 				Coord p_coord = prim_acts.get(MatsimRandom.getRandom().nextInt(prim_acts.size())).getFacility().getCoord();
 				model.setDistanceHome2Work(CoordUtils.calcDistance(h_coord, p_coord)/1000.0);
 			}
-			// tickets; // holds some kind of season tickets 
+			// tickets; // holds some kind of season tickets
 			model.setTickets(person.getTravelcards());
 			// purpose; // main purpose of the tour (Work = 0, Education = 1, Shop=2, leis=3)
 			model.setMainPurpose(mainpurpose);
@@ -299,7 +301,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 				LegImpl l = (LegImpl)p.getPlanElements().get(leg_indices.get(j));
 				l.setMode(mode);
 			}
-			
+
 			// write a line
 			try {
 				int pid = Integer.parseInt(person.getId().toString());
@@ -344,10 +346,10 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 		}
 	}
-	
+
 	public void run(Plan plan) {
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// close method
 	//////////////////////////////////////////////////////////////////////

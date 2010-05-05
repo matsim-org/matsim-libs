@@ -63,8 +63,10 @@ public abstract class Gbl {
 	 * @param args
 	 * @return
 	 * @deprecated use {@link ScenarioLoaderImpl#loadScenario()} to read
-	 * a complete Scenario from file. If only a default Config instance
-	 * is needed, use <code>Scenario sc = new {@link ScenarioImpl}(); Config config = sc.getConfig();</code>.
+	 * a complete Scenario from file. If only a config-file should be loaded,
+	 * use <code>new ScenarioLoaderImpl(configFilename).getScenario().getConfig()</code>.
+	 * If only a default, empty (=not loaded) Config instance is needed, use
+	 * <code>Scenario sc = new {@link ScenarioImpl}(); Config config = sc.getConfig();</code>.
 	 */
 	@Deprecated
 	public static final Config createConfig(final String[] args) {
