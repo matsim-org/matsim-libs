@@ -29,14 +29,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.lanes.LaneDefinitions;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.SignalGroupSettings;
 import org.matsim.signalsystems.config.SignalSystemConfiguration;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.config.SignalSystemPlan;
-import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -64,9 +62,9 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		ScenarioImpl data = new ScenarioImpl(conf);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();
-		
-		LaneDefinitions lanedefs = data.getLaneDefinitions();
-		
+
+//		LaneDefinitions lanedefs = data.getLaneDefinitions();
+
 		EventsManagerImpl events = new EventsManagerImpl();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
@@ -75,15 +73,15 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 
 		int circulationTime = 60;
 
-		SignalSystems lssDefs = data.getSignalSystems();
+//		SignalSystems lssDefs = data.getSignalSystems();
 		SignalSystemConfigurations lssConfigs = data.getSignalSystemConfigurations();
-		
+
 		Id id2 = new IdImpl(2);
 		Id id100 = new IdImpl(100);
 
 		for (int dropping = 1; dropping <= circulationTime; dropping++) {
 			eventHandler.reset(1);
-			
+
 			for (SignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
 				PlanBasedSignalSystemControlInfo controlInfo = (PlanBasedSignalSystemControlInfo) lssConfig
 						.getControlInfo();
@@ -118,7 +116,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		ScenarioImpl data = new ScenarioImpl(conf);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();
-		
+
 		EventsManagerImpl events = new EventsManagerImpl();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
@@ -159,7 +157,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 	/*package*/ static class StubLinkEnterEventHandler implements LinkEnterEventHandler {
 
 		public MeasurementPoint beginningOfLink2 = null;
-		
+
 		public void handleEvent(LinkEnterEvent event) {
 			// log.info("link enter event id :" + event.linkId);
 			if (event.getLinkId().toString().equalsIgnoreCase("2")) {
@@ -167,15 +165,15 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 					this.beginningOfLink2 = new MeasurementPoint(event.getTime()
 							+ TravelTimeOneWayTest.timeToWaitBeforeMeasure);
 				}
-				
+
 				this.beginningOfLink2.numberOfVehPassed++;
-				
+
 				if (this.beginningOfLink2.timeToStartMeasurement <= event.getTime()) {
-					
+
 					if (this.beginningOfLink2.firstVehPassTime_s == -1) {
 						this.beginningOfLink2.firstVehPassTime_s = event.getTime();
 					}
-					
+
 					if (event.getTime() < this.beginningOfLink2.timeToStartMeasurement
 							+ MeasurementPoint.timeToMeasure_s) {
 						this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure++;
@@ -184,12 +182,12 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 				}
 			}
 		}
-		
+
 		public void reset(int iteration) {
 			this.beginningOfLink2 = null;
 		}
 	}
-	
+
 	private static class MeasurementPoint {
 
 		static final int timeToMeasure_s = 3600;

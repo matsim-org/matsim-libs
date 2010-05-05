@@ -551,7 +551,7 @@ public class QLinkImpl implements QLink {
 	QVehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
-	
+
 	@Override
 	public void addAgentInActivity(PersonAgent agent) {
 		this.agentsInActivities.put(agent.getPerson().getId(), agent);
@@ -597,7 +597,7 @@ public class QLinkImpl implements QLink {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
 			snapshotInfoBuilder.addVehiclePositions(positions, time, QLinkImpl.this.link, QLinkImpl.this.buffer,
-					QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacity, QLinkImpl.this.storageCapacity, 
+					QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacity, QLinkImpl.this.storageCapacity,
 					QLinkImpl.this.bufferStorageCapacity, QLinkImpl.this.getLink().getLength(), QLinkImpl.this.transitQueueLaneFeature);
 
 			int cnt2 = 0 ; // a counter according to which non-moving items can be "spread out" in the visualization
@@ -605,12 +605,12 @@ public class QLinkImpl implements QLink {
 			QLinkImpl.this.transitQueueLaneFeature.positionVehiclesFromTransitStop(positions, cnt2 );
 
 			// treat vehicles from waiting list:
-			snapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkImpl.this.link, cnt2,  
+			snapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkImpl.this.link, cnt2,
 					QLinkImpl.this.waitingList, QLinkImpl.this.transitQueueLaneFeature);
-			
-			cnt2 = snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkImpl.this.link,
+
+			snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkImpl.this.link,
 					QLinkImpl.this.agentsInActivities.values(), cnt2);
-			
+
 			// return:
 			return positions;
 		}

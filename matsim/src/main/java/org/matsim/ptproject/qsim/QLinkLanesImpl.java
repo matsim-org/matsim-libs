@@ -143,14 +143,14 @@ public class QLinkLanesImpl implements QLink {
 	/*package*/ VisData visdata = this.new VisDataImpl();
 
 	private QSimEngine qsimEngine = null;
-	
+
 	/**
 	 * All vehicles from parkingList move to the waitingList as soon as their time
 	 * has come. They are then filled into the vehQueue, depending on free space
 	 * in the vehQueue
 	 */
 	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
-	
+
 	/**
 	 * Initializes a QueueLink with one QueueLane.
 	 * @param link2
@@ -183,7 +183,7 @@ public class QLinkLanesImpl implements QLink {
 			if (this.originalLane.getLaneId().equals(signalLane.getId())){
 			  throw new IllegalStateException("Lane definition has same id as auto generated original lane on link " + this.link.getId());
 			}
-			
+
 			QLane lane = null;
 			lane = new QLane(this, signalLane);
 			lane.setMetersFromLinkEnd(0.0);
@@ -358,7 +358,7 @@ public class QLinkLanesImpl implements QLink {
 		this.active = (ret || (!this.waitingList.isEmpty()));
 		return this.active;
 	}
-	
+
 	/**
 	 * Move as many waiting cars to the link as it is possible
 	 *
@@ -373,7 +373,7 @@ public class QLinkLanesImpl implements QLink {
 			}
 
 			this.getQSimEngine().getQSim().getEventsManager().processEvent(
-			new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId(), 
+			new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId(),
 					veh.getDriver().getCurrentLeg().getMode()));
 			boolean handled = this.originalLane.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
 			if (!handled) {
@@ -381,7 +381,7 @@ public class QLinkLanesImpl implements QLink {
 			}
 		}
 	}
-	
+
 
 	public boolean bufferIsEmpty() {
 		//if there is only one lane...
@@ -483,12 +483,12 @@ public class QLinkLanesImpl implements QLink {
 	public QSimEngine getQSimEngine(){
     return this.qsimEngine;
   }
-	
+
 	@Override
 	public void setQSimEngine(QSimEngine qsimEngine) {
 		this.qsimEngine = qsimEngine;
 	}
-		
+
 	/**
 	 * @return the QLanes of this QueueLink
 	 */
@@ -526,23 +526,23 @@ public class QLinkLanesImpl implements QLink {
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
-			
+
 		  for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
 		    lane.visdata.getVehiclePositions(time, positions);
 		  }
-		  
+
 		  int cnt2 = 0;
   		// treat vehicles from waiting list:
-		  agentSnapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkLanesImpl.this.link, cnt2, 
+		  agentSnapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkLanesImpl.this.link, cnt2,
 					QLinkLanesImpl.this.waitingList, null);
 		  cnt2 = QLinkLanesImpl.this.waitingList.size();
-		  cnt2 = agentSnapshotInfoBuilder.positionAgentsInActivities(positions, QLinkLanesImpl.this.link,
+		  agentSnapshotInfoBuilder.positionAgentsInActivities(positions, QLinkLanesImpl.this.link,
 		  		QLinkLanesImpl.this.agentsInActivities.values(), cnt2);
-		  
+
 		  return positions;
 		}
 	}
-	
+
 	@Override
 	public void addAgentInActivity(PersonAgent agent) {
 		agentsInActivities.put(agent.getPerson().getId(), agent);
@@ -564,5 +564,5 @@ public class QLinkLanesImpl implements QLink {
   public QVehicle popFirstFromBuffer() {
     throw new UnsupportedOperationException();
   }
-  
+
 }
