@@ -167,7 +167,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	private void init(EventsManager events){
-		this.setEvents(events);
+		this.events = events;
 	}
 
 	public static OnTheFlyServer createInstance(String readableName, EventsManager events) {
@@ -396,7 +396,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	public OTFQueryRemote answerQuery(AbstractQuery query) throws RemoteException {
 			OTFServerQuad2 quad = quads.values().iterator().next();
-			query.installQuery(otfVisQueueSimFeature, getEvents(), quad);
+			query.installQuery(otfVisQueueSimFeature, events, quad);
 			activeQueries.add(query);
 			OTFQueryRemote stub = (OTFQueryRemote) UnicastRemoteObject.exportObject(query, 0);
 			return stub;
@@ -431,10 +431,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		return controllerStatus;
 	}
 
-	public int getRequestStatus() {
-		return requestStatus;
-	}
-
 	public void setControllerStatus(int controllerStatus) {
 		this.controllerStatus = controllerStatus;
 		switch(OTFVisControlerListener.getStatus(controllerStatus)) {
@@ -455,14 +451,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	public void addAdditionalElement(OTFDataWriter<?> element) {
 		this.additionalElements.add(element);
-	}
-
-	public void setEvents(EventsManager events) {
-		this.events = events;
-	}
-
-	public EventsManager getEvents() {
-		return events;
 	}
 
 	public void setSimulation(OTFVisQSimFeature otfVisQueueSimFeature) {
