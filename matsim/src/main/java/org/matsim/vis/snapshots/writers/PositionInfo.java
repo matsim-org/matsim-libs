@@ -291,5 +291,10 @@ public class PositionInfo implements AgentSnapshotInfo {
 	public void setUserDefined( int tmp ) {
 		this.user = tmp ;
 	}
+	
+	@Override
+	public String toString() {
+		return "PositionInfo; agentId: " + this.agentId.toString() + " easting: " + this.easting + " northing: " + this.northing ;
+	}
 
 }
