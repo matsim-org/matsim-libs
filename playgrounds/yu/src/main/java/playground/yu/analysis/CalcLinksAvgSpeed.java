@@ -302,8 +302,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 		SimpleWriter writer = new SimpleWriter(chartFilename.replace(".png",
 				".txt"));
-		writer.write("time\tavg. speed (car) in "
-				+ ((toll == null) ? "cityarea" : "toll range") + " [km/h");
+		writer.writeln("time\tavg. speed (car) in "
+				+ ((toll == null) ? "cityarea" : "toll range") + " [km/h]");
 
 		for (int i = 0; i < xs.length; i++)
 			writer.writeln(Time.writeTime(xs[i] * 3600.0) + "\t" + ySpeed[i]);
