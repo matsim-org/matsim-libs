@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.jhackney.controler;
 
 import java.util.ArrayList;
@@ -14,6 +33,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 import playground.jhackney.socialnetworks.replanning.SNPickFacilityFromAlter;
 
@@ -22,16 +42,16 @@ public class SNController4 extends Controler {
 	private final Logger log = Logger.getLogger(SNController4.class);
 	protected LinkedHashMap<Id, ArrayList<TimeWindow>> twm;
 	protected SNControllerListener4 snControllerListener;
-		
+
 	public SNController4(String args[]){
 		super(args);
+		this.config.addModule(SocNetConfigGroup.GROUP_NAME, new SocNetConfigGroup());
 		this.snControllerListener=new SNControllerListener4(this);
-		this.addControlerListener(new SNControllerListener4(this));
+		this.addControlerListener(this.snControllerListener);
 	}
 
 	public static void main(final String[] args) {
 		final Controler controler = new SNController4(args);
-//		controler.addControlerListener(new SNControllerListener3());
 		controler.setOverwriteFiles(true);
 		controler.run();
 		System.exit(0);
@@ -47,7 +67,7 @@ public class SNController4 extends Controler {
 		StrategyManager manager = new StrategyManager();
 
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
-		
+
 		// Adjust activity start times by social network and time windows
 		PlanStrategy strategy1 = new PlanStrategy(new RandomPlanSelector());// only facilities visited in last iteration are in time window hastable
 		PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(this.getConfig(), this.network,this.createTravelCostCalculator(),this.travelTimeCalculator, (this.getScenario()).getKnowledges());
@@ -68,7 +88,7 @@ public class SNController4 extends Controler {
 
 		return manager;
 	}
-	
+
 	public LinkedHashMap<Id,ArrayList<TimeWindow>> getTwm() {
 		return this.twm;
 	}

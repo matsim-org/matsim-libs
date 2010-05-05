@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.jhackney.controler;
 
 import java.util.ArrayList;
@@ -15,6 +34,7 @@ import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 
+import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.replanning.SNCoordinateArrivalTimes;
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 
@@ -23,11 +43,12 @@ public class SNController3 extends Controler {
 	private final Logger log = Logger.getLogger(SNController3.class);
 	protected LinkedHashMap<Id,ArrayList<TimeWindow>> twm;
 	protected SNControllerListener3 snControllerListener;
-		
+
 	public SNController3(String args[]){
 		super(args);
+		this.config.addModule(SocNetConfigGroup.GROUP_NAME, new SocNetConfigGroup());
 		this.snControllerListener=new SNControllerListener3(this);
-		this.addControlerListener(new SNControllerListener3(this));
+		this.addControlerListener(this.snControllerListener);
 	}
 
 	public static void main(final String[] args) {
