@@ -102,7 +102,7 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 //								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.AGENT_MOVING, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
 						AgentSnapshotInfo position = new PositionInfo(new IdImpl(agent), easting, northing,
 								Double.parseDouble(elevation), Double.parseDouble(azimuth) ) ;
-						position.setColorValueBetweenZeroAndOne( Double.parseDouble(speed) ) ;
+						position.setColorValueBetweenZeroAndOne( Double.parseDouble(speed)/37.5 ) ;
 						position.setAgentState( AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR ) ;
 						position.setType( Integer.parseInt(result[7]) ) ;
 						position.setUserDefined( Integer.parseInt(result[15]) );
