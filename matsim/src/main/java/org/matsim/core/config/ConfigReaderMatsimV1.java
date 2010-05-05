@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
  */
 public class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeReader {
 
-	private final static String CONFIG = "config";
+//	private final static String CONFIG = "config";
 	private final static String MODULE = "module";
 	private final static String INCLUDE = "include";
 	private final static String PARAM = "param";
@@ -51,9 +51,6 @@ public class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeR
 
 	private String localDtd;
 
-	/**
-	 * @param config
-	 */
 	public ConfigReaderMatsimV1(final Config config) {
 		this.config = config;
 	}
@@ -64,8 +61,6 @@ public class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeR
 			startParam(atts);
 		} else if (MODULE.equals(name)) {
 			startModule(atts);
-		} else if (CONFIG.equals(name)) {
-			// do nothing
 		} else if (INCLUDE.equals(name)) {
 			Logger.getLogger(this.getClass()).warn("<incude> is currently not supported.");
 		}
@@ -81,7 +76,7 @@ public class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeR
 	private void startModule(final Attributes atts) {
 		String name = atts.getValue("name");
 	  this.currmodule = this.config.getModule(name);
-		
+
 		if (this.currmodule == null) {
 		  //if there are type safe optional modules they have to be added here
 		  if (name.equals(QSimConfigGroup.GROUP_NAME)){

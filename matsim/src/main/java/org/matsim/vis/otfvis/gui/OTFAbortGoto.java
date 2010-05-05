@@ -92,8 +92,6 @@ public class OTFAbortGoto extends Thread  {
 					message = String.format("Completed to Time: "+ actIter + "#" + Time.writeTime(actTime));
 				} else if( actStatus == OTFVisControlerListener.REPLANNING){
 					message = String.format("Completed to Iteration: "+ actIter + ": REPLANNING");
-				} else {
-
 				}
 				progressMonitor.setNote(message);
 				double pastMidnight = (actTime > 24*3600) ? (actTime -24*3600)/3600. : 0;

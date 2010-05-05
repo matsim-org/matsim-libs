@@ -35,18 +35,18 @@ public class PMessageQueue extends MessageQueue {
 	// E.g. making this parameter 100000 would make the simulation extremly fast
 	// (fully parallel)
 	// but the results are a bit of rubish probably...
-	
+
 	// in my personal opinion, a randomness within 1 to 5/10 minutes shouldn't be a problem,
-	// if we think about the rest of MATSim (we can't model each person anyway that he is first and 
+	// if we think about the rest of MATSim (we can't model each person anyway that he is first and
 	// the other is second - why it didn't happen as due to randomness?).
-	
+
 	// already putting it to 10min/600sec gives very good performance...
-	
+
 	// question: how does the output look in the case when we put it that high? does correction happen automatically
 	// along the links (it should because of the congestions, because the time for that is given by the vehicle in front)
 	// so it might be, this has even a smaller effect.
 	// in the empty network a big delta doesn't anyway cause problems....
-	
+
 	// along the border it could cause some bad influence...
 	private double maxTimeDelta = 10;
 
@@ -56,18 +56,18 @@ public class PMessageQueue extends MessageQueue {
 
 	public boolean lowerThreadWitnessedEmptyQueue = false;
 	public boolean higherThreadWitnessedEmptyQueue = false;
-	
+
 	// THIS gives also some improvement in time...
 	private static final int SECONDS_IN_DAY=86400;
-	
+
 	// how many times is it the case, that the process can't progress
 	// although, it has messages in the queue (but it does not return them).
 	private int thread1_TimesCantProgressBecauseOfMaxDelta=0;
 
 	/**
-	 * 
+	 *
 	 * Putting a message into the queue
-	 * 
+	 *
 	 * @param m
 	 */
 	@Override
@@ -181,13 +181,13 @@ public class PMessageQueue extends MessageQueue {
 		 * queueThread2.add(m); // queueSizeThread2++; } else { assert (false) :
 		 * "Inconsitency in logic!!! => the border area is not setup in the right way..."
 		 * ; }
-		 * 
+		 *
 		 * }
 		 */
 	}
 
 	/**
-	 * 
+	 *
 	 * Remove the message from the queue and discard it. - queue1.remove(m) does
 	 * not function, because it discards all message with the same priority as m
 	 * from the queue. - This java api bug is reported at:
@@ -195,7 +195,7 @@ public class PMessageQueue extends MessageQueue {
 	 * queue1.removeAll(Collections.singletonList(m)); can be used, but it has
 	 * been removed because of just putting a flag to kill a message is more
 	 * efficient.
-	 * 
+	 *
 	 * @param m
 	 */
 	@Override
@@ -210,9 +210,9 @@ public class PMessageQueue extends MessageQueue {
 	}
 
 	/**
-	 * 
+	 *
 	 * get the first message in the queue (with least time stamp)
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -280,7 +280,7 @@ public class PMessageQueue extends MessageQueue {
 	/*
 	 * Instead of just fetching one message, it should be possible to fetch all
 	 * messages, which are within maxTimeDelta.
-	 * 
+	 *
 	 * As input give an empty list and get the same list back with messages in
 	 * it.
 	 */
@@ -316,7 +316,7 @@ public class PMessageQueue extends MessageQueue {
 		double maxTimeStampAllowed = -1;
 		double myMinTimeStamp = -1;
 		double otherThreadMinTimeStamp = -1;
-		
+
 		if (!secondDayStarted) {
 
 			// as we are not using syncrhonization, a null pointer exception
@@ -351,7 +351,7 @@ public class PMessageQueue extends MessageQueue {
 			} else {
 				maxTimeStampAllowed = otherThreadMinTimeStamp + maxTimeDelta;
 			}
-			
+
 			// allow each process to operate separatly now...
 			// THIS gives also some improvement
 			if (maxTimeStampAllowed>SECONDS_IN_DAY){
@@ -369,16 +369,16 @@ public class PMessageQueue extends MessageQueue {
 					&& queueThread1.peek().getMessageArrivalTime() <= maxTimeStampAllowed) {
 				list.add(queueThread1.poll());
 			}
-			
+
 			if (list.size()==0 && queueThread1.size()!=0){
 				thread1_TimesCantProgressBecauseOfMaxDelta++;
-				
-				if (thread1_TimesCantProgressBecauseOfMaxDelta>1000){
+
+//				if (thread1_TimesCantProgressBecauseOfMaxDelta>1000){
 					//System.out.println();
 					// this is really often the case...
-				}
+//				}
 			}
-			
+
 
 		} else {
 
@@ -388,8 +388,8 @@ public class PMessageQueue extends MessageQueue {
 			}
 
 		}
-		
-		
+
+
 
 		return list;
 	}

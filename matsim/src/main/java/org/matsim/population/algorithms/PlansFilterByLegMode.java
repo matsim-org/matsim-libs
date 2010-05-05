@@ -154,8 +154,6 @@ public class PlansFilterByLegMode {
 				// the person has no plans left. remove the person afterwards (so we do not disrupt the Iterator)
 				pid_set.add(personId);
 			}
-			else {
-			}
 		}
 
 		// okay, now remove in a 2nd step all persons we do no longer need

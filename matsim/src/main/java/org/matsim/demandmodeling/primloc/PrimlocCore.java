@@ -29,11 +29,11 @@ import Jama.Matrix;
 
 /**
  * Solves primary location choice with capacity constraints.
- * 
+ *
  * The method is described in : F. Marchal (2005), "A trip generation method for time-dependent
  * large-scale simulations of transport and land-use", Networks and Spatial Economics 5(2),
  * Kluwer Academic Publishers, 179-192.
- * 
+ *
  * @author Fabrice Marchal
  *
  */
@@ -50,7 +50,7 @@ public class PrimlocCore {
 	double J[];  // number of jobs per zone
 	double X[];  // rent patterns
 
-	Matrix cij;  // Input:		zone to zone travel costs 
+	Matrix cij;  // Input:		zone to zone travel costs
 	Matrix ecij; // Internal:	exp( - cij/ mu )
 	Matrix trips;  // Output:	Trip matrix
 
@@ -68,7 +68,7 @@ public class PrimlocCore {
 	boolean verbose;
 
 	PrimlocCalibrationError calib;
-	
+
 	// Travel Cost statistics
 	double minCost, maxCost, avgCost, stdCost;
 
@@ -78,13 +78,13 @@ public class PrimlocCore {
 		df = (DecimalFormat) DecimalFormat.getInstance();
 		df.applyPattern("0.###E0");
 	}
-	
+
 	public void setCalibrationError( PrimlocCalibrationError calib ){
 		this.calib = calib;
 	}
-	
+
 	public void runModel(){
-		
+
 		log.info("PLCM: Running model with mu = "+df.format(mu));
 
 		setup_expCij();
@@ -104,7 +104,7 @@ public class PrimlocCore {
 	}
 
 	public void runCalibrationProcess(){
-		
+
 		double muC = mu;
 		double muL = mu;
 		double muR = mu;
@@ -112,13 +112,13 @@ public class PrimlocCore {
 		double errL = Double.NEGATIVE_INFINITY;
 		double errR = Double.NEGATIVE_INFINITY;
 
-		
+
 		runModel();
 		errC = calib.error( trips, X );
-		
+
 		log.info("PLCM:\tCalibration loop. Initial condition run completed");
 		calibrationLoopInfo( mu, errC );
-		
+
 		while( errL < errC ){
 			mu = muL = mu/2;
 			runModel();
@@ -162,7 +162,7 @@ public class PrimlocCore {
 			mu = (muC+muR)/2;
 			runModel();
 			err = calib.error( trips, X );
-			calibrationLoopInfo( mu, err );	
+			calibrationLoopInfo( mu, err );
 			if( err< errC ){
 				muL = muC;
 				errL = errC;
@@ -181,7 +181,7 @@ public class PrimlocCore {
 			omuR = muR;
 		}
 	}
-	
+
 	void calibrationLoopInfo( double mu, double err){
 		log.info("PLCM:\tCalibration loop: mu = "+df.format(mu)+",\t error = "+df.format(err));
 	}
@@ -213,13 +213,13 @@ public class PrimlocCore {
 	private void computeFinalRents(){
 		// Restore rent values in X
 		double minir = Double.POSITIVE_INFINITY;
-		
+
 		// renormalize according to initial values
 		for( int i=0; i<numZ; i++)
 			if(P[i] > 0)
 				X[i]=X[i]/P[i];
-		
-		
+
+
 		for( int i=0; i<numZ; i++){
 			X[i] = -mu*Math.log(X[i]);
 			if( minir > X[i] )
@@ -229,7 +229,7 @@ public class PrimlocCore {
 			X[i] -= minir;
 	}
 
-	
+
 	private void initRent(){
 		X = new double[ numZ ];
 		// Initialize rent with the solution of the
@@ -337,11 +337,9 @@ public class PrimlocCore {
 				X[i] = X[i] - fac * theta * DX[i];
 			}
 			residual = Math.sqrt(residual/sumx);
-			if( verbose ){
-				if( (iterations %10 == 0) || (residual < threshold1 ) ){
-					log.info("PLCM:\t\tResidual = " + df.format(residual) +" (iterative substitution #" + iterations + " )");
-					rentStatistics();
-				}
+			if (verbose && ( (iterations %10 == 0) || (residual < threshold1 ) )) {
+				log.info("PLCM:\t\tResidual = " + df.format(residual) +" (iterative substitution #" + iterations + " )");
+				rentStatistics();
 			}
 			if( residual < threshold1 )
 				break;
@@ -355,7 +353,7 @@ public class PrimlocCore {
 		int numR=numZ-1;
 		int count=0;
 		double residual = Double.POSITIVE_INFINITY;
-		
+
 		while( (count++ < maxiter) && (residual>threshold2) ){
 			double[] Z = new double[ numZ ];
 			Matrix A = new Matrix( numR, numR ); // Jacobi Matrix
@@ -404,7 +402,7 @@ public class PrimlocCore {
 			Matrix x = A.solve( b );
 			timeMill = System.currentTimeMillis() - timeMill;
 			double duration = timeMill / 1000.0;
-			
+
 			for( int i=0; i<numR; i++ )
 				X[i] = X[i] - theta*x.get(i, 0);
 
@@ -420,12 +418,12 @@ public class PrimlocCore {
 				log.info( "PLCM:\t\tResidual = "+df.format(residual)+" (linear system solved in "+duration+" s)" );
 				rentStatistics();
 			}
-			
+
 		}
 	}
 
 
-	
+
 	void setupCostStatistics(){
 		minCost = Double.POSITIVE_INFINITY;
 		maxCost = Double.NEGATIVE_INFINITY;

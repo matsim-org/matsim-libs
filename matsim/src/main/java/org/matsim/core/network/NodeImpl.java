@@ -91,12 +91,10 @@ public class NodeImpl implements Node {
 		if (this.inlinks.containsKey(linkid)) {
 			throw new IllegalArgumentException(this + "[inlink_id=" + inlink.getId() + " already exists]");
 		}
-		if (this.outlinks.containsKey(linkid)) {
-			if ( cnt2 < 1 ) {
-				cnt2++ ;
-				log.warn(this + "[inlink_id=" + inlink.getId() + " is now in- and out-link]");
-				log.warn(Gbl.ONLYONCE) ;
-			}
+		if (this.outlinks.containsKey(linkid) && (cnt2 < 1)) {
+			cnt2++ ;
+			log.warn(this + "[inlink_id=" + inlink.getId() + " is now in- and out-link]");
+			log.warn(Gbl.ONLYONCE) ;
 		}
 		this.inlinks.put(linkid, inlink);
 		return true; // yy should return true only if collection changed as result of call
@@ -108,12 +106,10 @@ public class NodeImpl implements Node {
 		if (this.outlinks.containsKey(linkid)) {
 			throw new IllegalArgumentException(this + "[inlink_id=" + outlink.getId() + " already exists]");
 		}
-		if (this.inlinks.containsKey(linkid)) {
-			if ( cnt < 1 ) {
-				cnt++ ;
-				log.warn(this.toString() + "[outlink_id=" + outlink + " is now in- and out-link]");
-				log.warn(Gbl.ONLYONCE) ;
-			}
+		if (this.inlinks.containsKey(linkid) && (cnt < 1)) {
+			cnt++ ;
+			log.warn(this.toString() + "[outlink_id=" + outlink + " is now in- and out-link]");
+			log.warn(Gbl.ONLYONCE) ;
 		}
 		this.outlinks.put(linkid, outlink);
 		return true ; // yy should return true only if collection changed as result of call

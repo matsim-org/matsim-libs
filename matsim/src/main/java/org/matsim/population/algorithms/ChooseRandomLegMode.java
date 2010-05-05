@@ -81,7 +81,7 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 				List<PlanElement> tour = plan.getPlanElements();
 				changeToRandomLegMode(tour);
 			}
-		} else {
+//		} else {
 			// Nothing to do - the whole plan does not contain a
 			// subtour. It isn't even its own subtour because it isn't a
 			// tour.

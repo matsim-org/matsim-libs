@@ -92,12 +92,10 @@ public class LinkImpl extends AbstractLocation implements Link {
 
 		this.euklideanDist = CoordUtils.calcDistance(this.from.getCoord(), this.to.getCoord());
 
-		if (this.from.equals(this.to)) {
-			if ( loopWarnCnt < maxLoopWarnCnt ) {
-				loopWarnCnt++ ;
-				log.warn("[from=to=" + this.to + " link is a loop]");
-				log.warn(Gbl.ONLYONCE) ;
-			}
+		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
+			loopWarnCnt++ ;
+			log.warn("[from=to=" + this.to + " link is a loop]");
+			log.warn(Gbl.ONLYONCE);
 		}
 	}
 

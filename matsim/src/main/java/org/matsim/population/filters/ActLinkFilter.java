@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -56,11 +55,9 @@ public class ActLinkFilter extends AbstractPlanFilter {
 	public boolean judge(final Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
-				ActivityImpl act = (ActivityImpl) pe;
-				if (Pattern.matches(actTypePattern, act.getType())) {
-					if (this.linkIds.contains(act.getLinkId())) {
-						return true;
-					}
+				Activity act = (Activity) pe;
+				if (Pattern.matches(actTypePattern, act.getType()) && (this.linkIds.contains(act.getLinkId()))) {
+					return true;
 				}
 			}
 		}

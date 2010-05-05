@@ -308,10 +308,8 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 	private boolean agentHasPrimaryActivityInPlan(Person guy) {
 		for (Plan plan : guy.getPlans()) {
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					if (((Activity) pe).getType().equals(primaryActivityName)) {
-						return true;
-					}
+				if ((pe instanceof Activity) && (((Activity) pe).getType().equals(primaryActivityName))) {
+					return true;
 				}
 			}
 		}

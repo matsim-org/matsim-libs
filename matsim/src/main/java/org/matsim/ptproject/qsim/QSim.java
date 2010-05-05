@@ -132,7 +132,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	protected QSim(final Scenario sc, final EventsManager events, final QSimEngineFactory simEngineFac){
 		this.scenario = sc;
 		this.events = events;
-		init(this.scenario, events, simEngineFac);
+		init(this.scenario, simEngineFac);
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 * after assignments of another constructor
 	 * @param simEngineFac
 	 */
-	private void init(final Scenario sc, final EventsManager eventsManager, QSimEngineFactory simEngineFac){
+	private void init(final Scenario sc, QSimEngineFactory simEngineFac){
     log.info("Using QSim...");
     this.listenerManager = new SimulationListenerManager<QSim>(this);
     Simulation.reset(sc.getConfig().getQSimConfigGroup().getStuckTime());

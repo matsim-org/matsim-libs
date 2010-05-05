@@ -45,10 +45,8 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 	@Override
 	public void startNetwork(final Network network, final BufferedWriter out) throws IOException {
 		out.write("<network");
-		if (network instanceof NetworkLayer) {
-			if (((NetworkLayer) network).getName() != null) {
-				out.write(" name=\"" + ((NetworkLayer) network).getName() + "\"");
-			}
+		if (network instanceof NetworkLayer && (((NetworkLayer) network).getName() != null)) {
+			out.write(" name=\"" + ((NetworkLayer) network).getName() + "\"");
 		}
 		out.write(">\n\n");
 	}

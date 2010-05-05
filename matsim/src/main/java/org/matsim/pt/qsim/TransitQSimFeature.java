@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -58,7 +58,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 	@Override
 	public void agentCreated(PersonAgent agent) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public static class TransitAgentTriesToTeleportException extends RuntimeException {
@@ -102,7 +102,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 		TransitStopAgentTracker agentTracker = this.agentTracker;
 		Collection<PersonAgent> ptDrivers;
 		if (useUmlaeufe ) {
-			ptDrivers = createVehiclesAndDriversWithUmlaeufe(schedule, agentTracker);
+			ptDrivers = createVehiclesAndDriversWithUmlaeufe(agentTracker);
 		} else {
 			ptDrivers = createVehiclesAndDriversWithoutUmlaeufe(schedule, agentTracker);
 		}
@@ -119,8 +119,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 
 	}
 
-	private Collection<PersonAgent> createVehiclesAndDriversWithUmlaeufe(TransitSchedule thisSchedule,
-			TransitStopAgentTracker thisAgentTracker) {
+	private Collection<PersonAgent> createVehiclesAndDriversWithUmlaeufe(TransitStopAgentTracker thisAgentTracker) {
 		BasicVehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
 		Collection<PersonAgent> drivers = new ArrayList<PersonAgent>();
 		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(this.qSim.getScenario().getNetwork(),((ScenarioImpl) this.qSim.getScenario()).getTransitSchedule().getTransitLines().values(), ((ScenarioImpl) this.qSim.getScenario()).getVehicles(), this.qSim.getScenario().getConfig().charyparNagelScoring());
@@ -211,7 +210,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 			}
 		}
 	}
-	
+
 	@Override
 	public void beforeHandleUnknownLegMode(double now, final PersonAgent agent, Link link) {
 

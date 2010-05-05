@@ -82,11 +82,11 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private static final String FULLSCREEN = "fullscreen";
 
 	private transient MovieTimer movieTimer = null;
-	
+
 	private JButton playButton;
-	
+
 	private JFormattedTextField timeField;
-	
+
 	private int simTime = 0;
 
 	private int gotoIter = 0;
@@ -100,17 +100,17 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private final List <OTFHostConnectionManager> hostControls = new ArrayList<OTFHostConnectionManager>();
 
 	private ImageIcon playIcon = null;
-	
+
 	private ImageIcon pauseIcon = null;
 
 	private JFrame frame = null;
 
 	private Rectangle windowBounds = null;
-	
+
 	private transient OTFAbortGoto progressBar = null;
-	
+
 	private Object blockReading = new Object();
-	
+
 	public OTFHostControlBar(OTFHostConnectionManager masterHostControl, JFrame frame)  {
 		this.masterHostControl = masterHostControl;
 		this.hostControls.add(this.masterHostControl);
@@ -153,25 +153,23 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private void addButtons() {
 		try {
 			this.setFloatable(false);
-	
+
 			playIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPlay.png"), "Play");
 			pauseIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPause.png"), "Pause");
-	
+
 			add(createButton("Restart", TO_START, "buttonRestart", "restart the server/simulation"));
 			if (!this.masterHostControl.getOTFServer().isLive()) {
 				add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
 				add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
 			}
-	
+
 			playButton = createButton("PLAY", PLAY, "buttonPlay", "press to play simulation continuously");
 			add(playButton);
 			add(createButton(">", STEP_F, "buttonStepF", "go one timestep forward"));
 			add(createButton(">>", STEP_FF, "buttonStepFF", "go several timesteps forward"));
 			MessageFormat format = new MessageFormat("{0,number,00}:{1,number,00}:{2,number,00}");
-			if(this.masterHostControl.getOTFServer().isLive()) {
-				 if(controllerStatus != OTFVisControlerListener.NOCONTROL) {
-						 format = new MessageFormat("{0,number,00}#{0,number,00}:{1,number,00}:{2,number,00}");
-				 }
+			if (this.masterHostControl.getOTFServer().isLive() && (controllerStatus != OTFVisControlerListener.NOCONTROL)) {
+				 format = new MessageFormat("{0,number,00}#{0,number,00}:{1,number,00}:{2,number,00}");
 			}
 			timeField = new JFormattedTextField(format);
 			timeField.setMaximumSize(new Dimension(100,30));
@@ -180,9 +178,9 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			timeField.setHorizontalAlignment(JTextField.CENTER);
 			add( timeField );
 			timeField.addActionListener( this );
-	
+
 			createCheckBoxes();
-	
+
 			add(new JLabel(this.masterHostControl.getAddress()));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
@@ -376,10 +374,10 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 	}
 
-	
+
 	/**
 	 * Called when user clicks on the time line displayed when playing movies.
-	 *  
+	 *
 	 * @param newTime_s
 	 */
 	public void setNEWTime(int newTime_s) {

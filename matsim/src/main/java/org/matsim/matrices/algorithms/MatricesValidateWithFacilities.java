@@ -61,7 +61,7 @@ public class MatricesValidateWithFacilities {
 		while (dl_it.hasNext()) {
 			MappedLocation dl = dl_it.next();
 			ActivityFacilityImpl f = this.facilities.getFacilities().get(dl.getId());
-			if (f == null) { 
+			if (f == null) {
 				throw new RuntimeException("SOMETHING IS WRONG!!!");
 			}
 			if (f.getActivityOptions().containsKey(act_type)) {
@@ -131,10 +131,8 @@ public class MatricesValidateWithFacilities {
 					MappedLocation to_loc = to_loc_it.next();
 
 					Entry e = m.getEntry(from_loc,to_loc);
-					if (e != null) {
-						if (!this.hasFacility(from_loc,"home") || !this.hasFacility(to_loc,act_type)) {
-							m.removeEntry(e);
-						}
+					if ((e != null) && (!this.hasFacility(from_loc,"home") || !this.hasFacility(to_loc,act_type))) {
+						m.removeEntry(e);
 					}
 				}
 			}
@@ -144,12 +142,10 @@ public class MatricesValidateWithFacilities {
 			from_loc_it = m_l.getLocations().values().iterator();
 			while (from_loc_it.hasNext()) {
 				MappedLocation from_loc = from_loc_it.next();
-				if (this.hasFacility(from_loc,"home")) {
-					if (m.getFromLocEntries(from_loc) == null) {
-						MappedLocation to_loc = this.findNearestLocation(from_loc,act_type);
-						Entry e = m.setEntry(from_loc,to_loc, 1);
-						System.out.println("          create entry: " + e.toString());
-					}
+				if (this.hasFacility(from_loc,"home") && (m.getFromLocEntries(from_loc) == null)) {
+					MappedLocation to_loc = this.findNearestLocation(from_loc,act_type);
+					Entry e = m.setEntry(from_loc,to_loc, 1);
+					System.out.println("          create entry: " + e.toString());
 				}
 			}
 			System.out.println("        done.");

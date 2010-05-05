@@ -108,7 +108,7 @@ public class VisumWriteRoutes extends AbstractPersonAlgorithm implements PlanAlg
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			} else {
+//			} else {
 //				visum.append("00;00;");
 			}
 		}

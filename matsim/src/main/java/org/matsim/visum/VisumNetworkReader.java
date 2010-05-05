@@ -152,9 +152,7 @@ public class VisumNetworkReader {
 			// next line after header:
 			line = reader.readLine();
 			while (line != null) {
-				if (line.startsWith("* ")) {
-					// just a comment, ignore it
-				} else if (line.startsWith("$VERSION:")) {
+				if (line.startsWith("$VERSION:")) {
 					readVersion(line, reader);
 				} else if (line.startsWith(this.TABLE_STOP[this.language])) {
 					readStops(line, reader);
@@ -184,8 +182,8 @@ public class VisumNetworkReader {
 					readVehicleUnitToVehicleCombination(line, reader);
 				} else if (line.startsWith("$")) {
 					readUnknownTable(reader);
-				} else {
-					throw new IOException("can not interpret line: " + line);
+				} else if (!line.startsWith("* ")) {
+					throw new IOException("cannot interpret line: " + line);
 				}
 				// next line:
 				line = reader.readLine();
