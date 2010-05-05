@@ -181,21 +181,21 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		}
 
 		// loop over all <act>s
-		ActivityImpl fromAct = null;
-		ActivityImpl toAct = null;
+		Activity fromAct = null;
+		Activity toAct = null;
 		Leg leg = null;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				leg = (Leg) pe;
-			} else if (pe instanceof ActivityImpl) {
+			} else if (pe instanceof Activity) {
 				if (fromAct == null) {
-					fromAct = (ActivityImpl) pe;
+					fromAct = (Activity) pe;
 				} else {
 					toAct = (ActivityImpl) pe;
 
 					double endTime = fromAct.getEndTime();
 					double startTime = fromAct.getStartTime();
-					double dur = fromAct.getDuration();
+					double dur = (fromAct instanceof ActivityImpl ? ((ActivityImpl) fromAct).getDuration() : Time.UNDEFINED_TIME);
 					if (endTime != Time.UNDEFINED_TIME) {
 						// use fromAct.endTime as time for routing
 						now = endTime;

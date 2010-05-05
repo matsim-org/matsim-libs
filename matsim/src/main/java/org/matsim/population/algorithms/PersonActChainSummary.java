@@ -121,7 +121,7 @@ public class PersonActChainSummary extends AbstractPersonAlgorithm {
 		this.plan_dur[index]++;
 
 		// fill up the starts
-		ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(0);
+		Activity act = (Activity)plan.getPlanElements().get(0);
 		index = (int)(act.getEndTime()/3600);
 		this.starts[index]++;
 

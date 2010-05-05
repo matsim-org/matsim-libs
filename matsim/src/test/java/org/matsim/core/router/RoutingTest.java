@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -67,9 +66,7 @@ public class RoutingTest extends MatsimTestCase {
 			}
 			public LeastCostPathCalculator getRouter(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
-				long now = System.currentTimeMillis();
 				preProcessData.run(network);
-				log.info("Elapsed time for preprocessing:\n" + Gbl.printTimeDiff(System.currentTimeMillis(), now));
 				return new Dijkstra(network, costCalc, timeCalc, preProcessData);
 			}
 		});
@@ -82,9 +79,7 @@ public class RoutingTest extends MatsimTestCase {
 			}
 			public LeastCostPathCalculator getRouter(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				PreProcessEuclidean preProcessData = new PreProcessEuclidean(costCalc);
-				long now = System.currentTimeMillis();
 				preProcessData.run(network);
-				log.info("Elapsed time for preprocessing:\n" + Gbl.printTimeDiff(System.currentTimeMillis(), now));
 				return new AStarEuclidean(network, preProcessData, timeCalc);
 			}
 		});
@@ -97,9 +92,7 @@ public class RoutingTest extends MatsimTestCase {
 			}
 			public LeastCostPathCalculator getRouter(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				PreProcessLandmarks preProcessData = new PreProcessLandmarks(costCalc);
-				long now = System.currentTimeMillis();
 				preProcessData.run(network);
-				log.info("Elapsed time for preprocessing:\n" + Gbl.printTimeDiff(System.currentTimeMillis(), now));
 				return new AStarLandmarks(network, preProcessData, timeCalc);
 			}
 		});
@@ -136,12 +129,7 @@ public class RoutingTest extends MatsimTestCase {
 
 		PlansCalcRoute router = null;
 		router = new PlansCalcRoute(network, routingAlgo, routingAlgo);
-		long now = System.currentTimeMillis();
 		router.run(population);
-
-		log.info("Elapsed time for routing using " +
-				routingAlgo.getClass().getName() + ": " +
-				Gbl.printTimeDiff(System.currentTimeMillis(), now));
 	}
 
 }

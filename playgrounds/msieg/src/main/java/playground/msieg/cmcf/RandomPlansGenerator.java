@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -180,10 +179,6 @@ public class RandomPlansGenerator {
 			randomLink = iterator.next();
 		}
 		return randomLink;
-	}
-
-	public void writePlans(final Population plans) {
-		new PopulationWriter(plans, this.network).write(Gbl.getConfig().plans().getOutputFile());
 	}
 
 	public void writePlans(final Population plans, final String file) {

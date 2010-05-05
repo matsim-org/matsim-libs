@@ -62,7 +62,7 @@ public class CMCFDemandWriter{
 //	}
 
 	public CMCFDemandWriter(final String configPath){
-		this( 	Gbl.createConfig(new String[] { configPath, "config_v1.dtd" }));
+		this(Gbl.createConfig(new String[] { configPath, "config_v1.dtd" }));
 	}
 
 	private CMCFDemandWriter(final Config config) {
@@ -70,8 +70,8 @@ public class CMCFDemandWriter{
 	}
 
 	public CMCFDemandWriter(final String networkPath, final String plansPath){
-		this.networkPath = networkPath == null ? Gbl.getConfig().network().getInputFile(): networkPath;
-		this.plansPath = plansPath == null ? Gbl.getConfig().plans().getInputFile(): plansPath;
+		this.networkPath = networkPath;
+		this.plansPath = plansPath;
 
 		this.scenario = new ScenarioImpl();
 		this.network = scenario.getNetwork();

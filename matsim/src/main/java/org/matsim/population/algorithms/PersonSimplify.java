@@ -22,6 +22,7 @@ package org.matsim.population.algorithms;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -55,20 +56,20 @@ public class PersonSimplify extends AbstractPersonAlgorithm {
 
 			// set the first and last activty to home
 			List acts_legs = plan.getPlanElements();
-			((ActivityImpl)acts_legs.get(0)).setType("h");
-			((ActivityImpl)acts_legs.get(acts_legs.size()-1)).setType("h");
+			((Activity)acts_legs.get(0)).setType("h");
+			((Activity)acts_legs.get(acts_legs.size()-1)).setType("h");
 
 			// set all "m" activities (unspecified ones) to "l" (what else should i do....)
 			for (int j=0; j<acts_legs.size(); j+=2) {
-				ActivityImpl act = (ActivityImpl)acts_legs.get(j);
+				Activity act = (ActivityImpl)acts_legs.get(j);
 				if (act.getType().equals("m")) {
 					act.setType("l");
 				}
 			}
 
 			// if start time is after midnight subtract 24 hours
-			double end_time = ((ActivityImpl)acts_legs.get(0)).getEndTime();
-			if (end_time >= 24*3600) { ((ActivityImpl)acts_legs.get(0)).setEndTime(end_time-24*3600); }
+			double end_time = ((Activity)acts_legs.get(0)).getEndTime();
+			if (end_time >= 24*3600) { ((Activity)acts_legs.get(0)).setEndTime(end_time-24*3600); }
 
 			// group the durations to predefined ones. (manually choosen according to the
 			// duration distributions of the given microcensus2000)

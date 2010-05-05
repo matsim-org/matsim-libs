@@ -115,7 +115,7 @@ public class QueuePersonAgent implements PersonDriverAgent {
 	public boolean initialize() {
 		List<? extends PlanElement> planElements = this.getPlanElements();
 		this.currentPlanElementIndex = 0;
-		ActivityImpl firstAct = (ActivityImpl) planElements.get(0);
+		Activity firstAct = (Activity) planElements.get(0);
 		double departureTime = firstAct.getEndTime();
 
 		this.currentLinkId = firstAct.getLinkId();

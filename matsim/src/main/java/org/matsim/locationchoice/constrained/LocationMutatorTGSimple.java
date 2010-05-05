@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -37,7 +38,6 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -74,10 +74,10 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		int indexOfActToMove = actslegs.indexOf(actToMove);
 
 		// starting home and ending home are never flexible
-		final LegImpl legPre = (LegImpl)actslegs.get(indexOfActToMove -1);
-		final LegImpl legPost = (LegImpl)actslegs.get(indexOfActToMove + 1);
-		final ActivityImpl actPre = (ActivityImpl)actslegs.get(indexOfActToMove - 2);
-		final ActivityImpl actPost = (ActivityImpl)actslegs.get(indexOfActToMove + 2);
+		final Leg legPre = (Leg)actslegs.get(indexOfActToMove -1);
+		final Leg legPost = (Leg)actslegs.get(indexOfActToMove + 1);
+		final Activity actPre = (Activity)actslegs.get(indexOfActToMove - 2);
+		final Activity actPost = (Activity)actslegs.get(indexOfActToMove + 2);
 
 		double travelDistancePre = 0.0;
 		double travelDistancePost = 0.0;
@@ -117,7 +117,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			flexibleActivities = defineMovablePrimaryActivities(plan);
 			List<?> actslegs = plan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
-				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+				final Activity act = (Activity)actslegs.get(j);
 				if (!this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId()) &&
 						!(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
 					flexibleActivities.add(act);

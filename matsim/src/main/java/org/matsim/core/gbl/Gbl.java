@@ -203,7 +203,7 @@ public abstract class Gbl {
 		return printTimeDiff(System.currentTimeMillis(), Gbl.measurementStartTime);
 	}
 
-	public static final String printTimeDiff(final long later, final long earlier) {
+	private static final String printTimeDiff(final long later, final long earlier) {
 		long elapsedTimeMillis = later - earlier;
 		float elapsedTimeSec = elapsedTimeMillis/1000F;
 		float elapsedTimeMin = elapsedTimeMillis/(60*1000F);

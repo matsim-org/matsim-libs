@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -141,19 +140,19 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 					if (currentTuple.getSecond() != null) {
 						// first and last leg do not have the route set, as the start or end  link is unknown.
 						Leg firstLeg = currentTuple.getSecond().get(0);
-						Id fromLinkId = ((ActivityImpl) planElements.get(i-1)).getLinkId();
+						Id fromLinkId = ((Activity) planElements.get(i-1)).getLinkId();
 						Id toLinkId = null;
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
 							toLinkId = (currentTuple.getSecond().get(1).getRoute()).getStartLinkId();
 						} else {
-							toLinkId = ((ActivityImpl) planElements.get(i+1)).getLinkId();
+							toLinkId = ((Activity) planElements.get(i+1)).getLinkId();
 						}
 						firstLeg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
 
 						Leg lastLeg = currentTuple.getSecond().get(currentTuple.getSecond().size() - 1);
-						toLinkId = ((ActivityImpl) planElements.get(i+1)).getLinkId();
+						toLinkId = ((Activity) planElements.get(i+1)).getLinkId();
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							fromLinkId = ((Route) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLinkId();
+							fromLinkId = (currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLinkId();
 						}
 						lastLeg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
 

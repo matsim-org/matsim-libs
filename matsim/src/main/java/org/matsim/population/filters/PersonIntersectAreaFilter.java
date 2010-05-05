@@ -27,10 +27,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.world.WorldUtils;
@@ -82,16 +82,16 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 	public boolean judge(final Person person) {
 		for (Plan plan : person.getPlans()) {
 			for (int i = 1, n = plan.getPlanElements().size(); i < n; i+=2) {
-				LegImpl leg = (LegImpl) plan.getPlanElements().get(i);
+				Leg leg = (Leg) plan.getPlanElements().get(i);
 				if (leg.getRoute() == null) {
-					if (judgeByBeeline((ActivityImpl) plan.getPlanElements().get(i-1), (ActivityImpl) plan.getPlanElements().get(i+1))) {
+					if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
 						return true;
 					}
 				}
 				else if (leg.getRoute() instanceof NetworkRoute) {
 					List<Id> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 					if (linkIds.size() == 0) {
-						if (judgeByBeeline((ActivityImpl) plan.getPlanElements().get(i-1), (ActivityImpl) plan.getPlanElements().get(i+1))) {
+						if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
 							return true;
 						}
 					}
@@ -102,19 +102,19 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 							}
 						}
 						// test departure link
-						Id linkId = ((ActivityImpl) plan.getPlanElements().get(i-1)).getLinkId();
+						Id linkId = ((Activity) plan.getPlanElements().get(i-1)).getLinkId();
 						if ((linkId != null) && (this.areaOfInterest.containsKey(linkId))) {
 							return true;
 						}
 						// test arrival link
-						linkId = ((ActivityImpl) plan.getPlanElements().get(i+1)).getLinkId();
+						linkId = ((Activity) plan.getPlanElements().get(i+1)).getLinkId();
 						if ((linkId != null) && (this.areaOfInterest.containsKey(linkId))) {
 							return true;
 						}
 					}
 				}
 				else { // leg.getRoute() instanceof GenericRoute
-					if (judgeByBeeline((ActivityImpl) plan.getPlanElements().get(i-1), (ActivityImpl) plan.getPlanElements().get(i+1))) {
+					if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
 						return true;
 					}
 				}
@@ -123,7 +123,7 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 		return false;
 	}
 
-	private boolean judgeByBeeline(final ActivityImpl fromAct, final ActivityImpl toAct) {
+	private boolean judgeByBeeline(final Activity fromAct, final Activity toAct) {
 		if (this.aoiCenter == null) {
 			// we cannot use the bee-line decision if we don't know the alternative aoi-center
 			return false;
