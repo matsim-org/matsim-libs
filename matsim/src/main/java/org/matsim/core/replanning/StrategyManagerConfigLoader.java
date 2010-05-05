@@ -210,8 +210,8 @@ public class StrategyManagerConfigLoader {
 						c = klas.getConstructor(args);
 						strategy = c.newInstance(controler.getScenario());
 					} catch(NoSuchMethodException e){
-						log.warn("Cannot find Constructor in PlanStrategy " + name + " with single argument of type BasicScenario. " +
-								"This is not fatal, trying to find other constructor, however a constructor expecting BasicScenario as " +
+						log.warn("Cannot find Constructor in PlanStrategy " + name + " with single argument of type Scenario. " +
+								"This is not fatal, trying to find other constructor, however a constructor expecting Scenario as " +
 								"single argument is recommented!" );
 					}
 					if (c == null){

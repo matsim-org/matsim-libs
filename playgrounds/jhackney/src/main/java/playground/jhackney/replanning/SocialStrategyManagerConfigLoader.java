@@ -50,7 +50,6 @@ import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.LocationChoice;
 
@@ -183,8 +182,8 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 						try{
 							c = klas.getConstructor(args);
 						} catch(NoSuchMethodException e){
-							log.warn("Cannot find Constructor in PlanStrategy " + classname + " with single argument of type BasicScenario. " +
-									"This is not fatal, trying to find other constructor, however a constructor expecting BasicScenario as " +
+							log.warn("Cannot find Constructor in PlanStrategy " + classname + " with single argument of type Scenario. " +
+									"This is not fatal, trying to find other constructor, however a constructor expecting Scenario as " +
 									"single argument is recommented!" );
 						}
 						if (c == null){
