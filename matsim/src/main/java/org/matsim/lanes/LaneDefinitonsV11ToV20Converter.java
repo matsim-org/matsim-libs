@@ -31,6 +31,7 @@ import java.util.SortedMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -48,6 +49,8 @@ import org.xml.sax.SAXException;
  *
  */
 public class LaneDefinitonsV11ToV20Converter {
+
+	private static final Logger log = Logger.getLogger(LaneDefinitonsV11ToV20Converter.class);
 
 	public LaneDefinitonsV11ToV20Converter(){
 	}
@@ -166,16 +169,19 @@ public class LaneDefinitonsV11ToV20Converter {
 			
 			//calculate the alignment
 			int mostRight = l2l.getLanes().size() / 2;
-			SortedMap<Double, Link> result = CalculateAngle.getOutLinksSortedByAngle(link);
+			SortedMap<Double, Link> outLinksByAngle = CalculateAngle.getOutLinksSortedByAngle(link);
 			Lane newLane;
 			Set<Lane> assignedLanes = new HashSet<Lane>();
-			for (Link tmpLink : result.values()){
+			for (Link outlink : outLinksByAngle.values()){
+//				log.info("Outlink: " + outlink.getId());
 				for (Lane l : l2l.getLanes().values()){
+//					log.info("lane: " + l.getId());
 					if (assignedLanes.contains(l)){
-						break;
+						continue;
 					}
 					newLane = l2lnew.getLanes().get(l.getId());
-					if (newLane.getToLinkIds().contains(tmpLink.getId())){
+					if (newLane.getToLinkIds().contains(outlink.getId())){
+//						log.info("lane " + newLane.getId() + "  alignment: " + mostRight);
 						newLane.setAlignment(mostRight);
 						assignedLanes.add(l);
 						//decrement mostRigth skip 0 if number of lanes is even
@@ -183,7 +189,6 @@ public class LaneDefinitonsV11ToV20Converter {
 						if ((mostRight == 0) && (l2l.getLanes().size() % 2  == 0)){
 							mostRight--;
 						}
-						break;
 					}
 				}
 			}
