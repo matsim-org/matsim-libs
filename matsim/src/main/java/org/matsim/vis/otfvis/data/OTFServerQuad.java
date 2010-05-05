@@ -310,24 +310,6 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 		return this.minNorthing;
 	}
 
-	/**
-	 * Get access to all values of this leaf
-	 *
-	 * @param x x-coordinate from which the specified values should be retrieves
-	 * @param y y-coordinate from which the specified values should be retrieves
-	 *
-	 * @return A list of T values, if this leaf has values,
-	 *         otherwise null.
-	 */
-	private List<OTFDataWriter> getLeafValues(final double x, final double y) {
-		Leaf<OTFDataWriter> leaf =  this.top.getLeaf(x, y);
-		if(leaf != null) return leaf.values;
-		return null;
-	}
-
-	/**
-	 * @see org.matsim.vis.otfvis.data.OTFServerQuadI#replaceSrc(org.matsim.core.mobsim.queuesim.QueueNetwork)
-	 */
 	public void replaceSrc(QueueNetwork newNet) {
 		//int colls =
 		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
