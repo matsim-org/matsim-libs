@@ -49,7 +49,6 @@ import org.jdesktop.animation.timing.interpolation.KeyValues;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
@@ -393,12 +392,6 @@ implements MouseWheelListener{
 		//posZ = (float)obj_pos[2];
 		// maintain z-pos == zoom level
 		return new Point3f(posX, posY, cameraStart.getZ());
-	}
-
-	public CoordImpl getPixelsize() {
-		Point3f p1 = getOGLPos(300,300);
-		Point3f p2 = getOGLPos(301,301);
-		return new CoordImpl(Math.abs(p2.x-p1.x), Math.abs(p2.y-p1.y));
 	}
 
 	public float getScale() {
