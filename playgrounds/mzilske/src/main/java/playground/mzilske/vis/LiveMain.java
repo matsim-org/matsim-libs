@@ -7,9 +7,10 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 
-public class Main {
+public class LiveMain {
 	
 	public static void main(String[] args) throws InterruptedException, InvocationTargetException {
 //		 String fileName = "../../detailedEval/Net/network.xml.gz";
@@ -18,38 +19,29 @@ public class Main {
 //		 String fileName = "../../run749/749.output_network.xml.gz";
 //		 String eventsFileName = "../../run749/it.1000/749.1000.events.txt.gz";
 //		
-		String fileName = "../../matsim/output/example5/output_network.xml.gz";
+		String networkFileName = "../../matsim/output/example5/output_network.xml.gz";
 		String eventsFileName = "../../matsim/output/example5/ITERS/it.10/10.events.xml.gz";
+		String populationFileName = "../../matsim/output/example5/output_plans.xml.gz";
 		
-		double snapshotPeriod = 10;
+		double snapshotPeriod = 60;
 		SimulationConfigGroup simulationConfigGroup = new SimulationConfigGroup();
 		ScenarioImpl scenario = new ScenarioImpl();
 		
-		new MatsimNetworkReader(scenario).readFile(fileName);
+		new MatsimNetworkReader(scenario).readFile(networkFileName);
+		new MatsimPopulationReader(scenario).readFile(populationFileName);
 		
 		EventsManagerImpl events = new EventsManagerImpl();
 		
 		// final BintreeServer server = new BintreeServer(scenario.getNetwork(), events, snapshotPeriod, simulationConfigGroup);
-		final EventsCollectingServer server = new EventsCollectingServer(scenario.getNetwork(), events, snapshotPeriod, simulationConfigGroup);
-		
-		new MatsimEventsReader(events).readFile(eventsFileName);
-		
+		final EventsCollectingLiveServer server = new EventsCollectingLiveServer(scenario, events, snapshotPeriod, simulationConfigGroup);
+				
 		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", server);
 		
 		InjectableOTFClient client = new InjectableOTFClient();
 		client.setHostConnectionManager(hostConnectionManager);
-		
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-
-			@Override
-			public void run() {
-				System.out.println("Closing server...");
-				server.close();
-			}
-			
-		});
-		
 		client.run();
+		System.out.println("Reading...");
+		new MatsimEventsReader(events).readFile(eventsFileName);
 		
 	}
 

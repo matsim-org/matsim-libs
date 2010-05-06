@@ -13,6 +13,7 @@ import org.matsim.core.api.experimental.controller.Controller;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.utils.charts.XYLineChart;
 import org.postgis.LinearRing;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -26,8 +27,8 @@ public class Cordon {
 	private static final int SLOT_SIZE = 3600;	// 5-min slots
 	private static final int MAXINDEX = 24; // slots 0..11 are regular slots, slot 12 is anything above
 
-	int[] in = new int[MAXINDEX + 1];
-	int[] out = new int[MAXINDEX + 1];
+	double[] in = new double[MAXINDEX + 1];
+	double[] out = new double[MAXINDEX + 1];
 	
 	public static void main(String[] args) {
 		Cordon cordon = new Cordon();
@@ -72,14 +73,24 @@ public class Cordon {
 		controller.addEventHandler(linkLeaveEventHandler);
 		controller.run();
 		
+		double[] hours = new double[MAXINDEX + 1];
+		for (int i=0; i < hours.length; i++) {
+			hours[i] = i;
+		}
+		
 		System.out.println();
-		for (int iin : in) {
+		for (double iin : in) {
 			System.out.print(iin + " ");
 		}
 		
-		for (int oout : out) {
+		for (double oout : out) {
 			System.out.print(oout + " ");
 		}
+		
+		XYLineChart chart = new XYLineChart("Traffic link 2", "iteration", "last time");
+		chart.addSeries("in", hours, in);
+		chart.addSeries("out", hours, out);
+		chart.saveAsPng("./output/wurst.png", 800, 600);
 
 	}
 

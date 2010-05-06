@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -49,124 +50,125 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
  */
 public class OTFQueryControlToolBar extends JToolBar implements ActionListener, ItemListener {
 
-  private static final Logger log = Logger.getLogger(OTFQueryControlToolBar.class);
-  
-  private JTextField textField;
-  private JComboBox queryTypeComboBox;
-  private JTabbedPane pane;
+	private static final Logger log = Logger.getLogger(OTFQueryControlToolBar.class);
 
-  private final OTFVisConfig config;
+	private JTextField textField;
+	private JComboBox queryTypeComboBox;
+	private JTabbedPane pane;
 
-  private final OTFQueryControl queryControl; 
+	private final OTFVisConfig config;
+
+	private final OTFQueryControl queryControl; 
 
 
-  public OTFQueryControlToolBar(OTFQueryControl queryControl, final OTFVisConfig config) {
-    super();
-    this.config = config;
-    this.queryControl = queryControl;
-    initGui();
-  }
-  
-  private void initGui(){
-    this.pane = new JTabbedPane();
-    this.add(pane);
-    JPanel panel = new JPanel();
-    panel.setSize(500, 60);
-    {
-      JLabel jLabel3 = new JLabel();
-      panel.add(jLabel3);
-      jLabel3.setText("Query:");
-      jLabel3.setBounds(344, 45, 36, 31);
-    }
-    {
-      ComboBoxModel leftMFuncModel =  new DefaultComboBoxModel(this.queryControl.getQueries());
-      leftMFuncModel.setSelectedItem(this.queryControl.getQueries().get(0));
-      queryTypeComboBox = new JComboBox();
-      panel.add(queryTypeComboBox);
-      queryTypeComboBox.setActionCommand("type_changed");
-      queryTypeComboBox.setModel(leftMFuncModel);
-      queryTypeComboBox.setBounds(57, 76, 92, 27);
-      queryTypeComboBox.setMaximumSize(new Dimension(250,60));
-      queryTypeComboBox.addActionListener(this);
-      queryTypeComboBox.setToolTipText(this.queryControl.getQueries().get(0).toolTip);
-    }
-    {
-      JLabel jLabel3 = new JLabel();
-      panel.add(jLabel3);
-      jLabel3.setText(" Id:");
-      textField = new JTextField();
-      panel.add(textField);
-      textField.setActionCommand("id_changed");
-      textField.setPreferredSize(new Dimension(350,30));
-      textField.setMaximumSize(new Dimension(350,40));
-      textField.addActionListener(this);
-    }
-    {
-      JLabel jLabel3 = new JLabel();
-      panel.add(jLabel3);
-      jLabel3.setText("  ");
+	public OTFQueryControlToolBar(OTFQueryControl queryControl, final OTFVisConfig config) {
+		super();
+		this.config = config;
+		this.queryControl = queryControl;
+		initGui();
+	}
 
-      JButton button = new JButton();
-      button.setText("Clear!");
-      button.setActionCommand("clear");
-      button.addActionListener(this);
-      button.setToolTipText("Clears all queries!");
-      panel.add(button);
+	private void initGui(){
+		this.pane = new JTabbedPane();
+		this.add(pane);
+		JPanel panel = new JPanel();
+		panel.setSize(500, 60);
+		{
+			JLabel jLabel3 = new JLabel();
+			panel.add(jLabel3);
+			jLabel3.setText("Query:");
+			jLabel3.setBounds(344, 45, 36, 31);
+		}
+		{
+			Vector<QueryEntry> queries = this.queryControl.getQueries();
+			ComboBoxModel leftMFuncModel =  new DefaultComboBoxModel(queries);
+			leftMFuncModel.setSelectedItem(queries.get(0));
+			queryTypeComboBox = new JComboBox();
+			panel.add(queryTypeComboBox);
+			queryTypeComboBox.setActionCommand("type_changed");
+			queryTypeComboBox.setModel(leftMFuncModel);
+			queryTypeComboBox.setBounds(57, 76, 92, 27);
+			queryTypeComboBox.setMaximumSize(new Dimension(250,60));
+			queryTypeComboBox.addActionListener(this);
+			queryTypeComboBox.setToolTipText(queries.get(0).toolTip);
+			this.config.setQueryType(queries.get(0).clazz.getCanonicalName());
+		}
+		{
+			JLabel jLabel3 = new JLabel();
+			panel.add(jLabel3);
+			jLabel3.setText(" Id:");
+			textField = new JTextField();
+			panel.add(textField);
+			textField.setActionCommand("id_changed");
+			textField.setPreferredSize(new Dimension(350,30));
+			textField.setMaximumSize(new Dimension(350,40));
+			textField.addActionListener(this);
+		}
+		{
+			JLabel jLabel3 = new JLabel();
+			panel.add(jLabel3);
+			jLabel3.setText("  ");
 
-      JCheckBox SynchBox = new JCheckBox("multiple select");
-      SynchBox.setMnemonic(KeyEvent.VK_M);
-      SynchBox.setSelected(config.isMultipleSelect());
-      SynchBox.addItemListener(this);
-      panel.add(SynchBox);
-    }
-    panel.doLayout();
-    panel.setBounds(250, 130, 220, 160);
-    pane.addTab("Query", panel);
-  }
+			JButton button = new JButton();
+			button.setText("Clear!");
+			button.setActionCommand("clear");
+			button.addActionListener(this);
+			button.setToolTipText("Clears all queries!");
+			panel.add(button);
 
-  public void actionPerformed(ActionEvent e) {
-    OTFVisConfig cfg = this.config;
-    String command = e.getActionCommand();
-    if("id_changed".equals(command)) {
-      String id = ((JTextField)e.getSource()).getText();
-      log.debug("action performed on textfield with text " + id);
-      if (!cfg.isMultipleSelect()){
-        this.queryControl.removeQueries();
-      }
-      this.queryControl.handleIdQuery(id.trim(), cfg.getQueryType());
-    } 
-    else if ("type_changed".equals(command)) {
-      JComboBox cb = (JComboBox)e.getSource();
-      QueryEntry queryType = (QueryEntry)cb.getSelectedItem();
-      cfg.setQueryType(queryType.clazz.getCanonicalName());
-      cfg.setQueryType(queryType.clazz.getCanonicalName());
-      this.queryControl.removeQueries();
-      OTFQuery test = this.queryControl.createQuery(queryType.clazz.getCanonicalName());
+			JCheckBox SynchBox = new JCheckBox("multiple select");
+			SynchBox.setMnemonic(KeyEvent.VK_M);
+			SynchBox.setSelected(config.isMultipleSelect());
+			SynchBox.addItemListener(this);
+			panel.add(SynchBox);
+		}
+		panel.doLayout();
+		panel.setBounds(250, 130, 220, 160);
+		pane.addTab("Query", panel);
+	}
 
-      if(pane.getTabCount() > 1){
-        pane.remove(1);
-      }
+	public void actionPerformed(ActionEvent e) {
+		OTFVisConfig cfg = this.config;
+		String command = e.getActionCommand();
+		if("id_changed".equals(command)) {
+			String id = ((JTextField)e.getSource()).getText();
+			log.debug("action performed on textfield with text " + id);
+			if (!cfg.isMultipleSelect()){
+				this.queryControl.removeQueries();
+			}
+			this.queryControl.handleIdQuery(id.trim(), cfg.getQueryType());
+		} 
+		else if ("type_changed".equals(command)) {
+			JComboBox cb = (JComboBox)e.getSource();
+			QueryEntry queryType = (QueryEntry)cb.getSelectedItem();
+			cfg.setQueryType(queryType.clazz.getCanonicalName());
+			this.queryControl.removeQueries();
+			OTFQuery test = this.queryControl.createQuery(queryType.clazz.getCanonicalName());
 
-      if(test instanceof OTFQueryOptions) {
-        JComponent settings = ((OTFQueryOptions)test).getOptionsGUI(pane);
-        pane.addTab("Options", settings);
-      }
+			if(pane.getTabCount() > 1){
+				pane.remove(1);
+			}
 
-      cb.setToolTipText(queryType.toolTip);
-    } else if ("clear".equals(command)) {
-      this.queryControl.removeQueries();
-    }
-  }
+			if(test instanceof OTFQueryOptions) {
+				JComponent settings = ((OTFQueryOptions)test).getOptionsGUI(pane);
+				pane.addTab("Options", settings);
+			}
 
-  public void itemStateChanged(ItemEvent e) {
-    JCheckBox source = (JCheckBox)e.getItemSelectable();
-    if (source.getText().equals("multiple select")) {
-      this.config.setMultipleSelect(e.getStateChange() != ItemEvent.DESELECTED);
-    }
-  }
+			cb.setToolTipText(queryType.toolTip);
+		} else if ("clear".equals(command)) {
+			this.queryControl.removeQueries();
+		}
+	}
 
-  
-  public synchronized JTextField getTextField() {
-    return textField;
-  } 
+	public void itemStateChanged(ItemEvent e) {
+		JCheckBox source = (JCheckBox)e.getItemSelectable();
+		if (source.getText().equals("multiple select")) {
+			this.config.setMultipleSelect(e.getStateChange() != ItemEvent.DESELECTED);
+		}
+	}
+
+
+	public synchronized JTextField getTextField() {
+		return textField;
+	} 
 }

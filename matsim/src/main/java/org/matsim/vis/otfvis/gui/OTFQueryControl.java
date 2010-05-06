@@ -63,9 +63,10 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	private JTextField textField;
 
-	private final IdResolver agentIdResolver;
+	private IdResolver agentIdResolver;
 
 	private final OTFHostControlBar hostControlBar;
+	
 	private final Map<OTFQueryRemote, OTFQueryResult> queryEntries = new HashMap<OTFQueryRemote, OTFQueryResult>();
 
 	private final Vector<QueryEntry> queries = new Vector<QueryEntry>(Arrays
@@ -88,7 +89,6 @@ public class OTFQueryControl implements OTFQueryHandler {
 		this.config = config;
 		this.agentIdResolver = new MyIdResolver();
 		this.hostControlBar = handler;
-		this.config.setQueryType(queries.get(0).clazz.getCanonicalName());
 	}
 
 	synchronized public void handleIdQuery(String id, String queryName) {
@@ -170,7 +170,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 		}
 	}
 
-	private OTFQueryResult createQuery(AbstractQuery query) {
+	public OTFQueryResult createQuery(AbstractQuery query) {
 		OTFQueryRemote remoteQuery = doQuery(query);
 		OTFQueryResult queryResult;
 		try {
@@ -231,6 +231,10 @@ public class OTFQueryControl implements OTFQueryHandler {
 		return typeOfQuery;
 	}
 
+	public void setAgentIdResolver(IdResolver agentIdResolver) {
+		this.agentIdResolver = agentIdResolver;
+	}
+
 	public interface IdResolver {
 		List<String> resolveId(Double origRect);
 	}
@@ -255,21 +259,4 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 }
 
-class QueryEntry {
-	public String shortName;
-	public String toolTip;
-	public Class<? extends OTFQuery> clazz;
 
-	public QueryEntry(String string, String string2,
-			Class<? extends OTFQuery> class1) {
-		this.shortName = string;
-		this.toolTip = string2;
-		this.clazz = class1;
-	}
-
-	@Override
-	public String toString() {
-		return shortName;
-	}
-
-}

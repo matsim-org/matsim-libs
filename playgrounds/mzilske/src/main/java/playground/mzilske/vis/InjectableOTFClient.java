@@ -1,12 +1,19 @@
 package playground.mzilske.vis;
 
 import java.awt.BorderLayout;
+import java.awt.geom.Rectangle2D.Double;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.matsim.vis.otfvis.OTFClient;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.gui.OTFQueryControl;
+import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.gui.QueryEntry;
+import org.matsim.vis.otfvis.gui.OTFQueryControl.IdResolver;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
@@ -22,13 +29,13 @@ public final class InjectableOTFClient extends OTFClient {
 
 	public InjectableOTFClient() {
 		super();
-		
+
 		this.connect.connectWriterToReader(LinkHandler.Writer.class, LinkHandler.class);
 		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		
+
 		this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
 		this.connect.connectReaderToReceiver(LinkHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		
+
 		this.connect.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);		
 		this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 
@@ -44,7 +51,26 @@ public final class InjectableOTFClient extends OTFClient {
 	protected OTFDrawer createDrawer(){
 		try {
 			frame.getContentPane().add(new OTFTimeLine("time", hostControlBar), BorderLayout.SOUTH);
-			OTFDrawer mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent());
+			OTFOGLDrawer mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent());
+			if (hostControlBar.getOTFHostControl().isLiveHost()) {
+				final OTFQueryControl queryControl = new OTFQueryControl(hostControlBar, OTFClientControl.getInstance().getOTFVisConfig());
+				queryControl.getQueries().clear();
+				queryControl.getQueries().add(new QueryEntry("agentPlan", "show the current plan of an agent", EventBasedQueryAgentPlan.class));
+				queryControl.setAgentIdResolver(new IdResolver() {
+
+					@Override
+					public List<String> resolveId(Double origRect) {
+						EventBasedQueryAgentId.Result agentIdQuery = (EventBasedQueryAgentId.Result) queryControl.createQuery(new EventBasedQueryAgentId(origRect));
+						return agentIdQuery.agentIds;
+					}
+
+
+				});
+				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, OTFClientControl.getInstance().getOTFVisConfig());
+				queryControl.setQueryTextField(queryControlBar.getTextField());
+				frame.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
+				mainDrawer.setQueryHandler(queryControl);
+			}
 			return mainDrawer;
 		} catch (RemoteException e) {
 			e.printStackTrace();
