@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
@@ -55,7 +56,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 
 	private final static Logger log = Logger.getLogger(NetworkExpandNode.class);
 
-	private Node node = null;
+	private Id nId = null;
 	private ArrayList<Tuple<Id,Id>> turns = null;
 	private double radius = Double.NaN;
 	private double offset = Double.NaN;
@@ -73,8 +74,8 @@ public class NetworkExpandNode implements NetworkRunnable {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void setNode(Node node) {
-		this.node = node;
+	public final void setNodeId(Id nodeId) {
+		this.nId = nodeId;
 	}
 
 	public final void setTurns(ArrayList<Tuple<Id,Id>> turns) {
@@ -97,11 +98,12 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 * The run method such that it is still consistent with the other network algorithms.
 	 * But rather use {@link #expandNode(NetworkLayer,Id,ArrayList,double,double)}.
 	 *
-	 * @param network {@link NetworkLayer MATSim network DB}
+	 * @param network
 	 */
-	public void run(final NetworkLayer network) {
+	@Override
+	public void run(final Network network) {
 		log.info("running " + this.getClass().getName() + " module...");
-		this.expandNode(network,this.node.getId(),this.turns,this.radius,this.offset);
+		this.expandNode(network,this.nId,this.turns,this.radius,this.offset);
 		log.info("running " + this.getClass().getName() + " module...");
 	}
 
@@ -206,7 +208,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 * @return The {@link Tuple} of {@link ArrayList array lists} containing the new
 	 * {@link Node nodes}, new {@link Link links} resp.
 	 */
-	public final Tuple<ArrayList<Node>,ArrayList<Link>> expandNode(final NetworkLayer network, final Id nodeId, final ArrayList<Tuple<Id,Id>> turns, final double r, final double e) {
+	public final Tuple<ArrayList<Node>,ArrayList<Link>> expandNode(final Network network, final Id nodeId, final ArrayList<Tuple<Id,Id>> turns, final double r, final double e) {
 		// check the input
 		if (Double.isNaN(r)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
 		if (Double.isNaN(e)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
@@ -240,10 +242,18 @@ public class NetworkExpandNode implements NetworkRunnable {
 			double lpc = Math.sqrt(pc.getX()*pc.getX()+pc.getY()*pc.getY());
 			double x = p.getX()+(1-d/lpc)*pc.getX()+e/lpc*pc.getY();
 			double y = p.getY()+(1-d/lpc)*pc.getY()-e/lpc*pc.getX();
-			Node n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y));
+			Node n = network.getFactory().createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y));
+			network.addNode(n);
 			newNodes.add(n);
 			nodeIdCnt++;
-			network.createAndAddLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(),inlink.getCapacity(),inlink.getNumberOfLanes(),((LinkImpl) inlink).getOrigId(),((LinkImpl) inlink).getType());
+			Link l = network.getFactory().createLink(inlink.getId(), inlink.getFromNode().getId(), n.getId());
+			l.setLength(inlink.getLength());
+			l.setFreespeed(inlink.getFreespeed());
+			l.setCapacity(inlink.getCapacity());
+			l.setNumberOfLanes(inlink.getNumberOfLanes());
+			((LinkImpl) l).setOrigId(((LinkImpl) inlink).getOrigId());
+			((LinkImpl) l).setType(((LinkImpl) inlink).getType());
+			network.addLink(l);
 		}
 		for (Link outlink : outlinks.values()) {
 			Coord c = node.getCoord();
@@ -252,10 +262,18 @@ public class NetworkExpandNode implements NetworkRunnable {
 			double lcp = Math.sqrt(cp.getX()*cp.getX()+cp.getY()*cp.getY());
 			double x = c.getX()+d/lcp*cp.getX()+e/lcp*cp.getY();
 			double y = c.getY()+d/lcp*cp.getY()-e/lcp*cp.getX();
-			Node n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y));
+			Node n = network.getFactory().createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y));
+			network.addNode(n);
 			newNodes.add(n);
 			nodeIdCnt++;
-			network.createAndAddLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(),outlink.getCapacity(),outlink.getNumberOfLanes(),((LinkImpl) outlink).getOrigId(),((LinkImpl) outlink).getType());
+			Link l = network.getFactory().createLink(outlink.getId(), n.getId(), outlink.getToNode().getId());
+			l.setLength(outlink.getLength());
+			l.setFreespeed(outlink.getFreespeed());
+			l.setCapacity(outlink.getCapacity());
+			l.setNumberOfLanes(outlink.getNumberOfLanes());
+			((LinkImpl) l).setOrigId(((LinkImpl) outlink).getOrigId());
+			((LinkImpl) l).setType(((LinkImpl) outlink).getType());
+			network.addLink(l);
 		}
 
 		// add virtual links for the turn restrictions
@@ -263,7 +281,14 @@ public class NetworkExpandNode implements NetworkRunnable {
 			Tuple<Id,Id> turn = turns.get(i);
 			Link fromLink = network.getLinks().get(turn.getFirst());
 			Link toLink = network.getLinks().get(turn.getSecond());
-			Link l = network.createAndAddLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(),fromLink.getCapacity(),fromLink.getNumberOfLanes(),((LinkImpl) fromLink).getOrigId(),((LinkImpl) fromLink).getType());
+			Link l = network.getFactory().createLink(new IdImpl(fromLink.getId()+"-"+i), fromLink.getToNode().getId(), toLink.getFromNode().getId());
+			l.setLength(CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()));
+			l.setFreespeed(fromLink.getFreespeed());
+			l.setCapacity(fromLink.getCapacity());
+			l.setNumberOfLanes(fromLink.getNumberOfLanes());
+			((LinkImpl) l).setOrigId(((LinkImpl) fromLink).getOrigId());
+			((LinkImpl) l).setType(((LinkImpl) fromLink).getType());
+			network.addLink(l);
 			newLinks.add(l);
 		}
 		return new Tuple<ArrayList<Node>, ArrayList<Link>>(newNodes,newLinks);

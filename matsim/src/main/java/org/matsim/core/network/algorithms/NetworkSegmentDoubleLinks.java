@@ -56,6 +56,7 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(final Network network) {
 		this.network = network;
 		log.info("    running " + this.getClass().getName() + " algorithm...");
@@ -117,17 +118,17 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 		double freespeed = link.getFreespeed();
 		double capacity = link.getCapacity();
 		double permlanes = link.getNumberOfLanes();
-		
+
 		Node medianNode = this.network.getFactory().createNode(getNewNodeId(), link.getCoord());
 		this.network.addNode(medianNode);
-		
+
 		Link tmpLink = this.network.getFactory().createLink(link.getId(), link.getFromNode().getId(), medianNode.getId());
 		tmpLink.setLength(length);
 		tmpLink.setFreespeed(freespeed);
 		tmpLink.setCapacity(capacity);
 		tmpLink.setNumberOfLanes(permlanes);
 		this.network.addLink(tmpLink);
-		
+
 		tmpLink = this.network.getFactory().createLink(getNewLinkId(), medianNode.getId(), link.getToNode().getId());
 		tmpLink.setLength(length);
 		tmpLink.setFreespeed(freespeed);

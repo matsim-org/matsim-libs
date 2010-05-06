@@ -20,16 +20,15 @@
 
 package org.matsim.core.api.internal;
 
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * standardization interface
- * 
- * @author nagel
  *
+ * @author nagel
  */
 public interface NetworkRunnable {
-	
-//	public void run( Network net ) ;
-	// it is sometimes Network and sometimes NetworkLayer :-(
+
+	public void run(final Network network);
 
 }

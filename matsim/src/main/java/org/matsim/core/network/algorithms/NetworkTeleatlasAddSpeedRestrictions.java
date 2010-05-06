@@ -26,6 +26,7 @@ import java.nio.channels.FileChannel;
 import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -109,9 +110,18 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 	 * </ul></p>
 	 *
 	 * @param network
-	 * @throws Exception
+	 * @throws RuntimeException with another Exception in it in the case something goes wrong
 	 */
-	public void run(final NetworkLayer network) throws Exception {
+	@Override
+	public void run(final Network network) {
+		try {
+			run2(network);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void run2(final Network network) throws Exception {
 		log.info("running " + this.getClass().getName() + " module...");
 		FileChannel in = new FileInputStream(this.srDbfFileName).getChannel();
 		DbaseFileReader r = new DbaseFileReader(in,true);

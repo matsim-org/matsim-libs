@@ -22,6 +22,7 @@ package org.matsim.core.network.algorithms;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkLayer;
@@ -40,7 +41,8 @@ public class NetworkSummary implements NetworkRunnable {
 		super();
 	}
 
-	public void run(final NetworkLayer network) {
+	@Override
+	public void run(final Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		int min_node_id = Integer.MAX_VALUE;
@@ -63,16 +65,20 @@ public class NetworkSummary implements NetworkRunnable {
 			if (y < this.minY) { this.minY = y; }
 		}
 
+		double cellSize = 7.5;
+		if (network instanceof NetworkLayer) {
+			cellSize = ((NetworkLayer) network).getEffectiveCellSize();
+		}
 		for (Link link : network.getLinks().values()) {
 			link_cnt++;
 			int link_getID = Integer.parseInt(link.getId().toString());
 			if (min_link_id > link_getID) { min_link_id = link_getID; }
 			if (max_link_id < link_getID) { max_link_id = link_getID; }
-			this.network_capacity += Math.ceil(link.getLength()/network.getEffectiveCellSize());
+			this.network_capacity += Math.ceil(link.getLength()/cellSize);
 		}
 
 		System.out.println("      network summary:");
-		System.out.println("        name             = " + network.getName());
+//		System.out.println("        name             = " + network.getName());
 		System.out.println("        capperiod        = " + Time.writeTime(network.getCapacityPeriod()));
 		System.out.println("        network_capacity = " + this.network_capacity + " cells");
 		System.out.println("      nodes summary:");

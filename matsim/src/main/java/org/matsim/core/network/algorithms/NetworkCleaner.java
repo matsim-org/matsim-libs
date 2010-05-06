@@ -106,6 +106,7 @@ public class NetworkCleaner implements NetworkRunnable {
 		return clusterNodes;
 	}
 
+	@Override
 	public void run(final Network network) {
 		final Map<Id, Node> visitedNodes = new TreeMap<Id, Node>();
 		Map<Id, Node> biggestCluster = new TreeMap<Id, Node>();

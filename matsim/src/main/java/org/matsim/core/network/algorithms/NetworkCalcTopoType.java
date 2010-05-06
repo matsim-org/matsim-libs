@@ -48,6 +48,7 @@ public class NetworkCalcTopoType implements NetworkRunnable {
 
 	private final Map<Node, Integer> topoTypePerNode = new HashMap<Node, Integer>();
 
+	@Override
 	public void run(final Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 

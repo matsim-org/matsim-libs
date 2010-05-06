@@ -22,19 +22,21 @@ package org.matsim.core.network.algorithms;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.internal.NetworkRunnable;
 
 /**
  * Calculates the bounding box (=maximal extent) of a network.
  *
  * @author mrieser
  */
-public class CalcBoundingBox {
+public class CalcBoundingBox implements NetworkRunnable {
 
 	private double minX = Double.POSITIVE_INFINITY;
 	private double minY = Double.POSITIVE_INFINITY;
 	private double maxX = Double.NEGATIVE_INFINITY;
 	private double maxY = Double.NEGATIVE_INFINITY;
 
+	@Override
 	public void run(final Network network) {
 		this.minX = Double.POSITIVE_INFINITY;
 		this.minY = Double.POSITIVE_INFINITY;

@@ -24,11 +24,11 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -69,7 +69,8 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkLayer network) {
+	@Override
+	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		double capperiod = network.getCapacityPeriod();

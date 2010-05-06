@@ -109,6 +109,7 @@ public class NetworkMergeDoubleLinks implements NetworkRunnable {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Network network) {
 		for (Node n : network.getNodes().values()) {
 			Iterator<? extends Link> l1_it = n.getOutLinks().values().iterator();
