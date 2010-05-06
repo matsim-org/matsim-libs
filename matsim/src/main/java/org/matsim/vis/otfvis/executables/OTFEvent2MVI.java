@@ -36,7 +36,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 /**
  * This is a standalone executable class for converting a event-file to a .mvi file.
  * This is called by org.matsim.run.otfvis.
- * 
+ *
  * @author dstrippgen
  *
  */
@@ -95,15 +95,6 @@ public class OTFEvent2MVI extends OTFFileWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void finish() {
-		// TODO Auto-generated method stub
-		/* FIXME must this method really be overwritten? it does NOT call super.finish(), even that
-		 * there is something done. So if this method is here to explicitly NOT call super.finish(), please
-		 * add comment. Otherwise one might remove this method completely...
-		 */
 	}
 
 }

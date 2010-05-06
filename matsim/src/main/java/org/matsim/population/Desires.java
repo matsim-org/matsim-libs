@@ -125,7 +125,6 @@ public class Desires implements MatsimToplevelContainer {
 	@Override
 	@Deprecated // not yet implemented.  kai, apr'10
 	public MatsimFactory getFactory() {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
 }

@@ -55,13 +55,12 @@ import org.matsim.vehicles.BasicVehicles;
 
 /**
  * @author mrieser
+ * @author mzilske
  */
 public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 
 	@Override
 	public void agentCreated(PersonAgent agent) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public static class TransitAgentTriesToTeleportException extends RuntimeException {
@@ -121,14 +120,14 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 	public void beforeCleanupSim() {
 		double now = this.qSim.getSimTimer().getTimeOfDay();
 		for (Entry<TransitStopFacility, List<PassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
-			
+
 			for (PassengerAgent agent : agentsAtStop.getValue()) {
 				this.qSim.getEventsManager().processEvent(
 						new AgentStuckEventImpl(now, ((TransitAgent) agent).getPerson().getId(), agentsAtStop.getKey().getLinkId(), ((TransitAgent) agent).getVehicle().getDriver().getCurrentLeg().getMode()));
 
 				Simulation.decLiving();
 				Simulation.incLost();
-			}			
+			}
 		}
 	}
 
