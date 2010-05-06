@@ -83,9 +83,13 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 								break;
 							}
 
-							handler.handlePassengerEntering(enteringPassengers.get(0), now);
-							enteringPassengers.remove(0);
-							this.passengersEnteringTimeFraction += personEntersTime;
+							if(handler.handlePassengerEntering(enteringPassengers.get(0), now)){
+								enteringPassengers.remove(0);
+								this.passengersEnteringTimeFraction += personEntersTime;
+							} else {
+								break;
+							}
+							
 						}
 
 						this.passengersEnteringTimeFraction -= 1.0;
@@ -111,9 +115,14 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 							if (leavingPassengers.size() == 0) {
 								break;
 							}
-							handler.handlePassengerLeaving(leavingPassengers.get(0), now);
-							leavingPassengers.remove(0);
-							this.passengersLeavingTimeFraction += personLeavesTime;
+							
+							if(handler.handlePassengerLeaving(leavingPassengers.get(0), now)){
+								leavingPassengers.remove(0);
+								this.passengersLeavingTimeFraction += personLeavesTime;
+							} else {
+								break;
+							}
+							
 						}
 
 						this.passengersLeavingTimeFraction -= 1.0;

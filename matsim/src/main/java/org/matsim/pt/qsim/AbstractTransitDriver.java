@@ -198,23 +198,29 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		}
 	}
 
-	public void handlePassengerEntering(final PassengerAgent passenger, final double time) {
-		this.agentTracker.removeAgentFromStop(passenger, this.currentStop.getStopFacility());
-		this.vehicle.addPassenger(passenger);
-		PersonDriverAgent agent = (PersonDriverAgent) passenger;
-		EventsManager events = this.sim.getEventsManager();
-		events.processEvent(new PersonEntersVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getBasicVehicle(), this.getTransitRoute().getId()));
+	public boolean handlePassengerEntering(final PassengerAgent passenger, final double time) {
+		boolean handled = this.vehicle.addPassenger(passenger);		
+		if(handled){
+			this.agentTracker.removeAgentFromStop(passenger, this.currentStop.getStopFacility());
+			PersonDriverAgent agent = (PersonDriverAgent) passenger;
+			EventsManager events = this.sim.getEventsManager();
+			events.processEvent(new PersonEntersVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getBasicVehicle(), this.getTransitRoute().getId()));
+		}		
+		return handled;
 	}
 
-	public void handlePassengerLeaving(final PassengerAgent passenger, final double time) {
-		this.vehicle.removePassenger(passenger);
-		PersonDriverAgent agent = (PersonDriverAgent) passenger;
-		EventsManager events = this.sim.getEventsManager();
-		events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getBasicVehicle().getId(), this.getTransitRoute().getId()));
-		agent.teleportToLink(this.currentStop.getStopFacility().getLinkId());
-//			events.processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
-//					stop.getLink(), agent.getCurrentLeg()));
-		agent.legEnds(time);
+	public boolean handlePassengerLeaving(final PassengerAgent passenger, final double time) {
+		boolean handled = this.vehicle.removePassenger(passenger);		
+		if(handled){
+			PersonDriverAgent agent = (PersonDriverAgent) passenger;
+			EventsManager events = this.sim.getEventsManager();
+			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getBasicVehicle().getId(), this.getTransitRoute().getId()));
+			agent.teleportToLink(this.currentStop.getStopFacility().getLinkId());
+//				events.processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
+//						stop.getLink(), agent.getCurrentLeg()));
+			agent.legEnds(time);
+		}		
+		return handled;		
 	}
 
 	private List<PassengerAgent> findPassengersEntering(
