@@ -28,9 +28,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
+import org.matsim.core.config.Config;
+
 
 /**
- * Coordinates the movement of vehicles on the links and the nodes. 
+ * Coordinates the movement of vehicles on the links and the nodes.
  *
  * @author mrieser
  * @author dgrether
@@ -55,17 +57,20 @@ public class QueueSimEngine {
 	private final QueueNode[] simNodesArray;
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
-	
+
 	private final Random random;
-	
-	public QueueSimEngine(final QueueNetwork network, final Random random) {
-		this(network.getLinks().values(), network.getNodes().values(), random);
+
+	public final Config config;
+
+	public QueueSimEngine(final QueueNetwork network, final Random random, final Config config) {
+		this(network.getLinks().values(), network.getNodes().values(), random, config);
 	}
-	
-	/*package*/ QueueSimEngine(final Collection<QueueLink> links, final Collection<QueueNode> nodes, final Random random) {
+
+	/*package*/ QueueSimEngine(final Collection<QueueLink> links, final Collection<QueueNode> nodes, final Random random, final Config config) {
 		this.random = random;
 		this.allLinks = new ArrayList<QueueLink>(links);
-		
+		this.config = config;
+
 		this.simNodesArray = nodes.toArray(new QueueNode[nodes.size()]);
 		//dg[april08] as the order of nodes has an influence on the simulation
 		//results they are sorted to avoid indeterministic simulations
@@ -93,7 +98,7 @@ public class QueueSimEngine {
 			link.clearVehicles();
 		}
 	}
-	
+
 	/**
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.

@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -161,7 +160,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	}
 
 	// Constructor for test case
-	public TimeModeChoicer1 (LegTravelTimeEstimatorFactory estimatorFactory, LegTravelTimeEstimator	estimator, PlanScorer scorer, PlansCalcRoute router, Network network){
+	public TimeModeChoicer1 (LegTravelTimeEstimatorFactory estimatorFactory, LegTravelTimeEstimator	estimator, PlanScorer scorer, PlansCalcRoute router, Network network, PlanomatConfigGroup config){
 
 		this.router 				= router;
 		this.scorer 				= scorer;
@@ -194,7 +193,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 
 		// meisterk
 		this.legTravelTimeEstimatorFactory = estimatorFactory;
-		this.config					= Gbl.getConfig().planomat();
+		this.config					= config;
 		this.estimator = estimator;
 	}
 

@@ -107,7 +107,7 @@ public class MyStrategyManagerConfigLoader {
 				strategy.addStrategyModule(new ChangeLegMode(config));
 				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (classname.equals("SelectPathSizeLogit")) {
-				strategy = new PlanStrategy(new PathSizeLogitSelector(controler.getNetwork()));
+				strategy = new PlanStrategy(new PathSizeLogitSelector(controler.getNetwork(), config.charyparNagelScoring()));
 //				// JH
 			} else if (classname.equals("KSecLoc")){
 //				strategy = new PlanStrategy(new RandomPlanSelector());

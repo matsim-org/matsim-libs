@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -64,6 +63,16 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 	private LegTravelTimeEstimator estimator;
 	private TimeModeChoicer1 testee;
 	private ScenarioImpl scenario_input;
+
+	@Override
+	protected void tearDown() throws Exception {
+		this.initializer = null;
+		this.scenario_input = null;
+		this.testee = null;
+		this.estimator = null;
+		this.router = null;
+		super.tearDown();
+	}
 
 	@Override
 	protected void setUp() throws Exception {
@@ -101,7 +110,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 				this.router,
 				this.scenario_input.getNetwork());
 
-		this.testee = new TimeModeChoicer1 (legTravelTimeEstimatorFactory, this.estimator, new PlanScorer(new JohScoringTestFunctionFactory()), this.router, this.scenario_input.getNetwork());
+		this.testee = new TimeModeChoicer1 (legTravelTimeEstimatorFactory, this.estimator, new PlanScorer(new JohScoringTestFunctionFactory()), this.router, this.scenario_input.getNetwork(), this.scenario_input.getConfig().planomat());
 	}
 
 
@@ -200,7 +209,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
 
 		/* Analysis of subtours */
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(Gbl.getConfig().planomat());
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(this.scenario_input.getConfig().planomat());
 		planAnalyzeSubtours.run(newPlan);
 
 		/* Make sure that all subtours with distance = 0 are set to "walk" */
@@ -288,7 +297,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
 
 		/* Analysis of subtours */
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(Gbl.getConfig().planomat());
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(this.scenario_input.getConfig().planomat());
 		planAnalyzeSubtours.run(newPlan);
 
 		/* Make sure that all subtours with distance = 0 are set to "walk" */

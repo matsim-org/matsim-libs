@@ -20,7 +20,6 @@
 
 package org.matsim.core.mobsim.queuesim;
 
-import org.matsim.core.gbl.Gbl;
 
 public abstract class AbstractSimulation {
 
@@ -36,10 +35,10 @@ public abstract class AbstractSimulation {
 
 	private static double stuckTime = Double.MAX_VALUE;
 
-	public static void reset() {
+	public static void reset(final double stuckTime) {
 		setLiving(0);
 		resetLost();
-		setStuckTime(Gbl.getConfig().simulation().getStuckTime());
+		setStuckTime(stuckTime);
 	}
 
 	public static final double getStuckTime() {return stuckTime;	}

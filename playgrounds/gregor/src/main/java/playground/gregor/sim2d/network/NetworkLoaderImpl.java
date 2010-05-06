@@ -146,7 +146,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 			ScenarioImpl scenario = new ScenarioImpl();
 			scenario.getConfig().global().setCoordinateSystem("WGS84_UTM33N");
 			//		CoordinateReferenceSystem crs = MGC.getCRS("WGS84_UTM33N");
-			FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(this.network);
+			FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(this.network, "WGS84_UTM33N");
 			//		builder.setCoordinateReferenceSystem(crs);
 			builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 			builder.setWidthCoefficient(0.5);

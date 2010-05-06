@@ -22,7 +22,7 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderTeleatlas;
 import org.matsim.core.network.NetworkWriter;
@@ -42,7 +42,7 @@ public class TeleAtlas2Network {
 	//////////////////////////////////////////////////////////////////////
 
 	private static NetworkReaderTeleatlas reader = null;
-	private static NetworkLayer network = null;
+	private static Network network = null;
 	private static String jcShpFileName = null; // teleatlas junction shape file name
 	private static String nwShpFileName = null; // teleatlas network shape file name
 
@@ -52,7 +52,7 @@ public class TeleAtlas2Network {
 	private static NetworkTeleatlasAddManeuverRestrictions mrModule = null;
 	private static String mnShpFileName; // teleatlas maneuvers shape file name
 	private static String mpDbfFileName; // teleatlas maneuver paths dbf file name
-	
+
 	private static String outputDir = "output";
 	private static boolean writeNetworkXmlFile = false;
 	private static boolean writeNetworkTxtFile = false;
@@ -61,16 +61,16 @@ public class TeleAtlas2Network {
 	//////////////////////////////////////////////////////////////////////
 	// convert method
 	//////////////////////////////////////////////////////////////////////
-	
-	public static final NetworkLayer convert() throws Exception {
+
+	public static final Network convert() throws Exception {
 		System.out.println("conversion settings...");
 		printSetting();
 		System.out.println("done.");
-		
+
 		reader.read();
 		if (srModule != null) { srModule.run(network); }
 		if (mrModule != null) { mrModule.run(network); }
-		
+
 		if (writeNetworkXmlFile) {
 			System.out.println("writing xml file...");
 			new NetworkWriter(network).write(outputDir+"/output_network.xml.gz");
@@ -84,17 +84,17 @@ public class TeleAtlas2Network {
 		}
 		if (writeNetworkShapeFile) {
 			System.out.println("writing shape file...");
-			if (Gbl.getConfig() == null) { Gbl.createConfig(null); }
-			Gbl.getConfig().global().setCoordinateSystem("WGS84");
-			FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
+//			if (Gbl.getConfig() == null) { Gbl.createConfig(null); }
+//			Gbl.getConfig().global().setCoordinateSystem("WGS84");
+			FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, "WGS84");
 			builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
-			builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
+			builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 			new Links2ESRIShape(network,outputDir+"/output_links.shp",builder).write();
 			System.out.println("done.");
 		}
 		return network;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// print method
 	//////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ public class TeleAtlas2Network {
 		System.out.println("    writeNetworkTxtFile:   "+writeNetworkTxtFile);
 		System.out.println("    writeNetworkShapeFile: "+writeNetworkShapeFile);
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// helper methods
 	//////////////////////////////////////////////////////////////////////
@@ -124,7 +124,7 @@ public class TeleAtlas2Network {
 		boolean removeUTurns = false;
 		double expansionRadius = Double.NaN;
 		double linkSeparation = Double.NaN;
-		
+
 		if (args.length == 0) { System.out.println("Too few arguments."); printUsage(); System.exit(1); }
 		Iterator<String> argIter = new ArgumentParser(args).iterator();
 		while (argIter.hasNext()) {
@@ -304,7 +304,7 @@ public class TeleAtlas2Network {
 //		String str = options+jcShpFile+nwShpFile+srDbfFile+mnShpFile+mpShpFile+outDir;
 //		str = str.trim();
 //		args = str.split(" ");
-		
+
 		network = new NetworkLayer();
 		parseArguments(args);
 		convert();

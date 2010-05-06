@@ -216,10 +216,12 @@ public class OTFVis {
 		}
 		if (args[1].toLowerCase().endsWith(".xml") || args[1].toLowerCase().endsWith(".xml.gz")) {
 			String netFileName = args[1];
-			if (Gbl.getConfig() == null) {
-				Gbl.createConfig(null); // is this really required?
-			}
-			Gbl.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+//  seeing that Gbl.getConfig() is nowhere used anymore in org.matsim.vis.otfvis, I assume
+//  it should now work without the following lines. marcel/6apr2010
+//			if (Gbl.getConfig() == null) {
+//				Gbl.createConfig(null); // is this really required?
+//			}
+//			Gbl.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 			OTFClientLive client = new OTFClientLive("tveh:"+vehFileName + "@" + netFileName, new DefaultConnectionManagerFactory().createConnectionManager());
 			client.run();
 		}
@@ -284,7 +286,7 @@ public class OTFVis {
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		QSim sim = new QSim(scenario, new EventsManagerImpl());
 		OTFEvent2MVI converter = new OTFEvent2MVI(sim.getQNetwork(), eventFile, mviFile, snapshotPeriod);
-		converter.convert();
+		converter.convert(scenario.getConfig());
 	}
 
 }

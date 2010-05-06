@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -50,11 +50,11 @@ public class PathSizeLogitSelector implements PlanSelector {
 	private final double tau;
 	private final Network network;
 
-	public PathSizeLogitSelector(final Network network) {
-		this.beta = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "PathSizeLogitBeta"));
+	public PathSizeLogitSelector(final Network network, final CharyparNagelScoringConfigGroup config) {
+		this.beta = config.getPathSizeLogitBeta();
 
 		//in PSL tau is  the equivalent to BrainExpBeta in the multinomial logit model
-		this.tau = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "BrainExpBeta"));
+		this.tau = config.getBrainExpBeta();
 
 		this.network = network;
 	}
@@ -136,7 +136,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 					for (Id linkId : route.getLinkIds()){
 						double denominator = 0;
 						for (double dbl : linksInTime.get(linkId)){
-							//TODO this is just for testing (those legs where the depature time differs more then 3600 seconds will not compared to each other) - need a
+							//TODO this is just for testing (those legs where the departure time differs more then 3600 seconds will not compared to each other) - need a
 							//little bit to brood on it - gl
 							if (Math.abs(dbl - currentTime) <= 3600)
 								denominator++;

@@ -19,14 +19,14 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
@@ -40,9 +40,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * This class is a copy of main() from
  * org.matsim.utils.gis.matsim2esri.network.Network2ESRIShape and can convert a
  * MATSim-network to a QGIS .shp-file (link or polygon)
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class MATSimNet2QGISDemo implements X2QGIS {
 
@@ -68,11 +68,11 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 
 		Logger log = Logger.getLogger(Links2ESRIShape.class);
 		log.info("loading network from " + netfile);
-		NetworkLayer network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
+		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, coordinateSys);
 		builder
 				.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);

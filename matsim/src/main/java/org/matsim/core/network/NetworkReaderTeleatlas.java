@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -54,7 +56,7 @@ public class NetworkReaderTeleatlas {
 
 	private final static Logger log = Logger.getLogger(NetworkReaderTeleatlas.class);
 
-	private final NetworkLayer network;
+	private final Network network;
 
 	/**
 	 * path and name to the Tele Atlas MultiNet junction (jc) Shapefile
@@ -138,7 +140,7 @@ public class NetworkReaderTeleatlas {
 	 * @param jcShpFileName Tele Atlas MultiNet junction Shapefile
 	 * @param nwShpFileName Tele Atlas MultiNet network Shapefile
 	 */
-	public NetworkReaderTeleatlas(final NetworkLayer network, final String jcShpFileName, final String nwShpFileName) {
+	public NetworkReaderTeleatlas(final Network network, final String jcShpFileName, final String nwShpFileName) {
 		this.network = network;
 		this.jcShpFileName = jcShpFileName;
 		this.nwShpFileName = nwShpFileName;
@@ -149,9 +151,6 @@ public class NetworkReaderTeleatlas {
 	// read methods
 	//////////////////////////////////////////////////////////////////////
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.NetworkReader#read()
-	 */
 	public void read() throws IOException {
 		log.info("reading nodes from Junction Shape file '"+this.jcShpFileName+"'...");
 		this.readNodesFromJCshp();
@@ -160,7 +159,9 @@ public class NetworkReaderTeleatlas {
 		this.readLinksFromNWshp();
 		log.info("done.");
 		// TODO balmermi: adding date and check if you get more info from the input files to include into the name
-		network.setName("teleatlas");
+		if (network instanceof NetworkLayer) {
+			((NetworkLayer) network).setName("teleatlas");
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -208,7 +209,9 @@ public class NetworkReaderTeleatlas {
 			if ((jncttyp < 0) || (jncttyp == 1) || (jncttyp > 6)) { throw new IllegalArgumentException(NODE_ID_NAME+"="+id+": "+NODE_JNCTTYP_NAME+"="+jncttyp+" not allowed."); }
 			if (id == null) { throw new IllegalArgumentException("In "+jcShpFileName+": There is at least one feature that does not have an ID set."); }
 			String type = feattyp+"-"+jncttyp;
-			network.createAndAddNode(new IdImpl(id.toString()),new CoordImpl(c.x,c.y),type);
+			Node n = network.getFactory().createNode(new IdImpl(id.toString()),new CoordImpl(c.x,c.y));
+			((NodeImpl) n).setType(type);
+			network.addNode(n);
 		}
 		nCnt = network.getNodes().size()-nCnt;
 		log.info("  "+nCnt+" nodes added to the network.");
@@ -338,14 +341,38 @@ public class NetworkReaderTeleatlas {
 			if (ignore) { ignoreCnt++; }
 			else {
 				if (oneway.equals(" ") || oneway.equals("N")) {
-					network.createAndAddLink(new IdImpl(id.toString()+"FT"),fNode,tNode,length,speed/3.6,cap,lanes,id.toString(),linksType+"-"+featTyp+"-"+ferryType);
-					network.createAndAddLink(new IdImpl(id.toString()+"TF"),tNode,fNode,length,speed/3.6,cap,lanes,id.toString(),linksType+"-"+featTyp+"-"+ferryType);
+					Link l = network.getFactory().createLink(new IdImpl(id.toString()+"FT"), fNode.getId(), tNode.getId());
+					l.setLength(length);
+					l.setFreespeed(speed/3.6);
+					l.setCapacity(cap);
+					l.setNumberOfLanes(lanes);
+					((LinkImpl) l).setOrigId(id.toString());
+					((LinkImpl) l).setType(linksType+"-"+featTyp+"-"+ferryType);
+					l = network.getFactory().createLink(new IdImpl(id.toString()+"TF"), tNode.getId(), fNode.getId());
+					l.setLength(length);
+					l.setFreespeed(speed/3.6);
+					l.setCapacity(cap);
+					l.setNumberOfLanes(lanes);
+					((LinkImpl) l).setOrigId(id.toString());
+					((LinkImpl) l).setType(linksType+"-"+featTyp+"-"+ferryType);
 				}
 				else if (oneway.equals("FT")) {
-					network.createAndAddLink(new IdImpl(id.toString()+oneway),fNode,tNode,length,speed/3.6,cap,lanes,id.toString(),linksType+"-"+featTyp+"-"+ferryType);
+					Link l = network.getFactory().createLink(new IdImpl(id.toString()+oneway), fNode.getId(), tNode.getId());
+					l.setLength(length);
+					l.setFreespeed(speed/3.6);
+					l.setCapacity(cap);
+					l.setNumberOfLanes(lanes);
+					((LinkImpl) l).setOrigId(id.toString());
+					((LinkImpl) l).setType(linksType+"-"+featTyp+"-"+ferryType);
 				}
 				else if (oneway.equals("TF")) {
-					network.createAndAddLink(new IdImpl(id.toString()+oneway),tNode,fNode,length,speed/3.6,cap,lanes,id.toString(),linksType+"-"+featTyp+"-"+ferryType);
+					Link l = network.getFactory().createLink(new IdImpl(id.toString()+oneway), tNode.getId(), fNode.getId());
+					l.setLength(length);
+					l.setFreespeed(speed/3.6);
+					l.setCapacity(cap);
+					l.setNumberOfLanes(lanes);
+					((LinkImpl) l).setOrigId(id.toString());
+					((LinkImpl) l).setType(linksType+"-"+featTyp+"-"+ferryType);
 				}
 				else {
 					throw new IllegalArgumentException("linkId="+id.toString()+": "+LINK_ONEWAY_NAME+"="+oneway+" not known!");
@@ -353,7 +380,7 @@ public class NetworkReaderTeleatlas {
 			}
 		}
 
-		network.setCapacityPeriod(3600.0);
+		((NetworkImpl) network).setCapacityPeriod(3600.0);
 
 		lCnt = network.getLinks().size()-lCnt;
 		log.info("  "+lCnt+" links added to the network layer.");

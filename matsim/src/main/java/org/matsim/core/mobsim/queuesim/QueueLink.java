@@ -603,7 +603,7 @@ public class QueueLink {
 
     public Collection<AgentSnapshotInfo> getVehiclePositions(
         final Collection<AgentSnapshotInfo> positions) {
-      String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
+      String snapshotStyle = simEngine.config.simulation().getSnapshotStyle();
       if ("queue".equals(snapshotStyle)) {
         getVehiclePositionsQueue(positions);
       } else if ("equiDist".equals(snapshotStyle)) {
@@ -688,7 +688,7 @@ public class QueueLink {
       double now = SimulationTimer.getTime();
       Link link = QueueLink.this.getLink();
       double queueEnd = getInitialQueueEnd();
-      double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
+      double storageCapFactor = simEngine.config.simulation().getStorageCapFactor();
       double cellSize = ((NetworkImpl)QueueLink.this.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize();
       double vehLen = calculateVehicleLength(link, storageCapFactor, cellSize);
 

@@ -225,7 +225,7 @@ public class AnalysisTest {
 					args[2] + "../" + args[args.length - 1] + "."
 							+ (scenario.equals("normal") ? "" : scenario + ".")
 							+ "vis.mvi", Integer
-							.parseInt(args[args.length - 2])).convert();
+							.parseInt(args[args.length - 2])).convert(scenario2.getConfig());
 		}
 		System.out.println("done.");
 	}

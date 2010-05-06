@@ -148,9 +148,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	public QueueSimulation(final Scenario sc, final EventsManager events, final QueueNetworkFactory factory){
 		this.scenario = sc;
-		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
-		AbstractSimulation.reset();
 		this.config = scenario.getConfig();
+		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
+		AbstractSimulation.reset(this.config.simulation().getStuckTime());
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
 		setEvents(events);
 		this.population = scenario.getPopulation();
@@ -161,7 +161,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 		this.notTeleportedModes.add(TransportMode.car);
 
-		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
+		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom(), this.scenario.getConfig());
 	}
 
 	/**

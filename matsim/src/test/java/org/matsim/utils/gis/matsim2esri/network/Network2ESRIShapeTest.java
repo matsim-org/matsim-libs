@@ -31,129 +31,129 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class Network2ESRIShapeTest extends MatsimTestCase  {
 
-	
+
 	//TODO [GL] - find a way to compare *.dbf files since simple checksum tests are not applicable here. - 08/30/2008 gl
 	public void testPolygonCapacityShape() {
 		String netFileName = "test/scenarios/berlin/network.xml.gz";
 		String outputFileP = getOutputDirectory() + "./network.shp";
 		String ref = getInputDirectory() + "./network.shp";
-		
+
 		Scenario scenario = new ScenarioImpl();
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
+		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, "DHDN_GK4");
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		builder.setWidthCoefficient(0.001);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
-		
+
 		long checksum1 = CRCChecksum.getCRCFromFile(ref);
 		long checksum2 = CRCChecksum.getCRCFromFile(outputFileP);
 		assertEquals("different shp-files.", checksum1, checksum2);
-		
+
 
 	}
-	
+
 	public void testPolygonLanesShape() {
 		String netFileName = "test/scenarios/berlin/network.xml.gz";
 		String outputFileP = getOutputDirectory() + "./network.shp";
 		String ref = getInputDirectory() + "./network.shp";
-		
+
 		Scenario scenario = new ScenarioImpl();
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
+		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, "DHDN_GK4");
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		builder.setWidthCoefficient(1);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
-		
+
 		long checksum1 = CRCChecksum.getCRCFromFile(ref);
 		long checksum2 = CRCChecksum.getCRCFromFile(outputFileP);
 		assertEquals("different shp-files.", checksum1, checksum2);
 	}
-	
+
 	public void testPolygonFreespeedShape() {
 		String netFileName = "test/scenarios/berlin/network.xml.gz";
 		String outputFileP = getOutputDirectory() + "./network.shp";
 		String ref = getInputDirectory() + "./network.shp";
-		
+
 		Scenario scenario = new ScenarioImpl();
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
+		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, "DHDN_GK4");
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		builder.setWidthCoefficient(1);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
-		
+
 		long checksum1 = CRCChecksum.getCRCFromFile(ref);
 		long checksum2 = CRCChecksum.getCRCFromFile(outputFileP);
 		assertEquals("different shp-files.", checksum1, checksum2);
 	}
-	
+
 	public void testLineStringShape() {
 		String netFileName = "test/scenarios/berlin/network.xml.gz";
 		String outputFileShp = getOutputDirectory() + "./network.shp";
 //		String outputFileDbf = getOutputDirectory() + "./network.dbf";
 		String refShp = getInputDirectory() + "./network.shp";
 //		String refDbf = getInputDirectory() + "./network.dbf";
-		
+
 		Scenario scenario = new ScenarioImpl();
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
+		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, "DHDN_GK4");
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		builder.setWidthCoefficient(1);
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileShp, builder).write();
-		
+
 		long checksum1 = CRCChecksum.getCRCFromFile(refShp);
 		long checksum2 = CRCChecksum.getCRCFromFile(outputFileShp);
 		assertEquals("different shp-files.", checksum1, checksum2);
-		
+
 //		System.out.println("calculating *.dbf file checksums...");
 //		checksum1 = CRCChecksum.getCRCFromFile(refDbf);;
 //		checksum2 = CRCChecksum.getCRCFromFile(outputFileDbf);
 //		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 //		assertEquals(checksum1, checksum2);
 	}
-	
+
 	public void testNodesShape() {
 		String netFileName = "test/scenarios/berlin/network.xml.gz";
 		String outputFileShp = getOutputDirectory() + "./network.shp";
 //		String outputFileDbf = getOutputDirectory() + "./network.dbf";
 		String refShp = getInputDirectory() + "./network.shp";
 //		String refDbf = getInputDirectory() + "./network.dbf";
-		
+
 		Scenario scenario = new ScenarioImpl();
-		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
+//		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		new Nodes2ESRIShape(network,outputFileShp).write();	
-		
+		new Nodes2ESRIShape(network,outputFileShp, "DHDN_GK4").write();
+
 		long checksum1 = CRCChecksum.getCRCFromFile(refShp);
 		long checksum2 = CRCChecksum.getCRCFromFile(outputFileShp);
 		assertEquals("different shp-files.", checksum1, checksum2);

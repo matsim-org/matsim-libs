@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
@@ -159,7 +158,7 @@ public class BkScoringFunction implements ScoringFunction {
 				Math.min(marginalUtilityOfTraveling, marginalUtilityOfWaiting)) * 3600.0 * 24.0; // SCENARIO_DURATION
 		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
 
-		readUtilityValues();
+		readUtilityValues(configGroup);
 		scoreActs = ((marginalUtilityOfPerforming != 0) || (marginalUtilityOfWaiting != 0) ||
 				(marginalUtilityOfLateArrival != 0) || (marginalUtilityOfEarlyDeparture != 0));
 		initialized = true;
@@ -337,9 +336,7 @@ public class BkScoringFunction implements ScoringFunction {
 	/**
 	 * reads all activity utility values from the config-file
 	 */
-	private static final void readUtilityValues() {
-		CharyparNagelScoringConfigGroup config = Gbl.getConfig().charyparNagelScoring();
-
+	private static final void readUtilityValues(CharyparNagelScoringConfigGroup config) {
 		for (ActivityParams params : config.getActivityParams()) {
 			String type = params.getType();
 			double priority = params.getPriority();

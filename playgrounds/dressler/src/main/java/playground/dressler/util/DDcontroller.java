@@ -135,7 +135,7 @@ public class DDcontroller {
 
 			String eventFile = "./output/events.txt";
 			OTFEvent2MVI mviconverter = new OTFEvent2MVI(qnet, eventFile, "./output/otfvis.mvi", 60);
-			mviconverter.convert();
+			mviconverter.convert(scenario.getConfig());
 
 			String[] visargs = {"./output/otfvis.mvi"};
 			OTFVis.main(visargs);

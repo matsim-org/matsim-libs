@@ -23,7 +23,7 @@ package org.matsim.vis.otfvis.executables;
 import java.io.File;
 import java.io.IOException;
 
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.config.Config;
 import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -60,15 +60,15 @@ public class OTFEvent2MVI extends OTFFileWriter {
 
 	private double lastTime=-1;
 
-	public void convert() {
+	public void convert(final Config config) {
 		open();
 
 		// create SnapshotGenerator
-		Gbl.getConfig().simulation().setSnapshotFormat("none");
-		Gbl.getConfig().simulation().setSnapshotPeriod(this.interval_s);
+		config.simulation().setSnapshotFormat("none");
+		config.simulation().setSnapshotPeriod(this.interval_s);
 		Events2Snapshot app = new Events2Snapshot();
 		app.addExternalSnapshotWriter(this);
-		app.run(new File(this.eventFileName), Gbl.getConfig(), this.network.getNetwork());
+		app.run(new File(this.eventFileName), config, this.network.getNetwork());
 
 		close();
 	}

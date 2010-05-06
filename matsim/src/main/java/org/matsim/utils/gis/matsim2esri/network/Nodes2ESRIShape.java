@@ -36,7 +36,6 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -49,25 +48,25 @@ import com.vividsolutions.jts.geom.Point;
  * Simple class to convert the nodess of MATSim network files to ESRI shape files. The nodes could be written points
  * For a basic example please have a look at the <code>main</code> method.
  * Can also be called as Nodes2ESRIShape inputNetwork.xml output.shp .
- *  
+ *
  * <p> <strong>Keywords:</strong> converter, network, nodes, esri, shp, matsim </p>
  *
  * @author laemmel
  */
 public class Nodes2ESRIShape {
-	
+
 	private final static Logger log = Logger.getLogger(Nodes2ESRIShape.class);
-	
+
 	private final Network network;
 	private final String filename;
 	private FeatureType featureType;
 
-	public Nodes2ESRIShape(final Network network, final String filename) {
+	public Nodes2ESRIShape(final Network network, final String filename, final String coordinateSystem) {
 		this.network = network;
 		this.filename = filename;
-		initFeatureType();
+		initFeatureType(coordinateSystem);
 	}
-	
+
 	public void write() {
 		Collection<Feature> features = new ArrayList<Feature>();
 		for (Node node : this.network.getNodes().values()) {
@@ -77,8 +76,8 @@ public class Nodes2ESRIShape {
 			ShapeFileWriter.writeGeometries(features, this.filename);
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
-	
+		}
+
 	}
 
 	private Feature getFeature(Node node) {
@@ -89,9 +88,9 @@ public class Nodes2ESRIShape {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	private void initFeatureType() {
-		CoordinateReferenceSystem crs = MGC.getCRS(Gbl.getConfig().global().getCoordinateSystem());
+
+	private void initFeatureType(final String coordinateSystem) {
+		CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
 		AttributeType [] attribs = new AttributeType[2];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, crs);
 		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
@@ -105,11 +104,11 @@ public class Nodes2ESRIShape {
 		}
 
 	}
-	
+
 	public static void main(String [] args) {
 		String netfile = null ;
 		String outputFile = null ;
-		
+
 		if ( args.length == 0 ) {
 			netfile = "./examples/equil/network.xml";
 //		String netfile = "./test/scenarios/berlin/network.xml.gz";
@@ -122,16 +121,16 @@ public class Nodes2ESRIShape {
 			log.error("Arguments cannot be interpreted.  Aborting ...") ;
 			System.exit(-1) ;
 		}
-		
+
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
+//		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		log.info("loading network from " + netfile);
 		final NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
-		
-		new Nodes2ESRIShape(network,outputFile).write();
+
+		new Nodes2ESRIShape(network,outputFile, "DHDN_GK4").write();
 	}
 
 }

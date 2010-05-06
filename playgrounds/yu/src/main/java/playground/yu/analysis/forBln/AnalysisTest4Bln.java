@@ -233,7 +233,7 @@ public class AnalysisTest4Bln implements Analysis4Bln {
 					eventsFilename.split("events.txt.gz")[0]
 							+ (scenario.equals("normal") ? "" : scenario + ".")
 							+ "otfvis.mvi", Integer
-							.parseInt(args[args.length - 2])).convert();
+							.parseInt(args[args.length - 2])).convert(sc.getConfig());
 		}
 		System.out.println("done.");
 	}
