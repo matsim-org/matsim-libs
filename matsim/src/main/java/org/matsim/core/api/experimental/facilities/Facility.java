@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
 /**
- * A (Basic)Facility is a (Basic)Location ("getCoord") with an Id ("getId") that is connected to a Link ("getLinkId").
- * 
+ * A Facility is a (Basic)Location ("getCoord") with an Id ("getId") that is connected to a Link ("getLinkId").
+ *
  * @author nagel
  */
 public interface Facility extends BasicLocation, Identifiable {
-	
-	public Id getLinkId() ;
+
+	public Id getLinkId();
 
 }
