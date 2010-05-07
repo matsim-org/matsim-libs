@@ -23,7 +23,9 @@ package org.matsim.pt.qsim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -50,14 +52,14 @@ public class TransitDriver extends AbstractTransitDriver {
 
 	final double departureTime;
 
-	private final LegImpl currentLeg;
+	private final Leg currentLeg;
 
 	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final QSim sim) {
 		super(sim, agentTracker);
 		PersonImpl driver = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
 		this.carRoute = route.getRoute();
 		Plan plan = new PlanImpl();
-		LegImpl leg = new LegImpl(TransportMode.car);
+		Leg leg = new LegImpl(TransportMode.car);
 		leg.setRoute(getWrappedCarRoute(getCarRoute()));
 		Activity startActivity = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, leg.getRoute().getStartLinkId());
 		Activity endActiity = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, leg.getRoute().getEndLinkId());
@@ -100,8 +102,13 @@ public class TransitDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public LegImpl getCurrentLeg() {
+	public Leg getCurrentLeg() {
 		return this.currentLeg;
+	}
+	
+	@Override
+	public PlanElement getCurrentPlanElement() {
+		return this.currentLeg ; // always a leg (?)
 	}
 
 	@Override

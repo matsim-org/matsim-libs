@@ -216,7 +216,7 @@ public class QPersonAgent implements PersonDriverAgent {
 		this.currentLinkId = linkId;
 	}
 
-	// yyyy might make sense to add this to the interface.  kai, jan'10
+	@Override
 	public PlanElement getCurrentPlanElement() {
 		return this.getPlanElements().get( this.currentPlanElementIndex ) ;
 	}

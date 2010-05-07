@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.LegImpl;
@@ -44,7 +46,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 
 	private final TransitStopFacility exitStop;
-	private final LegImpl dummyLeg;
+	private final Leg dummyLeg;
 	private final PersonImpl dummyPerson = new PersonImpl(new IdImpl(1));
 
 	/**
@@ -74,8 +76,13 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public LegImpl getCurrentLeg() {
+	public Leg getCurrentLeg() {
 		return this.dummyLeg;
+	}
+	
+	@Override
+	public PlanElement getCurrentPlanElement() {
+		return this.dummyLeg ;
 	}
 
 	@Override

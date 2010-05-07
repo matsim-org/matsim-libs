@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
@@ -59,7 +60,6 @@ public class QueuePersonAgent implements PersonDriverAgent {
 
 	private transient Id destinationLinkId;
 
-	private Leg currentLeg;
 	private List<Id> cachedRouteLinkIds = null;
 
 	private int currentLinkIdIndex;
@@ -103,8 +103,14 @@ public class QueuePersonAgent implements PersonDriverAgent {
 		return this.currentLinkId;
 	}
 
+	@Override
 	public Leg getCurrentLeg() {
-		return this.currentLeg;
+		return (Leg) this.getCurrentPlanElement() ;
+	}
+
+	@Override
+	public PlanElement getCurrentPlanElement() {
+		return this.getPlanElements().get(this.currentPlanElementIndex);
 	}
 
 	@Override
@@ -113,13 +119,12 @@ public class QueuePersonAgent implements PersonDriverAgent {
 	}
 
 	public boolean initialize() {
-		List<? extends PlanElement> planElements = this.getPlanElements();
 		this.currentPlanElementIndex = 0;
-		Activity firstAct = (Activity) planElements.get(0);
+		Activity firstAct = (Activity) this.getCurrentPlanElement() ;
 		double departureTime = firstAct.getEndTime();
 
 		this.currentLinkId = firstAct.getLinkId();
-		if ((departureTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
+		if ((departureTime != Time.UNDEFINED_TIME) && (this.getPlanElements().size() > 1)) {
 			setDepartureTime(departureTime);
 			this.simulation.scheduleActivityEnd(this);
 			AbstractSimulation.incLiving();
@@ -139,7 +144,6 @@ public class QueuePersonAgent implements PersonDriverAgent {
 		this.destinationLinkId = route.getEndLinkId();
 
 		// set the route according to the next leg
-		this.currentLeg = leg;
 		this.cachedRouteLinkIds = null;
 		this.currentLinkIdIndex = 0;
 		this.cachedNextLinkId = null;
@@ -154,8 +158,12 @@ public class QueuePersonAgent implements PersonDriverAgent {
 	 * @param now the current time
 	 */
 	public void activityEnds(final double now) {
-		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
-		QueueSimulation.getEvents().processEvent(new ActivityEndEventImpl(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+		Activity act = (Activity) this.getCurrentPlanElement() ;
+//		QueueSimulation.getEvents().processEvent(new ActivityEndEventImpl(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+		
+		EventsManager events = QueueSimulation.getEvents();
+		events.processEvent( events.getFactory().createActivityEndEvent(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+
 		advancePlanElement(now);
 	}
 
@@ -263,7 +271,8 @@ public class QueuePersonAgent implements PersonDriverAgent {
 			return this.cachedNextLinkId;
 		}
 		if (this.cachedRouteLinkIds == null) {
-			this.cachedRouteLinkIds = ((NetworkRoute) this.currentLeg.getRoute()).getLinkIds();
+			Leg leg = (Leg) this.getCurrentPlanElement();
+			this.cachedRouteLinkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 		}
 
 		if (this.currentLinkIdIndex >= this.cachedRouteLinkIds.size()) {

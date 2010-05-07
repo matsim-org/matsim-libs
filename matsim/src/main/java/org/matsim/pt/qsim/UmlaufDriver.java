@@ -153,8 +153,14 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		return this.departureTime;
 	}
 
+	@Override
 	public Leg getCurrentLeg() {
 		return this.currentLeg;
+	}
+	
+	@Override
+	public PlanElement getCurrentPlanElement() {
+		return this.currentLeg ; // always a leg (?)
 	}
 
 	@Override

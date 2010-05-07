@@ -51,8 +51,6 @@ public class QLinkImpl implements QLink {
 
 	final private static Logger log = Logger.getLogger(QLinkImpl.class);
 
-	private static int cellSizeCacheWarningCount = 0;
-
 	private static int spaceCapWarningCount = 0;
 
 	/**

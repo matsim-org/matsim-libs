@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.framework;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 
 
 /**
@@ -65,10 +66,11 @@ public interface PersonAgent {
 	 * @param now the current time in the simulation
 	 */
 	public void legEnds(final double now);
+	
+	public PlanElement getCurrentPlanElement() ;
+	// if this does not make sense for a class, then the class is maybe not a "Person"Agent.  kai, may'10
 
 	public Leg getCurrentLeg();
-	// yyyy given that there is "getCurrentLeg", there should also be "getCurrentActivity", or in my view better
-	// "getCurrentPlanElement".  kai, apr'10
 
 	public Person getPerson();
 	
