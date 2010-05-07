@@ -39,8 +39,6 @@ public class Mobsim {
 		PersonAgent person = null ; // dummy
 		BasicVehicle veh = null ; // dummy
 		MobsimFacility linkFac = new MobsimFacility() ; // dummy
-		MobsimLink link = new MobsimLink() ;
-		MobsimNode node = new MobsimNode() ;
 
 		// INITIALIZATION:
 		
@@ -51,10 +49,10 @@ public class Mobsim {
 		linkFac.addEmptyVehicle( veh ) ;
 		
 		// UPDATES
-		/* for all links */ {
+		for ( MobsimLink link : mobsimLinks.values() ) {
 			link.update() ;  // link facility update included here ?!
 		}
-		/* for all nodes */ {
+		for ( MobsimNode node : mobsimNodes.values() ) {
 			node.update() ;
 		}
 		/* for all link facilities */ {
