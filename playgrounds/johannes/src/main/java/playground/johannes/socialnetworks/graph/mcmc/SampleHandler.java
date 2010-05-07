@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+
 /**
  * @author illenberger
  *

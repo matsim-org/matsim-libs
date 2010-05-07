@@ -19,11 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import gnu.trove.TObjectDoubleHashMap;
 
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 
@@ -37,7 +41,7 @@ public class ErgmEdgeCost extends ErgmTerm {
 	
 	private EdgeCostFunction costFunction;
 	
-	public ErgmEdgeCost(SpatialAdjacencyMatrix y, EdgeCostFunction costFunction, double budget) {
+	public ErgmEdgeCost(SpatialAdjacencyMatrix y, EdgeCostFunction costFunction, double budget, String thetaFile) {
 		this.costFunction = costFunction;
 		
 		TObjectDoubleHashMap<SpatialVertex> budgets = new TObjectDoubleHashMap<SpatialVertex>();
@@ -48,8 +52,21 @@ public class ErgmEdgeCost extends ErgmTerm {
 		ThetaSolver solver = new ThetaSolver(costFunction);
 		TObjectDoubleHashMap<SpatialVertex> tmpThetas = solver.solve(budgets);
 		thetas = new double[y.getVertexCount()];
+		Distribution distr = new Distribution();
 		for(int i = 0; i < thetas.length; i++) {
 			thetas[i] = tmpThetas.get(y.getVertex(i));
+			distr.add(thetas[i]);
+		}
+		
+		if(thetaFile != null) {
+			double binsize = (distr.max() - distr.min())/100.0;
+			try {
+				Distribution.writeHistogram(distr.absoluteDistribution(binsize), thetaFile);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

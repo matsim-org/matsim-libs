@@ -24,9 +24,9 @@ import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntDoubleIterator;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 

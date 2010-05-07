@@ -25,7 +25,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+
 
 /**
  * @author illenberger

@@ -21,10 +21,10 @@ package playground.johannes.socialnetworks.graph.analysis;
 
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.math.Distribution;
 
 import playground.johannes.socialnetworks.graph.matrix.MatrixCentrality;
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 
 /**
  * @author illenberger
@@ -32,12 +32,12 @@ import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
  */
 public class Centrality {
 
-	private AdjacencyMatrixDecorator<Vertex> y;
+	private AdjacencyMatrix<Vertex> y;
 	
 	private MatrixCentrality mCentrality;
 	
 	public void init(Graph graph) {
-		y = new AdjacencyMatrixDecorator<Vertex>(graph);
+		y = new AdjacencyMatrix<Vertex>(graph);
 		mCentrality = new MatrixCentrality();
 		mCentrality.run(y);
 	}

@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
+import gnu.trove.TDoubleArrayList;
 import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntObjectHashMap;
@@ -27,9 +28,13 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.collections.list.FixedSizeList;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+
+import playground.johannes.socialnetworks.statistics.Discretizer;
+import playground.johannes.socialnetworks.statistics.FixedSampleSizeDiscretizer;
 
 import visad.data.netcdf.UnsupportedOperationException;
 
@@ -52,6 +57,8 @@ public class Estimator11 implements BiasedDistribution {
 	private TIntObjectHashMap<TIntDoubleHashMap> probaNeighborKIt = new TIntObjectHashMap<TIntDoubleHashMap>();
 	
 	private Map<SampledVertex, TIntIntHashMap> deltaVertex = new HashMap<SampledVertex, TIntIntHashMap>();
+	
+	private Discretizer discretizer;
 	
 	public Estimator11(int N) {
 		this.N = N;
@@ -157,6 +164,8 @@ public class Estimator11 implements BiasedDistribution {
 		return p_sum;
 	}
 	
+	final double binsize = 10.0;
+	
 	private int hasNeighborK(SampledVertex vertex, int k) {
 		TIntIntHashMap deltas = deltaVertex.get(vertex);
 		if(deltas == null) {
@@ -168,10 +177,12 @@ public class Estimator11 implements BiasedDistribution {
 		if(deltas.contains(k))
 			delta = deltas.get(k);
 		else {
+			int bin = discretize(k);
 			for(Vertex n : vertex.getNeighbours()) {
 				SampledVertex neighbor = (SampledVertex)n;
 				if(neighbor.isSampled()) {
-					if(neighbor.getNeighbours().size() == k) {
+					int k_n = neighbor.getNeighbours().size(); 
+					if(discretize(k_n) == bin) {
 						delta = 1;
 						break;
 					}
@@ -184,6 +195,12 @@ public class Estimator11 implements BiasedDistribution {
 		return delta;
 	}
 	
+	private int discretize(int k) {
+//		int bin = (int) Math.floor(Math.log(k)/Math.log(2.0));
+//		return Math.max(bin, 0);
+		return (int) discretizer.discretize(k);
+	}
+	
 	@Override
 	public double getWeight(SampledVertex vertex) {
 		throw new UnsupportedOperationException();
@@ -193,6 +210,14 @@ public class Estimator11 implements BiasedDistribution {
 	public void update(SampledGraph graph) {
 		stats = new SampleStats(graph);
 		this.graph = graph;
+		
+		TDoubleArrayList degrees = new TDoubleArrayList(graph.getVertices().size());
+		for(Vertex vertex : graph.getVertices()) {
+			if(((SampledVertex)vertex).isSampled()) {
+				degrees.add(vertex.getNeighbours().size());
+			}
+		}
+		discretizer = new FixedSampleSizeDiscretizer(degrees.toNativeArray(), 50);
 	}
 
 }

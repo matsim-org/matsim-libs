@@ -23,6 +23,8 @@
  */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+
 
 /**
  * @author illenberger
@@ -43,7 +45,7 @@ public class GibbsEdgeFlip extends GibbsSampler {
 	@Override
 	public void sample(AdjacencyMatrix y, ConditionalDistribution d, SampleHandler handler) {
 		int N = y.getVertexCount();
-		int M = y.getEdgeCount();
+		int M = y.countEdges();
 		edges = new int[M][2];
 		int idx_ij = 0;
 		for(int i = 0; i < N; i++) {

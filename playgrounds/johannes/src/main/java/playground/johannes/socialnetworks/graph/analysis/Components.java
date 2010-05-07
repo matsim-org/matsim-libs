@@ -31,10 +31,9 @@ import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 import playground.johannes.socialnetworks.graph.matrix.Dijkstra;
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 
 /**
  * @author illenberger
@@ -50,11 +49,11 @@ public class Components {
 	 * @return the number of disconnected components.
 	 */
 	public int countComponents(Graph graph) {
-		return extractComponents(new AdjacencyMatrix(graph)).size();
+		return extractComponents(new AdjacencyMatrix<Vertex>(graph)).size();
 	}
 
 	public Set<Set<Vertex>> components(Graph graph) {
-		AdjacencyMatrixDecorator<Vertex> y = new AdjacencyMatrixDecorator<Vertex>(graph);
+		AdjacencyMatrix<Vertex> y = new AdjacencyMatrix<Vertex>(graph);
 		Set<Set<Vertex>> components = new HashSet<Set<Vertex>>();
 		List<TIntArrayList> comps = extractComponents(y);
 		for(TIntArrayList comp : comps) {
@@ -67,7 +66,7 @@ public class Components {
 		return components;
 	}
 	
-	private List<TIntArrayList> extractComponents(AdjacencyMatrix y) {
+	private List<TIntArrayList> extractComponents(AdjacencyMatrix<?> y) {
 		boolean[] pending = new boolean[y.getVertexCount()];
 		Arrays.fill(pending, true);
 

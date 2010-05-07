@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+
 /**
  * @author illenberger
  *
@@ -27,7 +29,7 @@ public class ErgmPrefAttach extends ErgmTerm {
 
 	@Override
 	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij) {
-		int k = y.countNeighbours(j);
+		int k = y.getNeighborCount(j);
 		k = Math.min(k, 50);
 		if(y_ij)
 			return - getTheta() * (k-1);

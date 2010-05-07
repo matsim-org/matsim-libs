@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.generators.ErdosRenyiGenerator;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
@@ -35,7 +36,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.xml.sax.SAXException;
 
-import playground.johannes.socialnetworks.graph.generators.ErdosRenyiGenerator;
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeSwitch;
@@ -112,8 +112,8 @@ public class ErgmSimulator {
 		 */
 		ArrayList<ErgmTerm> terms = new ArrayList<ErgmTerm>();
 		
-		EdgeCostFunction costFunction = new GravityCostFunction(-1.6, 1.0);
-		ErgmEdgeCost edgeCost = new ErgmEdgeCost(y, costFunction, totalCost);
+		EdgeCostFunction costFunction = new GravityCostFunction(1.6, 1.0);
+		ErgmEdgeCost edgeCost = new ErgmEdgeCost(y, costFunction, totalCost, outputDir + "/thetas.txt");
 		terms.add(edgeCost);
 		
 		Ergm ergm = new Ergm();

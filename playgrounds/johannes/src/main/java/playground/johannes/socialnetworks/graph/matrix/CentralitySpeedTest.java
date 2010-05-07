@@ -23,10 +23,10 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 
 /**
  * @author illenberger
@@ -43,7 +43,7 @@ public class CentralitySpeedTest extends TestCase {
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		SpatialSparseGraph graph = reader.readGraph("/Volumes/hertz:ils-raid/socialnets/mcmc/runs/run45/output/2000000000/graph.graphml"); 
 		logger.info("Converting matrix...");
-		AdjacencyMatrixDecorator<SparseVertex> y = new AdjacencyMatrixDecorator<SparseVertex>(graph);
+		AdjacencyMatrix<SparseVertex> y = new AdjacencyMatrix<SparseVertex>(graph);
 		
 		logger.info("Calculation centrality measures...");
 		long time = System.currentTimeMillis();

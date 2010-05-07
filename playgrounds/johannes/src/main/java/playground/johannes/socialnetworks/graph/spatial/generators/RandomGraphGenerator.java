@@ -24,13 +24,13 @@ import java.io.IOException;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
+import org.matsim.contrib.sna.graph.generators.ErdosRenyiGenerator;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 
-import playground.johannes.socialnetworks.graph.generators.ErdosRenyiGenerator;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 
 /**

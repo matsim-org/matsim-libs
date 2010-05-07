@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
@@ -35,7 +36,6 @@ import org.matsim.contrib.sna.math.Distribution;
 
 import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
 import playground.johannes.socialnetworks.graph.io.PajekDegreeColorizer;
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixStatistics;
 import playground.johannes.socialnetworks.graph.mcmc.SampleHandler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
@@ -136,7 +136,7 @@ public class DumpHandler implements SampleHandler {
 	}
 
 	private void log(AdjacencyMatrix y, long iteration) {
-		double m = y.getEdgeCount();
+		double m = y.countEdges();
 		double k_mean = AdjacencyMatrixStatistics.getMeanDegree(y);
 		double c_local = AdjacencyMatrixStatistics.getLocalClusteringCoefficient(y);
 		double c_global = AdjacencyMatrixStatistics.getGlobalClusteringCoefficient(y);
@@ -159,7 +159,7 @@ public class DumpHandler implements SampleHandler {
 	protected SpatialSparseGraph dump(AdjacencyMatrix y, long iteration, TravelTimeMatrix matrix) {
 		logger.info("Dumping sample...");
 		
-		edges.add(y.getEdgeCount());
+		edges.add(y.countEdges());
 		degree.add(AdjacencyMatrixStatistics.getMeanDegree(y));
 		clustering.add(AdjacencyMatrixStatistics.getLocalClusteringCoefficient(y));
 		

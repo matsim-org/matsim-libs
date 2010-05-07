@@ -23,6 +23,8 @@
  */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+
 /**
  * @author illenberger
  *
@@ -31,7 +33,7 @@ public class AdjacencyMatrixStatistics {
 
 	public static double getDensity(AdjacencyMatrix y) {
 		int N = y.getVertexCount();
-		return 2 * y.getEdgeCount()/ (double)(N * (N - 1));
+		return 2 * y.countEdges()/ (double)(N * (N - 1));
 	}
 	
 	public static double getMeanDegree(AdjacencyMatrix y) {
@@ -61,7 +63,7 @@ public class AdjacencyMatrixStatistics {
 		int tripples = 0;
 		for(int i = 0; i < N; i++) {
 			triangles += y.countTriangles(i);
-			tripples += y.countTripples(i);
+			tripples += y.countTriples(i);
 		}
 		return triangles/(double)tripples;
 	}

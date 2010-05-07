@@ -117,7 +117,7 @@ public class VertexSamplingCounter implements SamplerListener {
 		VertexSamplingCounter counter = new VertexSamplingCounter(graph);
 		for(int i = 0; i < nSims; i++) {
 			Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>();
-			sampler.setSeedGenerator(new RandomSeedGenerator(100, (long) (Math.random() * nSims)));
+			sampler.setSeedGenerator(new RandomSeedGenerator(10, (long) (Math.random() * nSims)));
 			counter.reset(graph);
 			sampler.setListener(counter);
 			sampler.run(graph);

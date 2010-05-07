@@ -29,8 +29,8 @@ import java.util.List;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 
 /**
  * @author illenberger

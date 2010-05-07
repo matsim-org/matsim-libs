@@ -23,6 +23,8 @@
  */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+
 /**
  * @author illenberger
  *
@@ -32,9 +34,9 @@ public class ErgmTwoStars extends ErgmTerm {
 	@Override
 	public double changeStatistic(AdjacencyMatrix m, int i, int j, boolean y_ij) {
 		if(y_ij) {
-			return getTheta() * -(m.countNeighbours(i) + m.countNeighbours(j) - 2);
+			return getTheta() * -(m.getNeighborCount(i) + m.getNeighborCount(j) - 2);
 		} else {
-			return getTheta() * -(m.countNeighbours(i) + m.countNeighbours(j));
+			return getTheta() * -(m.getNeighborCount(i) + m.getNeighborCount(j));
 		}
 	}
 

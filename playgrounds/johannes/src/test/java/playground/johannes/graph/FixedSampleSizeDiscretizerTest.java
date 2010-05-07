@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GibbsEdgeReplace.java
+ * FixedSampleSizeDiscretizerTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,41 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.mcmc;
+package playground.johannes.graph;
 
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import java.util.Random;
+
+import junit.framework.TestCase;
+import playground.johannes.socialnetworks.statistics.Discretizer;
+import playground.johannes.socialnetworks.statistics.FixedSampleSizeDiscretizer;
 
 /**
  * @author illenberger
  *
  */
-public class GibbsEdgeSwitch extends GibbsEdgeFlip {
+public class FixedSampleSizeDiscretizerTest extends TestCase {
 
-	@Override
-	public boolean step(AdjacencyMatrix y, ConditionalDistribution d) {
-		boolean accept = false;
-		int idx_ij = random.nextInt(edges.length);
-		int i = edges[idx_ij][0];
-		int j = edges[idx_ij][1];
+	public void test() {
+		Random random = new Random(0);
+		double samples[] = new double[100]; 
+		for(int i = 0; i < 100; i++)
+			samples[i] = random.nextInt(100);
 		
-		int u = random.nextInt(y.getVertexCount());
-		int v = random.nextInt(y.getVertexCount());
+		Discretizer discretizer = new FixedSampleSizeDiscretizer(samples, 10);
 		
-		if(u != v && !y.getEdge(u, v)) {
-			double p_change = 1/d.changeStatistic(y, i, j, true) * d.changeStatistic(y, u, v, false);
-			
-			double p = 1 / (1 + p_change);
-			if(random.nextDouble() <= p) {
-				y.removeEdge(i, j);
-				y.addEdge(u, v);
-				
-				edges[idx_ij][0] = u;
-				edges[idx_ij][1] = v;
-				
-				accept = true;
-			}
-		}
-		
-		return accept;
+		assertEquals(12.0, discretizer.discretize(10));
+		assertEquals(19.0, discretizer.discretize(13));
+		assertEquals(29.0, discretizer.discretize(29));
+		assertEquals(98.0, discretizer.discretize(89));
 	}
 }

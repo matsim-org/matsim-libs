@@ -26,6 +26,7 @@ package playground.johannes.socialnetworks.graph.mcmc;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 
 /**

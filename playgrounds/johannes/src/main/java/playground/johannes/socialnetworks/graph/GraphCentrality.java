@@ -19,14 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph;
 
+import gnu.trove.TIntIntIterator;
+import gnu.trove.TObjectIntHashMap;
+
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
-import gnu.trove.TIntIntIterator;
-import gnu.trove.TObjectIntHashMap;
 import playground.johannes.socialnetworks.graph.matrix.MatrixCentrality;
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 
 /**
  * @author illenberger
@@ -47,7 +48,7 @@ public class GraphCentrality {
 	}
 	
 	public void calculate() {
-		AdjacencyMatrixDecorator<? extends Vertex> y = new AdjacencyMatrixDecorator<Vertex>(g);
+		AdjacencyMatrix<? extends Vertex> y = new AdjacencyMatrix<Vertex>(g);
 		
 		MatrixCentrality c = new MatrixCentrality();
 		c.run(y);

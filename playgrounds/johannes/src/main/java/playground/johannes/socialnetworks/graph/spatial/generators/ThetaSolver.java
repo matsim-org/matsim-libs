@@ -68,8 +68,8 @@ public class ThetaSolver {
 		TObjectDoubleHashMap<SpatialVertex> thetas = new TObjectDoubleHashMap<SpatialVertex>();
 		
 		solver = new NewtonSolver();
-		solver.setMaximalIterationCount(1000);
-		solver.setAbsoluteAccuracy(0.001);
+		solver.setMaximalIterationCount(2000);
+		solver.setAbsoluteAccuracy(0.0001);
 		
 		int iterCount = 0;
 		
@@ -79,9 +79,11 @@ public class ThetaSolver {
 			double theta = solve(it.key(), it.value(), vertices);
 			thetas.put(it.key(), theta);
 			iterCount += solver.getIterationCount();
-			
-			if(i % 100 == 0)
+//			System.out.println(String.valueOf(theta));
+			if(i % 100 == 0) {
 				logger.info(String.format("Processed %1$s out of %2$s vertices.", i, budgets.size()));
+				logger.info(String.format("Average number of iterations: %1$s", iterCount/(float)i));
+			}
 		}
 		
 		return thetas;
@@ -90,13 +92,13 @@ public class ThetaSolver {
 	private double solve(SpatialVertex vertex, double budget, Set<SpatialVertex> vertices) {
 		DifferentiableUnivariateRealFunction func = new Primitive(vertex, costFunction, budget, vertices);
 		try {
-			return solver.solve(func, THETA_MIN, THETA_MAX, 80.0);
+			return solver.solve(func, THETA_MIN, THETA_MAX);
 		} catch (MaxIterationsExceededException e) {
 			e.printStackTrace();
 		} catch (FunctionEvaluationException e) {
 			e.printStackTrace();
 		}
-		return 0;
+		return solver.getResult();
 	}
 	
 	private class Primitive implements DifferentiableUnivariateRealFunction {
@@ -156,7 +158,7 @@ public class ThetaSolver {
 			for(SpatialVertex vj : primitive.vertices) {
 				if(primitive.vi != vj) {
 					double c = primitive.costFunction.edgeCost(primitive.vi, vj);
-					sum += c * c * Math.exp(-x * c) - primitive.budget;
+					sum += -c * c * Math.exp(-x * c) - primitive.budget;
 				}
 			}
 			
@@ -169,7 +171,7 @@ public class ThetaSolver {
 		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		SpatialSparseGraph graph = reader.read(args[0]);
 		
-		GravityCostFunction func = new GravityCostFunction(-1.6, 1.0);
+		GravityCostFunction func = new GravityCostFunction(1.6, 1.0);
 		ThetaSolver solver = new ThetaSolver(func);
 		
 		TObjectDoubleHashMap<SpatialVertex> budgets = new TObjectDoubleHashMap<SpatialVertex>();

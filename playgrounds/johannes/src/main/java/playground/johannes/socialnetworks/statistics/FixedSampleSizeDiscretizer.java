@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SNAdjacencyMatrix.java
+ * FixedSampleSizeDiscretizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,55 +17,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.statistics;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import gnu.trove.TDoubleArrayList;
+import gnu.trove.TDoubleIntHashMap;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.core.utils.collections.Tuple;
-
+import java.util.Arrays;
 
 /**
  * @author illenberger
  *
  */
-public class AdjacencyMatrixDecorator<V extends Vertex> extends AdjacencyMatrix {
+public class FixedSampleSizeDiscretizer implements Discretizer {
 
-	private List<V> vertices;
+	private TDoubleArrayList borders;
 	
-	@SuppressWarnings("unchecked")
-	public AdjacencyMatrixDecorator(Graph g) {
-		super();
-		vertices = new ArrayList<V>(g.getVertices().size());
-		
-		int idx = 0;
-		for(Vertex v : g.getVertices()) {
-			vertices.add((V)v);
-			addVertex();
-			idx++;
+	public FixedSampleSizeDiscretizer(double[] samples, int minSize) {
+		Arrays.sort(samples);
+		TDoubleIntHashMap hist = new TDoubleIntHashMap(samples.length);
+		for(int i = 0; i < samples.length; i++) {
+			hist.adjustOrPutValue(samples[i], 1, 1);
 		}
 		
-		for(Edge e : g.getEdges()) {
-			Tuple<? extends Vertex, ? extends Vertex> p = e.getVertices();
-			int i = vertices.indexOf(p.getFirst());
-			int j = vertices.indexOf(p.getSecond());
-			
-			if(i > -1 && j > -1) {
-				addEdge(i, j);
-			} else {
-				throw new IllegalArgumentException(String.format("Indices i=%1$s, j=%2$s not allowed!", i, j));
+		double keys[] = hist.keys();
+		Arrays.sort(keys);
+		borders = new TDoubleArrayList(keys.length);
+		int size = 0;
+		for(int i = 0; i < keys.length; i++) {
+			size += hist.get(keys[i]);
+			if(size >= minSize) {
+				borders.add(keys[i]);
+				size = 0;
 			}
 		}
+		if(size > 0)
+			borders.add(samples[samples.length - 1]);
 	}
 	
-	public V getVertex(int i) {
-		return vertices.get(i);
+	@Override
+	public double discretize(double value) {
+		int idx = borders.binarySearch(value);
+		if(idx > -1) {
+			return borders.get(idx);
+		} else {
+			return borders.get(-idx - 1);
+		}
 	}
+
 }

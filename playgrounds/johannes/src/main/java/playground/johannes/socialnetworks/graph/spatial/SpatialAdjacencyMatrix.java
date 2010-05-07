@@ -19,20 +19,21 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial;
 
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntObjectHashMap;
+
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntObjectHashMap;
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialAdjacencyMatrix extends AdjacencyMatrixDecorator<SpatialSparseVertex> {
+public class SpatialAdjacencyMatrix extends AdjacencyMatrix<SpatialSparseVertex> {
 	
 	private final CoordinateReferenceSystem crs;
 	

@@ -23,9 +23,9 @@
  */
 package playground.johannes.socialnetworks.graph.social.mcmc;
 
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.core.population.PersonImpl;
 
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 
 /**
