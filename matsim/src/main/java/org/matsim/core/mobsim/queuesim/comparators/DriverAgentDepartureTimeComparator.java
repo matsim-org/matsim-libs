@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimVehicle.java
+ * DriverAgentDepartureTimeComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.core.mobsim.queuesim.comparators;
 
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
+import java.io.Serializable;
+import java.util.Comparator;
+
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.vehicles.BasicVehicle;
 
-public interface QueueVehicle extends Identifiable {
+/**
+ * Compares two {@link PersonDriverAgent}s according to their (planned) departure time. If the 
+ * departure times are the same, the agent with the higher id is considered smaller.
+ *
+ * @author mrieser
+ * 
+ * @see PersonDriverAgent#getDepartureTime()
+ */
+public class DriverAgentDepartureTimeComparator implements Comparator<PersonDriverAgent>, Serializable {
 
-	public PersonDriverAgent getDriver();
+	private static final long serialVersionUID = 1L;
 
-	public void setDriver(final PersonDriverAgent driver);
-	
-	public Link getCurrentLink();
-	
-	public void setCurrentLink(final Link link);
-	
-	public double getSizeInEquivalents();
-	
-	public double getLinkEnterTime();
-	
-	public void setLinkEnterTime(final double time);
-
-	public double getEarliestLinkExitTime();
-
-	public void setEarliestLinkExitTime(final double time);
-
-	/**
-	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
-	 */
-	public BasicVehicle getBasicVehicle();
+	public int compare(PersonDriverAgent agent1, PersonDriverAgent agent2) {
+		int cmp = Double.compare(agent1.getDepartureTime(), agent2.getDepartureTime());
+		if (cmp == 0) {
+			// Both depart at the same time -> let the one with the larger id be first (=smaller)
+			return agent2.getPerson().getId().compareTo(agent1.getPerson().getId());
+		}
+		return cmp;
+	}
 
 }

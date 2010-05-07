@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -81,7 +82,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		//we have to do it like this
 		//can be seen as reason why static access from an object should be avoided
 		try {
-			f.qlink1.add(v);
+			f.qlink1.addFromIntersection(v);
 		}
 		catch (Exception ex) {
 			e = ex;
@@ -106,7 +107,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QueueSimulation qsim = new QueueSimulation(f.scenario, new EventsManagerImpl());
+		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(f.scenario, new EventsManagerImpl());
 
 		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(23));
@@ -130,7 +131,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		assertEquals(0, f.qlink1.getAllVehicles().size());
 
 		// add a vehicle, it should be now in the vehicle queue
-		f.qlink1.add(veh);
+		f.qlink1.addFromIntersection(veh);
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(1, f.qlink1.vehOnLinkCount());
 		assertEquals("vehicle not found on link.", veh, f.qlink1.getVehicle(id1));
@@ -163,7 +164,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QueueSimulation qsim = new QueueSimulation(f.scenario, new EventsManagerImpl());
+		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(f.scenario, new EventsManagerImpl());
 
 		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(42));
@@ -209,7 +210,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QueueSimulation qsim = new QueueSimulation(f.scenario, new EventsManagerImpl());
+		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(f.scenario, new EventsManagerImpl());
 
 		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(80));
@@ -273,7 +274,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		qlink.setSimEngine(simEngine);
 		qlink.finishInit();
 
-		QueueSimulation qsim = new QueueSimulation(scenario, new EventsManagerImpl());
+		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, new EventsManagerImpl());
 		QueueVehicleImpl v1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl("1"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		PlanImpl plan = p.createAndAddPlan(true);
@@ -303,7 +304,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		assertTrue(qlink.bufferIsEmpty());
 		assertEquals(0, qlink.vehOnLinkCount());
 		// add v1
-		qlink.add(v1);
+		qlink.addFromIntersection(v1);
 		assertEquals(1, qlink.vehOnLinkCount());
 		assertTrue(qlink.bufferIsEmpty());
 		// time step 1, v1 is moved to buffer
@@ -311,7 +312,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		assertEquals(0, qlink.vehOnLinkCount());
 		assertFalse(qlink.bufferIsEmpty());
 		// add v2, still time step 1
-		qlink.add(v2);
+		qlink.addFromIntersection(v2);
 		assertEquals(1, qlink.vehOnLinkCount());
 		assertFalse(qlink.bufferIsEmpty());
 		// time step 2, v1 still in buffer, v2 cannot enter buffer, so still on link
@@ -339,7 +340,7 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testStorageSpaceDifferentVehicleSizes() {
 		Fixture f = new Fixture();
 		PersonImpl p = new PersonImpl(new IdImpl(5));
-		QueueSimulation qsim = new QueueSimulation(new ScenarioImpl(), new EventsManagerImpl());
+		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(new ScenarioImpl(), new EventsManagerImpl());
 
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		QueueVehicle veh1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(1), vehType));
@@ -350,9 +351,9 @@ public class QueueLinkTest extends MatsimTestCase {
 		veh5.setDriver(new QueuePersonAgent(p, null));
 
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getSpaceCap(), EPSILON);
-		f.qlink2.add(veh5);  // used vehicle equivalents: 5
+		f.qlink2.addFromIntersection(veh5);  // used vehicle equivalents: 5
 		assertTrue(f.qlink2.hasSpace());
-		f.qlink2.add(veh5);  // used vehicle equivalents: 10
+		f.qlink2.addFromIntersection(veh5);  // used vehicle equivalents: 10
 		assertFalse(f.qlink2.hasSpace());
 
 		assertTrue(f.qlink2.bufferIsEmpty());
@@ -362,18 +363,18 @@ public class QueueLinkTest extends MatsimTestCase {
 		f.qlink2.popFirstFromBuffer();  // first veh leaves buffer
 		assertTrue(f.qlink2.hasSpace());
 
-		f.qlink2.add(veh25); // used vehicle equivalents: 7.5
-		f.qlink2.add(veh1);  // used vehicle equivalents: 8.5
-		f.qlink2.add(veh1);  // used vehicle equivalents: 9.5
+		f.qlink2.addFromIntersection(veh25); // used vehicle equivalents: 7.5
+		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 8.5
+		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 9.5
 		assertTrue(f.qlink2.hasSpace());
-		f.qlink2.add(veh1);  // used vehicle equivalents: 10.5
+		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 10.5
 		assertFalse(f.qlink2.hasSpace());
 
 		f.qlink2.moveLink(6.0); // first veh moves to buffer, used vehicle equivalents: 5.5
 		assertTrue(f.qlink2.hasSpace());
-		f.qlink2.add(veh1);  // used vehicle equivalents: 6.5
-		f.qlink2.add(veh25); // used vehicle equivalents: 9.0
-		f.qlink2.add(veh1);  // used vehicle equivalents: 10.0
+		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 6.5
+		f.qlink2.addFromIntersection(veh25); // used vehicle equivalents: 9.0
+		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 10.0
 		assertFalse(f.qlink2.hasSpace());
 
 	}

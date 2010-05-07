@@ -54,6 +54,9 @@ import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
+import org.matsim.core.mobsim.queuesim.comparators.DriverAgentDepartureTimeComparator;
+import org.matsim.core.mobsim.queuesim.interfaces.QueueNetworkFactory;
+import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -141,12 +144,12 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 * @param scenario
 	 * @param events
 	 */
-	public QueueSimulation(final Scenario scenario, final EventsManager events) {
+	protected QueueSimulation(final Scenario scenario, final EventsManager events) {
 		this(scenario, events, new DefaultQueueNetworkFactory());
 	}
 
 
-	public QueueSimulation(final Scenario sc, final EventsManager events, final QueueNetworkFactory factory){
+	protected QueueSimulation(final Scenario sc, final EventsManager events, final QueueNetworkFactory factory){
 		this.scenario = sc;
 		this.config = scenario.getConfig();
 		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
@@ -169,6 +172,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 * listener to this QueueSimulation instance.
 	 * @param listeners
 	 */
+	@Override
 	public void addQueueSimulationListeners(final SimulationListener listener){
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
@@ -217,18 +221,19 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		}
 	}
 
-	@Deprecated // I don't think that netvis works any more.  kai, apr/10
-	public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
-		/* TODO [MR] I don't really like it that we change the configuration on the fly here.
-		 * In my eyes, the configuration should usually be a read-only object in general, but
-		 * that's hard to be implemented...
-		 */
-		// yyyy it is also a misnomer, since it (presumably) has the side effect of removing all other snapshot writers.  kai, apr'10
-		this.config.network().setInputFile(networkFilename);
-		this.config.simulation().setSnapshotFormat("netvis");
-		this.config.simulation().setSnapshotPeriod(snapshotPeriod);
-		this.config.simulation().setSnapshotFile(snapshotFilename);
-	}
+//	@Deprecated // I don't think that netvis works any more.  kai, apr/10
+//	public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
+//		/* TODO [MR] I don't really like it that we change the configuration on the fly here.
+//		 * In my eyes, the configuration should usually be a read-only object in general, but
+//		 * that's hard to be implemented...
+//		 */
+//		// yyyy it is also a misnomer, since it (presumably) has the side effect of removing all other snapshot writers.  kai, apr'10
+//		this.config.network().setInputFile(networkFilename);
+//		this.config.simulation().setSnapshotFormat("netvis");
+//		this.config.simulation().setSnapshotPeriod(snapshotPeriod);
+//		this.config.simulation().setSnapshotFile(snapshotFilename);
+//	}
+	// netvis is gone.  kai, may'10
 
 	private void createSnapshotwriter() {
 		// A snapshot period of 0 or less indicates that there should be NO snapshot written
@@ -396,7 +401,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	}
 
-	public static final EventsManager getEvents() {
+	/* package */ static final EventsManager getEvents() {
 		return events;
 	}
 
@@ -528,15 +533,15 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		}
 	}
 
-	public boolean addSnapshotWriter(final SnapshotWriter writer) {
+	/*package*/ boolean addSnapshotWriter(final SnapshotWriter writer) {
 		return this.snapshotWriters.add(writer);
 	}
 
-	public boolean removeSnapshotWriter(final SnapshotWriter writer) {
+	/*package*/ boolean removeSnapshotWriter(final SnapshotWriter writer) {
 		return this.snapshotWriters.remove(writer);
 	}
 
-	public void setAgentFactory(final AgentFactory fac) {
+	/*package*/ void setAgentFactory(final AgentFactory fac) {
 		this.agentFactory = fac;
 	}
 
@@ -551,7 +556,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 *
 	 * @param teleportVehicles
 	 */
-	public void setTeleportVehicles(final boolean teleportVehicles) {
+	/*package*/ void setTeleportVehicles(final boolean teleportVehicles) {
 		this.teleportVehicles = teleportVehicles;
 	}
 
@@ -566,30 +571,30 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		}
 	}
 
-	public QueueNetwork getQueueNetwork() {
+	public QueueNetwork getQueueNetwork() { // accessed from elsewhere; "QueueNetwork" should be replaced by interface. kai, may'10
 		return this.network;
 	}
 
-	public Scenario getScenario() {
+	/*package*/ Scenario getScenario() {
 		return this.scenario;
 	}
 
 
-	public boolean isUseActivityDurations() {
+	/*package*/ boolean isUseActivityDurations() {
 		return this.useActivityDurations;
 	}
 
-	public void setUseActivityDurations(final boolean useActivityDurations) {
+	/*package*/ void setUseActivityDurations(final boolean useActivityDurations) {
 		this.useActivityDurations = useActivityDurations;
 		log.info("QueueSimulation is working with activity durations: " + this.isUseActivityDurations());
 	}
 
-	public Set<TransportMode> getNotTeleportedModes() {
+	/*package*/ Set<TransportMode> getNotTeleportedModes() {
 		return notTeleportedModes;
 	}
 
 
-	public Integer getIterationNumber() {
+	/*package*/ Integer getIterationNumber() {
 		return iterationNumber;
 	}
 

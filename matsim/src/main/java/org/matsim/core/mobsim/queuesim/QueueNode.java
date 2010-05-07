@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
 
 /**
  * Represents a node in the QueueSimulation.
@@ -48,9 +49,9 @@ public class QueueNode {
 
 	private final Node node;
 
-	public QueueNetwork queueNetwork;
+	private QueueNetwork queueNetwork;
 
-	public QueueNode(final Node n, final QueueNetwork queueNetwork) {
+	/* package */ QueueNode(final Node n, final QueueNetwork queueNetwork) {
 		this.node = n;
 		this.queueNetwork = queueNetwork;
 
@@ -77,7 +78,7 @@ public class QueueNode {
 		Arrays.sort(this.inLinksArrayCache, QueueNode.qlinkIdComparator);
 	}
 
-	public Node getNode() {
+	public Node getNode() { // accessed from elsewhere
 		return this.node;
 	}
 
@@ -108,7 +109,7 @@ public class QueueNode {
 			if (nextQueueLink.hasSpace()) {
 				link.popFirstFromBuffer();
 				veh.getDriver().moveOverNode();
-				nextQueueLink.add(veh);
+				nextQueueLink.addFromIntersection(veh);
 				return true;
 			}
 
@@ -128,7 +129,7 @@ public class QueueNode {
 				} else {
 					link.popFirstFromBuffer();
 					veh.getDriver().moveOverNode();
-					nextQueueLink.add(veh);
+					nextQueueLink.addFromIntersection(veh);
 					return true;
 				}
 			}
@@ -150,7 +151,7 @@ public class QueueNode {
 		this.active = true;
 	}
 
-	public final boolean isActive() {
+	/*package*/ final boolean isActive() {
 		return this.active;
 	}
 
@@ -170,7 +171,7 @@ public class QueueNode {
 	 *          The current time in seconds from midnight.
 	 * @param random the random number generator to be used
 	 */
-	public void moveNode(final double now, final Random random) {
+	/*package*/ void moveNode(final double now, final Random random) {
 	  int inLinksCounter = 0;
 	  double inLinksCapSum = 0.0;
 	  // Check all incoming links for buffered agents

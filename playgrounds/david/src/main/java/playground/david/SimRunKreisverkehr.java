@@ -28,6 +28,7 @@ import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -93,8 +94,9 @@ public class SimRunKreisverkehr {
 		//Config.getSingleton().setParam(Simulation.SIMULATION, Simulation.STARTTIME, "05:55:00");
 		//Config.getSingleton().setParam(Simulation.SIMULATION, Simulation.ENDTIME, "08:00:00");
 
-		QueueSimulation sim = new QueueSimulation(scenario, events);
-		sim.openNetStateWriter("../../tmp/testWrite2", netFileName, 60);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+//		sim.openNetStateWriter("../../tmp/testWrite2", netFileName, 60);
+		// netvis is gone.  kai, may'10
 
 		sim.run();
 

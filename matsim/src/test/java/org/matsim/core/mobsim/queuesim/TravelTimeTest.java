@@ -56,7 +56,7 @@ public class TravelTimeTest {
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
-		new QueueSimulation(data, events).run();
+		QueueSimulationFactory.createMobsimStatic(data, events).run();
 
 		Map<Id, Double> travelTimes = agentTravelTimes.get(new IdImpl("1"));
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), MatsimTestUtils.EPSILON);
@@ -82,7 +82,7 @@ public class TravelTimeTest {
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
-		new QueueSimulation(data, events).run();
+		QueueSimulationFactory.createMobsimStatic(data, events).run();
 
 		Map<Id, Double> travelTimes = agentTravelTimes.get(new IdImpl("1"));
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), MatsimTestUtils.EPSILON);

@@ -27,6 +27,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
@@ -46,6 +47,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 	private final int travelTimeBinSize;
 	private final int numSlots;
 	private final NetworkLayer network;
+	private final EventsManager events ;
 
 
 	private final HashMap<String,AgentInfo> agentInfos = new HashMap<String, AgentInfo>();
@@ -60,19 +62,20 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 	static int iteration = 0;
 	private final double storageCapFactor;
 
-	public SocialCostCalculatorNetwork(final NetworkLayer network, final double storageCapFactor) {
-		this(network, 15*60, 30*3600, storageCapFactor);	// default timeslot-duration: 15 minutes
+	public SocialCostCalculatorNetwork(final NetworkLayer network, final double storageCapFactor, final EventsManager events ) {
+		this(network, 15*60, 30*3600, storageCapFactor, events );	// default timeslot-duration: 15 minutes
 	}
 
-	public SocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice, final double storageCapFactor) {
-		this(network, timeslice, 30*3600, storageCapFactor); // default: 30 hours at most
+	public SocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice, final double storageCapFactor, final EventsManager events ) {
+		this(network, timeslice, 30*3600, storageCapFactor, events ); // default: 30 hours at most
 	}
 
-	public SocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice,	final int maxTime, final double storageCapFactor) {
+	public SocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice,	final int maxTime, final double storageCapFactor, final EventsManager events ) {
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
 		this.network = network;
 		this.storageCapFactor = storageCapFactor;
+		this.events = events ;
 	}
 
 	public double getSocialCost(final LinkImpl link, final double time) {
@@ -200,12 +203,14 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 			for (String agentId : toCongested) {
 				Id id = new IdImpl(agentId);
 				AgentMoneyEventImpl e = new AgentMoneyEventImpl(currentTimeUncongested,id,scoringCost);
-				QueueSimulation.getEvents().processEvent(e);
+//				QueueSimulation.getEvents().processEvent(e);
+				events.processEvent(e);
 			}
 			for (String agentId : toUncongested) {
 				Id id = new IdImpl(agentId);
 				AgentMoneyEventImpl e = new AgentMoneyEventImpl(currentTimeUncongested,id,scoringCost);
-				QueueSimulation.getEvents().processEvent(e);
+//				QueueSimulation.getEvents().processEvent(e);
+				events.processEvent(e);
 			}
 
 		}

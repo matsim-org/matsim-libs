@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VehicleDepartureTimeComparator.java
+ * SimVehicle.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,31 +18,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.core.mobsim.queuesim.interfaces;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.vehicles.BasicVehicle;
 
-/**
- * @author dstrippgen
- *
- * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
- * according to their departure time
- */
-public class QueueVehicleEarliestLinkExitTimeComparator implements Comparator<QueueVehicle>,
-		Serializable {
+public interface QueueVehicle extends Identifiable {
 
-	private static final long serialVersionUID = 1L;
+	public PersonDriverAgent getDriver();
 
-	public int compare(final QueueVehicle veh1, final QueueVehicle veh2) {
-		if (veh1.getEarliestLinkExitTime() > veh2.getEarliestLinkExitTime()) {
-			return 1;
-		}
-		if (veh1.getEarliestLinkExitTime() < veh2.getEarliestLinkExitTime()) {
-			return -1;
-		}
+	public void setDriver(final PersonDriverAgent driver);
+	
+	public Link getCurrentLink();
+	
+	public void setCurrentLink(final Link link);
+	
+	public double getSizeInEquivalents();
+	
+	public double getLinkEnterTime();
+	
+	public void setLinkEnterTime(final double time);
 
-		// Both depart at the same time -> let the one with the larger id be first
-		return veh2.getId().compareTo(veh1.getId());
-	}
+	public double getEarliestLinkExitTime();
+
+	public void setEarliestLinkExitTime(final double time);
+
+	/**
+	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
+	 */
+	public BasicVehicle getBasicVehicle();
+
 }

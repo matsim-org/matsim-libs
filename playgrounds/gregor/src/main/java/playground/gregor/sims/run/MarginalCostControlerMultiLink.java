@@ -46,7 +46,7 @@ public class MarginalCostControlerMultiLink extends Controler{
 //		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 //		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 //		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
-		final SocialCostCalculatorMultiLink sc = new SocialCostCalculatorMultiLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), this.travelTimeCalculator, this.population);
+		final SocialCostCalculatorMultiLink sc = new SocialCostCalculatorMultiLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), this.travelTimeCalculator, this.population, this.events );
 		
 		this.events.addHandler(sc);
 		this.getQueueSimulationListener().add(sc);

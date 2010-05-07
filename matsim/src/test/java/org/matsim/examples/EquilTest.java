@@ -25,6 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -55,7 +56,7 @@ public class EquilTest extends MatsimTestCase {
 		events.addHandler(writer);
 
 		SimulationTimer.setTime(0);
-		QueueSimulation sim = new QueueSimulation(scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
 		sim.run();
 
 		writer.closeFile();

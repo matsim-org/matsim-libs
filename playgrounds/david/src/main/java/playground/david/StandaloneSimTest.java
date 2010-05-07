@@ -34,6 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -154,7 +155,7 @@ public class StandaloneSimTest {
 
 //		QueueLink link = (QueueLink)network.getLinks().get("15");
 //		link.setCapacity()
-		QueueSimulation sim = new QueueSimulation(scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
 		//sim.openNetStateWriter("testWrite", netFileName, 10);
 		config.simulation().setSnapshotFormat("none");
 		config.simulation().setSnapshotPeriod(300);

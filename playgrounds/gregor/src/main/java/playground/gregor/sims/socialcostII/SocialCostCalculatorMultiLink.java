@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
@@ -42,6 +43,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 	private final int binSize;
 	private final TravelTimeCalculator travelTimeCalculator;
 	private final Population population;
+	private EventsManager events ;
 	
 	private Integer maxK;
 	private final int minK;
@@ -55,13 +57,14 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 
 	private final static int MSA_OFFSET = 0;
 	
-	public SocialCostCalculatorMultiLink(Network network, int binSize, TravelTimeCalculator travelTimeCalculator, Population population) {
+	public SocialCostCalculatorMultiLink(Network network, int binSize, TravelTimeCalculator travelTimeCalculator, Population population, EventsManager events ) {
 		this.network = network;
 		this.binSize = binSize;
 		this.minK = (int)(3 * 3600 / (double)binSize); //just a HACK needs to be fixed
 		this.travelTimeCalculator = travelTimeCalculator;
 		this.population = population;
 		this.discount = MarginalCostControlerMultiLink.QUICKnDIRTY;
+		this.events = events ;
 	}
 	
 	public double getLinkTravelCost(Link link, double time) {
@@ -180,7 +183,8 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 				cost += getLinkTravelCost(this.network.getLinks().get(id), li.getAgentEnterTime(pers.getId()));
 			}
 			AgentMoneyEventImpl e = new AgentMoneyEventImpl(this.maxK * this.binSize,pers.getId(),cost/-600);
-			QueueSimulation.getEvents().processEvent(e);
+//			QueueSimulation.getEvents().processEvent(e);
+			events.processEvent(e);
 		}
 		
 	}
@@ -249,7 +253,8 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 			}
 		}
 		AgentMoneyEventImpl e = new AgentMoneyEventImpl(this.maxK * this.binSize,agentId,agentDelay/-600);
-		QueueSimulation.getEvents().processEvent(e);
+//		QueueSimulation.getEvents().processEvent(e);
+		events.processEvent(e);
 		
 	}
 

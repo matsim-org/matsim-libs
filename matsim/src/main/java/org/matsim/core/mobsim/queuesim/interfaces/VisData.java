@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.core.mobsim.queuesim.interfaces;
 
 import java.util.Collection;
 

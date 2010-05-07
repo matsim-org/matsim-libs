@@ -34,6 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
@@ -64,7 +65,7 @@ public class QueuePersonAgent implements PersonDriverAgent {
 
 	private int currentLinkIdIndex;
 
-	public QueuePersonAgent(final Person p, final QueueSimulation simulation) {
+	/*package*/ QueuePersonAgent(final Person p, final QueueSimulation simulation) {
 		this.person = p;
 		this.simulation = simulation;
 	}
@@ -82,11 +83,11 @@ public class QueuePersonAgent implements PersonDriverAgent {
 		return this.person.getSelectedPlan().getPlanElements();
 	}
 
-	public void setVehicle(final QueueVehicle veh) {
+	/*package*/ void setVehicle(final QueueVehicle veh) {
 		this.vehicle = veh;
 	}
 
-	public QueueVehicle getVehicle() {
+	/*package*/ QueueVehicle getVehicle() {
 		return this.vehicle;
 	}
 
@@ -118,7 +119,7 @@ public class QueuePersonAgent implements PersonDriverAgent {
 		return this.destinationLinkId;
 	}
 
-	public boolean initialize() {
+	boolean initialize() {
 		this.currentPlanElementIndex = 0;
 		Activity firstAct = (Activity) this.getCurrentPlanElement() ;
 		double departureTime = firstAct.getEndTime();

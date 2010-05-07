@@ -17,11 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.core.mobsim.queuesim.interfaces;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.QueueNode;
 
 
 /**
@@ -29,8 +32,8 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface QueueNetworkFactory<QN extends QueueNode, QL extends QueueLink> extends MatsimFactory {
 
-	public QN newQueueNode(Node node, QueueNetwork queueNetwork);
+	public QN createQueueNode(Node node, QueueNetwork queueNetwork);
 
-	public QL newQueueLink(Link link, QueueNetwork queueNetwork, QN queueNode);
+	public QL createQueueLink(Link link, QueueNetwork queueNetwork, QN queueNode);
 
 }

@@ -18,10 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.core.mobsim.queuesim.comparators;
 
 import java.io.Serializable;
 import java.util.Comparator;
+
+import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
 
 /**
  * @author dstrippgen
@@ -29,16 +31,18 @@ import java.util.Comparator;
  * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
  * according to their departure time
  */
-public class QueueVehicleDepartureTimeComparator implements Comparator<QueueVehicle>,
+public class QueueVehicleEarliestLinkExitTimeComparator implements Comparator<QueueVehicle>,
 		Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	public int compare(final QueueVehicle veh1, final QueueVehicle veh2) {
-		if (veh1.getDriver().getDepartureTime() > veh2.getDriver().getDepartureTime())
+		if (veh1.getEarliestLinkExitTime() > veh2.getEarliestLinkExitTime()) {
 			return 1;
-		if (veh1.getDriver().getDepartureTime() < veh2.getDriver().getDepartureTime())
+		}
+		if (veh1.getEarliestLinkExitTime() < veh2.getEarliestLinkExitTime()) {
 			return -1;
+		}
 
 		// Both depart at the same time -> let the one with the larger id be first
 		return veh2.getId().compareTo(veh1.getId());

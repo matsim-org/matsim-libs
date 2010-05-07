@@ -36,6 +36,8 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
+import org.matsim.core.mobsim.queuesim.interfaces.VisData;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -134,7 +136,7 @@ public class QueueLink {
    * @param toNode
    * @see QueueLink#createLanes(java.util.List)
    */
-  public QueueLink(final Link link2, final QueueNetwork queueNetwork, final QueueNode toNode) {
+  /* package */ QueueLink(final Link link2, final QueueNetwork queueNetwork, final QueueNode toNode) {
     this.link = link2;
     this.queueNetwork = queueNetwork;
     this.toQueueNode = toNode;
@@ -144,15 +146,15 @@ public class QueueLink {
   }
 
   /** Is called after link has been read completely */
-  public void finishInit() {
+  public void finishInit() { // needs to remain public
     this.active = false;
   }
 
-  public void setSimEngine(final QueueSimEngine simEngine) {
+  /*package*/ void setSimEngine(final QueueSimEngine simEngine) {
     this.simEngine = simEngine;
   }
 
-  public void activateLink() {
+  private void activateLink() {
     if (!this.active) {
       this.simEngine.activateLink(this);
       this.active = true;
@@ -166,7 +168,7 @@ public class QueueLink {
    * @param veh
    *          the vehicle
    */
-  public void add(final QueueVehicle veh) {
+  /* package */ void addFromIntersection(final QueueVehicle veh) {
     double now = SimulationTimer.getTime();
     activateLink();
     this.add(veh, now);
@@ -198,7 +200,7 @@ public class QueueLink {
     veh.setEarliestLinkExitTime(departureTime);
   }
 
-  public void clearVehicles() {
+  /* package */ void clearVehicles() {
     this.parkedVehicles.clear();
     double now = SimulationTimer.getTime();
 
@@ -227,7 +229,7 @@ public class QueueLink {
     this.buffer.clear();
   }
 
-  public void addParkedVehicle(QueueVehicle vehicle) {
+  /* package */ void addParkedVehicle(QueueVehicle vehicle) {
     this.parkedVehicles.put(vehicle.getId(), vehicle);
     vehicle.setCurrentLink(this.link);
   }
@@ -236,16 +238,16 @@ public class QueueLink {
     return this.parkedVehicles.get(vehicleId);
   }
 
-  public QueueVehicle removeParkedVehicle(Id vehicleId) {
+  /*package*/ QueueVehicle removeParkedVehicle(Id vehicleId) {
     return this.parkedVehicles.remove(vehicleId);
   }
 
-  public void addDepartingVehicle(QueueVehicle vehicle) {
+  /*package*/ void addDepartingVehicle(QueueVehicle vehicle) {
     this.waitingList.add(vehicle);
     this.activateLink();
   }
 
-  public boolean moveLink(double now) {
+  /*package*/ boolean moveLink(double now) {
     boolean ret = false;
     ret = this.moveLane(now);
     this.active = ret;
@@ -332,7 +334,7 @@ public class QueueLink {
      addToBuffer(veh, now);
    }
  }
-  public void processVehicleArrival(final double now, final QueueVehicle veh) {
+  /*package*/ void processVehicleArrival(final double now, final QueueVehicle veh) {
 //    QueueSimulation.getEvents().processEvent(
 //        new AgentArrivalEventImpl(now, veh.getDriver().getPerson(),
 //            this.getLink(), veh.getDriver().getCurrentLeg()));
@@ -342,15 +344,15 @@ public class QueueLink {
   }
 
 
-  public boolean bufferIsEmpty() {
+  /* package */ boolean bufferIsEmpty() {
     return this.buffer.isEmpty();
   }
 
-  public boolean hasSpace() {
+  /* package */ boolean hasSpace() { // used in tests
     return this.usedStorageCapacity < getStorageCapacity();
   }
 
-  public void recalcTimeVariantAttributes(double now) {
+  public void recalcTimeVariantAttributes(double now) { // accessed from elsewhere
     this.freespeedTravelTime = this.length / this.getLink().getFreespeed(now);
     calculateFlowCapacity(now);
     calculateStorageCapacity(now);
@@ -402,7 +404,7 @@ public class QueueLink {
     }
 
 
-  public QueueVehicle getVehicle(Id vehicleId) {
+  /* package */ QueueVehicle getVehicle(Id vehicleId) { // needed in tests
     QueueVehicle ret = getParkedVehicle(vehicleId);
     if (ret != null) {
       return ret;
@@ -422,7 +424,7 @@ public class QueueLink {
     return null;
   }
 
-  public Collection<QueueVehicle> getAllVehicles() {
+  /* package */ Collection<QueueVehicle> getAllVehicles() {
 
     Collection<QueueVehicle> vehicles = this.getAllNonParkedVehicles();
     vehicles.addAll(this.parkedVehicles.values());
@@ -434,7 +436,7 @@ public class QueueLink {
     return vehicles;
   }
 
-  public Collection<QueueVehicle> getAllNonParkedVehicles(){
+  private Collection<QueueVehicle> getAllNonParkedVehicles(){
     Collection<QueueVehicle> vehicles = new ArrayList<QueueVehicle>();
     vehicles.addAll(this.waitingList);
     vehicles.addAll(this.vehQueue);
@@ -453,7 +455,7 @@ public class QueueLink {
   /**
    * @return the total space capacity available on that link (includes the space on lanes if available)
    */
-  public double getSpaceCap() {
+  public double getSpaceCap() { // needs to remain public
     return this.storageCapacity;
   }
 
@@ -475,11 +477,11 @@ public class QueueLink {
     return this.link;
   }
 
-  public QueueNetwork getQueueNetwork() {
+  private QueueNetwork getQueueNetwork() {
     return this.queueNetwork;
   }
 
-  public QueueNode getToQueueNode() {
+  /* package */ QueueNode getToQueueNode() { // needed in tests
     return this.toQueueNode;
   }
 
@@ -491,11 +493,11 @@ public class QueueLink {
    * @return the flow capacity of this link per second, scaled by the config
    *         values and in relation to the SimulationTimer's simticktime.
    */
-  public double getSimulatedFlowCapacity() {
+  public double getSimulatedFlowCapacity() { // needs to remain public
     return this.simulatedFlowCapacity;
   }
 
-  public VisData getVisData() {
+  public VisData getVisData() { // needs to remain public
     return this.visdata;
   }
 
@@ -510,9 +512,9 @@ public class QueueLink {
       return active;
     }
 
-    public LinkedList<QueueVehicle> getVehQueue() {
-      return this.vehQueue;
-    }
+//    private LinkedList<QueueVehicle> getVehQueue() {
+//      return this.vehQueue;
+//    }
 
     /**
      * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
@@ -603,7 +605,7 @@ public class QueueLink {
 
     public Collection<AgentSnapshotInfo> getVehiclePositions(
         final Collection<AgentSnapshotInfo> positions) {
-      String snapshotStyle = simEngine.config.simulation().getSnapshotStyle();
+      String snapshotStyle = simEngine.getConfig().simulation().getSnapshotStyle();
       if ("queue".equals(snapshotStyle)) {
         getVehiclePositionsQueue(positions);
       } else if ("equiDist".equals(snapshotStyle)) {
@@ -688,7 +690,7 @@ public class QueueLink {
       double now = SimulationTimer.getTime();
       Link link = QueueLink.this.getLink();
       double queueEnd = getInitialQueueEnd();
-      double storageCapFactor = simEngine.config.simulation().getStorageCapFactor();
+      double storageCapFactor = simEngine.getConfig().simulation().getStorageCapFactor();
       double cellSize = ((NetworkImpl)QueueLink.this.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize();
       double vehLen = calculateVehicleLength(link, storageCapFactor, cellSize);
 

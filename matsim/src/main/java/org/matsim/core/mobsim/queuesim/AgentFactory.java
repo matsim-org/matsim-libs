@@ -25,7 +25,7 @@ import org.matsim.core.api.internal.MatsimFactory;
 /**
  * @author dgrether
  */
-public class AgentFactory implements MatsimFactory {
+/* package */ class AgentFactory implements MatsimFactory {
 
 	protected final QueueSimulation simulation;
 

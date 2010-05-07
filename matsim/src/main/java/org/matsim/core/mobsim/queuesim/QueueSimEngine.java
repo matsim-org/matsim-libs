@@ -60,9 +60,9 @@ public class QueueSimEngine {
 
 	private final Random random;
 
-	public final Config config;
+	private final Config config;
 
-	public QueueSimEngine(final QueueNetwork network, final Random random, final Config config) {
+	/*package*/ QueueSimEngine(final QueueNetwork network, final Random random, final Config config) {
 		this(network.getLinks().values(), network.getNodes().values(), random, config);
 	}
 
@@ -157,5 +157,9 @@ public class QueueSimEngine {
 	 */
 	protected int getNumberOfSimulatedLinks() {
 		return this.simLinksArray.size();
+	}
+
+	/*package*/ Config getConfig() {
+		return config;
 	}
 }

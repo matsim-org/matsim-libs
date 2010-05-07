@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 	}
 
 	/**
-	 * @see org.matsim.core.mobsim.queuesim.QueueNetworkFactory#newQueueNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
+	 * @see org.matsim.core.mobsim.queuesim.interfaces.QueueNetworkFactory#createQueueNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
 	 */
 	public QNode newQueueNode(final Node node, QSimEngine simEngine) {
 		return new QNode(node, simEngine);

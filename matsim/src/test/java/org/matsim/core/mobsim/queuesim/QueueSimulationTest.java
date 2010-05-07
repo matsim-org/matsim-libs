@@ -60,6 +60,7 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -106,7 +107,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -144,7 +145,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -181,7 +182,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -224,7 +225,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -275,7 +276,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -302,7 +303,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -333,7 +334,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -391,7 +392,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -448,7 +449,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -517,7 +518,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -560,7 +561,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.setTeleportVehicles(true);
 		sim.run();
 
@@ -609,7 +610,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.setTeleportVehicles(false);
 		try {
 			sim.run();
@@ -654,7 +655,7 @@ public class QueueSimulationTest extends TestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 
 		/* prepare sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		QueueNetwork qnet = sim.getQueueNetwork();
 		QueueLink qlink2 = qnet.getQueueLink(id2);
 		QueueLink qlink3 = qnet.getQueueLink(new IdImpl(3));
@@ -719,7 +720,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -777,7 +778,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = new QueueSimulation(f.scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -946,7 +947,7 @@ public class QueueSimulationTest extends TestCase {
 		/* run sim with special logger */
 		LogCounter logger = new LogCounter();
 		Logger.getRootLogger().addAppender(logger);
-		new QueueSimulation(f.scenario, events).run();
+		QueueSimulationFactory.createMobsimStatic(f.scenario, events).run();
 		Logger.getRootLogger().removeAppender(logger);
 
 		return logger;
@@ -990,7 +991,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		// first test without special settings
-		QueueSimulation sim = new QueueSimulation(scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
 		sim.run();
 		assertEquals(act1.getEndTime(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(act1.getEndTime() + leg.getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -999,7 +1000,7 @@ public class QueueSimulationTest extends TestCase {
 		// second test with special start/end times
 		config.simulation().setStartTime(8.0*3600);
 		config.simulation().setEndTime(11.0*3600);
-		sim = new QueueSimulation(scenario, events);
+		sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
 		sim.run();
 		assertEquals(8.0*3600, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -1088,7 +1089,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		// run the simulation
-		QueueSimulation sim = new QueueSimulation(scenario, events);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
 		config.simulation().setEndTime(simEndTime);
 		sim.run();
 		assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);

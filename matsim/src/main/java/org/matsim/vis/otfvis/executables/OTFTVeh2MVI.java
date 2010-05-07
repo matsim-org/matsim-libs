@@ -30,6 +30,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
@@ -179,7 +180,7 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 		Scenario scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 //		QSim qsim = new QSim(scenario, new EventsManagerImpl());
-		QueueSimulation qsim = new QueueSimulation(scenario, new EventsManagerImpl());
+		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, new EventsManagerImpl());
 
 		new OTFTVeh2MVI(qsim.getQueueNetwork(), vehFileName, intervall_s, outFileName).convert();
 	}

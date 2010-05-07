@@ -26,6 +26,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -59,7 +60,7 @@ public class ExternalMobsimTest {
 		//
 		System.out.println("["  + "] mobsim starts");
 		SimulationTimer.setTime(0);
-		QueueSimulation sim = new QueueSimulation(scenario, events_);
+		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events_);
 		sim.run();
 
 		writer.reset(1);
