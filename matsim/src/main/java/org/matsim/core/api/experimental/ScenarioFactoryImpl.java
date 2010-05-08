@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
  */
 @Deprecated
 public class ScenarioFactoryImpl implements MatsimFactory {
+	// yyyy if we use "Impl" for classes that should not be instantiated directly, then this should not be an "Impl".  kai, may'10
 	
 	public Scenario createScenario() {
 		return new ScenarioImpl() ;

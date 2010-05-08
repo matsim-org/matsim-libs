@@ -10,6 +10,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
  * with Scenario containers that already contain information.
  */
 public class ScenarioLoaderFactoryImpl implements MatsimFactory {
+	// yyyy if we use "Impl" for classes that should not be instantiated directly, then this should not be an "Impl".  kai, may'10
 
 	public ScenarioLoader createScenarioLoader(String configFileName) {
 		return new ScenarioLoaderImpl( configFileName ) ;
