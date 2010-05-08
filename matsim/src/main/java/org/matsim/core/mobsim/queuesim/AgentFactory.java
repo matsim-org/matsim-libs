@@ -27,13 +27,13 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 /* package */ class AgentFactory implements MatsimFactory {
 
-	protected final QueueSimulation simulation;
+	private final QueueSimulation simulation;
 
-	public AgentFactory(final QueueSimulation simulation) {
+	/*package*/ AgentFactory(final QueueSimulation simulation) {
 		this.simulation = simulation;
 	}
 
-	public QueuePersonAgent createPersonAgent(final Person p) {
+	/*package*/ QueuePersonAgent createPersonAgent(final Person p) {
 		QueuePersonAgent agent = new QueuePersonAgent(p, this.simulation);
 		return agent;
 	}

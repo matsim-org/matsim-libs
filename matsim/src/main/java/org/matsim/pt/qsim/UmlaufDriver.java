@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.queuesim.AbstractSimulation;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -179,7 +178,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 			this.sim.scheduleActivityEnd(this, 0);
 		} else {
 			this.sim.handleAgentArrival(now, this);
-			AbstractSimulation.decLiving();
+//			AbstractSimulation.decLiving();  // yyyyyy?
 		}
 	}
 

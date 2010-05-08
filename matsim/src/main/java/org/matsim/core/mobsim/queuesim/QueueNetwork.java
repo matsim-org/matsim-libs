@@ -50,7 +50,7 @@ public class QueueNetwork {
 
 	private final QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
 
-	public QueueNetwork(final Network networkLayer2) { // accessed from elsewhere
+	/*package*/ QueueNetwork(final Network networkLayer2) {
 		this(networkLayer2, new DefaultQueueNetworkFactory());
 	}
 
@@ -86,15 +86,15 @@ public class QueueNetwork {
 		return positions;
 	}
 
-	public Map<Id, QueueLink> getLinks() { // accessed from elsewhere but I think "QueueLink" should be replaced by an interface.  kai, may'10
+	public Map<Id, QueueLink> getQueueLinks() { // accessed from elsewhere but I think "QueueLink" should be replaced by an interface.  kai, may'10
 		return Collections.unmodifiableMap(this.links);
 	}
 
-	public Map<Id, QueueNode> getNodes() { // accessed from elsewhere but I think "QueueNode" should be replaced by an interface.  kai, may'10
+	public Map<Id, QueueNode> getQueueNodes() { // accessed from elsewhere but I think "QueueNode" should be replaced by an interface.  kai, may'10
 		return Collections.unmodifiableMap(this.nodes);
 	}
 
-	public QueueLink getQueueLink(final Id id) { // accessed from elsewhere but I think "QueueLink" should be replaced by an interface.  kai, may'10
+	/*package*/ QueueLink getQueueLink(final Id id) {
 		return this.links.get(id);
 	}
 

@@ -23,10 +23,9 @@ package org.matsim.core.mobsim.queuesim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
 import org.matsim.vehicles.BasicVehicle;
 
-public class QueueVehicleImpl implements QueueVehicle {
+public class QueueVehicle {
 
 	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
@@ -41,11 +40,11 @@ public class QueueVehicleImpl implements QueueVehicle {
 	
 	private final BasicVehicle basicVehicle;
 
-	public QueueVehicleImpl(final BasicVehicle basicVehicle) {
+	/*package*/ QueueVehicle(final BasicVehicle basicVehicle) {
 		this(basicVehicle, 1.0);
 	}
 	
-	public QueueVehicleImpl(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
+	/*package*/ QueueVehicle(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
 		this.id = basicVehicle.getId();
 		this.sizeInEquivalents = sizeInEquivalents;
 		this.basicVehicle = basicVehicle;
@@ -55,7 +54,7 @@ public class QueueVehicleImpl implements QueueVehicle {
 		return this.linkEnterTime;
 	}
 	
-	public void setLinkEnterTime(final double time) {
+	void setLinkEnterTime(final double time) {
 		this.linkEnterTime = time;
 	}
 	
@@ -63,7 +62,7 @@ public class QueueVehicleImpl implements QueueVehicle {
 		return this.earliestLinkExitTime;
 	}
 
-	public void setEarliestLinkExitTime(final double time) {
+	void setEarliestLinkExitTime(final double time) {
 		this.earliestLinkExitTime = time;
 	}
 
@@ -71,7 +70,7 @@ public class QueueVehicleImpl implements QueueVehicle {
 		return this.currentLink;
 	}
 	
-	public void setCurrentLink(final Link link) {
+	void setCurrentLink(final Link link) {
 		this.currentLink = link;
 	}
 
@@ -79,7 +78,7 @@ public class QueueVehicleImpl implements QueueVehicle {
 		return this.driver;
 	}
 
-	public void setDriver(final PersonDriverAgent driver) {
+	void setDriver(final PersonDriverAgent driver) {
 		this.driver = driver;
 	}
 

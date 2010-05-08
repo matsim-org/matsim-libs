@@ -56,7 +56,6 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.mobsim.queuesim.comparators.DriverAgentDepartureTimeComparator;
 import org.matsim.core.mobsim.queuesim.interfaces.QueueNetworkFactory;
-import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -84,21 +83,18 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
  * @author dgrether
  */
 public class QueueSimulation implements IOSimulation, ObservableSimulation {
+	// yyyy needed in many places since the factory returns this class directly.  This should probably be changed.  kai, may'10
 
 	private int snapshotPeriod = 0;
-
-	/* time since lasat snapshot */
-	private double snapshotTime = 0.0;
+	private double snapshotTime = 0.0; 	/* time since lasat snapshot */
 
 	protected static final int INFO_PERIOD = 3600;
-
-	/* time since last "info" message */
-	private double infoTime = 0;
+	private double infoTime = 0; 	/* time since last "info" message */
 
 	private final Config config;
-	protected final Population population;
-	protected QueueNetwork network;
-	protected Network networkLayer;
+	private final Population population;
+	private QueueNetwork network;
+	protected /* yyyyyy */ Network networkLayer;
 
 	private static EventsManager events = null;
 
@@ -112,7 +108,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
 	 */
-	protected final PriorityQueue<Tuple<Double, PersonDriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, PersonDriverAgent>>(30, new TeleportationArrivalTimeComparator());
+	private final PriorityQueue<Tuple<Double, PersonDriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, PersonDriverAgent>>(30, new TeleportationArrivalTimeComparator());
 
 	private final Date starttime = new Date();
 
@@ -124,9 +120,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	private SimulationListenerManager<QueueSimulation> listenerManager;
 
-	protected final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = new PriorityBlockingQueue<PersonDriverAgent>(500, new DriverAgentDepartureTimeComparator());
+	private final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = new PriorityBlockingQueue<PersonDriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
-	protected Scenario scenario = null;
+	private Scenario scenario = null;
 
 	/** @see #setTeleportVehicles(boolean) */
 	private boolean teleportVehicles = true;
@@ -209,7 +205,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		for (Person p : this.population.getPersons().values()) {
 			QueuePersonAgent agent = this.agentFactory.createPersonAgent(p);
 
-			QueueVehicle veh = new QueueVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
+			QueueVehicle veh = new QueueVehicle(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);

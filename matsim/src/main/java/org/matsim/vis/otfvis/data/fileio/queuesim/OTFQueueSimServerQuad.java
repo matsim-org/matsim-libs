@@ -76,7 +76,7 @@ public class OTFQueueSimServerQuad extends OTFServerQuad2 {
 
     	if(!linkWriterFactoryObjects.isEmpty()) {
     		boolean first = true;
-    		for (QueueLink link : this.net.getLinks().values()) {
+    		for (QueueLink link : this.net.getQueueLinks().values()) {
     			double middleEast = (link.getLink().getToNode().getCoord().getX() + link.getLink().getFromNode().getCoord().getX())*0.5 - this.minEasting;
     			double middleNorth = (link.getLink().getToNode().getCoord().getY() + link.getLink().getFromNode().getCoord().getY())*0.5 - this.minNorthing;
 

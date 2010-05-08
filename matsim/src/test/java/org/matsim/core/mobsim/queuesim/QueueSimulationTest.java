@@ -60,7 +60,6 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -661,8 +660,8 @@ public class QueueSimulationTest extends TestCase {
 		QueueLink qlink3 = qnet.getQueueLink(new IdImpl(3));
 
 		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		QueueVehicle vehicle1 = new QueueVehicleImpl(new BasicVehicleImpl(id1, defaultVehicleType));
-		QueueVehicle vehicle2 = new QueueVehicleImpl(new BasicVehicleImpl(id2, defaultVehicleType));
+		QueueVehicle vehicle1 = new QueueVehicle(new BasicVehicleImpl(id1, defaultVehicleType));
+		QueueVehicle vehicle2 = new QueueVehicle(new BasicVehicleImpl(id2, defaultVehicleType));
 		qlink2.addParkedVehicle(vehicle1);
 		qlink2.addParkedVehicle(vehicle2);
 

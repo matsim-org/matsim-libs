@@ -143,10 +143,10 @@ public class TravelTimeEstimator implements TravelTime, Cloneable{
 //		double rhoMax = length * this.storageCapacityFactor / this.vehicleLength;
 //		double flowMax = link.getCapacity(time) * SimulationTimer.getSimTickTime() * flowCapacityFactor / 36000;
 //		double rhoMax = queueNetwork.getLinks().get(link.getId()).getSpaceCap();
-		double vehMax = queueNetwork.getLinks().get(link.getId()).getSpaceCap();
+		double vehMax = queueNetwork.getQueueLinks().get(link.getId()).getStorageCapacity();
 		double rhoMax = vehMax / length;
 		
-		double flowMax = queueNetwork.getLinks().get(link.getId()).getSimulatedFlowCapacity();
+		double flowMax = queueNetwork.getQueueLinks().get(link.getId()).getSimulatedFlowCapacity();
 		double rhoFreeSpeed = flowMax / freeSpeed;
 		
 		double flow = binFlow / this.travelTimeBinSize;

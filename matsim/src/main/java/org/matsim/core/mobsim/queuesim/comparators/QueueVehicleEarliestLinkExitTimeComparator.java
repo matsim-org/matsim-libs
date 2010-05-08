@@ -23,7 +23,7 @@ package org.matsim.core.mobsim.queuesim.comparators;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
+import org.matsim.core.mobsim.queuesim.QueueVehicle;
 
 /**
  * @author dstrippgen

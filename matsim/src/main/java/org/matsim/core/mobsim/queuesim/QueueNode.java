@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
 
 /**
  * Represents a node in the QueueSimulation.
@@ -69,7 +68,7 @@ public class QueueNode {
 	/*package*/ void init() {
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
-			this.inLinksArrayCache[i] = this.queueNetwork.getLinks().get(l.getId());
+			this.inLinksArrayCache[i] = this.queueNetwork.getQueueLinks().get(l.getId());
 			i++;
 		}
 		/* As the order of nodes has an influence on the simulation results,

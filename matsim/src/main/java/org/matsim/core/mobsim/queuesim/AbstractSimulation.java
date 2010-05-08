@@ -21,7 +21,7 @@
 package org.matsim.core.mobsim.queuesim;
 
 
-public abstract class AbstractSimulation {
+/*package*/ abstract class AbstractSimulation {
 
 	/**
 	 * Number of agents that have not yet reached their final activity location
@@ -35,25 +35,25 @@ public abstract class AbstractSimulation {
 
 	private static double stuckTime = Double.MAX_VALUE;
 
-	public static void reset(final double stuckTime) {
+	/*package*/ static void reset(final double stuckTimeTmp) {
 		setLiving(0);
 		resetLost();
-		setStuckTime(stuckTime);
+		setStuckTime(stuckTimeTmp);
 	}
 
-	public static final double getStuckTime() {return stuckTime;	}
+	/*package*/ static final double getStuckTime() {return stuckTime;	}
 	private static final void setStuckTime(final double stuckTime) { AbstractSimulation.stuckTime = stuckTime; }
 
-	public static final int getLiving() {return living;	}
-	public static final void setLiving(final int count) {living = count;}
-	public static final boolean isLiving() {return living > 0;	}
-	public static final int getLost() {return lost;	}
-	public static final void incLost() {lost++;}
-	public static final void incLost(final int count) {lost += count;}
-	private static final void resetLost() { lost = 0; }
+	/*package*/ static final int getLiving() {return living;	}
+	/*package*/ static final void setLiving(final int count) {living = count;}
+	/*package*/ static final boolean isLiving() {return living > 0;	}
+	/*package*/ static final int getLost() {return lost;	}
+	/*package*/ static final void incLost() {lost++;}
+	/*package*/ static final void incLost(final int count) {lost += count;}
+	/*package*/ static final void resetLost() { lost = 0; }
 
-	public static final void incLiving() {living++;}
-	public static final void incLiving(final int count) {living += count;}
-	public static final void decLiving() {living--;}
-	public static final void decLiving(final int count) {living -= count;}
+	/*package*/ static final void incLiving() {living++;}
+	/*package*/ static final void incLiving(final int count) {living += count;}
+	/*package*/ static final void decLiving() {living--;}
+	/*package*/ static final void decLiving(final int count) {living -= count;}
 }

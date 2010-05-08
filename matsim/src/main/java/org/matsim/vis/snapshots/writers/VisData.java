@@ -17,11 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim.interfaces;
+package org.matsim.vis.snapshots.writers;
 
 import java.util.Collection;
 
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 /**
  * Interface for methods to provide a visualizer with data.
  * @author dgrether

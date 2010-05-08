@@ -106,7 +106,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Object src = writer.getSrc();
 			if(src instanceof QueueLink) {
-				QueueLink link = q.getLinks().get(((QueueLink) src).getLink().getId());
+				QueueLink link = q.getQueueLinks().get(((QueueLink) src).getLink().getId());
 				writer.setSrc(link);
 //			} else if(src instanceof QueueNode) {
 //
@@ -162,7 +162,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 		this.minNorthing = Double.POSITIVE_INFINITY;
 		this.maxNorthing = Double.NEGATIVE_INFINITY;
 
-		for (Iterator<? extends QueueNode> it = net.getNodes().values().iterator(); it.hasNext();) {
+		for (Iterator<? extends QueueNode> it = net.getQueueNodes().values().iterator(); it.hasNext();) {
 			QueueNode node = it.next();
 			this.minEasting = Math.min(this.minEasting, node.getNode().getCoord().getX());
 			this.maxEasting = Math.max(this.maxEasting, node.getNode().getCoord().getX());
@@ -203,7 +203,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 
     	if(!linkWriterFactoriyObjects.isEmpty()) {
     		boolean first = true;
-    		for (QueueLink link : this.net.getLinks().values()) {
+    		for (QueueLink link : this.net.getQueueLinks().values()) {
     			double middleEast = (link.getLink().getToNode().getCoord().getX() + link.getLink().getFromNode().getCoord().getX())*0.5 - this.minEasting;
     			double middleNorth = (link.getLink().getToNode().getCoord().getY() + link.getLink().getFromNode().getCoord().getY())*0.5 - this.minNorthing;
 

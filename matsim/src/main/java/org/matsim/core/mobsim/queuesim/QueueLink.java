@@ -36,8 +36,6 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
-import org.matsim.core.mobsim.queuesim.interfaces.VisData;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -45,13 +43,15 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.VisData;
+import org.matsim.vis.snapshots.writers.VisualizableLink;
 
 /**
  * @author dstrippgen
  * @author dgrether
  * @author mrieser
  */
-public class QueueLink {
+public class QueueLink implements VisualizableLink {
 
   final private static Logger log = Logger.getLogger(QueueLink.class);
 
@@ -94,12 +94,12 @@ public class QueueLink {
    * The list of vehicles that have not yet reached the end of the link
    * according to the free travel speed of the link
    */
-  /*package*/ private final LinkedList<QueueVehicle> vehQueue = new LinkedList<QueueVehicle>();
+  private final LinkedList<QueueVehicle> vehQueue = new LinkedList<QueueVehicle>();
 
   /**
    * Holds all vehicles that are ready to cross the outgoing intersection
    */
-  /*package*/ final Queue<QueueVehicle> buffer = new LinkedList<QueueVehicle>();
+  private final Queue<QueueVehicle> buffer = new LinkedList<QueueVehicle>();
 
   private double storageCapacity;
 
@@ -110,7 +110,7 @@ public class QueueLink {
    */
   private double simulatedFlowCapacity; // previously called timeCap
 
-  /*package*/ double inverseSimulatedFlowCapacity; // optimization, cache 1.0 / simulatedFlowCapacity
+  private double inverseSimulatedFlowCapacity; // optimization, cache 1.0 / simulatedFlowCapacity
 
   private int bufferStorageCapacity; // optimization, cache Math.ceil(simulatedFlowCap)
 
@@ -146,7 +146,7 @@ public class QueueLink {
   }
 
   /** Is called after link has been read completely */
-  public void finishInit() { // needs to remain public
+  /*package*/ void finishInit() {
     this.active = false;
   }
 
@@ -348,11 +348,11 @@ public class QueueLink {
     return this.buffer.isEmpty();
   }
 
-  /* package */ boolean hasSpace() { // used in tests
-    return this.usedStorageCapacity < getStorageCapacity();
+  /* package */ boolean hasSpace() {
+    return this.usedStorageCapacity < this.storageCapacity ;
   }
 
-  public void recalcTimeVariantAttributes(double now) { // accessed from elsewhere
+  /*package*/ void recalcTimeVariantAttributes(double now) {
     this.freespeedTravelTime = this.length / this.getLink().getFreespeed(now);
     calculateFlowCapacity(now);
     calculateStorageCapacity(now);
@@ -444,18 +444,22 @@ public class QueueLink {
     return vehicles;
   }
 
-   /**
-   * @return Returns the maximum number of vehicles that can be placed on the
-   *         link at a time.
-   */
-  /*package*/ double getStorageCapacity() {
-    return this.storageCapacity;
-  }
+//   /**
+//   * @return Returns the maximum number of vehicles that can be placed on the
+//   *         link at a time.
+//   */
+//  /*package*/ double getStorageCapacity() {
+//    return this.storageCapacity;
+//  }
 
   /**
-   * @return the total space capacity available on that link (includes the space on lanes if available)
+   * @return the total storage capacity available on that link (includes the space on lanes if available)
+   * <br/>
+   * (The "storage capacity" of the link is the number of vehicles that can be on the link, i.e. from
+   * one node to the next.  Other quantities can have other names.  kai, may'10)
    */
-  public double getSpaceCap() { // needs to remain public
+  @Deprecated // it is preferred to either use the "Link" data, or to evaluate events.  kai, may'10
+  public double getStorageCapacity() { // needs to remain public
     return this.storageCapacity;
   }
 
@@ -468,12 +472,13 @@ public class QueueLink {
    * because it is only called by one testcase
    * @return
    */
-  protected int vehOnLinkCount() {
+   int vehOnLinkCount() {
     return this.vehQueue.size();
   }
 
 
-  public Link getLink() {
+  public Link getLink() { 
+	  //  needed at many places in otfvis (if you assume that otfvis gets "visualizableLink", then this makes sense)
     return this.link;
   }
 
@@ -481,7 +486,7 @@ public class QueueLink {
     return this.queueNetwork;
   }
 
-  /* package */ QueueNode getToQueueNode() { // needed in tests
+  /* package */ QueueNode getToQueueNode() {
     return this.toQueueNode;
   }
 
@@ -492,12 +497,16 @@ public class QueueLink {
    *
    * @return the flow capacity of this link per second, scaled by the config
    *         values and in relation to the SimulationTimer's simticktime.
+   * <br/>
+   * I don't understand.  Is it vehicles per second, or vehicles per simticktime? kai, may'10
+   * 
    */
+  @Deprecated // it is preferred to either use the "Link" data, or to evaluate events.  kai, may'10
   public double getSimulatedFlowCapacity() { // needs to remain public
     return this.simulatedFlowCapacity;
   }
 
-  public VisData getVisData() { // needs to remain public
+  public VisData getVisData() { // needs to remain public (makes sense, but should become interface method)
     return this.visdata;
   }
 

@@ -44,14 +44,14 @@ public class SimulationTimer {
 	 *
 	 * @see #getSimTickTime()
 	 */
-	public static final void incTime() {
+	/*package*/ static final void incTime() {
 		time += SIM_TICK_TIME_S;
 	}
 
 	/**
 	 * @return Returns the simStartTime. That is the lowest found start time of a leg
 	 */
-	public static final double getSimStartTime() {
+	/*package*/ static final double getSimStartTime() {
 		return simStartTime;
 	}
 
@@ -66,7 +66,7 @@ public class SimulationTimer {
 		return SIM_TICK_TIME_S;
 	}
 
-	synchronized public static final void setSimStartTime(final double newStartTime) {
+	synchronized /*package*/ static final void setSimStartTime(final double newStartTime) {
 		SimulationTimer.simStartTime = newStartTime;
 	}
 
@@ -80,7 +80,7 @@ public class SimulationTimer {
 	 *
 	 * @param stepSize The step-size the simulation uses to advance time.
 	 */
-	/*package*/ static final void reset(final double stepSize) {
+	/* package */ static final void reset(final double stepSize) {
 		SimulationTimer.simStartTime = 24*3600;
 		SimulationTimer.time = 0;
 		SimulationTimer.SIM_TICK_TIME_S = stepSize;

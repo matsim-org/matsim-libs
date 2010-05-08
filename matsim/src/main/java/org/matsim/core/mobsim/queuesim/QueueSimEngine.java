@@ -38,7 +38,7 @@ import org.matsim.core.config.Config;
  * @author dgrether
  * @author dstrippgen
  */
-public class QueueSimEngine {
+/*package*/ class QueueSimEngine {
 
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
@@ -63,7 +63,7 @@ public class QueueSimEngine {
 	private final Config config;
 
 	/*package*/ QueueSimEngine(final QueueNetwork network, final Random random, final Config config) {
-		this(network.getLinks().values(), network.getNodes().values(), random, config);
+		this(network.getQueueLinks().values(), network.getQueueNodes().values(), random, config);
 	}
 
 	/*package*/ QueueSimEngine(final Collection<QueueLink> links, final Collection<QueueNode> nodes, final Random random, final Config config) {

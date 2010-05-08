@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.queuesim.interfaces.QueueVehicle;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -60,7 +59,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		assertNotNull(f.qlink1);
 		assertEquals(1.0, f.qlink1.getSimulatedFlowCapacity(), EPSILON);
-		assertEquals(1.0, f.qlink1.getSpaceCap(), EPSILON);
+		assertEquals(1.0, f.qlink1.getStorageCapacity(), EPSILON);
 		// TODO dg[april2008] this assertions are not covering everything in
 		// QueueLink's constructor.
 		// Extend the tests by checking the methods initFlowCapacity and
@@ -72,7 +71,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 	public void testAdd() {
 		Fixture f = new Fixture();
-		QueueVehicleImpl v = new QueueVehicleImpl(f.basicVehicle);
+		QueueVehicle v = new QueueVehicle(f.basicVehicle);
 
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		v.setDriver(new QueuePersonAgent(p, null));
@@ -109,7 +108,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(f.scenario, new EventsManagerImpl());
 
-		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
+		QueueVehicle veh = new QueueVehicle(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(23));
 		Plan plan = new PlanImpl();
 		p.addPlan(plan);
@@ -166,7 +165,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(f.scenario, new EventsManagerImpl());
 
-		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
+		QueueVehicle veh = new QueueVehicle(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(42));
 		Plan plan = new PlanImpl();
 		p.addPlan(plan);
@@ -212,7 +211,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(f.scenario, new EventsManagerImpl());
 
-		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
+		QueueVehicle veh = new QueueVehicle(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(80));
 		Plan plan = new PlanImpl();
 		p.addPlan(plan);
@@ -275,7 +274,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		qlink.finishInit();
 
 		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, new EventsManagerImpl());
-		QueueVehicleImpl v1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl("1"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"))));
+		QueueVehicle v1 = new QueueVehicle(new BasicVehicleImpl(new IdImpl("1"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		PlanImpl plan = p.createAndAddPlan(true);
 		try {
@@ -294,7 +293,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		pa1.setVehicle(v1);
 		pa1.initialize();
 
-		QueueVehicleImpl v2 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl("2"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"))));
+		QueueVehicle v2 = new QueueVehicle(new BasicVehicleImpl(new IdImpl("2"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		QueuePersonAgent pa2 = new QueuePersonAgent(p, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
@@ -343,14 +342,14 @@ public class QueueLinkTest extends MatsimTestCase {
 		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(new ScenarioImpl(), new EventsManagerImpl());
 
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		QueueVehicle veh1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(1), vehType));
+		QueueVehicle veh1 = new QueueVehicle(new BasicVehicleImpl(new IdImpl(1), vehType));
 		veh1.setDriver(new QueuePersonAgent(p, qsim));
-		QueueVehicle veh25 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(2), vehType), 2.5);
+		QueueVehicle veh25 = new QueueVehicle(new BasicVehicleImpl(new IdImpl(2), vehType), 2.5);
 		veh25.setDriver(new QueuePersonAgent(p, null));
-		QueueVehicle veh5 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(3), vehType), 5);
+		QueueVehicle veh5 = new QueueVehicle(new BasicVehicleImpl(new IdImpl(3), vehType), 5);
 		veh5.setDriver(new QueuePersonAgent(p, null));
 
-		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getSpaceCap(), EPSILON);
+		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getStorageCapacity(), EPSILON);
 		f.qlink2.addFromIntersection(veh5);  // used vehicle equivalents: 5
 		assertTrue(f.qlink2.hasSpace());
 		f.qlink2.addFromIntersection(veh5);  // used vehicle equivalents: 10
