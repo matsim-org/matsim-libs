@@ -105,34 +105,22 @@ public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer impl
 
 
 	public void onDraw(final GL gl) {
-	
-		onPrepareDraw(gl);
-		gl.glCallList(featureDisplList);
-
-	}
-	
-	public void onPrepareDraw(final GL gl) {
-		if(featureDisplList == -1) {
-			featureDisplList = gl.glGenLists(1);
-			gl.glNewList(featureDisplList, GL.GL_COMPILE);
-
-			for(OTFFeature feature : featureList) {
-				if (!feature.converted) {
-					feature.setOffset((float)this.offsetEast, (float)this.offsetNorth);
-				}
-				gl.glColor4f(feature.color[0],feature.color[1],feature.color[2],feature.color[3]);
-				gl.glBegin(feature.glType);
-				for (int i =  0; i < feature.npoints; i++) {
-					gl.glVertex3d(feature.xpoints[i], feature.ypoints[i], 0);	
-					
-				}
-				gl.glEnd();
-			}
-			gl.glEndList();
-		}
 		
-	}
+		for(OTFFeature feature : featureList) {
+			if (!feature.converted) {
+				feature.setOffset((float)this.offsetEast, (float)this.offsetNorth);
+			}
+			gl.glColor4f(feature.color[0],feature.color[1],feature.color[2],feature.color[3]);
+			gl.glBegin(feature.glType);
+			for (int i =  0; i < feature.npoints; i++) {
+				gl.glVertex3d(feature.xpoints[i], feature.ypoints[i], 0);	
+				
+			}
+			gl.glEnd();
+		}
 
+	}
+	
 	
 	private static class OTFFeature implements Serializable{
 		
