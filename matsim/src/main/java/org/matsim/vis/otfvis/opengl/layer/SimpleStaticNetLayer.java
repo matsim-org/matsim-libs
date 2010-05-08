@@ -198,7 +198,10 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	      double middleX = alpha*this.quad[0].x + (1.0-alpha)*this.quad[3].x;
 	      double middleY = alpha*this.quad[0].y + (1.0-alpha)*this.quad[3].y;
 	      //Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);
-	      String idstr = new String(id);
+	      String idstr = "" ;
+	      if ( id != null ) { // yyyy can't say if this is a meaningful fix but it works for the problem that I have right now.  kai, may'10
+	    	  idstr = new String(id);
+	      } 
 	      linkIds.put(new CoordImpl(middleX , middleY ), idstr);
 	    }
 

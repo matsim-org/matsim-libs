@@ -50,7 +50,6 @@ import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -537,6 +536,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	private void displayLinkIds(Map<Coord, String> linkIds) {
 		String testText = "0000000";
+	    float idSize = (float)(0.1 * OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth()); 
 		Rectangle2D test = InfoText.getBoundsOf(testText);
 		Map<Coord, Boolean> xymap = new HashMap<Coord, Boolean>(); // Why is here a Map used, and not a Set?
 		double xRaster = test.getWidth(), yRaster = test.getHeight();
@@ -546,7 +546,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			float east = (float)coord.getX() ;
 			float north = (float)coord.getY() ;
 			float textX = (float) (((int)(east / xRaster) +1)*xRaster);
-			float textY = north -(float)(north % yRaster) +80;
+			float textY = (north -(float)(north % yRaster) +80);
 			CoordImpl text = new CoordImpl(textX,textY);
 			int i = 1;
 			while (xymap.get(text) != null) {
@@ -557,7 +557,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				i++;
 			}
 			xymap.put(text, Boolean.TRUE);
-			InfoTextContainer.showTextOnce(linkId, (float)text.getX(), (float)text.getY(), 1.f);
+			InfoTextContainer.showTextOnce(linkId, (float)text.getX(), (float)text.getY(),idSize);
 			this.gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
 			this.gl.glLineWidth(2);
 			this.gl.glBegin(GL.GL_LINE_STRIP);
@@ -567,24 +567,14 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		}
 	}
 
-	private boolean isZoomBigEnoughForLabels() {
-		CoordImpl size  = this.mouseMan.getPixelsize();
-		final double cellWidth = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
-		final double pixelsizeStreet = 5;
-		return (size.getX()*pixelsizeStreet < cellWidth) && (size.getX()*pixelsizeStreet < cellWidth);
-	}
 
 	private Map<Coord, String> findVisibleLinks() {
-		if (isZoomBigEnoughForLabels()) {
 			Rect rect = this.mouseMan.getBounds();
 			Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX , rect.minY , rect.maxX - rect.minX, rect.maxY - rect.minY);
 			CollectDrawLinkId linkIdQuery = new CollectDrawLinkId(dest);
 			linkIdQuery.prepare(this.clientQ);
 			Map<Coord, String> linkIds = linkIdQuery.getLinkIds();
 			return linkIds;
-		} else {
-			return Collections.emptyMap();
-		}
 	}
 
 	synchronized public void display(GLAutoDrawable drawable) {
