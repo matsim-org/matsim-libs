@@ -56,8 +56,6 @@ public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer impl
 
 	final List<OTFFeature> featureList = new ArrayList<OTFFeature>();
 	
-	protected int featureDisplList = -1;
-	
 	public SimpleBackgroundFeatureDrawer(final FeatureSource features, final float [] color) throws IOException{
 		final Iterator<Feature> it = features.getFeatures().iterator();
 		while (it.hasNext()){
