@@ -74,6 +74,7 @@ import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
+import org.matsim.vis.snapshots.writers.VisVehicle;
 
 public class QueueSimulationTest extends TestCase {
 
@@ -675,7 +676,7 @@ public class QueueSimulationTest extends TestCase {
 		SimulationTimer.setTime(102.0);
 		sim.doSimStep(102.0); // agent should be moved to qlink3
 
-		Collection<QueueVehicle> vehicles = qlink3.getAllVehicles();
+		Collection<? extends VisVehicle> vehicles = qlink3.getAllVehicles();
 		assertEquals(1, vehicles.size());
 		assertEquals(id2, vehicles.toArray(new QueueVehicle[1])[0].getBasicVehicle().getId());
 		// vehicle 1 should still stay on qlink2
