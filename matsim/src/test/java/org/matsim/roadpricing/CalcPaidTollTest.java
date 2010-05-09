@@ -35,7 +35,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
@@ -219,7 +219,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		EventsToScore scoring = new EventsToScore(scenario.getPopulation(), new CharyparNagelScoringFunctionFactory(config));
 		events.addHandler(scoring);
 
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+		Simulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
 		sim.run();
 
 		paidToll.sendUtilityEvents(Time.MIDNIGHT, events);

@@ -25,9 +25,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
-import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
@@ -65,7 +64,7 @@ public class ExternalMobsimTest {
 		// I think that the code still works without that line (in particular, since it is not in the test repository).
 		// kai, may'10
 		
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events_);
+		Simulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events_);
 		sim.run();
 
 		writer.reset(1);

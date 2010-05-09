@@ -38,7 +38,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelCost;

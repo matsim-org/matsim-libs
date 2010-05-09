@@ -28,7 +28,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -77,7 +77,7 @@ public class IteratePopSimTest {
 
 //		QueueLink link = (QueueLink)network.getLinks().get("15");
 //		link.setCapacity()
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+		Simulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
 //		sim.openNetStateWriter("testWrite", netFileName, 10);
 		// netvis is gone.  kai, may'10
 		

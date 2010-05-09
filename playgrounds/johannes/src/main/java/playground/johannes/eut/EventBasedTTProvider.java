@@ -16,7 +16,6 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.router.util.TravelTime;
 
 
@@ -52,6 +51,8 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 //	private SimTimeI simTime;
 
 	private int lastCall = -1;
+	
+	private double timeOfLastEvent = Double.NEGATIVE_INFINITY ;
 
 	// =====================================================================
 	// constructor
@@ -67,6 +68,7 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 	// =====================================================================
 
 	public void handleEvent(LinkEnterEvent event) {
+		this.timeOfLastEvent = event.getTime() ;
 		Key2d<String, String> key = new Key2d<String, String>(event.getLinkId().toString(),
 				event.getPersonId().toString());
 		this.enterEvents.put(key, event.getTime());
@@ -74,6 +76,7 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
+		this.timeOfLastEvent = event.getTime() ;
 		Key2d<String, String> key = new Key2d<String, String>(event.getLinkId().toString(),
 				event.getPersonId().toString());
 		Double t1 = this.enterEvents.remove(key);
@@ -89,6 +92,7 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
+		this.timeOfLastEvent = event.getTime() ;
 		/*
 		 * Arrival event does not count as travel time!
 		 */
@@ -107,15 +111,23 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 		/*
 		 * Average the travel times only if there are new events available.
 		 */
-		if ((SimulationTimer.getTime() - this.lastCall) > 0) {
-			this.lastCall = (int) SimulationTimer.getTime();
+
+//		if ((SimulationTimer.getTime() - this.lastCall) > 0) {
+		if ((this.timeOfLastEvent - this.lastCall) > 0) { 
+
+//			this.lastCall = (int) SimulationTimer.getTime();
+			this.lastCall = (int) this.timeOfLastEvent ;
+			
 //			eventsAvailable = false;
 
 			/*
 			 * Remove all events that are older than the current time minus
 			 * the binsize.
 			 */
-			int lowerbound = (int) (SimulationTimer.getTime() - this.binsize);
+//			int lowerbound = (int) (SimulationTimer.getTime() - this.binsize);
+			
+			int lowerbound = (int) (this.timeOfLastEvent - this.binsize);
+
 			for (ListIterator<TTElement> it = this.ttimes.listIterator(); it
 					.hasNext();) {
 				TTElement e = it.next();

@@ -35,7 +35,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -85,7 +85,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
-		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+		Simulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, events);
 		qsim.run();
 
 		// check that we get the expected result
@@ -145,7 +145,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
-		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+		Simulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, events);
 		qsim.run();
 		/*
 		 * The last person of the first wave should have taken 20 s to travel

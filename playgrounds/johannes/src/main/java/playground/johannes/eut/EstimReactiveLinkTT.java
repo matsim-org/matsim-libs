@@ -39,7 +39,6 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelTime;
 
@@ -67,6 +66,8 @@ public class EstimReactiveLinkTT implements
 	private double lastTravelTime;
 	
 	private final Network network;
+	
+	private double timeOfLastEvent = Double.NEGATIVE_INFINITY ;
 
 	public EstimReactiveLinkTT(double scenarioScale, Network network) {
 		capacityFactor = scenarioScale;
@@ -79,18 +80,22 @@ public class EstimReactiveLinkTT implements
 
 	public void handleEvent(LinkEnterEvent event) {
 		increaseCount(event.getLinkId(), event.getPersonId(), (int) event.getTime());
+		this.timeOfLastEvent = event.getTime() ;
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
 		decreaseCount(event.getLinkId(), event.getPersonId(), (int) event.getTime());
+		this.timeOfLastEvent = event.getTime() ;
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
 		decreaseCount(event.getLinkId(), event.getPersonId(), (int) event.getTime());
+		this.timeOfLastEvent = event.getTime() ;
 	}
 
 	public void handleEvent(AgentWait2LinkEvent event) {
 		increaseCount(event.getLinkId(), event.getPersonId(), (int) event.getTime());
+		this.timeOfLastEvent = event.getTime() ;
 	}
 
 	private void increaseCount(Id linkId, Id personId, int time) {
@@ -108,7 +113,10 @@ public class EstimReactiveLinkTT implements
 	}
 
 	public double getLinkTravelTime(Link link, double time) {
-		int simtime = (int) SimulationTimer.getTime();
+
+		//		int simtime = (int) SimulationTimer.getTime();
+		int simtime = (int) this.timeOfLastEvent ; // changed in may'10.  kai
+
 		if ((simtime == this.lastQueryTime) && (link == this.lastQueriedLink))
 			return this.lastTravelTime;
 		else {

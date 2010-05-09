@@ -54,6 +54,8 @@ import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
+import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationMobsim;
+import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationNetwork;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -71,6 +73,7 @@ import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
+import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
@@ -81,7 +84,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author mrieser
  * @author dgrether
  */
-public class QueueSimulation implements IOSimulation, ObservableSimulation {
+ class QueueSimulation implements IOSimulation, ObservableSimulation, CapacityInformationMobsim, VisMobsim {
 	// yyyy needed in many places since the factory returns this class directly.  This should probably be changed.  kai, may'10
 
 	private int snapshotPeriod = 0;
@@ -566,11 +569,15 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 		}
 	}
 
-	public QueueNetwork getQueueNetwork() { // accessed from elsewhere; "QueueNetwork" should be replaced by interface. kai, may'10
+	QueueNetwork getQueueNetwork() {
 		return this.network;
 	}
 	
 	public VisNetwork getVisNetwork() {
+		return this.network ;
+	}
+	
+	public CapacityInformationNetwork getCapacityInformationNetwork() {
 		return this.network ;
 	}
 

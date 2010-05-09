@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -40,6 +39,7 @@ import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
@@ -180,9 +180,9 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 		Scenario scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 //		QSim qsim = new QSim(scenario, new EventsManagerImpl());
-		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, new EventsManagerImpl());
+		VisMobsim qsim = QueueSimulationFactory.createMobsimStatic(scenario, new EventsManagerImpl());
 
-		new OTFTVeh2MVI(qsim.getQueueNetwork(), vehFileName, intervall_s, outFileName).convert();
+		new OTFTVeh2MVI(qsim.getVisNetwork(), vehFileName, intervall_s, outFileName).convert();
 	}
 
 }

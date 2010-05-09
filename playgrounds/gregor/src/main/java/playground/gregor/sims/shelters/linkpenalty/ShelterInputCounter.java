@@ -13,7 +13,6 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.evacuation.base.Building;
 import org.matsim.signalsystems.control.SignalSystemController;

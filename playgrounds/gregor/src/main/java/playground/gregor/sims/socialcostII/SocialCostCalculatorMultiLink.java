@@ -25,7 +25,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
