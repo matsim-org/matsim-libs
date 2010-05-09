@@ -31,8 +31,8 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.mobsim.queuesim.CapacityInformationNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationNetwork;
 import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.christoph.events.ExtendedAgentReplanEventImpl;

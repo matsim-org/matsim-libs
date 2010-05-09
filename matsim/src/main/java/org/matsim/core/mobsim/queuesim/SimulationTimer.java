@@ -35,7 +35,7 @@ public class SimulationTimer {
 	/**
 	 * @param time The time to set.
 	 */
-	public static final void setTime(final double time) {
+	 static final void setTime(final double time) {
 		SimulationTimer.time = time;
 	}
 
@@ -61,7 +61,7 @@ public class SimulationTimer {
 	 * @return The number of time steps.
 	 * @see #incTime()
 	 */
-	public static final double getSimTickTime() {
+	static final double getSimTickTime() {
 		// TODO [MR,DS] rename this to something like getSimTimestepSize?
 		return SIM_TICK_TIME_S;
 	}

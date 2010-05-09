@@ -55,7 +55,7 @@ public class EquilTest extends MatsimTestCase {
 		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
 		events.addHandler(writer);
 
-		SimulationTimer.setTime(0);
+//		SimulationTimer.setTime(0); // I don't think this is needed. kai, may'10
 		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
 		sim.run();
 

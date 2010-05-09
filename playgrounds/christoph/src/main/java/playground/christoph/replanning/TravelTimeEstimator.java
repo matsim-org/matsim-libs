@@ -6,8 +6,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.CapacityInformationNetwork;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationNetwork;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.network.MyLinkImpl;
@@ -208,8 +208,14 @@ public class TravelTimeEstimator implements TravelTime, Cloneable{
 //		flow = flow * 30;
 		
 		double qa = flow * 3600 / this.travelTimeBinSize; // vehicles / hour (?)
-		double ca = link.getCapacity(time) * SimulationTimer.getSimTickTime() * flowCapacityFactor;
-//		double ca = link.getCapacity(time) * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
+
+//		double ca = link.getCapacity(time) * SimulationTimer.getSimTickTime() * flowCapacityFactor;
+		double ca = link.getCapacity(time) * 1 * flowCapacityFactor;
+		log.fatal("Christoph, ich habe `SimulationTimer.getSimTickTime()' hier durch `1' ersetzt, weil (1) ich die Innereien der queuesim staerker\n"
+				+"beschuetzen will, und weil (2) ich ohnehin nicht glaube, dass das so funktioniert oder funktionieren sollte. kai, may'10" ) ;
+		System.exit(-1) ;
+		
+		//		double ca = link.getCapacity(time) * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
 		
 		// Model Parameters
 		double alpha = 0.15;

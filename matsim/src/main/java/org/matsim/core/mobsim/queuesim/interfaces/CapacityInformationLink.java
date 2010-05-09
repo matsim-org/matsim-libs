@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.core.mobsim.queuesim.interfaces;
 
 import org.matsim.api.core.v01.network.Link;
 
