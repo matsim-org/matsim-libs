@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.matsim.core.config.Config;
-import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
@@ -32,6 +31,7 @@ import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManager
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
  * This is a standalone executable class for converting a event-file to a .mvi file.
@@ -45,9 +45,9 @@ public class OTFEvent2MVI extends OTFFileWriter {
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
-	private QNetwork network;
+	private VisNetwork network;
 
-	public OTFEvent2MVI(QNetwork net, String eventFileName, String outFileName, double interval_s) {
+	public OTFEvent2MVI(VisNetwork net, String eventFileName, String outFileName, double interval_s) {
 		super(interval_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterQSimConnectionManagerFactory());
 		this.network = net;
 		this.eventFileName = eventFileName;
@@ -68,7 +68,7 @@ public class OTFEvent2MVI extends OTFFileWriter {
 		config.simulation().setSnapshotPeriod(this.interval_s);
 		Events2Snapshot app = new Events2Snapshot();
 		app.addExternalSnapshotWriter(this);
-		app.run(new File(this.eventFileName), config, this.network.getNetwork());
+		app.run(new File(this.eventFileName), config, this.network.getNetworkLayer());
 
 		close();
 	}

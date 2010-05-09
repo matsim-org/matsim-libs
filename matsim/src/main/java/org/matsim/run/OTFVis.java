@@ -47,8 +47,10 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFClientSwing;
 import org.matsim.vis.otfvis.OTFDoubleMVI;
 import org.matsim.vis.otfvis.OTFVisQSim;
+import org.matsim.vis.otfvis.OTFVisQueueSimulation;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
+import org.matsim.vis.snapshots.writers.VisMobsim;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports
@@ -249,7 +251,15 @@ public class OTFVis {
 		ScenarioImpl scenario = loader.getScenario();
 		EventsManagerImpl events = new EventsManagerImpl();
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
-		OTFVisQSim queueSimulation = new OTFVisQSim(scenario, events);
+		VisMobsim queueSimulation = new OTFVisQSim(scenario, events);
+
+		// replacing above line by following line runs with with core.mobsim.queuesimulation instead of the QSim.
+		// There are, however, things that don't work, for example:
+		// - parked vehicles are not shown
+		// - it "catches" the wrong vehicles when you click on the vehicles
+		// - plans are not displayed in queries
+//		VisMobsim queueSimulation = new OTFVisQueueSimulation( scenario, events ) ;
+
 		queueSimulation.setControlerIO(controlerIO);
 		queueSimulation.setIterationNumber(scenario.getConfig().controler().getLastIteration());
 		queueSimulation.run();

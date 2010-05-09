@@ -46,6 +46,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.VisData;
 import org.matsim.vis.snapshots.writers.VisLink;
+import org.matsim.vis.snapshots.writers.VisVehicle;
 
 /**
  * @author dstrippgen
@@ -425,10 +426,11 @@ import org.matsim.vis.snapshots.writers.VisLink;
     return null;
   }
 
-  /* package */ Collection<QueueVehicle> getAllVehicles() {
+  public Collection<VisVehicle> getAllVehicles() {
 
-    Collection<QueueVehicle> vehicles = this.getAllNonParkedVehicles();
-    vehicles.addAll(this.parkedVehicles.values());
+    Collection<VisVehicle> vehicles = this.getAllNonParkedVehicles();
+//    vehicles.addAll(this.parkedVehicles.values());
+    vehicles.addAll(getAllParkedVehicles());
 //      new ArrayList<QueueVehicle>(this.parkedVehicles.values());
 //    vehicles.addAll(transitQueueLaneFeature.getFeatureVehicles());
 //    vehicles.addAll(this.waitingList);
@@ -436,12 +438,23 @@ import org.matsim.vis.snapshots.writers.VisLink;
 //    vehicles.addAll(this.buffer);
     return vehicles;
   }
+  
+  private Collection<VisVehicle> getAllParkedVehicles() {
+//	  return this.parkedVehicles.values();
+	    Collection<VisVehicle> vehicles = new ArrayList<VisVehicle>() ;
 
-  private Collection<QueueVehicle> getAllNonParkedVehicles(){
-    Collection<QueueVehicle> vehicles = new ArrayList<QueueVehicle>();
+	    // yy is there a faster type-safe way of doing this? kai, may'10
+	    for ( VisVehicle veh : this.parkedVehicles.values() ) {
+	    	vehicles.add( veh );
+	    }
+
+	    return vehicles;
+  }
+  private Collection<VisVehicle> getAllNonParkedVehicles(){
+    Collection<VisVehicle> vehicles = new ArrayList<VisVehicle>() ;
+    vehicles.addAll(this.buffer);
     vehicles.addAll(this.waitingList);
     vehicles.addAll(this.vehQueue);
-    vehicles.addAll(this.buffer);
     return vehicles;
   }
 

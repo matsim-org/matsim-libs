@@ -52,9 +52,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QNetwork;
-import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -65,6 +62,9 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
+import org.matsim.vis.snapshots.writers.VisLink;
+import org.matsim.vis.snapshots.writers.VisNetwork;
+import org.matsim.vis.snapshots.writers.VisVehicle;
 
 import com.sun.opengl.util.BufferUtil;
 
@@ -255,16 +255,16 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		else  this.drivenLinks.put(linkId, count + 1);
 	}
 
-	protected List<Plan> getPersonsNOW(Population plans, QNetwork net) {
+	protected List<Plan> getPersonsNOW(Population plans, VisNetwork net) {
 		List<Plan> actPersons = new ArrayList<Plan>();
-		QLink link = net.getLinks().get(this.queryLinkId);
-		Collection<QVehicle> vehs = link.getAllVehicles();
-		for( QVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
+		VisLink link = net.getVisLinks().get(this.queryLinkId);
+		Collection<? extends VisVehicle> vehs = link.getAllVehicles();
+		for( VisVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
 
 		return actPersons;
 	}
 
-	protected List<Plan> getPersons(Population plans, QNetwork net) {
+	protected List<Plan> getPersons(Population plans, VisNetwork net) {
 		List<Plan> actPersons = new ArrayList<Plan>();
 
 		for (Person person : plans.getPersons().values()) {
@@ -342,8 +342,8 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 	@Override
 	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
-		QNetwork net = queueSimulation.getQueueSimulation().getQNetwork();
-		Population plans = queueSimulation.getQueueSimulation().getScenario().getPopulation();
+		VisNetwork net = queueSimulation.getVisMobsim().getVisNetwork();
+		Population plans = queueSimulation.getVisMobsim().getScenario().getPopulation();
 		this.result = new Result();
 		result.linkIdString = this.queryLinkId.toString();
 		this.drivenLinks = new HashMap<Id, Integer>();
@@ -360,7 +360,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		result.count = new int[this.drivenLinks.size()];
 		int pos = 0;
 		for(Id linkId : this.drivenLinks.keySet()) {
-			Link link = net.getNetwork().getLinks().get(linkId);
+			Link link = net.getNetworkLayer().getLinks().get(linkId);
 			result.count[pos/4] = this.drivenLinks.get(linkId);
 			Node node = link.getFromNode();
 			result.vertex[pos++] = (float)node.getCoord().getX();

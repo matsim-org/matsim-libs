@@ -59,7 +59,7 @@ package org.matsim.vis.otfvis.handler;
 //		}
 //
 //		@Override
-//		public OTFDataWriter<QLink> getWriter() {
+//		public OTFDataWriter<VisLink> getWriter() {
 //			if (count == null)
 //			{
 //				LinkTravelTimeCounter.init(server.getEvents(), 1000000);

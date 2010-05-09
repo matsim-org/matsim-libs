@@ -48,6 +48,7 @@ import org.matsim.lanes.Lane;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.VisData;
 
 
 /**
@@ -700,7 +701,10 @@ public class QLane implements QBufferItem {
       return count * 2.0 / QLane.this.storageCapacity;
     }
 
-    public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
+    public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
+		double time = QLane.this.getQLink().getQSimEngine().getQSim().getSimTimer().getTimeOfDay() ;
+
+    	
     	AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLane.this.queueLink.getQSimEngine().getAgentSnapshotInfoBuilder();
     	//the offset of this lane
     	double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();

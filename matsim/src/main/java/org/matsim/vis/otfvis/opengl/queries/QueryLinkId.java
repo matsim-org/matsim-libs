@@ -31,7 +31,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Executor;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -40,6 +39,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
+import org.matsim.vis.snapshots.writers.VisLink;
 
 /**
  * QueryLinkId find the most likely link (or links) to a given coordinate (or rectangle).
@@ -112,8 +112,8 @@ public class QueryLinkId extends AbstractQuery {
 		
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Object src = writer.getSrc();
-			if(src instanceof QLink) {
-				Link link = ((QLink)src).getLink();
+			if(src instanceof VisLink) {
+				Link link = ((VisLink)src).getLink();
 				double alpha = 0.6;
 				double fromX = link.getFromNode().getCoord().getX();
 				double fromY = link.getFromNode().getCoord().getY();

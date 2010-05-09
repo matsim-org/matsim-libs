@@ -25,9 +25,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
+import org.matsim.vis.snapshots.writers.OTFVisMobsim;
 
 
-public class OTFVisQSim extends QSim {
+public class OTFVisQSim extends QSim implements OTFVisMobsim {
 
 	private final OTFVisQSimFeature queueSimulationFeature;
 

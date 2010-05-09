@@ -28,6 +28,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.vis.snapshots.writers.VisLink;
+import org.matsim.vis.snapshots.writers.VisNetwork;
+import org.matsim.vis.snapshots.writers.VisNode;
 
 /**
  *
@@ -35,7 +38,7 @@ import org.matsim.api.core.v01.network.Node;
  * @author mrieser
  * @author dgrether
  */
-public class QNetwork {
+public class QNetwork implements VisNetwork {
 
 	private final Map<Id, QLink> links;
 
@@ -69,15 +72,28 @@ public class QNetwork {
     }
   }
 
+	// the following two are really the same but there is a name conflict in matsim
   public Network getNetwork() {
 		return this.networkLayer;
 	}
+  @Deprecated // use getNetwork.  kai, may'10
+  public Network getNetworkLayer() {
+	  return this.networkLayer ;
+  }
 
 	public Map<Id, QLink> getLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
+	public Map<Id, ? extends VisLink> getVisLinks() {
+		return Collections.unmodifiableMap(this.links);
+	}
+
 	public Map<Id, QNode> getNodes() {
+		return Collections.unmodifiableMap(this.nodes);
+	}
+
+	public Map<Id, ? extends VisNode> getVisNodes() {
 		return Collections.unmodifiableMap(this.nodes);
 	}
 

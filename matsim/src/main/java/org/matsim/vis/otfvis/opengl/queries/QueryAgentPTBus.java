@@ -187,14 +187,14 @@ public class QueryAgentPTBus extends AbstractQuery {
 
 	@Override
 	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
-		this.net = queueSimulation.getQueueSimulation().getQNetwork().getNetwork();
+		this.net = queueSimulation.getVisMobsim().getVisNetwork().getNetworkLayer();
 		this.result = new Result(this.allIds);
 		String prefix = agentId + "-";
-		for(Person person : queueSimulation.getQueueSimulation().getScenario().getPopulation().getPersons().values()) {
+		for(Person person : queueSimulation.getVisMobsim().getScenario().getPopulation().getPersons().values()) {
 			if(person.getId().toString().startsWith(prefix, 0)) allIds.add(person.getId().toString());
 		}
 		if (allIds.size()==0) return;
-		Plan plan = queueSimulation.getQueueSimulation().getScenario().getPopulation().getPersons().get(new IdImpl(allIds.get(0))).getSelectedPlan();
+		Plan plan = queueSimulation.getVisMobsim().getScenario().getPopulation().getPersons().get(new IdImpl(allIds.get(0))).getSelectedPlan();
 		this.result.vertex = buildRoute(plan);
 	}
 

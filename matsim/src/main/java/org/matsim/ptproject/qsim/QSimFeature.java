@@ -34,14 +34,18 @@ public interface QSimFeature {
 
 	void beforeHandleAgentArrival(PersonAgent agent);
 
+	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
 	void afterAfterSimStep(double time);
 
+	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
 	void beforeHandleUnknownLegMode(double now, PersonAgent agent, Link link);
 
 	Collection<PersonAgent> createAgents();
 
+	@Deprecated // do we need to pass the planElementIndex?  to be discussed ...  kai, may'10
 	void afterActivityBegins(PersonAgent agent, int planElementIndex);
 
+	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
 	void afterActivityEnds(PersonAgent agent, double time);
 	
 	void agentCreated(PersonAgent agent);

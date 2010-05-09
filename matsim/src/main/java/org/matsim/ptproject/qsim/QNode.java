@@ -30,11 +30,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.vis.snapshots.writers.VisData;
+import org.matsim.vis.snapshots.writers.VisNode;
 
 /**
  * Represents a node in the QueueSimulation.
  */
-public class QNode {
+public class QNode implements VisNode {
 
 	private static final Logger log = Logger.getLogger(QNode.class);
 
@@ -272,6 +274,12 @@ public class QNode {
 		public int compare(final QLink o1, final QLink o2) {
 			return o1.getLink().getId().compareTo(o2.getLink().getId());
 		}
+	}
+
+	@Override
+	public VisData getVisData() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

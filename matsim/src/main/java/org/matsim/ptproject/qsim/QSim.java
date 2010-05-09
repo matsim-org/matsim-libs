@@ -66,6 +66,8 @@ import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
+import org.matsim.vis.snapshots.writers.VisMobsim;
+import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
  * Implementation of a queue-based transport simulation.
@@ -75,7 +77,7 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
  * @author mrieser
  * @author dgrether
  */
-public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, ObservableSimulation {
+public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, ObservableSimulation, VisMobsim, AcceptsFeatures {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
@@ -415,7 +417,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		if (!this.snapshotManager.getSnapshotWriters().isEmpty()) {
 		  Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 	    for (QLink link : this.getQNetwork().getLinks().values()) {
-	      link.getVisData().getVehiclePositions(time, positions);
+	      link.getVisData().getVehiclePositions( positions);
 	    }
 			for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
 				writer.beginSnapshot(time);
@@ -607,6 +609,10 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public QNetwork getQNetwork() {
 		return this.network;
 	}
+	
+	public VisNetwork getVisNetwork() {
+		return this.network ;
+	}
 
 	public Scenario getScenario() {
 		return this.scenario;
@@ -624,6 +630,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		return this.notTeleportedModes;
 	}
 
+	@Override
 	public void addFeature(final QSimFeature queueSimulationFeature) {
 		this.queueSimulationFeatures.add(queueSimulationFeature);
 	}

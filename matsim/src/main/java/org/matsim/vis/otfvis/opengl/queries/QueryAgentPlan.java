@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisQSimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -56,6 +55,7 @@ import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
+import org.matsim.vis.snapshots.writers.VisNetwork;
 
 import com.sun.opengl.util.BufferUtil;
 
@@ -76,7 +76,7 @@ public class QueryAgentPlan extends AbstractQuery {
 
 	private transient Result result;
 	private transient Map<Id, TeleportationVisData> visTeleportationData;
-	private transient QNetwork net;
+	private transient VisNetwork net;
 	private transient OTFVisQSimFeature queueSimulation;
 
 
@@ -119,7 +119,7 @@ public class QueryAgentPlan extends AbstractQuery {
 	@Override
 	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.queueSimulation = queueSimulation;
-		this.net = queueSimulation.getQueueSimulation().getQNetwork();
+		this.net = queueSimulation.getVisMobsim().getVisNetwork();
 		this.visTeleportationData = queueSimulation.getVisTeleportationData();
 		result = new Result();
 		result.agentId = this.agentId.toString();
@@ -131,7 +131,7 @@ public class QueryAgentPlan extends AbstractQuery {
 					Activity act = (Activity) e;
 					Coord coord = act.getCoord();
 					if (coord == null) {
-						Link link = net.getLinks().get(act.getLinkId())
+						Link link = net.getVisLinks().get(act.getLinkId())
 								.getLink();
 						coord = link.getCoord();
 					}
@@ -139,7 +139,7 @@ public class QueryAgentPlan extends AbstractQuery {
 							(float) coord.getY(), act.getType()));
 				}
 			}
-			QueryAgentUtils.buildRoute(plan, result, agentId, net.getNetwork());
+			QueryAgentUtils.buildRoute(plan, result, agentId, net.getNetworkLayer());
 			result.hasPlan = true;
 		} else {
 			log.error("No plan found for id " + this.agentId);

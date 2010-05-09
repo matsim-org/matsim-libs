@@ -30,13 +30,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QNode;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SceneLayer;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.VisLink;
+import org.matsim.vis.snapshots.writers.VisNode;
 
 /**
  * The OTFConnectionManager is the most important class when building an OTFVis instance.
@@ -114,13 +113,13 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		return clone;
 	}
 
-	public void connectQNodeToWriter(Class<? extends OTFDataWriter<? extends QNode>> writer) {
-		Entry entry = new Entry(QNode.class, writer);
+	public void connectQNodeToWriter(Class<? extends OTFDataWriter<? extends VisNode>> writer) {
+		Entry entry = new Entry(VisNode.class, writer);
 		connections.add(entry);
 	}
 
-	public void connectQLinkToWriter(Class<? extends OTFDataWriter<? extends QLink>> writer) {
-		Entry entry = new Entry(QLink.class, writer);
+	public void connectQLinkToWriter(Class<? extends OTFDataWriter<? extends VisLink>> writer) {
+		Entry entry = new Entry(VisLink.class, writer);
 		connections.add(entry);
 	}
 
@@ -242,19 +241,19 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<Class<OTFWriterFactory<QNode>>> getQNodeEntries() {
-		Collection<Class<OTFWriterFactory<QNode>>> result = new ArrayList<Class<OTFWriterFactory<QNode>>>();
-		for (Class<?> clazz : getToEntries(QNode.class)) {
-			result.add((Class<OTFWriterFactory<QNode>>) clazz);
+	public Collection<Class<OTFWriterFactory<VisNode>>> getQNodeEntries() {
+		Collection<Class<OTFWriterFactory<VisNode>>> result = new ArrayList<Class<OTFWriterFactory<VisNode>>>();
+		for (Class<?> clazz : getToEntries(VisNode.class)) {
+			result.add((Class<OTFWriterFactory<VisNode>>) clazz);
 		}
 		return result;
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<Class<OTFWriterFactory<QLink>>> getQLinkEntries() {
-		Collection<Class<OTFWriterFactory<QLink>>> result = new ArrayList<Class<OTFWriterFactory<QLink>>>();
-		for (Class<?> clazz : getToEntries(QLink.class)) {
-			result.add((Class<OTFWriterFactory<QLink>>) clazz);
+	public Collection<Class<OTFWriterFactory<VisLink>>> getQLinkEntries() {
+		Collection<Class<OTFWriterFactory<VisLink>>> result = new ArrayList<Class<OTFWriterFactory<VisLink>>>();
+		for (Class<?> clazz : getToEntries(VisLink.class)) {
+			result.add((Class<OTFWriterFactory<VisLink>>) clazz);
 		}
 		return result;
 	}

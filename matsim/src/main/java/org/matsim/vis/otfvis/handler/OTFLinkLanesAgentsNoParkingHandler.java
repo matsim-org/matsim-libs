@@ -25,8 +25,8 @@ import java.nio.ByteBuffer;
 
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
+import org.matsim.vis.snapshots.writers.VisLink;
 
 public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 	static public class Writer extends  OTFLinkAgentsHandler.Writer {
@@ -42,7 +42,7 @@ public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 		}
 
 		@Override
-		public OTFDataWriter<QLink> getWriter() {
+		public OTFDataWriter<VisLink> getWriter() {
 			return new Writer();
 		}
 

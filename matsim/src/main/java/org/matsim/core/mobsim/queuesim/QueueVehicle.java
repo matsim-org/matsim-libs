@@ -24,8 +24,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vis.snapshots.writers.VisVehicle;
 
- class QueueVehicle {
+public class QueueVehicle implements VisVehicle {
 
 	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
@@ -74,7 +75,7 @@ import org.matsim.vehicles.BasicVehicle;
 		this.currentLink = link;
 	}
 
-	 PersonDriverAgent getDriver() {
+	 public PersonDriverAgent getDriver() {
 		return this.driver;
 	}
 
@@ -90,7 +91,7 @@ import org.matsim.vehicles.BasicVehicle;
 		return this.sizeInEquivalents;
 	}
 
-	 BasicVehicle getBasicVehicle() {
+	public BasicVehicle getBasicVehicle() {
 		return this.basicVehicle;
 	}
 	

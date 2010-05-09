@@ -41,6 +41,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.VisData;
 
 /**
  * @author dstrippgen
@@ -591,7 +592,9 @@ public class QLinkImpl implements QLink {
 			return count * 2.0 / QLinkImpl.this.storageCapacity;
 		}
 
-		public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions) {
+		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
+			double time = QLinkImpl.this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay() ;
+			
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
 			snapshotInfoBuilder.addVehiclePositions(positions, time, QLinkImpl.this.link, QLinkImpl.this.buffer,

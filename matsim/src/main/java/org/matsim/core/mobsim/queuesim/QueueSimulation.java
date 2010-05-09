@@ -62,6 +62,8 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.AcceptsFeatures;
+import org.matsim.ptproject.qsim.QSimFeature;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
@@ -84,9 +86,9 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author mrieser
  * @author dgrether
  */
- class QueueSimulation implements IOSimulation, ObservableSimulation, CapacityInformationMobsim, VisMobsim {
-	// yyyy needed in many places since the factory returns this class directly.  This should probably be changed.  kai, may'10
-
+public class QueueSimulation implements IOSimulation, ObservableSimulation, CapacityInformationMobsim, VisMobsim, AcceptsFeatures {
+	// yyyy not sure if I want this public but something has to give for integration with OTFVis.  kai, may'10
+	
 	private int snapshotPeriod = 0;
 	private double snapshotTime = 0.0; 	/* time since lasat snapshot */
 
@@ -136,6 +138,8 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
 
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
+	
+	private final List<QSimFeature> queueSimulationFeatures = new ArrayList<QSimFeature>() ;
 
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -319,6 +323,10 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
 		createSnapshotwriter();
 
 		prepareNetworkChangeEventsQueue();
+		
+		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+			queueSimulationFeature.afterPrepareSim();
+		}
 	}
 
 
@@ -326,6 +334,10 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
 	 * Close any files, etc.
 	 */
 	protected void cleanupSim() {
+		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+			queueSimulationFeature.beforeCleanupSim();
+		}
+
 		this.simEngine.afterSim();
 		double now = SimulationTimer.getTime();
 		for (Tuple<Double, PersonDriverAgent> entry : this.teleportationList) {
@@ -383,6 +395,9 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
 			this.snapshotTime += this.snapshotPeriod;
 			doSnapshot(time);
 		}
+		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+			queueSimulationFeature.afterAfterSimStep(time);
+		}
 	}
 
 	private void doSnapshot(final double time) {
@@ -401,6 +416,10 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
 
 	/* package */ static final EventsManager getEvents() {
 		return events;
+	}
+	
+	public EventsManager getEventsManager() {
+		return this.events ;
 	}
 
 	private static final void setEvents(final EventsManager events) {
@@ -581,7 +600,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
 		return this.network ;
 	}
 
-	/*package*/ Scenario getScenario() {
+	public Scenario getScenario() {
 		return this.scenario;
 	}
 
@@ -610,6 +629,12 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
 
 	public void setControlerIO(ControlerIO controlerIO) {
 		this.controlerIO = controlerIO;
+	}
+
+
+	@Override
+	public void addFeature(QSimFeature queueSimulationFeature) {
+		this.queueSimulationFeatures.add( queueSimulationFeature ) ;
 	}
 
 

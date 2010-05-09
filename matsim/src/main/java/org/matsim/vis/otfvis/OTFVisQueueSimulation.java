@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * OnTheFlyQueueSimQuad.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +18,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim;
-
-import java.util.Collection;
-
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-/**
- * Interface for methods to provide a visualizer with data.
- * @author dgrether
- */
-public interface VisData {
-//	/**
-//	 * Returns a measure for how many vehicles on the link have a travel time
-//	 * higher than freespeedTraveltime on a scale from 0 to 2. When more then half
-//	 * of the possible vehicles are delayed, the value 1 will be returned, which
-//	 * depicts the worst case on a (traditional) scale from 0 to 1.
-//	 *
-//	 * @return A measure for the number of vehicles being delayed on this link.
-//	 */
-//	@Deprecated // this was used for netvis, but I don't think that we support netvis any more. kai, apr'10
-//	public double getDisplayableTimeCapValue(double time);
-
-	public Collection<AgentSnapshotInfo> getVehiclePositions(double time, final Collection<AgentSnapshotInfo> positions);
+package org.matsim.vis.otfvis;
 
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.vis.otfvis.server.OnTheFlyServer;
+import org.matsim.vis.snapshots.writers.OTFVisMobsim;
+
+
+public class OTFVisQueueSimulation extends QueueSimulation implements OTFVisMobsim {
+
+	private final OTFVisQSimFeature queueSimulationFeature;
+
+	public OTFVisQueueSimulation(Scenario scenario, EventsManager events) {
+		super(scenario, events);
+		queueSimulationFeature = new OTFVisQSimFeature(this);
+		super.addFeature(queueSimulationFeature);
+		this.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
+	}
+
+	public void setServer(OnTheFlyServer server) {
+		queueSimulationFeature.setServer(server);
+	}
+
+	public void setVisualizeTeleportedAgents(boolean active) {
+		queueSimulationFeature.setVisualizeTeleportedAgents(active);
+	}
+
+	public OTFVisQSimFeature getQueueSimulationFeature() {
+		return queueSimulationFeature;
+	}
+	
 }
+

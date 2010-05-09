@@ -30,7 +30,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
@@ -38,6 +37,7 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
@@ -70,7 +70,8 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			// Write additional agent data
 
 			positions.clear();
-			this.src.getVisData().getVehiclePositions(this.src.getQSimEngine().getQSim().getSimTimer().getTimeOfDay(), positions);
+//			this.src.getVisData().getVehiclePositions(this.src.getQSimEngine().getQSim().getSimTimer().getTimeOfDay(), positions);
+			this.src.getVisData().getVehiclePositions( positions);
 
 			if (showParked) {
 				out.putInt(positions.size());
@@ -102,7 +103,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		}
 
 		@Override
-		public OTFDataWriter<QLink> getWriter() {
+		public OTFDataWriter<VisLink> getWriter() {
 			return new Writer();
 		}
 

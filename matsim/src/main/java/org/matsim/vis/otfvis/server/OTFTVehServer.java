@@ -35,7 +35,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -47,6 +46,8 @@ import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.VisMobsim;
+import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
  * OTFTVehServer is a Server that reads from the T.veh file format.
@@ -77,8 +78,8 @@ public class OTFTVehServer implements OTFServerRemote {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(netFileName);
-		QSim sim = new QSim(scenario, new EventsManagerImpl());
-		QNetwork qnet = sim.getQNetwork();
+		VisMobsim sim = new QSim(scenario, new EventsManagerImpl()); // use QSim as an implementation of a VisMobsim
+		VisNetwork qnet = sim.getVisNetwork();
 
 		OTFConnectionManager connect = new OTFConnectionManager();
 		connect.connectQLinkToWriter(OTFLinkLanesAgentsNoParkingHandler.Writer.class);

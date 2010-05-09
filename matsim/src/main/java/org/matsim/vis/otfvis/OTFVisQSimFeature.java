@@ -18,7 +18,6 @@ import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.qsim.TransitQSimulation;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFeature;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
@@ -31,8 +30,10 @@ import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDrawer;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsLayer;
 import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
+import org.matsim.vis.snapshots.writers.VisMobsim;
+import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
-public class OTFVisQSimFeature implements QSimFeature {
+public class OTFVisQSimFeature implements QSimFeature, VisMobsimFeature {
 
 	protected OnTheFlyServer otfServer = null;
 
@@ -44,7 +45,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 
 	private OTFTeleportAgentsDataWriter teleportationWriter;
 
-	private QSim queueSimulation;
+	private VisMobsim queueSimulation;
 
 	private final LinkedHashMap<Id, TeleportationVisData> visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
 
@@ -52,7 +53,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 
 	private final LinkedHashMap<Id, PersonAgent> agents = new LinkedHashMap<Id, PersonAgent>();
 
-	public OTFVisQSimFeature(QSim queueSimulation) {
+	public OTFVisQSimFeature(VisMobsim queueSimulation) {
 		this.queueSimulation = queueSimulation;
 	}
 
@@ -83,7 +84,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 			if (queueSimulation instanceof TransitQSimulation) {
 				this.otfServer
 						.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
-								queueSimulation.getQNetwork().getNetwork(),
+								queueSimulation.getVisNetwork().getNetworkLayer(),
 								((ScenarioImpl) queueSimulation.getScenario())
 										.getTransitSchedule(),
 								((TransitQSimulation) queueSimulation)
@@ -154,7 +155,7 @@ public class OTFVisQSimFeature implements QSimFeature {
 	}
 
 	public void beforeHandleUnknownLegMode(double now, final PersonAgent agent, Link link) {
-		this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getQNetwork().getNetwork().getLinks().get(agent.getDestinationLinkId())));
+		this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getVisNetwork().getNetworkLayer().getLinks().get(agent.getDestinationLinkId())));
 	}
 
 	private void visualizeTeleportedAgents(double time) {
@@ -192,7 +193,8 @@ public class OTFVisQSimFeature implements QSimFeature {
 		currentActivityNumbers.remove(agent.getPerson().getId());
 	}
 
-	public QSim getQueueSimulation() {
+	@Override
+	public VisMobsim getVisMobsim() {
 		return queueSimulation;
 	}
 

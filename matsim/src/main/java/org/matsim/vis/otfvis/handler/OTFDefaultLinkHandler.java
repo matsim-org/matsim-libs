@@ -24,7 +24,6 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
@@ -32,6 +31,7 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+import org.matsim.vis.snapshots.writers.VisLink;
 
 /**
  * OTFDefaultLinkHandler handles the basic IO of a link.
@@ -51,7 +51,7 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 		return quadReceiver;
 	}
 
-	static public class Writer extends  OTFDataWriter<QLink> implements OTFWriterFactory<QLink> {
+	static public class Writer extends  OTFDataWriter<VisLink> implements OTFWriterFactory<VisLink> {
 
 		private static final long serialVersionUID = 2827811927720044709L;
 
@@ -75,7 +75,7 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 			out.putFloat((float)0.) ; // yy this should be fixed in the binary channel but I am not sure if it is worth it.  kai, apr'10
 		}
 
-		public OTFDataWriter<QLink> getWriter() {
+		public OTFDataWriter<VisLink> getWriter() {
 			return new Writer();
 		}
 	}

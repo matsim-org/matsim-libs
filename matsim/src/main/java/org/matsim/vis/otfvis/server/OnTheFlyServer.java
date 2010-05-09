@@ -455,12 +455,12 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	public void setSimulation(OTFVisQSimFeature otfVisQueueSimFeature) {
 		this.otfVisQueueSimFeature = otfVisQueueSimFeature;
-		this.quadBuilder = new OTFQSimServerQuadBuilder(otfVisQueueSimFeature.getQueueSimulation().getQNetwork());
+		this.quadBuilder = new OTFQSimServerQuadBuilder(otfVisQueueSimFeature.getVisMobsim().getVisNetwork());
 	}
 
 	@Override
 	public OTFVisConfig getOTFVisConfig() throws RemoteException {
-		OTFVisConfig otfVis = this.otfVisQueueSimFeature.getQueueSimulation().getScenario().getConfig().otfVis();
+		OTFVisConfig otfVis = this.otfVisQueueSimFeature.getVisMobsim().getScenario().getConfig().otfVis();
 		if (otfVis != null) {
 			return otfVis;
 		} else {
