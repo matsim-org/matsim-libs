@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.CapacityInformationNetwork;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.router.util.TravelTime;
 
@@ -132,7 +132,7 @@ public class TravelTimeEstimator implements TravelTime, Cloneable{
 		// Adding the vehicle itself to the count.
 //		vehicles++;
 		
-		QueueNetwork queueNetwork = this.handlerAndListener.getQueueNetwork();
+		CapacityInformationNetwork queueNetwork = this.handlerAndListener.getQueueNetwork();
 		
 		double length = link.getLength();		
 		double freeSpeed = link.getFreespeed(time);
@@ -143,10 +143,10 @@ public class TravelTimeEstimator implements TravelTime, Cloneable{
 //		double rhoMax = length * this.storageCapacityFactor / this.vehicleLength;
 //		double flowMax = link.getCapacity(time) * SimulationTimer.getSimTickTime() * flowCapacityFactor / 36000;
 //		double rhoMax = queueNetwork.getLinks().get(link.getId()).getSpaceCap();
-		double vehMax = queueNetwork.getQueueLinks().get(link.getId()).getStorageCapacity();
+		double vehMax = queueNetwork.getCapacityInformationLinks().get(link.getId()).getStorageCapacity();
 		double rhoMax = vehMax / length;
 		
-		double flowMax = queueNetwork.getQueueLinks().get(link.getId()).getSimulatedFlowCapacity();
+		double flowMax = queueNetwork.getCapacityInformationLinks().get(link.getId()).getSimulatedFlowCapacity();
 		double rhoFreeSpeed = flowMax / freeSpeed;
 		
 		double flow = binFlow / this.travelTimeBinSize;

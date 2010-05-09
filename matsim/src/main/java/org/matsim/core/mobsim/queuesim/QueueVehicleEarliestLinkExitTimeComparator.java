@@ -18,12 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim.comparators;
+package org.matsim.core.mobsim.queuesim;
 
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
 
 /**
  * @author dstrippgen

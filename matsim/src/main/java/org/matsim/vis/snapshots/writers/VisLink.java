@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author nagel
  *
  */
-public interface VisualizableLink extends VisualizableObject {
+public interface VisLink extends VisObject {
 
 	Link getLink() ;
 	

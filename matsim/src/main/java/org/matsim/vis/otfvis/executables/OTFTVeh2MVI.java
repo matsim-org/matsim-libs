@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -41,6 +40,7 @@ import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
  * This is a standalone executable to convert T.veh.gz files to .mvi files.
@@ -57,7 +57,7 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
-	public OTFTVeh2MVI(QueueNetwork net, String vehFileName, double interval_s, String outFileName) {
+	public OTFTVeh2MVI(VisNetwork net, String vehFileName, double interval_s, String outFileName) {
 		super(interval_s, new OTFQueueSimServerQuadBuilder(net), outFileName, new OTFFileWriterQSimConnectionManagerFactory());
 		this.vehFileName = vehFileName;
 	}

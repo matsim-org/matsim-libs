@@ -31,13 +31,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.vis.snapshots.writers.VisData;
+import org.matsim.vis.snapshots.writers.VisNode;
 
 /**
  * Represents a node in the QueueSimulation.
  */
-public class QueueNode {
+class QueueNode implements VisNode {
 
-	private static final Logger log = Logger.getLogger(QueueNode.class);
+	private static final Logger log = Logger.getLogger("noname");
 
 	private static final QueueLinkIdComparator qlinkIdComparator = new QueueLinkIdComparator();
 
@@ -223,6 +225,11 @@ public class QueueNode {
 		public int compare(final QueueLink o1, final QueueLink o2) {
 			return o1.getLink().getId().compareTo(o2.getLink().getId());
 		}
+	}
+
+	@Override
+	public VisData getVisData() {
+		return null;
 	}
 
 }

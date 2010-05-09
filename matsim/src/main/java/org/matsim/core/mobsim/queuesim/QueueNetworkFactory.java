@@ -17,14 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim.interfaces;
+package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.mobsim.queuesim.QueueNode;
 
 
 /**

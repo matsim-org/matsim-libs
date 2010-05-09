@@ -30,8 +30,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.mobsim.queuesim.interfaces.QueueNetworkFactory;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.VisLink;
+import org.matsim.vis.snapshots.writers.VisNetwork;
+import org.matsim.vis.snapshots.writers.VisNode;
 
 /**
  * QueueNetwork is responsible for creating the QueueLinks and QueueNodes.
@@ -40,7 +42,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
  * @author mrieser
  * @author dgrether
  */
-public class QueueNetwork {
+ class QueueNetwork implements VisNetwork, CapacityInformationNetwork {
 
 	private final Map<Id, QueueLink> links;
 
@@ -70,7 +72,7 @@ public class QueueNetwork {
 		}
 	}
 
-	public Network getNetworkLayer() { // accessed from elsewhere
+	public Network getNetworkLayer() {
 		return this.networkLayer;
 	}
 
@@ -86,12 +88,25 @@ public class QueueNetwork {
 		return positions;
 	}
 
-	public Map<Id, QueueLink> getQueueLinks() { // accessed from elsewhere but I think "QueueLink" should be replaced by an interface.  kai, may'10
+	/*package*/ Map<Id, QueueLink> getQueueLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
-	public Map<Id, QueueNode> getQueueNodes() { // accessed from elsewhere but I think "QueueNode" should be replaced by an interface.  kai, may'10
+	@Deprecated // only used by christoph
+	public Map<Id, ? extends CapacityInformationLink> getCapacityInformationLinks() {
+		return Collections.unmodifiableMap( this.links ) ;
+	}
+
+	/*package*/ Map<Id, QueueNode> getQueueNodes() {
 		return Collections.unmodifiableMap(this.nodes);
+	}
+	
+	public Map<Id,? extends VisLink> getVisLinks() {
+		return Collections.unmodifiableMap( this.links ) ;
+	}
+	
+	public Map<Id,? extends VisNode> getVisNodes() {
+		return Collections.unmodifiableMap( this.nodes);
 	}
 
 	/*package*/ QueueLink getQueueLink(final Id id) {

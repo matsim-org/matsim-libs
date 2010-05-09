@@ -24,12 +24,12 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
+import org.matsim.vis.snapshots.writers.VisLink;
+import org.matsim.vis.snapshots.writers.VisNetwork;
 
 
 /**
@@ -42,11 +42,11 @@ public class OTFQueueSimServerQuad extends OTFServerQuad2 {
 
   private static final Logger log = Logger.getLogger(OTFQueueSimServerQuad.class);
 
-  transient private QueueNetwork net;
+  transient private VisNetwork net;
   /**
 	 *
 	 */
-	public OTFQueueSimServerQuad(QueueNetwork net) {
+	public OTFQueueSimServerQuad(VisNetwork net) {
 		super(net.getNetworkLayer());
 		this.net = net;
 	}
@@ -58,13 +58,13 @@ public class OTFQueueSimServerQuad extends OTFServerQuad2 {
 
 	private void createFactoriesAndFillQuadTree(OTFConnectionManager connect) {
 		// Get the writer Factories from connect
-		Collection<Class<OTFWriterFactory<QueueLink>>> linkFactories = connect.getQueueLinkEntries();
-		List<OTFWriterFactory<QueueLink>> linkWriterFactoryObjects = new ArrayList<OTFWriterFactory<QueueLink>>(linkFactories.size());
+		Collection<Class<OTFWriterFactory<VisLink>>> linkFactories = connect.getQueueLinkEntries();
+		List<OTFWriterFactory<VisLink>> linkWriterFactoryObjects = new ArrayList<OTFWriterFactory<VisLink>>(linkFactories.size());
 		try {
-			OTFWriterFactory<QueueLink> linkWriterFac = null;
+			OTFWriterFactory<VisLink> linkWriterFac = null;
 			for (Class linkFactory : linkFactories ) {
 				if(linkFactory != Object.class) {
-					linkWriterFac = (OTFWriterFactory<QueueLink>)linkFactory.newInstance();
+					linkWriterFac = (OTFWriterFactory<VisLink>)linkFactory.newInstance();
 					linkWriterFactoryObjects.add(linkWriterFac);
 				}
 			}
@@ -76,12 +76,12 @@ public class OTFQueueSimServerQuad extends OTFServerQuad2 {
 
     	if(!linkWriterFactoryObjects.isEmpty()) {
     		boolean first = true;
-    		for (QueueLink link : this.net.getQueueLinks().values()) {
+    		for (VisLink link : this.net.getVisLinks().values()) {
     			double middleEast = (link.getLink().getToNode().getCoord().getX() + link.getLink().getFromNode().getCoord().getX())*0.5 - this.minEasting;
     			double middleNorth = (link.getLink().getToNode().getCoord().getY() + link.getLink().getFromNode().getCoord().getY())*0.5 - this.minNorthing;
 
-    			for (OTFWriterFactory<QueueLink> fac : linkWriterFactoryObjects) {
-    				OTFDataWriter<QueueLink> writer = fac.getWriter();
+    			for (OTFWriterFactory<VisLink> fac : linkWriterFactoryObjects) {
+    				OTFDataWriter<VisLink> writer = fac.getWriter();
     				// null means take the default handler
     				if (writer != null) {
     					writer.setSrc(link);

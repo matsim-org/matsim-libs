@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.vehicles.BasicVehicle;
 
-public class QueueVehicle {
+ class QueueVehicle {
 
 	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
@@ -50,7 +50,7 @@ public class QueueVehicle {
 		this.basicVehicle = basicVehicle;
 	}
 
-	public double getLinkEnterTime() {
+	 double getLinkEnterTime() {
 		return this.linkEnterTime;
 	}
 	
@@ -58,7 +58,7 @@ public class QueueVehicle {
 		this.linkEnterTime = time;
 	}
 	
-	public double getEarliestLinkExitTime() {
+	 double getEarliestLinkExitTime() {
 		return this.earliestLinkExitTime;
 	}
 
@@ -66,7 +66,7 @@ public class QueueVehicle {
 		this.earliestLinkExitTime = time;
 	}
 
-	public Link getCurrentLink() {
+	 Link getCurrentLink() {
 		return this.currentLink;
 	}
 	
@@ -74,7 +74,7 @@ public class QueueVehicle {
 		this.currentLink = link;
 	}
 
-	public PersonDriverAgent getDriver() {
+	 PersonDriverAgent getDriver() {
 		return this.driver;
 	}
 
@@ -82,15 +82,15 @@ public class QueueVehicle {
 		this.driver = driver;
 	}
 
-	public Id getId() {
+	 Id getId() {
 		return this.id;
 	}
 	
-	public double getSizeInEquivalents() {
+	 double getSizeInEquivalents() {
 		return this.sizeInEquivalents;
 	}
 
-	public BasicVehicle getBasicVehicle() {
+	 BasicVehicle getBasicVehicle() {
 		return this.basicVehicle;
 	}
 	

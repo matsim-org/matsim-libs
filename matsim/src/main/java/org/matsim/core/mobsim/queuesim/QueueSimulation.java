@@ -54,8 +54,6 @@ import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
-import org.matsim.core.mobsim.queuesim.comparators.DriverAgentDepartureTimeComparator;
-import org.matsim.core.mobsim.queuesim.interfaces.QueueNetworkFactory;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -73,6 +71,7 @@ import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
+import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
  * Implementation of a queue-based transport simulation.
@@ -569,6 +568,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	public QueueNetwork getQueueNetwork() { // accessed from elsewhere; "QueueNetwork" should be replaced by interface. kai, may'10
 		return this.network;
+	}
+	
+	public VisNetwork getVisNetwork() {
+		return this.network ;
 	}
 
 	/*package*/ Scenario getScenario() {

@@ -29,12 +29,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.snapshots.writers.VisLink;
+import org.matsim.vis.snapshots.writers.VisNetwork;
+import org.matsim.vis.snapshots.writers.VisNode;
 
 
 
@@ -97,16 +97,16 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 	}
 
 	private static class ReplaceSourceExecutor implements Executor<OTFDataWriter> {
-		public final QueueNetwork q;
+		public final VisNetwork q;
 
-		public ReplaceSourceExecutor(QueueNetwork newNet) {
+		public ReplaceSourceExecutor(VisNetwork newNet) {
 			q = newNet;
 		}
 
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Object src = writer.getSrc();
-			if(src instanceof QueueLink) {
-				QueueLink link = q.getQueueLinks().get(((QueueLink) src).getLink().getId());
+			if(src instanceof VisLink) {
+				VisLink link = q.getVisLinks().get(((VisLink) src).getLink().getId());
 				writer.setSrc(link);
 //			} else if(src instanceof QueueNode) {
 //
@@ -119,13 +119,13 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 	protected double maxEasting;
 	protected double minNorthing;
 	protected double maxNorthing;
-	transient private QueueNetwork net;
+	transient private VisNetwork net;
 
 	// Change this, find better way to transport this info into Writers
 	public static double offsetEast;
 	public static double offsetNorth;
 
-	public OTFServerQuad(QueueNetwork net) {
+	public OTFServerQuad(VisNetwork net) {
 		super(0,0,0,0);
 		updateBoundingBox(net);
 		// has to be done later, as we do not know the writers yet!
@@ -156,14 +156,14 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 	}
 
 
-	public void updateBoundingBox(QueueNetwork net){
+	public void updateBoundingBox(VisNetwork net){
 		this.minEasting = Double.POSITIVE_INFINITY;
 		this.maxEasting = Double.NEGATIVE_INFINITY;
 		this.minNorthing = Double.POSITIVE_INFINITY;
 		this.maxNorthing = Double.NEGATIVE_INFINITY;
 
-		for (Iterator<? extends QueueNode> it = net.getQueueNodes().values().iterator(); it.hasNext();) {
-			QueueNode node = it.next();
+		for (Iterator<? extends VisNode> it = net.getVisNodes().values().iterator(); it.hasNext();) {
+			VisNode node = it.next();
 			this.minEasting = Math.min(this.minEasting, node.getNode().getCoord().getX());
 			this.maxEasting = Math.max(this.maxEasting, node.getNode().getCoord().getX());
 			this.minNorthing = Math.min(this.minNorthing, node.getNode().getCoord().getY());
@@ -185,13 +185,13 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 		// set top node
 		setTopNode(0, 0, easting, northing);
 		// Get the writer Factories from connect
-		Collection<Class<OTFWriterFactory<QueueLink>>> linkFactories =  connect.getQueueLinkEntries();
-		List<OTFWriterFactory<QueueLink>> linkWriterFactoriyObjects = new ArrayList<OTFWriterFactory<QueueLink>>(linkFactories.size());
+		Collection<Class<OTFWriterFactory<VisLink>>> linkFactories =  connect.getQueueLinkEntries();
+		List<OTFWriterFactory<VisLink>> linkWriterFactoriyObjects = new ArrayList<OTFWriterFactory<VisLink>>(linkFactories.size());
 		try {
-			OTFWriterFactory<QueueLink> linkWriterFac = null;
+			OTFWriterFactory<VisLink> linkWriterFac = null;
 			for (Class linkFactory : linkFactories ) {
 				if(linkFactory != Object.class) {
-					linkWriterFac = (OTFWriterFactory<QueueLink>)linkFactory.newInstance();
+					linkWriterFac = (OTFWriterFactory<VisLink>)linkFactory.newInstance();
 					linkWriterFactoriyObjects.add(linkWriterFac);
 				}
 			}
@@ -203,12 +203,12 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 
     	if(!linkWriterFactoriyObjects.isEmpty()) {
     		boolean first = true;
-    		for (QueueLink link : this.net.getQueueLinks().values()) {
+    		for (VisLink link : this.net.getVisLinks().values()) {
     			double middleEast = (link.getLink().getToNode().getCoord().getX() + link.getLink().getFromNode().getCoord().getX())*0.5 - this.minEasting;
     			double middleNorth = (link.getLink().getToNode().getCoord().getY() + link.getLink().getFromNode().getCoord().getY())*0.5 - this.minNorthing;
 
-    			for (OTFWriterFactory<QueueLink> fac : linkWriterFactoriyObjects) {
-    				OTFDataWriter<QueueLink> writer = fac.getWriter();
+    			for (OTFWriterFactory<VisLink> fac : linkWriterFactoriyObjects) {
+    				OTFDataWriter<VisLink> writer = fac.getWriter();
     				// null means take the default handler
     				if (writer != null) {
     					writer.setSrc(link);
@@ -310,7 +310,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements OTFServerQ
 		return this.minNorthing;
 	}
 
-	public void replaceSrc(QueueNetwork newNet) {
+	public void replaceSrc(VisNetwork newNet) {
 		//int colls =
 		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
 				new ReplaceSourceExecutor(newNet));

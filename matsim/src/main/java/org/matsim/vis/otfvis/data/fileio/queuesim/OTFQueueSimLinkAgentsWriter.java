@@ -25,19 +25,19 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
  * @author dgrether
  */
-public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implements OTFWriterFactory<QueueLink> {
+public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<VisLink> implements OTFWriterFactory<VisLink> {
 	// yyyy this class should not be used since it is not clear where the corresponding reader is, and so that last possibility
 	// to fix the binary channel has gotten lost.  kai, apr'10
 	// by default, binary output of this class is linked to OTFLinkLanesAgentsNoParkingHandler
@@ -101,7 +101,7 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 	}
 
 	@Override
-	public OTFDataWriter<QueueLink> getWriter() {
+	public OTFDataWriter<VisLink> getWriter() {
 		return new OTFQueueSimLinkAgentsWriter();
 	}
 

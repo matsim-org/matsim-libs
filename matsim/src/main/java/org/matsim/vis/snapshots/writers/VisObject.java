@@ -1,6 +1,6 @@
 package org.matsim.vis.snapshots.writers;
 
-public interface VisualizableObject {
+public interface VisObject {
 
 	VisData getVisData() ;
 	

@@ -41,7 +41,7 @@ import org.matsim.core.utils.misc.Time;
  * @author dgrether
  * @author mrieser
  */
-public class QueuePersonAgent implements PersonDriverAgent {
+ class QueuePersonAgent implements PersonDriverAgent {
 
 	private static final Logger log = Logger.getLogger(QueuePersonAgent.class);
 

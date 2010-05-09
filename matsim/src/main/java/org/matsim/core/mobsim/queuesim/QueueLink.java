@@ -44,14 +44,14 @@ import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.VisData;
-import org.matsim.vis.snapshots.writers.VisualizableLink;
+import org.matsim.vis.snapshots.writers.VisLink;
 
 /**
  * @author dstrippgen
  * @author dgrether
  * @author mrieser
  */
-public class QueueLink implements VisualizableLink {
+ class QueueLink implements VisLink, CapacityInformationLink {
 
   final private static Logger log = Logger.getLogger(QueueLink.class);
 
@@ -457,8 +457,10 @@ public class QueueLink implements VisualizableLink {
    * <br/>
    * (The "storage capacity" of the link is the number of vehicles that can be on the link, i.e. from
    * one node to the next.  Other quantities can have other names.  kai, may'10)
+ * @deprecated
    */
   @Deprecated // it is preferred to either use the "Link" data, or to evaluate events.  kai, may'10
+  @Override
   public double getStorageCapacity() { // needs to remain public
     return this.storageCapacity;
   }
@@ -476,9 +478,9 @@ public class QueueLink implements VisualizableLink {
     return this.vehQueue.size();
   }
 
-
+  @Override
   public Link getLink() { 
-	  //  needed at many places in otfvis (if you assume that otfvis gets "visualizableLink", then this makes sense)
+	  //  needed at many places in otfvis (part of "VisLink")
     return this.link;
   }
 

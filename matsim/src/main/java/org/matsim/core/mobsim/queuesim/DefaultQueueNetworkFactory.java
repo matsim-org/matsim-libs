@@ -21,7 +21,6 @@ package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.mobsim.queuesim.interfaces.QueueNetworkFactory;
 
 
 /**
@@ -34,7 +33,7 @@ import org.matsim.core.mobsim.queuesim.interfaces.QueueNetworkFactory;
 	}
 
 	/**
-	 * @see org.matsim.core.mobsim.queuesim.interfaces.QueueNetworkFactory#createQueueNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
+	 * @see org.matsim.core.mobsim.queuesim.QueueNetworkFactory#createQueueNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
 	 */
 	public QueueNode createQueueNode(final Node node, final QueueNetwork queueNetwork) {
 		return new QueueNode(node, queueNetwork);

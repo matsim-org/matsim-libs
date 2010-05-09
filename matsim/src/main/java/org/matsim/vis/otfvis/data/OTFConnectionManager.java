@@ -30,13 +30,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QNode;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SceneLayer;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+import org.matsim.vis.snapshots.writers.VisLink;
 
 /**
  * The OTFConnectionManager is the most important class when building an OTFVis instance.
@@ -125,15 +125,15 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 	}
 
 	public void connectQueueLinkToWriter(Class<? extends OTFQueueSimLinkAgentsWriter> writer) {
-		Entry entry = new Entry(QueueLink.class, writer);
+		Entry entry = new Entry(VisLink.class, writer);
 		connections.add(entry);
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<Class<OTFWriterFactory<QueueLink>>> getQueueLinkEntries() {
-		Collection<Class<OTFWriterFactory<QueueLink>>> result = new ArrayList<Class<OTFWriterFactory<QueueLink>>>();
-		for (Class<?> clazz : getToEntries(QueueLink.class)) {
-			result.add((Class<OTFWriterFactory<QueueLink>>) clazz);
+	public Collection<Class<OTFWriterFactory<VisLink>>> getQueueLinkEntries() {
+		Collection<Class<OTFWriterFactory<VisLink>>> result = new ArrayList<Class<OTFWriterFactory<VisLink>>>();
+		for (Class<?> clazz : getToEntries(VisLink.class)) {
+			result.add((Class<OTFWriterFactory<VisLink>>) clazz);
 		}
 		return result;
 	}

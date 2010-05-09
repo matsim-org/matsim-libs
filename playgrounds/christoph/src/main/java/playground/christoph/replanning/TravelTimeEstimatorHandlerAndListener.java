@@ -31,7 +31,7 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.CapacityInformationNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.population.routes.NetworkRoute;
 
@@ -68,7 +68,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 
 	private Population population;
 	private Network network;
-	private QueueNetwork queueNetwork;
+	private CapacityInformationNetwork queueNetwork;
 	private int travelTimeBinSize;
 	private int numSlots;
 	private TravelTimeEstimator travelTimeEstimator;
@@ -162,7 +162,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 		return this.numSlots;
 	}
 	
-	protected QueueNetwork getQueueNetwork()
+	protected CapacityInformationNetwork getQueueNetwork()
 	{
 		return this.queueNetwork;
 	}
