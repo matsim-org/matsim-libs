@@ -59,7 +59,12 @@ public class ExternalMobsimTest {
 		// run mobsim
 		//
 		System.out.println("["  + "] mobsim starts");
-		SimulationTimer.setTime(0);
+
+//		SimulationTimer.setTime(0);
+		// commenting out the last line.  I don't think that anybody is using this piece of code, and even if so
+		// I think that the code still works without that line (in particular, since it is not in the test repository).
+		// kai, may'10
+		
 		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events_);
 		sim.run();
 
