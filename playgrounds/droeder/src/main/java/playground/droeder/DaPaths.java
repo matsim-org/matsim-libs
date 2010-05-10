@@ -32,6 +32,8 @@ public interface DaPaths {
 	final String DGSTUDIES = STUDIES + "dgrether/";
 	final String DASTUDIES = STUDIES + "droeder/";
 	
+	final String BVG09 = SHAREDSVN + "bvg09_urdaten/";
+	
 	final String OUTPUT = VSP + "output/";
 	
 	

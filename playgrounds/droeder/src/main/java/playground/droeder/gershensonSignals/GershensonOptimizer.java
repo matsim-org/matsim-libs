@@ -36,6 +36,7 @@ import playground.droeder.DaPaths;
 import playground.droeder.ValueComparator;
 
 /**
+ * provides methods to find parameters for the DaAdaptivController.
  * @author droeder
  *
  */
@@ -194,35 +195,29 @@ public class GershensonOptimizer {
 			reader.close();
 			
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		return solutions;
 	}
+	
 
 	public static void main(String[] args) {
 		GershensonOptimizer g = new GershensonOptimizer();
 		Map<Integer, Solution> temp = new HashMap<Integer, Solution>();
 		Map<Integer, Solution> best = new HashMap<Integer, Solution>();
 		GershensonRunner runner;
-		final String scenario = "denver";
-		String folder = DaPaths.OUTPUT + scenario + "\\optimization1\\";
+		final String scenario = "cottbus";
+		String folder = DaPaths.OUTPUT + scenario + "\\optimization2\\";
 		int i;
 		int b = 200;
-		i = 0;
-		for (Solution s : g.readFromTxt(folder + "median.txt").values()){
-			temp.put(i, s);
-			i++;
+		
+		
+		for (int ii = 0; ii<b; ii++){
+			temp.put(ii, g.init());
 		}
-		
-		
-//		for (int ii = 0; ii<b; ii++){
-//			temp.put(ii, g.init());
-//		}
 		for (Entry<Integer, Solution> e  : temp.entrySet()){
 			runner = new GershensonRunner(e.getValue().getU(), e.getValue().getN(), e.getValue().getCap(), e.getValue().getD(), e.getValue().getMaxRed(), false, false);
 			Gbl.reset();
@@ -235,11 +230,8 @@ public class GershensonOptimizer {
 			e.getValue().setMedianWaitFac(runner.getFactors().get("median"));
 			e.getValue().setAbsTT(runner.getAbsTT());
 		}
-		g.writeToTxt(temp, folder + "median.txt");
-		System.exit(0);
-
 		
-//		g.writeToTxt(temp,  folder + "randomSeed.txt");
+		g.writeToTxt(temp,  folder + "randomSeed.txt");
 		best = g.getBest(temp,b/5);
 		g.writeToTxt(best, folder + "bestRandom.txt");
 		
@@ -275,6 +267,12 @@ public class GershensonOptimizer {
 		}
 	}
 }
+
+/**
+ * This class stores Parametersettings for the DaAdaptiveController
+ * @author droeder
+ *
+ */
 class Solution{
 	private int u;
 	private int n;

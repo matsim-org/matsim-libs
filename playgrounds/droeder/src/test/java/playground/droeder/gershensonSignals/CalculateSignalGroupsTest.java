@@ -21,6 +21,7 @@ package playground.droeder.gershensonSignals;
 
 import java.util.SortedMap;
 
+import org.apache.commons.math.analysis.solvers.NewtonSolver;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
@@ -33,46 +34,65 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
+import playground.droeder.DaPaths;
+import playground.droeder.gershensonSignals.CalculateSignalGroups;
+import playground.droeder.gershensonSignals.DenverScenarioGenerator;
+import playground.droeder.gershensonSignals.GershensonScenarioGenerator;
 
 /**
  * @author droeder
  *
  */
 public class CalculateSignalGroupsTest {
-	Id id1 = new IdImpl("1");
-	Id id2 = new IdImpl("2");
-	Id id3 = new IdImpl("3");
-	Id id4 = new IdImpl("4");
-
-
-	ScenarioLoader  loader;
-	ScenarioImpl scenario;
-	Network net;
-	
-	private static final Logger log = Logger.getLogger(CalculateSignalGroupsTest.class);
- 
+//	
+//	final String INPUT = DaPaths.DASTUDIES + "denver\\";
+//	Id id1 = new IdImpl("1");
+//	Id id2 = new IdImpl("2");
+//	Id id3 = new IdImpl("3");
+//	Id id4 = new IdImpl("4");
+//
+//
+//	ScenarioLoader  loader;
+//	ScenarioImpl scenario;
+//	Network net;
+//	SortedMap<Id, SignalGroupDefinition> groups;
+//	CalculateSignalGroups ccsg;
+//	
+//	private static final Logger log = Logger.getLogger(CalculateSignalGroupsTest.class);
+// 
 	@Before public void init() {
-//		loader = new ScenarioLoaderImpl(GershensonScenarioGenerator.CONFIGOUTPUTFILE);
-		loader = new ScenarioLoaderImpl(DenverScenarioGenerator.CONFIGOUTPUTFILE);
-		scenario = (ScenarioImpl) loader.loadScenario();
-		net = scenario.getNetwork();
+//		loader = new ScenarioLoaderImpl(INPUT + "denverConfig.xml");
+//		scenario = (ScenarioImpl) loader.loadScenario();
+//		net = scenario.getNetwork();
+//		groups = scenario.getSignalSystems().getSignalGroupDefinitions();
+//		ccsg = new CalculateSignalGroups(groups, net);
 	}
 	
 	@Test public void testCorrespondingSignalGroups(){
-		SortedMap<Id, SignalGroupDefinition> groups = scenario.getSignalSystems().getSignalGroupDefinitions();
-		CalculateSignalGroups ccsg = new CalculateSignalGroups(groups, net);
-		
-		ccsg.calculateCorrespondingGroups();
-		ccsg.calculateCompetingGroups(ccsg.calculateCorrespondingGroups());
-		
-//		assertEquals(id3 , ccsg.calculateCorrespondingGroups(groups, net).
+//
+//		SortedMap<Id, SignalGroupDefinition> groups = scenario.getSignalSystems().getSignalGroupDefinitions();
+//		CalculateSignalGroups ccsg = new CalculateSignalGroups(groups, net);
+//
+//		ccsg.calculateCorrespondingGroups();
+//		ccsg.calculateCompetingGroups(ccsg.calculateCorrespondingGroups());
+
+//		assertEquals(id3 , ccsg.calculateCorrespondingGroups().
 //				get(id1));
-//		assertEquals(id1 , ccsg.calculateCorrespondingGroups(groups, net).
+//		assertEquals(id1 , ccsg.calculateCorrespondingGroups().
 //				get(id3));
-//		assertEquals(id4 , ccsg.calculateCorrespondingGroups(groups, net).
+//		assertEquals(id4 , ccsg.calculateCorrespondingGroups().
 //				get(id2));
-//		assertEquals(id2 , ccsg.calculateCorrespondingGroups(groups, net).
+//		assertEquals(id2 , ccsg.calculateCorrespondingGroups().
 //				get(id4));
+//		assertEquals(new IdImpl("12"), ccsg.calculateMainOutlinks().get(new IdImpl("11")));
+//		assertEquals(new IdImpl("14"), ccsg.calculateMainOutlinks().get(new IdImpl("13")));
+//		assertEquals(new IdImpl("15"), ccsg.calculateMainOutlinks().get(new IdImpl("16")));
+//		assertEquals(new IdImpl("17"), ccsg.calculateMainOutlinks().get(new IdImpl("18")));
+		
+//		ccsg.calcCorrGroups();
+		
+		
+//		assertEquals(1.5*Math.PI, ccsg.calcAngle(net.getLinks().get(new IdImpl("14"))), 0);
 	}
 	@After
 	public void endTest(){

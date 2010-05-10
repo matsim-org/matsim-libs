@@ -26,6 +26,8 @@ import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QLinkLanesImpl;
 
 /**
+ * This class provides methods to check, if a car is in distance d.
+ * 
  * @author droeder
  *
  */
@@ -44,8 +46,6 @@ public class CarLocator {
 		this.checkD();
 		this.earliestD();
 	}
-	
-	//wieso jedes mal D checken
 	private void checkD(){
 		if (this.link instanceof QLinkLanesImpl){
 			for (QLane ql : ((QLinkLanesImpl)link).getQueueLanes()){

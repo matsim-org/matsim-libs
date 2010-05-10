@@ -61,6 +61,8 @@ import playground.droeder.DaPaths;
 
 
 /**
+ * generates a simple test-scenario
+ * 
  * @author droeder
  *
  */

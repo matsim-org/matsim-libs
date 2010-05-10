@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -37,10 +39,10 @@ import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 /**
- * What is the difference of this class and the DaAdapativeController class
+ * First try. Do not use.
  * @author droeder
- *
  */
+@Deprecated
 public class GershensonAdaptiveTrafficLightController extends
 			AdaptiveSignalSystemControlerImpl implements EventHandler, SimulationBeforeSimStepListener {
 
@@ -71,7 +73,7 @@ public class GershensonAdaptiveTrafficLightController extends
 	protected Map<Id, Id> mainOutLinks;
 
 	protected QNetwork net;
-
+	
 
 	public GershensonAdaptiveTrafficLightController(AdaptiveSignalSystemControlInfo controlInfo) {
 		super(controlInfo);

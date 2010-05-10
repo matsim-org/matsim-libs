@@ -43,6 +43,8 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.signalsystems.systems.SignalSystemDefinition;
 
 /**
+ * Provides Methods to find compliant traffic flows an traffic lights.
+ * 
  * @author droeder
  *
  */
@@ -267,7 +269,6 @@ public class CalculateSignalGroups{
 			List<Id> l = new ArrayList<Id>();
 			for (SignalGroupDefinition sd : groups.values()){
 				
-				//new code
 				if(net.getLinks().get(groups.get(ee.getKey()).getLinkRefId()).getToNode().
 						equals(net.getLinks().get(sd.getLinkRefId()).getToNode())){
 					if (!(sd.getId().equals(ee.getKey()) || sd.getId().equals(ee.getValue()))){

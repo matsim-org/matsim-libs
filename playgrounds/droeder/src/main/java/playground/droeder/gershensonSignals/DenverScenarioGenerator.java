@@ -41,6 +41,8 @@ import org.matsim.signalsystems.systems.SignalSystemDefinition;
 import playground.droeder.DaPaths;
 
 /**
+ * generates a configfile for the denver-scenario.
+ * 
  * @author droeder
  *
  */

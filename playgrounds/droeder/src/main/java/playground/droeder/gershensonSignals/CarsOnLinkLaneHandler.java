@@ -44,8 +44,7 @@ import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 /**
- * This class is calculating CarLocator instances for every vehicle on every link. For performance reasons it would
- * be sufficient to calculate this information only on required links dg April 2010
+ * Eventhandler that provide methods to check how many cars are in the distances, specified by the DaAdaptiveController.
  * 
  * @author droeder
  *

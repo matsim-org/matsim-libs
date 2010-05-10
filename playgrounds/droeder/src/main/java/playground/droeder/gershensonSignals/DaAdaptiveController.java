@@ -42,6 +42,9 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import playground.droeder.ValueComparator;
 
 /**
+ * This class is the main component of the Bachelor Thesis. It contains the
+ * Gershenson-Algorithm and provides Methods for switching traffic-lights.
+ * 
  * @author droeder
  *
  */
@@ -74,9 +77,6 @@ public class DaAdaptiveController extends
 		private double switchedGreen = 0;
 		private Map<Id, Double> switchedToRed;
 		
-		/**
-		 * this map is only used for analysis -> move to separate object
-		 */
 		private Map<Id, SortedMap<Double, Double>> demandOnRefLink = new HashMap<Id, SortedMap<Double,Double>>();
 		
 		
@@ -227,11 +227,6 @@ public class DaAdaptiveController extends
 		@Override
 		public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
 			
-//			//check if this group was switched in this timestep. if so, return oldstate
-//			if (this.switchedGreen == e.getSimulationTime()){
-//				return;
-//			}
-			
 			// disable algorithm if interim is active
 			if (interim == true){
 				this.initIsGreen(e.getSimulationTime(), interimGroup);
@@ -242,8 +237,7 @@ public class DaAdaptiveController extends
 			//switch RedLights first
 			if (maxRedTimeActive == true){
 				Id id = new IdImpl("null");
-				//dg soll das Double.positiveInfinity sein?
-				double redTime = 99999;
+				double redTime = Double.POSITIVE_INFINITY;
 				for (Entry<Id, Double> ee : switchedToRed.entrySet()){
 					if ((e.getSimulationTime() - ee.getValue()) > maxRedTime && ee.getValue()<redTime){
 						id = ee.getKey();
@@ -409,7 +403,7 @@ public class DaAdaptiveController extends
 			this.switchedGreen = time;
 		}
 		
-		/*
+		/**
 		 * use this method to set parameters minimumGreenTime u, minimum of the product cars and waitingTime n, the capacityFactor for trafficJam on the outlink
 		 * and the maximumRedTime ( 0 == disable maximumRedTime)
 		 */
