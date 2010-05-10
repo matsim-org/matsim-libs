@@ -253,11 +253,10 @@ public class OTFVis {
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
 		VisMobsim queueSimulation = new OTFVisQSim(scenario, events);
 
-		// replacing above line by following line runs with with core.mobsim.queuesimulation instead of the QSim.
+		// replacing above line by following line runs this with core.mobsim.queuesimulation instead of QSim.
 		// There are, however, things that don't work, for example:
-		// - parked vehicles are not shown
-		// - it "catches" the wrong vehicles when you click on the vehicles
-		// - plans are not displayed in queries
+		// - parked vehicles are not shown (I would assume that they are simply not included into the core.mobsim.queuesim.QLink.Visdata)
+		// - it "catches" the wrong vehicles when you click on the vehicles (one time step forward seems to fix this)
 //		VisMobsim queueSimulation = new OTFVisQueueSimulation( scenario, events ) ;
 
 		queueSimulation.setControlerIO(controlerIO);
