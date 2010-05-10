@@ -85,6 +85,7 @@ public class OTFClientSwing extends OTFClient {
 		 */
 		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
 		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
+		this.connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class,  NetJComponent.AgentDrawer.class);
 
 	}
 
