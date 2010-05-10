@@ -168,4 +168,8 @@ public class PlanStrategy {
 		return name.toString();
 	}
 
+	public PlanSelector getPlanSelector() {
+		return planSelector;
+	}
+	
 }
