@@ -37,7 +37,7 @@ import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 	private static class LegChainModesListener1 implements
@@ -207,39 +207,46 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 	public void testLegChainModes1() {
 		// the agent in the initial plan has only "walk" legs.
-		Config config = loadConfig(getInputDirectory() + "config1.xml");
+		Config config = loadConfig("yu/" + getInputDirectory() + "config1.xml");
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener1());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
-		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring(), Double.parseDouble(config.findParam("subTourModeChoice", "offsetWalk"))));
+		ctl
+				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+						config.charyparNagelScoring(), Double
+								.parseDouble(config.findParam(
+										"changeLegModeWithParkLocation", "offsetWalk"))));
 		ctl.run();
 	}
 
 	public void testLegChainModes2() {
 		// the agent in the initial plan has only "car" legs.
-		Config config = loadConfig(getInputDirectory() + "config2.xml" );
+		Config config = loadConfig("yu/" + getInputDirectory() + "config2.xml");
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener2());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
-		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring(), Double.parseDouble(config.findParam(
-								"subTourModeChoice", "offsetWalk"))));
+		ctl
+				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+						config.charyparNagelScoring(), Double
+								.parseDouble(config.findParam(
+										"changeLegModeWithParkLocation", "offsetWalk"))));
 		ctl.run();
 	}
 
 	public void testLegChainModes3() {
 		// the agent in the initial plan has only "pt" legs.
-		Config config = loadConfig(getInputDirectory() + "config3.xml");
+		Config config = loadConfig("yu/" + getInputDirectory() + "config3.xml");
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener3());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
-		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring(), Double.parseDouble(config.findParam(
-								"subTourModeChoice", "offsetWalk"))));
+		ctl
+				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+						config.charyparNagelScoring(), Double
+								.parseDouble(config.findParam(
+										"changeLegModeWithParkLocation", "offsetWalk"))));
 		ctl.run();
 	}
 
