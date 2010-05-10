@@ -574,7 +574,6 @@ public class OsmNetworkReader {
 				boolean used = false;
 				OsmHighwayDefaults osmHighwayDefaults = highwayDefaults.get(this.currentWay.tags.get("highway"));
 				if (osmHighwayDefaults != null) {
-					System.out.println(osmHighwayDefaults.hierarchy);
 					int hierarchy = osmHighwayDefaults.hierarchy;
 					this.currentWay.hierarchy = hierarchy;
 				}  else {
