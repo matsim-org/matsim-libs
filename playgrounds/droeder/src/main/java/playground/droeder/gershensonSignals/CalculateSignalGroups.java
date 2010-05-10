@@ -32,7 +32,6 @@ import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -40,7 +39,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
-import org.matsim.signalsystems.systems.SignalSystemDefinition;
 
 /**
  * Provides Methods to find compliant traffic flows an traffic lights.
@@ -228,12 +226,6 @@ public class CalculateSignalGroups{
 		
 		if (theta < 0) theta += 2*Math.PI;
 		
-		return theta;
-	}
-	
-	private double calcAngle2 (Link l ){
-		Coord c = this.getVector(l);
-		double theta = Math.atan2(c.getY(), c.getX());
 		return theta;
 	}
 	

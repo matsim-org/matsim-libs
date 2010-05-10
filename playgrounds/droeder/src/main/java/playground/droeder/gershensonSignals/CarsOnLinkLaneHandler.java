@@ -52,9 +52,6 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
 public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEventHandler, 
 			LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentWait2LinkEventHandler{
 	
-	private static final Logger log = Logger
-			.getLogger(CarsOnLinkLaneHandler.class);
-	
 	private Map<Id, Map<Id, Integer>> vehOnLinkLanes = new HashMap<Id, Map<Id, Integer>>(); 
 	
 	private Map<Id, Map<Id, CarLocator>> locateCars =  new HashMap<Id, Map<Id, CarLocator>>();

@@ -341,7 +341,7 @@ public class GershensonRunner implements AgentStuckEventHandler {
 		int minRed = 25;
 		int carTime = 379;
 		int maxRed = 31;
-		runner = new GershensonRunner(minRed, carTime, cap, d, maxRed, false, false);
+		runner = new GershensonRunner(minRed, carTime, cap, d, maxRed, false, true);
 		runner.setSignalPlanBounds(21600, 22000, 22720);
 		runner.runScenario("denver");
 

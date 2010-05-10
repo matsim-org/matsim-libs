@@ -51,8 +51,6 @@ import playground.droeder.ValueComparator;
 public class DaAdaptiveController extends
 	AdaptiveSignalSystemControlerImpl implements EventHandler, SimulationBeforeSimStepListener {
 
-		private static final Logger log = Logger.getLogger(GershensonAdaptiveTrafficLightController.class);
-
 		protected int tGreenMin =  0; // time in seconds
 		protected int minCarsTime = 0; //
 		protected double capFactor = 0;
@@ -142,20 +140,7 @@ public class DaAdaptiveController extends
 			this.oldState = this.getSignalGroupStates().get(signalGroup);
 
 			// check if competing groups are green
-			//TODO what the fuck is this, remove the label syntax and programm in a better way
-			out : 
-			for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
-				if(!(e.getValue().contains(signalGroup))){
-					for (SignalGroupDefinition sd : e.getValue()){
-						if(this.getSignalGroupStates().get(sd).equals(SignalGroupState.GREEN)){
-							compGroupsGreen = true;
-							break out;
-						}else{
-							compGroupsGreen = false;
-						}
-					}
-				}
-			}
+			compGroupsGreen = this.checkCompetingGroups(signalGroup);
 			
 			// calculate outlinkCapacity for the mainOutlink and check if there is a trafficJam
 			if (!(mainOutLinks.get(signalGroup.getLinkRefId()) ==  null)){
@@ -216,6 +201,21 @@ public class DaAdaptiveController extends
 			}else{
 				this.approachingRed = 0;
 			}
+		}
+		
+		private boolean checkCompetingGroups(SignalGroupDefinition sg){
+				for (Entry<Id, List<SignalGroupDefinition>> e : corrGroups.entrySet()){
+					if(!(e.getValue().contains(sg))){
+						for (SignalGroupDefinition sd : e.getValue()){
+							if(this.getSignalGroupStates().get(sd).equals(SignalGroupState.GREEN)){
+								return true;
+							}
+						}
+					}
+				}
+			
+			
+			return false;
 		}
 		
 		@Override
