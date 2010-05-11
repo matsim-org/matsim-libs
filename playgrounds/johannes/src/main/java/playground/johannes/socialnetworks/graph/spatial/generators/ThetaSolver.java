@@ -134,11 +134,11 @@ public class ThetaSolver {
 			for(SpatialVertex vj : vertices) {
 				if(vi != vj) {
 					double c = costFunction.edgeCost(vi, vj);
-					sum += c * Math.exp(-x * c) - budget;
+					sum += c * Math.exp(-x * c);
 				}
 			}
 			
-			return sum;
+			return sum - budget;
 		}
 		
 	}
@@ -158,7 +158,7 @@ public class ThetaSolver {
 			for(SpatialVertex vj : primitive.vertices) {
 				if(primitive.vi != vj) {
 					double c = primitive.costFunction.edgeCost(primitive.vi, vj);
-					sum += -c * c * Math.exp(-x * c) - primitive.budget;
+					sum += -c * c * Math.exp(-x * c);
 				}
 			}
 			

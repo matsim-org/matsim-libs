@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ErgmEdgeCost.java
+ * EdgeCosts.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,65 +17,54 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.generators;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
-import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
+import playground.johannes.socialnetworks.graph.spatial.generators.EdgeCostFunction;
 
 /**
  * @author illenberger
  *
  */
-public class ErgmEdgeCost extends ErgmTerm {
+public class EdgeCosts {
 
-	private double[] thetas;
-	
 	private EdgeCostFunction costFunction;
 	
-	public ErgmEdgeCost(SpatialAdjacencyMatrix y, EdgeCostFunction costFunction, double budget, String thetaFile) {
+	public EdgeCosts(EdgeCostFunction costFunction) {
 		this.costFunction = costFunction;
-		
-		TObjectDoubleHashMap<SpatialVertex> budgets = new TObjectDoubleHashMap<SpatialVertex>();
-		for(int i = 0; i < y.getVertexCount(); i++) {
-			budgets.put(y.getVertex(i), budget);
-		}
-		
-		ThetaSolver solver = new ThetaSolver(costFunction);
-		TObjectDoubleHashMap<SpatialVertex> tmpThetas = solver.solve(budgets);
-		thetas = new double[y.getVertexCount()];
-		Distribution distr = new Distribution();
-		for(int i = 0; i < thetas.length; i++) {
-			thetas[i] = tmpThetas.get(y.getVertex(i));
-			distr.add(thetas[i]);
-		}
-		
-		if(thetaFile != null) {
-			double binsize = (distr.max() - distr.min())/100.0;
-			try {
-				Distribution.writeHistogram(distr.absoluteDistribution(binsize), thetaFile);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 	
-	@Override
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean yIj) {
-		SpatialVertex vi = ((SpatialAdjacencyMatrix)y).getVertex(i);
-		SpatialVertex vj = ((SpatialAdjacencyMatrix)y).getVertex(j);
+	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
+		Distribution distribution = new Distribution();
 		
-		return thetas[i] * costFunction.edgeCost(vi, vj);
+		Set<SpatialEdge> touched = new HashSet<SpatialEdge>();
+		for(SpatialVertex v : vertices) {
+			for(int i = 0; i < v.getEdges().size(); i++) {
+				if(touched.add(v.getEdges().get(i)))
+					distribution.add(costFunction.edgeCost(v, v.getNeighbours().get(i)));
+			}
+		}
+		
+		return distribution;
 	}
-
+	
+	public Distribution vertexCostsSum(Set<? extends SpatialVertex> vertices) {
+		Distribution distr = new Distribution();
+		for(SpatialVertex vertex : vertices) {
+			double sum = 0;
+			for(SpatialVertex neighbor : vertex.getNeighbours()) {
+				sum += costFunction.edgeCost(vertex, neighbor);
+			}
+			
+			distr.add(sum);
+		}
+		
+		return distr;
+	}
 }

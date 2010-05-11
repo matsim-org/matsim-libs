@@ -31,7 +31,7 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
  * @author illenberger
  *
  */
-public class Ergm implements ConditionalDistribution {
+public class Ergm implements GraphProbability {
 
 	private ErgmTerm[] ergmTerms;
 	
@@ -46,7 +46,7 @@ public class Ergm implements ConditionalDistribution {
 	}
 	
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij) {
+	public double difference(AdjacencyMatrix y, int i, int j, boolean y_ij) {
 		double h_y = evaluateExpHamiltonian(y, i, j, y_ij);
 //		if(Double.isInfinite(h_y))
 //			throw new IllegalArgumentException("H(y) must not be infinity!");
@@ -64,25 +64,25 @@ public class Ergm implements ConditionalDistribution {
 		}
 		return Math.exp(sum);
 	}
-
-	/* (non-Javadoc)
-	 * @see playground.johannes.socialnetworks.graph.mcmc.ConditionalDistribution#addEdge(playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix, int, int)
-	 */
-	public void addEdge(AdjacencyMatrix y, int i, int j) {
-		for(ErgmTerm term : ergmTerms) {
-			term.addEdge(y, i, j);
-		}
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see playground.johannes.socialnetworks.graph.mcmc.ConditionalDistribution#removeEdge(playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix, int, int)
-	 */
-	public void removeEdge(AdjacencyMatrix y, int i, int j) {
-		for(ErgmTerm term : ergmTerms) {
-			term.removeEdge(y, i, j);
-		}
-		
-	}
+//
+//	/* (non-Javadoc)
+//	 * @see playground.johannes.socialnetworks.graph.mcmc.ConditionalDistribution#addEdge(playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix, int, int)
+//	 */
+//	public void addEdge(AdjacencyMatrix y, int i, int j) {
+//		for(ErgmTerm term : ergmTerms) {
+//			term.addEdge(y, i, j);
+//		}
+//		
+//	}
+//
+//	/* (non-Javadoc)
+//	 * @see playground.johannes.socialnetworks.graph.mcmc.ConditionalDistribution#removeEdge(playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix, int, int)
+//	 */
+//	public void removeEdge(AdjacencyMatrix y, int i, int j) {
+//		for(ErgmTerm term : ergmTerms) {
+//			term.removeEdge(y, i, j);
+//		}
+//		
+//	}
 	
 }

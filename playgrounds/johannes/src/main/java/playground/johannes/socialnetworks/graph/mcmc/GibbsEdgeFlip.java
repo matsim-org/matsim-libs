@@ -23,6 +23,7 @@
  */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 
@@ -43,7 +44,7 @@ public class GibbsEdgeFlip extends GibbsSampler {
 	}
 
 	@Override
-	public void sample(AdjacencyMatrix y, ConditionalDistribution d, SampleHandler handler) {
+	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SampleHandler handler) {
 		int N = y.getVertexCount();
 		int M = y.countEdges();
 		edges = new int[M][2];
@@ -57,12 +58,11 @@ public class GibbsEdgeFlip extends GibbsSampler {
 				}
 			}
 		}
-//		super.sample(y, d, burninTime, handler);
 		super.sample(y, d, handler);
 	}
 	
 	@Override
-	public boolean step(AdjacencyMatrix y, ConditionalDistribution d) {
+	public <V extends Vertex> boolean step(AdjacencyMatrix<V> y, GraphProbability d) {
 		boolean accept = false;
 		int idx_ij = random.nextInt(edges.length);
 		int i = edges[idx_ij][0];
@@ -78,10 +78,10 @@ public class GibbsEdgeFlip extends GibbsSampler {
 		
 		if(i != u && j != v && j != u && i != v && !y.getEdge(i, u) && !y.getEdge(j, v)) {
 			
-			double p_change = d.changeStatistic(y, i, u, false)
-					* d.changeStatistic(y, j, v, false)
-					* 1/d.changeStatistic(y, i, j, true)
-					* 1/d.changeStatistic(y, u, v, true); 
+			double p_change = d.difference(y, i, u, false)
+					* d.difference(y, j, v, false)
+					* 1/d.difference(y, i, j, true)
+					* 1/d.difference(y, u, v, true); 
 			double p = 1 / (1 + p_change);
 			if(random.nextDouble() <= p) {
 				y.removeEdge(i, j);

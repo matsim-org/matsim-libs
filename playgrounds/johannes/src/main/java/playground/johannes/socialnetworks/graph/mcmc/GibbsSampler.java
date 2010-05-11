@@ -26,6 +26,7 @@ package playground.johannes.socialnetworks.graph.mcmc;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 
@@ -53,14 +54,12 @@ public class GibbsSampler {
 		this.inteval = interval;
 	}
 	
-	public void sample(AdjacencyMatrix y, ConditionalDistribution d, SampleHandler handler) {
+	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SampleHandler handler) {
 		long time = System.currentTimeMillis();
 		
 		int accept = 0;
-//		boolean terminate = false;
 		long it = 0;
 		while(handler.handle(y, it)) {
-//		for(long it = 0; it < burninTime; it++) {
 			it++;
 			if(step(y, d))
 				accept++;
@@ -68,40 +67,20 @@ public class GibbsSampler {
 			if(it % inteval == 0) {
 				logger.info(String.format("[%1$s] Accepted %2$s of %3$s steps (ratio = %4$s).", it, accept, inteval, accept/(float)inteval));
 				accept = 0;
-//				if(handler.checkTerminationCondition(y)) {
-//					logger.info("Termination condition reached.");
-//					break;
-//				}
 			}
 		}
-		
-//		logger.info(String.format("Drawing %1$s samples in %2$s steps...", handler.getSampleSize(), handler.getSampleInterval()));
-//		for(int it = 0; it < (handler.getSampleSize() * handler.getSampleInterval()); it++) {
-//			if(step(y, d))
-//				accept++;
-//			
-//			if(it % handler.getSampleInterval() == 0) {
-//				handler.handleSample(y);
-//			}
-//			
-//			if(it % inteval == 0) {
-//				logger.info(String.format("[%1$s] Accepted %2$s of %3$s steps (ratio = %4$s).", it, accept, inteval, accept/(float)inteval));
-//				accept = 0;
-//			}
-//		}
-		
+				
 		logger.info(String.format("Sampling done in %1$s s.", (System.currentTimeMillis() - time)/1000));
 	}
 	
-	public boolean step(AdjacencyMatrix m, ConditionalDistribution d) {
+	public <V extends Vertex> boolean step(AdjacencyMatrix<V> m, GraphProbability d) {
 		boolean accept = false;
 		int i = random.nextInt(m.getVertexCount());
 		int j = random.nextInt(m.getVertexCount());
 		
 		if(i != j) {
 			boolean y_ij = m.getEdge(i, j);
-			double p = 1 / (1 + d.changeStatistic(m, i, j, y_ij));
-//			double p = d.getNormConstant(i) / (1 + d.changeStatistic(m, i, j, y_ij));
+			double p = 1 / (1 + d.difference(m, i, j, y_ij));
 			
 			if(random.nextDouble() <= p) {
 				/*
@@ -110,7 +89,7 @@ public class GibbsSampler {
 				if(!y_ij) {
 					m.addEdge(i, j);
 					accept = true;
-					d.addEdge(m, i, j);
+//					d.addEdge(m, i, j);
 				}
 			} else {
 				/*
@@ -119,7 +98,7 @@ public class GibbsSampler {
 				if(y_ij) {
 					m.removeEdge(i, j);
 					accept = true;
-					d.removeEdge(m, i, j);
+//					d.removeEdge(m, i, j);
 				}
 			}
 		}

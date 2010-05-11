@@ -24,8 +24,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
@@ -34,6 +36,7 @@ import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 import org.matsim.contrib.sna.math.Distribution;
 
+import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
 import playground.johannes.socialnetworks.graph.io.PajekDegreeColorizer;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixStatistics;
@@ -41,6 +44,8 @@ import playground.johannes.socialnetworks.graph.mcmc.SampleHandler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphAnalyzer;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCosts;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCostsTask;
 import playground.johannes.socialnetworks.graph.spatial.io.PajekDistanceColorizer;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
@@ -183,6 +188,10 @@ public class DumpHandler implements SampleHandler {
 			 * graph analysis
 			 */
 			SpatialGraphAnalyzer.analyze(net, currentOutputDir, false, zones, matrix, null);
+			ModuleAnalyzerTask<EdgeCosts>  task = new EdgeCostsTask(new GravityCostFunction(1.6, 0.0));
+			task.setOutputDirectoy(currentOutputDir);
+			Map<String, Double> stats = GraphAnalyzer.analyze(net, task);
+			GraphAnalyzer.writeStats(stats, currentOutputDir + "stats.txt");
 			/*
 			 * graph output
 			 * 

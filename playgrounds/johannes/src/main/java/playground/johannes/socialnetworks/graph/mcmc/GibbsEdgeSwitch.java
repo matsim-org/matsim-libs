@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 /**
@@ -27,8 +28,16 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
  */
 public class GibbsEdgeSwitch extends GibbsEdgeFlip {
 
+	public GibbsEdgeSwitch() {
+		super();
+	}
+
+	public GibbsEdgeSwitch(long seed) {
+		super(seed);
+	}
+
 	@Override
-	public boolean step(AdjacencyMatrix y, ConditionalDistribution d) {
+	public <V extends Vertex> boolean step(AdjacencyMatrix<V> y, GraphProbability d) {
 		boolean accept = false;
 		int idx_ij = random.nextInt(edges.length);
 		int i = edges[idx_ij][0];
@@ -38,7 +47,7 @@ public class GibbsEdgeSwitch extends GibbsEdgeFlip {
 		int v = random.nextInt(y.getVertexCount());
 		
 		if(u != v && !y.getEdge(u, v)) {
-			double p_change = 1/d.changeStatistic(y, i, j, true) * d.changeStatistic(y, u, v, false);
+			double p_change = 1/d.difference(y, i, j, true) * d.difference(y, u, v, false);
 			
 			double p = 1 / (1 + p_change);
 			if(random.nextDouble() <= p) {

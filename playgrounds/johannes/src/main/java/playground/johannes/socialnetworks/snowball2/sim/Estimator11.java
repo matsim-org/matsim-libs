@@ -217,7 +217,7 @@ public class Estimator11 implements BiasedDistribution {
 				degrees.add(vertex.getNeighbours().size());
 			}
 		}
-		discretizer = new FixedSampleSizeDiscretizer(degrees.toNativeArray(), 50);
+		discretizer = new FixedSampleSizeDiscretizer(degrees.toNativeArray(), 300);
 	}
 
 }

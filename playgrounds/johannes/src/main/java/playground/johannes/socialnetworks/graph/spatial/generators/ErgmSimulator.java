@@ -112,7 +112,7 @@ public class ErgmSimulator {
 		 */
 		ArrayList<ErgmTerm> terms = new ArrayList<ErgmTerm>();
 		
-		EdgeCostFunction costFunction = new GravityCostFunction(1.6, 1.0);
+		EdgeCostFunction costFunction = new GravityCostFunction(1.6, 0.0);
 		ErgmEdgeCost edgeCost = new ErgmEdgeCost(y, costFunction, totalCost, outputDir + "/thetas.txt");
 		terms.add(edgeCost);
 		
@@ -129,7 +129,7 @@ public class ErgmSimulator {
 		handler.setBurnin(burnin);
 		handler.setDumpInterval(sampleInterval);
 		handler.setLogInterval(logInterval);
-		
+		handler.dump(y, 0, null);
 		logger.info(String.format("Starting gibbs sampler. Burnin time: %1$s iterations.", burnin));
 		sampler.sample(y, ergm, handler);
 		logger.info("Gibbs sampler terminated.");
