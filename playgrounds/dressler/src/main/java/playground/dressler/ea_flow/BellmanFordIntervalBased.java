@@ -247,7 +247,7 @@ public class BellmanFordIntervalBased {
 	 * refreshes all _labels and _sourcelabels before one run of the algorithm
 	 * and fill the queue
 	 */	
-	void refreshLabelsForward(Queue<BFTask> queue){		
+	void refreshLabelsForward(TaskQueue queue){		
 		this._labels = new HashMap<Node, VertexIntervals>(3 * this._network.getNodes().size() / 2);
 		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._network.getNodes().size() / 2);
 		
@@ -274,7 +274,7 @@ public class BellmanFordIntervalBased {
 	 * refreshes all _labels and _sourcelabels, before one run of the algorithm
 	 * and fill the queue
 	 */
-	void refreshLabelsReverse(Queue<BFTask> queue){		
+	void refreshLabelsReverse(TaskQueue queue){		
 		this._labels = new HashMap<Node, VertexIntervals>(3 * this._network.getNodes().size() / 2);
 		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._network.getNodes().size() / 2);
 		
@@ -299,7 +299,7 @@ public class BellmanFordIntervalBased {
 	 * refreshes all _labels and _sourcelabels, before one run of the algorithm
 	 * and fill the queue
 	 */
-	void refreshLabelsMixed(Queue<BFTask> queue){		
+	void refreshLabelsMixed(TaskQueue queue){		
 		this._labels = new HashMap<Node, VertexIntervals>(3 * this._network.getNodes().size() / 2);
 		this._sourcelabels = new HashMap<Node, VertexInterval>(3 * this._network.getNodes().size() / 2);
 		
@@ -762,7 +762,7 @@ public class BellmanFordIntervalBased {
 	}
 
 	
-	List<BFTask> processSourceForward(Node v) {
+	TaskQueue processSourceForward(Node v) {
 		// send out of source v
 		// just set the regular label on v
 				
@@ -780,7 +780,7 @@ public class BellmanFordIntervalBased {
 		}
 		inter.setScanned(true);
 		
-		List<BFTask> queue = new ArrayList<BFTask>();
+		TaskQueue queue = new SimpleTaskQueue();
 		
 		PathStep pred = new StepSourceFlow(v, 0, true);
 		
@@ -804,7 +804,7 @@ public class BellmanFordIntervalBased {
 	 * @param t the time at which oen should propagate 
 	 * @return The resulting tasks and the processed interval (containing t)
 	 */
-	Pair<List<BFTask>, Interval> processNormalNodeForward(Node v, int t) {
+	Pair<TaskQueue, Interval> processNormalNodeForward(Node v, int t) {
 				
 		Interval inter;
 		
@@ -814,7 +814,7 @@ public class BellmanFordIntervalBased {
 			if (!todo.first) { // we don't have anything todo
 				this._totalnonpolls++;
 				this._roundnonpolls++;
-				return new Pair<List<BFTask>, Interval>(null, inter);
+				return new Pair<TaskQueue, Interval>(null, inter);
 			}
 		    
 		} else {
@@ -822,20 +822,20 @@ public class BellmanFordIntervalBased {
 			
 			if (!temp.getReachable() || temp.getPredecessor() == null) {
 				System.out.println("Node " + v.getId() + " was not reachable or had no predecessor!");
-				return new Pair<List<BFTask>, Interval>(null, temp);
+				return new Pair<TaskQueue, Interval>(null, temp);
 			}
 			
 			if (temp.isScanned()) {
 				// don't scan again ... can happen with vertex cleanup
 				this._totalnonpolls++;
 				this._roundnonpolls++;
-				return new Pair<List<BFTask>, Interval>(null, temp);
+				return new Pair<TaskQueue, Interval>(null, temp);
 			}
 			temp.setScanned(true);
 			inter = temp;
 		}
 			
-		List<BFTask> queue = new ArrayList<BFTask>();
+		TaskQueue queue = new SimpleTaskQueue();
 		
 		// visit neighbors
 		// link is outgoing edge of v => forward edge
@@ -884,7 +884,7 @@ public class BellmanFordIntervalBased {
 			}
 		}
 		
-		return new Pair<List<BFTask>, Interval>(queue, inter);
+		return new Pair<TaskQueue, Interval>(queue, inter);
 	}
 	
 	/** Return the (usually) largest interval around t that is unscanned but reachable
@@ -954,7 +954,7 @@ public class BellmanFordIntervalBased {
 	}
 
 
-	Pair<List<BFTask>, Interval> processNormalNodeReverse(Node v, int t) {
+	Pair<TaskQueue, Interval> processNormalNodeReverse(Node v, int t) {
 		
 		Interval inter;
 
@@ -964,27 +964,27 @@ public class BellmanFordIntervalBased {
 			if (!todo.first) {
 				this._totalnonpolls++;
 				this._roundnonpolls++;
-				return new Pair<List<BFTask>, Interval>(null, inter);
+				return new Pair<TaskQueue, Interval>(null, inter);
 			}
 		} else {
 			VertexInterval temp = this._labels.get(v).getIntervalAt(t);
 
 			if (!temp.getReachable() || temp.getSuccessor() == null) {
 				System.out.println("Node " + v.getId() + " was not reachable or had no successor!");
-				return new Pair<List<BFTask>, Interval>(null, temp);
+				return new Pair<TaskQueue, Interval>(null, temp);
 			}
 
 			if (temp.isScanned()) {
 				// don't scan again ... can happen with vertex cleanup
 				this._totalnonpolls++;
 				this._roundnonpolls++;
-				return new Pair<List<BFTask>, Interval>(null, temp);
+				return new Pair<TaskQueue, Interval>(null, temp);
 			}
 			temp.setScanned(true);
 			inter = temp;
 		}
 		
-		List<BFTask> queue = new ArrayList<BFTask>();
+		TaskQueue queue = new SimpleTaskQueue();
 		
 		// visit neighbors
 		
@@ -1057,10 +1057,10 @@ public class BellmanFordIntervalBased {
 			}
 		}			
 		
-       return new Pair<List<BFTask>, Interval>(queue, inter);	
+       return new Pair<TaskQueue, Interval>(queue, inter);	
 	}
 	
-	List<BFTask> processSinkReverse(Node v, int lastArrival) {
+	TaskQueue processSinkReverse(Node v, int lastArrival) {
 		// we want to arrive at lastArrival
 		// propagate that to the associated real node
 		
@@ -1080,7 +1080,7 @@ public class BellmanFordIntervalBased {
 		
 		ArrayList<VertexInterval> changed = this._labels.get(v).setTrueList(arrive);
 		
-		List<BFTask> queue = new ArrayList<BFTask>();
+		TaskQueue queue = new SimpleTaskQueue();
 		
 		for(VertexInterval changedintervall : changed){
 			queue.add(new BFTask(new VirtualNormalNode(v, 0), changedintervall, true));
@@ -1089,7 +1089,7 @@ public class BellmanFordIntervalBased {
 		return queue;
 	}
 	
-	List<BFTask> processSourceReverse(Node v) {
+	TaskQueue processSourceReverse(Node v) {
 		// active sources are the end of the search
 		// nonactive sources are just transit nodes, and need to scan residual edges.
 		if (!this._flow.isNonActiveSource(v)) {
@@ -1116,7 +1116,7 @@ public class BellmanFordIntervalBased {
 
 		if (changed == null) return null;
 		
-		List<BFTask> queue = new ArrayList<BFTask>();
+		TaskQueue queue = new SimpleTaskQueue();
 
 		for(VertexInterval changedintervall : changed){
 			queue.add(new BFTask(new VirtualNormalNode(v, 0), changedintervall, true));
@@ -1141,7 +1141,7 @@ public class BellmanFordIntervalBased {
 		//TaskComparator taskcomp = new TaskComparator();
 		//Queue<BFTask> queue = new PriorityQueue<BFTask>((1), taskcomp);
 		// DEBUG! BFS instead of Priority Queue
-		Queue<BFTask> queue = new LinkedList<BFTask>();
+		TaskQueue queue = new SimpleTaskQueue();
 
 		//set fresh labels, initialize queue
 		refreshLabelsForward(queue);
@@ -1197,7 +1197,7 @@ public class BellmanFordIntervalBased {
 			} else if (task.node instanceof VirtualSource) {
 				// send out of source v
 				
-				List<BFTask> tempqueue = processSourceForward(v); 
+				TaskQueue tempqueue = processSourceForward(v); 
 				
 				if (tempqueue != null) {					
 				  queue.addAll(tempqueue);				  
@@ -1214,8 +1214,8 @@ public class BellmanFordIntervalBased {
 				// This does not really matter here, but in the search with cost.
 				int low = task.ival.getLowBound();
 				while (low < task.ival.getHighBound()) {
-					Pair<List<BFTask>, Interval> ret = processNormalNodeForward(v, low); 
-					List<BFTask> tempqueue = ret.first;
+					Pair<TaskQueue, Interval> ret = processNormalNodeForward(v, low); 
+					TaskQueue tempqueue = ret.first;
 
 					if (tempqueue != null) {
 						queue.addAll(tempqueue);
@@ -1304,7 +1304,7 @@ public class BellmanFordIntervalBased {
 		
 		//TaskComparator taskcomp = new TaskComparator();
 		//Queue<BFTask> queue = new PriorityQueue<BFTask>((1), taskcomp);
-		Queue<BFTask> queue = new LinkedList<BFTask>();
+		TaskQueue queue = new SimpleTaskQueue();
 
 		//set fresh labels, initialize queue
 		refreshLabelsReverse(queue);
@@ -1345,7 +1345,7 @@ public class BellmanFordIntervalBased {
 			
 			if (task.node instanceof VirtualSink) {
 				
-				List<BFTask> tempqueue = processSinkReverse(v, lastArrival); 
+				TaskQueue tempqueue = processSinkReverse(v, lastArrival); 
 
 				if (tempqueue != null) {
 					queue.addAll(tempqueue);
@@ -1353,7 +1353,7 @@ public class BellmanFordIntervalBased {
 				
 			} else 	if (task.node instanceof VirtualSource) {
 
-				List<BFTask> tempqueue = processSourceReverse(v); 
+				TaskQueue tempqueue = processSourceReverse(v); 
 
 				if (tempqueue != null) {
 					queue.addAll(tempqueue);
@@ -1375,8 +1375,8 @@ public class BellmanFordIntervalBased {
 				
 				int low = task.ival.getLowBound();
 				while (low < task.ival.getHighBound()) {
-					Pair<List<BFTask>, Interval> ret = processNormalNodeReverse(v, low); 
-					List<BFTask> tempqueue = ret.first;
+					Pair<TaskQueue, Interval> ret = processNormalNodeReverse(v, low); 
+					TaskQueue tempqueue = ret.first;
 
 					if (tempqueue != null) {
 						queue.addAll(tempqueue);
@@ -1432,7 +1432,7 @@ public class BellmanFordIntervalBased {
 		
 		//TaskComparator taskcomp = new TaskComparator();
 		//Queue<BFTask> queue = new PriorityQueue<BFTask>((1), taskcomp);
-		Queue<BFTask> queue = new LinkedList<BFTask>();
+		TaskQueue queue = new SimpleTaskQueue();
 
 		//set fresh labels, initialize queue
 		
@@ -1477,7 +1477,7 @@ public class BellmanFordIntervalBased {
 				
 				if (task.node instanceof VirtualSink) {
 					
-					List<BFTask> tempqueue = processSinkReverse(v, lastArrival); 
+					TaskQueue tempqueue = processSinkReverse(v, lastArrival); 
 
 					if (tempqueue != null) {
 						queue.addAll(tempqueue);
@@ -1485,7 +1485,7 @@ public class BellmanFordIntervalBased {
 					
 				} else 	if (task.node instanceof VirtualSource) {
 					
-					List<BFTask> tempqueue = processSourceReverse(v); 
+					TaskQueue tempqueue = processSourceReverse(v); 
 
 					if (tempqueue != null) {
 						queue.addAll(tempqueue);
@@ -1500,8 +1500,8 @@ public class BellmanFordIntervalBased {
 					
 					int low = task.ival.getLowBound();
 					while (low < task.ival.getHighBound()) {
-						Pair<List<BFTask>, Interval> ret = processNormalNodeReverse(v, low); 
-						List<BFTask> tempqueue = ret.first;
+						Pair<TaskQueue, Interval> ret = processNormalNodeReverse(v, low); 
+						TaskQueue tempqueue = ret.first;
 
 						if (tempqueue != null) {
 							queue.addAll(tempqueue);
@@ -1531,7 +1531,7 @@ public class BellmanFordIntervalBased {
 					}
 				} else if (task.node instanceof VirtualSource) {
 					// send out of source v
-					List<BFTask> tempqueue = processSourceForward(v); 
+					TaskQueue tempqueue = processSourceForward(v); 
 					
 					if (tempqueue != null) {
 					  queue.addAll(tempqueue);
@@ -1546,8 +1546,8 @@ public class BellmanFordIntervalBased {
 
 					int low = task.ival.getLowBound();
 					while (low < task.ival.getHighBound()) {
-						Pair<List<BFTask>, Interval> ret = processNormalNodeForward(v, low); 
-						List<BFTask> tempqueue = ret.first;
+						Pair<TaskQueue, Interval> ret = processNormalNodeForward(v, low); 
+						TaskQueue tempqueue = ret.first;
 
 						if (tempqueue != null) {
 							queue.addAll(tempqueue);
