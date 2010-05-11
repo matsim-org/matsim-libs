@@ -32,6 +32,12 @@ public interface QSimFeature {
 
 	void beforeCleanupSim();
 
+	/**
+	 * @deprecated as it seems this method is not used by any QSimFeature, also it is not clear what 
+	 * semantics  are provided by this method. QSim won't necessarily support the method handleAgentArrival(...). It is rather
+	 * possible that there is a ArrivalHandler similar to the DepartureHandler concept
+	 */
+	@Deprecated
 	void beforeHandleAgentArrival(PersonAgent agent);
 
 	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
@@ -39,7 +45,11 @@ public interface QSimFeature {
 
 	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
 	void beforeHandleUnknownLegMode(double now, PersonAgent agent, Link link);
-
+	/**
+	 * @deprecated as long as the agent representation of the QSim is not implemented this method provides
+	 * not reliable functionality.
+	 */
+	@Deprecated
 	Collection<PersonAgent> createAgents();
 
 	@Deprecated // do we need to pass the planElementIndex?  to be discussed ...  kai, may'10
@@ -48,6 +58,11 @@ public interface QSimFeature {
 	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
 	void afterActivityEnds(PersonAgent agent, double time);
 	
+	/**
+	 * @deprecated as long as the agent representation of the QSim is not implemented this method provides
+	 * not reliable functionality.
+	 */
+	@Deprecated
 	void agentCreated(PersonAgent agent);
 
 }
