@@ -179,7 +179,7 @@ public class BellmanFordIntervalBased {
 		//BellmanFordIntervalBased._warmstart = warmstart;
 	}
 	
-	class BFTask  {		
+	/*class BFTask  {		
 		public int time;
 		public Interval ival;
 		public VirtualNode node;
@@ -211,7 +211,7 @@ public class BellmanFordIntervalBased {
 		public String toString(){
 			return node.toString() + " @ " + time +  " interval " + ival + " reverse " + reverse;
 		}
-	}
+	}*/
 	
 	// Comparator needs total order!!!
 	class TaskComparator implements Comparator<BFTask> {

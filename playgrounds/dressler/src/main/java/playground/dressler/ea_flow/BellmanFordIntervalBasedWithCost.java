@@ -41,7 +41,7 @@ import playground.dressler.Interval.VertexIntervalWithCost;
 import playground.dressler.Interval.VertexIntervals;
 import playground.dressler.Interval.VertexIntervalsWithCost;
 import playground.dressler.control.FlowCalculationSettings;
-import playground.dressler.ea_flow.BellmanFordIntervalBased.BFTask;
+
 
 /**
  * @author Daniel Dressler, Manuel Schneider

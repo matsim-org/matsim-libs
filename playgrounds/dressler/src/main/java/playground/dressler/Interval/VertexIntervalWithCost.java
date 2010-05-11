@@ -327,6 +327,20 @@ public class VertexIntervalWithCost extends VertexInterval {
 		}
 	}
 	
+	public int getCost(){
+		return this.cost;
+	}
+	
+	public boolean relativeCost(){
+		return this.costIsRelative;
+	}
+	
+	@Override
+	public VertexIntervalWithCost copy(){
+		VertexIntervalWithCost result = new VertexIntervalWithCost(this._l,this._r,this);
+		return result;
+	}
+	
 	public String toString()
 	{
 		return super.toString() + " cost: " + this.cost + " cost is relative: " + this.costIsRelative;

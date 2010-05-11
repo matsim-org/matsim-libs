@@ -321,6 +321,11 @@ public class VertexInterval extends Interval {
 		return k;
 	}
 	
+	public VertexInterval copy(){
+		VertexInterval result = new VertexInterval(this._l,this._r,this);
+		return result;
+	}
+	
 	/**
 	 * gives a string representation of the VertexInterval of the form 
 	 * [x,y): reachable: true scanned: false  breadcrumb: ...  
