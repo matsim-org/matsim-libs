@@ -42,15 +42,10 @@ public class MyLinkImpl extends LinkImpl{
 	protected double travelTime = Double.NaN;
 	protected double travelCost;
 
-	// for TravelTimeEstimator
-	private float[] linkVehicleCounts;
-	private int[] linkEnterCounts;
-	private int[] linkLeaveCounts;
-
 	private LinkedList<TripInfo> tripInfos = new LinkedList<TripInfo>();
 
-	private boolean fadingTravelTimes = true;
-	private boolean binTravelTimes = false;
+	private boolean fadingTravelTimes = false;
+	private boolean binTravelTimes = true;
 
 	private double fadingFactor = 1.0015;	// How much does the weight of a previous TravelTime decrease per SimStep?
 //	private double fadingFactor = 1.0025;	// How much does the weight of a previous TravelTime decrease per SimStep?
@@ -90,30 +85,6 @@ public class MyLinkImpl extends LinkImpl{
 
 	public void setTravelCost(double travelCost) {
 		this.travelCost = travelCost;
-	}
-
-	public float[] getLinkVehicleCounts() {
-		return linkVehicleCounts;
-	}
-
-	public void setLinkVehicleCounts(float[] linkVehicleCounts) {
-		this.linkVehicleCounts = linkVehicleCounts;
-	}
-
-	public int[] getLinkEnterCounts() {
-		return linkEnterCounts;
-	}
-
-	public void setLinkEnterCounts(int[] linkEnterCounts) {
-		this.linkEnterCounts = linkEnterCounts;
-	}
-
-	public int[] getLinkLeaveCounts() {
-		return linkLeaveCounts;
-	}
-
-	public void setLinkLeaveCounts(int[] linkLeaveCounts) {
-		this.linkLeaveCounts = linkLeaveCounts;
 	}
 
 	/*
@@ -164,8 +135,9 @@ public class MyLinkImpl extends LinkImpl{
 		 * FreeSpeedTravelTime.
 		 */
 		double meanTravelTime = freeSpeedTravelTime;
-		if (this.tripInfos.size() > 0) meanTravelTime = sumTravelTimes / this.storedTravelTimes;
-
+//		if (this.tripInfos.size() > 0) meanTravelTime = sumTravelTimes / this.storedTravelTimes;
+		if (this.storedTravelTimes > 0) meanTravelTime = sumTravelTimes / this.storedTravelTimes;
+		
 		if (meanTravelTime * this.fadingFactor < freeSpeedTravelTime)
 		{
 			System.out.println("Warning: Mean TravelTime to short?");
@@ -179,19 +151,6 @@ public class MyLinkImpl extends LinkImpl{
 		double removedTravelTimes = 0.0;
 
 		// first remove old TravelTimes
-//		Iterator<TripInfo> iter = this.tripInfos.iterator();
-//		while (iter.hasNext())
-//		{
-//			TripInfo tripInfo = iter.next();
-//			if (tripInfo.leaveTime + this.storedTravelTimesWindow < time)
-//			{
-//				removedTravelTimes = removedTravelTimes + tripInfo.travelTime;
-//				iter.remove();
-//			}
-//			else break;
-//		}
-
-		//Is this faster?
 		TripInfo tripInfo;
 		while((tripInfo = this.tripInfos.peek()) != null)
 		{
@@ -220,7 +179,7 @@ public class MyLinkImpl extends LinkImpl{
 		 * FreeSpeedTravelTime.
 		 */
 		double meanTravelTime = freeSpeedTravelTime;
-		if (this.tripInfos.size() > 0) meanTravelTime = sumTravelTimes / this.tripInfos.size();
+		if (!tripInfos.isEmpty()) meanTravelTime = sumTravelTimes / this.tripInfos.size();
 
 		if (meanTravelTime < freeSpeedTravelTime)
 		{

@@ -149,15 +149,6 @@ public class WithinDayControler extends Controler {
 	 * By doing this every person can use a personalised Router.
 	 */
 	protected void initReplanningRouter() {
-
-//		TravelTimeEstimatorHandlerAndListener handlerAndListener = new TravelTimeEstimatorHandlerAndListener(population, network, 60, 86400 * 2);
-//		travelTime = new TravelTimeEstimator(handlerAndListener);
-//		foqsl.addQueueSimulationInitializedListener((TravelTimeEstimatorHandlerAndListener)handlerAndListener); // for TravelTimeEstimator
-//		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeEstimatorHandlerAndListener)handlerAndListener);	// for TravelTimeEstimator
-//		this.events.addHandler((TravelTimeEstimatorHandlerAndListener)handlerAndListener);	// for TravelTimeEstimator
-
-
-		
 		
 		travelTime = new TravelTimeCollector(network);
 		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
