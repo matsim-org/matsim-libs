@@ -526,9 +526,9 @@ public class QLinkLanesImpl implements QLink {
 //		}
 
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
-			double time = QLinkLanesImpl.this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay() ;
+//			double time = QLinkLanesImpl.this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay() ;
 
-			
+
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
 		  for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
