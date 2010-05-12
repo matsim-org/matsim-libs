@@ -20,7 +20,7 @@
 
 package org.matsim.core.mobsim.queuesim;
 
- class SimulationTimer {
+public class SimulationTimer {
 	static private double simStartTime = 24*3600;
 	static private double time = 0;
 	static private double SIM_TICK_TIME_S = 1;
@@ -71,7 +71,7 @@ package org.matsim.core.mobsim.queuesim;
 	}
 
 	/** Resets the SimulationTimer for a new simulation. */
-	static final void reset() {
+	public static final void reset() {
 		reset(1);
 	}
 

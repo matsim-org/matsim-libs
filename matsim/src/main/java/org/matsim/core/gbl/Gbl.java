@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReaderMatsimV1;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.xml.sax.SAXException;
 
@@ -126,9 +127,10 @@ public abstract class Gbl {
 		Gbl.config = null;
 		MatsimRandom.reset();
 
-//				SimulationTimer.reset();
+		SimulationTimer.reset();
 		// The org.matsim tests work correctly without this line.  The number of failures/errors in the playground
-		// test does not increas without this line.  As a next step, this object will be made non-static.  kai, may'10
+		// test does not increase without this line.  As a next step, this object will be made non-static.  kai, may'10
+		// I had to include the line again, as the tests only worked in some order, but not all. marcel, may'10
 	}
 
 	public static final void printMemoryUsage() {
