@@ -31,12 +31,12 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
  */
 public class AdjacencyMatrixStatistics {
 
-	public static double getDensity(AdjacencyMatrix y) {
+	public static double getDensity(AdjacencyMatrix<?> y) {
 		int N = y.getVertexCount();
 		return 2 * y.countEdges()/ (double)(N * (N - 1));
 	}
 	
-	public static double getMeanDegree(AdjacencyMatrix y) {
+	public static double getMeanDegree(AdjacencyMatrix<?> y) {
 		int N = y.getVertexCount();
 		int sum = 0;
 		for(int i = 0; i < N; i++) {
@@ -46,7 +46,7 @@ public class AdjacencyMatrixStatistics {
 		return sum/(double)N;
 	}
 	
-	public static double getLocalClusteringCoefficient(AdjacencyMatrix y) {
+	public static double getLocalClusteringCoefficient(AdjacencyMatrix<?> y) {
 		int N = y.getVertexCount();
 		double sum = 0;
 		for(int i = 0; i < N; i++) {
@@ -57,7 +57,7 @@ public class AdjacencyMatrixStatistics {
 		return sum / (double)N;
 	}
 	
-	public static double getGlobalClusteringCoefficient(AdjacencyMatrix y) {
+	public static double getGlobalClusteringCoefficient(AdjacencyMatrix<?> y) {
 		int N = y.getVertexCount();
 		int triangles = 0;
 		int tripples = 0;

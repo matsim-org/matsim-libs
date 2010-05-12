@@ -20,14 +20,13 @@
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.generators.ErdosRenyiGenerator;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
@@ -37,14 +36,10 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
-import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeSwitch;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
-import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCostsTask;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.spatial.ZoneLegacy;
-import playground.johannes.socialnetworks.spatial.ZoneLayerLegacy;
-import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 
 /**
  * @author illenberger
@@ -69,17 +64,17 @@ public class ErgmSimulator {
 		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		SpatialSparseGraph graph = reader.read(config.findParam("plans", "inputPlansFile"));
 		
-		String zonesFile = config.findParam(MODULE_NAME, "zonesFile");
-		String densityFile = config.findParam(MODULE_NAME, "densityFile");
+//		String zonesFile = config.findParam(MODULE_NAME, "zonesFile");
+//		String densityFile = config.findParam(MODULE_NAME, "densityFile");
 
 		
-		ZoneLayerDouble zones = null;
-		ZoneLayerLegacy layer = null;
+//		ZoneLayerDouble zones = null;
+//		ZoneLayerLegacy layer = null;
 
-		if(zonesFile != null && densityFile != null) {
-			layer = ZoneLayerLegacy.createFromShapeFile(zonesFile);
-			zones = ZoneLayerDouble.createFromFile(new HashSet<ZoneLegacy>(layer.getZones()), densityFile);
-		}
+//		if(zonesFile != null && densityFile != null) {
+//			layer = ZoneLayerLegacy.createFromShapeFile(zonesFile);
+//			zones = ZoneLayerDouble.createFromFile(new HashSet<ZoneLegacy>(layer.getZones()), densityFile);
+//		}
 		
 		long randomSeed = Long.parseLong(config.getParam("global", "randomSeed"));
 
@@ -97,7 +92,8 @@ public class ErgmSimulator {
 //		double descretization = Double.parseDouble(config.getParam(MODULE_NAME, "descretization"));
 		
 		logger.info("Creating random graph...");
-		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten()));
+		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten());
+		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(builder);
 		int k = (int)k_mean;
 		double p = k / (double)graph.getVertices().size();
 		generator.generate(graph, p, randomSeed);
@@ -106,18 +102,19 @@ public class ErgmSimulator {
 		/*
 		 * convert graph to matrix
 		 */
-		SpatialAdjacencyMatrix y = new SpatialAdjacencyMatrix(graph);
+		AdjacencyMatrix<SpatialSparseVertex> y = new AdjacencyMatrix<SpatialSparseVertex>(graph);
 		/*
 		 * setup ergm terms.
 		 */
-		ArrayList<ErgmTerm> terms = new ArrayList<ErgmTerm>();
+//		ArrayList<ErgmTerm> terms = new ArrayList<ErgmTerm>();
 		
 		EdgeCostFunction costFunction = new GravityCostFunction(1.6, 0.0);
 		ErgmEdgeCost edgeCost = new ErgmEdgeCost(y, costFunction, totalCost, outputDir + "/thetas.txt");
-		terms.add(edgeCost);
+//		terms.add(edgeCost);
 		
 		Ergm ergm = new Ergm();
-		ergm.setErgmTerms(terms.toArray(new ErgmTerm[1]));
+//		ergm.setErgmTerms(terms.toArray(new ErgmTerm[1]));
+		ergm.addComponent(edgeCost);
 		/*
 		 * setup gibbs sampler.
 		 */
@@ -125,14 +122,16 @@ public class ErgmSimulator {
 		GibbsSampler sampler = new GibbsEdgeSwitch();
 		sampler.setInterval(1000000);
 		
-		DumpHandler handler = new DumpHandler(outputDir, zones, null);
+		DumpHandler handler = new DumpHandler(graph, builder, outputDir);
+		handler.getAnalyzerTaks().addTask(new EdgeCostsTask(costFunction));
 		handler.setBurnin(burnin);
 		handler.setDumpInterval(sampleInterval);
 		handler.setLogInterval(logInterval);
-		handler.dump(y, 0, null);
+		handler.analyze(y, 0);
 		logger.info(String.format("Starting gibbs sampler. Burnin time: %1$s iterations.", burnin));
 		sampler.sample(y, ergm, handler);
 		logger.info("Gibbs sampler terminated.");
 	}
 
+	
 }

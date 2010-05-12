@@ -23,20 +23,21 @@
  */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger
  *
  */
-public class ErgmTwoStars extends ErgmTerm {
+public class ErgmTwoStars extends ErgmTerm implements GraphProbability {
 
 	@Override
-	public double changeStatistic(AdjacencyMatrix m, int i, int j, boolean y_ij) {
+	public <V extends Vertex> double difference(AdjacencyMatrix<V> m, int i, int j, boolean y_ij) {
 		if(y_ij) {
-			return getTheta() * -(m.getNeighborCount(i) + m.getNeighborCount(j) - 2);
+			return Math.exp(getTheta() * -(m.getNeighborCount(i) + m.getNeighborCount(j) - 2));
 		} else {
-			return getTheta() * -(m.getNeighborCount(i) + m.getNeighborCount(j));
+			return Math.exp(getTheta() * -(m.getNeighborCount(i) + m.getNeighborCount(j)));
 		}
 	}
 

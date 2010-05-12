@@ -54,7 +54,7 @@ public class GibbsSampler {
 		this.inteval = interval;
 	}
 	
-	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SampleHandler handler) {
+	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SampleHandler<V> handler) {
 		long time = System.currentTimeMillis();
 		
 		int accept = 0;

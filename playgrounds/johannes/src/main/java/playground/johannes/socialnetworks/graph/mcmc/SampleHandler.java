@@ -19,14 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger
  *
  */
-public interface SampleHandler {
+public interface SampleHandler<V extends Vertex> {
 
-	public boolean handle(AdjacencyMatrix y, long iteration);
+	public boolean handle(AdjacencyMatrix<V> y, long iteration);
 	
 }

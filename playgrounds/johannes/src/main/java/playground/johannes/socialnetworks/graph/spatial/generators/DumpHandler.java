@@ -27,43 +27,42 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
+import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 import org.matsim.contrib.sna.math.Distribution;
 
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
-import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
-import playground.johannes.socialnetworks.graph.io.PajekDegreeColorizer;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixStatistics;
 import playground.johannes.socialnetworks.graph.mcmc.SampleHandler;
-import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphAnalyzer;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCosts;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCostsTask;
-import playground.johannes.socialnetworks.graph.spatial.io.PajekDistanceColorizer;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
-import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
-import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
+import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 
 /**
  * @author illenberger
  *
  */
-public class DumpHandler implements SampleHandler {
+public class DumpHandler implements SampleHandler<SpatialSparseVertex> {
 
+	private static final Logger logger = Logger.getLogger(DumpHandler.class);
+	
+	private SpatialSparseGraph graph;
+	
+	private SpatialSparseGraphBuilder builder;
+	
 	private long burnin;
 	
 	private long dumpInterval;
 	
 	private long logInterval;
-	
-	private static final Logger logger = Logger.getLogger(DumpHandler.class);
 
 	private Distribution edges = new Distribution();
 	
@@ -77,27 +76,35 @@ public class DumpHandler implements SampleHandler {
 	
 	private BufferedWriter writer;
 	
-//	private SpatialGrid<Double> densityGrid;
+	private AnalyzerTaskComposite analyzerTask;
 	
-	protected ZoneLayerDouble zones;
-	
-	private TravelTimeMatrix matrix;
-	
-//	private Geometry boundary;
-	
-	public DumpHandler(String filename, ZoneLayerDouble zones, TravelTimeMatrix matrix) {
-		outputDir = filename;
-		this.matrix = matrix;
-//		this.densityGrid = densityGrid;
-		this.zones = zones;
-//		this.boundary = boundary;
+	public DumpHandler(SpatialSparseGraph graph, SpatialSparseGraphBuilder builder, String outputDir) {
+		this.graph = graph;
+		this.builder = builder;
+		this.outputDir = outputDir;
 		try {
-			writer = new BufferedWriter(new FileWriter(filename + "samplestats.txt"));
+			writer = new BufferedWriter(new FileWriter(outputDir + "samplestats.txt"));
 			writer.write("it\tm\t<k>\t<c_local>\t<c_global>\t<d>");
 			writer.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		analyzerTask = initAnalyzerTask();
+	}
+	
+	private AnalyzerTaskComposite initAnalyzerTask() {
+		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
+		task.addTask(new GraphSizeTask());
+		task.addTask(new DegreeTask());
+		task.addTask(new TransitivityTask());
+		task.addTask(new DistanceTask());
+		
+		return task;
+	}
+	
+	public AnalyzerTaskComposite getAnalyzerTaks() {
+		return analyzerTask; 
 	}
 	
 	public long getBurnin() {
@@ -124,30 +131,31 @@ public class DumpHandler implements SampleHandler {
 		this.logInterval = logInterval;
 	}
 
-	public boolean handle(AdjacencyMatrix y, long iteration) {
+	public boolean handle(AdjacencyMatrix<SpatialSparseVertex> y, long iteration) {
 		if(iteration % logInterval == 0) {
 			log(y, iteration);
 		}
 		
 		if(iteration >= burnin) {
-			dump(y, iteration, matrix);
+			analyze(y, iteration);
 			return false;
 		} else if (iteration % dumpInterval == 0 && iteration > 0) {
-			dump(y, iteration, matrix);
+			analyze(y, iteration);
 			return true;
 		} else {
 			return true;
 		}
 	}
 
-	private void log(AdjacencyMatrix y, long iteration) {
+	private void log(AdjacencyMatrix<SpatialSparseVertex> y, long iteration) {
 		double m = y.countEdges();
 		double k_mean = AdjacencyMatrixStatistics.getMeanDegree(y);
 		double c_local = AdjacencyMatrixStatistics.getLocalClusteringCoefficient(y);
 		double c_global = AdjacencyMatrixStatistics.getGlobalClusteringCoefficient(y);
 	
-		SpatialSparseGraph net = ((SpatialAdjacencyMatrix)y).getGraph();
-		double d_mean = SpatialGraphStatistics.edgeLengthDistribution(net).mean();
+//		y.synchronizeEdges(graph, builder);
+//		double d_mean = SpatialGraphStatistics.edgeLengthDistribution(graph).mean();
+		double d_mean = Double.NaN;
 		logger.info(String.format(Locale.US, "m=%1$s, <k>=%2$.4f, <c_local>=%3$.4f, <c_global>=%4$.4f, <d>=%5$.4f", m, k_mean, c_local, c_global, d_mean));
 	
 		try {
@@ -156,20 +164,20 @@ public class DumpHandler implements SampleHandler {
 			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		
-		
+		}	
 	}
 	
-	protected SpatialSparseGraph dump(AdjacencyMatrix y, long iteration, TravelTimeMatrix matrix) {
-		logger.info("Dumping sample...");
+	public SpatialGraph analyze(AdjacencyMatrix<SpatialSparseVertex> y, long iteration) {
+		String currentOutputDir = String.format("%1$s%2$s/", outputDir, iteration);
+		File file = new File(currentOutputDir);
+		file.mkdirs();
 		
 		edges.add(y.countEdges());
 		degree.add(AdjacencyMatrixStatistics.getMeanDegree(y));
 		clustering.add(AdjacencyMatrixStatistics.getLocalClusteringCoefficient(y));
 		
-		SpatialSparseGraph net = ((SpatialAdjacencyMatrix)y).getGraph();
-		distance.add(SpatialGraphStatistics.edgeLengthDistribution(net).mean());
+		y.synchronizeEdges(graph, builder);
+		distance.add(SpatialGraphStatistics.edgeLengthDistribution(graph).mean());
 		
 		logger.info(String.format("VarK(m)=%1$.4f, VarK(<k>)=%2$.4f, VarK(<c_local>)=%3$.4f, VarK(<d>)=%4$.4f",
 				edges.coefficientOfVariance(),
@@ -177,53 +185,35 @@ public class DumpHandler implements SampleHandler {
 				clustering.coefficientOfVariance(),
 				distance.coefficientOfVariance()));
 		
+		analyzerTask.setOutputDirectoy(currentOutputDir);
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, analyzerTask);
 		try {
-			/*
-			 * make directories
-			 */
-			String currentOutputDir = String.format("%1$s%2$s/", outputDir, iteration);
-			File file = new File(currentOutputDir);
-			file.mkdirs();
-			/*
-			 * graph analysis
-			 */
-			SpatialGraphAnalyzer.analyze(net, currentOutputDir, false, zones, matrix, null);
-			ModuleAnalyzerTask<EdgeCosts>  task = new EdgeCostsTask(new GravityCostFunction(1.6, 0.0));
-			task.setOutputDirectoy(currentOutputDir);
-			Map<String, Double> stats = GraphAnalyzer.analyze(net, task);
 			GraphAnalyzer.writeStats(stats, currentOutputDir + "stats.txt");
-			/*
-			 * graph output
-			 * 
-			 * graphML
-			 */
-			SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
-			writer.write(net, String.format("%1$sgraph.graphml", currentOutputDir));
-			/*
-			 * KML
-			 */
-			SpatialGraphKMLWriter kmlWriter = new SpatialGraphKMLWriter();
-//			kmlWriter.setVertexStyle(new KMLDegreeStyle(kmlWriter.getVertexIconLink()));
-//			kmlWriter.setVertexDescriptor(new KMLVertexDescriptor(net));
-			kmlWriter.setDrawEdges(false);
-//			kmlWriter.setCoordinateTransformation(new CH1903LV03toWGS84());
-			kmlWriter.write(net, String.format("%1$sgraph.k.kml", currentOutputDir));
-			/*
-			 * Pajek
-			 */
-			PajekDegreeColorizer<SpatialSparseVertex, SpatialSparseEdge> colorizer1 = new PajekDegreeColorizer<SpatialSparseVertex, SpatialSparseEdge>(net, true);
-			PajekClusteringColorizer<SpatialSparseVertex, SpatialSparseEdge> colorizer2 = new PajekClusteringColorizer<SpatialSparseVertex, SpatialSparseEdge>(net);
-			PajekDistanceColorizer colorizer3 = new PajekDistanceColorizer(net, false);
-			SpatialPajekWriter pwriter = new SpatialPajekWriter();
-			pwriter.write(net, colorizer1, currentOutputDir + "graph.degree.net");
-			pwriter.write(net, colorizer2, currentOutputDir+ "graph.clustering.net");
-			pwriter.write(net, colorizer3, currentOutputDir + "graph.distance.net");
 			
-			
+			dump(graph, currentOutputDir);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		return net;
+		return graph;
+	}
+	
+	protected void dump(SpatialSparseGraph graph, String iterationDir) {
+		try {
+			/* 
+			 * graphML
+			 */
+			SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
+			writer.write(graph, String.format("%1$sgraph.graphml", iterationDir));
+			/*
+			 * KML
+			 */
+			SpatialGraphKMLWriter kmlWriter = new SpatialGraphKMLWriter();
+			kmlWriter.setDrawEdges(false);
+			kmlWriter.write(graph, String.format("%1$sgraph.k.kml", iterationDir));
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -23,7 +23,10 @@
  */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+
+import playground.johannes.socialnetworks.utils.Composite;
 
 
 
@@ -31,39 +34,41 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
  * @author illenberger
  *
  */
-public class Ergm implements GraphProbability {
+public class Ergm extends Composite<GraphProbability> implements GraphProbability {
 
-	private ErgmTerm[] ergmTerms;
-	
-//	private TIntDoubleHashMap norm_i = new TIntDoubleHashMap();
-	
-	public void setErgmTerms(ErgmTerm[] terms) {
-		ergmTerms = terms;
-	}
-	
-	public ErgmTerm[] getErgmTerms() {
-		return ergmTerms;
-	}
+//	private ErgmTerm[] ergmTerms;
+//	
+////	private TIntDoubleHashMap norm_i = new TIntDoubleHashMap();
+//	
+//	public void setErgmTerms(ErgmTerm[] terms) {
+//		ergmTerms = terms;
+//	}
+//	
+//	public ErgmTerm[] getErgmTerms() {
+//		return ergmTerms;
+//	}
 	
 
-	public double difference(AdjacencyMatrix y, int i, int j, boolean y_ij) {
-		double h_y = evaluateExpHamiltonian(y, i, j, y_ij);
-//		if(Double.isInfinite(h_y))
-//			throw new IllegalArgumentException("H(y) must not be infinity!");
-		if(Double.isNaN(h_y))
+	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean y_ij) {
+		double prod = 1;
+		for(int k = 0; k < components.size(); k++)
+			prod *= components.get(k).difference(y, i, j, y_ij);
+		
+		if(Double.isInfinite(prod))
+			throw new IllegalArgumentException("H(y) must not be infinity!");
+		if(Double.isNaN(prod))
 			throw new IllegalArgumentException("H(y) must not be NaN!");
 		
-		
-		return h_y;
+		return prod;
 	}
 
-	public double evaluateExpHamiltonian(AdjacencyMatrix y, int i, int j, boolean y_ij) {
-		double sum = 0;
-		for(ErgmTerm term : ergmTerms) {
-			sum += term.changeStatistic(y, i, j, y_ij); 
-		}
-		return Math.exp(sum);
-	}
+//	public double evaluateExpHamiltonian(AdjacencyMatrix y, int i, int j, boolean y_ij) {
+//		double sum = 0;
+//		for(ErgmTerm term : ergmTerms) {
+//			sum += term.changeStatistic(y, i, j, y_ij); 
+//		}
+//		return Math.exp(sum);
+//	}
 //
 //	/* (non-Javadoc)
 //	 * @see playground.johannes.socialnetworks.graph.mcmc.ConditionalDistribution#addEdge(playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix, int, int)

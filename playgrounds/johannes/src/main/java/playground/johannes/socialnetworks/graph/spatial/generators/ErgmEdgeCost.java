@@ -19,29 +19,29 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
+import gnu.trove.TObjectDoubleHashMap;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import gnu.trove.TObjectDoubleHashMap;
-
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
-import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
+import playground.johannes.socialnetworks.graph.mcmc.GraphProbability;
 
 /**
  * @author illenberger
  *
  */
-public class ErgmEdgeCost extends ErgmTerm {
+public class ErgmEdgeCost implements GraphProbability {
 
 	private double[] thetas;
 	
 	private EdgeCostFunction costFunction;
 	
-	public ErgmEdgeCost(SpatialAdjacencyMatrix y, EdgeCostFunction costFunction, double budget, String thetaFile) {
+	public ErgmEdgeCost(AdjacencyMatrix<? extends SpatialVertex> y, EdgeCostFunction costFunction, double budget, String thetaFile) {
 		this.costFunction = costFunction;
 		
 		TObjectDoubleHashMap<SpatialVertex> budgets = new TObjectDoubleHashMap<SpatialVertex>();
@@ -70,12 +70,13 @@ public class ErgmEdgeCost extends ErgmTerm {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean yIj) {
-		SpatialVertex vi = ((SpatialAdjacencyMatrix)y).getVertex(i);
-		SpatialVertex vj = ((SpatialAdjacencyMatrix)y).getVertex(j);
+	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+		SpatialVertex vi = ((AdjacencyMatrix<SpatialVertex>)y).getVertex(i);
+		SpatialVertex vj = ((AdjacencyMatrix<SpatialVertex>)y).getVertex(j);
 		
-		return thetas[i] * costFunction.edgeCost(vi, vj);
+		return Math.exp(thetas[i] * costFunction.edgeCost(vi, vj));
 	}
 
 }

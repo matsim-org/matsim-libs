@@ -22,7 +22,6 @@ package playground.johannes.socialnetworks.graph.spatial.generators;
 import java.io.IOException;
 
 import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.generators.ErdosRenyiGenerator;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;

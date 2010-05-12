@@ -23,6 +23,7 @@
  */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 
@@ -30,7 +31,7 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
  * @author illenberger
  *
  */
-public abstract class ErgmTerm {
+public abstract class ErgmTerm implements GraphProbability {
 
 	private double theta;
 	
@@ -42,14 +43,6 @@ public abstract class ErgmTerm {
 		return theta;
 	}
 	
-	abstract public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
-	protected void addEdge(AdjacencyMatrix y, int i, int j) {
-		
-	}
-	
-	protected void removeEdge(AdjacencyMatrix y, int i, int j) {
-		
-	}
+	abstract public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean y_ij);
 	
 }

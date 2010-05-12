@@ -23,6 +23,7 @@
  */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 
@@ -33,8 +34,8 @@ import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 public class ErgmDensity extends ErgmTerm {
 
 	@Override
-	public double changeStatistic(AdjacencyMatrix m, int i, int j, boolean y_ij) {
-		return - getTheta();
+	public <V extends Vertex> double difference(AdjacencyMatrix<V> m, int i, int j, boolean y_ij) {
+		return Math.exp(getTheta());
 	}
 
 }
