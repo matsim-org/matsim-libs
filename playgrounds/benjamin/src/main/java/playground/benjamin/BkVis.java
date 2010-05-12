@@ -37,10 +37,11 @@ public class BkVis {
 //			String otffile = "../matsim/test/input/playground/benjamin/BKickRouterTestIATBR/network.xml";
 //			String otffile = "../matsim/output/singleIteration/ITERS/it.0/0.otfvis.mvi";
 //			String otffile = BkPaths.RUNSSVN + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
-//			String otffile = BkPaths.RUNSSVN + "run950/it.1000/950.1000.events.mvi";
+			String otffile = BkPaths.RUNSSVN + "run950/it.1000/950.1000.events.mvi";
 
 //===========================================================================================================		
-//	Für den interactiven Modus: Unten die config übergeben und in der config:
+//	Für den interactiven Modus:
+//		Entweder DgOTFVisReplayLastIteration.java ausführen oder manuell unten die config übergeben und vorher dort folgendes ändern:
 //		
 //		1. QSim-Modul einschalten ("qsim" statt "simulation"):
 //			<module name="qsim">
@@ -64,7 +65,7 @@ public class BkVis {
 //		String otffile = "../matsim/examples/tutorial/singleIteration.xml";
 //		String otffile = BkPaths.RUNSSVN + "run749/TestOTFVis_interactive/749.output_config.xml";
 //		String otffile = "../detailedEval/pop/140k-synthetische-personen/config-for-visualisation.xml";
-		String otffile = BkPaths.RUNSSVN + "run950/950.output_config.xml";
+//		String otffile = BkPaths.RUNSSVN + "run950/950.output_config.xml";
 
 		
 		OTFVis.main(new String[] {otffile});

@@ -56,13 +56,13 @@ public class Trb09Analysis {
 		String netfile, plans1file, plans2file, housholdsfile;
 		int threshold;
 		
-		boolean isTestscenario = true;
-		String runNumber1 = "860";
-		String runNumber2 = "864";
+//		boolean isTestscenario = true;
+//		String runNumber1 = "860";
+//		String runNumber2 = "864";
 		
-//		boolean isTestscenario = false;		
-//		String runNumber1 = "749";
-//		String runNumber2 = "869";
+		boolean isTestscenario = false;		
+		String runNumber1 = "891";
+		String runNumber2 = "899";
 		
 		String runid1String = "run" + runNumber1;
 		String runid2String = "run" + runNumber2;
