@@ -51,9 +51,10 @@ public class TwinTaskQueue implements TaskQueue {
 	@Override
 	public boolean add(BFTask task) {
 		boolean result =false;
+		
 		if(task.ival instanceof playground.dressler.Interval.VertexIntervalWithCost){
 			VertexIntervalWithCost costival = (VertexIntervalWithCost)task.ival;
-			if(costival.costIsRelative && costival.getCost()==0){
+			if(costival.costIsRelative && costival.cost==0){
 				result =_first.add(task);
 			}else{
 				result =_second.add(task);

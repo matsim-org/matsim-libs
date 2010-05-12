@@ -27,7 +27,7 @@ public class SimpleTaskQueue implements TaskQueue {
 	}
 
 	@Override
-	public boolean addAll(TaskQueue tasks) {
+	public boolean addAll(TaskQueue tasks) {		
 		boolean result= false;
 		for(BFTask task: tasks){
 			Boolean test=_list.add(task);

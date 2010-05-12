@@ -4,10 +4,10 @@ import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.VertexInterval;
 
 public class BFTask {
-	public int time;
-	public VertexInterval ival;
-	public VirtualNode node;
-	public boolean reverse; 
+	final public int time;
+	final public VertexInterval ival;
+	final public VirtualNode node;
+	final public boolean reverse; 
 	
 	BFTask(VirtualNode node, VertexInterval oldival, boolean rev){
 		this.time = oldival.getLowBound();
