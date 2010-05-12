@@ -18,15 +18,15 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="yu/test/input/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/network.xml.gz" />
+		<param name="inputNetworkFile" value="test/input/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/network.xml.gz" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="yu/test/input/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/testLegChainModes1/plans1.xml" />
+		<param name="inputPlansFile" value="test/input/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/testLegChainModes1/plans1.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="yu/test/output/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/testLegChainModes1" />
+		<param name="outputDirectory" value="test/output/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/testLegChainModes1" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 	</module>

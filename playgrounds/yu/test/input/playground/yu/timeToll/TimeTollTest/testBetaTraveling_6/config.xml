@@ -8,15 +8,15 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="yu/test/input/playground/yu/timeToll/network.xml" />
+		<param name="inputNetworkFile" value="test/input/playground/yu/timeToll/network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="yu/test/input/playground/yu/timeToll/plans100.xml" />
+		<param name="inputPlansFile" value="test/input/playground/yu/timeToll/plans100.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="yu/test/output/playground/yu/timeToll/TimeTollTest/testBetaTraveling_6" />
+		<param name="outputDirectory" value="test/output/playground/yu/timeToll/TimeTollTest/testBetaTraveling_6" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="20" />
 	</module>
@@ -26,9 +26,6 @@
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
 	
-		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims -->
-		
 		<param name="flowCapacityFactor" value="0.1" />
 		<param name="storageCapacityFactor" value="0.3" />
 	</module>

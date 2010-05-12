@@ -8,15 +8,15 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="yu/test/input/playground/yu/pseudoPt/network.xml" />
+		<param name="inputNetworkFile" value="test/input/playground/yu/pseudoPt/network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="yu/test/input/playground/yu/pseudoPt/plans100withPt.xml" />
+		<param name="inputPlansFile" value="test/input/playground/yu/pseudoPt/plans100withPt.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="yu/test/output/playground/yu/pseudoPt/PtTest/testbetaPt_3" />
+		<param name="outputDirectory" value="test/output/playground/yu/pseudoPt/PtTest/testbetaPt_3" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="50" />
 	</module>

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.pseudoPt;
 
@@ -36,9 +36,9 @@ import playground.yu.analysis.PtCheck;
  * equil-net, but can neither do departure-time adaptation, nor rerouting. This
  * leads to all agents driving through the same one route in the network. The
  * agents can only choose plans with type "car" or "pt".
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class PtTest extends MatsimTestCase {
 
@@ -46,7 +46,7 @@ public class PtTest extends MatsimTestCase {
 	 * Responsible for the verification of the tests. It adds a
 	 * AbstractPersonAlgorithm (PtCheck) and checks their result (number of
 	 * ptUsers) in some specific iterations.
-	 * 
+	 *
 	 * @author ychen
 	 */
 	private static class TestControlerListener implements IterationEndsListener {
@@ -123,8 +123,7 @@ public class PtTest extends MatsimTestCase {
 	 * Runs the test with a value of -6 for beta_travelingPt.
 	 */
 	public void testbetaPt_6() {
-		Controler controler = new Controler("yu/" + getInputDirectory()
-				+ "config.xml");
+		Controler controler = new Controler(getInputDirectory() + "config.xml");
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
 		controler.setOverwriteFiles(true);
@@ -135,8 +134,7 @@ public class PtTest extends MatsimTestCase {
 	 * Runs the test with a value of -3 for beta_travelingPt
 	 */
 	public void testbetaPt_3() {
-		Controler controler = new Controler("yu/" + getInputDirectory()
-				+ "config.xml");
+		Controler controler = new Controler(getInputDirectory() + "config.xml");
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
 		controler.setOverwriteFiles(true);

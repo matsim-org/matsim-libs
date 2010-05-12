@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.timeToll;
 
@@ -33,7 +33,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class TimeTollTest extends MatsimTestCase {
 	private static class TestControlerListener implements
@@ -69,8 +69,7 @@ public class TimeTollTest extends MatsimTestCase {
 	}
 
 	public void testBetaTraveling_6() {
-		Controler ctl = new Controler("yu/" + getInputDirectory()
-				+ "config.xml");
+		Controler ctl = new Controler(getInputDirectory() + "config.xml");
 		ctl.addControlerListener(new TestControlerListener());
 		ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);
@@ -78,8 +77,7 @@ public class TimeTollTest extends MatsimTestCase {
 	}
 
 	public void testBetaTraveling_30() {
-		Controler ctl = new Controler("yu/" + getInputDirectory()
-				+ "config.xml");
+		Controler ctl = new Controler(getInputDirectory() + "config.xml");
 		ctl.addControlerListener(new TestControlerListener());
 		ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);

@@ -38,7 +38,7 @@ import playground.yu.test.ChangeLegModeWithParkLocation;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 	private static class LegChainModesListener1 implements
@@ -208,7 +208,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 	public void testLegChainModes1() {
 		// the agent in the initial plan has only "walk" legs.
-		Config config = loadConfig("yu/" + getInputDirectory() + "config1.xml");
+		Config config = loadConfig(getInputDirectory() + "config1.xml");
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener1());
 		ctl.setCreateGraphs(false);
@@ -223,7 +223,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 	public void testLegChainModes2() {
 		// the agent in the initial plan has only "car" legs.
-		Config config = loadConfig("yu/" + getInputDirectory() + "config2.xml");
+		Config config = loadConfig(getInputDirectory() + "config2.xml");
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener2());
 		ctl.setCreateGraphs(false);
@@ -238,7 +238,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 	public void testLegChainModes3() {
 		// the agent in the initial plan has only "pt" legs.
-		Config config = loadConfig("yu/" + getInputDirectory() + "config3.xml");
+		Config config = loadConfig(getInputDirectory() + "config3.xml");
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener3());
 		ctl.setCreateGraphs(false);
