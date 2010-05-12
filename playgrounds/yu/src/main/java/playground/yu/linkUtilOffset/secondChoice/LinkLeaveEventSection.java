@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkLeaveEventChain.java
+ * LinkLeaveEventSection.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,58 +21,49 @@
 /**
  * 
  */
-package playground.yu.linkUtilOffset;
+package playground.yu.linkUtilOffset.secondChoice;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 
 /**
+ * a simple unit of LinkLeaveEvent containing only timeBin and linkId
+ * informations
+ * 
  * @author yu
  * 
  */
-public class LinkLeaveEventChain {
-	/**
-	 * @param List
-	 *            {@code LinkLeaveEventSection}
-	 */
-	private List<LinkLeaveEventSection> chain = new ArrayList<LinkLeaveEventSection>();
-	private boolean afterEventsHandling = false;
+public class LinkLeaveEventSection {
+	private static int timeBin = 3600;
+	private int time;
+	private Id linkId;
 
-	public void setAfterEventsHandling(boolean afterEventsHandling) {
-		this.afterEventsHandling = afterEventsHandling;
+	public LinkLeaveEventSection(LinkLeaveEvent lle) {
+		this.time = (int) (lle.getTime() / timeBin);
+		this.linkId = lle.getLinkId();
 	}
 
-	// public void setTimeBin(int timeBin) {
-	// LinkLeaveEventSection.setTimeBin(timeBin);
-	// }
+	public static void setTimeBin(int timeBin) {
+		LinkLeaveEventSection.timeBin = timeBin;
+	}
 
-	public void addSection(LinkLeaveEventSection section) {
-		this.chain.add(section);
+	public int getTime() {
+		return time;
+	}
+
+	public Id getLinkId() {
+		return linkId;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this.afterEventsHandling) {
-			if (!(obj instanceof LinkLeaveEventChain))
-				return false;
-			LinkLeaveEventChain llec = (LinkLeaveEventChain) obj;
-			int size = this.chain.size();
-			if (size != llec.chain.size())
-				return false;
-			else {
-				for (int i = 0; i < size; i++)
-					if (!this.chain.get(i).equals(llec.chain.get(i)))
-						return false;
+		if (!(obj instanceof LinkLeaveEventSection))
+			return false;
 
-				return true;
-			}
-		} else {
-			Logger
-					.getLogger("afterEventsHandling")
-					.fine(
-							"The eventhandling is not finished, so that the LinkLeaveEventChain could not be complete!");
-			throw new RuntimeException();
-		}
+		LinkLeaveEventSection objSection = (LinkLeaveEventSection) obj;
+		if (this.getTime() != objSection.getTime())
+			return false;
+
+		return this.getLinkId().equals(objSection.getLinkId());
 	}
 }

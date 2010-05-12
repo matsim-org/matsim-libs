@@ -46,15 +46,16 @@ import playground.yu.analysis.PlanModeJudger;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "car" and the other with type "pt", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 	private Person person;
 	private List<PlanImpl> copyPlans = new ArrayList<PlanImpl>();
 
-	public NewPtPlans(final Network network, final Population population, final String filename) {
+	public NewPtPlans(final Network network, final Population population,
+			final String filename) {
 		super(network, population, filename);
 	}
 
@@ -113,9 +114,9 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		final String netFilename = "examples/equil/network.xml";
-		final String plansFilename = "../matsimTests/Calibration/test/plans100.xml";
-		final String outputFilename = "../matsimTests/Calibration/test/plans100withPt.xml";
+		final String netFilename = "yu/test/input/playground/yu/pseudoPt/network.xml";
+		final String plansFilename = "yu/test/input/playground/yu/pseudoPt/plans100.xml";
+		final String outputFilename = "yu/test/input/playground/yu/pseudoPt/plans100withPt.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();

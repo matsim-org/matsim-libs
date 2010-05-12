@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.linkUtilOffset;
+package playground.yu.linkUtilOffset.secondChoice;
 
 import java.util.HashMap;
 import java.util.HashSet;

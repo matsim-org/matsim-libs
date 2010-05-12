@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.linkUtilOffset;
+package playground.yu.linkUtilOffset.secondChoice;
 
 import java.util.HashSet;
 import java.util.List;
@@ -43,12 +43,18 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.yu.analysis.LegAlgorithm;
 
 /**
+ * extracts the links passed by really
+ * 
  * @author yu
- *
+ * 
  */
-public class LinkFilter extends AbstractPersonAlgorithm implements
+public class LinkWithTrafficFilter extends AbstractPersonAlgorithm implements
 		PlanAlgorithm, LegAlgorithm {
 	private Set<Id> passedLinkIds = new HashSet<Id>();
+
+	public Set<Id> getPassedLinkIds() {
+		return passedLinkIds;
+	}
 
 	@Override
 	public void run(Person person) {
@@ -65,14 +71,14 @@ public class LinkFilter extends AbstractPersonAlgorithm implements
 	@Override
 	public void run(LegImpl leg) {
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
-		// leave link -->volume++
+		// leave link --> volume++
 		this.passedLinkIds.add(route.getStartLinkId());
 		this.passedLinkIds.addAll(route.getLinkIds());
 	}
 
 	public void output() {
 		System.out
-				.println("the number of the links, over those is really ridden\t"
+				.println("the number of the links, through those is really passed\t"
 						+ this.passedLinkIds.size());
 	}
 
@@ -88,7 +94,7 @@ public class LinkFilter extends AbstractPersonAlgorithm implements
 		Population pop = sc.getPopulation();
 		new MatsimPopulationReader(sc).readFile(popFilename);
 
-		LinkFilter lf = new LinkFilter();
+		LinkWithTrafficFilter lf = new LinkWithTrafficFilter();
 		lf.run(pop);
 		lf.output();
 	}
