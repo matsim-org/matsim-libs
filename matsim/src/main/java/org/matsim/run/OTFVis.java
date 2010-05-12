@@ -47,7 +47,6 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFClientSwing;
 import org.matsim.vis.otfvis.OTFDoubleMVI;
 import org.matsim.vis.otfvis.OTFVisQSim;
-import org.matsim.vis.otfvis.OTFVisQueueSimulation;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 import org.matsim.vis.snapshots.writers.VisMobsim;
