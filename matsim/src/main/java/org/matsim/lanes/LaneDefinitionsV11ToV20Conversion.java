@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneDefinitonsV11ToV20Converter
+ * LaneDefinitionsV11ToV20Conversion
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,87 +19,43 @@
  * *********************************************************************** */
 package org.matsim.lanes;
 
-import java.io.IOException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.signalsystems.CalculateAngle;
-import org.xml.sax.SAXException;
 
 
 /**
+ * Converts LaneDefinitions that have been read from a xml file in the lanedefinitions_v1.1.xsd
+ * to LaneDefinitions that have all attributes set used in the lanedefinitions_v2.0.xsd file format.
+ * 
+ * In the v1.1 format only the Lanes at the end of a link are specified but not the ones at the 
+ * beginning of the link that lead to the Lanes at the end of the link. Furthermore there is no
+ * explicit U-Turn functionality expected to be modeled in the v1.1 format. Also not existing in
+ * v1.1 is information about the topological order of the Lanes on the link. All this information is 
+ * computed heuristically by this converter.
+ * 
+ * This means:
+ * <ul>
+ *   <li>One or more Lanes are created that lead from the beginning of the link to the Lanes at
+ *   the end of the link.</li>
+ *   <li>Based on the geometry information in the network graph topology information is added.</li>
+ *   <li>To the lane which is the most left one (looking south to north on the link) a additional out 
+ *   link is added to enable U-Turn funcitonality.</li>
+ * </ul>
+ * 
  * @author dgrether
- *
  */
-public class LaneDefinitonsV11ToV20Converter {
+public class LaneDefinitionsV11ToV20Conversion {
 
-	private static final Logger log = Logger.getLogger(LaneDefinitonsV11ToV20Converter.class);
-
-	public LaneDefinitonsV11ToV20Converter(){
-	}
-	
-	private void checkFileTypes(String laneDefs11Filename, String laneDefs20Filename){
-		MatsimFileTypeGuesser fileTypeGuesser;
-		try {
-			fileTypeGuesser = new MatsimFileTypeGuesser(laneDefs11Filename);
-			String sid11 = fileTypeGuesser.getSystemId();
-
-//			fileTypeGuesser = new MatsimFileTypeGuesser(laneDefs20Filename);
-//			String sid20 = fileTypeGuesser.getSystemId();
-			
-			if (!(sid11.compareTo(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11) == 0)){
-				throw new IllegalArgumentException("File " + laneDefs11Filename + " is no laneDefinitions_v1.1.xsd format");
-			}
-//			if (!(sid20.compareTo(MatsimLaneDefinitionsReader.SCHEMALOCATIONV20) == 0)){
-//				throw new IllegalArgumentException("File " + laneDefs20Filename + " is no laneDefinitions_v2.0.xsd format");
-//			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void convert(String laneDefs11Filename, String laneDefs20Filename, String networkFilename){
-		this.checkFileTypes(laneDefs11Filename, laneDefs20Filename);
-		
-		Scenario sc = new ScenarioImpl();
-		MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
-		netReader.readFile(networkFilename);
-		Network net = sc.getNetwork();
-		LaneDefinitions lanedefs11 = new LaneDefinitionsImpl();
-		LaneDefinitionsReader11 reader11 = new LaneDefinitionsReader11(lanedefs11, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
-		try {
-			reader11.readFile(laneDefs11Filename);
-			LaneDefinitions lanedefs20 = convertTo20(lanedefs11, net);
-			LaneDefinitionsWriter20 writer20 = new LaneDefinitionsWriter20(lanedefs20);
-			writer20.write(laneDefs20Filename);
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	
 	public LaneDefinitions convertTo20(LaneDefinitions lanedefs11, Network network) {
 		LaneDefinitions lanedefs20 = new LaneDefinitionsImpl();
@@ -149,10 +105,10 @@ public class LaneDefinitonsV11ToV20Converter {
 					intermediateLaneId = new IdImpl(intermediateLanesCounter + ".cl");
 					intermediateLanesCounter++;
 					intermediateLane = lanedefs20fac.createLane(intermediateLaneId);
+					//intermdiateLane needs values as startsAt and represented number of lanes
 					intermediateLane.setStartsAtMeterFromLinkEnd(longestLane.getStartsAtMeterFromLinkEnd());
 					intermediateLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
 					l2lnew.addLane(intermediateLane);
-					//intermdiateLane needs values as startsAt and 
 					lastLane.addToLaneId(intermediateLaneId);
 					lastLane = intermediateLane;
 					longestLane = secondLongestLane;
@@ -184,48 +140,21 @@ public class LaneDefinitonsV11ToV20Converter {
 //						log.info("lane " + newLane.getId() + "  alignment: " + mostRight);
 						newLane.setAlignment(mostRight);
 						assignedLanes.add(l);
-						//decrement mostRigth skip 0 if number of lanes is even
+						//decrement mostRight skip 0 if number of lanes is even
 						mostRight--;
 						if ((mostRight == 0) && (l2l.getLanes().size() % 2  == 0)){
 							mostRight--;
 						}
+						
+						//add uturn functionality if the first lane is processed, i.e. the most left lane that is indicated by an empty set of assignedLanes
+						if (outlink.getToNode().equals(link.getFromNode()) && assignedLanes.isEmpty()){
+							newLane.addToLinkId(outlink.getId());
+						}
 					}
 				}
 			}
-			
-			
 		}//end outer for
-		
 		return lanedefs20;
 	}
-
-	public static class LaneMeterFromLinkEndComparator implements Comparator<Lane>{
-
-		@Override
-		public int compare(Lane o1, Lane o2) {
-      if (o1.getStartsAtMeterFromLinkEnd() < o2.getStartsAtMeterFromLinkEnd()) {
-        return -1;
-      } else if (o1.getStartsAtMeterFromLinkEnd() > o2.getStartsAtMeterFromLinkEnd()) {
-        return 1;
-      } else {
-        return 0;
-      }
-		}
-  };
 	
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String inputDir = "./test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
-		
-		String net = inputDir + "network.xml.gz";
-		String lanes = inputDir + "testLaneDefinitions_v1.1.xml";
-		String lanes20 = inputDir + "testLaneDefinitions_v2.0.xml";
-		
-		new LaneDefinitonsV11ToV20Converter().convert(lanes, lanes20, net);
-		
-	}
-
 }
