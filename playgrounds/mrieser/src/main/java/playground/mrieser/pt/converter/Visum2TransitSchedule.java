@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mrieser.pt.converter;
 
 import java.util.ArrayList;
@@ -29,8 +48,6 @@ import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.VehicleCombination;
 import org.matsim.visum.VisumNetwork.VehicleUnit;
-
-
 
 public class Visum2TransitSchedule {
 
@@ -78,6 +95,7 @@ public class Visum2TransitSchedule {
 		for (VisumNetwork.StopPoint stopPoint : this.visum.stopPoints.values()){
 			Coord coord = this.coordinateTransformation.transform(this.visum.stops.get(this.visum.stopAreas.get(stopPoint.stopAreaId).StopId).coord);
 			TransitStopFacility stop = builder.createTransitStopFacility(stopPoint.id, coord, false);
+			stop.setName(stopPoint.name);
 			stopFacilities.put(stopPoint.id, stop);
 			this.schedule.addStopFacility(stop);
 		}
