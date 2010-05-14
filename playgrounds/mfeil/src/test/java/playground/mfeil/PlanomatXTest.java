@@ -76,7 +76,6 @@ public class PlanomatXTest extends MatsimTestCase{
 		this.testee.run(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
 		new PopulationWriter(this.scenario_input.getPopulation()).writeFile("D:/Documents and Settings/Matthias Feil/Desktop/test_plans.xml");
 		log.info("done.");
-		*/
 
 		PlanImpl plan = new PlanImpl (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
 		plan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
@@ -100,7 +99,7 @@ public class PlanomatXTest extends MatsimTestCase{
 				assertEquals(Math.floor(((LegImpl)(plan.getPlanElements().get(i))).getArrivalTime()),  Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getArrivalTime()));
 			}
 		}
-		log.info("... done.");
+		log.info("... done.");*/
 	}
 
 	public void testCreateNeighbourhood (){
