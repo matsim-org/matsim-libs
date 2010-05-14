@@ -408,8 +408,8 @@ public class AgentsAssigner implements PlanAlgorithm{
 		
 		// adjust first home duration if al.size()!=1: if start time later than 18h move it to midday. Plans get endless, otherwise
 		if (al.size()>1 && ((ActivityImpl)(al.get(0))).getEndTime()>18*3600){
-			((ActivityImpl)al.get(0)).setEndTime(12*3600);
-			((ActivityImpl)al.get(0)).setDuration(12*3600);
+			((ActivityImpl)al.get(0)).setEndTime(9*3600);
+			((ActivityImpl)al.get(0)).setDuration(9*3600);
 		}
 		
 		// adjust travel time budget for location choice:
