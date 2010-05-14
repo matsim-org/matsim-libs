@@ -44,6 +44,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationWriter;
 
 import playground.dressler.Interval.EdgeIntervals;
@@ -127,28 +128,34 @@ public class MultiSourceEAF {
 	 * @return
 	 */
 	public static HashMap<Node,Integer> readPopulation(final Scenario scenario, final String filename){
-		new MatsimPopulationReader(scenario).readFile(filename);
+		new PopulationReaderMatsimV4(scenario).readFile(filename);
 		return parsePopulation(scenario);
 	}
 
 	public static HashMap<Node,Integer> parsePopulation(final Scenario scenario) {
 		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
-
+		
+		//System.out.println("Parsing population of size: " + scenario.getPopulation().getPersons().size());
 		int missing = 0;
 
 		for(Person person : scenario.getPopulation().getPersons().values() ){
 
 			Plan plan = person.getPlans().get(0);
-			if(((PlanImpl) plan).getFirstActivity().getLinkId()==null){
+			/*if(((PlanImpl) plan).getFirstActivity().getLinkId()==null){
 				continue;
-			}
-
-			Link link = scenario.getNetwork().getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId());
+			}*/
+			Id id =
+				((org.matsim.core.population.ActivityImpl)person.getPlans().get(0).getPlanElements().get(0)).getLinkId();
+			//Link link = scenario.getNetwork().getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId());
+			Link link = scenario.getNetwork().getLinks().get(id);
 			if (link == null) {
 				missing += 1;
 				continue;
 			}
 			Node node = link.getToNode();
+			/*if (node.getId().toString().equals("en1")) {
+				System.out.println("Person starting on en1: " + person );
+			}*/
 			if(allnodes.containsKey(node)){
 				int temp = allnodes.get(node);
 				allnodes.put(node, temp + 1);
@@ -156,6 +163,12 @@ public class MultiSourceEAF {
 				allnodes.put(node, 1);
 			}
 		}
+		
+		int sum = 0;
+		for (Node node : allnodes.keySet()) {
+			sum += allnodes.get(node);
+		}
+		//System.out.println("Found " +  sum + " total demand.");
 
 		if (missing > 0) {
 			System.out.println("Missed some start links! Ignored " + missing + " people.");
@@ -656,7 +669,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 5;
+		int instance = 42;
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -703,7 +716,7 @@ public class MultiSourceEAF {
 		} else if (instance == 42) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
-			timeStep = 1;
+			timeStep = 10;
 			flowFactor = 1.0;
 			sinkid = "en1";
 			//shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
@@ -713,7 +726,7 @@ public class MultiSourceEAF {
 			timeStep = 10;
 			flowFactor = 1.0;
 			sinkid = "en1";
-			//shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
+			shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
 		} else if (instance == 44) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
@@ -925,14 +938,14 @@ public class MultiSourceEAF {
 		//settings.MaxRounds = 1;
 		//settings.checkConsistency = 100;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.
-		settings.useSinkCapacities = false;
+		//settings.useSinkCapacities = false;
 		//settings.useVertexCleanup = false;
 		settings.useImplicitVertexCleanup = true;
 		settings.useShadowFlow = true;		
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
-		settings.useRepeatedPaths = true; // not compatible with costs!
+		//settings.useRepeatedPaths = true; // not compatible with costs!
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
 		//settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		//settings.sortPathsBeforeAugmenting = true;
@@ -969,6 +982,7 @@ public class MultiSourceEAF {
 
 		//settings.writeLP();
 		//settings.writeSimpleNetwork(true);
+		//settings.writeSimpleNetwork(false);
 		//settings.writeNET(false);
 		//settings.writeLodyfa();
 		//if(true)return;

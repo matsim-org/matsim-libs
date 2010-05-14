@@ -171,6 +171,9 @@ public class FlowCalculationSettings {
 					}
 				}
 			}
+			if (this._demands.get(this.supersink) != null) {
+				System.out.println("Warning: Supersink had demand " + this._demands.get(this.supersink) + ". It will be overwritten!");
+			}
 			this._demands.put(this.supersink, -totaldemand);
 			if (overrideerrors > 0) {
 				System.out.println("Warning! " + overrideerrors + " sink(s) were removed because a supersink was specified.");

@@ -827,7 +827,7 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		// TaskComparator taskcomp = new TaskComparator();
 		// Queue<BFTask> queue = new PriorityQueue<BFTask>((1), taskcomp);
 		// DEBUG! BFS instead of Priority Queue
-		TaskQueue queue = new SimpleTaskQueue();
+		TaskQueue queue = new TwinTaskQueue();
 
 		// set fresh labels, initialize queue
 		refreshLabelsForward(queue);

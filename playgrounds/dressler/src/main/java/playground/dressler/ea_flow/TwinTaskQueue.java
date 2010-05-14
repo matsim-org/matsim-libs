@@ -57,7 +57,7 @@ public class TwinTaskQueue implements TaskQueue {
 			if(costival.costIsRelative && costival.cost==0){
 				result =_first.add(task);
 			}else{
-				result =_second.add(task);
+				result =_second.add(task);				
 			}
 		}else{
 			result =_first.add(task);
