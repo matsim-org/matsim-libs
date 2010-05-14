@@ -21,6 +21,7 @@
 package playground.mfeil.analysis;
 
 import java.io.File;
+
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Map;
@@ -36,7 +37,9 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-
+import org.matsim.core.utils.misc.RouteUtils;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.population.routes.NetworkRoute;
 import playground.mfeil.attributes.AgentsAttributesAdder;
 
 
@@ -48,7 +51,12 @@ import playground.mfeil.attributes.AgentsAttributesAdder;
  */
 public class TravelStatsMZMATSim {
 
+	public TravelStatsMZMATSim (Network network){
+		this.network = network;
+	}
+	
 	private static final Logger log = Logger.getLogger(TravelStatsMZMATSim.class);
+	private final Network network;
 
 	private PrintStream initiatePrinter(String outputFile){
 		PrintStream stream;
@@ -110,7 +118,7 @@ public class TravelStatsMZMATSim {
 			for (int i=1;i<plan.getPlanElements().size();i+=2){
 				LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 				if (leg.getMode().equals(TransportMode.car)) {
-					if (leg.getRoute()!=null) aveTripDistanceCarPop1 += weight*leg.getRoute().getDistance();
+					if (leg.getRoute()!=null) aveTripDistanceCarPop1 += weight*RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), network);//leg.getRoute().getDistance();
 					else log.warn("A car leg of person "+person.getId()+" has no route!");
 					aveTripTimeCarPop1 += weight*leg.getTravelTime();
 					duration += leg.getTravelTime();
@@ -177,7 +185,7 @@ public class TravelStatsMZMATSim {
 				LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 				if (leg.getMode().equals(TransportMode.car)) {
 					if (leg.getRoute()!=null) {
-						double distance = leg.getRoute().getDistance();
+						double distance = RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), network);//leg.getRoute().getDistance();
 						int distanceClass = this.getClass (distance);
 						stats[distanceClass][0] += weight;
 						stats[distanceClass][4] += weight;
@@ -259,7 +267,7 @@ public class TravelStatsMZMATSim {
 				new MatsimFacilitiesReader(scenarioMATSim).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenarioMATSim).readFile(populationFilenameMATSim);
 
-				TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
+				TravelStatsMZMATSim ts = new TravelStatsMZMATSim(scenarioMATSim.getNetwork());
 				PrintStream stream = ts.initiatePrinter(outputFile);
 				ts.printHeader(stream);
 				ts.run(scenarioMZ.getPopulation(), scenarioMATSim.getPopulation(), stream, attributesInputFile);

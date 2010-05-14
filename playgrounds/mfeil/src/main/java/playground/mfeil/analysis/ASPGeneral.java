@@ -77,7 +77,6 @@ public class ASPGeneral {
 		// Scenario files
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 	//	final String facilitiesFilename = "../matsim/test/scenarios/chessboard/facilities.xml";
-	//	final String networkFilename = "/home/baug/mfeil/data/Zurich10/network_0.7.xml";
 
 		// Special MZ file so that weights of MZ persons can be read
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
@@ -120,15 +119,15 @@ public class ASPGeneral {
 			this.reducePopulation(scenarioMZ.getPopulation(), attributesInputFile);
 			this.runMZActivityChains(pop);
 			this.compareMATSimAndMZActivityChains();
-			this.runMATSimTrips(scenarioMATSim.getPopulation());
-			this.runMZTrips(pop);
-			this.runMATSimDistances(scenarioMATSim.getPopulation());
-			this.runMZDistances(pop);
+			this.runMATSimTrips(scenarioMATSim.getPopulation(), scenarioMATSim.getNetwork());
+			this.runMZTrips(pop, scenarioMZ.getNetwork());
+			this.runMATSimDistances(scenarioMATSim.getPopulation(), scenarioMATSim.getNetwork());
+			this.runMZDistances(pop, scenarioMZ.getNetwork());
 			this.runMATSimTimings(scenarioMATSim.getPopulation());
 			this.runMZTimings(pop);
 		}
 		else {
-			this.runMATSimTrips(scenarioMATSim.getPopulation());
+			this.runMATSimTrips(scenarioMATSim.getPopulation(), scenarioMATSim.getNetwork());
 			this.runMATSimTimings(scenarioMATSim.getPopulation());
 		}
 		this.analyzeCounts(counts);
@@ -280,28 +279,43 @@ public class ASPGeneral {
 		this.stream.println(kpisMZWeighted[5]+"\t\t"+kpisMZUnweighted[5]+"\t\t"+kpisMATSim[5]+"\tShare of plans in which same acts occur");
 		this.stream.println();
 	}
+	
+	private void runMATSimTrips (Population pop, NetworkImpl network){
+		TravelStatsMZMATSim ts = new TravelStatsMZMATSim(network);
 
-	private void runMATSimTrips (Population pop){
-		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
+//	private void runMATSimTrips (Population pop){
+//		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
 		ts.printHeader(this.stream);
 		ts.runAggregateStats("MATSim", pop, this.stream, null);
 	}
 
-	private void runMZTrips (Population pop){
-		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
+	
+	private void runMZTrips (Population pop, NetworkImpl network){
+		TravelStatsMZMATSim ts = new TravelStatsMZMATSim(network);
+
+//	private void runMZTrips (Population pop){
+//		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
 		ts.runAggregateStats("MZ_weighted", pop, this.stream, this.personsWeights);
 		ts.runAggregateStats("MZ_unweighted", pop, this.stream, null);
 		this.stream.println();
 	}
+	
+	private void runMATSimDistances (Population pop, NetworkImpl network){
+		TravelStatsMZMATSim ts = new TravelStatsMZMATSim(network);
 
-	private void runMATSimDistances (Population pop){
-		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
+
+//	private void runMATSimDistances (Population pop){
+//		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
 		ts.printHeader(this.stream);
 		ts.runDisaggregateStats("MATSim", pop, this.stream, null);
 	}
+	
+	private void runMZDistances (Population pop, NetworkImpl network){
+		TravelStatsMZMATSim ts = new TravelStatsMZMATSim(network);
 
-	private void runMZDistances (Population pop){
-		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
+
+//	private void runMZDistances (Population pop){
+//		TravelStatsMZMATSim ts = new TravelStatsMZMATSim();
 		ts.runDisaggregateStats("MZ_weighted", pop, this.stream, this.personsWeights);
 		ts.runDisaggregateStats("MZ_unweighted", pop, this.stream, null);
 		this.stream.println();
@@ -557,13 +571,14 @@ public class ASPGeneral {
 	}
 
 	public static void main(final String [] args) {
-		int iter = 100;
+		int iter = 0;
 		int lastIter = iter;
-		String directory = "Test1";
-		/*	// Scenario files
-		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+		String directory = "/home/baug/mfeil/data/runs/1712";
+	//	String directory = "mfeil/output";
+		
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network_0.7.xml";
-
+	//	final String networkFilename = "../matsim/test/scenarios/chessboard/network.xml";;
+/*
 		// Special MZ file so that weights of MZ persons can be read
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 
@@ -580,7 +595,7 @@ public class ASPGeneral {
 		final String outputFile = "/home/baug/mfeil/output/plx.analysis.xls";
 	*/
 
-		final String networkFilename = "../matsim/test/scenarios/chessboard/network.xml";
+	//	final String networkFilename = "../matsim/test/scenarios/chessboard/network.xml";
 
 		// Start calculations
 		ScenarioImpl scenarioMATSim = new ScenarioImpl();

@@ -41,7 +41,7 @@ public class RunUtilFunctionEstimation {
 	public static void main(String[] args) {
 		log.info("Process started...");
 		
-		final String version = "160";
+		final String version = "163";
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mzAS0997b.xml";
@@ -53,20 +53,20 @@ public class RunUtilFunctionEstimation {
 
 		
 		String beta				= "yes";
-		String gamma			= "yes";
+		String gamma			= "no";
 		String similarity 		= "yes";
 		String incomeConstant 	= "no";
 		String incomeDivided	= "no";
 		String incomeDividedLN	= "no";
-		String incomeBoxCox		= "no";
-		String gender 			= "no";
-		String age 				= "no";
+		String incomeBoxCox		= "yes";
+		String gender 			= "yes";
+		String age 				= "yes";
 		String income	 		= "no";
-		String license 			= "no";
+		String license 			= "yes";
 		String carAvail 		= "no";
 		String seasonTicket 	= "no";
 		String travelDistance	= "no"; 
-		String travelCost		= "yes"; 
+		String travelCost		= "no"; 
 		String travelConstant 	= "yes";
 		String beta_travel		= "no";
 		String bikeIn			= "yes";
