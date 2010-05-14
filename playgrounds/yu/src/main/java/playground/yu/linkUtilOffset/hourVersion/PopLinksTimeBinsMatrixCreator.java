@@ -224,28 +224,13 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-
+		Matrix x;
 		if (A.rank() == A_b.rank()) {
 			if (new QRDecomposition(A).isFullRank()) {
-				Matrix x = A.solve(b);
-				try {
-					x.print(new PrintWriter(matrixXFilename), 1, 2);
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
+				x = A.solve(b);
 
-				Matrix Residual = A.times(x).minus(b);
-				try {
-					Residual.print(new PrintWriter(matrixResidualFilename), 1,
-							2);
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-
-				double rnorm = Residual.normInf();
-				System.out.println("Matrix\tResidual Infinity norm:\t" + rnorm);
 			} else {
-				Matrix G = A.inverse();
+				Matrix G = A.inverse();// Generalized inverse?
 
 				Matrix z = new Matrix(n, 1, 0d);
 				z.set(0, 0, 1d);
@@ -253,11 +238,25 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 				Matrix I = new Matrix(n, n, 0d);
 				for (int i = 0; i < n; i++)
 					I.set(i, i, 1d);
-				
-//				I.minus(G.times(A))
 
-				Matrix x = G.times(b);
+				x = G.times(b).plus(I.minus(G.times(A)).minus(z));
+
 			}
+			try {
+				x.print(new PrintWriter(matrixXFilename), 1, 2);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+
+			Matrix Residual = A.times(x).minus(b);
+			try {
+				Residual.print(new PrintWriter(matrixResidualFilename), 1, 2);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+
+			double rnorm = Residual.normInf();
+			System.out.println("Matrix\tResidual Infinity norm:\t" + rnorm);
 		}
 	}
 }

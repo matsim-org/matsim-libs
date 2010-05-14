@@ -51,18 +51,21 @@ import Jama.Matrix;
  * @author yu
  * 
  */
-public class PopLinksMatrixCreater extends AbstractPersonAlgorithm implements
+public class PopLinksMatrixCreator extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
 	private Network network;
 	private static double TIME_BIN = 86400d;// a whole day
-	private Matrix popLinksMatrix;
+	/**
+	 * matrix[mxn] m-number of pop, n-number of links
+	 */
+	private Matrix matrix;
 	private Map<Id, Integer> linkSequence = new HashMap<Id, Integer>();
 	private int personCnt = 0;
 
 	/**
 	 * 
 	 */
-	public PopLinksMatrixCreater(Network network, Population population) {
+	public PopLinksMatrixCreator(Network network, Population population) {
 		this.network = network;
 		Map<Id, Link> linkMap = (Map<Id, Link>) this.network.getLinks();
 		int i = 0;
@@ -71,8 +74,13 @@ public class PopLinksMatrixCreater extends AbstractPersonAlgorithm implements
 
 		System.out.println(this.linkSequence);// also the squence for X_n [one
 		// day version]
-		popLinksMatrix = new Matrix(population.getPersons().size(), linkMap
-				.size()/* [timeBin==one day version] */, 0d);
+		matrix = new Matrix(population.getPersons().size(), linkMap.size()/*
+																		 * [timeBin
+																		 * ==one
+																		 * day
+																		 * version
+																		 * ]
+																		 */, 0d);
 	}
 
 	/**
@@ -81,10 +89,10 @@ public class PopLinksMatrixCreater extends AbstractPersonAlgorithm implements
 	 * @param network
 	 * @param timeBin
 	 */
-	public PopLinksMatrixCreater(Network network, Population population,
+	public PopLinksMatrixCreator(Network network, Population population,
 			double timeBin) {
 		this(network, population);
-		this.TIME_BIN = timeBin;
+		TIME_BIN = timeBin;
 	}
 
 	public static double getTIME_BIN() {
@@ -106,15 +114,13 @@ public class PopLinksMatrixCreater extends AbstractPersonAlgorithm implements
 				int endLinkIdx = this.linkSequence.get(route.getEndLinkId());// routeEndLinkIdx
 				// in
 				// array
-				this.popLinksMatrix
-						.set(this.personCnt, endLinkIdx, this.popLinksMatrix
-								.get(this.personCnt, endLinkIdx) + 1d);
+				this.matrix.set(this.personCnt, endLinkIdx, this.matrix.get(
+						this.personCnt, endLinkIdx) + 1d);
 				for (Id linkId : route.getLinkIds()) {
 					int linkIdx = this.linkSequence.get(linkId);// routeLinkIdx
 					// in array
-					this.popLinksMatrix
-							.set(this.personCnt, linkIdx, this.popLinksMatrix
-									.get(this.personCnt, linkIdx) + 1d);
+					this.matrix.set(this.personCnt, linkIdx, this.matrix.get(
+							this.personCnt, linkIdx) + 1d);
 				}
 			}
 		}
@@ -123,17 +129,21 @@ public class PopLinksMatrixCreater extends AbstractPersonAlgorithm implements
 	public void writeMatrix(String matrixOutputFilename) {
 		SimpleWriter writer = new SimpleWriter(matrixOutputFilename);
 		writer.write("\tcol_no.");
-		for (int n = 0; n < this.popLinksMatrix.getColumnDimension(); n++)
+		for (int n = 0; n < this.matrix.getColumnDimension(); n++)
 			writer.write("\t" + n);
 		writer.writeln("\nrow_no.");
-		for (int m = 0; m < this.popLinksMatrix.getRowDimension(); m++) {
+		for (int m = 0; m < this.matrix.getRowDimension(); m++) {
 			writer.write(m + "\t");
-			for (int n = 0; n < this.popLinksMatrix.getColumnDimension(); n++) {
-				writer.write("\t" + this.popLinksMatrix.get(m, n));
+			for (int n = 0; n < this.matrix.getColumnDimension(); n++) {
+				writer.write("\t" + this.matrix.get(m, n));
 			}
 			writer.writeln();
 		}
 		writer.close();
+	}
+
+	public Matrix getMatrix() {
+		return matrix;
 	}
 
 	/**
@@ -152,10 +162,11 @@ public class PopLinksMatrixCreater extends AbstractPersonAlgorithm implements
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
-		PopLinksMatrixCreater plmc = new PopLinksMatrixCreater(network,
+		PopLinksMatrixCreator plmc = new PopLinksMatrixCreator(network,
 				population);
 		plmc.run(population);
 		plmc.writeMatrix(matrixOutputFilename);
 
 	}
+
 }
