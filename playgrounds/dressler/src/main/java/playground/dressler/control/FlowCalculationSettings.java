@@ -61,6 +61,8 @@ public class FlowCalculationSettings {
 	public boolean keepPaths = true; // should TEPs be stored at all?
 	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
 	public boolean useRepeatedPaths = true && !useSinkCapacities; // try to repeat paths
+	public boolean quickCutOff = false; // stop when the first path is found
+	public boolean delaySinkPropagation = false; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
 
 	public boolean trackUnreachableVertices = true && (searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);; // only works in REVERSE, wastes time otherwise
 
@@ -288,6 +290,8 @@ public class FlowCalculationSettings {
 		System.out.println("Sinks have finite capacity: " + this.useSinkCapacities);
 
 		System.out.println("Track unreachable vertices: " + this.trackUnreachableVertices);
+		System.out.println("Quick cutoff: " + this.quickCutOff);
+		System.out.println("Delay sink propagation: " + this.delaySinkPropagation);
 		System.out.println("Use vertex cleanup: " + this.useVertexCleanup);
 		System.out.println("Use implicit vertex cleanup: " + this.useImplicitVertexCleanup);
 		System.out.println("Use Shadow Flow: " + this.useShadowFlow);

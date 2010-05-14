@@ -106,6 +106,12 @@ public class StepSinkFlow implements PathStep {
 		}
 	}
 	
+	@Override
+	public int getCost() {
+		// these arcs have no cost
+		return 0;		
+	}
+	
 	/**
 	 * Checks if two PathEdges are "identical" up to direction
 	 * @param other another PathStep 

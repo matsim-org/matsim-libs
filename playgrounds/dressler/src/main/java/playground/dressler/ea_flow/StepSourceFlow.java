@@ -106,6 +106,14 @@ public class StepSourceFlow implements PathStep {
 		}
 	}
 	
+	@Override
+	public int getCost() {		
+		if (forward) 
+			return this.time;
+		else 
+			return 	-this.time;
+	}
+	
 	/**
 	 * Checks if two PathEdges are "identical" up to direction
 	 * @param other another PathStep 

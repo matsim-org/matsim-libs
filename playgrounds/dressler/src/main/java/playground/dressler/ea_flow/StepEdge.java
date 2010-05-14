@@ -236,5 +236,10 @@ public class StepEdge implements PathStep {
 		String str = "edge:"+edge.getId().toString()+":"+startTime+":"+arrivalTime+":"+forward;
 		return str;
 	}
+
+	@Override
+	public int getCost() {		
+		return this.arrivalTime - this.startTime;		
+	}
 };
 

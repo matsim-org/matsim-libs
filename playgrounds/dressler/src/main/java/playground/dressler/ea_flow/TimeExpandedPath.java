@@ -345,6 +345,17 @@ public class TimeExpandedPath {
 		return this._steps.getLast().getStartTime(); 
 	}
 	
+	/**
+	 * sums up the cost of the pathsteps!
+	 * @return the total cost
+	 */
+	public int getCost() {
+		int cost = 0;
+		for (PathStep step : this._steps) {
+			cost += step.getCost();
+		}
+		return cost;
+	}
 	
 	/**
 	 * getter for length of the path in steps (not cost or time or anything clever)

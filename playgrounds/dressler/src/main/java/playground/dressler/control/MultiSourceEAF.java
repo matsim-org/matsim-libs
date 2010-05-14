@@ -57,6 +57,7 @@ import playground.dressler.ea_flow.StepEdge;
 import playground.dressler.ea_flow.StepSinkFlow;
 import playground.dressler.ea_flow.StepSourceFlow;
 import playground.dressler.ea_flow.TimeExpandedPath;
+import playground.dressler.ea_flow.TwinTaskQueue;
 import playground.dressler.util.CPUTimer;
 import playground.dressler.util.ImportSimpleNetwork;
 
@@ -332,6 +333,8 @@ public class MultiSourceEAF {
 		int i;
 		long EdgeGain = 0;
 		int lasttime = 0;
+		int lastcost = Integer.MAX_VALUE;
+		boolean haslastcost = false;
 
 		boolean tryReverse;
 		boolean usedForwardSearch = false;
@@ -353,7 +356,12 @@ public class MultiSourceEAF {
 			Tgarbage.newiter();
 						
 			Tsearch.onoff();
-			routingAlgo.startNewIter(lasttime);
+			// ugly ...
+			if (haslastcost) {
+			  ((BellmanFordIntervalBasedWithCost) routingAlgo).startNewIter(lasttime, lastcost);
+			} else {
+			  routingAlgo.startNewIter(lasttime);
+			}
 			Tsearch.onoff();
 			
 			// call the garbage collection now that we have deleted most data structures
@@ -413,6 +421,7 @@ public class MultiSourceEAF {
 
 
 			if (result == null || result.isEmpty()){
+				haslastcost = false;
 				if (tryReverse) {
 					// backward search didn't find anything.
 					// we should try forward next time to determine new arrvivaltime
@@ -427,6 +436,9 @@ public class MultiSourceEAF {
 			} else {
 				// lazy way to get some element ...
 				for(TimeExpandedPath path : result) {
+					lastcost = path.getCost();
+					haslastcost = true;
+					
 					if (path.getArrival() > lasttime) {
 						// time has increased!
 
@@ -669,7 +681,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 42;
+		int instance = 43;
 		// 1 = siouxfalls, demand 500
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
@@ -934,7 +946,7 @@ public class MultiSourceEAF {
 		settings.flowFactor = flowFactor; // default 1.0
 
 		// set additional parameters
-		//settings.TimeHorizon = 810;
+		//settings.TimeHorizon = 100;
 		//settings.MaxRounds = 1;
 		//settings.checkConsistency = 100;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.
@@ -951,7 +963,9 @@ public class MultiSourceEAF {
 		//settings.sortPathsBeforeAugmenting = true;
 		//settings.checkTouchedNodes = true;
 		//settings.keepPaths = true; // store paths at all!
-		//settings.unfoldPaths = true; // unfold stored paths into forward paths
+		settings.unfoldPaths = true; // unfold stored paths into forward paths
+		settings.delaySinkPropagation = true; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
+		//settings.quickCutOff = true; // stop as soon as the first good path is found
 
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));

@@ -48,8 +48,10 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 	 * data structure to keep one label on each sink
 	 */
 
-	HashMap<Node, VertexInterval> _sinklabels;
+	HashMap<Node, VertexInterval> _sinklabels;	
 	
+	boolean _haslastcost = false;
+	int _lastcost = 0;	
 	
 	// --------------------CONSTRUCTORS-------------------------------------//
 
@@ -824,10 +826,13 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		this.Tcalc.onoff();
 		
 		// queue to save nodes we have to scan
-		// TaskComparator taskcomp = new TaskComparator();
-		// Queue<BFTask> queue = new PriorityQueue<BFTask>((1), taskcomp);
-		// DEBUG! BFS instead of Priority Queue
-		TaskQueue queue = new TwinTaskQueue();
+		
+		TaskQueue queue;
+		if (this._settings.delaySinkPropagation) {
+			queue = new TwinTaskQueue();
+		} else {
+			queue = new SimpleTaskQueue();
+		}
 
 		// set fresh labels, initialize queue
 		refreshLabelsForward(queue);
@@ -838,6 +843,9 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		// where the network should be empty
 		// this is decreased whenever a sink is found
 		int cutofftime = this._settings.TimeHorizon;
+		
+		// the best cost so far
+		int cutoffcost = Integer.MAX_VALUE;
 
 		BFTask task;
 
@@ -852,6 +860,30 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 
 			this._roundpolls++;
 			this._totalpolls++;
+			
+			// do we have a path and want to stop looking?
+			if (this._haslastcost && cutoffcost == this._lastcost) {								
+				// now, we could stop ...
+				
+				// do we want to stop after the first path is found? 
+				if (this._settings.quickCutOff) {
+					if (_debug > 0) {
+						System.out.println("Stopping search because of quick cutoff.");
+					}
+					break;
+				}
+				
+				// TODO make an option for this!
+				// Do we want to stop if the first queue is empty?
+				/*if (this._settings.costCutOff && queue instanceof TwinTaskQueue) {
+					if (((TwinTaskQueue) queue).firstQueueIsEmpty()) {
+						if (_debug > 0) {
+							System.out.println("Stopping search because of costcutoff and first queue is empty.");
+						}
+						break;						
+					}
+				}	*/			
+			}
 
 			// gets the first task in the queue
 			task = queue.poll();
@@ -876,21 +908,36 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 				
 				this.Tsinktime.onoff();
 				
-				// Cutoff is more difficult with costs.
-				// We only set it under the conditions of no costs:
-				// If cost = 0 and the sink is active, then we have reached
-				// a sink in the usual way.
-				if (task.time < cutofftime && this._flow.isActiveSink(v)) {
+
+				if (this._flow.isActiveSink(v)) {
 					VertexIntervalWithCost label = (VertexIntervalWithCost) this._sinklabels.get(v);
-					if (label.getReachable() && label.getAbsoluteCost(0) == 0) { 
-						cutofftime = task.time;
+
+					// Cutoff time is more difficult with costs.
+					// We only set it under the conditions of no costs:
+					// If "relative cost" = 0 and the sink is active, then we have reached
+					// a sink in the usual way.
+					// Relative cost can only be derived from the arrival time
+					if (task.time < cutofftime) {
+
+						if (label.getReachable() && label.getAbsoluteCost(0) == label.getPredecessor().getStartTime()) { 
+							cutofftime = task.time;
+							if (_debug > 0) {
+								System.out.println("Setting new cutoff time: "
+										+ cutofftime);
+							}
+						}
+					}
+
+					// cutoff cost is straightforward for active sinks
+					if (label.getReachable() && label.getAbsoluteCost(0) < cutoffcost) {
+						cutoffcost = label.getAbsoluteCost(0);
 						if (_debug > 0) {
-							System.out.println("Setting new cutoff time: "
-									+ cutofftime);
+							System.out.println("Setting new cutoff cost: "
+									+ cutoffcost);
 						}
 					}
 				}
-				
+
 				TaskQueue tempqueue = processSinkForward(v);
 				
 				if (tempqueue != null) {
@@ -2141,7 +2188,18 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		super.startNewIter(lastArrival);
 		
 		// "free" some more data structures
-		this._sinklabels = null;	
+		this._sinklabels = null;
+		this._haslastcost = false;
+	}
+	
+	public void startNewIter(int lastArrival, int lastCost) {
+		super.startNewIter(lastArrival);
+		
+		this._haslastcost = true;
+		this._lastcost = lastCost;
+		
+		// "free" some more data structures
+		this._sinklabels = null;				
 	}
 	
 

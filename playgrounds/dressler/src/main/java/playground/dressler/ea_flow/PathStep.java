@@ -107,6 +107,12 @@ public interface PathStep {
 	boolean isResidualVersionOf(PathStep other);
 	
 	/**
+	 * Returns the cost of the step, assuming costs on the edges and 0 cost going into a sink.
+	 * It accounts for primal/residual steps.
+	 */
+	int getCost();
+	
+	/**
 	 * Checks if this is the other leave the same time/node-pair in the full (virtual) time-expanded network
 	 * @param other a PathEdge 
 	 * @return true iff they really leave the same time/node

@@ -100,5 +100,9 @@ public class TwinTaskQueue implements TaskQueue {
 	public Iterator<BFTask> iterator() {
 		return new TwinIterator();
 	}
+	
+	public boolean firstQueueIsEmpty() {
+	  return _first.isEmpty();
+	}
 
 }
