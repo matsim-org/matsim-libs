@@ -3,7 +3,7 @@
     <lanesToLinkAssignment linkIdRef="1">
         <lane id="1">
             <leadsTo>
-                <toLink refId="2"/>
+                <toLink refId="3"/>
                 <toLink refId="4"/>
             </leadsTo>
             <representedLanes number="1.0"/>
@@ -21,11 +21,11 @@
         </lane>
         <lane id="2">
             <leadsTo>
-                <toLink refId="3"/>
+                <toLink refId="2"/>
             </leadsTo>
             <representedLanes number="2.0"/>
             <startsAt meterFromLinkEnd="200.0"/>
-            <alignment>0</alignment>
+            <alignment>-1</alignment>
         </lane>
     </lanesToLinkAssignment>
 </laneDefinitions>
