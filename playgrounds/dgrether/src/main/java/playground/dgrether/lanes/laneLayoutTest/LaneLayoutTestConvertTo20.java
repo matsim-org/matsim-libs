@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.lanes.laneLayoutTest;
 
-import org.matsim.lanes.LaneDefinitonsV11ToV20Converter;
+import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 
 
 /**
