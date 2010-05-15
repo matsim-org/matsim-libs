@@ -50,7 +50,7 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 	
 	private Queue<NodeCostInfo> sourceQueue;
 	
-	private final EvacuationShelterNetLoader esnl;
+	private final EvacuationShelterNetLoaderForShelterAllocation esnl;
 	
 	private int count = 0;
 
@@ -59,8 +59,10 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 	private PopulationFactory popB;
 
 	private EvacuationStartTimeCalculator time;
+
+	private int numOfPers = 0;
 	
-	public ShelterAllocator(Population pop, List<Building> buildings, Scenario scenario, EvacuationShelterNetLoader esnl) {
+	public ShelterAllocator(Population pop, List<Building> buildings, Scenario scenario, EvacuationShelterNetLoaderForShelterAllocation esnl) {
 		super(pop, buildings, scenario);
 		//TODO if this code moves one day to org.matsim than the corresponding fields in
 		//the super class should be accessed instead of creating these fields 
@@ -94,26 +96,27 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 	}
 
 	private void createShelterLinks() {
-		this.esnl.generateShelterLinks();
-		NetworkLayer  net = (NetworkLayer) this.scenario.getNetwork();
-		
-		Node toNode = net.createAndAddNode(new IdImpl("en3"), new CoordImpl(662433,9898853));
-		
-		List<Link> rm = new ArrayList<Link>();
-		for (Link l : this.scenario.getNetwork().getLinks().values()) {
-		 if (l.getId().toString().contains("c")) {
-			 rm.add(l);
-		 }
-		}
-		for (Link l : rm) {
-			this.scenario.getNetwork().removeLink(l.getId());
-			net.createAndAddLink(l.getId(), l.getFromNode(), toNode, l.getLength(), l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes());
-			
-		}
+		this.esnl.generateShelterLinks(this.numOfPers);
+//		NetworkLayer  net = (NetworkLayer) this.scenario.getNetwork();
+//		
+//		Node toNode = net.createAndAddNode(new IdImpl("en3"), new CoordImpl(662433,9898853));
+//		
+//		List<Link> rm = new ArrayList<Link>();
+//		for (Link l : this.scenario.getNetwork().getLinks().values()) {
+//		 if (l.getId().toString().contains("c")) {
+//			 rm.add(l);
+//		 }
+//		}
+//		for (Link l : rm) {
+//			this.scenario.getNetwork().removeLink(l.getId());
+//			net.createAndAddLink(l.getId(), l.getFromNode(), toNode, l.getLength(), l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes());
+//			
+//		}
 		
 	}
 
 	private void createPlans() {
+		int pop = 0;
 		while (this.sourceQueue.size() > 0) {
 			NodeCostInfo nci = this.sourceQueue.poll();
 			if (nci.ni.numPers == 0) {
@@ -122,6 +125,7 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 			int d = nci.ni.numPers;
 			for (int i = 0; i < d; i++) {
 				if (nci.sni.capacity > 0) {
+					pop++;
 					nci.sni.capacity--;
 					nci.ni.numPers--;
 					createPlan(nci.ni.node,nci.sni.node);
@@ -131,6 +135,7 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 			}
 			
 		}
+		System.out.println(pop);
 		
 	}
 
@@ -190,7 +195,7 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 				} else if (node.getId().toString().equals("en2") ) {
 					SinkNodeInfo sni = new SinkNodeInfo();
 					sni.node = node;
-					sni.capacity = Integer.MAX_VALUE;
+					sni.capacity = this.esnl.getShelterLinkMapping().get(new IdImpl("el1")).getShelterSpace();
 					this.sinks.add(sni);
 				}
 			}
@@ -206,9 +211,11 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 			Node n = l.getToNode();
 			
 			//TODO could may be removed if only building within the inundation area are considered
+			//FIXME this persons occupy space in shelters anyway, so they have to be considered some how
 			if (n.getId().toString().contains("n")) {
 				continue;
 			}
+			this.numOfPers  += numOfPers;
 			SourceNodeInfo ni = this.sources.get(n);
 			if (ni == null) {
 				ni = new SourceNodeInfo();

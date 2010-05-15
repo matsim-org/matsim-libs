@@ -28,6 +28,8 @@ import org.matsim.evacuation.shelters.signalsystems.ShelterInputCounterSignalSys
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
 
+import playground.gregor.sims.shelters.allocation.EvacuationShelterNetLoaderForShelterAllocation;
+import playground.gregor.sims.shelters.allocation.ShelterAllocationRePlanner;
 import playground.gregor.sims.shelters.allocation.ShelterAllocator;
 
 public class ShelterAllocationController extends Controler {
@@ -38,7 +40,7 @@ public class ShelterAllocationController extends Controler {
 
 	private List<FloodingReader> netcdfReaders = null;
 
-	private EvacuationShelterNetLoader esnl = null;
+	private EvacuationShelterNetLoaderForShelterAllocation esnl = null;
 
 	private HashMap<Id, Building> shelterLinkMapping = null;
 
@@ -72,6 +74,9 @@ public class ShelterAllocationController extends Controler {
 
 
 		unloadNetcdfReaders();
+		
+		ShelterAllocationRePlanner sARP = new ShelterAllocationRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings);
+		this.addControlerListener(sARP);
 
 	}
 
@@ -183,7 +188,7 @@ public class ShelterAllocationController extends Controler {
 			if (this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile()) {
 				loadNetcdfReaders();
 			}
-			this.esnl = new EvacuationShelterNetLoader(this.buildings,this.scenarioData,this.netcdfReaders);
+			this.esnl = new EvacuationShelterNetLoaderForShelterAllocation(this.buildings,this.scenarioData,this.netcdfReaders);
 			net = this.esnl.getNetwork();
 			this.shelterLinkMapping = this.esnl.getShelterLinkMapping();
 
