@@ -23,6 +23,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 
 
 /**
+ * If this is the basic agent class we should think about activityEnds() and
+ * legEnds() are those really needed for a basic agent? 
  * @author dgrether
  *
  */

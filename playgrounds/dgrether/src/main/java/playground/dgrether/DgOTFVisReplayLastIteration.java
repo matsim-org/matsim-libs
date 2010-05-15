@@ -169,9 +169,9 @@ public class DgOTFVisReplayLastIteration {
    * @throws FileNotFoundException 
    */
   public static void main(String[] args) throws FileNotFoundException, IOException {
-    args = new String[1];
+//    args = new String[1];
 //    args[0] = "/home/dgrether/data/work/matsimOutput/equil/output_config.xml.gz";
-  	args[0] = "/home/dgrether/runs-svn/run749/749.output_config.xml.gz";
+//  	args[0] = "/home/dgrether/runs-svn/run749/749.output_config.xml.gz";
     String configfile = null;
     if (args.length == 0){
       configfile = chooseFile();
