@@ -125,14 +125,12 @@ public class QLaneTest extends MatsimTestCase {
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
-		LaneDefinitions lanes = this.createOneLane(scenario, 1);
+		this.createOneLane(scenario, 1);
 		
 		QSim queueSim = new QSim(scenario, null);
 		QNetwork queueNetwork = queueSim.getQNetwork();
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQLink(id1);
 
-		queueSim.setLaneDefinitions(lanes);
-		queueSim.prepareLanes();
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
 		//900 m link, 2 lanes = 240 storage + 105 m lane, 1 lane = 14 storage
 		assertEquals(254.0, ql.getSpaceCap());
@@ -158,14 +156,12 @@ public class QLaneTest extends MatsimTestCase {
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
-		LaneDefinitions lanes = this.createOneLane(scenario, 2);
+		this.createOneLane(scenario, 2);
 		
 		QSim queueSim = new QSim(scenario, null);
 		QNetwork queueNetwork = queueSim.getQNetwork();
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQLink(id1);
 
-		queueSim.setLaneDefinitions(lanes);
-		queueSim.prepareLanes();
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
 		//900 m link, 2 lanes = 240 storage + 105 m lane, 2 lanes = 28 storage
 		assertEquals(268.0, ql.getSpaceCap());
@@ -193,14 +189,12 @@ public class QLaneTest extends MatsimTestCase {
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
-		LaneDefinitions lanes = this.createLanes(scenario);
+		this.createLanes(scenario);
 		
 		QSim queueSim = new QSim(scenario, null);
 		QNetwork queueNetwork = queueSim.getQNetwork();
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getQLink(id1);
 
-		queueSim.setLaneDefinitions(lanes);
-		queueSim.prepareLanes();
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
 		//240 link + 2 * 14 + 1 * 28 = 
 		assertEquals(296.0, ql.getSpaceCap());

@@ -100,8 +100,8 @@ public class QPersonAgent implements PersonDriverAgent {
 		Route route = currentLeg.getRoute();
 		if (route == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
-			Simulation.decLiving();
-			Simulation.incLost();
+			this.simulation.getAgentCounter().decLiving();
+			this.simulation.getAgentCounter().incLost();
 			return;
 		}
 		this.destinationLinkId = route.getEndLinkId();
@@ -163,7 +163,7 @@ public class QPersonAgent implements PersonDriverAgent {
 		if ((departureTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
 			setDepartureTime(departureTime);
 			this.simulation.scheduleActivityEnd(this, this.currentPlanElementIndex);
-			Simulation.incLiving();
+			this.simulation.getAgentCounter().incLiving();
 			return true;
 		}
 		return false; // the agent has no leg, so nothing more to do
@@ -173,8 +173,8 @@ public class QPersonAgent implements PersonDriverAgent {
 		Route route = leg.getRoute();
 		if (route == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
-			Simulation.decLiving();
-			Simulation.incLost();
+			this.simulation.getAgentCounter().decLiving();
+			this.simulation.getAgentCounter().incLost();
 			return;
 		}
 		this.destinationLinkId = route.getEndLinkId();
@@ -205,8 +205,8 @@ public class QPersonAgent implements PersonDriverAgent {
 		if(!this.currentLinkId.equals(this.destinationLinkId)) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.destinationLinkId
 					+ ", but arrived on link " + this.currentLinkId + ". Removing the agent from the simulation.");
-			Simulation.decLiving();
-			Simulation.incLost();
+			this.simulation.getAgentCounter().decLiving();
+			this.simulation.getAgentCounter().incLost();
 			return;
 		}
 		advancePlanElement(now);
@@ -233,7 +233,7 @@ public class QPersonAgent implements PersonDriverAgent {
 				this.simulation.scheduleActivityEnd(this, this.currentPlanElementIndex);
 			} else {
 				// this is the last activity
-				Simulation.decLiving();
+				this.simulation.getAgentCounter().decLiving();
 			}
 
 		} else if (pe instanceof Leg) {

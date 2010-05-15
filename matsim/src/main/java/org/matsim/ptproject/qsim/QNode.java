@@ -229,15 +229,15 @@ public class QNode implements VisNode {
 
       // check if veh is stuck!
 
-      if ((now - currentLane.getBufferLastMovedTime()) > Simulation.getStuckTime()) {
+      if ((now - currentLane.getBufferLastMovedTime()) > this.simEngine.getQSim().getStuckTime()) {
         /* We just push the vehicle further after stucktime is over, regardless
          * of if there is space on the next link or not.. optionally we let them
          * die here, we have a config setting for that!
          */
         if (this.simEngine.getQSim().getScenario().getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
           currentLane.popFirstFromBuffer();
-          Simulation.decLiving();
-          Simulation.incLost();
+          this.simEngine.getQSim().getAgentCounter().decLiving();
+          this.simEngine.getQSim().getAgentCounter().incLost();
           this.simEngine.getQSim().getEventsManager().processEvent(
               new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
         } else {
@@ -252,8 +252,8 @@ public class QNode implements VisNode {
 
     // --> nextLink == null
     currentLane.popFirstFromBuffer();
-    Simulation.decLiving();
-    Simulation.incLost();
+    this.simEngine.getQSim().getAgentCounter().decLiving();
+    this.simEngine.getQSim().getAgentCounter().incLost();
     log.error(
         "Agent has no or wrong route! agentId=" + veh.getDriver().getPerson().getId()
             + " currentLink=" + currentLink.getId().toString()

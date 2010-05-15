@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.AgentStuckEventImpl;
@@ -43,8 +42,6 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.DepartureHandler;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QSimFeature;
-import org.matsim.ptproject.qsim.Simulation;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -57,11 +54,8 @@ import org.matsim.vehicles.BasicVehicles;
  * @author mrieser
  * @author mzilske
  */
-public class TransitQSimFeature implements QSimFeature, DepartureHandler {
+public class TransitQSimFeature implements  DepartureHandler {
 
-	@Override
-	public void agentCreated(PersonAgent agent) {
-	}
 
 	public static class TransitAgentTriesToTeleportException extends RuntimeException {
 
@@ -111,12 +105,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 		return ptDrivers;
 	}
 
-	@Override
-	public void afterAfterSimStep(double time) {
 
-	}
-
-	@Override
 	public void beforeCleanupSim() {
 		double now = this.qSim.getSimTimer().getTimeOfDay();
 		for (Entry<TransitStopFacility, List<PassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
@@ -125,8 +114,8 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 				this.qSim.getEventsManager().processEvent(
 						new AgentStuckEventImpl(now, ((TransitAgent) agent).getPerson().getId(), agentsAtStop.getKey().getLinkId(), ((TransitAgent) agent).getVehicle().getDriver().getCurrentLeg().getMode()));
 
-				Simulation.decLiving();
-				Simulation.incLost();
+				this.qSim.getAgentCounter().decLiving();
+				this.qSim.getAgentCounter().incLost();
 			}
 		}
 	}
@@ -158,7 +147,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 		qlink.addParkedVehicle(veh);
 
 		this.qSim.scheduleActivityEnd(driver, 0);
-		Simulation.incLiving();
+		this.qSim.getAgentCounter().incLiving();
 		return driver;
 	}
 
@@ -180,7 +169,7 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 					QLink qlink = this.qSim.getQNetwork().getQLink(driver.getCurrentLeg().getRoute().getStartLinkId());
 					qlink.addParkedVehicle(veh);
 					this.qSim.scheduleActivityEnd(driver, 0);
-					Simulation.incLiving();
+					this.qSim.getAgentCounter().incLiving();
 					drivers.add(driver);
 				}
 			}
@@ -199,15 +188,15 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 							+ leg.getRoute().getClass().getCanonicalName()
 							+ " "
 							+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
-			Simulation.decLiving();
-			Simulation.incLost();
+			this.qSim.getAgentCounter().decLiving();
+			this.qSim.getAgentCounter().incLost();
 		} else {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
 			if (route.getAccessStopId() == null) {
 				// looks like this agent has a bad transit route, likely no
 				// route could be calculated for it
-				Simulation.decLiving();
-				Simulation.incLost();
+				this.qSim.getAgentCounter().decLiving();
+				this.qSim.getAgentCounter().incLost();
 				log.error("Agent has bad transit route! agentId="
 						+ agent.getPerson().getId() + " route="
 						+ route.getRouteDescription()
@@ -223,33 +212,12 @@ public class TransitQSimFeature implements QSimFeature, DepartureHandler {
 		}
 	}
 
-	@Override
-	public void beforeHandleUnknownLegMode(double now, final PersonAgent agent, Link link) {
-
-	}
-
-	@Override
-	public void afterPrepareSim() {
-
-	}
 
 	@Override
 	public void handleDeparture(double now, PersonAgent agent, Id linkId, Leg leg) {
 		if (leg.getMode() == TransportMode.pt) {
 			handleAgentPTDeparture(agent, linkId, leg);
 		}
-	}
-
-
-
-	@Override
-	public void afterActivityBegins(PersonAgent agent, int planElementIndex) {
-
-	}
-
-	@Override
-	public void afterActivityEnds(PersonAgent agent, double time) {
-
 	}
 
 	public TransitStopAgentTracker getAgentTracker() {

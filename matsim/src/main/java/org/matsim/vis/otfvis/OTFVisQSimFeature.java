@@ -1,8 +1,6 @@
 package org.matsim.vis.otfvis;
 
 import java.rmi.RemoteException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -173,10 +171,6 @@ public class OTFVisQSimFeature implements QSimFeature, VisMobsimFeature {
 
 	public void setVisualizeTeleportedAgents(boolean active) {
 		this.doVisualizeTeleportedAgents = active;
-	}
-
-	public Collection<PersonAgent> createAgents() {
-		return Collections.emptyList();
 	}
 
 	@Override

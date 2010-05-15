@@ -34,7 +34,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.PtConstants;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.Simulation;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -78,7 +77,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	@Override
 	public void legEnds(final double now) {
 		this.getSimulation().handleAgentArrival(now, this);
-		Simulation.decLiving();
+		this.getSimulation().getAgentCounter().decLiving();
 	}
 
 	@Override

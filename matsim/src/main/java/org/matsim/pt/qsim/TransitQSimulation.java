@@ -31,34 +31,42 @@ import org.matsim.ptproject.qsim.QSim;
 
 public class TransitQSimulation extends QSim {
 
-	static final Logger log = Logger.getLogger(TransitQSimulation.class);
+	private static final Logger log = Logger.getLogger(TransitQSimulation.class);
 	
-	private TransitQSimFeature transitQueueSimulationFeature;
-
 	public TransitQSimulation(Scenario scenario, EventsManager events) {
 		super(scenario, events);
 		if (scenario.getConfig().getQSimConfigGroup() == null){
 		  scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
+		  log.warn("using transit without specifying QSimConfigGroup/Module in config. A default" +
+		  		"QSimConfigModule is added to the config, values in simulation config module are ignored!");
 		}
-		installFeatures();
+		if (!scenario.getConfig().scenario().isUseTransit()){
+			installFeatures();
+			log.warn("Transit is enabled via TransitQSimulation but without enabling" +
+					"transit features in the scenario config group of the Scenario instance" +
+					"used to start the QSim. Try to modify your code in a way that" +
+					"the isUseTransit flag is set to true in the config before QSim is initialized. The" +
+					"Code producing this warning enables transit even if it is not switched on in the config, " +
+					"however this functionality will be removed somewhen!");
+		}
 	}
 
 	private void installFeatures() {
-		transitQueueSimulationFeature = new TransitQSimFeature(this);
-		super.addFeature(transitQueueSimulationFeature);
-		super.addDepartureHandler(transitQueueSimulationFeature);
+		transitEngine = new TransitQSimFeature(this);
+		super.addDepartureHandler(transitEngine);
+//		super.addFeature(transitEngine);
 	}
 
 	public TransitStopAgentTracker getAgentTracker() {
-		return transitQueueSimulationFeature.getAgentTracker();
+		return transitEngine.getAgentTracker();
 	}
 	
 	public void setUseUmlaeufe(boolean useUmlaeufe) {
-		transitQueueSimulationFeature.setUseUmlaeufe(useUmlaeufe);
+		transitEngine.setUseUmlaeufe(useUmlaeufe);
 	}
 	
 	public void setTransitStopHandlerFactory(TransitStopHandlerFactory stopHandlerFactory) {
-		transitQueueSimulationFeature.setTransitStopHandlerFactory(stopHandlerFactory);
+		transitEngine.setTransitStopHandlerFactory(stopHandlerFactory);
 	}
 	
 }

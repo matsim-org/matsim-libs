@@ -239,14 +239,14 @@ public class QLinkLanesImpl implements QLink {
 	 */
 	private void setToLinks(QLane lane, List<Id> toLinkIds) {
 		for (Id linkId : toLinkIds) {
-			QLink link = this.getQSimEngine().getQSim().getQNetwork().getQLink(linkId);
+			Link link = this.getQSimEngine().getQSim().getScenario().getNetwork().getLinks().get(linkId);
 			if (link == null) {
 				String message = "Cannot find Link with Id: " + linkId + " in network. ";
 				log.error(message);
 				throw new IllegalStateException(message);
 			}
-			lane.addDestinationLink(link.getLink().getId());
-			this.originalLane.addDestinationLink(link.getLink().getId());
+			lane.addDestinationLink(linkId);
+			this.originalLane.addDestinationLink(linkId);
 		}
 	}
 
@@ -317,8 +317,8 @@ public class QLinkLanesImpl implements QLink {
 			this.getQSimEngine().getQSim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
-		Simulation.decLiving(this.waitingList.size());
-		Simulation.incLost(this.waitingList.size());
+		this.getQSimEngine().getQSim().getAgentCounter().decLiving(this.waitingList.size());
+		this.getQSimEngine().getQSim().getAgentCounter().incLost(this.waitingList.size());
 		this.waitingList.clear();
 
 		for (QLane lane : this.queueLanes){

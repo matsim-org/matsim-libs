@@ -71,7 +71,6 @@ import org.matsim.pt.qsim.TransitQSimFeature.TransitAgentTriesToTeleportExceptio
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.Simulation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.transitSchedule.api.Departure;
@@ -553,7 +552,7 @@ public class TransitQueueSimulationTest {
 			qlink.addParkedVehicle(veh);
 
 			this.scheduleActivityEnd(this.driver, 0);
-			Simulation.incLiving();
+			this.getAgentCounter().incLiving();
 		}
 	}
 

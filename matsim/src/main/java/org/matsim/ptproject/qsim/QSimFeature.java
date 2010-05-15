@@ -20,8 +20,6 @@
 
 package org.matsim.ptproject.qsim;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonAgent;
 
@@ -45,12 +43,6 @@ public interface QSimFeature {
 
 	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
 	void beforeHandleUnknownLegMode(double now, PersonAgent agent, Link link);
-	/**
-	 * @deprecated as long as the agent representation of the QSim is not implemented this method provides
-	 * not reliable functionality.
-	 */
-	@Deprecated
-	Collection<PersonAgent> createAgents();
 
 	@Deprecated // do we need to pass the planElementIndex?  to be discussed ...  kai, may'10
 	void afterActivityBegins(PersonAgent agent, int planElementIndex);

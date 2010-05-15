@@ -235,7 +235,6 @@ public class MixedLaneTest extends TestCase {
 		((EventsManagerImpl)events).addHandler(handler);
 
 		QSim qsim = new QSim(this.sc, events);
-		qsim.setLaneDefinitions(this.sc.getLaneDefinitions());
 		qsim.run();
 
 		assertTrue(handler.hasCollectedLink2Event);

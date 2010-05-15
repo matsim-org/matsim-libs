@@ -199,24 +199,24 @@ public class QLinkImpl implements QLink {
 			this.getQSimEngine().getQSim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
-		Simulation.decLiving(this.waitingList.size());
-		Simulation.incLost(this.waitingList.size());
+		this.getQSimEngine().getQSim().getAgentCounter().decLiving(this.waitingList.size());
+		this.getQSimEngine().getQSim().getAgentCounter().incLost(this.waitingList.size());
 		this.waitingList.clear();
 
 		for (QVehicle veh : this.vehQueue) {
 			this.getQSimEngine().getQSim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
-		Simulation.decLiving(this.vehQueue.size());
-		Simulation.incLost(this.vehQueue.size());
+		this.getQSimEngine().getQSim().getAgentCounter().decLiving(this.vehQueue.size());
+		this.getQSimEngine().getQSim().getAgentCounter().incLost(this.vehQueue.size());
 		this.vehQueue.clear();
 
 		for (QVehicle veh : this.buffer) {
 			this.getQSimEngine().getQSim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
-		Simulation.decLiving(this.buffer.size());
-		Simulation.incLost(this.buffer.size());
+		this.getQSimEngine().getQSim().getAgentCounter().decLiving(this.buffer.size());
+		this.getQSimEngine().getQSim().getAgentCounter().incLost(this.buffer.size());
 		this.buffer.clear();
 	}
 

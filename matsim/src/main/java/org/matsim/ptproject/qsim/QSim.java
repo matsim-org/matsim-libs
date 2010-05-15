@@ -56,8 +56,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.LaneDefinitions;
-import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.pt.qsim.TransitQSimFeature;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.systems.SignalSystems;
@@ -111,7 +110,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	private SimulationListenerManager<QSim> listenerManager;
 	protected final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = new PriorityBlockingQueue<PersonDriverAgent>(500, new DriverAgentDepartureTimeComparator());
 	protected Scenario scenario = null;
-	private LaneDefinitions laneDefintions;
 	private QSimSignalEngine signalEngine = null;
 	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
 
@@ -121,6 +119,12 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
 	private QSimSnapshotWriterManager snapshotManager;
+
+	protected TransitQSimFeature transitEngine;
+
+	private AgentCounter agentCounter;
+
+	private double stuckTime = Double.MAX_VALUE;
 
 	/**
 	 * Initialize the QueueSimulation
@@ -145,7 +149,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	private void init(final Scenario sc, QSimEngineFactory simEngineFac){
     log.info("Using QSim...");
     this.listenerManager = new SimulationListenerManager<QSim>(this);
-    Simulation.reset(sc.getConfig().getQSimConfigGroup().getStuckTime());
+    this.stuckTime = sc.getConfig().getQSimConfigGroup().getStuckTime();
+    this.agentCounter = new AgentCounter();
     this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
     Config config = sc.getConfig();
     this.simEngine = simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
@@ -154,8 +159,9 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
       if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
         throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
       }
-      this.setLaneDefinitions(((ScenarioImpl)sc).getLaneDefinitions());
-      this.network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(), this.laneDefintions));
+      log.info("Lanes enabled...");
+      this.network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(),
+      		((ScenarioImpl)sc).getLaneDefinitions()));
     }
     else {
         this.network = new QNetwork(this);
@@ -167,12 +173,18 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
         throw new IllegalStateException(
             "Signal systems and signal system configurations have to be set if feature is enabled!");
       }
-      this.setSignalSystems(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
+      this.initSignalEngine(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
     }
 
     this.agentFactory = new AgentFactory(this);
     this.notTeleportedModes.add(TransportMode.car);
     installCarDepartureHandler();
+    if (config.scenario().isUseTransit()){
+    	this.transitEngine = new TransitQSimFeature(this);
+    	this.addDepartureHandler(this.transitEngine);
+//    	this.addFeature(transitEngine);
+    }
+
 	}
 
 	private void installCarDepartureHandler() {
@@ -194,12 +206,12 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
-	/**
-	 * Set the lanes used in the simulation
-	 * @param laneDefs
-	 */
-	public void setLaneDefinitions(final LaneDefinitions laneDefs){
-		this.laneDefintions = laneDefs;
+	public double getStuckTime(){
+		return this.stuckTime;
+	}
+	
+	public AgentCounter getAgentCounter(){
+		return this.agentCounter;
 	}
 
 	/**
@@ -207,7 +219,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 * @param signalSystems
 	 * @param signalSystemConfigurations
 	 */
-	public void setSignalSystems(final SignalSystems signalSystems, final SignalSystemConfigurations signalSystemConfigurations){
+	public void initSignalEngine(final SignalSystems signalSystems, final SignalSystemConfigurations signalSystemConfigurations){
 		this.signalEngine  = new QSimSignalEngine(this);
 		this.signalEngine.setSignalSystems(signalSystems, signalSystemConfigurations);
 	}
@@ -253,11 +265,11 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			}
 		}
 
-		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			Collection<PersonAgent> moreAgents = queueSimulationFeature.createAgents();
-			agents.addAll(moreAgents);
+		if (this.transitEngine != null){
+			Collection<PersonAgent> a = this.transitEngine.createAgents();
+			agents.addAll(a);
 		}
-
+		
 		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			for (PersonAgent agent : agents) {
 				queueSimulationFeature.agentCreated(agent);
@@ -291,7 +303,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			throw new RuntimeException("No valid Events Object (events == null)");
 		}
 		this.simEngine.onPrepareSim();
-		prepareLanes();
+//		prepareLanes();
 
 		if (this.signalEngine != null) {
 			this.signalEngine.onPrepareSim();
@@ -319,26 +331,15 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			queueSimulationFeature.afterPrepareSim();
 		}
 	}
-
-	protected void prepareLanes(){
-		if (this.laneDefintions != null){
-			log.info("Lanes enabled...");
-			for (LanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignments().values()){
-				QLink link = this.network.getQLink(laneToLink.getLinkId());
-				if (link == null) {
-					String message = "No Link with Id: " + laneToLink.getLinkId() + ". Cannot create lanes, check lanesToLinkAssignment of signalsystems definition!";
-					log.error(message);
-					throw new IllegalStateException(message);
-				}
-				((QLinkLanesImpl)link).createLanes(laneToLink.getLanes());
-			}
-		}
-	}
-
+	
 	/**
 	 * Close any files, etc.
 	 */
 	protected void cleanupSim(final double seconds) {
+		if (this.transitEngine != null) {
+			this.transitEngine.beforeCleanupSim();
+		}
+		
 		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeCleanupSim();
 		}
@@ -382,7 +383,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
       long diffreal = (endtime.getTime() - this.realWorldStarttime.getTime())/1000;
       double diffsim  = time - this.simTimer.getSimStartTime();
       int nofActiveLinks = this.simEngine.getNumberOfSimulatedLinks();
-      log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + Simulation.getLiving() + " lost=" + Simulation.getLost() + " #links=" + nofActiveLinks
+      log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + this.agentCounter.getLiving() + " lost=" + this.agentCounter.getLost() + " #links=" + nofActiveLinks
           + " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
       Gbl.printMemoryUsage();
     }
@@ -400,7 +401,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.simEngine.simStep(time);
 
 		this.printSimLog(time);
-		return (Simulation.isLiving() && (this.stopTime > time));
+		return (this.agentCounter.isLiving() && (this.stopTime > time));
 	}
 
 	protected void afterSimStep(final double time) {
@@ -408,6 +409,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			this.snapshotTime += this.snapshotPeriod;
 			doSnapshot(time);
 		}
+		
 		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterAfterSimStep(time);
 		}
