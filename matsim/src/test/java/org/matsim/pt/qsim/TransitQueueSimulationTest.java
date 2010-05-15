@@ -67,7 +67,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.qsim.TransitQSimFeature.TransitAgentTriesToTeleportException;
+import org.matsim.pt.qsim.TransitQSimEngine.TransitAgentTriesToTeleportException;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QLink;

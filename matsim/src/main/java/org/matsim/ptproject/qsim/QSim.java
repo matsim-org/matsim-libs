@@ -56,7 +56,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.qsim.TransitQSimFeature;
+import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.systems.SignalSystems;
@@ -120,7 +120,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	private ControlerIO controlerIO;
 	private QSimSnapshotWriterManager snapshotManager;
 
-	protected TransitQSimFeature transitEngine;
+	protected TransitQSimEngine transitEngine;
 
 	private AgentCounter agentCounter;
 
@@ -180,7 +180,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
     this.notTeleportedModes.add(TransportMode.car);
     installCarDepartureHandler();
     if (config.scenario().isUseTransit()){
-    	this.transitEngine = new TransitQSimFeature(this);
+    	this.transitEngine = new TransitQSimEngine(this);
     	this.addDepartureHandler(this.transitEngine);
 //    	this.addFeature(transitEngine);
     }
@@ -337,13 +337,12 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 */
 	protected void cleanupSim(final double seconds) {
 		if (this.transitEngine != null) {
-			this.transitEngine.beforeCleanupSim();
+			this.transitEngine.afterSim();
 		}
 		
 		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeCleanupSim();
 		}
-
 		this.simEngine.afterSim();
 		double now = this.simTimer.getTimeOfDay();
 		for (Tuple<Double, PersonDriverAgent> entry : this.teleportationList) {

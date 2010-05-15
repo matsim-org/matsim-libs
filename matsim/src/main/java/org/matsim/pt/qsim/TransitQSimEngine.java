@@ -42,6 +42,7 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.DepartureHandler;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.SimEngine;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -54,7 +55,7 @@ import org.matsim.vehicles.BasicVehicles;
  * @author mrieser
  * @author mzilske
  */
-public class TransitQSimFeature implements  DepartureHandler {
+public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 
 
 	public static class TransitAgentTriesToTeleportException extends RuntimeException {
@@ -67,7 +68,7 @@ public class TransitQSimFeature implements  DepartureHandler {
 
 	}
 
-	private static Logger log = Logger.getLogger(TransitQSimFeature.class);
+	private static Logger log = Logger.getLogger(TransitQSimEngine.class);
 
 	private QSim qSim;
 
@@ -81,7 +82,7 @@ public class TransitQSimFeature implements  DepartureHandler {
 
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
 
-	public TransitQSimFeature(QSim queueSimulation) {
+	public TransitQSimEngine(QSim queueSimulation) {
 		this.qSim = queueSimulation;
 		this.schedule = ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule();
 		this.agentTracker = new TransitStopAgentTracker();
@@ -92,6 +93,18 @@ public class TransitQSimFeature implements  DepartureHandler {
 		qSim.setAgentFactory(new TransitAgentFactory(qSim, this.agents));
 		qSim.getNotTeleportedModes().add(TransportMode.pt);
 	}
+	
+
+	@Override
+	public QSim getQSim() {
+		return this.qSim;
+	}
+
+	@Override
+	public void onPrepareSim() {
+		//nothing to do here
+	}
+
 
 	public Collection<PersonAgent> createAgents() {
 		TransitSchedule schedule = this.schedule;
@@ -106,7 +119,7 @@ public class TransitQSimFeature implements  DepartureHandler {
 	}
 
 
-	public void beforeCleanupSim() {
+	public void afterSim() {
 		double now = this.qSim.getSimTimer().getTimeOfDay();
 		for (Entry<TransitStopFacility, List<PassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
 
@@ -231,5 +244,6 @@ public class TransitQSimFeature implements  DepartureHandler {
 	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
 		this.stopHandlerFactory = stopHandlerFactory;
 	}
+
 
 }

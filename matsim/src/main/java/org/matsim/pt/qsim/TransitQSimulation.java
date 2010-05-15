@@ -52,7 +52,7 @@ public class TransitQSimulation extends QSim {
 	}
 
 	private void installFeatures() {
-		transitEngine = new TransitQSimFeature(this);
+		transitEngine = new TransitQSimEngine(this);
 		super.addDepartureHandler(transitEngine);
 //		super.addFeature(transitEngine);
 	}
