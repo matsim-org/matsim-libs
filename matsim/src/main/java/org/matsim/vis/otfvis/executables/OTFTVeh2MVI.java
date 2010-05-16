@@ -157,7 +157,7 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 
 
 	public static void main(String[] args) {
-
+		
 //		String netFileName = "../studies/schweiz/2network/ch.xml";
 //		String vehFileName = "../runs/run168/run168.it210.T.veh";
 //		String netFileName = "../../tmp/studies/ivtch/network.xml";
@@ -172,6 +172,12 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 		netFileName = "./output/net.xml" ;
 		vehFileName = "./output/T.veh" ;
 		outFileName = "./output/out.mvi" ;
+		
+		if ( args.length == 3 ) {
+			vehFileName = args[0] ;
+			netFileName = args[1] ;
+			outFileName = args[2] ;
+		}
 		
 		int intervall_s = 1;
 
