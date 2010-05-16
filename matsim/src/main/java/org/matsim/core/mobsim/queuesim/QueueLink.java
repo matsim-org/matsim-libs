@@ -584,50 +584,6 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
 
     private final double linkScale =  OTFDefaultLinkHandler.LINK_SCALE;
 
-//    /**
-//     * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
-//     */
-//    public double getDisplayableSpaceCapValue() {
-//      return (QueueLink.this.buffer.size() + QueueLink.this.vehQueue.size()) / QueueLink.this.storageCapacity;
-//    }
-
-//    /**
-//     * Returns a measure for how many vehicles on the link have a travel time
-//     * higher than freespeedTraveltime on a scale from 0 to 2. When more then half
-//     * of the possible vehicles are delayed, the value 1 will be returned, which
-//     * depicts the worst case on a (traditional) scale from 0 to 1.
-//     *
-//     * @return A measure for the number of vehicles being delayed on this link.
-//     */
-//    public double getDisplayableTimeCapValue(double now) {
-//      int count = QueueLink.this.buffer.size();
-//      for (QueueVehicle veh : QueueLink.this.vehQueue) {
-//        // Check if veh has reached destination
-//        if (veh.getEarliestLinkExitTime() <= now) {
-//          count++;
-//        }
-//      }
-//      return count * 2.0 / QueueLink.this.storageCapacity;
-//    }
-
-
-
-//    public Collection<AgentOnLink> getDrawableCollection() {
-//      Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-//      getVehiclePositions(positions);
-//
-//      List<AgentOnLink> vehs = new ArrayList<AgentOnLink>();
-//      for (AgentSnapshotInfo pos : positions) {
-//        if (pos.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR) {
-//          AgentOnLink veh = new AgentOnLink();
-//          veh.posInLink_m = pos.getDistanceOnLink();
-//          vehs.add(veh);
-//        }
-//      }
-//
-//      return vehs;
-//    }
-
     public Collection<AgentSnapshotInfo> getVehiclePositions(
         final Collection<AgentSnapshotInfo> positions) {
       String snapshotStyle = simEngine.getConfig().simulation().getSnapshotStyle();
@@ -638,6 +594,10 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
       } else {
         log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
       }
+      
+
+      positionVehiclesFromWaitingList(positions, link, 3.75);
+      
       return positions;
     }
 
@@ -683,21 +643,6 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
         }
       }
 
-      // the cars in the waitingQueue
-      // the actual position doesn't matter, so they're just placed next to the
-      // link at the end
-      cnt = QueueLink.this.waitingList.size();
-      if (cnt > 0) {
-        int lane = nLanes + 2;
-        double cellSize = Math.min(7.5, QueueLink.this.getLink().getLength() / cnt);
-        double distFromFromNode = QueueLink.this.getLink().getLength() - cellSize / 2.0;
-        for (QueueVehicle veh : QueueLink.this.waitingList) {
-        	AgentSnapshotInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
-              distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
-          positions.add(position);
-          distFromFromNode -= cellSize;
-        }
-      }
 
     }
 
@@ -722,7 +667,6 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
       queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);
       positionOtherDrivingVehicles(positions, now, queueEnd, link, vehLen);
 
-      positionVehiclesFromWaitingList(positions, link, cellSize);
     }
 
     private double calculateVehicleLength(Link link,
