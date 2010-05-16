@@ -18,6 +18,7 @@ import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationNetFromNetcdfGenerator;
 import org.matsim.evacuation.base.EvacuationNetGenerator;
+import org.matsim.evacuation.base.EvacuationPopulationFromShapeFileLoader;
 import org.matsim.evacuation.base.NetworkChangeEventsFromNetcdf;
 import org.matsim.evacuation.flooding.FloodingReader;
 import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
@@ -31,6 +32,7 @@ import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
 import playground.gregor.sims.shelters.allocation.EvacuationShelterNetLoaderForShelterAllocation;
 import playground.gregor.sims.shelters.allocation.ShelterAllocationRePlanner;
 import playground.gregor.sims.shelters.allocation.ShelterAllocator;
+import playground.gregor.sims.shelters.allocation.ShelterCounter;
 
 public class ShelterAllocationController extends Controler {
 
@@ -46,11 +48,14 @@ public class ShelterAllocationController extends Controler {
 
 	PluggableTravelCostCalculator pluggableTravelCost = null;
 
-	public ShelterAllocationController(String[] args) {
+	private int shift;
+
+	public ShelterAllocationController(String[] args, int shift) {
 		super(args);
+		this.shift = shift;
 		this.setOverwriteFiles(true);
-		this.config.scenario().setUseSignalSystems(true);
-		this.config.scenario().setUseLanes(true);
+		//		this.config.scenario().setUseSignalSystems(true);
+		//		this.config.scenario().setUseLanes(true);
 		this.config.setQSimConfigGroup(new QSimConfigGroup());
 	}
 
@@ -59,9 +64,9 @@ public class ShelterAllocationController extends Controler {
 	protected void setUp(){
 		super.setUp();
 
-		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
-			loadShelterSignalSystems();
-		}
+		//		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
+		//			loadShelterSignalSystems();
+		//		}
 
 		if (this.scenarioData.getConfig().evacuation().isSocialCostOptimization()) {
 			initSocialCostOptimization();
@@ -73,11 +78,19 @@ public class ShelterAllocationController extends Controler {
 
 
 
-		unloadNetcdfReaders();
-		
-		ShelterAllocationRePlanner sARP = new ShelterAllocationRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings);
+		initPluggableTravelCostCalculator();
+		ShelterAllocationRePlanner sARP = null;
+		if (shift == 1) {
+			ShelterCounter sc = new ShelterCounter(this.scenarioData.getNetwork(), this.shelterLinkMapping);
+			this.events.addHandler(sc);
+			sARP = new ShelterAllocationRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings,sc);
+		} else {
+			sARP = new ShelterAllocationRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings);
+		}
+
 		this.addControlerListener(sARP);
 
+		unloadNetcdfReaders();
 	}
 
 	private void initSocialCostOptimization() {
@@ -107,9 +120,9 @@ public class ShelterAllocationController extends Controler {
 			this.pluggableTravelCost = new PluggableTravelCostCalculator(this.travelTimeCalculator);
 			this.setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
 
-				
+
 				// This is thread-safe because pluggableTravelCost is thread-safe.
-				
+
 				@Override
 				public PersonalizableTravelCost createTravelCostCalculator(
 						TravelTime timeCalculator,
@@ -205,7 +218,7 @@ public class ShelterAllocationController extends Controler {
 			loadNetWorkChangeEvents(net);
 		}
 
-		
+
 		if (this.scenarioData.getConfig().evacuation().isLoadPopulationFromShapeFile()) {
 			if (this.scenarioData.getPopulation().getPersons().size() > 0 ) {
 				throw new RuntimeException("Population already loaded. In order to load population from shape file, the population input file paramter in the population section of the config.xml must not be set!");
@@ -214,33 +227,34 @@ public class ShelterAllocationController extends Controler {
 			if (this.buildings == null) {
 				this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile(),this.config.evacuation().getSampleSize());
 			}
-	
+
 			if (this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile()) {
-				throw new RuntimeException("Not implemented yet!");
-//				new EvacuationPopulationFromShapeFileLoader(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.netcdfReaders).getPopulation();
+				//				throw new RuntimeException("Not implemented yet!");
+				new ShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,this.netcdfReaders).getPopulation();
 			} else {
-				new ShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl).getPopulation();
+				new ShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,null).getPopulation();
 			}
 		} else {
 			throw new RuntimeException("This does not work!");
-//			if (this.scenarioData.getConfig().evacuation().getEvacuationScanrio() != EvacuationScenario.night) {
-//				throw new RuntimeException("Evacuation simulation from plans file so far only works for the night scenario.");
-//			}
-//			new EvacuationPlansGenerator(this.population,this.network,this.network.getLinks().get(new IdImpl("el1"))).run();
+			//			if (this.scenarioData.getConfig().evacuation().getEvacuationScanrio() != EvacuationScenario.night) {
+			//				throw new RuntimeException("Evacuation simulation from plans file so far only works for the night scenario.");
+			//			}
+			//			new EvacuationPlansGenerator(this.population,this.network,this.network.getLinks().get(new IdImpl("el1"))).run();
 		}
 
-		
+
 		this.population = this.scenarioData.getPopulation();
 
-//		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
-//			this.esnl.generateShelterLinks();
-//		}
+		//		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
+		//			this.esnl.generateShelterLinks();
+		//		}
 	}
 
 	public static void main(final String[] args) {
-		final Controler controler = new ShelterAllocationController(args);
+		int shift = Integer.parseInt(args[1]);
+		final Controler controler = new ShelterAllocationController(args,shift);
 		controler.run();
 		System.exit(0);
 	}
-	
+
 }

@@ -67,7 +67,7 @@ public class EvacuationShelterNetLoaderForShelterAllocation extends EvacuationSh
 //			}
 
 		}
-		int superCap = numOfPers - cap;
+		int superCap = numOfPers; // - cap;
 		Building superShelter = new Building(new IdImpl("super_shelter"),0,0,0,0,superCap,10000,1,null);
 		this.buildings.add(superShelter);
 		this.getShelterLinkMapping().put(saveLinkId, superShelter);

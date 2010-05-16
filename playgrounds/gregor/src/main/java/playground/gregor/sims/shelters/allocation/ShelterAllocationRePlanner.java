@@ -1,6 +1,7 @@
 package playground.gregor.sims.shelters.allocation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -36,7 +37,7 @@ public class ShelterAllocationRePlanner implements IterationStartsListener {
 
 	//	private Population plans;
 	private Dijkstra router;
-	private ScenarioImpl sceanrio;
+	private ScenarioImpl scenario;
 	private List<Building> buildings;
 	private ArrayList<Person> agents;
 
@@ -45,16 +46,34 @@ public class ShelterAllocationRePlanner implements IterationStartsListener {
 	private boolean initialized = false;
 	private int c = 0;
 	private NetworkFactoryImpl routeFactory;
+	private ShelterCounter shc;
 
 	public ShelterAllocationRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings) {
 		//		this.plans = sc.getPopulation();
-		this.router =  new Dijkstra(sc.getNetwork(),tc,tt);
-		this.sceanrio = sc;
-		this.buildings = buildings;
-		this.agents = new ArrayList<Person>(sc.getPopulation().getPersons().values());
-		this.routeFactory = (NetworkFactoryImpl) sc.getNetwork().getFactory();
+//		this.router =  new Dijkstra(sc.getNetwork(),tc,tt);
+//		this.sceanrio = sc;
+//		this.buildings = buildings;
+//		this.agents = new ArrayList<Person>(sc.getPopulation().getPersons().values());
+//		this.routeFactory = (NetworkFactoryImpl) sc.getNetwork().getFactory();
+		this(sc,tc,tt,buildings,null);
 	}
 
+	public ShelterAllocationRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings,ShelterCounter shc) {
+		this.router =  new Dijkstra(sc.getNetwork(),tc,tt);
+		this.scenario = sc;
+		this.buildings = new ArrayList<Building>();
+		for (Building b : buildings) {
+			if (b.isQuakeProof()) {
+				this.buildings.add(b);
+			}
+		}
+		this.agents = new ArrayList<Person>(sc.getPopulation().getPersons().values());
+		this.routeFactory = (NetworkFactoryImpl) sc.getNetwork().getFactory();
+		this.shc = shc;//
+
+		
+	}
+	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if (event.getIteration() > 0) {
@@ -87,17 +106,46 @@ public class ShelterAllocationRePlanner implements IterationStartsListener {
 	}
 
 	private void doRePlanning(Person pers, Random rand) {
-		//		if (rand.nextDouble() < (double)this.agents.size()/(double)this.c) {
-		//			doSwitchTwoAgents(pers,rand);
-		//		} else {
-		//			doShiftOneAgent(pers, rand);
-		//		}
-		doSwitchTwoAgents(pers,rand);
+//		double switchProb = (double)this.shc.getNumAgentsInShelter() / (double)this.c;
+		
+		if (this.shc != null) {
+				if (rand.nextDouble() < 0.5) {
+					doSwitchTwoAgents(pers,rand);
+				} else {
+					doShiftOneAgent(pers, rand);
+				}
+		} else {
+			doSwitchTwoAgents(pers,rand);
+		}
 	}
 
 	private void doShiftOneAgent(Person pers, Random rand) {
-		// TODO Auto-generated method stub
-
+		Id id = null;
+		while (id == null) {
+			Building b = this.buildings.get(rand.nextInt(this.buildings.size()));
+			id = this.shc.tryToAddAgent(b);
+		}
+		Plan plan = pers.getSelectedPlan();
+		Activity origAct1 = (Activity)plan.getPlanElements().get(0);
+		Node origN1 = this.scenario.getNetwork().getLinks().get(origAct1.getLinkId()).getToNode();
+		Node test = this.scenario.getNetwork().getLinks().get(id).getFromNode();
+		
+		Path path = this.router.calcLeastCostPath(origN1, test, origAct1.getEndTime());
+		double testScore = path.travelCost/-600;
+		if (plan.getScore() < (testScore)) {
+			Activity origAct2 = (Activity)plan.getPlanElements().get(2);
+			Leg leg = (Leg)plan.getPlanElements().get(1);
+			NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, origAct1.getLinkId(), id);
+			route.setLinkIds(origAct1.getLinkId(), NetworkUtils.getLinkIds(path.links), id);
+			route.setTravelTime((int) path.travelTime);
+			route.setTravelCost(path.travelCost);
+			route.setDistance(RouteUtils.calcDistance(route, this.scenario.getNetwork()));
+			leg.setRoute(route);
+			((ActivityImpl)origAct2).setLinkId(id);
+			plan.setScore(testScore);
+		}
+		
+//		id = shc.tryToAddAgent(b)
 	}
 
 	private void doSwitchTwoAgents(Person pers1, Random rand) {
@@ -111,11 +159,11 @@ public class ShelterAllocationRePlanner implements IterationStartsListener {
 		Activity origAct21 = (Activity)plan2.getPlanElements().get(0);
 		Activity origAct22 = (Activity)plan2.getPlanElements().get(2);
 
-		Node origN11 = this.sceanrio.getNetwork().getLinks().get(origAct11.getLinkId()).getToNode();
-		Node origN12 = this.sceanrio.getNetwork().getLinks().get(origAct12.getLinkId()).getFromNode();
+		Node origN11 = this.scenario.getNetwork().getLinks().get(origAct11.getLinkId()).getToNode();
+		Node origN12 = this.scenario.getNetwork().getLinks().get(origAct12.getLinkId()).getFromNode();
 
-		Node origN21 = this.sceanrio.getNetwork().getLinks().get(origAct21.getLinkId()).getToNode();
-		Node origN22 = this.sceanrio.getNetwork().getLinks().get(origAct22.getLinkId()).getFromNode();
+		Node origN21 = this.scenario.getNetwork().getLinks().get(origAct21.getLinkId()).getToNode();
+		Node origN22 = this.scenario.getNetwork().getLinks().get(origAct22.getLinkId()).getFromNode();
 
 		Path path1 = this.router.calcLeastCostPath(origN11, origN22, origAct11.getEndTime());
 		double newScore1 = path1.travelCost / -600;
@@ -129,7 +177,7 @@ public class ShelterAllocationRePlanner implements IterationStartsListener {
 			route1.setLinkIds(origAct11.getLinkId(), NetworkUtils.getLinkIds(path1.links), origAct22.getLinkId());
 			route1.setTravelTime((int) path1.travelTime);
 			route1.setTravelCost(path1.travelCost);
-			route1.setDistance(RouteUtils.calcDistance(route1, this.sceanrio.getNetwork()));
+			route1.setDistance(RouteUtils.calcDistance(route1, this.scenario.getNetwork()));
 			leg1.setRoute(route1);
 
 			Leg leg2 = (Leg)plan2.getPlanElements().get(1);
@@ -137,7 +185,7 @@ public class ShelterAllocationRePlanner implements IterationStartsListener {
 			route2.setLinkIds(origAct21.getLinkId(), NetworkUtils.getLinkIds(path2.links), origAct12.getLinkId());
 			route2.setTravelTime((int) path2.travelTime);
 			route2.setTravelCost(path2.travelCost);
-			route2.setDistance(RouteUtils.calcDistance(route2, this.sceanrio.getNetwork()));
+			route2.setDistance(RouteUtils.calcDistance(route2, this.scenario.getNetwork()));
 			leg2.setRoute(route2);
 	
 			((ActivityImpl)origAct12).setLinkId(route1.getEndLinkId());

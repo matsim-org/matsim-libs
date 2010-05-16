@@ -10,6 +10,7 @@ import java.util.Queue;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -28,13 +29,18 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.EvacuationPopulationFromShapeFileLoader;
 import org.matsim.evacuation.base.EvacuationStartTimeCalculator;
+import org.matsim.evacuation.flooding.FloodingInfo;
+import org.matsim.evacuation.flooding.FloodingReader;
 import org.matsim.evacuation.shelters.EvacuationShelterNetLoader;
 import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 
@@ -61,8 +67,12 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 	private EvacuationStartTimeCalculator time;
 
 	private int numOfPers = 0;
+
+	private List<FloodingReader> readers;
 	
-	public ShelterAllocator(Population pop, List<Building> buildings, Scenario scenario, EvacuationShelterNetLoaderForShelterAllocation esnl) {
+	private QuadTree<FloodingInfo> fis = null;
+	
+	public ShelterAllocator(Population pop, List<Building> buildings, Scenario scenario, EvacuationShelterNetLoaderForShelterAllocation esnl, List<FloodingReader> netcdfReaders) {
 		super(pop, buildings, scenario);
 		//TODO if this code moves one day to org.matsim than the corresponding fields in
 		//the super class should be accessed instead of creating these fields 
@@ -70,11 +80,15 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 		this.buildings = buildings;
 		this.esnl = esnl;
 		this.pop = pop;
+		this.readers = netcdfReaders;
 	}
 	
 	@Override
 	public Population getPopulation() {
 		log.info("doing intialization...");
+		if (this.readers != null) {
+			buildFiQuadTree();
+		}
 		initRouter();
 		initNodeInfos();
 		createShelterLinks();
@@ -93,6 +107,22 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 		log.info("done.");
 		
 		return null;
+	}
+	
+	private void buildFiQuadTree() {
+
+		Envelope envelope = new Envelope(0,0,0,0);
+
+		for (FloodingReader fr : this.readers) {
+			envelope.expandToInclude(fr.getEnvelope());
+		}
+		this.fis = new QuadTree<FloodingInfo>(envelope.getMinX(),envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
+		for (FloodingReader fr : this.readers) {
+			for (FloodingInfo fi : fr.getFloodingInfos()) {
+					this.fis.put(fi.getCoordinate().x, fi.getCoordinate().y, fi);
+			}
+		}
+
 	}
 
 	private void createShelterLinks() {
@@ -206,6 +236,19 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 	private void initNodeInfos() {
 		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		for (Building building : this.buildings) {
+			
+			
+			if (building.getGeo() != null) {
+				Coord coord = MGC.point2Coord(building.getGeo().getCentroid());
+				if (this.fis != null) {
+					FloodingInfo fi = this.fis.get(coord.getX(), coord.getY());
+					if (fi.getCoordinate().distance(building.getGeo().getCentroid().getCoordinate()) > this.scenario.getConfig().evacuation().getBufferSize()) {
+						continue;
+					}
+
+				}
+			}
+			
 			int numOfPers = getNumOfPersons(building);
 			LinkImpl l = network.getNearestLink(MGC.coordinate2Coord(building.getGeo().getCentroid().getCoordinate()));
 			Node n = l.getToNode();
