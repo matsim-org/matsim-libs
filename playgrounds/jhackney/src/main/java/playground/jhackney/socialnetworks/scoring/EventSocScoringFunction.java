@@ -54,10 +54,10 @@ public class EventSocScoringFunction implements ScoringFunction{
 
 	private SocNetConfigGroup socnetConfig;
 
-	private double betaFriendFoe = Double.parseDouble(socnetConfig.getBeta1());
-	private double betaNFriends= Double.parseDouble(socnetConfig.getBeta2());
-	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
-	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
+	private double betaFriendFoe ;
+	private double betaNFriends;
+	private double betaLogNFriends;
+	private double betaTimeWithFriends;
 
 	public EventSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, final LinkedHashMap<Activity,ArrayList<Double>> actStats, SocNetConfigGroup snConfig) {
 //		this.paidToll = paidToll;
@@ -67,6 +67,11 @@ public class EventSocScoringFunction implements ScoringFunction{
 //		this.teo=teo;
 		this.factype=factype;
 		this.actStats=actStats;
+		betaFriendFoe = Double.parseDouble(socnetConfig.getBeta1());
+		betaNFriends= Double.parseDouble(socnetConfig.getBeta2());
+		betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
+		betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
+
 		if((this.betaNFriends!= 0) && (this.betaLogNFriends!=0)){
 			log.warn("Utility function values linear AND log number of Friends in spatial meeting");
 		}
