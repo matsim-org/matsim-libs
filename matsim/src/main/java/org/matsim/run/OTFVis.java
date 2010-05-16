@@ -208,7 +208,9 @@ public class OTFVis {
 	/* @deprecated this currently does not work; may be fixed if needed.  kai, jan'10 */
 	@Deprecated // this currently does not work; may be fixed if needed.  kai, jan'10
 	public static final void playVEH(final String[] args) {
-		log.error("this currently does not work; may be fixed if needed.  kai, jan'10" ) ;
+		log.error("this currently does not work; may be fixed if needed.  kai, jan'10" );
+		log.error("At least OTFTVeh2MVI is now working again.  kai, may'10" ) ;
+		System.exit(-1) ;
 		// we should have the network as second argument
 		String vehFileName = args[0];
 		if (args.length < 2) {
