@@ -17,7 +17,7 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
-import org.matsim.vis.otfvis.OTFVisQSimFeature;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.TransitSimulation.MMoyoPlansCalcTransitRoute;
@@ -58,7 +58,7 @@ public class PlanRouter {
 		/**play scenario*/
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		final TransitQSimulation sim = new TransitQSimulation(scenario, events);
-		sim.addFeature(new OTFVisQSimFeature(sim));
+		sim.addFeature(new OTFVisMobsimFeature(sim));
 		sim.run();
 
 		writer.closeFile();

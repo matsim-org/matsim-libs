@@ -30,11 +30,11 @@ import org.matsim.vis.snapshots.writers.OTFVisMobsim;
 
 public class OTFVisQueueSimulation extends QueueSimulation implements OTFVisMobsim {
 
-	private final OTFVisQSimFeature queueSimulationFeature;
+	private final OTFVisMobsimFeature queueSimulationFeature;
 
 	public OTFVisQueueSimulation(Scenario scenario, EventsManager events) {
 		super(scenario, events);
-		queueSimulationFeature = new OTFVisQSimFeature(this);
+		queueSimulationFeature = new OTFVisMobsimFeature(this);
 		super.addFeature(queueSimulationFeature);
 		this.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
 	}
@@ -47,7 +47,7 @@ public class OTFVisQueueSimulation extends QueueSimulation implements OTFVisMobs
 		queueSimulationFeature.setVisualizeTeleportedAgents(active);
 	}
 
-	public OTFVisQSimFeature getQueueSimulationFeature() {
+	public OTFVisMobsimFeature getQueueSimulationFeature() {
 		return queueSimulationFeature;
 	}
 	

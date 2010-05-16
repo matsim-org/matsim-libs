@@ -55,7 +55,7 @@ import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.BasicVehicleReaderV1;
-import org.matsim.vis.otfvis.OTFVisQSimFeature;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.xml.sax.SAXException;
 
 import playground.mrieser.pt.replanning.TransitStrategyManagerConfigLoader;
@@ -141,7 +141,7 @@ public class TransitControler extends Controler {
 	protected void runMobSim() {
 		TransitQSimulation sim = new TransitQSimulation(this.scenarioData, this.events);
 		if (useOTFVis) {
-			OTFVisQSimFeature otfVisQSimFeature = new OTFVisQSimFeature(sim);
+			OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(sim);
 			otfVisQSimFeature.setVisualizeTeleportedAgents(sim.getScenario().getConfig().otfVis().isShowTeleportedAgents());
 			sim.addFeature(otfVisQSimFeature);
 		}

@@ -45,7 +45,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.OTFVisControlerListener;
-import org.matsim.vis.otfvis.OTFVisQSimFeature;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
@@ -112,7 +112,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	private double stepToTime = 0;
 
-	private OTFVisQSimFeature otfVisQueueSimFeature;
+	private OTFVisMobsimFeature otfVisQueueSimFeature;
 
 	private ConcurrentLinkedQueue<Runnable> queue = new ConcurrentLinkedQueue<Runnable>();
 
@@ -453,7 +453,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		this.additionalElements.add(element);
 	}
 
-	public void setSimulation(OTFVisQSimFeature otfVisQueueSimFeature) {
+	public void setSimulation(OTFVisMobsimFeature otfVisQueueSimFeature) {
 		this.otfVisQueueSimFeature = otfVisQueueSimFeature;
 		this.quadBuilder = new OTFQSimServerQuadBuilder(otfVisQueueSimFeature.getVisMobsim().getVisNetwork());
 	}

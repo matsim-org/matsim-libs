@@ -49,7 +49,7 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.vis.otfvis.OTFVisQSimFeature;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 import playground.mrieser.pt.analysis.RouteOccupancy;
 import playground.mrieser.pt.analysis.VehicleTracker;
@@ -308,7 +308,7 @@ public class TwoLinesDemo {
 		events.addHandler(analysis2);
 
 		TransitQSimulation sim = new TransitQSimulation(this.scenario, events);
-		sim.addFeature(new OTFVisQSimFeature(sim));
+		sim.addFeature(new OTFVisMobsimFeature(sim));
 		sim.run();
 
 		System.out.println("stop\t#exitleaving\t#enter\t#inVehicle");

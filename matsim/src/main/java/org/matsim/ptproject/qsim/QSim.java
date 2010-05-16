@@ -113,7 +113,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	private QSimSignalEngine signalEngine = null;
 	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
 
-	private final List<QSimFeature> queueSimulationFeatures = new ArrayList<QSimFeature>();
+	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
 
 	private Integer iterationNumber = null;
@@ -270,7 +270,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			agents.addAll(a);
 		}
 		
-		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			for (PersonAgent agent : agents) {
 				queueSimulationFeature.agentCreated(agent);
 			}
@@ -327,7 +327,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
     this.changeEventsEngine = new NetworkChangeEventsEngine(this);
     this.changeEventsEngine.onPrepareSim();
 
-		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterPrepareSim();
 		}
 	}
@@ -340,7 +340,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			this.transitEngine.afterSim();
 		}
 		
-		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeCleanupSim();
 		}
 		this.simEngine.afterSim();
@@ -409,7 +409,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			doSnapshot(time);
 		}
 		
-		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterAfterSimStep(time);
 		}
 	}
@@ -435,7 +435,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	}
 
 	protected void handleUnknownLegMode(final double now, final PersonDriverAgent agent, final Id linkId) {
-		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.scenario.getNetwork().getLinks().get(linkId));
 		}
 		double arrivalTime = now + agent.getCurrentLeg().getTravelTime();
@@ -463,7 +463,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 * @param agent
 	 */
 	public void handleAgentArrival(final double now, final PersonDriverAgent agent) {
-		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeHandleAgentArrival(agent);
 		}
 		getEventsManager().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
@@ -482,7 +482,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public void scheduleActivityEnd(final PersonDriverAgent agent, final int planElementIndex) {
 		this.activityEndsList.add(agent);
 		addToAgentsInActivities(agent);
-		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterActivityBegins(agent, planElementIndex);
 		}
 	}
@@ -534,7 +534,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 				// ... puts the agent into the global agent tracker data structure, together with the correct stop id.
 				// kai, feb'10)
 
-				for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+				for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 
 					queueSimulationFeature.afterActivityEnds(agent, time);
 					// (calls TransitQSimFeature.afterActivityEnds(...), but that does not do anything. kai, feb'10
@@ -632,7 +632,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	}
 
 	@Override
-	public void addFeature(final QSimFeature queueSimulationFeature) {
+	public void addFeature(final MobsimFeature queueSimulationFeature) {
 		this.queueSimulationFeatures.add(queueSimulationFeature);
 	}
 

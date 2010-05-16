@@ -39,7 +39,7 @@ import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.vis.otfvis.OTFVisQSimFeature;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.xml.sax.SAXException;
 
 import playground.mrieser.OTFDemo;
@@ -55,7 +55,7 @@ public class ScenarioPlayer {
 	public static void play(final ScenarioImpl scenario, final EventsManager events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		final TransitQSimulation sim = new TransitQSimulation(scenario, (EventsManagerImpl) events);
-		sim.addFeature(new OTFVisQSimFeature(sim));
+		sim.addFeature(new OTFVisMobsimFeature(sim));
 		sim.run();
 	}
 

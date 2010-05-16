@@ -16,7 +16,7 @@ import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.qsim.TransitQSimulation;
-import org.matsim.ptproject.qsim.QSimFeature;
+import org.matsim.ptproject.qsim.MobsimFeature;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.layer.OTFSignalLayer;
@@ -31,7 +31,7 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
-public class OTFVisQSimFeature implements QSimFeature, VisMobsimFeature {
+public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 
 	protected OnTheFlyServer otfServer = null;
 
@@ -51,11 +51,11 @@ public class OTFVisQSimFeature implements QSimFeature, VisMobsimFeature {
 
 	private final LinkedHashMap<Id, PersonAgent> agents = new LinkedHashMap<Id, PersonAgent>();
 
-	public OTFVisQSimFeature(VisMobsim queueSimulation) {
+	public OTFVisMobsimFeature(VisMobsim queueSimulation) {
 		this.queueSimulation = queueSimulation;
 	}
 
-	public void setServer(OnTheFlyServer server) {
+	/*package*/ void setServer(OnTheFlyServer server) {
 		this.otfServer = server;
 		ownServer = false;
 	}
@@ -165,7 +165,7 @@ public class OTFVisQSimFeature implements QSimFeature, VisMobsimFeature {
 		}
 	}
 
-	public void setConnectionManager(OTFConnectionManager connectionManager) {
+	void setConnectionManager(OTFConnectionManager connectionManager) {
 		this.connectionManager = connectionManager;
 	}
 

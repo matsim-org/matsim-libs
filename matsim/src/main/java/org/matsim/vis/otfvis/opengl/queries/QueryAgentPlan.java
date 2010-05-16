@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.OTFVisQSimFeature;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -77,7 +77,7 @@ public class QueryAgentPlan extends AbstractQuery {
 	private transient Result result;
 	private transient Map<Id, TeleportationVisData> visTeleportationData;
 	private transient VisNetwork net;
-	private transient OTFVisQSimFeature queueSimulation;
+	private transient OTFVisMobsimFeature queueSimulation;
 
 
 	@Override
@@ -117,7 +117,7 @@ public class QueryAgentPlan extends AbstractQuery {
 	}
 
 	@Override
-	public void installQuery(OTFVisQSimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+	public void installQuery(OTFVisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.queueSimulation = queueSimulation;
 		this.net = queueSimulation.getVisMobsim().getVisNetwork();
 		this.visTeleportationData = queueSimulation.getVisTeleportationData();

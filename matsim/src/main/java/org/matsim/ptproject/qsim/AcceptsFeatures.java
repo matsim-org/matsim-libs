@@ -8,5 +8,5 @@ package org.matsim.ptproject.qsim;
  *
  */
 public interface AcceptsFeatures {
-	public void addFeature(final QSimFeature queueSimulationFeature) ;
+	public void addFeature(final MobsimFeature queueSimulationFeature) ;
 }

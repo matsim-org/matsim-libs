@@ -51,6 +51,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
@@ -63,7 +64,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.AcceptsFeatures;
-import org.matsim.ptproject.qsim.QSimFeature;
+import org.matsim.ptproject.qsim.MobsimFeature;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
@@ -139,7 +140,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
 	
-	private final List<QSimFeature> queueSimulationFeatures = new ArrayList<QSimFeature>() ;
+	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>() ;
 
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -207,9 +208,11 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
 		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
+		Collection<PersonAgent> agents = new ArrayList<PersonAgent>();
 
 		for (Person p : this.population.getPersons().values()) {
 			QueuePersonAgent agent = this.agentFactory.createPersonAgent(p);
+			agents.add( agent ) ;
 
 			QueueVehicle veh = new QueueVehicle(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
@@ -221,6 +224,14 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 				qlink.addParkedVehicle(veh);
 			}
 		}
+		
+
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+			for (PersonAgent agent : agents) {
+				queueSimulationFeature.agentCreated(agent);
+			}
+		}
+
 	}
 
 //	@Deprecated // I don't think that netvis works any more.  kai, apr/10
@@ -324,7 +335,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 
 		prepareNetworkChangeEventsQueue();
 		
-		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterPrepareSim();
 		}
 	}
@@ -334,7 +345,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	 * Close any files, etc.
 	 */
 	protected void cleanupSim() {
-		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeCleanupSim();
 		}
 
@@ -395,7 +406,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 			this.snapshotTime += this.snapshotPeriod;
 			doSnapshot(time);
 		}
-		for (QSimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterAfterSimStep(time);
 		}
 	}
@@ -427,6 +438,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	}
 
 	protected void handleUnknownLegMode(double now, final PersonDriverAgent agent) {
+		Id startLinkId = agent.getCurrentLeg().getRoute().getStartLinkId() ;
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.scenario.getNetwork().getLinks().get(startLinkId));
+		}
 		double arrivalTime = SimulationTimer.getTime() + agent.getCurrentLeg().getTravelTime();
 		this.teleportationList.add(new Tuple<Double, PersonDriverAgent>(arrivalTime, agent));
 	}
@@ -453,6 +468,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	 * @param agent
 	 */
 	protected void handleAgentArrival(final double now, PersonDriverAgent agent){
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+			queueSimulationFeature.beforeHandleAgentArrival(agent);
+		}
 		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
 				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 	}
@@ -476,6 +494,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	 */
 	protected void scheduleActivityEnd(final PersonDriverAgent agent) {
 		this.activityEndsList.add(agent);
+		int planElementIndex = agent.getPerson().getSelectedPlan().getPlanElements().indexOf(agent.getCurrentPlanElement()) ; // yyyy Aaaarrrrgggghhh
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+			queueSimulationFeature.afterActivityBegins(agent, planElementIndex);
+		}
 	}
 
 	private void handleActivityEnds(final double time) {
@@ -484,6 +506,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
 				agent.activityEnds(time);
+				for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+					queueSimulationFeature.afterActivityEnds(agent, time);
+				}
 			} else {
 				return;
 			}
@@ -633,7 +658,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 
 
 	@Override
-	public void addFeature(QSimFeature queueSimulationFeature) {
+	public void addFeature(MobsimFeature queueSimulationFeature) {
 		this.queueSimulationFeatures.add( queueSimulationFeature ) ;
 	}
 

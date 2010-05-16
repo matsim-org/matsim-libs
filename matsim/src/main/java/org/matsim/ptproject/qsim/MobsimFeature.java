@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonAgent;
 
 
-public interface QSimFeature {
+public interface MobsimFeature {
 
 	void afterPrepareSim();
 
