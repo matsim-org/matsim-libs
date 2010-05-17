@@ -90,10 +90,7 @@ public class OsmNetworkReader {
 	/*package*/ final CoordinateTransformation transform;
 	private boolean keepPaths = false;
 	private boolean scaleMaxSpeed = false;
-	private final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
-
-
-
+	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
 
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
@@ -251,7 +248,7 @@ public class OsmNetworkReader {
 				}
 			}
 		}
-		
+
 		// check which nodes are used
 		for (OsmWay way : this.ways.values()) {
 			String highway = way.tags.get("highway");
@@ -504,7 +501,7 @@ public class OsmNetworkReader {
 		public final long id;
 		public final List<String> nodes = new ArrayList<String>();
 		public final Map<String, String> tags = new HashMap<String, String>();
-		public int hierarchy;
+		public int hierarchy = -1;
 
 		public OsmWay(final long id) {
 			this.id = id;
@@ -576,10 +573,14 @@ public class OsmNetworkReader {
 				if (osmHighwayDefaults != null) {
 					int hierarchy = osmHighwayDefaults.hierarchy;
 					this.currentWay.hierarchy = hierarchy;
-				}  else {
-					this.currentWay.hierarchy = -1;
-				}
-				if (this.currentWay.hierarchy != -1) {
+					if (hierarchyLayers.isEmpty()) {
+						for (String nodeId : this.currentWay.nodes) {
+							OsmNode node = nodes.get(nodeId);
+							if(node != null) {
+								used = true;
+							}
+						}
+					}
 					for (OsmFilter osmFilter : hierarchyLayers) {
 						for (String nodeId : this.currentWay.nodes) {
 							OsmNode node = nodes.get(nodeId);
