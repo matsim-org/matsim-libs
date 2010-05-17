@@ -126,9 +126,6 @@ public class QLinkLanesImpl implements QLink {
 	 */
 	private List<QLane> queueLanes;
 
-	/** set to <code>true</code> if there is more than one lane (the originalLanthis.positionInfoBuilder.init(link);e). */
-	private boolean hasLanes = false;
-
 	/**
 	 * If more than one QueueLane exists this list holds all QueueLanes connected to
 	 * the (To)QueueNode of the QueueLink
@@ -141,7 +138,7 @@ public class QLinkLanesImpl implements QLink {
 
 	private final Map<Id, PersonAgent> agentsInActivities = new LinkedHashMap<Id, PersonAgent>();
 
-	/*package*/ VisData visdata = this.new VisDataImpl();
+	private VisData visdata = this.new VisDataImpl();
 
 	private QSimEngine qsimEngine = null;
 
@@ -159,22 +156,22 @@ public class QLinkLanesImpl implements QLink {
 	 * @param toNode
 	 * @see QLink#createLanes(List)
 	 */
-	public QLinkLanesImpl(final Link link2, QSimEngine engine, final QNode toNode) {
+	public QLinkLanesImpl(final Link link2, QSimEngine engine, 
+			final QNode toNode, Map<Id, Lane> laneMap) {
 		this.link = link2;
 		this.toQueueNode = toNode;
 		this.qsimEngine = engine;
 		this.originalLane = new QLane(this, null);
 		this.queueLanes = new ArrayList<QLane>();
 		this.queueLanes.add(this.originalLane);
+		this.createLanes(laneMap);
 	}
-
 
 	/**
 	 * Initialize the QueueLink with more than one QueueLane
 	 * @param map
 	 */
-	/*package*/ void createLanes(Map<Id, Lane> map) {
-		this.hasLanes = true;
+	private void createLanes(Map<Id, Lane> map) {
 		boolean firstNodeLinkInitialized = false;
 
 		for (Lane signalLane : map.values()) {
@@ -346,19 +343,15 @@ public class QLinkLanesImpl implements QLink {
 
 	public boolean moveLink(double now) {
 		boolean ret = false;
-		if (this.hasLanes) { // performance optimization: "if" is faster then "for(queueLanes)" with only one lane
-			for (QLane lane : this.queueLanes){
-				if (lane.moveLane(now)){
-					ret = true;
-				}
+		for (QLane lane : this.queueLanes){
+			if (lane.moveLane(now)){
+				ret = true;
 			}
-		} else {
-			ret = this.originalLane.moveLane(now);
 		}
 		this.moveWaitToBuffer(now);
 		this.active = (ret || (!this.waitingList.isEmpty()));
 		return this.active;
-	}
+}
 
 	/**
 	 * Move as many waiting cars to the link as it is possible
@@ -439,11 +432,9 @@ public class QLinkLanesImpl implements QLink {
 	 * @return the total space capacity available on that link (includes the space on lanes if available)
 	 */
 	public double getSpaceCap() {
-		double total = this.originalLane.getStorageCapacity();
-		if (this.hasLanes) {
-			for (QLane ql : this.getToNodeQueueLanes()) {
+		double total = 0.0;
+		for (QLane ql : this.getQueueLanes()) {
 				total += ql.getStorageCapacity();
-			}
 		}
 		return total;
 	}

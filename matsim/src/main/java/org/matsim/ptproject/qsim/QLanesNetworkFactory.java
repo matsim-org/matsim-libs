@@ -40,8 +40,7 @@ public class QLanesNetworkFactory implements QNetworkFactory<QNode, QLink> {
       QNode queueNode) {
   	QLink ql = null;
   	if (this.laneDefinitions.getLanesToLinkAssignments().containsKey(link.getId())){
-  		ql = new QLinkLanesImpl(link, engine, queueNode);
-  		((QLinkLanesImpl)ql).createLanes(this.laneDefinitions.getLanesToLinkAssignments().get(link.getId()).getLanes());
+  		ql = new QLinkLanesImpl(link, engine, queueNode, this.laneDefinitions.getLanesToLinkAssignments().get(link.getId()).getLanes());
   	}
   	else {
   		ql = this.delegate.newQueueLink(link, engine, queueNode);
