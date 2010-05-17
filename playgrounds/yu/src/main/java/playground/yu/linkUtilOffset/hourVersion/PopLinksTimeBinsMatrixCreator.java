@@ -25,6 +25,7 @@ package playground.yu.linkUtilOffset.hourVersion;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -45,6 +46,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 
 import playground.yu.utils.io.ScoreModificationReader;
+import playground.yu.utils.math.MatrixUtils;
 import Jama.Matrix;
 import Jama.QRDecomposition;
 
@@ -203,20 +205,20 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		// Map<Id, Double> b=smReader.get
 
 		int m = A.getRowDimension(), n = A.getColumnDimension();
-		Matrix A_b = new Matrix(m, n + 1);
+
 		Matrix b = new Matrix(m, 1);
 		for (Entry<Id, Integer> personIdRowIdxEntry : pltbmc
 				.getPersonSequence().entrySet()) {
 			int rowIdx = personIdRowIdxEntry.getValue();
-			for (int colIdx = 0; colIdx < n; colIdx++) {
-				A_b.set(rowIdx, colIdx, A.get(rowIdx, colIdx));
-			}
+			// for (int colIdx = 0; colIdx < n; colIdx++) {
+			// A_b.set(rowIdx, colIdx, A.get(rowIdx, colIdx));
+			// }
 			double scoreModification = smReader
 					.getPersonUtilityOffset(personIdRowIdxEntry.getKey()/* personId */);
-			A_b.set(rowIdx, n, scoreModification);
+			// A_b.set(rowIdx, n, scoreModification);
 			b.set(rowIdx, 0, scoreModification);
 		}
-
+		Matrix A_b = MatrixUtils.getAugmentMatrix(A, b);
 		System.out.println("rank[A_b] =\t" + A_b.rank());
 
 		try {
@@ -230,23 +232,20 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 				x = A.solve(b);
 
 			} else {
-				Matrix G = A.inverse();// Generalized inverse?
-
-				Matrix z = new Matrix(n, 1, 0d);
-				z.set(0, 0, 1d);
-
-				Matrix I = new Matrix(n, n, 0d);
-				for (int i = 0; i < n; i++)
-					I.set(i, i, 1d);
-
-				x = G.times(b).plus(I.minus(G.times(A)).minus(z));
-
+				// Matrix G = A.inverse();// Generalized inverse?
+				//
+				// Matrix z = new Matrix(n, 1, 0d);
+				// z.set(0, 0, 1d);
+				//
+				// Matrix I = new Matrix(n, n, 0d);
+				// for (int i = 0; i < n; i++)
+				// I.set(i, i, 1d);
+				//
+				// x = G.times(b).plus(I.minus(G.times(A)).minus(z));
+				x = MatrixUtils.getMinimumNormSolution(A, b);
 			}
-			try {
-				x.print(new PrintWriter(matrixXFilename), 1, 2);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+
+			x.print(new DecimalFormat(), 10);
 
 			Matrix Residual = A.times(x).minus(b);
 			try {

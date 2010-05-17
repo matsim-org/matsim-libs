@@ -32,31 +32,98 @@ import Jama.Matrix;
  * 
  */
 public class MatrixUtils {
-	public static class GeneralizedInverse {
-		public static Matrix getGeneralizedInverse(Matrix A) {
-			FullRankDecomposition frd = new FullRankDecomposition(A);
-			Matrix F_t = frd.getF().transpose(), G_t = frd.getG().transpose();
-			return G_t.times(F_t.times(A).times(G_t).inverse()).times(F_t);
+	/**
+	 * @param A
+	 * @param y
+	 * @return
+	 */
+	public static boolean isConsistantEquation(Matrix A, Matrix y) {
+		return A.rank() == getAugmentMatrix(A, y).rank();
+	}
+
+	/**
+	 * @param A
+	 *            coefficient matrix
+	 * @param y
+	 * @return augmented matrix
+	 */
+	public static Matrix getAugmentMatrix(Matrix A, Matrix y) {
+		int n_y = y.getColumnDimension();
+		if (n_y != 1) {
+			System.err.println("y should has only one column!!!");
+			System.exit(0);
+			return null;
+		}
+		int m = A.getRowDimension(), m_y = y.getRowDimension();
+		if (m != m_y) {
+			System.err
+					.println("A and y should have the same row dimentions!!!");
+			System.exit(0);
+			return null;
+		}
+		int n = A.getColumnDimension();
+		Matrix augmented = new Matrix(m, n + 1);
+		augmented.setMatrix(0, m - 1, 0, n - 1, A);
+		augmented.setMatrix(0, m - 1, n, n, y);
+		return augmented;
+	}
+
+	/**
+	 * it should be used with consistent Linear equation system Ax=y
+	 * 
+	 * @param A
+	 *            Coefficient matrix
+	 * @param Y
+	 * @return
+	 */
+	public static Matrix getMinimumNormSolution(Matrix A, Matrix y) {
+		if (!isConsistantEquation(A, y)) {
+			System.err.println("Ax=y is not a consistant equation!!!");
+			System.exit(0);
+			return null;
+		}
+		Matrix GI = MatrixUtils.getGeneralizedInverse(A);
+		Matrix A_adjugate = A.transpose();
+		Matrix GAA_adjugate = GI.times(A).times(A_adjugate);
+		if (MatrixUtils.equals(A_adjugate, GAA_adjugate)) {
+			System.out
+					.println("this generalized inverse is a appropriate one for the minimum norm solution!!!");
+			return GI.times(y);
+		} else {
+			System.err
+					.println("this generalized inverse is NOT for the minimum norm solution!!!");
+			return null;
 		}
 
-		public static void main(String[] args) {
-			double[][] a = new double[][] { { 0d, 2d, 1d, 4d },
-					{ 2d, 3d, 2d, 6d }, {
-					// 8d, 4d, 3d, 2d
-							4d, 6d, 4d, 12d //
-					} };
-			Matrix A = new Matrix(a);
+	}
 
-			FullRankDecomposition frd = new FullRankDecomposition(A);
-			Matrix F = frd.getF(), G = frd.getG();
+	public static boolean equals(Matrix A, Matrix B) {
+		int m = A.getRowDimension(), n = A.getColumnDimension();
+		if (m != B.getRowDimension())
+			return false;
+		if (n != B.getColumnDimension())
+			return false;
+		for (int i = 0; i < m; i++)
+			for (int j = 0; j < n; j++)
+				if (A.get(i, j) != B.get(i, j))
+					return false;
+		return true;
+	}
 
-			System.out.println("A\t:");
-			A.print(new DecimalFormat(), 10);
-			System.out.println("GI\t:");
-			GeneralizedInverse.getGeneralizedInverse(A).print(
-					new DecimalFormat(), 10);
+	public static Matrix getGeneralizedInverse(Matrix A) {
+		FullRankDecomposition frd = new FullRankDecomposition(A);
+		Matrix F_t = frd.getF().transpose(), G_t = frd.getG().transpose();
+		return G_t.times(F_t.times(A).times(G_t).inverse()).times(F_t);
+	}
 
-		}
+	public static void main(String[] args) {
+		double[][] a = new double[][] { { 1d, 2d } };
+		Matrix A = new Matrix(a);
+
+		double[] b = new double[] { 10d };
+		Matrix y = new Matrix(b, 1);
+
+		getMinimumNormSolution(A, y).print(new DecimalFormat(), 10);
 	}
 
 	public static class FullRankDecomposition {
@@ -76,16 +143,19 @@ public class MatrixUtils {
 																		 */);// first
 			// r
 			// rows
-			this.F = pge.getTotalElementaryMatrix().inverse().getMatrix(0/*
+			Matrix TE = pge.getTotalElementaryMatrix();
+			System.out.println("TE:\t");
+			TE.print(new DecimalFormat(), 10);
+			this.F = TE.inverse().getMatrix(0/*
+											 * init row Idx
+											 */, m - 1/* final row idx */, 0/*
 																		 * init
-																		 * row
-																		 * Idx
-																		 */,
-					m - 1/* final row idx */, 0/* init column idx */, r - 1/*
-																		 * final
 																		 * column
 																		 * idx
-																		 */);// first
+																		 */,
+					r - 1/*
+						 * final column idx
+						 */);// first
 			// r
 			// columns
 		}
