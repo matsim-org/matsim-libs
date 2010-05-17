@@ -173,7 +173,7 @@ public class MatrixUtils {
 					{ 2d, 3d, 2d, 6d }, {
 					// 8d, 4d, 3d, 2d
 							4d, 6d, 4d, 12d //
-					} };
+					}, { 0d, 0d, 0d, 2d }, { 0d, 0d, 0d, 3d } };
 			Matrix A = new Matrix(a);
 
 			FullRankDecomposition frd = new FullRankDecomposition(A);
@@ -263,7 +263,7 @@ public class MatrixUtils {
 					{ 2d, 3d, 2d, 6d }, {
 					// 8d, 4d, 3d, 2d
 							4d, 6d, 4d, 12d //
-					} };
+					}, { 0d, 0d, 0d, 2d }, { 0d, 0d, 0d, 3d } };
 			Matrix A = new Matrix(a);
 			PivotGaussianElimination pge = new PivotGaussianElimination(A);
 			System.out.println("A\t:");
