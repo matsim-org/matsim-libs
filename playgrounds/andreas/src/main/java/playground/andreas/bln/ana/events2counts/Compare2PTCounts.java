@@ -1,5 +1,6 @@
 package playground.andreas.bln.ana.events2counts;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -12,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
@@ -24,6 +26,11 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 
 public class Compare2PTCounts extends Events2PTCounts{
 	
+	static String inDir = "F:/counts2/";
+	static String run1 = "767";
+	static String run2 = "768";
+	static String iteration = "500";
+	
 
 	public Compare2PTCounts(String outDir, String eventsInFile, String stopIDMapFile, String networkFile, String transitScheduleFile) throws IOException {
 		super(outDir, eventsInFile, stopIDMapFile, networkFile, transitScheduleFile);
@@ -33,35 +40,37 @@ public class Compare2PTCounts extends Events2PTCounts{
 	
 	
 	public static void main(String[] args) {
-		String inDir = "f:/counts/";
 		try {
-			new Compare2PTCounts(inDir, "f:/counts/767.380.events.xml.gz", 
-					"f:/counts/stopareamap.txt", 
-					"f:/counts/network.xml.gz", 
-					"f:/counts/transitSchedule.xml.gz").compare();
+			new Compare2PTCounts(Compare2PTCounts.inDir, inDir + Compare2PTCounts.run1 + "." + Compare2PTCounts.iteration + ".events.xml.gz", 
+					Compare2PTCounts.inDir + "stopareamap.txt", 
+					Compare2PTCounts.inDir + "network.xml.gz", 
+					Compare2PTCounts.inDir + "transitSchedule.xml.gz").compare();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	private void compare() {
-		
-		
+	private void compare() {		
 			
 			// compare counts 2 minus counts 1
 			String parentDir = this.outDir;
-			this.outDir = parentDir + "767/";
+			this.outDir = parentDir + Compare2PTCounts.run1 + "/";
+			(new File(this.outDir)).mkdir();
 			this.run();
 			Map<Id, Map<Id, StopCountBox>> countsMap1 = this.getLine2StopCountMap();
 			
 			reset();
-			this.eventsInFile = "f:/counts/768.380.events.xml.gz";
-			this.transitSchedule = ReadTransitSchedule.readTransitSchedule("f:/counts/network.xml.gz", "f:/counts/transitSchedule_long.xml.gz");
-			this.outDir = parentDir + "768/";
+			this.eventsInFile = Compare2PTCounts.inDir + Compare2PTCounts.run2 + "." + Compare2PTCounts.iteration + ".events.xml.gz";
+			this.transitSchedule = ReadTransitSchedule.readTransitSchedule(Compare2PTCounts.inDir + "network.xml.gz", Compare2PTCounts.inDir + "transitSchedule_long.xml.gz");
+			this.outDir = parentDir + Compare2PTCounts.run2 + "/";
+			(new File(this.outDir)).mkdir();
 			this.run();
 			Map<Id, Map<Id, StopCountBox>> countsMap2 = this.getLine2StopCountMap();
 //			countsMap2.put(new IdImpl("344  "), null);
+			
+			this.outDir = parentDir + Compare2PTCounts.run2 + "-" + Compare2PTCounts.run1 + "/";
+			(new File(this.outDir)).mkdir();
 			
 			createSimpleKMZ(countsMap1, countsMap2, this.transitSchedule);
 			
@@ -92,29 +101,20 @@ public class Compare2PTCounts extends Events2PTCounts{
 						log.warn("No counts data for line " + lineId);
 					}
 				}				
-			}
+			}			
 			
-			this.outDir = parentDir + "768-767/";
 			this.line2StopCountMap = mergedMap;
+			this.check();
 			this.dump();
-			
-			
-			
-
-			
-
 						
-			log.info("Finished");
-			
-			
-		
+			log.info("Finished");		
 				
 	}
 	
 	private void createSimpleKMZ(Map<Id, Map<Id, StopCountBox>> line2StopCountMap1, Map<Id, Map<Id, StopCountBox>> line2StopCountMap2, TransitSchedule transitSchedule) {
 	
 		HashMap<String, String> stringStopNameMap = new HashMap<String, String>();
-		for (Entry<Id, String> stopEntry : this.stopIDMap.entrySet()) {
+		for (Entry<Id, String> stopEntry : this.stopID2NameMap.entrySet()) {
 			stringStopNameMap.put(stopEntry.getKey().toString(), stopEntry.getValue());
 		}
 		
@@ -219,9 +219,15 @@ public class Compare2PTCounts extends Events2PTCounts{
 		
 		PtCountCountComparisonKMLWriter kmlWriter = new PtCountCountComparisonKMLWriter(boardCountSimCompList, alightCountSimCompList,
 				TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84),
-				boardCounts, alightCounts, stringStopNameMap, stopID2lineIdMap);
+				boardCounts, alightCounts, stringStopNameMap, stopID2lineIdMap, true);
 		kmlWriter.setIterationNumber(0);
-		kmlWriter.writeFile(this.outDir + "out.kmz");
+		kmlWriter.writeFile(this.outDir + "compare_withNames.kmz");
+		
+		kmlWriter = new PtCountCountComparisonKMLWriter(boardCountSimCompList, alightCountSimCompList,
+				TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84),
+				boardCounts, alightCounts, stringStopNameMap, stopID2lineIdMap, false);
+		kmlWriter.setIterationNumber(0);
+		kmlWriter.writeFile(this.outDir + "compare_woNames.kmz");
 		
 	}
 	
@@ -298,7 +304,7 @@ public class Compare2PTCounts extends Events2PTCounts{
 			if(countsMap1.get(stopId) != null){
 				if(countsMap2.get(stopId) != null){
 					// both != null -> compare 2 minus 1
-					for (int i = 0; i < new StopCountBox(null, null).accessCount.length; i++) {
+					for (int i = 0; i < StopCountBox.slots; i++) {
 						countsMap1.get(stopId).accessCount[i] = countsMap2.get(stopId).accessCount[i] - countsMap1.get(stopId).accessCount[i];
 						countsMap1.get(stopId).egressCount[i] = countsMap2.get(stopId).egressCount[i] - countsMap1.get(stopId).egressCount[i];
 					}
@@ -306,9 +312,9 @@ public class Compare2PTCounts extends Events2PTCounts{
 					
 				} else {
 					// 2 == null -> take inverted 1
-					for (int i = 0; i < new StopCountBox(null, null).accessCount.length; i++) {
-						countsMap1.get(stopId).accessCount[i] *= -1;
-						countsMap1.get(stopId).egressCount[i] *= -1;
+					for (int i = 0; i < StopCountBox.slots; i++) {
+						countsMap1.get(stopId).accessCount[i] = -countsMap1.get(stopId).accessCount[i];
+						countsMap1.get(stopId).egressCount[i] = -countsMap1.get(stopId).egressCount[i];
 					}
 					mergedMap.put(stopId, countsMap1.get(stopId));
 				}
@@ -318,7 +324,7 @@ public class Compare2PTCounts extends Events2PTCounts{
 					mergedMap.put(stopId, countsMap2.get(stopId));
 				} else {
 					// both == null -> take none
-					log.warn("No counts data for line " + stopId);
+					log.warn("No counts data for stop " + stopId);
 				}
 			}
 		}
@@ -330,7 +336,7 @@ public class Compare2PTCounts extends Events2PTCounts{
 	private void invertMapEntries(Map<Id, StopCountBox> routeMap){
 		
 		for (Entry<Id, StopCountBox> routeEntry : routeMap.entrySet()) {
-			for (int i = 0; i < new StopCountBox(null, null).accessCount.length; i++) {
+			for (int i = 0; i < StopCountBox.slots; i++) {
 				routeEntry.getValue().accessCount[i] *= -1;
 				routeEntry.getValue().egressCount[i] *= -1;
 			}

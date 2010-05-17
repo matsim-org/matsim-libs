@@ -128,6 +128,7 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 	private StyleType greenCrossStyle;
 	private StyleType greyCrossStyle;
 	private StyleType greyMinusStyle;
+	
 	/**
 	 * maps stopids to filenames in the kmz
 	 */
@@ -135,6 +136,7 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 	private Counts boardCounts, alightCounts;
 	private HashMap<String, String> stopIDMap;
 	private Map<String, TreeSet<String>> stopID2lineIdMap;
+	private boolean writePlacemarkName;
 
 	/** The logging object for this class. */
 	private static final Logger log = Logger
@@ -154,7 +156,7 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 			final List<CountSimComparison> alightCountSimCompList,
 			// final Network network,
 			final CoordinateTransformation coordTransform,
-			final Counts boradCounts, final Counts alightCounts, HashMap<String,String> stopIDMap, Map<String, TreeSet<String>> stopID2lineIdMap) {
+			final Counts boradCounts, final Counts alightCounts, HashMap<String,String> stopIDMap, Map<String, TreeSet<String>> stopID2lineIdMap, boolean writePlacemarkName) {
 		super(boardCountSimCompList, alightCountSimCompList);
 		// this.network = network;
 		this.coordTransform = coordTransform;
@@ -162,6 +164,7 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 		this.alightCounts = alightCounts;
 		this.stopIDMap = stopIDMap;
 		this.stopID2lineIdMap = stopID2lineIdMap;
+		this.writePlacemarkName = writePlacemarkName;
 	}
 
 	/**
@@ -419,8 +422,10 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 			}
 		} else {
 			log.warn(stopid + " is not served by any line!?");
-		}		
-		placemark.setName(name.toString());
+		}	
+		if(this.writePlacemarkName == true){
+			placemark.setName(name.toString());
+		}
 		
 		return placemark;
 	}
@@ -462,26 +467,34 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 							+ Double.toString(coord.getY()) + ",0.0");
 			placemark.setAbstractGeometryGroup(kmlObjectFactory
 					.createPoint(point));
-			// cross
-			if (csc.getSimulationValue() > csc.getCountValue()) {
-				if (csc.getSimulationValue() < csc.getCountValue() * 1.5) {
-					placemark.setStyleUrl(this.greenCrossStyle.getId());
-				} else if (csc.getSimulationValue() < csc.getCountValue() * 2) {
-					placemark.setStyleUrl(this.yellowCrossStyle.getId());
-				} else {
-					placemark.setStyleUrl(this.redCrossStyle.getId());
+			
+			// first check if we got any counts
+			if (csc.getSimulationValue() == 0.0 && csc.getCountValue() == 0.0){
+				// no, so place something neutral, e.g. grey dot
+				placemark.setStyleUrl(this.greyMinusStyle.getId());
+			} else {
+				// yes, we have so decide what color and type
+				// cross
+				if (csc.getSimulationValue() > csc.getCountValue()) {
+					if (csc.getSimulationValue() < csc.getCountValue() * 1.5) {
+						placemark.setStyleUrl(this.greenCrossStyle.getId());
+					} else if (csc.getSimulationValue() < csc.getCountValue() * 2) {
+						placemark.setStyleUrl(this.yellowCrossStyle.getId());
+					} else {
+						placemark.setStyleUrl(this.redCrossStyle.getId());
+					}
 				}
-			}
-			// minus
-			else {
-				if (csc.getSimulationValue() > csc.getCountValue() * 0.75) {
-					placemark.setStyleUrl("#greenMinusStyle");
-				} else if (csc.getSimulationValue() > csc.getCountValue() * 0.5) {
-					placemark.setStyleUrl("#yellowMinusStyle");
-				} else {
-					placemark.setStyleUrl("#redMinusStyle");
+				// minus
+				else {
+					if (csc.getSimulationValue() > csc.getCountValue() * 0.75) {
+						placemark.setStyleUrl("#greenMinusStyle");
+					} else if (csc.getSimulationValue() > csc.getCountValue() * 0.5) {
+						placemark.setStyleUrl("#yellowMinusStyle");
+					} else {				
+						placemark.setStyleUrl("#redMinusStyle");
+					}
 				}
-			}
+			}			
 			folder.getAbstractFeatureGroup().add(
 					kmlObjectFactory.createPlacemark(placemark));
 		}
