@@ -50,9 +50,12 @@ public class ShelterAllocationController extends Controler {
 
 	private int shift;
 
-	public ShelterAllocationController(String[] args, int shift) {
+	private double pshelter;
+
+	public ShelterAllocationController(String[] args, int shift, double pshelter) {
 		super(args);
 		this.shift = shift;
+		this.pshelter = pshelter;
 		this.setOverwriteFiles(true);
 		//		this.config.scenario().setUseSignalSystems(true);
 		//		this.config.scenario().setUseLanes(true);
@@ -79,16 +82,13 @@ public class ShelterAllocationController extends Controler {
 
 
 		initPluggableTravelCostCalculator();
-		ShelterAllocationRePlanner sARP = null;
 		if (shift == 1) {
 			ShelterCounter sc = new ShelterCounter(this.scenarioData.getNetwork(), this.shelterLinkMapping);
 			this.events.addHandler(sc);
-			sARP = new ShelterAllocationRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings,sc);
-		} else {
-			sARP = new ShelterAllocationRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings);
+			ShelterAllocationRePlanner sARP = new ShelterAllocationRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings,sc, this.pshelter);
+			this.addControlerListener(sARP);
 		}
 
-		this.addControlerListener(sARP);
 
 		unloadNetcdfReaders();
 	}
@@ -252,7 +252,8 @@ public class ShelterAllocationController extends Controler {
 
 	public static void main(final String[] args) {
 		int shift = Integer.parseInt(args[1]);
-		final Controler controler = new ShelterAllocationController(args,shift);
+		double pshelter = Double.parseDouble(args[2]);
+		final Controler controler = new ShelterAllocationController(args,shift,pshelter);
 		controler.run();
 		System.exit(0);
 	}

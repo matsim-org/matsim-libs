@@ -1,7 +1,6 @@
 package playground.gregor.sims.shelters.allocation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -13,17 +12,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
@@ -41,7 +34,8 @@ public class ShelterAllocationRePlanner implements IterationStartsListener {
 	private List<Building> buildings;
 	private ArrayList<Person> agents;
 
-	private static final double PSHELTER = 0.05;
+	private final double PSHELTER;
+//	private static final double EPSILON = 0.005;
 
 	private boolean initialized = false;
 	private int c = 0;
@@ -55,10 +49,10 @@ public class ShelterAllocationRePlanner implements IterationStartsListener {
 //		this.buildings = buildings;
 //		this.agents = new ArrayList<Person>(sc.getPopulation().getPersons().values());
 //		this.routeFactory = (NetworkFactoryImpl) sc.getNetwork().getFactory();
-		this(sc,tc,tt,buildings,null);
+		this(sc,tc,tt,buildings,null,0);
 	}
 
-	public ShelterAllocationRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings,ShelterCounter shc) {
+	public ShelterAllocationRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings,ShelterCounter shc, double pshelter) {
 		this.router =  new Dijkstra(sc.getNetwork(),tc,tt);
 		this.scenario = sc;
 		this.buildings = new ArrayList<Building>();
@@ -70,7 +64,7 @@ public class ShelterAllocationRePlanner implements IterationStartsListener {
 		this.agents = new ArrayList<Person>(sc.getPopulation().getPersons().values());
 		this.routeFactory = (NetworkFactoryImpl) sc.getNetwork().getFactory();
 		this.shc = shc;//
-
+		this.PSHELTER = pshelter;
 		
 	}
 	
@@ -132,9 +126,10 @@ public class ShelterAllocationRePlanner implements IterationStartsListener {
 		
 		Path path = this.router.calcLeastCostPath(origN1, test, origAct1.getEndTime());
 		double testScore = path.travelCost/-600;
-		if (plan.getScore() < (testScore)) {
+		Leg leg = (Leg)plan.getPlanElements().get(1);
+		
+		if (plan.getScore() < testScore ) { // || path.travelTime < 60*60 && rand.nextDouble() < EPSILON) {
 			Activity origAct2 = (Activity)plan.getPlanElements().get(2);
-			Leg leg = (Leg)plan.getPlanElements().get(1);
 			NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, origAct1.getLinkId(), id);
 			route.setLinkIds(origAct1.getLinkId(), NetworkUtils.getLinkIds(path.links), id);
 			route.setTravelTime((int) path.travelTime);
@@ -170,22 +165,22 @@ public class ShelterAllocationRePlanner implements IterationStartsListener {
 		Path path2 = this.router.calcLeastCostPath(origN21, origN12, origAct21.getEndTime());
 		double newScore2 = path2.travelCost / -600;
 
-		if ((origScore1 + origScore2) < (newScore1 + newScore2)) {
+		if ((origScore1 + origScore2) < (newScore1 + newScore2)) { // || path1.travelTime < 60*60 && path2.travelTime < 60*60 && rand.nextDouble() < EPSILON) {
 //			System.out.println("old1:" + origScore1 + " old2:" + origScore2 + " new1:" + newScore1+ " new2:" + newScore2);
-			Leg leg1 = (Leg)plan1.getPlanElements().get(1);
 			NetworkRoute route1 = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, origAct11.getLinkId(), origAct22.getLinkId());
 			route1.setLinkIds(origAct11.getLinkId(), NetworkUtils.getLinkIds(path1.links), origAct22.getLinkId());
 			route1.setTravelTime((int) path1.travelTime);
 			route1.setTravelCost(path1.travelCost);
 			route1.setDistance(RouteUtils.calcDistance(route1, this.scenario.getNetwork()));
+			Leg leg1 = (Leg)plan1.getPlanElements().get(1);
 			leg1.setRoute(route1);
 
-			Leg leg2 = (Leg)plan2.getPlanElements().get(1);
 			NetworkRoute route2 = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, origAct21.getLinkId(), origAct12.getLinkId());
 			route2.setLinkIds(origAct21.getLinkId(), NetworkUtils.getLinkIds(path2.links), origAct12.getLinkId());
 			route2.setTravelTime((int) path2.travelTime);
 			route2.setTravelCost(path2.travelCost);
 			route2.setDistance(RouteUtils.calcDistance(route2, this.scenario.getNetwork()));
+			Leg leg2 = (Leg)plan2.getPlanElements().get(1);
 			leg2.setRoute(route2);
 	
 			((ActivityImpl)origAct12).setLinkId(route1.getEndLinkId());
