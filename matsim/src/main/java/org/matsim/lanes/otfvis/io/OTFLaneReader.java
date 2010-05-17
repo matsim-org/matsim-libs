@@ -48,7 +48,7 @@ public class OTFLaneReader extends OTFDataReader {
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
-		int isQLinkLanesIndicator = in.getInt();
+		short isQLinkLanesIndicator = in.getShort();
 		if (isQLinkLanesIndicator == 1){
 			this.isQLinkLanesReader = true;
 		}

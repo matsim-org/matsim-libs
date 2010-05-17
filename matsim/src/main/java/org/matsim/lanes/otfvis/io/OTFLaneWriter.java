@@ -52,10 +52,10 @@ public class OTFLaneWriter extends OTFDataWriter<QLink> implements OTFWriterFact
 	@Override
 	public void writeConstData(ByteBuffer out) throws IOException {
 		if (! (this.src instanceof QLinkLanesImpl)) {
-			out.putInt(0);
+			out.putShort((short)0);
 		}
 		else {
-			out.putInt(1);
+			out.putShort((short)1);
 //		String id = this.src.getLink().getId().toString();
 //		ByteBufferUtils.putString(out, id);
 			Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
