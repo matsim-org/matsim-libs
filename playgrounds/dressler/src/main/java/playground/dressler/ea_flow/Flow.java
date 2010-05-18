@@ -1936,7 +1936,7 @@ public class Flow {
 						pid = person.getId();
 						
 						orgokay = true;
-						System.out.println("found person #" + i + "/" + nofpersons + " id " + pid + " at " + firstnode.getId());
+						//System.out.println("found person #" + i + "/" + nofpersons + " id " + pid + " at " + firstnode.getId());
 						
 						startLinkId = ((PlanImpl) person.getPlans().get(0)).getFirstActivity().getLinkId();
 						startindex = 0;
@@ -1952,14 +1952,14 @@ public class Flow {
 						pid = new IdImpl("new" + String.valueOf(id));
 						person = new PersonImpl(pid);
 						id++;
-						System.out.println("created person #" + i + "/" + nofpersons + " id " + pid + " at " + firstnode.getId());
+						//System.out.println("created person #" + i + "/" + nofpersons + " id " + pid + " at " + firstnode.getId());
 
 						startLinkId = ids.get(0);
 						startindex = 1;
 					}
 					
 					
-					System.out.println("starts on link " + startLinkId + " from " + this._network.getLinks().get(startLinkId).getFromNode().getId() + " --> " + this._network.getLinks().get(startLinkId).getToNode().getId());
+					//System.out.println("starts on link " + startLinkId + " from " + this._network.getLinks().get(startLinkId).getFromNode().getId() + " --> " + this._network.getLinks().get(startLinkId).getToNode().getId());
 					
 					// add "sink flow"
 					Id endLinkId = ids.getLast();
