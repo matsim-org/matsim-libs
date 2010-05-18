@@ -46,6 +46,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 
 import playground.yu.utils.io.ScoreModificationReader;
+import playground.yu.utils.io.SimpleWriter;
 import playground.yu.utils.math.MatrixUtils;
 import Jama.Matrix;
 import Jama.QRDecomposition;
@@ -188,7 +189,7 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		matrixOutputFilename = "../integration-demandCalibration1.0.1/test/output/prepare/popLinksMatrix.log", //
 		scoreModificationFilename = "../integration-demandCalibration1.0.1/test/output/calibration/CalibrationTest/testLogLikelihood/scoreModification.log", //
 		matrixA_bFilename = "../integration-demandCalibration1.0.1/test/output/prepare/popLinksMatrixA_b.log", //
-		matrixXFilename = "../integration-demandCalibration1.0.1/test/output/prepare/x.log", //
+		linkUtilityOffsetFilename = "../integration-demandCalibration1.0.1/test/output/prepare/linkIdTimeBinX.log", //
 		matrixResidualFilename = "../integration-demandCalibration1.0.1/test/output/prepare/residual.log";
 
 		Scenario scenario = new ScenarioImpl();
@@ -242,11 +243,12 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 				x = MatrixUtils.getMinimumNormSolution(A, b);
 			}
 
-			// x.print(new DecimalFormat(), 10);
+			SimpleWriter writer = new SimpleWriter(linkUtilityOffsetFilename);
 			for (int i = 0; i < x.getRowDimension(); i++) {
-				System.out.println(pltbmc.linkTimeBinSequence2.get(i)
+				writer.writeln(pltbmc.linkTimeBinSequence2.get(i)
 						+ "\tutiliyOffset\t" + x.get(i, 0));
 			}
+			writer.close();
 
 			Matrix Residual = A.times(x).minus(b);
 			System.out.println("Ax-b:");
