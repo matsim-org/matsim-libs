@@ -34,7 +34,7 @@ import org.jfree.util.Log;
 import playground.jjoubert.Utilities.DateString;
 
 public class ProcessVehicles {
-	private static String root = "/home/jjoubert/data/DigiCore/";
+	private static String root = "/home/jwjoubert/MATSim/MATSimData/DigiCore/2009/";
 	private static String filename = "Poslog_Research_Data.txt";
 	private static String delimiter = ",";
 	private static long startLine = 1;
