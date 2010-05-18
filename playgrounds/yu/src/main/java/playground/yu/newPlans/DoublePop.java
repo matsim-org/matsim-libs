@@ -95,7 +95,7 @@ public class DoublePop extends NewPopulation {
 	public static void main(final String[] args) {
 
 		String networkFilename = "../integration-parameterCalibration/test/prepare2/network.xml";
-		String plansFilename = "../integration-parameterCalibration/test/prepare2/pop1.xml";
+		String plansFilename = "../matsim/test/scenarios/equil/plans1.xml";
 		String outputPlansFilename = "../integration-parameterCalibration/test/prepare2/pop200.xml";
 
 		ScenarioImpl s = new ScenarioImpl();

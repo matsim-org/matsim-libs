@@ -67,6 +67,7 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 	 * as the column index in Matrix>
 	 */
 	private Map<String, Integer> linkTimeBinSequence = new HashMap<String, Integer>();
+	private Map<Integer, String> linkTimeBinSequence2 = new HashMap<Integer, String>();
 	/**
 	 * Map<perosnId, personIndex in Collection, which will be used as the row
 	 * index in Matrix>
@@ -104,11 +105,15 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 	public void init() {
 		int colIdx = 0;
 		for (Link link : this.network.getLinks().values())
-			for (int tb = CALIBRATION_START_TIMEBIN; tb <= CALIBRATION_END_TIMEBIN; tb++)
-				this.linkTimeBinSequence.put(link.getId() + "_" + tb, colIdx++);// 1.transfers
-		// value,
-		// 2.++
-
+			for (int tb = CALIBRATION_START_TIMEBIN; tb <= CALIBRATION_END_TIMEBIN; tb++) {
+				String linkTimeBin = "linkId\t" + link.getId() + "\ttimeBin\t"
+						+ tb;
+				this.linkTimeBinSequence.put(linkTimeBin, colIdx++);// 1.transfers
+				// value,
+				// 2.++
+				this.linkTimeBinSequence2.put(this.linkTimeBinSequence
+						.get(linkTimeBin), linkTimeBin);
+			}
 		int rowIdx = 0;
 		for (Person person : this.population.getPersons().values())
 			this.personSequence.put(person.getId(), rowIdx++);// 1.transfers
@@ -126,6 +131,10 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		return personSequence;
 	}
 
+	public Map<Integer, String> getLinkTimeBinSequence2() {
+		return linkTimeBinSequence2;
+	}
+
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		double time = event.getTime();
@@ -133,7 +142,8 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		if (timeBin >= CALIBRATION_START_TIMEBIN
 				&& timeBin <= CALIBRATION_END_TIMEBIN) {
 			int rowIdx = this.personSequence.get(event.getPersonId()), //
-			colIdx = this.linkTimeBinSequence.get(event.getLinkId() + "_"
+			colIdx = this.linkTimeBinSequence.get("linkId\t"
+					+ event.getLinkId() + "\ttimeBin\t"
 					+ getCalibrationTimeBin(time));
 			this.matrix.set(rowIdx, colIdx,
 					this.matrix.get(rowIdx, colIdx) + 1d);
@@ -177,7 +187,9 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		eventsFilename = "../integration-demandCalibration1.0.1/test/output/calibration/CalibrationTest/testLogLikelihood/ITERS/it.300/300.events.txt.gz", //
 		matrixOutputFilename = "../integration-demandCalibration1.0.1/test/output/prepare/popLinksMatrix.log", //
 		scoreModificationFilename = "../integration-demandCalibration1.0.1/test/output/calibration/CalibrationTest/testLogLikelihood/scoreModification.log", //
-		matrixA_bFilename = "../integration-demandCalibration1.0.1/test/output/prepare/popLinksMatrixA_b.log", matrixXFilename = "../integration-demandCalibration1.0.1/test/output/prepare/x.log", matrixResidualFilename = "../integration-demandCalibration1.0.1/test/output/prepare/residual.log";
+		matrixA_bFilename = "../integration-demandCalibration1.0.1/test/output/prepare/popLinksMatrixA_b.log", //
+		matrixXFilename = "../integration-demandCalibration1.0.1/test/output/prepare/x.log", //
+		matrixResidualFilename = "../integration-demandCalibration1.0.1/test/output/prepare/residual.log";
 
 		Scenario scenario = new ScenarioImpl();
 
@@ -205,14 +217,12 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		// Map<Id, Double> b=smReader.get
 
 		int m = A.getRowDimension(), n = A.getColumnDimension();
+		System.out.println("A mxn:\t" + m + "\tx\t" + n);
 
 		Matrix b = new Matrix(m, 1);
 		for (Entry<Id, Integer> personIdRowIdxEntry : pltbmc
 				.getPersonSequence().entrySet()) {
 			int rowIdx = personIdRowIdxEntry.getValue();
-			// for (int colIdx = 0; colIdx < n; colIdx++) {
-			// A_b.set(rowIdx, colIdx, A.get(rowIdx, colIdx));
-			// }
 			double scoreModification = smReader
 					.getPersonUtilityOffset(personIdRowIdxEntry.getKey()/* personId */);
 			// A_b.set(rowIdx, n, scoreModification);
@@ -221,39 +231,28 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		Matrix A_b = MatrixUtils.getAugmentMatrix(A, b);
 		System.out.println("rank[A_b] =\t" + A_b.rank());
 
-		try {
-			A_b.print(new PrintWriter(matrixA_bFilename), 100, 2);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		A_b.print(new DecimalFormat(), 10);
+
 		Matrix x;
 		if (A.rank() == A_b.rank()) {
 			if (new QRDecomposition(A).isFullRank()) {
 				x = A.solve(b);
 
 			} else {
-				// Matrix G = A.inverse();// Generalized inverse?
-				//
-				// Matrix z = new Matrix(n, 1, 0d);
-				// z.set(0, 0, 1d);
-				//
-				// Matrix I = new Matrix(n, n, 0d);
-				// for (int i = 0; i < n; i++)
-				// I.set(i, i, 1d);
-				//
-				// x = G.times(b).plus(I.minus(G.times(A)).minus(z));
 				x = MatrixUtils.getMinimumNormSolution(A, b);
 			}
 
-			x.print(new DecimalFormat(), 10);
-
-			Matrix Residual = A.times(x).minus(b);
-			try {
-				Residual.print(new PrintWriter(matrixResidualFilename), 1, 2);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+			// x.print(new DecimalFormat(), 10);
+			for (int i = 0; i < x.getRowDimension(); i++) {
+				System.out.println(pltbmc.linkTimeBinSequence2.get(i)
+						+ "\tutiliyOffset\t" + x.get(i, 0));
 			}
 
+			Matrix Residual = A.times(x).minus(b);
+			System.out.println("Ax-b:");
+			Residual.print(new DecimalFormat("0.###E00"), 10);
+			System.out.println("b:");
+			b.print(new DecimalFormat("0.###E00"), 10);
 			double rnorm = Residual.normInf();
 			System.out.println("Matrix\tResidual Infinity norm:\t" + rnorm);
 		}

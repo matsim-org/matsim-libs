@@ -69,7 +69,9 @@ public class MatrixUtils {
 	}
 
 	/**
-	 * it should be used with consistent Linear equation system Ax=y
+	 * it should be used with consistent Linear equation system Ax=y,
+	 * (rank[A]==rank[A_y]),das linear equation system should not be
+	 * overdetermine
 	 * 
 	 * @param A
 	 *            Coefficient matrix
@@ -99,21 +101,31 @@ public class MatrixUtils {
 
 	public static boolean equals(Matrix A, Matrix B) {
 		int m = A.getRowDimension(), n = A.getColumnDimension();
-		if (m != B.getRowDimension())
+		if (m != B.getRowDimension()) {
+			System.out.println("UNEQUALS :\tdifferent row dimention");
 			return false;
-		if (n != B.getColumnDimension())
+		}
+		if (n != B.getColumnDimension()) {
+			System.out.println("UNEQUALS :\tdifferent column dimention");
 			return false;
+		}
 		for (int i = 0; i < m; i++)
 			for (int j = 0; j < n; j++)
-				if (A.get(i, j) != B.get(i, j))
+				if (Math.abs(A.get(i, j) - B.get(i, j)) > 1e-12) {
+					System.out.println("UNEQUALS :\tdifferent element at [\t"
+							+ i + ",\t" + j + "], A :\t" + A.get(i, j)
+							+ "\tB :\t" + B.get(i, j));
 					return false;
+				}
 		return true;
 	}
 
 	public static Matrix getGeneralizedInverse(Matrix A) {
 		FullRankDecomposition frd = new FullRankDecomposition(A);
 		Matrix F_t = frd.getF().transpose(), G_t = frd.getG().transpose();
-		return G_t.times(F_t.times(A).times(G_t).inverse()).times(F_t);
+		Matrix F_txAxG_t = F_t.times(A).times(G_t);
+		System.out.println("F_txAxG_t^-1 =\t" + F_txAxG_t.det());
+		return G_t.times(F_txAxG_t.inverse()).times(F_t);
 	}
 
 	public static void main(String[] args) {
@@ -144,8 +156,6 @@ public class MatrixUtils {
 			// r
 			// rows
 			Matrix TE = pge.getTotalElementaryMatrix();
-			System.out.println("TE:\t");
-			TE.print(new DecimalFormat(), 10);
 			this.F = TE.inverse().getMatrix(0/*
 											 * init row Idx
 											 */, m - 1/* final row idx */, 0/*
@@ -173,7 +183,7 @@ public class MatrixUtils {
 					{ 2d, 3d, 2d, 6d }, {
 					// 8d, 4d, 3d, 2d
 							4d, 6d, 4d, 12d //
-					}, { 0d, 0d, 0d, 2d }, { 0d, 0d, 0d, 3d } };
+					}, { 1d, 1d, 1d, 1d } };
 			Matrix A = new Matrix(a);
 
 			FullRankDecomposition frd = new FullRankDecomposition(A);
@@ -245,9 +255,16 @@ public class MatrixUtils {
 					// Row-multiplying and Row-addition
 					{
 						Matrix E = Matrix.identity(m, m);// Identity matrix
-						for (int u = i + 1; u < m; u++)
-							E.set(u, j, -this.REF.get(u, j)
-									/ this.REF.get(i, j));
+						for (int u = i + 1; u < m; u++) {
+							double value = -this.REF.get(u, j)
+									/ this.REF.get(i, j);
+							if (value != 0d) {
+								E.set(u, i/* VERY IMPORTANT */, value);
+								// System.out.println("E.set(\tu =\t" + u
+								// + ", j =\t" + j + ", value =\t" + value
+								// + ")");
+							}
+						}
 						// end for u
 						this.REF = E.times(this.REF);
 						this.TE = E.times(TE);
@@ -263,7 +280,7 @@ public class MatrixUtils {
 					{ 2d, 3d, 2d, 6d }, {
 					// 8d, 4d, 3d, 2d
 							4d, 6d, 4d, 12d //
-					}, { 0d, 0d, 0d, 2d }, { 0d, 0d, 0d, 3d } };
+					}, { 1d, 1d, 1d, 1d } };
 			Matrix A = new Matrix(a);
 			PivotGaussianElimination pge = new PivotGaussianElimination(A);
 			System.out.println("A\t:");
