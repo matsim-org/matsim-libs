@@ -29,15 +29,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-import org.jfree.util.Log;
+import org.apache.log4j.Logger;
 
 import playground.jjoubert.Utilities.DateString;
 
 public class ProcessVehicles {
+	private static Logger log = Logger.getLogger(ProcessVehicles.class);
 	private static String root = "/home/jwjoubert/MATSim/MATSimData/DigiCore/2009/";
 	private static String filename = "Poslog_Research_Data.txt";
 	private static String delimiter = ",";
-	private static long startLine = 1;
+	private static long startLine = 2;
 	private static long numberOfLinesToRead = Long.MAX_VALUE;
 
 	private static int fieldVehId;
@@ -100,21 +101,21 @@ public class ProcessVehicles {
 		fieldStatus = Integer.parseInt(args[4]);
 		fieldSpeed = Integer.parseInt(args[5]);
 		
-		System.out.println("=================================================================");
-		System.out.println("  Splitting the DigiCore data file into seperate vehicle files.");
-		System.out.println("=================================================================");
-		System.out.println();
+		log.info("=================================================================");
+		log.info("  Splitting the DigiCore data file into seperate vehicle files.");
+		log.info("=================================================================");
 		long line = 0;
 		long linesRead = 0;
 		long reportValue = 1;
 
 		File outputFolder = new File(root + "Vehicles/");
 		if(outputFolder.exists()){
-			System.err.printf("The folder %s already exists! Delete, and rerun.", outputFolder.getPath());
+			String s = "The folder %s already exists! Delete " + outputFolder.getPath() + " and rerun.";
+			throw new RuntimeException(s);
 		} else{
 			boolean checkDirectory = outputFolder.mkdirs();
 			if(!checkDirectory){
-				Log.warn("Could not make " + outputFolder.toString() + ", or it already exists!");
+				log.warn("Could not make " + outputFolder.toString() + ", or it already exists!");
 			}
 		}		
 
@@ -212,8 +213,7 @@ public class ProcessVehicles {
 
 										// Update report
 										if(linesRead == reportValue){
-											System.out.println(String.valueOf(linesRead));
-											System.out.printf("   Lines read... ");
+											log.info("   Lines read... " + linesRead);
 											reportValue *= 2;
 										}
 									}
@@ -238,7 +238,9 @@ public class ProcessVehicles {
 			e1.printStackTrace();
 		}
 					
-		System.out.print(String.valueOf(linesRead));
-		System.out.printf(" (Done)\n");
+		log.info("   Lines read... " + linesRead + " (Done)");
+		log.info("----------------------------------");
+		log.info("   Process complete.");
+		log.info("==================================");
 	}
 }
