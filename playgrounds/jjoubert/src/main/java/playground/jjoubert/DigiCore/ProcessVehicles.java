@@ -34,10 +34,18 @@ import org.jfree.util.Log;
 import playground.jjoubert.Utilities.DateString;
 
 public class ProcessVehicles {
-	private static String delimiter = ","; 
 	private static String root = "/home/jjoubert/data/DigiCore/";
-	private static long startLine = 0;
+	private static String filename = "Poslog_Research_Data.txt";
+	private static String delimiter = ",";
+	private static long startLine = 1;
 	private static long numberOfLinesToRead = Long.MAX_VALUE;
+
+	private static int fieldVehId;
+	private static int fieldTime;
+	private static int fieldLong;
+	private static int fieldLat;
+	private static int fieldStatus;
+	private static int fieldSpeed;
 	
 	/**
 	 * This class only has a main method. It is invoked on its own to process the single file 
@@ -82,7 +90,16 @@ public class ProcessVehicles {
 	 * @author jwjoubert
 	 */
 	public static void main( String[] args){
-
+		if(args.length != 6){
+			throw new RuntimeException("Must provide 5 field arguments: VehId, Time, Long, Lat, Status and Speed.");
+		}
+		fieldVehId = Integer.parseInt(args[0]);
+		fieldTime = Integer.parseInt(args[1]);
+		fieldLong = Integer.parseInt(args[2]);
+		fieldLat = Integer.parseInt(args[3]);
+		fieldStatus = Integer.parseInt(args[4]);
+		fieldSpeed = Integer.parseInt(args[5]);
+		
 		System.out.println("=================================================================");
 		System.out.println("  Splitting the DigiCore data file into seperate vehicle files.");
 		System.out.println("=================================================================");
@@ -110,7 +127,7 @@ public class ProcessVehicles {
 			BufferedWriter logRecords = new BufferedWriter(new FileWriter(new File(root + "logRecordsRead_" + ds.toString() + ".txt")));
 			try{
 				try {
-					input = new Scanner(new BufferedReader(new FileReader(new File( root + "Poslog_Research_Data.csv"))));
+					input = new Scanner(new BufferedReader(new FileReader(new File( root + filename))));
 
 					if( input.hasNextLine() ){			
 
@@ -121,21 +138,21 @@ public class ProcessVehicles {
 						if(line >= startLine || linesRead <= numberOfLinesToRead){
 							if(inputString.length == 6){
 								// Open the file for the vehicle 
-								vehicleFile = root + "Vehicles/" + inputString[0] + ".txt";
+								vehicleFile = root + "Vehicles/" + inputString[fieldVehId] + ".txt";
 								output = new BufferedWriter(new FileWriter(vehicleFile, true) , 10000 );
 
 								// Write the record to the associated file
-								output.write(inputString[0]); // Vehicle ID
+								output.write(inputString[fieldVehId]); // Vehicle ID
 								output.write(delimiter);
-								output.write(inputString[1]); // Time stamp
+								output.write(inputString[fieldTime]); // Time stamp
 								output.write(delimiter);
-								output.write(inputString[2]); // X (longitude)
+								output.write(inputString[fieldLong]); // X (longitude)
 								output.write(delimiter);
-								output.write(inputString[3]); // Y (latitude)
+								output.write(inputString[fieldLat]); // Y (latitude)
 								output.write(delimiter);
-								output.write(inputString[4]); // Status
+								output.write(inputString[fieldStatus]); // Status
 								output.write(delimiter);
-								output.write(inputString[5]); // Speed
+								output.write(inputString[fieldSpeed]); // Speed
 								output.newLine();
 
 								linesRead++;
@@ -151,7 +168,7 @@ public class ProcessVehicles {
 							}
 
 
-							String vehID = inputString[0];
+							String vehID = inputString[fieldVehId];
 							while ( input.hasNextLine() ){
 
 								// Read the next input line
@@ -160,12 +177,12 @@ public class ProcessVehicles {
 
 								if(line >= startLine || linesRead <= numberOfLinesToRead){
 									if(inputString.length == 6){
-										if ( !vehID.equalsIgnoreCase(inputString[0])) {
+										if ( !vehID.equalsIgnoreCase(inputString[fieldVehId])) {
 											// Close the file for the current vehicle.
 											output.close();
 
 											// Open the file for the new vehicle.
-											vehicleFile = root + "Vehicles/" + inputString[0] + ".txt";
+											vehicleFile = root + "Vehicles/" + inputString[fieldVehId] + ".txt";
 											try {
 												output = new BufferedWriter(new FileWriter(vehicleFile, true) , 100000 );
 											} catch (IOException e) {
@@ -174,24 +191,24 @@ public class ProcessVehicles {
 										}
 
 										// Write the record to the new file
-										output.write(inputString[0]); // Vehicle ID
+										output.write(inputString[fieldVehId]); // Vehicle ID
 										output.write(delimiter);
-										output.write(inputString[1]); // Time stamp
+										output.write(inputString[fieldTime]); // Time stamp
 										output.write(delimiter);
-										output.write(inputString[2]); // X (longitude)
+										output.write(inputString[fieldLong]); // X (longitude)
 										output.write(delimiter);
-										output.write(inputString[3]); // Y (latitude)
+										output.write(inputString[fieldLat]); // Y (latitude)
 										output.write(delimiter);
-										output.write(inputString[4]); // Status
+										output.write(inputString[fieldStatus]); // Status
 										output.write(delimiter);
-										output.write(inputString[5]); // Speed
+										output.write(inputString[fieldSpeed]); // Speed
 										output.newLine();
 
 										linesRead++;
 										logRecords.write(String.valueOf(linesRead));
 										logRecords.newLine();
 
-										vehID = inputString[0];
+										vehID = inputString[fieldVehId];
 
 										// Update report
 										if(linesRead == reportValue){
