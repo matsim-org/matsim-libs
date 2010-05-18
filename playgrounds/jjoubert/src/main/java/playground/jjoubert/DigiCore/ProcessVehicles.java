@@ -110,7 +110,7 @@ public class ProcessVehicles {
 
 		File outputFolder = new File(root + "Vehicles/");
 		if(outputFolder.exists()){
-			String s = "The folder %s already exists! Delete " + outputFolder.getPath() + " and rerun.";
+			String s = "The folder already exists! Delete " + outputFolder.getPath() + " and rerun.";
 			throw new RuntimeException(s);
 		} else{
 			boolean checkDirectory = outputFolder.mkdirs();
@@ -162,8 +162,7 @@ public class ProcessVehicles {
 
 								// Update report
 								if(linesRead == reportValue){
-									System.out.println(String.valueOf(linesRead));
-									System.out.printf("   Lines read... ");
+									log.info("   Lines read... " + linesRead);
 									reportValue *= 2;
 								}
 							}
