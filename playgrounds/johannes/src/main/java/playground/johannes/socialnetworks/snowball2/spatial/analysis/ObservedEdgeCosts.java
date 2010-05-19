@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KMLWriter.java
+ * ObservedEdgeCosts.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.spatial;
+package playground.johannes.socialnetworks.snowball2.spatial.analysis;
 
-import java.io.IOException;
+import java.util.Set;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCosts;
+import playground.johannes.socialnetworks.graph.spatial.generators.EdgeCostFunction;
+import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
+import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledVertexDecorator;
 
 /**
  * @author illenberger
  *
  */
-public class NormalizedDistribution {
+public class ObservedEdgeCosts extends EdgeCosts {
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		SpatialSparseGraph graph;
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		graph = reader.readGraph(args[0]);
-		
-		ZoneLayerLegacy zones = ZoneLayerLegacy.createFromShapeFile(args[1]);
-		
-		String output = args[2];
-		
-		Distribution distr = SpatialGraphStatistics.normalizedEdgeLengthDistribution(graph.getVertices(), graph, 1000, zones);
-		Distribution.writeHistogram(distr.absoluteDistribution(1000), output + "distance.norm.txt");
-		Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistribution(1000)), output + "distance.norm.norm.txt");
-		Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionLog2(1000)), output + "distance.norm.log2.norm.txt");
+	public ObservedEdgeCosts(EdgeCostFunction costFunction) {
+		super(costFunction);
+	}
+
+	@Override
+	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
+		Set<SpatialSampledVertexDecorator<SpatialVertex>> spatialVertices = (Set<SpatialSampledVertexDecorator<SpatialVertex>>)vertices;
+		return super.distribution(SnowballPartitions.createSampledPartition(spatialVertices));
+	}
+
+	@Override
+	public Distribution vertexCostsSum(Set<? extends SpatialVertex> vertices) {
+		Set<SpatialSampledVertexDecorator<SpatialVertex>> spatialVertices = (Set<SpatialSampledVertexDecorator<SpatialVertex>>)vertices;
+		return super.vertexCostsSum(SnowballPartitions.createSampledPartition(spatialVertices));
 	}
 
 }

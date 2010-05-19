@@ -23,6 +23,8 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
@@ -44,13 +46,23 @@ public class ErgmEdgeCost implements GraphProbability {
 	public ErgmEdgeCost(AdjacencyMatrix<? extends SpatialVertex> y, EdgeCostFunction costFunction, double budget, String thetaFile) {
 		this.costFunction = costFunction;
 		
-		TObjectDoubleHashMap<SpatialVertex> budgets = new TObjectDoubleHashMap<SpatialVertex>();
+//		TObjectDoubleHashMap<SpatialVertex> budgets = new TObjectDoubleHashMap<SpatialVertex>();
+//		for(int i = 0; i < y.getVertexCount(); i++) {
+//			budgets.put(y.getVertex(i), budget);
+//		}
+		
+//		ThetaSolver solver = new ThetaSolver(costFunction);
+//		TObjectDoubleHashMap<SpatialVertex> tmpThetas = solver.solve(budgets);
+		
+		ThetaApproximator approximator = new ThetaApproximator();
+		Set<SpatialVertex> vertices = new HashSet<SpatialVertex>();
+		
 		for(int i = 0; i < y.getVertexCount(); i++) {
-			budgets.put(y.getVertex(i), budget);
+			vertices.add(y.getVertex(i));
 		}
 		
-		ThetaSolver solver = new ThetaSolver(costFunction);
-		TObjectDoubleHashMap<SpatialVertex> tmpThetas = solver.solve(budgets);
+		TObjectDoubleHashMap<SpatialVertex> tmpThetas = approximator.approximate(vertices, budget, costFunction);
+		
 		thetas = new double[y.getVertexCount()];
 		Distribution distr = new Distribution();
 		for(int i = 0; i < thetas.length; i++) {

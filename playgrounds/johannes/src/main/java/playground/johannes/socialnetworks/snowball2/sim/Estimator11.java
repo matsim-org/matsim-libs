@@ -119,6 +119,8 @@ public class Estimator11 implements BiasedDistribution {
 				
 				p = 1 - Math.pow(1 - num_k / proba_k, k);
 			}
+		
+			p *= stats.getResonseRate();
 			
 			probas.put(vertex, p);
 		}
@@ -217,7 +219,7 @@ public class Estimator11 implements BiasedDistribution {
 				degrees.add(vertex.getNeighbours().size());
 			}
 		}
-		discretizer = new FixedSampleSizeDiscretizer(degrees.toNativeArray(), 300);
+		discretizer = new FixedSampleSizeDiscretizer(degrees.toNativeArray(), 200);
 	}
 
 }

@@ -38,6 +38,7 @@ import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 
 /**
@@ -171,7 +172,7 @@ public class ThetaSolver {
 		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		SpatialSparseGraph graph = reader.read(args[0]);
 		
-		GravityCostFunction func = new GravityCostFunction(1.6, 1.0);
+		GravityCostFunction func = new GravityCostFunction(1.6, 1.0, new CartesianDistanceCalculator());
 		ThetaSolver solver = new ThetaSolver(func);
 		
 		TObjectDoubleHashMap<SpatialVertex> budgets = new TObjectDoubleHashMap<SpatialVertex>();

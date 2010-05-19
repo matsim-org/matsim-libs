@@ -57,16 +57,18 @@ public class VertexSamplingCounter implements SamplerListener {
 	
 	private Map<Vertex, double[]> probaTable;
 	
-	private int[] nsim = new int[15];
+	private int[] nsim = new int[maxIters];
 	
 	private BiasedDistribution estimator;
+	
+	private static final int maxIters = 40;
 	
 	public VertexSamplingCounter(Graph graph) {
 		countTable = new HashMap<Vertex, int[]>();
 		probaTable = new HashMap<Vertex, double[]>();
 		for(Vertex v : graph.getVertices()) {
-			countTable.put(v, new int[15]);
-			probaTable.put(v, new double[15]);
+			countTable.put(v, new int[maxIters]);
+			probaTable.put(v, new double[maxIters]);
 		}
 		
 	}
@@ -118,24 +120,25 @@ public class VertexSamplingCounter implements SamplerListener {
 		for(int i = 0; i < nSims; i++) {
 			Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>();
 			sampler.setSeedGenerator(new RandomSeedGenerator(10, (long) (Math.random() * nSims)));
+			sampler.setResponseGenerator(new RandomResponse(0.25, (long) (Math.random() * nSims)));
 			counter.reset(graph);
 			sampler.setListener(counter);
 			sampler.run(graph);
 		}
 		
-		TIntIntHashMap[] count_k = new TIntIntHashMap[15];
-		TDoubleDoubleHashMap[] p_obs_k = new TDoubleDoubleHashMap[15];
-		TDoubleDoubleHashMap[] p_estim_k = new TDoubleDoubleHashMap[15];
-		TIntIntHashMap[] count_estim_k = new TIntIntHashMap[15];
+		TIntIntHashMap[] count_k = new TIntIntHashMap[maxIters];
+		TDoubleDoubleHashMap[] p_obs_k = new TDoubleDoubleHashMap[maxIters];
+		TDoubleDoubleHashMap[] p_estim_k = new TDoubleDoubleHashMap[maxIters];
+		TIntIntHashMap[] count_estim_k = new TIntIntHashMap[maxIters];
 		
-		List<TIntObjectHashMap<TDoubleArrayList>> k_samples = new ArrayList<TIntObjectHashMap<TDoubleArrayList>>(15);
-		for(int i = 0; i < 15; i++) {
+		List<TIntObjectHashMap<TDoubleArrayList>> k_samples = new ArrayList<TIntObjectHashMap<TDoubleArrayList>>(maxIters);
+		for(int i = 0; i < maxIters; i++) {
 			k_samples.add(new TIntObjectHashMap<TDoubleArrayList>());
 		}
 		int maxSize = 0;
 		
-		double[] diffs = new double[15];
-		int[] samples = new int[15];
+		double[] diffs = new double[maxIters];
+		int[] samples = new int[maxIters];
 		for(Vertex v : graph.getVertices()) {
 			int k = v.getNeighbours().size();
 			int[] counts = counter.countTable.get(v);

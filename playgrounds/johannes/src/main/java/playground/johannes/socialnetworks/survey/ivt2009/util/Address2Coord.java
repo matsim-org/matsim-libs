@@ -98,17 +98,31 @@ public class Address2Coord {
 				String addressRow3 = tokens[addressIdx3];
 
 				Coord coord = null;
-				if (!addressRow1.equalsIgnoreCase("NA")
-						|| !addressRow2.equalsIgnoreCase("NA")
-						|| !addressRow3.equalsIgnoreCase("NA")) {
-					StringBuilder builder = new StringBuilder();
+//				if (!addressRow1.equalsIgnoreCase("NA")
+//						|| !addressRow2.equalsIgnoreCase("NA")
+//						|| !addressRow3.equalsIgnoreCase("NA")) {
+//					StringBuilder builder = new StringBuilder();
+//					builder.append(addressRow1);
+//					builder.append(", ");
+//					builder.append(addressRow2);
+//					builder.append(", ");
+//					builder.append(addressRow3);
+				StringBuilder builder = new StringBuilder();
+				if(!addressRow1.equalsIgnoreCase("NA")) {
 					builder.append(addressRow1);
 					builder.append(", ");
+				}
+				if(!addressRow2.equalsIgnoreCase("NA")) {
 					builder.append(addressRow2);
 					builder.append(", ");
+				}
+				if(!addressRow3.equalsIgnoreCase("NA")) {
 					builder.append(addressRow3);
+				}
 
-					coord = lookup.locationToCoord(builder.toString());
+				String queryString = builder.toString(); 
+				if(!queryString.isEmpty()) {
+					coord = lookup.locationToCoord(queryString);
 					if (lookup.getLastErrorCode() == 620) {
 						while (lookup.getLastErrorCode() == 620) {
 							if (lookupInterval > 5000) {

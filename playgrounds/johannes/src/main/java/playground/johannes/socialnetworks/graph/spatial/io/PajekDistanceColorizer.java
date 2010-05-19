@@ -23,13 +23,15 @@
  */
 package playground.johannes.socialnetworks.graph.spatial.io;
 
+import gnu.trove.TObjectDoubleHashMap;
+
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
-import gnu.trove.TObjectDoubleHashMap;
 import playground.johannes.socialnetworks.graph.io.PajekColorizer;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
 
 /**
  * @author illenberger
@@ -41,15 +43,14 @@ public class PajekDistanceColorizer extends PajekColorizer<SpatialSparseVertex, 
 	
 	private double d_max;
 	
-	private TObjectDoubleHashMap<SpatialSparseVertex> d_mean;
+	private TObjectDoubleHashMap<SpatialVertex> d_mean;
 	
 	private boolean logScale = false;
 	
-	@SuppressWarnings("unchecked")
 	public PajekDistanceColorizer(SpatialSparseGraph graph, boolean logScale) {
 		super();
 		setLogScale(logScale);
-		d_mean = (TObjectDoubleHashMap<SpatialSparseVertex>) SpatialGraphStatistics.meanEdgeLength(graph);
+		d_mean = new Distance().vertexMeanValues(graph.getVertices());
 		
 		d_min = Double.MAX_VALUE;
 		d_max = Double.MIN_VALUE;

@@ -43,7 +43,7 @@ import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixStatistics;
 import playground.johannes.socialnetworks.graph.mcmc.SampleHandler;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 
 /**
@@ -177,7 +177,7 @@ public class DumpHandler implements SampleHandler<SpatialSparseVertex> {
 		clustering.add(AdjacencyMatrixStatistics.getLocalClusteringCoefficient(y));
 		
 		y.synchronizeEdges(graph, builder);
-		distance.add(SpatialGraphStatistics.edgeLengthDistribution(graph).mean());
+		distance.add(new Distance().distribution(graph.getVertices()).mean());
 		
 		logger.info(String.format("VarK(m)=%1$.4f, VarK(<k>)=%2$.4f, VarK(<c_local>)=%3$.4f, VarK(<d>)=%4$.4f",
 				edges.coefficientOfVariance(),

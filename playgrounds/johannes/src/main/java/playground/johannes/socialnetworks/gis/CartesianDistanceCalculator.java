@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VertexBetweennessColorizer.java
+ * CartesianDistanceCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,49 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.io;
+package playground.johannes.socialnetworks.gis;
 
-import gnu.trove.TObjectDoubleIterator;
-
-import java.awt.Color;
-
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.io.Colorizable;
-
-import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.GraphStatistics.GraphDistance;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public class VertexBetweennessColorizer implements Colorizable<Vertex> {
+public class CartesianDistanceCalculator implements DistanceCalculator {
 
-	private Vertex vertex = null;
-	
-	public VertexBetweennessColorizer(Graph graph) {
-		GraphDistance dist = GraphStatistics.centrality(graph);
-		
-		double max = 0;
-		
-		TObjectDoubleIterator<Vertex> it = dist.getVertexBetweennees().iterator();
-		for(int i = 0; i < dist.getVertexBetweennees().size(); i++) {
-			it.advance();
-			if(it.value() > max) {
-				max = it.value();
-				vertex = it.key();
-			}
-		}
-		System.err.println("Max betweenness is " + max);
-	}
-	
-	@Override
-	public Color getColor(Vertex object) {
-		if(object == vertex)
-			return Color.RED;
-		else
-			return Color.WHITE;
+	public double distance(Point p1, Point p2) {
+		double dx = p1.getCoordinate().x - p2.getCoordinate().x;
+		double dy = p1.getCoordinate().y - p2.getCoordinate().y;
+		return Math.sqrt(dx*dx + dy*dy);
 	}
 
 }

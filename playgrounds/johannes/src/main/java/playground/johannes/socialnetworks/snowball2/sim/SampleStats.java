@@ -64,8 +64,8 @@ public class SampleStats {
 		}
 		
 		responseRate = 1;
-		if(maxIteration > 1)
-			responseRate = sampledAccumulated.get(maxIteration - 1)/(double)(detectedAccumulated.get(maxIteration - 2) + sampled.get(0));
+		if(maxIteration > 0)
+			responseRate = sampledAccumulated.get(maxIteration)/(double)(detectedAccumulated.get(maxIteration - 1) + sampled.get(0));
 	}
 	
 	public int getNumSampled(int iteration) {

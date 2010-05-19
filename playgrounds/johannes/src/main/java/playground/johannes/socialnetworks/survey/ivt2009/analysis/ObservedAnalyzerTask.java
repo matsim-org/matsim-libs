@@ -32,11 +32,14 @@ import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeDensityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCostsTask;
+import playground.johannes.socialnetworks.graph.spatial.generators.GravityCostFunction;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedTransitivity;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
 import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
+import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedEdgeCosts;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -78,6 +81,10 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		addTask(density);
 		
 		addTask(new ComponentsTask());
+		
+		EdgeCostsTask costs = new EdgeCostsTask(null);
+		costs.setModule(new ObservedEdgeCosts(new GravityCostFunction(1.6, 1.0)));
+		addTask(costs);
 	}
 
 }

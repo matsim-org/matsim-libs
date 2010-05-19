@@ -93,7 +93,7 @@ public class EdgeCostsTask extends ModuleAnalyzerTask<EdgeCosts> {
 		
 		if(getOutputDirectory() != null) {
 			try {
-				writeHistograms(distr, (sum_max-sum_min)/100.0, false, "costs_i");
+				writeHistograms(distr, (sum_max-sum_min)/20.0, false, "costs_i");
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

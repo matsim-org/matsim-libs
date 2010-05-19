@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import java.util.Collection;
+import gnu.trove.TObjectDoubleHashMap;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
@@ -63,21 +63,17 @@ public class Distance {
 		return distribution;
 	}
 	
-	public Distribution vertexAccumulatedCostDistribution(Collection<? extends SpatialVertex> vertices) {
-		Distribution distribution = new Distribution();
+	public TObjectDoubleHashMap<SpatialVertex> vertexMeanValues(Set<? extends SpatialVertex> vertices) {
+		TObjectDoubleHashMap<SpatialVertex> values = new TObjectDoubleHashMap<SpatialVertex>();
 		
-		for(SpatialVertex v_i : vertices) {
+		for(SpatialVertex vertex : vertices) {
 			double sum = 0;
-			for(Edge e : v_i.getEdges()) {
-				double d = ((SpatialEdge) e).length();
-				d= Math.ceil(d/1000.0);
-				d=Math.max(1,d);
-//				sum += 15 * Math.log(d/2.0 + 1);
-				sum += Math.log(d);
-			}
-			distribution.add(sum);
+			for(SpatialEdge e : vertex.getEdges())
+				sum+= e.length();
+			
+			values.put(vertex, sum/(double)vertex.getEdges().size());
 		}
 		
-		return distribution;
+		return values;
 	}
 }

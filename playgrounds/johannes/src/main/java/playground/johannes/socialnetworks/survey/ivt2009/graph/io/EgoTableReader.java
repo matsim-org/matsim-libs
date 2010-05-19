@@ -123,23 +123,29 @@ public class EgoTableReader {
 		Record record = egos.get(egoId);
 		if(record == null)
 			return null;
-		/*
-		 * check for valid addresses
-		 */
-		if (record.location1.equalsIgnoreCase("NA")
-				|| record.location2.equalsIgnoreCase("NA")
-				|| record.location3.equalsIgnoreCase("NA")) {
-			return null;
-		}
+//		/*
+//		 * check for valid addresses
+//		 */
+//		if (record.location1.equalsIgnoreCase("NA")
+//				|| record.location2.equalsIgnoreCase("NA")
+//				|| record.location3.equalsIgnoreCase("NA")) {
+//			return null;
+//		}
 		/*
 		 * build query string
 		 */
 		StringBuilder builder = new StringBuilder();
-		builder.append(record.location1);
-		builder.append(", ");
-		builder.append(record.location2);
-		builder.append(", ");
-		builder.append(record.location3);
+		if(!record.location1.equalsIgnoreCase("NA")) {
+			builder.append(record.location1);
+			builder.append(", ");
+		}
+		if(!record.location2.equalsIgnoreCase("NA")) {
+			builder.append(record.location2);
+			builder.append(", ");
+		}
+		if(!record.location3.equalsIgnoreCase("NA")) {
+			builder.append(record.location3);
+		}
 		/*
 		 * sleep if necessary
 		 */

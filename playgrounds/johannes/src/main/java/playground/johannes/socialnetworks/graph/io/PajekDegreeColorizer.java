@@ -26,9 +26,8 @@ package playground.johannes.socialnetworks.graph.io;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.math.Distribution;
-
-import playground.johannes.socialnetworks.graph.GraphStatistics;
 
 /**
  * @author illenberger
@@ -45,7 +44,7 @@ public class PajekDegreeColorizer<V extends Vertex, E extends Edge> extends Paje
 	public PajekDegreeColorizer(Graph g, boolean logScale) {
 		super();
 		setLogScale(logScale);
-		Distribution stats = GraphStatistics.degreeDistribution(g);
+		Distribution stats = new Degree().distribution(g.getVertices());
 		k_min = stats.min();
 		k_max = stats.max();
 	}

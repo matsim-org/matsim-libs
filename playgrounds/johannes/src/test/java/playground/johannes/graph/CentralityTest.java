@@ -24,8 +24,6 @@ import junit.framework.TestCase;
 import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 
-import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.GraphStatistics.GraphDistance;
 import playground.johannes.socialnetworks.graph.analysis.Centrality;
 
 /**

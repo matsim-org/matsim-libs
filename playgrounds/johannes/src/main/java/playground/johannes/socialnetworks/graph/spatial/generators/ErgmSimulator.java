@@ -35,6 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.xml.sax.SAXException;
 
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeSwitch;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
@@ -64,18 +65,6 @@ public class ErgmSimulator {
 		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		SpatialSparseGraph graph = reader.read(config.findParam("plans", "inputPlansFile"));
 		
-//		String zonesFile = config.findParam(MODULE_NAME, "zonesFile");
-//		String densityFile = config.findParam(MODULE_NAME, "densityFile");
-
-		
-//		ZoneLayerDouble zones = null;
-//		ZoneLayerLegacy layer = null;
-
-//		if(zonesFile != null && densityFile != null) {
-//			layer = ZoneLayerLegacy.createFromShapeFile(zonesFile);
-//			zones = ZoneLayerDouble.createFromFile(new HashSet<ZoneLegacy>(layer.getZones()), densityFile);
-//		}
-		
 		long randomSeed = Long.parseLong(config.getParam("global", "randomSeed"));
 
 		double k_mean = Double.parseDouble(config.getParam(MODULE_NAME, "meanDegree"));
@@ -85,11 +74,6 @@ public class ErgmSimulator {
 		String outputDir = config.getParam(MODULE_NAME, "output");
 		
 		double totalCost = Double.parseDouble(config.getParam(MODULE_NAME, "totalCost"));
-//		double beta = Double.parseDouble(config.getParam(MODULE_NAME, "beta"));
-//		boolean onlyCost = Boolean.parseBoolean(config.getParam(MODULE_NAME, "onlyCost"));
-//		boolean linear = Boolean.parseBoolean(config.getParam(MODULE_NAME, "linear"));
-//		boolean adjustCost = Boolean.parseBoolean(config.getParam(MODULE_NAME, "adjustCost"));
-//		double descretization = Double.parseDouble(config.getParam(MODULE_NAME, "descretization"));
 		
 		logger.info("Creating random graph...");
 		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten());
@@ -97,8 +81,6 @@ public class ErgmSimulator {
 		int k = (int)k_mean;
 		double p = k / (double)graph.getVertices().size();
 		generator.generate(graph, p, randomSeed);
-//		SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
-//		writer.write(graph, "/Users/fearonni/vsp-work/work/socialnets/mcmc/graphk10.graphml");
 		/*
 		 * convert graph to matrix
 		 */
@@ -106,20 +88,16 @@ public class ErgmSimulator {
 		/*
 		 * setup ergm terms.
 		 */
-//		ArrayList<ErgmTerm> terms = new ArrayList<ErgmTerm>();
 		
-		EdgeCostFunction costFunction = new GravityCostFunction(1.6, 0.0);
+		EdgeCostFunction costFunction = new GravityCostFunction(1.6, 1.0, new CartesianDistanceCalculator());
 		ErgmEdgeCost edgeCost = new ErgmEdgeCost(y, costFunction, totalCost, outputDir + "/thetas.txt");
-//		terms.add(edgeCost);
 		
 		Ergm ergm = new Ergm();
-//		ergm.setErgmTerms(terms.toArray(new ErgmTerm[1]));
 		ergm.addComponent(edgeCost);
 		/*
 		 * setup gibbs sampler.
 		 */
-//		GibbsSampler sampler = new GibbsSampler(randomSeed);
-		GibbsSampler sampler = new GibbsEdgeSwitch();
+		GibbsSampler sampler = new GibbsEdgeSwitch(randomSeed);
 		sampler.setInterval(1000000);
 		
 		DumpHandler handler = new DumpHandler(graph, builder, outputDir);

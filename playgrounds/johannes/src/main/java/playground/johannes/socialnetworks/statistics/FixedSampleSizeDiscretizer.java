@@ -52,6 +52,12 @@ public class FixedSampleSizeDiscretizer implements Discretizer {
 		}
 		if(size > 0)
 			borders.add(samples[samples.length - 1]);
+		
+//		System.out.println("----------- borders --------------");
+//		for(int i = 0; i < borders.size(); i++) {
+//			System.out.println(String.valueOf(borders.get(i)));
+//		}
+//		System.out.println("----------- borders --------------");
 	}
 	
 	@Override

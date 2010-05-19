@@ -21,6 +21,8 @@ package playground.johannes.socialnetworks.graph.spatial.generators;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 import playground.johannes.socialnetworks.statistics.Discretizer;
 import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
@@ -36,17 +38,22 @@ public class GravityCostFunction implements EdgeCostFunction {
 	
 	private Discretizer discretizer;
 	
+	private DistanceCalculator calculator;
+	
 	public GravityCostFunction(double gamma, double constant) {
+		this(gamma, constant, new OrthodromicDistanceCalculator());
+	}
+	
+	public GravityCostFunction(double gamma, double constant, DistanceCalculator calculator) {
 		this.gamma = gamma;
 		this.constant = constant;
 		discretizer = new LinearDiscretizer(1000.0);
+		this.calculator = calculator;
 	}
 	
 	@Override
 	public double edgeCost(SpatialVertex vi, SpatialVertex vj) {
-		double dx = vj.getPoint().getCoordinate().x - vi.getPoint().getCoordinate().x;
-		double dy = vj.getPoint().getCoordinate().y - vi.getPoint().getCoordinate().y;
-		double d = Math.max(1.0, discretizer.discretize(Math.sqrt(dx*dx + dy*dy)));
+		double d = Math.max(1.0, discretizer.discretize(calculator.distance(vi.getPoint(), vj.getPoint())));
 		
 		return gamma * Math.log(d) + constant;
 	}
