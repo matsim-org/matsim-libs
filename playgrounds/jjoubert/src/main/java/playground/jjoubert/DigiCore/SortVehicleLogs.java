@@ -30,7 +30,7 @@ public class SortVehicleLogs {
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
 //	final static String ROOT = "~/";												// IVT-Sim0
 //	final static String ROOT = "~/data/DigiCore/";									// Satawal
-	final static String ROOT = "/home/jwjoubert/MATSim/MATSimData/DigiCore/2009";	// IE-Calvin
+	final static String ROOT = "/home/jwjoubert/MATSim/MATSimData/DigiCore/2009/";	// IE-Calvin
 	
 	// Derived string values
 	final static String SOURCEFOLDER = ROOT + "Vehicles/";
