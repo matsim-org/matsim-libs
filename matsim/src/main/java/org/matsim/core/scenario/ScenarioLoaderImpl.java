@@ -41,6 +41,7 @@ import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
@@ -223,6 +224,14 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 				laneDefinitions = this.getScenario().getLaneDefinitions();
 				MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(laneDefinitions);
 				reader.readFile(this.config.network().getLaneDefinitionsFile());
+				this.getScenario().addScenarioElement(laneDefinitions);
+				if (!MatsimLaneDefinitionsReader.SCHEMALOCATIONV20.equals(reader.getLastReadFileFormat())){
+					log.warn("No laneDefinitions_v2.0 file specified in scenario. Trying to convert the v1.1 format to " +
+							"the v2.0 format. For details see LaneDefinitionsV11ToV20Conversion.java.");
+					LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
+					conversion.convertTo20(laneDefinitions, scenario.getNetwork());
+					this.getScenario().setLaneDefinitions(laneDefinitions);
+				}
 			}
 			else {
 				log.info("no lane definition file set in config or feature disabled, not able to load anything");

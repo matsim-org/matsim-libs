@@ -55,7 +55,6 @@ import org.matsim.signalsystems.CalculateAngle;
  * @author dgrether
  */
 public class LaneDefinitionsV11ToV20Conversion {
-
 	
 	public LaneDefinitions convertTo20(LaneDefinitions lanedefs11, Network network) {
 		LaneDefinitions lanedefs20 = new LaneDefinitionsImpl();
@@ -156,5 +155,6 @@ public class LaneDefinitionsV11ToV20Conversion {
 		}//end outer for
 		return lanedefs20;
 	}
+
 	
 }

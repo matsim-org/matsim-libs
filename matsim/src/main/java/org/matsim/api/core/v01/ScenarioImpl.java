@@ -254,6 +254,11 @@ public class ScenarioImpl implements Scenario {
 		this.population = population2;
 	}
 
+	@Deprecated
+	public void setLaneDefinitions(LaneDefinitions laneDefs){
+		this.laneDefinitions = laneDefs;
+	}
+	
 	public Households getHouseholds() {
 		if ((this.households == null) && this.config.scenario().isUseHouseholds()){
 			this.createHouseholdsContainer();
@@ -339,4 +344,5 @@ public class ScenarioImpl implements Scenario {
 
 		return set;
 	}
+
 }
