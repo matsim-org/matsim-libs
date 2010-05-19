@@ -188,9 +188,8 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		eventsFilename = "../integration-demandCalibration1.0.1/test/output/calibration/CalibrationTest/testLogLikelihood/ITERS/it.300/300.events.txt.gz", //
 		matrixOutputFilename = "../integration-demandCalibration1.0.1/test/output/prepare/popLinksMatrix.log", //
 		scoreModificationFilename = "../integration-demandCalibration1.0.1/test/output/calibration/CalibrationTest/testLogLikelihood/scoreModification.log", //
-		matrixA_bFilename = "../integration-demandCalibration1.0.1/test/output/prepare/popLinksMatrixA_b.log", //
-		linkUtilityOffsetFilename = "../integration-demandCalibration1.0.1/test/output/prepare/linkIdTimeBinX.log", //
-		matrixResidualFilename = "../integration-demandCalibration1.0.1/test/output/prepare/residual.log";
+
+		linkUtilityOffsetFilename = "../integration-demandCalibration1.0.1/test/output/prepare/linkIdTimeBinX.log";
 
 		Scenario scenario = new ScenarioImpl();
 
@@ -207,7 +206,7 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		events.addHandler(pltbmc);
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
-		pltbmc.writeMatrix(matrixOutputFilename);
+//		pltbmc.writeMatrix(matrixOutputFilename);
 
 		Matrix A = pltbmc.getMatrix();
 		System.out.println("rank[A] =\t" + A.rank());
@@ -232,7 +231,7 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		Matrix A_b = MatrixUtils.getAugmentMatrix(A, b);
 		System.out.println("rank[A_b] =\t" + A_b.rank());
 
-		A_b.print(new DecimalFormat(), 10);
+		// A_b.print(new DecimalFormat(), 10);
 
 		Matrix x;
 		if (A.rank() == A_b.rank()) {

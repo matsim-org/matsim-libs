@@ -25,9 +25,10 @@ package playground.yu.utils.qgis;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 
 import playground.yu.utils.io.LinkUtilityOffsetsReader;
 
@@ -36,73 +37,45 @@ import playground.yu.utils.io.LinkUtilityOffsetsReader;
  * 
  */
 public class LinkUtilityOffset2QGIS implements X2QGIS {
-	// public static class LinkUtilityOffset2PolygonGraph extends
-	// Network2PolygonGraph {
-	//
-	// public LinkUtilityOffset2PolygonGraph(NetworkLayer network,
-	// CoordinateReferenceSystem crs) {
-	// super(network, crs);
-	// }
-	//
-	// protected double getLinkWidth(Link link) {
-	// Integer i = (Integer) parameters.get(0).get(link.getId());
-	// return (i.intValue()) * 1e4;
-	// }
-	//
-	// @Override
-	// public Collection<Feature> getFeatures() throws SchemaException,
-	// NumberFormatException, IllegalAttributeException {
-	// for (int i = 0; i < attrTypes.size(); i++)
-	// defaultFeatureTypeFactory.addType(attrTypes.get(i));
-	// FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
-	// for (Link link : this.links2paint == null ? this.network.getLinks()
-	// .values() : this.links2paint) {
-	// LinearRing lr = getLinearRing(link);
-	// Polygon p = new Polygon(lr, null, this.geofac);
-	// MultiPolygon mp = new MultiPolygon(new Polygon[] { p },
-	// this.geofac);
-	// int size = 9 + parameters.size();
-	// Object[] o = new Object[size];
-	// o[0] = mp;
-	// o[1] = link.getId().toString();
-	// o[2] = link.getFromNode().getId().toString();
-	// o[3] = link.getToNode().getId().toString();
-	// o[4] = link.getLength();
-	// o[5] = link.getCapacity() / network.getCapacityPeriod()
-	// * 3600.0;
-	// o[6] = (((LinkImpl) link).getType() != null) ? Integer
-	// .parseInt(((LinkImpl) link).getType()) : 0;
-	// o[7] = link.getFreespeed();
-	// o[8] = link.getAllowedModes();
-	// for (int i = 0; i < parameters.size(); i++) {
-	// o[i + 8] = parameters.get(i).get(link.getId());
-	// }
-	// // parameters.get(link.getId().toString()) }
-	// Feature ft = ftRoad.create(o, "network");
-	// features.add(ft);
-	// }
-	// return features;
-	// }
-	// }
 
-	// ------------------------------------------------------------------------
-	private Map<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>> linkUtiliyOffsets = new HashMap<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>>();
-	private Set<Integer> timBins;
+	private Map<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>> linkUtiliyOffsets = new HashMap<Integer, Map<Id, Double>>();
+	// private Set<Integer> timBins;
+	private Map<String/* linkId */, Id/* linkId */> stringIds = new HashMap<String, Id>();
+	private Network network;
 
-	public Set<Integer> getTimBins() {
-		return timBins;
-	}
+	// public Set<Integer> getTimBins() {
+	// return timBins;
+	// }
 
 	public Map<Integer, Map<Id, Double>> getLinkUtiliyOffsets() {
 		return linkUtiliyOffsets;
 	}
 
-	public LinkUtilityOffset2QGIS(String utilityOffsetsFilename) {
+	public LinkUtilityOffset2QGIS(String utilityOffsetsFilename, Network network) {
+		this.network = network;
 		LinkUtilityOffsetsReader reader = new LinkUtilityOffsetsReader(
 				utilityOffsetsFilename);
 		reader.parse();
 		this.linkUtiliyOffsets = reader.getLinkUtiliyOffsets();
-		timBins = this.linkUtiliyOffsets.keySet();
+		// timBins = this.linkUtiliyOffsets.keySet();
+		this.RationalizeIds();
+	}
+
+	private void RationalizeIds() {
+		for (Id linkId : this.network.getLinks().keySet())
+			this.stringIds.put(linkId.toString(), linkId);
+		// end for
+		Map<Integer, Map<Id, Double>> tmpLinkUtiliyOffsets = new HashMap<Integer, Map<Id, Double>>();
+		for (Integer timeBin : this.linkUtiliyOffsets.keySet()) {
+			Map<Id, Double> linkIdUO = this.linkUtiliyOffsets.get(timeBin);
+			Map<Id, Double> rationalizedlinkIdUO = new HashMap<Id, Double>();
+			for (Entry<Id, Double> linkIdUOEntry : linkIdUO.entrySet()) {
+				rationalizedlinkIdUO.put(this.stringIds.get(linkIdUOEntry
+						.getKey().toString()), linkIdUOEntry.getValue());
+			}
+			tmpLinkUtiliyOffsets.put(timeBin, rationalizedlinkIdUO);
+		}
+		this.linkUtiliyOffsets.putAll(tmpLinkUtiliyOffsets);
 	}
 
 	/**
@@ -114,11 +87,10 @@ public class LinkUtilityOffset2QGIS implements X2QGIS {
 
 		MATSimNet2QGIS net2qgis = new MATSimNet2QGIS(netFilename, gk4);
 		LinkUtilityOffset2QGIS luos2qgis = new LinkUtilityOffset2QGIS(
-				utilityOffsetsFilename);
-		for (Integer timeBin : luos2qgis.getTimBins()) {
+				utilityOffsetsFilename, net2qgis.getNetwork());
+		for (Integer timeBin : luos2qgis.getLinkUtiliyOffsets().keySet()) {
 			net2qgis.addParameter(timeBin + "hour", Double.class, luos2qgis
 					.getLinkUtiliyOffsets().get(timeBin));
-
 		}
 		net2qgis
 				.writeShapeFile("../integration-demandCalibration1.0.1/test/output/calibration/CalibrationTest/testLogLikelihood/linkUtilityOffset.shp");

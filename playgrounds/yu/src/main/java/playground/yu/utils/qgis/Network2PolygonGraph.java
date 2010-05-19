@@ -35,6 +35,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -47,7 +48,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- *
+ * 
  */
 public class Network2PolygonGraph extends X2GraphImpl {
 	protected Set<Link> links2paint = null;
@@ -74,6 +75,8 @@ public class Network2PolygonGraph extends X2GraphImpl {
 				Double.class);
 		AttributeType cap = AttributeTypeFactory.newAttributeType("capacity",
 				Double.class);
+		AttributeType type = AttributeTypeFactory.newAttributeType("type",
+				String.class);
 		AttributeType freespeed = AttributeTypeFactory.newAttributeType(
 				"freespeed", Double.class);
 		AttributeType transMode = AttributeTypeFactory.newAttributeType(
@@ -81,7 +84,7 @@ public class Network2PolygonGraph extends X2GraphImpl {
 		defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
 		defaultFeatureTypeFactory.setName("link");
 		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id,
-				fromNode, toNode, length, cap, freespeed, transMode });
+				fromNode, toNode, length, cap, type, freespeed, transMode });
 	}
 
 	@Override
@@ -95,8 +98,8 @@ public class Network2PolygonGraph extends X2GraphImpl {
 		for (int i = 0; i < attrTypes.size(); i++)
 			defaultFeatureTypeFactory.addType(attrTypes.get(i));
 		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
-		for (Link link : this.links2paint == null ? this.network.getLinks()
-				.values() : this.links2paint) {
+		for (Link link : (this.links2paint == null ? this.network.getLinks()
+				.values() : this.links2paint)) {
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);
@@ -111,12 +114,13 @@ public class Network2PolygonGraph extends X2GraphImpl {
 			o[6] = (((LinkImpl) link).getType() != null) ? Integer
 					.parseInt(((LinkImpl) link).getType()) : 0;
 			o[7] = link.getFreespeed();
-			o[8] = link.getAllowedModes();
+			o[8] = link.getAllowedModes() != null ? link.getAllowedModes()
+					.toString() : TransportMode.car.toString();
 			for (int i = 0; i < parameters.size(); i++) {
-				o[i + 8] = parameters.get(i).get(link.getId());
+				o[i + 9] = parameters.get(i).get(link.getId());
 			}
 			// parameters.get(link.getId().toString()) }
-			Feature ft = ftRoad.create(o, "network");
+			Feature ft = ftRoad.create(o, link.getId().toString());
 			features.add(ft);
 		}
 		return features;
