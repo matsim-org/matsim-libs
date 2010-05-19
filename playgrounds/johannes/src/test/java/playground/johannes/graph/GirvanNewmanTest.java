@@ -32,7 +32,7 @@ import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.Vertex;
 
 import junit.framework.TestCase;
-import playground.johannes.socialnetworks.graph.GirvanNewmanAlgorithm;
+import playground.johannes.socialnetworks.graph.analysis.GirvanNewmanAlgorithm;
 
 /**
  * @author illenberger

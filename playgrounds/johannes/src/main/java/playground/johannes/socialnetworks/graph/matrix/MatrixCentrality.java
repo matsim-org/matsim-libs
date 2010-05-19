@@ -88,7 +88,7 @@ public class MatrixCentrality {
 		return radius;
 	}
 
-	public void run(AdjacencyMatrix y) {
+	public void run(AdjacencyMatrix<?> y) {
 		int n = y.getVertexCount();
 		vertexCloseness = new double[n];
 		Arrays.fill(vertexCloseness, Double.POSITIVE_INFINITY);
@@ -222,7 +222,7 @@ public class MatrixCentrality {
 		
 		private final Logger logger = Logger.getLogger(CentralityThread.class);
 		
-		public CentralityThread(AdjacencyMatrix y, int i_start, int i_stop) {
+		public CentralityThread(AdjacencyMatrix<?> y, int i_start, int i_stop) {
 			dijkstra = new Dijkstra(y);
 			this.i_start = i_start;
 			this.i_stop = i_stop;

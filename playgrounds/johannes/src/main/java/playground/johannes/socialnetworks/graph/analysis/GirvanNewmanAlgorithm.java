@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph;
+package playground.johannes.socialnetworks.graph.analysis;
 
 import gnu.trove.TObjectIntIterator;
 
@@ -68,14 +68,15 @@ public class GirvanNewmanAlgorithm {
 		int lastSize = Integer.MAX_VALUE;
 		while(projection.getEdges().size() > 0 && iteration < maxIterations) {
 			logger.info(String.format("Calculating edge betweenness at level %1$s...", iteration));
-			GraphCentrality c = new GraphCentrality(projection);
-			c.calculate();
+			Centrality c = new Centrality();
+			c.init(projection);
+			
 			
 			
 			double maxBC = 0;
 			Edge maxBCEdge = null;
-			TObjectIntIterator<Edge> it = c.getEdgeBetweenness().iterator();
-			for(int i = 0; i < c.getEdgeBetweenness().size(); i++) {
+			TObjectIntIterator<Edge> it = c.edgeBetweenness().iterator();
+			for(int i = 0; i < c.edgeBetweenness().size(); i++) {
 				it.advance();
 				if(it.value() > maxBC) {
 					maxBC = it.value();
@@ -84,7 +85,7 @@ public class GirvanNewmanAlgorithm {
 			}
 			
 			builder.removeEdge(projection, (EdgeDecorator<Edge>) maxBCEdge);
-			SortedSet<Set<V>> partition = Partitions.disconnectedComponents(projection);
+			Set<Set<V>> partition = new Components().components(projection);
 		
 			logger.info(String.format("Done - disconnected components... %1$s", partition.size()));
 			

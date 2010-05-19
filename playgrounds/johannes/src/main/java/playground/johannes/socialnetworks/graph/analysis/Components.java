@@ -52,12 +52,12 @@ public class Components {
 		return extractComponents(new AdjacencyMatrix<Vertex>(graph)).size();
 	}
 
-	public Set<Set<Vertex>> components(Graph graph) {
-		AdjacencyMatrix<Vertex> y = new AdjacencyMatrix<Vertex>(graph);
-		Set<Set<Vertex>> components = new HashSet<Set<Vertex>>();
+	public <V extends Vertex> Set<Set<V>> components(Graph graph) {
+		AdjacencyMatrix<V> y = new AdjacencyMatrix<V>(graph);
+		Set<Set<V>> components = new HashSet<Set<V>>();
 		List<TIntArrayList> comps = extractComponents(y);
 		for(TIntArrayList comp : comps) {
-			Set<Vertex> component = new HashSet<Vertex>();
+			Set<V> component = new HashSet<V>();
 			for(int i = 0; i < comp.size(); i++) {
 				component.add(y.getVertex(comp.get(i)));
 			}

@@ -19,7 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
+import gnu.trove.TIntIntIterator;
+import gnu.trove.TObjectIntHashMap;
+
+import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphUtils;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.math.Distribution;
@@ -52,6 +57,26 @@ public class Centrality {
 			distr.add(mCentrality.getVertexBetweenness()[i]);
 		}
 		return distr;
+	}
+	
+	public TObjectIntHashMap<Edge> edgeBetweenness() {
+		TObjectIntHashMap<Edge> edgeBetweenness = new TObjectIntHashMap<Edge>();
+		
+		for(int i = 0; i < y.getVertexCount(); i++) {
+			Vertex v1 = y.getVertex(i);
+			
+			if(mCentrality.getEdgeBetweenness()[i] != null) {
+				TIntIntIterator it = mCentrality.getEdgeBetweenness()[i].iterator();
+				for(int k = 0; k < mCentrality.getEdgeBetweenness()[i].size(); k++) {
+					it.advance();
+					Vertex v2 = y.getVertex(it.key());
+					Edge e = GraphUtils.findEdge(v1, v2);
+					edgeBetweenness.put(e, it.value());
+				}
+			}
+		}
+		
+		return edgeBetweenness;
 	}
 	
 	public int diameter() {
