@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
-import org.jfree.util.Log;
-
+import org.apache.log4j.Logger;
 import playground.jjoubert.CommercialTraffic.GPSPoint;
 import playground.jjoubert.Utilities.ProgressBar;
 
@@ -25,10 +24,13 @@ import playground.jjoubert.Utilities.ProgressBar;
  */
 
 public class SortVehicleLogs {
+	private final static Logger log = Logger.getLogger(SortVehicleLogs.class);
+	
 	// Set the home directory, depending on where the job is executed.
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
 //	final static String ROOT = "~/";												// IVT-Sim0
-	final static String ROOT = "~/data/DigiCore/";									// Satawal
+//	final static String ROOT = "~/data/DigiCore/";									// Satawal
+	final static String ROOT = "/home/jwjoubert/MATSim/MATSimData/DigiCore/2009";	// IE-Calvin
 	
 	// Derived string values
 	final static String SOURCEFOLDER = ROOT + "Vehicles/";
@@ -42,16 +44,14 @@ public class SortVehicleLogs {
 	 * @param args
 	 */
 	public static void main (String args[] ){
-		System.out.println();
-		System.out.println("========================================================");
-		System.out.println("Sorting DigiCore vehicle files after they've been split.");
-		System.out.println("========================================================");
-		System.out.println();
+		log.info("=============================================================");
+		log.info("  Sorting DigiCore vehicle files after they've been split.");
+		log.info("-------------------------------------------------------------");
 		
 		File outFolder = new File(DESTFOLDER);
 		boolean checkDirectory = outFolder.mkdir();
 		if(!checkDirectory){
-			Log.warn("Could nor create " + outFolder.toString() + ", or it already exists.");
+			throw new RuntimeException("Could nor create " + outFolder.toString() + ", or it already exists. Delete and then rerun.");
 		}
 		
 		File files = new File(SOURCEFOLDER);
@@ -86,8 +86,10 @@ public class SortVehicleLogs {
 				}
 				filesSorted++;
 			}
-			System.out.printf("\n\n");
-			System.out.println("Done. Largest file is " + maxFile.getName() + " and has " + maxLines + " gps records.");
+			log.info("Done. Largest file is " + maxFile.getName() + " and has " + maxLines + " gps records.");
+			log.info("-------------------------------------------------------------");
+			log.info("                     PROCESS COMPLETE ");
+			log.info("=============================================================");
 		}
 	}
 	/**
@@ -188,7 +190,7 @@ public class SortVehicleLogs {
 
 			output.close();
 		} else{
-			System.err.println("There's a problem... empty file");
+			log.warn("There's a problem... empty file");
 		}
 	}
 
