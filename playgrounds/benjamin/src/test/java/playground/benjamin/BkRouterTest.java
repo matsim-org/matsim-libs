@@ -46,14 +46,14 @@ public class BkRouterTest extends MatsimTestCase {
 	/*package*/ final static Id id10 = new IdImpl("10");
 
 	public void testGeneralizedCostRouting() {
-		Config config = this.loadConfig("benjamin/" + this.getClassInputDirectory() + "configRouterTestIATBR.xml");
+		Config config = this.loadConfig(this.getClassInputDirectory() + "configRouterTestIATBR.xml");
 		config.controler().setOutputDirectory(this.getOutputDirectory());
-		String netFileName = "benjamin/" + this.getClassInputDirectory() + "network.xml";
+		String netFileName = this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
-		config.plans().setInputFile("benjamin/" + this.getClassInputDirectory() + "plansRouterTest.xml");
+		config.plans().setInputFile(this.getClassInputDirectory() + "plansRouterTest.xml");
 		//hh loading
 		config.scenario().setUseHouseholds(true);
-		config.households().setInputFile("benjamin/" + this.getClassInputDirectory() + "households.xml");
+		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
 
 		BkControlerIncome controler = new BkControlerIncome(config);
 	  controler.setCreateGraphs(false);
