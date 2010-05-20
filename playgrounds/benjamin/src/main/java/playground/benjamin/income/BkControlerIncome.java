@@ -53,6 +53,7 @@ public class BkControlerIncome extends BkControler {
 
 	@Override
 	protected void setUp() {
+		this.addInstallTravelCostCalculatorFactoryControlerListener();
 		this.scenarioData.getConfig().global().setNumberOfThreads(1);
 		this.personHouseholdMapping = new PersonHouseholdMapping(this.getScenario().getHouseholds());
 		
@@ -108,8 +109,6 @@ public class BkControlerIncome extends BkControler {
 			final BkControlerIncome controler = new BkControlerIncome(args);
 			
 			controler.setOverwriteFiles(true);
-	
-			controler.addInstallTravelCostCalculatorFactoryControlerListener();
 			controler.run();
 		}
 	}
