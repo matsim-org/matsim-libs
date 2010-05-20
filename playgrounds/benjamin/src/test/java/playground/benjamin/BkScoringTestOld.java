@@ -37,7 +37,7 @@ import playground.benjamin.old.income.BKickIncomeControler;
  * @author dgrether
  *
  */
-public class BKickScoringTest extends MatsimTestCase {
+public class BkScoringTestOld extends MatsimTestCase {
 
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");
@@ -45,10 +45,10 @@ public class BKickScoringTest extends MatsimTestCase {
 	private EventsToScore planScorer;
 
 	public void testSingleIterationScoring() {
-		Config config = this.loadConfig(this.getClassInputDirectory() + "configScoreTest.xml");
-		String netFileName = this.getClassInputDirectory() + "network.xml";
+		Config config = this.loadConfig("benjamin/" + this.getClassInputDirectory() + "configScoreTest.xml");
+		String netFileName = "benjamin/" + this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
-		config.plans().setInputFile(this.getClassInputDirectory() + "plansScoreTestV4.xml");
+		config.plans().setInputFile("benjamin/" + this.getClassInputDirectory() + "plansScoreTestV4.xml");
 
 		final BkControlerDistance controler = new BkControlerDistance(config);
 		controler.setCreateGraphs(false);
@@ -75,10 +75,10 @@ public class BKickScoringTest extends MatsimTestCase {
 	}
 
 	public void testSingleIterationControlerScoring() {
-		Config config = this.loadConfig(this.getClassInputDirectory() + "configControlerScoreTest.xml");
-		String netFileName = this.getClassInputDirectory() + "network.xml";
+		Config config = this.loadConfig("benjamin/" + this.getClassInputDirectory() + "configControlerScoreTest.xml");
+		String netFileName = "benjamin/" + this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
-		config.plans().setInputFile(this.getClassInputDirectory() + "plansScoreTestV4.xml");
+		config.plans().setInputFile("benjamin/" + this.getClassInputDirectory() + "plansScoreTestV4.xml");
 
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
@@ -105,13 +105,13 @@ public class BKickScoringTest extends MatsimTestCase {
 	}
 
 	public void testSingleIterationIncomeScoring() {
-		Config config = this.loadConfig(this.getClassInputDirectory() + "configIncomeScoreTest.xml");
-		String netFileName = this.getClassInputDirectory() + "network.xml";
+		Config config = this.loadConfig("benjamin/" + this.getClassInputDirectory() + "configIncomeScoreTest.xml");
+		String netFileName = "benjamin/" + this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
-		config.plans().setInputFile(this.getClassInputDirectory() + "plansScoreTestV4.xml");
+		config.plans().setInputFile("benjamin/" + this.getClassInputDirectory() + "plansScoreTestV4.xml");
 		//hh loading
 		config.scenario().setUseHouseholds(true);
-		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
+		config.households().setInputFile("benjamin/" + this.getClassInputDirectory() + "households.xml");
 
 
 		// controler with new scoring function

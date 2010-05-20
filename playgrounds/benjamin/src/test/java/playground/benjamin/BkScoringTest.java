@@ -35,7 +35,7 @@ import playground.benjamin.income.BkControlerIncome;
  * @author dgrether
  *
  */
-public class BKickScoringIATBRTest extends MatsimTestCase {
+public class BkScoringTest extends MatsimTestCase {
 
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");
@@ -43,13 +43,13 @@ public class BKickScoringIATBRTest extends MatsimTestCase {
 	private EventsToScore planScorer;
 
 	public void testSingleIterationIncomeScoring() {
-		Config config = this.loadConfig(this.getClassInputDirectory() + "configIncomeScoreTest.xml");
-		String netFileName = this.getClassInputDirectory() + "network.xml";
+		Config config = this.loadConfig("benjamin/" + this.getClassInputDirectory() + "configIncomeScoreTest.xml");
+		String netFileName = "benjamin/" + this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
-		config.plans().setInputFile(this.getClassInputDirectory() + "plansScoreTestV4.xml");
+		config.plans().setInputFile("benjamin/" + this.getClassInputDirectory() + "plansScoreTestV4.xml");
 		//hh loading
 		config.scenario().setUseHouseholds(true);
-		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
+		config.households().setInputFile("benjamin/" + this.getClassInputDirectory() + "households.xml");
 
 
 		// controler with new scoring function
