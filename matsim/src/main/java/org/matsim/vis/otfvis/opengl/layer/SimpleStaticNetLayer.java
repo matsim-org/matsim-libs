@@ -28,7 +28,6 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -157,9 +156,6 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 
 	 public static class SimpleQuadDrawer extends OTFGLDrawableImpl implements OTFDataQuadReceiver{
 
-    private static final Logger log = Logger
-        .getLogger(SimpleStaticNetLayer.SimpleQuadDrawer.class);
-
 	    protected final Point2D.Float[] quad = new Point2D.Float[4];
 	    protected float coloridx = 0;
 	    protected char[] id;
@@ -201,7 +197,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	      String idstr = "" ;
 	      if ( id != null ) { // yyyy can't say if this is a meaningful fix but it works for the problem that I have right now.  kai, may'10
 	    	  idstr = new String(id);
-	      } 
+	      }
 	      linkIds.put(new CoordImpl(middleX , middleY ), idstr);
 	    }
 

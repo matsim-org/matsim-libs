@@ -23,22 +23,17 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
-
 /**
  * @author dgrether
- *
  */
 public class OTFTeleportAgentsDataReader extends OTFDataReader {
-  
-	private static final Logger log = Logger.getLogger(OTFTeleportAgentsDataReader.class);
-	
+
 	private OTFTeleportAgentsDrawer drawer;
 
 	public OTFTeleportAgentsDataReader() {
@@ -62,11 +57,10 @@ public class OTFTeleportAgentsDataReader extends OTFDataReader {
 		int numberOfAgents = in.getInt();
 		drawer.getPositions().clear();
 		for (int i = 0; i < numberOfAgents; i++){
-			
+
 			String id = ByteBufferUtils.getString(in);
 			double x = in.getDouble() - OTFServerQuad2.offsetEast;
 			double y = in.getDouble() - OTFServerQuad2.offsetNorth;
-//			log.error("id: " + id + " x: " + x + " y: " + y);
 			drawer.getPositions().put(id, new Point2D.Double(x, y));
 		}
 	}

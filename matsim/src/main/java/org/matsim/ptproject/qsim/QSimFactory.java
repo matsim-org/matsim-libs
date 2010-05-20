@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.ptproject.qsim;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.IOSimulation;
@@ -32,8 +31,6 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
  */
 public class QSimFactory implements MobsimFactory {
 
-  private static final Logger log = Logger.getLogger(QSimFactory.class);
-  
   @Override
   public IOSimulation createMobsim(Scenario sc, EventsManager eventsManager) {
     QSim sim = new QSim(sc, eventsManager);
