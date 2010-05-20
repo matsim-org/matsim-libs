@@ -56,7 +56,7 @@ public class BkRouterTest extends MatsimTestCase {
 		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
 
 		BkControlerIncome controler = new BkControlerIncome(config);
-	  controler.setCreateGraphs(false);
+		controler.setCreateGraphs(false);
 		final EventHandler handler = new EventHandler();
 
 		controler.addControlerListener(new StartupListener() {
