@@ -75,7 +75,8 @@ public class VertexSamplingCounter implements SamplerListener {
 	
 	public void reset(Graph graph) {
 		lastIteration = 0;
-		estimator = new Estimator11(graph.getVertices().size());
+//		estimator = new Estimator11(graph.getVertices().size());
+		estimator = new Estimator1(graph.getVertices().size());
 	}
 	
 	@Override

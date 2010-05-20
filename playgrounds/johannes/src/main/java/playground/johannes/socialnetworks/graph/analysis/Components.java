@@ -32,8 +32,8 @@ import java.util.Set;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.sna.graph.matrix.Dijkstra;
 
-import playground.johannes.socialnetworks.graph.matrix.Dijkstra;
 
 /**
  * @author illenberger

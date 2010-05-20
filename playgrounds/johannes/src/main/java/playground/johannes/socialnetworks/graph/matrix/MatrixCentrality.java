@@ -30,6 +30,7 @@ import java.util.List;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.sna.graph.matrix.Dijkstra;
 
 
 /**
