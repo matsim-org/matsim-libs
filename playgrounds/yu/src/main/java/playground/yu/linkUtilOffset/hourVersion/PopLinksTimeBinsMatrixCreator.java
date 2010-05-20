@@ -102,7 +102,7 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		TIME_BIN = timeBin;
 	}
 
-	/** this should be called after the object is constructed */
+	/** this must be called after the object is constructed */
 	public void init() {
 		int colIdx = 0;
 		for (Link link : this.network.getLinks().values())
@@ -153,7 +153,10 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 
 	@Override
 	public void reset(int iteration) {
-
+		this.linkTimeBinSequence.clear();
+		this.linkTimeBinSequence2.clear();
+		this.personSequence.clear();
+		this.matrix = null;
 	}
 
 	public void writeMatrix(String matrixOutputFilename) {
@@ -206,7 +209,7 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		events.addHandler(pltbmc);
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
-//		pltbmc.writeMatrix(matrixOutputFilename);
+		// pltbmc.writeMatrix(matrixOutputFilename);
 
 		Matrix A = pltbmc.getMatrix();
 		System.out.println("rank[A] =\t" + A.rank());
@@ -225,7 +228,6 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 			int rowIdx = personIdRowIdxEntry.getValue();
 			double scoreModification = smReader
 					.getPersonUtilityOffset(personIdRowIdxEntry.getKey()/* personId */);
-			// A_b.set(rowIdx, n, scoreModification);
 			b.set(rowIdx, 0, scoreModification);
 		}
 		Matrix A_b = MatrixUtils.getAugmentMatrix(A, b);
