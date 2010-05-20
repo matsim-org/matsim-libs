@@ -25,7 +25,6 @@ package playground.yu.utils.qgis;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -58,26 +57,28 @@ public class LinkUtilityOffset2QGIS implements X2QGIS {
 		reader.parse();
 		this.linkUtiliyOffsets = reader.getLinkUtiliyOffsets();
 		// timBins = this.linkUtiliyOffsets.keySet();
-		this.RationalizeIds();
+		// this.RationalizeIds();
 	}
 
-	private void RationalizeIds() {
-		for (Id linkId : this.network.getLinks().keySet())
-			this.stringIds.put(linkId.toString(), linkId);
-		// end for
-		Map<Integer, Map<Id, Double>> tmpLinkUtiliyOffsets = new HashMap<Integer, Map<Id, Double>>();
-		for (Integer timeBin : this.linkUtiliyOffsets.keySet()) {
-			Map<Id, Double> linkIdUO = this.linkUtiliyOffsets.get(timeBin);
-			Map<Id, Double> rationalizedlinkIdUO = new HashMap<Id, Double>();
-			for (Entry<Id, Double> linkIdUOEntry : linkIdUO.entrySet()) {
-				rationalizedlinkIdUO.put(this.stringIds.get(linkIdUOEntry
-						.getKey().toString()), linkIdUOEntry.getValue());
-			}
-			tmpLinkUtiliyOffsets.put(timeBin, rationalizedlinkIdUO);
-		}
-		this.linkUtiliyOffsets.putAll(tmpLinkUtiliyOffsets);
-	}
-
+	/* not necessary to do it, if the Id works well */
+	// private void RationalizeIds() {
+	// for (Id linkId : this.network.getLinks().keySet())
+	// this.stringIds.put(linkId.toString(), linkId);
+	// // end for
+	// Map<Integer, Map<Id, Double>> tmpLinkUtiliyOffsets = new HashMap<Integer,
+	// Map<Id, Double>>();
+	// for (Integer timeBin : this.linkUtiliyOffsets.keySet()) {
+	// Map<Id, Double> linkIdUO = this.linkUtiliyOffsets.get(timeBin);
+	// Map<Id, Double> rationalizedlinkIdUO = new HashMap<Id, Double>();
+	// for (Entry<Id, Double> linkIdUOEntry : linkIdUO.entrySet()) {
+	// rationalizedlinkIdUO.put(this.stringIds.get(linkIdUOEntry
+	// .getKey().toString()), linkIdUOEntry.getValue());
+	// }
+	// tmpLinkUtiliyOffsets.put(timeBin, rationalizedlinkIdUO);
+	// }
+	// this.linkUtiliyOffsets.putAll(tmpLinkUtiliyOffsets);
+	// }
+	/* ************************************* */
 	/**
 	 * @param args
 	 */
