@@ -578,6 +578,7 @@ public class OsmNetworkReader {
 							OsmNode node = nodes.get(nodeId);
 							if(node != null) {
 								used = true;
+								break;
 							}
 						}
 					}
@@ -586,7 +587,11 @@ public class OsmNetworkReader {
 							OsmNode node = nodes.get(nodeId);
 							if(node != null && osmFilter.coordInFilter(node.coord, this.currentWay.hierarchy)){
 								used = true;
+								break;
 							}
+						}
+						if (used) {
+							break;
 						}
 					}
 				}
