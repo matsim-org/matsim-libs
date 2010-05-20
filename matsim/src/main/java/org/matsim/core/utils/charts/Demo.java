@@ -30,41 +30,48 @@ import org.apache.log4j.Logger;
 public class Demo {
 
 	private static final Logger log = Logger.getLogger(Demo.class);
-	
+
+	private static final String TITLE = "TITLE";
+	private static final String X_AXIS = "x-axis";
+	private static final String Y_AXIS = "y-axis";
+	private static final String SERIE_1 = "serie 1";
+	private static final String SERIE_2 = "serie 2";
+
+
 	public void createBarChart(final String filename) {
-		BarChart chart = new BarChart("TITLE", "x-axis", "y-axis", new String[] {"A", "B", "C"});
-		chart.addSeries("serie 1", new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
-		chart.addSeries("serie 2", new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
+		BarChart chart = new BarChart(TITLE, X_AXIS, Y_AXIS, new String[] {"A", "B", "C"});
+		chart.addSeries(SERIE_1, new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
+		chart.addSeries(SERIE_2, new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
 		chart.addMatsimLogo();
 		chart.saveAsPng(filename, 800, 600);
 	}
 
 	public void createLineChart(final String filename) {
-		LineChart chart = new LineChart("TITLE", "x-axis", "y-axis", new String[] {"A", "B", "C"});
-		chart.addSeries("serie 1", new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
-		chart.addSeries("serie 2", new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
+		LineChart chart = new LineChart(TITLE, X_AXIS, Y_AXIS, new String[] {"A", "B", "C"});
+		chart.addSeries(SERIE_1, new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
+		chart.addSeries(SERIE_2, new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
 		chart.saveAsPng(filename, 800, 600);
 	}
 
 	public void createXYLineChart(final String filename) {
-		XYLineChart chart = new XYLineChart("TITLE", "x-axis", "y-axis");
-		chart.addSeries("serie 1", new double[] {1.0, 2.0, 3.0, 4.0, 5.0}, new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
-		chart.addSeries("serie 2", new double[] {1.0, 5.0, 2.0, 4.0, 3.0}, new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
+		XYLineChart chart = new XYLineChart(TITLE, X_AXIS, Y_AXIS);
+		chart.addSeries(SERIE_1, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}, new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
+		chart.addSeries(SERIE_2, new double[] {1.0, 5.0, 2.0, 4.0, 3.0}, new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
 		chart.saveAsPng(filename, 800, 600);
 	}
-	
+
 	public void createXYLogLogLineChart(final String filename) {
-		XYLineChart chart = new XYLineChart("TITLE", "x-axis", "y-axis", true);
-		chart.addSeries("serie 1", new double[] {1.0, 2.0, 3.0, 4.0, 5.0}, new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
-		chart.addSeries("serie 2", new double[] {1.0, 5.0, 2.0, 4.0, 3.0}, new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
+		XYLineChart chart = new XYLineChart(TITLE, X_AXIS, Y_AXIS, true);
+		chart.addSeries(SERIE_1, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}, new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
+		chart.addSeries(SERIE_2, new double[] {1.0, 5.0, 2.0, 4.0, 3.0}, new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
 		chart.saveAsPng(filename, 800, 600);
 	}
 
 
 	public void createXYScatterChart(final String filename) {
-		XYScatterChart chart = new XYScatterChart("TITLE", "x-axis", "y-axis");
-		chart.addSeries("serie 1", new double[] {1.0, 2.0, 3.0, 4.0, 5.0}, new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
-		chart.addSeries("serie 2", new double[] {1.0, 5.0, 2.0, 4.0, 3.0}, new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
+		XYScatterChart chart = new XYScatterChart(TITLE, X_AXIS, Y_AXIS);
+		chart.addSeries(SERIE_1, new double[] {1.0, 2.0, 3.0, 4.0, 5.0}, new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
+		chart.addSeries(SERIE_2, new double[] {1.0, 5.0, 2.0, 4.0, 3.0}, new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
 		chart.saveAsPng(filename, 800, 600);
 	}
 
