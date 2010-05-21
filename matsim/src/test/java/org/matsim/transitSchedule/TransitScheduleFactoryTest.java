@@ -23,6 +23,8 @@ package org.matsim.transitSchedule;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -30,7 +32,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -42,25 +44,28 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 /**
  * @author mrieser
  */
-public class TransitScheduleBuilderTest extends MatsimTestCase {
+public class TransitScheduleFactoryTest {
 
 	protected TransitScheduleFactory createTransitScheduleBuilder() {
 		return new TransitScheduleFactoryImpl();
 	}
 
+	@Test
 	public void testCreateTransitSchedule() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		TransitSchedule schedule = builder.createTransitSchedule();
-		assertEquals(builder, schedule.getFactory());
+		Assert.assertEquals(builder, schedule.getFactory());
 	}
 
+	@Test
 	public void testCreateTransitLine() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id id = new IdImpl(1);
 		TransitLine line = builder.createTransitLine(id);
-		assertEquals(id, line.getId());
+		Assert.assertEquals(id, line.getId());
 	}
 
+	@Test
 	public void testCreateTransitRoute() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id id = new IdImpl(2);
@@ -70,24 +75,26 @@ public class TransitScheduleBuilderTest extends MatsimTestCase {
 		stops.add(stop1);
 		TransportMode mode = TransportMode.pt;
 		TransitRoute tRoute = builder.createTransitRoute(id, route, stops, mode);
-		assertEquals(id, tRoute.getId());
-		assertEquals(route, tRoute.getRoute());
-		assertEquals(1, tRoute.getStops().size());
-		assertEquals(stop1, tRoute.getStops().get(0));
-		assertEquals(mode, tRoute.getTransportMode());
+		Assert.assertEquals(id, tRoute.getId());
+		Assert.assertEquals(route, tRoute.getRoute());
+		Assert.assertEquals(1, tRoute.getStops().size());
+		Assert.assertEquals(stop1, tRoute.getStops().get(0));
+		Assert.assertEquals(mode, tRoute.getTransportMode());
 	}
 
+	@Test
 	public void testCreateTransitRouteStop() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		TransitStopFacility stopFacility = new TransitStopFacilityImpl(new IdImpl(5), new CoordImpl(6, 6), false);
 		double arrivalOffset = 23;
 		double departureOffset = 42;
 		TransitRouteStop stop = builder.createTransitRouteStop(stopFacility, 23, 42);
-		assertEquals(stopFacility, stop.getStopFacility());
-		assertEquals(arrivalOffset, stop.getArrivalOffset(), EPSILON);
-		assertEquals(departureOffset, stop.getDepartureOffset(), EPSILON);
+		Assert.assertEquals(stopFacility, stop.getStopFacility());
+		Assert.assertEquals(arrivalOffset, stop.getArrivalOffset(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(departureOffset, stop.getDepartureOffset(), MatsimTestUtils.EPSILON);
 	}
 
+	@Test
 	public void testCreateTransitStopFacility() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id id1 = new IdImpl(6);
@@ -95,24 +102,25 @@ public class TransitScheduleBuilderTest extends MatsimTestCase {
 		Id id2 = new IdImpl(7);
 		Coord coord2 = new CoordImpl(105, 1979);
 		TransitStopFacility stopFacility1 = builder.createTransitStopFacility(id1, coord1, false);
-		assertEquals(id1, stopFacility1.getId());
-		assertEquals(coord1.getX(), stopFacility1.getCoord().getX(), EPSILON);
-		assertEquals(coord1.getY(), stopFacility1.getCoord().getY(), EPSILON);
-		assertFalse(stopFacility1.getIsBlockingLane());
+		Assert.assertEquals(id1, stopFacility1.getId());
+		Assert.assertEquals(coord1.getX(), stopFacility1.getCoord().getX(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(coord1.getY(), stopFacility1.getCoord().getY(), MatsimTestUtils.EPSILON);
+		Assert.assertFalse(stopFacility1.getIsBlockingLane());
 		TransitStopFacility stopFacility2 = builder.createTransitStopFacility(id2, coord2, true);
-		assertEquals(id2, stopFacility2.getId());
-		assertEquals(coord2.getX(), stopFacility2.getCoord().getX(), EPSILON);
-		assertEquals(coord2.getY(), stopFacility2.getCoord().getY(), EPSILON);
-		assertTrue(stopFacility2.getIsBlockingLane());
+		Assert.assertEquals(id2, stopFacility2.getId());
+		Assert.assertEquals(coord2.getX(), stopFacility2.getCoord().getX(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(coord2.getY(), stopFacility2.getCoord().getY(), MatsimTestUtils.EPSILON);
+		Assert.assertTrue(stopFacility2.getIsBlockingLane());
 	}
 
+	@Test
 	public void testCreateDeparture() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id id = new IdImpl(8);
 		double time = 9.0*3600;
 		Departure dep = builder.createDeparture(id, time);
-		assertEquals(id, dep.getId());
-		assertEquals(time, dep.getDepartureTime(), EPSILON);
+		Assert.assertEquals(id, dep.getId());
+		Assert.assertEquals(time, dep.getDepartureTime(), MatsimTestUtils.EPSILON);
 	}
 
 }
