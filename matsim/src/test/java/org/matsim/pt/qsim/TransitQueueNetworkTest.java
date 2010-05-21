@@ -946,12 +946,6 @@ public class TransitQueueNetworkTest extends TestCase {
 		assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
 	}
 
-//	protected static class TestSimEngine extends QSimEngineImpl {
-//		TestSimEngine(final QSim sim) {
-//			super(sim, new Random(511));
-//		}
-//	}
-
 	protected static class Fixture {
 		public final QSimEngine simEngine;
 		public final QLinkImpl qlink1, qlink2, qlink3;
