@@ -105,22 +105,24 @@ public class PersonImpl implements Person {
 		return this.getPlans().get(index);
 	}
 
-	/** @deprecated this function is not tested.  kai, oct'09 */
-	@Deprecated
 	public Plan getBestPlan() {
-		if ( this.getPlans().size() == 0 ) {
-			return null ;
+		if (this.getPlans().size() == 0) {
+			return null;
 		}
-		double currMaxScore = Double.NEGATIVE_INFINITY ;
-		Plan currBestPlan = null ;
-		for ( Iterator<Plan> iter = this.getPlans().iterator() ; iter.hasNext(); ) {
-			Plan plan = iter.next() ;
-			if ( plan.getScore() > currMaxScore ) {
-				currMaxScore = plan.getScore() ;
-				currBestPlan = plan ;
+		double currMaxScore = Double.NEGATIVE_INFINITY;
+		Plan currBestPlan = null;
+		for ( Iterator<Plan> iter = this.getPlans().iterator(); iter.hasNext(); ) {
+			Plan plan = iter.next();
+			if (plan.getScore() == null) {
+				if (currBestPlan == null) {
+					currBestPlan = plan;
+				}
+			} else if (plan.getScore() > currMaxScore) {
+				currMaxScore = plan.getScore();
+				currBestPlan = plan;
 			}
 		}
-		return currBestPlan ;
+		return currBestPlan;
 	}
 
 	public Plan getRandomUnscoredPlan() {

@@ -143,4 +143,63 @@ public class PersonImplTest extends MatsimTestCase {
 		}
 	}
 
+	/**
+	 * @author mrieser
+	 */
+	public void testGetBestPlan() {
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		Plan p1 = new PlanImpl();
+		p1.setScore(90.0);
+		Plan p2 = new PlanImpl();
+		p2.setScore(89.0);
+		person.addPlan(p1);
+		person.addPlan(p2);
+		Plan p = person.getBestPlan();
+		assertEquals(p1, p);
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	public void testGetBestPlan_multipleBest() {
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		Plan p1 = new PlanImpl();
+		p1.setScore(11.0);
+		Plan p2 = new PlanImpl();
+		p2.setScore(5.0);
+		Plan p3 = new PlanImpl();
+		p3.setScore(11.0);
+		person.addPlan(p1);
+		person.addPlan(p2);
+		person.addPlan(p3);
+		Plan p = person.getBestPlan();
+		assertTrue(p == p1 || p == p3);
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	public void testGetBestPlan_oneWithoutScore() {
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		Plan p1 = new PlanImpl();
+		Plan p2 = new PlanImpl();
+		p2.setScore(80.0);
+		person.addPlan(p1);
+		person.addPlan(p2);
+		Plan p = person.getBestPlan();
+		assertEquals(p2, p);
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	public void testGetBestPlan_allWithoutScore() {
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		Plan p1 = new PlanImpl();
+		Plan p2 = new PlanImpl();
+		person.addPlan(p1);
+		person.addPlan(p2);
+		Plan p = person.getBestPlan();
+		assertTrue(p == p1 || p == p2);
+	}
 }
