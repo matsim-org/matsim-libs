@@ -22,13 +22,14 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import gnu.trove.TIntIntHashMap;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.VertexDecorator;
+import org.matsim.contrib.sna.graph.analysis.Components;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
-import playground.johannes.socialnetworks.graph.analysis.Components;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
@@ -90,7 +91,7 @@ public class ConnectTest {
 		
 		HashSet<SocialSampledVertexDecorator<?>> ids = new HashSet<SocialSampledVertexDecorator<?>>();
 		seeds = 0;
-		Set<Set<Vertex>> components = new Components().components(graph);
+		List<Set<Vertex>> components = new Components().components(graph);
 		for(Set<Vertex> component : components) {
 			TIntIntHashMap map = new TIntIntHashMap();
 			SocialSampledVertexDecorator<?> ego = null;

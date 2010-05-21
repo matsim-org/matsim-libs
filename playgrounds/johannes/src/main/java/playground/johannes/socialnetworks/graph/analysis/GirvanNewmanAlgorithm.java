@@ -41,6 +41,7 @@ import org.matsim.contrib.sna.graph.GraphProjection;
 import org.matsim.contrib.sna.graph.SparseGraphProjectionBuilder;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.VertexDecorator;
+import org.matsim.contrib.sna.graph.analysis.Components;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
@@ -85,7 +86,7 @@ public class GirvanNewmanAlgorithm {
 			}
 			
 			builder.removeEdge(projection, (EdgeDecorator<Edge>) maxBCEdge);
-			Set<Set<V>> partition = new Components().components(projection);
+			Set<Set<V>> partition = new HashSet<Set<V>>((Collection<? extends Set<V>>) new Components().components(projection));
 		
 			logger.info(String.format("Done - disconnected components... %1$s", partition.size()));
 			

@@ -22,11 +22,19 @@ package playground.johannes.socialnetworks.graph.spatial.generators;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
+
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.statistics.Discretizer;
+import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
 /**
  * @author illenberger
@@ -60,7 +68,7 @@ public class ThetaApproximator {
 			cell.add(vertex);
 		}
 		
-		TObjectDoubleHashMap<SpatialVertex> sample = new TObjectDoubleHashMap<SpatialVertex>();
+		Set<SpatialVertex> sample = new HashSet<SpatialVertex>();
 		
 		for(int x = 0; x < xDim; x++) {
 			for(int y = 0; y < yDim; y++) {
@@ -69,19 +77,55 @@ public class ThetaApproximator {
 				if(cell != null && !cell.isEmpty())
 					vertex = cell.iterator().next();
 				if(vertex != null) {
-					sample.put(vertex, budget);
+//					sample.put(vertex, budget);
+					sample.add(vertex);
 				}
 			}
 		}
 		
 		logger.info(String.format("Original size = %1$s, reduced size = %2$s.", vertices.size(), sample.size()));
 		
+		TObjectDoubleHashMap<SpatialVertex> costsSums = new TObjectDoubleHashMap<SpatialVertex>();
+		double totalSum = 0;
+		DistanceCalculator calc = new CartesianDistanceCalculator();
+		Discretizer disc = new LinearDiscretizer(1000.0);
+		
+		for(SpatialVertex vertex : sample) {
+			double sum = 0;
+			for(SpatialVertex opportunity : sample) {
+//				sum += costFunction.edgeCost(vertex, opportunity);
+				sum += disc.discretize(calc.distance(vertex.getPoint(), opportunity.getPoint())); 
+			}
+			costsSums.put(vertex, sum);
+			totalSum += sum;
+		}
+		
+		double konst = budget * sample.size() / totalSum;
+		
+//		Distribution distr = new Distribution();
+		
+		TObjectDoubleHashMap<SpatialVertex> budgets = new TObjectDoubleHashMap<SpatialVertex>();
+		TObjectDoubleIterator<SpatialVertex> it = costsSums.iterator();
+		for(int i = 0; i < costsSums.size(); i++) {
+			it.advance();
+			budgets.put(it.key(), it.value() * konst);
+//			distr.add(it.value() * konst);
+		}
+//		try {
+//			Distribution.writeHistogram(distr.absoluteDistribution((distr.max() - distr.min())/50.0), "/Users/jillenberger/Work/work/socialnets/mcmc/budgets.txt");
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		ThetaSolver solver = new ThetaSolver(costFunction);
-		TObjectDoubleHashMap<SpatialVertex> cellThetas = solver.solve(sample);
+		TObjectDoubleHashMap<SpatialVertex> cellThetas = solver.solve(budgets);
 		
 		TObjectDoubleHashMap<SpatialVertex> thetas = new TObjectDoubleHashMap<SpatialVertex>();
 		
-		TObjectDoubleIterator<SpatialVertex> it = cellThetas.iterator();
+		it = cellThetas.iterator();
 		for(int i = 0; i < cellThetas.size(); i++) {
 			it.advance();
 			SpatialVertex vertex = it.key();

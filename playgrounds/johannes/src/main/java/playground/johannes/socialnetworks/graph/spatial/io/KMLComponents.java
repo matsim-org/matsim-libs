@@ -29,13 +29,13 @@ import java.util.Set;
 import net.opengis.kml._2.FolderType;
 
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.Components;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
 import org.matsim.contrib.sna.graph.spatial.io.Colorizable;
 import org.matsim.contrib.sna.graph.spatial.io.KMLPartitions;
 
-import playground.johannes.socialnetworks.graph.analysis.Components;
 
 /**
  * @author illenberger
@@ -52,7 +52,7 @@ public class KMLComponents implements KMLPartitions, Colorizable<Vertex> {
 
 	@Override
 	public List<Set<? extends SpatialVertex>> getPartitions(SpatialGraph graph) {
-		Set<Set<SpatialVertex>> partitions = new Components().<SpatialVertex>components(graph);
+		List<Set<SpatialVertex>> partitions = new Components().<SpatialVertex>components(graph);
 		
 		colors = new HashMap<SpatialVertex, Color>();
 		int size = partitions.size();

@@ -22,12 +22,12 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import java.util.Set;
 
 import org.matsim.contrib.sna.gis.ZoneLayer;
+import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.analysis.ComponentsTask;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeDensityTask;
