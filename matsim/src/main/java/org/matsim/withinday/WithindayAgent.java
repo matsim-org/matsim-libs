@@ -45,7 +45,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.ptproject.qsim.QPersonAgent;
-import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QSimI;
 import org.matsim.withinday.beliefs.AgentBeliefs;
 import org.matsim.withinday.contentment.AgentContentment;
 import org.matsim.withinday.percepts.AgentPercepts;
@@ -82,7 +82,7 @@ public class WithindayAgent extends QPersonAgent {
 
 	private final Network network;
 
-	public WithindayAgent(final Person person, final QSim simulation, final int sightDistance, final WithindayAgentLogicFactory factory) {
+	public WithindayAgent(final Person person, final QSimI simulation, final int sightDistance, final WithindayAgentLogicFactory factory) {
 		super(person, simulation);
 		this.network = simulation.getQNetwork().getNetwork();
 //		this.person = person;

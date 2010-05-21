@@ -21,7 +21,6 @@ package org.matsim.ptproject.qsim;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 
 
@@ -32,7 +31,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 public class QSimFactory implements MobsimFactory {
 
   @Override
-  public IOSimulation createMobsim(Scenario sc, EventsManager eventsManager) {
+  public QSimI createMobsim(Scenario sc, EventsManager eventsManager) {
     QSim sim = new QSim(sc, eventsManager);
     return sim;
   }

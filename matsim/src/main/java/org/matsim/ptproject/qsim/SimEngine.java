@@ -29,7 +29,7 @@ public interface SimEngine {
    * 
    * @return the QSim instance
    */
-  public QSim getQSim();
+  public QSimI getQSim();
   /**
    * called in a predefined Order when the simulation is started
    */

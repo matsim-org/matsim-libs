@@ -26,10 +26,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QSimI;
 
 
 
-public class TransitQSimulation extends QSim {
+public class TransitQSimulation extends QSim implements QSimI {
+	// this is the one hook that needs to be there into the QSim 
+	// (although one could consider moving this class into the QSim package).  kai, may'10
 
 	private static final Logger log = Logger.getLogger(TransitQSimulation.class);
 	

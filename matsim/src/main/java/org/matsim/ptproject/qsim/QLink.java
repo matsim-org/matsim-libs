@@ -58,8 +58,11 @@ public interface QLink extends QBufferItem, VisLink {
   /**
    * @return the total space capacity available on that link (includes the space on lanes if available)
    */
+  @Deprecated // yyyyyy I am not convinced that this should be exposed.  kai, may'10
   public double getSpaceCap();
   
+  @Deprecated // yyyyyy I would say that this should not be accessible since it exposes internal structure
+  // which should not be necessary outside.  kai, may'10
   public LinkedList<QVehicle> getVehQueue();
 
   /**
@@ -70,6 +73,7 @@ public interface QLink extends QBufferItem, VisLink {
    * @return the flow capacity of this link per second, scaled by the config
    *         values and in relation to the SimulationTimer's simticktime.
    */
+  @Deprecated // yyyyyy I am not convinced that this should be exposed.  kai, may'10
   public double getSimulatedFlowCapacity();
 
   public VisData getVisData();
@@ -78,10 +82,12 @@ public interface QLink extends QBufferItem, VisLink {
   // methods that have been marked as package or protected
   // before the interface was introduced
   
+  @Deprecated // yyyyyy I am not convinced that this should be exposed.  kai, may'10
   public QNode getToQueueNode();
   
   public boolean hasSpace();
   
+  @Deprecated // yyyyyy I am not convinced that this should be exposed.  kai, may'10
   public void clearVehicles();
   
   public boolean moveLink(double now);

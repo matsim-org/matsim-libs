@@ -40,7 +40,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 	private static final double openDoorsDuration = 1.0;
 	private static final double closeDoorsDuration = 1.0;
 
-	public ComplexTransitStopHandler(BasicVehicle vehicle) {
+	/*package*/ ComplexTransitStopHandler(BasicVehicle vehicle) {
 		this.personEntersTime = vehicle.getType().getAccessTime();
 		this.personLeavesTime = vehicle.getType().getEgressTime();
 	}

@@ -38,7 +38,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
  * @author mrieser
  * @author dgrether
  */
-public class QNetwork implements VisNetwork {
+public class QNetwork implements VisNetwork, QNetworkI {
 
 	private final Map<Id, QLink> links;
 

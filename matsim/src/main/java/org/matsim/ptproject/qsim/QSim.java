@@ -49,6 +49,7 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
@@ -76,7 +77,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author mrieser
  * @author dgrether
  */
-public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, ObservableSimulation, VisMobsim, AcceptsFeatures {
+public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, ObservableSimulation, VisMobsim, AcceptsFeatures, QSimI {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
@@ -479,6 +480,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 *
 	 * @see PersonDriverAgent#getDepartureTime()
 	 */
+	@Deprecated // yyyyyy imho, planElementIndex does not make sense as argument.  imho, should be a Person.  kai, may'10
 	public void scheduleActivityEnd(final PersonDriverAgent agent, final int planElementIndex) {
 		this.activityEndsList.add(agent);
 		addToAgentsInActivities(agent);
@@ -554,6 +556,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
+	@Deprecated // unclear if this is "actEnd" or "departure"!  kai, may'10
+	// depending on this, it is a "PersonAgent" or "DriverAgent".  kai, may'10
 	public void agentDeparts(final double now, final PersonDriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
 		TransportMode mode = leg.getMode();

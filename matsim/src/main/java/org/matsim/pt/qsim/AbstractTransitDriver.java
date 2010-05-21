@@ -35,7 +35,7 @@ import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QPersonAgent;
-import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QSimI;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -51,7 +51,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	private int nextLinkIndex = 0;
 	private final TransitStopAgentTracker agentTracker;
 	private Person dummyPerson;
-	private final QSim sim;
+	private final QSimI sim;
 	private TransitRouteStop currentStop = null;
 	private TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
@@ -63,7 +63,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public abstract Departure getDeparture();
 	public abstract double getDepartureTime();
 
-	public AbstractTransitDriver(QSim sim, TransitStopAgentTracker agentTracker2) {
+	public AbstractTransitDriver(QSimI sim, TransitStopAgentTracker agentTracker2) {
 		super();
 		this.sim = sim;
 		this.agentTracker = agentTracker2;
@@ -132,7 +132,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public void teleportToLink(final Id linkId) {
 	}
 
-	QSim getSimulation(){
+	QSimI getSimulation(){
 		return this.sim;
 	}
 

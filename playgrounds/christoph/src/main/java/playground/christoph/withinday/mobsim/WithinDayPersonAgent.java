@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.ptproject.qsim.QPersonAgent;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QSimI;
 import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.withinday.replanning.WithinDayReplanner;
@@ -40,7 +41,7 @@ public class WithinDayPersonAgent extends QPersonAgent{
 
 	private List<WithinDayReplanner> withinDayReplanner = new ArrayList<WithinDayReplanner>();
 	
-	public WithinDayPersonAgent(final PersonImpl p, final QSim simulation)
+	public WithinDayPersonAgent(final PersonImpl p, final QSimI simulation)
 	{
 		super(p, simulation);
 	}

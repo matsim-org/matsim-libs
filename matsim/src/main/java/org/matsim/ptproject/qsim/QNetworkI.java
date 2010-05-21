@@ -19,24 +19,25 @@
 
 package org.matsim.ptproject.qsim;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 
 /**
- * @author dgrether
+ * @author nagel
+ *
  */
-public class AgentFactory implements MatsimFactory {
+public interface QNetworkI {
 
-	protected final QSimI simulation;
+	/**
+	 * @return
+	 */
+	Network getNetwork();
 
-	public AgentFactory(final QSimI simulation) {
-		this.simulation = simulation;
-	}
-
-	public QPersonAgent createPersonAgent(final Person p) {
-		QPersonAgent agent = new QPersonAgent(p, this.simulation);
-		return agent;
-	}
+	/**
+	 * @return
+	 */
+	Map<Id, QLink> getLinks();
 
 }

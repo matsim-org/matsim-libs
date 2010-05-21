@@ -49,7 +49,7 @@ public class QPersonAgent implements PersonDriverAgent {
 	private QVehicle vehicle;
 	protected Id cachedNextLinkId = null;
 
-	private final QSim simulation;
+	private final QSimI simulation;
 
 	private double activityDepartureTime = Time.UNDEFINED_TIME;
 
@@ -64,7 +64,7 @@ public class QPersonAgent implements PersonDriverAgent {
 
 	private int currentLinkIdIndex;
 
-	public QPersonAgent(final Person p, final QSim simulation) {
+	public QPersonAgent(final Person p, final QSimI simulation) {
 		this.person = p;
 		this.simulation = simulation;
 	}
@@ -336,7 +336,7 @@ public class QPersonAgent implements PersonDriverAgent {
 		return null;
 	}
 
-	protected QSim getQSimulation(){
+	protected QSimI getQSimulation(){
 		return this.simulation;
 	}
 

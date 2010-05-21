@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.QNetworkI;
 import org.matsim.ptproject.qsim.QPersonAgent;
-import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QSimI;
 
 
 /**
@@ -43,7 +43,7 @@ public class DgWithindayQPersonAgent extends QPersonAgent {
 	private static final Logger log = Logger.getLogger(DgWithindayQPersonAgent.class);
 	private Random random;
 
-	public DgWithindayQPersonAgent(Person p, QSim simulation, Random r) {
+	public DgWithindayQPersonAgent(Person p, QSimI simulation, Random r) {
 		super(p, simulation);
 		random = r;
 	}
@@ -60,11 +60,11 @@ public class DgWithindayQPersonAgent extends QPersonAgent {
 //			return super.chooseNextLinkId();
 //		}
 		Id destinationLinkId = this.getDestinationLinkId();
-		QNetwork qnet = this.getQSimulation().getQNetwork();
+		QNetworkI qnet = this.getQSimulation().getQNetwork();
 		if (currentLinkId == destinationLinkId){
 				return null;
 		}
-		QLink currentQLink = qnet.getQLink(currentLinkId);
+		QLink currentQLink = qnet.getLinks().get(currentLinkId);
 		Map<Id, ? extends Link> outlinks = currentQLink.getLink().getToNode().getOutLinks();
 		List<Link> outLinksList = new ArrayList<Link>(outlinks.values());
 		int nextLinkNr = (int) (random.nextDouble() * outLinksList.size());

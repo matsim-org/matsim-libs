@@ -361,13 +361,13 @@ public class QLinkImpl implements QLink {
 	private void calculateFlowCapacity(final double time) {
 		this.simulatedFlowCapacity = ((LinkImpl)this.getLink()).getFlowCapacity(time);
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQSimEngine().getQSim().getSimTimer().getSimTimestepSize() * this.getQSimEngine().getQSim().scenario.getConfig().getQSimConfigGroup().getFlowCapFactor();
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQSimEngine().getQSim().getSimTimer().getSimTimestepSize() * this.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 	}
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = this.getQSimEngine().getQSim().scenario.getConfig().getQSimConfigGroup().getStorageCapFactor();
+		double storageCapFactor = this.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 
 		double numberOfLanes = this.getLink().getNumberOfLanes(time);
