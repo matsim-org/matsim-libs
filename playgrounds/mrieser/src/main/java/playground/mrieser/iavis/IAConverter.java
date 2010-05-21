@@ -1,0 +1,67 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.mrieser.iavis;
+
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.xml.sax.SAXException;
+
+public class IAConverter {
+
+	private final static Logger log = Logger.getLogger(IAConverter.class);
+
+	private static final String IN_NETWORK = "/data/vis/zrh/output_network.xml.gz";
+	private static final String IN_PLANS = "/data/vis/zrh/100.plans.xml.gz";
+	private static final String IN_EVENTS = "/data/vis/zrh/100.events.xml.gz";
+
+	private static final String OUT_LINKS = "/data/vis/ia/links.txt";
+	private static final String OUT_ACTIVITIES = "/data/vis/ia/agentactivity.txt";
+	private static final String OUT_VEHICLES = "/data/vis/ia/agentdrive.txt";
+
+	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
+		log.info("start conversion");
+		Scenario s = new ScenarioImpl();
+		new MatsimNetworkReader(s).parse(IN_NETWORK);
+
+		new IANetworkWriter().write(s.getNetwork(), OUT_LINKS);
+
+		EventsManager e = new EventsManagerImpl();
+		IADrivingWriter driving = new IADrivingWriter(s.getNetwork(), OUT_VEHICLES);
+		e.addHandler(driving);
+		IAActivitiesWriter activities = new IAActivitiesWriter(s, IN_PLANS, OUT_ACTIVITIES);
+		e.addHandler(activities);
+
+		new MatsimEventsReader(e).readFile(IN_EVENTS);
+
+		driving.close();
+		activities.close();
+		log.info("conversion done.");
+	}
+
+}
