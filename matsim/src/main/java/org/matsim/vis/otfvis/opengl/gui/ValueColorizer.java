@@ -28,9 +28,6 @@ import java.io.Serializable;
  */
 public class ValueColorizer implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2510927168023208677L;
 
 	// MEMBER VARIABLES
@@ -47,8 +44,8 @@ public class ValueColorizer implements Serializable {
 	}
 
 	public ValueColorizer(double[] values, Color[] colors) {
-		this.values = values;
-		this.colors = colors;
+		this.values = values.clone();
+		this.colors = colors.clone();
 	}
 
 	// COLOR GENERATION
