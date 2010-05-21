@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE roadpricing SYSTEM "http://www.matsim.org/files/dtd/roadpricing_v1.dtd">
+<roadpricing type="distance" name="distance toll for toll router test case">
+	<description></description>
+	<links>
+		<link id="8" />
+		<link id="9" />
+	</links>
+	<cost start_time="04:00:00" end_time="09:00:00" amount="0.0005" /><!-- = 0.5 CHF/km -->
+</roadpricing>

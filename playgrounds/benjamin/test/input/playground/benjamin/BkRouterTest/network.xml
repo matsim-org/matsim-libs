@@ -17,7 +17,7 @@
       <link id="1" from="1" to="2" length="2500.00" capacity="36000" freespeed="27.78" permlanes="1"  />
       <link id="2" from="2" to="3" length="7500.00" capacity="36000" freespeed="27.78" permlanes="1"  />
       <link id="3" from="3" to="4" length="75000.00" capacity="36000" freespeed="10.42" permlanes="1"  />
-      <link id="4" from="4" to="5" length="5000.00" capacity="36000" freespeed="27.78" permlanes="1"  />
+      <link id="4" from="4" to="5" length="2500.00" capacity="36000" freespeed="27.78" permlanes="1"  />
       <link id="5" from="5" to="6" length="10000.00" capacity="36000" freespeed="27.78" permlanes="1"  />
       <link id="6" from="6" to="7" length="10000.00" capacity="36000" freespeed="27.78" permlanes="1"  />
       <link id="7" from="7" to="1" length="10000.00" capacity="36000" freespeed="27.78" permlanes="1"  />
