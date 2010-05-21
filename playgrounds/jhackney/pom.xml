@@ -17,5 +17,10 @@
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
+  	<dependency>
+			<groupId>jung</groupId>
+			<artifactId>jung</artifactId>
+			<version>1.7.6</version>
+		</dependency>
   </dependencies>
 </project>
