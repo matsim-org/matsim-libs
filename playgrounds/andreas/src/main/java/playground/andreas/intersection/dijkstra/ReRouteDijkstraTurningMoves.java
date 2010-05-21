@@ -20,20 +20,19 @@ package playground.andreas.intersection.dijkstra;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author dgrether
- *
  */
 public class ReRouteDijkstraTurningMoves extends AbstractMultithreadedModule {
 
-	TravelCost costCalculator = null;
+	PersonalizableTravelCost costCalculator = null;
 
 	TravelTime timeCalculator = null;
 
@@ -41,21 +40,21 @@ public class ReRouteDijkstraTurningMoves extends AbstractMultithreadedModule {
 
 	Network originalNetwork = null;
 
-	CharyparNagelScoringConfigGroup config = null;
+	PlansCalcRouteConfigGroup config = null;
 
-	public ReRouteDijkstraTurningMoves(Config config, final Network network, final TravelCost costCalculator,
+	public ReRouteDijkstraTurningMoves(Config config, final Network network, final PersonalizableTravelCost costCalculator,
 			final TravelTime timeCalculator) {
 		super(config.global());
 		this.originalNetwork = network;
 		this.wrappedNetwork = NetworkWrapper.wrapNetwork(network);
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
-		this.config = config.charyparNagelScoring();
+		this.config = config.plansCalcRoute();
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PlansCalcRouteDijkstra(this.originalNetwork, this.wrappedNetwork, this.costCalculator, this.timeCalculator, this.config);
+		return new PlansCalcRouteDijkstra(this.config, this.originalNetwork, this.wrappedNetwork, this.costCalculator, this.timeCalculator);
 	}
 
 }

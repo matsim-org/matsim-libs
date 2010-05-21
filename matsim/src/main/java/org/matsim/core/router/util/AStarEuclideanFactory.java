@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DijkstraFactory.java
+ * AStarLandmarksFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.AStarEuclidean;
 
-public class DijkstraFactory implements LeastCostPathCalculatorFactory {
+/**
+ * @author dgrether
+ */
+public class AStarEuclideanFactory implements LeastCostPathCalculatorFactory {
 
-	private final PreProcessDijkstra preProcessData;
+	private PreProcessEuclidean preProcessData;
 
-	public DijkstraFactory() {
-		this.preProcessData = null;
-	}
-
-	public DijkstraFactory(final PreProcessDijkstra preProcessData) {
-		this.preProcessData = preProcessData;
-	}
-
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelCost travelCosts, final TravelTime travelTimes) {
-		if (this.preProcessData == null) {
-			return new Dijkstra(network, travelCosts, travelTimes);
+	public AStarEuclideanFactory(Network network, final TravelMinCost fsttc){
+		synchronized (this) {
+				this.preProcessData = new PreProcessEuclidean(fsttc);
+				this.preProcessData.run(network);
 		}
-		return new Dijkstra(network, travelCosts, travelTimes, preProcessData);
+	}
+
+	public LeastCostPathCalculator createPathCalculator(Network network,
+			TravelCost travelCosts, TravelTime travelTimes) {
+		return new AStarEuclidean(network, this.preProcessData, travelCosts, travelTimes, 1);
 	}
 
 }

@@ -7,15 +7,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -31,15 +29,8 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 	Network wrappedNetwork;
 	Network originalNetwork;
 
-	public PlansCalcRouteDijkstra(final Network originalNetwork, final Network wrappedNetwork, final TravelCost costCalculator, final TravelTime timeCalculator, final CharyparNagelScoringConfigGroup config) {
-		this(originalNetwork, wrappedNetwork, costCalculator, timeCalculator, new FreespeedTravelTimeCost(config));
-	}
-
-	@SuppressWarnings("deprecation")
-	private PlansCalcRouteDijkstra(final Network originalNetwork, final Network wrappedNetwork, final TravelCost costCalculator, final TravelTime timeCalculator,
-			final FreespeedTravelTimeCost freespeedTimeCost) {
-		super(wrappedNetwork, new Dijkstra(wrappedNetwork, costCalculator, timeCalculator),
-				new Dijkstra(wrappedNetwork, freespeedTimeCost, freespeedTimeCost));
+	public PlansCalcRouteDijkstra(final PlansCalcRouteConfigGroup config, final Network originalNetwork, final Network wrappedNetwork, final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator) {
+		super(config, wrappedNetwork, costCalculator, timeCalculator);
 		this.originalNetwork = originalNetwork;
 		this.wrappedNetwork = wrappedNetwork;
 	}
@@ -49,9 +40,6 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 	 * That's why I had to change visibility to protected.
 	 *
 	 * TODO [an] No other transport means are implemented, yet.
-	 *
-	 * (non-Javadoc)
-	 * @see org.matsim.router.PlansCalcRoute#handleCarLeg(org.matsim.population.Leg, org.matsim.population.Act, org.matsim.population.Act, double)
 	 */
 	@Override
 	protected double handleCarLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {

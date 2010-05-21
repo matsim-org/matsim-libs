@@ -30,10 +30,11 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.AStarEuclideanFactory;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.PreProcessEuclidean;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -45,7 +46,7 @@ public class RoutingTest extends MatsimTestCase {
 
 	private interface RouterProvider {
 		public String getName();
-		public LeastCostPathCalculator getRouter(Network network, TravelMinCost costCalc, TravelTime timeCalc);
+		public LeastCostPathCalculatorFactory getFactory(Network network, TravelMinCost costCalc, TravelTime timeCalc);
 	}
 
 	public void testDijkstra() {
@@ -53,8 +54,8 @@ public class RoutingTest extends MatsimTestCase {
 			public String getName() {
 				return "Dijkstra";
 			}
-			public LeastCostPathCalculator getRouter(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
-				return new Dijkstra(network, costCalc, timeCalc, null);
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+				return new DijkstraFactory();
 			}
 		});
 	}
@@ -64,10 +65,10 @@ public class RoutingTest extends MatsimTestCase {
 			public String getName() {
 				return "DijkstraPruneDeadends";
 			}
-			public LeastCostPathCalculator getRouter(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 				preProcessData.run(network);
-				return new Dijkstra(network, costCalc, timeCalc, preProcessData);
+				return new DijkstraFactory(preProcessData);
 			}
 		});
 	}
@@ -77,10 +78,8 @@ public class RoutingTest extends MatsimTestCase {
 			public String getName() {
 				return "AStarEuclidean";
 			}
-			public LeastCostPathCalculator getRouter(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
-				PreProcessEuclidean preProcessData = new PreProcessEuclidean(costCalc);
-				preProcessData.run(network);
-				return new AStarEuclidean(network, preProcessData, timeCalc);
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+				return new AStarEuclideanFactory(network, costCalc);
 			}
 		});
 	}
@@ -90,10 +89,8 @@ public class RoutingTest extends MatsimTestCase {
 			public String getName() {
 				return "AStarLandmarks";
 			}
-			public LeastCostPathCalculator getRouter(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
-				PreProcessLandmarks preProcessData = new PreProcessLandmarks(costCalc);
-				preProcessData.run(network);
-				return new AStarLandmarks(network, preProcessData, timeCalc);
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+				return new AStarLandmarksFactory(network, costCalc);
 			}
 		});
 	}
@@ -125,10 +122,9 @@ public class RoutingTest extends MatsimTestCase {
 		log.info("### calcRoute with router " + provider.getName());
 
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(config.charyparNagelScoring());
-		LeastCostPathCalculator routingAlgo = provider.getRouter(network, calculator, calculator);
 
 		PlansCalcRoute router = null;
-		router = new PlansCalcRoute(network, routingAlgo, routingAlgo);
+		router = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, provider.getFactory(network, calculator, calculator));
 		router.run(population);
 	}
 
