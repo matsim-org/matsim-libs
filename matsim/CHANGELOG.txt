@@ -1,0 +1,83 @@
+MATSim - Multi Agent Transport Simulation
+===============================================================================
+
+
+Release version 0.x.x
+-------------------------------------------------------------------------------
+
+Features:
+
+- org.matsim.run.OTFVis now supports Swing-GUI (-swing) and Double-MVI (r11281)
+- Swing-OTFVis can now show Link-Ids (r11300) and different link-widths (r11366)
+- NetVis is no longer available (r11317ff)
+
+
+API-Changes:
+
+- ScenarioImpl.getPopulation() returns Population instead of PopulationImpl (r11288)
+
+
+Bug-Fixes:
+
+- Swing-OTFVis can open mvi-files created by conversion from events (r11476)
+
+
+
+Release version 0.1.1
+-------------------------------------------------------------------------------
+
+Bugfixes:
+- two examples in tutorial.* did not work as expected
+
+
+
+Release Spring 2010 (version 0.1.0)
+-------------------------------------------------------------------------------
+
+Main focus of this release:
+Code stability and performance improvements, not so much about new features for users.
+
+
+Changes:
+
+- Changed System Requirements to Java 6
+
+- New features:
+  - handling events in a separate thread for speed up of runs (http://matsim.org/node/238)
+  - conversion of OpenStreetMap-data for networks (see org.matsim.core.utils.io.OsmNetworkReader)
+  - events can be written in an XML format to better accomodate attributes from new events
+
+- Feature improvements:
+  - improved visualizer OTFVis:
+    show middle line of a road, save configuration, save views, start without argument, change speed, etc.
+  - improved speed of default QueueSimulation
+  - Events can be configured to be written only every n-th iteration 
+    (speed due to less file I/O) (see http://matsim.org/node/344)
+  - routing algorithms (Dijkstra, A*Landmarks) run faster (commit r8399)
+  - faster writing of events and plans-files (commit r8867)
+  - Planomat can now also do mode choice (see http://matsim.org/node/381)
+
+- Other changes for users:
+  - use Dijkstra as default routing algorithm instead of A*-Landmarks
+  - improved travel time calculation (r6767)
+  - lots of bug fixes, too many to list them here
+  - Simulation can handle non-car legs by means of simple teleportation
+
+- Other changes for developers:
+  - moved project structure and Build process to Maven
+  - first steps towards stable API for programmers (see package org.matsim.api.*)
+    Developers which cannot commit to the MATSim repository should try to only use
+    classes/interfaces from this package. If you need additional functionality from
+    other classes, please speak to us, as we cannot guarantee for other classes to
+    remain stable to the next release!
+  - code cleanup towards API
+  - renamed several classes and packages
+  - improved code quality based on static code analysis
+  - made scoring function more modular (see http://matsim.org/node/263)
+  - introduce Scenario-class as Super-Element containing pointers to other data containers
+    (see org.matsim.api.Scenario)
+  - use Builders to create Population and Network
+  - use (API-)Interfaces instead of Implementations in many playces
+  - try domain driven design, ues Ids instead of object references between data containers (like Network, Population, ...)
+  - Bugfix: QuadTree.values().iterator() did not return all values (r8303, r8863)
+
