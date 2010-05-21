@@ -29,6 +29,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Locale;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
@@ -41,14 +42,14 @@ import org.matsim.vis.otfvis.gui.OTFVisConfig;
 /**
  * @author dgrether
  * @author michaz
- * 
+ *
  */
 public class SettingsSaver {
 
 	private static final Logger log = Logger.getLogger(SettingsSaver.class);
 
 	private final String fileName;
-	
+
 	public SettingsSaver(String filename) {
 		if (filename.startsWith("file:")) {
 			this.fileName = filename.substring(5);
@@ -68,7 +69,7 @@ public class SettingsSaver {
 		fc.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().toLowerCase().endsWith(".vcfg");
+				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".vcfg");
 			}
 
 			@Override
@@ -159,5 +160,5 @@ public class SettingsSaver {
 			return null;
 		}
 	}
-	
+
 }

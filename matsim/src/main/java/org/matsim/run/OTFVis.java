@@ -168,14 +168,14 @@ public class OTFVis {
 
 	    fc.setFileFilter( new FileFilter() {
 	      @Override public boolean accept( File f ) {
-	        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".xml" );
+	        return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".xml" );
 	      }
 	      @Override public String getDescription() { return "MATSim net or config file (*.xml)"; }
 	    } );
 
 	    fc.setFileFilter( new FileFilter() {
 	      @Override public boolean accept( File f ) {
-	        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".mvi" );
+	        return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".mvi" );
 	      }
 	      @Override public String getDescription() { return "OTFVis movie file (*.mvi)"; }
 	    } );
@@ -217,7 +217,7 @@ public class OTFVis {
 			printUsage();
 			return;
 		}
-		if (args[1].toLowerCase().endsWith(".xml") || args[1].toLowerCase().endsWith(".xml.gz")) {
+		if (args[1].toLowerCase(Locale.ROOT).endsWith(".xml") || args[1].toLowerCase(Locale.ROOT).endsWith(".xml.gz")) {
 			String netFileName = args[1];
 //  seeing that Gbl.getConfig() is nowhere used anymore in org.matsim.vis.otfvis, I assume
 //  it should now work without the following lines. marcel/6apr2010

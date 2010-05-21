@@ -23,6 +23,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Locale;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -43,9 +44,9 @@ public class OTFFrame extends JFrame {
 
 	public OTFFrame(String title) {
 		super(title);
-		this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ); 		
+		this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		JFrame.setDefaultLookAndFeelDecorated(true);
-		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+		boolean isMac = System.getProperty("os.name").toLowerCase(Locale.ROOT).startsWith("mac os x");
 		if (isMac){
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			this.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
@@ -56,14 +57,14 @@ public class OTFFrame extends JFrame {
 		this.getContentPane().add(pane);
 		this.pane = pane;
 		//Make sure menus appear above JOGL Layer
-		JPopupMenu.setDefaultLightWeightPopupEnabled(false); 
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 
 	}
-	
+
 	public  JSplitPane getSplitPane(){
 		return this.pane;
 	}
-	
+
 	@Override
 	protected void processWindowEvent(WindowEvent e) {
 
@@ -87,7 +88,7 @@ public class OTFFrame extends JFrame {
 				dialog.addWindowListener(new WindowAdapter() {
 				    @Override
 						public void windowClosing(WindowEvent we) {
-				        
+
 				    }
 				});
 				optionPane.addPropertyChangeListener(
@@ -95,7 +96,7 @@ public class OTFFrame extends JFrame {
 				        public void propertyChange(PropertyChangeEvent e) {
 				            String prop = e.getPropertyName();
 
-				            if (dialog.isVisible() 
+				            if (dialog.isVisible()
 				             && (e.getSource() == optionPane)
 				             && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
 				                //If you were going to check something
@@ -116,6 +117,6 @@ public class OTFFrame extends JFrame {
 		System.exit(code);
 	}
 
-	
-	
+
+
 }
