@@ -46,7 +46,7 @@ public class BkRouterTest extends MatsimTestCase {
 	/*package*/ final static Id id10 = new IdImpl("10");
 
 	public void testGeneralizedCostRouting() {
-		Config config = this.loadConfig(this.getClassInputDirectory() + "configRouterTestIATBR.xml");
+		Config config = this.loadConfig(this.getClassInputDirectory() + "configRouterTest.xml");
 		config.controler().setOutputDirectory(this.getOutputDirectory());
 		String netFileName = this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
@@ -90,8 +90,51 @@ public class BkRouterTest extends MatsimTestCase {
 				link10Ok = true;
 			}
 		}
-
 		public void reset(int iteration) {}
+	
 	}
 
+	
+	public void testGeneralizedTollCostRouting() {
+		Config config = this.loadConfig(this.getClassInputDirectory() + "configRouterTest.xml");
+		config.controler().setOutputDirectory(this.getOutputDirectory());
+		String netFileName = this.getClassInputDirectory() + "networkForToll.xml";
+		config.network().setInputFile(netFileName);
+		config.plans().setInputFile(this.getClassInputDirectory() + "plansRouterTollTest.xml");
+		//hh loading
+		config.scenario().setUseHouseholds(true);
+		config.households().setInputFile(this.getClassInputDirectory() + "householdsForToll.xml");
+		//setting road pricing on link 8
+		config.scenario().setUseRoadpricing(true);
+		config.roadpricing().setTollLinksFile(this.getClassInputDirectory() + "tollLinksFile.xml");
+
+		BkControlerIncome controler = new BkControlerIncome(config);
+		controler.setCreateGraphs(false);
+		final EventHandler2 handler = new EventHandler2();
+
+		controler.addControlerListener(new StartupListener() {
+			public void notifyStartup(final StartupEvent event) {
+				event.getControler().getEvents().addHandler(handler);
+//				event.getControler().getEvents().addHandler(new LogOutputEventHandler());
+			}
+		});
+
+		controler.run();
+		assertTrue("Person 1 should be routed on link 10", handler.link10Ok);
+	}
+
+	private static class EventHandler2 implements LinkEnterEventHandler{
+
+		boolean link10Ok = false;
+
+		//link 10
+		public void handleEvent(LinkEnterEvent e) {
+			if (e.getLinkId().equals(id10) && e.getPersonId().equals(id1)) {
+				link10Ok = true;
+			}
+		}
+		public void reset(int iteration) {}
+	
+	}
+	
 }
