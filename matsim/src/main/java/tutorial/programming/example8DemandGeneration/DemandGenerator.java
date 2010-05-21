@@ -65,8 +65,7 @@ public class DemandGenerator {
 
 	public static void main(String [] args) throws IOException {
 
-		//out input files
-		String netFile = exampleDirectory + "network.xml";
+		// input files
 		String zonesFile = exampleDirectory + "zones.shp";
 
 		Scenario scenario = new ScenarioImpl();

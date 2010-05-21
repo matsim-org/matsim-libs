@@ -49,7 +49,6 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
@@ -87,7 +86,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	/* time since last "info" */
 	private double infoTime = 0;
-	protected static final int INFO_PERIOD = 3600;
+	private static final int INFO_PERIOD = 3600;
 
 
 	protected QNetwork network;
@@ -210,7 +209,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public double getStuckTime(){
 		return this.stuckTime;
 	}
-	
+
 	public AgentCounter getAgentCounter(){
 		return this.agentCounter;
 	}
@@ -270,7 +269,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			Collection<PersonAgent> a = this.transitEngine.createAgents();
 			agents.addAll(a);
 		}
-		
+
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			for (PersonAgent agent : agents) {
 				queueSimulationFeature.agentCreated(agent);
@@ -332,7 +331,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			queueSimulationFeature.afterPrepareSim();
 		}
 	}
-	
+
 	/**
 	 * Close any files, etc.
 	 */
@@ -340,7 +339,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		if (this.transitEngine != null) {
 			this.transitEngine.afterSim();
 		}
-		
+
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeCleanupSim();
 		}
@@ -409,7 +408,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			this.snapshotTime += this.snapshotPeriod;
 			doSnapshot(time);
 		}
-		
+
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterAfterSimStep(time);
 		}
@@ -614,7 +613,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public QNetwork getQNetwork() {
 		return this.network;
 	}
-	
+
 	public VisNetwork getVisNetwork() {
 		return this.network ;
 	}

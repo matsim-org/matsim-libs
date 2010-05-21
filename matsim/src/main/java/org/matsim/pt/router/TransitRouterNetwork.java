@@ -304,7 +304,7 @@ public final class TransitRouterNetwork implements Network {
 		this.qtNodes = quadTree;
 	}
 
-	public final Collection<TransitRouterNetworkNode> getNearestNodes(final Coord coord, final double distance) {
+	public Collection<TransitRouterNetworkNode> getNearestNodes(final Coord coord, final double distance) {
 		return this.qtNodes.get(coord.getX(), coord.getY(), distance);
 	}
 

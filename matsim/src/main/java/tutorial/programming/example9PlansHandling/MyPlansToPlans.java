@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
-import org.matsim.core.config.Config;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 
@@ -33,8 +32,6 @@ import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
  * @author kn after mrieser
  */
 public class MyPlansToPlans {
-
-	private Config config;
 
 	public void run(final String[] args) {
 		ScenarioLoader sl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader(
