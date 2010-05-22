@@ -15,5 +15,10 @@
   		<artifactId>dgrether</artifactId>
   		<version>0.2.0-SNAPSHOT</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.apache.commons</groupId>
+  		<artifactId>commons-math</artifactId>
+  		<version>2.0</version>
+  	</dependency>
    </dependencies>
 </project>
