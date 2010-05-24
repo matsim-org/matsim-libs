@@ -160,7 +160,7 @@ public class Controler {
 
 	private ControlerState state = ControlerState.Init;
 
-	private static String outputPath = null;
+	private String outputPath = null;
 
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout("%d{ISO8601} %5p %C{1}:%L %m%n");
 
