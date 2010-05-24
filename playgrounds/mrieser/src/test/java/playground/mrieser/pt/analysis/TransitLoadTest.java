@@ -28,10 +28,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.PersonEntersVehicleEventImpl;
-import org.matsim.core.events.PersonLeavesVehicleEventImpl;
-import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
-import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
+import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
@@ -77,26 +74,28 @@ public class TransitLoadTest {
 		line1.addRoute(route1);
 		schedule.addTransitLine(line1);
 
+		EventsFactoryImpl ef = new EventsFactoryImpl();
+
 		TransitLoad tl = new TransitLoad(schedule);
-		tl.handleEvent(new VehicleArrivesAtFacilityEventImpl(7.0*3600-10, vehicleIdDep1, stop1.getId(), 0));
-		tl.handleEvent(new PersonEntersVehicleEventImpl(7.0*3600-5, id[0], vehicleIdDep1, route1.getId()));
-		tl.handleEvent(new VehicleDepartsAtFacilityEventImpl(7.0*3600+10, vehicleIdDep1, stop1.getId(), 0));
+		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(7.0*3600-10, vehicleIdDep1, stop1.getId(), 0));
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.0*3600-5, id[0], vehicleIdDep1, route1.getId()));
+		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(7.0*3600+10, vehicleIdDep1, stop1.getId(), 0));
 
-		tl.handleEvent(new VehicleArrivesAtFacilityEventImpl(7.1*3600-25, vehicleIdDep1, stop2.getId(), 0));
-		tl.handleEvent(new PersonLeavesVehicleEventImpl(7.1*3600-5, id[0], vehicleIdDep1, route1.getId()));
-		tl.handleEvent(new PersonEntersVehicleEventImpl(7.1*3600, id[1], vehicleIdDep1, route1.getId()));
-		tl.handleEvent(new PersonEntersVehicleEventImpl(7.1*3600+5, id[2], vehicleIdDep1, route1.getId()));
-		tl.handleEvent(new VehicleDepartsAtFacilityEventImpl(7.1*3600+25, vehicleIdDep1, stop2.getId(), 0));
+		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(7.1*3600-25, vehicleIdDep1, stop2.getId(), 0));
+		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.1*3600-5, id[0], vehicleIdDep1, route1.getId()));
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.1*3600, id[1], vehicleIdDep1, route1.getId()));
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.1*3600+5, id[2], vehicleIdDep1, route1.getId()));
+		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(7.1*3600+25, vehicleIdDep1, stop2.getId(), 0));
 
-		tl.handleEvent(new VehicleArrivesAtFacilityEventImpl(7.2*3600-15, vehicleIdDep1, stop3.getId(), 0));
-		tl.handleEvent(new PersonLeavesVehicleEventImpl(7.2*3600-5, id[2], vehicleIdDep1, route1.getId()));
-		tl.handleEvent(new PersonEntersVehicleEventImpl(7.2*3600, id[3], vehicleIdDep1, route1.getId()));
-		tl.handleEvent(new VehicleDepartsAtFacilityEventImpl(7.2*3600+20, vehicleIdDep1, stop3.getId(), 0));
+		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(7.2*3600-15, vehicleIdDep1, stop3.getId(), 0));
+		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.2*3600-5, id[2], vehicleIdDep1, route1.getId()));
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.2*3600, id[3], vehicleIdDep1, route1.getId()));
+		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(7.2*3600+20, vehicleIdDep1, stop3.getId(), 0));
 
-		tl.handleEvent(new VehicleArrivesAtFacilityEventImpl(7.3*3600-20, vehicleIdDep1, stop4.getId(), 0));
-		tl.handleEvent(new PersonLeavesVehicleEventImpl(7.3*3600-5, id[1], vehicleIdDep1, route1.getId()));
-		tl.handleEvent(new PersonLeavesVehicleEventImpl(7.3*3600, id[3], vehicleIdDep1, route1.getId()));
-		tl.handleEvent(new VehicleDepartsAtFacilityEventImpl(7.3*3600+5, vehicleIdDep1, stop4.getId(), 0));
+		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(7.3*3600-20, vehicleIdDep1, stop4.getId(), 0));
+		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.3*3600-5, id[1], vehicleIdDep1, route1.getId()));
+		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.3*3600, id[3], vehicleIdDep1, route1.getId()));
+		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(7.3*3600+5, vehicleIdDep1, stop4.getId(), 0));
 
 		Assert.assertEquals(1, tl.getLoadAtDeparture(line1, route1, stop1, dep1));
 		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, stop2, dep1));
