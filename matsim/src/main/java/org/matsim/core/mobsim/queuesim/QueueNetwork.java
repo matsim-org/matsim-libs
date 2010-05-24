@@ -46,9 +46,9 @@ import org.matsim.vis.snapshots.writers.VisNode;
  */
  class QueueNetwork implements VisNetwork, CapacityInformationNetwork {
 
-	private final Map<Id, QueueLink> links;
+	private final Map<Id, QueueLink> queuelinks;
 
-	private final Map<Id, QueueNode> nodes;
+	private final Map<Id, QueueNode> queuenodes;
 
 	private final Network networkLayer;
 
@@ -61,15 +61,15 @@ import org.matsim.vis.snapshots.writers.VisNode;
 	/*package*/ QueueNetwork(final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory) {
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
-		this.links = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
-		this.nodes = new LinkedHashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.queuelinks = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.queuenodes = new LinkedHashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		for (Node n : networkLayer.getNodes().values()) {
-			this.nodes.put(n.getId(), this.queueNetworkFactory.createQueueNode(n, this));
+			this.queuenodes.put(n.getId(), this.queueNetworkFactory.createQueueNode(n, this));
 		}
 		for (Link l : networkLayer.getLinks().values()) {
-			this.links.put(l.getId(), this.queueNetworkFactory.createQueueLink(l, this, this.nodes.get(l.getToNode().getId())));
+			this.queuelinks.put(l.getId(), this.queueNetworkFactory.createQueueLink(l, this, this.queuenodes.get(l.getToNode().getId())));
 		}
-		for (QueueNode n : this.nodes.values()) {
+		for (QueueNode n : this.queuenodes.values()) {
 			n.init();
 		}
 	}
@@ -84,39 +84,39 @@ import org.matsim.vis.snapshots.writers.VisNode;
 	 */
 	/*package*/ Collection<AgentSnapshotInfo> getVehiclePositions() {
 		Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-		for (QueueLink link : this.links.values()) {
+		for (QueueLink link : this.queuelinks.values()) {
 			link.getVisData().getVehiclePositions(positions);
 		}
 		return positions;
 	}
 
 	/*package*/ Map<Id, QueueLink> getQueueLinks() {
-		return Collections.unmodifiableMap(this.links);
+		return Collections.unmodifiableMap(this.queuelinks);
 	}
 
 	@Deprecated // only used by christoph
 	public Map<Id, ? extends CapacityInformationLink> getCapacityInformationLinks() {
-		return Collections.unmodifiableMap( this.links ) ;
+		return Collections.unmodifiableMap( this.queuelinks ) ;
 	}
 
 	/*package*/ Map<Id, QueueNode> getQueueNodes() {
-		return Collections.unmodifiableMap(this.nodes);
+		return Collections.unmodifiableMap(this.queuenodes);
 	}
 	
 	public Map<Id,? extends VisLink> getVisLinks() {
-		return Collections.unmodifiableMap( this.links ) ;
+		return Collections.unmodifiableMap( this.queuelinks ) ;
 	}
 	
 	public Map<Id,? extends VisNode> getVisNodes() {
-		return Collections.unmodifiableMap( this.nodes);
+		return Collections.unmodifiableMap( this.queuenodes);
 	}
 
 	/*package*/ QueueLink getQueueLink(final Id id) {
-		return this.links.get(id);
+		return this.queuelinks.get(id);
 	}
 
 	/*package*/ QueueNode getQueueNode(final Id id) {
-		return this.nodes.get(id);
+		return this.queuenodes.get(id);
 	}
 	
 }
