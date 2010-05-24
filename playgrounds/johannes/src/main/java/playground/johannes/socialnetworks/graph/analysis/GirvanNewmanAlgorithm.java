@@ -54,26 +54,26 @@ import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
  *
  */
 public class GirvanNewmanAlgorithm {
-	
+
 	private static final Logger logger = Logger.getLogger(GirvanNewmanAlgorithm.class);
 
 	private String outputDir;
-	
+
 	public <V extends Vertex> List<Set<Set<V>>> dendogram(Graph graph, int maxIterations, Handler handler) {
 		List<Set<Set<V>>> dendogram = new ArrayList<Set<Set<V>>>();
 		SparseGraphProjectionBuilder<Graph, V, Edge> builder = new SparseGraphProjectionBuilder<Graph, V, Edge>();
 		GraphProjection<Graph, V, Edge> projection = builder.decorateGraph(graph);
 //		projection.decorate();
-		
+
 		int iteration = 0;
 		int lastSize = Integer.MAX_VALUE;
 		while(projection.getEdges().size() > 0 && iteration < maxIterations) {
 			logger.info(String.format("Calculating edge betweenness at level %1$s...", iteration));
 			Centrality c = new Centrality();
 			c.init(projection);
-			
-			
-			
+
+
+
 			double maxBC = 0;
 			Edge maxBCEdge = null;
 			TObjectIntIterator<Edge> it = c.edgeBetweenness().iterator();
@@ -84,28 +84,29 @@ public class GirvanNewmanAlgorithm {
 					maxBCEdge = it.key();
 				}
 			}
-			
+
 			builder.removeEdge(projection, (EdgeDecorator<Edge>) maxBCEdge);
-			Set<Set<V>> partition = new HashSet<Set<V>>((Collection<? extends Set<V>>) new Components().components(projection));
-		
+			Collection<Set<V>> list = new Components().components(projection);
+			Set<Set<V>> partition = new HashSet<Set<V>>(list);
+
 			logger.info(String.format("Done - disconnected components... %1$s", partition.size()));
-			
+
 			if(partition.size() != lastSize) {
 				dendogram.add(partition);
 				lastSize = partition.size();
 				if(handler != null)
 					handler.handlePartition(projection, partition, iteration, dendogram);
 			}
-			
+
 			iteration++;
 		}
-		
+
 		return dendogram;
 	}
-	
+
 	public static <V extends Vertex> void writeDendogram(List<Set<Set<V>>> dendogram, String filename) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-		
+
 		for(Set<Set<V>> level : dendogram) {
 			for(Set<?> cluster : level) {
 				writer.write(String.valueOf(cluster.size()));
@@ -115,13 +116,13 @@ public class GirvanNewmanAlgorithm {
 		}
 		writer.close();
 	}
-	
+
 	public interface Handler {
-		
+
 		public <V extends Vertex> void handlePartition(GraphProjection projection, Set<Set<V>> components, int iteration, List<Set<Set<V>>> dendogram);
-		
+
 	}
-	
+
 	public class DumpHandler implements Handler {
 
 		public <V extends Vertex> void handlePartition(GraphProjection projection, Set<Set<V>> partition, int level, List<Set<Set<V>>> dendogram) {
@@ -148,7 +149,7 @@ public class GirvanNewmanAlgorithm {
 					newCluster.add(((VertexDecorator<V>)v).getDelegate());
 				components.add(newCluster);
 			}
-			
+
 			//************************************************
 			SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
 //			writer.setCoordinateTransformation(new CH1903LV03toWGS84());
@@ -165,7 +166,7 @@ public class GirvanNewmanAlgorithm {
 			//************************************************
 			try {
 				writeDendogram(dendogram, String.format("%1$s/%2$s.dendogram.txt", outputDir, level));
-				
+
 				SpatialPajekWriter pwriter = new SpatialPajekWriter();
 				pwriter.write((SpatialSparseGraph) projection.getDelegate(), new PajekCommunityColorizer(components), String.format("%1$s/%2$s.graph.net", outputDir, level));
 			} catch (IOException e) {
@@ -173,9 +174,9 @@ public class GirvanNewmanAlgorithm {
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
-	
+
 	public static void main(String args[]) throws IOException {
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		Graph graph = reader.readGraph(args[0]);
@@ -184,14 +185,14 @@ public class GirvanNewmanAlgorithm {
 //		SparseGraph graph = generator.generate(200, 0.02, 4711);
 //		GMLReader reader = new GMLReader();
 //		Graph graph = reader.read("/Users/fearonni/Downloads/karate/karate.gml", new SparseGraphFactory());
-		
-		
-		
+
+
+
 		GirvanNewmanAlgorithm algo = new GirvanNewmanAlgorithm();
 		algo.outputDir = args[1];
-		
+
 		writeDendogram(algo.dendogram(graph, Integer.parseInt(args[2]), algo.new DumpHandler()), String.format("%1$s/dendogram.txt", algo.outputDir));
-		
-		
+
+
 	}
 }
