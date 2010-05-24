@@ -28,14 +28,14 @@ import org.matsim.api.core.v01.network.Node;
  */
 /*package*/ final class DefaultQNetworkFactory implements QNetworkFactory<QNode, QLink> {
 
-	public QLink newQueueLink(final Link link, final QSimEngine simEngine, final QNode toQueueNode) {
+	public QLink createQueueLink(final Link link, final QSimEngine simEngine, final QNode toQueueNode) {
 		return new QLinkImpl(link, simEngine, toQueueNode);
 	}
 
 	/**
 	 * @see org.matsim.core.mobsim.queuesim.QueueNetworkFactory#createQueueNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
 	 */
-	public QNode newQueueNode(final Node node, QSimEngine simEngine) {
+	public QNode createQueueNode(final Node node, QSimEngine simEngine) {
 		return new QNode(node, simEngine);
 	}
 

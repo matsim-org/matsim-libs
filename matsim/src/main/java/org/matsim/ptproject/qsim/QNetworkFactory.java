@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.network.Node;
  */
 public interface QNetworkFactory<QN extends QNode, QL extends QLink> {
 
-	public QN newQueueNode(Node node, QSimEngine simEngine);
+	public QN createQueueNode(Node node, QSimEngine simEngine);
 
-	public QL newQueueLink(Link link, QSimEngine simEngine, QN queueNode);
+	public QL createQueueLink(Link link, QSimEngine simEngine, QN queueNode);
 
 }

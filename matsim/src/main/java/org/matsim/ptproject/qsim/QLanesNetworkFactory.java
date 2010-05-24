@@ -36,21 +36,21 @@ public class QLanesNetworkFactory implements QNetworkFactory<QNode, QLink> {
   }
 
   @Override
-  public QLink newQueueLink(Link link, QSimEngine engine,
+  public QLink createQueueLink(Link link, QSimEngine engine,
       QNode queueNode) {
   	QLink ql = null;
   	if (this.laneDefinitions.getLanesToLinkAssignments().containsKey(link.getId())){
   		ql = new QLinkLanesImpl(link, engine, queueNode, this.laneDefinitions.getLanesToLinkAssignments().get(link.getId()).getLanes());
   	}
   	else {
-  		ql = this.delegate.newQueueLink(link, engine, queueNode);
+  		ql = this.delegate.createQueueLink(link, engine, queueNode);
   	}
   	return ql;
   }
 
   @Override
-  public QNode newQueueNode(Node node, QSimEngine simEngine) {
-    return this.delegate.newQueueNode(node, simEngine);
+  public QNode createQueueNode(Node node, QSimEngine simEngine) {
+    return this.delegate.createQueueNode(node, simEngine);
   }
 
 }

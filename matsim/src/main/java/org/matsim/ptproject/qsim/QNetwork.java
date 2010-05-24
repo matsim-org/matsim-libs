@@ -62,10 +62,10 @@ public class QNetwork implements VisNetwork, QNetworkI {
 	
 	protected void initialize(QSimEngine simEngine) {
     for (Node n : networkLayer.getNodes().values()) {
-      this.nodes.put(n.getId(), this.queueNetworkFactory.newQueueNode(n, simEngine));
+      this.nodes.put(n.getId(), this.queueNetworkFactory.createQueueNode(n, simEngine));
     }
     for (Link l : networkLayer.getLinks().values()) {
-      this.links.put(l.getId(), this.queueNetworkFactory.newQueueLink(l, simEngine, this.nodes.get(l.getToNode().getId())));
+      this.links.put(l.getId(), this.queueNetworkFactory.createQueueLink(l, simEngine, this.nodes.get(l.getToNode().getId())));
     }
     for (QNode n : this.nodes.values()) {
       n.init();
