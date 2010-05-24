@@ -26,6 +26,9 @@ public interface Leg extends PlanElement {
 
 	public TransportMode getMode();
 
+	/**Sets the mode of the leg. No consistency check is done; in particular, the route from a different mode
+	 * may remain in place.
+	 */
 	public void setMode(TransportMode mode);
 
 	public Route getRoute();
