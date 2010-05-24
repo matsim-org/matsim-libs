@@ -56,7 +56,11 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 	public ChangeLegMode(final Config config) {
 		super(config.global().getNumberOfThreads());
 		this.config = config;
+		
+		// try to get the modes from the "changeLegMode" module of the config file
 		String modes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
+		
+		// if there was anything in there, replace the default availableModes by the entries in the config file:
 		if (modes != null) {
 			String[] parts = StringUtils.explode(modes, ',');
 			this.availableModes = new TransportMode[parts.length];
@@ -64,10 +68,16 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 				this.availableModes[i] = TransportMode.valueOf(parts[i].trim());
 			}
 		}
+		
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
+		
+		// use a class from the planomat package.
+		// yy not clear to me: how the planomat config group is used to configure this.  Seems, however, that
+		// the only thing that is configured is if "facilities" or "links" decide if there is a return to the 
+		// same location.  kai, may'10
 		return new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance(), config.planomat());
 	}
 
