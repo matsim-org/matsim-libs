@@ -51,7 +51,7 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFServerQuadI;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
@@ -459,12 +459,12 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	@Override
-	public OTFVisConfig getOTFVisConfig() throws RemoteException {
-		OTFVisConfig otfVis = this.otfVisQueueSimFeature.getVisMobsim().getScenario().getConfig().otfVis();
+	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException {
+		OTFVisConfigGroup otfVis = this.otfVisQueueSimFeature.getVisMobsim().getScenario().getConfig().otfVis();
 		if (otfVis != null) {
 			return otfVis;
 		} else {
-			return new OTFVisConfig();
+			return new OTFVisConfigGroup();
 		}
 	}
 

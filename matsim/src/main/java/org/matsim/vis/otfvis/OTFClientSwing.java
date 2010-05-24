@@ -31,7 +31,7 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
 import org.matsim.vis.otfvis.gui.NetJComponent;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
@@ -107,9 +107,9 @@ public class OTFClientSwing extends OTFClient {
 	}
 
 	@Override
-	protected OTFVisConfig createOTFVisConfig() {
+	protected OTFVisConfigGroup createOTFVisConfig() {
 	    saver = new SettingsSaver(this.url);
-	    OTFVisConfig visconf = new OTFVisConfig();
+	    OTFVisConfigGroup visconf = new OTFVisConfigGroup();
 	    return visconf;
 	}
 

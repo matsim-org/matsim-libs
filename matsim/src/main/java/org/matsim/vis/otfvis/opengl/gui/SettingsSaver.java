@@ -37,7 +37,7 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
 /**
  * @author dgrether
@@ -88,14 +88,14 @@ public class SettingsSaver {
 
 	}
 
-	private OTFVisConfig readConfigFromFile(File file) {
+	private OTFVisConfigGroup readConfigFromFile(File file) {
 		ObjectInputStream inFile;
 		if (file == null) {
 			throw new NullPointerException("Not able to read config from file.");
 		}
 		try {
 			inFile = new ObjectInputStream(new FileInputStream(file));
-			OTFVisConfig visConfig = (OTFVisConfig) inFile.readObject();
+			OTFVisConfigGroup visConfig = (OTFVisConfigGroup) inFile.readObject();
 			log.info("Config read from file : " + file.getAbsolutePath());
 			log.info("Config has " + visConfig.getZooms().size()
 					+ " zoom entries...");
@@ -112,7 +112,7 @@ public class SettingsSaver {
 				"Not able to read config from file: " + file.getPath());
 	}
 
-	public void saveSettingsAs(OTFVisConfig visConfig) {
+	public void saveSettingsAs(OTFVisConfigGroup visConfig) {
 		File file = chooseFile(true);
 		if (file != null) {
 			OutputStream out;
@@ -135,23 +135,23 @@ public class SettingsSaver {
 		}
 	}
 
-	public OTFVisConfig chooseAndReadSettingsFile() {
+	public OTFVisConfigGroup chooseAndReadSettingsFile() {
 		File file = chooseFile(false);
 		return readConfigFromFile(file);
 	}
 
-	private void dumpConfig(OTFVisConfig visConfig) {
+	private void dumpConfig(OTFVisConfigGroup visConfig) {
 		log.info("OTFVis config dump:");
 		StringWriter writer = new StringWriter();
 		Config tmpConfig = new Config();
-		tmpConfig.addModule(OTFVisConfig.GROUP_NAME, visConfig);
+		tmpConfig.addModule(OTFVisConfigGroup.GROUP_NAME, visConfig);
 		PrintWriter pw = new PrintWriter(writer);
 		new ConfigWriter(tmpConfig).writeStream(pw);
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
 	}
 
-	public OTFVisConfig tryToReadSettingsFile() {
+	public OTFVisConfigGroup tryToReadSettingsFile() {
 		File file = new File(fileName + ".vcfg");
 		System.out.println(file.getAbsolutePath());
 		if (file.exists()) {

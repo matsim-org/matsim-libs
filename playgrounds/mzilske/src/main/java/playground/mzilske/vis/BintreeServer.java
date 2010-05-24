@@ -18,7 +18,7 @@ import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFServerQuadI;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -193,8 +193,8 @@ public final class BintreeServer implements OTFServerRemote {
 	}
 
 	@Override
-	public OTFVisConfig getOTFVisConfig() throws RemoteException {
-		return new OTFVisConfig();
+	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException {
+		return new OTFVisConfigGroup();
 	}
 
 	public void close() {

@@ -11,7 +11,7 @@ import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.QueryEntry;
 import org.matsim.vis.otfvis.gui.OTFQueryControl.IdResolver;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
@@ -79,7 +79,7 @@ public final class InjectableOTFClient extends OTFClient {
 	}
 
 	@Override
-	protected OTFVisConfig createOTFVisConfig() {
+	protected OTFVisConfigGroup createOTFVisConfig() {
 		try {
 			saver = new SettingsSaver(this.masterHostControl.getAddress());
 			return this.masterHostControl.getOTFServer().getOTFVisConfig();

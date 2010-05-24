@@ -56,12 +56,12 @@ public class OTFQueryControlToolBar extends JToolBar implements ActionListener, 
 	private JComboBox queryTypeComboBox;
 	private JTabbedPane pane;
 
-	private final OTFVisConfig config;
+	private final OTFVisConfigGroup config;
 
 	private final OTFQueryControl queryControl; 
 
 
-	public OTFQueryControlToolBar(OTFQueryControl queryControl, final OTFVisConfig config) {
+	public OTFQueryControlToolBar(OTFQueryControl queryControl, final OTFVisConfigGroup config) {
 		super();
 		this.config = config;
 		this.queryControl = queryControl;
@@ -128,7 +128,7 @@ public class OTFQueryControlToolBar extends JToolBar implements ActionListener, 
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		OTFVisConfig cfg = this.config;
+		OTFVisConfigGroup cfg = this.config;
 		String command = e.getActionCommand();
 		if("id_changed".equals(command)) {
 			String id = ((JTextField)e.getSource()).getText();

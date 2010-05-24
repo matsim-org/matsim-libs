@@ -83,9 +83,9 @@ public class OTFQueryControl implements OTFQueryHandler {
 							"show Spinne of all veh on the link NOW",
 							QuerySpinneNOW.class)));
 
-	private final OTFVisConfig config;
+	private final OTFVisConfigGroup config;
 
-	public OTFQueryControl(OTFHostControlBar handler, final OTFVisConfig config) {
+	public OTFQueryControl(OTFHostControlBar handler, final OTFVisConfigGroup config) {
 		this.config = config;
 		this.agentIdResolver = new MyIdResolver();
 		this.hostControlBar = handler;

@@ -52,7 +52,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	private static final long serialVersionUID = 5778562849300898138L;
 	
-	private OTFVisConfig visConfig;
+	private OTFVisConfigGroup visConfig;
 	
 	private JComboBox rightMFunc;
 	
@@ -365,7 +365,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		} 
 		}
 
-	public void setVisConfig(OTFVisConfig visConfig) {
+	public void setVisConfig(OTFVisConfigGroup visConfig) {
 		this.visConfig = visConfig;
 		initGUI();
 	}

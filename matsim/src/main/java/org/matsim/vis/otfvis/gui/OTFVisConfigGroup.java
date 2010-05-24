@@ -38,8 +38,8 @@ import org.matsim.vis.otfvis.opengl.gl.Point3f;
  * @author dstrippgen
  *
  */
-public class OTFVisConfig extends Module {
-	private static final Logger log = Logger.getLogger(OTFVisConfig.class);
+public class OTFVisConfigGroup extends Module {
+	private static final Logger log = Logger.getLogger(OTFVisConfigGroup.class);
 	
 	private static final long serialVersionUID = 1L;
 
@@ -86,7 +86,7 @@ public class OTFVisConfig extends Module {
 
   private boolean scaleQuadTreeRect;
 	
-  public OTFVisConfig() {
+  public OTFVisConfigGroup() {
     super(GROUP_NAME);
   }
 	

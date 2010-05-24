@@ -27,7 +27,7 @@ import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
@@ -42,10 +42,10 @@ public class OTFClientLive extends OTFClient {
 	}
 
 	@Override
-	protected OTFVisConfig createOTFVisConfig() {
+	protected OTFVisConfigGroup createOTFVisConfig() {
 		try {
 			saver = new SettingsSaver("otfsettings");
-			OTFVisConfig visconf = saver.tryToReadSettingsFile();
+			OTFVisConfigGroup visconf = saver.tryToReadSettingsFile();
 			if (visconf == null) {
 				visconf = this.masterHostControl.getOTFServer().getOTFVisConfig();
 			}

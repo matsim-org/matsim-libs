@@ -39,7 +39,7 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
@@ -270,8 +270,8 @@ public class OTFTVehServer implements OTFServerRemote {
 	}
 
 	@Override
-	public OTFVisConfig getOTFVisConfig() throws RemoteException {
-		return new OTFVisConfig();
+	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException {
+		return new OTFVisConfigGroup();
 	}
 
 }

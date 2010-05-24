@@ -26,7 +26,7 @@ import java.rmi.RemoteException;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
@@ -116,7 +116,7 @@ public class OTFClientFile extends OTFClient {
 	}
 
 	@Override
-	protected OTFVisConfig createOTFVisConfig() {
+	protected OTFVisConfigGroup createOTFVisConfig() {
 		try {
 			saver = new SettingsSaver(this.url);
 			return this.masterHostControl.getOTFServer().getOTFVisConfig();

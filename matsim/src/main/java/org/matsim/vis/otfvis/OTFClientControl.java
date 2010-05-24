@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis;
 
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 
 
@@ -37,7 +37,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 public final class OTFClientControl {
   
   private static final OTFClientControl instance = new OTFClientControl();
-  private OTFVisConfig config;
+  private OTFVisConfigGroup config;
   private OTFDrawer mainDrawer;
   
   private OTFClientControl() {}
@@ -46,11 +46,11 @@ public final class OTFClientControl {
     return instance;
   }
   
-  public void setOTFVisConfig(OTFVisConfig conf) {
+  public void setOTFVisConfig(OTFVisConfigGroup conf) {
     this.config = conf;
   }
   
-  public OTFVisConfig getOTFVisConfig() {
+  public OTFVisConfigGroup getOTFVisConfig() {
     return this.config;
   }
 

@@ -38,7 +38,7 @@ import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadI;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
@@ -64,7 +64,7 @@ public final class OTFFileReader implements OTFServerRemote {
 
 	private TreeMap<Double, Long> timesteps = new TreeMap<Double, Long>();
 
-	private OTFVisConfig otfVisConfig;
+	private OTFVisConfigGroup otfVisConfig;
 
 	public OTFFileReader(final String fname) {
 		this.fileName = fname;
@@ -106,7 +106,7 @@ public final class OTFFileReader implements OTFServerRemote {
 		}
 	}
 
-	private void setDelayParameterIfZero(OTFVisConfig cfg) {
+	private void setDelayParameterIfZero(OTFVisConfigGroup cfg) {
 		cfg.setDelay_ms(cfg.getDelay_ms() == 0 ? 30 : cfg.getDelay_ms());
 	}
 
@@ -297,12 +297,12 @@ public final class OTFFileReader implements OTFServerRemote {
 	}
 
 	@Override
-	public OTFVisConfig getOTFVisConfig() throws RemoteException {
+	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException {
 		return otfVisConfig;
 	}
 
-	private OTFVisConfig readConfigOrUseDefaults() {
-		OTFVisConfig otfVisConfig2 = tryToReadSettingsFromOldBinaryFormat();
+	private OTFVisConfigGroup readConfigOrUseDefaults() {
+		OTFVisConfigGroup otfVisConfig2 = tryToReadSettingsFromOldBinaryFormat();
 		if (otfVisConfig2 != null) {
 			return otfVisConfig2;
 		}
@@ -310,23 +310,23 @@ public final class OTFFileReader implements OTFServerRemote {
 		if (otfVisConfig2 != null) {
 			return otfVisConfig2;
 		}
-		return new OTFVisConfig();
+		return new OTFVisConfigGroup();
 	}
 
-	private OTFVisConfig tryToReadSettingsFromFileNextToMovie() {
+	private OTFVisConfigGroup tryToReadSettingsFromFileNextToMovie() {
 		log.debug("Looking for settings in: " + this.fileName);
 		SettingsSaver saver = new SettingsSaver(this.fileName);
-		OTFVisConfig settingsFromFile = saver.tryToReadSettingsFile();
+		OTFVisConfigGroup settingsFromFile = saver.tryToReadSettingsFile();
 		return settingsFromFile;
 	}
 
-	private OTFVisConfig tryToReadSettingsFromOldBinaryFormat() {
+	private OTFVisConfigGroup tryToReadSettingsFromOldBinaryFormat() {
 		try {
 			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 			ZipEntry infoEntry = zipFile.getEntry("config.bin");
 			if (infoEntry != null) {
 				ObjectInputStream inFile = new ObjectInputStream(zipFile.getInputStream(infoEntry));
-				OTFVisConfig cfg = (OTFVisConfig) inFile.readObject();
+				OTFVisConfigGroup cfg = (OTFVisConfigGroup) inFile.readObject();
 				setDelayParameterIfZero(cfg);
 				return cfg;
 			}

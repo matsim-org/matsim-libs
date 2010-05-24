@@ -41,7 +41,7 @@ import org.matsim.vis.otfvis.data.OTFServerQuadI;
 import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
@@ -82,7 +82,7 @@ public abstract class OTFClient implements Runnable {
 		}
 		createMainFrame();
 		log.info("created MainFrame");
-		OTFVisConfig visconf = createOTFVisConfig();
+		OTFVisConfigGroup visconf = createOTFVisConfig();
 		OTFClientControl.getInstance().setOTFVisConfig(visconf);
 		log.info("got OTFVis config");
 		createHostControlBar();
@@ -176,7 +176,7 @@ public abstract class OTFClient implements Runnable {
 			}
 
 			public void actionPerformed(final ActionEvent e) {
-				OTFVisConfig visConfig = save.chooseAndReadSettingsFile();
+				OTFVisConfigGroup visConfig = save.chooseAndReadSettingsFile();
 				OTFClientControl.getInstance().setOTFVisConfig(visConfig);
 				try {
 					OTFClientControl.getInstance().getMainOTFDrawer().invalidate(-1);
@@ -207,6 +207,6 @@ public abstract class OTFClient implements Runnable {
 
 	protected abstract OTFDrawer createDrawer();
 
-	protected abstract OTFVisConfig createOTFVisConfig();
+	protected abstract OTFVisConfigGroup createOTFVisConfig();
 
 }
