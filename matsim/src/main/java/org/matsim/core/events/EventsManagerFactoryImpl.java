@@ -18,10 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.experimental.events;
+package org.matsim.core.events;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.events.EventsManagerImpl;
 
 /**
  * @author nagel
