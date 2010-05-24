@@ -577,21 +577,6 @@ public class QLinkImpl implements QLink {
 		private VisDataImpl() {
 		}
 
-		/**
-		 * see javadoc of the interface
-		 */
-		public double getDisplayableTimeCapValue(double time) {
-			// yy otfvis does not use this, so I think that it should be made deprecated eventually. kai, apr'10
-			int count = QLinkImpl.this.buffer.size();
-			for (QVehicle veh : QLinkImpl.this.vehQueue) {
-				// Check if veh has reached destination
-				if (veh.getEarliestLinkExitTime() <= time) {
-					count++;
-				}
-			}
-			return count * 2.0 / QLinkImpl.this.storageCapacity;
-		}
-
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
 			double time = QLinkImpl.this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay() ;
 			
