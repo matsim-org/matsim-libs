@@ -7,7 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.EventsManagerFactoryImpl;
+import org.matsim.core.events.EventsManagerFactoryImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.router.PlansCalcRoute;
