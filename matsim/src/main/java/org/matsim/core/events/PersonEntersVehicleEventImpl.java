@@ -23,10 +23,8 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.BasicVehicle;
 
 /**
- *
  * @author mrieser
  */
 public class PersonEntersVehicleEventImpl extends PersonEventImpl implements PersonEntersVehicleEvent {
@@ -36,14 +34,8 @@ public class PersonEntersVehicleEventImpl extends PersonEventImpl implements Per
 	public static final String TRANSIT_ROUTE_ID = "transitRouteId";
 	private final Id vehicleId;
 	private Id transitRouteId = null;
-	
-	public PersonEntersVehicleEventImpl(final double time, final Id personId, final BasicVehicle vehicle, Id transitRouteId) {
-		super(time, personId);
-		this.vehicleId = vehicle.getId();
-		this.transitRouteId = transitRouteId;
-	}
 
-	/* package */ PersonEntersVehicleEventImpl(final double time, final Id personId, final Id vehicleId, Id transitRouteId) {
+	/*package*/ PersonEntersVehicleEventImpl(final double time, final Id personId, final Id vehicleId, Id transitRouteId) {
 		super(time, personId);
 		this.vehicleId = vehicleId;
 		this.transitRouteId = transitRouteId;
@@ -71,5 +63,5 @@ public class PersonEntersVehicleEventImpl extends PersonEventImpl implements Per
 	public Id getTransitRouteId() {
 		return transitRouteId;
 	}
-	
+
 }

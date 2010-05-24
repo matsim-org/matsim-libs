@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.PersonEntersVehicleEventImpl;
+import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
@@ -199,28 +199,26 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	public boolean handlePassengerEntering(final PassengerAgent passenger, final double time) {
-		boolean handled = this.vehicle.addPassenger(passenger);		
+		boolean handled = this.vehicle.addPassenger(passenger);
 		if(handled){
 			this.agentTracker.removeAgentFromStop(passenger, this.currentStop.getStopFacility());
 			PersonDriverAgent agent = (PersonDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
-			events.processEvent(new PersonEntersVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getBasicVehicle(), this.getTransitRoute().getId()));
-		}		
+			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time, agent.getPerson().getId(), this.vehicle.getBasicVehicle().getId(), this.getTransitRoute().getId()));
+		}
 		return handled;
 	}
 
 	public boolean handlePassengerLeaving(final PassengerAgent passenger, final double time) {
-		boolean handled = this.vehicle.removePassenger(passenger);		
+		boolean handled = this.vehicle.removePassenger(passenger);
 		if(handled){
 			PersonDriverAgent agent = (PersonDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getBasicVehicle().getId(), this.getTransitRoute().getId()));
 			agent.teleportToLink(this.currentStop.getStopFacility().getLinkId());
-//				events.processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
-//						stop.getLink(), agent.getCurrentLeg()));
 			agent.legEnds(time);
-		}		
-		return handled;		
+		}
+		return handled;
 	}
 
 	private List<PassengerAgent> findPassengersEntering(
