@@ -57,7 +57,7 @@ public class BkRouterTest extends MatsimTestCase {
 
 		BkControlerIncome controler = new BkControlerIncome(config);
 		controler.setCreateGraphs(false);
-		final EventHandler handler = new EventHandler();
+		final EventHandler1 handler = new EventHandler1();
 
 		controler.addControlerListener(new StartupListener() {
 			public void notifyStartup(final StartupEvent event) {
@@ -72,7 +72,7 @@ public class BkRouterTest extends MatsimTestCase {
 		assertTrue("Person 3 should be routed on link 10", handler.link10Ok);
 	}
 
-	private static class EventHandler implements LinkEnterEventHandler{
+	private static class EventHandler1 implements LinkEnterEventHandler{
 
 		boolean link3Ok = false;
 		boolean link8Ok = false;
