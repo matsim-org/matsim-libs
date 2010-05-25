@@ -120,6 +120,16 @@ public class MatrixUtils {
 		return true;
 	}
 
+	/**
+	 * @param A
+	 * 
+	 * @return if A is a real matrix, Moore-Penrose pseudo inverse ==
+	 *         generalized inverse, else it is the work in future
+	 */
+	public static Matrix getMoorePernrosePseudoInverse(Matrix A) {
+		return getGeneralizedInverse(A);
+	}
+
 	public static Matrix getGeneralizedInverse(Matrix A) {
 		FullRankDecomposition frd = new FullRankDecomposition(A);
 		Matrix F_t = frd.getF().transpose(), G_t = frd.getG().transpose();
