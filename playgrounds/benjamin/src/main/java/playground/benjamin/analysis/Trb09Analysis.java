@@ -19,13 +19,21 @@
  * *********************************************************************** */
 package playground.benjamin.analysis;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingScheme;
+import org.xml.sax.SAXException;
 
 import playground.benjamin.BkPaths;
+import playground.benjamin.analysis.filter.OnlyInnerZurichFilter;
 import playground.dgrether.analysis.charts.DgAvgDeltaMoneyGroupChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaMoneyQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaUtilsGroupChart;
@@ -42,6 +50,7 @@ import playground.dgrether.analysis.charts.utils.DgChartWriter;
 import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
 import playground.dgrether.analysis.io.DgHouseholdsAnalysisReader;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
+import playground.dgrether.analysis.population.ExcludeZurichTransitFilter;
 
 
 public class Trb09Analysis {
@@ -64,9 +73,11 @@ public class Trb09Analysis {
 	
 		boolean isTestscenario = false;		
 		String runNumber1 = "891";
-		String runNumber2 = "899";
+		String runNumber2 = "896";
 		
-		String tollLinksFile = BkPaths.STUDIESBK + "/transportEconomics/zh_forRun891_distanceMorningToll_0630-0900_cityWOhighways_35rp_per_km.xml";
+		//only necessary if there is a toll
+		String tollLinksFilePath = BkPaths.STUDIESBK + "/transportEconomics/zh_forRun891_distanceMorningToll_0630-0900_cityWOhighways_1120rp_per_km.xml";
+		RoadPricingScheme tollLinks = loadTollLinksFile(tollLinksFilePath);
 //***************************************************************************************************************************************************		
 		
 		String runid1String = "run" + runNumber1;
@@ -126,8 +137,13 @@ public class Trb09Analysis {
 		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader();
 		DgAnalysisPopulation ana = new DgAnalysisPopulation();
 //		DgAnalysisPopulation ana = pc.doPopulationAnalysis(netfile, plans1file, plans2file);
-		pc.readAnalysisPopulation(ana, runid1, netfile, plans1file, tollLinksFile);
-		pc.readAnalysisPopulation(ana, runid2, netfile, plans2file, tollLinksFile);
+		
+		//any filter can be applied here:
+		pc.addFilter(new ExcludeZurichTransitFilter());
+		pc.addFilter(new OnlyInnerZurichFilter(tollLinks));
+			
+		pc.readAnalysisPopulation(ana, runid1, netfile, plans1file);
+		pc.readAnalysisPopulation(ana, runid2, netfile, plans2file);
 		
 
 		DgHouseholdsAnalysisReader hhr = new DgHouseholdsAnalysisReader(ana);
@@ -189,7 +205,25 @@ public class Trb09Analysis {
 			
 	}
 	
-  public static void writeMixedDeltaUtilsModeGroupChart(DgDeltaUtilsModeGroupChart deltaUtilsModeGroupChart, DgAvgDeltaUtilsModeQuantilesChart avgDScoreModeIncomeChartData, String mixedDeltaScoreIncomeChartFile, String mixedMsoDeltaScoreIncomeChartFile,  Id runid1, Id runid2){
+  private static RoadPricingScheme loadTollLinksFile(String tollLinksFilePath) {
+		RoadPricingScheme scheme = new RoadPricingScheme();
+	  	RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
+		try {
+			reader.parse(tollLinksFilePath);
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return scheme;
+	}
+
+public static void writeMixedDeltaUtilsModeGroupChart(DgDeltaUtilsModeGroupChart deltaUtilsModeGroupChart, DgAvgDeltaUtilsModeQuantilesChart avgDScoreModeIncomeChartData, String mixedDeltaScoreIncomeChartFile, String mixedMsoDeltaScoreIncomeChartFile,  Id runid1, Id runid2){
 		DgMixedDeltaUtilsModeGroupChart mixedDsIncomeChart = new DgMixedDeltaUtilsModeGroupChart();
 		XYSeriesCollection modeChoiceDataset = deltaUtilsModeGroupChart.createDeltaScoreIncomeModeChoiceDataset(runid1, runid2);
 		mixedDsIncomeChart.addIncomeModeChoiceDataSet(modeChoiceDataset);
