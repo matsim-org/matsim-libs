@@ -24,6 +24,7 @@
 package playground.yu.utils.math;
 
 import java.text.DecimalFormat;
+import java.util.logging.Logger;
 
 import Jama.Matrix;
 
@@ -69,34 +70,34 @@ public class MatrixUtils {
 	}
 
 	/**
-	 * it should be used with consistent Linear equation system Ax=y,
-	 * (rank[A]==rank[A_y]),das linear equation system should not be
-	 * overdetermine
-	 * 
 	 * @param A
 	 *            Coefficient matrix
 	 * @param Y
-	 * @return
+	 * @return If Ax=y is a consistent Linear equation system (i.e.
+	 *         rank[A]==rank[A_y]), returns the minimum norm solution, otherwise
+	 *         returns the minimum norm least squares solution
 	 */
 	public static Matrix getMinimumNormSolution(Matrix A, Matrix y) {
-		if (!isConsistantEquation(A, y)) {
-			System.err.println("Ax=y is not a consistant equation!!!");
-			System.exit(0);
-			return null;
+		Matrix GI;
+		if (isConsistantEquation(A, y)) {// consistant
+			GI = MatrixUtils.getGeneralizedInverse(A);
+			Matrix A_adjugate = A.transpose();
+			Matrix GAA_adjugate = GI.times(A).times(A_adjugate);
+			if (MatrixUtils.equals(A_adjugate, GAA_adjugate))
+				Logger
+						.getLogger("this generalized inverse is a appropriate one for the minimum norm solution!!!");
+			else {
+				System.err
+						.println("this generalized inverse is NOT for the minimum norm solution!!!");
+				System.exit(0);
+				return null;
+			}
+		} else {// inconsistant
+			Logger
+					.getLogger("Ax=y is an inconsistant equation, so the minimum norm least squares solution will be calculated.");
+			GI = MatrixUtils.getMoorePernrosePseudoInverse(A);
 		}
-		Matrix GI = MatrixUtils.getGeneralizedInverse(A);
-		Matrix A_adjugate = A.transpose();
-		Matrix GAA_adjugate = GI.times(A).times(A_adjugate);
-		if (MatrixUtils.equals(A_adjugate, GAA_adjugate)) {
-			System.out
-					.println("this generalized inverse is a appropriate one for the minimum norm solution!!!");
-			return GI.times(y);
-		} else {
-			System.err
-					.println("this generalized inverse is NOT for the minimum norm solution!!!");
-			return null;
-		}
-
+		return GI.times(y);
 	}
 
 	public static boolean equals(Matrix A, Matrix B) {
@@ -122,9 +123,10 @@ public class MatrixUtils {
 
 	/**
 	 * @param A
+	 *            Matrix
 	 * 
-	 * @return if A is a real matrix, Moore-Penrose pseudo inverse ==
-	 *         generalized inverse, else it is the work in future
+	 * @return if A is a real matrix, return (Moore-Penrose pseudo inverse ==)
+	 *         generalized inverse, else it doesn't belong to this application
 	 */
 	public static Matrix getMoorePernrosePseudoInverse(Matrix A) {
 		return getGeneralizedInverse(A);
