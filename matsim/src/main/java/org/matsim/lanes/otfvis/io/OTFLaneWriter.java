@@ -38,7 +38,6 @@ import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
-@Deprecated // conversion of link coordinates to x/y coordinates should be done in mobsim.  kai, may'10
 public class OTFLaneWriter extends OTFDataWriter<QLink> implements OTFWriterFactory<QLink>{
 
   public static final boolean DRAW_LINK_TO_LINK_LINES = true;
