@@ -45,12 +45,12 @@ public class OnlyInnerZurichFilter implements DgAnalysisReaderFilter {
 	public boolean doAcceptPerson(Person person) {
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()){
             if (pe instanceof Activity) {
-                    Activity act = (Activity) pe;
-			if (this.tollLinks.getLinkIdSet().contains( act.getLinkId())) {
+                Activity act = (Activity) pe;
+			if (this.tollLinks.getLinkIdSet().contains(act.getLinkId())) {
 				return true;
             }
             }
-    }
+		}
 		return false;
 	}
 
