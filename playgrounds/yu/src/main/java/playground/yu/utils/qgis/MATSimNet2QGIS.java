@@ -39,14 +39,15 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -56,9 +57,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * This class founds on many codes of Gregor Laemmel. man should for this "run"
  * install com.sun.media.jai and javax.media.jai from http://jai.dev.java.net
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class MATSimNet2QGIS implements X2QGIS {
 
@@ -66,9 +67,9 @@ public class MATSimNet2QGIS implements X2QGIS {
 	 * this class is only a copy of
 	 * <class>playground.gregor.shapeFileToMATSim.ShapeFileWriter</class> Gregor
 	 * Laemmel's
-	 *
+	 * 
 	 * @author ychen
-	 *
+	 * 
 	 */
 	public static class ShapeFileWriter2 {
 
@@ -86,7 +87,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	protected static double flowCapFactor = 0.1;
-	protected ScenarioImpl scenario = new ScenarioImpl();
+	protected Scenario scenario = new ScenarioImpl();
 	protected CoordinateReferenceSystem crs = null;
 	protected X2GraphImpl n2g = null;
 
@@ -99,12 +100,18 @@ public class MATSimNet2QGIS implements X2QGIS {
 		n2g = new Network2PolygonGraph(getNetwork(), crs);
 	}
 
+	public MATSimNet2QGIS(Scenario scenario, String coordRefSys) {
+		this.scenario = scenario;
+		crs = MGC.getCRS(coordRefSys);
+		n2g = new Network2PolygonGraph(getNetwork(), crs);
+	}
+
 	public MATSimNet2QGIS(String netFilename, String coordRefSys,
 			Set<Id> linkIds2paint) {
 		this(netFilename, coordRefSys);
 		if (linkIds2paint != null) {
 			Set<Link> links2paint = new HashSet<Link>();
-			Map<Id, Link> linkImpls = getNetwork().getLinks();
+			Map<Id, Link> linkImpls = (Map<Id, Link>) getNetwork().getLinks();
 			for (Id linkId : linkIds2paint) {
 				links2paint.add(linkImpls.get(linkId));
 			}
@@ -150,7 +157,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 	/**
 	 * @return the network
 	 */
-	public NetworkLayer getNetwork() {
+	public Network getNetwork() {
 		return scenario.getNetwork();
 	}
 

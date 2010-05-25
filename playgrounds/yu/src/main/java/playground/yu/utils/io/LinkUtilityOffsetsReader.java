@@ -32,7 +32,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 public class LinkUtilityOffsetsReader implements TabularFileHandler {
 	private TabularFileParserConfig parserConfig = new TabularFileParserConfig();
-	private Map<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>> linkUtiliyOffsets = new HashMap<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>>();
+	private Map<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>> linkUtilityOffsets = new HashMap<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>>();
 
 	public LinkUtilityOffsetsReader(String inputFilename) {
 		// parserConfig.setCommentTags(new String[] { "?????" });
@@ -41,7 +41,7 @@ public class LinkUtilityOffsetsReader implements TabularFileHandler {
 	}
 
 	public Map<Integer, Map<Id, Double>> getLinkUtiliyOffsets() {
-		return linkUtiliyOffsets;
+		return linkUtilityOffsets;
 	}
 
 	@Override
@@ -49,11 +49,11 @@ public class LinkUtilityOffsetsReader implements TabularFileHandler {
 		String linkId = row[1];
 		int timeBin = Integer.parseInt(row[3]);
 		double utilityOffset = Double.parseDouble(row[5]);
-		Map<Id, Double> utilityOffsetsPerTimeBin = this.linkUtiliyOffsets
+		Map<Id, Double> utilityOffsetsPerTimeBin = this.linkUtilityOffsets
 				.get(timeBin);
 		if (utilityOffsetsPerTimeBin == null) {
 			utilityOffsetsPerTimeBin = new HashMap<Id, Double>();
-			this.linkUtiliyOffsets.put(timeBin, utilityOffsetsPerTimeBin);
+			this.linkUtilityOffsets.put(timeBin, utilityOffsetsPerTimeBin);
 		}
 		utilityOffsetsPerTimeBin.put(new IdImpl(linkId), utilityOffset);
 	}

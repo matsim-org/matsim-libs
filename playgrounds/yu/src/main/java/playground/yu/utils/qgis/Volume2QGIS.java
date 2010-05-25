@@ -35,15 +35,15 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
 /**
  * @author yu
- *
+ * 
  */
 public class Volume2QGIS extends MATSimNet2QGIS {
 
@@ -51,8 +51,8 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		super(netFilename, coordRefSys);
 	}
 
-	public static List<Map<Id, Integer>> createVolumes(
-			Collection<Id> linkIds, final VolumesAnalyzer va) {
+	public static List<Map<Id, Integer>> createVolumes(Collection<Id> linkIds,
+			final VolumesAnalyzer va) {
 		List<Map<Id, Integer>> volumes = new ArrayList<Map<Id, Integer>>(24);
 		for (int i = 0; i < 24; i++)
 			volumes.add(i, null);
@@ -97,7 +97,7 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		 * Traffic Volumes and MATSim-network to Shp-file //
 		 * ///////////////////////////////////////////////////////////////
 		 */
-		NetworkLayer net = mn2q.getNetwork();
+		Network net = mn2q.getNetwork();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
 		mn2q.readEvents("../runs-svn/run950/it.1000/950.1000.events.txt.gz",
 				new EventHandler[] { va });

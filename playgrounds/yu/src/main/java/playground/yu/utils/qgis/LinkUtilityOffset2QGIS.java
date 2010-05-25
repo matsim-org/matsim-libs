@@ -37,7 +37,7 @@ import playground.yu.utils.io.LinkUtilityOffsetsReader;
  */
 public class LinkUtilityOffset2QGIS implements X2QGIS {
 
-	private Map<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>> linkUtiliyOffsets = new HashMap<Integer, Map<Id, Double>>();
+	private Map<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>> linkUtilityOffsets = new HashMap<Integer, Map<Id, Double>>();
 	// private Set<Integer> timBins;
 	private Map<String/* linkId */, Id/* linkId */> stringIds = new HashMap<String, Id>();
 	private Network network;
@@ -46,8 +46,8 @@ public class LinkUtilityOffset2QGIS implements X2QGIS {
 	// return timBins;
 	// }
 
-	public Map<Integer, Map<Id, Double>> getLinkUtiliyOffsets() {
-		return linkUtiliyOffsets;
+	public Map<Integer, Map<Id, Double>> getLinkUtilityOffsets() {
+		return linkUtilityOffsets;
 	}
 
 	public LinkUtilityOffset2QGIS(String utilityOffsetsFilename, Network network) {
@@ -55,9 +55,15 @@ public class LinkUtilityOffset2QGIS implements X2QGIS {
 		LinkUtilityOffsetsReader reader = new LinkUtilityOffsetsReader(
 				utilityOffsetsFilename);
 		reader.parse();
-		this.linkUtiliyOffsets = reader.getLinkUtiliyOffsets();
+		this.linkUtilityOffsets = reader.getLinkUtiliyOffsets();
 		// timBins = this.linkUtiliyOffsets.keySet();
 		// this.RationalizeIds();
+	}
+
+	public LinkUtilityOffset2QGIS(
+			Map<Integer, Map<Id, Double>> linkUtilOffsets, Network network) {
+		this.network = network;
+		this.linkUtilityOffsets = linkUtilOffsets;
 	}
 
 	/* not necessary to do it, if the Id works well */
@@ -89,9 +95,9 @@ public class LinkUtilityOffset2QGIS implements X2QGIS {
 		MATSimNet2QGIS net2qgis = new MATSimNet2QGIS(netFilename, gk4);
 		LinkUtilityOffset2QGIS luos2qgis = new LinkUtilityOffset2QGIS(
 				utilityOffsetsFilename, net2qgis.getNetwork());
-		for (Integer timeBin : luos2qgis.getLinkUtiliyOffsets().keySet()) {
+		for (Integer timeBin : luos2qgis.getLinkUtilityOffsets().keySet()) {
 			net2qgis.addParameter(timeBin + "hour", Double.class, luos2qgis
-					.getLinkUtiliyOffsets().get(timeBin));
+					.getLinkUtilityOffsets().get(timeBin));
 		}
 		net2qgis
 				.writeShapeFile("../integration-demandCalibration1.0.1/test/output/calibration/CalibrationTest/testLogLikelihood/linkUtilityOffset.shp");

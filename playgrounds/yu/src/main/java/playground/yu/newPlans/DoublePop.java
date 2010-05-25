@@ -34,9 +34,9 @@ import org.matsim.core.population.PopulationReader;
 /**
  * increases the amount of Agents in a new MATSim plansfile, by copying the old
  * agents in the file and change only the Ids.
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class DoublePop extends NewPopulation {
 	// private String newPersonId;
@@ -45,7 +45,7 @@ public class DoublePop extends NewPopulation {
 
 	/**
 	 * Construcktor
-	 *
+	 * 
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
@@ -66,8 +66,13 @@ public class DoublePop extends NewPopulation {
 		long oldId = Integer.parseInt(person.getId().toString());
 		// produce new Person with new Id
 		// if (n == 1) {
-		for (int i = 1; i < 200; i++)
-			createNewPerson(oldId + i);
+		for (int i = 1; i < 10; i++)
+		// createNewPerson(oldId + i);
+
+		{
+			createNewPerson(oldId + i * 100);
+		}
+
 		// } else if (n == 2) {
 		// for (int i = 1; i <= 89; i++)
 		// createNewPerson(oldId+i);
@@ -94,9 +99,9 @@ public class DoublePop extends NewPopulation {
 
 	public static void main(final String[] args) {
 
-		String networkFilename = "../integration-parameterCalibration/test/prepare2/network.xml";
-		String plansFilename = "../matsim/test/scenarios/equil/plans1.xml";
-		String outputPlansFilename = "../integration-parameterCalibration/test/prepare2/pop200.xml";
+		String networkFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/network.xml";
+		String plansFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/plans100.xml";
+		String outputPlansFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/pop1k.xml";
 
 		ScenarioImpl s = new ScenarioImpl();
 

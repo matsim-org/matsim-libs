@@ -37,7 +37,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.api.core.v01.network.Network;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -47,13 +47,13 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- *
+ * 
  */
 public class Volume2PolygonGraph extends Network2PolygonGraph {
 	private Set<Id> linkIds;
 
-	public Volume2PolygonGraph(NetworkLayer network,
-			CoordinateReferenceSystem crs, Set<Id> linkIds) {
+	public Volume2PolygonGraph(Network network, CoordinateReferenceSystem crs,
+			Set<Id> linkIds) {
 		super(network, crs);
 		this.linkIds = linkIds;
 		this.geofac = new GeometryFactory();

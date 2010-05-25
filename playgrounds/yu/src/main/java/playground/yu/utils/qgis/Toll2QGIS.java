@@ -14,8 +14,8 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- *
+ * 
  */
 public class Toll2QGIS extends MATSimNet2QGIS {
 	public Toll2QGIS(String netFilename, String coordRefSys) {
@@ -37,7 +37,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 	public static class Toll2PolygonGraph extends Network2PolygonGraph {
 		private RoadPricingScheme toll;
 
-		public Toll2PolygonGraph(NetworkLayer network,
+		public Toll2PolygonGraph(Network network,
 				CoordinateReferenceSystem crs, RoadPricingScheme toll) {
 			super(network, crs);
 			this.toll = toll;
@@ -50,7 +50,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
 			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 
-			for (Id linkId: toll.getLinkIdSet()) {
+			for (Id linkId : toll.getLinkIdSet()) {
 				Link link = network.getLinks().get(linkId);
 				// if (link != null) {
 				LinearRing lr = getLinearRing(link);
@@ -64,8 +64,10 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 				o[2] = link.getFromNode().getId().toString();
 				o[3] = link.getToNode().getId().toString();
 				o[4] = link.getLength();
-				o[5] = link.getCapacity() / network.getCapacityPeriod() * 3600.0;
-				o[6] = (((LinkImpl) link).getType() != null) ? Integer.parseInt(((LinkImpl) link).getType()) : 0;
+				o[5] = link.getCapacity() / network.getCapacityPeriod()
+						* 3600.0;
+				o[6] = (((LinkImpl) link).getType() != null) ? Integer
+						.parseInt(((LinkImpl) link).getType()) : 0;
 				o[7] = link.getFreespeed();
 				for (int i = 0; i < parameters.size(); i++) {
 					o[i + 8] = parameters.get(i).get(link.getId());

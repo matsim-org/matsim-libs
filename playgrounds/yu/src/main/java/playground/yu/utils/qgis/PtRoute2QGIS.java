@@ -41,6 +41,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
@@ -137,7 +138,8 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 			NetworkRoute route = ptRoute.getRoute();
 
 			List<Link> links = new ArrayList<Link>();
-			Link startLink = this.network.getLinks().get(route.getStartLinkId());
+			Link startLink = this.network.getLinks()
+					.get(route.getStartLinkId());
 			links.add(startLink);
 			for (Id linkId : route.getLinkIds()) {
 				links.add(this.network.getLinks().get(linkId));
@@ -257,7 +259,8 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 
 			double[] widths = new double[size + 2], lengths = new double[size + 2];
 
-			Link startLink = this.network.getLinks().get(route.getStartLinkId());
+			Link startLink = this.network.getLinks()
+					.get(route.getStartLinkId());
 			widths[0] = 20;
 			lengths[0] = startLink.getLength();
 
@@ -297,7 +300,8 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
-		p2g = new PtRoute2PolygonGraph(crs, this.scenario.getTransitSchedule());
+		p2g = new PtRoute2PolygonGraph(crs, ((ScenarioImpl) this.scenario)
+				.getTransitSchedule());
 	}
 
 	/**

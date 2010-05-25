@@ -37,8 +37,8 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -57,8 +57,7 @@ public class Network2PolygonGraph extends X2GraphImpl {
 	 * @param network
 	 * @param coordinateReferenceSystem
 	 */
-	public Network2PolygonGraph(NetworkLayer network,
-			CoordinateReferenceSystem crs) {
+	public Network2PolygonGraph(Network network, CoordinateReferenceSystem crs) {
 		this.geofac = new GeometryFactory();
 		this.network = network;
 		this.crs = crs;

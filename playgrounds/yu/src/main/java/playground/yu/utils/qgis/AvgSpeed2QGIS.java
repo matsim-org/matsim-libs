@@ -30,8 +30,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.NetworkLayer;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
 
@@ -41,7 +41,7 @@ import playground.yu.analysis.CalcLinksAvgSpeed;
  */
 public class AvgSpeed2QGIS implements X2QGIS {
 
-	public static List<Map<Id, Double>> createSpeeds(NetworkLayer net,
+	public static List<Map<Id, Double>> createSpeeds(Network net,
 			CalcLinksAvgSpeed clas) {
 		List<Map<Id, Double>> speeds = new ArrayList<Map<Id, Double>>(24);
 		for (int i = 0; i < 24; i++) {
@@ -77,7 +77,7 @@ public class AvgSpeed2QGIS implements X2QGIS {
 		 * Traffic Volumes and MATSim-network to Shp-file // *
 		 * ///////////////////////////////////////////////////////////////
 		 */
-		NetworkLayer net = mn2q.getNetwork();
+		Network net = mn2q.getNetwork();
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(net);
 		mn2q
 				.readEvents(

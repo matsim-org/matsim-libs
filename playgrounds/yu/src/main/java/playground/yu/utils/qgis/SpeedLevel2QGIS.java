@@ -46,7 +46,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -61,7 +60,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- *
+ * 
  */
 public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 	public SpeedLevel2QGIS(String netFilename, String coordRefSys) {
@@ -71,7 +70,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 	public static class SpeedLevel2PolygonGraph extends Network2PolygonGraph {
 		private Set<Id> linkIds;
 
-		public SpeedLevel2PolygonGraph(NetworkLayer network,
+		public SpeedLevel2PolygonGraph(Network network,
 				CoordinateReferenceSystem crs, Set<Id> linkIds) {
 			super(network, crs);
 			this.linkIds = linkIds;
@@ -127,8 +126,10 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 					m = new HashMap<Id, Double>();
 					speeds.add(i, m);
 				}
-				double speed = clas.getAvgSpeed(linkId, (i * 3600)) / 3.6
-						/ network.getLinks().get(linkId).getFreespeed(i * 3600.0);
+				double speed = clas.getAvgSpeed(linkId, (i * 3600))
+						/ 3.6
+						/ network.getLinks().get(linkId).getFreespeed(
+								i * 3600.0);
 				m.put(linkId, speed);
 			}
 		}
@@ -149,7 +150,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		 * /////////////////////////////////////////////////////////////////////
 		 */
 
-		NetworkLayer net = mn2q.getNetwork();
+		Network net = mn2q.getNetwork();
 
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(net, 3600);
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);

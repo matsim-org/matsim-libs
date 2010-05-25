@@ -31,13 +31,13 @@ import java.util.Map;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 /**
  * @author yu
- *
+ * 
  */
 public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 
@@ -45,8 +45,8 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 		super(netFilename, coordRefSys);
 	}
 
-	public static List<Map<Id, Double>> createSaturationLevels(
-			NetworkLayer net, VolumesAnalyzer va) {
+	public static List<Map<Id, Double>> createSaturationLevels(Network net,
+			VolumesAnalyzer va) {
 		List<Map<Id, Double>> saturationLevels = new ArrayList<Map<Id, Double>>(
 				24);
 		for (int i = 0; i < 24; i++) {
@@ -68,8 +68,8 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 		return saturationLevels;
 	}
 
-	public static List<Map<Id, Double>> createSaturationLevels(
-			NetworkLayer net, RoadPricingScheme rps, VolumesAnalyzer va) {
+	public static List<Map<Id, Double>> createSaturationLevels(Network net,
+			RoadPricingScheme rps, VolumesAnalyzer va) {
 		List<Map<Id, Double>> saturationLevels = new ArrayList<Map<Id, Double>>(
 				24);
 		for (int i = 0; i < 24; i++) {
@@ -82,8 +82,11 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 				Map<Id, Double> m = saturationLevels.get(i);
 				if (m == null)
 					m = new HashMap<Id, Double>();
-				m.put(linkId, Double.valueOf(((v != null) ? v[i] : 0)
-						/ flowCapFactor / net.getLinks().get(linkId).getCapacity() * capPeriod));
+				m
+						.put(linkId, Double.valueOf(((v != null) ? v[i] : 0)
+								/ flowCapFactor
+								/ net.getLinks().get(linkId).getCapacity()
+								* capPeriod));
 				saturationLevels.set(i, m);
 			}
 		}
@@ -101,7 +104,7 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 		 * /Traffic saturation level and MATSim-network to Shp-file
 		 * /////////////////////////////////////////////////////////////////////
 		 */
-		NetworkLayer net = mn2q.getNetwork();
+		Network net = mn2q.getNetwork();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
 		mn2q.readEvents("../matsimTests/Calibration/680.events.txt.gz",
 				new EventHandler[] { va });

@@ -68,6 +68,7 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 	 * as the column index in Matrix>
 	 */
 	private Map<String, Integer> linkTimeBinSequence = new HashMap<String, Integer>();
+	/** Map<column index in Matrix (linkIndex),linkId_timeBin (String)> */
 	private Map<Integer, String> linkTimeBinSequence2 = new HashMap<Integer, String>();
 	/**
 	 * Map<perosnId, personIndex in Collection, which will be used as the row
