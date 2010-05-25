@@ -72,7 +72,8 @@ public class MatrixUtils {
 	/**
 	 * @param A
 	 *            Coefficient matrix
-	 * @param Y
+	 * @param y
+	 *            constant vector
 	 * @return If Ax=y is a consistent Linear equation system (i.e.
 	 *         rank[A]==rank[A_y]), returns the minimum norm solution, otherwise
 	 *         returns the minimum norm least squares solution
