@@ -77,7 +77,7 @@ public class DgIncomeDistributionAnalysis {
 		ScenarioImpl sc = new ScenarioImpl();
 		DgAnalysisPopulation pop = new DgAnalysisPopulation();
 		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader();
-		pc.setExcludeTransit(true);
+		pc.addFilter(new ExcludeZurichTransitFilter());
 		pc.readAnalysisPopulation(pop, runid1, netfile, plans1file);
 		pc.readAnalysisPopulation(pop, runid2, netfile, plans2file);
 		//households io

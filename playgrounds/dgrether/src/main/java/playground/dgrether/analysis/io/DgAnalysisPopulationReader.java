@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.io;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -47,7 +49,8 @@ public class DgAnalysisPopulationReader {
 
 	private Map<String, NetworkLayer> loadedNetworks = new HashMap<String, NetworkLayer>();
 
-	private boolean isExcludeTransit = false;
+	
+	private List<DgAnalysisReaderFilter> filterList = null;
 
 	public DgAnalysisPopulationReader() {
 	}
@@ -73,11 +76,14 @@ public class DgAnalysisPopulationReader {
 		Plan plan;
 		Activity act;
 		for (Id id : population.getPersons().keySet()) {
-			if (isExcludeTransit){
-				if (isTransitPerson(id)){
-					continue;
+			if (this.filterList != null){
+				for (DgAnalysisReaderFilter f : this.filterList){
+					if (! f.doAcceptPerson(population.getPersons().get(id))){
+						continue;
+					}
 				}
 			}
+			
 			plan = population.getPersons().get(id).getSelectedPlan();
 			act = ((PlanImpl) plan).getFirstActivity();
 
@@ -100,13 +106,6 @@ public class DgAnalysisPopulationReader {
 		return analysisPopulation;
 	}
 
-
-
-	private boolean isTransitPerson(Id id) {
-		int idi = Integer.parseInt(id.toString());
-		return (idi >= 1000000000);
-	}
-
 	/**
    * Load the plan file with the given path.
    *
@@ -124,8 +123,12 @@ public class DgAnalysisPopulationReader {
 
 		return plans;
 	}
-
-	public void setExcludeTransit(boolean b) {
-		this.isExcludeTransit  = b;
+	
+	public void addFilter(DgAnalysisReaderFilter filter){
+		if (this.filterList == null) {
+			this.filterList = new ArrayList<DgAnalysisReaderFilter>();
+		}
+		this.filterList.add(filter);
 	}
+
 }
