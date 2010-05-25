@@ -32,10 +32,16 @@ public interface PlanAgent  extends Agent {
 
 	public double getDepartureTime();
 	
+	
 	public void activityEnds();
 	
 	public void legEnds();
-	
+
+	/**
+	 * Irgendeine Art von Weiterschaltung ist benötigt
+	 * @return
+	 */
 	public PlanElement getCurrentPlanElement();
+	public PlanElement getNextPlanElement();
 	
 }
