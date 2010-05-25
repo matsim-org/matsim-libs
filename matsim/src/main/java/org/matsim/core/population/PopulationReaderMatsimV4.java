@@ -92,7 +92,6 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private Desires currdesires = null;
 	private KnowledgeImpl currknowledge = null;
 	private String curracttype = null;
-	private ActivityFacility currfacility = null;
 	private ActivityOption curractivity = null;
 	private PlanImpl currplan = null;
 	private ActivityImpl curract = null;
@@ -178,7 +177,6 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		} else if (ACTIVITY.equals(name)) {
 			this.curracttype = null;
 		} else if (LOCATION.equals(name)) {
-			this.currfacility = null;
 			this.curractivity = null;
 		} else if (PLAN.equals(name)) {
 			if (this.currplan.getPlanElements() instanceof ArrayList<?>) {
@@ -267,9 +265,9 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		if ((x != null) || (y != null)) { log.info("NEW: coords in <location> will be ignored!"); }
 		if (freq != null) { log.info("NEW: Attribute freq in <location> is not supported at the moment!"); }
 
-		this.currfacility = this.facilities.getFacilities().get(this.scenario.createId(id));
-		if (this.currfacility == null) { Gbl.errorMsg("facility id=" + id + " does not exist!"); }
-		this.curractivity = this.currfacility.getActivityOptions().get(this.curracttype);
+		ActivityFacility currfacility = this.facilities.getFacilities().get(this.scenario.createId(id));
+		if (currfacility == null) { Gbl.errorMsg("facility id=" + id + " does not exist!"); }
+		this.curractivity = currfacility.getActivityOptions().get(this.curracttype);
 		if (this.curractivity == null) { Gbl.errorMsg("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!"); }
 		this.currknowledge.addActivityOption((ActivityOptionImpl) this.curractivity,isPrimary);
 	}
@@ -344,11 +342,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
 		String fId = atts.getValue("facility");
 		if (fId != null) {
-			ActivityFacility f = this.facilities.getFacilities().get(this.scenario.createId(fId));
-			if (f == null) {
-				Gbl.errorMsg("facility id=" + fId + " does not exist!");
-			}
-			this.curract.setFacilityId(f.getId());
+			this.curract.setFacilityId(this.scenario.createId(fId));
 		}
 		if (this.routeDescription != null) {
 			Id startLinkId = null;
