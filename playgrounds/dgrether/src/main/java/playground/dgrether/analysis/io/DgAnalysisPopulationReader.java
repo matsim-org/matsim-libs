@@ -77,10 +77,14 @@ public class DgAnalysisPopulationReader {
 		Activity act;
 		for (Id id : population.getPersons().keySet()) {
 			if (this.filterList != null){
+				boolean doContinue = false;
 				for (DgAnalysisReaderFilter f : this.filterList){
 					if (! f.doAcceptPerson(population.getPersons().get(id))){
-						continue;
+						doContinue = true;
 					}
+				}
+				if (doContinue){
+					continue;
 				}
 			}
 			
