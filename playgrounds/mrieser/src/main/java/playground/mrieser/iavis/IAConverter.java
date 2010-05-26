@@ -36,13 +36,13 @@ public class IAConverter {
 
 	private final static Logger log = Logger.getLogger(IAConverter.class);
 
-	private static final String IN_NETWORK = "/data/vis/zrh/output_network.xml.gz";
-	private static final String IN_PLANS = "/data/vis/zrh/100.plans.xml.gz";
-	private static final String IN_EVENTS = "/data/vis/zrh/100.events.xml.gz";
+	private static final String IN_NETWORK = "/home/mrieser/zrh25pct/network.xml.gz";
+	private static final String IN_PLANS = "/home/mrieser/zrh25pct/60.plans.xml.gz";
+	private static final String IN_EVENTS = "/home/mrieser/zrh25pct/60.events.txt.gz";
 
-	private static final String OUT_LINKS = "/data/vis/ia/links.txt";
-	private static final String OUT_ACTIVITIES = "/data/vis/ia/agentactivity.txt";
-	private static final String OUT_VEHICLES = "/data/vis/ia/agentdrive.txt";
+	private static final String OUT_LINKS = "/home/mrieser/zrh25pct/ia/links.txt";
+	private static final String OUT_ACTIVITIES = "/home/mrieser/zrh25pct/ia/agentactivity.txt";
+	private static final String OUT_VEHICLES = "/home/mrieser/zrh25pct/ia/agentdrive.txt";
 
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
 		log.info("start conversion");
