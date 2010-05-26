@@ -19,22 +19,38 @@
  * *********************************************************************** */
 package playground.dgrether.tests.satellic;
 
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.run.OTFVis;
+
+import playground.dgrether.DgOTFVisConfigWriter;
+import playground.dgrether.DgPaths;
 
 
-/**
- * @author dgrether
- *
- */
-public class DgSatellicWithindayStarter {
 
-	/**
-	 * @param args
-	 */
+public class DgSatellicWithindayTestStarter {
+
 	public static void main(String[] args) {
-		Controler controler = new Controler(args);
+		final String configfile = DgPaths.EXAMPLEBASE + "equil/configPlans100.xml";
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader confReader = new MatsimConfigReader(config);
+		confReader.readFile(configfile);
+
+		config.controler().setLastIteration(0);
+		config.setQSimConfigGroup(new QSimConfigGroup());
+		config.getQSimConfigGroup().setSnapshotFormat("otfvis");
+		config.getQSimConfigGroup().setSnapshotPeriod(10.0);
+		config.getQSimConfigGroup().setSnapshotStyle("queue");
+		
+		
+		Controler controler = new Controler(config);
+		controler.setOverwriteFiles(true);
+		
 		controler.addControlerListener(new BeforeMobsimListener() {
 			
 			@Override
@@ -42,7 +58,15 @@ public class DgSatellicWithindayStarter {
 				event.getControler().setMobsimFactory(new DgWithindayMobsimFactory());
 			}
 		});
+		
+		
 		controler.run();
-	}
+		controler.addControlerListener(new DgOTFVisConfigWriter());
+		String outdir = controler.getConfig().controler().getOutputDirectory();
 
+		String file = controler.getControlerIO().getIterationFilename(0, "otfvis.mvi");
+		OTFVis.playMVI(file);
+		//		DgOTFVisReplayLastIteration.main(new String[]{outdir + "/" + Controler.FILENAME_CONFIG});
+	}
+	
 }
