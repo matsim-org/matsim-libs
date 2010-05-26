@@ -19,6 +19,7 @@
 
 package playground.mrieser.pt.analysis;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -53,6 +54,14 @@ public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEnt
 			return 0;
 		}
 		return sData.getWaitingCount(time);
+	}
+
+	public Map<Double, Integer> getStopFacilityLoad(final Id stopFacilityId) {
+		StopData sData = getStopData(stopFacilityId, false);
+		if (sData == null) {
+			return null;
+		}
+		return Collections.unmodifiableMap(sData.nOfPassengersByTime);
 	}
 
 	@Override
