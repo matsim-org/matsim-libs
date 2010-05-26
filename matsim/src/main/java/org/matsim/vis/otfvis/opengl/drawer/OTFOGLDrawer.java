@@ -45,8 +45,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -100,80 +98,8 @@ import org.matsim.vis.otfvis.opengl.gui.VisGUIMouseHandler;
 import com.sun.opengl.util.ImageUtil;
 import com.sun.opengl.util.Screenshot;
 import com.sun.opengl.util.j2d.TextRenderer;
-import com.sun.opengl.util.j2d.TextureRenderer;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
-
-/**
- * Call TextRenderHack to fix the TextRender problem on the Mac This class should only be used until
- * Apple puts out their fix.
- *
- * @author Jeff Addison - Southgate Software Ltd. www.southgatesoftware.com
- */
-class TextRenderHack
-{
-	/**
-	 * Call this function in your drawing code to fix the TextRender rendering problem on the Mac
-	 *
-	 * @param tr Text Renderer to fix
-	 */
-	public static void fixIt(TextRenderer tr)
-	{
-		// Get the OS Name
-		String osName = System.getProperty("os.name");
-
-		// Only fix it if it's broke :)
-		if ((osName != null) && osName.toLowerCase().contains("mac"))
-		{
-			// Call the TextRenderer's private function getBackingStore to get the backingStore
-			TextureRenderer backingStore = (TextureRenderer) invokePrivateMethod(tr, "getBackingStore",
-					null);
-
-			// If we have a valid backing store, mark the entire thing dirty.
-			if (backingStore != null)
-			{
-				backingStore.markDirty(0, 0, backingStore.getWidth(), backingStore.getHeight());
-			}
-		}
-	}
-
-	/**
-	 * Invokes a private method on and Object.
-	 *
-	 * @param o Object to call private method on
-	 * @param methodName Name of the method to call
-	 * @param params Array of parameters to be passed to the function
-	 * @return Object that the method called normally returns (Cast to proper type) NOTE: This function
-	 *         was found on the Internet. Lost the link so we are unable to give the author the proper
-	 *         credit.
-	 */
-	public static Object invokePrivateMethod(Object o, String methodName, Object[] params)
-	{
-		// Go and find the private method...
-		final Method methods[] = o.getClass().getDeclaredMethods();
-		for (int i = 0; i < methods.length; ++i)
-		{
-			if (methodName.equals(methods[i].getName()))
-			{
-				try
-				{
-					methods[i].setAccessible(true);
-					return methods[i].invoke(o, params);
-				}
-				catch (IllegalAccessException ex)
-				{
-					System.out.println("IllegalAccessException accessing " + methodName);
-				}
-				catch (InvocationTargetException ite)
-				{
-					System.out.println("InvocationTargetException accessing " + methodName);
-				}
-			}
-		}
-		return null;
-	}
-
-}
 
 class OTFGLOverlay extends OTFGLDrawableImpl {
 	private final InputStream texture;
@@ -582,9 +508,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			linkIdQuery.prepare(this.clientQ);
 			Map<Coord, String> linkIds = linkIdQuery.getLinkIds();
 			return linkIds;
-		} else {
-			return Collections.emptyMap();
 		}
+		return Collections.emptyMap();
 	}
 
 	synchronized public void display(GLAutoDrawable drawable) {
@@ -609,10 +534,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			displayLinkIds(coordStringPairs);
 		}
 		this.gl.glDisable(GL.GL_BLEND);
-
-		// Mac OS X impl of TextRenderer is broken as of 2008/10/24
-		// remove this if there is --ever-- a fix
-		TextRenderHack.fixIt( this.statusDrawer.textRenderer );
 
 		Collection<String> visibleLinkIds = coordStringPairs.values();
 		InfoTextContainer.drawInfoTexts(drawable, visibleLinkIds);
@@ -918,23 +839,20 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		return t;
 	}
 
+	@Override
 	public void clearCache() {
 		if (this.clientQ != null) this.clientQ.clearCache();
 	}
 
-	/**
-	 * @param queryHandler the queryHandler to set
-	 */
 	public void setQueryHandler(OTFQueryHandler queryHandler) {
 		if(queryHandler != null) this.queryHandler = queryHandler;
 	}
-
 
 	public OTFQueryHandler getQueryHandler() {
 		return queryHandler;
 	}
 
-
+	@Override
 	public Point3f getOGLPos(int x, int y) {
 		return this.mouseMan.getOGLPos(x, y);
 	}
