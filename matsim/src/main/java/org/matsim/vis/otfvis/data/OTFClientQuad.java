@@ -42,16 +42,16 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
  * The OTFClientQuad is a QuadTree holding OTFDataReads objects.
  * It mirrors the OTFServerQuad on the server side of the OTFVis exactly.
  * It has several Executor classes defined for invalidating reading and creading the Quad.
- * 
+ *
  * @author dstrippgen
  *
  */
 public class OTFClientQuad extends QuadTree<OTFDataReader> {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger log = Logger.getLogger(OTFClientQuad.class);
-	
+
 	private final double minEasting;
 	private final double maxEasting;
 	private final double minNorthing;
@@ -85,15 +85,14 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 				else
 					reader.readDynData(this.in, this.graph);
 			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(1);
+				throw new RuntimeException(e);
 			}
 		}
 	}
 
 	private static class InvalidateExecutor implements Executor<OTFDataReader> {
 		private final SceneGraph sceneGraph;
-		
+
 		public InvalidateExecutor(final SceneGraph aSceneGraph) {
 			this.sceneGraph = aSceneGraph;
 		}
@@ -135,7 +134,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 				reader.connect(drawer);
 			}
 		}
-		
+
 		log.info("Connecting additional elements...");
 		for(OTFDataReader element : this.additionalElements) {
 			Collection<OTFDataReceiver> drawers = connect.getReceiversForReader(element.getClass(), graph);
@@ -180,7 +179,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		if (OTFClientControl.getInstance().getOTFVisConfig().isScaleQuadTreeRect()){
 		  rect = rect.scale(5.0, 5.0);
 		}
-		
+
 		SceneGraph cachedResult = this.cachedTimes.get(time);
 		if(cachedResult != null) {
 			Rect cachedRect = cachedResult.getRect();
@@ -277,7 +276,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	synchronized public void invalidateAll(final SceneGraph result) {
 		invalidate(null, result);
 	}
-	
+
 	@Override
 	public double getMinEasting() {
 		return this.minEasting;

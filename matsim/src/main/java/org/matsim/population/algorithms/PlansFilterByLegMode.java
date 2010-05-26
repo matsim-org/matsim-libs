@@ -146,8 +146,7 @@ public class PlansFilterByLegMode {
 						planCount++;
 					}
 				} else {
-					log.error("should not happen; aborting ...") ;
-					System.exit(-1) ;
+					throw new RuntimeException("should not happen;");
 				}
 			}
 			if (person.getPlans().isEmpty()) {
