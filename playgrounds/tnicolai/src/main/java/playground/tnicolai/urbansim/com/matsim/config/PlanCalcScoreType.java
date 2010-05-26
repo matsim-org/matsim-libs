@@ -8,7 +8,6 @@
 
 package playground.tnicolai.urbansim.com.matsim.config;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -19,18 +18,17 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java class for urbansimParameterType complex type.
+ * <p>Java class for planCalcScoreType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="urbansimParameterType">
+ * &lt;complexType name="planCalcScoreType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="samplingRate" type="{http://www.w3.org/2001/XMLSchema}double"/>
- *         &lt;element name="year" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger"/>
- *         &lt;element name="tempDirectory" type="{http://www.w3.org/2001/XMLSchema}token"/>
+ *         &lt;element name="activityType_0" type="{http://www.w3.org/2001/XMLSchema}token"/>
+ *         &lt;element name="activityType_1" type="{http://www.w3.org/2001/XMLSchema}token"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -40,84 +38,67 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "urbansimParameterType", propOrder = {
-    "samplingRate",
-    "year",
-    "tempDirectory"
+@XmlType(name = "planCalcScoreType", propOrder = {
+    "activityType0",
+    "activityType1"
 })
-public class UrbansimParameterType {
+public class PlanCalcScoreType {
 
-    protected double samplingRate;
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "nonNegativeInteger")
-    protected BigInteger year;
-    @XmlElement(required = true)
+    @XmlElement(name = "activityType_0", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")
-    protected String tempDirectory;
+    protected String activityType0;
+    @XmlElement(name = "activityType_1", required = true)
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    @XmlSchemaType(name = "token")
+    protected String activityType1;
 
     /**
-     * Gets the value of the samplingRate property.
-     * 
-     */
-    public double getSamplingRate() {
-        return samplingRate;
-    }
-
-    /**
-     * Sets the value of the samplingRate property.
-     * 
-     */
-    public void setSamplingRate(double value) {
-        this.samplingRate = value;
-    }
-
-    /**
-     * Gets the value of the year property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
-     */
-    public BigInteger getYear() {
-        return year;
-    }
-
-    /**
-     * Sets the value of the year property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setYear(BigInteger value) {
-        this.year = value;
-    }
-
-    /**
-     * Gets the value of the tempDirectory property.
+     * Gets the value of the activityType0 property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getTempDirectory() {
-        return tempDirectory;
+    public String getActivityType0() {
+        return activityType0;
     }
 
     /**
-     * Sets the value of the tempDirectory property.
+     * Sets the value of the activityType0 property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setTempDirectory(String value) {
-        this.tempDirectory = value;
+    public void setActivityType0(String value) {
+        this.activityType0 = value;
+    }
+
+    /**
+     * Gets the value of the activityType1 property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getActivityType1() {
+        return activityType1;
+    }
+
+    /**
+     * Sets the value of the activityType1 property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setActivityType1(String value) {
+        this.activityType1 = value;
     }
 
 }

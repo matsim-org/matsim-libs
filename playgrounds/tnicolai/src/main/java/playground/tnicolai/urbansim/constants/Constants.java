@@ -40,6 +40,10 @@ public class Constants {
 	public static final String OPUS_MATSIM_OUTPUT_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/output/";
 	public static final String OPUS_MATSIM_TEMPORARY_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/tmp/";
 	
+	/** subdirectories in MATSim */
+	public static final String MATSIM_WORKING_DIRECTORY = System.getProperty("user.dir");
+	public static final String MATSIM_PLAYGROUND_DIRECTORY_STATIC = "tnicolai/src/main/java";
+	
 	/** file names */
 	public static final String GENERATED_PLANS_FILE_NAME = "output_plans.xml.gz";
 	public static final String GENERATED_MATSIM_CONFIG_FILE_NAME = "MATSimConfigFile.xml.gz";

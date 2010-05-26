@@ -41,6 +41,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -52,6 +54,7 @@ import org.xml.sax.SAXException;
 
 import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.urbansim.utils.IdFactory;
 import playground.tnicolai.urbansim.utils.MyControlerListener;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
@@ -72,6 +75,10 @@ public class MATSim4Urbansim {
 	private static int firstIteration = -1;
 	// number of last iteration of this run
 	private static int lastIteration = -1;
+	// identifier activityType_0
+	private static String activityType_0 = null;
+	// identifier activityType_1
+	private static String activityType_1 = null;
 	// year of this run
 	private static int year = -1;
 	// denotes the sample rate on which MATSim runs. 0.01 means 1%
@@ -157,8 +164,8 @@ public class MATSim4Urbansim {
 		// set population in scenario
 		scenario.setPopulation(newPopulation);
 		Controler controler = new Controler(scenario) ;
-		controler.setOverwriteFiles(true) ;
-
+		controler.setOverwriteFiles(true) ;	
+		
 		// The following lines register what should be done _after_ the iterations were run:
 		MyControlerListener myControlerListener = new MyControlerListener( zones ) ;
 		controler.addControlerListener(myControlerListener);
@@ -183,8 +190,8 @@ public class MATSim4Urbansim {
 
 			// crate a schema factory ...
 			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
-			// ... and initialize it with an xsd
-			File file2XSD = new File( Constants.OPUS_MATSIM_DIRECTORY + "/classesTNicolai/xsd/MATSim4UrbanSimTestConfig2.xsd" );
+			// ... and initialize it with an xsd (xsd lies in the urbansim project)
+			File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" );
 			if(!file2XSD.exists()){
 				log.error(file2XSD.getCanonicalPath() + " does not exsist!!!");
 				return false;
@@ -211,13 +218,16 @@ public class MATSim4Urbansim {
 				networkFile = matsimConfig.getNetwork().getInputFile();
 				firstIteration = matsimConfig.getControler().getFirstIteration().intValue();
 				lastIteration = matsimConfig.getControler().getLastIteration().intValue();
+				activityType_0 = matsimConfig.getPlanCalcScore().getActivityType0();
+				activityType_1 = matsimConfig.getPlanCalcScore().getActivityType1();
 				samplingRate = matsimConfig.getUrbansimParameter().getSamplingRate();
 				year = matsimConfig.getUrbansimParameter().getYear().intValue();
 				tempDirectory = matsimConfig.getUrbansimParameter().getTempDirectory();
 
-				log.info("Network: " + matsimConfig.getNetwork().getInputFile());
-				log.info("Controler FirstIteration: " + matsimConfig.getControler().getFirstIteration() + " LastIteration: " + matsimConfig.getControler().getLastIteration() );
-				log.info("UrbansimParameter SamplingRate: " + matsimConfig.getUrbansimParameter().getSamplingRate() + " Year: " + matsimConfig.getUrbansimParameter().getYear() + " TempDir: " + matsimConfig.getUrbansimParameter().getTempDirectory());
+				log.info("Network: " + networkFile);
+				log.info("Controler FirstIteration: " + firstIteration + " LastIteration: " + lastIteration );
+				log.info("PlanCalcScore Activity_Type_0: " + activityType_0 + " Activity_Type_1: " + activityType_1);
+				log.info("UrbansimParameter SamplingRate: " + samplingRate + " Year: " + year + " TempDir: " + tempDirectory);
 			}
 		}
 		catch(JAXBException je){
@@ -240,20 +250,41 @@ public class MATSim4Urbansim {
 	 * creates a MATSim config object with the parameter from the JaxB data structure
 	 */
 	private static void createAndInitializeConfigObject(){
-
+		
 		scenario = new ScenarioImpl();
 		MATSim4Urbansim.config = scenario.getConfig();
 
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) MATSim4Urbansim.config.getModule(NetworkConfigGroup.GROUP_NAME);
 		ControlerConfigGroup controlerCG = (ControlerConfigGroup) MATSim4Urbansim.config.getModule(ControlerConfigGroup.GROUP_NAME);
-
-		networkCG.setInputFile( MATSim4Urbansim.networkFile );
-		controlerCG.setFirstIteration( MATSim4Urbansim.firstIteration );
+		
+		// set values
+		networkCG.setInputFile( MATSim4Urbansim.networkFile );	// network
+		log.info("Set network to config...");
+		
+		controlerCG.setFirstIteration( MATSim4Urbansim.firstIteration );	// controller (first, last iteration)
 		controlerCG.setLastIteration( MATSim4Urbansim.lastIteration);
-
+		log.info("Set controler to config...");
+		
+		ActivityParams actType0 = new ActivityParams(MATSim4Urbansim.activityType_0);
+		actType0.setTypicalDuration(12*60*60);
+		ActivityParams actType1 = new ActivityParams(MATSim4Urbansim.activityType_1);
+		actType1.setTypicalDuration(8*60*60);
+		MATSim4Urbansim.config.charyparNagelScoring().addActivityParams( actType0 ); // planCalcScore
+		MATSim4Urbansim.config.charyparNagelScoring().addActivityParams( actType1 );
+		log.info("Set planCalcScore to config...");
+		
+		// configure strategies for replanning
+		MATSim4Urbansim.config.strategy().setMaxAgentPlanMemorySize(4);
+		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
+		selectExp.setModuleName("ReRoute_Dijkstra");
+		selectExp.setProbability(1.0);
+		MATSim4Urbansim.config.strategy().addStrategySettings(selectExp);
+		log.info("Set strategy to config...");
+		
+		// init loader
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
-
+		
 		// old version
 //		ScenarioLoaderImpl loader = new ScenarioLoaderImpl("/Users/thomas/Development/workspace/OPUS_MATSim_Config_Test/xmls/MATSim4UrbansimOldConfig.xml");
 //		loader.loadScenario();
@@ -387,4 +418,6 @@ public class MATSim4Urbansim {
 	}
 
 }
+
+
 
