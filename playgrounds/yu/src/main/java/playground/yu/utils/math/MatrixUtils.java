@@ -81,7 +81,10 @@ public class MatrixUtils {
 	public static Matrix getMinimumNormSolution(Matrix A, Matrix y) {
 		Matrix GI;
 		if (isConsistantEquation(A, y)) {// consistant
+			Logger.getLogger("Calculation of Generalized Inverse BEGAN");
 			GI = MatrixUtils.getGeneralizedInverse(A);
+			Logger.getLogger("Calculation of Generalized Inverse ENDED");
+
 			Matrix A_adjugate = A.transpose();
 			Matrix GAA_adjugate = GI.times(A).times(A_adjugate);
 			if (MatrixUtils.equals(A_adjugate, GAA_adjugate))
@@ -96,7 +99,11 @@ public class MatrixUtils {
 		} else {// inconsistant
 			Logger
 					.getLogger("Ax=y is an inconsistant equation, so the minimum norm least squares solution will be calculated.");
+			Logger
+					.getLogger("Calculation of Moore-Pernrose Pseudo Inverse BEGAN");
 			GI = MatrixUtils.getMoorePernrosePseudoInverse(A);
+			Logger
+					.getLogger("Calculation of Moore-Pernrose Pseudo Inverse ENDED");
 		}
 		return GI.times(y);
 	}
@@ -134,7 +141,9 @@ public class MatrixUtils {
 	}
 
 	public static Matrix getGeneralizedInverse(Matrix A) {
+		Logger.getLogger("Calculation of Full-rank Decomposition BEGAN");
 		FullRankDecomposition frd = new FullRankDecomposition(A);
+		Logger.getLogger("Calculation of Full-rank Decomposition ENDED");
 		Matrix F_t = frd.getF().transpose(), G_t = frd.getG().transpose();
 		Matrix F_txAxG_t = F_t.times(A).times(G_t);
 		System.out.println("F_txAxG_t^-1 =\t" + F_txAxG_t.det());
@@ -225,7 +234,9 @@ public class MatrixUtils {
 			m = this.REF.getRowDimension();
 			n = this.REF.getColumnDimension();
 			TE = Matrix.identity(m, m);// Identity matrix
+			Logger.getLogger("Calculation of Pivot Gaussian Elimination BEGAN");
 			calculate();
+			Logger.getLogger("Calculation of Pivot Gaussian Elimination ENDED");
 		}
 
 		public Matrix getRowEchelonForm() {

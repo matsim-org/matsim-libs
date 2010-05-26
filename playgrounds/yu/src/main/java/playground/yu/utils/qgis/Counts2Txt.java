@@ -46,9 +46,9 @@ public class Counts2Txt {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml", //
-		countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml", //
-		outputFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.txt";
+		String networkFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/network.xml", //
+		countsFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/counts1k.xml", //
+		outputFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/counts1k.txt";
 
 		Scenario snr = new ScenarioImpl();
 		Network net = snr.getNetwork();
