@@ -38,6 +38,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D.Double;
 import java.rmi.RemoteException;
 
@@ -53,6 +54,7 @@ import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gui.ValueColorizer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
@@ -135,6 +137,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	private MyNetVisScrollPane networkScrollPane = null;
 
 	private transient final VizGuiHandler mouseMan;
+	private OTFQueryHandler queryHandler;
 
 	public void setViewClipCoords( double minX, double minY, double maxX, double maxY) {
 		viewMinX  = networkClippingMinEasting() +  minX * networkClippingWidth();
@@ -285,6 +288,11 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		g2.setTransform(linkTransform);
 
 		sceneGraph.draw();
+		
+		if (this.queryHandler != null) {
+			this.queryHandler.drawQueries(this);
+		}
+		
 		g2.setTransform(new AffineTransform());
 		mouseMan.drawElements(g2);
 		g2.setTransform(originalTransform);
@@ -471,7 +479,6 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			} else {
 				display.setColor(color);
 			}
-
 			display.fillOval((int)Math.round(pos.x + offsetX), (int)pos.y, (int)Math.round(agentLength), (int)Math.round(agentWidth));
 		}
 
@@ -527,20 +534,19 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 					float scale =  networkScrollPane.getScale();
 					/*scale = */networkScrollPane.scaleNetwork(currentRect,scale);
 				} else {
-					// try to find agent under mouse
-					// calc mouse pos to component pos
-					//Rectangle rect = networkScrollPane.getViewport().getViewRect();
-					//Point2D.Double p =  getNetCoord(e.getX() + rect.getX(), e.getY()+ + rect.getY());
-					//					String id = visnet.getAgentId(p);
-					//					Plan plan = null;
-					//					try {
-					//						plan = host.getAgentPlan(id);
-					//					} catch (Exception e1) {
-					//						// _TODO Auto-generated catch block
-					//						e1.printStackTrace();
-					//					}
-					//					if(plan != null) agentRenderer.setPlan(plan);
-
+					Point2D.Double origPoint = new Point2D.Double(e.getX(), e.getY());
+//					AffineTransform originalTransform = ((Graphics2D) (e.getComponent().getGraphics())).getTransform();
+					AffineTransform linkTransform = new AffineTransform( );
+					linkTransform.concatenate(getBoxTransform());
+					try {
+						linkTransform = linkTransform.createInverse();
+					} catch (NoninvertibleTransformException e1) {
+						throw new RuntimeException(e1);
+					}
+					Point2D.Double transformedPoint = (Point2D.Double) linkTransform.transform(origPoint, null);
+//					System.out.println(origPoint);
+//					System.out.println(transformedPoint);
+					handleClick(transformedPoint, button, e);
 					networkScrollPane.invalidate();
 					networkScrollPane.repaint();
 				}
@@ -587,12 +593,18 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 	@Override
 	public void handleClick(Double point, int mouseButton, MouseEvent e) {
-
+		Point2D.Double origPoint = new Point2D.Double(point.x + this.quad.offsetEast, point.y + this.quad.offsetNorth);
+		if(this.queryHandler != null) this.queryHandler.handleClick(this.quad.getId(), origPoint, mouseButton);
 	}
 
 	@Override
 	public void handleClick(Rectangle currentRect, int button) {
-
+		Rectangle2D.Double origRect = new Rectangle2D.Double(currentRect.x + this.quad.offsetEast, currentRect.y + this.quad.offsetNorth, currentRect.width, currentRect.height);
+		if(this.queryHandler != null) this.queryHandler.handleClick(this.quad.getId(), origRect, button);
+	}
+	
+	public void setQueryHandler(OTFQueryHandler queryHandler) {
+		if(queryHandler != null) this.queryHandler = queryHandler;
 	}
 
 }

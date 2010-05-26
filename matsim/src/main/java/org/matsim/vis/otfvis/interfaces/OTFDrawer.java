@@ -44,4 +44,5 @@ public interface OTFDrawer {
 	public Component getComponent();
 	public void clearCache();
 	public void handleClick(Rectangle currentRect, int button);
+	public void setQueryHandler(OTFQueryHandler queryHandler);
 }
