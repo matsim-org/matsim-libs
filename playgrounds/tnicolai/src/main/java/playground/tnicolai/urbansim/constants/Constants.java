@@ -42,7 +42,6 @@ public class Constants {
 	
 	/** subdirectories in MATSim */
 	public static final String MATSIM_WORKING_DIRECTORY = System.getProperty("user.dir");
-	public static final String MATSIM_PLAYGROUND_DIRECTORY_STATIC = "tnicolai/src/main/java";
 	
 	/** file names */
 	public static final String GENERATED_PLANS_FILE_NAME = "output_plans.xml.gz";

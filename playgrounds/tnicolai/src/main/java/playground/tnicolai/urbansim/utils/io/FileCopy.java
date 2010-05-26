@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
@@ -42,7 +43,87 @@ public class FileCopy {
 	private static final Logger log = Logger.getLogger(FileCopy.class);
 	
 	/**
-	 * 
+	 * Copies all files from a source directory into a target directory
+	 * @param sourceDir
+	 * @param targetRoot
+	 * @return true if succssesful 
+	 */
+	public static boolean copyTree(String sourceDir, String targetRoot) { 
+	     boolean result; 
+	     try  { 
+	        File source = new File(sourceDir); 
+	        File root = new File(targetRoot); 
+	        if(source.exists() == false || source.isDirectory() == false){ 
+	        	log.error("Source path dosn't exsist (\"" + source.getCanonicalPath() + "\"). Can't copy files.");
+	           return false; 
+	        }
+	        if(root.exists() == false || root.isDirectory() == false){
+	        	log.error("Destination path dosn't exsist (\"" + root.getCanonicalPath() + "\"). Can't copy files.");
+	        	return false;
+	        }
+	        	
+	        // set destination path         
+	        String targetRootName = root.getCanonicalPath() + File.separator;
+
+	        // list all source files
+	        ArrayList<File> fileNames = listAllFiles(source, true); 
+	        result = true;
+	        File target;
+	        // copy every source file into destination path
+	        for(File f : fileNames) { 
+	        	String fullName = f.getCanonicalPath(); 
+	            int pos = fullName.indexOf(sourceDir);           
+	            String subName = fullName.substring(pos + sourceDir.length()+1); 
+	            String targetName = targetRootName + subName;
+	            target = new File(targetName); 
+	            if(f.isDirectory()) { 
+	            	// create subdirectory if needed
+	                if(target.exists() == false) { 
+	                	boolean st = target.mkdir(); 
+	                    if(st == false) 
+	                    	result = false; 
+	                    } 
+	                    continue; 
+	            }
+	            boolean st = fileCopy(f, target); 
+	            	 if(st == false) 
+	                 	result = false; 
+	        } 
+	     } catch(Exception e) { 
+	    	 e.printStackTrace(); 
+	         result = false; 
+	     } 
+	     return result; 
+	 }
+	
+	/**
+	 * Gather all files within a directory
+	 * @param rootDir directory
+	 * @param includeDirNames true if subdirectories
+	 * @return all files within a given directory
+	 */
+	public static ArrayList<File> listAllFiles(File rootDir, boolean includeDirNames) { 
+		ArrayList<File> result = new ArrayList<File>(); 
+		try { 
+			File[] fileList = rootDir.listFiles(); 
+			for(int i = 0; i < fileList.length; i++) { 
+
+				if(fileList[i].isDirectory() == true) { 
+					if(includeDirNames) 
+						result.add(fileList[i]); 
+					result.addAll(listAllFiles(fileList[i],includeDirNames)); 
+				} 
+				else 
+					result.add(fileList[i]); 
+			} 
+		} catch(Exception e) { 
+			e.printStackTrace(); 
+		} 
+		return result; 
+	} 
+	
+	/**
+	 * Copies a file (source file) to a given output file
 	 * @param sourceFile
 	 * @param outputFile
 	 * @return 
