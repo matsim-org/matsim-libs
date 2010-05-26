@@ -181,7 +181,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);
 
 	private static int linkTexWidth = 0;
-	private static float agentSize = 10.f;
 	private int netDisplList = 0;
 	private GL gl = null;
 	private VisGUIMouseHandler mouseMan = null;
@@ -312,21 +311,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	/**I think that this class is used nowhere except that some static fields are used from somewhere else.
 	 * (But, as usual, it might be needed in some old mvi files.)  Kai, jan'10
-	 *
 	 */
 	public static class AgentDrawer
-//	extends OTFGLDrawableImpl
-//	implements OTFDataSimpleAgentReceiver
 	{
-//		//Anything above 50km/h should be yellow!
-//		private final static FastColorizer colorizer = new FastColorizer(
-//				new double[] { 0.0, 25, 50, 75}, new Color[] {
-//						Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE});
-//
-//		protected char[] id;
-//		protected float startX, startY, color;
-//		protected int state;
-
 		public static  Texture  agentpng = null;
 
 		//for backward compatibility only
@@ -335,42 +322,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		//for backward compatibility only
 		@Deprecated
 		public static  Texture  pedpng = null;
-
-//		private static int cnt = 0 ;
-//		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-//			if ( cnt < 1 ) {
-//				cnt++ ;
-//				log.warn("calling setAgent") ;
-//			}
-//			this.id = id;
-//			this.startX = startX;
-//			this.startY = startY;
-//			this.color = color;
-//			this.state = state;
-//		}
-//
-//		public void displayPS(GL gl) {
-//			gl.glEnable(GL.GL_POINT_SPRITE_NV);
-//			gl.glPointSize(agentSize/10);
-//			gl.glBegin(GL.GL_POINTS);
-//			gl.glVertex3f(this.startX,this.startY, 0);
-//			gl.glEnd();
-//			gl.glDisable(GL.GL_POINT_SPRITE_NV);
-//		}
-//
-//		protected void setColor(GL gl) {
-//			Color color = colorizer.getColor(0.1 + 0.9*this.color);
-//			if ((this.state & 1) != 0) {
-//				color = Color.lightGray;
-//			}
-//			gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.8);
-//
-//		}
-//
-//		public void onDraw(GL gl) {
-//			setColor(gl);
-//			displayPS(gl);
-//		}
 	}
 
 	private static class MyGLCanvas2 extends GLCanvas {
@@ -512,6 +463,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		return Collections.emptyMap();
 	}
 
+	@Override
 	synchronized public void display(GLAutoDrawable drawable) {
 		float[] components = OTFClientControl.getInstance().getOTFVisConfig().getBackgroundColor().getColorComponents(new float[4]);
 		this.gl = drawable.getGL();
@@ -572,9 +524,11 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		}
 	}
 
+	@Override
 	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
 	}
 
+	@Override
 	public void init(GLAutoDrawable drawable) {
 		if(motherContext == null) motherContext = drawable.getContext();
 
@@ -749,7 +703,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	 * @throws RemoteException
 	 */
 	public void invalidate(int time) throws RemoteException {
-		agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
 		if(time != -1) {
 			this.now = time;
 			this.lastTime = Time.writeTime(time, ':');
@@ -799,9 +752,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		return this.mouseMan.getBounds();
 	}
 
-	/**
-	 * @return the actGraph
-	 */
 	public SceneGraph getActGraph() {
 		return this.actGraph;
 	}
@@ -846,10 +796,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	public void setQueryHandler(OTFQueryHandler queryHandler) {
 		if(queryHandler != null) this.queryHandler = queryHandler;
-	}
-
-	public OTFQueryHandler getQueryHandler() {
-		return queryHandler;
 	}
 
 	@Override
