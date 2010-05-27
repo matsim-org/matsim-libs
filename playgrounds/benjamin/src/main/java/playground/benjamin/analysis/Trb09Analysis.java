@@ -28,6 +28,9 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
@@ -62,11 +65,11 @@ public class Trb09Analysis {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String netfile, plans1file, plans2file, housholdsfile;
+		String netfile, plans1file, plans2file, housholdsfile, eventsfile;
 		int threshold;
 		
-//changes should only be done here:
 //***************************************************************************************************************************************************	
+//changes should be done here and under filters (see below):
 //		boolean isTestscenario = true;
 //		String runNumber1 = "860";
 //		String runNumber2 = "864";
@@ -75,7 +78,8 @@ public class Trb09Analysis {
 		String runNumber1 = "891";
 		String runNumber2 = "896";
 		
-		//only necessary if there is a toll
+		
+		//only if there is a toll scheme
 		String tollLinksFilePath = BkPaths.STUDIESBK + "/transportEconomics/zh_forRun891_distanceMorningToll_0630-0900_cityWOhighways_1120rp_per_km.xml";
 		RoadPricingScheme tollLinks = loadTollLinksFile(tollLinksFilePath);
 //***************************************************************************************************************************************************		
@@ -83,37 +87,38 @@ public class Trb09Analysis {
 		String runid1String = "run" + runNumber1;
 		String runid2String = "run" + runNumber2;
 		
-		Id runid1 = new IdImpl(runid1String);
-		Id runid2 = new IdImpl(runid2String);
-			
-		String runiddot1 = runid1String + ".";
-		String runiddot2 = runid2String + ".";
+		Id runid1 = new IdImpl(runNumber1);
+		Id runid2 = new IdImpl(runNumber2);
+		
+		String outputPath1 = BkPaths.RUNSSVN + runid1String;
+		String outputPath2 = BkPaths.RUNSSVN + runid2String;
+		ControlerIO io1 = new ControlerIO(outputPath1, runid1);
+		ControlerIO io2 = new ControlerIO(outputPath2, runid2);
+		
 		
 		if (isTestscenario){
-			netfile = BkPaths.RUNSSVN + runid1String + "/" + runiddot1 + "output_network.xml.gz";
-			plans1file = BkPaths.RUNSSVN + runid1String + "/" + runiddot1 + "output_plans.xml.gz";
-			plans2file = BkPaths.RUNSSVN + runid2String + "/" + runiddot2 + "output_plans.xml.gz";			
+			netfile = outputPath1 + "/" + runid1String + ".output_network.xml.gz";
+			plans1file = outputPath1 + "/" + runid1String + ".output_plans.xml.gz";
+			plans2file = outputPath2 + "/" + runid2String + ".output_plans.xml.gz";		
 			housholdsfile = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/households.xml";
 			threshold = 4;
 		}
 		else {
-			netfile = BkPaths.RUNSSVN + runid1String + "/" + runNumber1 + ".output_network.xml.gz";
-			plans1file = BkPaths.RUNSSVN + runid1String + "/" + runNumber1 + ".output_plans.xml.gz";
-			plans2file = BkPaths.RUNSSVN + runid2String + "/" + runNumber2 + ".output_plans.xml.gz";
+			netfile = io1.getOutputFilename("output_network") + ".xml.gz";
+			plans1file = io1.getOutputFilename("output_plans") + ".xml.gz";
+			plans2file = io2.getOutputFilename("output_plans") + ".xml.gz";		
 			housholdsfile = BkPaths.SHAREDSVN + "/studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
 			threshold = 100;
+			
+			String configPath = io2.getOutputFilename("output_config") + ".xml.gz";
+			Config config = new Config();
+			config.addCoreModules();
+			MatsimConfigReader reader = new MatsimConfigReader(config);
+			reader.readFile(configPath);
+			
+			eventsfile = io2.getIterationFilename(config.controler().getLastIteration(), "events") + ".txt.gz";
 		}
 
-		
-//		runid1 += "best";
-//		runid2 += "best";
-//		
-//		File file = new File(BkPaths.RUNSSVN + runid1);
-//		file.mkdir();
-//		File file2 = new File(BkPaths.RUNSSVN + runid2);
-//		file2.mkdir();
-
-		
 //		String modalSplitGroupChartFileRun1 = BkPaths.RUNSSVN + runid1String + "/"+runNumber1+"modalSplitGroupChart";
 //		String modalSplitGroupChartFileRun2 = BkPaths.RUNSSVN + runid2String + "/"+runNumber2+"modalSplitGroupChart";	
 //		String deltaUtilsModeGroupChartFile = BkPaths.RUNSSVN + runid2String + "/deltaUtilsModeGroupChart"+runNumber1+"vs"+runNumber2;
@@ -137,11 +142,12 @@ public class Trb09Analysis {
 		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader();
 		DgAnalysisPopulation ana = new DgAnalysisPopulation();
 //		DgAnalysisPopulation ana = pc.doPopulationAnalysis(netfile, plans1file, plans2file);
-		
-		//any filter can be applied here:
-		pc.addFilter(new ExcludeZurichTransitFilter());
-		pc.addFilter(new OnlyInnerZurichFilter(tollLinks));
-			
+
+//***************************************************************************************************************************************************
+//any filter can be applied here:
+pc.addFilter(new ExcludeZurichTransitFilter());
+pc.addFilter(new OnlyInnerZurichFilter(tollLinks));
+//***************************************************************************************************************************************************			
 		pc.readAnalysisPopulation(ana, runid1, netfile, plans1file);
 		pc.readAnalysisPopulation(ana, runid2, netfile, plans2file);
 		
@@ -201,7 +207,7 @@ public class Trb09Analysis {
 
 		writeMixedDeltaUtilsModeGroupChart(deltaUtilsModeGroupChart, avgDeltaUtilesModeQuantilesChart, mixedDeltaUtilsModeGroupChartFile, mixedMsoDeltaUtilsModeGroupChartFile,  runid1, runid2);
 		
-		log.debug("plots and tables finished!");
+		log.debug("Plots and tables finished!");
 			
 	}
 	
