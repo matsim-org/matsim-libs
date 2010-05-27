@@ -43,13 +43,9 @@ import org.matsim.world.Layer;
 
 
 /**
- *
- *
  * @author mrieser
  */
 public final class TransitRouterNetwork implements Network {
-
-	private static final long serialVersionUID = 1L;
 
 	private final Map<Id, TransitRouterNetworkLink> links = new LinkedHashMap<Id, TransitRouterNetworkLink>();
 	private final Map<Id, TransitRouterNetworkNode> nodes = new LinkedHashMap<Id, TransitRouterNetworkNode>();
@@ -57,10 +53,6 @@ public final class TransitRouterNetwork implements Network {
 
 	private long nextNodeId = 0;
 	private long nextLinkId = 0;
-
-	public TransitRouterNetwork() {
-
-	}
 
 	public static final class TransitRouterNetworkNode implements Node {
 
