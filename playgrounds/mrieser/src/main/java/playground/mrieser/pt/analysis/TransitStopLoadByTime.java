@@ -22,6 +22,8 @@ package playground.mrieser.pt.analysis;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -61,7 +63,7 @@ public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEnt
 		if (sData == null) {
 			return null;
 		}
-		return Collections.unmodifiableMap(sData.nOfPassengersByTime);
+		return Collections.unmodifiableMap(sData.getWaitingCount());
 	}
 
 	@Override
@@ -108,31 +110,52 @@ public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEnt
 	}
 
 	private static class StopData {
-		public final TreeMap<Double, Integer> nOfPassengersByTime = new TreeMap<Double, Integer>(); // Time, nOfPassengers
+		private final SortedMap<Double, Integer> nOfPassengersDeltaByTime = new TreeMap<Double, Integer>(); // Time, nOfDeltaPassengers
+		private volatile TreeMap<Double, Integer> nOfPassengersByTime = null;
 
 		public StopData() {
 		}
 
 		public void addWaitingChange(final double time, final int delta) {
-			Integer i = this.nOfPassengersByTime.get(time);
+			Integer i = this.nOfPassengersDeltaByTime.get(time);
 			if (i == null) {
-				Map.Entry<Double, Integer> prev = this.nOfPassengersByTime.floorEntry(time);
-				if (prev == null) {
-					this.nOfPassengersByTime.put(time, delta);
-				} else {
-					this.nOfPassengersByTime.put(time, prev.getValue().intValue() + delta);
-				}
+				this.nOfPassengersDeltaByTime.put(time, delta);
 			} else {
-				this.nOfPassengersByTime.put(time, i.intValue() + delta);
+				this.nOfPassengersDeltaByTime.put(time, i.intValue() + delta);
 			}
+			this.nOfPassengersByTime = null;
 		}
 
 		public int getWaitingCount(final double time) {
-			Map.Entry<Double, Integer> floor = this.nOfPassengersByTime.floorEntry(time);
+			NavigableMap<Double, Integer> map = this.nOfPassengersByTime;
+			if (map == null) {
+				map = calculateWaitingLoad();
+			}
+
+			Map.Entry<Double, Integer> floor = map.floorEntry(time);
 			if (floor == null) {
 				return 0;
 			}
 			return floor.getValue().intValue();
+		}
+
+		private NavigableMap<Double, Integer> calculateWaitingLoad() {
+			TreeMap<Double, Integer> map = new TreeMap<Double, Integer>();
+			int count = 0;
+			for (Map.Entry<Double, Integer> e : this.nOfPassengersDeltaByTime.entrySet()) {
+				count += e.getValue().intValue();
+				map.put(e.getKey(), count);
+			}
+			this.nOfPassengersByTime = map;
+			return map;
+		}
+
+		/*protected*/ Map<Double, Integer> getWaitingCount() {
+			SortedMap<Double, Integer> map = this.nOfPassengersByTime;
+			if (map == null) {
+				return calculateWaitingLoad();
+			}
+			return map;
 		}
 
 	}

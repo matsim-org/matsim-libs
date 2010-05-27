@@ -19,6 +19,8 @@
 
 package playground.mrieser.pt.analysis;
 
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -95,5 +97,73 @@ public class TransitStopLoadByTimeTest {
 		Assert.assertEquals(0, tl.getStopFacilityLoad(stopId2, 555));
 		Assert.assertEquals(0, tl.getStopFacilityLoad(stopId2, 570));
 		Assert.assertEquals(0, tl.getStopFacilityLoad(stopId2, 600));
+	}
+
+	@Test
+	public void testTransitLoad_twoLines() {
+		Id[] id = {new IdImpl(0), new IdImpl(1), new IdImpl(2), new IdImpl(3)};
+
+		Id stopId1 = id[0];
+		Id routeId1 = id[1];
+		Id agentId1 = id[0];
+		Id agentId2 = id[1];
+		Id vehicleIdDep1 = id[0];
+		Id vehicleIdDep2 = id[1];
+
+		EventsFactoryImpl ef = new EventsFactoryImpl();
+
+		TransitStopLoadByTime tl = new TransitStopLoadByTime();
+		tl.handleEvent(ef.createActivityEndEvent(110, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
+		tl.handleEvent(ef.createActivityEndEvent(120, agentId2, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
+		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(130, vehicleIdDep2, stopId1, 0));
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(135, agentId2, vehicleIdDep2, routeId1));
+		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(140, vehicleIdDep2, stopId1, 0));
+
+		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(150, vehicleIdDep1, stopId1, 0));
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(155, agentId1, vehicleIdDep1, routeId1));
+		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(160, vehicleIdDep1, stopId1, 0));
+
+		Assert.assertEquals(0, tl.getStopFacilityLoad(stopId1,  90));
+		Assert.assertEquals(0, tl.getStopFacilityLoad(stopId1, 100));
+		Assert.assertEquals(1, tl.getStopFacilityLoad(stopId1, 110));
+		Assert.assertEquals(2, tl.getStopFacilityLoad(stopId1, 120));
+		Assert.assertEquals(2, tl.getStopFacilityLoad(stopId1, 130));
+		Assert.assertEquals(1, tl.getStopFacilityLoad(stopId1, 135));
+		Assert.assertEquals(1, tl.getStopFacilityLoad(stopId1, 140));
+		Assert.assertEquals(1, tl.getStopFacilityLoad(stopId1, 150));
+		Assert.assertEquals(0, tl.getStopFacilityLoad(stopId1, 155));
+		Assert.assertEquals(0, tl.getStopFacilityLoad(stopId1, 160));
+	}
+	@Test
+	public void testGetTransitLoad_twoLines() {
+		Id[] id = {new IdImpl(0), new IdImpl(1), new IdImpl(2), new IdImpl(3)};
+
+		Id stopId1 = id[0];
+		Id routeId1 = id[1];
+		Id agentId1 = id[0];
+		Id agentId2 = id[1];
+		Id vehicleIdDep1 = id[0];
+		Id vehicleIdDep2 = id[1];
+
+		EventsFactoryImpl ef = new EventsFactoryImpl();
+
+		TransitStopLoadByTime tl = new TransitStopLoadByTime();
+		tl.handleEvent(ef.createActivityEndEvent(110, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
+		tl.handleEvent(ef.createActivityEndEvent(120, agentId2, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
+		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(130, vehicleIdDep2, stopId1, 0));
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(135, agentId2, vehicleIdDep2, routeId1));
+		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(140, vehicleIdDep2, stopId1, 0));
+
+		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(150, vehicleIdDep1, stopId1, 0));
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(155, agentId1, vehicleIdDep1, routeId1));
+		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(160, vehicleIdDep1, stopId1, 0));
+
+		Map<Double, Integer> map = tl.getStopFacilityLoad(stopId1);
+
+		Assert.assertEquals(4, map.size());
+		Assert.assertEquals(1, map.get(110.0).intValue());
+		Assert.assertEquals(2, map.get(120.0).intValue());
+		Assert.assertEquals(1, map.get(135.0).intValue());
+		Assert.assertEquals(0, map.get(155.0).intValue());
 	}
 }
