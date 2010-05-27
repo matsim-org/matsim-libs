@@ -54,7 +54,6 @@ public class BkControlerIncome extends BkControler {
 	@Override
 	protected void setUp() {
 
-		//ask michael if movement of this statement from main class can have an impact on the results...test do not indicate this, so i think its ok. benjamin Mai'10
 		this.addInstallTravelCostCalculatorFactoryControlerListener();
 
 		this.scenarioData.getConfig().global().setNumberOfThreads(1);
