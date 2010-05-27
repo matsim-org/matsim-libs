@@ -22,7 +22,7 @@ package org.matsim.pt.qsim;
 import java.util.List;
 
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author aneumann
@@ -40,7 +40,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 	private static final double openDoorsDuration = 1.0;
 	private static final double closeDoorsDuration = 1.0;
 
-	/*package*/ ComplexTransitStopHandler(BasicVehicle vehicle) {
+	/*package*/ ComplexTransitStopHandler(Vehicle vehicle) {
 		this.personEntersTime = vehicle.getType().getAccessTime();
 		this.personLeavesTime = vehicle.getType().getEgressTime();
 	}

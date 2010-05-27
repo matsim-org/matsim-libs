@@ -26,8 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.ptproject.qsim.QVehicleImpl;
-import org.matsim.vehicles.BasicVehicle;
-import org.matsim.vehicles.BasicVehicleCapacity;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
 
 
 public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
@@ -36,9 +36,9 @@ public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
 	private final List<PassengerAgent> passengers = new LinkedList<PassengerAgent>();
 	private TransitStopHandler stopHandler;
 
-	public TransitQVehicle(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
+	public TransitQVehicle(final Vehicle basicVehicle, final double sizeInEquivalents) {
 		super(basicVehicle, sizeInEquivalents);
-		BasicVehicleCapacity capacity = basicVehicle.getType().getCapacity();
+		VehicleCapacity capacity = basicVehicle.getType().getCapacity();
 		if (capacity == null) {
 			throw new NullPointerException("No capacity set in vehicle type.");
 		}

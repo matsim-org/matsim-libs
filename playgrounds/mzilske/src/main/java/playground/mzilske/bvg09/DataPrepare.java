@@ -51,10 +51,10 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.vehicles.BasicVehicle;
-import org.matsim.vehicles.BasicVehicleCapacity;
-import org.matsim.vehicles.BasicVehicleCapacityImpl;
-import org.matsim.vehicles.BasicVehicleType;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFVisQSim;
@@ -225,9 +225,9 @@ public class DataPrepare {
 		Collection<Umlauf> umlaeufe = greedyUmlaufBuilder.build();
 
 		VehiclesFactory vb = this.scenario.getVehicles().getFactory();
-		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl(
+		VehicleType vehicleType = vb.createVehicleType(new IdImpl(
 				"defaultTransitVehicleType"));
-		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
@@ -236,7 +236,7 @@ public class DataPrepare {
 
 		long vehId = 0;
 		for (Umlauf umlauf : umlaeufe) {
-			BasicVehicle veh = vb.createVehicle(new IdImpl("veh_"+ Long.toString(vehId++)), vehicleType);
+			Vehicle veh = vb.createVehicle(new IdImpl("veh_"+ Long.toString(vehId++)), vehicleType);
 			this.scenario.getVehicles().getVehicles().put(veh.getId(), veh);
 			umlauf.setVehicleId(veh.getId());
 		}

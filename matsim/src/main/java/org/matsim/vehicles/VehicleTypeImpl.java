@@ -24,14 +24,14 @@ import org.matsim.api.core.v01.Id;
 /**
  * @author dgrether
  */
-public class BasicVehicleTypeImpl implements BasicVehicleType {
+public class VehicleTypeImpl implements VehicleType {
 
 	private double width = 1.0;
 	private double maxVelocity = 1.0;
 	private double length = 7.5;
-	private BasicEngineInformation engineInformation;
+	private EngineInformation engineInformation;
 	private String description;
-	private BasicVehicleCapacity capacity;
+	private VehicleCapacity capacity;
 	/**
 	 * default from xml schema
 	 */
@@ -43,11 +43,11 @@ public class BasicVehicleTypeImpl implements BasicVehicleType {
 	
 	private Id id;
 
-	public BasicVehicleTypeImpl(Id typeId) {
+	public VehicleTypeImpl(Id typeId) {
 		this.id = typeId;
 	}
 
-	public void setCapacity(BasicVehicleCapacity capacity) {
+	public void setCapacity(VehicleCapacity capacity) {
 		this.capacity = capacity;
 	}
 
@@ -55,7 +55,7 @@ public class BasicVehicleTypeImpl implements BasicVehicleType {
 		this.description = desc;
 	}
 
-	public void setEngineInformation(BasicEngineInformation engineInformation) {
+	public void setEngineInformation(EngineInformation engineInformation) {
 		this.engineInformation = engineInformation;
 	}
 
@@ -83,7 +83,7 @@ public class BasicVehicleTypeImpl implements BasicVehicleType {
 		return length;
 	}
 
-	public BasicEngineInformation getEngineInformation() {
+	public EngineInformation getEngineInformation() {
 		return engineInformation;
 	}
 
@@ -91,7 +91,7 @@ public class BasicVehicleTypeImpl implements BasicVehicleType {
 		return description;
 	}
 
-	public BasicVehicleCapacity getCapacity() {
+	public VehicleCapacity getCapacity() {
 		return capacity;
 	}
 

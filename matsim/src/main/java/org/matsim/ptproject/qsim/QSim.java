@@ -60,9 +60,9 @@ import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.systems.SignalSystems;
-import org.matsim.vehicles.BasicVehicleImpl;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicleTypeImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.VisMobsim;
@@ -251,10 +251,10 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
 		Collection<PersonAgent> agents = new ArrayList<PersonAgent>();
-		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
+		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			QPersonAgent agent = this.agentFactory.createPersonAgent(p);
-			QVehicle veh = new QVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
+			QVehicle veh = new QVehicleImpl(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);

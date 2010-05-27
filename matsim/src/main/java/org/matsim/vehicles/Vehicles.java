@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicFreightCapacity
+ * BasicVehicles
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,10 +19,22 @@
  * *********************************************************************** */
 package org.matsim.vehicles;
 
-public interface BasicFreightCapacity {
-	
-	public double getVolume();
+import java.util.Map;
 
-	public void setVolume(double cubicMeters);
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
+
+
+/**
+ * @author dgrether
+ *
+ */
+public interface Vehicles extends MatsimToplevelContainer {
+
+	public Map<Id, VehicleType> getVehicleTypes();
+	
+	public Map<Id, Vehicle> getVehicles();
+	
+	public VehiclesFactory getFactory();
 	
 }

@@ -25,11 +25,11 @@ import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.BasicVehicle;
-import org.matsim.vehicles.BasicVehicleCapacity;
-import org.matsim.vehicles.BasicVehicleCapacityImpl;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
 /**
@@ -41,17 +41,17 @@ import org.matsim.vehicles.VehiclesFactory;
 public class CreateVehiclesForSchedule {
 
 	private final TransitSchedule schedule;
-	private final BasicVehicles vehicles;
+	private final Vehicles vehicles;
 
-	public CreateVehiclesForSchedule(final TransitSchedule schedule, final BasicVehicles vehicles) {
+	public CreateVehiclesForSchedule(final TransitSchedule schedule, final Vehicles vehicles) {
 		this.schedule = schedule;
 		this.vehicles = vehicles;
 	}
 
 	public void run() {
 		VehiclesFactory vb = this.vehicles.getFactory();
-		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl("defaultTransitVehicleType"));
-		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		VehicleType vehicleType = vb.createVehicleType(new IdImpl("defaultTransitVehicleType"));
+		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
@@ -61,7 +61,7 @@ public class CreateVehiclesForSchedule {
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
-					BasicVehicle veh = vb.createVehicle(new IdImpl("tr_" + Long.toString(vehId++)), vehicleType);
+					Vehicle veh = vb.createVehicle(new IdImpl("tr_" + Long.toString(vehId++)), vehicleType);
 					this.vehicles.getVehicles().put(veh.getId(), veh);
 					departure.setVehicleId(veh.getId());
 				}

@@ -19,41 +19,21 @@
 
 package org.matsim.vehicles;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.BasicEngineInformation.FuelType;
 
 /**
  * @author dgrether
  */
-public class BasicVehiclesFactoryImpl implements VehiclesFactory {
-
-
-	public BasicVehiclesFactoryImpl() {
-	}
-
-	public BasicVehicle createVehicle(Id id, BasicVehicleType type) {
-		BasicVehicle veh = new BasicVehicleImpl(id, type);
-		return veh;
-	}
+public interface VehicleCapacity {
 	
-	public BasicVehicleType createVehicleType(Id typeId) {
-			BasicVehicleType veh = new BasicVehicleTypeImpl(typeId);
-			return veh;
-	}
-
-
-	public BasicVehicleCapacity createVehicleCapacity() {
-		return new BasicVehicleCapacityImpl();
-	}
-
-
-	public BasicFreightCapacity createFreigthCapacity() {
-		return new BasicFreightCapacityImpl();
-	}
-
-
-	public BasicEngineInformation createEngineInformation(FuelType fuelType,
-			double gasConsumption) {
-			return new BasicEngineInformationImpl(fuelType, gasConsumption);
-	}
+	public Integer getSeats();
+	
+	public Integer getStandingRoom();
+	
+	public FreightCapacity getFreightCapacity();
+	
+	public void setSeats(Integer seats);
+	
+	public void setStandingRoom(Integer standingRoom);
+	
+	public void setFreightCapacity(FreightCapacity freightCap);
 }

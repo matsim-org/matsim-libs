@@ -2,13 +2,13 @@ package playground.kai.ptproject.qsim.interfaces;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.vehicles.BasicVehicle;
-import org.matsim.vehicles.BasicVehicleType;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
-public class MobsimVehicle implements BasicVehicle {
+public class MobsimVehicle implements Vehicle {
 
 	@Override
-	public BasicVehicleType getType() {
+	public VehicleType getType() {
 		// TODO Auto-generated method stub
 		return null;
 	}

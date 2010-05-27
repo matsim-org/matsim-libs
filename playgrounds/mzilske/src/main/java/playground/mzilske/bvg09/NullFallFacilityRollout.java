@@ -54,10 +54,10 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.BasicVehicle;
-import org.matsim.vehicles.BasicVehicleCapacity;
-import org.matsim.vehicles.BasicVehicleCapacityImpl;
-import org.matsim.vehicles.BasicVehicleType;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.visum.VisumNetwork;
@@ -328,9 +328,9 @@ public class NullFallFacilityRollout {
 		outScenario.getVehicles().getVehicles().clear();
 	}
 
-	private Map<Id, BasicVehicleType> readVehicles(){
-		Map<String, BasicVehicleType> vehicleTypeMap = DefaultVehTypes.getDefaultVehicleTypes();
-		Map<Id, BasicVehicleType> lineId2VehTypeMap = new HashMap<Id, BasicVehicleType>();
+	private Map<Id, VehicleType> readVehicles(){
+		Map<String, VehicleType> vehicleTypeMap = DefaultVehTypes.getDefaultVehicleTypes();
+		Map<Id, VehicleType> lineId2VehTypeMap = new HashMap<Id, VehicleType>();
 
 		for (Entry<Id, org.matsim.visum.VisumNetwork.TransitLine> entry : this.vNetwork.lines.entrySet()) {
 			lineId2VehTypeMap.put(entry.getKey(), vehicleTypeMap.get(entry.getValue().tCode));
@@ -345,21 +345,21 @@ public class NullFallFacilityRollout {
 		umlaeufe = greedyUmlaufBuilder.build();
 
 		VehiclesFactory vb = outScenario.getVehicles().getFactory();
-		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl(
+		VehicleType vehicleType = vb.createVehicleType(new IdImpl(
 				"defaultTransitVehicleType"));
-		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
 
-		Map<Id, BasicVehicleType> lineId2VehTypeMap = this.readVehicles();
+		Map<Id, VehicleType> lineId2VehTypeMap = this.readVehicles();
 
 		long vehId = 0;
 		for (Umlauf umlauf : umlaeufe) {
 			if(lineId2VehTypeMap.containsKey(umlauf.getLineId())){
 				vehicleType = lineId2VehTypeMap.get(umlauf.getLineId());
 			}
-			BasicVehicle veh = vb.createVehicle(new IdImpl("veh_"+ Long.toString(vehId++)), vehicleType);
+			Vehicle veh = vb.createVehicle(new IdImpl("veh_"+ Long.toString(vehId++)), vehicleType);
 			outScenario.getVehicles().getVehicleTypes().put(vehicleType.getId(), vehicleType);
 			outScenario.getVehicles().getVehicles().put(veh.getId(), veh);
 			umlauf.setVehicleId(veh.getId());

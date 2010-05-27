@@ -29,16 +29,16 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  *
  */
-public class BasicVehiclesImpl implements BasicVehicles {
+public class VehiclesImpl implements Vehicles {
 	
-	private Map<Id, BasicVehicleType> vehicleTypes;
-	private LinkedHashMap<Id, BasicVehicle> vehicles;
-	private BasicVehiclesFactoryImpl builder;
+	private Map<Id, VehicleType> vehicleTypes;
+	private LinkedHashMap<Id, Vehicle> vehicles;
+	private VehiclesFactoryImpl builder;
 
-	public BasicVehiclesImpl(){
-		this.vehicleTypes = new LinkedHashMap<Id, BasicVehicleType>();
-		this.builder = new BasicVehiclesFactoryImpl();
-		this.vehicles = new LinkedHashMap<Id, BasicVehicle>();
+	public VehiclesImpl(){
+		this.vehicleTypes = new LinkedHashMap<Id, VehicleType>();
+		this.builder = new VehiclesFactoryImpl();
+		this.vehicles = new LinkedHashMap<Id, Vehicle>();
 	}
 	
 	
@@ -46,12 +46,12 @@ public class BasicVehiclesImpl implements BasicVehicles {
 		return this.builder;
 	}
 
-	public Map<Id, BasicVehicle> getVehicles() {
+	public Map<Id, Vehicle> getVehicles() {
 		return this.vehicles;
 	}
 
 
-	public Map<Id, BasicVehicleType> getVehicleTypes() {
+	public Map<Id, VehicleType> getVehicleTypes() {
 		return this.vehicleTypes;
 	}
 

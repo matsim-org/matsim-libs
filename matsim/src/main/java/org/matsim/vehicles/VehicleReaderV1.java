@@ -27,24 +27,24 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.vehicles.BasicEngineInformation.FuelType;
+import org.matsim.vehicles.EngineInformation.FuelType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
  */
-public class BasicVehicleReaderV1 extends MatsimXmlParser {
+public class VehicleReaderV1 extends MatsimXmlParser {
 
 	private VehiclesFactory builder;
-	private BasicVehicleType currentVehType;
-	private BasicVehicleCapacity currentCapacity;
-	private BasicFreightCapacity currentFreightCap;
-	private BasicEngineInformation.FuelType currentFuelType;
+	private VehicleType currentVehType;
+	private VehicleCapacity currentCapacity;
+	private FreightCapacity currentFreightCap;
+	private EngineInformation.FuelType currentFuelType;
 	private double currentGasConsumption;
-	private BasicVehicles vehicles;
+	private Vehicles vehicles;
 	
-	public BasicVehicleReaderV1(BasicVehicles vehicles) {
+	public VehicleReaderV1(Vehicles vehicles) {
 		this.vehicles = vehicles;
 		this.builder = this.vehicles.getFactory();
 	}
@@ -67,7 +67,7 @@ public class BasicVehicleReaderV1 extends MatsimXmlParser {
 			this.currentVehType.setDescription(content.trim());
 		}
 		else if (VehicleSchemaV1Names.ENGINEINFORMATION.equalsIgnoreCase(name)){
-			BasicEngineInformation currentEngineInfo = this.builder.createEngineInformation(currentFuelType, currentGasConsumption);
+			EngineInformation currentEngineInfo = this.builder.createEngineInformation(currentFuelType, currentGasConsumption);
 			this.currentVehType.setEngineInformation(currentEngineInfo);
 			this.currentFuelType = null;
 			this.currentGasConsumption = Double.NaN;
@@ -142,9 +142,9 @@ public class BasicVehicleReaderV1 extends MatsimXmlParser {
 		}
 		else if (VehicleSchemaV1Names.VEHICLE.equalsIgnoreCase(name)){
 			Id typeId = new IdImpl(atts.getValue(VehicleSchemaV1Names.TYPE));
-			BasicVehicleType type = this.vehicles.getVehicleTypes().get(typeId);
+			VehicleType type = this.vehicles.getVehicleTypes().get(typeId);
 			Id id = new IdImpl(atts.getValue(VehicleSchemaV1Names.ID));
-			BasicVehicle v = this.builder.createVehicle(id, type);
+			Vehicle v = this.builder.createVehicle(id, type);
 			this.vehicles.getVehicles().put(id, v);
 		}
 		else if (VehicleSchemaV1Names.ACCESSTIME.equalsIgnoreCase(name)){

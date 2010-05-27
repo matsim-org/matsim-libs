@@ -23,17 +23,16 @@ package org.matsim.vehicles;
 /**
  * @author dgrether
  */
-public interface BasicVehicleCapacity {
+public class FreightCapacityImpl implements FreightCapacity {
+
+	private double volume;
 	
-	public Integer getSeats();
+	public void setVolume(double cubicMeters) {
+		this.volume = cubicMeters;
+	}
 	
-	public Integer getStandingRoom();
+	public double getVolume() {
+		return this.volume;
+	}
 	
-	public BasicFreightCapacity getFreightCapacity();
-	
-	public void setSeats(Integer seats);
-	
-	public void setStandingRoom(Integer standingRoom);
-	
-	public void setFreightCapacity(BasicFreightCapacity freightCap);
 }

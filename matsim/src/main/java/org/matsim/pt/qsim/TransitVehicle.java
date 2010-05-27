@@ -23,7 +23,7 @@ package org.matsim.pt.qsim;
 import java.util.Collection;
 
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.Vehicle;
 
 
 public interface TransitVehicle {
@@ -57,7 +57,7 @@ public interface TransitVehicle {
 	/**
 	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
 	 */
-	public BasicVehicle getBasicVehicle();
+	public Vehicle getBasicVehicle();
 
 	public PersonDriverAgent getDriver();
 	

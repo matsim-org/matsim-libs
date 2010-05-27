@@ -19,13 +19,41 @@
 
 package org.matsim.vehicles;
 
-import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.EngineInformation.FuelType;
 
 /**
  * @author dgrether
  */
-public interface BasicVehicle extends Identifiable {
+public class VehiclesFactoryImpl implements VehiclesFactory {
 
-	public BasicVehicleType getType();
+
+	public VehiclesFactoryImpl() {
+	}
+
+	public Vehicle createVehicle(Id id, VehicleType type) {
+		Vehicle veh = new VehicleImpl(id, type);
+		return veh;
+	}
 	
+	public VehicleType createVehicleType(Id typeId) {
+			VehicleType veh = new VehicleTypeImpl(typeId);
+			return veh;
+	}
+
+
+	public VehicleCapacity createVehicleCapacity() {
+		return new VehicleCapacityImpl();
+	}
+
+
+	public FreightCapacity createFreigthCapacity() {
+		return new FreightCapacityImpl();
+	}
+
+
+	public EngineInformation createEngineInformation(FuelType fuelType,
+			double gasConsumption) {
+			return new EngineInformationImpl(fuelType, gasConsumption);
+	}
 }

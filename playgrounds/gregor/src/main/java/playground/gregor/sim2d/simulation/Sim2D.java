@@ -18,8 +18,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicleTypeImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -187,7 +187,7 @@ public class Sim2D {
 		if (this.population == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
-		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
+		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 
 		for (Person p : this.population.getPersons().values()) {
 //			PersonAgent agent = this.agentFactory.createPersonAgent(p);

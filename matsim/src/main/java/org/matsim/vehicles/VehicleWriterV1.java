@@ -37,11 +37,11 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 public class VehicleWriterV1 extends MatsimXmlWriter {
 
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
-	private Map<Id, BasicVehicleType> vehicleTypes;
-	private Map<Id, BasicVehicle> vehicles;
+	private Map<Id, VehicleType> vehicleTypes;
+	private Map<Id, Vehicle> vehicles;
 
 	
-	public VehicleWriterV1(BasicVehicles vehicles) {
+	public VehicleWriterV1(Vehicles vehicles) {
 		this.vehicleTypes = vehicles.getVehicleTypes();
 		this.vehicles = vehicles.getVehicles();
 	}
@@ -64,8 +64,8 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		this.writeEndTag(VehicleSchemaV1Names.VEHICLEDEFINITIONS);
 	}
 
-	private void writeVehicles(Map<Id, BasicVehicle> veh) throws IOException {
-		for (BasicVehicle v : veh.values()) {
+	private void writeVehicles(Map<Id, Vehicle> veh) throws IOException {
+		for (Vehicle v : veh.values()) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV1Names.ID, v.getId().toString()));
 			atts.add(this.createTuple(VehicleSchemaV1Names.TYPE, v.getType().getId().toString()));
@@ -73,8 +73,8 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		}
 	}
 
-	private void writeVehicleTypes(Map<Id, BasicVehicleType> vts) throws IOException {
-		for (BasicVehicleType vt : vts.values()) {
+	private void writeVehicleTypes(Map<Id, VehicleType> vts) throws IOException {
+		for (VehicleType vt : vts.values()) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV1Names.ID, vt.getId().toString()));
 			this.writeStartTag(VehicleSchemaV1Names.VEHICLETYPE, atts);
@@ -115,7 +115,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		}
 	}
 
-	private void writeEngineInformation(BasicEngineInformation ei) throws IOException {
+	private void writeEngineInformation(EngineInformation ei) throws IOException {
 		this.writeStartTag(VehicleSchemaV1Names.ENGINEINFORMATION, null);
 		this.writeStartTag(VehicleSchemaV1Names.FUELTYPE, null);
 		this.writeContent(ei.getFuelType().toString(), false);
@@ -126,7 +126,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		this.writeEndTag(VehicleSchemaV1Names.ENGINEINFORMATION);
 	}
 
-	private void writeCapacity(BasicVehicleCapacity cap) throws IOException {
+	private void writeCapacity(VehicleCapacity cap) throws IOException {
 		this.writeStartTag(VehicleSchemaV1Names.CAPACITY, null);
 		if (cap.getSeats() != null) {
 			atts.clear();
@@ -144,7 +144,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		this.writeEndTag(VehicleSchemaV1Names.CAPACITY);
 	}
 
-	private void writeFreightCapacity(BasicFreightCapacity fc) throws IOException {
+	private void writeFreightCapacity(FreightCapacity fc) throws IOException {
 		this.writeStartTag(VehicleSchemaV1Names.FREIGHTCAPACITY, null);
 		atts.clear();
 		atts.add(this.createTuple(VehicleSchemaV1Names.CUBICMETERS, Double.toString(fc.getVolume())));

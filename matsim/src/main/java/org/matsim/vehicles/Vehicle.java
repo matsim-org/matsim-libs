@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicVehicles
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +16,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.vehicles;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
-
+import org.matsim.api.core.v01.Identifiable;
 
 /**
  * @author dgrether
- *
  */
-public interface BasicVehicles extends MatsimToplevelContainer {
+public interface Vehicle extends Identifiable {
 
-	public Map<Id, BasicVehicleType> getVehicleTypes();
-	
-	public Map<Id, BasicVehicle> getVehicles();
-	
-	public VehiclesFactory getFactory();
+	public VehicleType getType();
 	
 }

@@ -23,7 +23,7 @@ package org.matsim.core.mobsim.queuesim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshots.writers.VisVehicle;
 
 public class QueueVehicle implements VisVehicle {
@@ -39,13 +39,13 @@ public class QueueVehicle implements VisVehicle {
 	
 	private final double sizeInEquivalents;
 	
-	private final BasicVehicle basicVehicle;
+	private final Vehicle basicVehicle;
 
-	/*package*/ QueueVehicle(final BasicVehicle basicVehicle) {
+	/*package*/ QueueVehicle(final Vehicle basicVehicle) {
 		this(basicVehicle, 1.0);
 	}
 	
-	/*package*/ QueueVehicle(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
+	/*package*/ QueueVehicle(final Vehicle basicVehicle, final double sizeInEquivalents) {
 		this.id = basicVehicle.getId();
 		this.sizeInEquivalents = sizeInEquivalents;
 		this.basicVehicle = basicVehicle;
@@ -91,7 +91,7 @@ public class QueueVehicle implements VisVehicle {
 		return this.sizeInEquivalents;
 	}
 
-	public BasicVehicle getBasicVehicle() {
+	public Vehicle getBasicVehicle() {
 		return this.basicVehicle;
 	}
 	

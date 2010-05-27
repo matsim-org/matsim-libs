@@ -48,8 +48,8 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.BasicVehicle;
-import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * @author mrieser
@@ -134,12 +134,12 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 	}
 
 	private Collection<PersonAgent> createVehiclesAndDriversWithUmlaeufe(TransitStopAgentTracker thisAgentTracker) {
-		BasicVehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
+		Vehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
 		Collection<PersonAgent> drivers = new ArrayList<PersonAgent>();
 		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(this.qSim.getScenario().getNetwork(),((ScenarioImpl) this.qSim.getScenario()).getTransitSchedule().getTransitLines().values(), ((ScenarioImpl) this.qSim.getScenario()).getVehicles(), this.qSim.getScenario().getConfig().charyparNagelScoring());
 		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
 		for (Umlauf umlauf : umlaeufe) {
-			BasicVehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
+			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
 				PersonAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle, thisAgentTracker);
 				drivers.add(driver);
@@ -149,7 +149,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 	}
 
 	private UmlaufDriver createAndScheduleVehicleAndDriver(Umlauf umlauf,
-			BasicVehicle vehicle, TransitStopAgentTracker thisAgentTracker) {
+			Vehicle vehicle, TransitStopAgentTracker thisAgentTracker) {
 		TransitQVehicle veh = new TransitQVehicle(vehicle, 5);
 		UmlaufDriver driver = new UmlaufDriver(umlauf, thisAgentTracker, this.qSim);
 		veh.setDriver(driver);
@@ -168,7 +168,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 
 	private Collection<PersonAgent> createVehiclesAndDriversWithoutUmlaeufe(TransitSchedule schedule,
 			TransitStopAgentTracker agentTracker) {
-		BasicVehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
+		Vehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
 		Collection<PersonAgent> drivers = new ArrayList<PersonAgent>();
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {

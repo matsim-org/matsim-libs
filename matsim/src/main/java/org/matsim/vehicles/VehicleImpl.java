@@ -3,12 +3,12 @@ package org.matsim.vehicles;
 import org.matsim.api.core.v01.Id;
 
 
-public class BasicVehicleImpl implements BasicVehicle {
+public class VehicleImpl implements Vehicle {
 
-	private BasicVehicleType type;
+	private VehicleType type;
 	private Id id;
 
-	public BasicVehicleImpl(Id id, BasicVehicleType type) {
+	public VehicleImpl(Id id, VehicleType type) {
 		this.id = id;
 		this.type = type;
 	}
@@ -17,7 +17,7 @@ public class BasicVehicleImpl implements BasicVehicle {
 		return id;
 	}
 
-	public BasicVehicleType getType() {
+	public VehicleType getType() {
 		return this.type;
 	}
 

@@ -23,7 +23,7 @@ package org.matsim.ptproject.qsim;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshots.writers.VisVehicle;
 
 public interface QVehicle extends Identifiable, VisVehicle {
@@ -49,6 +49,6 @@ public interface QVehicle extends Identifiable, VisVehicle {
 	/**
 	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
 	 */
-	public BasicVehicle getBasicVehicle();
+	public Vehicle getBasicVehicle();
 
 }

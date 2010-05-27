@@ -13,8 +13,8 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.vehicles.BasicVehicle;
-import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.Vehicles;
 
 
 public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
@@ -28,7 +28,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	};
 
 	private Collection<TransitLine> transitLines;
-	private BasicVehicles basicVehicles;
+	private Vehicles basicVehicles;
 	private Map<Id,Umlauf> umlaeufe = new HashMap<Id,Umlauf>();
 	private ArrayList<UmlaufStueck> umlaufStuecke;
 
@@ -36,7 +36,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 
 
 	public ReconstructingUmlaufBuilder(Network network, Collection<TransitLine> transitLines,
-			BasicVehicles basicVehicles, CharyparNagelScoringConfigGroup config) {
+			Vehicles basicVehicles, CharyparNagelScoringConfigGroup config) {
 		super();
 		this.umlaufInterpolator = new UmlaufInterpolator(network, config);
 		this.transitLines = transitLines;
@@ -54,7 +54,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	}
 
 	private void createEmptyUmlaeufe() {
-		for (BasicVehicle basicVehicle : basicVehicles.getVehicles().values()) {
+		for (Vehicle basicVehicle : basicVehicles.getVehicles().values()) {
 			UmlaufImpl umlauf = new UmlaufImpl(basicVehicle.getId());
 			umlauf.setVehicleId(basicVehicle.getId());
 			umlaeufe.put(umlauf.getId(), umlauf);

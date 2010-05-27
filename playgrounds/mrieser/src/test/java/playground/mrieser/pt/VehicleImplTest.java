@@ -25,11 +25,11 @@ import org.matsim.pt.fakes.FakePassengerAgent;
 import org.matsim.pt.qsim.TransitQVehicle;
 import org.matsim.pt.qsim.TransitVehicle;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.BasicVehicleCapacity;
-import org.matsim.vehicles.BasicVehicleCapacityImpl;
-import org.matsim.vehicles.BasicVehicleImpl;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicleTypeImpl;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 
 
 public class VehicleImplTest extends MatsimTestCase {
@@ -37,12 +37,12 @@ public class VehicleImplTest extends MatsimTestCase {
 	public void testAddPassenger() {
 		FakePassengerAgent passenger1 = new FakePassengerAgent(null);
 		FakePassengerAgent passenger2 = new FakePassengerAgent(null);
-		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
-		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("testVehType"));
+		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(4));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-		TransitVehicle vehicle = new TransitQVehicle(new BasicVehicleImpl(new IdImpl(10), vehicleType), 5);
+		TransitVehicle vehicle = new TransitQVehicle(new VehicleImpl(new IdImpl(10), vehicleType), 5);
 
 		vehicle.addPassenger(passenger1);
 		assertEquals("there should be 1 passenger in vehicle.", 1, vehicle.getPassengers().size());
@@ -59,12 +59,12 @@ public class VehicleImplTest extends MatsimTestCase {
 		FakePassengerAgent passenger2 = new FakePassengerAgent(null);
 		FakePassengerAgent passenger3 = new FakePassengerAgent(null);
 		
-		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
-		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("testVehType"));
+		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(4));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-		TransitVehicle vehicle = new TransitQVehicle(new BasicVehicleImpl(new IdImpl(55), vehicleType), 5);
+		TransitVehicle vehicle = new TransitQVehicle(new VehicleImpl(new IdImpl(55), vehicleType), 5);
 
 		vehicle.addPassenger(passenger1);
 		vehicle.addPassenger(passenger2);

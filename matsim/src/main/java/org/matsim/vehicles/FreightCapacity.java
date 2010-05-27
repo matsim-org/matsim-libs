@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicFreightCapacity
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,22 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.vehicles;
 
-/**
- * @author dgrether
- */
-public interface BasicEngineInformation {
+public interface FreightCapacity {
+	
+	public double getVolume();
 
-	public enum FuelType {diesel, gasoline, electricity, biodiesel}
-
-	public FuelType getFuelType();
-
-	public double getGasConsumption();
-
-	public void setFuelType(FuelType fueltype);
-
-	public void setGasConsumption(double literPerMeter);
-
+	public void setVolume(double cubicMeters);
+	
 }

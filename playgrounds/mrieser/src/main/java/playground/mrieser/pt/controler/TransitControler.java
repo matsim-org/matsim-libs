@@ -45,7 +45,7 @@ import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.vehicles.BasicVehicleReaderV1;
+import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
 
 import playground.mrieser.pt.replanning.TransitStrategyManagerConfigLoader;
@@ -142,7 +142,7 @@ public class TransitControler extends Controler {
 			}
 			if (this.config.getVehiclesFile() != null) {
 				try {
-					new BasicVehicleReaderV1(event.getControler().getScenario().getVehicles()).parse(this.config.getVehiclesFile());
+					new VehicleReaderV1(event.getControler().getScenario().getVehicles()).parse(this.config.getVehiclesFile());
 				} catch (SAXException e) {
 					throw new RuntimeException("could not read vehicles.", e);
 				} catch (ParserConfigurationException e) {

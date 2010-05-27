@@ -19,7 +19,7 @@
 
 package org.matsim.pt.qsim;
 
-import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser
@@ -27,7 +27,7 @@ import org.matsim.vehicles.BasicVehicle;
 public class SimpleTransitStopHandlerFactory implements TransitStopHandlerFactory {
 
 	@Override
-	public TransitStopHandler createTransitStopHandler(BasicVehicle vehicle) {
+	public TransitStopHandler createTransitStopHandler(Vehicle vehicle) {
 		// TODO vehicle is not used, since constant values are used for access and egress time 
 		return new SimpleTransitStopHandler();
 	}

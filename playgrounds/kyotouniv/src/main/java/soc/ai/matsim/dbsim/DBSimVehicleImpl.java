@@ -22,7 +22,7 @@ package soc.ai.matsim.dbsim;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.Vehicle;
 
 public class DBSimVehicleImpl implements DBSimVehicle {
 
@@ -37,13 +37,13 @@ public class DBSimVehicleImpl implements DBSimVehicle {
 	
 	private final double sizeInEquivalents;
 	
-	private final BasicVehicle basicVehicle;
+	private final Vehicle basicVehicle;
 
-	public DBSimVehicleImpl(final BasicVehicle basicVehicle) {
+	public DBSimVehicleImpl(final Vehicle basicVehicle) {
 		this(basicVehicle, 1.0);
 	}
 	
-	public DBSimVehicleImpl(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
+	public DBSimVehicleImpl(final Vehicle basicVehicle, final double sizeInEquivalents) {
 		this.id = basicVehicle.getId();
 		this.sizeInEquivalents = sizeInEquivalents;
 		this.basicVehicle = basicVehicle;
@@ -89,7 +89,7 @@ public class DBSimVehicleImpl implements DBSimVehicle {
 		return this.sizeInEquivalents;
 	}
 
-	public BasicVehicle getBasicVehicle() {
+	public Vehicle getBasicVehicle() {
 		return this.basicVehicle;
 	}
 	

@@ -43,8 +43,8 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
-import org.matsim.vehicles.BasicVehicleReaderV1;
-import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.Vehicles;
 import org.xml.sax.SAXException;
 
 public class RouterTester {
@@ -53,12 +53,12 @@ public class RouterTester {
 		s.getConfig().scenario().setUseTransit(true);
 		s.getConfig().scenario().setUseVehicles(true);
 
-		BasicVehicles v = s.getVehicles();
+		Vehicles v = s.getVehicles();
 		TransitSchedule ts = s.getTransitSchedule();
 		PopulationImpl p = (PopulationImpl) s.getPopulation();
 
 		new MatsimNetworkReader(s).readFile("/data/vis/zrh/output_network.xml.gz");
-		new BasicVehicleReaderV1(v).readFile("/data/vis/zrh/vehicles10pct.oevModellZH.xml");
+		new VehicleReaderV1(v).readFile("/data/vis/zrh/vehicles10pct.oevModellZH.xml");
 		try {
 			new TransitScheduleReader(s).readFile("/data/vis/zrh/transitSchedule.networkOevModellZH.xml");
 		} catch (IOException e) {

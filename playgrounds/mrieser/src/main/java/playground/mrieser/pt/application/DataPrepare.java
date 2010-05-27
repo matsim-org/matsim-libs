@@ -59,17 +59,17 @@ public class DataPrepare {
 	private static final Logger log = Logger.getLogger(DataPrepare.class);
 
 	// INPUT FILES
-	private final static String VISUM_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/input/oev_modell.net";
+	private final static String VISUM_FILE = "/data/vis/bln/berlin.net";
 	private final static String NETWORK_FILE = "/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
 	private final static String INPUT_PLANS_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.sample.xml.gz";
 
 	// INTERMEDIARY FILES
 	private final static String TRANSIT_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/network.oevModellZH.xml";
-	private final static String TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/transitSchedule.OevModellZH.xml";
+	private final static String TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE = "/data/vis/bln/transitSchedule.xml";
 
 	// OUTPUT FILES
 	private final static String TRANSIT_SCHEDULE_WITH_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/transitSchedule.networkOevModellZH.xml";
-	private final static String VEHICLE_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/vehicles.oevModellZH.xml";
+	private final static String VEHICLE_FILE = "/data/vis/bln/vehicles.xml";
 	private final static String MULTIMODAL_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/network.multimodal.xml";
 	private final static String ROUTED_PLANS_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.routedOevModell.xml.gz";
 
@@ -217,9 +217,9 @@ public class DataPrepare {
 		DataPrepare app = new DataPrepare();
 		app.prepareConfig();
 		app.convertSchedule();
-		app.createNetworkFromSchedule();
-		app.mergeNetworks();
-		app.routePopulation();
+//		app.createNetworkFromSchedule();
+//		app.mergeNetworks();
+//		app.routePopulation();
 //		app.visualizeRouterNetwork();
 
 		log.info("done.");

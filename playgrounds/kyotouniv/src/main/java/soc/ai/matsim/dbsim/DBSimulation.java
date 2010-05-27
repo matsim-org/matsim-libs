@@ -59,9 +59,9 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vehicles.BasicVehicleImpl;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicleTypeImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -193,7 +193,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 		if (this.population == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
-		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
+		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 
 		//TODO read xml
 		for (Person p : this.population.getPersons().values()) {
@@ -201,7 +201,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 
 			// この機を逃すとPersonAgentへのアクセスが面倒なので，ここでモデルをセットしておく．
 			//TODO agent.setDriver(xml.get(p.id));
-			DBSimVehicle veh = new DBSimVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
+			DBSimVehicle veh = new DBSimVehicleImpl(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);

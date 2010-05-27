@@ -19,38 +19,45 @@
 
 package org.matsim.vehicles;
 
+import org.matsim.api.core.v01.Id;
+
 
 /**
  * @author dgrether
  */
-public class BasicVehicleCapacityImpl implements BasicVehicleCapacity {
+public interface VehicleType {
 
-	private Integer seats = null;
-	private Integer standingRoom = null;
-	private BasicFreightCapacity freightCap = null;
+	public void setDescription(String desc);
+
+	public void setLength(double length);
+
+	public void setWidth(double width);
+
+	public void setMaximumVelocity(double meterPerSecond);
+
+	public void setEngineInformation(EngineInformation currentEngineInfo);
+
+	public void setCapacity(VehicleCapacity capacity);
+
+	public double getWidth();
+
+	public double getMaximumVelocity();
 	
-	public BasicFreightCapacity getFreightCapacity() {
-		return freightCap;
-	}
-
-	public Integer getSeats() {
-		return seats;
-	}
-
-	public Integer getStandingRoom() {
-		return standingRoom;
-	}
-
-	public void setFreightCapacity(BasicFreightCapacity freightCap) {
-		this.freightCap = freightCap;
-	}
-
-	public void setSeats(Integer seats) {
-		this.seats = seats;
-	}
-
-	public void setStandingRoom(Integer standingRoom) {
-		this.standingRoom = standingRoom;
-	}
+	public double getLength();
 	
+	public EngineInformation getEngineInformation();
+	
+	public String getDescription();
+	
+	public VehicleCapacity getCapacity();
+	
+	public Id getId();
+	
+	public double getAccessTime();
+	
+	public void setAccessTime(double seconds);
+	
+	public double getEgressTime();
+	
+	public void setEgressTime(double seconds);
 }

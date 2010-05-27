@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.Vehicle;
 
 class Teleportation implements Updateable {
 	public void update() {}
@@ -37,7 +37,7 @@ public class Mobsim {
 	void run() {
 		Teleportation teleportation = new Teleportation() ;
 		PersonAgent person = null ; // dummy
-		BasicVehicle veh = null ; // dummy
+		Vehicle veh = null ; // dummy
 		MobsimFacility linkFac = new MobsimFacility() ; // dummy
 
 		// INITIALIZATION:

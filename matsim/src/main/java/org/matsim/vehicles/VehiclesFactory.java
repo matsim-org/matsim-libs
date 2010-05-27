@@ -2,19 +2,19 @@ package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.vehicles.BasicEngineInformation.FuelType;
+import org.matsim.vehicles.EngineInformation.FuelType;
 
 public interface VehiclesFactory extends MatsimFactory {
 
-	public BasicVehicleType createVehicleType(Id type);
+	public VehicleType createVehicleType(Id type);
 
-	public BasicVehicleCapacity createVehicleCapacity();
+	public VehicleCapacity createVehicleCapacity();
 
-	public BasicFreightCapacity createFreigthCapacity();
+	public FreightCapacity createFreigthCapacity();
 
-	public BasicEngineInformation createEngineInformation(FuelType fuelType,
+	public EngineInformation createEngineInformation(FuelType fuelType,
 			double gasConsumption);
 
-	public BasicVehicle createVehicle(Id id, BasicVehicleType type);
+	public Vehicle createVehicle(Id id, VehicleType type);
 
 }

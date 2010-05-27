@@ -4,15 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.vehicles.BasicVehicleCapacityImpl;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicleTypeImpl;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 
 public class DefaultVehTypes {
 	
-	public static Map<String, BasicVehicleType> getDefaultVehicleTypes(){
+	public static Map<String, VehicleType> getDefaultVehicleTypes(){
 		
-		Map<String, BasicVehicleType> vehMap = new HashMap<String, BasicVehicleType>();
+		Map<String, VehicleType> vehMap = new HashMap<String, VehicleType>();
 		
 		/** The following pt line types exist:
 		 * "B" Bus Berlin
@@ -39,12 +39,12 @@ public class DefaultVehTypes {
 		return vehMap;
 	}
 	
-	private static BasicVehicleType getBusBerlin(String id){
-		BasicVehicleType veh = new BasicVehicleTypeImpl(new IdImpl(id));
+	private static VehicleType getBusBerlin(String id){
+		VehicleType veh = new VehicleTypeImpl(new IdImpl(id));
 
 		veh.setDescription("Standard 3 doors");
 		
-		BasicVehicleCapacityImpl cap = new BasicVehicleCapacityImpl();
+		VehicleCapacityImpl cap = new VehicleCapacityImpl();
 		cap.setSeats(new Integer(30));
 		cap.setStandingRoom(new Integer(60));
 		veh.setCapacity(cap);
@@ -59,12 +59,12 @@ public class DefaultVehTypes {
 		return veh;
 	}
 	
-	private static BasicVehicleType getBusUmland(String id){
-		BasicVehicleType veh = new BasicVehicleTypeImpl(new IdImpl(id));
+	private static VehicleType getBusUmland(String id){
+		VehicleType veh = new VehicleTypeImpl(new IdImpl(id));
 
 		veh.setDescription("Standard 2 doors");
 		
-		BasicVehicleCapacityImpl cap = new BasicVehicleCapacityImpl();
+		VehicleCapacityImpl cap = new VehicleCapacityImpl();
 		cap.setSeats(new Integer(30));
 		cap.setStandingRoom(new Integer(70));
 		veh.setCapacity(cap);
@@ -79,12 +79,12 @@ public class DefaultVehTypes {
 		return veh;
 	}
 	
-	private static BasicVehicleType getTramBerlin(String id){
-		BasicVehicleType veh = new BasicVehicleTypeImpl(new IdImpl(id));
+	private static VehicleType getTramBerlin(String id){
+		VehicleType veh = new VehicleTypeImpl(new IdImpl(id));
 		
 		veh.setDescription("GT6, one wagon");
 		
-		BasicVehicleCapacityImpl cap = new BasicVehicleCapacityImpl();
+		VehicleCapacityImpl cap = new VehicleCapacityImpl();
 		cap.setSeats(new Integer(45));
 		cap.setStandingRoom(new Integer(103));
 		veh.setCapacity(cap);
@@ -99,12 +99,12 @@ public class DefaultVehTypes {
 		return veh;
 	}
 	
-	private static BasicVehicleType getTramUmland(String id){
-		BasicVehicleType veh = new BasicVehicleTypeImpl(new IdImpl(id));
+	private static VehicleType getTramUmland(String id){
+		VehicleType veh = new VehicleTypeImpl(new IdImpl(id));
 		
 		veh.setDescription("Tatra long KT4D mod, one wagon");
 		
-		BasicVehicleCapacityImpl cap = new BasicVehicleCapacityImpl();
+		VehicleCapacityImpl cap = new VehicleCapacityImpl();
 		cap.setSeats(new Integer(33));
 		cap.setStandingRoom(new Integer(66));
 		veh.setCapacity(cap);
@@ -119,12 +119,12 @@ public class DefaultVehTypes {
 		return veh;
 	}
 	
-	private static BasicVehicleType getUBahn(String id){
-		BasicVehicleType veh = new BasicVehicleTypeImpl(new IdImpl(id));
+	private static VehicleType getUBahn(String id){
+		VehicleType veh = new VehicleTypeImpl(new IdImpl(id));
 		
 		veh.setDescription("Baureihe F gross, 6 wagon unit");
 		
-		BasicVehicleCapacityImpl cap = new BasicVehicleCapacityImpl();
+		VehicleCapacityImpl cap = new VehicleCapacityImpl();
 		cap.setSeats(new Integer(228));
 		cap.setStandingRoom(new Integer(477));
 		veh.setCapacity(cap);
@@ -139,12 +139,12 @@ public class DefaultVehTypes {
 		return veh;
 	}
 	
-	private static BasicVehicleType getSBahn(String id){
-		BasicVehicleType veh = new BasicVehicleTypeImpl(new IdImpl(id));
+	private static VehicleType getSBahn(String id){
+		VehicleType veh = new VehicleTypeImpl(new IdImpl(id));
 		
 		veh.setDescription("Baureihe 481, 8 wagon unit");
 		
-		BasicVehicleCapacityImpl cap = new BasicVehicleCapacityImpl();
+		VehicleCapacityImpl cap = new VehicleCapacityImpl();
 		cap.setSeats(new Integer(376));
 		cap.setStandingRoom(new Integer(800));
 		veh.setCapacity(cap);
@@ -159,12 +159,12 @@ public class DefaultVehTypes {
 		return veh;
 	}
 	
-	private static BasicVehicleType getRegionalBahn(String id){
-		BasicVehicleType veh = new BasicVehicleTypeImpl(new IdImpl(id));
+	private static VehicleType getRegionalBahn(String id){
+		VehicleType veh = new VehicleTypeImpl(new IdImpl(id));
 		
 		veh.setDescription("Baureihe DBpza 752 RE160, 5 wagon unit");
 		
-		BasicVehicleCapacityImpl cap = new BasicVehicleCapacityImpl();
+		VehicleCapacityImpl cap = new VehicleCapacityImpl();
 		cap.setSeats(new Integer(578)); // 4*121 + 1*94
 		cap.setStandingRoom(new Integer(250)); // maybe 50p per wagon
 		veh.setCapacity(cap);

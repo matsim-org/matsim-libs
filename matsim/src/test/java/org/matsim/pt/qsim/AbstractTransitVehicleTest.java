@@ -29,12 +29,12 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.fakes.FakePassengerAgent;
 import org.matsim.pt.qsim.PassengerAgent;
 import org.matsim.pt.qsim.TransitVehicle;
-import org.matsim.vehicles.BasicVehicle;
-import org.matsim.vehicles.BasicVehicleCapacity;
-import org.matsim.vehicles.BasicVehicleCapacityImpl;
-import org.matsim.vehicles.BasicVehicleImpl;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicleTypeImpl;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 
 
 /**
@@ -44,34 +44,34 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 
 	private static final Logger log = Logger.getLogger(AbstractTransitVehicleTest.class);
 
-	protected abstract TransitVehicle createTransitVehicle(final BasicVehicle vehicle);
+	protected abstract TransitVehicle createTransitVehicle(final Vehicle vehicle);
 
 	public void testInitialization_SeatAndStandCapacity() {
-		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
-		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		capacity.setStandingRoom(Integer.valueOf(3));
 		vehType.setCapacity(capacity);
-		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		assertEquals(vehicle, veh.getBasicVehicle());
 		assertEquals(7, veh.getPassengerCapacity()); // 1 place used by driver
 	}
 
 	public void testInitialization_SeatOnlyCapacity() {
-		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
-		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		assertEquals(vehicle, veh.getBasicVehicle());
 		assertEquals(4, veh.getPassengerCapacity()); // 1 place used by driver
 	}
 
 	public void testInitialization_NoCapacity() {
-		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
-		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
+		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 		try {
 			createTransitVehicle(vehicle);
 			fail("missing exception.");
@@ -82,11 +82,11 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	}
 
 	public void testAddPassenger() {
-		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
-		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		ArrayList<PassengerAgent> passengers = new ArrayList<PassengerAgent>(veh.getPassengerCapacity());
 		for (int i = 0; i < veh.getPassengerCapacity(); i++) {
@@ -104,11 +104,11 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	}
 
 	public void testRemovePassenger() {
-		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
-		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
 
 		PassengerAgent passenger1 = new FakePassengerAgent(null);
@@ -135,11 +135,11 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	}
 
 	public void testGetPassengers_Immutable() {
-		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
-		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
 
 		PassengerAgent passenger1 = new FakePassengerAgent(null);

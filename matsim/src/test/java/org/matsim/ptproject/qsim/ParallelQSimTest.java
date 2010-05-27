@@ -79,9 +79,9 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
-import org.matsim.vehicles.BasicVehicleImpl;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicleTypeImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 
 public class ParallelQSimTest extends TestCase {
 
@@ -733,9 +733,9 @@ public class ParallelQSimTest extends TestCase {
 		QLink qlink2 = qnet.getQLink(id2);
 		QLink qlink3 = qnet.getQLink(new IdImpl(3));
 
-		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		QVehicle vehicle1 = new QVehicleImpl(new BasicVehicleImpl(id1, defaultVehicleType));
-		QVehicle vehicle2 = new QVehicleImpl(new BasicVehicleImpl(id2, defaultVehicleType));
+		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
+		QVehicle vehicle1 = new QVehicleImpl(new VehicleImpl(id1, defaultVehicleType));
+		QVehicle vehicle2 = new QVehicleImpl(new VehicleImpl(id2, defaultVehicleType));
 		qlink2.addParkedVehicle(vehicle1);
 		qlink2.addParkedVehicle(vehicle2);
 

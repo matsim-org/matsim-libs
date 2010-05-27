@@ -80,12 +80,12 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.BasicVehicleCapacity;
-import org.matsim.vehicles.BasicVehicleCapacityImpl;
-import org.matsim.vehicles.BasicVehicleImpl;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicleTypeImpl;
-import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
 
@@ -122,10 +122,10 @@ public class TransitQueueSimulationTest {
 		network.addLink(link2);
 
 		// setup: vehicles
-		BasicVehicles vehicles = scenario.getVehicles();
+		Vehicles vehicles = scenario.getVehicles();
 		VehiclesFactory vb = vehicles.getFactory();
-		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl("transitVehicleType"));
-		BasicVehicleCapacity capacity = vb.createVehicleCapacity();
+		VehicleType vehicleType = vb.createVehicleType(new IdImpl("transitVehicleType"));
+		VehicleCapacity capacity = vb.createVehicleCapacity();
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
@@ -537,13 +537,13 @@ public class TransitQueueSimulationTest {
 
 			this.driver = new SpyDriver(this.line, this.route, this.departure, this.getAgentTracker(), this);
 
-			BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("transitVehicleType"));
-			BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+			VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("transitVehicleType"));
+			VehicleCapacity capacity = new VehicleCapacityImpl();
 			capacity.setSeats(Integer.valueOf(101));
 			capacity.setStandingRoom(Integer.valueOf(0));
 			vehicleType.setCapacity(capacity);
 
-			TransitQVehicle veh = new TransitQVehicle(new BasicVehicleImpl(this.driver.getPerson().getId(), vehicleType), 5);
+			TransitQVehicle veh = new TransitQVehicle(new VehicleImpl(this.driver.getPerson().getId(), vehicleType), 5);
 			veh.setDriver(this.driver);
 			veh.setStopHandler(new SimpleTransitStopHandler());
 			this.driver.setVehicle(veh);

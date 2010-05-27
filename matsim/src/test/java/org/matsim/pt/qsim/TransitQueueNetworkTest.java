@@ -58,11 +58,11 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.BasicVehicleCapacity;
-import org.matsim.vehicles.BasicVehicleCapacityImpl;
-import org.matsim.vehicles.BasicVehicleImpl;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicleTypeImpl;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 
 
 public class TransitQueueNetworkTest extends TestCase {
@@ -1043,14 +1043,14 @@ public class TransitQueueNetworkTest extends TestCase {
 			qsim.getSimTimer().setTime(100);
 
 			// setup: vehicles
-			BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehicleType"));
-			BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+			VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("testVehicleType"));
+			VehicleCapacity capacity = new VehicleCapacityImpl();
 			capacity.setSeats(Integer.valueOf(101));
 			capacity.setStandingRoom(Integer.valueOf(0));
 			vehicleType.setCapacity(capacity);
 
 			TransitDriver tDriver = new FakeTransitDriver(tLine, tRoute, dep, tracker, qsim);
-			this.transitVehicle = new TransitQVehicle(new BasicVehicleImpl(tDriver.getPerson().getId(), vehicleType), 1.0);
+			this.transitVehicle = new TransitQVehicle(new VehicleImpl(tDriver.getPerson().getId(), vehicleType), 1.0);
 			this.qlink1.addParkedVehicle(this.transitVehicle);
 			this.transitVehicle.setEarliestLinkExitTime(100);
 			this.transitVehicle.setDriver(tDriver);
@@ -1058,7 +1058,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			tDriver.setVehicle(this.transitVehicle);
 			tDriver.activityEnds(100);
 
-			this.normalVehicle = new QVehicleImpl(new BasicVehicleImpl(id2, vehicleType));
+			this.normalVehicle = new QVehicleImpl(new VehicleImpl(id2, vehicleType));
 			this.qlink1.addParkedVehicle(this.normalVehicle);
 
 			QPersonAgent nDriver = new QPersonAgent(person, qsim);
@@ -1070,7 +1070,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			if (stop2 != null) {
 				/* we're testing two stops. Add another normal vehicle with 20 seconds delay,
 				 * that *could* overtake a transit vehicle at its second stop. */
-				this.normalVehicle2 = new QVehicleImpl(new BasicVehicleImpl(id3, vehicleType));
+				this.normalVehicle2 = new QVehicleImpl(new VehicleImpl(id3, vehicleType));
 				this.qlink1.addParkedVehicle(this.normalVehicle2);
 
 				Person person2 = pb.createPerson(id3);

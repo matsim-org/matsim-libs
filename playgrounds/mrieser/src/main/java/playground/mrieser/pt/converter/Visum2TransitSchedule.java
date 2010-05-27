@@ -40,10 +40,10 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.BasicVehicle;
-import org.matsim.vehicles.BasicVehicleCapacity;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.VehicleCombination;
@@ -55,12 +55,12 @@ public class Visum2TransitSchedule {
 
 	private final VisumNetwork visum;
 	private final TransitSchedule schedule;
-	private final BasicVehicles vehicles;
+	private final Vehicles vehicles;
 	//	private final CoordinateTransformation coordinateTransformation = new Kilometer2MeterTransformation();
 	private final CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 	private final Map<String, TransportMode> transportModes = new HashMap<String, TransportMode>();
 
-	public Visum2TransitSchedule(final VisumNetwork visum, final TransitSchedule schedule, final BasicVehicles vehicles) {
+	public Visum2TransitSchedule(final VisumNetwork visum, final TransitSchedule schedule, final Vehicles vehicles) {
 		this.visum = visum;
 		this.schedule = schedule;
 		this.vehicles = vehicles;
@@ -79,9 +79,9 @@ public class Visum2TransitSchedule {
 		// 1st step: convert vehicle types
 		VehiclesFactory vb = this.vehicles.getFactory();
 		for (VehicleCombination vehComb : this.visum.vehicleCombinations.values()) {
-			BasicVehicleType type = vb.createVehicleType(new IdImpl(vehComb.id));
+			VehicleType type = vb.createVehicleType(new IdImpl(vehComb.id));
 			type.setDescription(vehComb.name);
-			BasicVehicleCapacity capacity = vb.createVehicleCapacity();
+			VehicleCapacity capacity = vb.createVehicleCapacity();
 			VehicleUnit vu = this.visum.vehicleUnits.get(vehComb.vehUnitId);
 			capacity.setSeats(Integer.valueOf(vehComb.numOfVehicles * vu.seats));
 			capacity.setStandingRoom(Integer.valueOf(vehComb.numOfVehicles * (vu.passengerCapacity - vu.seats)));
@@ -112,7 +112,7 @@ public class Visum2TransitSchedule {
 				if (vehCombination == null) {
 					log.error("Could not find vehicle combination with id=" + timeProfile.vehCombNr + " used in line " + line.id.toString() + ". Some TimeProfile may not be converted.");
 				} else {
-					BasicVehicleType vehType = this.vehicles.getVehicleTypes().get(new IdImpl(vehCombination.id));
+					VehicleType vehType = this.vehicles.getVehicleTypes().get(new IdImpl(vehCombination.id));
 					// convert line routes
 					if (timeProfile.lineName.equals(line.id)) {
 						List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -132,7 +132,7 @@ public class Visum2TransitSchedule {
 						for (VisumNetwork.Departure d : this.visum.departures.values()){
 							if (d.lineName.equals(line.id.toString()) && d.lineRouteName.equals(timeProfile.lineRouteName.toString()) && d.TRI.equals(timeProfile.index.toString())) {
 								Departure departure = builder.createDeparture(new IdImpl(d.index), Time.parseTime(d.dep));
-								BasicVehicle veh = vb.createVehicle(new IdImpl("tr_" + vehId++), vehType);
+								Vehicle veh = vb.createVehicle(new IdImpl("tr_" + vehId++), vehType);
 								this.vehicles.getVehicles().put(veh.getId(), veh);
 								departure.setVehicleId(veh.getId());
 								tRoute.addDeparture(departure);

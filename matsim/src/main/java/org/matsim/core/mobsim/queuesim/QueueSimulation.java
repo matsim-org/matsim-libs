@@ -65,9 +65,9 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.AcceptsFeatures;
 import org.matsim.ptproject.qsim.MobsimFeature;
-import org.matsim.vehicles.BasicVehicleImpl;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicleTypeImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFFileWriterQueueSimConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimServerQuadBuilder;
@@ -207,14 +207,14 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		if (this.population == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
-		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
+		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		Collection<PersonAgent> agents = new ArrayList<PersonAgent>();
 
 		for (Person p : this.population.getPersons().values()) {
 			QueuePersonAgent agent = this.agentFactory.createPersonAgent(p);
 			agents.add( agent ) ;
 
-			QueueVehicle veh = new QueueVehicle(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
+			QueueVehicle veh = new QueueVehicle(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);

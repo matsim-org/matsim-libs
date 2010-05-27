@@ -22,7 +22,7 @@ package soc.ai.matsim.dbsim;
 
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.Vehicle;
 
 public interface DBSimVehicle extends Identifiable {
 
@@ -47,7 +47,7 @@ public interface DBSimVehicle extends Identifiable {
 	/**
 	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
 	 */
-	public BasicVehicle getBasicVehicle();
+	public Vehicle getBasicVehicle();
 
 	//TODO public VehicleEmulator getVehicleEmulator();
 	//TODO public double getPositionInLinkX();

@@ -49,8 +49,8 @@ import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.signalsystems.systems.SignalSystemsImpl;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.BasicVehicles;
-import org.matsim.vehicles.BasicVehiclesImpl;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesImpl;
 import org.matsim.world.World;
 
 
@@ -82,7 +82,7 @@ public class ScenarioImpl implements Scenario {
 	private TransitSchedule transitSchedule = null;
 
 	private Households households;
-  private BasicVehicles vehicles;
+  private Vehicles vehicles;
 
   private Knowledges knowledges;
 
@@ -133,7 +133,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	protected void createVehicleContainer(){
-		this.vehicles = new BasicVehiclesImpl();
+		this.vehicles = new VehiclesImpl();
 	}
 
 	protected void createHouseholdsContainer(){
@@ -269,7 +269,7 @@ public class ScenarioImpl implements Scenario {
 		return this.households;
 	}
 
-	public BasicVehicles getVehicles(){
+	public Vehicles getVehicles(){
 		if ((this.vehicles == null) && this.config.scenario().isUseVehicles()){
 			this.createVehicleContainer();
 		}

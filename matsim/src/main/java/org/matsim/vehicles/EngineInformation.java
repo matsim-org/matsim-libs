@@ -19,20 +19,19 @@
 
 package org.matsim.vehicles;
 
-
 /**
  * @author dgrether
  */
-public class BasicFreightCapacityImpl implements BasicFreightCapacity {
+public interface EngineInformation {
 
-	private double volume;
-	
-	public void setVolume(double cubicMeters) {
-		this.volume = cubicMeters;
-	}
-	
-	public double getVolume() {
-		return this.volume;
-	}
-	
+	public enum FuelType {diesel, gasoline, electricity, biodiesel}
+
+	public FuelType getFuelType();
+
+	public double getGasConsumption();
+
+	public void setFuelType(FuelType fueltype);
+
+	public void setGasConsumption(double literPerMeter);
+
 }

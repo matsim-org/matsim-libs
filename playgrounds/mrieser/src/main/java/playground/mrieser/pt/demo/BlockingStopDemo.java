@@ -53,9 +53,9 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.BasicVehicleCapacity;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
@@ -185,10 +185,10 @@ public class BlockingStopDemo {
 	}
 
 	private void createVehicles() {
-		BasicVehicles vehicles = this.scenario.getVehicles();
+		Vehicles vehicles = this.scenario.getVehicles();
 		VehiclesFactory vb = vehicles.getFactory();
-		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl("transitVehicleType"));
-		BasicVehicleCapacity capacity = vb.createVehicleCapacity();
+		VehicleType vehicleType = vb.createVehicleType(new IdImpl("transitVehicleType"));
+		VehicleCapacity capacity = vb.createVehicleCapacity();
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);

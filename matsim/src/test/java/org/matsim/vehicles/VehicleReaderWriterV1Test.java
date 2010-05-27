@@ -39,8 +39,8 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
   private final Id id42 = new IdImpl("42");
   
 	public void testBasicParser() {
-		BasicVehicles vehicles = new BasicVehiclesImpl();
-		BasicVehicleReaderV1 reader = new BasicVehicleReaderV1(vehicles);
+		Vehicles vehicles = new VehiclesImpl();
+		VehicleReaderV1 reader = new VehicleReaderV1(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		
 		checkContent(vehicles);
@@ -53,29 +53,29 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		String outfileName = this.getOutputDirectory() + "testOutputVehicles.xml";
 		
 		//read it
-		BasicVehicles vehicles = new BasicVehiclesImpl();
-		BasicVehicleReaderV1 reader = new BasicVehicleReaderV1(vehicles);
+		Vehicles vehicles = new VehiclesImpl();
+		VehicleReaderV1 reader = new VehicleReaderV1(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		//write it
 		VehicleWriterV1 writer = new VehicleWriterV1(vehicles);
 		writer.writeFile(outfileName);
 		assertTrue(new File(outfileName).exists()); 
 		//read it again
-		vehicles = new BasicVehiclesImpl();
-		reader = new BasicVehicleReaderV1(vehicles);
+		vehicles = new VehiclesImpl();
+		reader = new VehicleReaderV1(vehicles);
 		reader.readFile(this.getOutputDirectory() + "testOutputVehicles.xml");
 		
 		//check it, check it, check it now!
 		this.checkContent(vehicles);
 	}
 
-	private void checkContent(BasicVehicles vehdef) {
-		Map<Id, BasicVehicleType> vehicleTypes = vehdef.getVehicleTypes();
-		Map<Id, BasicVehicle> vehicles = vehdef.getVehicles();
+	private void checkContent(Vehicles vehdef) {
+		Map<Id, VehicleType> vehicleTypes = vehdef.getVehicleTypes();
+		Map<Id, Vehicle> vehicles = vehdef.getVehicles();
 			
 		assertNotNull(vehicleTypes);
 		assertEquals(2, vehicleTypes.size());
-		BasicVehicleType vehType = vehicleTypes.get(new IdImpl("normalCar"));
+		VehicleType vehType = vehicleTypes.get(new IdImpl("normalCar"));
 		assertNotNull(vehType);
 		assertEquals(9.5, vehType.getLength(), EPSILON);
 		assertEquals(3.0, vehType.getWidth(), EPSILON);
@@ -86,7 +86,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		assertNotNull(vehType.getCapacity().getFreightCapacity());
 		assertEquals(23.23, vehType.getCapacity().getFreightCapacity().getVolume(), EPSILON);
 		assertNotNull(vehType.getEngineInformation());
-		assertEquals(BasicEngineInformation.FuelType.diesel, vehType.getEngineInformation().getFuelType());
+		assertEquals(EngineInformation.FuelType.diesel, vehType.getEngineInformation().getFuelType());
 		assertEquals(0.23, vehType.getEngineInformation().getGasConsumption(), EPSILON);
 		assertEquals(23.23, vehType.getAccessTime(), EPSILON);
 		assertEquals(42.42, vehType.getEgressTime(), EPSILON);

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.Vehicle;
 
 public class MobsimFacility implements Updateable {
 	final private static Logger log = Logger.getLogger( MobsimFacility.class ) ;
@@ -41,7 +41,7 @@ public class MobsimFacility implements Updateable {
 	Mobsim mobsim = null ; // dummy
 
 	/** data structure for parking needs to be searchable by vehicle id */
-	private Map<Id,BasicVehicle> parking = new TreeMap<Id,BasicVehicle>() ;
+	private Map<Id,Vehicle> parking = new TreeMap<Id,Vehicle>() ;
 
 	/** data structure for activities needs to be sorted by departure time */
 	private Queue<PersonAgent> agentsAtActivities = new PriorityQueue<PersonAgent>(1, new DepartureTimeComparator() ) ;
@@ -57,7 +57,7 @@ public class MobsimFacility implements Updateable {
 	void addOccupiedVehicle( MobsimVehicle veh ) {}
 
 	/**Receives an empty vehicle.  Normally during initialization. */
-	void addEmptyVehicle( BasicVehicle veh ) {
+	void addEmptyVehicle( Vehicle veh ) {
 		parking.put( veh.getId(), veh ) ;
 	}
 
