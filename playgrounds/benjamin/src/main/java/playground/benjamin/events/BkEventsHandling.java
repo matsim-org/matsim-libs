@@ -61,7 +61,7 @@ public class BkEventsHandling {
 		//MyEventHandler2 has method getAverageTravelTime
 //		System.out.println("average travel time: " + handler.getAverageTravelTime());
 		
-		//MyEventHandler2 has method writeChart
+		//MyEventHandler2 and 3 have method writeChart
 		handler.writeChart("../matsim/output/multipleIterations/departuresPerHour.png");
 		handler.writeTxt("../matsim/output/multipleIterations/departuresPerHour.txt");
 		
