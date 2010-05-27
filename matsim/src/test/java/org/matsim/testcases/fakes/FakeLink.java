@@ -42,8 +42,6 @@ import org.matsim.world.Layer;
  */
 public class FakeLink implements Link {
 
-	private static final long serialVersionUID = 1L;
-
 	private final Id id;
 	private final Node fromNode;
 	private final Node toNode;

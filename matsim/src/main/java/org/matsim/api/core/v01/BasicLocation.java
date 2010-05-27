@@ -19,16 +19,15 @@
 
 package org.matsim.api.core.v01;
 
-import java.io.Serializable;
 
 
 /**
  * @author dgrether
  */
-public interface BasicLocation extends Serializable {
+public interface BasicLocation {
 
 	public Coord getCoord();
-	
+
 //	public void setCoord( Coord coord ) ;
-	
+
 }

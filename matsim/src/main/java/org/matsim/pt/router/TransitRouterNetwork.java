@@ -56,8 +56,6 @@ public final class TransitRouterNetwork implements Network {
 
 	public static final class TransitRouterNetworkNode implements Node {
 
-		private static final long serialVersionUID = 1L;
-
 		public final TransitRouteStop stop;
 		public final TransitRoute route;
 		public final TransitLine line;
@@ -116,8 +114,6 @@ public final class TransitRouterNetwork implements Network {
 	}
 
 	public static final class TransitRouterNetworkLink implements Link {
-
-		private static final long serialVersionUID = 1L;
 
 		public final TransitRouterNetworkNode fromNode;
 		public final TransitRouterNetworkNode toNode;

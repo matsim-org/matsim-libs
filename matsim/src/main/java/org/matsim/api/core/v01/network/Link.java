@@ -1,6 +1,5 @@
 package org.matsim.api.core.v01.network;
 
-import java.io.Serializable;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Identifiable;
@@ -15,7 +14,7 @@ import org.matsim.world.Location;
  * the context.
  * (This becomes clear if you think about a nodeId/linkId given by person.)
  */
-public interface Link extends Identifiable, Serializable, Location {
+public interface Link extends Identifiable, Location {
 
 
 	/**

@@ -31,19 +31,17 @@ import org.matsim.api.core.v01.network.Node;
  * A very simple fake implementation of {@link Node} to be used in tests.
  * Only stores an Id and returns it in {@link #getId()}, all other
  * operations throw {@link UnsupportedOperationException}.
- * 
+ *
  * @author mrieser
  */
 public class FakeNode implements Node {
 
-	private static final long serialVersionUID = 1L;
+	private final Id id;
 
-	private final Id id; 
-	
 	public FakeNode(final Id id) {
 		this.id = id;
 	}
-	
+
 	public Map<Id, ? extends Link> getInLinks() {
 		throw new UnsupportedOperationException();
 	}
