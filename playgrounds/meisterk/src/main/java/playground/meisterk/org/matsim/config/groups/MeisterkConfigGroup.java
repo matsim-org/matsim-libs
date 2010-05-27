@@ -47,7 +47,8 @@ public class MeisterkConfigGroup extends Module {
 	
 	public enum MeisterkConfigParameter {
 		
-		CHAIN_BASED_MODES("chainBasedModes", "car,bike", "");
+		CHAIN_BASED_MODES("chainBasedModes", "car,bike", ""),
+		INPUT_SECOND_NETWORK_FILE("inputSecondNetworkFile", "", "");
 		
 		private final String parameterName;
 		private final String defaultValue;

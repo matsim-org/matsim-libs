@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+        [
+                <!ENTITY STUDY_BASE  "/home/meisterk/sandbox00">
+                <!ENTITY OUTPUT_BASE  "output">
+        ]
+>
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="&STUDY_BASE;/ivt/studies/switzerland/networks/ivtch-changed-wu-flama/network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="&STUDY_BASE;/ivt/studies/switzerland/plans/ivtch/census2000_dilZh30km_miv_transitincl_10pct/plans.xml.gz" />
+		<param name="outputPlansFile" value="&OUTPUT_BASE;/plans-census2000_dilZh30km_miv_transitincl_10pct-ivtch-changed-wu-flama-xy2links.xml.gz" />
+	</module>
+</config>

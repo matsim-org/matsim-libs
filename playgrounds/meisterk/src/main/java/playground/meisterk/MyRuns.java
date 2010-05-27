@@ -20,8 +20,11 @@
 
 package playground.meisterk;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +32,7 @@ import java.util.ArrayList;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -41,6 +45,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -48,6 +53,8 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -56,10 +63,16 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
+import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
+import org.matsim.run.XY2Links;
 import org.xml.sax.SAXException;
 
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
@@ -79,15 +92,14 @@ public class MyRuns {
 
 	public void run(Config config) throws Exception {
 
-//		MyRuns.writeGUESSFile();
-//		MyRuns.conversionSpeedTest();
-//		MyRuns.convertPlansV0ToPlansV4();
-//		MyRuns.produceSTRC2007KML();
+		//		MyRuns.writeGUESSFile();
+		//		MyRuns.conversionSpeedTest();
+		//		MyRuns.convertPlansV0ToPlansV4();
+		//		MyRuns.produceSTRC2007KML();
 
-//		MyRuns.setPlansToSameDepTime(config);
+		//		MyRuns.setPlansToSameDepTime(config);
 
-//		this.analyzeModeChainFeasibility(config);
-		this.analyzeLegDistanceDistribution(config);
+		//		this.analyzeModeChainFeasibility(config);
 
 		System.out.println();
 
@@ -99,10 +111,112 @@ public class MyRuns {
 
 	public static void main(final String[] args) throws Exception {
 
-//		Config config = Gbl.createConfig(args);
+		//		Config config = Gbl.createConfig(args);
 
 		MyRuns myRuns = new MyRuns();
-		myRuns.doSUEStudySensitivityAnalysis(args);
+
+		//		myRuns.doSUEStudySensitivityAnalysis(args);
+		//		myRuns.wctr2010(args);
+		myRuns.moveInitDemandToDifferentNetwork(args);
+
+	}
+
+	/**
+	 * Generate initial ivtch demand for ivtch-changed-wu-flama for semester project of elias aptus
+	 * 
+	 * @param args
+	 */
+	void moveInitDemandToDifferentNetwork(final String[] args) {
+		
+		// read ivtch demand
+		ScenarioImpl scenario = new ScenarioImpl();
+		Config config = scenario.getConfig();
+		MeisterkConfigGroup meisterkConfigGroup = new MeisterkConfigGroup();
+		config.addModule(MeisterkConfigGroup.GROUP_NAME, meisterkConfigGroup);
+		MatsimConfigReader reader = new MatsimConfigReader(config);
+		reader.readFile(args[0]);
+		Gbl.setConfig(config);
+		MatsimRandom.reset(config.global().getRandomSeed());
+
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
+		loader.loadScenario();
+
+		Population population = scenario.getPopulation();
+		Network network = scenario.getNetwork();
+		
+		// remove links and routes
+		PersonRemoveLinkAndRoute personRemoveLinkAndRoute = new PersonRemoveLinkAndRoute();
+		personRemoveLinkAndRoute.run(population);
+		
+		// switch to new network in scenario
+		ScenarioImpl scenario2 = new ScenarioImpl();
+		try {
+			new MatsimNetworkReader(scenario2).parse(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		scenario.setNetwork(scenario2.getNetwork());
+		// run XY2Links
+		XY2Links xY2Links = new XY2Links();
+		
+		// write out new initial demand
+		new PopulationWriter(population, network).write(scenario.getConfig().plans().getOutputFile());
+		
+	}
+	
+	void wctr2010(final String[] args) {
+
+		String sourceFilename = args[0];
+		String destinationFilename = args[1];
+
+		// open source file
+		try {
+			BufferedReader input = new BufferedReader(new FileReader(new File(sourceFilename)));
+			BufferedWriter output = new BufferedWriter(new FileWriter(new File(destinationFilename)));
+
+			String line = null;
+			// ignore header
+			line = input.readLine();
+			output.write(line);
+			
+			while ( (line = input.readLine()) != null) {
+				
+				String[] tokens = StringUtils.explode(line, '\t');
+				Coord ch1903Coord = new CoordImpl(Double.parseDouble(tokens[0]), Double.parseDouble(tokens[1]));
+				CoordinateTransformation trafo = new CH1903LV03toWGS84();
+				Coord wgs84Coord = trafo.transform(ch1903Coord);
+				
+				StringBuffer newLine = new StringBuffer();
+				newLine.append(wgs84Coord.getX());
+				newLine.append('\t');
+				newLine.append(wgs84Coord.getY());
+				for (int i=2; i<tokens.length; i++) {
+					newLine.append('\t');
+					newLine.append(tokens[i]);
+				}
+				newLine.append(System.getProperty("line.separator"));
+				output.write(newLine.toString());
+			}
+			
+			// write stuff to destination file
+
+			input.close();
+			output.close();
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
@@ -135,9 +249,9 @@ public class MyRuns {
 
 					testee.getConfig().controler().setOutputDirectory(
 							"output/"
-									+ OUTPUT_PARENT_DIRECTORY_NAME
-									+ "/"
-									+ this.getRunOutputDirectoryName(timingModule, beta, learningRate));
+							+ OUTPUT_PARENT_DIRECTORY_NAME
+							+ "/"
+							+ this.getRunOutputDirectoryName(timingModule, beta, learningRate));
 					testee.getConfig().charyparNagelScoring().setBrainExpBeta(beta);
 					testee.getConfig().charyparNagelScoring().setLearningRate(learningRate);
 
@@ -152,10 +266,9 @@ public class MyRuns {
 	}
 
 	String getRunOutputDirectoryName(final String timingModule, final double beta, final double learningRate) {
-
-		return
-		"timingModule_" + timingModule + "/" +
-		"brainExpBeta_" + Double.toString(beta) + "/" +
+		return 
+		"timingModule_" + timingModule + "/" + 
+		"brainExpBeta_" + Double.toString(beta) + "/" + 
 		"learningRate_" + Double.toString(learningRate);
 
 	}
@@ -226,6 +339,7 @@ public class MyRuns {
 //		pa.printDeciles(true);
 
 	}
+
 
 	public void analyzeModeChainFeasibility(Config config) {
 
@@ -442,7 +556,7 @@ public class MyRuns {
 				out.write(Time.writeTime(timeIndex * TIME_BIN_SIZE) + "\t");
 				for (int aa=0; aa < anArray.length; aa++) {
 
-//					if (numDeps[aa][timeIndex] != null) {
+					//					if (numDeps[aa][timeIndex] != null) {
 					if (timeIndex < anArray[aa].length) {
 						out.write(Integer.toString(anArray[aa][timeIndex]));
 						timesAvailable = true;
