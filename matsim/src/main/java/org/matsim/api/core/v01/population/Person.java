@@ -19,7 +19,6 @@
 
 package org.matsim.api.core.v01.population;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -29,8 +28,8 @@ import org.matsim.utils.customize.Customizable;
 /**
  * @author dgrether
  */
-public interface Person extends Identifiable, Serializable, Customizable{
-	
+public interface Person extends Identifiable, Customizable{
+
 	public List<? extends Plan> getPlans();
 
 	public void setId(final Id id);
