@@ -1,10 +1,10 @@
-package org.matsim.vis.otfvis.opengl.queries;
+package org.matsim.vis.otfvis;
 
 import java.util.Collection;
 
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
-public interface QueryQueueModel {
+public interface SimulationViewForQueries {
 
 	Collection<AgentSnapshotInfo> getSnapshot();
 

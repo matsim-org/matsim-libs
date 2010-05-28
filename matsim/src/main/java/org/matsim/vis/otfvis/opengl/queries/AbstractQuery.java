@@ -3,6 +3,7 @@ package org.matsim.vis.otfvis.opengl.queries;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
@@ -29,8 +30,8 @@ public abstract class AbstractQuery implements OTFQuery, OTFQueryRemote {
 		// Default implementation doesn't do anything.
 	}
 
-	public void installQuery(Scenario scenario, QueryQueueModel queueModel) {
-	
+	public void installQuery(Scenario scenario, SimulationViewForQueries queueModel) {
+		
 	}
 
 }

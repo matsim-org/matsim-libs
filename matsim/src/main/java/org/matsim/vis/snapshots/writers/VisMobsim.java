@@ -21,5 +21,7 @@ public interface VisMobsim extends ObservableSimulation, IOSimulation {
 	Scenario getScenario() ;
 	
 	EventsManager getEventsManager() ;
+	
+	void addSnapshotWriter(SnapshotWriter snapshotWriter) ;
 
 }

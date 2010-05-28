@@ -118,7 +118,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
-	private QSimSnapshotWriterManager snapshotManager;
+	private QSimSnapshotWriterManager snapshotManager = new QSimSnapshotWriterManager();
 
 	protected TransitQSimEngine transitEngine;
 
@@ -318,7 +318,6 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) this.scenario.getConfig().getQSimConfigGroup().getSnapshotPeriod();
-		this.snapshotManager = new QSimSnapshotWriterManager();
 		this.snapshotManager.createSnapshotwriter(this.network, this.scenario, this.snapshotPeriod, this.iterationNumber, this.controlerIO);
     if (this.snapshotTime < this.simTimer.getSimStartTime()) {
       this.snapshotTime += this.snapshotPeriod;
@@ -659,6 +658,11 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	public QSimEngine getQSimEngine() {
 	  return this.simEngine;
+	}
+
+	@Override
+	public void addSnapshotWriter(SnapshotWriter snapshotWriter) {
+		this.snapshotManager.addSnapshotWriter(snapshotWriter);
 	}
 
 }

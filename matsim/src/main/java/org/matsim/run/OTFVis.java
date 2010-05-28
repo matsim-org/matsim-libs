@@ -32,11 +32,14 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
@@ -49,6 +52,9 @@ import org.matsim.vis.otfvis.OTFDoubleMVI;
 import org.matsim.vis.otfvis.OTFVisQSim;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
+import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
+import org.matsim.vis.otfvis2.OTFVisLiveServer;
+import org.matsim.vis.otfvis2.OTFVisClient;
 import org.matsim.vis.snapshots.writers.VisMobsim;
 
 /**
@@ -146,7 +152,11 @@ public class OTFVis {
 				return;
 			}
 			if (FileType.Config.equals(type)) {
-				playConfig(args2);
+				if (useSwing) {
+					playConfig_Swing(args2[0]);
+				} else {
+					playConfig(args2);
+				}
 			} else if (FileType.Network.equals(type)) {
 				if (useSwing) {
 					playNetwork_Swing(args2[0]);
@@ -232,6 +242,23 @@ public class OTFVis {
 
 	public static final void playConfig(final String configFilename){
 		playConfig(new String[]{configFilename});
+	}
+	
+
+	public static final void playConfig_Swing(String configFileName) {		
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(configFileName);
+		loader.loadScenario();
+		Scenario scenario = loader.getScenario();
+		EventsManager events = new EventsManagerImpl();
+		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
+		QueueSimulation queueSimulation = (QueueSimulation) new QueueSimulationFactory().createMobsim(scenario, events);
+		queueSimulation.addSnapshotWriter(server.getSnapshotReceiver());
+		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager(configFileName, server);
+		OTFVisClient client = new OTFVisClient();
+		client.setHostConnectionManager(hostConnectionManager);
+		client.setSwing(true);
+		client.run();
+		queueSimulation.run();
 	}
 
 	public static final void playConfig(final String[] args) {

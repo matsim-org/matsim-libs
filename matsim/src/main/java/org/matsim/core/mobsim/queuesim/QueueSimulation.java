@@ -575,8 +575,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		}
 	}
 
-	public boolean addSnapshotWriter(final SnapshotWriter writer) {
-		return this.snapshotWriters.add(writer);
+	public void addSnapshotWriter(final SnapshotWriter writer) {
+		this.snapshotWriters.add(writer);
 	}
 
 	/*package*/ void setAgentFactory(final AgentFactory fac) {
