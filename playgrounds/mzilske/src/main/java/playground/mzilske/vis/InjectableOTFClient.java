@@ -9,6 +9,7 @@ import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.gui.NetJComponent;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
@@ -25,20 +26,26 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 public final class InjectableOTFClient extends OTFClient {
 
-	protected OTFConnectionManager connect = new OTFConnectionManager();
+	private boolean swing = false;
+	
+	private OTFConnectionManager connect = new OTFConnectionManager();
 
 	public InjectableOTFClient() {
 		super();
+	}
 
+	private void prepareConnectionManager() {
 		this.connect.connectWriterToReader(LinkHandler.Writer.class, LinkHandler.class);
 		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-
-		this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
-		this.connect.connectReaderToReceiver(LinkHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
-
-		this.connect.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);		
-		this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
-
+		if (swing) {
+			this.connect.connectReaderToReceiver(LinkHandler.class, NetJComponent.SimpleQuadDrawer.class);
+			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  NetJComponent.AgentDrawer.class);
+		} else {
+			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
+			this.connect.connectReaderToReceiver(LinkHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
+			this.connect.connectReceiverToLayer(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);		
+			this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
+		}
 	}
 
 	protected OTFClientQuad getRightDrawerComponent() throws RemoteException {
@@ -49,9 +56,15 @@ public final class InjectableOTFClient extends OTFClient {
 
 	@Override
 	protected OTFDrawer createDrawer(){
+		prepareConnectionManager();
 		try {
 			frame.getContentPane().add(new OTFTimeLine("time", hostControlBar), BorderLayout.SOUTH);
-			OTFOGLDrawer mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent());
+			OTFDrawer mainDrawer;
+			if (swing) {
+				mainDrawer = new NetJComponent(this.getRightDrawerComponent());
+			} else {
+				mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent());
+			}
 			if (hostControlBar.getOTFHostControl().isLiveHost()) {
 				final OTFQueryControl queryControl = new OTFQueryControl(hostControlBar, OTFClientControl.getInstance().getOTFVisConfig());
 				queryControl.getQueries().clear();
@@ -87,6 +100,10 @@ public final class InjectableOTFClient extends OTFClient {
 			e.printStackTrace();
 			throw new RuntimeException();
 		}
+	}
+
+	void setSwing(boolean swing) {
+		this.swing = swing;
 	}
 
 }

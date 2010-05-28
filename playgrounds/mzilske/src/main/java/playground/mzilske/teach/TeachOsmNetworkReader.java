@@ -1,3 +1,4 @@
+package playground.mzilske.teach;
 /* *********************************************************************** *
  * project: org.matsim.*
  * OSMReader.java
@@ -18,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mzilske.osm;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,9 +79,9 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser, aneumann
  */
-public class OsmNetworkReader {
+public class TeachOsmNetworkReader {
 
-	private final static Logger log = Logger.getLogger(OsmNetworkReader.class);
+	private final static Logger log = Logger.getLogger(TeachOsmNetworkReader.class);
 
 	private final Map<String, OsmNode> nodes = new HashMap<String, OsmNode>();
 	private final Map<String, OsmWay> ways = new HashMap<String, OsmWay>();
@@ -102,7 +103,7 @@ public class OsmNetworkReader {
 	 * @param network An empty network where the converted OSM data will be stored.
 	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
 	 */
-	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation) {
+	public TeachOsmNetworkReader(final Network network, final CoordinateTransformation transformation) {
 		this(network, transformation, true);
 	}
 
@@ -113,7 +114,7 @@ public class OsmNetworkReader {
 	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
-	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation, boolean useHighwayDefaults) {
+	public TeachOsmNetworkReader(final Network network, final CoordinateTransformation transformation, boolean useHighwayDefaults) {
 		this.network = (NetworkLayer) network;
 		this.transform = transformation;
 
@@ -343,7 +344,6 @@ public class OsmNetworkReader {
 						if (toNode != lastToNode) {
 							length += CoordUtils.calcDistance(lastToNode.coord, toNode.coord);
 							if (toNode.used) {
-
 								if(this.hierarchyLayers.isEmpty()){
 									createLink(this.network, way, fromNode, toNode, length);
 								} else {

@@ -61,7 +61,7 @@ public class GeneratePopulation {
 
 	private static final String CLONED_HOUSEHOLDS_FILE = "../detailedEval/pop/140k-synthetische-personen/households.xml";
 	
-	private static final Integer NUMBER_OF_SIMULATED_PEOPLE = 2000;
+	private static final Integer NUMBER_OF_SIMULATED_PEOPLE = 140000;
 	
 	private Random random = new Random();
 
@@ -184,7 +184,7 @@ public class GeneratePopulation {
 			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
 			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
 			p = MGC.xy2Point(x, y);
-		} while (ft.getDefaultGeometry().contains(p));
+		} while (!ft.getDefaultGeometry().contains(p));
 		return p;
 	}
 	

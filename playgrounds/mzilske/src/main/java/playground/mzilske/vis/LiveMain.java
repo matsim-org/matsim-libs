@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
@@ -32,14 +33,19 @@ public class LiveMain {
 		
 		EventsManagerImpl events = new EventsManagerImpl();
 		
-		// final BintreeServer server = new BintreeServer(scenario.getNetwork(), events, snapshotPeriod, simulationConfigGroup);
-		final EventsCollectingLiveServer server = new EventsCollectingLiveServer(scenario, events, snapshotPeriod, simulationConfigGroup);
-				
+		
+		final EventsCollectingLiveServer server = new EventsCollectingLiveServer(scenario, events);
+		SnapshotGenerator snapshotGenerator = new SnapshotGenerator(scenario.getNetwork(), (int) snapshotPeriod, simulationConfigGroup); 
+		snapshotGenerator.addSnapshotWriter(server.getSnapshotReceiver());
+		events.addHandler(snapshotGenerator);
+		
 		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", server);
 		
 		InjectableOTFClient client = new InjectableOTFClient();
 		client.setHostConnectionManager(hostConnectionManager);
+		client.setSwing(true);
 		client.run();
+		
 		System.out.println("Reading...");
 		new MatsimEventsReader(events).readFile(eventsFileName);
 		

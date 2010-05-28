@@ -10,7 +10,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -42,6 +41,8 @@ public class EventsCollectingLiveServer implements OTFLiveServerRemote {
 	private final ByteBuffer byteBuffer = ByteBuffer.allocate(80000000);
 
 	private Scenario scenario;
+
+	private SnapshotReceiver snapshotReceiver;
 	
 	private final class CurrentTimeStepView implements QueryQueueModel {
 		
@@ -129,16 +130,13 @@ public class EventsCollectingLiveServer implements OTFLiveServerRemote {
 		
 	}
 
-	public EventsCollectingLiveServer(Scenario scenario, EventsManager eventsManager, double snapshotPeriod, SimulationConfigGroup simulationConfigGroup) {
+	public EventsCollectingLiveServer(Scenario scenario, EventsManager eventsManager) {
 		this.scenario = scenario;
-		SnapshotGenerator snapshotGenerator = new SnapshotGenerator(scenario.getNetwork(), (int) snapshotPeriod, simulationConfigGroup); 
-		SnapshotReceiver snapshotReceiver = new SnapshotReceiver();
-		snapshotGenerator.addSnapshotWriter(snapshotReceiver);
-		eventsManager.addHandler(snapshotGenerator);
-		quadTree = new MyQuadTree();
-		quadTree.initQuadTree();
+		this.snapshotReceiver = new SnapshotReceiver();
+		this.quadTree = new MyQuadTree();
+		this.quadTree.initQuadTree();
 		QueryQueueModel queueModel = new CurrentTimeStepView();
-		queryServer = new QueryServer(scenario, eventsManager, queueModel);
+		this.queryServer = new QueryServer(scenario, eventsManager, queueModel);
 	}
 
 	@Override
@@ -252,6 +250,10 @@ public class EventsCollectingLiveServer implements OTFLiveServerRemote {
 	@Override
 	public void toggleShowParking() throws RemoteException {
 		
+	}
+
+	SnapshotReceiver getSnapshotReceiver() {
+		return snapshotReceiver;
 	}
 
 }

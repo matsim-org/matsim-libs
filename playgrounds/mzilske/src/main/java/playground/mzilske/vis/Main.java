@@ -29,8 +29,9 @@ public class Main {
 		
 		EventsManagerImpl events = new EventsManagerImpl();
 		
-		// final BintreeServer server = new BintreeServer(scenario.getNetwork(), events, snapshotPeriod, simulationConfigGroup);
-		final EventsCollectingServer server = new EventsCollectingServer(scenario.getNetwork(), events, snapshotPeriod, simulationConfigGroup);
+		final BintreeServer server = new BintreeServer(scenario.getNetwork(), events, snapshotPeriod, simulationConfigGroup);
+		
+		// final EventsCollectingServer server = new EventsCollectingServer(scenario.getNetwork(), events, snapshotPeriod, simulationConfigGroup);
 		
 		new MatsimEventsReader(events).readFile(eventsFileName);
 		
@@ -38,6 +39,7 @@ public class Main {
 		
 		InjectableOTFClient client = new InjectableOTFClient();
 		client.setHostConnectionManager(hostConnectionManager);
+		client.setSwing(true);
 		
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 

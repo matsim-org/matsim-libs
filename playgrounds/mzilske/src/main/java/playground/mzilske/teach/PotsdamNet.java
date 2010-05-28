@@ -15,7 +15,8 @@ import org.xml.sax.SAXException;
 
 import playground.mzilske.osm.OsmNetworkReader;
 
-public class Potsdam {
+
+public class PotsdamNet {
 	
 	public static void main(String[] args) {
 		String osm = "./inputs/brandenburg.osm";
@@ -27,7 +28,7 @@ public class Potsdam {
 		
 			
 		
-		OsmNetworkReader onr = new OsmNetworkReader(net,ct); //constructs a new openstreetmap reader
+		TeachOsmNetworkReader onr = new TeachOsmNetworkReader(net,ct); //constructs a new openstreetmap reader
 		onr.setHierarchyLayer(52.774, 12.398, 52.051, 13.774, 3);
 		onr.setHierarchyLayer(52.5152, 12.8838, 52.3402, 13.1709, 6);
 	
