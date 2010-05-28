@@ -26,17 +26,15 @@ import org.matsim.core.population.routes.RouteFactory;
 
 public class KtiPtRouteFactory implements RouteFactory {
 
-	private static final long serialVersionUID = 1L;
-
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 
-	public KtiPtRouteFactory(PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
+	public KtiPtRouteFactory(final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
 		super();
 		this.plansCalcRouteKtiInfo = plansCalcRouteKtiInfo;
 	}
 
 	@Override
-	public Route createRoute(Id startLinkId, Id endLinkId) {
+	public Route createRoute(final Id startLinkId, final Id endLinkId) {
 		return new KtiPtRoute(startLinkId, endLinkId, this.plansCalcRouteKtiInfo);
 	}
 

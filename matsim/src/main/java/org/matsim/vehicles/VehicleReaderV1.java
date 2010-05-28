@@ -36,20 +36,20 @@ import org.xml.sax.SAXException;
  */
 public class VehicleReaderV1 extends MatsimXmlParser {
 
-	private VehiclesFactory builder;
-	private VehicleType currentVehType;
-	private VehicleCapacity currentCapacity;
-	private FreightCapacity currentFreightCap;
-	private EngineInformation.FuelType currentFuelType;
-	private double currentGasConsumption;
-	private Vehicles vehicles;
-	
-	public VehicleReaderV1(Vehicles vehicles) {
+	private final Vehicles vehicles;
+	private final VehiclesFactory builder;
+	private VehicleType currentVehType = null;
+	private VehicleCapacity currentCapacity = null;
+	private FreightCapacity currentFreightCap = null;
+	private EngineInformation.FuelType currentFuelType = null;
+	private double currentGasConsumption = Double.NaN;
+
+	public VehicleReaderV1(final Vehicles vehicles) {
 		this.vehicles = vehicles;
 		this.builder = this.vehicles.getFactory();
 	}
-	
-	public void readFile(String filename) {
+
+	public void readFile(final String filename) {
 		try {
 			parse(filename);
 		} catch (SAXException e) {
@@ -62,12 +62,12 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 	}
 
 	@Override
-	public void endTag(String name, String content, Stack<String> context) {
+	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (VehicleSchemaV1Names.DESCRIPTION.equalsIgnoreCase(name) && (content.trim().length() > 0)){
 			this.currentVehType.setDescription(content.trim());
 		}
 		else if (VehicleSchemaV1Names.ENGINEINFORMATION.equalsIgnoreCase(name)){
-			EngineInformation currentEngineInfo = this.builder.createEngineInformation(currentFuelType, currentGasConsumption);
+			EngineInformation currentEngineInfo = this.builder.createEngineInformation(this.currentFuelType, this.currentGasConsumption);
 			this.currentVehType.setEngineInformation(currentEngineInfo);
 			this.currentFuelType = null;
 			this.currentGasConsumption = Double.NaN;
@@ -87,10 +87,10 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 			this.vehicles.getVehicleTypes().put(this.currentVehType.getId(), this.currentVehType);
 			this.currentVehType = null;
 		}
-	
+
 	}
 
-	private FuelType parseFuelType(String content) {
+	private FuelType parseFuelType(final String content) {
 		if (FuelType.gasoline.toString().equalsIgnoreCase(content)){
 			return FuelType.gasoline;
 		}
@@ -109,9 +109,9 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 	}
 
 	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
+	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if (VehicleSchemaV1Names.VEHICLETYPE.equalsIgnoreCase(name)) {
-			this.currentVehType = this.builder.createVehicleType(new IdImpl(atts.getValue(VehicleSchemaV1Names.ID)));			
+			this.currentVehType = this.builder.createVehicleType(new IdImpl(atts.getValue(VehicleSchemaV1Names.ID)));
 		}
 		else if (VehicleSchemaV1Names.LENGTH.equalsIgnoreCase(name)){
 			this.currentVehType.setLength(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.METER)));
@@ -154,5 +154,5 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 		  this.currentVehType.setEgressTime(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.SECONDSPERPERSON)));
 		}
 	}
-		
+
 }

@@ -25,8 +25,6 @@ import org.matsim.api.core.v01.population.Route;
 
 public class GenericRouteFactory implements RouteFactory {
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public Route createRoute(final Id startLinkId, final Id endLinkId) {
 		return new GenericRouteImpl(startLinkId, endLinkId);

@@ -88,7 +88,6 @@ public class NetworkFactoryTest extends MatsimTestCase {
 	}
 
 	/*package*/ static class CarRouteMockFactory implements RouteFactory {
-		private static final long serialVersionUID = 1L;
 		@Override
 		public Route createRoute(final Id startLinkId, final Id endLinkId) {
 			return new CarRouteMock(startLinkId, endLinkId);
@@ -97,7 +96,6 @@ public class NetworkFactoryTest extends MatsimTestCase {
 	}
 
 	/*package*/ static class PtRouteMockFactory implements RouteFactory {
-		private static final long serialVersionUID = 1L;
 		@Override
 		public Route createRoute(final Id startLinkId, final Id endLinkId) {
 			return new PtRouteMock(startLinkId, endLinkId);

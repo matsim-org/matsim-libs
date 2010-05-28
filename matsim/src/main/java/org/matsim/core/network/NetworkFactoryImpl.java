@@ -19,7 +19,6 @@
 
 package org.matsim.core.network;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +36,7 @@ import org.matsim.core.population.routes.RouteFactory;
 /**
  * @author dgrether
  */
-public class NetworkFactoryImpl implements Serializable, NetworkFactory {
+public class NetworkFactoryImpl implements NetworkFactory {
 
 	private LinkFactory linkFactory = null;
 
@@ -46,7 +45,7 @@ public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 
 	private NetworkLayer network;
 
-	public NetworkFactoryImpl(NetworkLayer network) {
+	public NetworkFactoryImpl(final NetworkLayer network) {
 		this.network = network;
 		this.linkFactory = new LinkFactoryImpl();
 		this.routeFactories.put(TransportMode.car, new LinkNetworkRouteFactory());
@@ -116,7 +115,7 @@ public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 		return (this.linkFactory instanceof TimeVariantLinkFactory);
 	}
 
-	public void setNetwork(NetworkLayer networkLayer) {
+	public void setNetwork(final NetworkLayer networkLayer) {
 		this.network = networkLayer;
 	}
 
