@@ -1,6 +1,5 @@
 package playground.mzilske.teach;
 
-import org.matsim.core.api.experimental.controller.Controller;
 import org.matsim.run.OTFVis;
 
 public class PotsdamVis implements Runnable {

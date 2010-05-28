@@ -14,7 +14,6 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.charts.XYLineChart;
-import org.postgis.LinearRing;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

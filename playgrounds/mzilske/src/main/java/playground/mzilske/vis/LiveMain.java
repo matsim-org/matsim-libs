@@ -10,6 +10,8 @@ import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
+import org.matsim.vis.otfvis2.OTFVisLiveServer;
+import org.matsim.vis.otfvis2.OTFVisClient;
 
 public class LiveMain {
 	
@@ -20,9 +22,13 @@ public class LiveMain {
 //		 String fileName = "../../run749/749.output_network.xml.gz";
 //		 String eventsFileName = "../../run749/it.1000/749.1000.events.txt.gz";
 //		
-		String networkFileName = "../../matsim/output/example5/output_network.xml.gz";
-		String eventsFileName = "../../matsim/output/example5/ITERS/it.10/10.events.xml.gz";
-		String populationFileName = "../../matsim/output/example5/output_plans.xml.gz";
+//		String networkFileName = "../../matsim/output/example5/output_network.xml.gz";
+//		String eventsFileName = "../../matsim/output/example5/ITERS/it.10/10.events.xml.gz";
+//		String populationFileName = "../../matsim/output/example5/output_plans.xml.gz";
+		
+		String networkFileName = "../../run1052/output_network.xml.gz";
+		String eventsFileName = "../../run1052/ITERS/it.0/0.events.xml";
+		String populationFileName = "../../run1052/output_plans.xml.gz";
 		
 		double snapshotPeriod = 60;
 		SimulationConfigGroup simulationConfigGroup = new SimulationConfigGroup();
@@ -34,14 +40,14 @@ public class LiveMain {
 		EventsManagerImpl events = new EventsManagerImpl();
 		
 		
-		final EventsCollectingLiveServer server = new EventsCollectingLiveServer(scenario, events);
+		final OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
 		SnapshotGenerator snapshotGenerator = new SnapshotGenerator(scenario.getNetwork(), (int) snapshotPeriod, simulationConfigGroup); 
 		snapshotGenerator.addSnapshotWriter(server.getSnapshotReceiver());
 		events.addHandler(snapshotGenerator);
 		
 		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", server);
 		
-		InjectableOTFClient client = new InjectableOTFClient();
+		OTFVisClient client = new OTFVisClient();
 		client.setHostConnectionManager(hostConnectionManager);
 		client.setSwing(true);
 		client.run();

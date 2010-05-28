@@ -13,8 +13,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.xml.sax.SAXException;
 
-import playground.mzilske.osm.OsmNetworkReader;
-
 
 public class PotsdamNet {
 	

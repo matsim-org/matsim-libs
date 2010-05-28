@@ -8,9 +8,10 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
+import org.matsim.vis.otfvis2.OTFVisClient;
 
-public class Main {
-	
+public class Main {	
+
 	public static void main(String[] args) throws InterruptedException, InvocationTargetException {
 //		 String fileName = "../../detailedEval/Net/network.xml.gz";
 //		 String eventsFileName = "../../run950/it.1000/950.1000.events.txt.gz";
@@ -37,7 +38,7 @@ public class Main {
 		
 		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", server);
 		
-		InjectableOTFClient client = new InjectableOTFClient();
+		OTFVisClient client = new OTFVisClient();
 		client.setHostConnectionManager(hostConnectionManager);
 		client.setSwing(true);
 		

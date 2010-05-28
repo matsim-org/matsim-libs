@@ -19,11 +19,9 @@
 
 package playground.mzilske.bvg09;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,7 +46,6 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.transitSchedule.TransitRouteImpl;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.Departure;
