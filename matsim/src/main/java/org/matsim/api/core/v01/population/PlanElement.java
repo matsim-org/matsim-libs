@@ -20,10 +20,8 @@
 
 package org.matsim.api.core.v01.population;
 
-import java.io.Serializable;
-
 import org.matsim.core.api.internal.MatsimPopulationObject;
 
-public interface PlanElement extends Serializable, MatsimPopulationObject {
+public interface PlanElement extends MatsimPopulationObject {
 
 }
