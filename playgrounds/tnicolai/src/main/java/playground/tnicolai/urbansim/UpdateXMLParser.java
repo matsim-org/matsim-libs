@@ -75,7 +75,7 @@ public class UpdateXMLParser {
 			log.info("Running command: " + cmd );
 			Runtime.getRuntime().exec( cmd );
 			// copy generated files into destination directory
-			String source = tmpDirectory + File.separator + outputPackage;
+			String source = tmpDirectory + File.separator + outputPackage.replace(".", File.separator);
 			log.info("Copying generated files from " + source + " to " + outputDirectory);
 			FileCopy.copyTree(source, outputDirectory);
 		}
@@ -104,6 +104,9 @@ public class UpdateXMLParser {
 			else if ( parts[0].equals("--destination") ) {
 				outputDirectory = parts[1];
 			}
+			else if ( parts[0].equals("--package") ) {
+				outputPackage = parts[1];
+			}
 			else if ( parts[0].equals("--help") ) {
 				log.info("Enter the location of the JAXB libary and the location of the schema file (xsd) as described below:");
 				log.info("java UpdateXMLParser --jaxbLocation=[path/to/your/jaxb/libar] --xsdLocation=[path/to/your/xsd.file]");
@@ -128,11 +131,15 @@ public class UpdateXMLParser {
 			outputDirectory = Constants.MATSIM_WORKING_DIRECTORY + "/tnicolai/src/main/java/playground/tnicolai/urbansim/com/matsim/config";
 			log.info("Set default destination to: " + outputDirectory);
 		}
-
-		outputPackage = "generatedSchemaBindings";
+		if(outputPackage == null){
+			log.info("Package name not given...");
+			// set default location
+			outputPackage = "playground.tnicolai.urbansim.com.matsim.config";
+			log.info("Set default package name to: " + outputPackage);
+		}
+		
 		tmpDirectory = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY;
-		
-		
+
 		if( !(outputDirectory!= null && outputPackage != null && checkParameter(jaxBLocation) && checkParameter(xsdLocation) && tmpDirectory != null) )
 			return false;
 		return true;
