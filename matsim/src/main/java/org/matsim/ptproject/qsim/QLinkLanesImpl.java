@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.SortedMap;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -40,7 +39,6 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
-import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisData;
@@ -238,7 +236,6 @@ public class QLinkLanesImpl implements QLink {
 		}
 
 		Collections.sort(this.queueLanes, QLinkLanesImpl.fromLinkEndComparator);
-		findLayout();
 	}
 
 	public List<QLane> getToNodeQueueLanes() {
@@ -248,39 +245,6 @@ public class QLinkLanesImpl implements QLink {
 	protected void addSignalGroupDefinition(SignalGroupDefinition signalGroupDefinition) {
 		for (QLane lane : this.toNodeQueueLanes) {
 			lane.addSignalGroupDefinition(signalGroupDefinition);
-		}
-	}
-
-
-	/**
-	 * Helper setting the Ids of the toLinks for the QueueLane given as parameter.
-	 * @param lane
-	 * @param toLinkIds
-	 */
-	private void setToLinks(QLane lane, List<Id> toLinkIds) {
-		for (Id linkId : toLinkIds) {
-			Link link = this.getQSimEngine().getQSim().getScenario().getNetwork().getLinks().get(linkId);
-			if (link == null) {
-				String message = "Cannot find Link with Id: " + linkId + " in network. ";
-				log.error(message);
-				throw new IllegalStateException(message);
-			}
-			lane.addDestinationLink(linkId);
-			this.originalLane.addDestinationLink(linkId);
-		}
-	}
-
-	private void findLayout(){
-		SortedMap<Double, Link> result = CalculateAngle.getOutLinksSortedByAngle(this.getLink());
-		for (QLane lane : this.queueLanes) {
-			int laneNumber = 1;
-			for (Link l : result.values()) {
-				if (lane.getDestinationLinkIds().contains(l.getId())){
-					lane.setVisualizerLane(laneNumber);
-					break;
-				}
-				laneNumber++;
-			}
 		}
 	}
 
@@ -434,10 +398,8 @@ public class QLinkLanesImpl implements QLink {
 	 */
 	public double getSpaceCap() {
 		double total = 0.0;
-		log.error("link id " + this.getLink().getId() + " has " + this.getQueueLanes().size() + " qlanes");
 		for (QLane ql : this.getQueueLanes()) {
 				total += ql.getStorageCapacity();
-				log.error(total);
 		}
 		return total;
 	}
