@@ -229,7 +229,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 					log.warn("No laneDefinitions_v2.0 file specified in scenario. Trying to convert the v1.1 format to " +
 							"the v2.0 format. For details see LaneDefinitionsV11ToV20Conversion.java.");
 					LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
-					conversion.convertTo20(laneDefinitions, scenario.getNetwork());
+					laneDefinitions = conversion.convertTo20(laneDefinitions, scenario.getNetwork());
 					this.getScenario().setLaneDefinitions(laneDefinitions);
 				}
 			}
