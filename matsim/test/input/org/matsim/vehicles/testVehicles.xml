@@ -23,6 +23,7 @@
   </engineInformation>
   <accessTime secondsPerPerson="23.23" />
   <egressTime secondsPerPerson="42.42" />
+  <doorOperation mode="parallel" />
 </vehicleType>
 
 <vehicleType id="defaultValueCar">

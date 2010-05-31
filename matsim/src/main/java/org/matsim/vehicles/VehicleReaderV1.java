@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vehicles.EngineInformation.FuelType;
+import org.matsim.vehicles.VehicleType.DoorOperationMode;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -107,6 +108,18 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 			throw new IllegalArgumentException("Fuel type: " + content + " is not supported!");
 		}
 	}
+	
+	private DoorOperationMode parseDoorOperationMode(final String modeString){
+		if (DoorOperationMode.serial.toString().equalsIgnoreCase(modeString)){
+			return DoorOperationMode.serial;
+		}
+		else if (DoorOperationMode.parallel.toString().equalsIgnoreCase(modeString)){
+			return DoorOperationMode.parallel;
+		}
+		else {
+			throw new IllegalArgumentException("Door operation mode " + modeString + " is not supported");
+		}
+	}
 
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
@@ -152,6 +165,9 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 		}
 		else if (VehicleSchemaV1Names.EGRESSTIME.equalsIgnoreCase(name)){
 		  this.currentVehType.setEgressTime(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.SECONDSPERPERSON)));
+		}
+		else if (VehicleSchemaV1Names.DOOROPERATION.equalsIgnoreCase(name)){
+			this.currentVehType.setDoorOperationMode(this.parseDoorOperationMode(atts.getValue(VehicleSchemaV1Names.MODE)));
 		}
 	}
 

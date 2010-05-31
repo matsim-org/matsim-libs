@@ -58,6 +58,11 @@ xml:lang="en">
         <xs:attribute name="secondsPerPerson" type="xs:decimal" default="1.0"></xs:attribute>
       </xs:complexType>
     </xs:element>    
+    <xs:element name="doorOperation" minOccurs="0" maxOccurs="1">
+      <xs:complexType>
+        <xs:attribute name="mode" type="doorOperationModeType" default="serial"/>
+      </xs:complexType>
+    </xs:element>    
   </xs:sequence>
     </xs:extension>
   </xs:complexContent>

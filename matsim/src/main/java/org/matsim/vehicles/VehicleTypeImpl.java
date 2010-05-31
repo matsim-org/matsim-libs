@@ -43,6 +43,8 @@ public class VehicleTypeImpl implements VehicleType {
 	
 	private Id id;
 
+	private DoorOperationMode doorOperationMode = DoorOperationMode.serial;
+	
 	public VehicleTypeImpl(Id typeId) {
 		this.id = typeId;
 	}
@@ -118,5 +120,15 @@ public class VehicleTypeImpl implements VehicleType {
   public void setEgressTime(double seconds) {
     this.egressTime = seconds;
   }
+
+	@Override
+	public DoorOperationMode getDoorOperationMode() {
+		return this.doorOperationMode;
+	}
+
+	@Override
+	public void setDoorOperationMode(DoorOperationMode mode) {
+		this.doorOperationMode = mode;
+	}
 
 }

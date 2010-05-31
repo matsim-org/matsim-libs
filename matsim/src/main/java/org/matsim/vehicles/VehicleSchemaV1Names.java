@@ -49,5 +49,7 @@ public interface VehicleSchemaV1Names {
 	public static final String ACCESSTIME = "accessTime";
 	public static final String SECONDSPERPERSON = "secondsPerPerson";
 	public static final String EGRESSTIME = "egressTime";
+	public static final String DOOROPERATION = "doorOperation";
+	public static final String MODE = "mode";
 	
 }

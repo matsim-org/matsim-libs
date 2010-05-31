@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  */
 public interface VehicleType {
+	
+	public enum DoorOperationMode {serial, parallel}
 
 	public void setDescription(String desc);
 
@@ -60,4 +62,8 @@ public interface VehicleType {
 	public double getEgressTime();
 	
 	public void setEgressTime(double seconds);
+	
+	public DoorOperationMode getDoorOperationMode();
+	
+	public void setDoorOperationMode(DoorOperationMode mode);
 }

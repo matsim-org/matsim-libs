@@ -27,6 +27,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
 /**
  * @author dgrether
@@ -90,6 +91,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		assertEquals(0.23, vehType.getEngineInformation().getGasConsumption(), EPSILON);
 		assertEquals(23.23, vehType.getAccessTime(), EPSILON);
 		assertEquals(42.42, vehType.getEgressTime(), EPSILON);
+		assertEquals(DoorOperationMode.parallel, vehType.getDoorOperationMode());
 		
 		vehType = vehicleTypes.get(new IdImpl("defaultValueCar"));
 		assertNotNull(vehType);
@@ -97,7 +99,8 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		assertEquals(1.0, vehType.getWidth(), EPSILON);
 		assertEquals(1.0, vehType.getMaximumVelocity(), EPSILON);
 		assertNull(vehType.getCapacity());
-	
+		assertEquals(DoorOperationMode.serial, vehType.getDoorOperationMode());
+		
 		assertNotNull(vehicles);
 		assertEquals(2, vehicles.size());
 	

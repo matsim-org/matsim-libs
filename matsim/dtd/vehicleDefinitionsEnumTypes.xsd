@@ -14,4 +14,11 @@ xml:lang="en">
   </xs:restriction>
 </xs:simpleType>
 
+<xs:simpleType name="doorOperationModeType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="serial"/>
+    <xs:enumeration value="parallel"/>
+  </xs:restriction>
+</xs:simpleType>
+
 </xs:schema>
