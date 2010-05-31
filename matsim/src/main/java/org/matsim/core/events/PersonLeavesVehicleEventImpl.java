@@ -62,7 +62,7 @@ public class PersonLeavesVehicleEventImpl extends PersonEventImpl implements Per
 	}
 	
 	public Id getTransitRouteId() {
-		return transitRouteId;
+		return this.transitRouteId;
 	}
 	
 
