@@ -23,9 +23,6 @@
  */
 package playground.yu.linkUtilOffset.hourVersion;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,16 +46,19 @@ import org.matsim.core.population.MatsimPopulationReader;
 import playground.yu.utils.io.ScoreModificationReader;
 import playground.yu.utils.io.SimpleWriter;
 import playground.yu.utils.math.MatrixUtils;
-import Jama.Matrix;
-import Jama.QRDecomposition;
+import cern.colt.matrix.DoubleMatrix2D;
+import cern.colt.matrix.doublealgo.Transform;
+import cern.colt.matrix.impl.SparseDoubleMatrix2D;
+import cern.colt.matrix.linalg.Algebra;
+import cern.colt.matrix.linalg.QRDecomposition;
 
 /**
  * @author yu
  * 
  */
-public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
+public class PopLinksTimeBinsMatrixCreator2 implements LinkLeaveEventHandler {
 	/** matrix[mxn] m-number of pop, n-number of links */
-	private Matrix matrix;
+	private SparseDoubleMatrix2D matrix;
 	private static double TIME_BIN = 3600d;// an hour
 	private Network network;
 	private Population population;
@@ -77,18 +77,18 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 	 */
 	private Map<Id, Integer> personSequence = new HashMap<Id, Integer>();
 
-	public PopLinksTimeBinsMatrixCreator(Network network, Population population) {
+	public PopLinksTimeBinsMatrixCreator2(Network network, Population population) {
 		this.network = network;
 		this.population = population;
 	}
 
-	public PopLinksTimeBinsMatrixCreator(Network network,
+	public PopLinksTimeBinsMatrixCreator2(Network network,
 			Population population, double timeBin) {
 		this(network, population);
 		TIME_BIN = timeBin;
 	}
 
-	public PopLinksTimeBinsMatrixCreator(Network network,
+	public PopLinksTimeBinsMatrixCreator2(Network network,
 			Population population, int calibrationStartTimeBin,
 			int calibrationEndTimeBin) {
 		this(network, population);
@@ -96,7 +96,7 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		CALIBRATION_END_TIMEBIN = calibrationEndTimeBin;
 	}
 
-	public PopLinksTimeBinsMatrixCreator(Network network,
+	public PopLinksTimeBinsMatrixCreator2(Network network,
 			Population population, double timeBin, int calibrationStartTimeBin,
 			int calibrationEndTimeBin) {
 		this(network, population, calibrationStartTimeBin,
@@ -123,8 +123,10 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 			this.personSequence.put(person.getId(), rowIdx++);// 1.transfers
 		// value, 2.++
 
-		this.matrix = new Matrix(this.personSequence.size()/* row-pop */,
-				this.linkTimeBinSequence.size()/* col-link_timeBin */, 0d);
+		this.matrix = new SparseDoubleMatrix2D(this.personSequence.size()/*
+																		 * row-pop
+																		 */,
+				this.linkTimeBinSequence.size()/* col-link_timeBin */);
 	}
 
 	private static int getCalibrationTimeBin(double time) {
@@ -163,32 +165,23 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 	}
 
 	public void writeMatrix(String matrixOutputFilename) {
-		// SimpleWriter writer = new SimpleWriter(matrixOutputFilename);
-		// writer.write("\tcol_no.");
-		// for (int n = 0; n < this.matrix.getColumnDimension(); n++)
-		// writer.write("\t" + n);
-		// writer.writeln("\nrow_no.");
-		// for (int m = 0; m < this.matrix.getRowDimension(); m++) {
-		// writer.write(m + "\t");
-		// for (int n = 0; n < this.matrix.getColumnDimension(); n++) {
-		// writer.write("\t" + this.matrix.get(m, n));
-		// }
-		// writer.writeln();
-		// }
-		// writer.close();
-		try {
-			this.matrix.print(new PrintWriter(matrixOutputFilename), 100, 2);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		SimpleWriter writer = new SimpleWriter(matrixOutputFilename);
+		writer.write("row_no.\tcol_no.\tvalue");
+		for (int row = 0; row < this.matrix.rows(); row++)
+			for (int col = 0; col < this.matrix.columns(); col++) {
+				double value = this.matrix.get(row, col);
+				if (value != 0d)
+					writer.writeln(row + "\t" + col + "\t" + value);
+			}
+		writer.close();
 	}
 
-	public Matrix getMatrix() {
+	public SparseDoubleMatrix2D getMatrix() {
 		return matrix;
 	}
 
 	/** @param args */
-	public static void runJama(String[] args) {
+	public static void runColt(String[] args) {
 		// String networkFilename =
 		// "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/network.xml",
 		// //
@@ -224,7 +217,7 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
-		PopLinksTimeBinsMatrixCreator pltbmc = new PopLinksTimeBinsMatrixCreator(
+		PopLinksTimeBinsMatrixCreator2 pltbmc = new PopLinksTimeBinsMatrixCreator2(
 				network, population, 7, 10);
 		pltbmc.init();
 		EventsManager events = new EventsManagerImpl();
@@ -233,18 +226,19 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 
 		// pltbmc.writeMatrix(matrixOutputFilename);
 
-		Matrix A = pltbmc.getMatrix();
-		System.out.println("rank[A] =\t" + A.rank());
+		SparseDoubleMatrix2D A = pltbmc.getMatrix();
+		Algebra algebra = new Algebra();
+		System.out.println("rank[A] =\t" + algebra.rank(A));
 
 		ScoreModificationReader smReader = new ScoreModificationReader(
 				scoreModificationFilename);
 		smReader.parse();
 		// Map<Id, Double> b=smReader.get
 
-		int m = A.getRowDimension(), n = A.getColumnDimension();
+		int m = A.rows(), n = A.columns();
 		System.out.println("A mxn:\t" + m + "\tx\t" + n);
 
-		Matrix b = new Matrix(m, 1);
+		SparseDoubleMatrix2D b = new SparseDoubleMatrix2D(m, 1);
 		for (Entry<Id, Integer> personIdRowIdxEntry : pltbmc
 				.getPersonSequence().entrySet()) {
 			int rowIdx = personIdRowIdxEntry.getValue();
@@ -252,33 +246,32 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 					.getPersonUtilityOffset(personIdRowIdxEntry.getKey()/* personId */);
 			b.set(rowIdx, 0, scoreModification);
 		}
-		Matrix A_b = MatrixUtils.getAugmentMatrix(A, b);
-		System.out.println("rank[A_b] =\t" + A_b.rank());
+		SparseDoubleMatrix2D A_b = (SparseDoubleMatrix2D) MatrixUtils
+				.getAugmentMatrix(A, b);
+		System.out.println("rank[A_b] =\t" + algebra.rank(A_b));
 
 		// A_b.print(new DecimalFormat(), 10);
 
-		Matrix x;
-		if (A.rank() == A_b.rank()) {
-			if (new QRDecomposition(A).isFullRank()) {
-				x = A.solve(b);
-
+		DoubleMatrix2D x;
+		if (algebra.rank(A) == algebra.rank(A_b)) {
+			if (new QRDecomposition(A).hasFullRank()) {
+				x = algebra.solve(A, b);
 			} else {
 				x = MatrixUtils.getMinimumNormSolution(A, b);
 			}
 
 			SimpleWriter writer = new SimpleWriter(linkUtilityOffsetFilename);
-			for (int i = 0; i < x.getRowDimension(); i++) {
+			for (int i = 0; i < x.rows(); i++) {
 				writer.writeln(pltbmc.linkTimeBinSequence2.get(i)
 						+ "\tutiliyOffset\t" + x.get(i, 0));
 			}
 			writer.close();
 
-			Matrix Residual = A.times(x).minus(b);
-			System.out.println("Ax-b:");
-			Residual.print(new DecimalFormat("0.###E00"), 10);
-			System.out.println("b:");
-			b.print(new DecimalFormat("0.###E00"), 10);
-			double rnorm = Residual.normInf();
+			SparseDoubleMatrix2D Residual = (SparseDoubleMatrix2D) Transform
+					.minus(algebra.mult(A, x), b);
+			System.out.println("Ax-b:\n" + Residual);
+			System.out.println("b:\n" + b);
+			double rnorm = algebra.normInfinity(Residual);
 			System.out.println("Matrix\tResidual Infinity norm:\t" + rnorm);
 		}
 	}
@@ -286,7 +279,7 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 	public static void main(String[] args) {
 		Logger.getLogger("Start time").info(
 				"----------------->STARTED-------------------------");
-		runJama(args);
+		runColt(args);
 		Logger.getLogger("End time").info(
 				"----------------->ENDED-------------------------");
 	}

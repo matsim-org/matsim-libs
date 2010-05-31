@@ -117,7 +117,6 @@ public class MyStrategyManagerConfigLoader extends StrategyManagerConfigLoader {
 			strategy = StrategyManagerConfigLoader.loadStrategy(controler,
 					name, settings);
 		}
-
 		return strategy;
 	}
 }

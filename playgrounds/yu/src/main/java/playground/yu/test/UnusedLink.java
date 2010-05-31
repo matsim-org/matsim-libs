@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SubTourModeChoiceControler.java
+ * UnusedLink.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,48 +19,54 @@
  * *********************************************************************** */
 
 /**
- *
+ * 
  */
 package playground.yu.test;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
-import playground.yu.analysis.MZComparison.MZComparisonListener;
-import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
-
-/**
+/**check 
  * @author yu
- * 
+ *
  */
-public class SubTourModeChoiceControler extends Controler {
+public class UnusedLink implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-	public SubTourModeChoiceControler(String args) {
-		super(args);
-	}
-
+	/* (non-Javadoc)
+	 * @see org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler#handleEvent(org.matsim.core.api.experimental.events.LinkEnterEvent)
+	 */
 	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		MyStrategyManagerConfigLoader.load(this, manager);
-		return manager;
+	public void handleEvent(LinkEnterEvent event) {
+		// TODO Auto-generated method stub
+
 	}
 
-	public static void main(String[] args) {
-		Config config = new ScenarioLoaderImpl(args[0]).loadScenario()
-				.getConfig();
-		Controler controler = new SubTourModeChoiceControler(args[0]);
-		controler
-				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring(), Double
-								.parseDouble(config.findParam(
-										"vspExperimental", "offsetWalk"))));
-		controler.addControlerListener(new MZComparisonListener());
-		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
-		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
-		controler.setOverwriteFiles(true);
-		controler.run();
+	/* (non-Javadoc)
+	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
+	 */
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+
 	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler#handleEvent(org.matsim.core.api.experimental.events.LinkLeaveEvent)
+	 */
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

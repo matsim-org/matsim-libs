@@ -50,7 +50,7 @@ import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeC
  * 
  */
 public class SubTourModeChoice extends AbstractMultithreadedModule {
-	public final static String CONFIG_MODULE = "subTourModeChoice";
+	public final static String CONFIG_MODULE = "vspExperimental";
 	public final static String CONFIG_PARAM_MODES = "modes",
 			CONFIG_PARAM_CHAIN_BASED_MODES = "chainBasedModes";
 
