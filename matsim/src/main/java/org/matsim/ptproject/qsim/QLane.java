@@ -158,10 +158,10 @@ public class QLane implements QBufferItem {
 
 	protected final TransitQLaneFeature transitQueueLaneFeature;
 
-	/*package*/ QLane(final QLink ql, Lane laneData) {
+	/*package*/ QLane(final QLink ql, Lane laneData, boolean isOriginalLane) {
 		this.queueLink = ql;
 		this.transitQueueLaneFeature = new TransitQLaneFeature(this.getQLink());
-		this.isOriginalLane = (laneData == null) ? true : false;
+		this.isOriginalLane = isOriginalLane;
 		this.laneData = laneData;
 		this.length = ql.getLink().getLength();
 		this.freespeedTravelTime = this.length / ql.getLink().getFreespeed();
@@ -283,7 +283,7 @@ public class QLane implements QBufferItem {
 		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
 	}
 
-	void setMetersFromLinkEnd(final double meters) {
+	void setEndsAtMetersFromLinkEnd(final double meters) {
 		this.meterFromLinkEnd = meters;
 	}
 
@@ -638,6 +638,10 @@ public class QLane implements QBufferItem {
     }
     this.toLanes.add(lane);
   }
+  
+  protected List<QLane> getToLanes(){
+  	return this.toLanes;
+  }
 
   protected void addDestinationLink(final Id linkId) {
     this.destinationLinkIds.add(linkId);
@@ -729,4 +733,8 @@ public class QLane implements QBufferItem {
       }
     }
   }
+
+	protected Lane getLaneData() {
+		return this.laneData;
+	}
 }

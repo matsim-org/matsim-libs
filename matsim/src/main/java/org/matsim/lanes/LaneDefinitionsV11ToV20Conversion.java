@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.lanes;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -80,7 +80,7 @@ public class LaneDefinitionsV11ToV20Conversion {
 			}
 			//further processing of not defined lanes in 1.1 format
 			//add original lane
-			List<Lane> sortedLanes =  new LinkedList<Lane>(l2lnew.getLanes().values());
+			List<Lane> sortedLanes =  new ArrayList<Lane>(l2lnew.getLanes().values());
 			Collections.sort(sortedLanes, new LaneMeterFromLinkEndComparator());
 			Lane longestLane = sortedLanes.get(sortedLanes.size()-1);
 //			double originalLaneLength = link.getLength() - longestLane.getStartsAtMeterFromLinkEnd();
@@ -122,38 +122,47 @@ public class LaneDefinitionsV11ToV20Conversion {
 			}
 			
 			
-			//calculate the alignment
+			//calculate the alignment and uturn
 			int mostRight = l2l.getLanes().size() / 2;
 			SortedMap<Double, Link> outLinksByAngle = CalculateAngle.getOutLinksSortedByAngle(link);
 			Lane newLane;
 			Set<Lane> assignedLanes = new HashSet<Lane>();
 			for (Link outlink : outLinksByAngle.values()){
 //				log.info("Outlink: " + outlink.getId());
-				for (Lane l : l2l.getLanes().values()){
+				for (Lane oldLane : l2l.getLanes().values()){
 //					log.info("lane: " + l.getId());
-					if (assignedLanes.contains(l)){
+					if (assignedLanes.contains(oldLane)){
 						continue;
 					}
-					newLane = l2lnew.getLanes().get(l.getId());
+					newLane = l2lnew.getLanes().get(oldLane.getId());
+					
+					//add uturn functionality if the first lane is processed, i.e. the most left lane that is indicated by an empty set of assignedLanes
+					if (assignedLanes.isEmpty()){
+						this.addUTurn(link, newLane);
+					}
+					
 					if (newLane.getToLinkIds().contains(outlink.getId())){
 //						log.info("lane " + newLane.getId() + "  alignment: " + mostRight);
 						newLane.setAlignment(mostRight);
-						assignedLanes.add(l);
+						assignedLanes.add(oldLane);
 						//decrement mostRight skip 0 if number of lanes is even
 						mostRight--;
 						if ((mostRight == 0) && (l2l.getLanes().size() % 2  == 0)){
 							mostRight--;
-						}
-						
-						//add uturn functionality if the first lane is processed, i.e. the most left lane that is indicated by an empty set of assignedLanes
-						if (outlink.getToNode().equals(link.getFromNode()) && assignedLanes.isEmpty()){
-							newLane.addToLinkId(outlink.getId());
 						}
 					}
 				}
 			}
 		}//end outer for
 		return lanedefs20;
+	}
+	
+	private void addUTurn(Link link, Lane newLane) {
+		for (Link outLink : link.getToNode().getOutLinks().values()) {
+			if ((outLink.getToNode().equals(link.getFromNode()))) {
+				newLane.addToLinkId(outLink.getId());
+			}
+		}
 	}
 
 	

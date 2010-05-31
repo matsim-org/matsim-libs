@@ -14,6 +14,7 @@
         <lane id="7">
             <leadsTo>
                 <toLink refId="5"/>
+                <toLink refId="3"/>
             </leadsTo>
             <representedLanes number="1.0"/>
             <startsAt meterFromLinkEnd="45.0"/>
@@ -40,6 +41,7 @@
         <lane id="4">
             <leadsTo>
                 <toLink refId="7"/>
+                <toLink refId="5"/>
             </leadsTo>
             <representedLanes number="1.0"/>
             <startsAt meterFromLinkEnd="45.0"/>
@@ -68,6 +70,7 @@
         <lane id="1">
             <leadsTo>
                 <toLink refId="9"/>
+                <toLink refId="7"/>
             </leadsTo>
             <representedLanes number="1.0"/>
             <startsAt meterFromLinkEnd="45.0"/>
@@ -104,6 +107,7 @@
         <lane id="10">
             <leadsTo>
                 <toLink refId="3"/>
+                <toLink refId="9"/>
             </leadsTo>
             <representedLanes number="1.0"/>
             <startsAt meterFromLinkEnd="45.0"/>

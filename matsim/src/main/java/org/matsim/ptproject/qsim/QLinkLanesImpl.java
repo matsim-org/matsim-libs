@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.SortedMap;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,6 +39,7 @@ import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.lanes.Lane;
+import org.matsim.lanes.LaneMeterFromLinkEndComparator;
 import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -161,64 +163,85 @@ public class QLinkLanesImpl implements QLink {
 		this.link = link2;
 		this.toQueueNode = toNode;
 		this.qsimEngine = engine;
-		this.originalLane = new QLane(this, null);
 		this.queueLanes = new ArrayList<QLane>();
-		this.queueLanes.add(this.originalLane);
+		this.toNodeQueueLanes = new ArrayList<QLane>();
 		this.createLanes(laneMap);
 	}
-
+	
+	
 	/**
 	 * Initialize the QueueLink with more than one QueueLane
 	 * @param map
 	 */
 	private void createLanes(Map<Id, Lane> map) {
-		boolean firstNodeLinkInitialized = false;
-
-		for (Lane signalLane : map.values()) {
-			if (signalLane.getStartsAtMeterFromLinkEnd() > this.link.getLength()) {
-				throw new IllegalStateException("Link Id " + this.link.getId() + " is shorter than Lane Id " + signalLane.getId() + " on this link!");
+		List<Lane> sortedLanes =  new ArrayList<Lane>(map.values());
+		Collections.sort(sortedLanes, new LaneMeterFromLinkEndComparator());
+		Collections.reverse(sortedLanes);
+		
+		List<QLane> laneList = new LinkedList<QLane>();
+		Lane firstLane = sortedLanes.remove(0);
+		if (firstLane.getStartsAtMeterFromLinkEnd() != this.link.getLength()) {
+			throw new IllegalStateException("First Lane Id " + firstLane.getId() + " on Link Id " + this.link.getId() + 
+					"isn't starting at the beginning of the link!");
+		}
+		this.originalLane = new QLane(this, firstLane, true);
+		laneList.add(this.originalLane);
+		Stack<QLane> laneStack = new Stack<QLane>();
+		
+		while (!laneList.isEmpty()){
+			QLane lastQLane = laneList.remove(0);
+			laneStack.push(lastQLane);
+			lastQLane.setFireLaneEvents(true);
+			this.queueLanes.add(lastQLane);
+			
+			//if existing create the subsequent lanes
+			List<Id> toLaneIds = lastQLane.getLaneData().getToLaneIds();
+			double nextMetersFromLinkEnd = 0.0;
+			double laneLength = 0.0;
+			if (toLaneIds != null 	&& (!toLaneIds.isEmpty())) {
+				for (Id toLaneId : toLaneIds){
+					Lane currentLane = map.get(toLaneId);
+					nextMetersFromLinkEnd = currentLane.getStartsAtMeterFromLinkEnd();
+					QLane currentQLane = new QLane(this, currentLane, false);
+					laneList.add(currentQLane);
+					lastQLane.addToLane(currentQLane);
+				}
+				laneLength = (link.getLength() - nextMetersFromLinkEnd) - (link.getLength() -  lastQLane.getLaneData().getStartsAtMeterFromLinkEnd());
+				laneLength = lastQLane.getLaneData().getStartsAtMeterFromLinkEnd() - nextMetersFromLinkEnd;
+				lastQLane.setEndsAtMetersFromLinkEnd(nextMetersFromLinkEnd);
 			}
-			if (this.originalLane.getLaneId().equals(signalLane.getId())){
-			  throw new IllegalStateException("Lane definition has same id as auto generated original lane on link " + this.link.getId());
+			//there are no subsequent lanes 
+			else {
+				laneLength = lastQLane.getLaneData().getStartsAtMeterFromLinkEnd();
+				lastQLane.setEndsAtMetersFromLinkEnd(0.0);
+				this.toNodeQueueLanes.add(lastQLane);
 			}
-
-			QLane lane = null;
-			lane = new QLane(this, signalLane);
-			lane.setMetersFromLinkEnd(0.0);
-			lane.setLaneLength(signalLane.getStartsAtMeterFromLinkEnd());
-			lane.calculateCapacities();
-
-			this.originalLane.addToLane(lane);
-			this.setToLinks(lane, signalLane.getToLinkIds());
-			lane.setFireLaneEvents(true);
-			this.queueLanes.add(lane);
-
-			if(!firstNodeLinkInitialized){
-				this.originalLane.setMetersFromLinkEnd(signalLane.getStartsAtMeterFromLinkEnd());
-				double originalLaneEnd = this.getLink().getLength() - signalLane.getStartsAtMeterFromLinkEnd();
-				this.originalLane.setLaneLength(originalLaneEnd);
-				this.originalLane.calculateCapacities();
-				firstNodeLinkInitialized = true;
-				this.originalLane.setFireLaneEvents(true);
+			lastQLane.setLaneLength(laneLength);
+		}		
+		
+		//fill toLinks
+		while (!laneStack.isEmpty()){
+			QLane qLane = laneStack.pop();
+			qLane.calculateCapacities();
+			if (qLane.getToLanes() == null || (qLane.getToLanes().isEmpty())) {
+				for (Id toLinkId : qLane.getLaneData().getToLinkIds()){
+					qLane.addDestinationLink(toLinkId);
+				}
 			}
-			else if (signalLane.getStartsAtMeterFromLinkEnd() != this.originalLane.getMeterFromLinkEnd()){
-					String message = "The lanes on link id " + this.getLink().getId() + " have "
-						+ "different length. Currently this feature is not supported. To " +
-								"avoid this exception set all lanes to the same lenght in lane definition file";
-					log.error(message);
-					throw new IllegalStateException(message);
+			else {
+				for (QLane subsequentLane : qLane.getToLanes()){
+					for (Id toLinkId : subsequentLane.getDestinationLinkIds()){
+						qLane.addDestinationLink(toLinkId);
+					}
+				}
 			}
 		}
-		initToNodeQueueLanes();
+
 		Collections.sort(this.queueLanes, QLinkLanesImpl.fromLinkEndComparator);
 		findLayout();
-		addUTurn();
 	}
 
 	public List<QLane> getToNodeQueueLanes() {
-		if ((this.toNodeQueueLanes == null) && (this.queueLanes.size() == 1)){
-			return this.queueLanes;
-		}
 		return this.toNodeQueueLanes;
 	}
 
@@ -257,28 +280,6 @@ public class QLinkLanesImpl implements QLink {
 					break;
 				}
 				laneNumber++;
-			}
-		}
-	}
-
-	private void addUTurn() {
-		for (Link outLink : this.getLink().getToNode().getOutLinks().values()) {
-			if ((outLink.getToNode().equals(this.getLink().getFromNode()))) {
-				for (QLane l : this.toNodeQueueLanes) {
-					if ((l.getVisualizerLane() == 1) && (l.getMeterFromLinkEnd() == 0)){
-						l.addDestinationLink(outLink.getId());
-						this.originalLane.addDestinationLink(outLink.getId());
-					}
-				}
-			}
-		}
-	}
-
-	private void initToNodeQueueLanes() {
-		this.toNodeQueueLanes = new ArrayList<QLane>();
-		for (QLane l : this.queueLanes) {
-			if (l.getMeterFromLinkEnd() == 0.0) {
-				this.toNodeQueueLanes.add(l);
 			}
 		}
 	}
@@ -433,8 +434,10 @@ public class QLinkLanesImpl implements QLink {
 	 */
 	public double getSpaceCap() {
 		double total = 0.0;
+		log.error("link id " + this.getLink().getId() + " has " + this.getQueueLanes().size() + " qlanes");
 		for (QLane ql : this.getQueueLanes()) {
 				total += ql.getStorageCapacity();
+				log.error(total);
 		}
 		return total;
 	}

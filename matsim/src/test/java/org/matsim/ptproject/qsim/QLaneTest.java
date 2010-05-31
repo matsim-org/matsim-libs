@@ -70,6 +70,12 @@ public class QLaneTest extends MatsimTestCase {
 		LaneDefinitionsFactory builder = lanes.getFactory();
 		//lanes for link 1
 		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(id1);
+		Lane link1FirstLane = builder.createLane(new IdImpl("1.ol"));
+		link1FirstLane.addToLaneId(id1);
+		link1FirstLane.setNumberOfRepresentedLanes(2.0);
+		link1FirstLane.setStartsAtMeterFromLinkEnd(1005.0);
+		lanesForLink1.addLane(link1FirstLane);
+		
 		Lane link1lane1 = builder.createLane(id1);
 		link1lane1.addToLinkId(id2);
 		link1lane1.setStartsAtMeterFromLinkEnd(105.0);
@@ -85,6 +91,15 @@ public class QLaneTest extends MatsimTestCase {
 		LaneDefinitionsFactory builder = lanes.getFactory();
 		//lanes for link 1
 		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(id1);
+		
+		Lane link1FirstLane = builder.createLane(new IdImpl("1.ol"));
+		link1FirstLane.addToLaneId(id1);
+		link1FirstLane.addToLaneId(id2);
+		link1FirstLane.addToLaneId(id3);
+		link1FirstLane.setNumberOfRepresentedLanes(2.0);
+		link1FirstLane.setStartsAtMeterFromLinkEnd(1005.0);
+		lanesForLink1.addLane(link1FirstLane);
+		
 		Lane link1lane1 = builder.createLane(id1);
 		link1lane1.addToLinkId(id2);
 		link1lane1.setStartsAtMeterFromLinkEnd(105.0);

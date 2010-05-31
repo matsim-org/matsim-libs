@@ -49,6 +49,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
+import org.matsim.lanes.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
@@ -147,6 +148,10 @@ public class MixedLaneTest extends TestCase {
 		LanesToLinkAssignment l2l = lb.createLanesToLinkAssignment(id1);
 		l2l.addLane(lane);
 		lanes.addLanesToLinkAssignment(l2l);
+		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
+		lanes = conversion.convertTo20(lanes, this.sc.getNetwork());
+		this.sc.setLaneDefinitions(lanes);
+		
 
 		//create signalsystems
 		SignalSystems signals = this.sc.getSignalSystems();
