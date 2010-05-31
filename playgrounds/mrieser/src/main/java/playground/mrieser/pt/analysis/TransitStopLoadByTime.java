@@ -82,14 +82,17 @@ public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEnt
 		sData.addWaitingChange(event.getTime(), -1);
 	}
 
+	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		this.vehicleFacilityMap.put(event.getVehicleId(), event.getFacilityId());
 	}
 
+	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		this.vehicleFacilityMap.remove(event.getVehicleId());
 	}
 
+	@Override
 	public void reset(int iteration) {
 		this.stopData.clear();
 		this.passengerWaitingSince.clear();

@@ -31,7 +31,7 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 
 /**
  * Calculates the number of passenger that are in a transit vehicle as
- * a function of time
+ * a function of time. Requires that the events come sorted by time.
  *
  * @author mrieser
  */
@@ -59,6 +59,7 @@ public class TransitLoadByTime implements PersonEntersVehicleEventHandler, Perso
 		vData.addPassengerChange(event.getTime(), -1);
 	}
 
+	@Override
 	public void reset(int iteration) {
 		this.vehicleData.clear();
 	}
