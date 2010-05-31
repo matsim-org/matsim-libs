@@ -34,7 +34,7 @@ import java.io.Serializable;
  * @param <B>
  */
 public class Tuple<A extends Object, B extends Object> implements Serializable{
-	private static final long serialVersionUID = -5006806073108429434L;
+	private static final long serialVersionUID = 1L;
 	/**
 	 * First entry of the tuple
 	 */

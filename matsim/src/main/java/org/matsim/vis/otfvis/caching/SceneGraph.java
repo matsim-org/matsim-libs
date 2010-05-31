@@ -45,9 +45,6 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
  */
 class LayerDrawingOrderComparator implements Comparator<SceneLayer>, Serializable {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public int compare(SceneLayer o1, SceneLayer o2) {

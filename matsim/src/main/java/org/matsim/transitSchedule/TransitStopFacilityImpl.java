@@ -31,8 +31,6 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
  */
 public class TransitStopFacilityImpl implements TransitStopFacility {
 
-	private static final long serialVersionUID = 1L;
-
 	private final Id id;
 	private Id stopPostAreaId;
 	private final Coord coord;
