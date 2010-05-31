@@ -35,7 +35,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.LaneEnterEventImpl;
 import org.matsim.core.events.LaneLeaveEventImpl;
@@ -134,7 +133,7 @@ public class QLane implements QBufferItem {
 
 	private double meterFromLinkEnd = Double.NaN;
 
-	private int visualizerLane;
+	private int visualizerLane = 1;
 
 	/**
 	 * Contains all Link instances which are reachable from this lane
@@ -163,31 +162,10 @@ public class QLane implements QBufferItem {
 		this.transitQueueLaneFeature = new TransitQLaneFeature(this.getQLink());
 		this.isOriginalLane = isOriginalLane;
 		this.laneData = laneData;
-		this.length = ql.getLink().getLength();
-		this.freespeedTravelTime = this.length / ql.getLink().getFreespeed();
-		this.meterFromLinkEnd = 0.0;
-
-		if (this.isOriginalLane){
-			this.laneId = new  IdImpl(this.queueLink.getLink().getId().toString() + ".ol");
-		}
-
-		/*
-		 * moved capacity calculation to two methods, to be able to call it from
-		 * outside e.g. for reducing cap in case of an incident
-		 */
-		this.calculateCapacities();
 	}
 
 	public Id getLaneId(){
-		if (this.laneData != null){
-			return this.laneData.getId();
-		}
-		else if (this.isOriginalLane){
-			return this.laneId;
-		}
-		else {
-			throw new IllegalStateException("Currently a lane must have a LaneData instance or be the original lane");
-		}
+		return this.laneData.getId();
 	}
 
 	protected void addSignalGroupDefinition(final SignalGroupDefinition signalGroupDefinition) {
@@ -649,14 +627,6 @@ public class QLane implements QBufferItem {
 
   public Set<Id> getDestinationLinkIds(){
     return this.destinationLinkIds;
-  }
-
-  public int getVisualizerLane() {
-    return this.visualizerLane;
-  }
-
-  protected void setVisualizerLane(final int visualizerLane) {
-    this.visualizerLane = visualizerLane;
   }
 
   public SortedMap<Id, SignalGroupDefinition> getSignalGroups() {
