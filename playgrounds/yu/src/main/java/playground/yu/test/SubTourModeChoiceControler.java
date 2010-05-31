@@ -54,9 +54,8 @@ public class SubTourModeChoiceControler extends Controler {
 		Controler controler = new SubTourModeChoiceControler(args[0]);
 		controler
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring(), Double
-								.parseDouble(config.findParam(
-										"vspExperimental", "offsetWalk"))));
+						config.charyparNagelScoring(), config.vspExperimental()
+								.getOffsetWalk()));
 		controler.addControlerListener(new MZComparisonListener());
 		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
 		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));

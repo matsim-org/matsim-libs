@@ -50,10 +50,6 @@ import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeC
  * 
  */
 public class SubTourModeChoice extends AbstractMultithreadedModule {
-	public final static String CONFIG_MODULE = "vspExperimental";
-	public final static String CONFIG_PARAM_MODES = "modes",
-			CONFIG_PARAM_CHAIN_BASED_MODES = "chainBasedModes";
-
 	private Config config;
 	private EnumSet<TransportMode> availableModes = EnumSet.of(
 			TransportMode.car, TransportMode.pt), chainBasedModes = EnumSet
@@ -62,14 +58,14 @@ public class SubTourModeChoice extends AbstractMultithreadedModule {
 	private Network network;
 	private Random random = MatsimRandom.getLocalInstance();
 
-	public SubTourModeChoice(final Config config, ActivityFacilities facilities,
-			Network network) {
+	public SubTourModeChoice(final Config config,
+			ActivityFacilities facilities, Network network) {
 		super(config.global().getNumberOfThreads());
 		this.config = config;
 		this.facilities = facilities;
 		this.network = network;
 
-		String modes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
+		String modes = config.vspExperimental().getModesForSubTourModeChoice();
 		if (modes != null) {
 			String[] parts = StringUtils.explode(modes, ',');
 			this.availableModes = EnumSet.noneOf(TransportMode.class);
@@ -78,8 +74,7 @@ public class SubTourModeChoice extends AbstractMultithreadedModule {
 			}
 		}
 
-		String chainModes = config.findParam(CONFIG_MODULE,
-				CONFIG_PARAM_CHAIN_BASED_MODES);
+		String chainModes = config.vspExperimental().getChainBasedModes();
 		if (chainModes != null) {
 			String[] parts = StringUtils.explode(chainModes, ',');
 			this.chainBasedModes = EnumSet.noneOf(TransportMode.class);

@@ -20,8 +20,8 @@ public class MZComparisonListener implements IterationEndsListener,
 	private MZComparisonDataIO mzcdi = new MZComparisonDataIO();
 
 	public void notifyStartup(StartupEvent event) {
-		mzcdi.readMZData(event.getControler().getConfig().findParam(
-				"vspExperimental", "inputMZ05File"));
+		mzcdi.readMZData(event.getControler().getConfig().vspExperimental()
+				.getValue("inputMZ05File"));
 	}
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
