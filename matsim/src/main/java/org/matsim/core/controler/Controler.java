@@ -116,7 +116,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.lanes.LaneDefinitionsWriter11;
+import org.matsim.lanes.LaneDefinitionsWriter20;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
@@ -456,7 +456,7 @@ public class Controler {
         }
 			}
 			if (this.config.scenario().isUseLanes()){
-			  new LaneDefinitionsWriter11(this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
+			  new LaneDefinitionsWriter20(this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
 			}
 			if (this.config.scenario().isUseSignalSystems()){
 			  new SignalSystemsWriter11(this.scenarioData.getSignalSystems()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS));
