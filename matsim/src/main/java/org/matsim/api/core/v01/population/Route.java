@@ -20,8 +20,6 @@
 
 package org.matsim.api.core.v01.population;
 
-import java.io.Serializable;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimPopulationObject;
 
@@ -29,7 +27,7 @@ import org.matsim.core.api.internal.MatsimPopulationObject;
  * @author nagel
  *
  */
-public interface Route extends Serializable, MatsimPopulationObject {
+public interface Route extends MatsimPopulationObject {
 
 	/** @deprecated  use RouteUtils.calcDistance()  */
 	@Deprecated

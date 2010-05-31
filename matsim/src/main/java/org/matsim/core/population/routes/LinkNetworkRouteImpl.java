@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.LinkNetworkRoute;
  */
 public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute, LinkNetworkRoute, Cloneable {
 
-	private static final long serialVersionUID = 1L;
 	private ArrayList<Id> route = new ArrayList<Id>();
 	private double travelCost = Double.NaN;
 	private Id vehicleId = null;

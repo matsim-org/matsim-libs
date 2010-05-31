@@ -30,8 +30,6 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 
 public class ExperimentalTransitRoute extends GenericRouteImpl {
 
-	private static final long serialVersionUID = 1L;
-
 	private final static String SEPARATOR = "===";
 	private final static String IDENTIFIER_1 = "PT1" + SEPARATOR;
 

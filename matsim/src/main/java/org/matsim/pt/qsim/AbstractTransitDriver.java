@@ -263,7 +263,6 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	 */
 	protected class NetworkRouteWrapper implements NetworkRoute, Cloneable {
 
-		private static final long serialVersionUID = 1L;
 		private final NetworkRoute delegate;
 
 		public NetworkRouteWrapper(final NetworkRoute route) {

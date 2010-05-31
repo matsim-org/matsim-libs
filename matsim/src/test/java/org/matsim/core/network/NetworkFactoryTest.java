@@ -66,7 +66,6 @@ public class NetworkFactoryTest extends MatsimTestCase {
 	}
 
 	/*package*/ static class CarRouteMock extends AbstractRoute implements Cloneable {
-		private static final long serialVersionUID = 1L;
 		CarRouteMock(final Id startLinkId, final Id endLinkId) {
 			super(startLinkId, endLinkId);
 		}
@@ -77,7 +76,6 @@ public class NetworkFactoryTest extends MatsimTestCase {
 	}
 
 	/*package*/ static class PtRouteMock extends AbstractRoute implements Cloneable {
-		private static final long serialVersionUID = 1L;
 		PtRouteMock(final Id startLinkId, final Id endLinkId) {
 			super(startLinkId, endLinkId);
 		}
