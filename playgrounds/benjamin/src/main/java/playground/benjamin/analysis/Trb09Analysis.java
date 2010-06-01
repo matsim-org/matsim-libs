@@ -27,10 +27,13 @@ import org.apache.log4j.Logger;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
@@ -110,13 +113,18 @@ public class Trb09Analysis {
 			housholdsfile = BkPaths.SHAREDSVN + "/studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
 			threshold = 100;
 			
+			//reading the events file
 			String configPath = io2.getOutputFilename("output_config") + ".xml.gz";
 			Config config = new Config();
 			config.addCoreModules();
-			MatsimConfigReader reader = new MatsimConfigReader(config);
-			reader.readFile(configPath);
+			MatsimConfigReader configReader = new MatsimConfigReader(config);
+			configReader.readFile(configPath);
 			
 			eventsfile = io2.getIterationFilename(config.controler().getLastIteration(), "events") + ".txt.gz";
+			EventsManager events = new EventsManagerImpl();
+			MatsimEventsReader eventsReader = new MatsimEventsReader(events);
+			eventsReader.readFile(eventsfile);
+				System.out.println("Events file read!");
 		}
 
 //		String modalSplitGroupChartFileRun1 = BkPaths.RUNSSVN + runid1String + "/"+runNumber1+"modalSplitGroupChart";
