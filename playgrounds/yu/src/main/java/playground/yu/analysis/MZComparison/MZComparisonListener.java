@@ -21,7 +21,7 @@ public class MZComparisonListener implements IterationEndsListener,
 
 	public void notifyStartup(StartupEvent event) {
 		mzcdi.readMZData(event.getControler().getConfig().vspExperimental()
-				.getValue("inputMZ05File"));
+				.getInputMZ05File());
 	}
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
