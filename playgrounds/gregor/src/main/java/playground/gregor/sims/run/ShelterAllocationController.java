@@ -1,19 +1,41 @@
 package playground.gregor.sims.run;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.geotools.factory.FactoryRegistryException;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultAttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.TimeVariantLinkImpl;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationNetFromNetcdfGenerator;
@@ -28,11 +50,19 @@ import org.matsim.evacuation.shelters.signalsystems.ShelterDoorBlockerSetup;
 import org.matsim.evacuation.shelters.signalsystems.ShelterInputCounterSignalSystems;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+
+import playground.gregor.sims.shelters.allocation.BuildingsShapeReaderSheleterAllocation;
 import playground.gregor.sims.shelters.allocation.EvacuationShelterNetLoaderForShelterAllocation;
 import playground.gregor.sims.shelters.allocation.ShelterAllocationRePlanner;
 import playground.gregor.sims.shelters.allocation.ShelterAllocator;
 import playground.gregor.sims.shelters.allocation.ShelterCounter;
+import playground.gregor.sims.shelters.allocation.ShelterLocationRePlanner;
 
 public class ShelterAllocationController extends Controler {
 
@@ -52,11 +82,17 @@ public class ShelterAllocationController extends Controler {
 
 	private double pshelter;
 
-	public ShelterAllocationController(String[] args, int shift, double pshelter) {
+	private String plans;
+
+
+
+
+	public ShelterAllocationController(String[] args, int shift, double pshelter, String plans) {
 		super(args);
 		this.shift = shift;
 		this.pshelter = pshelter;
 		this.setOverwriteFiles(true);
+		this.plans = plans;
 		//		this.config.scenario().setUseSignalSystems(true);
 		//		this.config.scenario().setUseLanes(true);
 		this.config.setQSimConfigGroup(new QSimConfigGroup());
@@ -82,9 +118,15 @@ public class ShelterAllocationController extends Controler {
 
 
 		initPluggableTravelCostCalculator();
-		if (shift == 1) {
+		if (shift >= 1) {
+			
 			ShelterCounter sc = new ShelterCounter(this.scenarioData.getNetwork(), this.shelterLinkMapping);
-			this.events.addHandler(sc);
+			if (shift == 2) {
+				ShelterLocationRePlanner sLRP = new ShelterLocationRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings,sc);
+				this.addControlerListener(sLRP);
+//			this.events.addHandler(sc);
+			}
+			
 			ShelterAllocationRePlanner sARP = new ShelterAllocationRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings,sc, this.pshelter);
 			this.addControlerListener(sARP);
 		}
@@ -117,6 +159,9 @@ public class ShelterAllocationController extends Controler {
 			if (this.travelTimeCalculator == null) {
 				this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 			}
+			
+
+			
 			this.pluggableTravelCost = new PluggableTravelCostCalculator(this.travelTimeCalculator);
 			this.setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
 
@@ -134,16 +179,16 @@ public class ShelterAllocationController extends Controler {
 		}
 	}
 
-	private void loadShelterSignalSystems() {
-		this.config.network().setLaneDefinitionsFile("nullnull");
-
-		ShelterInputCounterSignalSystems sic = new ShelterInputCounterSignalSystems(this.scenarioData,this.shelterLinkMapping);
-		this.events.addHandler(sic);
-
-		this.addControlerListener(new ShelterDoorBlockerSetup());
-		this.getQueueSimulationListener().add(sic);
-
-	}
+//	private void loadShelterSignalSystems() {
+//		this.config.network().setLaneDefinitionsFile("nullnull");
+//
+//		ShelterInputCounterSignalSystems sic = new ShelterInputCounterSignalSystems(this.scenarioData,this.shelterLinkMapping);
+//		this.events.addHandler(sic);
+//
+//		this.addControlerListener(new ShelterDoorBlockerSetup());
+//		this.getQueueSimulationListener().add(sic);
+//
+//	}
 
 
 	private void unloadNetcdfReaders() {
@@ -235,14 +280,15 @@ public class ShelterAllocationController extends Controler {
 				new ShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,null).getPopulation();
 			}
 		} else {
-			throw new RuntimeException("This does not work!");
+//			throw new RuntimeException("This does not work!");
 			//			if (this.scenarioData.getConfig().evacuation().getEvacuationScanrio() != EvacuationScenario.night) {
 			//				throw new RuntimeException("Evacuation simulation from plans file so far only works for the night scenario.");
 			//			}
 			//			new EvacuationPlansGenerator(this.population,this.network,this.network.getLinks().get(new IdImpl("el1"))).run();
 		}
 
-
+		this.scenarioData.getPopulation().getPersons().clear();
+		new PopulationReaderMatsimV4(getScenario()).readFile(this.plans);
 		this.population = this.scenarioData.getPopulation();
 
 		//		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
@@ -253,9 +299,57 @@ public class ShelterAllocationController extends Controler {
 	public static void main(final String[] args) {
 		int shift = Integer.parseInt(args[1]);
 		double pshelter = Double.parseDouble(args[2]);
-		final Controler controler = new ShelterAllocationController(args,shift,pshelter);
+		String plans = args[3];
+//		String shelterFile = args[3];
+		final Controler controler = new ShelterAllocationController(args,shift,pshelter,plans);
 		controler.run();
+//		try {
+//			dumpShelters(((ShelterAllocationController)controler).buildings,"/home/laemmel/devel/allocation/output/output_shelters.shp");
+//		} catch (FactoryRegistryException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (SchemaException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IllegalAttributeException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		System.exit(0);
+	}
+
+
+	private static void dumpShelters(List<Building> buildings2, String string) throws FactoryRegistryException, SchemaException, IllegalAttributeException, IOException {
+		CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
+		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, targetCRS);
+		AttributeType id = AttributeTypeFactory.newAttributeType("id", String.class);
+		AttributeType cap = AttributeTypeFactory.newAttributeType("capacity", Integer.class);
+//		AttributeType agLost = AttributeTypeFactory.newAttributeType("agLost", Integer.class);
+//		AttributeType agLostRate = AttributeTypeFactory.newAttributeType("agLostRate", Double.class);
+//		AttributeType agLostPerc = AttributeTypeFactory.newAttributeType("agLostPerc", Integer.class);
+//		AttributeType agLostPercStr = AttributeTypeFactory.newAttributeType("agLostPercStr", String.class);
+		
+		FeatureType ft = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id,cap}, "Shelters");
+		List<Feature> fts = new ArrayList<Feature>();
+		for (Building b : buildings2) {
+			if (b.isQuakeProof()){
+				Geometry geo = b.getGeo();
+				if (geo == null) {
+					continue;
+				}
+				Point p = null;
+				if (geo instanceof MultiPoint) {
+					p = (Point) geo.getGeometryN(0);
+				} else {
+					p = (Point) geo;
+				}
+				fts.add(ft.create(new Object[] {p,b.getId().toString(),b.getShelterSpace()}));
+			}
+		}
+		ShapeFileWriter.writeGeometries(fts, string);
 	}
 
 }

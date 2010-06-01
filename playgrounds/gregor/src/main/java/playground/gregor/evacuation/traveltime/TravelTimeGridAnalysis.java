@@ -18,7 +18,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class TravelTimeGridAnalysis {
 
-	public static final String SVN = "/home/laemmel/arbeit/svn/runs-svn/run1032/output";
+	public static final String SVN = "/home/laemmel/arbeit/svn/runs-svn/run1022/output";
 	private static final double WIDTH = 250;
 	
 	public static void main(String [] args) {
@@ -30,14 +30,14 @@ public class TravelTimeGridAnalysis {
 		scenario.getConfig().network().setInputFile(SVN + "/output_network.xml.gz");
 		
 		int it = scenario.getConfig().controler().getLastIteration();
-//		it = 0;
+		it = 1000;
 		sl.loadNetwork();
 		String eventsFile = SVN + "/ITERS/it." + it + "/" + it + ".events.txt.gz";
 		
 		Envelope e = getEnvelope(sl.getScenario().getNetwork());
 		List<MultiPolygon> l = getMultiPolygons(e);
 
-		new TravelTimeAnalyzer(SVN + "/../analysis/evacuationTime.shp", eventsFile, l, sl.getScenario().getNetwork()).run();
+		new TravelTimeAnalyzer(SVN + "/../analysis/evacuationTimeII.shp", eventsFile, l, sl.getScenario().getNetwork()).run();
 		
 	}
 	

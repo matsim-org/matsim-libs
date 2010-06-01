@@ -78,7 +78,7 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 		StringBuffer buff = new StringBuffer();
 		buff.append(line[0]);
 		for (int i = 1; i < line.length; i++){
-			buff.append("\t");
+			buff.append(",");
 			buff.append(line[i]);
 		}
 		buff.append("\n");
@@ -102,16 +102,17 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 	
 	public static void main(final String [] args) {
 		
-		String baseDir = "/home/laemmel/arbeit/svn/runs-svn/run1014/output/ITERS";
-		String baseOutput = "/home/laemmel/arbeit/svn/runs-svn/run1014/analysis/";
+		int run = 2001;
+		String baseDir = "/home/laemmel/arbeit/svn/runs-svn/run" + run + "/output/ITERS";
+		String baseOutput = "/home/laemmel/arbeit/svn/runs-svn/run" + run + "/analysis/";
 		ArrayList<Integer> its = new ArrayList<Integer>();
 //		its.add(0); its.add(1); its.add(10); its.add(50); its.add(100); its.add(200);
-		its.add(500);
+		its.add(2000);
 				
 		
 		for (int it : its) {
 			String input = baseDir + "/it." + it + "/" + it + ".events.txt.gz";
-			String output = baseOutput +"/it." + it + ".outflow.txt"; 
+			String output = baseOutput +"/" + run + "it." + it + ".outflow.txt"; 
 			new OutFlowRate(input,output).run();
 			
 			

@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -38,11 +39,26 @@ public class EvacuationShelterNetLoaderForShelterAllocation extends EvacuationSh
 		
 		Node toNode = this.network.createAndAddNode(new IdImpl("en3"), new CoordImpl(662433,9898853));
 		
+		
 		for (Building building : this.buildings) {
+			
+//			if (MatsimRandom.getRandom().nextDouble() < 0.01) {
+//				building.setIsQuakeProof(1);
+//				building.setMinWidth(3);
+//			building.setShelterSpace((int) (100*this.scenario.getConfig().evacuation().getSampleSize()));
+//			} else {
+//				building.setIsQuakeProof(0);
+//			}
+			
+			
 			if (!building.isQuakeProof()) {
 				continue;
 			}
+			
+//			building.setShelterSpace(250000);
 			cap += building.getShelterSpace();
+//			cap += 1;
+			
 			double flowCap = 0.4 * building.getMinWidth() * this.scenario.getConfig().simulation().getTimeStepSize();
 //			flowCap = 6;
 			String shelterId = building.getId().toString();
@@ -60,12 +76,15 @@ public class EvacuationShelterNetLoaderForShelterAllocation extends EvacuationSh
 			this.getShelterLinks().add(l1);
 			this.getShelterLinks().add(l2);
 			this.getShelterLinks().add(l3);
+			
 //			try {
 //				bw.append(from.getId() + "," + flowCap + "," + building.getShelterSpace() + "\n");
 //			} catch (IOException e) {
 //				e.printStackTrace();
 //			}
-
+//			if (cap > 200) {
+//				break;
+//			}
 		}
 		int superCap = numOfPers; // - cap;
 		Building superShelter = new Building(new IdImpl("super_shelter"),0,0,0,0,superCap,10000,1,null);

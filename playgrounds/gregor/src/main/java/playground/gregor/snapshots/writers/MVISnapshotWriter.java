@@ -80,6 +80,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 		
 	//	final String NODES_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_nodes.shp";
 	final String BUILDINGS_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/shelters.shp";
+//	final String BUILDINGS_FILE =  "/home/laemmel/devel/allocation/data/buildings.shp";
 	final String LINKS_FILE = OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/links.shp";
 	final String NODES_FILE = OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/nodes.shp";
 	final String REGION_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/region.shp";
@@ -91,7 +92,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 	final private static float [] nodesColor = new float [] {.4f,.4f,.4f,.7f};
 
 	private final AgentWriterXYAzimuth writer = new AgentWriterXYAzimuth();
-	private final boolean insertWave = true;
+	private final boolean insertWave = false;
 	
 	private String label = "run1006: Nash approach";
 	

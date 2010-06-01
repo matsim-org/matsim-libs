@@ -1,5 +1,7 @@
 package playground.gregor;
 
+
+
 public class MY_STATIC_STUFF {
 	public final static double FLOODED_DIST_THRESHOLD = 10.;
 	public final static double BUFFER_SIZE = 500.;
@@ -31,5 +33,6 @@ public class MY_STATIC_STUFF {
 	
 	
 	public static final String PADANG_SVN_DATA = PADANG_SVN + "/data";
+
 
 }
