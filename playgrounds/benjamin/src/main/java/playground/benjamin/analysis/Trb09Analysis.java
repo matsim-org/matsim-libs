@@ -20,6 +20,7 @@
 package playground.benjamin.analysis;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -40,17 +41,14 @@ import org.xml.sax.SAXException;
 
 import playground.benjamin.BkPaths;
 import playground.benjamin.analysis.filter.OnlyInnerZurichFilter;
-import playground.dgrether.analysis.charts.DgAvgDeltaMoneyGroupChart;
+import playground.benjamin.events.MoneyEventHandler;
 import playground.dgrether.analysis.charts.DgAvgDeltaMoneyQuantilesChart;
-import playground.dgrether.analysis.charts.DgAvgDeltaUtilsGroupChart;
-import playground.dgrether.analysis.charts.DgAvgDeltaUtilsModeGroupChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaUtilsModeQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaUtilsQuantilesChart;
 import playground.dgrether.analysis.charts.DgDeltaUtilsModeGroupChart;
 import playground.dgrether.analysis.charts.DgMixedDeltaUtilsModeGroupChart;
 import playground.dgrether.analysis.charts.DgMixedModeSwitcherOnlyDeltaScoreIncomeModeChoiceChart;
 import playground.dgrether.analysis.charts.DgModalSplitDiffQuantilesChart;
-import playground.dgrether.analysis.charts.DgModalSplitGroupChart;
 import playground.dgrether.analysis.charts.DgModalSplitQuantilesChart;
 import playground.dgrether.analysis.charts.utils.DgChartWriter;
 import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
@@ -58,17 +56,12 @@ import playground.dgrether.analysis.io.DgHouseholdsAnalysisReader;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
 import playground.dgrether.analysis.population.ExcludeZurichTransitFilter;
 
-
 public class Trb09Analysis {
 
 	private static final Logger log = Logger.getLogger(Trb09Analysis.class);
 	
-	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		String netfile, plans1file, plans2file, housholdsfile, eventsfile;
+		String netfile, plans1file, plans2file, housholdsfile, outputConfig2Path, eventsfile;
 		int threshold;
 		
 //***************************************************************************************************************************************************	
@@ -80,11 +73,6 @@ public class Trb09Analysis {
 		boolean isTestscenario = false;		
 		String runNumber1 = "891";
 		String runNumber2 = "896";
-		
-		
-		//only if there is a toll scheme
-		String tollLinksFilePath = BkPaths.STUDIESBK + "/transportEconomics/zh_forRun891_distanceMorningToll_0630-0900_cityWOhighways_1120rp_per_km.xml";
-		RoadPricingScheme tollLinks = loadTollLinksFile(tollLinksFilePath);
 //***************************************************************************************************************************************************		
 		
 		String runid1String = "run" + runNumber1;
@@ -103,30 +91,20 @@ public class Trb09Analysis {
 			netfile = outputPath1 + "/" + runid1String + ".output_network.xml.gz";
 			plans1file = outputPath1 + "/" + runid1String + ".output_plans.xml.gz";
 			plans2file = outputPath2 + "/" + runid2String + ".output_plans.xml.gz";		
-			housholdsfile = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/households.xml";
+			housholdsfile = outputPath2 + "/" + runid2String + ".output_households.xml.gz";		
+			outputConfig2Path = outputPath2 + "/" + runid2String + ".output_config.xml.gz";
 			threshold = 4;
 		}
 		else {
 			netfile = io1.getOutputFilename("output_network") + ".xml.gz";
 			plans1file = io1.getOutputFilename("output_plans") + ".xml.gz";
 			plans2file = io2.getOutputFilename("output_plans") + ".xml.gz";		
-			housholdsfile = BkPaths.SHAREDSVN + "/studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
+			housholdsfile = io2.getOutputFilename("output_households") + ".xml.gz";
+			outputConfig2Path = plans2file = io2.getOutputFilename("output_config") + ".xml.gz";	
 			threshold = 100;
-			
-			//reading the events file
-			String configPath = io2.getOutputFilename("output_config") + ".xml.gz";
-			Config config = new Config();
-			config.addCoreModules();
-			MatsimConfigReader configReader = new MatsimConfigReader(config);
-			configReader.readFile(configPath);
-			
-			eventsfile = io2.getIterationFilename(config.controler().getLastIteration(), "events") + ".txt.gz";
-			EventsManager events = new EventsManagerImpl();
-			MatsimEventsReader eventsReader = new MatsimEventsReader(events);
-			eventsReader.readFile(eventsfile);
-				System.out.println("Events file read!");
 		}
-
+		
+		////group charts
 //		String modalSplitGroupChartFileRun1 = BkPaths.RUNSSVN + runid1String + "/"+runNumber1+"modalSplitGroupChart";
 //		String modalSplitGroupChartFileRun2 = BkPaths.RUNSSVN + runid2String + "/"+runNumber2+"modalSplitGroupChart";	
 //		String deltaUtilsModeGroupChartFile = BkPaths.RUNSSVN + runid2String + "/deltaUtilsModeGroupChart"+runNumber1+"vs"+runNumber2;
@@ -144,26 +122,50 @@ public class Trb09Analysis {
 		String avgDeltaUtilsQuantilesChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaUtilsQuantilesChart" + runNumber1 + "vs" + runNumber2;
 		String avgDeltaUtilsModeQuantilesChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaUtilsModeQuantilesChart"+runNumber1+"vs"+runNumber2;
 		String avgDeltaMoneyQuantilesChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaMoneyQuantilesChart"+runNumber1+"vs"+runNumber2;
-
+//***************************************************************************************************************************************************
 		
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(outputConfig2Path);		
 
 		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader();
-		DgAnalysisPopulation ana = new DgAnalysisPopulation();
-//		DgAnalysisPopulation ana = pc.doPopulationAnalysis(netfile, plans1file, plans2file);
-
-//***************************************************************************************************************************************************
-//any filter can be applied here:
-pc.addFilter(new ExcludeZurichTransitFilter());
-pc.addFilter(new OnlyInnerZurichFilter(tollLinks));
-//***************************************************************************************************************************************************			
+		DgAnalysisPopulation ana = new DgAnalysisPopulation();	
 		pc.readAnalysisPopulation(ana, runid1, netfile, plans1file);
 		pc.readAnalysisPopulation(ana, runid2, netfile, plans2file);
 		
-
 		DgHouseholdsAnalysisReader hhr = new DgHouseholdsAnalysisReader(ana);
 		hhr.readHousholds(housholdsfile);
 		ana.calculateIncomeData();
+
+//***************************************************************************************************************************************************
+//any filter can be applied here or for toll area see below:
+pc.addFilter(new ExcludeZurichTransitFilter());
+//***************************************************************************************************************************************************
+//only if there is a toll scheme, money events file needed
+if(config.scenario().isUseRoadpricing()){
+	eventsfile = io2.getIterationFilename(config.controler().getLastIteration(), "events") + ".txt.gz";
+	
+	EventsManager events = new EventsManagerImpl();
+	MoneyEventHandler tollCollectHandler = new MoneyEventHandler();
+	events.addHandler(tollCollectHandler);
+	
+	MatsimEventsReader eventsReader = new MatsimEventsReader(events);
+	eventsReader.readFile(eventsfile);
+		System.out.println("Events file read!");
 			
+	Map<Id, Double> id2Toll= tollCollectHandler.getPersonId2TollMap();
+	
+	
+//***************************************************************************************************************************************************
+//another filter for a certain area
+	String tollLinksFilePath = BkPaths.STUDIESBK + "/transportEconomics/zh_forRun891_distanceMorningToll_0630-0900_cityWOhighways_1120rp_per_km.xml";
+	RoadPricingScheme tollLinks = loadTollLinksFile(tollLinksFilePath);
+pc.addFilter(new OnlyInnerZurichFilter(tollLinks));
+//***************************************************************************************************************************************************	
+}
+
+//group charts
 //		DgModalSplitGroupChart modalSplitGroupChartRun1 = new DgModalSplitGroupChart(ana, runid1, threshold);
 //		DgChartWriter.writeChart(modalSplitGroupChartFileRun1, modalSplitGroupChartRun1.createChart());
 //		DgModalSplitGroupChart modalSplitGroupChartRun2 = new DgModalSplitGroupChart(ana, runid2, threshold);
