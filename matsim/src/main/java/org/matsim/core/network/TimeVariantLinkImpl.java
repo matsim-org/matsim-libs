@@ -290,5 +290,13 @@ public class TimeVariantLinkImpl extends LinkImpl {
 
 	}
 
+	/**
+	 * Getter for the change events tree map
+	 * @return changeEvents
+	 */
+	public TreeMap<Double,NetworkChangeEvent> getChangeEvents() {
+		return this.changeEvents;
+	}
+	
 }
 
