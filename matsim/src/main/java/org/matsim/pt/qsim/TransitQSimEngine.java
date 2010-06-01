@@ -81,7 +81,9 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 	private boolean useUmlaeufe = false;
 
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
-
+	
+	private AbstractTransitDriverFactory abstractTransitDriverFactory = new UmlaufDriverFactory();
+	
 	public TransitQSimEngine(QSimI queueSimulation) {
 		this.qSim = queueSimulation;
 		this.schedule = ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule();
@@ -148,10 +150,10 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 		return drivers;
 	}
 
-	private UmlaufDriver createAndScheduleVehicleAndDriver(Umlauf umlauf,
+	private AbstractTransitDriver createAndScheduleVehicleAndDriver(Umlauf umlauf,
 			Vehicle vehicle, TransitStopAgentTracker thisAgentTracker) {
 		TransitQVehicle veh = new TransitQVehicle(vehicle, 5);
-		UmlaufDriver driver = new UmlaufDriver(umlauf, thisAgentTracker, this.qSim);
+		AbstractTransitDriver driver = this.abstractTransitDriverFactory.createTransitDriver(umlauf, thisAgentTracker, this.qSim);
 		veh.setDriver(driver);
 		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getBasicVehicle()));
 		driver.setVehicle(veh);
@@ -247,6 +249,10 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 
 	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
 		this.stopHandlerFactory = stopHandlerFactory;
+	}
+	
+	public void setAbstractTransitDriverFactory(final AbstractTransitDriverFactory abstractTransitDriverFactory) {
+		this.abstractTransitDriverFactory = abstractTransitDriverFactory;
 	}
 
 

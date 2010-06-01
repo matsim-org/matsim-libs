@@ -72,4 +72,8 @@ public class TransitQSimulation extends QSim implements QSimI {
 		transitEngine.setTransitStopHandlerFactory(stopHandlerFactory);
 	}
 	
+	public void setTransitDriverFactory(AbstractTransitDriverFactory driverFactory){
+		transitEngine.setAbstractTransitDriverFactory(driverFactory);
+	}
+	
 }
