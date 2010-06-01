@@ -50,7 +50,7 @@ public class VspExperimentalConfigGroup extends Module {
 	private String modesForSubTourModeChoice = "car, pt";
 	private String chainBasedModes = "car";
 
-	private double offsetWalk = 6d;
+	private double offsetWalk = 0d;
 	
 	
 	public VspExperimentalConfigGroup() {
