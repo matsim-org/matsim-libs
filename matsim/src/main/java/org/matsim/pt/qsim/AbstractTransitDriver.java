@@ -53,7 +53,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	private Person dummyPerson;
 	private final QSimI sim;
 	private TransitRouteStop currentStop = null;
-	private TransitRouteStop nextStop;
+	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
 
 	public abstract void legEnds(final double now);
@@ -164,7 +164,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		}
 	}
 
-	private double longerStopTimeIfWeAreAheadOfSchedule(final double now,
+	protected double longerStopTimeIfWeAreAheadOfSchedule(final double now,
 			final double stopTime) {
 		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.UNDEFINED_TIME)) {
 			double earliestDepTime = getDepartureTime() + this.nextStop.getDepartureOffset();

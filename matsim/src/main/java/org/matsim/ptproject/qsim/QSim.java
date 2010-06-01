@@ -98,6 +98,8 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	private CarDepartureHandler carDepartureHandler;
 
 	private QSimTimer simTimer;
+	
+	private Collection<PersonAgent> transitAgents;
 
 	/**
 	 * Includes all agents that have transportation modes unknown to
@@ -267,6 +269,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 		if (this.transitEngine != null){
 			Collection<PersonAgent> a = this.transitEngine.createAgents();
+			this.transitAgents = a;			
 			agents.addAll(a);
 		}
 
@@ -658,6 +661,10 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	public QSimEngine getQSimEngine() {
 	  return this.simEngine;
+	}
+	
+	public Collection<PersonAgent> getTransitAgents(){
+		return this.transitAgents; // set null to save memory
 	}
 
 	@Override
