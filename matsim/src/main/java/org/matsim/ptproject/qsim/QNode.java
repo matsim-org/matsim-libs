@@ -111,57 +111,39 @@ public class QNode implements VisNode {
 	 * @param random the random number generator to be used
 	 */
 	public void moveNode(final double now, final Random random) {
-		/* called by the framework, do all necessary action for node movement here */
-		if (this.signalized) {
-			for (QLink link : this.inLinksArrayCache){
-				for (QLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
-//					lane.updateGreenState(now);
-					if (lane.isThisTimeStepGreen()){
-		        while (!lane.bufferIsEmpty()) {
-		          QVehicle veh = lane.getFirstFromBuffer();
-		          if (!moveVehicleOverNode(veh, lane, now)) {
-		            break;
-		          }
-		        }
-					}
-				}
+		int inLinksCounter = 0;
+		double inLinksCapSum = 0.0;
+		// Check all incoming links for buffered agents
+		for (QLink link : this.inLinksArrayCache) {
+			if (!link.bufferIsEmpty()) {
+				this.tempLinks[inLinksCounter] = link;
+				inLinksCounter++;
+				inLinksCapSum += link.getLink().getCapacity(now);
 			}
 		}
-		else { // Node is not signal controlled -> inLink selection randomized based on capacity
-			int inLinksCounter = 0;
-			double inLinksCapSum = 0.0;
-			// Check all incoming links for buffered agents
-			for (QLink link : this.inLinksArrayCache) {
-				if (!link.bufferIsEmpty()) {
-					this.tempLinks[inLinksCounter] = link;
-					inLinksCounter++;
-					inLinksCapSum += link.getLink().getCapacity(now);
-				}
-			}
 
-			if (inLinksCounter == 0) {
-				this.active = false;
-				return; // Nothing to do
-			}
+		if (inLinksCounter == 0) {
+			this.active = false;
+			return; // Nothing to do
+		}
 
-			int auxCounter = 0;
-			// randomize based on capacity
-			while (auxCounter < inLinksCounter) {
-				double rndNum = random.nextDouble() * inLinksCapSum;
-				double selCap = 0.0;
-				for (int i = 0; i < inLinksCounter; i++) {
-					QLink link = this.tempLinks[i];
-					if (link == null)
-						continue;
-					selCap += link.getLink().getCapacity(now);
-					if (selCap >= rndNum) {
-						auxCounter++;
-						inLinksCapSum -= link.getLink().getCapacity(now);
-						this.tempLinks[i] = null;
-						//move the link
-					  this.clearLinkBuffer(link, now);
-						break;
-					}
+		int auxCounter = 0;
+		// randomize based on capacity
+		while (auxCounter < inLinksCounter) {
+			double rndNum = random.nextDouble() * inLinksCapSum;
+			double selCap = 0.0;
+			for (int i = 0; i < inLinksCounter; i++) {
+				QLink link = this.tempLinks[i];
+				if (link == null)
+					continue;
+				selCap += link.getLink().getCapacity(now);
+				if (selCap >= rndNum) {
+					auxCounter++;
+					inLinksCapSum -= link.getLink().getCapacity(now);
+					this.tempLinks[i] = null;
+					//move the link
+					this.clearLinkBuffer(link, now);
+					break;
 				}
 			}
 		}
@@ -178,21 +160,18 @@ public class QNode implements VisNode {
     }
     else {
       for (QLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
-        while (!lane.bufferIsEmpty()) {
-          QVehicle veh = lane.getFirstFromBuffer();
-          if (!moveVehicleOverNode(veh, lane, now)) {
-            break;
-          }
-        }
+      	if (lane.isThisTimeStepGreen()){
+      		while (!lane.bufferIsEmpty()) {
+      			QVehicle veh = lane.getFirstFromBuffer();
+      			if (!moveVehicleOverNode(veh, lane, now)) {
+      				break;
+      			}
+      		}
+      	}
       }
     }
   }
 	
-//	protected boolean moveVehicleOverNode(QVehicle veh, QLane lane,
-//      double now) {
-//	  throw new UnsupportedOperationException("Must be subclassed to use this method!");
-//	};
-
 	
 	protected void checkNextLinkSemantics(Link currentLink, Link nextLink, QVehicle veh){
     if (currentLink.getToNode() != nextLink.getFromNode()) {
