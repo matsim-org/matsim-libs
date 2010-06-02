@@ -217,8 +217,8 @@ public class RunKdeAnalyser {
 			}	
 			log.info("   ...lines processed: " + counter + " (Done)");
 			mr.convertMatrixToRaster();
-			String output = String.format("%s%s/%d/%s/%04d/Sample%02d/Activities/%s_KDE_%s_Radius-.png", 
-					root, studyAreaName, year, version, threshold, sample, studyAreaName, activityType);
+			String output = String.format("%s%s/%d/%s/%04d/Sample%02d/Activities/%s_KDE_%s_%s_%s_%s_%s.png", 
+					root, studyAreaName, year, version, threshold, sample, studyAreaName, args[0], args[1], args[2], args[3], args[4]);
 			mr.writeMyRasterToFile(output, "png");
 			
 //			for(int a = 0; a < mr.)
