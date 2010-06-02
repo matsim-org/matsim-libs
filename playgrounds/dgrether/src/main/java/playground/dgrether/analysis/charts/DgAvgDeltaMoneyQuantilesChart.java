@@ -139,7 +139,7 @@ public class DgAvgDeltaMoneyQuantilesChart {
 	/**
 	  * A custom label generator.
 	  */
-	private static class LabelGenerator extends AbstractXYItemLabelGenerator
+	public static class LabelGenerator extends AbstractXYItemLabelGenerator
 	                               implements XYItemLabelGenerator {
 
 		private Map<Integer, List<String>> labels = new HashMap<Integer, List<String>>();

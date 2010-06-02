@@ -42,6 +42,8 @@ public class DgPersonData {
 	private Id personId;
 
 	private Income income;
+	
+	private Double toll = null;
 
 	public DgPersonData() {
 		this.planData = new HashMap<Id, DgPlanData>();
@@ -51,6 +53,15 @@ public class DgPersonData {
 	 *
 	 * @return the home location
 	 */
+	
+	public void setToll(Double toll) {
+		this.toll = toll;
+	}
+
+	public Double getToll() {
+		return toll;
+	}
+	
 	public Activity getFirstActivity() {
 		return homeActivity;
 	}
