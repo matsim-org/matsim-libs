@@ -23,10 +23,9 @@ package org.matsim.core.mobsim.queuesim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshots.writers.VisVehicle;
 
-public class QueueVehicle implements VisVehicle {
+public class QueueVehicle /* implements VisVehicle, QVehicle */ {
 
 	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
@@ -40,38 +39,42 @@ public class QueueVehicle implements VisVehicle {
 	private final double sizeInEquivalents;
 	
 	private final Vehicle basicVehicle;
+	
+	private QueueVehicle() {
+		this( null ) ;
+	}
 
-	/*package*/ QueueVehicle(final Vehicle basicVehicle) {
+	private QueueVehicle(final Vehicle basicVehicle) {
 		this(basicVehicle, 1.0);
 	}
 	
-	/*package*/ QueueVehicle(final Vehicle basicVehicle, final double sizeInEquivalents) {
+	private QueueVehicle(final Vehicle basicVehicle, final double sizeInEquivalents) {
 		this.id = basicVehicle.getId();
 		this.sizeInEquivalents = sizeInEquivalents;
 		this.basicVehicle = basicVehicle;
 	}
 
-	 double getLinkEnterTime() {
+	 public double getLinkEnterTime() {
 		return this.linkEnterTime;
 	}
 	
-	void setLinkEnterTime(final double time) {
+	public void setLinkEnterTime(final double time) {
 		this.linkEnterTime = time;
 	}
 	
-	 double getEarliestLinkExitTime() {
+	 public double getEarliestLinkExitTime() {
 		return this.earliestLinkExitTime;
 	}
 
-	void setEarliestLinkExitTime(final double time) {
+	public void setEarliestLinkExitTime(final double time) {
 		this.earliestLinkExitTime = time;
 	}
 
-	 Link getCurrentLink() {
+	 public Link getCurrentLink() {
 		return this.currentLink;
 	}
 	
-	void setCurrentLink(final Link link) {
+	public void setCurrentLink(final Link link) {
 		this.currentLink = link;
 	}
 
@@ -79,15 +82,15 @@ public class QueueVehicle implements VisVehicle {
 		return this.driver;
 	}
 
-	void setDriver(final PersonDriverAgent driver) {
+	public void setDriver(final PersonDriverAgent driver) {
 		this.driver = driver;
 	}
 
-	 Id getId() {
+	 public Id getId() {
 		return this.id;
 	}
 	
-	 double getSizeInEquivalents() {
+	 public double getSizeInEquivalents() {
 		return this.sizeInEquivalents;
 	}
 

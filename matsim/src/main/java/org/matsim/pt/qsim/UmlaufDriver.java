@@ -175,7 +175,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 				this.departureTime = now;
 			}
 			this.sim.handleAgentArrival(now, this);
-			this.sim.scheduleActivityEnd(this, 0);
+			this.sim.scheduleActivityEnd(this);
 		} else {
 			this.sim.handleAgentArrival(now, this);
 //			AbstractSimulation.decLiving();  // yyyyyy?

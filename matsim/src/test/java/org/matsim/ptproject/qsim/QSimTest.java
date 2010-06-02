@@ -687,7 +687,7 @@ public class QSimTest {
 
 		sim.getSimTimer().setTime(100.0);
 		QPersonAgent agent = new QPersonAgent(person, sim);
-		agent.initialize();
+		agent.initializeAndCheckIfAlive();
 		agent.activityEnds(100.0);
 
 		sim.getSimTimer().setTime(101.0);

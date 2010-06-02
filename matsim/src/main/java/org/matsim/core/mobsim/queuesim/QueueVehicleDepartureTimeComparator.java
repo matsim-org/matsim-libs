@@ -23,6 +23,8 @@ package org.matsim.core.mobsim.queuesim;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.matsim.ptproject.qsim.QVehicle;
+
 
 /**
  * @author dstrippgen
@@ -30,12 +32,12 @@ import java.util.Comparator;
  * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
  * according to their departure time
  */
- class QueueVehicleDepartureTimeComparator implements Comparator<QueueVehicle>,
+ class QueueVehicleDepartureTimeComparator implements Comparator<QVehicle>,
 		Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public int compare(final QueueVehicle veh1, final QueueVehicle veh2) {
+	public int compare(final QVehicle veh1, final QVehicle veh2) {
 		if (veh1.getDriver().getDepartureTime() > veh2.getDriver().getDepartureTime())
 			return 1;
 		if (veh1.getDriver().getDepartureTime() < veh2.getDriver().getDepartureTime())

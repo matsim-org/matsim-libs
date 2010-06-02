@@ -44,8 +44,7 @@ public interface MobsimFeature {
 	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
 	void beforeHandleUnknownLegMode(double now, PersonAgent agent, Link link);
 
-	@Deprecated // do we need to pass the planElementIndex?  to be discussed ...  kai, may'10
-	void afterActivityBegins(PersonAgent agent, int planElementIndex);
+	void afterActivityBegins(PersonAgent agent);
 
 	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
 	void afterActivityEnds(PersonAgent agent, double time);

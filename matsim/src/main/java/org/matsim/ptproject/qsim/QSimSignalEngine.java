@@ -71,15 +71,15 @@ public class QSimSignalEngine implements SignalEngine, SimEngine {
 
 	private SignalSystemConfigurations signalSystemsConfig;
 
-	private QNetwork network;
+	private QNetwork qNetwork;
 
-	private QSim simulation;
+	private QSim qSimulation;
 
 	private EventsManager events;
 
 	public QSimSignalEngine(QSim sim) {
-		this.simulation = sim;
-		this.network = sim.getQNetwork();
+		this.qSimulation = sim;
+		this.qNetwork = sim.getQNetwork();
 		this.events = sim.getEventsManager();
 	}
 
@@ -104,7 +104,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine {
   public void beforeSimStep(double time) {
     for (SignalGroupDefinition signalGroup : this.signalSystems.getSignalGroupDefinitions().values()) {
       Id linkId = signalGroup.getLinkRefId();
-      QLinkLanesImpl qlink = (QLinkLanesImpl) this.network.getQLink(linkId);
+      QLinkLanesImpl qlink = (QLinkLanesImpl) this.qNetwork.getQLink(linkId);
       for (QLane qlane : qlink.getToNodeQueueLanes()){
         qlane.updateGreenState(time);
       }
@@ -135,7 +135,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine {
 		//init the signalGroupDefinitions
 		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<SignalGroupDefinition>>();
 		for (SignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitions().values()) {
-			QLink queueLink = this.network.getQLink(signalGroupDefinition.getLinkRefId());
+			QLink queueLink = this.qNetwork.getQLink(signalGroupDefinition.getLinkRefId());
 			if (queueLink == null) {
 				throw new IllegalStateException("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " of SignalSystem Id:  " + signalGroupDefinition.getSignalSystemDefinitionId() + " is set to non existing Link with Id: " + signalGroupDefinition.getLinkRefId());
 			}
@@ -154,7 +154,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine {
 			}
 			list.add(signalGroupDefinition);
 			((QLinkLanesImpl)queueLink).addSignalGroupDefinition(signalGroupDefinition);
-			this.network.getNodes().get(queueLink.getLink().getToNode().getId()).setSignalized(true);
+			this.qNetwork.getNodes().get(queueLink.getLink().getToNode().getId()).setSignalized(true);
 		}
 	}
 
@@ -189,7 +189,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine {
 				this.signalSystemControlerBySystemId.put(config.getSignalSystemId(), systemControler);
 				systemControler.setSignalEngine(this);
 				if (systemControler instanceof SimulationListener) {
-					this.simulation.addQueueSimulationListeners((SimulationListener)systemControler);
+					this.qSimulation.addQueueSimulationListeners((SimulationListener)systemControler);
 				}
 				//add controller to signal groups
 				List<SignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
@@ -277,7 +277,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine {
 
   @Override
   public QSim getQSim() {
-    return this.simulation;
+    return this.qSimulation;
   }
 
 

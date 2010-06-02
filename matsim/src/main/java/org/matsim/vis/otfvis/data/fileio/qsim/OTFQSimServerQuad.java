@@ -45,7 +45,7 @@ public class OTFQSimServerQuad extends OTFServerQuad2 {
 	transient private VisNetwork net;
 
 	public OTFQSimServerQuad(VisNetwork net) {
-		super(net.getNetworkLayer());
+		super(net.getNetwork());
 		this.net = net;
 	}
 

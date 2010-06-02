@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.vis.snapshots.writers.VisData;
 import org.matsim.vis.snapshots.writers.VisNode;
 
@@ -93,13 +94,13 @@ class QueueNode implements VisNode {
 	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
-	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLink link, final double now) {
+	protected boolean moveVehicleOverNode(final QVehicle veh, final QueueLink link, final double now) {
 		Id nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = link.getLink();
 
 		// veh has to move over node
 		if (nextLinkId != null) {
-			Link nextLink = this.queueNetwork.getNetworkLayer().getLinks().get(nextLinkId);
+			Link nextLink = this.queueNetwork.getNetwork().getLinks().get(nextLinkId);
 			if (currentLink.getToNode() != nextLink.getFromNode()) {
 				throw new RuntimeException("Cannot move vehicle " + veh.getId() +
 						" from link " + currentLink.getId() + " to link " + nextLinkId);
@@ -213,7 +214,7 @@ class QueueNode implements VisNode {
 
 	private void clearLaneBuffer(final QueueLink link, final double now){
 		while (!link.bufferIsEmpty()) {
-			QueueVehicle veh = link.getFirstFromBuffer();
+			QVehicle veh = link.getFirstFromBuffer();
 			if (!moveVehicleOverNode(veh, link, now)) {
 				break;
 			}

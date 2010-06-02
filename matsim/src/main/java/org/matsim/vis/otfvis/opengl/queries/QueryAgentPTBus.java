@@ -187,7 +187,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 
 	@Override
 	public void installQuery(OTFVisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
-		this.net = queueSimulation.getVisMobsim().getVisNetwork().getNetworkLayer();
+		this.net = queueSimulation.getVisMobsim().getVisNetwork().getNetwork();
 		this.result = new Result(this.allIds);
 		String prefix = agentId + "-";
 		for(Person person : queueSimulation.getVisMobsim().getScenario().getPopulation().getPersons().values()) {

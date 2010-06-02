@@ -34,6 +34,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.pt.qsim.PassengerAgent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -73,6 +74,11 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	@Override
 	public Id chooseNextLinkId() {
 		return null;
+	}
+	
+	@Override
+	public Id getCurrentLinkId() {
+		return null ;
 	}
 
 	@Override
@@ -121,5 +127,22 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	public boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome) {
 		return true;
 	}
+	
+	public boolean initializeAndCheckIfAlive() {
+		return true ;
+	}
+
+	@Override
+	public void setVehicle(QVehicle veh) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public QVehicle getVehicle() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

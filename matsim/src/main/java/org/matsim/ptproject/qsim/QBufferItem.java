@@ -20,11 +20,12 @@
 package org.matsim.ptproject.qsim;
 
 
+
 /**
  * @author dgrether
  *
  */
-public interface QBufferItem extends QSimFunctionalInterface {
+interface QBufferItem extends QSimFunctionalInterface {
 
   public boolean bufferIsEmpty();
 

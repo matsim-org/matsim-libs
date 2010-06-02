@@ -37,13 +37,16 @@ import org.matsim.core.gbl.MatsimRandom;
  * The results of the Simulation stays deterministic but the order
  * of the LinkEvents within a single TimeStep does not. Ordering
  * the Events by Time AND AgentId should produce deterministic results.
- *
+ * <br/><br/>
  * Due to the fact that a Random Number generator is used for each
  * simulated Node instead of one in total as the Single CPU
- * QSim does, the Results will slightly vary between
- * the Simulations!
+ * QSim does, the Results will slightly vary between the parallel and the sequential version.
+ * <br/><br/>
+ * The ParallelQSimEngine (this class) will fulfill the QSimEngine interface upwards (i.e. against the QSim).
+ * The QSimEngineThreads will fulfill the QSimEngine interface downwars (i.e. against nodes and links).
  */
 public class ParallelQSimEngine extends QSimEngineImpl{
+	// yy I think we could consider moving the node-based rnd num gen also into the sequential version. kai, jun'10
 
 	private QSimEngineThread[] threads;
 	private int numOfThreads;

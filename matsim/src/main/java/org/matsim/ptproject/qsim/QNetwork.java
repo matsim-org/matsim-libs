@@ -72,14 +72,9 @@ public class QNetwork implements VisNetwork, QNetworkI {
     }
   }
 
-	// the following two are really the same but there is a name conflict in matsim
-  public Network getNetwork() {
+	public Network getNetwork() {
 		return this.networkLayer;
 	}
-  @Deprecated // use getNetwork.  kai, may'10
-  public Network getNetworkLayer() {
-	  return this.networkLayer ;
-  }
 
 	public Map<Id, QLink> getLinks() {
 		return Collections.unmodifiableMap(this.links);

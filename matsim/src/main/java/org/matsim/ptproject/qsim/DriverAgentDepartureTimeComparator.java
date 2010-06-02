@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.framework.PersonDriverAgent;
  * 
  * @see PersonDriverAgent#getDepartureTime()
  */
-/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<PersonDriverAgent>, Serializable {
+public class DriverAgentDepartureTimeComparator implements Comparator<PersonDriverAgent>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 

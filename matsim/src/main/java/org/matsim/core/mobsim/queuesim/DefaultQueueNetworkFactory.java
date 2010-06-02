@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.ptproject.qsim.QNetworkFactory;
 
 
 /**

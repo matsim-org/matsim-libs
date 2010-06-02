@@ -106,6 +106,10 @@ public class QSimEngineImpl implements QSimEngine{
 		moveNodes(time);
 		moveLinks(time);
 	}
+	
+	public void beforeSimStep( final double time ) {
+		// nothing to do here
+	}
 
 	protected void moveNodes(final double time) {
 		for (QNode node : this.simNodesArray) {

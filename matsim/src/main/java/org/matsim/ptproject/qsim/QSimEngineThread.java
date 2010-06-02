@@ -45,11 +45,11 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 	private List<QLink> links = new ArrayList<QLink>();
 
 	/** This is the collection of links that have to be activated in the current time step */
-	/*package*/ final ArrayList<QLink> linksToActivate = new ArrayList<QLink>();
+	private final ArrayList<QLink> linksToActivate = new ArrayList<QLink>();
 	private QSim qsim;
 	private AgentSnapshotInfoBuilder positionInfoBuilder;
 
-	public QSimEngineThread(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier, 
+	/*package*/ QSimEngineThread(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier, 
 			QSim sim, AgentSnapshotInfoBuilder positionInfoBuilder)
 	{
 		this.simulateAllNodes = simulateAllNodes;
@@ -61,22 +61,22 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 		this.positionInfoBuilder = positionInfoBuilder;
 	}
 
-	public void setExtendedQueueNodeArray(ExtendedQueueNode[] queueNodes)
+	/*package*/ void setExtendedQueueNodeArray(ExtendedQueueNode[] queueNodes)
 	{
 		this.queueNodes = queueNodes;
 	}
 
-	public void setLinks(List<QLink> links)
+	/*package*/ void setLinks(List<QLink> links)
 	{
 		this.links = links;
 	}
 
-	public void addLink(QLink link)
-	{
-		this.links.add(link);
-	}
+//	private void addLink(QLink link)
+//	{
+//		this.links.add(link);
+//	}
 
-	public void setTime(final double t)
+	/*package*/ void setTime(final double t)
 	{
 		time = t;
 	}
@@ -86,6 +86,10 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 	}
 
 	public void simStep(double time) {
+		// nothing to do here
+	}
+	
+	public void beforeSimStep( double time ) {
 		// nothing to do here
 	}
 
@@ -194,16 +198,16 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 		}
 	}
 
-	public void activateLinks()
+	/*package*/ void activateLinks()
 	{
 		this.links.addAll(this.linksToActivate);
 		this.linksToActivate.clear();
 	}
 
-	public List<QLink> getLinksToActivate()
-	{
-		return this.linksToActivate;
-	}
+//	private List<QLink> getLinksToActivate()
+//	{
+//		return this.linksToActivate;
+//	}
 
 	public int getNumberOfSimulatedLinks()
 	{

@@ -89,7 +89,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	private static final int INFO_PERIOD = 3600;
 
 
-	protected QNetwork network;
+	private QNetwork network;
 	private EventsManager events = null;
 
 	private QSimEngine simEngine = null;
@@ -261,7 +261,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);
 			agents.add(agent);
-			if (agent.initialize()) {
+			if (agent.initializeAndCheckIfAlive()) {
 				QLink qlink = this.network.getQLink(agent.getCurrentLinkId());
 				qlink.addParkedVehicle(veh);
 			}
@@ -476,17 +476,16 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	/**
 	 * Registers this agent as performing an activity and makes sure that the
 	 * agent will be informed once his departure time has come.
-	 *
 	 * @param agent
 	 *
 	 * @see PersonDriverAgent#getDepartureTime()
 	 */
 	@Deprecated // yyyyyy imho, planElementIndex does not make sense as argument.  imho, should be a Person.  kai, may'10
-	public void scheduleActivityEnd(final PersonDriverAgent agent, final int planElementIndex) {
+	public void scheduleActivityEnd(final PersonDriverAgent agent) {
 		this.activityEndsList.add(agent);
 		addToAgentsInActivities(agent);
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.afterActivityBegins(agent, planElementIndex);
+			queueSimulationFeature.afterActivityBegins(agent);
 		}
 	}
 

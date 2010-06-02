@@ -64,7 +64,13 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.AcceptsFeatures;
+import org.matsim.ptproject.qsim.AgentCounter;
+import org.matsim.ptproject.qsim.DriverAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.MobsimFeature;
+import org.matsim.ptproject.qsim.QNetworkI;
+import org.matsim.ptproject.qsim.QSimI;
+import org.matsim.ptproject.qsim.QSimTimer;
+import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -87,7 +93,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author mrieser
  * @author dgrether
  */
-public class QueueSimulation implements IOSimulation, ObservableSimulation, CapacityInformationMobsim, VisMobsim, AcceptsFeatures {
+public class QueueSimulation implements IOSimulation, ObservableSimulation, CapacityInformationMobsim, VisMobsim, AcceptsFeatures, QSimI {
 	// yyyy not sure if I want this public but something has to give for integration with OTFVis.  kai, may'10
 	
 	private int snapshotPeriod = 0;
@@ -163,7 +169,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 
 		this.networkLayer = scenario.getNetwork();
 		this.network = new QueueNetwork(this.networkLayer, factory);
-		this.agentFactory = new AgentFactory(this);
+		this.agentFactory = new AgentFactory( this);
 
 		this.notTeleportedModes.add(TransportMode.car);
 
@@ -211,15 +217,15 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		Collection<PersonAgent> agents = new ArrayList<PersonAgent>();
 
 		for (Person p : this.population.getPersons().values()) {
-			QueuePersonAgent agent = this.agentFactory.createPersonAgent(p);
+			PersonDriverAgent agent = this.agentFactory.createPersonAgent(p);
 			agents.add( agent ) ;
 
-			QueueVehicle veh = new QueueVehicle(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
+			QVehicle veh = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);
 
-			if (agent.initialize()) {
+			if ( agent.initializeAndCheckIfAlive()) {
 				QueueLink qlink = this.network.getQueueLink(agent.getCurrentLinkId());
 				qlink.addParkedVehicle(veh);
 			}
@@ -233,20 +239,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		}
 
 	}
-
-//	@Deprecated // I don't think that netvis works any more.  kai, apr/10
-//	public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
-//		/* TODO [MR] I don't really like it that we change the configuration on the fly here.
-//		 * In my eyes, the configuration should usually be a read-only object in general, but
-//		 * that's hard to be implemented...
-//		 */
-//		// yyyy it is also a misnomer, since it (presumably) has the side effect of removing all other snapshot writers.  kai, apr'10
-//		this.config.network().setInputFile(networkFilename);
-//		this.config.simulation().setSnapshotFormat("netvis");
-//		this.config.simulation().setSnapshotPeriod(snapshotPeriod);
-//		this.config.simulation().setSnapshotFile(snapshotFilename);
-//	}
-	// netvis is gone.  kai, may'10
 
 	private void createSnapshotwriter() {
 		// A snapshot period of 0 or less indicates that there should be NO snapshot written
@@ -467,7 +459,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	 * @param now
 	 * @param agent
 	 */
-	protected void handleAgentArrival(final double now, PersonDriverAgent agent){
+	public void handleAgentArrival(final double now, PersonDriverAgent agent){
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeHandleAgentArrival(agent);
 		}
@@ -492,11 +484,11 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	 *
 	 * @see PersonDriverAgent#getDepartureTime()
 	 */
-	protected void scheduleActivityEnd(final PersonDriverAgent agent) {
+	public void scheduleActivityEnd(final PersonDriverAgent agent) {
 		this.activityEndsList.add(agent);
 		int planElementIndex = agent.getPerson().getSelectedPlan().getPlanElements().indexOf(agent.getCurrentPlanElement()) ; // yyyy Aaaarrrrgggghhh
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.afterActivityBegins(agent, planElementIndex);
+			queueSimulationFeature.afterActivityBegins(agent);
 		}
 	}
 
@@ -523,7 +515,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	protected void agentDeparts(double now, final PersonDriverAgent agent, final Id linkId) {
+	public void agentDeparts(double now, final PersonDriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
 		TransportMode mode = leg.getMode();
 		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, leg.getMode()));
@@ -544,7 +536,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 				vehicleId = agent.getPerson().getId(); // backwards-compatibility
 			}
 			QueueLink qlink = this.network.getQueueLink(linkId);
-			QueueVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
+			QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 			if (vehicle == null) {
 				// try to fix it somehow
 				if (this.teleportVehicles && (agent instanceof QueuePersonAgent)) {
@@ -626,7 +618,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	}
 
 
-	/*package*/ boolean isUseActivityDurations() {
+	public boolean isUseActivityDurations() {
 		return this.useActivityDurations;
 	}
 
@@ -635,7 +627,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		log.info("QueueSimulation is working with activity durations: " + this.isUseActivityDurations());
 	}
 
-	/*package*/ Set<TransportMode> getNotTeleportedModes() {
+	public Set<TransportMode> getNotTeleportedModes() {
 		return notTeleportedModes;
 	}
 
@@ -656,6 +648,36 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	@Override
 	public void addFeature(MobsimFeature queueSimulationFeature) {
 		this.queueSimulationFeatures.add( queueSimulationFeature ) ;
+	}
+
+
+	@Override
+	public AgentCounter getAgentCounter() {
+		throw new UnsupportedOperationException() ;
+	}
+
+
+	@Override
+	public QNetworkI getQNetwork() {
+		throw new UnsupportedOperationException() ;
+	}
+
+
+	@Override
+	public QSimTimer getSimTimer() {
+		throw new UnsupportedOperationException() ;
+	}
+
+
+	@Override
+	public double getStuckTime() {
+		return this.getScenario().getConfig().simulation().getStuckTime() ;
+	}
+
+
+	@Override
+	public void setAgentFactory( org.matsim.ptproject.qsim.AgentFactory agentFactory) {
+		throw new UnsupportedOperationException() ;
 	}
 
 

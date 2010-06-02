@@ -66,7 +66,7 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 
 	private final LinkedHashMap<Id, TeleportationVisData> visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
 
-	private final LinkedHashMap<Id, Integer> currentActivityNumbers = new LinkedHashMap<Id, Integer>();
+//	private final LinkedHashMap<Id, Integer> currentActivityNumbers = new LinkedHashMap<Id, Integer>();
 
 	private final LinkedHashMap<Id, PersonAgent> agents = new LinkedHashMap<Id, PersonAgent>();
 
@@ -102,7 +102,7 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 			if (queueSimulation instanceof TransitQSimulation) {
 				this.otfServer
 						.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
-								queueSimulation.getVisNetwork().getNetworkLayer(),
+								queueSimulation.getVisNetwork().getNetwork(),
 								((ScenarioImpl) queueSimulation.getScenario())
 										.getTransitSchedule(),
 								((TransitQSimulation) queueSimulation)
@@ -177,7 +177,7 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 
 	@Override
 	public void beforeHandleUnknownLegMode(double now, final PersonAgent agent, Link link) {
-		this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getVisNetwork().getNetworkLayer().getLinks().get(agent.getDestinationLinkId())));
+		this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getVisNetwork().getNetwork().getLinks().get(agent.getDestinationLinkId())));
 	}
 
 	private void visualizeTeleportedAgents(double time) {
@@ -198,17 +198,17 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 	}
 
 	@Override
-	public void afterActivityBegins(PersonAgent agent, int planElementIndex) {
-		currentActivityNumbers.put(agent.getPerson().getId(), planElementIndex);
+	public void afterActivityBegins(PersonAgent agent) {
+//		currentActivityNumbers.put(agent.getPerson().getId(), planElementIndex);
 	}
 
-	public LinkedHashMap<Id, Integer> getCurrentActivityNumbers() {
-		return currentActivityNumbers;
-	}
+//	public LinkedHashMap<Id, Integer> getCurrentActivityNumbers() {
+//		return currentActivityNumbers;
+//	}
 
 	@Override
 	public void afterActivityEnds(PersonAgent agent, double time) {
-		currentActivityNumbers.remove(agent.getPerson().getId());
+//		currentActivityNumbers.remove(agent.getPerson().getId());
 	}
 
 	@Override

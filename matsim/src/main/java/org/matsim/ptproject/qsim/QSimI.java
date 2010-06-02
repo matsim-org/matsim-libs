@@ -43,23 +43,12 @@ public interface QSimI extends IOSimulation {
 	// depending on this, it is a "PersonAgent" or "DriverAgent".  kai, may'10
 	void agentDeparts(double now, PersonDriverAgent driverAgent, Id startLinkId);
 
-	/**
-	 * @return
-	 */
 	EventsManager getEventsManager();
 
-	/**
-	 * @return
-	 */
 	AgentCounter getAgentCounter();
 
-	/**
-	 * @param qPersonAgent
-	 * @param currentPlanElementIndex
-	 */
-	@Deprecated // yyyyyy imho, planElementIndex does not belong here.  kai, may'10
 	// yyyyyy imho, should take a PersonAgent as argument.  kai, may'10
-	void scheduleActivityEnd(PersonDriverAgent personAgent, int currentPlanElementIndex);
+	void scheduleActivityEnd(PersonDriverAgent personAgent);
 
 	/**
 	 * @param now

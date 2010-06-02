@@ -41,6 +41,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -64,7 +65,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
    * has come. They are then filled into the vehQueue, depending on free space
    * in the vehQueue
    */
-  /*package*/ final Queue<QueueVehicle> waitingList = new LinkedList<QueueVehicle>();
+  /*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
   /**
    * The Link instance containing the data
    */
@@ -80,7 +81,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
 
   private boolean active = false;
 
-  private final Map<Id, QueueVehicle> parkedVehicles = new LinkedHashMap<Id, QueueVehicle>(10);
+  private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
 
   /*package*/ VisData visdata = this.new VisDataImpl();
 
@@ -96,12 +97,12 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
    * The list of vehicles that have not yet reached the end of the link
    * according to the free travel speed of the link
    */
-  private final LinkedList<QueueVehicle> vehQueue = new LinkedList<QueueVehicle>();
+  private final LinkedList<QVehicle> vehQueue = new LinkedList<QVehicle>();
 
   /**
    * Holds all vehicles that are ready to cross the outgoing intersection
    */
-  private final Queue<QueueVehicle> buffer = new LinkedList<QueueVehicle>();
+  private final Queue<QVehicle> buffer = new LinkedList<QVehicle>();
 
   private double storageCapacity;
 
@@ -165,12 +166,12 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
 
   /**
    * Adds a vehicle to the link, called by
-   * {@link QueueNode#moveVehicleOverNode(QueueVehicle, QueueLink, double)}.
+   * {@link QueueNode#moveVehicleOverNode(QVehicle, QueueLink, double)}.
    *
    * @param veh
    *          the vehicle
    */
-  /* package */ void addFromIntersection(final QueueVehicle veh) {
+  /* package */ void addFromIntersection(final QVehicle veh) {
     double now = SimulationTimer.getTime();
     activateLink();
     this.add(veh, now);
@@ -186,7 +187,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
    * @param veh
    * @param now the current time
    */
-  /*package*/ void add(final QueueVehicle veh, final double now) {
+  /*package*/ void add(final QVehicle veh, final double now) {
     this.vehQueue.add(veh);
     this.usedStorageCapacity += veh.getSizeInEquivalents();
     double departureTime;
@@ -206,7 +207,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
     this.parkedVehicles.clear();
     double now = SimulationTimer.getTime();
 
-    for (QueueVehicle veh : this.waitingList) {
+    for (QVehicle veh : this.waitingList) {
       QueueSimulation.getEvents().processEvent(
           new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
     }
@@ -214,7 +215,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
     AbstractSimulation.incLost(this.waitingList.size());
     this.waitingList.clear();
 
-    for (QueueVehicle veh : this.vehQueue) {
+    for (QVehicle veh : this.vehQueue) {
       QueueSimulation.getEvents().processEvent(
           new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
     }
@@ -222,7 +223,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
     AbstractSimulation.incLost(this.vehQueue.size());
     this.vehQueue.clear();
 
-    for (QueueVehicle veh : this.buffer) {
+    for (QVehicle veh : this.buffer) {
       QueueSimulation.getEvents().processEvent(
           new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
     }
@@ -231,20 +232,20 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
     this.buffer.clear();
   }
 
-  /* package */ void addParkedVehicle(QueueVehicle vehicle) {
+  /* package */ void addParkedVehicle(QVehicle vehicle) {
     this.parkedVehicles.put(vehicle.getId(), vehicle);
     vehicle.setCurrentLink(this.link);
   }
 
-  /*package*/ QueueVehicle getParkedVehicle(Id vehicleId) {
+  /*package*/ QVehicle getParkedVehicle(Id vehicleId) {
     return this.parkedVehicles.get(vehicleId);
   }
 
-  /*package*/ QueueVehicle removeParkedVehicle(Id vehicleId) {
+  /*package*/ QVehicle removeParkedVehicle(Id vehicleId) {
     return this.parkedVehicles.remove(vehicleId);
   }
 
-  /*package*/ void addDepartingVehicle(QueueVehicle vehicle) {
+  /*package*/ void addDepartingVehicle(QVehicle vehicle) {
     this.waitingList.add(vehicle);
     this.activateLink();
   }
@@ -288,7 +289,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
   *          The current time.
   */
  protected void moveLaneToBuffer(final double now) {
-   QueueVehicle veh;
+   QVehicle veh;
 
    // handle regular traffic
    while ((veh = this.vehQueue.peek()) != null) {
@@ -326,7 +327,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
   */
  private void moveWaitToBuffer(final double now) {
    while (hasBufferSpace()) {
-     QueueVehicle veh = this.waitingList.poll();
+     QVehicle veh = this.waitingList.poll();
      if (veh == null) {
        return;
      }
@@ -336,7 +337,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
      addToBuffer(veh, now);
    }
  }
-  /*package*/ void processVehicleArrival(final double now, final QueueVehicle veh) {
+  /*package*/ void processVehicleArrival(final double now, final QVehicle veh) {
 //    QueueSimulation.getEvents().processEvent(
 //        new AgentArrivalEventImpl(now, veh.getDriver().getPerson(),
 //            this.getLink(), veh.getDriver().getCurrentLeg()));
@@ -381,7 +382,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
       double numberOfLanes = this.getLink().getNumberOfLanes(time);
       // first guess at storageCapacity:
       this.storageCapacity = (this.length * numberOfLanes)
-          / ((NetworkImpl) this.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize() * storageCapFactor;
+          / ((NetworkImpl) this.getQueueNetwork().getNetwork()).getEffectiveCellSize() * storageCapFactor;
 
       // storage capacity needs to be at least enough to handle the cap_per_time_step:
       this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -406,20 +407,20 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
     }
 
 
-  /* package */ QueueVehicle getVehicle(Id vehicleId) { // needed in tests
-    QueueVehicle ret = getParkedVehicle(vehicleId);
+  /* package */ QVehicle getVehicle(Id vehicleId) { // needed in tests
+    QVehicle ret = getParkedVehicle(vehicleId);
     if (ret != null) {
       return ret;
     }
-    for (QueueVehicle veh : this.vehQueue) {
+    for (QVehicle veh : this.vehQueue) {
       if (veh.getId().equals(vehicleId))
         return veh;
     }
-    for (QueueVehicle veh : this.buffer) {
+    for (QVehicle veh : this.buffer) {
       if (veh.getId().equals(vehicleId))
         return veh;
     }
-    for (QueueVehicle veh : this.waitingList) {
+    for (QVehicle veh : this.waitingList) {
       if (veh.getId().equals(vehicleId))
         return veh;
     }
@@ -549,7 +550,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
           || (this.buffercap_accumulate >= 1.0)));
     }
 
-    private void addToBuffer(final QueueVehicle veh, final double now) {
+    private void addToBuffer(final QVehicle veh, final double now) {
       if (this.bufferCap >= 1.0) {
         this.bufferCap--;
       }
@@ -565,14 +566,14 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
       }
       this.getToQueueNode().activateNode();
     }
-    /*package*/ QueueVehicle popFirstFromBuffer() {
+    /*package*/ QVehicle popFirstFromBuffer() {
       double now = SimulationTimer.getTime();
-      QueueVehicle veh = this.buffer.poll();
+      QVehicle veh = this.buffer.poll();
       this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
       QueueSimulation.getEvents().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
       return veh;
     }
-    QueueVehicle getFirstFromBuffer() {
+    QVehicle getFirstFromBuffer() {
       return this.buffer.peek();
     }
   /**
@@ -621,7 +622,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
         double freespeed = QueueLink.this.getLink().getFreespeed();
 
         // the cars in the buffer
-        for (QueueVehicle veh : QueueLink.this.buffer) {
+        for (QVehicle veh : QueueLink.this.buffer) {
           int lane = 1 + (veh.getId().hashCode() % nLanes);
           int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
           double speed = (time > cmp ? 0.0 : freespeed);
@@ -632,7 +633,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
         }
 
         // the cars in the drivingQueue
-        for (QueueVehicle veh : QueueLink.this.vehQueue) {
+        for (QVehicle veh : QueueLink.this.vehQueue) {
           int lane = 1 + (veh.getId().hashCode() % nLanes);
           int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
           double speed = (time > cmp ? 0.0 : freespeed);
@@ -661,7 +662,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
       Link link = QueueLink.this.getLink();
       double queueEnd = getInitialQueueEnd();
       double storageCapFactor = simEngine.getConfig().simulation().getStorageCapFactor();
-      double cellSize = ((NetworkImpl)QueueLink.this.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize();
+      double cellSize = ((NetworkImpl)QueueLink.this.getQueueNetwork().getNetwork()).getEffectiveCellSize();
       double vehLen = calculateVehicleLength(link, storageCapFactor, cellSize);
 
       queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);
@@ -688,7 +689,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
     private double positionVehiclesFromBuffer(
         final Collection<AgentSnapshotInfo> positions, double now,
         double queueEnd, Link link, double vehLen) {
-      for (QueueVehicle veh : QueueLink.this.buffer) {
+      for (QVehicle veh : QueueLink.this.buffer) {
 
         int lane = 1 + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QueueLink.this.getLink()));
 
@@ -715,7 +716,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
         double queueEnd, Link link, double vehLen) {
       double lastDistance = Integer.MAX_VALUE;
       double ttfs = link.getLength() / link.getFreespeed(now);
-      for (QueueVehicle veh : QueueLink.this.vehQueue) {
+      for (QVehicle veh : QueueLink.this.vehQueue) {
         double travelTime = now - veh.getLinkEnterTime();
         double distanceOnLink = (ttfs == 0.0 ? 0.0
             : ((travelTime / ttfs) * link.getLength()));
@@ -762,7 +763,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
         final Collection<AgentSnapshotInfo> positions, Link link,
         double cellSize) {
       int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
-      for (QueueVehicle veh : QueueLink.this.waitingList) {
+      for (QVehicle veh : QueueLink.this.waitingList) {
     	  AgentSnapshotInfo position = new PositionInfo(this.linkScale, veh.getDriver().getPerson().getId(), QueueLink.this.getLink(),
             /*positionOnLink*/cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
         positions.add(position);

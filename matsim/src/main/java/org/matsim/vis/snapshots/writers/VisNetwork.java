@@ -9,5 +9,5 @@ public interface VisNetwork {
 
 	Map<Id,? extends VisLink> getVisLinks() ;
 	Map<Id,? extends VisNode> getVisNodes() ;
-	Network getNetworkLayer() ;
+	Network getNetwork() ;
 }

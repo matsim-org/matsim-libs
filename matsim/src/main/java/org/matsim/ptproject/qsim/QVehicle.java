@@ -29,25 +29,32 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
 public interface QVehicle extends Identifiable, VisVehicle {
 
 	public PersonDriverAgent getDriver();
+	// yy presumably, this should return DriverAgent
 
 	public void setDriver(final PersonDriverAgent driver);
+	// yy presumably, this should set DriverAgent
 	
 	public Link getCurrentLink();
 	
 	public void setCurrentLink(final Link link);
+	// yy not sure if this needs to be publicly exposed
 	
 	public double getSizeInEquivalents();
 	
 	public double getLinkEnterTime();
+	// yy not sure if this needs to be publicly exposed
 	
 	public void setLinkEnterTime(final double time);
+	// yy not sure if this needs to be publicly exposed
 
 	public double getEarliestLinkExitTime();
+	// yy not sure if this needs to be publicly exposed
 
 	public void setEarliestLinkExitTime(final double time);
+	// yy not sure if this needs to be publicly exposed
 
 	/**
-	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
+	 * @return the <code>Vehicle</code> that this simulation vehicle represents
 	 */
 	public Vehicle getBasicVehicle();
 

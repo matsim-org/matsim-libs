@@ -36,6 +36,8 @@ import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.QPersonAgent;
+import org.matsim.ptproject.qsim.QVehicle;
 
 /**
  * @author dgrether
@@ -46,7 +48,7 @@ import org.matsim.core.utils.misc.Time;
 	private static final Logger log = Logger.getLogger(QueuePersonAgent.class);
 
 	private final Person person;
-	private QueueVehicle vehicle;
+	private QVehicle vehicle;
 	protected Id cachedNextLinkId = null;
 
 	private final QueueSimulation simulation;
@@ -81,11 +83,11 @@ import org.matsim.core.utils.misc.Time;
 		return this.person.getSelectedPlan().getPlanElements();
 	}
 
-	/*package*/ void setVehicle(final QueueVehicle veh) {
+	public void setVehicle(final QVehicle veh) {
 		this.vehicle = veh;
 	}
 
-	/*package*/ QueueVehicle getVehicle() {
+	public QVehicle getVehicle() {
 		return this.vehicle;
 	}
 
@@ -98,7 +100,7 @@ import org.matsim.core.utils.misc.Time;
 		this.activityDepartureTime = seconds;
 	}
 
-	protected Id getCurrentLinkId() {
+	public Id getCurrentLinkId() {
 		return this.currentLinkId;
 	}
 
@@ -117,7 +119,8 @@ import org.matsim.core.utils.misc.Time;
 		return this.destinationLinkId;
 	}
 
-	boolean initialize() {
+	@Override
+	public boolean initializeAndCheckIfAlive() {
 		this.currentPlanElementIndex = 0;
 		Activity firstAct = (Activity) this.getCurrentPlanElement() ;
 		double departureTime = firstAct.getEndTime();

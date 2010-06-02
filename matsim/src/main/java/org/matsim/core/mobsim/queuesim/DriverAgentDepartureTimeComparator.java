@@ -25,6 +25,7 @@ import java.util.Comparator;
 
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
+
 /**
  * Compares two {@link PersonDriverAgent}s according to their (planned) departure time. If the 
  * departure times are the same, the agent with the higher id is considered smaller.

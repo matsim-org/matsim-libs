@@ -21,6 +21,7 @@
 package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.ptproject.qsim.QVehicle;
 
 /**
  * @author nagel
@@ -38,11 +39,20 @@ public interface DriverAgent {
 	public Id chooseNextLinkId();
 
 
+//	// yyyy would be nice if this was (Basic)Vehicle, not QVehicle.  kai, may'10
+	public void setVehicle( QVehicle veh ) ;
+	public QVehicle getVehicle() ;
+	
+	/**
+	 * driver should know where she/he is
+	 */
+	public Id getCurrentLinkId();
+
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
 
 	/**
 	 * notifies the agent that it was moved over the node
 	 */
 	public void moveOverNode();
-
+	
 }

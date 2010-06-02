@@ -131,7 +131,7 @@ public class QPersonAgent implements PersonDriverAgent {
 		this.activityDepartureTime = seconds;
 	}
 
-	protected Id getCurrentLinkId() {
+	public Id getCurrentLinkId() {
 		return this.currentLinkId;
 	}
 
@@ -153,7 +153,7 @@ public class QPersonAgent implements PersonDriverAgent {
 		return this.destinationLinkId;
 	}
 
-	public boolean initialize() {
+	public boolean initializeAndCheckIfAlive() {
 		List<? extends PlanElement> planElements = this.getPlanElements();
 		this.currentPlanElementIndex = 0;
 		Activity firstAct = (Activity) planElements.get(0);
@@ -162,7 +162,7 @@ public class QPersonAgent implements PersonDriverAgent {
 		this.currentLinkId = firstAct.getLinkId();
 		if ((departureTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
 			setDepartureTime(departureTime);
-			this.simulation.scheduleActivityEnd(this, this.currentPlanElementIndex);
+			this.simulation.scheduleActivityEnd(this);
 			this.simulation.getAgentCounter().incLiving();
 			return true;
 		}
@@ -230,7 +230,7 @@ public class QPersonAgent implements PersonDriverAgent {
 
 			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
 				// there is still at least on plan element left
-				this.simulation.scheduleActivityEnd(this, this.currentPlanElementIndex);
+				this.simulation.scheduleActivityEnd(this);
 			} else {
 				// this is the last activity
 				this.simulation.getAgentCounter().decLiving();

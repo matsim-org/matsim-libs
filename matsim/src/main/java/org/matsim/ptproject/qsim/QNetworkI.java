@@ -39,5 +39,6 @@ public interface QNetworkI {
 	 * @return
 	 */
 	Map<Id, QLink> getLinks();
+	// yyyy this should probably be getQLinks().  Esthetically less pleasing, but imho easier to use.  kai, may'10
 
 }

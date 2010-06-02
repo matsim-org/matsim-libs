@@ -47,7 +47,7 @@ public class OTFQueueSimServerQuad extends OTFServerQuad2 {
 	 *
 	 */
 	public OTFQueueSimServerQuad(VisNetwork net) {
-		super(net.getNetworkLayer());
+		super(net.getNetwork());
 		this.net = net;
 	}
 

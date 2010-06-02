@@ -60,6 +60,7 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -69,6 +70,7 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.VehicleImpl;
@@ -661,14 +663,14 @@ public class QueueSimulationTest extends TestCase {
 		QueueLink qlink3 = qnet.getQueueLink(new IdImpl(3));
 
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		QueueVehicle vehicle1 = new QueueVehicle(new VehicleImpl(id1, defaultVehicleType));
-		QueueVehicle vehicle2 = new QueueVehicle(new VehicleImpl(id2, defaultVehicleType));
+		QVehicle vehicle1 = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(id1, defaultVehicleType));
+		QVehicle vehicle2 = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(id2, defaultVehicleType));
 		qlink2.addParkedVehicle(vehicle1);
 		qlink2.addParkedVehicle(vehicle2);
 
 		SimulationTimer.setTime(100.0);
-		QueuePersonAgent agent = new QueuePersonAgent(person, sim);
-		agent.initialize();
+		PersonDriverAgent agent = StaticFactoriesContainer.createQueuePersonAgent(person, sim);
+		agent.initializeAndCheckIfAlive();
 		agent.activityEnds(100.0);
 
 		SimulationTimer.setTime(101.0);
@@ -678,11 +680,13 @@ public class QueueSimulationTest extends TestCase {
 
 		Collection<? extends VisVehicle> vehicles = qlink3.getAllVehicles();
 		assertEquals(1, vehicles.size());
-		assertEquals(id2, vehicles.toArray(new QueueVehicle[1])[0].getBasicVehicle().getId());
+//		assertEquals(id2, vehicles.toArray(new QueueVehicle[1])[0].getBasicVehicle().getId());
+		assertEquals(id2, vehicles.iterator().next().getBasicVehicle().getId());
 		// vehicle 1 should still stay on qlink2
 		vehicles = qlink2.getAllVehicles();
 		assertEquals(1, vehicles.size());
-		assertEquals(id1, vehicles.toArray(new QueueVehicle[1])[0].getBasicVehicle().getId());
+//		assertEquals(id1, vehicles.toArray(new QueueVehicle[1])[0].getBasicVehicle().getId());
+		assertEquals(id1, vehicles.iterator().next().getBasicVehicle().getId());
 	}
 
 	/**

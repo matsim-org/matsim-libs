@@ -91,20 +91,20 @@ public class QueryAgentPlan extends AbstractQuery {
 		} else {
 			result.teleportingAgentPosition = null;
 		}
-		queryActivityStatus();
+//		queryActivityStatus();
 		return result;
 	}
 
-	private void queryActivityStatus() {
-		Integer currentActivityNumber = queueSimulation.getCurrentActivityNumbers().get(this.agentId);
-		if (currentActivityNumber != null) {
-			result.activityFinished = 0;
-			result.activityNr = currentActivityNumber/2;
-			log.debug("Agent is in activity " + result.activityNr);
-		} else {
-			result.activityNr = -1;
-		}
-	}
+//	private void queryActivityStatus() {
+//		Integer currentActivityNumber = queueSimulation.getCurrentActivityNumbers().get(this.agentId);
+//		if (currentActivityNumber != null) {
+//			result.activityFinished = 0;
+//			result.activityNr = currentActivityNumber/2;
+//			log.debug("Agent is in activity " + result.activityNr);
+//		} else {
+//			result.activityNr = -1;
+//		}
+//	}
 
 	@Override
 	public Type getType() {
@@ -139,7 +139,7 @@ public class QueryAgentPlan extends AbstractQuery {
 							(float) coord.getY(), act.getType()));
 				}
 			}
-			QueryAgentUtils.buildRoute(plan, result, agentId, net.getNetworkLayer());
+			QueryAgentUtils.buildRoute(plan, result, agentId, net.getNetwork());
 			result.hasPlan = true;
 		} else {
 			log.error("No plan found for id " + this.agentId);

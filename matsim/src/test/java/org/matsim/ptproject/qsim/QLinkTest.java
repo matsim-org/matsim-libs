@@ -188,7 +188,7 @@ public class QLinkTest extends MatsimTestCase {
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		QPersonAgent driver = new QPersonAgent(pers, qsim);
-		driver.initialize();
+		driver.initializeAndCheckIfAlive();
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
 		driver.activityEnds(0);
@@ -258,13 +258,13 @@ public class QLinkTest extends MatsimTestCase {
 		QPersonAgent pa1 = new QPersonAgent(p, qsim);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
-		pa1.initialize();
+		pa1.initializeAndCheckIfAlive();
 
 		QVehicleImpl v2 = new QVehicleImpl(new VehicleImpl(new IdImpl("2"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		QPersonAgent pa2 = new QPersonAgent(p, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
-		pa2.initialize();
+		pa2.initializeAndCheckIfAlive();
 
 		// start test
 		assertTrue(qlink.bufferIsEmpty());

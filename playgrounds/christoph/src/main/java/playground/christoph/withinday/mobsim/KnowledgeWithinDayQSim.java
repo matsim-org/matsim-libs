@@ -75,10 +75,10 @@ public class KnowledgeWithinDayQSim extends WithinDayQSim{
 	 * for the Knowledge Modules
 	 */
 	@Override
-	public void scheduleActivityEnd(final PersonDriverAgent driverAgent, int planElementIndex)
+	public void scheduleActivityEnd(final PersonDriverAgent driverAgent )
 	{	
 		if (knowledgeDBStorageHandler != null) knowledgeDBStorageHandler.scheduleActivityEnd(driverAgent);
 //		offsetActivityEndsList.add(agent);
-		super.scheduleActivityEnd(driverAgent, planElementIndex);
+		super.scheduleActivityEnd(driverAgent);
 	}
 }
