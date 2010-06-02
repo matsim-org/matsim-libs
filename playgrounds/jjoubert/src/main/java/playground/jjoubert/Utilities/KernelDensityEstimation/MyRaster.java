@@ -29,14 +29,12 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.QuadTree;
 
-import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -50,8 +48,7 @@ public class MyRaster{
 	private final Logger log = Logger.getLogger(MyRaster.class);
 	private Geometry envelope = null;
 	private BufferedImage bufferedImage = null;
-	private DenseDoubleMatrix2D imageMatrix = null;
-	private QuadTree<Coordinate> quadTree = null;
+	private SparseDoubleMatrix2D imageMatrix = null;
 	private Color color = null;
 	private double resolution = 0.0; 
 	private Double radius;
@@ -122,9 +119,7 @@ public class MyRaster{
 			bufferedImage = new BufferedImage(numberOfPixelsX,numberOfPixelsY,BufferedImage.TYPE_INT_ARGB);
 			setInitialColor(this.color);
 
-			imageMatrix = new DenseDoubleMatrix2D(numberOfPixelsX, numberOfPixelsY);
-			quadTree = new QuadTree<Coordinate>(0, 0, numberOfPixelsX, numberOfPixelsY);
-			
+			imageMatrix = new SparseDoubleMatrix2D(numberOfPixelsX, numberOfPixelsY);			
 		}	
 	}
 	
@@ -228,12 +223,7 @@ public class MyRaster{
 			int x = (int) Math.floor((point.getX() - originX)/resolution);
 			int y = (int) Math.floor((originY - point.getY())/resolution);
 
-			Double value = null;
-
-			int minX = (int) Math.max(0, Math.floor((point.getX() - radius - originX)/resolution));
-			int maxX = (int) Math.min(imageMatrix.rows()-1, Math.floor((point.getX() + radius - originX)/resolution));
-			int minY = (int) Math.max(0, Math.floor((originY - (point.getY() + radius))/resolution));
-			int maxY = (int) Math.min(imageMatrix.columns()-1, Math.floor((originY - (point.getY() - radius))/resolution));
+			double value = 0;
 			Point p = null;
 			Polygon pixel = null;
 			GeometryFactory gf = new GeometryFactory();
@@ -247,6 +237,10 @@ public class MyRaster{
 				break;
 				
 			case 1: // Uniform
+				int minX = (int) Math.max(0, Math.floor((point.getX() - radius - originX)/resolution));
+				int maxX = (int) Math.min(imageMatrix.rows()-1, Math.floor((point.getX() + radius - originX)/resolution));
+				int minY = (int) Math.max(0, Math.floor((originY - (point.getY() + radius))/resolution));
+				int maxY = (int) Math.min(imageMatrix.columns()-1, Math.floor((originY - (point.getY() - radius))/resolution));
 				value = 0.5;
 				for(int i = minX; i <= maxX; i++){
 					for(int j = minY; j <= maxY; j++){
@@ -274,6 +268,10 @@ public class MyRaster{
 				break;
 				
 			case 2: // Triangular
+				minX = (int) Math.max(0, Math.floor((point.getX() - radius - originX)/resolution));
+				maxX = (int) Math.min(imageMatrix.rows()-1, Math.floor((point.getX() + radius - originX)/resolution));
+				minY = (int) Math.max(0, Math.floor((originY - (point.getY() + radius))/resolution));
+				maxY = (int) Math.min(imageMatrix.columns()-1, Math.floor((originY - (point.getY() - radius))/resolution));
 				for(int i = minX; i <= maxX; i++){
 					for(int j = minY; j <= maxY; j++){
 						p = gf.createPoint(new Coordinate((i + 0.5)*resolution + originX, originY - (j + 0.5)*resolution));
@@ -305,6 +303,10 @@ public class MyRaster{
 				break;
 
 			case 3: // Triweight
+				minX = (int) Math.max(0, Math.floor((point.getX() - radius - originX)/resolution));
+				maxX = (int) Math.min(imageMatrix.rows()-1, Math.floor((point.getX() + radius - originX)/resolution));
+				minY = (int) Math.max(0, Math.floor((originY - (point.getY() + radius))/resolution));
+				maxY = (int) Math.min(imageMatrix.columns()-1, Math.floor((originY - (point.getY() - radius))/resolution));
 				for(int i = minX; i <= maxX; i++){
 					for(int j = minY; j <= maxY; j++){
 						p = gf.createPoint(new Coordinate((i + 0.5)*resolution + originX, originY - (j + 0.5)*resolution));
@@ -375,8 +377,8 @@ public class MyRaster{
 		return this.maxValue;
 	}
 	
-	public int getImageMatrixValue(int x, int y){
-		return (int) Math.round(this.imageMatrix.get(x, y));
+	public double getImageMatrixValue(int x, int y){
+		return this.imageMatrix.get(x, y);
 	}
 
 }

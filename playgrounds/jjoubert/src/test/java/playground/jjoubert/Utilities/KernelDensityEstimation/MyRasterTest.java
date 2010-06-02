@@ -93,18 +93,18 @@ public class MyRasterTest extends MatsimTestCase{
 		assertEquals("Should not add point `a'.", false, mr.processPoint(points.get(0)));
 
 		mr.processPoint(points.get(1));
-		assertEquals("Point `b' allocated to the wrong pixel.", 1, mr.getImageMatrixValue(0, 2));
+		assertEquals("Point `b' allocated to the wrong pixel.", 1.0, mr.getImageMatrixValue(0, 2));
 		assertEquals("Max pixel value is wrong.", 1.0, mr.getMaxImageMatrixValue());
 		
 		assertEquals("Point `c' should be added.", true, mr.processPoint(points.get(2)));
 		
 		mr.processPoint(points.get(3));
-		assertEquals("Point `d' allocated to the wrong pixel.", 1, mr.getImageMatrixValue(1, 1));
+		assertEquals("Point `d' allocated to the wrong pixel.", 1.0, mr.getImageMatrixValue(1, 1));
 		mr.processPoint(points.get(4));
-		assertEquals("Point `e' allocated to the wrong pixel.", 2, mr.getImageMatrixValue(1, 1));
+		assertEquals("Point `e' allocated to the wrong pixel.", 2.0, mr.getImageMatrixValue(1, 1));
 		assertEquals("Maximum image matrix value not correct.", 2.0, mr.getMaxImageMatrixValue());
 		mr.processPoint(points.get(5));
-		assertEquals("Point `f' allocated to the wrong pixel.", 3, mr.getImageMatrixValue(1, 1));
+		assertEquals("Point `f' allocated to the wrong pixel.", 3.0, mr.getImageMatrixValue(1, 1));
 		assertEquals("Maximum image matrix value not correct.", 3.0, mr.getMaxImageMatrixValue());
 		
 		
@@ -120,28 +120,28 @@ public class MyRasterTest extends MatsimTestCase{
 		MyRaster mr1 = new MyRaster(polygon, 1, null, 0, Color.BLACK);
 		mr1.processPoints(points);
 		
-		assertEquals("Pixel value (0,0) of the imageMatrix `mr1' is incorrect.", 2, mr1.getImageMatrixValue(0, 0));
-		assertEquals("Pixel value (1,0) of the imageMatrix `mr1' is incorrect.", 0, mr1.getImageMatrixValue(1, 0));
-		assertEquals("Pixel value (2,0) of the imageMatrix `mr1' is incorrect.", 0, mr1.getImageMatrixValue(2, 0));
-		assertEquals("Pixel value (3,0) of the imageMatrix `mr1' is incorrect.", 0, mr1.getImageMatrixValue(3, 0));
-		assertEquals("Pixel value (0,1) of the imageMatrix `mr1' is incorrect.", 0, mr1.getImageMatrixValue(0, 1));
-		assertEquals("Pixel value (1,1) of the imageMatrix `mr1' is incorrect.", 3, mr1.getImageMatrixValue(1, 1));
-		assertEquals("Pixel value (2,1) of the imageMatrix `mr1' is incorrect.", 0, mr1.getImageMatrixValue(2, 1));
-		assertEquals("Pixel value (3,1) of the imageMatrix `mr1' is incorrect.", 0, mr1.getImageMatrixValue(3, 1));
-		assertEquals("Pixel value (0,2) of the imageMatrix `mr1' is incorrect.", 1, mr1.getImageMatrixValue(0, 2));
-		assertEquals("Pixel value (1,2) of the imageMatrix `mr1' is incorrect.", 0, mr1.getImageMatrixValue(1, 2));
-		assertEquals("Pixel value (2,2) of the imageMatrix `mr1' is incorrect.", 0, mr1.getImageMatrixValue(2, 2));
-		assertEquals("Pixel value (3,2) of the imageMatrix `mr1' is incorrect.", 1, mr1.getImageMatrixValue(3, 2));
+		assertEquals("Pixel value (0,0) of the imageMatrix `mr1' is incorrect.", 2.0, mr1.getImageMatrixValue(0, 0));
+		assertEquals("Pixel value (1,0) of the imageMatrix `mr1' is incorrect.", 0.0, mr1.getImageMatrixValue(1, 0));
+		assertEquals("Pixel value (2,0) of the imageMatrix `mr1' is incorrect.", 0.0, mr1.getImageMatrixValue(2, 0));
+		assertEquals("Pixel value (3,0) of the imageMatrix `mr1' is incorrect.", 0.0, mr1.getImageMatrixValue(3, 0));
+		assertEquals("Pixel value (0,1) of the imageMatrix `mr1' is incorrect.", 0.0, mr1.getImageMatrixValue(0, 1));
+		assertEquals("Pixel value (1,1) of the imageMatrix `mr1' is incorrect.", 3.0, mr1.getImageMatrixValue(1, 1));
+		assertEquals("Pixel value (2,1) of the imageMatrix `mr1' is incorrect.", 0.0, mr1.getImageMatrixValue(2, 1));
+		assertEquals("Pixel value (3,1) of the imageMatrix `mr1' is incorrect.", 0.0, mr1.getImageMatrixValue(3, 1));
+		assertEquals("Pixel value (0,2) of the imageMatrix `mr1' is incorrect.", 1.0, mr1.getImageMatrixValue(0, 2));
+		assertEquals("Pixel value (1,2) of the imageMatrix `mr1' is incorrect.", 0.0, mr1.getImageMatrixValue(1, 2));
+		assertEquals("Pixel value (2,2) of the imageMatrix `mr1' is incorrect.", 0.0, mr1.getImageMatrixValue(2, 2));
+		assertEquals("Pixel value (3,2) of the imageMatrix `mr1' is incorrect.", 1.0, mr1.getImageMatrixValue(3, 2));
 		/*
 		 * Create a raster with stride of 2: raster is 2x2.
 		 */
 		MyRaster mr2 = new MyRaster(polygon, 2, null, 0, Color.BLACK);
 		mr2.processPoints(points);
 		
-		assertEquals("Pixel value (0,0) of the imageMatrix `mr2' is incorrect.", 5, mr2.getImageMatrixValue(0, 0));
-		assertEquals("Pixel value (1,0) of the imageMatrix `mr2' is incorrect.", 0, mr2.getImageMatrixValue(1, 0));
-		assertEquals("Pixel value (0,1) of the imageMatrix `mr2' is incorrect.", 1, mr2.getImageMatrixValue(0, 1));
-		assertEquals("Pixel value (1,1) of the imageMatrix `mr2' is incorrect.", 1, mr2.getImageMatrixValue(1, 1));
+		assertEquals("Pixel value (0,0) of the imageMatrix `mr2' is incorrect.", 5.0, mr2.getImageMatrixValue(0, 0));
+		assertEquals("Pixel value (1,0) of the imageMatrix `mr2' is incorrect.", 0.0, mr2.getImageMatrixValue(1, 0));
+		assertEquals("Pixel value (0,1) of the imageMatrix `mr2' is incorrect.", 1.0, mr2.getImageMatrixValue(0, 1));
+		assertEquals("Pixel value (1,1) of the imageMatrix `mr2' is incorrect.", 1.0, mr2.getImageMatrixValue(1, 1));
 		
 		/*
 		 * Create a raster with stride of 3: raster is 2x1.
@@ -149,8 +149,8 @@ public class MyRasterTest extends MatsimTestCase{
 		MyRaster mr3 = new MyRaster(polygon, 3, null, 0, Color.BLACK);
 		mr3.processPoints(points);
 
-		assertEquals("Pixel value (0,0) of the imageMatrix `mr3' is incorrect.", 6, mr3.getImageMatrixValue(0, 0));
-		assertEquals("Pixel value (1,0) of the imageMatrix `mr3' is incorrect.", 1, mr3.getImageMatrixValue(1, 0));
+		assertEquals("Pixel value (0,0) of the imageMatrix `mr3' is incorrect.", 6.0, mr3.getImageMatrixValue(0, 0));
+		assertEquals("Pixel value (1,0) of the imageMatrix `mr3' is incorrect.", 1.0, mr3.getImageMatrixValue(1, 0));
 		
 		/*
 		 * Perform tests with a radius of 1, stride of 1, and a KDE type that 
@@ -158,18 +158,18 @@ public class MyRasterTest extends MatsimTestCase{
 		 */
 		MyRaster mr4 = new MyRaster(polygon, 1.0, 1.0, 1, Color.BLACK);
 		mr4.processPoints(points);
-		assertEquals("Pixel (0,0) has the wrong value.", 2, mr4.getImageMatrixValue(0, 0));
-		assertEquals("Pixel (1,0) has the wrong value.", 4, mr4.getImageMatrixValue(1, 0));
-		assertEquals("Pixel (2,0) has the wrong value.", 0, mr4.getImageMatrixValue(2, 0));
-		assertEquals("Pixel (3,0) has the wrong value.", 0, mr4.getImageMatrixValue(3, 0));
-		assertEquals("Pixel (0,1) has the wrong value.", 3, mr4.getImageMatrixValue(0, 1));
-		assertEquals("Pixel (1,1) has the wrong value.", 4, mr4.getImageMatrixValue(1, 1));
-		assertEquals("Pixel (2,1) has the wrong value.", 3, mr4.getImageMatrixValue(2, 1));
-		assertEquals("Pixel (3,1) has the wrong value.", 1, mr4.getImageMatrixValue(3, 1));
-		assertEquals("Pixel (0,2) has the wrong value.", 1, mr4.getImageMatrixValue(0, 2));
-		assertEquals("Pixel (1,2) has the wrong value.", 1, mr4.getImageMatrixValue(1, 2));
-		assertEquals("Pixel (2,2) has the wrong value.", 1, mr4.getImageMatrixValue(2, 2));
-		assertEquals("Pixel (3,2) has the wrong value.", 1, mr4.getImageMatrixValue(3, 2));
+		assertEquals("Pixel (0,0) has the wrong value.", 1.0, mr4.getImageMatrixValue(0, 0));
+		assertEquals("Pixel (1,0) has the wrong value.", 2.0, mr4.getImageMatrixValue(1, 0));
+		assertEquals("Pixel (2,0) has the wrong value.", 0.0, mr4.getImageMatrixValue(2, 0));
+		assertEquals("Pixel (3,0) has the wrong value.", 0.0, mr4.getImageMatrixValue(3, 0));
+		assertEquals("Pixel (0,1) has the wrong value.", 1.5, mr4.getImageMatrixValue(0, 1));
+		assertEquals("Pixel (1,1) has the wrong value.", 2.0, mr4.getImageMatrixValue(1, 1));
+		assertEquals("Pixel (2,1) has the wrong value.", 1.5, mr4.getImageMatrixValue(2, 1));
+		assertEquals("Pixel (3,1) has the wrong value.", 0.5, mr4.getImageMatrixValue(3, 1));
+		assertEquals("Pixel (0,2) has the wrong value.", 0.5, mr4.getImageMatrixValue(0, 2));
+		assertEquals("Pixel (1,2) has the wrong value.", 0.5, mr4.getImageMatrixValue(1, 2));
+		assertEquals("Pixel (2,2) has the wrong value.", 0.5, mr4.getImageMatrixValue(2, 2));
+		assertEquals("Pixel (3,2) has the wrong value.", 0.5, mr4.getImageMatrixValue(3, 2));
 		mr4.convertMatrixToRaster();
 		boolean b = mr4.writeMyRasterToFile(getOutputDirectory() + "UniformKDE-Stride1.png", "png");
 		assertEquals("Could not write uniform KDE raster to file", true, b);
@@ -180,10 +180,10 @@ public class MyRasterTest extends MatsimTestCase{
 		 */
 		MyRaster mr5 = new MyRaster(polygon, 2.0, 1.0, 1, Color.BLACK);
 		mr5.processPoints(points);
-		assertEquals("Pixel (0,0) has the wrong value.", 5, mr5.getImageMatrixValue(0, 0));
-		assertEquals("Pixel (1,0) has the wrong value.", 0, mr5.getImageMatrixValue(1, 0));
-		assertEquals("Pixel (0,1) has the wrong value.", 1, mr5.getImageMatrixValue(0, 1));
-		assertEquals("Pixel (1,1) has the wrong value.", 1, mr5.getImageMatrixValue(1, 1));
+		assertEquals("Pixel (0,0) has the wrong value.", 2.5, mr5.getImageMatrixValue(0, 0));
+		assertEquals("Pixel (1,0) has the wrong value.", 0.0, mr5.getImageMatrixValue(1, 0));
+		assertEquals("Pixel (0,1) has the wrong value.", 0.5, mr5.getImageMatrixValue(0, 1));
+		assertEquals("Pixel (1,1) has the wrong value.", 0.5, mr5.getImageMatrixValue(1, 1));
 		mr5.convertMatrixToRaster();
 		b = mr5.writeMyRasterToFile(getOutputDirectory() + "UniformKDE-Stride2.png", "png");
 		assertEquals("Could not write uniform KDE raster to file", true, b);
