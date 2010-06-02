@@ -41,4 +41,21 @@ public class MGCTest extends MatsimTestCase {
 		junit.framework.Assert.assertEquals(y,y1,delta);
 
 	}
+	
+	public void testGetCRS(){
+		// CH1903_LV03 Id
+		junit.framework.Assert.assertNotNull(MGC.getCRS("EPSG:21781"));
+
+		try {
+			MGC.getCRS("");
+			junit.framework.Assert.fail("IllegalArgumentException expected");
+		} catch (IllegalArgumentException expected) { }
+
+		// unknown EPSG Id
+		try {
+			MGC.getCRS("EPSG:MATSim");
+			junit.framework.Assert.fail("IllegalArgumentException expected");
+		} catch (IllegalArgumentException expected) { }
+
+	}
 }

@@ -23,11 +23,13 @@ package org.matsim.core.utils.geometry.geotools;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -42,6 +44,8 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class MGC {
 
+	private final static Logger log = Logger.getLogger(MGC.class);
+	
 	public static final GeometryFactory geoFac = new GeometryFactory();
 
 	private final static Map<String, String> transformations = new HashMap<String, String>();
@@ -117,7 +121,7 @@ public class MGC {
 
 	/**
 	 * Generates a Geotools <code>CoordinateReferenceSystem</code> from a coordinate system <code>String</code>. The coordinate system
-	 * can either be specified as shortened names, as defined in {@link TransformationFactory}, or as
+	 * can either be specified as shortened names, as defined in {@link TransformationFactory}, as EPSG Code or as
 	 * Well-Known-Text (WKT) as supported by the GeoTools.
 	 * @param crsString
 	 * @return crs
@@ -131,8 +135,16 @@ public class MGC {
 		try {
 			return CRS.parseWKT(wkt_CRS);
 		} catch (FactoryException e) {
+			log.info("seems to be no WKT: " + wkt_CRS);
+		}
+		try {
+			
+			return CRS.decode(crsString);
+		} catch (NoSuchAuthorityCodeException e) {
+			throw new IllegalArgumentException(e);
+		} catch (FactoryException e) {
 			throw new IllegalArgumentException(e);
 		}
 	}
-
+	
 }
