@@ -21,11 +21,11 @@ package playground.benjamin.analysis;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -41,6 +41,7 @@ import org.xml.sax.SAXException;
 
 import playground.benjamin.BkPaths;
 import playground.benjamin.analysis.filter.OnlyInnerZurichFilter;
+import playground.benjamin.charts.types.BkAvgTollPaidQuantilesChart;
 import playground.benjamin.events.MoneyEventHandler;
 import playground.dgrether.analysis.charts.DgAvgDeltaMoneyQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaUtilsModeQuantilesChart;
@@ -54,6 +55,7 @@ import playground.dgrether.analysis.charts.utils.DgChartWriter;
 import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
 import playground.dgrether.analysis.io.DgHouseholdsAnalysisReader;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
+import playground.dgrether.analysis.population.DgPersonData;
 import playground.dgrether.analysis.population.ExcludeZurichTransitFilter;
 
 public class Trb09Analysis {
@@ -66,11 +68,6 @@ public class Trb09Analysis {
 		
 //***************************************************************************************************************************************************	
 //changes should be done here and under filters (see below):
-//		boolean isTestscenario = true;
-//		String runNumber1 = "860";
-//		String runNumber2 = "864";
-	
-		boolean isTestscenario = false;		
 		String runNumber1 = "891";
 		String runNumber2 = "896";
 //***************************************************************************************************************************************************		
@@ -86,31 +83,13 @@ public class Trb09Analysis {
 		ControlerIO io1 = new ControlerIO(outputPath1, runid1);
 		ControlerIO io2 = new ControlerIO(outputPath2, runid2);
 		
-		
-		if (isTestscenario){
-			netfile = outputPath1 + "/" + runid1String + ".output_network.xml.gz";
-			plans1file = outputPath1 + "/" + runid1String + ".output_plans.xml.gz";
-			plans2file = outputPath2 + "/" + runid2String + ".output_plans.xml.gz";		
-			housholdsfile = outputPath2 + "/" + runid2String + ".output_households.xml.gz";		
-			outputConfig2Path = outputPath2 + "/" + runid2String + ".output_config.xml.gz";
-			threshold = 4;
-		}
-		else {
-			netfile = io1.getOutputFilename("output_network") + ".xml.gz";
-			plans1file = io1.getOutputFilename("output_plans") + ".xml.gz";
-			plans2file = io2.getOutputFilename("output_plans") + ".xml.gz";		
-			housholdsfile = io2.getOutputFilename("output_households") + ".xml.gz";
-			outputConfig2Path = plans2file = io2.getOutputFilename("output_config") + ".xml.gz";	
-			threshold = 100;
-		}
-		
-		////group charts
-//		String modalSplitGroupChartFileRun1 = BkPaths.RUNSSVN + runid1String + "/"+runNumber1+"modalSplitGroupChart";
-//		String modalSplitGroupChartFileRun2 = BkPaths.RUNSSVN + runid2String + "/"+runNumber2+"modalSplitGroupChart";	
-//		String deltaUtilsModeGroupChartFile = BkPaths.RUNSSVN + runid2String + "/deltaUtilsModeGroupChart"+runNumber1+"vs"+runNumber2;
-//		String avgDeltaUtilsGroupChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaUtilsGroupChart"+runNumber1+"vs"+runNumber2;
-//		String avgDeltaUtilsModeGroupChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaUtilsModeGroupChart"+runNumber1+"vs"+runNumber2;
-//		String avgDeltaMoneyGroupChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaMoneyGroupChart"+runNumber1+"vs"+runNumber2;
+
+		netfile = io1.getOutputFilename("output_network") + ".xml.gz";
+		plans1file = io1.getOutputFilename("output_plans") + ".xml.gz";
+		plans2file = io2.getOutputFilename("output_plans") + ".xml.gz";		
+		housholdsfile = io2.getOutputFilename("output_households") + ".xml.gz";
+		outputConfig2Path = io2.getOutputFilename("output_config") + ".xml.gz";	
+		threshold = 100;
 
 		String mixedDeltaUtilsModeGroupChartFile = BkPaths.RUNSSVN + runid2String + "/mixedDeltaUtilsModeGroupChart"+runNumber1+"vs"+runNumber2;
 		String mixedMsoDeltaUtilsModeGroupChartFile = BkPaths.RUNSSVN + runid2String + "/mixedMsoDeltaUtilsModeGroupChart"+runNumber1+"vs"+runNumber2;
@@ -122,13 +101,9 @@ public class Trb09Analysis {
 		String avgDeltaUtilsQuantilesChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaUtilsQuantilesChart" + runNumber1 + "vs" + runNumber2;
 		String avgDeltaUtilsModeQuantilesChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaUtilsModeQuantilesChart"+runNumber1+"vs"+runNumber2;
 		String avgDeltaMoneyQuantilesChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaMoneyQuantilesChart"+runNumber1+"vs"+runNumber2;
+		String avgTollPaidInQuantileChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaMoneyQuantilesChart"+runNumber2;
 //***************************************************************************************************************************************************
 		
-		Config config = new Config();
-		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(outputConfig2Path);		
-
 		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader();
 		DgAnalysisPopulation ana = new DgAnalysisPopulation();	
 		pc.readAnalysisPopulation(ana, runid1, netfile, plans1file);
@@ -137,10 +112,47 @@ public class Trb09Analysis {
 		DgHouseholdsAnalysisReader hhr = new DgHouseholdsAnalysisReader(ana);
 		hhr.readHousholds(housholdsfile);
 		ana.calculateIncomeData();
-
+		
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(outputConfig2Path);
+		
 //***************************************************************************************************************************************************
 //any filter can be applied here or for toll area see below:
-pc.addFilter(new ExcludeZurichTransitFilter());
+		pc.addFilter(new ExcludeZurichTransitFilter());
+		
+//***************************************************************************************************************************************************
+//creating the charts:		
+	//group chart
+		DgDeltaUtilsModeGroupChart deltaUtilsModeGroupChart = new DgDeltaUtilsModeGroupChart(ana, runid1, runid2);
+
+	//quantile charts
+		//modal split
+		DgModalSplitQuantilesChart modalSplitQuantilesChartRun1 = new DgModalSplitQuantilesChart(ana, runid1);
+		DgChartWriter.writeChart(modalSplitQuantilesChartFileRun1, modalSplitQuantilesChartRun1.createChart());
+		
+		DgModalSplitQuantilesChart modalSplitQuantilesChartRun2 = new DgModalSplitQuantilesChart(ana, runid2);
+		DgChartWriter.writeChart(modalSplitQuantilesChartFileRun2, modalSplitQuantilesChartRun2.createChart());
+
+		DgModalSplitDiffQuantilesChart modalSplitDiffQuantilesChartRun2 = new DgModalSplitDiffQuantilesChart(ana, runid1,  runid2);
+		DgChartWriter.writeChart(modalSplitDiffQuantilesChartFileRun2, modalSplitDiffQuantilesChartRun2.createChart());
+
+		//utility differences
+		DgAvgDeltaUtilsQuantilesChart avgDeltaUtilsQuantilesChart = new DgAvgDeltaUtilsQuantilesChart(ana, runid1, runid2);
+		DgChartWriter.writeChart(avgDeltaUtilsQuantilesChartFile, avgDeltaUtilsQuantilesChart.createChart());
+
+		DgAvgDeltaUtilsModeQuantilesChart avgDeltaUtilesModeQuantilesChart = new DgAvgDeltaUtilsModeQuantilesChart(ana, threshold,  runid1, runid2);
+		DgChartWriter.writeChart(avgDeltaUtilsModeQuantilesChartFile, avgDeltaUtilesModeQuantilesChart.createChart());
+		
+		//monetized utility differences
+		DgAvgDeltaMoneyQuantilesChart avgDeltaMoneyQuantilesChart = new DgAvgDeltaMoneyQuantilesChart(ana, runid1, runid2);
+		DgChartWriter.writeChart(avgDeltaMoneyQuantilesChartFile, avgDeltaMoneyQuantilesChart.createChart());
+
+		writeMixedDeltaUtilsModeGroupChart(deltaUtilsModeGroupChart, avgDeltaUtilesModeQuantilesChart, mixedDeltaUtilsModeGroupChartFile, mixedMsoDeltaUtilsModeGroupChartFile,  runid1, runid2);
+		
+		log.debug("Plots and tables finished!");
+		
 //***************************************************************************************************************************************************
 //only if there is a toll scheme, money events file needed
 if(config.scenario().isUseRoadpricing()){
@@ -154,72 +166,28 @@ if(config.scenario().isUseRoadpricing()){
 	eventsReader.readFile(eventsfile);
 		System.out.println("Events file read!");
 			
-	Map<Id, Double> id2Toll= tollCollectHandler.getPersonId2TollMap();
+	Map<Id, Double> id2Toll = tollCollectHandler.getPersonId2TollMap();
+	for (DgPersonData data : ana.getPersonData().values()){
+		if (id2Toll.containsKey(data.getPersonId())){
+			data.setToll(id2Toll.get(data.getPersonId()));
+		}
+		else {
+			data.setToll(0.0);
+		}
+	}
 	
+	//money difference chart (due to toll)
+	BkAvgTollPaidQuantilesChart avgTollPaidQuantilesChart = new BkAvgTollPaidQuantilesChart (ana, runid2);
+	DgChartWriter.writeChart(avgTollPaidInQuantileChartFile, avgTollPaidQuantilesChart.createChart());
 	
 //***************************************************************************************************************************************************
 //another filter for a certain area
-	String tollLinksFilePath = BkPaths.STUDIESBK + "/transportEconomics/zh_forRun891_distanceMorningToll_0630-0900_cityWOhighways_1120rp_per_km.xml";
-	RoadPricingScheme tollLinks = loadTollLinksFile(tollLinksFilePath);
-pc.addFilter(new OnlyInnerZurichFilter(tollLinks));
+//	String tollLinksFilePath = BkPaths.STUDIESBK + "/transportEconomics/zh_forRun891_distanceMorningToll_0630-0900_cityWOhighways_1120rp_per_km.xml";
+//	RoadPricingScheme tollLinks = loadTollLinksFile(tollLinksFilePath);
+//pc.addFilter(new OnlyInnerZurichFilter(tollLinks));
 //***************************************************************************************************************************************************	
+	}		
 }
-
-//group charts
-//		DgModalSplitGroupChart modalSplitGroupChartRun1 = new DgModalSplitGroupChart(ana, runid1, threshold);
-//		DgChartWriter.writeChart(modalSplitGroupChartFileRun1, modalSplitGroupChartRun1.createChart());
-//		DgModalSplitGroupChart modalSplitGroupChartRun2 = new DgModalSplitGroupChart(ana, runid2, threshold);
-//		DgChartWriter.writeChart(modalSplitGroupChartFileRun2, modalSplitGroupChartRun2.createChart());
-
-		
-		DgDeltaUtilsModeGroupChart deltaUtilsModeGroupChart = new DgDeltaUtilsModeGroupChart(ana, runid1, runid2);
-////		DgChartFrame frame = new DgChartFrame("test", deltaUtilsModeGroupChart.createChart());
-//		DgChartWriter.writeChart(deltaUtilsModeGroupChartFile, deltaUtilsModeGroupChart.createChart());
-
-//		DgAvgDeltaUtilsGroupChart avgDeltaUtilsGroupChart = new DgAvgDeltaUtilsGroupChart(ana, threshold,  runid1, runid2);
-////		DgChartFrame frame = new DgChartFrame("test", avgDeltaUtilsGroupChart.createChart());
-//		DgChartWriter.writeChart(avgDeltaUtilsGroupChartFile, avgDeltaUtilsGroupChart.createChart());
-
-//		DgAvgDeltaUtilsModeGroupChart avgDeltaUtilsModeGroupChart = new DgAvgDeltaUtilsModeGroupChart(ana, threshold,  runid1, runid2);
-////		DgChartFrame frame = new DgChartFrame("test", avgDScoreIncomeChartData.createChart());
-//		DgChartWriter.writeChart(avgDeltaUtilsModeGroupChartFile, avgDeltaUtilsModeGroupChart.createChart());
-
-//		DgAvgDeltaMoneyGroupChart avgDeltaMoneyGroupChart = new DgAvgDeltaMoneyGroupChart(ana, threshold,  runid1, runid2);
-////		DgChartFrame frame = new DgChartFrame("test", avgDeltaUtilsGroupChart.createChart());
-//		DgChartWriter.writeChart(avgDeltaMoneyGroupChartFile, avgDeltaMoneyGroupChart.createChart());
-
-
-
-//quantile charts
-		DgModalSplitQuantilesChart modalSplitQuantilesChartRun1 = new DgModalSplitQuantilesChart(ana, runid1);
-//		DgChartFrame frame = new DgChartFrame("test", modalSplitQuantilesChartRun1.createChart());
-		DgChartWriter.writeChart(modalSplitQuantilesChartFileRun1, modalSplitQuantilesChartRun1.createChart());
-		DgModalSplitQuantilesChart modalSplitQuantilesChartRun2 = new DgModalSplitQuantilesChart(ana, runid2);
-		DgChartWriter.writeChart(modalSplitQuantilesChartFileRun2, modalSplitQuantilesChartRun2.createChart());
-
-		DgModalSplitDiffQuantilesChart modalSplitDiffQuantilesChartRun2 = new DgModalSplitDiffQuantilesChart(ana, runid1,  runid2);
-//		DgChartFrame frame = new DgChartFrame("test", modalSplitDiffQuantilesChartRun2.createChart());
-		DgChartWriter.writeChart(modalSplitDiffQuantilesChartFileRun2, modalSplitDiffQuantilesChartRun2.createChart());
-
-		
-		DgAvgDeltaUtilsQuantilesChart avgDeltaUtilsQuantilesChart = new DgAvgDeltaUtilsQuantilesChart(ana, runid1, runid2);
-//		DgChartFrame frame = new DgChartFrame("test", avgDeltaUtilsQuantilesChart.createChart());
-		DgChartWriter.writeChart(avgDeltaUtilsQuantilesChartFile, avgDeltaUtilsQuantilesChart.createChart());
-
-		DgAvgDeltaUtilsModeQuantilesChart avgDeltaUtilesModeQuantilesChart = new DgAvgDeltaUtilsModeQuantilesChart(ana, threshold,  runid1, runid2);
-////		DgChartFrame frame = new DgChartFrame("test", avgDeltaUtilesModeQuantilesChart.createChart());
-		DgChartWriter.writeChart(avgDeltaUtilsModeQuantilesChartFile, avgDeltaUtilesModeQuantilesChart.createChart());
-		
-		DgAvgDeltaMoneyQuantilesChart avgDeltaMoneyQuantilesChart = new DgAvgDeltaMoneyQuantilesChart(ana, runid1, runid2);
-////		DgChartFrame frame = new DgChartFrame("test", avgDeltaUtilsQuantilesChart.createChart());
-		JFreeChart jfChart = avgDeltaMoneyQuantilesChart.createChart();
-		DgChartWriter.writeChart(avgDeltaMoneyQuantilesChartFile, jfChart);
-
-		writeMixedDeltaUtilsModeGroupChart(deltaUtilsModeGroupChart, avgDeltaUtilesModeQuantilesChart, mixedDeltaUtilsModeGroupChartFile, mixedMsoDeltaUtilsModeGroupChartFile,  runid1, runid2);
-		
-		log.debug("Plots and tables finished!");
-			
-	}
 	
   private static RoadPricingScheme loadTollLinksFile(String tollLinksFilePath) {
 		RoadPricingScheme scheme = new RoadPricingScheme();
