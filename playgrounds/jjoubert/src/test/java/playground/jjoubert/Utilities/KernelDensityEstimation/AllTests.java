@@ -18,23 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities;
+package playground.jjoubert.Utilities.KernelDensityEstimation;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-
 public class AllTests {
-		
+	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities");
+		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities.KernelDensityEstimation");
 		
-		suite.addTestSuite(MyXmlConverterTest.class);
-		suite.addTestSuite(MyVehicleIdentifierTest.class);
-		suite.addTestSuite(MyFileSamplerTest.class);
-		
-		suite.addTest(playground.jjoubert.Utilities.KernelDensityEstimation.AllTests.suite());
+		suite.addTestSuite(MyRasterTest.class);
 		
 		return suite;
 	}
+
 }
