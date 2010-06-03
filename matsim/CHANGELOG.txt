@@ -15,7 +15,7 @@ Features:
 API-Changes:
 
 - ScenarioImpl.getPopulation() returns Population instead of PopulationImpl (r11288)
-- Network, Link, BasicLocation (incl. Node) no longer implement Serializable (r11637, r11638)
+- A bunch of classes no longer implement or extend Serializable, mostly for Network and Population data structure (r11637, r11638, r11650 - r11653, r11655)
 
 
 Bug-Fixes:
