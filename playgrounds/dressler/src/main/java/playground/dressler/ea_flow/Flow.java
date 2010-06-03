@@ -1423,7 +1423,7 @@ public class Flow {
 		}else if(step instanceof StepSourceFlow){
 			StepSourceFlow sourcestep = (StepSourceFlow)step;
 			Node source =sourcestep.getArrivalNode().getRealNode();
-			time = sourcestep.getArrivalTime();
+			time = sourcestep.getStartTime();
 			tree =this._sourcePathMap.get(source);
 		}else if(step instanceof StepSinkFlow){
 			StepSinkFlow sinkstep = (StepSinkFlow)step;
@@ -1431,7 +1431,7 @@ public class Flow {
 			time = sinkstep.getArrivalTime();
 			tree =this._sinkPathMap.get(sink);
 		}
-		System.out.println("timttimetime: "+ time);
+		//System.out.println("timttimetime: "+ time);
 		return tree.get(time);
 	}
 	private boolean checkPathMap(boolean complete){
@@ -1505,7 +1505,7 @@ public class Flow {
 				}else if(step instanceof StepSourceFlow){
 					StepSourceFlow sourcestep = (StepSourceFlow)step;
 					Node source =sourcestep.getArrivalNode().getRealNode();
-					time = sourcestep.getStartTime();
+					time = sourcestep.getArrivalTime();
 					tree =this._sourcePathMap.get(source);
 				}else if(step instanceof StepSinkFlow){
 					StepSinkFlow sinkstep = (StepSinkFlow)step;
@@ -1563,7 +1563,7 @@ public class Flow {
 			}else if(step instanceof StepSourceFlow){
 				StepSourceFlow sourcestep = (StepSourceFlow)step;
 				Node source =sourcestep.getArrivalNode().getRealNode();
-				time = sourcestep.getStartTime();
+				time = sourcestep.getArrivalTime();
 				tree =this._sourcePathMap.get(source);
 				if(tree == null){
 					tree = new TreeMap<Integer,LinkedList<TimeExpandedPath>>();
@@ -1602,8 +1602,8 @@ public class Flow {
 					tree =this._edgePathMap.get(link);
 				}else if(step instanceof StepSourceFlow){
 					StepSourceFlow sourcestep = (StepSourceFlow)step;
-					Node source =sourcestep.getArrivalNode().getRealNode();
-					time = sourcestep.getStartTime();
+					Node source = sourcestep.getArrivalNode().getRealNode();
+					time = sourcestep.getArrivalTime();
 					tree =this._sourcePathMap.get(source);
 				}else if(step instanceof StepSinkFlow){
 					StepSinkFlow sinkstep = (StepSinkFlow)step;
