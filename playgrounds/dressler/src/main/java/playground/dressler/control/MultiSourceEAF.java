@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -303,10 +304,8 @@ public class MultiSourceEAF {
 		
 		List<TimeExpandedPath> result = null;
 		fluss = new Flow(settings);
-		if(paths!=null){
-			if (_debug) {
-				System.out.println("restoring flow");
-			}
+		if(paths!=null) {
+			System.out.println("restoring flow");			
 			for (TimeExpandedPath path : paths) {
 				fluss.augment(path,path.getFlow());
 			}
@@ -357,7 +356,7 @@ public class MultiSourceEAF {
 						
 			Tsearch.onoff();
 			// ugly ...
-			if (haslastcost) {
+			if (haslastcost && settings.useSinkCapacities) {
 			  ((BellmanFordIntervalBasedWithCost) routingAlgo).startNewIter(lasttime, lastcost);
 			} else {
 			  routingAlgo.startNewIter(lasttime);
@@ -681,7 +680,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 11;
+		int instance = 2;
 		// 1 = siouxfalls, demand 500
 		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
@@ -742,10 +741,15 @@ public class MultiSourceEAF {
 		} else if (instance == 42) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
-			timeStep = 10;
+			timeStep = 10; // war 10
 			flowFactor = 1.0;
 			sinkid = "en1";
 			//shelterfile = "/homes/combi/Projects/ADVEST/padang/network/shelter_info_v20100317";
+		} else if (instance == 4200) {
+			// wie 42, aber als .dat-Datei
+			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_10s_no_shelters.dat";
+			timeStep = 1;
+			flowFactor = 1.0;
 		} else if (instance == 43) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
@@ -847,7 +851,7 @@ public class MultiSourceEAF {
 		
 		//outputplansfile = "/homes/combi/dressler/V/code/meine_EA/tempplans.xml";
 		//flowfile = "/homes/combi/dressler/V/vnotes/statistik_2010_04_april/bug_shelters_implicit.pathflow";
-		//flowfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_250k_10s_no_shelters.pathflow";
+		//flowfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_250k_10s_shelters.pathflow";
 		
 
 		if(_debug){
@@ -940,6 +944,10 @@ public class MultiSourceEAF {
 			
 		}
 		
+		//NetworkWriter writer = new NetworkWriter(network);
+		//writer.write("/homes/combi/dressler/V/code/meine_EA/padang_v2010_mit_shelter.xml");
+		//if (true) return;
+		
 		
 		//check if demands and sink are set
 		if (demands.isEmpty()) {
@@ -960,26 +968,26 @@ public class MultiSourceEAF {
 		settings.flowFactor = flowFactor; // default 1.0
 
 		// set additional parameters
-		//settings.TimeHorizon = 100;
+		//settings.TimeHorizon = 2500;
 		//settings.MaxRounds = 1;
 		//settings.checkConsistency = 100;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.
-		//settings.useSinkCapacities = false;
+		settings.useSinkCapacities = false;
 		//settings.useVertexCleanup = false;
 		settings.useImplicitVertexCleanup = true;
-		settings.useShadowFlow = true;		
+		//settings.useShadowFlow = false;		
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
-		//settings.useRepeatedPaths = true; // not compatible with costs!
+		settings.useRepeatedPaths = true; // not compatible with costs!
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
 		//settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		//settings.sortPathsBeforeAugmenting = true;
 		//settings.checkTouchedNodes = true;
 		//settings.keepPaths = true; // store paths at all!
-		settings.unfoldPaths = true; // unfold stored paths into forward paths
+		//settings.unfoldPaths = true; // unfold stored paths into forward paths
 		settings.delaySinkPropagation = true; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
-		//settings.quickCutOff = true; // stop as soon as the first good path is found
+		settings.quickCutOff = false; // stop as soon as the first good path is found
 
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
@@ -1011,7 +1019,7 @@ public class MultiSourceEAF {
 		//settings.writeLP();
 		//settings.writeSimpleNetwork(true);
 		//settings.writeSimpleNetwork(false);
-		//settings.writeNET(false);
+		//settings.writeNET(true);
 		//settings.writeLodyfa();
 		//if(true)return;
 		
@@ -1038,7 +1046,7 @@ public class MultiSourceEAF {
 			int demand = fluss.getDemands().get(node);
 			if (demand > 0) {
 				// this can be a lot of text
-				//System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
+				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
 			}
 		}
 
