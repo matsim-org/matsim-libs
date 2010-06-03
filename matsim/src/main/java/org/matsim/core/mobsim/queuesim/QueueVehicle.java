@@ -23,7 +23,7 @@ package org.matsim.core.mobsim.queuesim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.vis.snapshots.writers.VisVehicle;
+import org.matsim.vehicles.Vehicle;
 
 public class QueueVehicle /* implements VisVehicle, QVehicle */ {
 
@@ -33,21 +33,21 @@ public class QueueVehicle /* implements VisVehicle, QVehicle */ {
 	private PersonDriverAgent driver = null;
 
 	private final Id id;
-	
+
 	private Link currentLink = null;
-	
+
 	private final double sizeInEquivalents;
-	
+
 	private final Vehicle basicVehicle;
-	
+
 	private QueueVehicle() {
-		this( null ) ;
+		this(null);
 	}
 
 	private QueueVehicle(final Vehicle basicVehicle) {
 		this(basicVehicle, 1.0);
 	}
-	
+
 	private QueueVehicle(final Vehicle basicVehicle, final double sizeInEquivalents) {
 		this.id = basicVehicle.getId();
 		this.sizeInEquivalents = sizeInEquivalents;
@@ -57,11 +57,11 @@ public class QueueVehicle /* implements VisVehicle, QVehicle */ {
 	 public double getLinkEnterTime() {
 		return this.linkEnterTime;
 	}
-	
+
 	public void setLinkEnterTime(final double time) {
 		this.linkEnterTime = time;
 	}
-	
+
 	 public double getEarliestLinkExitTime() {
 		return this.earliestLinkExitTime;
 	}
@@ -73,7 +73,7 @@ public class QueueVehicle /* implements VisVehicle, QVehicle */ {
 	 public Link getCurrentLink() {
 		return this.currentLink;
 	}
-	
+
 	public void setCurrentLink(final Link link) {
 		this.currentLink = link;
 	}
@@ -89,7 +89,7 @@ public class QueueVehicle /* implements VisVehicle, QVehicle */ {
 	 public Id getId() {
 		return this.id;
 	}
-	
+
 	 public double getSizeInEquivalents() {
 		return this.sizeInEquivalents;
 	}
@@ -97,11 +97,11 @@ public class QueueVehicle /* implements VisVehicle, QVehicle */ {
 	public Vehicle getBasicVehicle() {
 		return this.basicVehicle;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Vehicle Id " + getId() + ", driven by (personId) " + this.driver.getPerson().getId()
 				+ ", on link " + this.currentLink.getId();
 	}
-	
+
 }
