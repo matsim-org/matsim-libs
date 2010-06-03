@@ -48,10 +48,10 @@ public class RunKdeAnalyser {
 	 * 		- Satawal																|
 	 * 		- IE-Calvin														  		|
 	 *=============================================================================*/
-	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
+//	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
 //	private static String root = "/home/jjoubert/";										// IVT-Sim0
 //	private static String root = "/home/jjoubert/data/";								// Satawal
-//	private static String root = "/home/jwjoubert/MATSim/MATSimData/";					// IE-Calvin
+	private static String root = "/home/jwjoubert/MATSim/MATSimData/";					// IE-Calvin
 
 	 /*=============================================================================
 	 * String value that must be set. Allowed study areas are:						|
