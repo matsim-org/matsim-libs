@@ -47,7 +47,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * Default location of the namespace of xml schema
 	 */
 	public static final String DEFAULTSCHEMANAMESPACELOCATION = "http://www.w3.org/2001/XMLSchema-instance";
-	
+
 	/**
 	 * Stores the current level of indentation
 	 */
@@ -62,7 +62,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 */
 	private boolean doPrettyPrint = true;
 	private boolean noWhitespaces = false;
-	
+
 	/**
 	 * Set the pretty print flag of the XMLWriter, see comment of flag.
 	 * @param doPrettyPrint
@@ -77,20 +77,20 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	public void setIndentationString(String indentationString) {
 		this.indentationString = indentationString;
 	}
-	
+
 	/**
-	 * Set the indentation level of the writer for 
+	 * Set the indentation level of the writer for
 	 * pretty print option
 	 * @param level
 	 */
 	protected void setIndentationLevel(int level){
 		this.indentationLevel = level;
 	}
-	
+
 	protected int getIndentationLevel(){
 		return this.indentationLevel;
 	}
-	
+
 	/**
 	 * Writes the standard xml 1.0 header to the output.
 	 *
@@ -113,7 +113,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	protected void writeDoctype(String rootTag, String dtdUrl) throws IOException {
 		this.writer.write("<!DOCTYPE " + rootTag + " SYSTEM \"" + dtdUrl + "\">\n");
 	}
-	
+
 	/**
 	 * Convenience method to create XML Attributes written by startTag()
 	 */
@@ -122,7 +122,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	}
 	/**
 	 * Convenience method to create XML Attributes written by startTag()
-	 */	
+	 */
 	protected Tuple<String, String> createTuple(String one, int two) {
 		return this.createTuple(one, Integer.toString(two));
 	}
@@ -133,7 +133,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	protected Tuple<String, String> createTuple(String one, double two) {
 		return this.createTuple(one, Double.toString(two));
 	}
-	
+
 	/**
 	 * Convenience method to create XML Attributes written by startTag()
 	 */
@@ -147,8 +147,8 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	protected Tuple<String, String> createTimeTuple(String one, double sec) {
 		return this.createTuple(one, Time.writeTime(sec));
 	}
-	
-	
+
+
 	private void indent() throws IOException{
 		for (int i = 0; i < this.indentationLevel; i++) {
 			this.writer.write(this.indentationString);
@@ -164,7 +164,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	protected void writeStartTag(String tagname, List<Tuple<String, String>> attributes) throws IOException{
 		this.writeStartTag(tagname, attributes, false);
 	}
-	
+
 	protected void writeStartTag(String tagname, List<Tuple<String, String>> attributes, boolean closeElement) throws IOException {
 		if (doPrettyPrint) {
 			this.writer.write(NL);
@@ -196,14 +196,14 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 		}
 	}
 
-	
+
 	protected void writeContent(String content, boolean allowWhitespaces) throws IOException{
 		if (doPrettyPrint) {
 			this.noWhitespaces = !allowWhitespaces;
 			if (!this.noWhitespaces) {
 				this.writer.write(NL);
 				this.indentationLevel++;
-				indent();				
+				indent();
 			}
 		}
 		writer.write(content);
@@ -211,7 +211,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 			this.indentationLevel--;
 		}
 	}
-	
+
 	/**
 	 * Writes a XML end tag with the given name to the given writer instance
 	 * @param tagname
@@ -223,7 +223,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 			this.indentationLevel--;
 			if (!this.noWhitespaces) {
 				this.writer.write(NL);
-				indent();				
+				indent();
 			}
 			else {
 				this.noWhitespaces = false;
@@ -231,5 +231,16 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 		}
 		this.writer.write("</" + tagname + ">");
 	}
-	
+
+	/**
+	 * Encodes the given string in such a way that it no longer contains
+	 * characters that have a special meaning in xml.
+	 *
+	 * @param attributeValue
+	 * @return String with some characters replaced by their xml-encoding.
+	 */
+	protected String encodeAttributeValue(final String attributeValue) {
+		return attributeValue.replace("&", "&amp;").replace("\"", "&quot;");
+	}
+
 }
