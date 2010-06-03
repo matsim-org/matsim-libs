@@ -100,7 +100,7 @@ public class TransitLoad implements VehicleArrivesAtFacilityEventHandler, Vehicl
 	}
 
 	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
+	public void handleEvent(final PersonEntersVehicleEvent event) {
 		if (this.vehicleData == null) {
 			collectVehiclesInfo();
 		}
@@ -110,7 +110,7 @@ public class TransitLoad implements VehicleArrivesAtFacilityEventHandler, Vehicl
 	}
 
 	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
+	public void handleEvent(final PersonLeavesVehicleEvent event) {
 		if (this.vehicleData == null) {
 			collectVehiclesInfo();
 		}
@@ -121,7 +121,9 @@ public class TransitLoad implements VehicleArrivesAtFacilityEventHandler, Vehicl
 
 	public void reset(int iteration) {
 		this.vehicleFacilityMap.clear();
-		this.vehicleData.clear();
+		if (this.vehicleData != null) {
+			this.vehicleData.clear();
+		}
 	}
 
 	/**
