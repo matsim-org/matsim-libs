@@ -60,7 +60,7 @@ public class FlowCalculationSettings {
 	public boolean sortPathsBeforeAugmenting = true; // try to augment shorter (#steps) first?
 	public boolean keepPaths = true; // should TEPs be stored at all?
 	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
-	public boolean mapLinksToTEP=true; // remeber which path uses an edge at a given time
+	public boolean mapLinksToTEP = true; // remember which path uses an edge at a given time
 	public boolean useRepeatedPaths = true && !useSinkCapacities; // try to repeat paths
 	public boolean quickCutOff = false; // stop when the first path is found
 	public boolean delaySinkPropagation = false; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
