@@ -48,10 +48,10 @@ public class RunKdeAnalyser {
 	 * 		- Satawal																|
 	 * 		- IE-Calvin														  		|
 	 *=============================================================================*/
-//	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
+	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
 //	private static String root = "/home/jjoubert/";										// IVT-Sim0
 //	private static String root = "/home/jjoubert/data/";								// Satawal
-	private static String root = "/home/jwjoubert/MATSim/MATSimData/";					// IE-Calvin
+//	private static String root = "/home/jwjoubert/MATSim/MATSimData/";					// IE-Calvin
 
 	 /*=============================================================================
 	 * String value that must be set. Allowed study areas are:						|
@@ -88,7 +88,7 @@ public class RunKdeAnalyser {
 	private static boolean splitHourOfDay;
 	private static double resolution;
 	private static double radius;
-	private static int kdeType = 3;
+	private static int kdeType;
 	
 	/**
 	 * 
@@ -218,8 +218,19 @@ public class RunKdeAnalyser {
 			log.info("   ...lines processed: " + counter + " (Done)");
 			mr.convertMatrixToRaster();
 			String output = String.format("%s%s/%d/%s/%04d/Sample%02d/Activities/%s_KDE_%s_%s_%s_%s_%s.png", 
-					root, studyAreaName, year, version, threshold, sample, studyAreaName, args[0], args[1], args[2], args[3], args[4]);
+					root, studyAreaName, year, version, threshold, sample, studyAreaName, studyAreaName, args[0], args[1], args[2], args[3], args[4]);
 			mr.writeMyRasterToFile(output, "png");
+			
+			log.info("=================================================");
+			log.info("              PROCESS COMPLETED");
+			log.info("-------------------------------------------------");
+			log.info("Arguments:");
+			log.info("             Activity type: " + args[0]);
+			log.info("    Split hours of the day: " + args[1]);
+			log.info("                Resolution: " + args[2]);
+			log.info("                    Radius: " + args[3]);
+			log.info("                  KDE type: " + args[4]);
+			log.info("=================================================");
 			
 //			for(int a = 0; a < mr.)
 		}
