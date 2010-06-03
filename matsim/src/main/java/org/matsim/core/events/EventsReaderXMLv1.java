@@ -144,7 +144,7 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 						new IdImpl(transitRouteString)));
 			}
 			else {
-				this.events.processEvent(this.builder.createPersonEntersVehicleEvent(time,
+				this.events.processEvent(this.builder.createPersonLeavesVehicleEvent(time,
 						pId, vId, null));
 			}
 		}
