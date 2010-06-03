@@ -704,7 +704,7 @@ public class MultiSourceEAF {
 			sinkid = "supersink";
 		}else if (instance == 11) {
 			networkfile  = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
-			uniformDemands = 3;
+			uniformDemands = 10;
 			timeStep = 5;
 			flowFactor = 1.0;
 			sinkid = "supersink";

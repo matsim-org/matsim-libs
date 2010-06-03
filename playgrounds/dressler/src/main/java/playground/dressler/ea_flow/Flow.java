@@ -101,7 +101,8 @@ public class Flow {
 	 * stores which path uses an Edge a a given piont of time
 	 */
 	private  HashMap<Link,TreeMap<Integer,LinkedList<TimeExpandedPath>>> _edgePathMap;
-
+	private  HashMap<Node,TreeMap<Integer,LinkedList<TimeExpandedPath>>> _sourcePathMap;
+	private HashMap<Node,TreeMap<Integer,LinkedList<TimeExpandedPath>>>  _sinkPathMap;
 	/**
 	 * list of all sources
 	 */
@@ -172,7 +173,9 @@ public class Flow {
 		this._sources = new ArrayList<Node>();
 		this._sinks = new ArrayList<Node>();
 		this._edgePathMap =new HashMap<Link,TreeMap<Integer,LinkedList<TimeExpandedPath>>>();
-
+		this._sinkPathMap =new HashMap<Node,TreeMap<Integer,LinkedList<TimeExpandedPath>>>();
+		this._sourcePathMap =new HashMap<Node,TreeMap<Integer,LinkedList<TimeExpandedPath>>>();
+		
 		for(Node node : this._network.getNodes().values()){
 			if (this._settings.isSource(node)) {
 				int i = this._settings.getDemand(node);
@@ -191,7 +194,7 @@ public class Flow {
 
 		// initialize EdgeIntervalls or the ShadowEdgeFlows and edgePathMap
 		for (Link edge : this._network.getLinks().values()) {
-			if(settings.mapLinksToTPE){
+			if(settings.mapLinksToTEP){
 				TreeMap<Integer,LinkedList<TimeExpandedPath>> temp = new TreeMap<Integer,LinkedList<TimeExpandedPath>>();
 				this._edgePathMap.put(edge, temp);
 			}
@@ -550,7 +553,7 @@ public class Flow {
 	 * @return Amount of flow augmented
 	 */
 	public int augment(TimeExpandedPath TEP){
-	if(this._settings.mapLinksToTPE){
+	if(this._settings.mapLinksToTEP && _debug>0){
 		checkPathMap(true);
 		//mapAllPaths();
 	}
@@ -583,7 +586,7 @@ public class Flow {
 		  } else {
 			  dumbaugment(TEP, gamma);
 			  this._TimeExpandedPaths.addFirst(TEP);
-			  if(this._settings.mapLinksToTPE){
+			  if(this._settings.mapLinksToTEP){
 				  System.out.println("normal augment called");
 				  mapPath(TEP);
 			  }
@@ -1118,7 +1121,7 @@ public class Flow {
 	 * @param TEPtoAdd The TimeExpandedPath to add.
 	 */
 	private void unfoldandaugment(TimeExpandedPath TEPtoAdd){
-		if(this._settings.mapLinksToTPE){
+		if(this._settings.mapLinksToTEP&& _debug>0){
 			if(checkPathMap(true)){
 				//mapAllPaths();
 			}
@@ -1214,9 +1217,10 @@ public class Flow {
 						}
 					   throw new RuntimeException("flowToUndo == 0");
 				   }
-
+				   LinkedList<TimeExpandedPath> unfoldPaths= findReversePath(step);
+				   
   				   // search for an appropriate TEP to unfold with
-				   for (TimeExpandedPath otherTEP : this._TimeExpandedPaths) {
+				   for (TimeExpandedPath otherTEP : unfoldPaths) {
 
 					   // FIXME this seems to slow down rather than speed up the augmenting!
 					   // That is somewhat surprising, though. Needs more testing.
@@ -1350,7 +1354,7 @@ public class Flow {
 
 			// deleting paths with 0 flow does not change the flow
 			
-			if(this._settings.mapLinksToTPE){
+			if(this._settings.mapLinksToTEP){
 				  unMapPaths(zeroTEPs);
 			}
 			this._TimeExpandedPaths.removeAll(zeroTEPs);
@@ -1374,7 +1378,7 @@ public class Flow {
 			  this._TimeExpandedPaths.addFirst(good);
 			  dumbaugment(good, good.getFlow());
 			  
-			  if(this._settings.mapLinksToTPE){
+			  if(this._settings.mapLinksToTEP){
 				  mapPath(good);
 			  }
 			}
@@ -1403,9 +1407,32 @@ public class Flow {
 				}
 			}
 		}
-
-
-
+	}
+	
+	private LinkedList<TimeExpandedPath> findReversePath(PathStep step){
+		if(!this._settings.mapLinksToTEP){
+			return this._TimeExpandedPaths;
+		}
+		TreeMap<Integer,LinkedList<TimeExpandedPath>> tree=null;
+		int time=-1;
+		if (step instanceof StepEdge){
+			StepEdge edge =(StepEdge) step;
+			time = edge.getArrivalTime();
+			Link link = edge.getEdge();
+			tree =this._edgePathMap.get(link);
+		}else if(step instanceof StepSourceFlow){
+			StepSourceFlow sourcestep = (StepSourceFlow)step;
+			Node source =sourcestep.getArrivalNode().getRealNode();
+			time = sourcestep.getArrivalTime();
+			tree =this._sourcePathMap.get(source);
+		}else if(step instanceof StepSinkFlow){
+			StepSinkFlow sinkstep = (StepSinkFlow)step;
+			Node sink =sinkstep.getArrivalNode().getRealNode();
+			time = sinkstep.getArrivalTime();
+			tree =this._sinkPathMap.get(sink);
+		}
+		System.out.println("timttimetime: "+ time);
+		return tree.get(time);
 	}
 	private boolean checkPathMap(boolean complete){
 		
@@ -1420,10 +1447,39 @@ public class Flow {
 			for(LinkedList<TimeExpandedPath> list : this._edgePathMap.get(edge).values()){
 				for(TimeExpandedPath path :list){
 					if(!this._TimeExpandedPaths.contains(path)){
-						System.out.println("Path still mapped: \n"+path.toString());
+						System.out.println("WARNING  Path still mapped: \n"+path.toString());
 						error=true;
 					}else{
-						System.out.println("exists");
+						if (_debug>0){
+							System.out.println("exists");
+						}
+					}
+				}
+			}
+		}
+		for(Node node : this._sourcePathMap.keySet()){
+			for(LinkedList<TimeExpandedPath> list : this._sourcePathMap.get(node).values()){
+				for(TimeExpandedPath path :list){
+					if(!this._TimeExpandedPaths.contains(path)){
+						System.out.println("WARNING  Path still mapped: \n"+path.toString());
+						error=true;
+					}else{
+						if (_debug>0){
+							System.out.println("exists");
+						}
+					}
+				}
+			}
+		}for(Node node : this._sinkPathMap.keySet()){
+			for(LinkedList<TimeExpandedPath> list : this._sinkPathMap.get(node).values()){
+				for(TimeExpandedPath path :list){
+					if(!this._TimeExpandedPaths.contains(path)){
+						System.out.println("WARNING  Path still mapped: \n"+path.toString());
+						error=true;
+					}else{
+						if (_debug>0){
+							System.out.println("exists");
+						}
 					}
 				}
 			}
@@ -1439,33 +1495,45 @@ public class Flow {
 		//check if all paths are mapped 
 		for(TimeExpandedPath path : this._TimeExpandedPaths)
 			for (PathStep step : path.getPathSteps()){
+				TreeMap<Integer,LinkedList<TimeExpandedPath>> tree=null;
+				int time=-1;
 				if (step instanceof StepEdge){
 					StepEdge edge =(StepEdge) step;
-					int time = edge.getStartTime();
+					time = edge.getStartTime();
 					Link link = edge.getEdge();
-					TreeMap<Integer,LinkedList<TimeExpandedPath>> tree =this._edgePathMap.get(link);
-					if(tree==null){
-						System.out.println("no tree on link: "+ link.getId().toString());
-						if(!complete){
-							return false;
-						}
-						error=true;
+					tree =this._edgePathMap.get(link);
+				}else if(step instanceof StepSourceFlow){
+					StepSourceFlow sourcestep = (StepSourceFlow)step;
+					Node source =sourcestep.getArrivalNode().getRealNode();
+					time = sourcestep.getStartTime();
+					tree =this._sourcePathMap.get(source);
+				}else if(step instanceof StepSinkFlow){
+					StepSinkFlow sinkstep = (StepSinkFlow)step;
+					Node sink =sinkstep.getArrivalNode().getRealNode();
+					time = sinkstep.getStartTime();
+					tree =this._sinkPathMap.get(sink);
+				}
+				if(tree==null){
+					System.out.println("no tree on"+ step.toString());
+					if(!complete){
+						return false;
 					}
-					LinkedList<TimeExpandedPath> list =tree.get(time);
-					if(list==null){
-						System.out.println("no list on link: "+link.getId().toString()+" at time :" +time);
-						if(!complete){
-							return false;
-						}
-						error=true;
+					error=true;
+				}
+				LinkedList<TimeExpandedPath> list =tree.get(time);
+				if(list==null){
+					System.out.println("no list for: "+step.toString() +" at time :" +time);
+					if(!complete){
+						return false;
 					}
-					if(!list.contains(path)){
-						System.out.println("Path not set on link: "+link.getId().toString()+" at time :" +time+ "\n Path: "+ path.toString());
-						if(!complete){
-							return false;
-						}
-						error=true;
+					error=true;
+				}
+				if(!list.contains(path)){
+					System.out.println("Path not set on: "+step.toString()+" at time :" +time+ "\n Path: "+ path.toString());
+					if(!complete){
+						return false;
 					}
+					error=true;
 				}
 			}
 		
@@ -1481,23 +1549,43 @@ public class Flow {
 
 	private void mapPath(TimeExpandedPath path){
 		for(PathStep step : path.getPathSteps()){
+			TreeMap<Integer,LinkedList<TimeExpandedPath>> tree=null;
+			int time=-1;
 			if (step instanceof StepEdge){
 				StepEdge edge =(StepEdge) step;
-				int time = edge.getStartTime();
+				time = edge.getStartTime();
 				Link link = edge.getEdge();
-				TreeMap<Integer,LinkedList<TimeExpandedPath>> tree =this._edgePathMap.get(link);
+				tree =this._edgePathMap.get(link);
 				if(tree == null){
 					tree = new TreeMap<Integer,LinkedList<TimeExpandedPath>>();
 					this._edgePathMap.put(link, tree);
 				}
-				LinkedList<TimeExpandedPath> list =tree.get(time);
-				if(list==null){
-					list = new LinkedList<TimeExpandedPath>();
-					tree.put(time, list);
+			}else if(step instanceof StepSourceFlow){
+				StepSourceFlow sourcestep = (StepSourceFlow)step;
+				Node source =sourcestep.getArrivalNode().getRealNode();
+				time = sourcestep.getStartTime();
+				tree =this._sourcePathMap.get(source);
+				if(tree == null){
+					tree = new TreeMap<Integer,LinkedList<TimeExpandedPath>>();
+					this._sourcePathMap.put(source, tree);
 				}
-				if(!list.contains(path)){
-					list.addFirst(path);
+			}else if(step instanceof StepSinkFlow){
+				StepSinkFlow sinkstep = (StepSinkFlow)step;
+				Node sink =sinkstep.getArrivalNode().getRealNode();
+				time = sinkstep.getStartTime();
+				tree =this._sinkPathMap.get(sink);
+				if(tree == null){
+					tree = new TreeMap<Integer,LinkedList<TimeExpandedPath>>();
+					this._sinkPathMap.put(sink, tree);
 				}
+			}
+			LinkedList<TimeExpandedPath> list =tree.get(time);
+			if(list==null){
+				list = new LinkedList<TimeExpandedPath>();
+				tree.put(time, list);
+			}
+			if(!list.contains(path)){
+				list.addFirst(path);
 			}
 		}
 	}
@@ -1505,26 +1593,39 @@ public class Flow {
 	private void unMapPaths(LinkedList<TimeExpandedPath> paths){
 		for (TimeExpandedPath path : paths){
 			for (PathStep step : path.getPathSteps()){
+				int time = -1;
+				TreeMap<Integer,LinkedList<TimeExpandedPath>> tree =null;
 				if (step instanceof StepEdge){
 					StepEdge edge =(StepEdge) step;
-					int time = edge.getStartTime();
+					time = edge.getStartTime();
 					Link link = edge.getEdge();
-					TreeMap<Integer,LinkedList<TimeExpandedPath>> tree =this._edgePathMap.get(link);
-					if(tree == null){
-						System.out.println("NO PATH TREE!!!!!");
+					tree =this._edgePathMap.get(link);
+				}else if(step instanceof StepSourceFlow){
+					StepSourceFlow sourcestep = (StepSourceFlow)step;
+					Node source =sourcestep.getArrivalNode().getRealNode();
+					time = sourcestep.getStartTime();
+					tree =this._sourcePathMap.get(source);
+				}else if(step instanceof StepSinkFlow){
+					StepSinkFlow sinkstep = (StepSinkFlow)step;
+					Node sink =sinkstep.getArrivalNode().getRealNode();
+					time = sinkstep.getStartTime();
+					tree =this._sinkPathMap.get(sink);
+				}
+				if(tree == null){
+					System.out.println("NO PATH TREE!!!!!");
+				}else{
+					LinkedList<TimeExpandedPath> list =tree.get(time);
+					if(list==null){
+						System.out.println("NO LIST WHERE IT SOULD BE!!!!!!");
 					}else{
-						LinkedList<TimeExpandedPath> list =tree.get(time);
-						if(list==null){
-							System.out.println("NO LIST WHERE IT SOULD BE!!!!!!");
-						}else{
-							if(!list.remove(path)){
-								if(this._TimeExpandedPaths.contains(path)){
-									System.out.println("NO PATH ENTRY!!!!!!");
-								}
-							}else{System.out.println("found: \n"+path);}
-						}
+						if(!list.remove(path)){
+							if(this._TimeExpandedPaths.contains(path)){
+								System.out.println("NO PATH ENTRY!!!!!!");
+							}
+						}else if(_debug>0){System.out.println("found: \n"+path);}
 					}
 				}
+				
 			}
 		}
 	}
