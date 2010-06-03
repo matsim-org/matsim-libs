@@ -116,7 +116,6 @@ public class RunKdeAnalyser {
 		if(args.length != 5){
 			throw new RuntimeException("Must have 5 arguments!");
 		}
-		
 		activityType = args[0];
 		splitHourOfDay = Boolean.parseBoolean(args[1]);
 		resolution = Double.parseDouble(args[2]);

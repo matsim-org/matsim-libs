@@ -157,6 +157,7 @@ public class MyRaster{
 		return b;
 	}
 
+	
 	/**
 	 * Just a dummy method to test the image reading capability of the 
 	 * <i>java.awt</i> package.
