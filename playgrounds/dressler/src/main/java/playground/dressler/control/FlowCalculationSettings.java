@@ -60,6 +60,7 @@ public class FlowCalculationSettings {
 	public boolean sortPathsBeforeAugmenting = true; // try to augment shorter (#steps) first?
 	public boolean keepPaths = true; // should TEPs be stored at all?
 	public boolean unfoldPaths = true; // if they are stored, should they be unfolded to contain only forward edges?
+	public boolean mapLinksToTPE=true; // remeber which path uses an edge at a given time
 	public boolean useRepeatedPaths = true && !useSinkCapacities; // try to repeat paths
 	public boolean quickCutOff = false; // stop when the first path is found
 	public boolean delaySinkPropagation = false; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
@@ -300,6 +301,7 @@ public class FlowCalculationSettings {
 		System.out.println("Use touched nodes hashmaps: " + this.checkTouchedNodes);
 		System.out.println("Keep paths at all: " + this.keepPaths);
 		System.out.println("Unfold stored paths: " + this.unfoldPaths);
+		System.out.println(" Remeber which Paths use an edge: "+ this.mapLinksToTPE);
 		System.out.println("Check consistency every: " + this.checkConsistency + " rounds (0 = off)");
 		System.out.println("Garbage collection every: " + this.doGarbageCollection + " rounds (0 = off)");
 

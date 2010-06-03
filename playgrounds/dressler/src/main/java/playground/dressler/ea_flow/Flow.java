@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -95,6 +96,11 @@ public class Flow {
 	 * TimeExpandedTimeExpandedPath representation of flow on the network
 	 */
 	private final LinkedList<TimeExpandedPath> _TimeExpandedPaths;
+	
+	/**
+	 * stores which path uses an Edge a a given piont of time
+	 */
+	private  HashMap<Link,TreeMap<Integer,LinkedList<TimeExpandedPath>>> _edgePathMap;
 
 	/**
 	 * list of all sources
@@ -165,7 +171,7 @@ public class Flow {
 		this._demands = new HashMap<Node, Integer>();
 		this._sources = new ArrayList<Node>();
 		this._sinks = new ArrayList<Node>();
-
+		this._edgePathMap =new HashMap<Link,TreeMap<Integer,LinkedList<TimeExpandedPath>>>();
 
 		for(Node node : this._network.getNodes().values()){
 			if (this._settings.isSource(node)) {
@@ -183,8 +189,12 @@ public class Flow {
 			}
 		}
 
-		// initialize EdgeIntervalls or the ShadowEdgeFlows
+		// initialize EdgeIntervalls or the ShadowEdgeFlows and edgePathMap
 		for (Link edge : this._network.getLinks().values()) {
+			if(settings.mapLinksToTPE){
+				TreeMap<Integer,LinkedList<TimeExpandedPath>> temp = new TreeMap<Integer,LinkedList<TimeExpandedPath>>();
+				this._edgePathMap.put(edge, temp);
+			}
 			int low = 0;
 			int high = settings.TimeHorizon;
 			// Intervals expects that it starts at 0, so we cannot restrict ourselves
@@ -540,6 +550,10 @@ public class Flow {
 	 * @return Amount of flow augmented
 	 */
 	public int augment(TimeExpandedPath TEP){
+	if(this._settings.mapLinksToTPE){
+		checkPathMap(true);
+		//mapAllPaths();
+	}
 	  int bottleneck = bottleNeckCapacity(TEP);
 	  return this.augment(TEP, bottleneck);
 	}
@@ -569,6 +583,10 @@ public class Flow {
 		  } else {
 			  dumbaugment(TEP, gamma);
 			  this._TimeExpandedPaths.addFirst(TEP);
+			  if(this._settings.mapLinksToTPE){
+				  System.out.println("normal augment called");
+				  mapPath(TEP);
+			  }
 		  }
 	  } else {
 		  dumbaugment(TEP, gamma);
@@ -1100,6 +1118,11 @@ public class Flow {
 	 * @param TEPtoAdd The TimeExpandedPath to add.
 	 */
 	private void unfoldandaugment(TimeExpandedPath TEPtoAdd){
+		if(this._settings.mapLinksToTPE){
+			if(checkPathMap(true)){
+				//mapAllPaths();
+			}
+		}
 		// this function could be quite slow ...
 		/*
 		 * This is built on the following assumptions:
@@ -1161,7 +1184,7 @@ public class Flow {
 
 			/* remove loops
 			 */
-
+		    //TODO may need remapping
 			TEP = removeOpposing(TEP);
 			TEP = unloopNoOpposing(TEP);
 
@@ -1279,7 +1302,9 @@ public class Flow {
 
 							   // flow might be zero, should be deleted!
 							   if (otherTEP.getFlow() == 0) {
-							     zeroTEPs.add(otherTEP);
+								   if(!zeroTEPs.contains(otherTEP)){
+									   zeroTEPs.add(otherTEP);
+								   }
 							   }
 
 							   // We found the forward step we were looking for.
@@ -1324,7 +1349,12 @@ public class Flow {
 			}
 
 			// deleting paths with 0 flow does not change the flow
+			
+			if(this._settings.mapLinksToTPE){
+				  unMapPaths(zeroTEPs);
+			}
 			this._TimeExpandedPaths.removeAll(zeroTEPs);
+			
 			zeroTEPs.clear();
 
 			/*// DEBUG
@@ -1343,6 +1373,10 @@ public class Flow {
 			  // addFirst is better than addLast: interact with recently added TEPs
 			  this._TimeExpandedPaths.addFirst(good);
 			  dumbaugment(good, good.getFlow());
+			  
+			  if(this._settings.mapLinksToTPE){
+				  mapPath(good);
+			  }
 			}
 			goodTEPs.clear();
 
@@ -1373,7 +1407,127 @@ public class Flow {
 
 
 	}
+	private boolean checkPathMap(boolean complete){
+		
+	
+		return pathsAreMapped(complete)&& mappedPathsExist(complete);
+	}
+	
+	
+	private boolean mappedPathsExist(boolean complete){
+		boolean error =false;
+		for(Link edge : this._network.getLinks().values()){
+			for(LinkedList<TimeExpandedPath> list : this._edgePathMap.get(edge).values()){
+				for(TimeExpandedPath path :list){
+					if(!this._TimeExpandedPaths.contains(path)){
+						System.out.println("Path still mapped: \n"+path.toString());
+						error=true;
+					}else{
+						System.out.println("exists");
+					}
+				}
+			}
+		}
+		return !error;
+	}
+	
+	
+	
+	private boolean pathsAreMapped(boolean complete){
+		System.out.println( "begin pathmapcheck");
+		boolean error=false;
+		//check if all paths are mapped 
+		for(TimeExpandedPath path : this._TimeExpandedPaths)
+			for (PathStep step : path.getPathSteps()){
+				if (step instanceof StepEdge){
+					StepEdge edge =(StepEdge) step;
+					int time = edge.getStartTime();
+					Link link = edge.getEdge();
+					TreeMap<Integer,LinkedList<TimeExpandedPath>> tree =this._edgePathMap.get(link);
+					if(tree==null){
+						System.out.println("no tree on link: "+ link.getId().toString());
+						if(!complete){
+							return false;
+						}
+						error=true;
+					}
+					LinkedList<TimeExpandedPath> list =tree.get(time);
+					if(list==null){
+						System.out.println("no list on link: "+link.getId().toString()+" at time :" +time);
+						if(!complete){
+							return false;
+						}
+						error=true;
+					}
+					if(!list.contains(path)){
+						System.out.println("Path not set on link: "+link.getId().toString()+" at time :" +time+ "\n Path: "+ path.toString());
+						if(!complete){
+							return false;
+						}
+						error=true;
+					}
+				}
+			}
+		
+		System.out.println("end pathmapcheck");
+		return !error;
+	}
+	
+	private void mapAllPaths(){
+		for(TimeExpandedPath path : this._TimeExpandedPaths){
+			mapPath(path);
+		}
+	}
 
+	private void mapPath(TimeExpandedPath path){
+		for(PathStep step : path.getPathSteps()){
+			if (step instanceof StepEdge){
+				StepEdge edge =(StepEdge) step;
+				int time = edge.getStartTime();
+				Link link = edge.getEdge();
+				TreeMap<Integer,LinkedList<TimeExpandedPath>> tree =this._edgePathMap.get(link);
+				if(tree == null){
+					tree = new TreeMap<Integer,LinkedList<TimeExpandedPath>>();
+					this._edgePathMap.put(link, tree);
+				}
+				LinkedList<TimeExpandedPath> list =tree.get(time);
+				if(list==null){
+					list = new LinkedList<TimeExpandedPath>();
+					tree.put(time, list);
+				}
+				if(!list.contains(path)){
+					list.addFirst(path);
+				}
+			}
+		}
+	}
+	
+	private void unMapPaths(LinkedList<TimeExpandedPath> paths){
+		for (TimeExpandedPath path : paths){
+			for (PathStep step : path.getPathSteps()){
+				if (step instanceof StepEdge){
+					StepEdge edge =(StepEdge) step;
+					int time = edge.getStartTime();
+					Link link = edge.getEdge();
+					TreeMap<Integer,LinkedList<TimeExpandedPath>> tree =this._edgePathMap.get(link);
+					if(tree == null){
+						System.out.println("NO PATH TREE!!!!!");
+					}else{
+						LinkedList<TimeExpandedPath> list =tree.get(time);
+						if(list==null){
+							System.out.println("NO LIST WHERE IT SOULD BE!!!!!!");
+						}else{
+							if(!list.remove(path)){
+								if(this._TimeExpandedPaths.contains(path)){
+									System.out.println("NO PATH ENTRY!!!!!!");
+								}
+							}else{System.out.println("found: \n"+path);}
+						}
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 * method to resolve residual edges in TEP
@@ -1775,6 +1929,7 @@ public class Flow {
 //-----------evaluation methods---------------------------------------------------//
 ////////////////////////////////////////////////////////////////////////////////////
 
+	
 	/**
 	 * gives back an array containing the amount of flow into the sink for all time steps from 0 to time horizon
 	 */

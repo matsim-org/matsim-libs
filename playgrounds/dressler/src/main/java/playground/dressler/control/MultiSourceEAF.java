@@ -681,8 +681,9 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 43;
+		int instance = 11;
 		// 1 = siouxfalls, demand 500
+		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
 		// 3 = padang, demand 5
 		// 4 = padang, with 10% plans, 10s steps
@@ -690,7 +691,7 @@ public class MultiSourceEAF {
 		// 42 = padang, v2010, with 100% plans (no shelters yet)
 		// 43 = padang, v2010, with 100% plans, 10s steps, shelters
 		// 44 = padang, v2010, with 100% plans, 5s steps (no shelters yet)
-		//421-441 same as above only Manuel
+		// 421-441 same as above only Manuel
 		// 5 = probeevakuierung telefunken
 		// 1024 = xmas network
 		// else = custom ...
@@ -701,7 +702,20 @@ public class MultiSourceEAF {
 			timeStep = 10;
 			flowFactor = 1.0;
 			sinkid = "supersink";
-		} else if (instance == 2) {
+		}else if (instance == 11) {
+			networkfile  = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
+			uniformDemands = 3;
+			timeStep = 5;
+			flowFactor = 1.0;
+			sinkid = "supersink";
+		}else if (instance == 12) {
+			networkfile  = "/Users/manuel/testdata/simple/elfen_net.xml";
+			//uniformDemands = 30;
+			plansfile ="/Users/manuel/testdata/simple/elfen_1_plan.xml";
+			timeStep = 1;
+			flowFactor = 1.0;
+			sinkid = "en1";}
+		else if (instance == 2) {
 			networkfile = "/homes/combi/Projects/ADVEST/testcases/meine_EA/swissold_network_5s.xml";
 			uniformDemands = 100;
 			timeStep = 10;
