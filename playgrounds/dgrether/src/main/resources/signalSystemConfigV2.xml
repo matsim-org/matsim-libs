@@ -1,0 +1,43 @@
+<!--  AdaptiveSignalSystemController muss signalgroups eigentlich nicht mehr kennen-->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<signalSystemConfig xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalSystemsConfig_v1.1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
+    <signalSystemConfiguration refId="42">
+        <signalSystemControlInfo xsi:type="planbasedSignalSystemControlInfoType">
+            <signalSystemPlan id="8">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="60"/>
+                <signalGroupSettings refId="23">
+                    <roughcast sec="0"/>
+                    <dropping sec="45"/>
+                </signalGroupSettings>
+            </signalSystemPlan>
+        </signalSystemControlInfo>
+    </signalSystemConfiguration>
+    
+    <signalSystemConfiguration refId="43">
+      <signalSystemControlInfo xsi:type="adaptiveSignalSystemControlInfoType">
+          <adaptiveControler>org.matism.nonexistingpackage.Nonexistingcontroler</adaptiveControler>
+      </signalSystemControlInfo>
+    </signalSystemConfiguration>
+
+    <signalSystemConfiguration refId="24">
+        <signalSystemControlInfo xsi:type="adaptivePlanbasedSignalSystemControlInfoType">
+          <adaptiveControler>org.matism.nonexistingpackage.Nonexistingcontroler</adaptiveControler>
+          <signalGroup refId="23"/>
+          <signalGroup refId="42"/>
+          <signalSystemPlan id="5">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="40"/>
+                <synchronizationOffset sec="3"/>
+                <signalGroupSettings refId="23">
+                    <roughcast sec="0"/>
+                    <dropping sec="45"/>
+                    <interGreenTimeRoughcast sec="2"/>
+                    <interGreenTimeDropping sec="3"/>
+                </signalGroupSettings>
+            </signalSystemPlan>
+        </signalSystemControlInfo>
+    </signalSystemConfiguration>
+</signalSystemConfig>

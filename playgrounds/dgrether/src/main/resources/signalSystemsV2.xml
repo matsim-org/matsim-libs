@@ -5,18 +5,34 @@
         <defaultCycleTime seconds="57.0"/>
         <defaultSynchronizationOffset seconds="0.0"/>
         <defaultInterGreenTime seconds="3.0"/>
+        <!-- Definiert die Signalgruppe für den Link 6  (alle Richtungen)     -->
+	      <signalGroupDefinition linkIdRef="6" id="1">
+	       </signalGroupDefinition>
+	      
+	      <!-- Definiert die Signalgruppe für die Spur 1 (alle Richtungen) auf Link 6       -->
+        <signalGroupDefinition linkIdRef="6" id="1">
+           <lane refId="1" />
+         </signalGroupDefinition>
+
+        <!-- Definiert die Signalgruppe für den Link 6, nur in Richtung Link 3       -->
+        <signalGroupDefinition linkIdRef="6" id="1">
+            <toLink refId="3"/>
+         </signalGroupDefinition>
+         
+        <!-- Definiert die Signalgruppe für die Spur 1 auf Link 6, aber nur in Richtung Link 3  -->
+        <signalGroupDefinition linkIdRef="6" id="1">
+           <lane refId="1">
+             <toLink refId="3"/>
+           </lane>
+         </signalGroupDefinition>
+         
+        <!-- Definiert die Signalgruppe für die Spur 1 auf Link 6, aber nur in Richtung Link 5  -->
+        <signalGroupDefinition linkIdRef="6" id="2">
+           <lane refId="1">
+             <toLink refId="5"/>
+           </lane>
+         </signalGroupDefinition>
     </signalSystemDefinition>
-    <signalGroupDefinition linkIdRef="6" id="1">
-        <signalSystemDefinition refId="1"/>
-        <lane refId="1"/>
-        <toLink refId="9"/>
-    </signalGroupDefinition>
-    <signalGroupDefinition linkIdRef="6" id="2">
-        <signalSystemDefinition refId="1"/>
-        <lane refId="2"/>
-        <lane refId="3"/>
-        <toLink refId="3"/>
-        <toLink refId="5"/>
-    </signalGroupDefinition>
+    
 </signalSystems>   
  
