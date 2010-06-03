@@ -101,7 +101,7 @@ public class Trb09Analysis {
 		String avgDeltaUtilsQuantilesChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaUtilsQuantilesChart" + runNumber1 + "vs" + runNumber2;
 		String avgDeltaUtilsModeQuantilesChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaUtilsModeQuantilesChart"+runNumber1+"vs"+runNumber2;
 		String avgDeltaMoneyQuantilesChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaMoneyQuantilesChart"+runNumber1+"vs"+runNumber2;
-		String avgTollPaidInQuantileChartFile = BkPaths.RUNSSVN + runid2String + "/avgDeltaMoneyQuantilesChart"+runNumber2;
+		String avgTollPaidInQuantilesChartFile = BkPaths.RUNSSVN + runid2String + "/avgTollPaidInQuantilesChart"+runNumber2;
 //***************************************************************************************************************************************************
 		
 		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader();
@@ -178,7 +178,7 @@ if(config.scenario().isUseRoadpricing()){
 	
 	//money difference chart (due to toll)
 	BkAvgTollPaidQuantilesChart avgTollPaidQuantilesChart = new BkAvgTollPaidQuantilesChart (ana, runid2);
-	DgChartWriter.writeChart(avgTollPaidInQuantileChartFile, avgTollPaidQuantilesChart.createChart());
+	DgChartWriter.writeChart(avgTollPaidInQuantilesChartFile, avgTollPaidQuantilesChart.createChart());
 	
 //***************************************************************************************************************************************************
 //another filter for a certain area
