@@ -73,12 +73,14 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 			nofLegs += nofDepartures;
 		}
 		log.info("number of legs:\t"  + nofLegs + "\t100%");
-		for (TransportMode legMode : this.histogram.getLegModes()) {
+		for (TransportMode legMode : TransportMode.values()) {
 			int nofModeLegs = 0;
 			for (int nofDepartures : this.histogram.getDepartures(legMode)) {
 				nofModeLegs += nofDepartures;
 			}
-			log.info("number of " + legMode + " legs:\t"  + nofModeLegs + "\t" + (nofModeLegs * 100.0 / nofLegs) + "%");
+			if (nofModeLegs != 0) {
+				log.info("number of " + legMode + " legs:\t"  + nofModeLegs + "\t" + (nofModeLegs * 100.0 / nofLegs) + "%");
+			}
 		}
 	}
 
