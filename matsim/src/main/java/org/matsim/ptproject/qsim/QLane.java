@@ -524,7 +524,7 @@ public class QLane implements QBufferItem {
 		return this.simulatedFlowCapacity;
 	}
 
-	QVehicle getFirstFromBuffer() {
+	public QVehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
 
@@ -649,7 +649,12 @@ public class QLane implements QBufferItem {
   public double getBufferLastMovedTime() {
     return this.bufferLastMovedTime;
   }
-
+  
+  @Override
+  public boolean hasGreenForToLink(Id toLinkId){
+  	return true;
+  }
+  
   /**
    * Inner class to capsulate visualization methods
    *

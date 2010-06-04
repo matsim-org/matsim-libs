@@ -150,9 +150,9 @@ public class QNode implements VisNode {
 	}
 	
   protected void clearLinkBuffer(final QLink link, final double now){
-    if (link instanceof QLinkImpl){
+  	if (link instanceof QLinkImpl){
       while (!link.bufferIsEmpty()) {
-        QVehicle veh = ((QLinkImpl) link).getFirstFromBuffer();
+        QVehicle veh = link.getFirstFromBuffer();
         if (!moveVehicleOverNode(veh, link, now)) {
           break;
         }
@@ -185,22 +185,26 @@ public class QNode implements VisNode {
   // ////////////////////////////////////////////////////////////////////
   /**
    * @param veh
-   * @param currentLane
+   * @param qbufferedItem
    * @param now
    * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
    * otherwise (e.g. in case where the next link is jammed)
    */
-  protected boolean moveVehicleOverNode(final QVehicle veh, final QBufferItem currentLane, final double now) {
+  protected boolean moveVehicleOverNode(final QVehicle veh, final QBufferItem qbufferedItem, final double now) {
     Id nextLinkId = veh.getDriver().chooseNextLinkId();
     Link currentLink = veh.getCurrentLink();
-    
+    if (this.isSignalized() && (!qbufferedItem.hasGreenForToLink(nextLinkId))) {
+    		if (!((now - qbufferedItem.getBufferLastMovedTime()) > this.simEngine.getQSim().getStuckTime())){
+    			return false;
+    		}
+    }
     // veh has to move over node
     if (nextLinkId != null) {
       QLink nextQueueLink = this.simEngine.getQSim().getQNetwork().getLinks().get(nextLinkId);
       Link nextLink = nextQueueLink.getLink();
       this.checkNextLinkSemantics(currentLink, nextLink, veh);
       if (nextQueueLink.hasSpace()) {
-        (currentLane).popFirstFromBuffer();
+        qbufferedItem.popFirstFromBuffer();
         veh.getDriver().moveOverNode();
         nextQueueLink.addFromIntersection(veh);
         return true;
@@ -208,19 +212,19 @@ public class QNode implements VisNode {
 
       // check if veh is stuck!
 
-      if ((now - currentLane.getBufferLastMovedTime()) > this.simEngine.getQSim().getStuckTime()) {
+      if ((now - qbufferedItem.getBufferLastMovedTime()) > this.simEngine.getQSim().getStuckTime()) {
         /* We just push the vehicle further after stucktime is over, regardless
          * of if there is space on the next link or not.. optionally we let them
          * die here, we have a config setting for that!
          */
         if (this.simEngine.getQSim().getScenario().getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
-          currentLane.popFirstFromBuffer();
+          qbufferedItem.popFirstFromBuffer();
           this.simEngine.getQSim().getAgentCounter().decLiving();
           this.simEngine.getQSim().getAgentCounter().incLost();
           this.simEngine.getQSim().getEventsManager().processEvent(
               new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
         } else {
-          currentLane.popFirstFromBuffer();
+          qbufferedItem.popFirstFromBuffer();
           veh.getDriver().moveOverNode();
           nextQueueLink.addFromIntersection(veh);
           return true;
@@ -230,7 +234,7 @@ public class QNode implements VisNode {
     }
 
     // --> nextLink == null
-    currentLane.popFirstFromBuffer();
+    qbufferedItem.popFirstFromBuffer();
     this.simEngine.getQSim().getAgentCounter().decLiving();
     this.simEngine.getQSim().getAgentCounter().incLost();
     log.error(
@@ -257,7 +261,6 @@ public class QNode implements VisNode {
 
 	@Override
 	public VisData getVisData() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

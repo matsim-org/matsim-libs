@@ -470,6 +470,8 @@ public class QLinkLanesImpl implements QLink {
     return ll;
   }
 
+  
+  
 	/**
 	 * Inner class to capsulate visualization methods
 	 * @author dgrether
@@ -514,15 +516,27 @@ public class QLinkLanesImpl implements QLink {
 	}
 
 
-  @Override
-  public double getBufferLastMovedTime() {
-    throw new UnsupportedOperationException();
-  }
+	@Override
+	public double getBufferLastMovedTime() {
+		throw new UnsupportedOperationException("Method should not be called on this instance");
+	}
 
 
-  @Override
-  public QVehicle popFirstFromBuffer() {
-    throw new UnsupportedOperationException();
-  }
+	@Override
+	public QVehicle getFirstFromBuffer() {
+		throw new UnsupportedOperationException("Method should not be called on this instance");
+	}
+
+
+	@Override
+	public boolean hasGreenForToLink(Id toLinkId) {
+		throw new UnsupportedOperationException("Method should not be called on this instance");
+	}
+
+
+	@Override
+	public QVehicle popFirstFromBuffer() {
+		throw new UnsupportedOperationException("Method should not be called on this instance");
+	}
 
 }

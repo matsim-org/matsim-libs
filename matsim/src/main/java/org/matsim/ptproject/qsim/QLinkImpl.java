@@ -345,6 +345,7 @@ public class QLinkImpl implements QLink {
 	public boolean hasSpace() {
 		return this.usedStorageCapacity < getStorageCapacity();
 	}
+	
 
 	public void recalcTimeVariantAttributes(double now) {
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed(now);
@@ -458,13 +459,10 @@ public class QLinkImpl implements QLink {
 		return this.qsimEngine;
 	}
 
-	public void setQSimEngine(QSimEngine qsimEngine){
+	@Override
+	public void setQSimEngine(QSimEngine qsimEngine) {
 		this.qsimEngine = qsimEngine;
 	}
-
-	//	public Queue<QueueVehicle> getVehiclesInBuffer() {
-	//		return this.originalLane.getVehiclesInBuffer();
-	//	}
 
 	/**
 	 * One should think about the need for this method
@@ -547,7 +545,8 @@ public class QLinkImpl implements QLink {
 		this.getQSimEngine().getQSim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
 		return veh;
 	}
-	QVehicle getFirstFromBuffer() {
+	
+	public QVehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
 
@@ -566,7 +565,13 @@ public class QLinkImpl implements QLink {
 		return this.bufferLastMovedTime;
 	}
 
+	@Override
+  public boolean hasGreenForToLink(Id toLinkId){
+  	return true;
+  }
 
+	
+	
 	/**
 	 * Inner class to encapsulate visualization methods
 	 *

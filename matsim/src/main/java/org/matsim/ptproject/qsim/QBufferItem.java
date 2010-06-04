@@ -19,18 +19,34 @@
  * *********************************************************************** */
 package org.matsim.ptproject.qsim;
 
+import org.matsim.api.core.v01.Id;
+
 
 
 /**
+ * Interface representing the buffer functionality common for all Queue-Logic Links and Lanes, i.e.
+ * providing selected, decorated methods for Buffer access and additional methods needed for
+ * the buffer logic implemented.
  * @author dgrether
  *
  */
 interface QBufferItem extends QSimFunctionalInterface {
+  /**
+   * equivalent to a Buffer.isEmpty() operation 
+   */
+  boolean bufferIsEmpty();
 
-  public boolean bufferIsEmpty();
-
-  public QVehicle popFirstFromBuffer();
+  /**
+   * equivalent to a Buffer.pop() operation 
+   */
+  QVehicle popFirstFromBuffer();
+  /**
+   * equivalent to a Buffer.peek() operation 
+   */
+  QVehicle getFirstFromBuffer();
   
-  public double getBufferLastMovedTime();
+  double getBufferLastMovedTime();
+
+	boolean hasGreenForToLink(Id toLinkId);
   
 }
