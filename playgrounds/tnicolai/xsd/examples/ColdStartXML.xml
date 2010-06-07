@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "F:\Development\VSPworkspace\matsim\src\playground\thomas\XML\2009_tnConfigSuggestionSchema.xsd">
+<config>
+
+<network>
+	<!-- inputFile: token, restriction: *.xml ? -->
+	<inputFile>test/scenarios/equil/network.xml</inputFile>
+</network>
+
+<controler>
+	<!-- firstIteration: nonNegativeInteger -->
+	<firstIteration>0</firstIteration>
+	<!-- lastIteration: nonNegativeInteger -->
+	<lastIteration>1</lastIteration>
+</controler>
+
+<urbansimParameter>
+	<samplingRate>0.01</samplingRate>
+	<year>2002</year>
+	<tempDirectory>/opus_matsim/tmp/</tempDirectory>
+</urbansimParameter>
+
+</config>

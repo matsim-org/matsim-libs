@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	
+	<xs:element name="network">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="inputFile" type="xs:token"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="controler">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="firstIteration" type="xs:nonNegativeInteger"/>
+				<xs:element name="lastIteration" type="xs:nonNegativeInteger"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="urbansimParameter">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="samplingRate" type="xs:double"/>
+				<xs:element name="year" type="xs:nonNegativeInteger"/>
+				<xs:element name="tempDirectory" type="xs:token"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="config">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="network"/>
+				<xs:element ref="controler"/>
+				<xs:element ref="urbansimParameter"/>
+			</xs:sequence>	
+		</xs:complexType>
+	</xs:element>
+	
+</xs:schema>
