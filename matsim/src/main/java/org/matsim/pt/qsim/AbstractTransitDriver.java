@@ -169,7 +169,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		EventsManager events = this.sim.getEventsManager();
 		if (this.currentStop == null) {
 			this.currentStop = this.nextStop;
-			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId(), now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
+			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(), stop.getId(), now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
 		}
 	}
 
@@ -192,7 +192,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 	private void depart(final double now) {
 		EventsManager events = this.sim.getEventsManager();
-		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), this.currentStop.getStopFacility().getId(), now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
+		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(), this.currentStop.getStopFacility().getId(), now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
 		this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
 		if(this.nextStop == null) {
 			assertVehicleIsEmpty();
@@ -203,7 +203,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	private void assertVehicleIsEmpty() {
 		if (this.vehicle.getPassengers().size() > 0) {
 			RuntimeException e = new RuntimeException("Transit vehicle is at last stop but still contains passengers that did not leave the vehicle!");
-			log.error("Transit vehicle must be empty after last stop! vehicle-id = " + this.vehicle.getBasicVehicle().getId(), e);
+			log.error("Transit vehicle must be empty after last stop! vehicle-id = " + this.vehicle.getVehicle().getId(), e);
 			for (PassengerAgent agent : this.vehicle.getPassengers()) {
 				if (agent instanceof QPersonAgent) {
 				log.error("Agent is still in transit vehicle: agent-id = " + ((QPersonAgent) agent).getPerson().getId());
@@ -219,7 +219,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			this.agentTracker.removeAgentFromStop(passenger, this.currentStop.getStopFacility());
 			PersonDriverAgent agent = (PersonDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
-			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time, agent.getPerson().getId(), this.vehicle.getBasicVehicle().getId(), this.getTransitRoute().getId()));
+			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time, agent.getPerson().getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
 		}
 		return handled;
 	}
@@ -229,7 +229,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		if(handled){
 			PersonDriverAgent agent = (PersonDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
-			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getBasicVehicle().getId(), this.getTransitRoute().getId()));
+			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
 			agent.teleportToLink(this.currentStop.getStopFacility().getLinkId());
 			agent.legEnds(time);
 		}
@@ -301,7 +301,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 		@Override
 		public Id getVehicleId() {
-			return AbstractTransitDriver.this.vehicle.getBasicVehicle().getId();
+			return AbstractTransitDriver.this.vehicle.getVehicle().getId();
 		}
 
 		@Override

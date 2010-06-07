@@ -56,6 +56,6 @@ public interface QVehicle extends Identifiable, VisVehicle {
 	/**
 	 * @return the <code>Vehicle</code> that this simulation vehicle represents
 	 */
-	public Vehicle getBasicVehicle();
+	public Vehicle getVehicle();
 
 }

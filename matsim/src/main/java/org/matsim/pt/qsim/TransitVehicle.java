@@ -58,7 +58,7 @@ public interface TransitVehicle extends QVehicle {
 	/**
 	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
 	 */
-	public Vehicle getBasicVehicle();
+	public Vehicle getVehicle();
 
 	public PersonDriverAgent getDriver();
 	

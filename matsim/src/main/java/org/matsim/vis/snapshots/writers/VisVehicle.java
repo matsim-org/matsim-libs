@@ -12,7 +12,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public interface VisVehicle {
 	
-	Vehicle getBasicVehicle() ;
+	Vehicle getVehicle() ;
 	
 	PersonDriverAgent getDriver() ;
 

@@ -54,7 +54,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
-		assertEquals(vehicle, veh.getBasicVehicle());
+		assertEquals(vehicle, veh.getVehicle());
 		assertEquals(7, veh.getPassengerCapacity()); // 1 place used by driver
 	}
 
@@ -65,7 +65,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
-		assertEquals(vehicle, veh.getBasicVehicle());
+		assertEquals(vehicle, veh.getVehicle());
 		assertEquals(4, veh.getPassengerCapacity()); // 1 place used by driver
 	}
 

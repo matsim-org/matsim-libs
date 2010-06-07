@@ -681,12 +681,12 @@ public class QueueSimulationTest extends TestCase {
 		Collection<? extends VisVehicle> vehicles = qlink3.getAllVehicles();
 		assertEquals(1, vehicles.size());
 //		assertEquals(id2, vehicles.toArray(new QueueVehicle[1])[0].getBasicVehicle().getId());
-		assertEquals(id2, vehicles.iterator().next().getBasicVehicle().getId());
+		assertEquals(id2, vehicles.iterator().next().getVehicle().getId());
 		// vehicle 1 should still stay on qlink2
 		vehicles = qlink2.getAllVehicles();
 		assertEquals(1, vehicles.size());
 //		assertEquals(id1, vehicles.toArray(new QueueVehicle[1])[0].getBasicVehicle().getId());
-		assertEquals(id1, vehicles.iterator().next().getBasicVehicle().getId());
+		assertEquals(id1, vehicles.iterator().next().getVehicle().getId());
 	}
 
 	/**

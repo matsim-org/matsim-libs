@@ -155,7 +155,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 		TransitQVehicle veh = new TransitQVehicle(vehicle, 5);
 		AbstractTransitDriver driver = this.abstractTransitDriverFactory.createTransitDriver(umlauf, thisAgentTracker, this.qSim);
 		veh.setDriver(driver);
-		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getBasicVehicle()));
+		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 		driver.setVehicle(veh);
 		QLink qlink = this.qSim.getQNetwork().getLinks().get(driver
 				.getCurrentLeg().getRoute().getStartLinkId());
@@ -181,7 +181,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 					TransitQVehicle veh = new TransitQVehicle(vehicles.getVehicles().get(departure.getVehicleId()), 5);
 					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this.qSim);
 					veh.setDriver(driver);
-					veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getBasicVehicle()));
+					veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 					driver.setVehicle(veh);
 					QLink qlink = this.qSim.getQNetwork().getLinks().get(driver.getCurrentLeg().getRoute().getStartLinkId());
 					// yyyyyy this could, in principle, also be a method mobsim.addVehicle( ..., linkId), and then the qnetwork

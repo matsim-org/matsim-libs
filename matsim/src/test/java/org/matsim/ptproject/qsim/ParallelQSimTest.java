@@ -751,11 +751,11 @@ public class ParallelQSimTest extends TestCase {
 
 		Collection<QVehicle> vehicles = qlink3.getAllVehicles();
 		assertEquals(1, vehicles.size());
-		assertEquals(id2, vehicles.toArray(new QVehicle[1])[0].getBasicVehicle().getId());
+		assertEquals(id2, vehicles.toArray(new QVehicle[1])[0].getVehicle().getId());
 		// vehicle 1 should still stay on qlink2
 		vehicles = qlink2.getAllVehicles();
 		assertEquals(1, vehicles.size());
-		assertEquals(id1, vehicles.toArray(new QVehicle[1])[0].getBasicVehicle().getId());
+		assertEquals(id1, vehicles.toArray(new QVehicle[1])[0].getVehicle().getId());
 	}
 
 	/**

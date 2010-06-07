@@ -547,7 +547,7 @@ public class TransitQueueSimulationTest {
 			veh.setDriver(this.driver);
 			veh.setStopHandler(new SimpleTransitStopHandler());
 			this.driver.setVehicle(veh);
-			this.departure.setVehicleId(veh.getBasicVehicle().getId());
+			this.departure.setVehicleId(veh.getVehicle().getId());
 			QLink qlink = this.getQNetwork().getQLink(this.driver.getCurrentLeg().getRoute().getStartLinkId());
 			qlink.addParkedVehicle(veh);
 

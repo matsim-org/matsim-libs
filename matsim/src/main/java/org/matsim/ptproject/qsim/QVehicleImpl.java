@@ -90,7 +90,7 @@ public class QVehicleImpl implements QVehicle {
 		return this.sizeInEquivalents;
 	}
 
-	public Vehicle getBasicVehicle() {
+	public Vehicle getVehicle() {
 		return this.basicVehicle;
 	}
 	
