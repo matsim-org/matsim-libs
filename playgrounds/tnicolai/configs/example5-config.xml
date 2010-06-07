@@ -1,0 +1,78 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+	[
+		<!ENTITY INPUTBASE    "./tnicolai/configs">
+		<!ENTITY OUTPUTBASE   "../matsim/output/example5">
+	]
+>
+<!-- This is a fairly minimal config file; see console or logfile output for more options. -->
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="&INPUTBASE;/network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="&INPUTBASE;/plans100.xml" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="&OUTPUTBASE;" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="1" />
+		<param name="eventsFileFormat" value="xml" />
+	</module>
+
+
+	<module name="simulation">
+	        <param name="snapshotFormat" value="otfvis" />
+<!-- 		Produces visualiser output in the following formats: -->
+<!-- 		"otfvis": matsim native visualizer format.  Two ways to use it: -->
+<!-- 		          () without hardware acceleration.  Simpler, but slower -->
+<!--                      () with hardware acceleration.  A bit more complicated to set up, but indispensable for larger matsim  -->
+<!--                         scenarios -->
+<!-- 		The visualiser output files are in <outputDirectory>/ITERS/it..../... -->
+		<param name="snapshotperiod" value="00:01:00" />
+
+	</module>
+
+	<module name="planCalcScore" >
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		<param name="waiting" value="-0" />
+		
+		<param name="activityType_0"            value="h" /> <!-- home -->
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />
+	
+		<param name="activityType_1"            value="w" /> <!-- work -->
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityMinimalDuration_1" value="06:00:00" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityLatestStartTime_1" value="09:00:00" />
+		<param name="activityClosingTime_1"     value="18:00:00" />
+	</module>
+
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.9" />
+		<param name="Module_1" value="ChangeExpBeta" />
+		<param name="ModuleDisableAfterIteration_1" value="null" />
+
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="ReRoute_Dijkstra" />
+		<param name="ModuleDisableAfterIteration_2" value="null" />
+
+		<param name="ModuleProbability_3" value="0.1" />
+		<param name="Module_3" value="TimeAllocationMutator" />
+		<param name="ModuleDisableAfterIteration_3" value="null" />
+	</module>
+
+	<module name="parallelEventHandling">
+        <param name="numberOfThreads" value="2" />
+    </module>
+
+</config>
