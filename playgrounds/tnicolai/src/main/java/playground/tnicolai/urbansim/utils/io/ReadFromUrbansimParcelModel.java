@@ -217,12 +217,7 @@ public class ReadFromUrbansimParcelModel {
 				PersonImpl newPerson = new PersonImpl( personId ) ;
 
 				double random = MatsimRandom.getRandom().nextDouble();
-				boolean param1 = flag;
-				boolean param2 = random < samplingRate;
 				boolean param3 = oldPop==null ? false : (oldPop.getPersons().get( personId))!=null;
-
-				boolean intermediateRes = !(param1 || param2 || param3);
-				boolean alternative = !param1 && !param2 && !param3;
 
 				if ( !( flag || random < samplingRate || param3 ) )
 					continue ;
