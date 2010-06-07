@@ -83,7 +83,7 @@ public class SignalSystemsReaderWriterTest extends MatsimTestCase {
 
   private void checkContent(SignalSystems lss) {
   	SignalSystemDefinition lssd;
-  	lssd = lss.getSignalSystemDefinitionsList().get(0);
+  	lssd = lss.getSignalSystemDefinitions().get(id23);
   	assertNotNull(lssd);
   	assertEquals(id23, lssd.getId());
   	assertEquals(60.0, lssd.getDefaultCycleTime(), EPSILON);
@@ -91,7 +91,7 @@ public class SignalSystemsReaderWriterTest extends MatsimTestCase {
   	assertEquals(3.0, lssd.getDefaultInterGreenTime(), EPSILON);
   	
   	SignalGroupDefinition lsgd;
-  	lsgd = lss.getSignalGroupDefinitionsList().get(1);
+  	lsgd = lss.getSignalGroupDefinitions().get(id42);
   	assertNotNull(lsgd);
   	assertEquals(id42, lsgd.getLinkRefId());
   	assertEquals(id42, lsgd.getId());

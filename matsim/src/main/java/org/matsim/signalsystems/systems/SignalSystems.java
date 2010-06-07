@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.systems;
 
-import java.util.List;
 import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
@@ -32,22 +31,6 @@ public interface SignalSystems extends MatsimToplevelContainer {
 
 	public SortedMap<Id, SignalGroupDefinition> getSignalGroupDefinitions();
 
-	/**
-	 * 
-	 * @deprecated use getSignalSystemDefinitions()
-	 */
-	@Deprecated
-	public List<SignalSystemDefinition> getSignalSystemDefinitionsList();
-	/**
-	 * 
-	 * @deprecated use getSignalGroupDefinitions()
-	 */
-	@Deprecated
-	public List<SignalGroupDefinition> getSignalGroupDefinitionsList();
-
-	/**
-	 * @param lssdef
-	 */
 	public void addSignalSystemDefinition(SignalSystemDefinition lssdef);
 
 	public void addSignalGroupDefinition(SignalGroupDefinition lsgdef);

@@ -84,7 +84,7 @@ public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 		XMLSignalSystems xmllss = fac.createXMLSignalSystems();
 		
 		//writing lightSignalSystemDefinitions
-		for (SignalSystemDefinition lssd : this.blss.getSignalSystemDefinitionsList()) {
+		for (SignalSystemDefinition lssd : this.blss.getSignalSystemDefinitions().values()) {
 			XMLSignalSystemDefinitionType xmllssd = fac.createXMLSignalSystemDefinitionType();
 			xmllssd.setId(lssd.getId().toString());
 			
@@ -110,7 +110,7 @@ public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 		}
 		
 		//writing lightSignalGroupDefinitions
-		for (SignalGroupDefinition lsgd : this.blss.getSignalGroupDefinitionsList()) {
+		for (SignalGroupDefinition lsgd : this.blss.getSignalGroupDefinitions().values()) {
 			XMLSignalGroupDefinitionType xmllsgd = fac.createXMLSignalGroupDefinitionType();
 			xmllsgd.setLinkIdRef(lsgd.getLinkRefId().toString());
 			xmllsgd.setId(lsgd.getId().toString());
