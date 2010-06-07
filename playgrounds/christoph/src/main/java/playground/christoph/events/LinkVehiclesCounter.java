@@ -25,7 +25,7 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.ptproject.qsim.AgentCounter;
+import org.matsim.ptproject.qsim.AgentCounterI;
 import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.ptproject.qsim.QSim;
@@ -78,7 +78,7 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 	int lostVehicles;
 	int initialVehicleCount;
 
-	private AgentCounter agentCounter;
+	private AgentCounterI agentCounter;
 
 	public void setQueueNetwork(QNetwork qNetwork)
 	{
