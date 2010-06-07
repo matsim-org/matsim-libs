@@ -22,6 +22,9 @@ Bug-Fixes:
 
 - Swing-OTFVis can open mvi-files created by conversion from events (r11476)
 
+Non-API Refactorings:
+
+- QVehicle.getBasicVehicle() has been renamed to QVehicle.getVehicle()
 
 
 Release version 0.1.1
