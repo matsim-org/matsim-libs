@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyEventHandler.java
+ * PotsdamRun.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,44 +21,23 @@
 /**
  * 
  */
-package tryouts.examples;
+package tryouts.multiagentsimulation.hw4;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.api.experimental.controller.Controller;
 
 /**
  * @author thomas
  *
  */
-public class MyEventHandling {
+public class PotsdamRun {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
-		//path to events file
-		String inputFile = "/Users/thomas/Development/workspace/matsim/output/example5/ITERS/it.100/100.events.xml.gz";
-		//create an EventsManager object
-		EventsManager events = new EventsManagerImpl();
-		//create the handler and add it
-//		MyEventHandler1 handler = new MyEventHandler1();
-//		MyEventHandler2 handler = new MyEventHandler2(2000);
-		MyEventHandler3 handler = new MyEventHandler3();
-		events.addHandler(handler);
-		//create the reader and read the file
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(inputFile);
-		
-		// only available in MyEventHandler2
-//		System.out.println("Total travel time: " + handler.getTotalTravelTime());
-//		System.out.println("Avarage travel time for 2000 agents: " + handler.getAverageTravelTime());
-		
-		// only available in MyEventHandler3
-		handler.writeChart("/Users/thomas/Development/workspace/matsim/output/chart.png");
-		
-		System.out.println("Events file read!");
+		final Controller controller = new Controller("./tnicolai/configs/brandenburg/config-potsdam_after.xml");
+		controller.setOverwriteFiles(true);
+		controller.run();
 	}
 
 }
