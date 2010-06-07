@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationLink;
 import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationNetwork;
-import org.matsim.ptproject.qsim.QNetworkI;
+import org.matsim.ptproject.qsim.QSimI;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.VisNetwork;
@@ -46,6 +46,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
  * @author dgrether
  */
  class QueueNetwork implements VisNetwork, CapacityInformationNetwork {
+	private QSimI qSim = null ; // QueueNetwork can exist without qSim, so this is not enforced.
 
 	private final Map<Id, QueueLink> queuelinks;
 
@@ -55,13 +56,19 @@ import org.matsim.vis.snapshots.writers.VisNode;
 
 	private final QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
 
-	/*package*/ QueueNetwork(final Network networkLayer2) {
-		this(networkLayer2, new DefaultQueueNetworkFactory());
+	/**
+	 * @param networkLayer2
+	 * @param qSim2 -- may be null, in particular for tests
+	 */
+	/*package*/ QueueNetwork(final Network networkLayer2, QSimI qSim2) {
+		this(networkLayer2, new DefaultQueueNetworkFactory(), qSim2);
 	}
 
-	/*package*/ QueueNetwork(final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory) {
+	/*package*/ QueueNetwork(final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory, QSimI qSim2) {
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
+		this.qSim = qSim2 ;
+		
 		this.queuelinks = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		this.queuenodes = new LinkedHashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		for (Node n : networkLayer.getNodes().values()) {
@@ -120,4 +127,8 @@ import org.matsim.vis.snapshots.writers.VisNode;
 		return this.queuenodes.get(id);
 	}
 	
+	public QSimI getQSim() {
+		return qSim;
+	}
+
 }

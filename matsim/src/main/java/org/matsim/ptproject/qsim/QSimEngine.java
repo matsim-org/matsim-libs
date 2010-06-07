@@ -36,6 +36,9 @@ public interface QSimEngine extends LinkActivator, SimEngine{
 	 */
 	public void simStep(final double time);
 	
+	// yyyy I find that this exposes too much interior information to the interface.
+	// I also don't find it logical to have it in a class that is meant to be replaceable for,
+	// say, parallel execution.  On the other hand, it makes sense for a QNetworkEngine.  kai, jun'10
 	public AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder();
 		
 }

@@ -49,7 +49,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author dgrether
  *
  */
-public class AgentCounter {
+public class AgentCounter implements AgentCounterI {
 	/**
 	 * Number of agents that have not yet reached their final activity location
 	 */

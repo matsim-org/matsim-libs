@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -50,6 +51,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
@@ -70,6 +72,11 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.ptproject.qsim.AgentCounterI;
+import org.matsim.ptproject.qsim.AgentFactory;
+import org.matsim.ptproject.qsim.QNetworkI;
+import org.matsim.ptproject.qsim.QSimI;
+import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
@@ -1205,6 +1212,7 @@ public class QueueSimulationTest extends TestCase {
 			this.config = scenario.getConfig();
 			this.config.simulation().setFlowCapFactor(1.0);
 			this.config.simulation().setStorageCapFactor(1.0);
+			this.config.simulation().setStuckTime(1.0) ;
 
 			/* build network */
 			this.network = scenario.getNetwork();
@@ -1243,5 +1251,6 @@ public class QueueSimulationTest extends TestCase {
 			this.linkIds2 = new ArrayList<Id>(1);
 			this.linkIds2.add(this.link2.getId());
 		}
+		
 	}
 }

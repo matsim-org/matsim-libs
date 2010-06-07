@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.core.mobsim.queuesim.obsolete;
 
 import java.util.List;
 
@@ -33,6 +33,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.queuesim.AbstractSimulation;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;

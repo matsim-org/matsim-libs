@@ -45,7 +45,7 @@ public interface QSimI extends IOSimulation {
 
 	EventsManager getEventsManager();
 
-	AgentCounter getAgentCounter();
+	AgentCounterI getAgentCounter();
 
 	// yyyyyy imho, should take a PersonAgent as argument.  kai, may'10
 	void scheduleActivityEnd(PersonDriverAgent personAgent);
@@ -87,8 +87,6 @@ public interface QSimI extends IOSimulation {
 	/**
 	 * @return
 	 */
-	@Deprecated // yyyyyy I don't think that it is really necessary to expose this but some manual reworking
-	// will be necessary.  kai, may'10
 	QNetworkI getQNetwork();
 
 	/**

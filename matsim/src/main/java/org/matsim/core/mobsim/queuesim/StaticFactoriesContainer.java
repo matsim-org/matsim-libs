@@ -20,8 +20,8 @@ public class StaticFactoriesContainer {
 		}
 
 	public static PersonDriverAgent createQueuePersonAgent(Person p, QueueSimulation simulation) {
-		return new QueuePersonAgent(p, simulation);
-//		return new QPersonAgent(p, simulation);
+//		return new QueuePersonAgent(p, simulation);
+		return new QPersonAgent(p, simulation);
 	}
 
 }

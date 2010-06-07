@@ -49,6 +49,7 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonAgent;
@@ -64,7 +65,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.AcceptsFeatures;
-import org.matsim.ptproject.qsim.AgentCounter;
+import org.matsim.ptproject.qsim.AgentCounterI;
 import org.matsim.ptproject.qsim.DriverAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.MobsimFeature;
 import org.matsim.ptproject.qsim.QNetworkI;
@@ -147,6 +148,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	private ControlerIO controlerIO;
 	
 	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>() ;
+	private AgentCounterI agentCounter;
 
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -162,18 +164,24 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		this.scenario = sc;
 		this.config = scenario.getConfig();
 		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
-		AbstractSimulation.reset(this.config.simulation().getStuckTime());
+//		AbstractSimulation.reset(this.config.simulation().getStuckTime());
+		AbstractSimulation.setLiving(0);
+		AbstractSimulation.resetLost();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
 		setEvents(events);
 		this.population = scenario.getPopulation();
 
 		this.networkLayer = scenario.getNetwork();
-		this.network = new QueueNetwork(this.networkLayer, factory);
+
+		this.network = new QueueNetwork(this.networkLayer, factory, this);
+		
 		this.agentFactory = new AgentFactory( this);
 
 		this.notTeleportedModes.add(TransportMode.car);
 
 		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom(), this.scenario.getConfig());
+		
+		this.agentCounter = new QueueAgentCounter() ;
 	}
 
 	/**
@@ -539,8 +547,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 			QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 			if (vehicle == null) {
 				// try to fix it somehow
-				if (this.teleportVehicles && (agent instanceof QueuePersonAgent)) {
-					vehicle = ((QueuePersonAgent) agent).getVehicle();
+				if (this.teleportVehicles && (agent instanceof DriverAgent)) {
+					vehicle = ((DriverAgent) agent).getVehicle();
 					if (vehicle.getCurrentLink() != null) {
 						if (this.cntTeleportVehicle < 9) {
 							this.cntTeleportVehicle++;
@@ -652,8 +660,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 
 
 	@Override
-	public AgentCounter getAgentCounter() {
-		throw new UnsupportedOperationException() ;
+	public AgentCounterI getAgentCounter() {
+		return this.agentCounter ;
 	}
 
 

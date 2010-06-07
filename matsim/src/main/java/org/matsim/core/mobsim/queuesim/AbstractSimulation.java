@@ -33,16 +33,21 @@ package org.matsim.core.mobsim.queuesim;
 	 */
 	private static int lost = 0;
 
-	private static double stuckTime = Double.MAX_VALUE;
-
-	/*package*/ static void reset(final double stuckTimeTmp) {
+//	private static double stuckTime = Double.MAX_VALUE;
+//
+//	/*package*/ private static void reset(final double stuckTimeTmp) {
+//		setLiving(0);
+//		resetLost();
+//		setStuckTime(stuckTimeTmp);
+//	}
+//
+//	/*package*/ private static final double getStuckTime() {return stuckTime;	}
+//	private static final void setStuckTime(final double stuckTime) { AbstractSimulation.stuckTime = stuckTime; }
+	
+	/*package*/ static void reset() {
 		setLiving(0);
 		resetLost();
-		setStuckTime(stuckTimeTmp);
 	}
-
-	/*package*/ static final double getStuckTime() {return stuckTime;	}
-	private static final void setStuckTime(final double stuckTime) { AbstractSimulation.stuckTime = stuckTime; }
 
 	/*package*/ static final int getLiving() {return living;	}
 	/*package*/ static final void setLiving(final int count) {living = count;}
@@ -56,4 +61,6 @@ package org.matsim.core.mobsim.queuesim;
 	/*package*/ static final void incLiving(final int count) {living += count;}
 	/*package*/ static final void decLiving() {living--;}
 	/*package*/ static final void decLiving(final int count) {living -= count;}
+	
+
 }

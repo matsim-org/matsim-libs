@@ -72,7 +72,7 @@ public class TimeVariantQueueLinkImplTest extends MatsimTestCase {
 		network.addNetworkChangeEvent(change2);
 
 
-		QueueNetwork qNetwork = new QueueNetwork(network);
+		QueueNetwork qNetwork = new QueueNetwork(network, null);
 		QueueLink qLink = qNetwork.getQueueLink(new IdImpl("1"));
 		qLink.finishInit();
 
@@ -122,7 +122,7 @@ public class TimeVariantQueueLinkImplTest extends MatsimTestCase {
 		change2.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 0.5));
 		network.addNetworkChangeEvent(change2);
 
-		QueueNetwork qNetwork = new QueueNetwork(network);
+		QueueNetwork qNetwork = new QueueNetwork(network, null);
 		QueueLink qLink = qNetwork.getQueueLink(new IdImpl("1"));
 		qLink.finishInit();
 

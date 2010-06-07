@@ -270,7 +270,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2, 0));
 		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		Link link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
-		QueueNetwork queueNetwork = new QueueNetwork(network);
+		QueueNetwork queueNetwork = new QueueNetwork(network, null);
 		QueueSimEngine simEngine = new QueueSimEngine(queueNetwork, MatsimRandom.getRandom(), scenario.getConfig());
 		QueueLink qlink = queueNetwork.getQueueLink(new IdImpl("1"));
 		qlink.setSimEngine(simEngine);
@@ -404,7 +404,7 @@ public class QueueLinkTest extends MatsimTestCase {
 			Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1001, 0));
 			this.link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 3600.0, 1.0);
 			this.link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
-			this.queueNetwork = new QueueNetwork(network);
+			this.queueNetwork = new QueueNetwork(network, null);
 			QueueSimEngine engine = new QueueSimEngine(this.queueNetwork, MatsimRandom.getRandom(), this.scenario.getConfig());
 			this.qlink1 = this.queueNetwork.getQueueLink(new IdImpl("1"));
 			this.qlink1.setSimEngine(engine);

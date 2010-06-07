@@ -27,10 +27,13 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.ptproject.qsim.QSimI;
 import org.matsim.ptproject.qsim.QVehicle;
 import org.matsim.vis.snapshots.writers.VisData;
 import org.matsim.vis.snapshots.writers.VisNode;
@@ -116,8 +119,12 @@ class QueueNode implements VisNode {
 			}
 
 			// check if veh is stuck!
+			QSimI qSim = this.queueNetwork.getQSim() ;
+			Scenario sc = qSim.getScenario() ;
+			Config config = sc.getConfig() ;
 
-			if ((now - link.bufferLastMovedTime) > AbstractSimulation.getStuckTime()) {
+//			if ((now - link.bufferLastMovedTime) > AbstractSimulation.getStuckTime()) {
+			if ((now - link.bufferLastMovedTime) > this.queueNetwork.getQSim().getScenario().getConfig().simulation().getStuckTime() ) {
 				/* We just push the vehicle further after stucktime is over, regardless
 				 * of if there is space on the next link or not.. optionally we let them
 				 * die here, we have a config setting for that!

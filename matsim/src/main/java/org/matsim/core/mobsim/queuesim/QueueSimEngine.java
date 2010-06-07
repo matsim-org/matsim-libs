@@ -29,6 +29,7 @@ import java.util.ListIterator;
 import java.util.Random;
 
 import org.matsim.core.config.Config;
+import org.matsim.ptproject.qsim.QSimI;
 
 
 /**
@@ -39,6 +40,7 @@ import org.matsim.core.config.Config;
  * @author dstrippgen
  */
 /*package*/ class QueueSimEngine {
+	private QueueNetwork qNetwork = null ; 
 
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
@@ -49,6 +51,7 @@ import org.matsim.core.config.Config;
 	 */
 	private static boolean simulateAllLinks = false;
 	private static boolean simulateAllNodes = false;
+	// yyyyyy why should these be static?  but run tests before and after.  kai, jun'10
 
 	private final List<QueueLink> allLinks;
 	/** This is the collection of links that have to be moved in the simulation */
@@ -64,9 +67,10 @@ import org.matsim.core.config.Config;
 
 	/*package*/ QueueSimEngine(final QueueNetwork network, final Random random, final Config config) {
 		this(network.getQueueLinks().values(), network.getQueueNodes().values(), random, config);
+		this.qNetwork = network ; // simEngine cannot exist without qNetwork, and so it makes sense to keep the back ptr here.
 	}
 
-	/*package*/ QueueSimEngine(final Collection<QueueLink> links, final Collection<QueueNode> nodes, final Random random, final Config config) {
+	private QueueSimEngine(final Collection<QueueLink> links, final Collection<QueueNode> nodes, final Random random, final Config config) {
 		this.random = random;
 		this.allLinks = new ArrayList<QueueLink>(links);
 		this.config = config;

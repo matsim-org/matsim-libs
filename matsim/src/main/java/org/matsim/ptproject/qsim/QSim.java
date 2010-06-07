@@ -124,7 +124,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	protected TransitQSimEngine transitEngine;
 
-	private AgentCounter agentCounter;
+	private AgentCounterI agentCounter;
 
 	private double stuckTime = Double.MAX_VALUE;
 
@@ -212,7 +212,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		return this.stuckTime;
 	}
 
-	public AgentCounter getAgentCounter(){
+	public AgentCounterI getAgentCounter(){
 		return this.agentCounter;
 	}
 
