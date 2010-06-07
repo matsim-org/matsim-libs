@@ -62,7 +62,7 @@ public class FixedHeadwayControler implements VehicleDepartsAtFacilityEventHandl
 				double delay = event.getDelay() / 2.0;
 				FixedHeadwayCycleUmlaufDriver veh = vehicleAhead.get(0);
 				veh.setAdditionalDelayAtNextStop(delay);
-				log.info(event.getTime() + ": Vehicle " + veh.getVehicle().getBasicVehicle().getId() + " will be delayed by " + delay + " because vehicle " + event.getVehicleId() + " got delayed by " + event.getDelay() + " seconds.");
+				log.info(event.getTime() + ": Vehicle " + veh.getVehicle().getVehicle().getId() + " will be delayed by " + delay + " because vehicle " + event.getVehicleId() + " got delayed by " + event.getDelay() + " seconds.");
 			}
 		}
 		
@@ -72,7 +72,7 @@ public class FixedHeadwayControler implements VehicleDepartsAtFacilityEventHandl
 	private void init() {		
 		this.umlaufDriver = new HashMap<Id, FixedHeadwayCycleUmlaufDriver>();
 		for (PersonAgent personAgent : this.qSim.getTransitAgents()) {
-			this.umlaufDriver.put(((FixedHeadwayCycleUmlaufDriver) personAgent).getVehicle().getBasicVehicle().getId(), (FixedHeadwayCycleUmlaufDriver) personAgent); 
+			this.umlaufDriver.put(((FixedHeadwayCycleUmlaufDriver) personAgent).getVehicle().getVehicle().getId(), (FixedHeadwayCycleUmlaufDriver) personAgent); 
 		}
 		log.info("initialized with " + this.umlaufDriver.size() + " drivers");		
 	}
