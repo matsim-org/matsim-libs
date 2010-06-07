@@ -19,15 +19,13 @@
  * *********************************************************************** */
 package playground.droeder.bvg09;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -40,7 +38,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
@@ -53,7 +50,7 @@ import playground.droeder.DaPaths;
  * @author droeder
  *
  */
-public class DaHafas2VisumMapper6 {
+public class DaHafas2VisumMapper7 {
 	
 	private static final Logger log = Logger
 			.getLogger(DaHafas2VisumMapper6.class);
@@ -73,8 +70,10 @@ public class DaHafas2VisumMapper6 {
 	private SortedMap<Id, Id> visumHafasLineIds = null;
 	private SortedMap<Id, Id> visumHafasUnmatchedLineIds = null;
 	private Map<Id, Map<Id, Id>> hafas2VisumMap = null; 
+	private Map<Id, Map<Id, Id>> hafas2VisumMapUnmatched = null; 
+	private Map<Id, Set<Id>> missedVisumStops = new TreeMap<Id, Set<Id>>();
 	
-	public DaHafas2VisumMapper6(){
+	public DaHafas2VisumMapper7(){
 		visumSc.getConfig().scenario().setUseTransit(true);
 		readSchedule(VISUM, visumSc);
 		hafasSc.getConfig().scenario().setUseTransit(true);
@@ -82,11 +81,49 @@ public class DaHafas2VisumMapper6 {
 		this.createHafasLineIdsFromVisum();
 	}
 	
+	public static void main(String[] args){
+		DaHafas2VisumMapper7 mapper = new DaHafas2VisumMapper7();
+		mapper.run();
+	
+	}
+	
+	public void run(){
+		this.calcHafas2VisumMap();
+		for(Entry<Id, Map<Id, Id>> e:  hafas2VisumMapUnmatched.entrySet()){
+			System.out.println("line " + e.getKey());
+			System.out.print("hafas \t");
+			for(Entry<Id, Id> ee : e.getValue().entrySet()){
+				System.out.print(ee.getKey() + "\t");
+			}
+			System.out.println();
+			System.out.print("visum\t");
+			for(Entry<Id, Id> ee : e.getValue().entrySet()){
+				System.out.print(ee.getValue() + "\t");
+			}
+			System.out.println("");
+			System.out.println("#####");
+		}
+		System.out.println("unmatched: " + hafas2VisumMapUnmatched.size());
+		
+		for(Entry<Id, Set<Id>> e : missedVisumStops.entrySet()){
+			System.out.print(e.getKey() + "\t");
+			for(Id id : e.getValue()){
+				System.out.print(id + "\t");
+			}
+			System.out.println("");
+			System.out.println("");
+		}
+	}
+	
 	public Map<Id, Id> getVisumHafasLineIds(){
 		if (visumHafasLineIds == null) this.createHafasLineIdsFromVisum();
 		return visumHafasLineIds;
 	}
 	
+	public Map<Id, Id> getMatchedVisumHafasLineIds(){
+		this.calcHafas2VisumMap();
+		return visumHafasLineIds;
+	}
 	public Map<Id, Map<Id, Id>> getHafas2VisumMap(){
 		if (this.hafas2VisumMap == null) this.calcHafas2VisumMap();
 		return hafas2VisumMap;
@@ -98,13 +135,19 @@ public class DaHafas2VisumMapper6 {
 		
 		for (Entry<Id, Id> visumHafasLines : visumHafasLineIds.entrySet()){
 			Map<Id, Id> temp = this.compareLines(visumHafasLines.getKey(), visumHafasLines.getValue());
-			if (!temp.equals(null) && temp.size()>1 && this.allVisumStopsContained(visumHafasLines.getKey(), temp) == true){
+			if (!(temp.equals(null)) && (temp.size()>1) && this.allVisumStopsContained(visumHafasLines.getKey(), temp)){
 				this.hafas2VisumMap.put(visumHafasLines.getValue(), temp);
-			}else{
-				if (this.visumHafasUnmatchedLineIds == null){
-					this.visumHafasUnmatchedLineIds = new TreeMap<Id, Id>();
-				}
-				this.visumHafasUnmatchedLineIds.put(visumHafasLines.getKey(), visumHafasLines.getValue());
+			}else if(temp.equals(null)){
+				log.error("no matching found for " + visumHafasLines.getKey());
+				this.removeToCheck(visumHafasLines.getKey(), visumHafasLines.getValue(), temp);
+			}
+			else if(!this.allVisumStopsContained(visumHafasLines.getKey(), temp)){
+				log.error("not all VisumStops contained " + visumHafasLines.getKey());
+				this.removeToCheck(visumHafasLines.getKey(), visumHafasLines.getValue(), temp);
+			}
+			else if(temp.size()<2){
+				log.error("a line must have more than one stop " + visumHafasLines.getKey());
+				this.removeToCheck(visumHafasLines.getKey(), visumHafasLines.getValue(), temp);
 			}
 		}
 		
@@ -116,19 +159,40 @@ public class DaHafas2VisumMapper6 {
 		
 	}
 	
+	private void removeToCheck(Id visum, Id hafas, Map<Id, Id> hafas2Visum){
+		if (this.visumHafasUnmatchedLineIds == null){
+			this.visumHafasUnmatchedLineIds = new TreeMap<Id, Id>();
+		}
+		if(this.hafas2VisumMapUnmatched == null){
+			this.hafas2VisumMapUnmatched = new TreeMap<Id, Map<Id,Id>>();
+		}
+		this.visumHafasUnmatchedLineIds.put(visum, hafas);
+		if(!(hafas2Visum == null)){
+			this.hafas2VisumMapUnmatched.put(hafas, hafas2Visum);
+		}
+	}
+	
 	private boolean allVisumStopsContained(Id visumLine, Map<Id, Id> hafas2Visum){
+		boolean all = true;
+		Set<Id> missed = null;
+		
 		
 		for (TransitRoute route : visumSc.getTransitSchedule().getTransitLines().get(visumLine).getRoutes().values()){
 			for(TransitRouteStop stop : route.getStops()){
 				TransitStopFacility fac = stop.getStopFacility();
 				if(!hafas2Visum.containsValue(fac.getId())){
-					return false;
+					if (missed == null) missed = new TreeSet<Id>();
+					missed.add(fac.getId());
+					all = false;
 				}
 			}
 		}
 		
+		if(!(missed == null)){
+			this.missedVisumStops.put(visumLine, missed);
+		}
 		
-		return true;
+		return all;
 	}
 	
 	private void removeUnmatchedLines(){
@@ -136,8 +200,14 @@ public class DaHafas2VisumMapper6 {
 			visumHafasLineIds.remove(e.getKey());
 		}
 	}
+	
 	private void removeBugLines(){
 		Id remove;
+		
+		remove = new IdImpl("B-101");
+		hafas2VisumMap.remove(visumHafasLineIds.get(remove));
+		visumHafasUnmatchedLineIds.put(remove, visumHafasLineIds.get(remove));
+		visumHafasLineIds.remove(remove);
 		
 		remove = new IdImpl("B-135");
 		hafas2VisumMap.remove(visumHafasLineIds.get(remove));
@@ -155,6 +225,21 @@ public class DaHafas2VisumMapper6 {
 		visumHafasLineIds.remove(remove);
 		
 		remove = new IdImpl("B-320");
+		hafas2VisumMap.remove(visumHafasLineIds.get(remove));
+		visumHafasUnmatchedLineIds.put(remove, visumHafasLineIds.get(remove));
+		visumHafasLineIds.remove(remove);
+		
+		remove = new IdImpl("B-X11");
+		hafas2VisumMap.remove(visumHafasLineIds.get(remove));
+		visumHafasUnmatchedLineIds.put(remove, visumHafasLineIds.get(remove));
+		visumHafasLineIds.remove(remove);
+		
+		remove = new IdImpl("B-X76");
+		hafas2VisumMap.remove(visumHafasLineIds.get(remove));
+		visumHafasUnmatchedLineIds.put(remove, visumHafasLineIds.get(remove));
+		visumHafasLineIds.remove(remove);
+		
+		remove = new IdImpl("U-1");
 		hafas2VisumMap.remove(visumHafasLineIds.get(remove));
 		visumHafasUnmatchedLineIds.put(remove, visumHafasLineIds.get(remove));
 		visumHafasLineIds.remove(remove);
@@ -183,10 +268,14 @@ public class DaHafas2VisumMapper6 {
 		if(!(hafasSc.getTransitSchedule().getTransitLines().containsKey(hafas))){
 			return null;
 		}
+		if(!(visumSc.getTransitSchedule().getTransitLines().containsKey(visum))){
+			return null;
+		}
 		
 		for(TransitRoute hafasRoute : hafasSc.getTransitSchedule().getTransitLines().get(hafas).getRoutes().values()){
+			
 			for (TransitRoute visumRoute : visumSc.getTransitSchedule().getTransitLines().get(visum).getRoutes().values()){
-				Map<Id, Id> temp = this.compareHafas2VisumRoute(visumRoute, hafasRoute, hafasVisumStops);
+				Map<Id, Id> temp = this.compareHafas2VisumRouteByDist(visumRoute, hafasRoute, hafasVisumStops);
 				if (!(temp == null)){
 					hafasVisumStops = temp;
 				}
@@ -195,78 +284,100 @@ public class DaHafas2VisumMapper6 {
 		return hafasVisumStops;
 	}
 	
-	public void unmatchedToTxt(){
-		Map<Id, Collection<Id>> temp = new HashMap<Id, Collection<Id>>();
+	private boolean matchingPossible(TransitRoute visumRoute, TransitRoute hafasRoute){
+		double first = this.getDistance(visumRoute.getStops().get(0).getStopFacility().getCoord(), 
+				hafasRoute.getStops().get(0).getStopFacility().getCoord());
+		double last = this.getDistance(visumRoute.getStops().get(0).getStopFacility().getCoord(), 
+				hafasRoute.getStops().get(hafasRoute.getStops().size()-1).getStopFacility().getCoord());
 		
-		for(Entry<Id, Id> e : this.visumHafasUnmatchedLineIds.entrySet()){
-			Collection<Id> v = new TreeSet<Id>();
-			Collection<Id> h = new TreeSet<Id>();
-			for(TransitRoute visum : visumSc.getTransitSchedule().getTransitLines().get(e.getKey()).getRoutes().values()){
-				for (TransitRouteStop fac : visum.getStops()){
-					if(!v.contains(fac.getStopFacility().getId())){
-						v.add(fac.getStopFacility().getId());
-					}
-				}
-			}
-			temp.put(e.getKey(), v);
-			for(TransitRoute hafas : hafasSc.getTransitSchedule().getTransitLines().get(e.getValue()).getRoutes().values()){
-				for (TransitRouteStop fac : hafas.getStops()){
-					if(!h.contains(fac.getStopFacility().getId())){
-						h.add(fac.getStopFacility().getId());
-					}
-				}
-			}
-			temp.put(e.getValue(), h);
+		if((first<last) && (visumRoute.getStops().size()<= hafasRoute.getStops().size())){
+			return true;
+		}else{
+			return false;
 		}
+	}
+
+	private Map<Id, Id> compareHafas2VisumRouteByDist(TransitRoute visumRoute, TransitRoute hafasRoute, Map<Id, Id> hafasVisum) {
+		if(!this.matchingPossible(visumRoute, hafasRoute)) return null;
+
+		Map<Id, Id> temp = new HashMap<Id, Id>();
 		
-		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(PATH + "/unmatchedLines.txt");
-			for(Entry<Id, Id> e : visumHafasUnmatchedLineIds.entrySet()){
-				writer.write("visumLine " + e.getKey() + " hafasLine " + e.getValue());
-				writer.newLine();
-				writer.write("visum \t");
-				for(Id id : temp.get(e.getKey())){
-					writer.write(id + "\t");
-				}
-				writer.newLine();
-				writer.write("hafas \t");
-				for(Id id : temp.get(e.getValue())){
-					writer.write(id + "\t");
-				}
-				writer.newLine();
-				writer.newLine();
-			}
-			writer.close();
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		ListIterator<TransitRouteStop> hafasIterator = hafasRoute.getStops().listIterator(this.getBestPossibleByDist(visumRoute, hafasRoute));
+		ListIterator<TransitRouteStop> visumIterator = visumRoute.getStops().listIterator();
+		TransitRouteStop hafasStop;
+		TransitRouteStop visumStop;
+		
+		
+		while(hafasIterator.hasNext() && visumIterator.hasNext()){
+			hafasStop = hafasIterator.next();
+			visumStop = visumIterator.next();
+			
+			temp.put(hafasStop.getStopFacility().getId(), visumStop.getStopFacility().getId());
+			
 		}
+		temp = compareHafas2VisumRouteById(visumRoute, hafasRoute, temp);
 		
-		
+		if(visumIterator.hasNext()){
+			return null;
+		}else{
+			temp.putAll(hafasVisum);
+			return temp;
+		}
 	}
 	
-
-	private Map<Id, Id> compareHafas2VisumRoute(TransitRoute visumRoute, TransitRoute hafasRoute, Map<Id, Id> hafasVisum) {
+	private Map<Id, Id> compareHafas2VisumRouteById(TransitRoute visumRoute, TransitRoute hafasRoute, Map<Id, Id> hafasVisum){
 		Map<Id, Id> temp = hafasVisum;
 		
-		
-		if(visumRoute.getStops().size() == hafasRoute.getStops().size()){
-			Coord firstVisum = visumRoute.getStops().get(0).getStopFacility().getCoord();
-			Coord firstHafas = hafasRoute.getStops().get(0).getStopFacility().getCoord();
-			Coord lastHafas  = hafasRoute.getStops().get(hafasRoute.getStops().size()-1).getStopFacility().getCoord();
-			
-			if(this.getDistance(firstVisum, firstHafas) < this.getDistance(firstVisum, lastHafas)){
-				for (int ii = 0; ii < visumRoute.getStops().size(); ii++){
-					temp.put(hafasRoute.getStops().get(ii).getStopFacility().getId(), visumRoute.getStops().get(ii).getStopFacility().getId());
+		for(TransitRouteStop vStop : visumRoute.getStops()){
+			if(!temp.containsValue(vStop.getStopFacility().getId())){
+				for(TransitRouteStop hStop : hafasRoute.getStops()){
+					if(this.checkFacsById(vStop.getStopFacility().getId(), hStop.getStopFacility().getId()) && !(temp.containsKey(hStop.getStopFacility().getId()))){
+						temp.put(hStop.getStopFacility().getId(), vStop.getStopFacility().getId());
+					}else if(this.checkFacsById(vStop.getStopFacility().getId(), hStop.getStopFacility().getId()) && temp.containsKey(hStop.getStopFacility().getId())){
+						temp.put(new IdImpl(hStop.getStopFacility().getId().toString() + "_double"), vStop.getStopFacility().getId());
+					}
 				}
 			}
-			return temp;
-		}else{
-			return null;
 		}
+		
+		
+		
+		return temp;
+	}
+	
+	
+	private int getBestPossibleByDist(TransitRoute visumRoute, TransitRoute hafasRoute){
+		double avDist = Double.MAX_VALUE;
+		int bestIteratorPosition = 0;
+		
+		List<TransitRouteStop> visumStops = visumRoute.getStops();
+		List<TransitRouteStop> hafasStops = hafasRoute.getStops();
+		
+		ListIterator<TransitRouteStop> hafasIterator;
+		TransitRouteStop hafasStop = null;
+		TransitRouteStop visumStop;
+		int hafasOffset = 0;
+		
+		
+		while((visumStops.size()) <= (hafasStops.size() -hafasOffset)){
+			hafasIterator = hafasStops.listIterator(hafasOffset);
+			if (hafasIterator.hasNext()){
+				hafasStop = hafasIterator.next();
+			}
+			
+			double average = 0;
+			for (ListIterator<TransitRouteStop> visumIterator = visumStops.listIterator(); visumIterator.hasNext();){
+				visumStop = visumIterator.next();
+				average += this.getDistance(visumStop.getStopFacility().getCoord(), hafasStop.getStopFacility().getCoord());
+			}
+			if(avDist >= (average / visumStops.size())){
+				bestIteratorPosition = hafasOffset;
+				avDist = average/visumStops.size();
+			}
+			hafasOffset++;
+		}
+		
+		return bestIteratorPosition;
 	}
 	
 	private double getDistance(Coord visum, Coord hafas){
@@ -275,6 +386,28 @@ public class DaHafas2VisumMapper6 {
 		return Math.sqrt(Math.pow(xDif, 2.0) + Math.pow(yDif, 2.0));
 	}
 	
+	private boolean checkFacsById(Id vis, Id haf){
+		boolean equal = false;
+		
+		String hafas = null;
+		String visum =  vis.toString();
+		if (visum.length() == 6){
+			hafas = haf.toString().substring(2, haf.toString().length());
+			visum = visum.substring(0, visum.length()-1);
+		}else if(visum.length() == 5){
+			hafas = haf.toString().substring(3, haf.toString().length());
+			visum = visum.substring(0, visum.length()-1);
+		}else if(visum.length() == 7){
+			hafas = haf.toString().substring(1, haf.toString().length());
+			visum = visum.substring(0, visum.length()-1);
+		}
+		
+		if(visum.equals(hafas)){
+			equal = true;
+		}
+		
+		return equal;
+	}
 	
 	public void calcAverageDifference(){
 		if (hafas2VisumMap ==  null) this.calcHafas2VisumMap();
@@ -385,32 +518,4 @@ public class DaHafas2VisumMapper6 {
 	}
 	
 	
-	public static void main(String[] args){
-		DaHafas2VisumMapper6 mapper = new DaHafas2VisumMapper6();
-		mapper.calcAverageDifference();
-		
-//		for (Entry<Id, Map<Id, Id>> stops : mapper.getHafas2VisumMap().entrySet()){
-//			System.out.println("hafasLineId: " + stops.getKey().toString());
-//			
-//			System.out.print("hafasStopId" + "\t");
-//			for(Entry<Id, Id> e : stops.getValue().entrySet()){
-//				System.out.print(e.getKey().toString() + "\t");
-//			}
-//			System.out.println("");
-//			System.out.print("visumStopId" + "\t");
-//			for(Entry<Id, Id> e : stops.getValue().entrySet()){
-//				System.out.print(e.getValue().toString() + "\t");
-//			}
-//			System.out.println("");
-//			System.out.println("");
-//		}
-//		
-//		for(Entry<Id, Id> e : mapper.getVisumHafasLineIds().entrySet()){
-//			System.out.println(e.getKey() + " " + e.getValue());
-//		}
-		
-//		mapper.unmatchedToTxt();
-		
-		
-	}
 }

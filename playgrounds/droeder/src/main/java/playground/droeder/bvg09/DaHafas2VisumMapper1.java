@@ -323,6 +323,7 @@ public class DaHafas2VisumMapper1{
 			}
 			System.out.println("");
 		}
+		System.out.println(mapper.getHafas2VisumMapAll().size());
 		
 		
 //		System.out.println("####################################");

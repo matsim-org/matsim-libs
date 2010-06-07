@@ -110,13 +110,13 @@ public class DaVisumHafasScheduleMerger {
 	
 	private void treatAllRoutes(){		
 		
-		DaHafas2VisumMapper6 mapper = new DaHafas2VisumMapper6();
-		Map<Id, Map<Id, Id>> visum2HafasMap = null;
+		DaVisum2HafasMapper2 mapper = new DaVisum2HafasMapper2();
+		Map<Id, Map<Id, Id>> visum2HafasMap = mapper.getVisum2HafasMap();
 		Map<Id, Id> visum2hafasLineIds = mapper.getVisumHafasLineIds();
 		
 		
 		for (Entry<Id, TransitLine> entry : this.intermediateScenario.getTransitSchedule().getTransitLines().entrySet()) {
-			
+			log.warn(entry.getKey() + " " + visum2hafasLineIds.get(entry.getKey()));
 			if (visum2hafasLineIds.get(entry.getKey()) == null) {
 				log.warn("Could not find hafas line for visum line " + entry.getKey() + " Adding anyway.");
 				outSchedule.addTransitLine(this.intermediateScenario.getTransitSchedule().getTransitLines().get(entry.getKey()));
@@ -155,11 +155,14 @@ public class DaVisumHafasScheduleMerger {
 			if (networkRoute != null) {
 				List<TransitRouteStop> outStops = new ArrayList<TransitRouteStop>();
 				for (TransitRouteStop stop : hafasRoute.getStops()) {
-					Id visumId = visum2Hafas.get(stop.getStopFacility().getId());
-					if (!visumId.equals(REMOVE)) {
-						TransitRouteStop outStop = outScenario.getTransitSchedule().getFactory().createTransitRouteStop(outScenario.getTransitSchedule().getFacilities().get(visumId), stop.getArrivalOffset(), stop.getDepartureOffset());
-						outStops.add(outStop);
+					Id visumId = REMOVE;
+					for(Entry<Id, Id> e : visum2Hafas.entrySet()){
+						if (stop.getStopFacility().getId().equals(e.getValue())){
+							visumId = e.getKey();
+						}
 					}
+					TransitRouteStop outStop = outScenario.getTransitSchedule().getFactory().createTransitRouteStop(outScenario.getTransitSchedule().getFacilities().get(visumId), stop.getArrivalOffset(), stop.getDepartureOffset());
+					outStops.add(outStop);
 				}
 				TransitRoute outRoute = outScenario.getTransitSchedule().getFactory().createTransitRoute(hafasRoute.getId(), networkRoute, outStops, hafasRoute.getTransportMode());
 				for (Departure departure : hafasRoute.getDepartures().values()) {
@@ -168,7 +171,7 @@ public class DaVisumHafasScheduleMerger {
 				return outRoute;
 			}
 		}
-		throw new RuntimeException("Nothing found: " + visumLine.getId().toString() + " " + hafasRoute.getId());
+		throw new RuntimeException("Nothing found: " + visumLine.getId().toString() );
 	}
 
 	private List<Id> getIdRoute(List<TransitRouteStop> stops) {
@@ -234,9 +237,10 @@ public class DaVisumHafasScheduleMerger {
 	private List<Id> listHafas2Visum(List<Id> idRouteHafas, Map<Id, Id> visum2Hafas) {
 		List<Id> idRouteVisum = new ArrayList<Id>();
 		for (Id hafasId : idRouteHafas) {
-			Id visumId = visum2Hafas.get(hafasId);
-			if (!visumId.equals(REMOVE)) {
-				idRouteVisum.add(visumId);
+			for(Entry<Id, Id> e : visum2Hafas.entrySet()){
+				if (hafasId.equals(e.getValue())) {
+					idRouteVisum.add(e.getKey());
+				}
 			}
 		}
 		return idRouteVisum;

@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
@@ -385,6 +386,52 @@ public class DaHafas2VisumMapper5 {
 			}
 		}
 	}
+	private double getDistance(Coord visum, Coord hafas){
+		double xDif = visum.getX() - hafas.getX();
+		double yDif = visum.getY() - hafas.getY();
+		return Math.sqrt(Math.pow(xDif, 2.0) + Math.pow(yDif, 2.0));
+	}
+	
+	
+	public void calcAverageDistance(){
+		if (hafas2VisumMap ==  null) this.calcHafas2VisumMap();
+
+		
+		for (Entry<Id, Map<Id, Id>> e : hafas2VisumMap.entrySet()){
+			double avDist = 0;
+			int count = 0;
+			double max = 0;
+			double min = Double.MAX_VALUE;
+			TransitStopFacility hafasStop;
+			TransitStopFacility visumStop;
+			for (Entry<Id, Id> ee : e.getValue().entrySet()){
+				hafasStop = hafasSc.getTransitSchedule().getFacilities().get(ee.getKey());
+				visumStop = visumSc.getTransitSchedule().getFacilities().get(ee.getValue());
+				if(visumStop == null && hafasStop == null){
+					log.warn("no visumstop and no hafasstop found for line " + e.getKey());
+				}else if(visumStop == null){
+					log.warn("no visumStop found for Hafasstop " + hafasStop.getId() + " on line " + e.getKey());
+				}else if (hafasStop == null ){
+					log.warn("no hafasStop found for visumstop " + visumStop.getId() + " on line " + e.getKey());
+				}else{
+					double dist = this.getDistance(visumStop.getCoord(), hafasStop.getCoord());
+					avDist += dist;
+					if(dist > max){
+						max = dist;
+					}
+					if(dist < min){
+						min = dist;
+					}
+					count++;
+				}
+				
+			}
+			
+			avDist = avDist/count;
+			System.out.println("for line " + e.getKey() + ": av=" + avDist + " min=" + min + " max=" + max);
+		}
+		
+	}
 	
 	private boolean checkFacsById(Id vis, Id haf){
 		boolean equal = false;
@@ -418,9 +465,7 @@ public class DaHafas2VisumMapper5 {
 	
 	public static void main(String[] args){
 		DaHafas2VisumMapper5 mapper = new DaHafas2VisumMapper5();
-		mapper.getHafasStopsForVisum();
-		mapper.test();
-		
+		mapper.calcAverageDistance();
 		
 //		for (Entry<Id, Map<Id, Id>> stops : mapper.getHafas2VisumMap().entrySet()){
 //			System.out.println("hafasLineId: " + stops.getKey().toString());
