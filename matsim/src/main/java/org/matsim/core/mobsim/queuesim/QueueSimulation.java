@@ -65,13 +65,14 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.AcceptsFeatures;
+import org.matsim.ptproject.qsim.AgentCounter;
 import org.matsim.ptproject.qsim.AgentCounterI;
 import org.matsim.ptproject.qsim.DriverAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.MobsimFeature;
 import org.matsim.ptproject.qsim.QNetworkI;
 import org.matsim.ptproject.qsim.QSimI;
-import org.matsim.ptproject.qsim.QSimTimer;
 import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.SimTimerI;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -148,7 +149,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	private ControlerIO controlerIO;
 	
 	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>() ;
-	private AgentCounterI agentCounter;
+	private AgentCounterI agentCounter = new AgentCounter() ;
+	private SimTimerI simTimer ;
 
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -165,9 +167,14 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		this.config = scenario.getConfig();
 		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
 //		AbstractSimulation.reset(this.config.simulation().getStuckTime());
-		AbstractSimulation.setLiving(0);
-		AbstractSimulation.resetLost();
-		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
+		
+//		this.agentCounter.setLiving(0);
+//		this.agentCounter.setLost(0);
+		this.agentCounter.reset();
+		
+//		SimulationTimer.resetStatic(this.config.simulation().getTimeStepSize());
+		simTimer = StaticFactoriesContainer.createSimulationTimer(this.config.simulation().getTimeStepSize()) ;
+		
 		setEvents(events);
 		this.population = scenario.getPopulation();
 
@@ -180,8 +187,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		this.notTeleportedModes.add(TransportMode.car);
 
 		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom(), this.scenario.getConfig());
-		
-		this.agentCounter = new QueueAgentCounter() ;
 	}
 
 	/**
@@ -201,14 +206,17 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		//do iterations
 		boolean cont = true;
 		while (cont) {
-			double time = SimulationTimer.getTime();
+			
+//			double time = this.simTimer.getTimeOfDayStatic();
+			double time = simTimer.getTimeOfDay() ;
+
 			beforeSimStep(time);
 			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
 			cont = doSimStep(time);
 			afterSimStep(time);
 			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 			if (cont) {
-				SimulationTimer.incTime();
+				this.simTimer.incrementTime();
 			}
 		}
 		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
@@ -312,8 +320,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
 		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;
 
-		SimulationTimer.setSimStartTime(24*3600);
-		SimulationTimer.setTime(startTime);
+		this.simTimer.setSimStartTime(24*3600);
+		this.simTimer.setTime(startTime);
 
 		createAgents();
 
@@ -328,8 +336,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		if (this.snapshotTime < simStartTime) {
 			this.snapshotTime += this.snapshotPeriod;
 		}
-		SimulationTimer.setSimStartTime(simStartTime);
-		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
+		this.simTimer.setSimStartTime(simStartTime);
+		this.simTimer.setTime(this.simTimer.getSimStartTime());
 
 		createSnapshotwriter();
 
@@ -350,7 +358,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		}
 
 		this.simEngine.afterSim();
-		double now = SimulationTimer.getTime();
+
+//		double now = this.simTimer.getTimeOfDayStatic();
+		double now = this.simTimer.getTimeOfDay();
+
 		for (Tuple<Double, PersonDriverAgent> entry : this.teleportationList) {
 			PersonDriverAgent agent = entry.getSecond();
 			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
@@ -391,14 +402,14 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 			this.infoTime += INFO_PERIOD;
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
-			double diffsim  = time - SimulationTimer.getSimStartTime();
+			double diffsim  = time - this.simTimer.getSimStartTime();
 			int nofActiveLinks = this.simEngine.getNumberOfSimulatedLinks();
-			log.info("SIMULATION AT " + Time.writeTime(time) + ": #Veh=" + AbstractSimulation.getLiving() + " lost=" + AbstractSimulation.getLost() + " #links=" + nofActiveLinks
+			log.info("SIMULATION AT " + Time.writeTime(time) + ": #Veh=" + this.agentCounter.getLiving() + " lost=" + this.agentCounter.getLost() + " #links=" + nofActiveLinks
 					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
 			Gbl.printMemoryUsage();
 		}
 
-		return (AbstractSimulation.isLiving() && (this.stopTime > time));
+		return (this.agentCounter.isLiving() && (this.stopTime > time));
 	}
 
 	protected void afterSimStep(final double time) {
@@ -442,7 +453,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.scenario.getNetwork().getLinks().get(startLinkId));
 		}
-		double arrivalTime = SimulationTimer.getTime() + agent.getCurrentLeg().getTravelTime();
+
+//		double arrivalTime = this.simTimer.getTimeOfDayStatic() + agent.getCurrentLeg().getTravelTime();
+		double arrivalTime = this.simTimer.getTimeOfDay() + agent.getCurrentLeg().getTravelTime();
+
 		this.teleportationList.add(new Tuple<Double, PersonDriverAgent>(arrivalTime, agent));
 	}
 
@@ -672,8 +686,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 
 
 	@Override
-	public QSimTimer getSimTimer() {
-		throw new UnsupportedOperationException() ;
+	public SimTimerI getSimTimer() {
+		return this.simTimer ;
 	}
 
 

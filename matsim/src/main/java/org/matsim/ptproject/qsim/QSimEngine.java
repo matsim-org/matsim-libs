@@ -20,6 +20,8 @@
 
 package org.matsim.ptproject.qsim;
 
+import org.matsim.core.mobsim.framework.Steppable;
+
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -28,13 +30,8 @@ package org.matsim.ptproject.qsim;
  * @author dgrether
  */
 
-public interface QSimEngine extends LinkActivator, SimEngine{
+public interface QSimEngine extends LinkActivator, SimEngine, Steppable {
 
-	/**
-	 * Implements one simulation step, called from simulation framework
-	 * @param time The current time in the simulation.
-	 */
-	public void simStep(final double time);
 	
 	// yyyy I find that this exposes too much interior information to the interface.
 	// I also don't find it logical to have it in a class that is meant to be replaceable for,

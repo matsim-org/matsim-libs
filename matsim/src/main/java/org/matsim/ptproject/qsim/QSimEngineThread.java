@@ -85,7 +85,7 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 		this.simulationRunning = false;
 	}
 
-	public void simStep(double time) {
+	public void doSimStep(double time) {
 		// nothing to do here
 	}
 	

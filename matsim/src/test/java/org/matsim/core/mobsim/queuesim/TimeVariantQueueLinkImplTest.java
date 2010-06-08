@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.queuesim;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -70,7 +71,6 @@ public class TimeVariantQueueLinkImplTest extends MatsimTestCase {
 		change2.addLink(link);
 		change2.setLanesChange(new ChangeValue(ChangeType.FACTOR, 0.5));
 		network.addNetworkChangeEvent(change2);
-
 
 		QueueNetwork qNetwork = new QueueNetwork(network, null);
 		QueueLink qLink = qNetwork.getQueueLink(new IdImpl("1"));

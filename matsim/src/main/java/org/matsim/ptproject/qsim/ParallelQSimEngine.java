@@ -77,7 +77,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 	 * @param time The current time in the simulation.
 	 */
 	@Override
-	public void simStep(final double time)
+	public void doSimStep(final double time)
 	{
 		run(time);
 	}

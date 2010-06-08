@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
 import org.matsim.signalsystems.config.AdaptivePlanBasedSignalSystemControlInfo;
@@ -47,7 +48,7 @@ import org.matsim.signalsystems.systems.SignalSystemDefinition;
 import org.matsim.signalsystems.systems.SignalSystems;
 
 
-public class QSimSignalEngine implements SignalEngine, SimEngine {
+public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
 
 
 	private static final Logger log = Logger.getLogger(QSimSignalEngine.class);
@@ -101,7 +102,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine {
 		}
 	}
 	
-  public void beforeSimStep(double time) {
+  public void doSimStep(double time) {
     for (SignalGroupDefinition signalGroup : this.signalSystems.getSignalGroupDefinitions().values()) {
       Id linkId = signalGroup.getLinkRefId();
       QLinkLanesImpl qlink = (QLinkLanesImpl) this.qNetwork.getQLink(linkId);

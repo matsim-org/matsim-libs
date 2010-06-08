@@ -675,14 +675,14 @@ public class QueueSimulationTest extends TestCase {
 		qlink2.addParkedVehicle(vehicle1);
 		qlink2.addParkedVehicle(vehicle2);
 
-		SimulationTimer.setTime(100.0);
+		sim.getSimTimer().setTime(100.0);
 		PersonDriverAgent agent = StaticFactoriesContainer.createQueuePersonAgent(person, sim);
 		agent.initializeAndCheckIfAlive();
 		agent.activityEnds(100.0);
 
-		SimulationTimer.setTime(101.0);
+		sim.getSimTimer().setTime(101.0);
 		sim.doSimStep(101.0); // agent should be moved to qlink2.buffer
-		SimulationTimer.setTime(102.0);
+		sim.getSimTimer().setTime(102.0);
 		sim.doSimStep(102.0); // agent should be moved to qlink3
 
 		Collection<? extends VisVehicle> vehicles = qlink3.getAllVehicles();

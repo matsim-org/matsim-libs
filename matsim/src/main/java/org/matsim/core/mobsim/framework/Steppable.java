@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimEngine
+ * Steppable.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,28 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.ptproject.qsim;
-
-import org.matsim.core.mobsim.framework.Steppable;
-
+package org.matsim.core.mobsim.framework;
 
 /**
- * @author dgrether
- * @TODO rename QSimEngine to QSimNetorkEngine and this to QSimEngine
+ * @author nagel
+ *
  */
-public interface SimEngine {
-  /**
-   * 
-   * @return the QSim instance
-   */
-  public QSimI getQSim();
-  /**
-   * called in a predefined Order when the simulation is started
-   */
-  public void onPrepareSim();
-  /**
-   * Do some clean up.
-   */
-  public void afterSim();
-  
+public interface Steppable {
+	
+	public void doSimStep( double time ) ;
+	// yyyy it is to be debated if "time" should be passed as an argument.  kai, jun'10
+
 }

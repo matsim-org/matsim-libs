@@ -102,7 +102,7 @@ public class QSimEngineImpl implements QSimEngine{
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
 	 */
-	public void simStep(final double time) {
+	public void doSimStep(final double time) {
 		moveNodes(time);
 		moveLinks(time);
 	}

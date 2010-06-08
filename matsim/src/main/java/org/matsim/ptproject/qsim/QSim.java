@@ -97,7 +97,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 	private CarDepartureHandler carDepartureHandler;
 
-	private QSimTimer simTimer;
+	private SimTimerI simTimer;
 	
 	private Collection<PersonAgent> transitAgents;
 
@@ -149,43 +149,43 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	 * @param simEngineFac
 	 */
 	private void init(final Scenario sc, QSimEngineFactory simEngineFac){
-    log.info("Using QSim...");
-    this.listenerManager = new SimulationListenerManager<QSim>(this);
-    this.stuckTime = sc.getConfig().getQSimConfigGroup().getStuckTime();
-    this.agentCounter = new AgentCounter();
-    this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
-    Config config = sc.getConfig();
-    this.simEngine = simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
+		log.info("Using QSim...");
+		this.listenerManager = new SimulationListenerManager<QSim>(this);
+		this.stuckTime = sc.getConfig().getQSimConfigGroup().getStuckTime();
+		this.agentCounter = new AgentCounter();
+		this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
+		Config config = sc.getConfig();
+		this.simEngine = simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
 
-    if (config.scenario().isUseLanes()) {
-      if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
-        throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
-      }
-      log.info("Lanes enabled...");
-      this.network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(),
-      		((ScenarioImpl)sc).getLaneDefinitions()));
-    }
-    else {
-        this.network = new QNetwork(this);
-    }
-    this.network.initialize(this.simEngine);
-    if (config.scenario().isUseSignalSystems()) {
-      if ((((ScenarioImpl)sc).getSignalSystems() == null)
-          || (((ScenarioImpl)sc).getSignalSystemConfigurations() == null)) {
-        throw new IllegalStateException(
-            "Signal systems and signal system configurations have to be set if feature is enabled!");
-      }
-      this.initSignalEngine(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
-    }
+		if (config.scenario().isUseLanes()) {
+			if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
+				throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
+			}
+			log.info("Lanes enabled...");
+			this.network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(),
+					((ScenarioImpl)sc).getLaneDefinitions()));
+		}
+		else {
+			this.network = new QNetwork(this);
+		}
+		this.network.initialize(this.simEngine);
+		if (config.scenario().isUseSignalSystems()) {
+			if ((((ScenarioImpl)sc).getSignalSystems() == null)
+					|| (((ScenarioImpl)sc).getSignalSystemConfigurations() == null)) {
+				throw new IllegalStateException(
+						"Signal systems and signal system configurations have to be set if feature is enabled!");
+			}
+			this.initSignalEngine(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
+		}
 
-    this.agentFactory = new AgentFactory(this);
-    this.notTeleportedModes.add(TransportMode.car);
-    installCarDepartureHandler();
-    if (config.scenario().isUseTransit()){
-    	this.transitEngine = new TransitQSimEngine(this);
-    	this.addDepartureHandler(this.transitEngine);
-//    	this.addFeature(transitEngine);
-    }
+		this.agentFactory = new AgentFactory(this);
+		this.notTeleportedModes.add(TransportMode.car);
+		installCarDepartureHandler();
+		if (config.scenario().isUseTransit()){
+			this.transitEngine = new TransitQSimEngine(this);
+			this.addDepartureHandler(this.transitEngine);
+			//    	this.addFeature(transitEngine);
+		}
 
 	}
 
@@ -372,7 +372,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 		this.changeEventsEngine.onBeforeSimStep(time);
     if (this.signalEngine != null) {
-      this.signalEngine.beforeSimStep(time);
+      this.signalEngine.doSimStep(time);
     }
 	}
 
@@ -399,7 +399,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	protected boolean doSimStep(final double time) {
 		this.moveVehiclesWithUnknownLegMode(time);
 		this.handleActivityEnds(time);
-		this.simEngine.simStep(time);
+		this.simEngine.doSimStep(time);
 
 		this.printSimLog(time);
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
@@ -654,7 +654,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 		this.controlerIO = controlerIO;
 	}
 
-	public QSimTimer getSimTimer() {
+	public SimTimerI getSimTimer() {
 		return this.simTimer ;
 	}
 

@@ -23,7 +23,7 @@ package org.matsim.ptproject.qsim;
 /**
  * @author dgrether
  */
-public class QSimTimer {
+public class QSimTimer implements SimTimerI {
 	/**
 	 * TODO 24 * 3600 is a quite strange time to initialize this
 	 */
@@ -43,38 +43,42 @@ public class QSimTimer {
 	}
 	
 	
-	/**
-	 * @return Returns the simStartTime. That is the lowest found start time of a leg
+	/* (non-Javadoc)
+	 * @see org.matsim.ptproject.qsim.SimTimerI#getSimStartTime()
 	 */
 	public final double getSimStartTime() {
 		return this.simStartTime;
 	}
-	/**
-	 * @return the time of day in seconds
+	/* (non-Javadoc)
+	 * @see org.matsim.ptproject.qsim.SimTimerI#getTimeOfDay()
 	 */
 	public double getTimeOfDay() {
 		return this.time;
 	}
-	/**
-	 * Increments the time by one timestep
-	 * @return the new time in seconds
+	/* (non-Javadoc)
+	 * @see org.matsim.ptproject.qsim.SimTimerI#incrementTime()
 	 */
 	public double incrementTime(){
 		this.time += stepSize;
 		return this.time;
 	}
 	
-	/**
-	 * Returns the number of seconds (time steps) the simulation advances when increasing the simulation time.
-	 * @return The number of time steps.
+	/* (non-Javadoc)
+	 * @see org.matsim.ptproject.qsim.SimTimerI#getSimTimestepSize()
 	 */
 	public final double getSimTimestepSize() {
 		return this.stepSize;
 	}
+	/* (non-Javadoc)
+	 * @see org.matsim.ptproject.qsim.SimTimerI#setSimStartTime(double)
+	 */
 	public void setSimStartTime(double startTimeSec) {
 		this.simStartTime = startTimeSec;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.matsim.ptproject.qsim.SimTimerI#setTime(double)
+	 */
 	public void setTime(double timeSec) {
 		this.time = timeSec;
 	}

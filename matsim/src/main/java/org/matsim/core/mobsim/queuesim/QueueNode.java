@@ -131,8 +131,8 @@ class QueueNode implements VisNode {
 				 */
 				if (Gbl.getConfig().simulation().isRemoveStuckVehicles()) {
 					link.popFirstFromBuffer();
-					AbstractSimulation.decLiving();
-					AbstractSimulation.incLost();
+					this.queueNetwork.getQSim().getAgentCounter().decLiving();
+					this.queueNetwork.getQSim().getAgentCounter().incLost();
 					QueueSimulation.getEvents().processEvent(
 							new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
 				} else {
@@ -147,8 +147,8 @@ class QueueNode implements VisNode {
 
 		// --> nextLink == null
 		link.popFirstFromBuffer();
-		AbstractSimulation.decLiving();
-		AbstractSimulation.incLost();
+		this.queueNetwork.getQSim().getAgentCounter().decLiving();
+		this.queueNetwork.getQSim().getAgentCounter().incLost();
 		log.error(
 				"Agent has no or wrong route! agentId=" + veh.getDriver().getPerson().getId()
 						+ " currentLink=" + currentLink.getId().toString()

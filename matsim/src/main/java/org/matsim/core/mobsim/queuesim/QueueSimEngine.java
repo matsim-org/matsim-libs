@@ -166,4 +166,8 @@ import org.matsim.ptproject.qsim.QSimI;
 	/*package*/ Config getConfig() {
 		return config;
 	}
+
+	/*package*/ QueueNetwork getQNetwork() {
+		return qNetwork;
+	}
 }

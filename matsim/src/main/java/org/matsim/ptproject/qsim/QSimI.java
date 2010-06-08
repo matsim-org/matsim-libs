@@ -82,7 +82,7 @@ public interface QSimI extends IOSimulation {
 	/**
 	 * @return
 	 */
-	QSimTimer getSimTimer();
+	SimTimerI getSimTimer();
 
 	/**
 	 * @return
