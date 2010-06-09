@@ -75,7 +75,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testRandomChoice() {
 		PlanomatConfigGroup planomatConfigGroup = new PlanomatConfigGroup();
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom(), planomatConfigGroup);
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -105,7 +105,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testHandleEmptyPlan() {
 		PlanomatConfigGroup planomatConfigGroup = new PlanomatConfigGroup();
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom(), planomatConfigGroup);
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
@@ -113,7 +113,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testHandlePlanWithoutLeg() {
 		PlanomatConfigGroup planomatConfigGroup = new PlanomatConfigGroup();
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom(), planomatConfigGroup);
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		algo.run(plan);
@@ -125,7 +125,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	 */
 	public void testMultipleLegs() {
 		PlanomatConfigGroup planomatConfigGroup = new PlanomatConfigGroup();
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt}, MatsimRandom.getRandom(), planomatConfigGroup);
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt}, MatsimRandom.getRandom());
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		plan.createAndAddLeg(TransportMode.car);
@@ -173,7 +173,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	public void testSubTourMutationToCar(Layer layer, PlanomatConfigGroup planomatConfigGroup) {
 		TransportMode expectedMode = TransportMode.car;
 		TransportMode originalMode = TransportMode.pt;
-		ChooseRandomLegMode testee = new ChooseRandomLegMode(new TransportMode[] {expectedMode, originalMode}, MatsimRandom.getRandom(), planomatConfigGroup);
+		ChooseRandomLegMode testee = new ChooseRandomLegMode(new TransportMode[] {expectedMode, originalMode}, MatsimRandom.getRandom());
 		testee.setChangeOnlyOneSubtour(true);
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 		for (String activityChainString : activityChainStrings) {
@@ -190,7 +190,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	public void testSubTourMutationToPt(Layer layer, PlanomatConfigGroup planomatConfigGroup) {
 		TransportMode expectedMode = TransportMode.pt;
 		TransportMode originalMode = TransportMode.car;
-		ChooseRandomLegMode testee = new ChooseRandomLegMode(new TransportMode[] {expectedMode, originalMode}, MatsimRandom.getRandom(), planomatConfigGroup);
+		ChooseRandomLegMode testee = new ChooseRandomLegMode(new TransportMode[] {expectedMode, originalMode}, MatsimRandom.getRandom());
 		testee.setChangeOnlyOneSubtour(true);
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 		for (String activityChainString : activityChainStrings) {
@@ -205,7 +205,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	}
 	
 	public void testCarDoesntTeleport(Layer layer, PlanomatConfigGroup planomatConfigGroup, TransportMode originalMode, TransportMode otherMode) {
-		ChooseRandomLegMode testee = new ChooseRandomLegMode(new TransportMode[] {originalMode, otherMode}, MatsimRandom.getRandom(), planomatConfigGroup);
+		ChooseRandomLegMode testee = new ChooseRandomLegMode(new TransportMode[] {originalMode, otherMode}, MatsimRandom.getRandom());
 		testee.setChangeOnlyOneSubtour(true);
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 		for (String activityChainString : activityChainStrings) {

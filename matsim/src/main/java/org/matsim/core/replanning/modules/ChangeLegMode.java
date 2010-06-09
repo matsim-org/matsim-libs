@@ -78,7 +78,7 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 		// yy not clear to me: how the planomat config group is used to configure this.  Seems, however, that
 		// the only thing that is configured is if "facilities" or "links" decide if there is a return to the 
 		// same location.  kai, may'10
-		return new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance(), config.planomat());
+		return new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance());
 	}
 
 }

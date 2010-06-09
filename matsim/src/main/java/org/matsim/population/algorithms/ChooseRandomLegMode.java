@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
@@ -57,26 +58,30 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 	/**
 	 * @param possibleModes
 	 * @param rng The random number generator used to draw random numbers to select another mode.
-	 *
 	 * @see TransportMode
 	 * @see MatsimRandom
 	 */
-	public ChooseRandomLegMode(final TransportMode[] possibleModes, final Random rng, PlanomatConfigGroup planomatConfigGroup) {
+	public ChooseRandomLegMode(final TransportMode[] possibleModes, final Random rng) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
-		this.planAnalyzeSubtours = new PlanAnalyzeSubtours(planomatConfigGroup);
+		PlanomatConfigGroup myPlanomatConfigGroup = new PlanomatConfigGroup();
+		myPlanomatConfigGroup.setTripStructureAnalysisLayer(TripStructureAnalysisLayerOption.link);
+		this.planAnalyzeSubtours = new PlanAnalyzeSubtours(myPlanomatConfigGroup);
 	}
 
 	public void run(final Plan plan) {
+//		System.out.println(plan.getPerson().getId());
 		if (plan.getPlanElements().size() > 1) {
 			if (changeOnlyOneSubtour) {
 				planAnalyzeSubtours.run(plan);
 				List<Candidate> candidates = determineChangeCandidates();
-				Candidate whatToDo = candidates.get(rng.nextInt(candidates
-						.size()));
-				List<PlanElement> subTour = planAnalyzeSubtours.getSubtours()
-						.get(whatToDo.subTourIndex);
-				changeLegModeTo(subTour, whatToDo.newTransportMode);
+				if (!candidates.isEmpty()) {
+					Candidate whatToDo = candidates.get(rng.nextInt(candidates
+							.size()));
+					List<PlanElement> subTour = planAnalyzeSubtours.getSubtours()
+					.get(whatToDo.subTourIndex);
+					changeLegModeTo(subTour, whatToDo.newTransportMode);
+				}
 			} else {
 				List<PlanElement> tour = plan.getPlanElements();
 				changeToRandomLegMode(tour);
@@ -90,7 +95,11 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 
 	private List<Candidate> determineChangeCandidates() {
 		ArrayList<Candidate> candidates = new ArrayList<Candidate>();
+//		print(planAnalyzeSubtours.getSubtourIndexation());
 		for (Integer subTourIndex : planAnalyzeSubtours.getSubtourIndexation()) {
+			if (subTourIndex < 0) {
+				continue;
+			}
 			List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(subTourIndex);
 			Integer parentSubtourIndex = planAnalyzeSubtours.getParentTours().get(subTourIndex);
 			Set<TransportMode> usableChainBasedModes = EnumSet.noneOf(TransportMode.class);
@@ -121,6 +130,13 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 		}
 		return candidates;
 	}
+
+//	private void print(int[] subtourIndexation) {
+//		for (int ix : subtourIndexation) {
+//			System.out.print(ix + " ");
+//		}
+//		System.out.println();
+//	}
 
 	private void changeToRandomLegMode(List<PlanElement> tour) {
 		final TransportMode currentMode = getTransportMode(tour);
