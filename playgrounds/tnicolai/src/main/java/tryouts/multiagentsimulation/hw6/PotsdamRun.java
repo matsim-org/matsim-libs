@@ -35,7 +35,7 @@ public class PotsdamRun {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final Controller controller = new Controller("./tnicolai/configs/brandenburg/hw6/config-potsdam_pt_before.xml");
+		final Controller controller = new Controller("./tnicolai/configs/brandenburg/hw6/config-potsdam_pt_after.xml");
 		controller.setOverwriteFiles(true);
 		controller.run();
 	}
