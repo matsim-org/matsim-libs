@@ -56,7 +56,8 @@ public class MyRaster{
 	 * The following Kernel Density Estimate function types are available:		|
 	 * 	0 - Only the pixel in which the point occurs.							|
 	 *  1 - Uniform function. A radius must be given.							|
-	 *  2 - Triangular function.												|
+	 *  2 - Triangular function.	
+	 *  3 - Triweight function.											|
 	 *  																		|
 	 *  For all but the `0' case a value for the radius is required. 			|
 	 *========================================================================*/
@@ -183,9 +184,10 @@ public class MyRaster{
 	}
 	
 	/**
-	 * A method that iterates through the given list, calling 
+	 * A method that iterates through a given list of points, calling 
 	 * <i>processPoint(Point point)</i> for each.
-	 * @param list of points to be processed
+	 * @param list of type <code>com.vividsolutions.jts.geom.Point</code> 
+	 * 		points to be processed.
 	 */
 	public void processPoints(List<com.vividsolutions.jts.geom.Point> list){
 		int counter = 0;
@@ -210,7 +212,15 @@ public class MyRaster{
 	 * Kernel Density Estimate functions are currently implemented:
 	 * <ul>
 	 * 		<b>0</b> - Only increase the value of the pixel within which the 
-	 * 				   point falls. 
+	 * 				   point falls. <br>
+	 * 		<b>1</b> - Uniform. Increases all pixels within the radius by the
+	 * 				   same amount, 0.5.<br>
+	 * 		<b>2</b> - Triangular. Increases the pixel within which the activity
+	 * 				   takes place, by 1, and all other pixels within the radius
+	 * 				   by an inverse linear function between 0 (at a distance 
+	 * 				   equal to the radius) and 1 (at the activity, i.e. distance
+	 * 				   equal to zero).<br>
+	 * 		<b>3</b> - Triweight.
 	 * </ul>
 	 * @param point that is to be processed.
 	 * @return
