@@ -66,12 +66,34 @@ public class DgWithindayQPersonAgent extends QPersonAgent {
 		}
 		QLink currentQLink = qnet.getLinks().get(currentLinkId);
 		Map<Id, ? extends Link> outlinks = currentQLink.getLink().getToNode().getOutLinks();
-		List<Link> outLinksList = new ArrayList<Link>(outlinks.values());
-		int nextLinkNr = (int) (random.nextDouble() * outLinksList.size());
-		Link nextLink = outLinksList.get(nextLinkNr);
-		this.cachedNextLinkId = nextLink.getId();
-		String nextLinkId = this.cachedNextLinkId.toString();
-		return this.cachedNextLinkId;
+		List<Link> outLinksList = new ArrayList<Link>();
+		log.error("outlinks.size " + outlinks.size());
+
+		double outLinksCapacitySum = 0.0;
+		for (Link outLink : outlinks.values()){
+			if (!outLink.getToNode().getId().equals(currentQLink.getLink().getFromNode().getId())){
+				outLinksList.add(outLink);
+				outLinksCapacitySum += outLink.getCapacity(this.getQSimulation().getSimTimer().getTimeOfDay());
+			}
+		}
+		double randomNumber = random.nextDouble() * outLinksCapacitySum;
+		double selectedCapacity = 0.0;
+		log.error("outlinkslist.size " + outLinksList.size());
+		for (Link outLink : outLinksList){
+			selectedCapacity += outLink.getCapacity(this.getQSimulation().getSimTimer().getTimeOfDay());
+			log.error("selectedCap: " + selectedCapacity + " randomNumber: " + randomNumber);
+			if (selectedCapacity >= randomNumber){
+				this.cachedNextLinkId = outLink.getId();
+				return this.cachedNextLinkId;
+			}
+		}
+		throw new IllegalStateException();
+//		
+//		
+//		int nextLinkNr = (int) (random.nextDouble() * outLinksList.size());
+//		Link nextLink = outLinksList.get(nextLinkNr);
+//		this.cachedNextLinkId = nextLink.getId();
+//		return this.cachedNextLinkId;
 	}
 	
 }
