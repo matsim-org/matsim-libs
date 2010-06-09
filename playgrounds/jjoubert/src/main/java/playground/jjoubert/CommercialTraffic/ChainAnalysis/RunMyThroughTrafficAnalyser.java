@@ -99,7 +99,7 @@ public class RunMyThroughTrafficAnalyser {
 		/*
 		 * Identify through-vehicles.
 		 */
-		String vehicleFolder = String.format("%sDigiCore/XML/%d/%s/%04d/Sample%02d/", 
+		String vehicleFolder = String.format("%sDigiCore/%d/XML/%s/%04d/Sample%02d/", 
 				root, year, version, threshold, sample);
 		File folder = new File(vehicleFolder);
 		if(!folder.isDirectory()){
