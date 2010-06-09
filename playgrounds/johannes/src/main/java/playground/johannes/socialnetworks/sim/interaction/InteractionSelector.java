@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WeightedDijkstra.java
+ * InteractionSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,27 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.matrix;
 
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.graph.matrix.Dijkstra;
+/**
+ * 
+ */
+package playground.johannes.socialnetworks.sim.interaction;
+
+import java.util.Collection;
+
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author illenberger
  *
  */
-public class WeightedDijkstra extends Dijkstra {
+public interface InteractionSelector {
 
-	private EdgeCostFunction costs;
+	public Collection<Id> select(Id v, Collection<Id> choiceSet);
 	
-	public WeightedDijkstra(AdjacencyMatrix<?> y, EdgeCostFunction costs) {
-		super(y);
-		this.costs = costs;
-	}
-
-	@Override
-	protected double getCost(int i, int j) {
-		return costs.edgeCost(i, j);
-	}
-
 }

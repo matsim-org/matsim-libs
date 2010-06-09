@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WeightedDijkstra.java
+ * SeedColorizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.matrix;
+package playground.johannes.socialnetworks.snowball2.io;
 
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.graph.matrix.Dijkstra;
+import java.awt.Color;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
+import org.matsim.contrib.sna.graph.spatial.io.Colorizable;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger
  *
  */
-public class WeightedDijkstra extends Dijkstra {
+public class SeedColorizer<V extends SampledVertex> implements Colorizable<V> {
 
-	private EdgeCostFunction costs;
+	private Map<SampledVertex, Color> colorMap;
 	
-	public WeightedDijkstra(AdjacencyMatrix<?> y, EdgeCostFunction costs) {
-		super(y);
-		this.costs = costs;
+	public SeedColorizer(Set<? extends SampledVertex> seeds) {
+		int nSeeds = Math.max(6, seeds.size() + 1);
+		int i = 1;
+		colorMap = new HashMap<SampledVertex, Color>();
+		for(SampledVertex vertex : seeds) {
+			Color c = ColorUtils.getGRBColor(i/(double)(nSeeds - i));
+			colorMap.put(vertex, c);
+			i++;
+		}
+		
 	}
-
 	@Override
-	protected double getCost(int i, int j) {
-		return costs.edgeCost(i, j);
+	public Color getColor(V object) {
+		Color c = colorMap.get(object.getSeed());
+		if(c == null)
+			c = Color.BLACK;
+		return c;
 	}
 
 }

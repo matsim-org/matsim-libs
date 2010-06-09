@@ -43,7 +43,7 @@ public class ErgmEdgeCost implements GraphProbability {
 	
 	private EdgeCostFunction costFunction;
 	
-	public ErgmEdgeCost(AdjacencyMatrix<? extends SpatialVertex> y, EdgeCostFunction costFunction, double budget, String thetaFile) {
+	public ErgmEdgeCost(AdjacencyMatrix<? extends SpatialVertex> y, EdgeCostFunction costFunction, double budget, String thetaFile, double theta_edge) {
 		this.costFunction = costFunction;
 		
 //		TObjectDoubleHashMap<SpatialVertex> budgets = new TObjectDoubleHashMap<SpatialVertex>();
@@ -61,7 +61,7 @@ public class ErgmEdgeCost implements GraphProbability {
 			vertices.add(y.getVertex(i));
 		}
 		
-		TObjectDoubleHashMap<SpatialVertex> tmpThetas = approximator.approximate(vertices, budget, costFunction);
+		TObjectDoubleHashMap<SpatialVertex> tmpThetas = approximator.approximate(vertices, budget, costFunction, theta_edge);
 		
 		thetas = new double[y.getVertexCount()];
 		Distribution distr = new Distribution();

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InteractionSelector.java
+ * GraphML2KML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.interaction;
-
-import java.util.Collection;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
 /**
  * @author illenberger
  *
  */
-public interface InteractionSelector {
+public class GraphML2KML {
 
-	public Collection<Visitor> select(Visitor v, Collection<Visitor> choiceSet);
-	
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraph graph = reader.readGraph(args[0]);
+		
+		SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
+		writer.write(graph, args[1]);
+	}
+
 }

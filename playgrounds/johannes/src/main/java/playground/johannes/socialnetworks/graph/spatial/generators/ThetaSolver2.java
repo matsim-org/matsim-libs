@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ThetaSolver.java
+ * ThetaSolver2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,12 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
+import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.math.FunctionEvaluationException;
@@ -34,6 +37,7 @@ import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.commons.math.analysis.solvers.NewtonSolver;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
@@ -45,56 +49,65 @@ import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGra
  * @author illenberger
  *
  */
-public class ThetaSolver {
+public class ThetaSolver2 {
 	
-	private static final Logger logger = Logger.getLogger(ThetaSolver.class);
+	private static final Logger logger = Logger.getLogger(ThetaSolver2.class);
 
 	private NewtonSolver solver;
 	
 	private EdgeCostFunction costFunction;
 	
-	private double theta_edge;
+	private playground.johannes.socialnetworks.graph.matrix.EdgeCostFunction cachedCostFunction;
+	
+	private int nEdges;
 	
 	private static final double THETA_MIN = -200;
 	
 	private static final double THETA_MAX = 200;
 	
-	public ThetaSolver(EdgeCostFunction costFunction, double theta_edge) {
+	public ThetaSolver2(EdgeCostFunction costFunction, int nEdges) {
 		this.costFunction = costFunction;
-		this.theta_edge = theta_edge;
+		this.nEdges = nEdges;
 	}
 	
 	public TObjectDoubleHashMap<SpatialVertex> solve(TObjectDoubleHashMap<SpatialVertex> budgets) {
-		Set<SpatialVertex> vertices = new HashSet<SpatialVertex>();
+		List<SpatialVertex> vertices = new ArrayList<SpatialVertex>(budgets.size());
 		for(Object v : budgets.keys())
 			vertices.add((SpatialVertex)v);
+		
+		int N = vertices.size();
+		cachedCostFunction = new CachedCostFunction(vertices, costFunction);
 		
 		TObjectDoubleHashMap<SpatialVertex> thetas = new TObjectDoubleHashMap<SpatialVertex>();
 		
 		solver = new NewtonSolver();
-		solver.setMaximalIterationCount(2000);
-		solver.setAbsoluteAccuracy(0.0001);
+		solver.setMaximalIterationCount(50);
+		solver.setAbsoluteAccuracy(0.00001);
 		
 		int iterCount = 0;
 		
-		TObjectDoubleIterator<SpatialVertex> it = budgets.iterator();
-		for(int i = 0; i < budgets.size(); i++) {
-			it.advance();
-			double theta = solve(it.key(), it.value(), vertices);
-			thetas.put(it.key(), theta);
+		
+		
+//		TObjectDoubleIterator<SpatialVertex> it = budgets.iterator();
+		for(int i = 0; i < N; i++) {
+			logger.info(String.format("Processing %1$s out of %2$s vertices.", i+1, budgets.size()));
+//			it.advance();
+			double theta = solve(i, budgets.get(vertices.get(i)), N);
+			System.out.println("theta:" + theta);
+			thetas.put(vertices.get(i), theta);
 			iterCount += solver.getIterationCount();
 //			System.out.println(String.valueOf(theta));
-			if(i % 100 == 0) {
-				logger.info(String.format("Processed %1$s out of %2$s vertices.", i, budgets.size()));
-				logger.info(String.format("Average number of iterations: %1$s", iterCount/(float)i));
+			if(i % 1 == 0) {
+				logger.info(String.format("Processed %1$s out of %2$s vertices.", i+1, budgets.size()));
+				logger.info(String.format("Average number of iterations: %1$s", iterCount/(float)(i+1)));
 			}
 		}
 		
 		return thetas;
 	}
 	
-	private double solve(SpatialVertex vertex, double budget, Set<SpatialVertex> vertices) {
-		DifferentiableUnivariateRealFunction func = new Primitive(vertex, costFunction, budget, vertices, theta_edge);
+	private double solve(int vertex, double budget, int vertices) {
+		DifferentiableUnivariateRealFunction func = new Primitive(vertex, budget, vertices, cachedCostFunction, nEdges);
 		try {
 			return solver.solve(func, THETA_MIN, THETA_MAX);
 		} catch (MaxIterationsExceededException e) {
@@ -107,24 +120,25 @@ public class ThetaSolver {
 	
 	private class Primitive implements DifferentiableUnivariateRealFunction {
 
-		private final Set<SpatialVertex> vertices;
+		private final int N;
 		
-		private final SpatialVertex vi;
+		private final int vi;
 		
-		private final EdgeCostFunction costFunction;
+		private final playground.johannes.socialnetworks.graph.matrix.EdgeCostFunction costFunction;
 		
 		private final double budget;
 		
+		private final double p;
+		
 		private final Derivative derivative;
 		
-		private final double theta_edge;
-		
-		public Primitive(SpatialVertex vi, EdgeCostFunction costFunction, double budget, Set<SpatialVertex> vertices, double theta_edge) {
+		private Primitive(int vi, double budget, int N, playground.johannes.socialnetworks.graph.matrix.EdgeCostFunction costFunction, int nEdges) {
 			this.vi = vi;
-			this.vertices = vertices;
+//			this.vertices = new ArrayList<SpatialVertex>(vertices);
+			this.N = N;
 			this.costFunction = costFunction;
 			this.budget = budget;
-			this.theta_edge = theta_edge;
+			this.p = nEdges/(double)(N*(N-1)/2.0);
 			derivative = new Derivative(this);
 		}
 		
@@ -135,16 +149,22 @@ public class ThetaSolver {
 
 		@Override
 		public double value(double x) throws FunctionEvaluationException {
-			double sum = 0;
-			
-			for(SpatialVertex vj : vertices) {
-				if(vi != vj) {
-					double c = costFunction.edgeCost(vi, vj);
-					sum += c * Math.exp(-x * c);
+			double sum1 = 0;
+			for(int i = 0; i < N; i++) {
+				for(int j = i+1 ; j < N; j++) {
+					sum1 += Math.exp(-x * costFunction.edgeCost(i, j));
 				}
 			}
 			
-			return Math.exp(- theta_edge) * sum - budget;
+			double sum2 = 0;
+			for(int j = 0; j < N; j++) {
+				if(vi != j) {
+					double c = costFunction.edgeCost(vi, j);
+					sum2 += c * Math.exp(-x * c);
+				}
+			}
+			
+			return p/sum1 * sum2 - budget;
 		}
 		
 	}
@@ -159,16 +179,50 @@ public class ThetaSolver {
 		
 		@Override
 		public double value(double x) throws FunctionEvaluationException {
-			double sum = 0;
+			double sum1 = 0;
+			double sum2 = 0;
 			
-			for(SpatialVertex vj : primitive.vertices) {
-				if(primitive.vi != vj) {
-					double c = primitive.costFunction.edgeCost(primitive.vi, vj);
-					sum += -c * c * Math.exp(-x * c);
+			for(int i = 0; i < primitive.N; i++) {
+				for(int j = i+1 ; j < primitive.N; j++) {
+					double c = primitive.costFunction.edgeCost(i, j);
+					sum1 += c * Math.exp(-x * c);
+					sum2 += Math.exp(-x * c);
 				}
 			}
 			
-			return Math.exp(- theta_edge) * sum;
+			double sum3 = 0;
+			for(int j = 0; j < primitive.N; j++) {
+				if(j != primitive.vi) {
+					double c = primitive.costFunction.edgeCost(primitive.vi, j);
+					sum3 += -c * c * Math.exp(-x * c);
+				}
+			}
+			
+			return sum1/sum2 +sum3;
+		}
+		
+	}
+	
+	private static class CachedCostFunction implements playground.johannes.socialnetworks.graph.matrix.EdgeCostFunction {
+
+		private double[][] costs;
+		
+		public CachedCostFunction(List<? extends SpatialVertex> vertices, EdgeCostFunction costFunction) {
+			System.out.println("Caching costs...");
+			int N = vertices.size();
+			costs = new double[N][N];
+			for(int i = 0; i < N; i++) {
+				for(int j = 0; j < N; j++) {
+					if(i != j)
+						costs[i][j] = costFunction.edgeCost(vertices.get(i), vertices.get(j));
+				}
+			}
+			System.out.println("Done.");
+		}
+		
+		@Override
+		public double edgeCost(int i, int j) {
+			return costs[i][j];
 		}
 		
 	}
@@ -178,11 +232,13 @@ public class ThetaSolver {
 		SpatialSparseGraph graph = reader.read(args[0]);
 		
 		GravityCostFunction func = new GravityCostFunction(1.6, 1.0, new CartesianDistanceCalculator());
-		ThetaSolver solver = new ThetaSolver(func, 1.0);
+		int k = 15;
+		int m = (int) (0.5 * k * graph.getVertices().size());
+		ThetaSolver2 solver = new ThetaSolver2(func, m);
 		
 		TObjectDoubleHashMap<SpatialVertex> budgets = new TObjectDoubleHashMap<SpatialVertex>();
 		for(SpatialVertex vertex : graph.getVertices()) {
-			budgets.put(vertex, 25);
+			budgets.put(vertex, 60);
 		}
 		
 		TObjectDoubleHashMap<SpatialVertex> thetas = solver.solve(budgets);

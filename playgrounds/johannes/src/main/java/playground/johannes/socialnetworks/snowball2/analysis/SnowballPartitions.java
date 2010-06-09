@@ -19,8 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.analysis;
 
+import gnu.trove.TIntObjectHashMap;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.matsim.contrib.sna.snowball.SampledVertex;
@@ -44,7 +48,7 @@ public class SnowballPartitions {
 		Set<V> partition = new HashSet<V>();
 		for(V vertex : vertices) {
 			if(vertex.getIterationSampled() == iteration)
-				vertices.add(vertex);
+				partition.add(vertex);
 		}
 		return partition;
 	}
@@ -56,5 +60,26 @@ public class SnowballPartitions {
 				vertices.add(vertex);
 		}
 		return partition;
+	}
+	
+	public static <V extends SampledVertex> List<Set<V>> createSampledPartitions(Collection<V> vertices) {
+		TIntObjectHashMap<Set<V>> partitions = new TIntObjectHashMap<Set<V>>();
+		for(V vertex : vertices) {
+			int it = vertex.getIterationSampled();
+			Set<V> partition = partitions.get(it);
+			if(partition == null) {
+				partition = new HashSet<V>();
+				partitions.put(it, partition);
+			}
+			
+			partition.add(vertex);
+		}
+		
+		List<Set<V>> list = new ArrayList<Set<V>>(partitions.size());
+		for(int i = 0; i < partitions.size()-1; i++) {
+			list.add(partitions.get(i));
+		}
+		
+		return list;
 	}
 }

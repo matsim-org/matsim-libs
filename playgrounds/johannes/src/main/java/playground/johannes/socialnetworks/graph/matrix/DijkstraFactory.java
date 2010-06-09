@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Interactor.java
+ * DijkstraFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.graph.matrix;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.interaction;
-
-import org.matsim.api.core.v01.population.Person;
-
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.sna.graph.matrix.Dijkstra;
 
 /**
  * @author illenberger
  *
  */
-public interface Interactor {
+public class DijkstraFactory {
 
-	public void interact(Person p1, Person p2, double startTime, double endTime);
-	
+	public Dijkstra newDijkstra(AdjacencyMatrix<?> y) {
+		return new Dijkstra(y);
+	}
 }

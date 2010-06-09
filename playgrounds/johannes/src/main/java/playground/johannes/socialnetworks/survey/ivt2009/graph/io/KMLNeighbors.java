@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WeightedDijkstra.java
+ * KMLNeighbors.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.matrix;
+package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.graph.matrix.Dijkstra;
+import net.opengis.kml._2.PlacemarkType;
+
+import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail;
+
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class WeightedDijkstra extends Dijkstra {
+public class KMLNeighbors<V extends SocialVertex> implements KMLObjectDetail<V> {
 
-	private EdgeCostFunction costs;
-	
-	public WeightedDijkstra(AdjacencyMatrix<?> y, EdgeCostFunction costs) {
-		super(y);
-		this.costs = costs;
-	}
-
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail#addDetail(net.opengis.kml._2.PlacemarkType, java.lang.Object)
+	 */
 	@Override
-	protected double getCost(int i, int j) {
-		return costs.edgeCost(i, j);
+	public void addDetail(PlacemarkType kmlPlacemark, V object) {
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append(kmlPlacemark.getDescription());
+		
+		builder.append("<b>neihbors:<b>");
+		for(SocialVertex neighbor : object.getNeighbours()) {
+			builder.append(neighbor.getPerson().getId().toString());
+			builder.append(" ");
+		}
+		
+		kmlPlacemark.setDescription(builder.toString());
+		
 	}
 
 }

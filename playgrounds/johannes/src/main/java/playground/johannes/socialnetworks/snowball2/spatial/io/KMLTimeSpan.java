@@ -25,34 +25,32 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.TimeSpanType;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail;
 
 /**
  * @author illenberger
  *
  */
-public class KMLTimeSpan implements KMLObjectDetail<SpatialVertex> {
+public class KMLTimeSpan implements KMLObjectDetail {
 
 	private ObjectFactory factory = new ObjectFactory();
 	
-	private Map<Vertex, String> timeStamps;
+	private Map<?, String> timeStamps;
 	
-	public KMLTimeSpan(Map<Vertex, String> timeStamps) {
+	public KMLTimeSpan(Map<?, String> timeStamps) {
 		this.timeStamps = timeStamps;
 	}
-	
 
 	@Override
-	public void addDetail(PlacemarkType kmlPlacemark, SpatialVertex vertex) {
+	public void addDetail(PlacemarkType kmlPlacemark, Object obj) {
 		TimeSpanType tType = factory.createTimeSpanType();
 		
-		String timeStamp = timeStamps.get(vertex);
-		tType.setBegin(timeStamp.replace(" ", "T"));
-//		tType.setBegin(String.valueOf(((SampledVertex)vertex).getIterationDetected()+2000));
+		String timeStamp = timeStamps.get(obj);
+		if(timeStamp == null)
+			timeStamp = "200000";
+		tType.setBegin(timeStamp);
 		kmlPlacemark.setAbstractTimePrimitiveGroup(factory.createTimeSpan(tType));
-		
+//		kmlPlacemark.setName(timeStamp);
 	}
 
 }

@@ -19,16 +19,22 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
 import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
+import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
+import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
+import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
+import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSampledComponents;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSnowballDescriptor;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.KMLVertexId;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 
 
@@ -42,8 +48,12 @@ public class GraphML2KML {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialGraph graph = reader.readGraph(args[0]);
+		SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> reader =
+			new SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(new SocialSparseGraphMLReader());
+		
+		reader.setGraphProjectionBuilder(new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>());
+		
+		SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = (SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>) reader.readGraph(args[0]);
 
 		SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
 		KMLSampledComponents components = new KMLSampledComponents();

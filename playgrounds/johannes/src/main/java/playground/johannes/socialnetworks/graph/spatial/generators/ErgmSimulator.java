@@ -37,6 +37,7 @@ import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
+import playground.johannes.socialnetworks.graph.mcmc.ErgmDensity;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeSwitch;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCostsTask;
@@ -74,13 +75,14 @@ public class ErgmSimulator {
 		String outputDir = config.getParam(MODULE_NAME, "output");
 		
 		double totalCost = Double.parseDouble(config.getParam(MODULE_NAME, "totalCost"));
+		double theta_edge = Double.parseDouble(config.getParam(MODULE_NAME, "thetaEdge"));
 		
-		logger.info("Creating random graph...");
+//		logger.info("Creating random graph...");
 		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten());
-		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(builder);
-		int k = (int)k_mean;
-		double p = k / (double)graph.getVertices().size();
-		generator.generate(graph, p, randomSeed);
+//		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(builder);
+//		int k = (int)k_mean;
+//		double p = k / (double)graph.getVertices().size();
+//		generator.generate(graph, p, randomSeed);
 		/*
 		 * convert graph to matrix
 		 */
@@ -90,14 +92,19 @@ public class ErgmSimulator {
 		 */
 		
 		EdgeCostFunction costFunction = new GravityCostFunction(1.6, 1.0, new CartesianDistanceCalculator());
-		ErgmEdgeCost edgeCost = new ErgmEdgeCost(y, costFunction, totalCost, outputDir + "/thetas.txt");
+		ErgmEdgeCost edgeCost = new ErgmEdgeCost(y, costFunction, totalCost, outputDir + "/thetas.txt", theta_edge);
+		
+		ErgmDensity density = new ErgmDensity();
+		density.setTheta(theta_edge);
 		
 		Ergm ergm = new Ergm();
+		ergm.addComponent(density);
 		ergm.addComponent(edgeCost);
 		/*
 		 * setup gibbs sampler.
 		 */
-		GibbsSampler sampler = new GibbsEdgeSwitch(randomSeed);
+//		GibbsSampler sampler = new GibbsEdgeSwitch(randomSeed);
+		GibbsSampler sampler = new GibbsSampler(randomSeed);
 		sampler.setInterval(1000000);
 		
 		DumpHandler handler = new DumpHandler(graph, builder, outputDir);

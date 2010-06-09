@@ -93,10 +93,10 @@ public class Loader {
 		Map<String, EstimatorSet> estimators = new HashMap<String, EstimatorSet>();
 		Set<BiasedDistribution> estimatorSet = new HashSet<BiasedDistribution>();
 		
-		BiasedDistribution estim1 = new Estimator1(N);
-		estimatorSet.add(estim1);
-		estimators.put("estim1a", new EstimatorSet(estim1, null, null));
-		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
+//		BiasedDistribution estim1 = new Estimator1(N);
+//		estimatorSet.add(estim1);
+//		estimators.put("estim1a", new EstimatorSet(estim1, null, null));
+//		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
 		
 //		BiasedDistribution estim2 = new Estimator2(N);
 //		estimatorSet.add(estim2);

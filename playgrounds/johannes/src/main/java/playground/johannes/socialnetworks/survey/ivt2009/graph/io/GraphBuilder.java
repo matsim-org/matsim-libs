@@ -254,7 +254,7 @@ public class GraphBuilder {
 		GraphBuilder builder = new GraphBuilder();
 		
 		ArrayList<String> alterTables = new ArrayList<String>();
-		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/Netzwerkgrafik_Alteri_Sub1.txt");
+		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/SubSample1.fixed.txt");
 		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/Netzwerkgrafik_Alteri_Sub2.txt");
 		
 		ArrayList<String> egoTables = new ArrayList<String>();

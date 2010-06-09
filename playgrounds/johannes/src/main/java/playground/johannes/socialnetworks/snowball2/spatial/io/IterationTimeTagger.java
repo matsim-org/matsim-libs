@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WeightedDijkstra.java
+ * TimeTagger.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.matrix;
+package playground.johannes.socialnetworks.snowball2.spatial.io;
 
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.graph.matrix.Dijkstra;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.contrib.sna.graph.Vertex;
+
+import playground.johannes.socialnetworks.snowball2.SampledEdgeDecorator;
+import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
+import playground.johannes.socialnetworks.snowball2.sim.Sampler;
+import playground.johannes.socialnetworks.snowball2.sim.SamplerListener;
 
 /**
  * @author illenberger
  *
  */
-public class WeightedDijkstra extends Dijkstra {
-
-	private EdgeCostFunction costs;
+public class IterationTimeTagger implements SamplerListener {
 	
-	public WeightedDijkstra(AdjacencyMatrix<?> y, EdgeCostFunction costs) {
-		super(y);
-		this.costs = costs;
+	private Map<Object, String> timeTags = new HashMap<Object, String>();
+
+//	private int timeCode = 1900;
+	
+	public Map<?, String> getTimeTags() {
+		return timeTags;
+	}
+	
+	@Override
+	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
+		String time = String.valueOf(vertex.getIterationSampled());
+		for(SampledEdgeDecorator<?> edge : vertex.getEdges()) {
+			if(!timeTags.containsKey(edge.getDelegate()))
+				timeTags.put(edge.getDelegate(), time);
+			
+			Vertex v = edge.getOpposite(vertex).getDelegate();
+			if(!timeTags.containsKey(v))
+				timeTags.put(v, time);
+			
+//			timeCode++;
+		}
+		return true;
 	}
 
 	@Override
-	protected double getCost(int i, int j) {
-		return costs.edgeCost(i, j);
+	public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
+		return true;
+	}
+
+	@Override
+	public void endSampling(Sampler<?, ?, ?> sampler) {
 	}
 
 }

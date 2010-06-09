@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WeightedDijkstra.java
+ * WeightedDijkstraFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,18 +26,17 @@ import org.matsim.contrib.sna.graph.matrix.Dijkstra;
  * @author illenberger
  *
  */
-public class WeightedDijkstra extends Dijkstra {
+public class WeightedDijkstraFactory extends DijkstraFactory {
 
 	private EdgeCostFunction costs;
 	
-	public WeightedDijkstra(AdjacencyMatrix<?> y, EdgeCostFunction costs) {
-		super(y);
+	public WeightedDijkstraFactory(EdgeCostFunction costs) {
 		this.costs = costs;
 	}
-
+	
 	@Override
-	protected double getCost(int i, int j) {
-		return costs.edgeCost(i, j);
+	public Dijkstra newDijkstra(AdjacencyMatrix<?> y) {
+		return new WeightedDijkstra(y, costs);
 	}
 
 }

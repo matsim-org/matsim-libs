@@ -44,7 +44,7 @@ public class ThetaApproximator {
 	
 	private static final Logger logger = Logger.getLogger(ThetaApproximator.class);
 
-	public TObjectDoubleHashMap<SpatialVertex> approximate(Set<SpatialVertex> vertices, double budget, EdgeCostFunction costFunction) {
+	public TObjectDoubleHashMap<SpatialVertex> approximate(Set<SpatialVertex> vertices, double budget, EdgeCostFunction costFunction, double theta_edge) {
 		double xMin = Double.MAX_VALUE;
 		double yMin = Double.MAX_VALUE;
 		double xMax = -Double.MAX_VALUE;
@@ -85,32 +85,32 @@ public class ThetaApproximator {
 		
 		logger.info(String.format("Original size = %1$s, reduced size = %2$s.", vertices.size(), sample.size()));
 		
-		TObjectDoubleHashMap<SpatialVertex> costsSums = new TObjectDoubleHashMap<SpatialVertex>();
-		double totalSum = 0;
-		DistanceCalculator calc = new CartesianDistanceCalculator();
-		Discretizer disc = new LinearDiscretizer(1000.0);
-		
-		for(SpatialVertex vertex : sample) {
-			double sum = 0;
-			for(SpatialVertex opportunity : sample) {
-//				sum += costFunction.edgeCost(vertex, opportunity);
-				sum += disc.discretize(calc.distance(vertex.getPoint(), opportunity.getPoint())); 
-			}
-			costsSums.put(vertex, sum);
-			totalSum += sum;
-		}
-		
-		double konst = budget * sample.size() / totalSum;
+//		TObjectDoubleHashMap<SpatialVertex> costsSums = new TObjectDoubleHashMap<SpatialVertex>();
+//		double totalSum = 0;
+//		DistanceCalculator calc = new CartesianDistanceCalculator();
+//		Discretizer disc = new LinearDiscretizer(1000.0);
+//		
+//		for(SpatialVertex vertex : sample) {
+//			double sum = 0;
+//			for(SpatialVertex opportunity : sample) {
+////				sum += costFunction.edgeCost(vertex, opportunity);
+//				sum += disc.discretize(calc.distance(vertex.getPoint(), opportunity.getPoint())); 
+//			}
+//			costsSums.put(vertex, sum);
+//			totalSum += sum;
+//		}
+//		
+//		double konst = budget * sample.size() / totalSum;
 		
 //		Distribution distr = new Distribution();
 		
 		TObjectDoubleHashMap<SpatialVertex> budgets = new TObjectDoubleHashMap<SpatialVertex>();
-		TObjectDoubleIterator<SpatialVertex> it = costsSums.iterator();
-		for(int i = 0; i < costsSums.size(); i++) {
-			it.advance();
-			budgets.put(it.key(), it.value() * konst);
+//		TObjectDoubleIterator<SpatialVertex> it = costsSums.iterator();
+//		for(int i = 0; i < costsSums.size(); i++) {
+//			it.advance();
+//			budgets.put(it.key(), it.value() * konst);
 //			distr.add(it.value() * konst);
-		}
+//		}
 //		try {
 //			Distribution.writeHistogram(distr.absoluteDistribution((distr.max() - distr.min())/50.0), "/Users/jillenberger/Work/work/socialnets/mcmc/budgets.txt");
 //		} catch (FileNotFoundException e) {
@@ -120,12 +120,16 @@ public class ThetaApproximator {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-		ThetaSolver solver = new ThetaSolver(costFunction);
+	
+		for(SpatialVertex v : sample)
+			budgets.put(v, budget);
+		
+		ThetaSolver solver = new ThetaSolver(costFunction, theta_edge);
 		TObjectDoubleHashMap<SpatialVertex> cellThetas = solver.solve(budgets);
 		
 		TObjectDoubleHashMap<SpatialVertex> thetas = new TObjectDoubleHashMap<SpatialVertex>();
 		
-		it = cellThetas.iterator();
+		TObjectDoubleIterator<SpatialVertex> it = cellThetas.iterator();
 		for(int i = 0; i < cellThetas.size(); i++) {
 			it.advance();
 			SpatialVertex vertex = it.key();

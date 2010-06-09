@@ -136,6 +136,11 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		iteration = 0;
 		numSampledVertices = 0;
 		/*
+		 * 
+		 */
+		if(listener == null)
+			listener = new DefaultListener();
+		/*
 		 * create an internally tagged graph for the sampler 
 		 */
 		TaggedGraphBuilder tBuilder = new TaggedGraphBuilder();
@@ -338,6 +343,24 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		@Override
 		public <V extends Vertex> Set<V> getPartition(Set<V> vertices) {
 			return vertices;
+		}
+		
+	}
+	
+	private static class DefaultListener implements SamplerListener {
+
+		@Override
+		public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
+			return true;
+		}
+
+		@Override
+		public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
+			return true;
+		}
+
+		@Override
+		public void endSampling(Sampler<?, ?, ?> sampler) {
 		}
 		
 	}

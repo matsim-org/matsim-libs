@@ -50,17 +50,18 @@ public class EstimatorTask extends AnalyzerTask {
 		TIntDoubleHashMap probas = new TIntDoubleHashMap();
 		
 		double p_sum = 0;
-		
+		int n = 0;
 		for(Vertex vertex : graph.getVertices()) {
 			if(((SampledVertex)vertex).isSampled()) {
 				int k = vertex.getNeighbours().size();
 				double p = estimator.getProbability((SampledVertex) vertex);
 				probas.put(k, p);
-				
+				p_sum += 1/p;
+				n++;
 //				p_sum += estimator.getWeight((SampledVertex) vertex);
 			}
 		}
-		System.out.println("Proba sum = " + p_sum);
+		System.out.println("Const = " + 36458.0/p_sum);
 		writeValues(probas, "proba");	
 	}
 

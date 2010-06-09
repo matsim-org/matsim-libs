@@ -59,6 +59,8 @@ public class MatrixCentrality {
 	private int radius;
 
 	private final int numThreads;
+	
+	private DijkstraFactory dijkstraFactory;
 
 	/**
 	 * Creates a new MatrixCentrality object that uses multiple threads for
@@ -80,6 +82,10 @@ public class MatrixCentrality {
 		this.numThreads = numThreads;
 	}
 
+	public void setDijkstraFactory(DijkstraFactory factory) {
+		this.dijkstraFactory = factory;
+	}
+	
 	/**
 	 * Returns an array with values for vertex closeness (array indices
 	 * correspond to vertex indices).
@@ -172,17 +178,20 @@ public class MatrixCentrality {
 		/*
 		 * create threads
 		 */
+		if(dijkstraFactory == null)
+			dijkstraFactory = new DijkstraFactory();
+		
 		List<CentralityThread> threads = new ArrayList<CentralityThread>();
 		int size = (int) Math.floor(n / (double) numThreads);
 		int i_start = 0;
 		int i_stop = size;
 		for (int i = 0; i < numThreads - 1; i++) {
 			// threads.add(new CentralityThread(y, vertices));
-			threads.add(new CentralityThread(y, i_start, i_stop));
+			threads.add(new CentralityThread(y, i_start, i_stop, dijkstraFactory));
 			i_start = i_stop;
 			i_stop += size;
 		}
-		threads.add(new CentralityThread(y, i_start, n));
+		threads.add(new CentralityThread(y, i_start, n, dijkstraFactory));
 		/*
 		 * start threads
 		 */
@@ -289,10 +298,12 @@ public class MatrixCentrality {
 
 		private int radius;
 
+//		private DijkstraFactory dijkstraFactory;
+		
 		private final Logger logger = Logger.getLogger(CentralityThread.class);
 
-		public CentralityThread(AdjacencyMatrix<?> y, int i_start, int i_stop) {
-			dijkstra = new Dijkstra(y);
+		public CentralityThread(AdjacencyMatrix<?> y, int i_start, int i_stop, DijkstraFactory dijkstraFactory) {
+			dijkstra = dijkstraFactory.newDijkstra(y); 
 			this.i_start = i_start;
 			this.i_stop = i_stop;
 			n = y.getVertexCount();
