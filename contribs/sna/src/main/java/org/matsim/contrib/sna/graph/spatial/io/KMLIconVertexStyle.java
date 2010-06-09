@@ -42,13 +42,13 @@ import org.matsim.vis.kml.KMZWriter;
  * Implementation of {@link KMLObjectStyle} that displays an icon at the
  * position of the placemark representing a vertex. Per default vertices will be
  * drawn as a dot ("icon18.png" in the main matsim package) colored by
- * {@link VertexDegreeColorizer}.
+ * {@link VertexDegreeColorizer}. This class is also a {@link KMZWriterListener}
+ * and thus requires registering at the {@link SpatialGraphKMLWriter}.
  * 
  * @author jillenberger
  * 
  */
-public class KMLIconVertexStyle implements KMLObjectStyle<SpatialVertex>,
-		KMZWriterListener {
+public class KMLIconVertexStyle implements KMLObjectStyle<SpatialVertex>, KMZWriterListener {
 
 	private static final String ICON_HREF = "vertex.png";
 
@@ -135,14 +135,11 @@ public class KMLIconVertexStyle implements KMLObjectStyle<SpatialVertex>,
 			IconStyleType kmlIconStyle = kmlFactory.createIconStyleType();
 			kmlIconStyle.setIcon(kmlIconLink);
 			kmlIconStyle.setScale(0.5);
-			kmlIconStyle
-					.setColor(new byte[] { (byte) c.getAlpha(),
-							(byte) c.getBlue(), (byte) c.getGreen(),
-							(byte) c.getRed() });
+			kmlIconStyle.setColor(new byte[] { (byte) c.getAlpha(), (byte) c.getBlue(), (byte) c.getGreen(),
+					(byte) c.getRed() });
 
 			StyleType kmlStyle = kmlFactory.createStyleType();
-			kmlStyle.setId(String.format("vertex%1$s", Integer.toHexString(c
-					.getRGB())));
+			kmlStyle.setId(String.format("vertex%1$s", Integer.toHexString(c.getRGB())));
 			kmlStyle.setIconStyle(kmlIconStyle);
 
 			colorStyles.put(c, kmlStyle);
@@ -152,8 +149,7 @@ public class KMLIconVertexStyle implements KMLObjectStyle<SpatialVertex>,
 		 */
 		Map<Vertex, StyleType> vertexStyleMapping = new HashMap<Vertex, StyleType>();
 		for (Entry<Vertex, Color> entry : vertexColorMapping.entrySet()) {
-			vertexStyleMapping.put(entry.getKey(), colorStyles.get(entry
-					.getValue()));
+			vertexStyleMapping.put(entry.getKey(), colorStyles.get(entry.getValue()));
 		}
 
 		return vertexStyleMapping;
@@ -180,15 +176,15 @@ public class KMLIconVertexStyle implements KMLObjectStyle<SpatialVertex>,
 	}
 
 	/**
-	 * Adds the image resource which is used to draw vertices to the KMZ archive.
+	 * Adds the image resource which is used to draw vertices to the KMZ
+	 * archive.
 	 * 
 	 * @see {@link KMZWriterListener#openWriter(KMZWriter)}
 	 */
 	@Override
 	public void openWriter(KMZWriter writer) {
 		try {
-			writer.addNonKMLFile(MatsimResource.getAsInputStream(iconName),
-					ICON_HREF);
+			writer.addNonKMLFile(MatsimResource.getAsInputStream(iconName), ICON_HREF);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
