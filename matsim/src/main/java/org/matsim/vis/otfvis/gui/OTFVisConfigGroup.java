@@ -55,6 +55,7 @@ public class OTFVisConfigGroup extends Module {
 
   public static final String BIG_TIME_STEP = "bigTimeStep";
   public static final String SHOW_TELEPORTATION = "showTeleportation";
+  public static final String LINK_WIDTH = "linkWidth";
   
   private  float agentSize = 120.f;
   private  String middleMouseFunc = "Pan";
@@ -163,6 +164,9 @@ public class OTFVisConfigGroup extends Module {
 		else if (SHOW_TELEPORTATION.equalsIgnoreCase(key)){
 			return Boolean.toString(this.showTeleportedAgents);
 		}
+		else if (LINK_WIDTH.equalsIgnoreCase(key)){
+			return Float.toString(this.getLinkWidth());
+		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -182,6 +186,9 @@ public class OTFVisConfigGroup extends Module {
 		else if (SHOW_TELEPORTATION.equalsIgnoreCase(key)){
 			this.showTeleportedAgents = Boolean.parseBoolean(value);
 		}
+		else if (LINK_WIDTH.equalsIgnoreCase(key)){
+			this.linkWidth = Float.parseFloat(value);
+		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -195,6 +202,7 @@ public class OTFVisConfigGroup extends Module {
 		map.put(MIDDLE_MOUSE_FUNC, getValue(MIDDLE_MOUSE_FUNC));
 		map.put(RIGHT_MOUSE_FUNC, getValue(RIGHT_MOUSE_FUNC));
 		map.put(SHOW_TELEPORTATION, getValue(SHOW_TELEPORTATION));
+		map.put(LINK_WIDTH, this.getValue(LINK_WIDTH));
 		return map;
 	}
 	
@@ -203,6 +211,7 @@ public class OTFVisConfigGroup extends Module {
 		Map<String,String> map = super.getComments();
 		map.put(AGENT_SIZE, "The (initial) size of the agents.  Only a range of numbers is allowed, otherwise otfvis aborts"
 				+ " rather ungracefully, or displays no agents at all." ) ; 
+		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
 		return map ;
 	}
 
