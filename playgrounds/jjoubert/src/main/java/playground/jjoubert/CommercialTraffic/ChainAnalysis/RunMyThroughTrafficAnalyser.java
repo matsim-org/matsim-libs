@@ -113,24 +113,26 @@ public class RunMyThroughTrafficAnalyser {
 		log.info("Processing vehicles from " + folder.getAbsolutePath());
 		log.info("Total number of vehicles to process: " + files.length);
 		for(File f : files){
-			String vehicleXML = f.getAbsolutePath();
-			CommercialVehicle cv = null;
-			MyXmlConverter xc = new MyXmlConverter(true);
-			Object o = xc.readObjectFromFile(vehicleXML);
-			if(o instanceof CommercialVehicle){
-				cv = (CommercialVehicle) o;
+			if(f.exists() && f.isFile()){
+				String vehicleXML = f.getAbsolutePath();
+				CommercialVehicle cv = null;
+				MyXmlConverter xc = new MyXmlConverter(true);
+				Object o = xc.readObjectFromFile(vehicleXML);
+				if(o instanceof CommercialVehicle){
+					cv = (CommercialVehicle) o;
+				}
+				if(cv.getFractionMinorInStudyArea() > 0 && cv.getFractionMinorInStudyArea() < withinThreshold){
+					// It is a through-traffic vehicle.
+					mtta.processVehicle(cv);
+				}
+				/*
+				 * Report progress.
+				 */
+				if(++counter == multiplier){
+					log.info("   Vehicles processed: " + counter);
+					multiplier *= 2;
+				}			
 			}
-			if(cv.getFractionMinorInStudyArea() > 0 && cv.getFractionMinorInStudyArea() < withinThreshold){
-				// It is a through-traffic vehicle.
-				mtta.processVehicle(cv);
-			}
-			/*
-			 * Report progress.
-			 */
-			if(++counter == multiplier){
-				log.info("   Vehicles processed: " + counter);
-				multiplier *= 2;
-			}			
 		}
 		log.info("   Vehicles processed: " + counter + " (Done)");		
 		
