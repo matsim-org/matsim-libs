@@ -70,10 +70,17 @@ public class DgWithindayQPersonAgent extends QPersonAgent {
 //		log.error("outlinks.size " + outlinks.size());
 
 		double outLinksCapacitySum = 0.0;
-		for (Link outLink : outlinks.values()){
-			if (!outLink.getToNode().getId().equals(currentQLink.getLink().getFromNode().getId())){
-				outLinksList.add(outLink);
-				outLinksCapacitySum += outLink.getCapacity(this.getQSimulation().getSimTimer().getTimeOfDay());
+		if (outlinks.values().size() == 1){
+			Link outLink = outlinks.values().iterator().next();
+			this.cachedNextLinkId = outLink.getId();
+			return this.cachedNextLinkId;
+		}
+		else {
+			for (Link outLink : outlinks.values()){
+				if (!outLink.getToNode().getId().equals(currentQLink.getLink().getFromNode().getId())){
+					outLinksList.add(outLink);
+					outLinksCapacitySum += outLink.getCapacity(this.getQSimulation().getSimTimer().getTimeOfDay());
+				}
 			}
 		}
 		double randomNumber = random.nextDouble() * outLinksCapacitySum;
@@ -88,7 +95,7 @@ public class DgWithindayQPersonAgent extends QPersonAgent {
 			}
 		}
 		throw new IllegalStateException("selectedCapacity: " + selectedCapacity + " randomNumber: " + randomNumber
-				+ " outLinksList.size() " + outLinksList.size());
+				+ " outLinksList.size() " + outLinksList.size() + " outlinks.size() " + outlinks.size());
 //		
 //		
 //		int nextLinkNr = (int) (random.nextDouble() * outLinksList.size());
