@@ -20,17 +20,18 @@
 
 package playground.jjoubert.CommercialTraffic.ChainAnalysis;
 
+import java.io.File;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-
 import playground.jjoubert.CommercialTraffic.CommercialVehicle;
 import playground.jjoubert.Utilities.MyShapefileReader;
 import playground.jjoubert.Utilities.MyXmlConverter;
+import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
+
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
 
 public class RunMyThroughTrafficAnalyser {
 	private static Logger log = Logger.getLogger(RunMyThroughTrafficAnalyser.class);
@@ -40,8 +41,8 @@ public class RunMyThroughTrafficAnalyser {
 	 * 		- Mac																	|
 	 * 		- IE-Calvin														  		|
 	 *=============================================================================*/
-	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
-//	private static String root = "/home/jwjoubert/MATSim/MATSimData/";					// IE-Calvin
+//	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
+	private static String root = "/home/jwjoubert/MATSim/MATSimData/";					// IE-Calvin
 
 	 /*=============================================================================
 	 * String value that must be set. Allowed study areas are:						|
@@ -98,20 +99,40 @@ public class RunMyThroughTrafficAnalyser {
 		/*
 		 * Identify through-vehicles.
 		 */
-		String theVehicle = "211.xml";
-		String vehicleXML = String.format("%sDigiCore/XML/%d/%s/%04d/Sample%02d/%s",
-				root, year, version, threshold, sample, theVehicle
-			);
-		CommercialVehicle cv = null;
-		MyXmlConverter xc = new MyXmlConverter(true);
-		Object o = xc.readObjectFromFile(vehicleXML);
-		if(o instanceof CommercialVehicle){
-			cv = (CommercialVehicle) o;
+		String vehicleFolder = String.format("%sDigiCore/XML/%d/%s/%04d/Sample%02d/", 
+				root, year, version, threshold, sample);
+		File folder = new File(vehicleFolder);
+		if(!folder.isDirectory()){
+			throw new RuntimeException("The location " + vehicleFolder + " is not a folder.");
 		}
-		if(cv.getFractionMinorInStudyArea() > 0 && cv.getFractionMinorInStudyArea() < withinThreshold){
-			// It is a through-traffic vehicle.
-			mtta.processVehicle(cv);
+		MyFileFilter mff = new MyFileFilter(".xml");
+		File[] files = folder.listFiles(mff);
+		
+		int counter = 0;
+		int multiplier = 1;
+		log.info("Processing vehicles from " + folder.getAbsolutePath());
+		log.info("Total number of vehicles to process: " + files.length);
+		for(File f : files){
+			String vehicleXML = f.getAbsolutePath();
+			CommercialVehicle cv = null;
+			MyXmlConverter xc = new MyXmlConverter(true);
+			Object o = xc.readObjectFromFile(vehicleXML);
+			if(o instanceof CommercialVehicle){
+				cv = (CommercialVehicle) o;
+			}
+			if(cv.getFractionMinorInStudyArea() > 0 && cv.getFractionMinorInStudyArea() < withinThreshold){
+				// It is a through-traffic vehicle.
+				mtta.processVehicle(cv);
+			}
+			/*
+			 * Report progress.
+			 */
+			if(++counter == multiplier){
+				log.info("   Vehicles processed: " + counter);
+				multiplier *= 2;
+			}			
 		}
+		log.info("   Vehicles processed: " + counter + " (Done)");		
 		
 		String location = String.format("%s%s/%d/%s/%04d/Sample%02d/%s_%03.0fp_", 
 				root, studyAreaName, year, version, threshold, sample, studyAreaName, withinThreshold*100);

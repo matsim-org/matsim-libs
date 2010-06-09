@@ -96,7 +96,7 @@ public class MyThroughTrafficAnalyser {
 				if((in1 && !in2) || (!in1 && in2)){
 					Coordinate[] cs = {p1.getCoordinate(), p2.getCoordinate()};
 					LineString ls = gf.createLineString(cs);
-					LineString lsIn = (LineString) ls.intersection(studyArea); // Just get first point.
+					LineString lsIn = (LineString) ls.intersection(studyArea).getGeometryN(0); // Just get first point.
 					Coordinate coord;
 					List<Double> list = new ArrayList<Double>(6);
 					if(lsIn == null){
