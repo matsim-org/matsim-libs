@@ -67,7 +67,7 @@ public class DgWithindayQPersonAgent extends QPersonAgent {
 		QLink currentQLink = qnet.getLinks().get(currentLinkId);
 		Map<Id, ? extends Link> outlinks = currentQLink.getLink().getToNode().getOutLinks();
 		List<Link> outLinksList = new ArrayList<Link>();
-		log.error("outlinks.size " + outlinks.size());
+//		log.error("outlinks.size " + outlinks.size());
 
 		double outLinksCapacitySum = 0.0;
 		for (Link outLink : outlinks.values()){
@@ -78,10 +78,10 @@ public class DgWithindayQPersonAgent extends QPersonAgent {
 		}
 		double randomNumber = random.nextDouble() * outLinksCapacitySum;
 		double selectedCapacity = 0.0;
-		log.error("outlinkslist.size " + outLinksList.size());
+//		log.error("outlinkslist.size " + outLinksList.size());
 		for (Link outLink : outLinksList){
 			selectedCapacity += outLink.getCapacity(this.getQSimulation().getSimTimer().getTimeOfDay());
-			log.error("selectedCap: " + selectedCapacity + " randomNumber: " + randomNumber);
+//			log.error("selectedCap: " + selectedCapacity + " randomNumber: " + randomNumber);
 			if (selectedCapacity >= randomNumber){
 				this.cachedNextLinkId = outLink.getId();
 				return this.cachedNextLinkId;
