@@ -87,7 +87,8 @@ public class DgWithindayQPersonAgent extends QPersonAgent {
 				return this.cachedNextLinkId;
 			}
 		}
-		throw new IllegalStateException();
+		throw new IllegalStateException("selectedCapacity: " + selectedCapacity + " randomNumber: " + randomNumber
+				+ " outLinksList.size() " + outLinksList.size());
 //		
 //		
 //		int nextLinkNr = (int) (random.nextDouble() * outLinksList.size());
