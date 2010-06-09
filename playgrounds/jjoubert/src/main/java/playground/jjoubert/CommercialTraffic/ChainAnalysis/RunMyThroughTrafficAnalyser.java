@@ -125,14 +125,14 @@ public class RunMyThroughTrafficAnalyser {
 					// It is a through-traffic vehicle.
 					mtta.processVehicle(cv);
 				}
-				/*
-				 * Report progress.
-				 */
-				if(++counter == multiplier){
-					log.info("   Vehicles processed: " + counter);
-					multiplier *= 2;
-				}			
 			}
+			/*
+			 * Report progress.
+			 */
+			if(++counter == multiplier){
+				log.info("   Vehicles processed: " + counter);
+				multiplier *= 2;
+			}			
 		}
 		log.info("   Vehicles processed: " + counter + " (Done)");		
 		
