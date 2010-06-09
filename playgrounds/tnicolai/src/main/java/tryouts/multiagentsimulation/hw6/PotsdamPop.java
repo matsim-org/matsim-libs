@@ -1,4 +1,4 @@
-package tryouts.multiagentsimulation.hw4;
+package tryouts.multiagentsimulation.hw6;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -42,20 +42,22 @@ public class PotsdamPop implements Runnable {
 	}
 
 	public static enum Zone {
-		P(12054, 946314, 72899, 56183), PM(12069, 166538, 53526, 75379), HVL(12063, 5624, 36142, 54661), BRB(12051, 123200, 26109, 23207), TF(12072, 49912, 50778, 61022), B(11000, 691178, 1106163, 1002809);
+		// desription: Zone(Rel_id,WorTripsPerYearByCar,WorTripsPerYearByPt,Workplaces,Population)
+		P(12054, 7836764, 946314, 72899, 56183), PM(12069, 4041652, 166538, 53526, 75379), HVL(12063, 722754, 5624, 36142, 54661), BRB(12051, 364595, 123200, 26109, 23207), TF(12072, 1040648, 49912, 50778, 61022), B(11000, 4085592, 691178, 1106163, 1002809);
 		
 		public final int rel_id;
-		public final int workTripsPerDay;
+		public final int workTripsPerDayByCar;
+		public final int workTripsPerDayByPt;
 		public final int workplaces;
 		public final int workingPopulation;
 
-		Zone(int rel_id, int workTripsPerYear, int workplaces, int workingPopulation) {
-			this.workTripsPerDay = (int) (workTripsPerYear / 255);
+		Zone(int rel_id, int workTripsPerYearByCar,int workTripsPerYearByPt,  int workplaces, int workingPopulation) {
+			this.workTripsPerDayByCar = (int) (workTripsPerYearByCar / 255);
+			this.workTripsPerDayByPt = (int) (workTripsPerYearByPt / 255);
 			this.rel_id = rel_id;
 			this.workplaces = workplaces;
 			this.workingPopulation = workingPopulation;
 		}
-		
 	}
 	
 	private static EnumSet<Zone> zones = EnumSet.allOf(Zone.class);
@@ -67,6 +69,9 @@ public class PotsdamPop implements Runnable {
 	private Scenario scenario;
 
 	private Population population;
+	
+	private final int CAR = 0;
+	private final int PT = 1;
 	
 	static {
 		GeometryFactory geometryFactory= new GeometryFactory();
@@ -90,78 +95,156 @@ public class PotsdamPop implements Runnable {
 //		}
 	}
 	
-	
+	/**
+	 * entry point
+	 * @param args
+	 */
 	public static void main(String[] args) {
+		long startTime, endTime;
+		startTime = System.currentTimeMillis();
 		PotsdamPop potsdamPop = new PotsdamPop();
 		potsdamPop.run();
+		endTime = System.currentTimeMillis();
+		System.out.println("Total Time: " + (endTime - startTime)/1000 + "sec");
 	}
-	
-	
 
 	@Override
 	public void run() {
+		showInfo();
 		scenario = new ScenarioImpl();
 		population = scenario.getPopulation();
+		
+		Quantity quantity = new Quantity();
+		
 		for (Zone sink : zones) {
 			Zone source = Zone.P;
-			int quantity = scale(getQuantityOut(sink));
+			quantity = scale(getQuantityOut(sink));
 			createFromTo(source, sink, quantity);
 			if (sink == Zone.P) continue;
-			quantity = scale(getQuantityIn(sink));
+			quantity = scale(getQuantityIn(sink, quantity));
 			createFromTo(sink, source, quantity);
 		}
 		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write("./tnicolai/inputs/brandenburg/plans.xml");
+		populationWriter.write("./tnicolai/configs/brandenburg/hw6/plans_pt_generated.xml");
 	}
 
-	private int scale(int quantityOut) {
-		int scaled = (int) (quantityOut * 0.1);
-		System.out.println("scaled: " + scaled);
-		return scaled;
+	/**
+	 * some information about zones in this computation
+	 */
+	private void showInfo(){
+		for (Zone sink : zones) {
+			// show currents work progress
+			System.out.println("Zone: " + sink.name());
+			System.out.println("Working Population: " + sink.workingPopulation);
+			System.out.println("Workplaces: " + sink.workplaces);
+			System.out.println("Work trips: " + sink.workTripsPerDayByCar);
+			System.out.println("Rel_ID: " + sink.rel_id);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param amount
+	 * @return
+	 */
+	private Quantity scale(Amount amount) {
+		
+		Quantity quantity = new Quantity();
+		
+		quantity.car = (int) (amount.car * 0.1);
+		quantity.pt = (int) (amount.pt * 0.1);
+		System.out.println("scaled car: " + quantity.car);
+		System.out.println("scaled pt: " + quantity.pt);
+		return quantity;
 	}
 
-	private int getQuantityIn(Zone sink) {
-		int amount = sink.workTripsPerDay - getQuantityOut(sink);
-		System.out.println("in: " + amount);
+	/**
+	 * 
+	 * @param sink
+	 * @return
+	 */
+	private Amount getQuantityIn(Zone sink, Quantity quantityOut) {
+		Amount amount = new Amount();
+		
+		amount.car = sink.workTripsPerDayByCar - quantityOut.car;
+		amount.pt = sink.workTripsPerDayByPt - quantityOut.pt;
+		System.out.println("in car : " + amount.car);
+		System.out.println("in pt : " + amount.pt);
 		return amount;
 	}
 
-
-
-	private int getQuantityOut(Zone sink) {
+	/**
+	 * 
+	 * @param sink
+	 * @return
+	 */
+	private Amount getQuantityOut(Zone sink) {
 		double outWeight = ((double) Zone.P.workingPopulation * sink.workplaces) /  ((double) Zone.P.workplaces * sink.workingPopulation);
 		double inWeight = ((double) Zone.P.workplaces * sink.workingPopulation) /  ((double) Zone.P.workingPopulation * sink.workplaces);
 		System.out.println(sink + ": " + outWeight + " / " + inWeight);
 		double outShare = outWeight / (inWeight + outWeight);
-		int amount = (int) (outShare * sink.workTripsPerDay);
-		System.out.println("out: " + amount);
+
+		Amount amount = new Amount();
+		
+		amount.car = (int) (outShare * sink.workTripsPerDayByCar);
+		amount.pt = (int) (outShare * sink.workTripsPerDayByPt);
+		System.out.println("out car: " + amount.car);
+		System.out.println("out pt: " + amount.pt);
+		
 		return amount;
 	}
 
 
-
-	private void createFromTo(Zone source, Zone sink, int quantity) {
-		for (int i=0; i<quantity; i++) {
-			Person person = population.getFactory().createPerson(createId(source, sink, i));
-			Plan plan = population.getFactory().createPlan();
-			Coord homeLocation = shoot(source);
-			Coord workLocation = shoot(sink);
-			plan.addActivity(createHome(homeLocation));
-			plan.addLeg(createDriveLeg());
-			plan.addActivity(createWork(workLocation));
-			plan.addLeg(createDriveLeg());
-			plan.addActivity(createHome(homeLocation));
-			person.addPlan(plan);
-			population.addPerson(person);
+	/**
+	 * 
+	 * @param source
+	 * @param sink
+	 * @param quantity
+	 */
+	private void createFromTo(Zone source, Zone sink, Quantity quantity) {
+		int i = 0;
+		for (; i<quantity.car; i++)
+			createPerson(source, sink, i, CAR);
+		for (int j = 0; j<quantity.pt; j++){
+			createPerson(source, sink, ++i, PT);
 		}
 	}
-
-	private Leg createDriveLeg() {
-		Leg leg = population.getFactory().createLeg(TransportMode.car);
-		return leg;
+	
+	/**
+	 * creates a new person with a home -> work -> home plan without any time constraits
+	 * @param source
+	 * @param sink
+	 * @param id
+	 * @param tranportMode
+	 */
+	private void createPerson(Zone source, Zone sink, int id, int tranportMode){
+		
+		Person person = population.getFactory().createPerson(createId(source, sink, id));
+		Plan plan = population.getFactory().createPlan();
+		Coord homeLocation = shoot(source);
+		Coord workLocation = shoot(sink);
+		plan.addActivity(createHome(homeLocation));
+		plan.addLeg(createDriveLeg( tranportMode ));
+		plan.addActivity(createWork( workLocation ));
+		plan.addLeg(createDriveLeg( tranportMode ));
+		plan.addActivity(createHome( homeLocation ));
+		person.addPlan(plan);
+		population.addPerson(person);
 	}
 
-
+	/**
+	 * creates a drive leg according to given transport mode (car or pt)
+	 * @param tranportMode
+	 * @return
+	 */
+	private Leg createDriveLeg(int tranportMode) {
+		Leg leg;
+		if(tranportMode == PT)
+			leg = population.getFactory().createLeg(TransportMode.pt);
+		else
+			leg = population.getFactory().createLeg(TransportMode.car);
+		return leg;
+	}
 
 	private Activity createWork(Coord workLocation) {
 		Activity activity = population.getFactory().createActivityFromCoord("work", workLocation);
@@ -169,25 +252,56 @@ public class PotsdamPop implements Runnable {
 		return activity;
 	}
 
-
-
 	private Activity createHome(Coord homeLocation) {
 		Activity activity = population.getFactory().createActivityFromCoord("home", homeLocation);
 		activity.setEndTime(9*60*60);
 		return activity;
 	}
-
-
-
+	
+	/**
+	 * returns a random position within the scenario
+	 * @param zone
+	 * @return
+	 */
 	private Coord shoot(Zone zone) {
 		Random r = new Random();
 		Point point = getRandomPointInFeature(r, zoneGeometries.get(zone));
 		CoordImpl coordImpl = new CoordImpl(point.getX(), point.getY());
 		return ct.transform(coordImpl);
 	}
-
+	
+	/**
+	 * makeing individual ids
+	 * @param source
+	 * @param sink
+	 * @param i
+	 * @return
+	 */
 	private Id createId(Zone source, Zone sink, int i) {
 		return new IdImpl(source + "_" + sink + "_" + i);
+	}
+	
+	
+	public class Quantity{
+		
+		public int car;
+		public int pt;
+		
+		public Quantity(){
+			this.car = 0;
+			this.pt = 0;
+		}
+	}
+	
+	public class Amount{
+		
+		public int car;
+		public int pt;
+		
+		public Amount(){
+			this.car = 0;
+			this.pt = 0;
+		}
 	}
 
 }
