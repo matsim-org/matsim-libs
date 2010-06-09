@@ -46,9 +46,9 @@ import playground.yu.utils.DebugTools;
 /**
  * approximately forecasts the score of a plan, that was newly created by e.g.
  * ReRoute or TimeAllocationMutator
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class PlanScoreForecaster4onlyTravPt {
 	private PlanImpl plan, oldSelected;
@@ -109,7 +109,7 @@ public class PlanScoreForecaster4onlyTravPt {
 
 	/**
 	 * believes only legDepartureTime of newly created Plans
-	 *
+	 * 
 	 * @param leg
 	 */
 	private void handleLeg(LegImpl leg) {
@@ -276,47 +276,4 @@ public class PlanScoreForecaster4onlyTravPt {
 					+ "\tutil/score is a NaN.");
 
 	}
-
-	// public static void main(String[] args) {
-	//
-	// String configFilename =
-	// "../integration-parameterCalibration/test/matsim/configDummy.xml", //
-	// netFilename = "../integration-parameterCalibration/test/network.xml", //
-	// eventsFilename =
-	// "../integration-parameterCalibration/test/matsim/outputReplanning/ITERS/it.100/100.events.txt.gz",
-	// //
-	// popFilename =
-	// "../integration-parameterCalibration/test/matsim/outputReplanning/output_plans.xml.gz";
-	//
-	// Scenario sc = new ScenarioImpl();
-	//
-	// Config cf = sc.getConfig();
-	// new MatsimConfigReader(cf).readFile(configFilename);
-	// CharyparNagelScoringConfigGroup scoring = cf.charyparNagelScoring();
-	//
-	// NetworkLayer net = (NetworkLayer) sc.getNetwork();
-	// new MatsimNetworkReader(sc).readFile(netFilename);
-	//
-	// Population pop = sc.getPopulation();
-	// new MatsimPopulationReader(sc).readFile(popFilename);
-	//
-	// TravelTimeCalculator ttc = new TravelTimeCalculatorFactoryImpl()
-	// .createTravelTimeCalculator(net, cf.travelTimeCalculator());
-	//
-	// EventsManager events = new EventsManagerImpl();
-	// events.addHandler(ttc);
-	// new EventsReaderTXTv1(events).readFile(eventsFilename);
-	//
-	// for (Person ps : pop.getPersons().values()) {
-	// // for (Plan pl : ps.getPlans()) {
-	// Plan pl = ps.getSelectedPlan();
-	// double score = new PlanScoreForecaster4onlyTravPt((PlanImpl) pl,
-	// net, ttc, scoring, -6.0, 6.0).getPlanScore();
-	// if (pl.getScore().intValue() != (int) score)
-	// System.out.println("person\t" + ps.getId() + "\tplan\t" + pl
-	// + "\tutil\t" + score);
-	// // }
-	// }
-	//
-	// }
 }
