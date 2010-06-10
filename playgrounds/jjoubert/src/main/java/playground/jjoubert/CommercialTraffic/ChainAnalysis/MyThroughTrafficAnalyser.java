@@ -76,6 +76,7 @@ public class MyThroughTrafficAnalyser {
 		this.activityCounterList = new ArrayList<Integer>();
 		
 		// Create the basic structure for gate statistics.
+		this.gateStats = new ArrayList<List<Integer>>(gates.size());
 		for(Point p : gates){
 			List<Integer> gateLine = new ArrayList<Integer>(26);
 			for(int i = 0; i < 26; i++){
