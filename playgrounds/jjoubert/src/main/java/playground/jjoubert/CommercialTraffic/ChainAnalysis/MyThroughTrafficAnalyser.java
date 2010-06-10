@@ -151,6 +151,7 @@ public class MyThroughTrafficAnalyser {
 		log.info("Writing list to " + location + "Line.txt");
 		try {
 			File f1 = new File(location + "Line.txt");
+			log.info("File f1: " + f1.exists());
 			boolean f1create = f1.createNewFile();
 			if(!f1create){
 				log.warn("Cannot create " + f1.getAbsolutePath());
