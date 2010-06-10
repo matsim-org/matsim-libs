@@ -139,10 +139,10 @@ public class RunMyThroughTrafficAnalyser {
 		/*
 		 * TODO Remove later when writing is sorted out
 		 */
-		String object = String.format("%s%s/%d/%s/%04d/Sample%02d/%s_%03.0fp_xml.xml", 
-				root, studyAreaName, year, version, threshold, sample, studyAreaName, withinThreshold*100);
-		MyXmlConverter mxc = new MyXmlConverter(true);
-		mxc.writeObjectToFile(mtta, object);
+//		String object = String.format("%s%s/%d/%s/%04d/Sample%02d/%s_%03.0fp_xml.xml", 
+//				root, studyAreaName, year, version, threshold, sample, studyAreaName, withinThreshold*100);
+//		MyXmlConverter mxc = new MyXmlConverter(true);
+//		mxc.writeObjectToFile(mtta, object);
 		
 		String location = String.format("%sOutput/%s_", 
 				root, studyAreaName);
