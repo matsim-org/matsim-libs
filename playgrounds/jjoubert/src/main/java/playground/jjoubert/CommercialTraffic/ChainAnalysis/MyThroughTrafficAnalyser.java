@@ -25,11 +25,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.jjoubert.CommercialTraffic.Activity;
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.CommercialVehicle;
 
@@ -47,6 +51,8 @@ public class MyThroughTrafficAnalyser {
 	private MultiPolygon studyArea;
 	private Polygon studyAreaEnvelope;
 	private List<Point> gates;
+	private List<List<Integer>> gateStats;
+	private List<Integer> activityCounterList;
 	private QuadTree<Coordinate> entryQT;
 	private QuadTree<Coordinate> exitQT;
 	private List<List<Double>> entryLineList;
@@ -67,14 +73,30 @@ public class MyThroughTrafficAnalyser {
 				g.getCoordinates()[2].y);
 		this.entryLineList = new ArrayList<List<Double>>();
 		this.exitLineList = new ArrayList<List<Double>>();
+		this.activityCounterList = new ArrayList<Integer>();
+		
+		// Create the basic structure for gate statistics.
+		for(Point p : gates){
+			List<Integer> gateLine = new ArrayList<Integer>(26);
+			for(int i = 0; i < 26; i++){
+				gateLine.add(new Integer(0));
+			}
+			// Set the first two entries as the gate's coordinates.
+			gateLine.set(0, (int) Math.round(p.getX()));
+			gateLine.set(1, (int) Math.round(p.getY()));
+			gateStats.add(gateLine);
+		}
 	}
 
 	public void processVehicle(CommercialVehicle v) {
 		GeometryFactory gf = new GeometryFactory();
 		for (Chain c : v.getChains()){
+			Integer activityCounter = null;
 			for (int i = 0; i < c.getActivities().size()-1; i++){
-				Point p1 = gf.createPoint(c.getActivities().get(i).getLocation().getCoordinate());
-				Point p2 = gf.createPoint(c.getActivities().get(i+1).getLocation().getCoordinate());
+				Activity a1 = c.getActivities().get(i);
+				Activity a2 = c.getActivities().get(i+1);				
+				Point p1 = gf.createPoint(a1.getLocation().getCoordinate());
+				Point p2 = gf.createPoint(a2.getLocation().getCoordinate());
 				
 				boolean in1 = false;
 				if(studyAreaEnvelope.contains(p1)){
@@ -98,10 +120,28 @@ public class MyThroughTrafficAnalyser {
 					LineString ls = gf.createLineString(cs);
 					LineString lsIn = (LineString) ls.intersection(studyArea).getGeometryN(0); // Just get first point.
 					Coordinate coord;
+					/*
+					 * Add the following values to the list:
+					 * 	- origin's x-coordinate;
+					 *  - origin's y-coordinate;
+					 *  - entry point's x-coordinate;
+					 *  - entry point's y-coordinate;
+					 *  - destination's x-coordinate;
+					 *  - destination's y-coordinate;
+					 *  - entry point's hour of the day;
+					 */
 					List<Double> list = new ArrayList<Double>(6);
 					if(lsIn == null){
 						log.warn("Could not find the intersection.");
 					}
+					/*
+					 * Variables to calculate the entry point's time of day.
+					 */
+					double fraction;
+					long tripDuration = a2.getStartTime().getTimeInMillis() - a1.getEndTime().getTimeInMillis();
+					GregorianCalendar entryTime = new GregorianCalendar(a1.getStartTime().getTimeZone(), new Locale("en", "ZA"));
+					int hourOfDay;
+					
 					if(!in1 && in2){
 						/*
 						 * It is an entry.
@@ -113,8 +153,17 @@ public class MyThroughTrafficAnalyser {
 						list.add(coord.x);
 						list.add(coord.y);
 						list.add(p2.getX());
-						list.add(p2.getY());						
-						entryLineList.add(list);						
+						list.add(p2.getY());	
+						// Time of entry (hour of the day).
+						fraction = (ls.getLength() - lsIn.getLength()) / ls.getLength();
+						entryTime.setTimeInMillis((long) (a1.getEndTime().getTimeInMillis() + fraction*tripDuration));
+						hourOfDay = entryTime.get(Calendar.HOUR_OF_DAY);
+						list.add(Double.valueOf(hourOfDay));
+						
+						entryLineList.add(list);	
+						
+						activityCounter = new Integer(1);
+						
 					} else{
 						/*
 						 * It is an exit.
@@ -127,8 +176,33 @@ public class MyThroughTrafficAnalyser {
 						list.add(coord.y);
 						list.add(p2.getX());
 						list.add(p2.getY());
+						// Time of entry (hour of the day).
+						fraction = (lsIn.getLength()) / ls.getLength();
+						entryTime.setTimeInMillis((long) (a1.getEndTime().getTimeInMillis() + fraction*tripDuration));
+						hourOfDay = entryTime.get(Calendar.HOUR_OF_DAY);
+						list.add(Double.valueOf(hourOfDay));
+						
 						exitLineList.add(list);
+						
+						if(activityCounter != null){
+							activityCounterList.add(activityCounter);
+							activityCounter = null;
+						}
 					}
+					// Find the closest entry gate and add the details.
+					double minD = Double.MAX_VALUE;
+					int index = Integer.MAX_VALUE;
+					for(int gate = 0; gate < gates.size(); gate++){
+						double d = gates.get(gate).distance(gf.createPoint(coord));
+						if(d < minD){
+							minD = d;
+							index = gate;
+						}
+					}
+					gateStats.get(index).set(hourOfDay+2, gateStats.get(index).get(hourOfDay+2) + 1);
+
+				} else if (in1 && in2){
+					activityCounter++;
 				}
 			}
 		}
@@ -143,8 +217,64 @@ public class MyThroughTrafficAnalyser {
 	}
 
 	public void writeListsToFile(String location) {
+		/*
+		 * Write the entry and exit lines and points in a format readable and
+		 * processable by the ET Geowizard in ArcGIS. 
+		 */
 		writeListToFile(entryLineList, location + "Entry");
-		writeListToFile(exitLineList, location + "Exit");		
+		writeListToFile(exitLineList, location + "Exit");
+		
+		/*
+		 * TODO Write all values in the entry and exit lists to a flat file.  
+		 */
+		
+		
+		/*
+		 * Write activityCounter details.
+		 */
+		String activityCounterfilename = location + "ActivityCount.txt";
+		log.info("Writing activity counter values to " + activityCounterfilename);
+		try {
+			BufferedWriter bw1 = new BufferedWriter(new FileWriter(new File(activityCounterfilename)));
+			try {
+				for(Integer i : activityCounterList){
+					bw1.write(String.valueOf(i));
+					bw1.newLine();
+				}
+			} finally {
+				bw1.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	
+		/*
+		 * Write the gate statistics to file.
+		 */
+		String gateStatisticsFilename = location + "GateStatistics.txt";
+		log.info("Writing gate statistics to " + gateStatisticsFilename);
+		try {
+			BufferedWriter bw2 = new BufferedWriter(new FileWriter(new File(gateStatisticsFilename)));
+			try{
+				bw2.write("Long,Lat,H0,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15,H16,H17,H18,H19,H20,H21,H22,H23");
+				bw2.newLine();
+				for(List<Integer> line : gateStats){
+					for(int i = 0; i < line.size()-1; i++){
+						bw2.write(line.get(i));
+						bw2.write(",");
+					}
+					bw2.write(line.get(line.size()-1));
+					bw2.newLine();
+				}
+			} finally {
+				bw2.close();
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		
+
 	}
 	
 	private void writeListToFile(List<List<Double>> list, String location){
