@@ -78,7 +78,18 @@ public class RunMyThroughTrafficAnalyser {
 	
 	private static double withinThreshold = 0.6;
 
+	/**
+	 * Should provide the number of vehicles to sample. If not provided, all
+	 * vehicle files will be processed.
+	 * @param args
+	 */
 	public static void main(String[] args) {
+		int numberOfVehiclesToSample;
+		if(args.length > 0){
+			numberOfVehiclesToSample = Integer.parseInt(args[0]);
+		} else{
+			numberOfVehiclesToSample = Integer.MAX_VALUE;
+		}
 		/*
 		 * Read study area.
 		 */
@@ -108,13 +119,11 @@ public class RunMyThroughTrafficAnalyser {
 		}
 		MyFileSampler mfs = new MyFileSampler(folder.getAbsolutePath());
 		MyFileFilter mff = new MyFileFilter(".xml");
-//		File[] files = folder.listFiles(mff);
-		List<File> files = mfs.sampleFiles(50, mff);
+		List<File> files = mfs.sampleFiles(numberOfVehiclesToSample, mff);
 		
 		int counter = 0;
 		int multiplier = 1;
 		log.info("Processing vehicles from " + folder.getAbsolutePath());
-//		log.info("Total number of vehicles to process: " + files.length);
 		log.info("Total number of vehicles to process: " + files.size());
 		for(File f : files){
 			if(f.exists() && f.isFile()){
@@ -148,8 +157,8 @@ public class RunMyThroughTrafficAnalyser {
 //		MyXmlConverter mxc = new MyXmlConverter(true);
 //		mxc.writeObjectToFile(mtta, object);
 		
-		String location = String.format("%sOutput/%s_", 
-				root, studyAreaName);
+		String location = String.format("%s%s/%d/%s/%04d/Sample%02d/%s_%03.0fp_", 
+				root, studyAreaName, year, version, threshold, sample, studyAreaName, withinThreshold*100);
 		mtta.writeListsToFile(location);
 		
 		log.info("----------------------------------------");
