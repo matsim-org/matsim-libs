@@ -29,6 +29,7 @@ import playground.jjoubert.CommercialTraffic.CommercialVehicle;
 import playground.jjoubert.Utilities.MyShapefileReader;
 import playground.jjoubert.Utilities.MyXmlConverter;
 import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
+import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -105,13 +106,16 @@ public class RunMyThroughTrafficAnalyser {
 		if(!folder.isDirectory()){
 			throw new RuntimeException("The location " + vehicleFolder + " is not a folder.");
 		}
+		MyFileSampler mfs = new MyFileSampler(folder.getAbsolutePath());
 		MyFileFilter mff = new MyFileFilter(".xml");
-		File[] files = folder.listFiles(mff);
+//		File[] files = folder.listFiles(mff);
+		List<File> files = mfs.sampleFiles(50, mff);
 		
 		int counter = 0;
 		int multiplier = 1;
 		log.info("Processing vehicles from " + folder.getAbsolutePath());
-		log.info("Total number of vehicles to process: " + files.length);
+//		log.info("Total number of vehicles to process: " + files.length);
+		log.info("Total number of vehicles to process: " + files.size());
 		for(File f : files){
 			if(f.exists() && f.isFile()){
 				String vehicleXML = f.getAbsolutePath();
