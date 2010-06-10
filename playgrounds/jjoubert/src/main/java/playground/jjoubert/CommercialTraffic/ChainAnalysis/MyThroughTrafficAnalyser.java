@@ -261,10 +261,10 @@ public class MyThroughTrafficAnalyser {
 				bw2.newLine();
 				for(List<Integer> line : gateStats){
 					for(int i = 0; i < line.size()-1; i++){
-						bw2.write(line.get(i));
+						bw2.write(String.valueOf(line.get(i)));
 						bw2.write(",");
 					}
-					bw2.write(line.get(line.size()-1));
+					bw2.write(String.valueOf(line.get(line.size()-1)));
 					bw2.newLine();
 				}
 			} finally {
