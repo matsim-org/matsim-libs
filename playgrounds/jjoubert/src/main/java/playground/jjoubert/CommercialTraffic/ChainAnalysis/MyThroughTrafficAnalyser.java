@@ -202,7 +202,7 @@ public class MyThroughTrafficAnalyser {
 					}
 					gateStats.get(index).set(hourOfDay+2, gateStats.get(index).get(hourOfDay+2) + 1);
 
-				} else if (in1 && in2){
+				} else if (in1 && in2 && activityCounter != null){
 					activityCounter++;
 				}
 			}
