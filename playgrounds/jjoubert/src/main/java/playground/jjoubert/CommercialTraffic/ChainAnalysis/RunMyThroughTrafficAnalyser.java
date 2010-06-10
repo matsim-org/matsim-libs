@@ -136,8 +136,8 @@ public class RunMyThroughTrafficAnalyser {
 		}
 		log.info("   Vehicles processed: " + counter + " (Done)");		
 		
-		String location = String.format("%s%s/%d/%s/%04d/Sample%02d/%s_%03.0fp_", 
-				root, studyAreaName, year, version, threshold, sample, studyAreaName, withinThreshold*100);
+		String location = String.format("%sOutput/%s_", 
+				root, studyAreaName);
 		mtta.writeListsToFile(location);
 		
 		log.info("----------------------------------------");
