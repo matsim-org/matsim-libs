@@ -157,8 +157,9 @@ public class RunMyThroughTrafficAnalyser {
 //		MyXmlConverter mxc = new MyXmlConverter(true);
 //		mxc.writeObjectToFile(mtta, object);
 		
-		String location = String.format("%s%s/%d/%s/%04d/Sample%02d/%s_%03.0fp_", 
-				root, studyAreaName, year, version, threshold, sample, studyAreaName, withinThreshold*100);
+		String location = String.format("%s%s/%d/%s/%04d/Sample%02d/%s_%03.0fp_%d_", 
+				root, studyAreaName, year, version, threshold, sample, studyAreaName, 
+				withinThreshold*100, files.size());
 		mtta.writeListsToFile(location);
 		
 		log.info("----------------------------------------");
