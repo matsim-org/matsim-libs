@@ -150,8 +150,24 @@ public class MyThroughTrafficAnalyser {
 	private void writeListToFile(List<List<Double>> list, String location){
 		log.info("Writing list to " + location + "Line.txt");
 		try {
-			BufferedWriter o1 = new BufferedWriter(new FileWriter(new File(location + "Line.txt")));			
-			BufferedWriter o2 = new BufferedWriter(new FileWriter(new File(location + "Point.txt")));			
+			File f1 = new File(location + "Line.txt");
+			boolean f1create = f1.createNewFile();
+			if(!f1create){
+				log.warn("Cannot create " + f1.getAbsolutePath());
+			}
+			if(!f1.canWrite()){
+				log.warn("Cannot write to " + f1.getAbsolutePath());
+			}
+			File f2 = new File(location + "Point.txt");
+			boolean f2create = f1.createNewFile();
+			if(!f2create){
+				log.warn("Cannot create " + f2.getAbsolutePath());
+			}
+			if(!f2.canWrite()){
+				log.warn("Cannot write to " + f2.getAbsolutePath());
+			}
+			BufferedWriter o1 = new BufferedWriter(new FileWriter(f1));			
+			BufferedWriter o2 = new BufferedWriter(new FileWriter(f2));			
 			try{
 				o1.write("ID");
 				o1.newLine();
