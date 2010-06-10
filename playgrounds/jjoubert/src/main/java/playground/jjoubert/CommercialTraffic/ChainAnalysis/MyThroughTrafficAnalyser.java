@@ -151,22 +151,15 @@ public class MyThroughTrafficAnalyser {
 		log.info("Writing list to " + location + "Line.txt");
 		try {
 			File f1 = new File(location + "Line.txt");
-			log.info("File f1: " + f1.exists());
-			boolean f1create = f1.createNewFile();
-			if(!f1create){
-				log.warn("Cannot create " + f1.getAbsolutePath());
-			}
-			if(!f1.canWrite()){
-				log.warn("Cannot write to " + f1.getAbsolutePath());
-			}
+			log.info("File f1 exist   : " + f1.exists());
+			log.info("File f1 created : " + f1.createNewFile());
+			log.info("File f1 writable: " + f1.canWrite());
+
 			File f2 = new File(location + "Point.txt");
-			boolean f2create = f1.createNewFile();
-			if(!f2create){
-				log.warn("Cannot create " + f2.getAbsolutePath());
-			}
-			if(!f2.canWrite()){
-				log.warn("Cannot write to " + f2.getAbsolutePath());
-			}
+			log.info("File f2 exist   : " + f2.exists());
+			log.info("File f2 created : " + f2.createNewFile());
+			log.info("File f2 writable: " + f2.canWrite());
+
 			BufferedWriter o1 = new BufferedWriter(new FileWriter(f1));			
 			BufferedWriter o2 = new BufferedWriter(new FileWriter(f2));			
 			try{
