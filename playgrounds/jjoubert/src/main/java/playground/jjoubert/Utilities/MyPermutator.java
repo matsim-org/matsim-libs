@@ -30,6 +30,7 @@ public class MyPermutator {
 	}
 	
 	public ArrayList<Integer> permutate(int size){
+		MatsimRandom.reset((long) (Math.random()*1000));
 		ArrayList<Integer> unused = new ArrayList<Integer>();
 		for(int i = 0; i < size; i++){
 			unused.add(Integer.valueOf(i+1));
