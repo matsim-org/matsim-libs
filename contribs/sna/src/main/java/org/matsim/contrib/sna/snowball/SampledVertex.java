@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.snowball;
 
+import java.util.List;
+
 import org.matsim.contrib.sna.graph.Vertex;
 
 
@@ -30,21 +32,15 @@ import org.matsim.contrib.sna.graph.Vertex;
  */
 public interface SampledVertex extends Vertex {
 
-	/*
-	 * Due to a bug in Sun's java compiler the return type of this method cannot
-	 * be generic, since otherwise multiple inheritance (e.g. in
-	 * SampledSpatialGraph) would result in a compile error. See also
-	 * http://bugs.sun.com/view_bug.do;jsessionid=3cb252856515e1983e4affdf768e?bug_id=6294779
+	/**
+	 * @see {@link Vertex#getEdges()}
 	 */
-//	public List getEdges();
+	public List<? extends SampledEdge> getEdges();
 	
-	/*
-	 * Due to a bug in Sun's java compiler the return type of this method cannot
-	 * be generic, since otherwise multiple inheritance (e.g. in
-	 * SampledSpatialGraph) would result in a compile error. See also
-	 * http://bugs.sun.com/view_bug.do;jsessionid=3cb252856515e1983e4affdf768e?bug_id=6294779
+	/**
+	 * @see {@link Vertex#getNeighbours()}
 	 */
-//	public List getNeighbours();
+	public List<? extends SampledVertex> getNeighbours();
 	
 	/**
 	 * @see {@link SnowballAttributes#detect(int)}

@@ -21,9 +21,7 @@ package org.matsim.contrib.sna.snowball;
 
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
 
 
 /**
@@ -35,23 +33,13 @@ import org.matsim.contrib.sna.graph.Vertex;
 public interface SampledGraph extends Graph {
 
 	/**
-	 * Due to a bug in Sun's java compiler the return type of this method cannot
-	 * be parameterized with SampledVertex, since otherwise multiple inheritance (e.g. in
-	 * SampledSpatialGraph) would result in a compile error. See also
-	 * http://bugs.sun.com/view_bug.do;jsessionid=3cb252856515e1983e4affdf768e?bug_id=6294779
-	 * 
 	 * @see {@link Graph#getVertices()}
 	 */
-	public Set<? extends Vertex> getVertices();
+	public Set<? extends SampledVertex> getVertices();
 
 	/**
-	 * Due to a bug in Sun's java compiler the return type of this method cannot
-	 * be parameterized with SampledEdge, since otherwise multiple inheritance (e.g. in
-	 * SampledSpatialGraph) would result in a compile error. See also
-	 * http://bugs.sun.com/view_bug.do;jsessionid=3cb252856515e1983e4affdf768e?bug_id=6294779
-	 * 
 	 * @see {@link Graph#getEdges()}
 	 */
-	public Set<? extends Edge> getEdges();
+	public Set<? extends SampledEdge> getEdges();
 
 }
