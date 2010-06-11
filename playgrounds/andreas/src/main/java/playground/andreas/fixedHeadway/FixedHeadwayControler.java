@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitStopFacility;
@@ -42,10 +43,10 @@ public class FixedHeadwayControler implements VehicleDepartsAtFacilityEventHandl
 			init();
 		}
 		
-		if(event.getDelay() > 120){
+		if(event.getDelay() > 180){
 			ArrayList<FixedHeadwayCycleUmlaufDriver> vehicleAhead = getVehicleAhead(this.umlaufDriver.get(event.getVehicleId()));
 			if(vehicleAhead.size() == 0){
-				log.warn("Tried to delay a vehicle at stop " + event.getFacilityId() + " but none is ahead. Vehicle " + event.getVehicleId() + " got delayed by " + event.getDelay());	
+				log.warn(Time.writeTime(event.getTime()) + " - Tried to delay a vehicle at stop, but none is ahead. Vehicle " + event.getVehicleId() + " got delayed by " + event.getDelay() + " at " + event.getFacilityId());	
 			} else {
 				
 				// complex one
@@ -62,7 +63,7 @@ public class FixedHeadwayControler implements VehicleDepartsAtFacilityEventHandl
 				double delay = event.getDelay() / 2.0;
 				FixedHeadwayCycleUmlaufDriver veh = vehicleAhead.get(0);
 				veh.setAdditionalDelayAtNextStop(delay);
-				log.info(event.getTime() + ": Vehicle " + veh.getVehicle().getVehicle().getId() + " will be delayed by " + delay + " because vehicle " + event.getVehicleId() + " got delayed by " + event.getDelay() + " seconds.");
+				log.info(Time.writeTime(event.getTime()) + " - Vehicle " + veh.getVehicle().getVehicle().getId() + " will be delayed by " + delay + " because vehicle " + event.getVehicleId() + " got delayed by " + event.getDelay() + " seconds at " + event.getFacilityId());
 			}
 		}
 		
