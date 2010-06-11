@@ -25,7 +25,6 @@ import net.opengis.kml._2.PlacemarkType;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
 /**
  * A KMLVertexDescriptor adds a description to the placemark representing a
@@ -37,7 +36,7 @@ import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
  * @author jillenberger
  * 
  */
-public class KMLVertexDescriptor implements KMLObjectDetail<SpatialVertex> {
+public class KMLVertexDescriptor implements KMLObjectDetail {
 
 	private final TObjectDoubleHashMap<Vertex> kDistr;
 
@@ -57,11 +56,11 @@ public class KMLVertexDescriptor implements KMLObjectDetail<SpatialVertex> {
 	 * @see {@link KMLObjectDetail#addDetail(PlacemarkType, Object)}
 	 */
 	@Override
-	public void addDetail(PlacemarkType kmlPlacemark, SpatialVertex vertex) {
+	public void addDetail(PlacemarkType kmlPlacemark, Object vertex) {
 		StringBuilder builder = new StringBuilder();
 
 		builder.append("k = ");
-		builder.append(String.valueOf(kDistr.get(vertex)));
+		builder.append(String.valueOf(kDistr.get((Vertex) vertex)));
 
 		kmlPlacemark.setDescription(builder.toString());
 	}

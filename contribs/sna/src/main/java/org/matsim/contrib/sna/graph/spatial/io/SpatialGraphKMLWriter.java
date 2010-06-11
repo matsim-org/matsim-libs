@@ -69,13 +69,13 @@ public class SpatialGraphKMLWriter {
 
 	private boolean drawEdges = true;
 
-	private KMLObjectStyle<SpatialVertex> kmlVertexStyle;
+	private KMLObjectStyle kmlVertexStyle;
 
-	private KMLObjectStyle<SpatialEdge> kmlEdgeStyle;
+	private KMLObjectStyle kmlEdgeStyle;
 
-	private KMLObjectDetail<SpatialVertex> kmlVertexDetail;
+	private KMLObjectDetail kmlVertexDetail;
 
-	private KMLObjectDetail<SpatialEdge> kmlEdgeDetail;
+	private KMLObjectDetail kmlEdgeDetail;
 
 	/**
 	 * Adds a KMZWriterListener to the writer. Listeners will be called
@@ -157,7 +157,7 @@ public class SpatialGraphKMLWriter {
 	 * 
 	 * @return the style object that is used to draw vertices.
 	 */
-	public KMLObjectStyle<SpatialVertex> getKmlVertexStyle() {
+	public KMLObjectStyle getKmlVertexStyle() {
 		return kmlVertexStyle;
 	}
 
@@ -167,7 +167,7 @@ public class SpatialGraphKMLWriter {
 	 * @param kmlVertexStyle
 	 *            a style object
 	 */
-	public void setKmlVertexStyle(KMLObjectStyle<SpatialVertex> kmlVertexStyle) {
+	public void setKmlVertexStyle(KMLObjectStyle kmlVertexStyle) {
 		this.kmlVertexStyle = kmlVertexStyle;
 	}
 
@@ -177,7 +177,7 @@ public class SpatialGraphKMLWriter {
 	 * 
 	 * @return the style object that is used to draw edges.
 	 */
-	public KMLObjectStyle<SpatialEdge> getKmlEdgeStyle() {
+	public KMLObjectStyle getKmlEdgeStyle() {
 		return kmlEdgeStyle;
 	}
 
@@ -187,7 +187,7 @@ public class SpatialGraphKMLWriter {
 	 * @param kmlEdgeStyle
 	 *            a style object
 	 */
-	public void setKmlEdgeStyle(KMLObjectStyle<SpatialEdge> kmlEdgeStyle) {
+	public void setKmlEdgeStyle(KMLObjectStyle kmlEdgeStyle) {
 		this.kmlEdgeStyle = kmlEdgeStyle;
 	}
 
@@ -198,7 +198,7 @@ public class SpatialGraphKMLWriter {
 	 * @return the object that appends further attributes to the placemark
 	 *         representing a vertex.
 	 */
-	public KMLObjectDetail<SpatialVertex> getKmlVertexDetail() {
+	public KMLObjectDetail getKmlVertexDetail() {
 		return kmlVertexDetail;
 	}
 
@@ -210,8 +210,7 @@ public class SpatialGraphKMLWriter {
 	 *            KMLObjectDetail object, or <tt>null</tt> if no further
 	 *            attributes should be added to the placemark.
 	 */
-	public void setKmlVertexDetail(
-			KMLObjectDetail<SpatialVertex> kmlVertexDetail) {
+	public void setKmlVertexDetail(KMLObjectDetail kmlVertexDetail) {
 		this.kmlVertexDetail = kmlVertexDetail;
 	}
 
@@ -222,7 +221,7 @@ public class SpatialGraphKMLWriter {
 	 * @return the object that appends further attributes to the placemark
 	 *         representing an edge.
 	 */
-	public KMLObjectDetail<SpatialEdge> getKmlEdgeDetail() {
+	public KMLObjectDetail getKmlEdgeDetail() {
 		return kmlEdgeDetail;
 	}
 
@@ -234,7 +233,7 @@ public class SpatialGraphKMLWriter {
 	 *            KMLObjectDetail object, or <tt>null</tt> if no further
 	 *            attributes should be added to the placemark.
 	 */
-	public void setKmlEdgeDetail(KMLObjectDetail<SpatialEdge> kmlEdgeDetail) {
+	public void setKmlEdgeDetail(KMLObjectDetail kmlEdgeDetail) {
 		this.kmlEdgeDetail = kmlEdgeDetail;
 	}
 
@@ -264,8 +263,7 @@ public class SpatialGraphKMLWriter {
 		/*
 		 * Find the coordinate transformation.
 		 */
-		CoordinateReferenceSystem sourceCRS = graph
-				.getCoordinateReferenceSysten();
+		CoordinateReferenceSystem sourceCRS = graph.getCoordinateReferenceSysten();
 		CoordinateReferenceSystem targetCRS = DefaultGeographicCRS.WGS84;
 		try {
 			transform = CRS.findMathTransform(sourceCRS, targetCRS);
@@ -276,19 +274,16 @@ public class SpatialGraphKMLWriter {
 			/*
 			 * Write each partition in a separate folder.
 			 */
-			for (Set<? extends SpatialVertex> partition : kmlPartitition
-					.getPartitions(graph)) {
+			for (Set<? extends SpatialVertex> partition : kmlPartitition.getPartitions(graph)) {
 				FolderType kmlFolder = createFolder(partition, kmlDocument);
 				kmlPartitition.addDetail(kmlFolder, partition);
-				kmlDocument.getAbstractFeatureGroup().add(
-						kmlFactory.createFolder(kmlFolder));
+				kmlDocument.getAbstractFeatureGroup().add(kmlFactory.createFolder(kmlFolder));
 			}
 			/*
 			 * Write the KML document.
 			 */
 			KmlType kmlType = kmlFactory.createKmlType();
-			kmlType.setAbstractFeatureGroup(kmlFactory
-					.createDocument(kmlDocument));
+			kmlType.setAbstractFeatureGroup(kmlFactory.createDocument(kmlDocument));
 			writer.writeMainKml(kmlType);
 		} catch (FactoryException e) {
 			e.printStackTrace();
@@ -302,8 +297,7 @@ public class SpatialGraphKMLWriter {
 		writer.close();
 	}
 
-	private FolderType createFolder(Set<? extends SpatialVertex> vertices,
-			DocumentType kmlDocument) {
+	private FolderType createFolder(Set<? extends SpatialVertex> vertices, DocumentType kmlDocument) {
 		/*
 		 * Create a folder.
 		 */
@@ -329,8 +323,7 @@ public class SpatialGraphKMLWriter {
 		 * Add all style types to the selector group.
 		 */
 		for (StyleType kmlStyle : styleSet) {
-			kmlFolder.getAbstractStyleSelectorGroup().add(
-					kmlFactory.createStyle(kmlStyle));
+			kmlFolder.getAbstractStyleSelectorGroup().add(kmlFactory.createStyle(kmlStyle));
 		}
 		/*
 		 * Add vertices and edges.
@@ -343,24 +336,18 @@ public class SpatialGraphKMLWriter {
 					/*
 					 * Encode the vertex.
 					 */
-					double[] points = new double[] {
-							v.getPoint().getCoordinate().x,
-							v.getPoint().getCoordinate().y };
+					double[] points = new double[] { v.getPoint().getCoordinate().x, v.getPoint().getCoordinate().y };
 					transform.transform(points, 0, points, 0, 1);
 					PointType kmlPoint = kmlFactory.createPointType();
-					kmlPoint.getCoordinates().add(
-							makeCoordinateString(points[0], points[1]));
+					kmlPoint.getCoordinates().add(makeCoordinateString(points[0], points[1]));
 
-					PlacemarkType kmlPlacemark = kmlFactory
-							.createPlacemarkType();
-					kmlPlacemark.setAbstractGeometryGroup(kmlFactory
-							.createPoint(kmlPoint));
+					PlacemarkType kmlPlacemark = kmlFactory.createPlacemarkType();
+					kmlPlacemark.setAbstractGeometryGroup(kmlFactory.createPoint(kmlPoint));
 					kmlPlacemark.setStyleUrl(styleMap.get(v).getId());
 					if (kmlVertexDetail != null)
 						kmlVertexDetail.addDetail(kmlPlacemark, v);
 
-					kmlFolder.getAbstractFeatureGroup().add(
-							kmlFactory.createPlacemark(kmlPlacemark));
+					kmlFolder.getAbstractFeatureGroup().add(kmlFactory.createPlacemark(kmlPlacemark));
 				}
 				/*
 				 * Encode the edges.
@@ -368,30 +355,22 @@ public class SpatialGraphKMLWriter {
 				for (SpatialEdge e : v.getEdges()) {
 					if (drawEdges) {
 						if (processedEdges.add(e)) {
-							LineStringType kmlLineString = kmlFactory
-									.createLineStringType();
+							LineStringType kmlLineString = kmlFactory.createLineStringType();
 							SpatialVertex v2 = e.getOpposite(v);
-							double[] points = new double[] {
-									v.getPoint().getCoordinate().x,
-									v.getPoint().getCoordinate().y,
-									v2.getPoint().getCoordinate().x,
+							double[] points = new double[] { v.getPoint().getCoordinate().x,
+									v.getPoint().getCoordinate().y, v2.getPoint().getCoordinate().x,
 									v2.getPoint().getCoordinate().y };
 							transform.transform(points, 0, points, 0, 2);
-							kmlLineString.getCoordinates().add(
-									makeCoordinateString(points[0], points[1]));
-							kmlLineString.getCoordinates().add(
-									makeCoordinateString(points[2], points[3]));
+							kmlLineString.getCoordinates().add(makeCoordinateString(points[0], points[1]));
+							kmlLineString.getCoordinates().add(makeCoordinateString(points[2], points[3]));
 
-							PlacemarkType kmlPlacemark = kmlFactory
-									.createPlacemarkType();
-							kmlPlacemark.setAbstractGeometryGroup(kmlFactory
-									.createLineString(kmlLineString));
+							PlacemarkType kmlPlacemark = kmlFactory.createPlacemarkType();
+							kmlPlacemark.setAbstractGeometryGroup(kmlFactory.createLineString(kmlLineString));
 							kmlPlacemark.setStyleUrl(styleMap.get(e).getId());
 							if (kmlEdgeDetail != null)
 								kmlEdgeDetail.addDetail(kmlPlacemark, e);
 
-							kmlFolder.getAbstractFeatureGroup().add(
-									kmlFactory.createPlacemark(kmlPlacemark));
+							kmlFolder.getAbstractFeatureGroup().add(kmlFactory.createPlacemark(kmlPlacemark));
 						}
 					}
 				}
@@ -416,26 +395,23 @@ public class SpatialGraphKMLWriter {
 		private SpatialGraph graph;
 
 		@Override
-		public void addDetail(FolderType kmlFolder,
-				Set<? extends SpatialVertex> partition) {
+		public void addDetail(FolderType kmlFolder, Set<? extends SpatialVertex> partition) {
 			kmlFolder.setName("Graph");
-			kmlFolder.setDescription(String.format("%1$s vertices, %2$s edges",
-					graph.getVertices().size(), graph.getEdges().size()));
+			kmlFolder.setDescription(String.format("%1$s vertices, %2$s edges", graph.getVertices().size(), graph
+					.getEdges().size()));
 		}
 
 		@Override
-		public List<Set<? extends SpatialVertex>> getPartitions(
-				SpatialGraph graph) {
+		public List<Set<? extends SpatialVertex>> getPartitions(SpatialGraph graph) {
 			this.graph = graph;
-			List<Set<? extends SpatialVertex>> partitions = new ArrayList<Set<? extends SpatialVertex>>(
-					1);
+			List<Set<? extends SpatialVertex>> partitions = new ArrayList<Set<? extends SpatialVertex>>(1);
 			partitions.add(graph.getVertices());
 			return partitions;
 		}
 
 	}
 
-	private class DefaultEdgeStyle implements KMLObjectStyle<SpatialEdge> {
+	private class DefaultEdgeStyle implements KMLObjectStyle {
 
 		private final static String STYLE_ID = "defaultEdgeStyle";
 
@@ -444,10 +420,8 @@ public class SpatialGraphKMLWriter {
 		public DefaultEdgeStyle() {
 			LineStyleType kmlLineStyle = kmlFactory.createLineStyleType();
 			Color c = Color.WHITE;
-			kmlLineStyle
-					.setColor(new byte[] { (byte) c.getAlpha(),
-							(byte) c.getBlue(), (byte) c.getGreen(),
-							(byte) c.getRed() });
+			kmlLineStyle.setColor(new byte[] { (byte) c.getAlpha(), (byte) c.getBlue(), (byte) c.getGreen(),
+					(byte) c.getRed() });
 			kmlLineStyle.setWidth(1.0);
 
 			kmlStyle = kmlFactory.createStyleType();
@@ -456,7 +430,7 @@ public class SpatialGraphKMLWriter {
 		}
 
 		@Override
-		public StyleType getStyle(SpatialEdge object) {
+		public StyleType getStyle(Object object) {
 			return kmlStyle;
 		}
 

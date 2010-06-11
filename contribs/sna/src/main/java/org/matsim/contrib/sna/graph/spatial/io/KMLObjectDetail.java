@@ -28,7 +28,7 @@ import net.opengis.kml._2.PlacemarkType;
  * @author jillenberger
  * 
  */
-public interface KMLObjectDetail<T> {
+public interface KMLObjectDetail {
 
 	/**
 	 * Will be called by after creating a placemark with its geometry set.
@@ -36,8 +36,9 @@ public interface KMLObjectDetail<T> {
 	 * @param kmlPlacemark
 	 *            a placemark
 	 * @param object
-	 *            the object that is associated to <tt>kmlPlacemark</tt>.
+	 *            the object that is associated to <tt>kmlPlacemark</tt>,
+	 *            usually a vertex or an edge.
 	 */
-	public void addDetail(PlacemarkType kmlPlacemark, T object);
+	public void addDetail(PlacemarkType kmlPlacemark, Object object);
 
 }

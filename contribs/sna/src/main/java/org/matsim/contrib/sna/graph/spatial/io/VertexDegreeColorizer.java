@@ -34,7 +34,7 @@ import org.matsim.contrib.sna.math.Distribution;
  * @author jillenberger
  * 
  */
-public class VertexDegreeColorizer implements Colorizable<Vertex> {
+public class VertexDegreeColorizer implements Colorizable {
 
 	private final int k_min;
 
@@ -83,8 +83,8 @@ public class VertexDegreeColorizer implements Colorizable<Vertex> {
 	 * @param vertex a vertex
 	 */
 	@Override
-	public Color getColor(Vertex vertex) {
-		int val = vertex.getEdges().size();
+	public Color getColor(Object vertex) {
+		int val = ((Vertex) vertex).getEdges().size();
 		double color = 0;
 		if (logscale) {
 			double min2 = Math.log(k_min + 1);

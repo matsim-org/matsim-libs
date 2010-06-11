@@ -34,7 +34,6 @@ import net.opengis.kml._2.StyleType;
 
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.kml.KMZWriter;
 
@@ -48,13 +47,13 @@ import org.matsim.vis.kml.KMZWriter;
  * @author jillenberger
  * 
  */
-public class KMLIconVertexStyle implements KMLObjectStyle<SpatialVertex>, KMZWriterListener {
+public class KMLIconVertexStyle implements KMLObjectStyle, KMZWriterListener {
 
 	private static final String ICON_HREF = "vertex.png";
 
 	private final ObjectFactory kmlFactory = new ObjectFactory();
 
-	private Colorizable<Vertex> vertexColorizer;
+	private Colorizable vertexColorizer;
 
 	private Map<Vertex, StyleType> vertexStyles;
 
@@ -79,7 +78,7 @@ public class KMLIconVertexStyle implements KMLObjectStyle<SpatialVertex>, KMZWri
 	 * 
 	 * @return the colorizer used to color vertices.
 	 */
-	public Colorizable<Vertex> getVertexColorizer() {
+	public Colorizable getVertexColorizer() {
 		return vertexColorizer;
 	}
 
@@ -89,7 +88,7 @@ public class KMLIconVertexStyle implements KMLObjectStyle<SpatialVertex>, KMZWri
 	 * @param vertexColorizer
 	 *            a colorizer.
 	 */
-	public void setVertexColorizer(Colorizable<Vertex> vertexColorizer) {
+	public void setVertexColorizer(Colorizable vertexColorizer) {
 		this.vertexColorizer = vertexColorizer;
 	}
 
@@ -159,7 +158,7 @@ public class KMLIconVertexStyle implements KMLObjectStyle<SpatialVertex>, KMZWri
 	 * @see {@link KMLObjectStyle#getStyle(Object)}
 	 */
 	@Override
-	public StyleType getStyle(SpatialVertex object) {
+	public StyleType getStyle(Object object) {
 		if (vertexStyles == null)
 			vertexStyles = initVertexStyles(graph);
 

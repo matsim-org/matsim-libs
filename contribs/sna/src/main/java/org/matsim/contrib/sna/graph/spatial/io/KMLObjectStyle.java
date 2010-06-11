@@ -28,7 +28,7 @@ import net.opengis.kml._2.StyleType;
  * @author jillenberger
  * 
  */
-public interface KMLObjectStyle<T> {
+public interface KMLObjectStyle {
 
 	/**
 	 * Returns the style type used to display <tt>object</tt>.
@@ -37,6 +37,6 @@ public interface KMLObjectStyle<T> {
 	 *            an object (e.g., vertex or edge)
 	 * @return the style type used to display <tt>object</tt>.
 	 */
-	public StyleType getStyle(T object);
+	public StyleType getStyle(Object object);
 
 }

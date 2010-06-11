@@ -28,7 +28,7 @@ import java.awt.Color;
  * @author jillenberger
  * 
  */
-public interface Colorizable<T> {
+public interface Colorizable {
 
 	/**
 	 * Returns the color used to display <tt>object</tt>.
@@ -37,6 +37,6 @@ public interface Colorizable<T> {
 	 *            an object (e.g., a vertex or an edge).
 	 * @return the color used to display <tt>object</tt>.
 	 */
-	public Color getColor(T object);
+	public Color getColor(Object object);
 
 }

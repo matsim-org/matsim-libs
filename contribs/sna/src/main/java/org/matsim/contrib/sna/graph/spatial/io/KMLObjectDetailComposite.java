@@ -30,9 +30,9 @@ import net.opengis.kml._2.PlacemarkType;
  * @author jillenberger
  * 
  */
-public class KMLObjectDetailComposite<T> implements KMLObjectDetail<T> {
+public class KMLObjectDetailComposite implements KMLObjectDetail {
 
-	private final List<KMLObjectDetail<T>> elements = new ArrayList<KMLObjectDetail<T>>();
+	private final List<KMLObjectDetail> elements = new ArrayList<KMLObjectDetail>();
 
 	/**
 	 * Adds a KMLObjectDetail object to the composite.
@@ -40,7 +40,7 @@ public class KMLObjectDetailComposite<T> implements KMLObjectDetail<T> {
 	 * @param objectDetail
 	 *            a KMLObjectDetail object
 	 */
-	public void addObjectDetail(KMLObjectDetail<T> objectDetail) {
+	public void addObjectDetail(KMLObjectDetail objectDetail) {
 		elements.add(objectDetail);
 	}
 
@@ -50,8 +50,8 @@ public class KMLObjectDetailComposite<T> implements KMLObjectDetail<T> {
 	 * insertion-order.
 	 */
 	@Override
-	public void addDetail(PlacemarkType kmlPlacemark, T object) {
-		for (KMLObjectDetail<T> objectDetail : elements)
+	public void addDetail(PlacemarkType kmlPlacemark, Object object) {
+		for (KMLObjectDetail objectDetail : elements)
 			objectDetail.addDetail(kmlPlacemark, object);
 
 	}
