@@ -32,6 +32,6 @@ import org.matsim.api.core.v01.Id;
  */
 public interface Interactor {
 
-	public void interact(Id p1, Id p2, double startTime, double endTime);
+	public void interact(Id p1, Id p2, double startTime, double endTime, String actType);
 	
 }

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2;
 
+import java.util.Set;
+
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.GraphProjection;
@@ -33,5 +35,17 @@ public class SampledGraphProjection<G extends Graph, V extends Vertex, E extends
 
 	public SampledGraphProjection(G delegate) {
 		super(delegate);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SampledEdgeDecorator<E>> getEdges() {
+		return (Set<? extends SampledEdgeDecorator<E>>) super.getEdges();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SampledVertexDecorator<V>> getVertices() {
+		return (Set<? extends SampledVertexDecorator<V>>) super.getVertices();
 	}
 }

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.sim.interaction;
 
+import gnu.trove.TObjectIntIterator;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
@@ -97,13 +99,27 @@ public class PseudoSim {
 		for(Person person : population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			List<PlanElement> elements = plan.getPlanElements();
-			for(int i = 0; i < elements.size(); i += 2) {
-				Activity act = (Activity) elements.get(i);
-				ActivityStartEvent startEvent = new ActivityStartEventImpl(act.getStartTime(), person.getId(), act.getLinkId(), act.getFacilityId(), act.getType());
-				ActivityEndEvent endEvent = new ActivityEndEventImpl(act.getEndTime(), person.getId(), act.getLinkId(), act.getFacilityId(), act.getType());
+			/*
+			 * first act
+			 */
+			Activity act = (Activity) elements.get(0);
+			ActivityStartEvent startEvent = new ActivityStartEventImpl(0.0, person.getId(), act.getLinkId(), act.getFacilityId(), act.getType());
+			ActivityEndEvent endEvent = new ActivityEndEventImpl(act.getEndTime(), person.getId(), act.getLinkId(), act.getFacilityId(), act.getType());
+	
+			eventQueue.add(startEvent);
+			eventQueue.add(endEvent);
+			double lastEndTime = endEvent.getTime();
+			/*
+			 * next acts
+			 */
+			for(int i = 2; i < elements.size(); i += 2) {
+				act = (Activity) elements.get(i);
+				startEvent = new ActivityStartEventImpl(lastEndTime, person.getId(), act.getLinkId(), act.getFacilityId(), act.getType());
+				endEvent = new ActivityEndEventImpl(act.getEndTime(), person.getId(), act.getLinkId(), act.getFacilityId(), act.getType());
 		
 				eventQueue.add(startEvent);
 				eventQueue.add(endEvent);
+				lastEndTime = endEvent.getTime();
 			}
 		}
 		
@@ -116,6 +132,7 @@ public class PseudoSim {
 		String facFile = args[1];
 		String popFile = args[2];
 		String graphFile = args[3];
+		double proba = Double.parseDouble(args[4]);
 		
 		GeometryFactory geoFactory = new GeometryFactory();
 		
@@ -142,7 +159,7 @@ public class PseudoSim {
 		
 		logger.info("Initializing interactors...");
 		
-		Interactor interactor = new BefriendInteractor(graph, builder, 1.0, 0);
+		BefriendInteractor interactor = new BefriendInteractor(graph, builder, proba, 0);
 		InteractionSelector selector = new InteractionSelector() {
 			@Override
 			public Collection<Id> select(Id v, Collection<Id> choiceSet) {
@@ -159,9 +176,17 @@ public class PseudoSim {
 		logger.info("Running pseudo sim...");
 		sim.run(scenario.getPopulation(), manager);
 		
+		TObjectIntIterator<String> it = interactor.getActTypes().iterator();
+		for(int i = 0; i < interactor.getActTypes().size(); i++) {
+			it.advance();
+			logger.info(String.format("Act type = %1$s, edges = %2$s.", it.key(), it.value()));
+		}
+		
 		logger.info("Writing graph...");
 		SocialGraphMLWriter writer = new SocialGraphMLWriter();
 		writer.write(graph, graphFile);
 		logger.info("Done.");
+		
+		
 	}
 }

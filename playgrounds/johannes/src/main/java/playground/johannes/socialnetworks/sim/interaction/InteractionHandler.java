@@ -72,7 +72,7 @@ public class InteractionHandler implements ActivityStartEventHandler, ActivityEn
 				Collection<Id> targets = selector.select(startEvent.getPersonId(), visitors.keySet());
 				for (Id person : targets) {
 					double startTime = Math.max(startEvent.getTime(), visitors.get(person).getTime());
-					interactor.interact(startEvent.getPersonId(), person, startTime, event.getTime());
+					interactor.interact(startEvent.getPersonId(), person, startTime, event.getTime(), event.getActType());
 				}
 			} else {
 				System.err.println("Event not in list!");

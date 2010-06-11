@@ -23,6 +23,9 @@
  */
 package playground.johannes.socialnetworks.sim.interaction;
 
+import gnu.trove.TObjectIntHashMap;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -52,14 +55,23 @@ public class BefriendInteractor implements Interactor {//, IterationStartsListen
 	
 	private Map<Id, SocialSparseVertex> vertices;
 	
+	private TObjectIntHashMap<String> actTypes;
+	
 	public BefriendInteractor(SocialSparseGraph socialnet, SocialSparseGraphBuilder builder, double p, long randomSeed) {
 		this.socialnet = socialnet;
 		this.builder = builder;
 		this.tieProba = p;
 		random = new Random(randomSeed);
+		
+		vertices = new HashMap<Id, SocialSparseVertex>(socialnet.getVertices().size());
+		for(SocialSparseVertex vertex : socialnet.getVertices()) {
+			vertices.put(vertex.getPerson().getId(), vertex);
+		}
+		
+		actTypes = new TObjectIntHashMap<String>();
 	}
 	
-	public void interact(Id p1, Id p2, double startTime, double endTime) {
+	public void interact(Id p1, Id p2, double startTime, double endTime, String actType) {
 		SocialSparseVertex v1 = vertices.get(p1);
 //		Ego<Person> e1 = socialnet.getEgo(p1);
 		SocialSparseVertex v2 = vertices.get(p2);
@@ -70,8 +82,10 @@ public class BefriendInteractor implements Interactor {//, IterationStartsListen
 			/*
 			 * Create tie...
 			 */
-			if(random.nextDouble() <= tieProba)
+			if(random.nextDouble() <= tieProba) {
 				tie = builder.addEdge(socialnet, v1, v2);
+				actTypes.adjustOrPutValue(actType, 1, 1);
+			}
 		} else {
 			/*
 			 * Reinforce tie...
@@ -80,6 +94,9 @@ public class BefriendInteractor implements Interactor {//, IterationStartsListen
 		}
 	}
 
+	public TObjectIntHashMap<String> getActTypes() {
+		return actTypes;
+	}
 //	public void notifyIterationStarts(IterationStartsEvent event) {
 //		currentIteration = event.getIteration();
 //	}

@@ -19,9 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
+import java.io.IOException;
+import java.util.Map;
+
+import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
+import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 
 
 /**
@@ -36,4 +41,14 @@ public class StandardAnalyzerTask extends AnalyzerTaskComposite {
 		addTask(new TransitivityTask());
 	}
 
+	public static void main(String args[]) throws IOException {
+		SparseGraphMLReader reader = new SparseGraphMLReader();
+		Graph graph = reader.readGraph(args[0]);
+		
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, new StandardAnalyzerTask());
+		
+		if(args.length > 1) {
+			GraphAnalyzer.writeStats(stats, args[1]);
+		}
+	}
 }
