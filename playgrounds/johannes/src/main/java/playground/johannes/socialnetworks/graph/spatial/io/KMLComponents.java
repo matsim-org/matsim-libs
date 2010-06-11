@@ -28,7 +28,6 @@ import java.util.Set;
 
 import net.opengis.kml._2.FolderType;
 
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Components;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
@@ -41,7 +40,7 @@ import org.matsim.contrib.sna.graph.spatial.io.KMLPartitions;
  * @author illenberger
  *
  */
-public class KMLComponents implements KMLPartitions, Colorizable<Vertex> {
+public class KMLComponents implements KMLPartitions, Colorizable {
 
 	private Map<SpatialVertex, Color> colors;
 	
@@ -68,7 +67,7 @@ public class KMLComponents implements KMLPartitions, Colorizable<Vertex> {
 	}
 
 	@Override
-	public Color getColor(Vertex object) {
+	public Color getColor(Object object) {
 		return colors.get(object);
 	}
 

@@ -21,7 +21,6 @@ package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
 import net.opengis.kml._2.PlacemarkType;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
 import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
@@ -35,7 +34,7 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVerte
 public class KMLSocialDescriptor extends KMLSnowballDescriptor {
 
 	@Override
-	public void addDetail(PlacemarkType kmlPlacemark, SpatialVertex object) {
+	public void addDetail(PlacemarkType kmlPlacemark, Object object) {
 		super.addDetail(kmlPlacemark, object);
 		
 		StringBuilder builder = new StringBuilder(kmlPlacemark.getDescription());

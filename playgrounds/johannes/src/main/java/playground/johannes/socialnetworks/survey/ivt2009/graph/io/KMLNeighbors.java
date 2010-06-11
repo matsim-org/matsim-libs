@@ -29,19 +29,19 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
  * @author illenberger
  *
  */
-public class KMLNeighbors<V extends SocialVertex> implements KMLObjectDetail<V> {
+public class KMLNeighbors implements KMLObjectDetail {
 
 	/* (non-Javadoc)
 	 * @see org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail#addDetail(net.opengis.kml._2.PlacemarkType, java.lang.Object)
 	 */
 	@Override
-	public void addDetail(PlacemarkType kmlPlacemark, V object) {
+	public void addDetail(PlacemarkType kmlPlacemark, Object object) {
 		StringBuilder builder = new StringBuilder();
 		
 		builder.append(kmlPlacemark.getDescription());
 		
 		builder.append("<b>neihbors:<b>");
-		for(SocialVertex neighbor : object.getNeighbours()) {
+		for(SocialVertex neighbor : ((SocialVertex) object).getNeighbours()) {
 			builder.append(neighbor.getPerson().getId().toString());
 			builder.append(" ");
 		}

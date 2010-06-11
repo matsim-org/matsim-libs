@@ -22,7 +22,6 @@ package playground.johannes.socialnetworks.snowball2.io;
 import java.awt.Color;
 import java.util.Collection;
 
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
 import org.matsim.contrib.sna.graph.spatial.io.Colorizable;
 import org.matsim.contrib.sna.snowball.SampledVertex;
@@ -31,7 +30,7 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
  * @author illenberger
  *
  */
-public class SnowballColorizer implements Colorizable<Vertex> {
+public class SnowballColorizer implements Colorizable {
 
 	private int minIteration = Integer.MAX_VALUE;
 	
@@ -55,7 +54,7 @@ public class SnowballColorizer implements Colorizable<Vertex> {
 	}
 	
 	@Override
-	public Color getColor(Vertex object) {
+	public Color getColor(Object object) {
 		double val = 0;
 		if(((SampledVertex) object).isSampled())
 			val = (((SampledVertex) object).getIterationSampled() + 1 - minIteration)/(double)(maxIteration - minIteration);

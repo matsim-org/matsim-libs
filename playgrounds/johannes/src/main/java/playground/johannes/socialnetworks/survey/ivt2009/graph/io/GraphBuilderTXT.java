@@ -251,7 +251,7 @@ public class GraphBuilderTXT {
 		kmlwriter.addKMZWriterListener(vertexStyle);
 		kmlwriter.setKmlVertexStyle(vertexStyle);
 		
-		KMLObjectDetailComposite<SpatialVertex> detail = new KMLObjectDetailComposite<SpatialVertex>();
+		KMLObjectDetailComposite detail = new KMLObjectDetailComposite();
 		detail.addObjectDetail(new KMLSocialDescriptor());
 //		detail.addObjectDetail(new KMLVertexId());
 		kmlwriter.setKmlVertexDetail(detail);

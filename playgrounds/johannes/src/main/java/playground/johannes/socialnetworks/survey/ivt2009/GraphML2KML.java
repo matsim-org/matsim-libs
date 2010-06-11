@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
 import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
@@ -27,7 +26,6 @@ import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
-import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSampledComponents;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSnowballDescriptor;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
@@ -63,7 +61,7 @@ public class GraphML2KML {
 		writer.addKMZWriterListener(vertexStyle);
 		writer.setKmlVertexStyle(vertexStyle);
 		
-		KMLObjectDetailComposite<SpatialVertex> detail = new KMLObjectDetailComposite<SpatialVertex>();
+		KMLObjectDetailComposite detail = new KMLObjectDetailComposite();
 		detail.addObjectDetail(new KMLSnowballDescriptor());
 		detail.addObjectDetail(new KMLVertexId());
 		writer.setKmlVertexDetail(detail);

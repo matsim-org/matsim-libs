@@ -32,7 +32,7 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
  * @author illenberger
  *
  */
-public class SeedColorizer<V extends SampledVertex> implements Colorizable<V> {
+public class SeedColorizer implements Colorizable {
 
 	private Map<SampledVertex, Color> colorMap;
 	
@@ -48,8 +48,8 @@ public class SeedColorizer<V extends SampledVertex> implements Colorizable<V> {
 		
 	}
 	@Override
-	public Color getColor(V object) {
-		Color c = colorMap.get(object.getSeed());
+	public Color getColor(Object object) {
+		Color c = colorMap.get(((SampledVertex) object).getSeed());
 		if(c == null)
 			c = Color.BLACK;
 		return c;

@@ -44,7 +44,7 @@ public class KMLSeedComponents extends KMLSampledComponents {
 	private Map<Vertex, Color> colors = new HashMap<Vertex, Color>();
 	
 	@Override
-	public Color getColor(Vertex object) {
+	public Color getColor(Object object) {
 		return colors.get(object);
 	}
 

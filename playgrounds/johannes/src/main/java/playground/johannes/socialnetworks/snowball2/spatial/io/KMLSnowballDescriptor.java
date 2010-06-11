@@ -21,7 +21,6 @@ package playground.johannes.socialnetworks.snowball2.spatial.io;
 
 import net.opengis.kml._2.PlacemarkType;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
@@ -29,10 +28,10 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
  * @author illenberger
  *
  */
-public class KMLSnowballDescriptor implements KMLObjectDetail<SpatialVertex> {
+public class KMLSnowballDescriptor implements KMLObjectDetail {
 	
 	@Override
-	public void addDetail(PlacemarkType kmlPlacemark, SpatialVertex object) {
+	public void addDetail(PlacemarkType kmlPlacemark, Object object) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Detected: ");
 		builder.append(String.valueOf(((SampledVertex)object).getIterationDetected()));

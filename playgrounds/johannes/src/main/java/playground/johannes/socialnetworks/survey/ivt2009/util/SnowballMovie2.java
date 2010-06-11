@@ -28,6 +28,7 @@ import java.util.Set;
 import net.opengis.kml._2.FolderType;
 
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.VertexDecorator;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
@@ -36,7 +37,6 @@ import org.matsim.contrib.sna.graph.spatial.io.KMLPartitions;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
@@ -55,7 +55,6 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.KMLNeighbors;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.KMLVertexId;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 /**
@@ -182,7 +181,7 @@ public class SnowballMovie2 {
 		return null;
 	}
 	
-	private static class SeedColorizerWrapper<V extends SampledVertex> extends SeedColorizer<V> {
+	private static class SeedColorizerWrapper<V extends SampledVertex> extends SeedColorizer {
 
 		private SampledGraphProjection<?, V, ?> graph;
 		
@@ -192,8 +191,8 @@ public class SnowballMovie2 {
 		}
 
 		@Override
-		public Color getColor(V object) {
-			V v = (V) graph.getVertex(object);
+		public Color getColor(Object object) {
+			VertexDecorator<V> v = graph.getVertex((V) object);
 			if(v != null)
 				return super.getColor(v);
 			else

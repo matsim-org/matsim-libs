@@ -21,7 +21,6 @@ package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
 import net.opengis.kml._2.PlacemarkType;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
@@ -30,10 +29,10 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
  * @author illenberger
  *
  */
-public class KMLVertexId implements KMLObjectDetail<SpatialVertex> {
+public class KMLVertexId implements KMLObjectDetail {
 
 	@Override
-	public void addDetail(PlacemarkType kmlPlacemark, SpatialVertex object) {
+	public void addDetail(PlacemarkType kmlPlacemark, Object object) {
 		kmlPlacemark.setName(((SocialVertex) object).getPerson().getId().toString());
 	}
 
