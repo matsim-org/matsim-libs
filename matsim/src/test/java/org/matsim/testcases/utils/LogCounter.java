@@ -21,6 +21,7 @@ package org.matsim.testcases.utils;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 
 /**
@@ -29,12 +30,14 @@ import org.apache.log4j.spi.LoggingEvent;
  * To be used in the following way:
  * <pre>
  *   LogCounter logger = new LogCounter(Level.WARN);
- *   Logger.getRootLogger().addAppender(logger);
+ *   logger.activiate()
  *   // do your stuff
- *   Logger.getRootLogger().removeAppender(logger);
+ *   logger.deactiviate();
  *   System.out.println("number of warnings: " + logger.getWarnCount());
  * </pre>
- * It is important that the logger is removed from the root logger at the end of your test code!
+ * It is important that the logger is deactivated at the end of your test! If not, it
+ * will also count the log-messages of all other tests running afterwards, slowing down
+ * the test execution.
  *
  * @author mrieser
  */
@@ -104,4 +107,11 @@ public class LogCounter extends AppenderSkeleton {
 		this.cntTRACE = 0;
 	}
 
+	public void activiate() {
+		Logger.getRootLogger().addAppender(this);
+	}
+
+	public void deactiviate() {
+		Logger.getRootLogger().removeAppender(this);
+	}
 }
