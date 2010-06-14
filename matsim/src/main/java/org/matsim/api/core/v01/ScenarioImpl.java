@@ -20,10 +20,7 @@
 package org.matsim.api.core.v01;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -36,6 +33,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ClassUtils;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.knowledges.Knowledges;
@@ -258,7 +256,7 @@ public class ScenarioImpl implements Scenario {
 	public void setLaneDefinitions(LaneDefinitions laneDefs){
 		this.laneDefinitions = laneDefs;
 	}
-	
+
 	public Households getHouseholds() {
 		if ((this.households == null) && this.config.scenario().isUseHouseholds()){
 			this.createHouseholdsContainer();
@@ -301,7 +299,7 @@ public class ScenarioImpl implements Scenario {
 
 	@Override
 	public void addScenarioElement(final Object o) {
-		for (Class<?> c : getAllTypes(o.getClass())) {
+		for (Class<?> c : ClassUtils.getAllTypes(o.getClass())) {
 			this.elements.put(c, o);
 		}
 	}
@@ -310,7 +308,7 @@ public class ScenarioImpl implements Scenario {
 	public boolean removeScenarioElement(Object o) {
 		boolean changed = false;
 
-		for (Class<?> c : getAllTypes(o.getClass())) {
+		for (Class<?> c : ClassUtils.getAllTypes(o.getClass())) {
 			if (this.elements.get(c) == o) {
 				this.elements.remove(c);
 				changed = true;
@@ -324,25 +322,6 @@ public class ScenarioImpl implements Scenario {
 	@Override
 	public <T> T getScenarioElement(java.lang.Class<? extends T> klass) {
 		return (T) this.elements.get(klass);
-	}
-
-	private Set<Class<?>> getAllTypes(final Class<?> klass) {
-		Set<Class<?>> set = new HashSet<Class<?>>();
-		Stack<Class<?>> stack = new Stack<Class<?>>();
-		stack.add(klass);
-
-		while (!stack.isEmpty()) {
-			Class<?> c = stack.pop();
-			set.add(c);
-			for (Class<?> k : c.getInterfaces()) {
-				stack.push(k);
-			}
-			if (c.getSuperclass() != null) {
-				stack.push(c.getSuperclass());
-			}
-		}
-
-		return set;
 	}
 
 }
