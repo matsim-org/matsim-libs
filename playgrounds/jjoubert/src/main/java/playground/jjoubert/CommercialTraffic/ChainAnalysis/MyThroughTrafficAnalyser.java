@@ -51,7 +51,8 @@ public class MyThroughTrafficAnalyser {
 	private MultiPolygon studyArea;
 	private Polygon studyAreaEnvelope;
 	private List<Point> gates;
-	private List<List<Integer>> gateStats;
+	private List<List<Integer>> gateStatsIn;
+	private List<List<Integer>> gateStatsOut;
 	private List<Integer> activityCounterList;
 	private QuadTree<Coordinate> entryQT;
 	private QuadTree<Coordinate> exitQT;
@@ -76,16 +77,23 @@ public class MyThroughTrafficAnalyser {
 		this.activityCounterList = new ArrayList<Integer>();
 		
 		// Create the basic structure for gate statistics.
-		this.gateStats = new ArrayList<List<Integer>>(gates.size());
+		this.gateStatsIn = new ArrayList<List<Integer>>(gates.size());
+		this.gateStatsOut = new ArrayList<List<Integer>>(gates.size());
 		for(Point p : gates){
-			List<Integer> gateLine = new ArrayList<Integer>(26);
+			List<Integer> gateLineIn = new ArrayList<Integer>(26);
+			List<Integer> gateLineOut = new ArrayList<Integer>(26);
 			for(int i = 0; i < 26; i++){
-				gateLine.add(new Integer(0));
+				gateLineIn.add(new Integer(0));
+				gateLineOut.add(new Integer(0));
 			}
 			// Set the first two entries as the gate's coordinates.
-			gateLine.set(0, (int) Math.round(p.getX()));
-			gateLine.set(1, (int) Math.round(p.getY()));
-			gateStats.add(gateLine);
+			gateLineIn.set(0, (int) Math.round(p.getX()));
+			gateLineIn.set(1, (int) Math.round(p.getY()));
+			gateStatsIn.add(gateLineIn);
+
+			gateLineOut.set(0, (int) Math.round(p.getX()));
+			gateLineOut.set(1, (int) Math.round(p.getY()));
+			gateStatsOut.add(gateLineOut);
 		}
 	}
 
@@ -165,6 +173,18 @@ public class MyThroughTrafficAnalyser {
 						
 						activityCounter = new Integer(1);
 						
+						// Find the closest entry gate and add the details.
+						double minD = Double.MAX_VALUE;
+						int index = Integer.MAX_VALUE;
+						for(int gate = 0; gate < gates.size(); gate++){
+							double d = gates.get(gate).distance(gf.createPoint(coord));
+							if(d < minD){
+								minD = d;
+								index = gate;
+							}
+						}
+						gateStatsIn.get(index).set(hourOfDay+2, gateStatsIn.get(index).get(hourOfDay+2) + 1);
+						
 					} else{
 						/*
 						 * It is an exit.
@@ -189,18 +209,18 @@ public class MyThroughTrafficAnalyser {
 							activityCounterList.add(activityCounter);
 							activityCounter = null;
 						}
-					}
-					// Find the closest entry gate and add the details.
-					double minD = Double.MAX_VALUE;
-					int index = Integer.MAX_VALUE;
-					for(int gate = 0; gate < gates.size(); gate++){
-						double d = gates.get(gate).distance(gf.createPoint(coord));
-						if(d < minD){
-							minD = d;
-							index = gate;
+						// Find the closest entry gate and add the details.
+						double minD = Double.MAX_VALUE;
+						int index = Integer.MAX_VALUE;
+						for(int gate = 0; gate < gates.size(); gate++){
+							double d = gates.get(gate).distance(gf.createPoint(coord));
+							if(d < minD){
+								minD = d;
+								index = gate;
+							}
 						}
+						gateStatsOut.get(index).set(hourOfDay+2, gateStatsOut.get(index).get(hourOfDay+2) + 1);
 					}
-					gateStats.get(index).set(hourOfDay+2, gateStats.get(index).get(hourOfDay+2) + 1);
 
 				} else if (in1 && in2 && activityCounter != null){
 					activityCounter++;
@@ -252,23 +272,35 @@ public class MyThroughTrafficAnalyser {
 		/*
 		 * Write the gate statistics to file.
 		 */
-		String gateStatisticsFilename = location + "GateStatistics.txt";
-		log.info("Writing gate statistics to " + gateStatisticsFilename);
+		String gateStatisticsInFilename = location + "GateStatisticsIn.txt";
+		String gateStatisticsOutFilename = location + "GateStatisticsOut.txt";
+		log.info("Writing gate statistics to " + location);
 		try {
-			BufferedWriter bw2 = new BufferedWriter(new FileWriter(new File(gateStatisticsFilename)));
+			BufferedWriter bw2In = new BufferedWriter(new FileWriter(new File(gateStatisticsInFilename)));
+			BufferedWriter bw2Out = new BufferedWriter(new FileWriter(new File(gateStatisticsOutFilename)));
 			try{
-				bw2.write("Long,Lat,H0,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15,H16,H17,H18,H19,H20,H21,H22,H23");
-				bw2.newLine();
-				for(List<Integer> line : gateStats){
-					for(int i = 0; i < line.size()-1; i++){
-						bw2.write(String.valueOf(line.get(i)));
-						bw2.write(",");
+				bw2In.write("Long,Lat,H0,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15,H16,H17,H18,H19,H20,H21,H22,H23");
+				bw2In.newLine();
+				bw2Out.write("Long,Lat,H0,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15,H16,H17,H18,H19,H20,H21,H22,H23");
+				bw2Out.newLine();
+				
+				for(int i = 0; i < gateStatsIn.size(); i++){
+					List<Integer> lineIn = gateStatsIn.get(i);
+					List<Integer> lineOut = gateStatsOut.get(i);
+					for(int j = 0; j < lineIn.size()-1; j++){
+						bw2In.write(String.valueOf(lineIn.get(j)));
+						bw2In.write(",");
+						bw2Out.write(String.valueOf(lineOut.get(j)));
+						bw2Out.write(",");
 					}
-					bw2.write(String.valueOf(line.get(line.size()-1)));
-					bw2.newLine();
+					bw2In.write(String.valueOf(lineIn.get(lineIn.size()-1)));
+					bw2In.newLine();
+					bw2Out.write(String.valueOf(lineOut.get(lineOut.size()-1)));
+					bw2Out.newLine();
 				}
 			} finally {
-				bw2.close();
+				bw2In.close();
+				bw2Out.close();
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();

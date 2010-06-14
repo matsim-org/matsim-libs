@@ -42,8 +42,8 @@ public class RunMyThroughTrafficAnalyser {
 	 * 		- Mac																	|
 	 * 		- IE-Calvin														  		|
 	 *=============================================================================*/
-//	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
-	private static String root = "/home/jwjoubert/MATSim/MATSimData/";					// IE-Calvin
+	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
+//	private static String root = "/home/jwjoubert/MATSim/MATSimData/";					// IE-Calvin
 
 	 /*=============================================================================
 	 * String value that must be set. Allowed study areas are:						|
@@ -148,14 +148,6 @@ public class RunMyThroughTrafficAnalyser {
 			}			
 		}
 		log.info("   Vehicles processed: " + counter + " (Done)");	
-		
-		/*
-		 * TODO Remove later when writing is sorted out
-		 */
-//		String object = String.format("%s%s/%d/%s/%04d/Sample%02d/%s_%03.0fp_xml.xml", 
-//				root, studyAreaName, year, version, threshold, sample, studyAreaName, withinThreshold*100);
-//		MyXmlConverter mxc = new MyXmlConverter(true);
-//		mxc.writeObjectToFile(mtta, object);
 		
 		String outputFoldername = "./Output/";
 		File locationFolder = new File(outputFoldername);
