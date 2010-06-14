@@ -153,6 +153,7 @@ public class CreatePseudoNetwork {
 				TransitStopFacility newFacility = this.schedule.getFactory().createTransitStopFacility(newId, toFacility.getCoord(), toFacility.getIsBlockingLane());
 				newFacility.setStopPostAreaId(toFacility.getId());
 				newFacility.setLinkId(link.getId());
+				newFacility.setName(toFacility.getName());
 				copies.add(newFacility);
 				this.nodes.put(newFacility, toNode);
 				this.schedule.addStopFacility(newFacility);
