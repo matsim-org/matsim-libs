@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationLink;
 import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationNetwork;
 import org.matsim.ptproject.qsim.QSimI;
@@ -69,7 +68,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
 		this.qSim = qSim2 ;
-		
+
 		this.queuelinks = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		this.queuenodes = new LinkedHashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		for (Node n : networkLayer.getNodes().values()) {
@@ -111,11 +110,11 @@ import org.matsim.vis.snapshots.writers.VisNode;
 	/*package*/ Map<Id, QueueNode> getQueueNodes() {
 		return Collections.unmodifiableMap(this.queuenodes);
 	}
-	
+
 	public Map<Id,? extends VisLink> getVisLinks() {
 		return Collections.unmodifiableMap( this.queuelinks ) ;
 	}
-	
+
 	public Map<Id,? extends VisNode> getVisNodes() {
 		return Collections.unmodifiableMap( this.queuenodes);
 	}
@@ -127,7 +126,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
 	/*package*/ QueueNode getQueueNode(final Id id) {
 		return this.queuenodes.get(id);
 	}
-	
+
 	public QSimI getQSim() {
 		return qSim;
 	}

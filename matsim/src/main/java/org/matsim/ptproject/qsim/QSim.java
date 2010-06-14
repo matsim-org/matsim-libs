@@ -49,6 +49,7 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
@@ -76,7 +77,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author mrieser
  * @author dgrether
  */
-public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, ObservableSimulation, VisMobsim, AcceptsFeatures, QSimI {
+public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, AcceptsFeatures, QSimI {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
@@ -98,7 +99,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	private CarDepartureHandler carDepartureHandler;
 
 	private SimTimerI simTimer;
-	
+
 	private Collection<PersonAgent> transitAgents;
 
 	/**
@@ -269,7 +270,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 
 		if (this.transitEngine != null){
 			Collection<PersonAgent> a = this.transitEngine.createAgents();
-			this.transitAgents = a;			
+			this.transitAgents = a;
 			agents.addAll(a);
 		}
 
@@ -661,7 +662,7 @@ public class QSim implements org.matsim.core.mobsim.framework.IOSimulation, Obse
 	public QSimEngine getQSimEngine() {
 	  return this.simEngine;
 	}
-	
+
 	public Collection<PersonAgent> getTransitAgents(){
 		return this.transitAgents; // set null to save memory
 	}

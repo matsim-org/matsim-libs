@@ -19,16 +19,13 @@
  * *********************************************************************** */
 package org.matsim.ptproject.qsim;
 
-import org.matsim.core.mobsim.framework.Steppable;
-
-
 /**
  * @author dgrether
  * @TODO rename QSimEngine to QSimNetorkEngine and this to QSimEngine
  */
 public interface SimEngine {
   /**
-   * 
+   *
    * @return the QSim instance
    */
   public QSimI getQSim();
@@ -40,5 +37,5 @@ public interface SimEngine {
    * Do some clean up.
    */
   public void afterSim();
-  
+
 }

@@ -29,8 +29,6 @@ import java.util.ListIterator;
 import java.util.Random;
 
 import org.matsim.core.config.Config;
-import org.matsim.ptproject.qsim.QSimI;
-
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -40,7 +38,7 @@ import org.matsim.ptproject.qsim.QSimI;
  * @author dstrippgen
  */
 /*package*/ class QueueSimEngine {
-	private QueueNetwork qNetwork = null ; 
+	private QueueNetwork qNetwork = null ;
 
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
