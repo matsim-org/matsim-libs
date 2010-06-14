@@ -27,10 +27,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -79,6 +77,7 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
+import org.matsim.testcases.utils.LogCounter;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -883,7 +882,6 @@ public class ParallelQSimTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_WrongRoute() {
-		new LogCounter();
 		EventsManagerImpl events = new EventsManagerImpl();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
@@ -900,7 +898,6 @@ public class ParallelQSimTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_WrongStartLink() {
-		new LogCounter();
 		EventsManagerImpl events = new EventsManagerImpl();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
@@ -917,7 +914,6 @@ public class ParallelQSimTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_WrongEndLink() {
-		new LogCounter();
 		EventsManagerImpl events = new EventsManagerImpl();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
@@ -1004,7 +1000,7 @@ public class ParallelQSimTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* run sim with special logger */
-		LogCounter logger = new LogCounter();
+		LogCounter logger = new LogCounter(Level.WARN);
 		Logger.getRootLogger().addAppender(logger);
 
 		/* use two parallel Threads */
@@ -1216,36 +1212,6 @@ public class ParallelQSimTest extends TestCase {
 		public void reset(final int iteration) {
 			firstEvent = null;
 			lastEvent = null;
-		}
-	}
-
-	private final static class LogCounter extends AppenderSkeleton {
-		private int cntWARN = 0;
-		private int cntERROR = 0;
-
-		public LogCounter() {
-			this.setThreshold(Level.WARN);
-		}
-
-		@Override
-		protected void append(final LoggingEvent event) {
-			if (event.getLevel() == Level.WARN) this.cntWARN++;
-			if (event.getLevel() == Level.ERROR) this.cntERROR++;
-		}
-
-		public void close() {
-		}
-
-		public boolean requiresLayout() {
-			return false;
-		}
-
-		public int getWarnCount() {
-			return this.cntWARN;
-		}
-
-		public int getErrorCount() {
-			return this.cntERROR;
 		}
 	}
 
