@@ -21,7 +21,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="output/Test1" />
+		<param name="outputDirectory" value="output/chessboard" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 	</module>
@@ -32,7 +32,7 @@
 		<param name="endTime" value="00:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims -->
+		<param name = "snapshotFormat"	value = "otfvis"/> <!-- otfvis, googleearth, transims -->
 	</module>
 
 	<module name="planCalcScore">
@@ -81,9 +81,8 @@
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
-		
 		<param name="ModuleProbability_1" value="0.1" />
-		<param name="Module_1" value="PlanomatX" />
+		<param name="Module_1" value="TimeAllocationMutator" />
 		
 		<param name="ModuleProbability_2" value="0.0" />
 		<param name="Module_2" value="ReRoute" />
@@ -91,18 +90,6 @@
 		<param name="ModuleProbability_3" value="0.9" />
 		<param name="Module_3" value="BestScore" />
 		
-		<param name="ModuleProbability_4" value="0.0" />
-		<param name="Module_4" value="Planomat" />
-		
-		<param name="ModuleProbability_5" value="0.0" />
-		<param name="Module_5" value="Clustering" />
-
-	
 	</module>
 	
-	<module name="locationchoice">
-		<param name="constrained" value="true"/>
-		<param name="maxRecursions" value="20"/>
-	</module>
-
 </config>
