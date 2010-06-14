@@ -34,7 +34,6 @@ import org.matsim.visum.VisumNetwork.StopPoint;
 import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;
-import playground.droeder.bvg09.DaHafas2VisumMapper6;
 
 
 public class DaVisumHafasScheduleMerger {
@@ -110,31 +109,47 @@ public class DaVisumHafasScheduleMerger {
 	
 	private void treatAllRoutes(){		
 		
-		DaVisum2HafasMapper2 mapper = new DaVisum2HafasMapper2();
+		DaVisum2HafasMapper mapper = new DaVisum2HafasMapper();
 		Map<Id, Map<Id, Id>> visum2HafasMap = mapper.getVisum2HafasMap();
-		Map<Id, Id> visum2hafasLineIds = mapper.getVisumHafasLineIds();
+		Map<Id, Id> visum2hafasLineIds = mapper.getMatchedLines();
 		
+		for(Entry<Id, Id> e : visum2hafasLineIds.entrySet()){
+			System.out.println(e.getKey() + " " + e.getValue());
+		}
 		
+		int i = 0;
 		for (Entry<Id, TransitLine> entry : this.intermediateScenario.getTransitSchedule().getTransitLines().entrySet()) {
-			log.warn(entry.getKey() + " " + visum2hafasLineIds.get(entry.getKey()));
 			if (visum2hafasLineIds.get(entry.getKey()) == null) {
 				log.warn("Could not find hafas line for visum line " + entry.getKey() + " Adding anyway.");
 				outSchedule.addTransitLine(this.intermediateScenario.getTransitSchedule().getTransitLines().get(entry.getKey()));
 			} else {
-				treatRoutes(visum2hafasLineIds.get(entry.getKey()), entry.getKey(), visum2HafasMap.get(entry.getKey()));
-				log.info("add hafas line for visum line " + entry.getKey().toString());
+				TransitLine outLine = treatRoutes(visum2hafasLineIds.get(entry.getKey()), entry.getKey(), visum2HafasMap.get(entry.getKey()));
+				if(outLine == null){
+					outSchedule.addTransitLine(this.intermediateScenario.getTransitSchedule().getTransitLines().get(entry.getKey()));
+					log.error("there was a matching for line " + entry.getKey().toString() + " but there was no matching found! Adding anyway!");
+				}else{
+					outSchedule.addTransitLine(outLine);
+					log.info("add hafas line for visum line " + entry.getKey().toString());
+					i++;
+				}
+
 			}
 		}
+		log.info(i + " of " + visum2hafasLineIds.size() + " prematched visum lines are matched!");
 	}
 
-	private void treatRoutes(Id hafasLineId, Id visumLineId, Map<Id, Id> visum2Hafas) {
+	private TransitLine treatRoutes(Id hafasLineId, Id visumLineId, Map<Id, Id> visum2Hafas) {
 		TransitLine visumLine = intermediateScenario.getTransitSchedule().getTransitLines().get(visumLineId);
 		TransitLine outLine = outSchedule.getFactory().createTransitLine(visumLineId);
 		for (TransitRoute route : hafasScenario.getTransitSchedule().getTransitLines().get(hafasLineId).getRoutes().values()) {
 			TransitRoute outRoute = treatRoute(visumLine, route, visum2Hafas);
+			if(outRoute == null){
+				return null;
+			}
 			outLine.addRoute(outRoute);
 		}
-		outSchedule.addTransitLine(outLine);
+		return outLine;
+
 	}
 
 	private void copyFacilities() {
@@ -171,7 +186,7 @@ public class DaVisumHafasScheduleMerger {
 				return outRoute;
 			}
 		}
-		throw new RuntimeException("Nothing found: " + visumLine.getId().toString() );
+		return null;
 	}
 
 	private List<Id> getIdRoute(List<TransitRouteStop> stops) {
