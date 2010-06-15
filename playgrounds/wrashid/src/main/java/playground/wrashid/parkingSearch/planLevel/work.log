@@ -1,3 +1,19 @@
+TODO:
+
+1.) add scoring
+2.) add proper replanning module for parking (2 possibilites)
+3.) add tests (assert statements)
+4.) add per agent utility functions.
+
+
+
+
+
+
+
+
+
+
 1.) A facilities file was generated at 
 /playgrounds/wrashid/test/input/playground/wrashid/parkingSearch/planLevel/berlinFacilities.xml
 (each node was assigned a parking lot of capacity 67). => 2 times the number of links (no problem). 
