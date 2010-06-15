@@ -121,7 +121,7 @@ public class ActivityHandler implements PlanElementHandler, Steppable {
 		return departure;
 	}
 
-	private class ActivityData implements Comparable<ActivityData> {
+	private static class ActivityData implements Comparable<ActivityData> {
 		public final double endTime;
 		public final Plan plan;
 
@@ -133,6 +133,15 @@ public class ActivityHandler implements PlanElementHandler, Steppable {
 		@Override
 		public int compareTo(ActivityData o) {
 			return Double.compare(this.endTime, o.endTime);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof ActivityData)) {
+				return false;
+			}
+			ActivityData data = (ActivityData) obj;
+			return (this.plan == data.plan) && (this.endTime == data.endTime);
 		}
 	}
 

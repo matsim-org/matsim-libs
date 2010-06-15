@@ -218,7 +218,7 @@ public class PlanSimulationImplTest {
 	}
 
 
-	/*package*/ class CountingPlanElementHandler implements PlanElementHandler {
+	/*package*/ static class CountingPlanElementHandler implements PlanElementHandler {
 		public int countStart = 0;
 		public int countEnd = 0;
 		@Override

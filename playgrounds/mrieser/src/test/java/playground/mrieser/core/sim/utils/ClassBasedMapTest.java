@@ -129,10 +129,10 @@ public class ClassBasedMapTest {
 		Assert.assertNull(map.get(A.class));
 	}
 
-	/*package*/ interface A { }
-	/*package*/ interface B { }
-	/*package*/ class Aimpl implements A { }
-	/*package*/ class Bimpl implements B { }
-	/*package*/ class Cimpl extends Bimpl { }
-	/*package*/ class ABimpl implements A, B { }
+	/*package*/ static interface A { }
+	/*package*/ static interface B { }
+	/*package*/ static class Aimpl implements A { }
+	/*package*/ static class Bimpl implements B { }
+	/*package*/ static class Cimpl extends Bimpl { }
+	/*package*/ static class ABimpl implements A, B { }
 }

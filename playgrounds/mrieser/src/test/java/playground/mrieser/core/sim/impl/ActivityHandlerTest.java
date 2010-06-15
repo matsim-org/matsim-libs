@@ -43,6 +43,9 @@ import org.matsim.testcases.utils.LogCounter;
 
 import playground.mrieser.core.sim.api.NewSimEngine;
 
+/**
+ * @author mrieser
+ */
 public class ActivityHandlerTest {
 
 	@Test
@@ -280,7 +283,7 @@ public class ActivityHandlerTest {
 		Assert.assertEquals(1, logCounter.getErrorCount());
 	}
 
-	private class Fixture {
+	private static class Fixture {
 		public final Person person1;
 		public final Plan plan1;
 		public final Activity firstHomeAct;
@@ -312,7 +315,7 @@ public class ActivityHandlerTest {
 		}
 	}
 
-	private class SimTestEngine implements NewSimEngine {
+	private static class SimTestEngine implements NewSimEngine {
 
 		private final EventsManager em = new EventsManagerImpl();
 		private double time;
@@ -340,7 +343,7 @@ public class ActivityHandlerTest {
 		}
 	}
 
-	private class EventsCounter implements BasicEventHandler {
+	private static class EventsCounter implements BasicEventHandler {
 
 		public int count = 0;
 
