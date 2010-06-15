@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -64,13 +63,10 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 	public ChooseRandomLegMode(final TransportMode[] possibleModes, final Random rng) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
-		PlanomatConfigGroup myPlanomatConfigGroup = new PlanomatConfigGroup();
-		myPlanomatConfigGroup.setTripStructureAnalysisLayer(TripStructureAnalysisLayerOption.link);
-		this.planAnalyzeSubtours = new PlanAnalyzeSubtours(myPlanomatConfigGroup);
+		this.planAnalyzeSubtours = new PlanAnalyzeSubtours();
 	}
 
 	public void run(final Plan plan) {
-//		System.out.println(plan.getPerson().getId());
 		if (plan.getPlanElements().size() > 1) {
 			if (changeOnlyOneSubtour) {
 				planAnalyzeSubtours.run(plan);
@@ -95,7 +91,6 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 
 	private List<Candidate> determineChangeCandidates() {
 		ArrayList<Candidate> candidates = new ArrayList<Candidate>();
-//		print(planAnalyzeSubtours.getSubtourIndexation());
 		for (Integer subTourIndex : planAnalyzeSubtours.getSubtourIndexation()) {
 			if (subTourIndex < 0) {
 				continue;
@@ -130,13 +125,6 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 		}
 		return candidates;
 	}
-
-//	private void print(int[] subtourIndexation) {
-//		for (int ix : subtourIndexation) {
-//			System.out.print(ix + " ");
-//		}
-//		System.out.println();
-//	}
 
 	private void changeToRandomLegMode(List<PlanElement> tour) {
 		final TransportMode currentMode = getTransportMode(tour);
@@ -177,6 +165,12 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 
 	public void setChangeOnlyOneSubtour(boolean changeOnlyOneSubtour) {
 		this.changeOnlyOneSubtour = changeOnlyOneSubtour;
+	}
+
+	public void setTripStructureAnalysisLayer(
+			TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+		planAnalyzeSubtours
+				.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
 	}
 
 

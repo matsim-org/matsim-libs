@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -124,10 +125,10 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	private void doTest(Layer layer, PlanomatConfigGroup planomatConfigGroup,
 			String facString, String expectedSubtourIndexationString,
 			int expectedNumSubtoursForThis, Map<Integer, Integer> childToParent) {
-		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours(planomatConfigGroup);
+		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours();
+		testee.setTripStructureAnalysisLayer(planomatConfigGroup.getTripStructureAnalysisLayer());
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
-		PlanImpl plan = TestsUtil.createPlan(layer, person, TransportMode.car, facString,
-				planomatConfigGroup);
+		PlanImpl plan = TestsUtil.createPlan(layer, person, TransportMode.car, facString, planomatConfigGroup.getTripStructureAnalysisLayer());
 		testee.run(plan);
 		StringBuilder builder = new StringBuilder();
 		List<Integer> actualSubtourIndexation = toList(testee.getSubtourIndexation());

@@ -52,15 +52,9 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	private List<Integer> parentTourIndices;
 	private List<Integer> firstIndexOfSubtours;
 	private List<Integer> lastIndexOfSubtours;
-	private PlanomatConfigGroup planomatConfigGroup;
-
-	public PlanAnalyzeSubtours(PlanomatConfigGroup planomatConfigGroup) {
-		super();
-		this.planomatConfigGroup = planomatConfigGroup;
-	}
+	private TripStructureAnalysisLayerOption tripStructureAnalysisLayer = TripStructureAnalysisLayerOption.facility;
 
 	public void run(final Plan plan) {
-
 		this.locationIds = new ArrayList<Id>();
 		this.subTours = new ArrayList<List<PlanElement>>();
 		this.parentTourIndices = new ArrayList<Integer>();
@@ -71,7 +65,6 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		List<PlanElement> actsLegs = plan.getPlanElements();
 		for (int ii=0; ii < actsLegs.size(); ii++) {
 			if (actsLegs.get(ii) instanceof Activity) {
-				TripStructureAnalysisLayerOption tripStructureAnalysisLayer = planomatConfigGroup.getTripStructureAnalysisLayer();
 				if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
 					locationId = ((Activity) actsLegs.get(ii)).getFacilityId();
 				} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
@@ -157,6 +150,11 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 
 	public List<Integer> getToIndexOfSubtours() {
 		return lastIndexOfSubtours;
+	}
+
+	public void setTripStructureAnalysisLayer(
+			TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+		this.tripStructureAnalysisLayer = tripStructureAnalysisLayer;
 	}
 
 }

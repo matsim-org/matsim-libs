@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -19,16 +20,16 @@ import org.matsim.world.Location;
 public class TestsUtil {
 
 	static PlanImpl createPlan(Layer layer, PersonImpl person, TransportMode mode,
-			String facString, PlanomatConfigGroup planomatConfigGroup) {
+			String facString, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			Location location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
 			ActivityImpl act;
-			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(planomatConfigGroup.getTripStructureAnalysisLayer())) {
+			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
 				act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
 				act.setFacilityId(location.getId());
-			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(planomatConfigGroup.getTripStructureAnalysisLayer())) {
+			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
 				act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], location.getId());
 			} else {
 				throw new RuntimeException("Unknown tripStrucureAnalysisLayerOption");
