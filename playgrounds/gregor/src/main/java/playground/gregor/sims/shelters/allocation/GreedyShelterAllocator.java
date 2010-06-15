@@ -38,9 +38,9 @@ import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
+public class GreedyShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 
-	private static final Logger log = Logger.getLogger(ShelterAllocator.class);
+	private static final Logger log = Logger.getLogger(GreedyShelterAllocator.class);
 	
 	private final Scenario scenario;
 	private Dijkstra router;
@@ -68,9 +68,9 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 	
 	private QuadTree<FloodingInfo> fis = null;
 	
-	public ShelterAllocator(Population pop, List<Building> buildings, Scenario scenario, EvacuationShelterNetLoaderForShelterAllocation esnl, List<FloodingReader> netcdfReaders) {
+	public GreedyShelterAllocator(Population pop, List<Building> buildings, Scenario scenario, EvacuationShelterNetLoaderForShelterAllocation esnl, List<FloodingReader> netcdfReaders) {
 		super(pop, buildings, scenario);
-		//TODO if this code moves one day to org.matsim than the corresponding fields in
+		//TODO the corresponding fields in 
 		//the super class should be accessed instead of creating these fields 
 		this.scenario = scenario;
 		this.buildings = buildings;
@@ -123,21 +123,7 @@ public class ShelterAllocator extends EvacuationPopulationFromShapeFileLoader {
 
 	private void createShelterLinks() {
 		this.esnl.generateShelterLinks(this.numOfPers);
-//		NetworkLayer  net = (NetworkLayer) this.scenario.getNetwork();
-//		
-//		Node toNode = net.createAndAddNode(new IdImpl("en3"), new CoordImpl(662433,9898853));
-//		
-//		List<Link> rm = new ArrayList<Link>();
-//		for (Link l : this.scenario.getNetwork().getLinks().values()) {
-//		 if (l.getId().toString().contains("c")) {
-//			 rm.add(l);
-//		 }
-//		}
-//		for (Link l : rm) {
-//			this.scenario.getNetwork().removeLink(l.getId());
-//			net.createAndAddLink(l.getId(), l.getFromNode(), toNode, l.getLength(), l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes());
-//			
-//		}
+
 		
 	}
 

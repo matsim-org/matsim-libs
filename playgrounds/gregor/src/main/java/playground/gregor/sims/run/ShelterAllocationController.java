@@ -16,23 +16,14 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.TimeVariantLinkImpl;
-import org.matsim.core.network.NetworkChangeEvent.ChangeType;
-import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -40,29 +31,23 @@ import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationNetFromNetcdfGenerator;
 import org.matsim.evacuation.base.EvacuationNetGenerator;
-import org.matsim.evacuation.base.EvacuationPopulationFromShapeFileLoader;
 import org.matsim.evacuation.base.NetworkChangeEventsFromNetcdf;
 import org.matsim.evacuation.flooding.FloodingReader;
 import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
 import org.matsim.evacuation.run.EvacuationQSimControllerII;
-import org.matsim.evacuation.shelters.EvacuationShelterNetLoader;
-import org.matsim.evacuation.shelters.signalsystems.ShelterDoorBlockerSetup;
-import org.matsim.evacuation.shelters.signalsystems.ShelterInputCounterSignalSystems;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
-import playground.gregor.sims.shelters.allocation.BuildingsShapeReaderSheleterAllocation;
 import playground.gregor.sims.shelters.allocation.EvacuationShelterNetLoaderForShelterAllocation;
 import playground.gregor.sims.shelters.allocation.ShelterAllocationRePlanner;
-import playground.gregor.sims.shelters.allocation.ShelterAllocator;
+import playground.gregor.sims.shelters.allocation.GreedyShelterAllocator;
 import playground.gregor.sims.shelters.allocation.ShelterCounter;
-import playground.gregor.sims.shelters.allocation.ShelterLocationRePlanner;
+import playground.gregor.sims.shelters.allocation.ShelterLocationRePlannerII;
 
 public class ShelterAllocationController extends Controler {
 
@@ -122,7 +107,7 @@ public class ShelterAllocationController extends Controler {
 			
 			ShelterCounter sc = new ShelterCounter(this.scenarioData.getNetwork(), this.shelterLinkMapping);
 			if (shift == 2) {
-				ShelterLocationRePlanner sLRP = new ShelterLocationRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings,sc);
+				ShelterLocationRePlannerII sLRP = new ShelterLocationRePlannerII(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings,sc);
 				this.addControlerListener(sLRP);
 //			this.events.addHandler(sc);
 			}
@@ -274,10 +259,9 @@ public class ShelterAllocationController extends Controler {
 			}
 
 			if (this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile()) {
-				//				throw new RuntimeException("Not implemented yet!");
-				new ShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,this.netcdfReaders).getPopulation();
+				new GreedyShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,this.netcdfReaders).getPopulation();
 			} else {
-				new ShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,null).getPopulation();
+				new GreedyShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,null).getPopulation();
 			}
 		} else {
 //			throw new RuntimeException("This does not work!");
@@ -287,9 +271,9 @@ public class ShelterAllocationController extends Controler {
 			//			new EvacuationPlansGenerator(this.population,this.network,this.network.getLinks().get(new IdImpl("el1"))).run();
 		}
 
-		this.scenarioData.getPopulation().getPersons().clear();
-		new PopulationReaderMatsimV4(getScenario()).readFile(this.plans);
-		this.population = this.scenarioData.getPopulation();
+//		this.scenarioData.getPopulation().getPersons().clear();
+//		new PopulationReaderMatsimV4(getScenario()).readFile(this.plans);
+//		this.population = this.scenarioData.getPopulation();
 
 		//		if (this.scenarioData.getConfig().evacuation().isLoadShelters()) {
 		//			this.esnl.generateShelterLinks();
