@@ -283,6 +283,38 @@ public class ActivityHandlerTest {
 		Assert.assertEquals(1, logCounter.getErrorCount());
 	}
 
+	@Test
+	public void testIsFinished() {
+		Fixture f = new Fixture();
+		SimTestEngine engine = new SimTestEngine();
+		ActivityHandler ah = new ActivityHandler(engine);
+
+		Assert.assertTrue(ah.isFinished());
+		ah.handleStart(f.firstHomeAct, f.plan1);
+		Assert.assertFalse(ah.isFinished());
+
+		ah.doSimStep(8.0 * 3600 - 1.0);
+		Assert.assertFalse(ah.isFinished());
+
+		ah.doSimStep(8.0 * 3600);
+		Assert.assertTrue(ah.isFinished());
+
+		ah.handleStart(f.workAct, f.plan1);
+		Assert.assertFalse(ah.isFinished());
+
+		ah.doSimStep(16.0 * 3600);
+		Assert.assertFalse(ah.isFinished());
+
+		ah.doSimStep(17.0 * 3600 - 1);
+		Assert.assertFalse(ah.isFinished());
+
+		ah.doSimStep(17.0 * 3600);
+		Assert.assertTrue(ah.isFinished());
+
+		ah.doSimStep(24.0 * 3600);
+		Assert.assertTrue(ah.isFinished());
+	}
+
 	private static class Fixture {
 		public final Person person1;
 		public final Plan plan1;
