@@ -23,11 +23,18 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.mrieser.core.sim.api.DepartureHandler;
+import playground.mrieser.core.sim.features.NetworkFeature;
 
 /**
  * @author mrieser
  */
 public class CarDepartureHandler implements DepartureHandler {
+
+	private final NetworkFeature networkFeature;
+
+	public CarDepartureHandler(final NetworkFeature networkFeature) {
+		this.networkFeature = networkFeature;
+	}
 
 	@Override
 	public void handleDeparture(Leg leg, Plan plan) {

@@ -19,8 +19,11 @@
 
 package playground.mrieser.core.sim.api;
 
-import org.matsim.api.core.v01.population.Plan;
+import java.util.List;
+
 import org.matsim.api.core.v01.population.PlanElement;
+
+import playground.mrieser.core.sim.features.SimFeature;
 
 /**
  * @author mrieser
@@ -39,5 +42,13 @@ public interface PlanSimulation {
 
 	public PlanElementHandler removePlanElementHandler(final Class<? extends PlanElement> klass);
 
-	public void handleNextPlanElement(final Plan plan);
+	public PlanElementHandler getPlanElementHandler(final Class<? extends PlanElement> klass);
+
+	public void setSimEngine(final NewSimEngine engine);
+
+	public void runSim();
+
+	public void addSimFeature(final SimFeature feature);
+
+	public List<SimFeature> getSimFeatures();
 }

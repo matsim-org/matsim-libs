@@ -158,8 +158,7 @@ public class LegHandlerTest {
 		}
 
 		@Override
-		public void doSimStep(final double time) {
-			this.time = time;
+		public void runSim() {
 		}
 	}
 

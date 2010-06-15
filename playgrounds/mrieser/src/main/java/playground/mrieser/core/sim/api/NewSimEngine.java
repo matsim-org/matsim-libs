@@ -21,17 +21,18 @@ package playground.mrieser.core.sim.api;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Steppable;
 
 /**
  * @author mrieser
  */
-public interface NewSimEngine extends Steppable {
+public interface NewSimEngine {
 
 	public EventsManager getEventsManager();
 
 	public double getCurrentTime();
 
 	public void handleNextPlanElement(final Plan plan);
+
+	public void runSim();
 
 }

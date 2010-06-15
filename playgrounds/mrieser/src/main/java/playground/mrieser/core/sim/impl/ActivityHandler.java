@@ -26,17 +26,17 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanElementHandler;
+import playground.mrieser.core.sim.features.SimFeature;
 
 /**
  * @author mrieser
  */
-public class ActivityHandler implements PlanElementHandler, Steppable {
+public class ActivityHandler implements PlanElementHandler, SimFeature {
 
 	private final static Logger log = Logger.getLogger(ActivityHandler.class);
 
@@ -85,6 +85,11 @@ public class ActivityHandler implements PlanElementHandler, Steppable {
 			ActivityData data = this.activityEndsList.poll();
 			this.simEngine.handleNextPlanElement(data.plan);
 		}
+	}
+
+	@Override
+	public boolean isFinished() {
+		return this.activityEndsList.isEmpty();
 	}
 
 	private double calculateActivityEndTime(final Activity act) {

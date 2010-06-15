@@ -19,14 +19,19 @@
 
 package playground.mrieser.core.sim.impl;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.matsim.api.core.v01.population.Plan;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanElementHandler;
 import playground.mrieser.core.sim.api.PlanSimulation;
+import playground.mrieser.core.sim.features.SimFeature;
 import playground.mrieser.core.sim.utils.ClassBasedMap;
 
 /**
@@ -34,8 +39,21 @@ import playground.mrieser.core.sim.utils.ClassBasedMap;
  */
 public class PlanSimulationImpl implements PlanSimulation {
 
+	private final static Logger log = Logger.getLogger(PlanSimulationImpl.class);
+
+	private final Scenario scenario;
+	private NewSimEngine simEngine = null;
 	private final ClassBasedMap<PlanElement, PlanElementHandler> peHandlers = new ClassBasedMap<PlanElement, PlanElementHandler>();
-	private final Map<Plan, Integer> planElementIndex = new HashMap<Plan, Integer>();
+	private final LinkedList<SimFeature> simFeatures = new LinkedList<SimFeature>();
+
+	public PlanSimulationImpl(final Scenario scenario, final EventsManager events) {
+		this.scenario = scenario;
+	}
+
+	@Override
+	public void setSimEngine(final NewSimEngine simEngine) {
+		this.simEngine = simEngine;
+	}
 
 	@Override
 	public PlanElementHandler setPlanElementHandler(final Class<? extends PlanElement> klass, final PlanElementHandler handler) {
@@ -47,37 +65,39 @@ public class PlanSimulationImpl implements PlanSimulation {
 		return this.peHandlers.remove(klass);
 	}
 
-	/*package*/ PlanElementHandler getPlanElementHandler(final Class<? extends PlanElement> klass) {
+	@Override
+	public PlanElementHandler getPlanElementHandler(final Class<? extends PlanElement> klass) {
 		return this.peHandlers.get(klass);
 	}
 
 	@Override
-	public void handleNextPlanElement(Plan plan) {
-		Integer idx = this.planElementIndex.get(plan);
-		int i = 0;
-		int nOfPE = plan.getPlanElements().size();
-		if (idx != null) {
-			i = idx.intValue();
-			if (i < nOfPE) {
-				PlanElement pe = plan.getPlanElements().get(i);
-				PlanElementHandler peh = getPlanElementHandler(pe.getClass());
-				if (peh == null) {
-					throw new NullPointerException("No PlanElementHandler found for " + pe.getClass());
-				}
-				peh.handleEnd(pe, plan);
-			}
-			i++;
-		}
-		if (i <= nOfPE) {
-			this.planElementIndex.put(plan, Integer.valueOf(i)); // first store current index to prevent endless loop
-		}
-		if (i < nOfPE) {
-			PlanElement pe = plan.getPlanElements().get(i);
-			PlanElementHandler peh = getPlanElementHandler(pe.getClass());
-			if (peh == null) {
-				throw new NullPointerException("No PlanElementHandler found for " + pe.getClass());
-			}
-			peh.handleStart(pe, plan);
-		}
+	public void runSim() {
+		log.info("begin simulation.");
+
+		// TODO
+		// init
+		// create agents etc.
+
+		// run
+		this.simEngine.runSim();
+
+		// finish
+		// anything to do?
+
+		log.info("simulation ends.");
+	}
+
+	@Override
+	public void addSimFeature(final SimFeature feature) {
+		this.simFeatures.add(feature);
+	}
+
+	public void removeSimFeature(final SimFeature feature) {
+		this.simFeatures.remove(feature);
+	}
+
+	@Override
+	public List<SimFeature> getSimFeatures() {
+		return Collections.unmodifiableList(this.simFeatures);
 	}
 }

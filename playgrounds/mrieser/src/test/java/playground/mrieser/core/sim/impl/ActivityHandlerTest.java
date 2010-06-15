@@ -97,11 +97,11 @@ public class ActivityHandlerTest {
 		ah.handleStart(f.firstHomeAct, f.plan1);
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(8.0 * 3600 - 1.0);
+		engine.setCurrentTime(8.0 * 3600 - 1.0);
 		ah.doSimStep(8.0 * 3600 - 1.0);
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(8.0 * 3600);
+		engine.setCurrentTime(8.0 * 3600);
 		ah.doSimStep(8.0 * 3600);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 		ah.handleEnd(f.firstHomeAct, f.plan1);
@@ -109,11 +109,11 @@ public class ActivityHandlerTest {
 		ah.handleStart(f.workAct, f.plan1);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(16.0 * 3600 - 1.0);
+		engine.setCurrentTime(16.0 * 3600 - 1.0);
 		ah.doSimStep(16.0 * 3600 - 1.0);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(16.0 * 3600);
+		engine.setCurrentTime(16.0 * 3600);
 		ah.doSimStep(16.0 * 3600);
 		Assert.assertEquals(2, engine.countHandleNextPlanElement);
 		ah.handleEnd(f.workAct, f.plan1);
@@ -121,11 +121,11 @@ public class ActivityHandlerTest {
 		ah.handleStart(f.lastHomeAct, f.plan1);
 		Assert.assertEquals(2, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(24.0 * 3600);
+		engine.setCurrentTime(24.0 * 3600);
 		ah.doSimStep(24.0 * 3600);
 		Assert.assertEquals(2, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(30.0 * 3600);
+		engine.setCurrentTime(30.0 * 3600);
 		ah.doSimStep(30.0 * 3600);
 		Assert.assertEquals(2, engine.countHandleNextPlanElement);
 	}
@@ -143,11 +143,11 @@ public class ActivityHandlerTest {
 		ah.handleStart(f.firstHomeAct, f.plan1);
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(8.0 * 3600 - 1.0);
+		engine.setCurrentTime(8.0 * 3600 - 1.0);
 		ah.doSimStep(8.0 * 3600 - 1.0);
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(8.0 * 3600);
+		engine.setCurrentTime(8.0 * 3600);
 		ah.doSimStep(8.0 * 3600);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 		ah.handleEnd(f.firstHomeAct, f.plan1);
@@ -155,15 +155,15 @@ public class ActivityHandlerTest {
 		ah.handleStart(f.workAct, f.plan1);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(16.0 * 3600);
+		engine.setCurrentTime(16.0 * 3600);
 		ah.doSimStep(16.0 * 3600);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(17.0 * 3600 - 1.0);
+		engine.setCurrentTime(17.0 * 3600 - 1.0);
 		ah.doSimStep(17.0 * 3600 - 1.0);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(17.0 * 3600);
+		engine.setCurrentTime(17.0 * 3600);
 		ah.doSimStep(17.0 * 3600);
 		Assert.assertEquals(2, engine.countHandleNextPlanElement);
 		ah.handleEnd(f.workAct, f.plan1);
@@ -171,11 +171,11 @@ public class ActivityHandlerTest {
 		ah.handleStart(f.lastHomeAct, f.plan1);
 		Assert.assertEquals(2, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(24.0 * 3600);
+		engine.setCurrentTime(24.0 * 3600);
 		ah.doSimStep(24.0 * 3600);
 		Assert.assertEquals(2, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(30.0 * 3600);
+		engine.setCurrentTime(30.0 * 3600);
 		ah.doSimStep(30.0 * 3600);
 		Assert.assertEquals(2, engine.countHandleNextPlanElement);
 	}
@@ -196,11 +196,11 @@ public class ActivityHandlerTest {
 		ah.handleStart(f.firstHomeAct, f.plan1);
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(8.0 * 3600 - 1.0);
+		engine.setCurrentTime(8.0 * 3600 - 1.0);
 		ah.doSimStep(8.0 * 3600 - 1.0);
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(8.0 * 3600);
+		engine.setCurrentTime(8.0 * 3600);
 		ah.doSimStep(8.0 * 3600);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 		ah.handleEnd(f.firstHomeAct, f.plan1);
@@ -208,15 +208,15 @@ public class ActivityHandlerTest {
 		ah.handleStart(f.workAct, f.plan1);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(16.0 * 3600);
+		engine.setCurrentTime(16.0 * 3600);
 		ah.doSimStep(16.0 * 3600);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(17.0 * 3600 - 1.0);
+		engine.setCurrentTime(17.0 * 3600 - 1.0);
 		ah.doSimStep(17.0 * 3600 - 1.0);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(17.0 * 3600);
+		engine.setCurrentTime(17.0 * 3600);
 		ah.doSimStep(17.0 * 3600);
 		Assert.assertEquals(2, engine.countHandleNextPlanElement);
 		ah.handleEnd(f.workAct, f.plan1);
@@ -224,11 +224,11 @@ public class ActivityHandlerTest {
 		ah.handleStart(f.lastHomeAct, f.plan1);
 		Assert.assertEquals(2, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(24.0 * 3600);
+		engine.setCurrentTime(24.0 * 3600);
 		ah.doSimStep(24.0 * 3600);
 		Assert.assertEquals(2, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(30.0 * 3600);
+		engine.setCurrentTime(30.0 * 3600);
 		ah.doSimStep(30.0 * 3600);
 		Assert.assertEquals(2, engine.countHandleNextPlanElement);
 	}
@@ -253,11 +253,11 @@ public class ActivityHandlerTest {
 		ah.handleStart(f.firstHomeAct, f.plan1);
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(8.0 * 3600 - 1.0);
+		engine.setCurrentTime(8.0 * 3600 - 1.0);
 		ah.doSimStep(8.0 * 3600 - 1.0);
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(8.0 * 3600);
+		engine.setCurrentTime(8.0 * 3600);
 		ah.doSimStep(8.0 * 3600);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 		ah.handleEnd(f.firstHomeAct, f.plan1);
@@ -267,15 +267,15 @@ public class ActivityHandlerTest {
 		Assert.assertEquals(1, logCounter.getErrorCount());
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(16.0 * 3600);
+		engine.setCurrentTime(16.0 * 3600);
 		ah.doSimStep(16.0 * 3600);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(17.0 * 3600);
+		engine.setCurrentTime(17.0 * 3600);
 		ah.doSimStep(17.0 * 3600);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 
-		engine.doSimStep(24.0 * 3600);
+		engine.setCurrentTime(24.0 * 3600);
 		ah.doSimStep(24.0 * 3600);
 		Assert.assertEquals(1, engine.countHandleNextPlanElement);
 
@@ -326,6 +326,10 @@ public class ActivityHandlerTest {
 			return this.time;
 		}
 
+		public void setCurrentTime(final double time) {
+			this.time = time;
+		}
+
 		@Override
 		public EventsManager getEventsManager() {
 			return this.em;
@@ -334,12 +338,10 @@ public class ActivityHandlerTest {
 		@Override
 		public void handleNextPlanElement(final Plan plan) {
 			this.countHandleNextPlanElement++;
-
 		}
 
 		@Override
-		public void doSimStep(final double time) {
-			this.time = time;
+		public void runSim() {
 		}
 	}
 
