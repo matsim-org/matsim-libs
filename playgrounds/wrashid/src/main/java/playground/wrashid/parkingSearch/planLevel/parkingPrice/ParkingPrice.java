@@ -2,6 +2,8 @@ package playground.wrashid.parkingSearch.planLevel.parkingPrice;
 
 public abstract class ParkingPrice {
 
+		
+	
 	/**
 	 * How much must be paid for parking at the specified parking for the given
 	 * startParking and endParking times.
