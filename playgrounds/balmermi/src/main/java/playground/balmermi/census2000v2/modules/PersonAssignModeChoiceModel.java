@@ -77,7 +77,8 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 	public PersonAssignModeChoiceModel(final Municipalities municipalities, String outfile, Knowledges knowledges, final ActivityFacilities facilities, final PlanomatConfigGroup planomatConfig) {
 		log.info("    init " + this.getClass().getName() + " module...");
-		this.past = new PlanAnalyzeSubtours(planomatConfig);
+		this.past = new PlanAnalyzeSubtours();
+		this.past.setTripStructureAnalysisLayer(planomatConfig.getTripStructureAnalysisLayer());
 		this.municipalities = municipalities;
 		this.knowledges = knowledges;
 		this.facilities = facilities;

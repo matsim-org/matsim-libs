@@ -209,7 +209,8 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
 
 		/* Analysis of subtours */
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(this.scenario_input.getConfig().planomat());
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		planAnalyzeSubtours.setTripStructureAnalysisLayer(this.scenario_input.getConfig().planomat().getTripStructureAnalysisLayer());
 		planAnalyzeSubtours.run(newPlan);
 
 		/* Make sure that all subtours with distance = 0 are set to "walk" */
@@ -297,7 +298,8 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
 
 		/* Analysis of subtours */
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(this.scenario_input.getConfig().planomat());
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		planAnalyzeSubtours.setTripStructureAnalysisLayer(this.scenario_input.getConfig().planomat().getTripStructureAnalysisLayer());
 		planAnalyzeSubtours.run(newPlan);
 
 		/* Make sure that all subtours with distance = 0 are set to "walk" */

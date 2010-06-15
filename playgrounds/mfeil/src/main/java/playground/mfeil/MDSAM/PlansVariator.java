@@ -52,15 +52,15 @@ import playground.mfeil.config.TimeModeChoicerConfigGroup;
 
 /**
  * Class that creates a number of (slightly) varied plans of a person's original plan.
- * 
+ *
  * @author Matthias Feil
  */
 public class PlansVariator implements PlanAlgorithm {
-	
+
 	private final int agentIDthreshold;
 	private final int noOfVariedPlans;
 	private int noOfMaxActs;
-	private final double shareAC, shareACMC, shareLCMC, shareNumber, shareOrder; 
+	private final double shareAC, shareACMC, shareLCMC, shareNumber, shareOrder;
 	private final Controler controler;
 	private final LocationMutatorwChoiceSet locator;
 	private final PlansCalcRoute router;
@@ -68,7 +68,7 @@ public class PlansVariator implements PlanAlgorithm {
 	private final TransportMode[] possibleModes;
 	private final double maxWalkingDistance;
 	private final TimeOptimizer timer;
-	
+
 	public PlansVariator (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc, LocationMutatorwChoiceSet locator, PlansCalcRoute router, List<String> actTypes){
 		this.controler = controler;
 		this.locator = locator;
@@ -86,13 +86,13 @@ public class PlansVariator implements PlanAlgorithm {
 		this.maxWalkingDistance	= Double.parseDouble(TimeModeChoicerConfigGroup.getMaximumWalkingDistance());
 		this.timer = new TimeOptimizer (this.controler, tDepDelayCalc);
 	}
-	
-	
+
+
 	public void run (Plan plan){
-		
+
 		/* Ensure that noOfMaxActs is greater or equal than the noOfActs of current plan */
 		this.noOfMaxActs = java.lang.Math.max(this.noOfMaxActs, plan.getPlanElements().size()/2);
-		
+
 		/* Remove all non-selected plans */
 		Population pop = controler.getPopulation();
 		for (int i=0;i<(pop.getPersons().get(plan.getPerson().getId())).getPlans().size();i++){
@@ -100,44 +100,44 @@ public class PlansVariator implements PlanAlgorithm {
 				pop.getPersons().get(plan.getPerson().getId()).getPlans().remove(i);
 			}
 		}
-		
+
 		/* Do nothing for non-relevant agents */
 		if (Integer.parseInt(plan.getPerson().getId().toString())<this.agentIDthreshold) {
 			return;
 		}
-		
+
 		PlanImpl[] output = new PlanImpl [this.noOfVariedPlans];
-		
+
 		/* Copy the plan into all fields of the output array and vary plans */
 		for (int i = 0; i < output.length; i++){
 			output[i] = new PlanImpl (plan.getPerson());
-			output[i].copyPlan(plan);	
+			output[i].copyPlan(plan);
 		}
 		this.varyPlans(output, plan);
-		
+
 		/* Add the new plans to the person's set of plans */
 		for (int i = 0; i < output.length; i++){
 			pop.getPersons().get(plan.getPerson().getId()).addPlan(output[i]);
-		}	
-		
-		
-		
+		}
+
+
+
 		//PopulationWriter popwriter = new PopulationWriter(pop, "./plans/output_pop.xml");
 		//popwriter.write();
 	}
-	
+
 	private void varyPlans (PlanImpl[] output, Plan plan){
 		int counter = 0;
-		
+
 		/* Change number */
 		int slots = (int) (this.noOfVariedPlans*this.shareAC*this.shareNumber);
-		
+
 		int j;
 		if (slots/(this.noOfMaxActs-1)>=1)j=1;
 		else j=java.lang.Math.max((output[0].getPlanElements().size()/2+1)-(slots/2),1);
-		
-		for (int i=0;i<slots;i++){	
-			if (j>this.noOfMaxActs) j=3; //sets the index back to an act chain of 3 acts (1 and 2 exist only once).	
+
+		for (int i=0;i<slots;i++){
+			if (j>this.noOfMaxActs) j=3; //sets the index back to an act chain of 3 acts (1 and 2 exist only once).
 			if (j==output[i].getPlanElements().size()/2+1) j++; // jumps over the base act chain.
 			while (j<=output[i].getPlanElements().size()/2){
 				if (j==1) output[i].removeActivity(0); //remove first act until only one final home act remains
@@ -145,9 +145,9 @@ public class PlansVariator implements PlanAlgorithm {
 					int pos = (1+((int)(MatsimRandom.getRandom().nextDouble()*((output[i].getPlanElements().size()-2)/2))))*2;
 					output[i].removeActivity(pos);
 					/* Recovers the route of the trip in front of the removed act */
-					router.handleLeg(plan.getPerson(), 
-							(LegImpl)output[i].getPlanElements().get(pos-1), 
-							(ActivityImpl)output[i].getPlanElements().get(pos-2), 
+					router.handleLeg(plan.getPerson(),
+							(LegImpl)output[i].getPlanElements().get(pos-1),
+							(ActivityImpl)output[i].getPlanElements().get(pos-2),
 							(ActivityImpl)output[i].getPlanElements().get(pos), ((ActivityImpl)output[i].getPlanElements().get(pos-2)).getEndTime());
 				}
 			}
@@ -165,7 +165,7 @@ public class PlansVariator implements PlanAlgorithm {
 			j++;
 			counter++;
 		}
-		
+
 		/* Change order */
 		//TODO: Positions should be indexed in acts order, not planElements order
 		int[] orderPos = {2,4};
@@ -173,7 +173,7 @@ public class PlansVariator implements PlanAlgorithm {
 			if (!this.changeOrder(output[i], orderPos)) break;
 			counter++;
 		}
-		
+
 		/* Change type */
 		int [] typePos = new int [(plan.getPlanElements().size()/2)];
 		for (int x=1;x<plan.getPlanElements().size()/2;x++){
@@ -183,13 +183,13 @@ public class PlansVariator implements PlanAlgorithm {
 		for (int i=counter;i<this.noOfVariedPlans*this.shareAC;i++){
 			rotationPos = this.changeType(output[i], typePos, rotationPos);
 			counter++;
-		}		
-		
+		}
+
 		/* Location choice for all slots */
 		for (int i=0;i<output.length;i++){
 			locator.handlePlan(output[i]);
 		}
-		
+
 		/* Check whether LC activity chains are duplicated */
 		boolean [] chosen = new boolean [output.length];
 		boolean [] equal = new boolean [output.length];
@@ -205,23 +205,23 @@ public class PlansVariator implements PlanAlgorithm {
 					}
 				}
 			}
-			if (equal[i]) equalChains++; 
+			if (equal[i]) equalChains++;
 		}
-		
-		/* Variation of modes */		
+
+		/* Variation of modes */
 		// AC slots
 		for (int i=0;i<this.noOfVariedPlans*this.shareAC*this.shareACMC;i++){
-			
+
 			/* Selection of plan */
 			int MCpos = (int)(MatsimRandom.getRandom().nextDouble()*this.noOfVariedPlans*this.shareAC);
 			while (chosen[MCpos] || output[MCpos].getPlanElements().size()<4){
 				MCpos++;
 				if (MCpos>=(int) (this.noOfVariedPlans*this.shareAC)) MCpos=0;
-			}			
+			}
 			this.changeMode(output[MCpos]);
 			chosen[MCpos]=true;
 		}
-		
+
 		// LC slots
 		for (int i=0;i<equal.length;i++){
 			if (equal[i]) {
@@ -238,42 +238,42 @@ public class PlansVariator implements PlanAlgorithm {
 				if (MCpos>=this.noOfVariedPlans) MCpos= (int)(this.noOfVariedPlans*this.shareAC);
 				if (count>this.noOfVariedPlans*(1-this.shareAC)) break Loop;
 				count++;
-			}		
+			}
 			this.changeMode(output[MCpos]);
 			chosen[MCpos]=true;
 		}
-		
+
 		/* Route choice for all slots */
 		for (int i=0;i<output.length;i++){
 			router.run(output[i]);
 			timer.run(output[i]);
 		}
-		
+
 	}
-	
+
 	private boolean changeOrder (PlanImpl plan, int [] positions){
-		
+
 		List<PlanElement> actslegs = plan.getPlanElements();
 
-		if (actslegs.size()<=5){	//If true the plan has not enough activities to change their order. Do nothing.		
+		if (actslegs.size()<=5){	//If true the plan has not enough activities to change their order. Do nothing.
 			return false;
 		}
 		else {
-			for (int planBasePos = positions[0]; planBasePos < actslegs.size()-4; planBasePos=planBasePos+2){			
+			for (int planBasePos = positions[0]; planBasePos < actslegs.size()-4; planBasePos=planBasePos+2){
 				for (int planRunningPos = positions[1]; planRunningPos < actslegs.size()-2; planRunningPos=planRunningPos+2){ //Go through the "inner" acts only
 					positions[1] = positions[1]+2;
-					
-					/*Activity swapping	*/		
+
+					/*Activity swapping	*/
 					ActivityImpl act0 = (ActivityImpl)(actslegs.get(planBasePos));
 					ActivityImpl act1 = (ActivityImpl)(actslegs.get(planRunningPos));
 					if (act0.getType()!=act1.getType() &&
 							!act0.getFacilityId().equals(act1.getFacilityId())){
-							
+
 						ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get(planBasePos)));
-						
+
 						actslegs.set(planBasePos, actslegs.get(planRunningPos));
 						actslegs.set(planRunningPos, actHelp);
-						
+
 						positions[0] = planBasePos;
 						return true;
 					}
@@ -283,17 +283,17 @@ public class PlansVariator implements PlanAlgorithm {
 			return false;
 		}
 	}
-	
+
 	private int changeType (PlanImpl plan, int [] position, int rotationPos){
-			
+
 		ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(rotationPos*2);
 		String type = act.getType();
-				
+
 		while (type.equals(this.actTypes.get(position[rotationPos]))) {
 			position[rotationPos]++;
 			if (position[rotationPos]>=this.actTypes.size()) position[rotationPos] = 0;
-		} 
-		
+		}
+
 		act.setType(this.actTypes.get(position[rotationPos]));
 		if (act.getType().equalsIgnoreCase("home")){
 			act.setFacilityId(((Activity)(plan.getPlanElements().get(0))).getFacilityId());
@@ -304,29 +304,29 @@ public class PlansVariator implements PlanAlgorithm {
 		if (position[rotationPos]>=this.actTypes.size()) position[rotationPos] = 0;
 		rotationPos++;
 		if (rotationPos>=plan.getPlanElements().size()/2) rotationPos=1;
-		return rotationPos;		
+		return rotationPos;
 	}
-	
-	
+
+
 	/* Method that returns true if two plans feature the same activity chain and the same locations, or false otherwise.*/
 	private boolean checkEqualityOfLocations (Plan plan1, Plan plan2){
-			
+
 		ArrayList<String> acts1 = new ArrayList<String> ();
 		ArrayList<String> acts2 = new ArrayList<String> ();
 		for (int i = 0;i<plan1.getPlanElements().size();i=i+2){
-			//acts1.add(((Activity)(plan1.getPlanElements().get(i))).getType().toString());	
-			acts1.add(((ActivityImpl)(plan1.getPlanElements().get(i))).getFacilityId().toString());	
+			//acts1.add(((Activity)(plan1.getPlanElements().get(i))).getType().toString());
+			acts1.add(((ActivityImpl)(plan1.getPlanElements().get(i))).getFacilityId().toString());
 		}
 		for (int i = 0;i<plan2.getPlanElements().size();i=i+2){
 			//acts2.add(((Activity)(plan2.getPlanElements().get(i))).getType().toString());
-			acts2.add(((ActivityImpl)(plan2.getPlanElements().get(i))).getFacilityId().toString());	
+			acts2.add(((ActivityImpl)(plan2.getPlanElements().get(i))).getFacilityId().toString());
 		}
-	
+
 		return (acts1.equals(acts2));
-		
-	}	
-	
-	/* Method that calculates the distance of a subtour. 
+
+	}
+
+	/* Method that calculates the distance of a subtour.
 	 * Returns 	0 if distance = 0m
 	 * 			2 if distance is longer than this.maxWalkingDistance
 	 * 			1 otherwise.
@@ -342,15 +342,16 @@ public class PlansVariator implements PlanAlgorithm {
 			}
 		}
 		if (distance==0) return 0;
-		return 1;	
+		return 1;
 	}
-	
+
 	private void changeMode (PlanImpl plan){
 		/* Selection of subtour to be changed */
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(controler.getConfig().planomat());
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		planAnalyzeSubtours.setTripStructureAnalysisLayer(controler.getConfig().planomat().getTripStructureAnalysisLayer());
 		planAnalyzeSubtours.run(plan);
 		int subtourIndex = (int)(MatsimRandom.getRandom().nextDouble()*planAnalyzeSubtours.getNumSubtours());
-		
+
 		/* Selection of mode to be inserted */
 		// Current mode
 		TransportMode currentMode;
@@ -358,8 +359,8 @@ public class PlansVariator implements PlanAlgorithm {
 		do {
 			j+=2;
 			currentMode = ((LegImpl)(plan.getPlanElements().get(j))).getMode();
-		} while (planAnalyzeSubtours.getSubtourIndexation()[j/2]!=subtourIndex);			
-		
+		} while (planAnalyzeSubtours.getSubtourIndexation()[j/2]!=subtourIndex);
+
 		// New mode
 		int modeIndex = ((int)(MatsimRandom.getRandom().nextDouble()*this.possibleModes.length));
 		while (this.possibleModes[modeIndex].equals(currentMode) ||
@@ -368,7 +369,7 @@ public class PlansVariator implements PlanAlgorithm {
 			modeIndex++;
 			if (modeIndex>=this.possibleModes.length) modeIndex=0;
 		}
-		
+
 		/* Replacement of mode */
 		for (j=1;j<plan.getPlanElements().size();j+=2){
 			if (planAnalyzeSubtours.getSubtourIndexation()[j/2]==subtourIndex){
