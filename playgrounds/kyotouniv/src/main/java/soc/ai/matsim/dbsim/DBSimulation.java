@@ -147,7 +147,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 		this.population = scenario.getPopulation();
 
 		this.networkLayer = scenario.getNetwork();
-		
+
 		this.network = new DBSimNetwork(this.networkLayer); //roadShapeConfig
 
 		this.agentFactory = new AgentFactory(this);
@@ -213,18 +213,6 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 
 	}
 
-
-	public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
-		/* TODO [MR] I don't really like it that we change the configuration on the fly here.
-		 * In my eyes, the configuration should usually be a read-only object in general, but
-		 * that's hard to be implemented...
-		 */
-		this.config.network().setInputFile(networkFilename);
-		this.config.simulation().setSnapshotFormat("netvis");
-		this.config.simulation().setSnapshotPeriod(snapshotPeriod);
-		this.config.simulation().setSnapshotFile(snapshotFilename);
-	}
-
 	private void createSnapshotwriter() {
 		// A snapshot period of 0 or less indicates that there should be NO snapshot written
 		if (this.snapshotPeriod > 0 ) {
@@ -279,7 +267,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 	 */
 	protected void prepareSim() {
 		//TODO prepareNetwork();
-		
+
 		if (events == null) {
 			throw new RuntimeException("No valid Events Object (events == null)");
 		}
@@ -316,13 +304,13 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 
 		prepareNetworkChangeEventsQueue();
 	}
-	
+
 	private void prepareNetwork() {
 		//TODO read additional link parameter from XML (RoadShape.xml)
 		//TODO RoadShapeConfig roadShapeConfig = (new RoadShapeConfigReader("RoadShape.xml")).read();
 		//TODO for each this.network.dbsimLinks do setShape(roadShapeConfig);
 	}
-	
+
 	/**
 	 * Close any files, etc.
 	 */

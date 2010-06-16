@@ -42,12 +42,12 @@ import playground.droeder.DaPaths;
 
 /**
  * generates a configfile for the denver-scenario.
- * 
+ *
  * @author droeder
  *
  */
 public class DenverScenarioGenerator {
-	
+
 	private static final Logger log = Logger.getLogger(DenverScenarioGenerator.class);
 
 	private static final String INPUT = DaPaths.DGSTUDIES + "denver/";
@@ -56,58 +56,58 @@ public class DenverScenarioGenerator {
 	private static final String NETWORKFILE = INPUT + "networkDenver.xml";
 	private static final String LANESINPUTFILE = INPUT + "laneDefinitions.xml";
 	private static final String SIGNALSYSTEMINPUTFILE = OUTPUT + "signalSystemsByNodes.xml";
-	private static final String PLANSINPUTFILE = INPUT + "plans.xml"; 
-	
+	private static final String PLANSINPUTFILE = INPUT + "plans.xml";
+
 	// OUTPUT
 	private static final String CHANGEEVENTSFILE = OUTPUT +"changeEventsFile.xml";
 	public static final String CONFIGOUTPUTFILE = OUTPUT + "denverConfig.xml";
 	private static final String SIGNALSYSTEMCONFIG = OUTPUT + "signalSystemConfig.xml";
 	private static final String OUTPUTDIRECTORY = DaPaths.OUTPUT + "denver/" ;
-	
+
 	// DEFINITIONS
 	protected static String controllerClass = DaAdaptiveController.class.getCanonicalName();
 	private static final int iterations = 1;
 	Id id1 = new IdImpl("1");
 	Id id2 = new IdImpl("2");
-	
-	
-	
+
+
+
 	public void createScenario(){
 		ScenarioImpl sc = new ScenarioImpl();
-		
+
 		Config conf = sc.getConfig();
-		
+
 		// set Network and Lanes
 		conf.network().setInputFile(NETWORKFILE);
 		conf.scenario().setUseLanes(true);
 		conf.network().setLaneDefinitionsFile(LANESINPUTFILE);
-		
-		
+
+
 		// set plans
 		conf.plans().setInputFile(PLANSINPUTFILE);
-		
+
 		//set Signalsystems
 		conf.scenario().setUseSignalSystems(true);
 		conf.signalSystems().setSignalSystemFile(SIGNALSYSTEMINPUTFILE);
-		
+
 		//create and write SignalSystemConfig
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
 		loader.loadScenario();
 		createSignalSystemsConfig(sc);
 		conf.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIG);
-		
+
 		//create changeEvents
 //		this.createChangeEvents(sc);
-		
+
 		//create and write config
 		createConfig(conf);
 		new ConfigWriter(conf).write(CONFIGOUTPUTFILE);
 	}
-	
+
 	private void createSignalSystemsConfig (ScenarioImpl sc){
 		SignalSystemConfigurations configs = sc.getSignalSystemConfigurations();
 		SignalSystemConfigurationsFactory factory = configs.getFactory();
-		
+
 		for (Entry<Id, SignalSystemDefinition> e : sc.getSignalSystems().getSignalSystemDefinitions().entrySet()){
 			SignalSystemConfiguration systemConfig = factory.createSignalSystemConfiguration(e.getKey());
 			AdaptiveSignalSystemControlInfo controlInfo = factory.createAdaptiveSignalSystemControlInfo();
@@ -120,38 +120,38 @@ public class DenverScenarioGenerator {
 			systemConfig.setSignalSystemControlInfo(controlInfo);
 			configs.getSignalSystemConfigurations().put(systemConfig.getSignalSystemId(), systemConfig);
 		}
-		
+
 		SignalSystemConfigurations ssConfigs = configs;
-		MatsimSignalSystemConfigurationsWriter ssConfigsWriter = new MatsimSignalSystemConfigurationsWriter(ssConfigs);	
+		MatsimSignalSystemConfigurationsWriter ssConfigsWriter = new MatsimSignalSystemConfigurationsWriter(ssConfigs);
 		ssConfigsWriter.writeFile(SIGNALSYSTEMCONFIG);
 	}
-	
+
 //	private void createChangeEvents (ScenarioImpl sc){
 //		Network net = sc.getNetwork();
 //		List<NetworkChangeEvent> ce = new LinkedList<NetworkChangeEvent>();
 //		NetworkChangeEvent nce;
-//		
+//
 //		nce = new NetworkChangeEvent(6*3600 + 90);
 //		nce.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR,0.1));
 //		nce.addLink(net.getLinks().get(sc.createId("35")));
 //		ce.add(nce);
-//		
+//
 //		nce = new NetworkChangeEvent(6*3600 + 390);
 //		nce.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 10));
 //		nce.addLink(net.getLinks().get(sc.createId("35")));
 //		ce.add(nce);
-//		
+//
 //		NetworkChangeEventsWriter ceWriter = new NetworkChangeEventsWriter();
 //		ceWriter.write(CHANGEEVENTSFILE, ce);
 //	}
-	
+
 private void createConfig(Config config) {
-		
+
 		config.network().setInputFile(NETWORKFILE);
 		config.network().setChangeEventInputFile(CHANGEEVENTSFILE);
 		config.network().setTimeVariantNetwork(false);
 		config.plans().setInputFile(PLANSINPUTFILE);
-	
+
 
 		// configure scoring for plans
 		config.charyparNagelScoring().setLateArrival(0.0);
@@ -171,13 +171,12 @@ private void createConfig(Config config) {
 		config.controler().setOutputDirectory(OUTPUTDIRECTORY);
 		config.controler().setLinkToLinkRoutingEnabled(true);
 		config.controler().setWriteEventsInterval(0);
-	
+
 
 
 		// configure simulation and snapshot writing
 		config.setQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setSnapshotFormat("otfvis");
-		config.getQSimConfigGroup().setSnapshotFile("cmcf.mvi");
 		config.getQSimConfigGroup().setSnapshotPeriod(60.0);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
 		config.getQSimConfigGroup().setStuckTime(20000);
@@ -185,10 +184,10 @@ private void createConfig(Config config) {
 //		config.getQSimConfigGroup().setStartTime(6*3600);
 		config.getQSimConfigGroup().setEndTime(24*3600);
 		config.otfVis().setDrawLinkIds(true);
-		
-		
+
+
 		// configure strategies for replanning
-		
+
 		config.strategy().setMaxAgentPlanMemorySize(4);
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(id1);
 		selectExp.setProbability(0.9);

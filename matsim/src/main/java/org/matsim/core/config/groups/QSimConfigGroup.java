@@ -29,6 +29,8 @@ import org.matsim.core.utils.misc.Time;
 
 public class QSimConfigGroup extends Module {
 
+	private final static Logger log = Logger.getLogger(QSimConfigGroup.class);
+
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "qsim";
@@ -51,7 +53,6 @@ public class QSimConfigGroup extends Module {
 	private double timeStepSize = 1.0;
 	private double snapshotPeriod = 0; // off, no snapshots
 	private String snapshotFormat = "";
-	private String snapshotFile = "Snapshot";
 	private String snapshotStyle = "equiDist"; // currently supported: queue, equiDist
 	private double flowCapFactor = 1.0;
 	private double stroageCapFactor = 1.0;
@@ -76,8 +77,6 @@ public class QSimConfigGroup extends Module {
 			setSnapshotPeriod(Time.parseTime(value));
 		} else if (SNAPSHOT_FORMAT.equals(key)) {
 			setSnapshotFormat(value);
-		} else if (SNAPSHOT_FILE.equals(key)) {
-			setSnapshotFile(value);
 		} else if (SNAPSHOT_STYLE.equals(key)) {
 			setSnapshotStyle(value);
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
@@ -90,6 +89,8 @@ public class QSimConfigGroup extends Module {
 			setRemoveStuckVehicles(Boolean.parseBoolean(value));
 		} else if (NUMBER_OF_THREADS.equals(key)){
 		  setNumberOfThreads(Integer.parseInt(value));
+		} else if (SNAPSHOT_FILE.equals(key)) {
+			log.warn("The config option " + key + " is no longer supported and should be removed from the configuration file.");
 		}	else {
 			throw new IllegalArgumentException(key);
 		}
@@ -108,8 +109,6 @@ public class QSimConfigGroup extends Module {
 			return Time.writeTime(getSnapshotPeriod());
 		} else if (SNAPSHOT_FORMAT.equals(key)) {
 			return getSnapshotFormat();
-		} else if (SNAPSHOT_FILE.equals(key)) {
-			return getSnapshotFile();
 		} else if (SNAPSHOT_STYLE.equals(key)) {
 			return getSnapshotStyle();
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
@@ -135,7 +134,6 @@ public class QSimConfigGroup extends Module {
 		map.put(TIME_STEP_SIZE, getValue(TIME_STEP_SIZE));
 		map.put(SNAPSHOT_PERIOD, getValue(SNAPSHOT_PERIOD));
 		map.put(SNAPSHOT_FORMAT, getValue(SNAPSHOT_FORMAT));
-		map.put(SNAPSHOT_FILE, getValue(SNAPSHOT_FILE));
 		map.put(SNAPSHOT_STYLE, getValue(SNAPSHOT_STYLE));
 		map.put(FLOW_CAPACITY_FACTOR, getValue(FLOW_CAPACITY_FACTOR));
 		map.put(STORAGE_CAPACITY_FACTOR, getValue(STORAGE_CAPACITY_FACTOR));
@@ -200,14 +198,6 @@ public class QSimConfigGroup extends Module {
 
 	public String getSnapshotFormat() {
 		return this.snapshotFormat;
-	}
-
-	public void setSnapshotFile(final String snapshotFile) {
-		this.snapshotFile = snapshotFile.replace('\\', '/');
-	}
-
-	public String getSnapshotFile() {
-		return this.snapshotFile;
 	}
 
 	public void setFlowCapFactor(final double flowCapFactor) {

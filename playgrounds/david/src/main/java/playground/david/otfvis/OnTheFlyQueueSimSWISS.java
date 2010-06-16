@@ -55,7 +55,6 @@ public class OnTheFlyQueueSimSWISS {
 
 		config.simulation().setSnapshotFormat("otfvis");
 		config.simulation().setSnapshotPeriod(600);
-		config.simulation().setSnapshotFile("output/OTFQuadfileSCHWEIZ2.mvi");
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
 		config.simulation().setEndTime(Time.parseTime("00:00:11"));
 		sim = new QSim(scenario, events);

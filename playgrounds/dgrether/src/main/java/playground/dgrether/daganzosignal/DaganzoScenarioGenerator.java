@@ -300,7 +300,6 @@ public class DaganzoScenarioGenerator {
 		// configure simulation and snapshot writing
 		config.setQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setSnapshotFormat("otfvis");
-		config.getQSimConfigGroup().setSnapshotFile("cmcf.mvi");
 		config.getQSimConfigGroup().setSnapshotPeriod(60.0);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
 //    config.getQSimConfigGroup().setSnapshotFormat(null);

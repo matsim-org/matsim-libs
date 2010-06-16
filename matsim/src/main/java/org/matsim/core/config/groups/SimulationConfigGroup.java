@@ -66,7 +66,6 @@ public class SimulationConfigGroup extends Module {
 	private double timeStepSize = 1.0;
 	private double snapshotPeriod = 0; // off, no snapshots
 	private String snapshotFormat = "";
-	private String snapshotFile = "Snapshot";
 	private String snapshotStyle = "equiDist"; // currently supported: queue, equiDist
 	private double flowCapFactor = 1.0;
 	private double stroageCapFactor = 1.0;
@@ -91,8 +90,6 @@ public class SimulationConfigGroup extends Module {
 			setSnapshotPeriod(Time.parseTime(value));
 		} else if (SNAPSHOT_FORMAT.equals(key)) {
 			setSnapshotFormat(value);
-		} else if (SNAPSHOT_FILE.equals(key)) {
-			setSnapshotFile(value);
 		} else if (SNAPSHOT_STYLE.equals(key)) {
 			setSnapshotStyle(value);
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
@@ -107,7 +104,7 @@ public class SimulationConfigGroup extends Module {
 			setExternalExe(value);
 		} else if (TIMEOUT.equals(key)) {
 			setExternalTimeOut(Integer.parseInt(value));
-		} else if (MOVE_WAIT_FIRST.equals(key) || EVACUATION_TIME.equals(key)) {
+		} else if (MOVE_WAIT_FIRST.equals(key) || EVACUATION_TIME.equals(key) || SNAPSHOT_FILE.equals(key)) {
 			log.warn("The config option " + key + " is no longer supported and should be removed from the configuration file.");
 		} else if (SHELLTYPE.equals(key) || JAVACLASSPATH.equals(key) || JVMOPTIONS.equals(key)
 				|| CLIENTLIST.equals(key) || LOCALCONFIG.equals(key) || LOCALCONFIGDTD.equals(key) || EXE_PATH.equals(key)) {
@@ -130,8 +127,6 @@ public class SimulationConfigGroup extends Module {
 			return Time.writeTime(getSnapshotPeriod());
 		} else if (SNAPSHOT_FORMAT.equals(key)) {
 			return getSnapshotFormat();
-		} else if (SNAPSHOT_FILE.equals(key)) {
-			return getSnapshotFile();
 		} else if (SNAPSHOT_STYLE.equals(key)) {
 			return getSnapshotStyle();
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
@@ -159,7 +154,6 @@ public class SimulationConfigGroup extends Module {
 		map.put(TIME_STEP_SIZE, getValue(TIME_STEP_SIZE));
 		map.put(SNAPSHOT_PERIOD, getValue(SNAPSHOT_PERIOD));
 		map.put(SNAPSHOT_FORMAT, getValue(SNAPSHOT_FORMAT));
-		map.put(SNAPSHOT_FILE, getValue(SNAPSHOT_FILE));
 		map.put(SNAPSHOT_STYLE, getValue(SNAPSHOT_STYLE));
 		map.put(FLOW_CAPACITY_FACTOR, getValue(FLOW_CAPACITY_FACTOR));
 		map.put(STORAGE_CAPACITY_FACTOR, getValue(STORAGE_CAPACITY_FACTOR));
@@ -230,14 +224,6 @@ public class SimulationConfigGroup extends Module {
 
 	public String getSnapshotFormat() {
 		return this.snapshotFormat;
-	}
-
-	public void setSnapshotFile(final String snapshotFile) {
-		this.snapshotFile = snapshotFile.replace('\\', '/');
-	}
-
-	public String getSnapshotFile() {
-		return this.snapshotFile;
 	}
 
 	public void setFlowCapFactor(final double flowCapFactor) {

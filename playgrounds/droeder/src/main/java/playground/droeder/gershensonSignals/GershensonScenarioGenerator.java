@@ -62,7 +62,7 @@ import playground.droeder.DaPaths;
 
 /**
  * generates a simple test-scenario
- * 
+ *
  * @author droeder
  *
  */
@@ -421,7 +421,6 @@ public class GershensonScenarioGenerator {
 		// configure simulation and snapshot writing
 		config.setQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setSnapshotFormat("otfvis");
-		config.getQSimConfigGroup().setSnapshotFile("cmcf.mvi");
 		config.getQSimConfigGroup().setSnapshotPeriod(60.0);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
 		config.otfVis().setDrawLinkIds(true);
