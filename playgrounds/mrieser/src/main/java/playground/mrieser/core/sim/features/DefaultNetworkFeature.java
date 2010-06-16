@@ -17,17 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.sim.network.api;
+package playground.mrieser.core.sim.features;
 
-import java.util.Map;
+import playground.mrieser.core.sim.network.api.SimNetwork;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.Steppable;
+public class DefaultNetworkFeature implements NetworkFeature {
 
-public interface SimNetwork extends Steppable {
+	private final SimNetwork network;
 
-	Map<Id, ? extends SimLink> getLinks();
+	public DefaultNetworkFeature(final SimNetwork network) {
+		this.network = network;
+	}
 
-	Map<Id, ? extends SimNode> getNodes();
+	@Override
+	public void doSimStep(double time) {
+		this.network.doSimStep(time);
+	}
+
+	@Override
+	public SimNetwork getSimNetwork() {
+		return this.network;
+	}
+
+	@Override
+	public boolean isFinished() {
+		// TODO change to take road state into account
+		return true;
+	}
 
 }

@@ -19,6 +19,26 @@
 
 package playground.mrieser.core.sim.network.api;
 
+import org.matsim.api.core.v01.Id;
+
+import playground.mrieser.core.sim.api.SimVehicle;
+
 public interface SimLink {
+
+	public static final double POSITION_AT_FROM_NODE = 0.0;
+	public static final double POSITION_AT_TO_NODE = 1.0;
+
+	public static final double PRIORITY_AS_SOON_AS_SPACE_AVAILABLE = 0.0;
+	public static final double PRIORITY_IMMEDIATELY = 1.0;
+
+	public Id getId();
+
+	public void addVehicle(final SimVehicle vehicle, final double position, final double priority);
+
+	public double removeVehicle(final SimVehicle vehicle);
+
+	public void stopVehicle(final SimVehicle vehicle);
+
+	public void continueVehicle(final SimVehicle vehicle);
 
 }

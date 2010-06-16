@@ -19,8 +19,56 @@
 
 package playground.mrieser.core.sim.network.queueNetwork;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.Steppable;
+
+import playground.mrieser.core.sim.api.SimVehicle;
 import playground.mrieser.core.sim.network.api.SimLink;
 
-public class QueueLink implements SimLink {
+/*package*/ class QueueLink implements SimLink, Steppable {
+
+	private final QueueNetwork network;
+	private final Link link;
+
+	public QueueLink(final Link link, final QueueNetwork network) {
+		this.link = link;
+		this.network = network;
+	}
+
+	@Override
+	public void addVehicle(SimVehicle vehicle, double position, double priority) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void continueVehicle(SimVehicle vehicle) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public double removeVehicle(SimVehicle vehicle) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void stopVehicle(SimVehicle vehicle) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void doSimStep(double time) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Id getId() {
+		return this.link.getId();
+	}
 
 }

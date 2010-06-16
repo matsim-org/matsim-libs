@@ -17,17 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.sim.network.api;
+package playground.mrieser.core.sim.network.queueNetwork;
 
-import java.util.Map;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.Steppable;
+import playground.mrieser.core.sim.network.api.SimNetwork;
 
-public interface SimNetwork extends Steppable {
+public abstract class QueueNetworkCreator {
 
-	Map<Id, ? extends SimLink> getLinks();
+	public static SimNetwork createQueueNetwork(final Network network) {
+		QueueNetwork qnet = new QueueNetwork();
 
-	Map<Id, ? extends SimNode> getNodes();
+		for (Link link : network.getLinks().values()) {
+			qnet.addLink(new QueueLink(link, qnet));
+		}
+		for (Node node : network.getNodes().values()) {
+			qnet.addNode(new QueueNode(node, qnet));
+		}
+
+		return qnet;
+	}
 
 }

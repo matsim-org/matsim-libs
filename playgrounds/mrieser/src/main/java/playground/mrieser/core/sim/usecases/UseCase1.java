@@ -33,9 +33,9 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.mrieser.core.sim.api.PlanSimulation;
+import playground.mrieser.core.sim.features.DefaultNetworkFeature;
 import playground.mrieser.core.sim.features.NetworkFeature;
 import playground.mrieser.core.sim.features.OTFVisFeature;
-import playground.mrieser.core.sim.features.QueueNetworkFeature;
 import playground.mrieser.core.sim.features.SignalSystemsFeature;
 import playground.mrieser.core.sim.features.StatusFeature;
 import playground.mrieser.core.sim.features.TransitFeature;
@@ -46,6 +46,8 @@ import playground.mrieser.core.sim.impl.PlanSimulationImpl;
 import playground.mrieser.core.sim.impl.TeleportationHandler;
 import playground.mrieser.core.sim.impl.TimestepSimEngine;
 import playground.mrieser.core.sim.impl.TransitDepartureHandler;
+import playground.mrieser.core.sim.network.api.SimNetwork;
+import playground.mrieser.core.sim.network.queueNetwork.QueueNetworkCreator;
 
 /**
  * @author mrieser
@@ -73,13 +75,16 @@ public class UseCase1 {
 		TimestepSimEngine engine = new TimestepSimEngine(planSim, events);
 		planSim.setSimEngine(engine);
 
-		// setup features
+		// setup network
+		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(scenario.getNetwork());
+		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
+
+		// setup features; order is important!
 		planSim.addSimFeature(new StatusFeature());
-		NetworkFeature netFeature = new QueueNetworkFeature(scenario.getNetwork());
-		planSim.addSimFeature(netFeature);
-		planSim.addSimFeature(new OTFVisFeature());
 		planSim.addSimFeature(new SignalSystemsFeature());
 		planSim.addSimFeature(new TransitFeature());
+		planSim.addSimFeature(netFeature);
+		planSim.addSimFeature(new OTFVisFeature());
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
@@ -90,7 +95,7 @@ public class UseCase1 {
 		// setup DepartureHandlers
 		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(netFeature));
 		lh.setDepartureHandler(TransportMode.pt, new TransitDepartureHandler());
-		TeleportationHandler teleporter = new TeleportationHandler();
+		TeleportationHandler teleporter = new TeleportationHandler(engine);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);
 		lh.setDepartureHandler(TransportMode.bike, teleporter);
 

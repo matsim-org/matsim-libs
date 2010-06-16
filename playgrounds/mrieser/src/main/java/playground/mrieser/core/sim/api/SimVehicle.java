@@ -17,36 +17,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.sim.features;
+package playground.mrieser.core.sim.api;
 
-import org.matsim.api.core.v01.network.Network;
-
-import playground.mrieser.core.sim.network.api.SimNetwork;
-import playground.mrieser.core.sim.network.queueNetwork.QueueNetwork;
-
-public class QueueNetworkFeature implements NetworkFeature {
-
-	private final QueueNetwork network;
-
-	public QueueNetworkFeature(final Network network) {
-		// convert network
-		this.network = new QueueNetwork();
-	}
-
-	@Override
-	public void doSimStep(double time) {
-		this.network.doSimStep(time);
-	}
-
-	@Override
-	public SimNetwork getSimNetwork() {
-		return this.network;
-	}
-
-	@Override
-	public boolean isFinished() {
-		// TODO change to take road state into account
-		return true;
-	}
+public interface SimVehicle {
 
 }

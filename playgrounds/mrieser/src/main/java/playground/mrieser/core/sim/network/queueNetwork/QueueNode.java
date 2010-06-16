@@ -19,8 +19,30 @@
 
 package playground.mrieser.core.sim.network.queueNetwork;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.mobsim.framework.Steppable;
+
 import playground.mrieser.core.sim.network.api.SimNode;
 
-public class QueueNode implements SimNode {
+/*package*/ class QueueNode implements SimNode, Steppable {
+
+	private final QueueNetwork network;
+	private final Node node;
+
+	public QueueNode(final Node node, final QueueNetwork network) {
+		this.node = node;
+		this.network = network;
+	}
+
+	@Override
+	public void doSimStep(double time) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public Id getId() {
+		return this.node.getId();
+	}
 
 }
