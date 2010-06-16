@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.pt.analysis;
+package org.matsim.pt.analysis;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -206,15 +206,15 @@ public class TransitLoad implements VehicleArrivesAtFacilityEventHandler, Vehicl
 		}
 	}
 
-	private static class LineData {
+	/*package*/ static class LineData {
 		public final Map<TransitRoute, RouteData> routeData = new HashMap<TransitRoute, RouteData>();
 	}
 
-	private static class RouteData {
+	/*package*/ static class RouteData {
 		public final Map<TransitStopFacility, StopData> stopData = new HashMap<TransitStopFacility, StopData>();
 	}
 
-	private static class StopData {
+	/*package*/ static class StopData {
 		public final Map<Departure, StopInformation> departureData = new HashMap<Departure, StopInformation>();
 	}
 
