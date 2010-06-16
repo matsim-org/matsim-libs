@@ -33,11 +33,11 @@ public class MainTest extends MatsimTestCase {
 		
 		controler.setOverwriteFiles(true);
 		
+		// add handlers (e.g. parking book keeping)
 		EventHandlerAtStartupAdder eventHandlerAdder=new EventHandlerAtStartupAdder();
 		eventHandlerAdder.addEventHandler(new ParkingBookKeeper(controler));
 		controler.addControlerListener(eventHandlerAdder);
 		
-		// 
 		
 		
 		controler.run();

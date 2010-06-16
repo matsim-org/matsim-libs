@@ -2,6 +2,7 @@ TODO:
 
 1.) add scoring
 2.) add proper replanning module for parking (2 possibilites)
+	- do this e.g. by watching playground examples for replanning.
 3.) add tests (assert statements)
 4.) add per agent utility functions.
 

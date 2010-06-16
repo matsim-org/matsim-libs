@@ -13,6 +13,7 @@ import org.matsim.core.population.PlanImpl;
 public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private Controler controler;
+	
 
 	public ParkingBookKeeper(Controler controler){
 		this.controler=controler;
@@ -25,6 +26,8 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 //		Plan originalPlan=person.getSelectedPlan();
 //		PlanImpl newPlan = new PlanImpl(person);
 //		Activity homeAct= (Activity) originalPlan.getPlanElements().get(0);
+		
+		
 		
 	}
 
