@@ -19,10 +19,8 @@
 
 package playground.mrieser.core.sim.impl;
 
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-
 import playground.mrieser.core.sim.api.DepartureHandler;
+import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.features.NetworkFeature;
 
 /**
@@ -37,7 +35,7 @@ public class CarDepartureHandler implements DepartureHandler {
 	}
 
 	@Override
-	public void handleDeparture(Leg leg, Plan plan) {
+	public void handleDeparture(final PlanAgent agent) {
 		// TODO Auto-generated method stub
 
 	}

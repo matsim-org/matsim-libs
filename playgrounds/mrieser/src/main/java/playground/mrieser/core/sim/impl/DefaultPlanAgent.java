@@ -19,17 +19,42 @@
 
 package playground.mrieser.core.sim.impl;
 
-import playground.mrieser.core.sim.api.DepartureHandler;
+import java.util.Iterator;
+
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+
 import playground.mrieser.core.sim.api.PlanAgent;
 
-/**
- * @author mrieser
- */
-public class TransitDepartureHandler implements DepartureHandler {
+public class DefaultPlanAgent implements PlanAgent {
+
+	private final Plan plan;
+	private final Iterator<PlanElement> peIterator;
+	private PlanElement currentElement = null;
+
+	public DefaultPlanAgent(final Plan plan) {
+		this.plan = plan;
+		this.peIterator = this.plan.getPlanElements().iterator();
+	}
 
 	@Override
-	public void handleDeparture(final PlanAgent agent) {
-		// TODO Auto-generated method stub
+	public PlanElement getCurrentPlanElement() {
+		return this.currentElement;
+	}
+
+	@Override
+	public Plan getPlan() {
+		return this.plan;
+	}
+
+	@Override
+	public PlanElement useNextPlanElement() {
+		if (this.peIterator.hasNext()) {
+			this.currentElement = this.peIterator.next();
+		} else {
+			this.currentElement = null;
+		}
+		return this.currentElement;
 	}
 
 }

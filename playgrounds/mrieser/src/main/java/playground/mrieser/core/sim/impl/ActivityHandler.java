@@ -23,13 +23,13 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.core.sim.api.NewSimEngine;
+import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.api.PlanElementHandler;
 import playground.mrieser.core.sim.features.SimFeature;
 
@@ -53,37 +53,37 @@ public class ActivityHandler implements PlanElementHandler, SimFeature {
 	}
 
 	@Override
-	public void handleStart(final PlanElement element, final Plan plan) {
-		Activity act = (Activity) element;
+	public void handleStart(final PlanAgent agent) {
+		Activity act = (Activity) agent.getCurrentPlanElement();
 		EventsManager em = this.simEngine.getEventsManager();
 		double endTime = calculateActivityEndTime(act);
 		if (endTime != Time.UNDEFINED_TIME) {
-			this.activityEndsList.put(new ActivityData(endTime, plan));
+			this.activityEndsList.put(new ActivityData(endTime, agent));
 		} else {
 			// make some checks
-			PlanElement last = plan.getPlanElements().get(plan.getPlanElements().size() - 1);
-			if (last != element) {
+			PlanElement last = agent.getPlan().getPlanElements().get(agent.getPlan().getPlanElements().size() - 1);
+			if (last != act) {
 				log.error("Activity has no end-time specified, but is not the last element in the plan. " +
-						"personId = " + plan.getPerson().getId() + ". Activity = " + act);
+						"personId = " + agent.getPlan().getPerson().getId() + ". Activity = " + act);
 			}
 		}
 		em.processEvent(em.getFactory().createActivityStartEvent(this.simEngine.getCurrentTime(),
-				plan.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+				agent.getPlan().getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 	}
 
 	@Override
-	public void handleEnd(final PlanElement element, final Plan plan) {
-		Activity act = (Activity) element;
+	public void handleEnd(final PlanAgent agent) {
+		Activity act = (Activity) agent.getCurrentPlanElement();
 		EventsManager em = this.simEngine.getEventsManager();
 		em.processEvent(em.getFactory().createActivityEndEvent(this.simEngine.getCurrentTime(),
-				plan.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+				agent.getPlan().getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 	}
 
 	@Override
 	public void doSimStep(final double time) {
 		while ((!this.activityEndsList.isEmpty()) && (this.activityEndsList.peek().endTime <= time)) {
 			ActivityData data = this.activityEndsList.poll();
-			this.simEngine.handleNextPlanElement(data.plan);
+			this.simEngine.handleAgent(data.agent);
 		}
 	}
 
@@ -128,11 +128,11 @@ public class ActivityHandler implements PlanElementHandler, SimFeature {
 
 	private static class ActivityData implements Comparable<ActivityData> {
 		public final double endTime;
-		public final Plan plan;
+		public final PlanAgent agent;
 
-		public ActivityData(final double endTime, final Plan plan) {
+		public ActivityData(final double endTime, final PlanAgent agent) {
 			this.endTime = endTime;
-			this.plan = plan;
+			this.agent = agent;
 		}
 
 		@Override
@@ -146,7 +146,7 @@ public class ActivityHandler implements PlanElementHandler, SimFeature {
 				return false;
 			}
 			ActivityData data = (ActivityData) obj;
-			return (this.plan == data.plan) && (this.endTime == data.endTime);
+			return (this.agent == data.agent) && (this.endTime == data.endTime);
 		}
 	}
 

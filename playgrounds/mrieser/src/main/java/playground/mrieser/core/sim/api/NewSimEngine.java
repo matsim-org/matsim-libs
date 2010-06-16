@@ -19,7 +19,6 @@
 
 package playground.mrieser.core.sim.api;
 
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
@@ -31,7 +30,7 @@ public interface NewSimEngine {
 
 	public double getCurrentTime();
 
-	public void handleNextPlanElement(final Plan plan);
+	public void handleAgent(final PlanAgent agent);
 
 	public void runSim();
 

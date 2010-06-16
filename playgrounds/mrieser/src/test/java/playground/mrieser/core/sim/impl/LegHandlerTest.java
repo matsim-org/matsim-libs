@@ -39,6 +39,7 @@ import org.matsim.testcases.utils.EventsCollector;
 
 import playground.mrieser.core.sim.api.DepartureHandler;
 import playground.mrieser.core.sim.api.NewSimEngine;
+import playground.mrieser.core.sim.api.PlanAgent;
 
 /**
  * @author mrieser
@@ -84,22 +85,29 @@ public class LegHandlerTest {
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 		Assert.assertEquals(0, depHandler.count);
 
-		lh.handleStart(f.firstLeg, f.plan1);
+		f.agent1.useNextPlanElement(); // first home act
+
+		Assert.assertEquals(f.firstLeg, f.agent1.useNextPlanElement());
+
+		lh.handleStart(f.agent1);
 		Assert.assertEquals(1, eventsCollector.getEvents().size());
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 		Assert.assertEquals(1, depHandler.count);
 
-		lh.handleEnd(f.firstLeg, f.plan1);
+		lh.handleEnd(f.agent1);
 		Assert.assertEquals(2, eventsCollector.getEvents().size());
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 		Assert.assertEquals(1, depHandler.count);
 
-		lh.handleStart(f.secondLeg, f.plan1);
+		f.agent1.useNextPlanElement(); // work act
+		Assert.assertEquals(f.secondLeg, f.agent1.useNextPlanElement());
+
+		lh.handleStart(f.agent1);
 		Assert.assertEquals(3, eventsCollector.getEvents().size());
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 		Assert.assertEquals(2, depHandler.count);
 
-		lh.handleEnd(f.secondLeg, f.plan1);
+		lh.handleEnd(f.agent1);
 		Assert.assertEquals(4, eventsCollector.getEvents().size());
 		Assert.assertEquals(0, engine.countHandleNextPlanElement);
 		Assert.assertEquals(2, depHandler.count);
@@ -110,6 +118,7 @@ public class LegHandlerTest {
 		public final Plan plan1;
 		public final Leg firstLeg;
 		public final Leg secondLeg;
+		public final PlanAgent agent1;
 
 		public Fixture() {
 			this.person1 = new PersonImpl(new IdImpl("1"));
@@ -133,6 +142,8 @@ public class LegHandlerTest {
 
 			act = new ActivityImpl("work", c);
 			this.plan1.addActivity(act);
+
+			this.agent1 = new DefaultPlanAgent(this.plan1);
 		}
 	}
 
@@ -153,7 +164,7 @@ public class LegHandlerTest {
 		}
 
 		@Override
-		public void handleNextPlanElement(final Plan plan) {
+		public void handleAgent(final PlanAgent agent) {
 			this.countHandleNextPlanElement++;
 		}
 
@@ -167,7 +178,7 @@ public class LegHandlerTest {
 		public int count = 0;
 
 		@Override
-		public void handleDeparture(Leg leg, Plan plan) {
+		public void handleDeparture(final PlanAgent agent) {
 			this.count++;
 		}
 

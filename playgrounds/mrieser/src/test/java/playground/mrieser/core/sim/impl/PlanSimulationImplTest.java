@@ -23,11 +23,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
+import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.api.PlanElementHandler;
 
 /**
@@ -117,11 +117,11 @@ public class PlanSimulationImplTest {
 		public int countStart = 0;
 		public int countEnd = 0;
 		@Override
-		public void handleStart(PlanElement element, Plan plan) {
+		public void handleStart(final PlanAgent agent) {
 			this.countStart++;
 		}
 		@Override
-		public void handleEnd(PlanElement element, Plan plan) {
+		public void handleEnd(final PlanAgent agent) {
 			this.countEnd++;
 		}
 	}

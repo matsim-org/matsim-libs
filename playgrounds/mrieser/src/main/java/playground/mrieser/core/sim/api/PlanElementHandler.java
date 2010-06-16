@@ -19,12 +19,9 @@
 
 package playground.mrieser.core.sim.api;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-
 public interface PlanElementHandler {
 
-	public void handleStart(final PlanElement element, final Plan plan);
-	public void handleEnd(final PlanElement element, final Plan plan);
+	public void handleStart(final PlanAgent agent);
+	public void handleEnd(final PlanAgent agent);
 
 }

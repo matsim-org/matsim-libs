@@ -24,12 +24,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.mrieser.core.sim.api.DepartureHandler;
 import playground.mrieser.core.sim.api.NewSimEngine;
+import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.api.PlanElementHandler;
 
 /**
@@ -45,56 +45,56 @@ public class LegHandler implements PlanElementHandler {
 	}
 
 	@Override
-	public void handleStart(final PlanElement element, final Plan plan) {
-		Leg leg = (Leg) element;
+	public void handleStart(final PlanAgent agent) {
+		Leg leg = (Leg) agent.getCurrentPlanElement();
 		EventsManager em = this.simEngine.getEventsManager();
 
 		// find departure link id
 		// TODO [MR] improve this, or remove this information from event
 		Activity prevActivity = null;
-		for (PlanElement pe : plan.getPlanElements()) {
+		for (PlanElement pe : agent.getPlan().getPlanElements()) {
 			if (pe instanceof Activity) {
 				prevActivity = (Activity) pe;
 			}
-			if (pe == element) {
+			if (pe == leg) {
 				break;
 			}
 		}
 
 		// generate event
-		em.processEvent(em.getFactory().createAgentDepartureEvent(this.simEngine.getCurrentTime(), plan.getPerson().getId(), prevActivity.getLinkId(), leg.getMode()));
+		em.processEvent(em.getFactory().createAgentDepartureEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), prevActivity.getLinkId(), leg.getMode()));
 
 		// process departure
 		DepartureHandler depHandler = getDepartureHandler(leg.getMode());
 		if (depHandler == null) {
 			throw new NullPointerException("No DepartureHandler registered for mode " + leg.getMode());
 		}
-		depHandler.handleDeparture(leg, plan);
+		depHandler.handleDeparture(agent);
 	}
 
 	@Override
-	public void handleEnd(final PlanElement element, final Plan plan) {
-		Leg leg = (Leg) element;
+	public void handleEnd(final PlanAgent agent) {
+		Leg leg = (Leg) agent.getCurrentPlanElement();
 		EventsManager em = this.simEngine.getEventsManager();
 
 		// find departure link id
 		// TODO [MR] improve this, or remove this information from event
 		boolean breakAtNextActivity = false;
 		Activity nextActivity = null;
-		for (PlanElement pe : plan.getPlanElements()) {
+		for (PlanElement pe : agent.getPlan().getPlanElements()) {
 			if (pe instanceof Activity) {
 				nextActivity = (Activity) pe;
 				if (breakAtNextActivity) {
 					break;
 				}
 			}
-			if (pe == element) {
+			if (pe == leg) {
 				breakAtNextActivity = true;
 			}
 		}
 
 		// generate event
-		em.processEvent(em.getFactory().createAgentArrivalEvent(this.simEngine.getCurrentTime(), plan.getPerson().getId(), nextActivity.getLinkId(), leg.getMode()));
+		em.processEvent(em.getFactory().createAgentArrivalEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), nextActivity.getLinkId(), leg.getMode()));
 	}
 
 	public DepartureHandler setDepartureHandler(final TransportMode mode, final DepartureHandler handler) {

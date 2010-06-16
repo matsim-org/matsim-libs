@@ -26,12 +26,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.api.PlanElementHandler;
 import playground.mrieser.core.sim.api.PlanSimulation;
 
@@ -47,6 +47,7 @@ public class TimestepSimEngineTest {
 		plan.addActivity(new ActivityImpl("shop", c));
 		plan.addLeg(new LegImpl(TransportMode.car));
 		plan.addActivity(new ActivityImpl("home", c));
+		PlanAgent agent = new DefaultPlanAgent(plan);
 
 		PlanSimulation planSim = new PlanSimulationImpl(null, null);
 		TimestepSimEngine engine = new TimestepSimEngine(planSim, null);
@@ -57,23 +58,23 @@ public class TimestepSimEngineTest {
 		planSim.setPlanElementHandler(Leg.class, legHandler);
 
 		assertCounts(0, 0, 0, 0, actHandler, legHandler);
-		engine.handleNextPlanElement(plan); // home act
+		engine.handleAgent(agent); // home act
 		assertCounts(1, 0, 0, 0, actHandler, legHandler);
-		engine.handleNextPlanElement(plan); // leg
+		engine.handleAgent(agent); // leg
 		assertCounts(1, 1, 1, 0, actHandler, legHandler);
-		engine.handleNextPlanElement(plan); // work act
+		engine.handleAgent(agent); // work act
 		assertCounts(2, 1, 1, 1, actHandler, legHandler);
-		engine.handleNextPlanElement(plan); // leg
+		engine.handleAgent(agent); // leg
 		assertCounts(2, 2, 2, 1, actHandler, legHandler);
-		engine.handleNextPlanElement(plan); // shop act
+		engine.handleAgent(agent); // shop act
 		assertCounts(3, 2, 2, 2, actHandler, legHandler);
-		engine.handleNextPlanElement(plan); // leg
+		engine.handleAgent(agent); // leg
 		assertCounts(3, 3, 3, 2, actHandler, legHandler);
-		engine.handleNextPlanElement(plan); // home act
+		engine.handleAgent(agent); // home act
 		assertCounts(4, 3, 3, 3, actHandler, legHandler);
-		engine.handleNextPlanElement(plan); // proceed, just finish home act
+		engine.handleAgent(agent); // proceed, just finish home act
 		assertCounts(4, 4, 3, 3, actHandler, legHandler);
-		engine.handleNextPlanElement(plan); // nothing to proceed
+		engine.handleAgent(agent); // nothing to proceed
 		assertCounts(4, 4, 3, 3, actHandler, legHandler); // numbers should not change
 	}
 
@@ -88,12 +89,14 @@ public class TimestepSimEngineTest {
 		plan1.addActivity(new ActivityImpl("shop", c));
 		plan1.addLeg(new LegImpl(TransportMode.car));
 		plan1.addActivity(new ActivityImpl("home", c));
+		PlanAgent agent1 = new DefaultPlanAgent(plan1);
 		Plan plan2 = new PlanImpl();
 		plan2.addActivity(new ActivityImpl("home", c));
 		plan2.addLeg(new LegImpl(TransportMode.car));
 		plan2.addActivity(new ActivityImpl("leisure", c));
 		plan2.addLeg(new LegImpl(TransportMode.car));
 		plan2.addActivity(new ActivityImpl("home", c));
+		PlanAgent agent2 = new DefaultPlanAgent(plan2);
 
 		PlanSimulation planSim = new PlanSimulationImpl(null, null);
 		TimestepSimEngine engine = new TimestepSimEngine(planSim, null);
@@ -104,29 +107,29 @@ public class TimestepSimEngineTest {
 		planSim.setPlanElementHandler(Leg.class, legHandler);
 
 		assertCounts(0, 0, 0, 0, actHandler, legHandler);
-		engine.handleNextPlanElement(plan1); // 1.home act
+		engine.handleAgent(agent1); // 1.home act
 		assertCounts(1, 0, 0, 0, actHandler, legHandler);
-		engine.handleNextPlanElement(plan1); // 1.leg
+		engine.handleAgent(agent1); // 1.leg
 		assertCounts(1, 1, 1, 0, actHandler, legHandler);
-		engine.handleNextPlanElement(plan2); // 2.home act
+		engine.handleAgent(agent2); // 2.home act
 		assertCounts(2, 1, 1, 0, actHandler, legHandler);
-		engine.handleNextPlanElement(plan1); // 1.work act
+		engine.handleAgent(agent1); // 1.work act
 		assertCounts(3, 1, 1, 1, actHandler, legHandler);
-		engine.handleNextPlanElement(plan2); // 2.leg
+		engine.handleAgent(agent2); // 2.leg
 		assertCounts(3, 2, 2, 1, actHandler, legHandler);
-		engine.handleNextPlanElement(plan2); // 2.leisure
+		engine.handleAgent(agent2); // 2.leisure
 		assertCounts(4, 2, 2, 2, actHandler, legHandler);
-		engine.handleNextPlanElement(plan1); // 1.leg
+		engine.handleAgent(agent1); // 1.leg
 		assertCounts(4, 3, 3, 2, actHandler, legHandler);
-		engine.handleNextPlanElement(plan1); // 1.shop act
+		engine.handleAgent(agent1); // 1.shop act
 		assertCounts(5, 3, 3, 3, actHandler, legHandler);
-		engine.handleNextPlanElement(plan1); // 1.leg
+		engine.handleAgent(agent1); // 1.leg
 		assertCounts(5, 4, 4, 3, actHandler, legHandler);
-		engine.handleNextPlanElement(plan2); // 2.leg
+		engine.handleAgent(agent2); // 2.leg
 		assertCounts(5, 5, 5, 3, actHandler, legHandler);
-		engine.handleNextPlanElement(plan1); // 1.home act
+		engine.handleAgent(agent1); // 1.home act
 		assertCounts(6, 5, 5, 4, actHandler, legHandler);
-		engine.handleNextPlanElement(plan2); // 2.home act
+		engine.handleAgent(agent2); // 2.home act
 		assertCounts(7, 5, 5, 5, actHandler, legHandler);
 	}
 
@@ -143,11 +146,11 @@ public class TimestepSimEngineTest {
 		public int countStart = 0;
 		public int countEnd = 0;
 		@Override
-		public void handleStart(PlanElement element, Plan plan) {
+		public void handleStart(final PlanAgent agent) {
 			this.countStart++;
 		}
 		@Override
-		public void handleEnd(PlanElement element, Plan plan) {
+		public void handleEnd(final PlanAgent agent) {
 			this.countEnd++;
 		}
 	}

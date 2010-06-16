@@ -17,19 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.sim.impl;
+package playground.mrieser.core.sim.api;
 
-import playground.mrieser.core.sim.api.DepartureHandler;
-import playground.mrieser.core.sim.api.PlanAgent;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 
-/**
- * @author mrieser
- */
-public class TransitDepartureHandler implements DepartureHandler {
+public interface PlanAgent {
 
-	@Override
-	public void handleDeparture(final PlanAgent agent) {
-		// TODO Auto-generated method stub
-	}
+	public Plan getPlan();
+
+	public PlanElement getCurrentPlanElement();
+
+	public PlanElement useNextPlanElement();
 
 }

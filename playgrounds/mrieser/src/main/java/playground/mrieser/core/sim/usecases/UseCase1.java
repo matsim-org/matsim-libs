@@ -69,6 +69,8 @@ public class UseCase1 {
 		ScenarioLoader loader = new ScenarioLoaderImpl(config);
 		Scenario scenario = loader.loadScenario();
 
+		// the following lines could be placed in a mobsim factory
+
 		// setup Sim and Engine
 		EventsManager events = new EventsManagerImpl();
 		PlanSimulation planSim = new PlanSimulationImpl(scenario, events);

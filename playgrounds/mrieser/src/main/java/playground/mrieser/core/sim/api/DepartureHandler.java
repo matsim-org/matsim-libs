@@ -19,14 +19,11 @@
 
 package playground.mrieser.core.sim.api;
 
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-
 /**
  * @author mrieser
  */
 public interface DepartureHandler {
 
-	public void handleDeparture(final Leg leg, final Plan plan);
+	public void handleDeparture(final PlanAgent agent);
 
 }
