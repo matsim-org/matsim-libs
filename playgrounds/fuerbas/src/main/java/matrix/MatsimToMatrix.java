@@ -53,13 +53,13 @@ public class MatsimToMatrix {
 	
 	System.out.println("LINK ADDIEREN KOMPLETT"+Runtime.getRuntime().freeMemory());
 	
-	for (int i=0; i<100; i++){
-		for (int j=0; j<100; j++)
-			if (linkIdxFromTo[i][j]>0){
-			System.out.println(linkIdxFromTo[i][j]);
-			System.out.println(linkList.get(linkIdxFromTo[i][j]).getFreespeed());
-			}
-	}
+//	for (int i=0; i<100; i++){
+//		for (int j=0; j<100; j++)
+//			if (linkIdxFromTo[i][j]>0){
+//			System.out.println(linkIdxFromTo[i][j]);
+//			System.out.println(linkList.get(linkIdxFromTo[i][j]).getFreespeed());
+//			}
+//	}
 	
 	System.out.println("EDGE ADDIEREN KOMPLETT"+Runtime.getRuntime().freeMemory());
 	
