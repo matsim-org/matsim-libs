@@ -26,16 +26,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.api.PlanElementHandler;
 import playground.mrieser.core.sim.api.PlanSimulation;
 import playground.mrieser.core.sim.api.SimKeepAlive;
+import playground.mrieser.core.sim.api.TimestepSimEngine;
 import playground.mrieser.core.sim.features.SimFeature;
 
-public class TimestepSimEngine implements NewSimEngine {
+public class DefaultTimestepSimEngine implements TimestepSimEngine {
 
-	private final static Logger log = Logger.getLogger(TimestepSimEngine.class);
+	private final static Logger log = Logger.getLogger(DefaultTimestepSimEngine.class);
 
 	private final PlanSimulation sim;
 	private final EventsManager events;
@@ -43,15 +43,20 @@ public class TimestepSimEngine implements NewSimEngine {
 	private final double timeStepSize;
 	private final List<SimKeepAlive> aliveKeepers = new LinkedList<SimKeepAlive>();
 
-	public TimestepSimEngine(final PlanSimulation sim, final EventsManager events) {
+	public DefaultTimestepSimEngine(final PlanSimulation sim, final EventsManager events) {
 		this(sim, events, 1.0);
 	}
 
-	public TimestepSimEngine(final PlanSimulation sim, final EventsManager events, final double timeStepSize) {
+	public DefaultTimestepSimEngine(final PlanSimulation sim, final EventsManager events, final double timeStepSize) {
 		this.sim = sim;
 		this.events = events;
 		this.timeStepSize = timeStepSize;
 		this.time = 0;
+	}
+
+	@Override
+	public double getTimestepSize() {
+		return this.timeStepSize;
 	}
 
 	@Override

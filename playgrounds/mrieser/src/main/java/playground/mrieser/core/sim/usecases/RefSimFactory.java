@@ -38,8 +38,7 @@ import playground.mrieser.core.sim.impl.CarDepartureHandler;
 import playground.mrieser.core.sim.impl.LegHandler;
 import playground.mrieser.core.sim.impl.PlanSimulationImpl;
 import playground.mrieser.core.sim.impl.TeleportationHandler;
-import playground.mrieser.core.sim.impl.TimestepSimEngine;
-import playground.mrieser.core.sim.impl.TransitDepartureHandler;
+import playground.mrieser.core.sim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.sim.network.api.SimNetwork;
 import playground.mrieser.core.sim.network.queueNetwork.QueueNetworkCreator;
 
@@ -49,7 +48,7 @@ public class RefSimFactory implements MobsimFactory {
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
 
 		PlanSimulationImpl planSim = new PlanSimulationImpl(sc, eventsManager);
-		TimestepSimEngine engine = new TimestepSimEngine(planSim, eventsManager);
+		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
 		planSim.setSimEngine(engine);
 
 		// setup network
@@ -68,11 +67,13 @@ public class RefSimFactory implements MobsimFactory {
 		LegHandler lh = new LegHandler(engine);
 		planSim.setPlanElementHandler(Activity.class, ah);
 		planSim.setPlanElementHandler(Leg.class, lh);
+		planSim.addSimFeature(ah); // how should a user now ah is a simfeature, bug lh not?
 
 		// setup DepartureHandlers
 		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(netFeature));
-		lh.setDepartureHandler(TransportMode.pt, new TransitDepartureHandler());
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
+		planSim.addSimFeature(teleporter); // how should a user now teleporter is a simfeature?
+		lh.setDepartureHandler(TransportMode.pt, teleporter);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);
 		lh.setDepartureHandler(TransportMode.bike, teleporter);
 

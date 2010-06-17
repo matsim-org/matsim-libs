@@ -19,6 +19,7 @@
 
 package playground.mrieser.core.sim.impl;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.Vehicle;
 
 import playground.mrieser.core.sim.api.DriverAgent;
@@ -39,8 +40,8 @@ public class DefaultSimVehicle implements SimVehicle {
 	}
 
 	@Override
-	public Vehicle getVehicle() {
-		return this.vehicle;
+	public Id getId() {
+		return this.vehicle.getId();
 	}
 
 	public DriverAgent getDriver() {

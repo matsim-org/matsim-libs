@@ -17,18 +17,63 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.sim.api;
+package playground.mrieser.core.sim.fakes;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsManagerImpl;
 
-public interface SimVehicle {
+import playground.mrieser.core.sim.api.PlanAgent;
+import playground.mrieser.core.sim.api.SimKeepAlive;
+import playground.mrieser.core.sim.api.TimestepSimEngine;
 
-	public Id getId();
+/**
+ * Fake implementation of a SimEngine for test purposes.
+ *
+ * @author mrieser
+ */
+public class FakeSimEngine implements TimestepSimEngine {
+	private final EventsManager em = new EventsManagerImpl();
+	private double time;
+	public int countHandleAgent = 0;
+	public int countRunSim = 0;
+	public int countAddKeepAlive = 0;
+	public double timestepSize = 1.0;
 
-	public void setDriver(final DriverAgent driver);
+	@Override
+	public double getCurrentTime() {
+		return this.time;
+	}
 
-	public DriverAgent getDriver();
+	public void setCurrentTime(final double time) {
+		this.time = time;
+	}
 
-	public double getSizeInEquivalents(); // TODO [MR] IMO, this should come from Vehicle
+	@Override
+	public EventsManager getEventsManager() {
+		return this.em;
+	}
 
+	@Override
+	public void handleAgent(final PlanAgent agent) {
+		this.countHandleAgent++;
+	}
+
+	@Override
+	public void runSim() {
+		this.countRunSim++;
+	}
+
+	@Override
+	public void addKeepAlive(SimKeepAlive keepAlive) {
+		this.countAddKeepAlive++;
+	}
+
+	@Override
+	public double getTimestepSize() {
+		return this.timestepSize;
+	}
+
+	public void setTimestepSize(final double timestepSize) {
+		this.timestepSize = timestepSize;
+	}
 }

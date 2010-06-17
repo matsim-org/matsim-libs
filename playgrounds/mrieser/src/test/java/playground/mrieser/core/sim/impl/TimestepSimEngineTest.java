@@ -50,7 +50,7 @@ public class TimestepSimEngineTest {
 		PlanAgent agent = new DefaultPlanAgent(plan);
 
 		PlanSimulation planSim = new PlanSimulationImpl(null, null);
-		TimestepSimEngine engine = new TimestepSimEngine(planSim, null);
+		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, null);
 		CountingPlanElementHandler actHandler = new CountingPlanElementHandler();
 		CountingPlanElementHandler legHandler = new CountingPlanElementHandler();
 
@@ -99,7 +99,7 @@ public class TimestepSimEngineTest {
 		PlanAgent agent2 = new DefaultPlanAgent(plan2);
 
 		PlanSimulation planSim = new PlanSimulationImpl(null, null);
-		TimestepSimEngine engine = new TimestepSimEngine(planSim, null);
+		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, null);
 		CountingPlanElementHandler actHandler = new CountingPlanElementHandler();
 		CountingPlanElementHandler legHandler = new CountingPlanElementHandler();
 

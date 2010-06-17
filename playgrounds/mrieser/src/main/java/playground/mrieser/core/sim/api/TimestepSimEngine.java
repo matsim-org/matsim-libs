@@ -19,16 +19,11 @@
 
 package playground.mrieser.core.sim.api;
 
-import org.matsim.api.core.v01.Id;
+/**
+ * @author mrieser
+ */
+public interface TimestepSimEngine extends NewSimEngine {
 
-public interface SimVehicle {
-
-	public Id getId();
-
-	public void setDriver(final DriverAgent driver);
-
-	public DriverAgent getDriver();
-
-	public double getSizeInEquivalents(); // TODO [MR] IMO, this should come from Vehicle
+	public abstract double getTimestepSize();
 
 }

@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mrieser.core.sim.api.NewSimEngine;
+import playground.mrieser.core.sim.api.TimestepSimEngine;
 import playground.mrieser.core.sim.network.api.SimLink;
 import playground.mrieser.core.sim.network.api.SimNetwork;
 import playground.mrieser.core.sim.network.api.SimNode;
@@ -34,11 +34,14 @@ import playground.mrieser.core.sim.network.api.SimNode;
  */
 /*package*/ class QueueNetwork implements SimNetwork {
 
-	protected final NewSimEngine simEngine;
+	protected final TimestepSimEngine simEngine;
 	private final Map<Id, QueueLink> links;
 	private final Map<Id, QueueNode> nodes;
+	private double flowCapFactor = 1.0;
+	private double storageCapFactor = 1.0;
+	private double effectiveCellSize = 7.5;
 
-	public QueueNetwork(final NewSimEngine simEngine) {
+	public QueueNetwork(final TimestepSimEngine simEngine) {
 		this.simEngine = simEngine;
 		this.links = new HashMap<Id, QueueLink>();
 		this.nodes = new HashMap<Id, QueueNode>();
@@ -70,6 +73,30 @@ import playground.mrieser.core.sim.network.api.SimNode;
 
 	/*package*/ void addNode(final QueueNode node) {
 		this.nodes.put(node.getId(), node);
+	}
+
+	public void setFlowCapFactor(double flowCapFactor) {
+		this.flowCapFactor = flowCapFactor;
+	}
+
+	public double getFlowCapFactor() {
+		return this.flowCapFactor;
+	}
+
+	public void setStorageCapFactor(double storageCapFactor) {
+		this.storageCapFactor = storageCapFactor;
+	}
+
+	public double getStorageCapFactor() {
+		return storageCapFactor;
+	}
+
+	public void setEffectiveCellSize(double effectiveCellSize) {
+		this.effectiveCellSize = effectiveCellSize;
+	}
+
+	public double getEffectiveCellSize() {
+		return effectiveCellSize;
 	}
 
 }

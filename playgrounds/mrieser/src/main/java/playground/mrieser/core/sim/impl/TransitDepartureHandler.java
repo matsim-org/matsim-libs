@@ -29,7 +29,7 @@ public class TransitDepartureHandler implements DepartureHandler {
 
 	@Override
 	public void handleDeparture(final PlanAgent agent) {
-		// TODO Auto-generated method stub
+		throw new RuntimeException("not yet implemented.");
 	}
 
 }

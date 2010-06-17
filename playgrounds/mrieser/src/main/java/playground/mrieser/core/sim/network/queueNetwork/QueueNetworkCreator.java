@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
-import playground.mrieser.core.sim.api.NewSimEngine;
+import playground.mrieser.core.sim.api.TimestepSimEngine;
 import playground.mrieser.core.sim.network.api.SimNetwork;
 
 /**
@@ -31,7 +31,7 @@ import playground.mrieser.core.sim.network.api.SimNetwork;
  */
 public abstract class QueueNetworkCreator {
 
-	public static SimNetwork createQueueNetwork(final Network network, final NewSimEngine simEngine) {
+	public static SimNetwork createQueueNetwork(final Network network, final TimestepSimEngine simEngine) {
 		QueueNetwork qnet = new QueueNetwork(simEngine);
 
 		for (Link link : network.getLinks().values()) {

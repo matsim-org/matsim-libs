@@ -27,9 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -38,9 +36,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.utils.EventsCollector;
 
 import playground.mrieser.core.sim.api.DepartureHandler;
-import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanAgent;
-import playground.mrieser.core.sim.api.SimKeepAlive;
+import playground.mrieser.core.sim.fakes.FakeSimEngine;
 
 /**
  * @author mrieser
@@ -49,7 +46,7 @@ public class LegHandlerTest {
 
 	@Test
 	public void testSetGetDepartureHandlers() {
-		LegHandler legHandler = new LegHandler(new SimTestEngine());
+		LegHandler legHandler = new LegHandler(new FakeSimEngine());
 
 		CountingDepartureHandler carHandler = new CountingDepartureHandler();
 		CountingDepartureHandler transitHandler = new CountingDepartureHandler();
@@ -75,7 +72,7 @@ public class LegHandlerTest {
 	@Test
 	public void testHandleStartHandleEnd() {
 		Fixture f = new Fixture();
-		SimTestEngine engine = new SimTestEngine();
+		FakeSimEngine engine = new FakeSimEngine();
 		EventsCollector eventsCollector = new EventsCollector();
 		engine.getEventsManager().addHandler(eventsCollector);
 		LegHandler lh = new LegHandler(engine);
@@ -83,7 +80,7 @@ public class LegHandlerTest {
 		lh.setDepartureHandler(TransportMode.car, depHandler);
 
 		Assert.assertEquals(0, eventsCollector.getEvents().size());
-		Assert.assertEquals(0, engine.countHandleNextPlanElement);
+		Assert.assertEquals(0, engine.countHandleAgent);
 		Assert.assertEquals(0, depHandler.count);
 
 		f.agent1.useNextPlanElement(); // first home act
@@ -92,12 +89,12 @@ public class LegHandlerTest {
 
 		lh.handleStart(f.agent1);
 		Assert.assertEquals(1, eventsCollector.getEvents().size());
-		Assert.assertEquals(0, engine.countHandleNextPlanElement);
+		Assert.assertEquals(0, engine.countHandleAgent);
 		Assert.assertEquals(1, depHandler.count);
 
 		lh.handleEnd(f.agent1);
 		Assert.assertEquals(2, eventsCollector.getEvents().size());
-		Assert.assertEquals(0, engine.countHandleNextPlanElement);
+		Assert.assertEquals(0, engine.countHandleAgent);
 		Assert.assertEquals(1, depHandler.count);
 
 		f.agent1.useNextPlanElement(); // work act
@@ -105,12 +102,12 @@ public class LegHandlerTest {
 
 		lh.handleStart(f.agent1);
 		Assert.assertEquals(3, eventsCollector.getEvents().size());
-		Assert.assertEquals(0, engine.countHandleNextPlanElement);
+		Assert.assertEquals(0, engine.countHandleAgent);
 		Assert.assertEquals(2, depHandler.count);
 
 		lh.handleEnd(f.agent1);
 		Assert.assertEquals(4, eventsCollector.getEvents().size());
-		Assert.assertEquals(0, engine.countHandleNextPlanElement);
+		Assert.assertEquals(0, engine.countHandleAgent);
 		Assert.assertEquals(2, depHandler.count);
 	}
 
@@ -145,36 +142,6 @@ public class LegHandlerTest {
 			this.plan1.addActivity(act);
 
 			this.agent1 = new DefaultPlanAgent(this.plan1);
-		}
-	}
-
-	private static class SimTestEngine implements NewSimEngine {
-
-		private final EventsManager em = new EventsManagerImpl();
-		private double time;
-		public int countHandleNextPlanElement = 0;
-
-		@Override
-		public double getCurrentTime() {
-			return this.time;
-		}
-
-		@Override
-		public EventsManager getEventsManager() {
-			return this.em;
-		}
-
-		@Override
-		public void handleAgent(final PlanAgent agent) {
-			this.countHandleNextPlanElement++;
-		}
-
-		@Override
-		public void runSim() {
-		}
-
-		@Override
-		public void addKeepAlive(SimKeepAlive keepAlive) {
 		}
 	}
 

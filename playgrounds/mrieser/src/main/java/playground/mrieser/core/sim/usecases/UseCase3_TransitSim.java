@@ -34,7 +34,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 /**
  * @author mrieser
  */
-public class UseCase1 {
+public class UseCase3_TransitSim {
 
 	public static void main(String[] args) {
 
@@ -56,8 +56,7 @@ public class UseCase1 {
 
 		/* **************************************************************** */
 
-		Simulation sim = new TeleportOnlySimFactory().createMobsim(scenario, events);
-//		Simulation sim = new RefSimFactory().createMobsim(scenario, events);
+		Simulation sim = new TransitSimFactory().createMobsim(scenario, events);
 		sim.run(); // replace with PlanSimulation.runSim();
 
 		/* **************************************************************** */

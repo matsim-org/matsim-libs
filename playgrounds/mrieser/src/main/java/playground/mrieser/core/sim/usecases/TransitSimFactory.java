@@ -27,25 +27,41 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 
+import playground.mrieser.core.sim.features.DefaultNetworkFeature;
+import playground.mrieser.core.sim.features.NetworkFeature;
+import playground.mrieser.core.sim.features.OTFVisFeature;
+import playground.mrieser.core.sim.features.SignalSystemsFeature;
 import playground.mrieser.core.sim.features.StatusFeature;
+import playground.mrieser.core.sim.features.TransitFeature;
 import playground.mrieser.core.sim.impl.ActivityHandler;
+import playground.mrieser.core.sim.impl.CarDepartureHandler;
 import playground.mrieser.core.sim.impl.LegHandler;
 import playground.mrieser.core.sim.impl.PlanSimulationImpl;
 import playground.mrieser.core.sim.impl.TeleportationHandler;
 import playground.mrieser.core.sim.impl.DefaultTimestepSimEngine;
+import playground.mrieser.core.sim.impl.TransitDepartureHandler;
+import playground.mrieser.core.sim.network.api.SimNetwork;
+import playground.mrieser.core.sim.network.queueNetwork.QueueNetworkCreator;
 
-public class TeleportOnlySimFactory implements MobsimFactory {
+public class TransitSimFactory implements MobsimFactory {
 
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
 
 		PlanSimulationImpl planSim = new PlanSimulationImpl(sc, eventsManager);
-
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
 		planSim.setSimEngine(engine);
 
+		// setup network
+		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(sc.getNetwork(), engine);
+		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
+
 		// setup features; order is important!
 		planSim.addSimFeature(new StatusFeature());
+		planSim.addSimFeature(new SignalSystemsFeature());
+		planSim.addSimFeature(new TransitFeature());
+		planSim.addSimFeature(netFeature);
+		planSim.addSimFeature(new OTFVisFeature());
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
@@ -53,14 +69,10 @@ public class TeleportOnlySimFactory implements MobsimFactory {
 		planSim.setPlanElementHandler(Activity.class, ah);
 		planSim.setPlanElementHandler(Leg.class, lh);
 
-		planSim.addSimFeature(ah); // how should a user now ah is a simfeature, bug lh not?
-
 		// setup DepartureHandlers
+		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(netFeature));
+		lh.setDepartureHandler(TransportMode.pt, new TransitDepartureHandler());
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
-		teleporter.setDefaultTeleportationTime(180); // this should usually not be set! TODO [MR] remove line
-		planSim.addSimFeature(teleporter); // how should a user now teleporter is a simfeature?
-		lh.setDepartureHandler(TransportMode.car, teleporter);
-		lh.setDepartureHandler(TransportMode.pt, teleporter);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);
 		lh.setDepartureHandler(TransportMode.bike, teleporter);
 

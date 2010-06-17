@@ -25,16 +25,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanAgent;
-import playground.mrieser.core.sim.api.SimKeepAlive;
+import playground.mrieser.core.sim.fakes.FakeSimEngine;
 import playground.mrieser.core.sim.impl.TimestepSimEngineTest.CountingPlanElementHandler;
 
 public class TeleportationHandlerTest {
@@ -54,7 +51,7 @@ public class TeleportationHandlerTest {
 		plan.addActivity(new ActivityImpl("home", c));
 		PlanAgent agent = new DefaultPlanAgent(plan);
 
-		SimTestEngine engine = new SimTestEngine();
+		FakeSimEngine engine = new FakeSimEngine();
 		CountingPlanElementHandler actHandler = new CountingPlanElementHandler();
 
 		TeleportationHandler th = new TeleportationHandler(engine);
@@ -85,40 +82,6 @@ public class TeleportationHandlerTest {
 		Assert.assertEquals(2, engine.countHandleAgent);
 		th.doSimStep(11.0 * 3600 + 2000.0);
 		Assert.assertEquals(2, engine.countHandleAgent);
-	}
-
-	private static class SimTestEngine implements NewSimEngine {
-
-		private final EventsManager em = new EventsManagerImpl();
-		private double time;
-		public int countHandleAgent = 0;
-
-		@Override
-		public double getCurrentTime() {
-			return this.time;
-		}
-
-		public void setCurrentTime(final double time) {
-			this.time = time;
-		}
-
-		@Override
-		public EventsManager getEventsManager() {
-			return this.em;
-		}
-
-		@Override
-		public void handleAgent(final PlanAgent agent) {
-			this.countHandleAgent++;
-		}
-
-		@Override
-		public void runSim() {
-		}
-
-		@Override
-		public void addKeepAlive(SimKeepAlive keepAlive) {
-		}
 	}
 
 }
