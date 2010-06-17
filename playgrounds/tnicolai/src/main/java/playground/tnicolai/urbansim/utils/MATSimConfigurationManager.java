@@ -32,7 +32,11 @@ import org.matsim.core.config.MatsimConfigReader;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.properties.MATSimProperties;
 import playground.tnicolai.urbansim.utils.io.FileCopy;
-
+/**
+ * 
+ * @author thomas
+ * @deprecated
+ */
 public class MATSimConfigurationManager {
 	
 	// logger
@@ -48,6 +52,7 @@ public class MATSimConfigurationManager {
 	 * 
 	 * @param config MATSim config object
 	 * @return boolean true if process was successful
+	 * @deprecated
 	 */
 	public static boolean repareForNextRun(Config config){
 		
@@ -67,6 +72,7 @@ public class MATSimConfigurationManager {
 	 * copies the generated plans file to a save place
 	 * 
 	 * @return boolean true if copying was successful
+	 * @deprecated
 	 */
 	public static boolean saveOutputPlansFile(){
 		
@@ -95,6 +101,7 @@ public class MATSimConfigurationManager {
 	 * 
 	 * @param currentConfig MASim config object	
 	 * @return boolean true if creating new MATSim config was successful
+	 * @deprecated
 	 */
 	public static boolean generateNewMATSimConfigFile(Config currentConfig){
 		
@@ -142,6 +149,7 @@ public class MATSimConfigurationManager {
 	/**
 	 * save the path to generated MATSim config file and number of runs 
 	 * in the MATSim properties file
+	 * @deprecated
 	 */
 	private static void saveLinkToGeneratedMATSimConfigInPropertiesFile(){
 		
@@ -161,6 +169,7 @@ public class MATSimConfigurationManager {
 	 * returns the number of runs from the MATSim properties file
 	 * 
 	 * @return String number of runs
+	 * @deprecated
 	 */
 	public static String getMATSimRunCount(){
 		return MATSimProperties.properies.getProperty(Constants.RUN_NUMBER);
@@ -170,6 +179,7 @@ public class MATSimConfigurationManager {
 	 * returns the path to the generated MATSim config from the properties file
 	 * 
 	 * @return String path to generated MATSim config
+	 * @deprecated
 	 */
 	public static String getPathToGeneratedMATSimConfig(){
 		return MATSimProperties.properies.getProperty(Constants.PATH_TO_GENERATED_MATSIM_CONFIG_FILE);
@@ -178,6 +188,7 @@ public class MATSimConfigurationManager {
 	/**
 	 * set the number of runs to 1 and clears the path to the generated MATSim config file
 	 * when its the first run of MATSim
+	 * @deprecated
 	 */
 	public static void resetMATSimProperties(){
 		MATSimProperties.properies.setProperty(Constants.RUN_NUMBER, "1");
@@ -188,6 +199,7 @@ public class MATSimConfigurationManager {
 	/**
 	 * for testing purposes
 	 * @param args
+	 * @deprecated
 	 */
 	public static void main(String args[]){
 		
