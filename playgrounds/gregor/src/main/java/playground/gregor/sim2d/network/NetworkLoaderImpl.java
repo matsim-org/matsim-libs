@@ -40,7 +40,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
@@ -146,7 +146,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 			ScenarioImpl scenario = new ScenarioImpl();
 			scenario.getConfig().global().setCoordinateSystem("WGS84_UTM33N");
 			//		CoordinateReferenceSystem crs = MGC.getCRS("WGS84_UTM33N");
-			FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(this.network, "WGS84_UTM33N");
+			FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(this.network, "WGS84_UTM33N");
 			//		builder.setCoordinateReferenceSystem(crs);
 			builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 			builder.setWidthCoefficient(0.5);

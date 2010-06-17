@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
@@ -72,7 +72,7 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, coordinateSys);
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, coordinateSys);
 		builder
 				.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);

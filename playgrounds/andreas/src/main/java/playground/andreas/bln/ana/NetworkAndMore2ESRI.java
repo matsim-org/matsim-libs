@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -66,7 +66,7 @@ public class NetworkAndMore2ESRI extends Links2ESRIShape{
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, "DHDN_GK4");
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
 //		builder.setFeatureGeneratorPrototype(CountVehOnLinksStringBasedFeatureGenerator.class);
 		builder.setFeatureGeneratorPrototype(LinkstatsStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
