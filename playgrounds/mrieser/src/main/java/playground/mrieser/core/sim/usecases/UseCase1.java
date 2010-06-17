@@ -22,32 +22,13 @@ package playground.mrieser.core.sim.usecases;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
-
-import playground.mrieser.core.sim.api.PlanSimulation;
-import playground.mrieser.core.sim.features.DefaultNetworkFeature;
-import playground.mrieser.core.sim.features.NetworkFeature;
-import playground.mrieser.core.sim.features.OTFVisFeature;
-import playground.mrieser.core.sim.features.SignalSystemsFeature;
-import playground.mrieser.core.sim.features.StatusFeature;
-import playground.mrieser.core.sim.features.TransitFeature;
-import playground.mrieser.core.sim.impl.ActivityHandler;
-import playground.mrieser.core.sim.impl.CarDepartureHandler;
-import playground.mrieser.core.sim.impl.LegHandler;
-import playground.mrieser.core.sim.impl.PlanSimulationImpl;
-import playground.mrieser.core.sim.impl.TeleportationHandler;
-import playground.mrieser.core.sim.impl.TimestepSimEngine;
-import playground.mrieser.core.sim.impl.TransitDepartureHandler;
-import playground.mrieser.core.sim.network.api.SimNetwork;
-import playground.mrieser.core.sim.network.queueNetwork.QueueNetworkCreator;
 
 /**
  * @author mrieser
@@ -68,40 +49,9 @@ public class UseCase1 {
 		ConfigUtils.modifyFilePaths(config, prefix);
 		ScenarioLoader loader = new ScenarioLoaderImpl(config);
 		Scenario scenario = loader.loadScenario();
-
-		// the following lines could be placed in a mobsim factory
-
-		// setup Sim and Engine
 		EventsManager events = new EventsManagerImpl();
-		PlanSimulation planSim = new PlanSimulationImpl(scenario, events);
-		TimestepSimEngine engine = new TimestepSimEngine(planSim, events);
-		planSim.setSimEngine(engine);
 
-		// setup network
-		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(scenario.getNetwork());
-		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
-
-		// setup features; order is important!
-		planSim.addSimFeature(new StatusFeature());
-		planSim.addSimFeature(new SignalSystemsFeature());
-		planSim.addSimFeature(new TransitFeature());
-		planSim.addSimFeature(netFeature);
-		planSim.addSimFeature(new OTFVisFeature());
-
-		// setup PlanElementHandlers
-		ActivityHandler ah = new ActivityHandler(engine);
-		LegHandler lh = new LegHandler(engine);
-		planSim.setPlanElementHandler(Activity.class, ah);
-		planSim.setPlanElementHandler(Leg.class, lh);
-
-		// setup DepartureHandlers
-		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(netFeature));
-		lh.setDepartureHandler(TransportMode.pt, new TransitDepartureHandler());
-		TeleportationHandler teleporter = new TeleportationHandler(engine);
-		lh.setDepartureHandler(TransportMode.walk, teleporter);
-		lh.setDepartureHandler(TransportMode.bike, teleporter);
-
-		// run
-		planSim.runSim();
+		Simulation sim = new RefSimFactory().createMobsim(scenario, events);
+		sim.run(); // replace with PlanSimulation.runSim();
 	}
 }

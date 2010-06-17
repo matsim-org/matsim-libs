@@ -17,34 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.sim.impl;
+package playground.mrieser.core.sim.api;
 
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.api.core.v01.Id;
 
-import playground.mrieser.core.sim.api.DepartureHandler;
-import playground.mrieser.core.sim.api.DriverAgent;
-import playground.mrieser.core.sim.api.PlanAgent;
-import playground.mrieser.core.sim.features.NetworkFeature;
+public interface DriverAgent {
 
-/**
- * @author mrieser
- */
-public class CarDepartureHandler implements DepartureHandler {
+	/**
+	 * Returns the next link the vehicle will drive along.
+	 *
+	 * @return The next link the vehicle will drive on, or null if an error has happened.
+	 */
+	public Id getNextLinkId();
 
-	private final NetworkFeature networkFeature;
-
-	public CarDepartureHandler(final NetworkFeature networkFeature) {
-		this.networkFeature = networkFeature;
-	}
-
-	@Override
-	public void handleDeparture(final PlanAgent agent) {
-		Leg leg = (Leg) agent.getCurrentPlanElement();
-		NetworkRoute route = (NetworkRoute) leg.getRoute();
-
-		DriverAgent driver = new NetworkRouteDriver(route);
-
-	}
+	public void notifyMoveToNextLink();
 
 }

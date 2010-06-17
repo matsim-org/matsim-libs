@@ -19,32 +19,36 @@
 
 package playground.mrieser.core.sim.impl;
 
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.api.core.v01.Id;
 
-import playground.mrieser.core.sim.api.DepartureHandler;
 import playground.mrieser.core.sim.api.DriverAgent;
-import playground.mrieser.core.sim.api.PlanAgent;
-import playground.mrieser.core.sim.features.NetworkFeature;
+import playground.mrieser.core.sim.api.SimVehicle;
 
 /**
+ * Implementation of SimVehicle which delegates most of the work to a {@link DriverAgent}.
+ *
  * @author mrieser
  */
-public class CarDepartureHandler implements DepartureHandler {
+public class DriverSimVehicle implements SimVehicle {
 
-	private final NetworkFeature networkFeature;
+	private DriverAgent driver = null;
 
-	public CarDepartureHandler(final NetworkFeature networkFeature) {
-		this.networkFeature = networkFeature;
+	public DriverAgent getDriver() {
+		return this.driver;
+	}
+
+	public void setDriver(DriverAgent driver) {
+		this.driver = driver;
 	}
 
 	@Override
-	public void handleDeparture(final PlanAgent agent) {
-		Leg leg = (Leg) agent.getCurrentPlanElement();
-		NetworkRoute route = (NetworkRoute) leg.getRoute();
+	public Id getNextLinkId() {
+		return this.driver.getNextLinkId();
+	}
 
-		DriverAgent driver = new NetworkRouteDriver(route);
-
+	@Override
+	public void notifyMoveToNextLink() {
+		this.driver.notifyMoveToNextLink();
 	}
 
 }

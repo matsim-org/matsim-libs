@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.Simulation;
 
 import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanElementHandler;
@@ -37,7 +38,7 @@ import playground.mrieser.core.sim.utils.ClassBasedMap;
 /**
  * @author mrieser
  */
-public class PlanSimulationImpl implements PlanSimulation {
+public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO [MR] remove Simulation, only for backwards compability
 
 	private final static Logger log = Logger.getLogger(PlanSimulationImpl.class);
 
@@ -68,6 +69,11 @@ public class PlanSimulationImpl implements PlanSimulation {
 	@Override
 	public PlanElementHandler getPlanElementHandler(final Class<? extends PlanElement> klass) {
 		return this.peHandlers.get(klass);
+	}
+
+	@Override
+	public void run() {
+		runSim();
 	}
 
 	@Override

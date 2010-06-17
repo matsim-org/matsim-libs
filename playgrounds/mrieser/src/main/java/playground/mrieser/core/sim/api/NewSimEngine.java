@@ -30,6 +30,11 @@ public interface NewSimEngine {
 
 	public double getCurrentTime();
 
+	/**
+	 * Handles the agent by ending its current plan element and starting its next plan element.
+	 *
+	 * @param agent
+	 */
 	public void handleAgent(final PlanAgent agent);
 
 	public void runSim();

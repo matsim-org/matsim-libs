@@ -19,6 +19,12 @@
 
 package playground.mrieser.core.sim.api;
 
+import org.matsim.api.core.v01.Id;
+
 public interface SimVehicle {
+
+	public Id getNextLinkId();
+
+	public void notifyMoveToNextLink();
 
 }

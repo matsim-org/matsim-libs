@@ -19,32 +19,45 @@
 
 package playground.mrieser.core.sim.impl;
 
-import org.matsim.api.core.v01.population.Leg;
+import java.util.List;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.NetworkRoute;
 
-import playground.mrieser.core.sim.api.DepartureHandler;
 import playground.mrieser.core.sim.api.DriverAgent;
-import playground.mrieser.core.sim.api.PlanAgent;
-import playground.mrieser.core.sim.features.NetworkFeature;
 
-/**
- * @author mrieser
- */
-public class CarDepartureHandler implements DepartureHandler {
+public class NetworkRouteDriver implements DriverAgent {
 
-	private final NetworkFeature networkFeature;
+	private final Id[] linkIds;
+	private int nextLinkIndex = 0;
+	private Id nextLinkId = null;
 
-	public CarDepartureHandler(final NetworkFeature networkFeature) {
-		this.networkFeature = networkFeature;
+	public NetworkRouteDriver(final NetworkRoute route) {
+		List<Id> tmpIds = route.getLinkIds();
+		this.linkIds = new Id[3 + tmpIds.size()];
+		this.linkIds[0] = route.getStartLinkId();
+		int index = 1;
+		for (Id id : tmpIds) {
+			this.linkIds[index] = id;
+			index++;
+		}
+		this.linkIds[index] = route.getEndLinkId();
+		this.linkIds[index+1] = null; // sentinel
+		this.nextLinkId = this.linkIds[this.nextLinkIndex];
 	}
 
 	@Override
-	public void handleDeparture(final PlanAgent agent) {
-		Leg leg = (Leg) agent.getCurrentPlanElement();
-		NetworkRoute route = (NetworkRoute) leg.getRoute();
+	public Id getNextLinkId() {
+		return this.nextLinkId;
+	}
 
-		DriverAgent driver = new NetworkRouteDriver(route);
-
+	@Override
+	public void notifyMoveToNextLink() {
+		this.nextLinkIndex++;
+		if (this.nextLinkIndex == this.linkIds.length) {
+			this.nextLinkIndex--;
+		}
+		this.nextLinkId = this.linkIds[this.nextLinkIndex];
 	}
 
 }
