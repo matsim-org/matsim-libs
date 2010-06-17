@@ -20,7 +20,7 @@
 
 package org.matsim.core.mobsim.queuesim.obsolete;
 
-import org.matsim.ptproject.qsim.AgentCounterI;
+import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 
 
 /*package*/ class QueueAgentCounter implements AgentCounterI {
@@ -45,7 +45,7 @@ import org.matsim.ptproject.qsim.AgentCounterI;
 //
 //	/*package*/ private static final double getStuckTime() {return stuckTime;	}
 //	private static final void setStuckTime(final double stuckTime) { AbstractSimulation.stuckTime = stuckTime; }
-	
+
 	private static void staticReset() {
 		staticSetLiving(0);
 		staticResetLost();
@@ -63,7 +63,7 @@ import org.matsim.ptproject.qsim.AgentCounterI;
 	private static final void staticIncLiving(final int count) {living += count;}
 	private static final void staticDecLiving() {living--;}
 	private static final void staticDecLiving(final int count) {living -= count;}
-	
+
 	/* (non-Javadoc)
 	 * @see org.matsim.ptproject.qsim.AgentCounterI#decLiving()
 	 */
@@ -109,7 +109,7 @@ import org.matsim.ptproject.qsim.AgentCounterI;
 	 */
 	@Override
 	public void incLiving(int count) {
-		QueueAgentCounter.staticIncLiving(count) ; 
+		QueueAgentCounter.staticIncLiving(count) ;
 	}
 
 	/* (non-Javadoc)

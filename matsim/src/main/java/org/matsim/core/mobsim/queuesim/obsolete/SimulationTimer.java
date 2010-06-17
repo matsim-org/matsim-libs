@@ -20,7 +20,7 @@
 
 package org.matsim.core.mobsim.queuesim.obsolete;
 
-import org.matsim.ptproject.qsim.SimTimerI;
+import org.matsim.ptproject.qsim.interfaces.SimTimerI;
 
 public class SimulationTimer implements SimTimerI {
 	private double simStartTime = 24*3600;
@@ -86,7 +86,7 @@ public class SimulationTimer implements SimTimerI {
 //		SimulationTimer.time = 0;
 //		SimulationTimer.SIM_TICK_TIME_S = stepSize;
 //	}
-	
+
 	/*package*/ SimulationTimer( double stepSize ) {
 		simStartTime = 24*3600;
 		time = 0;
@@ -115,7 +115,7 @@ public class SimulationTimer implements SimTimerI {
 
 	@Override
 	public void setSimStartTime(double startTimeSec) {
-		simStartTime = startTimeSec ; 
+		simStartTime = startTimeSec ;
 	}
 
 	@Override
