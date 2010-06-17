@@ -30,7 +30,7 @@ import org.matsim.core.network.algorithms.NetworkTeleatlasAddManeuverRestriction
 import org.matsim.core.network.algorithms.NetworkTeleatlasAddSpeedRestrictions;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.utils.misc.ArgumentParser;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
@@ -86,7 +86,7 @@ public class TeleAtlas2Network {
 			System.out.println("writing shape file...");
 //			if (Gbl.getConfig() == null) { Gbl.createConfig(null); }
 //			Gbl.getConfig().global().setCoordinateSystem("WGS84");
-			FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, "WGS84");
+			FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "WGS84");
 			builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 			builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 			new Links2ESRIShape(network,outputDir+"/output_links.shp",builder).write();

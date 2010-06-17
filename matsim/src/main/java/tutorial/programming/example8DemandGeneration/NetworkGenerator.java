@@ -13,7 +13,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.xml.sax.SAXException;
@@ -56,7 +56,7 @@ public class NetworkGenerator {
 
 		sc.getConfig().global().setCoordinateSystem(UTM33N);
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(net, UTM33N);
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(net, UTM33N);
 		builder.setWidthCoefficient(0.01);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);

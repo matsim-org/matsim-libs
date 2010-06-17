@@ -55,7 +55,7 @@ public class Links2ESRIShape {
 
 
 	public Links2ESRIShape(final Network network, final String filename, final String coordinateSystem) {
-		this(network, filename, new FeatureGeneratorBuilder(network, coordinateSystem));
+		this(network, filename, new FeatureGeneratorBuilderImpl(network, coordinateSystem));
 	}
 
 	public Links2ESRIShape(final Network network, final String filename, final FeatureGeneratorBuilder builder) {
@@ -118,7 +118,7 @@ public class Links2ESRIShape {
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, defaultCRS);
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, defaultCRS);
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);

@@ -44,7 +44,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, "DHDN_GK4");
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		builder.setWidthCoefficient(0.001);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
@@ -70,7 +70,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, "DHDN_GK4");
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		builder.setWidthCoefficient(1);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
@@ -94,7 +94,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, "DHDN_GK4");
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		builder.setWidthCoefficient(1);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
@@ -120,7 +120,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network, "DHDN_GK4");
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		builder.setWidthCoefficient(1);
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
