@@ -23,12 +23,16 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
+import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.network.api.SimNetwork;
 
+/**
+ * @author mrieser
+ */
 public abstract class QueueNetworkCreator {
 
-	public static SimNetwork createQueueNetwork(final Network network) {
-		QueueNetwork qnet = new QueueNetwork();
+	public static SimNetwork createQueueNetwork(final Network network, final NewSimEngine simEngine) {
+		QueueNetwork qnet = new QueueNetwork(simEngine);
 
 		for (Link link : network.getLinks().values()) {
 			qnet.addLink(new QueueLink(link, qnet));

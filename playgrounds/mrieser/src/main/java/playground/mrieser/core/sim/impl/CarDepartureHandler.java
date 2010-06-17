@@ -25,7 +25,9 @@ import org.matsim.core.population.routes.NetworkRoute;
 import playground.mrieser.core.sim.api.DepartureHandler;
 import playground.mrieser.core.sim.api.DriverAgent;
 import playground.mrieser.core.sim.api.PlanAgent;
+import playground.mrieser.core.sim.api.SimVehicle;
 import playground.mrieser.core.sim.features.NetworkFeature;
+import playground.mrieser.core.sim.network.api.SimLink;
 
 /**
  * @author mrieser
@@ -43,8 +45,13 @@ public class CarDepartureHandler implements DepartureHandler {
 		Leg leg = (Leg) agent.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 
+		SimLink link = this.networkFeature.getSimNetwork().getLinks().get(route.getStartLinkId());
 		DriverAgent driver = new NetworkRouteDriver(route);
+		SimVehicle simVehicle = link.getParkedVehicle(agent.getPlan().getPerson().getId());// TODO [MR] use vehicleId instead of personId
+		simVehicle.setDriver(driver);
 
+		simVehicle.getDriver().notifyMoveToNextLink();
+		link.insertVehicle(simVehicle, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE); // current QSim behavior
 	}
 
 }

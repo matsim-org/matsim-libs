@@ -19,12 +19,16 @@
 
 package playground.mrieser.core.sim.api;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 
 public interface SimVehicle {
 
-	public Id getNextLinkId();
+	public void setDriver(final DriverAgent driver);
 
-	public void notifyMoveToNextLink();
+	public DriverAgent getDriver();
+
+	public Vehicle getVehicle();
+
+	public double getSizeInEquivalents(); // TODO [MR] IMO, this should come from Vehicle
 
 }

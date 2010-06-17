@@ -31,12 +31,13 @@ import org.matsim.core.utils.misc.Time;
 import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.api.PlanElementHandler;
+import playground.mrieser.core.sim.api.SimKeepAlive;
 import playground.mrieser.core.sim.features.SimFeature;
 
 /**
  * @author mrieser
  */
-public class ActivityHandler implements PlanElementHandler, SimFeature {
+public class ActivityHandler implements PlanElementHandler, SimFeature, SimKeepAlive {
 
 	private final static Logger log = Logger.getLogger(ActivityHandler.class);
 
@@ -46,6 +47,7 @@ public class ActivityHandler implements PlanElementHandler, SimFeature {
 
 	public ActivityHandler(final NewSimEngine simEngine) {
 		this.simEngine = simEngine;
+		this.simEngine.addKeepAlive(this);
 	}
 
 	public void setUseActivityDurations(final boolean useActivityDurations) {
@@ -88,8 +90,8 @@ public class ActivityHandler implements PlanElementHandler, SimFeature {
 	}
 
 	@Override
-	public boolean isFinished() {
-		return this.activityEndsList.isEmpty();
+	public boolean keepAlive() {
+		return !this.activityEndsList.isEmpty();
 	}
 
 	private double calculateActivityEndTime(final Activity act) {

@@ -19,36 +19,35 @@
 
 package playground.mrieser.core.sim.impl;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 
 import playground.mrieser.core.sim.api.DriverAgent;
-import playground.mrieser.core.sim.api.SimVehicle;
 
 /**
- * Implementation of SimVehicle which delegates most of the work to a {@link DriverAgent}.
- *
  * @author mrieser
  */
-public class DriverSimVehicle implements SimVehicle {
+public class DefaultSimVehicleTest {
 
-	private DriverAgent driver = null;
-
-	public DriverAgent getDriver() {
-		return this.driver;
+	@Test
+	public void testSetGetDriver() {
+		DefaultSimVehicle vehicle = new DefaultSimVehicle(null);
+		FakeDriverAgent driver = new FakeDriverAgent();
+		Assert.assertNull(vehicle.getDriver());
+		vehicle.setDriver(driver);
+		Assert.assertEquals(driver, vehicle.getDriver());
+		vehicle.setDriver(null);
+		Assert.assertNull(vehicle.getDriver());
 	}
 
-	public void setDriver(DriverAgent driver) {
-		this.driver = driver;
+	/*package*/ static class FakeDriverAgent implements DriverAgent {
+		@Override
+		public Id getNextLinkId() {
+			return null;
+		}
+		@Override
+		public void notifyMoveToNextLink() {
+		}
 	}
-
-	@Override
-	public Id getNextLinkId() {
-		return this.driver.getNextLinkId();
-	}
-
-	@Override
-	public void notifyMoveToNextLink() {
-		this.driver.notifyMoveToNextLink();
-	}
-
 }

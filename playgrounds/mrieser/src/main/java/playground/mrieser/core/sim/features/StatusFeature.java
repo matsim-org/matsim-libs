@@ -29,11 +29,6 @@ public class StatusFeature implements SimFeature {
 	private double nextTime = 0.0;
 
 	@Override
-	public boolean isFinished() {
-		return true;
-	}
-
-	@Override
 	public void doSimStep(double time) {
 		if (time >= this.nextTime) {
 			log.info("Simulation time: " + Time.writeTime(time));

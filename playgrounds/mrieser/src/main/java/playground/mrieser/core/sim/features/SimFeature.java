@@ -21,21 +21,9 @@ package playground.mrieser.core.sim.features;
 
 import org.matsim.core.mobsim.framework.Steppable;
 
+/**
+ * @author mrieser
+ */
 public interface SimFeature extends Steppable {
-
-	/**
-	 * Specifies if this SimFeature has still work to do and wishes to continue the
-	 * simulation, or if the simulation could be stopped from the point of view of
-	 * this SimFeature. Returning <code>true</code> does not force the simulation
-	 * to shut down, usually that only happens once all SimFeatures returned
-	 * <code>true</code>, so the SimFeature has to continue to work correctly no
-	 * matter what it returns. Most SimFeatures that only have to correctly setup
-	 * some data structures as long as the simulation is running may simply return
-	 * <code>true</code> all the time.
-	 *
-	 * @return <code>true</code> if this SimFeature has nothing left to do,
-	 * 		<code>false</code> otherwise.
-	 */
-	public boolean isFinished();
 
 }

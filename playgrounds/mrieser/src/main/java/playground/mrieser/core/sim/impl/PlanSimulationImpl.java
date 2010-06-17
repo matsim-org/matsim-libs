@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Simulation;
@@ -83,6 +85,7 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 		// TODO
 		// init
 		// create agents etc.
+		initAgents();
 
 		// run
 		this.simEngine.runSim();
@@ -91,6 +94,13 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 		// anything to do?
 
 		log.info("simulation ends.");
+	}
+
+	private void initAgents() {
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			this.simEngine.handleAgent(new DefaultPlanAgent(plan));
+		}
 	}
 
 	@Override

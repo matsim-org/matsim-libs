@@ -34,6 +34,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanAgent;
+import playground.mrieser.core.sim.api.SimKeepAlive;
 import playground.mrieser.core.sim.impl.TimestepSimEngineTest.CountingPlanElementHandler;
 
 public class TeleportationHandlerTest {
@@ -113,6 +114,10 @@ public class TeleportationHandlerTest {
 
 		@Override
 		public void runSim() {
+		}
+
+		@Override
+		public void addKeepAlive(SimKeepAlive keepAlive) {
 		}
 	}
 

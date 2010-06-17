@@ -19,26 +19,11 @@
 
 package playground.mrieser.core.sim.api;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-
-/**
- * @author mrieser
- */
-public interface NewSimEngine {
-
-	public EventsManager getEventsManager();
-
-	public double getCurrentTime();
+public interface SimKeepAlive {
 
 	/**
-	 * Handles the agent by ending its current plan element and starting its next plan element.
-	 *
-	 * @param agent
+	 * @return <code>true</code> if the simulation should continue running,
+	 * 		<code>false</code> otherwise.
 	 */
-	public void handleAgent(final PlanAgent agent);
-
-	public void runSim();
-
-	public void addKeepAlive(final SimKeepAlive keepAlive);
-
+	public boolean keepAlive();
 }

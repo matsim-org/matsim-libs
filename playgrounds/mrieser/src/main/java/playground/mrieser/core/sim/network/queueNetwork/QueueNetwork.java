@@ -24,16 +24,22 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.network.api.SimLink;
 import playground.mrieser.core.sim.network.api.SimNetwork;
 import playground.mrieser.core.sim.network.api.SimNode;
 
+/**
+ * @author mrieser
+ */
 /*package*/ class QueueNetwork implements SimNetwork {
 
+	protected final NewSimEngine simEngine;
 	private final Map<Id, QueueLink> links;
 	private final Map<Id, QueueNode> nodes;
 
-	public QueueNetwork() {
+	public QueueNetwork(final NewSimEngine simEngine) {
+		this.simEngine = simEngine;
 		this.links = new HashMap<Id, QueueLink>();
 		this.nodes = new HashMap<Id, QueueNode>();
 	}

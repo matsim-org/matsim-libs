@@ -23,32 +23,52 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.core.sim.api.DepartureHandler;
 import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanAgent;
+import playground.mrieser.core.sim.api.SimKeepAlive;
+import playground.mrieser.core.sim.features.SimFeature;
 
 /**
  * @author mrieser
  */
-public class TeleportationHandler implements DepartureHandler, Steppable {
+public class TeleportationHandler implements DepartureHandler, SimFeature, SimKeepAlive {
 
-	// TODO TeleportationHandler also needs something like isFinished()
+	private final static Logger log = Logger.getLogger(TeleportationHandler.class);
 
 	private final NewSimEngine simEngine;
 	private final PriorityQueue<Tuple<Double, PlanAgent>> teleportationList = new PriorityQueue<Tuple<Double, PlanAgent>>(30, new TeleportationArrivalTimeComparator());
+	private double defaultTeleportationTime = Time.UNDEFINED_TIME;
 
 	public TeleportationHandler(final NewSimEngine simEngine) {
 		this.simEngine = simEngine;
+		this.simEngine.addKeepAlive(this);
+	}
+
+	public void setDefaultTeleportationTime(double defaultTeleportationTime) {
+		this.defaultTeleportationTime = defaultTeleportationTime;
 	}
 
 	@Override
 	public void handleDeparture(final PlanAgent agent) {
 		Leg leg = (Leg) agent.getCurrentPlanElement();
-		double arrivalTime = this.simEngine.getCurrentTime() + leg.getTravelTime();
+		double travelTime = leg.getTravelTime();
+		if (travelTime == Time.UNDEFINED_TIME) {
+			if (this.defaultTeleportationTime != Time.UNDEFINED_TIME) {
+				log.warn("Leg of agent has no travel time specified. Using default teleportation time. agentId = " + agent.getPlan().getPerson().getId());
+				travelTime = this.defaultTeleportationTime;
+			} else {
+				log.error("Leg of agent has no travel time specified. Cannot teleport. agentId = " + agent.getPlan().getPerson().getId());
+				return;
+			}
+		}
+		double arrivalTime = this.simEngine.getCurrentTime() + travelTime;
 		this.teleportationList.add(new Tuple<Double, PlanAgent>(arrivalTime, agent));
 	}
 
@@ -57,6 +77,11 @@ public class TeleportationHandler implements DepartureHandler, Steppable {
 		while ((!this.teleportationList.isEmpty()) && this.teleportationList.peek().getFirst().doubleValue() <= time) {
 			this.simEngine.handleAgent(this.teleportationList.poll().getSecond());
 		}
+	}
+
+	@Override
+	public boolean keepAlive() {
+		return !this.teleportationList.isEmpty();
 	}
 
 	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PlanAgent>>, Serializable {

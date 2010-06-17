@@ -39,10 +39,4 @@ public class DefaultNetworkFeature implements NetworkFeature {
 		return this.network;
 	}
 
-	@Override
-	public boolean isFinished() {
-		// TODO change to take road state into account
-		return true;
-	}
-
 }

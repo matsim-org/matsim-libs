@@ -26,9 +26,4 @@ public class SignalSystemsFeature implements SimFeature {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
-	public boolean isFinished() {
-		return true;
-	}
-
 }

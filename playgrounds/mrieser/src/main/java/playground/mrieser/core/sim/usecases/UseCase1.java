@@ -26,6 +26,7 @@ import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -50,8 +51,17 @@ public class UseCase1 {
 		ScenarioLoader loader = new ScenarioLoaderImpl(config);
 		Scenario scenario = loader.loadScenario();
 		EventsManager events = new EventsManagerImpl();
+		EventWriterXML ew = new EventWriterXML("testEvents.xml");
+		events.addHandler(ew);
 
-		Simulation sim = new RefSimFactory().createMobsim(scenario, events);
+		/* **************************************************************** */
+
+		Simulation sim = new TeleportOnlySimFactory().createMobsim(scenario, events);
+//		Simulation sim = new RefSimFactory().createMobsim(scenario, events);
 		sim.run(); // replace with PlanSimulation.runSim();
+
+		/* **************************************************************** */
+
+		ew.closeFile();
 	}
 }

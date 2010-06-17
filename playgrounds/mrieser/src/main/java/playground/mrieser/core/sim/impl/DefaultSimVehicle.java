@@ -17,28 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.sim.api;
+package playground.mrieser.core.sim.impl;
 
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vehicles.Vehicle;
+
+import playground.mrieser.core.sim.api.DriverAgent;
+import playground.mrieser.core.sim.api.SimVehicle;
 
 /**
+ * Implementation of SimVehicle which delegates most of the work to a {@link DriverAgent}.
+ *
  * @author mrieser
  */
-public interface NewSimEngine {
+public class DefaultSimVehicle implements SimVehicle {
 
-	public EventsManager getEventsManager();
+	private final Vehicle vehicle;
+	private DriverAgent driver = null;
 
-	public double getCurrentTime();
+	public DefaultSimVehicle(final Vehicle vehicle) {
+		this.vehicle = vehicle;
+	}
 
-	/**
-	 * Handles the agent by ending its current plan element and starting its next plan element.
-	 *
-	 * @param agent
-	 */
-	public void handleAgent(final PlanAgent agent);
+	@Override
+	public Vehicle getVehicle() {
+		return this.vehicle;
+	}
 
-	public void runSim();
+	public DriverAgent getDriver() {
+		return this.driver;
+	}
 
-	public void addKeepAlive(final SimKeepAlive keepAlive);
+	public void setDriver(DriverAgent driver) {
+		this.driver = driver;
+	}
+
+	@Override
+	public double getSizeInEquivalents() {
+		return 1.0;
+	}
 
 }

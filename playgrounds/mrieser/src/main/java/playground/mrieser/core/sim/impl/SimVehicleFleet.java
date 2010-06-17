@@ -17,28 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.sim.api;
+package playground.mrieser.core.sim.impl;
 
-import org.matsim.core.api.experimental.events.EventsManager;
+public class SimVehicleFleet {
 
-/**
- * @author mrieser
- */
-public interface NewSimEngine {
-
-	public EventsManager getEventsManager();
-
-	public double getCurrentTime();
-
-	/**
-	 * Handles the agent by ending its current plan element and starting its next plan element.
-	 *
-	 * @param agent
-	 */
-	public void handleAgent(final PlanAgent agent);
-
-	public void runSim();
-
-	public void addKeepAlive(final SimKeepAlive keepAlive);
 
 }

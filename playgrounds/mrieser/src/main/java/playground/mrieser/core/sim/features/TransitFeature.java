@@ -25,9 +25,4 @@ public class TransitFeature implements SimFeature {
 	public void doSimStep(double time) {
 	}
 
-	@Override
-	public boolean isFinished() {
-		return true;
-	}
-
 }

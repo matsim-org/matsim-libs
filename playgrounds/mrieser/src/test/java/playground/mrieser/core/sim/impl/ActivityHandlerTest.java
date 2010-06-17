@@ -43,6 +43,7 @@ import org.matsim.testcases.utils.LogCounter;
 
 import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanAgent;
+import playground.mrieser.core.sim.api.SimKeepAlive;
 
 /**
  * @author mrieser
@@ -331,41 +332,41 @@ public class ActivityHandlerTest {
 	}
 
 	@Test
-	public void testIsFinished() {
+	public void testKeepAlive() {
 		Fixture f = new Fixture();
 		SimTestEngine engine = new SimTestEngine();
 		ActivityHandler ah = new ActivityHandler(engine);
 
 		Assert.assertEquals(f.firstHomeAct, f.agent1.useNextPlanElement());
 
-		Assert.assertTrue(ah.isFinished());
+		Assert.assertFalse(ah.keepAlive());
 		ah.handleStart(f.agent1);
-		Assert.assertFalse(ah.isFinished());
+		Assert.assertTrue(ah.keepAlive());
 
 		ah.doSimStep(8.0 * 3600 - 1.0);
-		Assert.assertFalse(ah.isFinished());
+		Assert.assertTrue(ah.keepAlive());
 
 		ah.doSimStep(8.0 * 3600);
-		Assert.assertTrue(ah.isFinished());
+		Assert.assertFalse(ah.keepAlive());
 
 		f.agent1.useNextPlanElement(); // leg
 
 		Assert.assertEquals(f.workAct, f.agent1.useNextPlanElement());
 
 		ah.handleStart(f.agent1);
-		Assert.assertFalse(ah.isFinished());
+		Assert.assertTrue(ah.keepAlive());
 
 		ah.doSimStep(16.0 * 3600);
-		Assert.assertFalse(ah.isFinished());
+		Assert.assertTrue(ah.keepAlive());
 
 		ah.doSimStep(17.0 * 3600 - 1);
-		Assert.assertFalse(ah.isFinished());
+		Assert.assertTrue(ah.keepAlive());
 
 		ah.doSimStep(17.0 * 3600);
-		Assert.assertTrue(ah.isFinished());
+		Assert.assertFalse(ah.keepAlive());
 
 		ah.doSimStep(24.0 * 3600);
-		Assert.assertTrue(ah.isFinished());
+		Assert.assertFalse(ah.keepAlive());
 	}
 
 	private static class Fixture {
@@ -430,6 +431,10 @@ public class ActivityHandlerTest {
 
 		@Override
 		public void runSim() {
+		}
+
+		@Override
+		public void addKeepAlive(SimKeepAlive keepAlive) {
 		}
 	}
 

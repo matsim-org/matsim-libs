@@ -19,8 +19,10 @@
 
 package playground.mrieser.core.sim.impl;
 
+import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 
@@ -28,14 +30,18 @@ import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.api.PlanElementHandler;
 import playground.mrieser.core.sim.api.PlanSimulation;
+import playground.mrieser.core.sim.api.SimKeepAlive;
 import playground.mrieser.core.sim.features.SimFeature;
 
 public class TimestepSimEngine implements NewSimEngine {
+
+	private final static Logger log = Logger.getLogger(TimestepSimEngine.class);
 
 	private final PlanSimulation sim;
 	private final EventsManager events;
 	private double time;
 	private final double timeStepSize;
+	private final List<SimKeepAlive> aliveKeepers = new LinkedList<SimKeepAlive>();
 
 	public TimestepSimEngine(final PlanSimulation sim, final EventsManager events) {
 		this(sim, events, 1.0);
@@ -83,23 +89,44 @@ public class TimestepSimEngine implements NewSimEngine {
 
 	@Override
 	public void runSim() {
+
 		this.time = 0.0;
 
 		List<SimFeature> tmpList = this.sim.getSimFeatures();
 		SimFeature[] simFeatures = tmpList.toArray(new SimFeature[tmpList.size()]);
 
+		log.info("registered features:");
+		for (SimFeature feature : simFeatures) {
+			log.info("  " + feature.getClass());
+		}
+
 		boolean running = true;
 		while (running) {
-			boolean isFinished = true;
 			for (SimFeature feature : simFeatures) {
-				feature.doSimStep(time);
-				isFinished = isFinished && feature.isFinished();
+				feature.doSimStep(this.time);
 			}
-			running = !isFinished;
+			running = keepAlive();
+			if (this.time > 40.0 * 3600) {  // TODO [MR] remove sim-end-time hack
+				running = false;
+			}
 			if (running) {
-				time += this.timeStepSize;
+				this.time += this.timeStepSize;
 			}
 		}
+	}
+
+	@Override
+	public void addKeepAlive(final SimKeepAlive keepAlive) {
+		this.aliveKeepers.add(keepAlive);
+	}
+
+	private boolean keepAlive() {
+		for (SimKeepAlive ska : this.aliveKeepers) {
+			if (ska.keepAlive()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

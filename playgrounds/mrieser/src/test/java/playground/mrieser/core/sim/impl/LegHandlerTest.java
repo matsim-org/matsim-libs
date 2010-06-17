@@ -40,6 +40,7 @@ import org.matsim.testcases.utils.EventsCollector;
 import playground.mrieser.core.sim.api.DepartureHandler;
 import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanAgent;
+import playground.mrieser.core.sim.api.SimKeepAlive;
 
 /**
  * @author mrieser
@@ -170,6 +171,10 @@ public class LegHandlerTest {
 
 		@Override
 		public void runSim() {
+		}
+
+		@Override
+		public void addKeepAlive(SimKeepAlive keepAlive) {
 		}
 	}
 
