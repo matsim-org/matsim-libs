@@ -4,7 +4,7 @@ import org.matsim.pt.Umlauf;
 import org.matsim.pt.qsim.AbstractTransitDriver;
 import org.matsim.pt.qsim.AbstractTransitDriverFactory;
 import org.matsim.pt.qsim.TransitStopAgentTracker;
-import org.matsim.ptproject.qsim.QSimI;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 /**
  * @author aneumann

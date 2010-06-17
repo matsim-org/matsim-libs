@@ -34,8 +34,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.run.OTFVis;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 

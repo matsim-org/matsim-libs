@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationLink;
 import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationNetwork;
-import org.matsim.ptproject.qsim.QSimI;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.VisNetwork;

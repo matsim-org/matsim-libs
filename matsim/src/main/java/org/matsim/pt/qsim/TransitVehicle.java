@@ -23,7 +23,7 @@ package org.matsim.pt.qsim;
 import java.util.Collection;
 
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.vehicles.Vehicle;
 
 

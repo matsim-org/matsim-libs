@@ -35,9 +35,9 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.network.MyLinkFactoryImpl;
@@ -350,7 +350,7 @@ public class WithinDayControler extends Controler {
 		{
 			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
 			
-			for (QLink queueLink : sim.getQNetwork().getLinks().values())
+			for (QLinkInternalI queueLink : sim.getQNetwork().getLinks().values())
 			{
 				for (QVehicle queueVehicle : queueLink.getAllVehicles())
 				{

@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
@@ -58,6 +57,29 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQSimEngine;
+import org.matsim.ptproject.qsim.changeeventsengine.NetworkChangeEventsEngine;
+import org.matsim.ptproject.qsim.comparators.DriverAgentDepartureTimeComparator;
+import org.matsim.ptproject.qsim.helpers.AgentCounter;
+import org.matsim.ptproject.qsim.helpers.QPersonAgent;
+import org.matsim.ptproject.qsim.helpers.QSimTimer;
+import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
+import org.matsim.ptproject.qsim.interfaces.AcceptsFeatures;
+import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
+import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.ptproject.qsim.interfaces.MobsimFeature;
+import org.matsim.ptproject.qsim.interfaces.QSimEngine;
+import org.matsim.ptproject.qsim.interfaces.QSimEngineFactory;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.ptproject.qsim.interfaces.SimTimerI;
+import org.matsim.ptproject.qsim.netsimengine.CarDepartureHandler;
+import org.matsim.ptproject.qsim.netsimengine.DefaultQNetworkFactory;
+import org.matsim.ptproject.qsim.netsimengine.DefaultQSimEngineFactory;
+import org.matsim.ptproject.qsim.netsimengine.QLanesNetworkFactory;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
+import org.matsim.ptproject.qsim.netsimengine.QSimEngineImpl;
+import org.matsim.ptproject.qsim.signalengine.QSimSignalEngine;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.systems.SignalSystems;
@@ -90,10 +112,10 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	private static final int INFO_PERIOD = 3600;
 
 
-	private QNetwork network;
+//	private QNetwork network;
 	private EventsManager events = null;
 
-	private QSimEngine simEngine = null;
+	private QSimEngineImpl netEngine = null;
 	private NetworkChangeEventsEngine changeEventsEngine = null;
 
 	private CarDepartureHandler carDepartureHandler;
@@ -150,27 +172,36 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * @param simEngineFac
 	 */
 	private void init(final Scenario sc, QSimEngineFactory simEngineFac){
+		// yyyy if someone makes this method less protected, can call it with a different scenario than the ctor. kai, jun'10
+		
 		log.info("Using QSim...");
 		this.listenerManager = new SimulationListenerManager<QSim>(this);
 		this.stuckTime = sc.getConfig().getQSimConfigGroup().getStuckTime();
 		this.agentCounter = new AgentCounter();
 		this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
-		Config config = sc.getConfig();
-		this.simEngine = simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
 
-		if (config.scenario().isUseLanes()) {
+		// create the NetworkEngine ...
+		this.netEngine = (QSimEngineImpl) simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
+
+		// create the QNetwork ...
+		QNetwork network = null ;
+		if (sc.getConfig().scenario().isUseLanes()) {
 			if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
 				throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
 			}
 			log.info("Lanes enabled...");
-			this.network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(),
+			network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(),
 					((ScenarioImpl)sc).getLaneDefinitions()));
 		}
 		else {
-			this.network = new QNetwork(this);
+			network = new QNetwork(this);
 		}
-		this.network.initialize(this.simEngine);
-		if (config.scenario().isUseSignalSystems()) {
+		
+		// then tell the QNetwork to use the simEngine (this also creates qlinks and qnodes)
+		network.initialize(this.netEngine);
+
+		
+		if (sc.getConfig().scenario().isUseSignalSystems()) {
 			if ((((ScenarioImpl)sc).getSignalSystems() == null)
 					|| (((ScenarioImpl)sc).getSignalSystemConfigurations() == null)) {
 				throw new IllegalStateException(
@@ -180,41 +211,17 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		}
 
 		this.agentFactory = new AgentFactory(this);
+
 		this.notTeleportedModes.add(TransportMode.car);
-		installCarDepartureHandler();
-		if (config.scenario().isUseTransit()){
-			this.transitEngine = new TransitQSimEngine(this);
-			this.addDepartureHandler(this.transitEngine);
-			//    	this.addFeature(transitEngine);
-		}
-
-	}
-
-	private void installCarDepartureHandler() {
 		this.carDepartureHandler = new CarDepartureHandler(this);
 		addDepartureHandler(this.carDepartureHandler);
-	}
 
-	public void addDepartureHandler(final DepartureHandler departureHandler) {
-		this.departureHandlers.add(departureHandler);
-	}
+		if (sc.getConfig().scenario().isUseTransit()){
+			this.transitEngine = new TransitQSimEngine(this);
+			this.addDepartureHandler(this.transitEngine);
+			// yyyy why is there not addition of pt to non teleported modes here?  kai, jun'10
+		}
 
-
-	/**
-	 * Adds the QueueSimulationListener instance  given as parameters as
-	 * listener to this QueueSimulation instance.
-	 * @param listeners
-	 */
-	public void addQueueSimulationListeners(final SimulationListener listener){
-		this.listenerManager.addQueueSimulationListener(listener);
-	}
-
-	public double getStuckTime(){
-		return this.stuckTime;
-	}
-
-	public AgentCounterI getAgentCounter(){
-		return this.agentCounter;
 	}
 
 	/**
@@ -263,7 +270,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			agent.setVehicle(veh);
 			agents.add(agent);
 			if (agent.initializeAndCheckIfAlive()) {
-				QLink qlink = this.network.getQLink(agent.getCurrentLinkId());
+				QLinkInternalI qlink = this.netEngine.getQNetwork().getQLink(agent.getCurrentLinkId());
 				qlink.addParkedVehicle(veh);
 			}
 		}
@@ -306,12 +313,14 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		if (events == null) {
 			throw new RuntimeException("No valid Events Object (events == null)");
 		}
-		this.simEngine.onPrepareSim();
-//		prepareLanes();
 
+		if ( this.netEngine != null ) {
+			this.netEngine.onPrepareSim();
+		}
 		if (this.signalEngine != null) {
 			this.signalEngine.onPrepareSim();
 		}
+
 		createAgents();
 
 		this.initSimTimer();
@@ -322,15 +331,17 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) this.scenario.getConfig().getQSimConfigGroup().getSnapshotPeriod();
-		this.snapshotManager.createSnapshotwriter(this.network, this.scenario, this.snapshotPeriod, this.iterationNumber, this.controlerIO);
-    if (this.snapshotTime < this.simTimer.getSimStartTime()) {
-      this.snapshotTime += this.snapshotPeriod;
-    }
+		this.snapshotManager.createSnapshotwriter(this.netEngine.getQNetwork(), this.scenario, this.snapshotPeriod, this.iterationNumber, this.controlerIO);
+		if (this.snapshotTime < this.simTimer.getSimStartTime()) {
+			this.snapshotTime += this.snapshotPeriod;
+		}
 
-    this.changeEventsEngine = new NetworkChangeEventsEngine(this);
-    this.changeEventsEngine.onPrepareSim();
+		this.changeEventsEngine = new NetworkChangeEventsEngine(this); // yyyy do much earlier
+		if ( this.changeEventsEngine != null ) { //yyyy do earlier
+			this.changeEventsEngine.onPrepareSim();
+		}
 
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) { // yyyy features should be replaced by listeners
 			queueSimulationFeature.afterPrepareSim();
 		}
 	}
@@ -339,15 +350,20 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * Close any files, etc.
 	 */
 	protected void cleanupSim(final double seconds) {
-		if (this.transitEngine != null) {
+		if (this.transitEngine != null) { // yyyy do after features
 			this.transitEngine.afterSim();
 		}
 
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) { // yyyy features should be replaced by listeners
 			queueSimulationFeature.beforeCleanupSim();
 		}
-		this.simEngine.afterSim();
+		
+		if ( this.netEngine != null ) {
+			this.netEngine.afterSim();
+		}
+
 		double now = this.simTimer.getTimeOfDay();
+
 		for (Tuple<Double, PersonDriverAgent> entry : this.teleportationList) {
 			PersonDriverAgent agent = entry.getSecond();
 			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
@@ -365,31 +381,19 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			writer.finish();
 		}
 
-		this.simEngine = null;
+		this.netEngine = null;
 		this.events = null; // delete events object to free events handlers, if they are nowhere else referenced
 	}
 
 	protected void beforeSimStep(final double time) {
-
-		this.changeEventsEngine.onBeforeSimStep(time);
-    if (this.signalEngine != null) {
-      this.signalEngine.doSimStep(time);
-    }
+		if ( this.changeEventsEngine != null ) {
+			this.changeEventsEngine.doSimStep(time);
+		}
+		if (this.signalEngine != null) {
+			this.signalEngine.doSimStep(time);
+		}
 	}
 
-
-	private void printSimLog(final double time) {
-    if (time >= this.infoTime) {
-      this.infoTime += INFO_PERIOD;
-      Date endtime = new Date();
-      long diffreal = (endtime.getTime() - this.realWorldStarttime.getTime())/1000;
-      double diffsim  = time - this.simTimer.getSimStartTime();
-      int nofActiveLinks = this.simEngine.getNumberOfSimulatedLinks();
-      log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + this.agentCounter.getLiving() + " lost=" + this.agentCounter.getLost() + " #links=" + nofActiveLinks
-          + " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
-      Gbl.printMemoryUsage();
-    }
-	}
 
 	/**
 	 * Do one step of the simulation run.
@@ -397,10 +401,12 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * @param time the current time in seconds after midnight
 	 * @return true if the simulation needs to continue
 	 */
-	protected boolean doSimStep(final double time) {
+	protected final boolean doSimStep(final double time) { // do not overwrite in inheritance.
 		this.moveVehiclesWithUnknownLegMode(time);
 		this.handleActivityEnds(time);
-		this.simEngine.doSimStep(time);
+		if ( this.netEngine != null ) {
+			this.netEngine.doSimStep(time);
+		}
 
 		this.printSimLog(time);
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
@@ -420,7 +426,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	private void doSnapshot(final double time) {
 		if (!this.snapshotManager.getSnapshotWriters().isEmpty()) {
 		  Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-	    for (QLink link : this.getQNetwork().getLinks().values()) {
+	    for (QLinkInternalI link : this.getQNetwork().getLinks().values()) {
 	      link.getVisData().getVehiclePositions( positions);
 	    }
 			for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
@@ -431,18 +437,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 				writer.endSnapshot();
 			}
 		}
-	}
-
-	public final EventsManager getEventsManager(){
-	  return events;
-	}
-
-	protected void handleUnknownLegMode(final double now, final PersonDriverAgent agent, final Id linkId) {
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.scenario.getNetwork().getLinks().get(linkId));
-		}
-		double arrivalTime = now + agent.getCurrentLeg().getTravelTime();
-		this.teleportationList.add(new Tuple<Double, PersonDriverAgent>(arrivalTime, agent));
 	}
 
 	protected void moveVehiclesWithUnknownLegMode(final double now) {
@@ -499,7 +493,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				QLink qLink = this.network.getQLink(linkId);
+				QLinkInternalI qLink = this.netEngine.getQNetwork().getQLink(linkId);
 				qLink.addAgentInActivity(agent);
 			}
 		}
@@ -514,7 +508,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				QLink qLink = this.network.getQLink(linkId);
+				QLinkInternalI qLink = this.netEngine.getQNetwork().getQLink(linkId);
 				qLink.removeAgentInActivity(agent);
 			}
 		}
@@ -571,7 +565,11 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 	protected void visAndHandleUnknownLegMode(final double now, final PersonDriverAgent agent, final Id linkId) {
-		this.handleUnknownLegMode(now, agent, linkId);
+		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.scenario.getNetwork().getLinks().get(linkId));
+		}
+		double arrivalTime = now + agent.getCurrentLeg().getTravelTime();
+		this.teleportationList.add(new Tuple<Double, PersonDriverAgent>(arrivalTime, agent));
 	}
 
 	private void handleKnownLegModeDeparture(final double now, final PersonDriverAgent agent, final Id linkId, final Leg leg) {
@@ -579,13 +577,43 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			departureHandler.handleDeparture(now, agent, linkId, leg);
 			// yy so richtig sympathisch ist mir das irgendwie nicht: Wenn sich aus irgendeinem Grunde zwei
 			// handler zustaendig fuehlen, existiert der Agent hinterher doppelt.  kai, apr'10
+			// Suggestion:
+			// if ( departureHandler.handleDeparture(...) == true ) {
+			//     return ;
+			// }
+			// then could leave teleportation as last option, and the unstable "knownLegMode" condition would no longer
+			// be needed.  kai, jun'10
 		}
 	}
+	
+	// ############################################################################################################################
+	// utility methods (presumably no state change)
+	// ############################################################################################################################
+
+	private void printSimLog(final double time) {
+	    if (time >= this.infoTime) {
+	      this.infoTime += INFO_PERIOD;
+	      Date endtime = new Date();
+	      long diffreal = (endtime.getTime() - this.realWorldStarttime.getTime())/1000;
+	      double diffsim  = time - this.simTimer.getSimStartTime();
+	      int nofActiveLinks = this.netEngine.getNumberOfSimulatedLinks();
+	      log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + this.agentCounter.getLiving() + " lost=" + this.agentCounter.getLost() + " #links=" + nofActiveLinks
+	          + " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
+	      Gbl.printMemoryUsage();
+	    }
+		}
+
+	// ############################################################################################################################
+	// no real functionality beyond this point
+	// ############################################################################################################################
+
+	public final EventsManager getEventsManager(){
+		  return events;
+		}
 
 	public void setAgentFactory(final AgentFactory fac) {
 		this.agentFactory = fac;
 	}
-
 
 	/** Specifies whether the simulation should track vehicle usage and throw an Exception
 	 * if an agent tries to use a car on a link where the car is not available, or not.
@@ -613,11 +641,15 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 	public QNetwork getQNetwork() {
-		return this.network;
+		if ( this.netEngine != null ) {
+			return this.netEngine.getQNetwork() ;
+		} else {
+			return null ;
+		}
 	}
 
 	public VisNetwork getVisNetwork() {
-		return this.network ;
+		return this.netEngine.getQNetwork() ;
 	}
 
 	public Scenario getScenario() {
@@ -660,7 +692,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 	public QSimEngine getQSimEngine() {
-	  return this.simEngine;
+	  return this.netEngine;
 	}
 
 	public Collection<PersonAgent> getTransitAgents(){
@@ -671,5 +703,26 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	public void addSnapshotWriter(SnapshotWriter snapshotWriter) {
 		this.snapshotManager.addSnapshotWriter(snapshotWriter);
 	}
+	public double getStuckTime(){
+		return this.stuckTime;
+	}
+
+	public AgentCounterI getAgentCounter(){
+		return this.agentCounter;
+	}
+
+	public void addDepartureHandler(final DepartureHandler departureHandler) {
+		this.departureHandlers.add(departureHandler);
+	}
+
+	/**
+	 * Adds the QueueSimulationListener instance  given as parameters as
+	 * listener to this QueueSimulation instance.
+	 * @param listeners
+	 */
+	public void addQueueSimulationListeners(final SimulationListener listener){
+		this.listenerManager.addQueueSimulationListener(listener);
+	}
+
 
 }

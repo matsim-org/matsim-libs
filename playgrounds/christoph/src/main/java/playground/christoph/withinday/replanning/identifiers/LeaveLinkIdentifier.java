@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.WithinDayReplanner;

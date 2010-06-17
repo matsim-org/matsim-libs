@@ -5,7 +5,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.qsim.TransitStopAgentTracker;
 import org.matsim.pt.qsim.UmlaufDriver;
-import org.matsim.ptproject.qsim.QSimI;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 
 /**

@@ -21,7 +21,7 @@
 package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
 /**
  * @author nagel

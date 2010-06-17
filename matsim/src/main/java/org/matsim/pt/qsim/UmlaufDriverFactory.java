@@ -20,7 +20,7 @@
 package org.matsim.pt.qsim;
 
 import org.matsim.pt.Umlauf;
-import org.matsim.ptproject.qsim.QSimI;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 /**
  * @author aneumann

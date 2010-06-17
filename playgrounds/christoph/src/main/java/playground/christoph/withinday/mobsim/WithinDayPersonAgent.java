@@ -28,9 +28,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.ptproject.qsim.QPersonAgent;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QSimI;
+import org.matsim.ptproject.qsim.helpers.QPersonAgent;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.withinday.replanning.WithinDayReplanner;

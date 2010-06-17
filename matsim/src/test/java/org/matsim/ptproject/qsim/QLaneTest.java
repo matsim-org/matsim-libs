@@ -32,6 +32,10 @@ import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
 import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.ptproject.qsim.netsimengine.QLane;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -129,7 +133,7 @@ public class QLaneTest extends MatsimTestCase {
 		
 		QSim queueSim = new QSim(scenario, null);
 		QNetwork queueNetwork = queueSim.getQNetwork();
-		QLink ql = queueNetwork.getQLink(id1);
+		QLinkInternalI ql = queueNetwork.getQLink(id1);
 
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
 		assertEquals(268.0, ql.getSpaceCap());

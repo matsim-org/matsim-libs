@@ -26,9 +26,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QSimEngineFactory;
+import org.matsim.ptproject.qsim.interfaces.QSimEngineFactory;
+import org.matsim.ptproject.qsim.netsimengine.DefaultQSimEngineFactory;
 
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 

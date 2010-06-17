@@ -35,7 +35,7 @@ import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.qsim.TransitQSimulation;
-import org.matsim.ptproject.qsim.MobsimFeature;
+import org.matsim.ptproject.qsim.interfaces.MobsimFeature;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.layer.OTFSignalLayer;

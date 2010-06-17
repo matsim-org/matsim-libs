@@ -21,7 +21,7 @@ package org.matsim.pt.qsim;
 
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.pt.Umlauf;
-import org.matsim.ptproject.qsim.QSimI;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 /**
  * @author aneumann

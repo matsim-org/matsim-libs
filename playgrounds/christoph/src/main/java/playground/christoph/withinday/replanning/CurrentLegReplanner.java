@@ -39,7 +39,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
 import playground.christoph.events.ExtendedAgentReplanEventImpl;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;

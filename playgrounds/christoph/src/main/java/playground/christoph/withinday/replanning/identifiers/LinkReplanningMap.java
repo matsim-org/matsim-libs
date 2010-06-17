@@ -40,10 +40,10 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -91,7 +91,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	public void handleEvent(LinkEnterEvent event)
 	{
 		double now = event.getTime();
-		QLink qLink = qNetwork.getQLink(event.getLinkId());
+		QLinkInternalI qLink = qNetwork.getQLink(event.getLinkId());
 		double departureTime = (now + ((LinkImpl)qLink.getLink()).getFreespeedTravelTime(now));
 
 		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));	

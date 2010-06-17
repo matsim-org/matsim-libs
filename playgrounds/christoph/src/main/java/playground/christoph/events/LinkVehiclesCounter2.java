@@ -24,8 +24,8 @@ import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 
 import playground.christoph.network.MyLinkImpl;
 
@@ -76,7 +76,7 @@ public class LinkVehiclesCounter2 implements LinkEnterEventHandler,
 		countChangedInTimeStepMap = new HashMap<Id, Integer>();
 
 		// collect the Counts
-		for (QLink qLink : qNetwork.getLinks().values()) 
+		for (QLinkInternalI qLink : qNetwork.getLinks().values()) 
 		{
 			Id id = qLink.getLink().getId();
 			
@@ -130,7 +130,7 @@ public class LinkVehiclesCounter2 implements LinkEnterEventHandler,
 		while(iter.hasNext())
 		{   
 			Id id = iter.next();
-            QLink queueLink = this.qNetwork.getLinks().get(id);
+            QLinkInternalI queueLink = this.qNetwork.getLinks().get(id);
             
     		int vehiclesCount = 0;
    			vehiclesCount = vehiclesCount + queueLink.getAllVehicles().size();

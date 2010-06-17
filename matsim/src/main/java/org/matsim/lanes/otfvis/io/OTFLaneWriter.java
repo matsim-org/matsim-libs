@@ -29,16 +29,16 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.ptproject.qsim.QLane;
-import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QLinkLanesImpl;
+import org.matsim.ptproject.qsim.netsimengine.QLane;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
-public class OTFLaneWriter extends OTFDataWriter<QLink> implements OTFWriterFactory<QLink>{
+public class OTFLaneWriter extends OTFDataWriter<QLinkInternalI> implements OTFWriterFactory<QLinkInternalI>{
 
   public static final boolean DRAW_LINK_TO_LINK_LINES = true;
 
@@ -182,7 +182,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLink> implements OTFWriterFact
 		//nothing to do as lanes are non dynamical
 	}
 
-	public OTFDataWriter<QLink> getWriter() {
+	public OTFDataWriter<QLinkInternalI> getWriter() {
 		return new OTFLaneWriter();
 	}
 }

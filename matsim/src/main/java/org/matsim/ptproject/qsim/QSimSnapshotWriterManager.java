@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.lanes.otfvis.OTFLanesConnectionManagerFactory;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;

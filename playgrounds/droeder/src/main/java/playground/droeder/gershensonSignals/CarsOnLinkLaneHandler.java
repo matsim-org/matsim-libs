@@ -39,8 +39,8 @@ import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
-import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 
 /**
@@ -195,7 +195,7 @@ public class CarsOnLinkLaneHandler implements LaneEnterEventHandler, LaneLeaveEv
 	
 	public void setQNetwork(QNetwork net){
 		this.qNet = net;
-		for(Entry<Id, QLink> e: net.getLinks().entrySet()){
+		for(Entry<Id, QLinkInternalI> e: net.getLinks().entrySet()){
 			locateCars.put(e.getKey(), new HashMap<Id, CarLocator>());
 		}
 	}

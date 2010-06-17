@@ -36,10 +36,10 @@ import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QNetwork;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
@@ -106,7 +106,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	{	
 		personAgentMapping = new TreeMap<Id, PersonDriverAgent>();
 		
-		for (QLink qLink : qNetwork.getLinks().values())
+		for (QLinkInternalI qLink : qNetwork.getLinks().values())
 		{		
 			for (QVehicle vehicle : qLink.getAllVehicles())
 			{

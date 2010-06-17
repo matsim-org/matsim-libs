@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.QLink;
-import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 
 import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
@@ -45,7 +45,7 @@ public class InitialIdentifierImpl extends InitialIdentifier{
 	{
 		List<PersonDriverAgent> agentsToReplan = new ArrayList<PersonDriverAgent>();
 		
-		for (QLink qLink : simulation.getQNetwork().getLinks().values())
+		for (QLinkInternalI qLink : simulation.getQNetwork().getLinks().values())
 		{
 			for (QVehicle vehicle : qLink.getAllVehicles())
 			{

@@ -23,8 +23,8 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.ptproject.qsim.AgentFactory;
-import org.matsim.ptproject.qsim.QPersonAgent;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.helpers.QPersonAgent;
 
 
 /**

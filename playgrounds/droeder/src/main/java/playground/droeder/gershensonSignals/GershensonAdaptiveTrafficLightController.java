@@ -32,7 +32,7 @@ import org.matsim.core.events.SignalGroupStateChangedEventImpl;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
 import org.matsim.signalsystems.control.SignalGroupState;

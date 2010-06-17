@@ -22,7 +22,7 @@ package playground.christoph.router.costcalculators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.ptproject.qsim.QNetwork;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 
 import playground.christoph.network.MyLinkImpl;
 import playground.christoph.network.SubLink;

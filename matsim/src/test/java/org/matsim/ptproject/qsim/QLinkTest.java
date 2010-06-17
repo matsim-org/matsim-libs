@@ -38,6 +38,12 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.ptproject.qsim.helpers.QPersonAgent;
+import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
+import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.netsimengine.QLinkImpl;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
@@ -86,8 +92,8 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles driving on a link are found with {@link QLink#getVehicle(Id)}
-	 * and {@link QLink#getAllVehicles()}.
+	 * Tests that vehicles driving on a link are found with {@link QLinkInternalI#getVehicle(Id)}
+	 * and {@link QLinkInternalI#getAllVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -132,8 +138,8 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles parked on a link are found with {@link QLink#getVehicle(Id)}
-	 * and {@link QLink#getAllVehicles()}.
+	 * Tests that vehicles parked on a link are found with {@link QLinkInternalI#getVehicle(Id)}
+	 * and {@link QLinkInternalI#getAllVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -167,8 +173,8 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles departing on a link are found with {@link QLink#getVehicle(Id)}
-	 * and {@link QLink#getAllVehicles()}.
+	 * Tests that vehicles departing on a link are found with {@link QLinkInternalI#getVehicle(Id)}
+	 * and {@link QLinkInternalI#getAllVehicles()}.
 	 *
 	 * @author mrieser
 	 */

@@ -75,6 +75,11 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.helpers.QPersonAgent;
+import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
+import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
@@ -729,8 +734,8 @@ public class ParallelQSimTest extends TestCase {
 		QSim sim = new ParallelQSimulation(f.scenario, synchronizedEvents);
 		QNetwork qnet = sim.getQNetwork();
 		sim.prepareSim();
-		QLink qlink2 = qnet.getQLink(id2);
-		QLink qlink3 = qnet.getQLink(new IdImpl(3));
+		QLinkInternalI qlink2 = qnet.getQLink(id2);
+		QLinkInternalI qlink3 = qnet.getQLink(new IdImpl(3));
 
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		QVehicle vehicle1 = new QVehicleImpl(new VehicleImpl(id1, defaultVehicleType));

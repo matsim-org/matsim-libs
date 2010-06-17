@@ -39,9 +39,9 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.ptproject.qsim.QLink;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QVehicle;
+import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
@@ -429,7 +429,7 @@ public class SimpleRouterControler extends Controler {
 		{
 			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
 			
-			for (QLink qLink : sim.getQNetwork().getLinks().values())
+			for (QLinkInternalI qLink : sim.getQNetwork().getLinks().values())
 			{
 				for (QVehicle qVehicle : qLink.getAllVehicles())
 				{
