@@ -60,7 +60,7 @@ public class MatsimToMatrix {
 		@Override
 		public double edgeCost(int i, int j) {
 			int linkIndex = linkIdxFromTo[i][j];  
-			costs=(linkList.get(linkIndex).getFreespeed()*linkList.get(linkIndex).getLength());		
+			costs=(linkList.get(linkIndex).getLength() / linkList.get(linkIndex).getFreespeed());		
 			return costs;
 		}
 		
