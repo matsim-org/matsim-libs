@@ -53,13 +53,6 @@ public class MatsimToMatrix {
 	
 	System.out.println("LINK ADDIEREN KOMPLETT"+Runtime.getRuntime().freeMemory());
 	
-//	for (int i=0; i<100; i++){
-//		for (int j=0; j<100; j++)
-//			if (linkIdxFromTo[i][j]>0){
-//			System.out.println(linkIdxFromTo[i][j]);
-//			System.out.println(linkList.get(linkIdxFromTo[i][j]).getFreespeed());
-//			}
-//	}
 	
 	System.out.println("EDGE ADDIEREN KOMPLETT"+Runtime.getRuntime().freeMemory());
 	
@@ -77,12 +70,16 @@ public class MatsimToMatrix {
 	
 	EdgeCost edgeCost = new EdgeCost();
 	System.out.println("EDGE COST INIT"+Runtime.getRuntime().freeMemory());
+	
 	WeightedDijkstraFactory factory = new WeightedDijkstraFactory(edgeCost);
 	System.out.println("WEIGHTED DIJKSTRA INIT"+Runtime.getRuntime().freeMemory());
-	MatrixCentrality MatrixCent = new MatrixCentrality();
+	
+	MatrixCentrality MatrixCent = new MatrixCentrality(1);
 	System.out.println("MATRIX CENT INIT"+Runtime.getRuntime().freeMemory());
+	
 	MatrixCent.setDijkstraFactory(factory);
 	System.out.println("MATRIX CENT SET FACTORY"+Runtime.getRuntime().freeMemory());
+	
 	MatrixCent.run(y);
 	System.out.println("MATRIX CENT RUN CPLT"+Runtime.getRuntime().freeMemory());
 	}
