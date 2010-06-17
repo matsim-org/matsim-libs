@@ -31,6 +31,8 @@ public class MatsimToMatrix {
 	
 	AdjacencyMatrix y = new AdjacencyMatrix();
 	
+	System.out.println("EINLESEN DER MATRIX KOMPLETT"+Runtime.getRuntime().freeMemory());
+	
 	for (Node node : network.getNodes().values()) {
 		int idx = y.addVertex();
 //		System.out.println(idx+node.toString());
@@ -49,10 +51,17 @@ public class MatsimToMatrix {
 		}			
 	}
 	
-//	for (int i=0; i<100; i++){
-//		for (int j=0; j<100; j++)
-//			System.out.println(linkIdxFromTo[i][j]);
-//	}
+	System.out.println("LINK ADDIEREN KOMPLETT"+Runtime.getRuntime().freeMemory());
+	
+	for (int i=0; i<100; i++){
+		for (int j=0; j<100; j++)
+			if (linkIdxFromTo[i][j]>0){
+			System.out.println(linkIdxFromTo[i][j]);
+			System.out.println(linkList.get(linkIdxFromTo[i][j]).getFreespeed());
+			}
+	}
+	
+	System.out.println("EDGE ADDIEREN KOMPLETT"+Runtime.getRuntime().freeMemory());
 	
 	class EdgeCost implements EdgeCostFunction {
 
@@ -60,19 +69,22 @@ public class MatsimToMatrix {
 		@Override
 		public double edgeCost(int i, int j) {
 			int linkIndex = linkIdxFromTo[i][j];  
-			costs=(linkList.get(linkIndex).getLength() / linkList.get(linkIndex).getFreespeed());		
+			costs=(linkList.get(linkIndex).getLength()/linkList.get(linkIndex).getFreespeed());		
 			return costs;
 		}
 		
 	}
 	
 	EdgeCost edgeCost = new EdgeCost();
-	
+	System.out.println("EDGE COST INIT"+Runtime.getRuntime().freeMemory());
 	WeightedDijkstraFactory factory = new WeightedDijkstraFactory(edgeCost);
+	System.out.println("WEIGHTED DIJKSTRA INIT"+Runtime.getRuntime().freeMemory());
 	MatrixCentrality MatrixCent = new MatrixCentrality();
+	System.out.println("MATRIX CENT INIT"+Runtime.getRuntime().freeMemory());
 	MatrixCent.setDijkstraFactory(factory);
+	System.out.println("MATRIX CENT SET FACTORY"+Runtime.getRuntime().freeMemory());
 	MatrixCent.run(y);
-	
+	System.out.println("MATRIX CENT RUN CPLT"+Runtime.getRuntime().freeMemory());
 	}
 	
 	
