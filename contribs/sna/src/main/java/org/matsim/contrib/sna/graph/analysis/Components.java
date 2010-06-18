@@ -101,7 +101,7 @@ public class Components {
 
 			@Override
 			public int compare(TIntArrayList o1, TIntArrayList o2) {
-				int result = o2.size() - o1.size();
+				int result = o1.size() - o2.size();
 				if (result == 0) {
 					if (o1 == o2)
 						return 0;
@@ -112,6 +112,8 @@ public class Components {
 			}
 		});
 
+		Collections.reverse(components);
+		
 		return components;
 	}
 }

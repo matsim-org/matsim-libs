@@ -81,6 +81,7 @@ public class DegreeTask extends ModuleAnalyzerTask<Degree> {
 		if (getOutputDirectory() != null) {
 			try {
 				writeHistograms(distr, 1.0, false, "k");
+				writeHistograms(distr, 5.0, false, "k_5");
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

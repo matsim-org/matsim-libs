@@ -52,6 +52,8 @@ public class AdjacencyMatrix<V extends Vertex> {
 
 	private List<V> vertices;
 
+	private TObjectIntHashMap<Vertex> vertexIndicies;
+
 	/**
 	 * Creates a new empty adjacency matrix.
 	 */
@@ -105,7 +107,7 @@ public class AdjacencyMatrix<V extends Vertex> {
 		/*
 		 * create vertices
 		 */
-		TObjectIntHashMap<Vertex> vertexIndicies = new TObjectIntHashMap<Vertex>();
+		vertexIndicies = new TObjectIntHashMap<Vertex>();
 		int idx = 0;
 		for (Vertex v : g.getVertices()) {
 			vertexIndicies.put(v, idx);
@@ -145,6 +147,21 @@ public class AdjacencyMatrix<V extends Vertex> {
 			return null;
 		else
 			return vertices.get(i);
+	}
+
+	/**
+	 * If this matrix has been created from a graph, returns the index
+	 * associated with <tt>vertex</tt>.
+	 * 
+	 * @param vertex
+	 *            a vertex
+	 * @return the index associated with <tt>vertex</tt>.
+	 */
+	public int getIndex(V vertex) {
+		if (vertexIndicies.contains(vertex))
+			return vertexIndicies.get(vertex);
+		else
+			return -1;
 	}
 
 	/**
