@@ -44,15 +44,15 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 	private final CyclicBarrier separationBarrier;
 	private final CyclicBarrier endBarrier;
 
-	private ExtendedQueueNode[] queueNodes;
+	private ExtendedQueueNode[] queueNodes = null;
 	private List<QLinkInternalI> links = new ArrayList<QLinkInternalI>();
 
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QLinkInternalI> linksToActivate = new ArrayList<QLinkInternalI>();
-	private QSim qsim;
-	private AgentSnapshotInfoBuilder positionInfoBuilder;
+	private final QSim qsim;
+	private final AgentSnapshotInfoBuilder positionInfoBuilder;
 
-	/*package*/ QSimEngineThread(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier, 
+	/*package*/ QSimEngineThread(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier,
 			QSim sim, AgentSnapshotInfoBuilder positionInfoBuilder)
 	{
 		this.simulateAllNodes = simulateAllNodes;
@@ -91,7 +91,7 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 	public void doSimStep(double time) {
 		// nothing to do here
 	}
-	
+
 	public void beforeSimStep( double time ) {
 		// nothing to do here
 	}

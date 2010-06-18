@@ -52,27 +52,27 @@ public class QSimEngineImpl implements QSimEngine{
 	/*package*/ static boolean simulateAllLinks = false;
 	/*package*/ static boolean simulateAllNodes = false;
 
-	/*package*/  List<QLinkInternalI> allLinks;
+	/*package*/  List<QLinkInternalI> allLinks = null;
 	/** This is the collection of links that have to be moved in the simulation */
 	/*package*/  List<QLinkInternalI> simLinksArray = new ArrayList<QLinkInternalI>();
 	/** This is the collection of nodes that have to be moved in the simulation */
-	/*package*/  QNode[] simNodesArray;
+	/*package*/  QNode[] simNodesArray = null;
 	/** This is the collection of links that have to be activated in the current time step */
 	/*package*/  ArrayList<QLinkInternalI> simActivateThis = new ArrayList<QLinkInternalI>();
 
 	private final Random random;
   private final QSim qsim;
-  
+
   private final AgentSnapshotInfoBuilder positionInfoBuilder;
-private QNetwork qNetwork; 
+private QNetwork qNetwork;
 
 	public QSimEngineImpl(final QSim sim, final Random random) {
     this.random = random;
     this.qsim = sim;
-    this.positionInfoBuilder = new AgentSnapshotInfoBuilder(sim.getScenario().getConfig().getQSimConfigGroup(), 
+    this.positionInfoBuilder = new AgentSnapshotInfoBuilder(sim.getScenario().getConfig().getQSimConfigGroup(),
     		((NetworkImpl)sim.getScenario().getNetwork()).getEffectiveCellSize());
 	}
-	
+
   @Override
   public void onPrepareSim() {
     this.allLinks = new ArrayList<QLinkInternalI>(this.qsim.getQNetwork().getLinks().values());
@@ -87,7 +87,7 @@ private QNetwork qNetwork;
     if (simulateAllLinks) {
       this.simLinksArray.addAll(this.allLinks);
     }
-    
+
   }
 
 
@@ -110,7 +110,7 @@ private QNetwork qNetwork;
 		moveNodes(time);
 		moveLinks(time);
 	}
-	
+
 	public void beforeSimStep( final double time ) {
 		// nothing to do here
 	}
@@ -168,7 +168,7 @@ private QNetwork qNetwork;
   public QSim getQSim() {
     return this.qsim;
   }
-  
+
   public AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(){
   	return this.positionInfoBuilder;
   }

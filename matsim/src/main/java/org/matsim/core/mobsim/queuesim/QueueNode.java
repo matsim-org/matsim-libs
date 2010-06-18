@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.vis.snapshots.writers.VisData;
@@ -108,7 +107,7 @@ class QueueNode implements VisNode {
 				throw new RuntimeException("Cannot move vehicle " + veh.getId() +
 						" from link " + currentLink.getId() + " to link " + nextLinkId);
 			}
-			
+
 			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
 
 			if (nextQueueLink.hasSpace()) {
@@ -124,12 +123,12 @@ class QueueNode implements VisNode {
 			Config config = sc.getConfig() ;
 
 //			if ((now - link.bufferLastMovedTime) > AbstractSimulation.getStuckTime()) {
-			if ((now - link.bufferLastMovedTime) > this.queueNetwork.getQSim().getScenario().getConfig().simulation().getStuckTime() ) {
+			if ((now - link.bufferLastMovedTime) > config.simulation().getStuckTime() ) {
 				/* We just push the vehicle further after stucktime is over, regardless
 				 * of if there is space on the next link or not.. optionally we let them
 				 * die here, we have a config setting for that!
 				 */
-				if (Gbl.getConfig().simulation().isRemoveStuckVehicles()) {
+				if (config.simulation().isRemoveStuckVehicles()) {
 					link.popFirstFromBuffer();
 					this.queueNetwork.getQSim().getAgentCounter().decLiving();
 					this.queueNetwork.getQSim().getAgentCounter().incLost();
