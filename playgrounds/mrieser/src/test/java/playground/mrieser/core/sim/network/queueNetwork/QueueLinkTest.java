@@ -19,6 +19,8 @@
 
 package playground.mrieser.core.sim.network.queueNetwork;
 
+import java.util.Random;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -49,7 +51,7 @@ public class QueueLinkTest {
 		link.setFreespeed(10);
 		link.setCapacity(3600.0);
 		link.setNumberOfLanes(1.0);
-		QueueNetwork qnet = new QueueNetwork(new FakeSimEngine());
+		QueueNetwork qnet = new QueueNetwork(new FakeSimEngine(), new Random());
 		QueueLink ql = new QueueLink(link, qnet);
 
 		Id veh1Id = new IdImpl(11);
@@ -80,7 +82,7 @@ public class QueueLinkTest {
 		link.setFreespeed(10);
 		link.setCapacity(3600.0);
 		link.setNumberOfLanes(1.0);
-		QueueNetwork qnet = new QueueNetwork(new FakeSimEngine());
+		QueueNetwork qnet = new QueueNetwork(new FakeSimEngine(), new Random());
 		QueueLink ql = new QueueLink(link, qnet);
 
 		Id veh1Id = new IdImpl(11);
@@ -120,7 +122,7 @@ public class QueueLinkTest {
 		link.setCapacity(3600.0);
 		link.setNumberOfLanes(1.0);
 		FakeSimEngine engine = new FakeSimEngine();
-		QueueNetwork qnet = new QueueNetwork(engine);
+		QueueNetwork qnet = new QueueNetwork(engine, new Random());
 		QueueLink ql = new QueueLink(link, qnet);
 
 		Id veh1Id = new IdImpl(11);
@@ -147,7 +149,7 @@ public class QueueLinkTest {
 		link.setCapacity(3600.0);
 		link.setNumberOfLanes(1.0);
 		FakeSimEngine engine = new FakeSimEngine();
-		QueueNetwork qnet = new QueueNetwork(engine);
+		QueueNetwork qnet = new QueueNetwork(engine, new Random());
 		QueueLink ql = new QueueLink(link, qnet);
 
 		Id veh1Id = new IdImpl(11);
@@ -179,7 +181,7 @@ public class QueueLinkTest {
 		link.setCapacity(3600.0);
 		link.setNumberOfLanes(1.0);
 		FakeSimEngine engine = new FakeSimEngine();
-		QueueNetwork qnet = new QueueNetwork(engine);
+		QueueNetwork qnet = new QueueNetwork(engine, new Random());
 		QueueLink ql = new QueueLink(link, qnet);
 
 		Id veh1Id = new IdImpl(11);
@@ -205,7 +207,7 @@ public class QueueLinkTest {
 		link.setCapacity(3600.0);
 		link.setNumberOfLanes(1.0);
 		FakeSimEngine engine = new FakeSimEngine();
-		QueueNetwork qnet = new QueueNetwork(engine);
+		QueueNetwork qnet = new QueueNetwork(engine, new Random());
 		QueueLink ql = new QueueLink(link, qnet);
 
 		Id veh1Id = new IdImpl(11);

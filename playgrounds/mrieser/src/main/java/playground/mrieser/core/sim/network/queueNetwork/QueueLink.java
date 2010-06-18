@@ -33,6 +33,7 @@ import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.core.sim.api.SimVehicle;
 import playground.mrieser.core.sim.network.api.SimLink;
@@ -42,7 +43,7 @@ import playground.mrieser.core.sim.network.api.SimLink;
 	private final static Logger log = Logger.getLogger(QueueLink.class);
 
 	private final QueueNetwork network;
-	private final Link link;
+	/*package*/ final Link link;
 
 	/* DRIVING VEHICLE QUEUE */
 
@@ -74,6 +75,8 @@ import playground.mrieser.core.sim.network.api.SimLink;
 	 * flowCapFraction.
 	 */
 	private double buffercap_accumulate = 1.0;
+
+	private double bufferLastMovedTime = Time.UNDEFINED_TIME;
 
 	/* WAITING QUEUE = DRIVEWAYS */
 
@@ -260,6 +263,9 @@ import playground.mrieser.core.sim.network.api.SimLink;
 			throw new IllegalStateException("Buffer of link " + this.link.getId() + " has no space left!");
 		}
 		this.buffer.add(veh);
+		if (this.buffer.size() == 1) {
+			this.bufferLastMovedTime = now;
+		}
 	}
 
 	@Override
@@ -272,7 +278,17 @@ import playground.mrieser.core.sim.network.api.SimLink;
 	}
 
 	/*package*/ SimVehicle removeFirstVehicleInBuffer() {
-		return this.buffer.poll();
+		double now = this.network.simEngine.getCurrentTime();
+		SimVehicle veh = this.buffer.poll();
+		this.bufferLastMovedTime = now;
+		return veh;
 	}
 
+	/*package*/ boolean hasSpace() {
+		return this.usedStorageCapacity < this.storageCapacity;
+	}
+
+	/*package*/ double getBufferLastMovedTime() {
+		return this.bufferLastMovedTime;
+	}
 }

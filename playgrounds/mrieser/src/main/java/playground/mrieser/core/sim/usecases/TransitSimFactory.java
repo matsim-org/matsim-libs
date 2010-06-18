@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 
@@ -35,10 +36,10 @@ import playground.mrieser.core.sim.features.StatusFeature;
 import playground.mrieser.core.sim.features.TransitFeature;
 import playground.mrieser.core.sim.impl.ActivityHandler;
 import playground.mrieser.core.sim.impl.CarDepartureHandler;
+import playground.mrieser.core.sim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.sim.impl.LegHandler;
 import playground.mrieser.core.sim.impl.PlanSimulationImpl;
 import playground.mrieser.core.sim.impl.TeleportationHandler;
-import playground.mrieser.core.sim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.sim.impl.TransitDepartureHandler;
 import playground.mrieser.core.sim.network.api.SimNetwork;
 import playground.mrieser.core.sim.network.queueNetwork.QueueNetworkCreator;
@@ -53,7 +54,7 @@ public class TransitSimFactory implements MobsimFactory {
 		planSim.setSimEngine(engine);
 
 		// setup network
-		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(sc.getNetwork(), engine);
+		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(sc.getNetwork(), engine, MatsimRandom.getRandom());
 		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
 
 		// setup features; order is important!

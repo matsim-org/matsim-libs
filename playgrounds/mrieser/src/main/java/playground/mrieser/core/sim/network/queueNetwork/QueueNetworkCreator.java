@@ -19,6 +19,8 @@
 
 package playground.mrieser.core.sim.network.queueNetwork;
 
+import java.util.Random;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -31,8 +33,8 @@ import playground.mrieser.core.sim.network.api.SimNetwork;
  */
 public abstract class QueueNetworkCreator {
 
-	public static SimNetwork createQueueNetwork(final Network network, final TimestepSimEngine simEngine) {
-		QueueNetwork qnet = new QueueNetwork(simEngine);
+	public static SimNetwork createQueueNetwork(final Network network, final TimestepSimEngine simEngine, final Random random) {
+		QueueNetwork qnet = new QueueNetwork(simEngine, random);
 
 		for (Link link : network.getLinks().values()) {
 			qnet.addLink(new QueueLink(link, qnet));

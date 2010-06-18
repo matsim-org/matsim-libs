@@ -25,7 +25,6 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
@@ -84,7 +83,7 @@ public class TeleportationHandler implements DepartureHandler, SimFeature, SimKe
 		return !this.teleportationList.isEmpty();
 	}
 
-	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PlanAgent>>, Serializable {
+	/*package*/ static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PlanAgent>>, Serializable {
 		private static final long serialVersionUID = 1L;
 		public int compare(final Tuple<Double, PlanAgent> o1, final Tuple<Double, PlanAgent> o2) {
 			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information

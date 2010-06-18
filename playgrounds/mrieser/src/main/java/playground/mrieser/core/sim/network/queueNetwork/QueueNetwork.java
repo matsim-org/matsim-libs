@@ -21,13 +21,12 @@ package playground.mrieser.core.sim.network.queueNetwork;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 
 import playground.mrieser.core.sim.api.TimestepSimEngine;
-import playground.mrieser.core.sim.network.api.SimLink;
 import playground.mrieser.core.sim.network.api.SimNetwork;
-import playground.mrieser.core.sim.network.api.SimNode;
 
 /**
  * @author mrieser
@@ -40,17 +39,21 @@ import playground.mrieser.core.sim.network.api.SimNode;
 	private double flowCapFactor = 1.0;
 	private double storageCapFactor = 1.0;
 	private double effectiveCellSize = 7.5;
+	private boolean removeStuckVehicles = true;
+	private double stuckTime = 100;
+	private final Random random;
 
-	public QueueNetwork(final TimestepSimEngine simEngine) {
+	public QueueNetwork(final TimestepSimEngine simEngine, final Random random) {
 		this.simEngine = simEngine;
 		this.links = new HashMap<Id, QueueLink>();
 		this.nodes = new HashMap<Id, QueueNode>();
+		this.random = random;
 	}
 
 	@Override
 	public void doSimStep(double time) {
 		for (QueueNode node : this.nodes.values()) {
-			node.doSimStep(time);
+			node.moveNode(time, this.random);
 		}
 		for (QueueLink link : this.links.values()) {
 			link.doSimStep(time);
@@ -58,12 +61,12 @@ import playground.mrieser.core.sim.network.api.SimNode;
 	}
 
 	@Override
-	public Map<Id, ? extends SimLink> getLinks() {
+	public Map<Id, ? extends QueueLink> getLinks() {
 		return this.links;
 	}
 
 	@Override
-	public Map<Id, ? extends SimNode> getNodes() {
+	public Map<Id, ? extends QueueNode> getNodes() {
 		return this.nodes;
 	}
 
@@ -97,6 +100,22 @@ import playground.mrieser.core.sim.network.api.SimNode;
 
 	public double getEffectiveCellSize() {
 		return effectiveCellSize;
+	}
+
+	public boolean isRemoveStuckVehicles() {
+		return this.removeStuckVehicles;
+	}
+
+	public void setRemoveStuckVehicles(final boolean removeStuckVehicles) {
+		this.removeStuckVehicles = removeStuckVehicles;
+	}
+
+	public double getStuckTime() {
+		return this.stuckTime;
+	}
+
+	public void setStuckTime(final double stuckTime) {
+		this.stuckTime = stuckTime;
 	}
 
 }
