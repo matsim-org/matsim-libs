@@ -59,7 +59,7 @@ public class IADrivingWriter implements LinkEnterEventHandler, LinkLeaveEventHan
 	}
 
 	public void close() {
-		if (this.writer == null) {
+		if (this.writer != null) {
 			try { this.writer.close(); }
 			catch (IOException e) { log.warn("Could not close writer.", e); }
 		}

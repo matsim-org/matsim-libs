@@ -47,8 +47,8 @@ import org.matsim.pt.PtConstants;
 public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
 	private final Map<Id, Id> vehicleFacilityMap = new HashMap<Id, Id>();
-	private Map<Id, Double> passengerWaitingSince = new ConcurrentHashMap<Id, Double>();
-	private Map<Id, StopData> stopData = new ConcurrentHashMap<Id, StopData>();
+	private ConcurrentHashMap<Id, Double> passengerWaitingSince = new ConcurrentHashMap<Id, Double>();
+	private ConcurrentHashMap<Id, StopData> stopData = new ConcurrentHashMap<Id, StopData>();
 
 	public int getStopFacilityLoad(final Id stopFacilityId, final double time) {
 		StopData sData = getStopData(stopFacilityId, false);
@@ -101,12 +101,10 @@ public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEnt
 	private StopData getStopData(final Id stopId, final boolean createIfMissing) {
 		StopData sData = this.stopData.get(stopId);
 		if (sData == null) {
-			synchronized(this.stopData) { // putIfMissing
-				sData = this.stopData.get(stopId);
-				if (sData == null) {
-					sData = new StopData();
-					this.stopData.put(stopId, sData);
-				}
+			StopData newData = new StopData();
+			sData = this.stopData.putIfAbsent(stopId, newData);
+			if (sData == null) {
+				sData = newData;
 			}
 		}
 		return sData;

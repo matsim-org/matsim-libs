@@ -43,7 +43,7 @@ public class IADriveFilter {
 
 		try {
 			String header = reader.readLine();
-//			writer.write(header + "\n");
+			writer.write(header + "\n");
 
 			String line = null;
 			while ((line = reader.readLine()) != null) {

@@ -28,18 +28,18 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 
 	private final CoordsConverter converter = new CoordsConverter(new Ellipsoid("Bessel", 3, 52.4186482777778, 13.6272036666667));
- 
+
 	public Coord transform(final Coord coord) {
 
 		return this.converter.RH2BL(coord.getX()-40000, coord.getY()-10000);
 	}
 
-	/* The following inner classes are taken from 
+	/* The following inner classes are taken from
    * CoordsCalculator (http://coordscalc.sourceforge.net/)
 	 * The classes were minimally changed to return MATSim-Coord objects
 	 * instead of the original PointRHBL objects.
 	 */
-	
+
 	/* **********************************************************************
 	 *             CoordsCalculator - CoordsConverter v1.1                  *
 	 ************************************************************************
@@ -61,10 +61,10 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	 * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.            *
 	 ************************************************************************/
 
-	
+
 	private static class CoordsConverter {
 	  private Ellipsoid Ell = null;
-	  private final double rho=180.0/Math.PI;
+	  private static final double rho=180.0/Math.PI;
 
 	  public CoordsConverter(){  }
 
@@ -153,7 +153,7 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 
 	  public Coord RH2BL(final double r, final double h){
 	  	Coord p = new CoordImpl(0, 0);
-	  	
+
 	    if (!this.Ell.isSoldner()) {
 	      int kz;
 
@@ -211,14 +211,14 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	  }
 
 	}
-	
+
 	private static class Ellipsoid {
 	  public String ellName;
 	  private double a = 0;
 	  private double b = 0;
 	  private int deg = 6;
 	  private boolean isUTM = false, isSoldner = false;
-	  private final double roh=180.0/Math.PI;
+	  private static final double roh=180.0/Math.PI;
 	  private double B0 = 0.0, L0 = 0.0;
 	  public Ellipsoid(final String ellName){
 	    this(ellName, 6, false);
@@ -325,8 +325,8 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 
 	  @Override
 		public String toString(){
-	    return new String(this.deg+"° - "+this.ellName);
+	    return this.deg + "° - " + this.ellName;
 	  }
 	}
-	
+
 }

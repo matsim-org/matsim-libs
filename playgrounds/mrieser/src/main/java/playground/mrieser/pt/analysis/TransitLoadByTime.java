@@ -37,7 +37,7 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
  */
 public class TransitLoadByTime implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
-	private Map<Id, VehicleData> vehicleData = new ConcurrentHashMap<Id, VehicleData>();
+	private ConcurrentHashMap<Id, VehicleData> vehicleData = new ConcurrentHashMap<Id, VehicleData>();
 
 	public int getVehicleLoad(final Id vehicleId, final double time) {
 		VehicleData vData = getVehicleData(vehicleId, false);
@@ -67,12 +67,11 @@ public class TransitLoadByTime implements PersonEntersVehicleEventHandler, Perso
 	private VehicleData getVehicleData(final Id vehicleId, final boolean createIfMissing) {
 		VehicleData vData = this.vehicleData.get(vehicleId);
 		if (vData == null) {
-			synchronized(this.vehicleData) { // putIfMissing
-				vData = this.vehicleData.get(vehicleId);
-				if (vData == null) {
-					vData = new VehicleData();
-					this.vehicleData.put(vehicleId, vData);
-				}
+			// optimization: only allocate new object when not found
+			VehicleData newData = new VehicleData();
+			vData = this.vehicleData.putIfAbsent(vehicleId, newData);
+			if (vData == null) {
+				vData = newData;
 			}
 		}
 		return vData;
