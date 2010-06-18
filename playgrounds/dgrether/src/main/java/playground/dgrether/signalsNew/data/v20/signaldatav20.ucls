@@ -1,70 +1,88 @@
-<class-diagram version="0.9.86" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+<class-diagram version="0.9.86" icons="true" always-add-relationships="true" generalizations="true" realizations="true" 
   associations="true" dependencies="false" nesting-relationships="true">  
-  <interface corner="BOTTOM_RIGHT" language="java" name="org.matsim.signalsystems.data.v20.SignalGroupData" 
-    project="matsim" file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalGroupData.java" binary="false">    
-    <position x="949" y="351" width="-1" height="-1"/>    
-    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </interface>  
-  <interface corner="BOTTOM_RIGHT" language="java" name="org.matsim.signalsystems.data.v20.SignalSystemData" 
-    project="matsim" file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalSystemData.java" binary="false">    
-    <position x="986" y="169" width="-1" height="-1"/>    
-    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </interface>  
-  <interface corner="BOTTOM_RIGHT" language="java" name="org.matsim.signalsystems.data.v20.SignalSystemsData" 
-    project="matsim" file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalSystemsData.java" 
+  <interface corner="BOTTOM_RIGHT" language="java" name="playground.dgrether.signalsNew.data.v20.SignalSystemsData" 
+    project="dgrether" file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalSystemsData.java" 
     binary="false">    
-    <position x="587" y="153" width="-1" height="-1"/>    
-    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+    <position x="177" y="161" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="true" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <interface corner="BOTTOM_RIGHT" language="java" name="org.matsim.signalsystems.data.v20.SignalData" project="matsim" 
-    file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalData.java" binary="false">    
-    <position x="925" y="500" width="-1" height="-1"/>    
-    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </interface>  
-  <interface corner="BOTTOM_RIGHT" language="java" name="org.matsim.signalsystems.data.v20.SignalSystemsDataFactory" 
-    project="matsim" file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalSystemsDataFactory.java" 
+  <interface corner="BOTTOM_RIGHT" language="java" name="playground.dgrether.signalsNew.data.v20.SignalGroupData" 
+    project="dgrether" file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalGroupData.java" 
     binary="false">    
-    <position x="209" y="155" width="-1" height="-1"/>    
+    <position x="527" y="416" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <interface corner="BOTTOM_RIGHT" language="java" 
+    name="playground.dgrether.signalsNew.data.v20.SignalSystemsDataFactory" project="dgrether" 
+    file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalSystemsDataFactory.java" binary="false">    
+    <position x="202" y="413" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <interface corner="BOTTOM_RIGHT" language="java" name="playground.dgrether.signalsNew.data.v20.SignalSystemData" 
+    project="dgrether" file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalSystemData.java" 
+    binary="false">    
+    <position x="572" y="154" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <interface corner="BOTTOM_RIGHT" language="java" name="playground.dgrether.signalsNew.data.v20.SignalData" 
+    project="dgrether" file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalData.java" 
+    binary="false">    
+    <position x="894" y="424" width="-1" height="-1"/>    
     <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
   <dependency>    
-    <source project="matsim" name="org.matsim.signalsystems.data.v20.SignalSystemsData" 
-      file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalSystemsData.java" binary="false"/>    
-    <target project="matsim" name="org.matsim.signalsystems.data.v20.SignalSystemsDataFactory" 
-      file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalSystemsDataFactory.java" binary="false"/>  
+    <source project="dgrether" name="playground.dgrether.signalsNew.data.v20.SignalGroupData" 
+      file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalGroupData.java" binary="false"/>    
+    <target project="dgrether" name="playground.dgrether.signalsNew.data.v20.SignalData" 
+      file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalData.java" binary="false"/>  
   </dependency>  
   <dependency>    
-    <source project="matsim" name="org.matsim.signalsystems.data.v20.SignalGroupData" 
-      file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalGroupData.java" binary="false"/>    
-    <target project="matsim" name="org.matsim.signalsystems.data.v20.SignalData" 
-      file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalData.java" binary="false"/>  
+    <source project="dgrether" name="playground.dgrether.signalsNew.data.v20.SignalSystemsData" 
+      file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalSystemsData.java" binary="false"/>    
+    <target project="dgrether" name="playground.dgrether.signalsNew.data.v20.SignalSystemsDataFactory" 
+      file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalSystemsDataFactory.java" 
+      binary="false"/>  
   </dependency>  
   <dependency>    
-    <source project="matsim" name="org.matsim.signalsystems.data.v20.SignalSystemsData" 
-      file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalSystemsData.java" binary="false"/>    
-    <target project="matsim" name="org.matsim.signalsystems.data.v20.SignalSystemData" 
-      file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalSystemData.java" binary="false"/>  
+    <source project="dgrether" name="playground.dgrether.signalsNew.data.v20.SignalSystemData" 
+      file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalSystemData.java" binary="false"/>    
+    <target project="dgrether" name="playground.dgrether.signalsNew.data.v20.SignalGroupData" 
+      file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalGroupData.java" binary="false"/>  
   </dependency>  
   <dependency>    
-    <source project="matsim" name="org.matsim.signalsystems.data.v20.SignalSystemData" 
-      file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalSystemData.java" binary="false"/>    
-    <target project="matsim" name="org.matsim.signalsystems.data.v20.SignalGroupData" 
-      file="/matsim/src/main/java/org/matsim/signalsystems/data/v20/SignalGroupData.java" binary="false"/>  
+    <source project="dgrether" name="playground.dgrether.signalsNew.data.v20.SignalSystemsDataFactory" 
+      file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalSystemsDataFactory.java" 
+      binary="false"/>    
+    <target project="dgrether" name="playground.dgrether.signalsNew.data.v20.SignalGroupData" 
+      file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalGroupData.java" binary="false"/>  
+  </dependency>  
+  <dependency>    
+    <source project="dgrether" name="playground.dgrether.signalsNew.data.v20.SignalSystemsData" 
+      file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalSystemsData.java" binary="false"/>    
+    <target project="dgrether" name="playground.dgrether.signalsNew.data.v20.SignalSystemData" 
+      file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalSystemData.java" binary="false"/>  
+  </dependency>  
+  <dependency>    
+    <source project="dgrether" name="playground.dgrether.signalsNew.data.v20.SignalSystemsDataFactory" 
+      file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalSystemsDataFactory.java" 
+      binary="false"/>    
+    <target project="dgrether" name="playground.dgrether.signalsNew.data.v20.SignalSystemData" 
+      file="/dgrether/src/main/java/playground/dgrether/signalsNew/data/v20/SignalSystemData.java" binary="false"/>  
   </dependency>  
   <classifier-display autosize="true" package="true" initial-value="false" signature="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true"/>    

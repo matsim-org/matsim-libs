@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalSystemsDataFactory
+ * SignalSystemsManager
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,22 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsNew.data.v20;
+package playground.dgrether.signalsNew.model;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 
 /**
  * @author dgrether
  *
  */
-public interface SignalSystemsDataFactory extends MatsimFactory {
+public interface SignalSystemsManager {
 
-	public SignalSystemData createSignalSystemData(Id systemId);
+	public EventsManager getEventsManager();
 	
-	public SignalGroupData createSignalGroupData(Id groupId);
-	
-	public SignalData createSignalData(Id signalId);
+	public void setEventsManager(EventsManager events);
 	
 }

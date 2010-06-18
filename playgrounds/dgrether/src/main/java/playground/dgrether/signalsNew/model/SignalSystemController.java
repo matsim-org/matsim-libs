@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalizedItem
+ * SignalSystemController
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,22 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems;
+package playground.dgrether.signalsNew.model;
+
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signalsystems.control.SignalGroupState;
 
 
 /**
+ * <ul>
+ * 		<li>No Id is needed because it is given in the SignalSystemData</li>
+ * 		<li>The default cycle time is also given by the SignalSystemData</li>
+ * </ul>
  * @author dgrether
- *
  */
-public interface SignalizedItem {
+public interface SignalSystemController {
 	
-	public void setSignalized(boolean isSignalized);
-	
-	public void setSignalStateAllTurningMoves(SignalGroupState state);
-	
-	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId);
 
+	public void addSignalGroup(SignalGroup group);
+	
+	public Map<Id, SignalGroup> getSignalGroups();
+	
+	public void updateState(double time_seconds);
+
+	
 }

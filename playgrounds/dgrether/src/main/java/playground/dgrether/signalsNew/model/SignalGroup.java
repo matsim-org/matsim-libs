@@ -20,14 +20,16 @@
 package playground.dgrether.signalsNew.model;
 
 import org.matsim.signalsystems.control.SignalGroupState;
-import org.matsim.signalsystems.control.SignalSystemController;
 
 import playground.dgrether.signalsNew.data.v20.SignalGroupData;
 
 
 /**
+ * <ul>
+ * 		<li>No Id is needed because it is given in the SignalSystemData</li>
+ * </ul>
+ * 
  * @author dgrether
- *
  */
 public interface SignalGroup {
 
@@ -38,8 +40,9 @@ public interface SignalGroup {
 
 	public SignalSystemController getSignalController();
 	
-	
 	public void addSignalizedItem(SignalizedItem item);
+	
+	
 	
 	public void updateState(SignalGroupState state);
 	

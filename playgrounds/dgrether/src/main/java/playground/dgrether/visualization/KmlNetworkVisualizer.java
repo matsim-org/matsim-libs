@@ -29,12 +29,12 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
@@ -47,7 +47,7 @@ public class KmlNetworkVisualizer {
 
 	private static final Logger log = Logger.getLogger(KmlNetworkVisualizer.class);
 
-	private NetworkLayer networkLayer;
+	private Network network;
 
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	
@@ -58,19 +58,16 @@ public class KmlNetworkVisualizer {
 	private FolderType mainFolder;
 
 	private KMZWriter writer;
-	public KmlNetworkVisualizer(final String networkFile, final String outputPath) {
-		ScenarioImpl scenario = new ScenarioImpl();
-		this.networkLayer = scenario.getNetwork();
-		loadNetwork(networkFile, scenario);
-		this.write(outputPath);
-	}
 
-	public KmlNetworkVisualizer(final NetworkLayer network, final String outputPath) {
-		this.networkLayer = network;
-		this.write(outputPath);
+	public KmlNetworkVisualizer(final Network network) {
+		this.network = network;
 	}
-
+	
 	private void write(final String filename) {
+			this.write(filename, new GK4toWGS84());
+	}	
+
+	public void write(final String filename, CoordinateTransformation transform) {
 		// init kml
 		this.mainKml = this.kmlObjectFactory.createKmlType();
 		this.mainDoc = this.kmlObjectFactory.createDocumentType();
@@ -85,8 +82,8 @@ public class KmlNetworkVisualizer {
 			// add the matsim logo to the kml
 			ScreenOverlayType logo = MatsimKMLLogo.writeMatsimKMLLogo(writer);
 			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(logo));
-			KmlNetworkWriter netWriter = new KmlNetworkWriter(this.networkLayer,
-					new GK4toWGS84(), this.writer, this.mainDoc);
+			KmlNetworkWriter netWriter = new KmlNetworkWriter(this.network,
+					transform, this.writer, this.mainDoc);
 			FolderType networkFolder = netWriter.getNetworkFolder();
 			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(networkFolder));
 		} catch (IOException e) {
@@ -98,8 +95,10 @@ public class KmlNetworkVisualizer {
 		log.info("Network written to kmz!");
 	}
 
-	protected void loadNetwork(final String networkFile, Scenario scenario) {
+	protected static Network loadNetwork(final String networkFile) {
+		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
+		return scenario.getNetwork();
 	}
 
 
@@ -108,9 +107,9 @@ public class KmlNetworkVisualizer {
 			printHelp();
 		}
 		else {
-//			new KmlNetworkVisualizer(args[0], args[1]);
+			Network net = loadNetwork("../../cvsRep/vsp-cvs/studies/berlin-wip/network/wip_net.xml");
 //			new KmlNetworkVisualizer("./examples/equil/network.xml", "./output/equil.kmz");
-			new KmlNetworkVisualizer("../../cvsRep/vsp-cvs/studies/berlin-wip/network/wip_net.xml", "./output/wipNet.kmz");
+			new KmlNetworkVisualizer(net).write("./output/wipNet.kmz");
 
 		}
 	}

@@ -1,6 +1,6 @@
 <!--  AdaptiveSignalSystemController muss signalgroups eigentlich nicht mehr kennen-->
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<signalSystemConfig xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalSystemsConfig_v1.1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
+<signalSystemConfig xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalSystemsConfig_v2.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
     <signalSystemConfiguration refId="42">
         <signalSystemControlInfo xsi:type="planbasedSignalSystemControlInfoType">
             <signalSystemPlan id="8">

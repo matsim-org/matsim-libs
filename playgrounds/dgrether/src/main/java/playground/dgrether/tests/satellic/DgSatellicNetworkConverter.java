@@ -19,34 +19,72 @@
  * *********************************************************************** */
 package playground.dgrether.tests.satellic;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGenerator;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
+import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.WidthCalculator;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
-
-
+import playground.dgrether.visualization.KmlNetworkVisualizer;
 
 /**
  * @author dgrether
- *
+ * 
  */
 public class DgSatellicNetworkConverter {
 
-  public static void main(String[] args) {
-    String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab.xml";
-    String netOut = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab.shp";
-    
-//    Scenario sc = new ScenarioImpl();
-//    MatsimNetworkReader reader = new MatsimNetworkReader(sc);
-//    reader.readFile(net);
-//    String srs = "+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs";
-    String srs = TransformationFactory.WGS84;
+	
+	private static final Logger log = Logger.getLogger(DgSatellicNetworkConverter.class);
+	
+	public static void main(String[] args) {
+		String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab.xml";
+//		String netOut = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab.shp";
+		String netOut = "/home/dgrether/Desktop/prognoseNetz/network_ab.shp";
 
-//    MATSimNet2QGIS mn2q = new MATSimNet2QGIS(net, srs);
-//    mn2q.writeShapeFile(netOut);
-//    
-//    NetworkWriteAsTable tableWriter = new NetworkWriteAsTable(netOut);
-//    tableWriter.run((NetworkLayer) sc.getNetwork());
-    
-  }
+		Scenario sc = new ScenarioImpl();
+		MatsimNetworkReader reader = new MatsimNetworkReader(sc);
+		reader.readFile(net);
+
+		final WidthCalculator wc = new WidthCalculator() {
+
+			@Override
+			public double getWidth(Link link) {
+				return 1.0;
+			}
+		};
+
+//		String epsgCode = "epsg:3035";
+		String epsgCode = "GEOGCS[\"GCS_ETRS_1989\",DATUM[\"D_ETRS_1989\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]]";
+		
+		final CoordinateReferenceSystem crs = MGC.getCRS(epsgCode);
+		
+		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder() {
+
+			@Override
+			public FeatureGenerator createFeatureGenerator() {
+				FeatureGenerator fg = new LineStringBasedFeatureGenerator(wc, crs);
+				return fg;
+			}
+		};
+
+		Links2ESRIShape linksToEsri = new Links2ESRIShape(sc.getNetwork(), netOut, builder);
+		linksToEsri.write();
+		
+		KmlNetworkVisualizer kmlwriter = new KmlNetworkVisualizer(sc.getNetwork());
+		kmlwriter.write(netOut + ".kmz", new GeotoolsTransformation(epsgCode, TransformationFactory.WGS84));
+//		NetworkWriteAsTable tableWriter = new NetworkWriteAsTable(netOut);
+//		tableWriter.run(sc.getNetwork());
+
+	}
 
 }
