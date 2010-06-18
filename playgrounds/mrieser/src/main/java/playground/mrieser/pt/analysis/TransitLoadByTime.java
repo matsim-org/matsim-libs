@@ -66,7 +66,7 @@ public class TransitLoadByTime implements PersonEntersVehicleEventHandler, Perso
 
 	private VehicleData getVehicleData(final Id vehicleId, final boolean createIfMissing) {
 		VehicleData vData = this.vehicleData.get(vehicleId);
-		if (vData == null) {
+		if (vData == null && createIfMissing) {
 			// optimization: only allocate new object when not found
 			VehicleData newData = new VehicleData();
 			vData = this.vehicleData.putIfAbsent(vehicleId, newData);

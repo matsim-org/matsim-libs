@@ -68,16 +68,7 @@ public class IADriveFilter {
 	}
 
 	private static boolean inRegion(double x, double y) {
-		if (x < minX) {
-			return false;
-		}
-		if (x > maxX) {
-			return false;
-		}
-		if (y < minY) {
-			return false;
-		}
-		if (y > maxY) {
+		if ((x < minX) || (x > maxX) || (y < minY) || (y > maxY)) {
 			return false;
 		}
 		return true;

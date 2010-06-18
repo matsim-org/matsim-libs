@@ -100,7 +100,7 @@ public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEnt
 
 	private StopData getStopData(final Id stopId, final boolean createIfMissing) {
 		StopData sData = this.stopData.get(stopId);
-		if (sData == null) {
+		if (sData == null && createIfMissing) {
 			StopData newData = new StopData();
 			sData = this.stopData.putIfAbsent(stopId, newData);
 			if (sData == null) {

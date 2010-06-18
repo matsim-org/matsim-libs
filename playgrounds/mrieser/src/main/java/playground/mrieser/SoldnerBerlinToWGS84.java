@@ -77,14 +77,14 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	    double E[] = new double[6];
 	    double e2 = this.Ell.getE2();
 	    double c = this.Ell.getC();
-	    E[0] = c / this.rho * (1.0-3.0/4.0*Math.pow(e2,2) +  45.0/64.0*Math.pow(e2,4) -  175.0/256.0*Math.pow(e2,6) + 11025.0/16384.0*Math.pow(e2,8) -  43659.0/65536.0*Math.pow(e2,10));
+	    E[0] = c / rho * (1.0-3.0/4.0*Math.pow(e2,2) +  45.0/64.0*Math.pow(e2,4) -  175.0/256.0*Math.pow(e2,6) + 11025.0/16384.0*Math.pow(e2,8) -  43659.0/65536.0*Math.pow(e2,10));
 	    E[1] = c            * (   -3.0/8.0*Math.pow(e2,2) +  15.0/32.0*Math.pow(e2,4) - 525.0/1024.0*Math.pow(e2,6) +   2205.0/4096.0*Math.pow(e2,8) - 72765.0/131072.0*Math.pow(e2,10));
 	    E[2] = c            * (                             15.0/256.0*Math.pow(e2,4) - 105.0/1024.0*Math.pow(e2,6) +  2205.0/16384.0*Math.pow(e2,8) -  10395.0/65536.0*Math.pow(e2,10));
 	    E[3] = c            * (                                                       -  35.0/3072.0*Math.pow(e2,6) +   315.0/12288.0*Math.pow(e2,8) - 31185.0/786432.0*Math.pow(e2,10));
 	    E[4] = c            * (                                                                                        315.0/131072.0*Math.pow(e2,8) -  3465.0/524288.0*Math.pow(e2,10));
 	    E[5] = c            * (                                                                                                                      -  693.0/1310720.0*Math.pow(e2,10));
 	    if (index < 0 || index >= E.length)
-	      return E[0]*B + E[1]*Math.sin(2.0*B/this.rho) + E[2]*Math.sin(4.0*B/this.rho) + E[3]*Math.sin(6.0*B/this.rho) + E[4]*Math.sin(8.0*B/this.rho) + + E[5]*Math.sin(10.0*B/this.rho);
+	      return E[0]*B + E[1]*Math.sin(2.0*B/rho) + E[2]*Math.sin(4.0*B/rho) + E[3]*Math.sin(6.0*B/rho) + E[4]*Math.sin(8.0*B/rho) + + E[5]*Math.sin(10.0*B/rho);
 	    else
 	      return E[index];
 	  }
@@ -94,11 +94,11 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	    double sigma = G/this.calcMeridianArcLength(B,0);
 	    double e2 = this.Ell.getE2();
 	    double F[] = new double[3];
-	    F[0] = this.rho * (3.0/8.0*Math.pow(e2,2) - 3.0/16.0*Math.pow(e2,4) + 213.0/2048.0*Math.pow(e2,6) -  255.0/4096.0*Math.pow(e2,8));
-	    F[1] = this.rho * (                       21.0/256.0*Math.pow(e2,4) -   21.0/256.0*Math.pow(e2,6) +  533.0/8192.0*Math.pow(e2,8));
-	    F[2] = this.rho * (                                                   151.0/6144.0*Math.pow(e2,6) - 453.0/12288.0*Math.pow(e2,8));
+	    F[0] = rho * (3.0/8.0*Math.pow(e2,2) - 3.0/16.0*Math.pow(e2,4) + 213.0/2048.0*Math.pow(e2,6) -  255.0/4096.0*Math.pow(e2,8));
+	    F[1] = rho * (                       21.0/256.0*Math.pow(e2,4) -   21.0/256.0*Math.pow(e2,6) +  533.0/8192.0*Math.pow(e2,8));
+	    F[2] = rho * (                                                   151.0/6144.0*Math.pow(e2,6) - 453.0/12288.0*Math.pow(e2,8));
 
-	    return sigma + F[0]*Math.sin(2*sigma/this.rho) + F[1]*Math.sin(4*sigma/this.rho) + F[2]*Math.sin(6*sigma/this.rho);
+	    return sigma + F[0]*Math.sin(2*sigma/rho) + F[1]*Math.sin(4*sigma/rho) + F[2]*Math.sin(6*sigma/rho);
 	  }
 
 	  public Coord BL2RH(final double b, final double l){
@@ -110,18 +110,18 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	      double eta2 = Math.pow(this.Ell.getEta(b),2);
 	      double L0 = kz*this.Ell.getDEG()-(this.Ell.getDEG()==3?0:3);
 	      double dL = l - L0;
-	      double t = Math.tan(b/this.rho);
+	      double t = Math.tan(b/rho);
 	      double x[] = new double[4];
 	      double y[] = new double[4];
 	      x[0] = this.calcMeridianArcLength(l, -1);
-	      x[1] = 1.0/(    2.0*Math.pow(this.rho,2)) * N * Math.pow(Math.cos(l/this.rho),2) * t;
-	      x[2] = 1.0/(   24.0*Math.pow(this.rho,4)) * N * Math.pow(Math.cos(l/this.rho),4) * t * (5.0-      Math.pow(t,2) + 9.0*eta2);
-	      x[3] = 1.0/(  720.0*Math.pow(this.rho,6)) * N * Math.pow(Math.cos(l/this.rho),6) * t * (61.0-58.0*Math.pow(t,2) + Math.pow(t,4) + 270.0*eta2 - 330.0*Math.pow(t,2)*eta2);
+	      x[1] = 1.0/(    2.0*Math.pow(rho,2)) * N * Math.pow(Math.cos(l/rho),2) * t;
+	      x[2] = 1.0/(   24.0*Math.pow(rho,4)) * N * Math.pow(Math.cos(l/rho),4) * t * (5.0-      Math.pow(t,2) + 9.0*eta2);
+	      x[3] = 1.0/(  720.0*Math.pow(rho,6)) * N * Math.pow(Math.cos(l/rho),6) * t * (61.0-58.0*Math.pow(t,2) + Math.pow(t,4) + 270.0*eta2 - 330.0*Math.pow(t,2)*eta2);
 
-	      y[0] = 1.0/this.rho                      * N * Math.cos(l/this.rho);
-	      y[1] = 1.0/(   6.0*Math.pow(this.rho,3)) * N * Math.pow(Math.cos(l/this.rho),3) * (1.0-       Math.pow(t,2) + eta2);
-	      y[2] = 1.0/( 120.0*Math.pow(this.rho,5)) * N * Math.pow(Math.cos(l/this.rho),5) * (5.0-18.0  *Math.pow(t,2) + Math.pow(t,4));
-	      y[3] = 1.0/(5040.0*Math.pow(this.rho,7)) * N * Math.pow(Math.cos(l/this.rho),7) * (61.0-479.0*Math.pow(t,2) + 179.0*Math.pow(t,4) - Math.pow(t,6));
+	      y[0] = 1.0/rho                      * N * Math.cos(l/rho);
+	      y[1] = 1.0/(   6.0*Math.pow(rho,3)) * N * Math.pow(Math.cos(l/rho),3) * (1.0-       Math.pow(t,2) + eta2);
+	      y[2] = 1.0/( 120.0*Math.pow(rho,5)) * N * Math.pow(Math.cos(l/rho),5) * (5.0-18.0  *Math.pow(t,2) + Math.pow(t,4));
+	      y[3] = 1.0/(5040.0*Math.pow(rho,7)) * N * Math.pow(Math.cos(l/rho),7) * (61.0-479.0*Math.pow(t,2) + 179.0*Math.pow(t,4) - Math.pow(t,6));
 
 	      p.setY(this.Ell.getScale()*(x[0]    + x[1]*Math.pow(dL,2) + x[2]*Math.pow(dL,4) + x[3]*Math.pow(dL,6)));
 	      p.setX( this.Ell.getScale()*(y[0]*dL + y[1]*Math.pow(dL,3) + y[2]*Math.pow(dL,5) + y[3]*Math.pow(dL,7)) + 500000.0 + kz*1000000.0);
@@ -133,17 +133,17 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	      L0 = this.Ell.getL0();
 	      dl = l-L0;
 	      xB = this.calcMeridianArcLength(b,-1) - this.calcMeridianArcLength(B0,-1);
-	      t  = Math.tan(b/this.rho);
-	      cosB = Math.cos(b/this.rho);
+	      t  = Math.tan(b/rho);
+	      cosB = Math.cos(b/rho);
 	      eta  = this.Ell.getEta(b);
 	      N    = this.Ell.getN(b);
 
-	      x  = 0.5*N*Math.pow(cosB,2)*t*Math.pow(dl,2)/Math.pow(this.rho,2);
-	      x += N*Math.pow(cosB,4)*t*(5.0-Math.pow(t,2)+5.0*Math.pow(eta,2))*Math.pow(dl,4)/(24.0*Math.pow(this.rho,4));
+	      x  = 0.5*N*Math.pow(cosB,2)*t*Math.pow(dl,2)/Math.pow(rho,2);
+	      x += N*Math.pow(cosB,4)*t*(5.0-Math.pow(t,2)+5.0*Math.pow(eta,2))*Math.pow(dl,4)/(24.0*Math.pow(rho,4));
 	      x += xB;
 
-	      y  = N*cosB*dl/this.rho;
-	      y -= N*Math.pow(cosB,3)*Math.pow(t,2)*Math.pow(dl,3)/(6.0*Math.pow(this.rho,3));
+	      y  = N*cosB*dl/rho;
+	      y -= N*Math.pow(cosB,3)*Math.pow(t,2)*Math.pow(dl,3)/(6.0*Math.pow(rho,3));
 
 	      p.setY( x ); // jep, that's correct, y := x
 	      p.setX( y );
@@ -168,39 +168,39 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 
 	      N = this.Ell.getN(B[0]);
 	      eta2 = Math.pow(this.Ell.getEta(B[0]),2);
-	      B[1] = -this.rho/(  2*Math.pow(N,2)) * Math.tan(B[0]/this.rho) * (    1+eta2);
-	      B[2] =  this.rho/( 24*Math.pow(N,4)) * Math.tan(B[0]/this.rho) * (  5+3*Math.pow(Math.tan(B[0]/this.rho),2)+ 6*eta2*(1-Math.pow(Math.tan(B[0]/this.rho),2)));
-	      B[3] = -this.rho/(720*Math.pow(N,6)) * Math.tan(B[0]/this.rho) * (61+90*Math.pow(Math.tan(B[0]/this.rho),2)+45*Math.pow(Math.tan(B[0]/this.rho),4));
+	      B[1] = -rho/(  2*Math.pow(N,2)) * Math.tan(B[0]/rho) * (    1+eta2);
+	      B[2] =  rho/( 24*Math.pow(N,4)) * Math.tan(B[0]/rho) * (  5+3*Math.pow(Math.tan(B[0]/rho),2)+ 6*eta2*(1-Math.pow(Math.tan(B[0]/rho),2)));
+	      B[3] = -rho/(720*Math.pow(N,6)) * Math.tan(B[0]/rho) * (61+90*Math.pow(Math.tan(B[0]/rho),2)+45*Math.pow(Math.tan(B[0]/rho),4));
 
 	      L[0] =  (kz-(this.Ell.isUTM()?30:0))*this.Ell.getDEG()-(this.Ell.getDEG()-3);
-	      L[1] =  this.rho/(             N   *Math.cos(B[0]/this.rho));
-	      L[2] = -this.rho/(  6*Math.pow(N,3)*Math.cos(B[0]/this.rho)) * (1+ 2*Math.pow(Math.tan(B[0]/this.rho),2)+eta2);
-	      L[3] =  this.rho/(120*Math.pow(N,5)*Math.cos(B[0]/this.rho)) * (5+28*Math.pow(Math.tan(B[0]/this.rho),2)+24*Math.pow(Math.tan(B[0]/this.rho),4));
+	      L[1] =  rho/(             N   *Math.cos(B[0]/rho));
+	      L[2] = -rho/(  6*Math.pow(N,3)*Math.cos(B[0]/rho)) * (1+ 2*Math.pow(Math.tan(B[0]/rho),2)+eta2);
+	      L[3] =  rho/(120*Math.pow(N,5)*Math.cos(B[0]/rho)) * (5+28*Math.pow(Math.tan(B[0]/rho),2)+24*Math.pow(Math.tan(B[0]/rho),4));
 
 	      p.setY( B[0] + B[1]*Math.pow(y0,2) + B[2]*Math.pow(y0,4) + B[3]*Math.pow(y0,6));
 	      p.setX(L[0] + L[1]*         y0    + L[2]*Math.pow(y0,3) + L[3]*Math.pow(y0,5));
 	    }
 
 	    else {
-	      double GF, BF, VF, B, L, BFB, NF, B0, L0, x=h, y=r, tF, etaF, l;
+	      double GF, BF, VF, B, L, NF, B0, L0, x=h, y=r, tF, etaF, l;
 	      B0 = this.Ell.getB0();
 	      L0 = this.Ell.getL0();
 	      GF = this.calcMeridianArcLength(B0,-1) + x;
 	      BF = this.calcEllLatitude(GF, this.calcMeridianArcLength(B0,0));
 
-	      tF = Math.tan(BF/this.rho);
+	      tF = Math.tan(BF/rho);
 	      VF = this.Ell.getV(BF);
 	      NF = this.Ell.getN(BF);
 
 	      etaF = this.Ell.getEta(BF);
 
-	      B  = 0.5 * Math.pow(VF,2) * tF * this.rho / Math.pow(NF,2) * Math.pow(y,2);
-	      B -= Math.pow(VF,2) * tF * (1.0 + 3.0*Math.pow(tF,2) + Math.pow(etaF,2) - 9.0*Math.pow(etaF,2)*Math.pow(tF,2)) * this.rho / (24.0*Math.pow(NF,4)) * Math.pow(y,4);
+	      B  = 0.5 * Math.pow(VF,2) * tF * rho / Math.pow(NF,2) * Math.pow(y,2);
+	      B -= Math.pow(VF,2) * tF * (1.0 + 3.0*Math.pow(tF,2) + Math.pow(etaF,2) - 9.0*Math.pow(etaF,2)*Math.pow(tF,2)) * rho / (24.0*Math.pow(NF,4)) * Math.pow(y,4);
 	      B  = BF-B;
 
 
-	      l  = this.rho/(NF*Math.cos(BF/this.rho)) * y - Math.pow(tF,2)*this.rho/(3.0*Math.pow(NF,3)*Math.cos(BF/this.rho)) * Math.pow(y,3);
-	      l += Math.pow(tF,2)*this.rho*(1.0 + 3.0*Math.pow(tF,2))/(15.0*Math.pow(NF,5)*Math.cos(BF/this.rho)) * Math.pow(y,5);
+	      l  = rho/(NF*Math.cos(BF/rho)) * y - Math.pow(tF,2)*rho/(3.0*Math.pow(NF,3)*Math.cos(BF/rho)) * Math.pow(y,3);
+	      l += Math.pow(tF,2)*rho*(1.0 + 3.0*Math.pow(tF,2))/(15.0*Math.pow(NF,5)*Math.cos(BF/rho)) * Math.pow(y,5);
 	      L = L0 + l;
 
 	      p.setY( B );

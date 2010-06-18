@@ -76,10 +76,8 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 		Point p = gf.createPoint(new Coordinate(x, y));
 
 		for (Feature f : this.featuers) {
-			if (f.getBounds().contains(x, y)) {
-				if (f.getDefaultGeometry().contains(p)) {
-					return f;
-				}
+			if (f.getBounds().contains(x, y) && (f.getDefaultGeometry().contains(p))) {
+				return f;
 			}
 		}
 		return null;
