@@ -27,15 +27,18 @@ import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 
+import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeAccessabilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeDensityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCostsTask;
-import playground.johannes.socialnetworks.graph.spatial.generators.GravityCostFunction;
+import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCostFunction;
+import playground.johannes.socialnetworks.snowball2.analysis.DegreeIterationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedTransitivity;
+import playground.johannes.socialnetworks.snowball2.analysis.SeedConnectionTask;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
 import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
@@ -69,8 +72,17 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		distance.setModule(new ObservedDistance());
 		addTask(distance);
 		
-		AcceptanceProbabilityTask pAccept = new AcceptanceProbabilityTask(choiceSet);
-		addTask(pAccept);
+//		AcceptanceProbabilityTask pAccept = new AcceptanceProbabilityTask(choiceSet);
+//		addTask(pAccept);
+		
+		DegreeDensityTask kRhoTask = new DegreeDensityTask(zones);
+		kRhoTask.setModule(new ObservedDegree());
+		addTask(kRhoTask);
+		
+//		DegreeAccessabilityTask kAccessTask = new DegreeAccessabilityTask(choiceSet, new GravityCostFunction(1.6, 1.0));
+//		DegreeAccessabilityTask kAccessTask = new DegreeAccessabilityTask(choiceSet, new BeelineCostFunction());
+//		kAccessTask.setModule(new ObservedDegree());
+//		addTask(kAccessTask);
 		
 		AgeTask age = new AgeTask();
 		age.setModule(new ObservedAge());
@@ -83,8 +95,10 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		addTask(new ComponentsTask());
 		
 		EdgeCostsTask costs = new EdgeCostsTask(null);
-		costs.setModule(new ObservedEdgeCosts(new GravityCostFunction(1.6, 1.0)));
+		costs.setModule(new ObservedEdgeCosts(new GravityEdgeCostFunction(1.6, 1.0)));
 		addTask(costs);
+		
+		addTask(new SeedConnectionTask());
 	}
 
 }

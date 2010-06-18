@@ -25,10 +25,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.feature.Feature;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
 
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
@@ -55,7 +60,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class Analyzer {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, FactoryException {
 		SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> reader =
 			new SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(new SocialSparseGraphMLReader());
 		
@@ -67,10 +72,12 @@ public class Analyzer {
 		zones.overwriteCRS(CRSUtils.getCRS(21781));
 		
 		Set<Point> choiceSet = new HashSet<Point>();
-		SpatialGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
-		for(SpatialVertex v : graph2.getVertices())
-			choiceSet.add(v.getPoint());
+		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
 		
+//		graph2.transformToCRS(CRSUtils.getCRS(4326));
+		for(SpatialVertex v : graph2.getVertices()) {	
+			choiceSet.add(v.getPoint());
+		}
 		/*
 		 * analyze the complete graph
 		 */

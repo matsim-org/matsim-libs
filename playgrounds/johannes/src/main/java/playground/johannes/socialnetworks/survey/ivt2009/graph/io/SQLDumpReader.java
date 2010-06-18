@@ -132,7 +132,12 @@ public class SQLDumpReader {
 		if(tokens.length >= 2) {
 			String latitude = tokens[0];
 			String longitude = tokens[1];
-			return geoFactory.createPoint(new Coordinate(Double.parseDouble(latitude), Double.parseDouble(longitude)));
+			if(!latitude.isEmpty() && !longitude.isEmpty())
+				return geoFactory.createPoint(new Coordinate(Double.parseDouble(latitude), Double.parseDouble(longitude)));
+			else {
+				logger.warn("Invalid coordinate string (empty string)!");
+				return null;
+			}
 		} else {
 			logger.warn("Invalid coordinate string!");
 			return null;

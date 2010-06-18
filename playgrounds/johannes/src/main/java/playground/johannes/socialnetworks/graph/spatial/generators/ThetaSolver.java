@@ -177,7 +177,7 @@ public class ThetaSolver {
 		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		SpatialSparseGraph graph = reader.read(args[0]);
 		
-		GravityCostFunction func = new GravityCostFunction(1.6, 1.0, new CartesianDistanceCalculator());
+		GravityEdgeCostFunction func = new GravityEdgeCostFunction(1.6, 1.0, new CartesianDistanceCalculator());
 		ThetaSolver solver = new ThetaSolver(func, 1.0);
 		
 		TObjectDoubleHashMap<SpatialVertex> budgets = new TObjectDoubleHashMap<SpatialVertex>();

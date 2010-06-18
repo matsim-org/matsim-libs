@@ -76,13 +76,13 @@ public class ErgmSimulator {
 		
 		double totalCost = Double.parseDouble(config.getParam(MODULE_NAME, "totalCost"));
 		double theta_edge = Double.parseDouble(config.getParam(MODULE_NAME, "thetaEdge"));
-		
+		double gamma = Double.parseDouble(config.getParam(MODULE_NAME, "gamma"));
 //		logger.info("Creating random graph...");
 		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten());
-//		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(builder);
-//		int k = (int)k_mean;
-//		double p = k / (double)graph.getVertices().size();
-//		generator.generate(graph, p, randomSeed);
+		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(builder);
+		int k = (int)k_mean;
+		double p = k / (double)graph.getVertices().size();
+		generator.generate(graph, p, randomSeed);
 		/*
 		 * convert graph to matrix
 		 */
@@ -91,7 +91,7 @@ public class ErgmSimulator {
 		 * setup ergm terms.
 		 */
 		
-		EdgeCostFunction costFunction = new GravityCostFunction(1.6, 1.0, new CartesianDistanceCalculator());
+		EdgeCostFunction costFunction = new GravityEdgeCostFunction(gamma, 1.0, new CartesianDistanceCalculator());
 		ErgmEdgeCost edgeCost = new ErgmEdgeCost(y, costFunction, totalCost, outputDir + "/thetas.txt", theta_edge);
 		
 		ErgmDensity density = new ErgmDensity();

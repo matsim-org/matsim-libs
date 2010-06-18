@@ -32,7 +32,7 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.spatial.generators.EdgeCostFunction;
-import playground.johannes.socialnetworks.graph.spatial.generators.GravityCostFunction;
+import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCostFunction;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
@@ -69,7 +69,7 @@ public class CostAnalysis {
 //		List<SpatialVertex> vertices = new ArrayList<SpatialVertex>(graph.getVertices());
 //		int N = vertices.size();
 		
-		EdgeCostFunction costFunction = new GravityCostFunction(1.6, 1, new CartesianDistanceCalculator());
+		EdgeCostFunction costFunction = new GravityEdgeCostFunction(1.6, 1, new CartesianDistanceCalculator());
 		Distribution distr = new Distribution();
 //		for(int i = 0; i < N; i++) {
 //			double sum = 0;

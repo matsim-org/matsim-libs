@@ -39,10 +39,12 @@ import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 import org.matsim.contrib.sna.math.Distribution;
 
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixStatistics;
 import playground.johannes.socialnetworks.graph.mcmc.SampleHandler;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 
@@ -99,6 +101,10 @@ public class DumpHandler implements SampleHandler<SpatialSparseVertex> {
 		task.addTask(new DegreeTask());
 		task.addTask(new TransitivityTask());
 		task.addTask(new DistanceTask());
+		
+		AcceptanceProbabilityTask ptask = new AcceptanceProbabilityTask();
+		ptask.setDistanceCalculator(new CartesianDistanceCalculator());
+		task.addTask(ptask);
 		
 		return task;
 	}

@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
@@ -35,6 +36,8 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
  */
 public class InteractionHandler implements ActivityStartEventHandler, ActivityEndEventHandler {
 
+	private static final Logger logger = Logger.getLogger(InteractionHandler.class);
+	
 	private InteractionSelector selector;
 
 	private Interactor interactor;
@@ -75,10 +78,10 @@ public class InteractionHandler implements ActivityStartEventHandler, ActivityEn
 					interactor.interact(startEvent.getPersonId(), person, startTime, event.getTime(), event.getActType());
 				}
 			} else {
-				System.err.println("Event not in list!");
+				logger.warn(String.format("No activity start event found. Facility = %1$s, Person = %2$s, Time = %3$s.", event.getFacilityId(), event.getPersonId(), event.getTime()));
 			}
 		} else {
-			System.err.println("Facility not in list!");
+			logger.warn(String.format("No facility with id %1$s found. Time = %2$s.", event.getFacilityId(), event.getTime()));
 		}
 	}
 

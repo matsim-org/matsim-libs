@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GravityCostFunction.java
+ * Accessability.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,45 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.generators;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
+
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.util.Set;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
+import playground.johannes.socialnetworks.gis.SpatialCostFunction;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public class GravityCostFunction implements EdgeCostFunction {
+public class Accessability {
 
-	private final double gamma;
-	
-	private final double constant;
-	
-	private Discretizer discretizer;
-	
-	private DistanceCalculator calculator;
-	
-	public GravityCostFunction(double gamma, double constant) {
-		this(gamma, constant, new OrthodromicDistanceCalculator());
-	}
-	
-	public GravityCostFunction(double gamma, double constant, DistanceCalculator calculator) {
-		this.gamma = gamma;
-		this.constant = constant;
-		discretizer = new LinearDiscretizer(1000.0);
-		this.calculator = calculator;
-	}
-	
-	@Override
-	public double edgeCost(SpatialVertex vi, SpatialVertex vj) {
-		double d = Math.max(1.0, discretizer.discretize(calculator.distance(vi.getPoint(), vj.getPoint())));
+	public TObjectDoubleHashMap<SpatialVertex> values(Set<? extends SpatialVertex> vertices, SpatialCostFunction costFunction, Set<Point> opportunities) {
+		TObjectDoubleHashMap<SpatialVertex> values = new TObjectDoubleHashMap<SpatialVertex>(vertices.size());
 		
-		return gamma * Math.log(d) + constant;
+		for(SpatialVertex vertex : vertices) {
+			double sum = 0;
+			for(Point point : opportunities) {
+				sum += costFunction.costs(vertex.getPoint(), point);
+			}
+			values.put(vertex, sum);
+		}
+		
+		return values;
 	}
-
 }

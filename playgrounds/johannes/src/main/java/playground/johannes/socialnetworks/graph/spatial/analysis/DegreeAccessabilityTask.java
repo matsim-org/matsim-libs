@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AcceptanceProbabilityTask.java
+ * DegreeAccessabilityTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,18 +19,22 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
+
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.gis.SpatialCostFunction;
+import playground.johannes.socialnetworks.statistics.Correlations;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -38,44 +42,45 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  *
  */
-public class AcceptanceProbabilityTask extends ModuleAnalyzerTask<AcceptanceProbability> {
+public class DegreeAccessabilityTask extends ModuleAnalyzerTask<Degree> {
+	
+	private static final Logger logger = Logger.getLogger(DegreeAccessabilityTask.class);
 
-	private Set<Point> choiceSet;;
+	private Set<Point> opportunities;
 	
-	private boolean graphAsChoiceSet;
+	private SpatialCostFunction costFunction;
 	
-	public AcceptanceProbabilityTask() {
-		setModule(new AcceptanceProbability());
-		graphAsChoiceSet = true;
-	}
-
-	public AcceptanceProbabilityTask(Set<Point> choiceSet) {
-		this.choiceSet = choiceSet;
-		setModule(new AcceptanceProbability());
-		graphAsChoiceSet = false;
+	public DegreeAccessabilityTask(Set<Point> opportunities, SpatialCostFunction costFunction) {
+		setModule(new Degree());
+		this.costFunction = costFunction;
+		this.opportunities = opportunities;
 	}
 	
-	public void setDistanceCalculator(DistanceCalculator calculator) {
-		module.setDistanceCalculator(calculator);
-	}
-	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
 		if(getOutputDirectory() != null) {
+			TObjectDoubleHashMap<Vertex> kMap = module.values(graph.getVertices());
+			TObjectDoubleHashMap<SpatialVertex> accessMap = new Accessability().values((Set<? extends SpatialVertex>) graph.getVertices(), costFunction, opportunities);
 			
-			if(graphAsChoiceSet) {
-				choiceSet = new HashSet<Point>();
-				for(Vertex vertex : graph.getVertices())
-					choiceSet.add(((SpatialVertex) vertex).getPoint());
+			double[] accessValues = new double[kMap.size()];
+			double[] kValues = new double[kMap.size()];
+			
+			TObjectDoubleIterator<Vertex> it = kMap.iterator();
+			for(int i = 0; i < kMap.size(); i++) {
+				it.advance();
+				accessValues[i] = accessMap.get((SpatialVertex) it.key());
+				kValues[i] = it.value();
 			}
 			
-			Distribution distr = module.distribution((Set<? extends SpatialVertex>) graph.getVertices(), choiceSet);
-			try {
-				writeHistograms(distr, 1000, true, "p_accept");
+			try{
+				Correlations.writeToFile(Correlations.correlationMean(accessValues, kValues, 50000), String.format("%1$s/k_access.txt", getOutputDirectory()), "access", "k_mean");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} else {
+			logger.warn("No output directory specified!");
 		}
+		
 	}
+
 }

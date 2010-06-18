@@ -60,6 +60,10 @@ public class SocialGraphMLWriter extends SpatialGraphMLWriter {
 		return attrs;
 	}
 
+	public void setPopulationFile(String file) {
+		this.populationFile = file;
+	}
+	
 	@Override
 	public void write(Graph graph, String filename) throws IOException {
 		if(graph instanceof SocialGraph) {
@@ -73,6 +77,7 @@ public class SocialGraphMLWriter extends SpatialGraphMLWriter {
 				relativPath = filename.substring(idx + 1, filename.length() - 1);
 				baseDir = filename.substring(0, idx + 1);
 			}
+			
 			/*
 			 * if no population file is explicitly given, set it to *.pop.xml
 			 */
@@ -83,10 +88,10 @@ public class SocialGraphMLWriter extends SpatialGraphMLWriter {
 				} else {
 					populationFile = relativPath + ".pop.xml";
 				}
+				writePlansFile((SocialGraph) graph, baseDir + populationFile);
 			}
 			
 			super.write(graph, filename);
-			writePlansFile((SocialGraph) graph, baseDir + populationFile);
 		} else {
 			throw new IllegalArgumentException("This is not a SocialGraph!");
 		}

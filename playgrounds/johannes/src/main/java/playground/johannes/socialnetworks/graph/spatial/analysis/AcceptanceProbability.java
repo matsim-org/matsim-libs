@@ -24,16 +24,12 @@ import gnu.trove.TDoubleDoubleHashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.referencing.CRS;
-import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 import playground.johannes.socialnetworks.statistics.Discretizer;
 import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
@@ -47,39 +43,50 @@ public class AcceptanceProbability {
 
 	private Discretizer discretizer = new LinearDiscretizer(1000);
 	
+	private DistanceCalculator distanceCalculator = new OrthodromicDistanceCalculator();
+	
+	public void setDistanceCalculator(DistanceCalculator calculator) {
+		this.distanceCalculator = calculator;
+	}
+	
 	public Distribution distribution(Set<? extends SpatialVertex> vertices, Set<Point> choiceSet) {
-		CoordinateReferenceSystem crs = CRSUtils.getCRS(21781);//DefaultEngineeringCRS.CARTESIAN_2D; FIXME
+//		CoordinateReferenceSystem crs = CRSUtils.getCRS(21781);//DefaultEngineeringCRS.CARTESIAN_2D; FIXME
 		
 		int srid1 = vertices.iterator().next().getPoint().getSRID();
 		int srid2 = choiceSet.iterator().next().getSRID();
 		
+		if(srid1 != srid2)
+			throw new RuntimeException("Vertices and points of choice set do not have the same coordinate reference system.");
+		
 		Distribution distribution = new Distribution();
 		Set<SpatialEdge> touched = new HashSet<SpatialEdge>();
 		
-		try {
-			MathTransform t1 = CRS.findMathTransform(CRSUtils.getCRS(srid1), crs);
-			MathTransform t2 = CRS.findMathTransform(CRSUtils.getCRS(srid2), crs);
+//		try {
+//			MathTransform t1 = CRS.findMathTransform(CRSUtils.getCRS(srid1), crs);
+//			MathTransform t2 = CRS.findMathTransform(CRSUtils.getCRS(srid2), crs);
 			
 			for(SpatialVertex vertex : vertices) {
-				
-				if(vertex.getPoint().getSRID() != srid1)
+				Point p1 = vertex.getPoint(); 
+				if(p1.getSRID() != srid1)
 					throw new RuntimeException("Vertices do not have the same coordinate reference system.");
 				
-				double p1[] = new double[]{vertex.getPoint().getCoordinate().x, vertex.getPoint().getCoordinate().y};
-				t1.transform(p1, 0, p1, 0, 1);
+//				double p1[] = new double[]{vertex.getPoint().getCoordinate().x, vertex.getPoint().getCoordinate().y};
+//				t1.transform(p1, 0, p1, 0, 1);
 				
 				TDoubleDoubleHashMap n_d = new TDoubleDoubleHashMap();
-				for(Point p : choiceSet) {
+				for(Point p2 : choiceSet) {
 					
-					if(p.getSRID() != srid2)
+					if(p2.getSRID() != srid2)
 						throw new RuntimeException("Points do not have the same coordinate reference system.");
 				
-					double p2[] = new double[]{p.getCoordinate().x, p.getCoordinate().y};
-					t2.transform(p2, 0, p2, 0, 1);
+//					double p2[] = new double[]{p.getCoordinate().x, p.getCoordinate().y};
+//					t2.transform(p2, 0, p2, 0, 1);
 					
-					double dx = p2[0] - p1[0];
-					double dy = p2[1] - p1[1];
-					double d = Math.sqrt(dx*dx + dy*dy);
+//					double dx = p2[0] - p1[0];
+//					double dy = p2[1] - p1[1];
+//					double d = Math.sqrt(dx*dx + dy*dy);
+					
+					double d = distanceCalculator.distance(p1, p2);
 					
 					n_d.adjustOrPutValue(discretizer.discretize(d), 1, 1);
 				}
@@ -92,12 +99,14 @@ public class AcceptanceProbability {
 						if(neighbor.getPoint().getSRID() != srid1)
 							throw new RuntimeException("Vertices do not have the same coordinate reference system.");
 						
-						double p2[] = new double[]{neighbor.getPoint().getCoordinate().x, neighbor.getPoint().getCoordinate().y};
-						t1.transform(p2, 0, p2, 0, 1);
+//						double p2[] = new double[]{neighbor.getPoint().getCoordinate().x, neighbor.getPoint().getCoordinate().y};
+//						t1.transform(p2, 0, p2, 0, 1);
+//						
+//						double dx = p2[0] - p1[0];
+//						double dy = p2[1] - p1[1];
+//						double d = Math.sqrt(dx*dx + dy*dy);
 						
-						double dx = p2[0] - p1[0];
-						double dy = p2[1] - p1[1];
-						double d = Math.sqrt(dx*dx + dy*dy);
+						double d = distanceCalculator.distance(p1, neighbor.getPoint());
 						
 						double n = n_d.get(discretizer.discretize(d));
 						if(n > 0)
@@ -105,13 +114,13 @@ public class AcceptanceProbability {
 					}
 				}
 			}
-		} catch (FactoryException e) {
-			e.printStackTrace();
-			return null;
-		} catch (TransformException e) {
-			e.printStackTrace();
-			return null;
-		}
+//		} catch (FactoryException e) {
+//			e.printStackTrace();
+//			return null;
+//		} catch (TransformException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
 		
 		return distribution;
 	}

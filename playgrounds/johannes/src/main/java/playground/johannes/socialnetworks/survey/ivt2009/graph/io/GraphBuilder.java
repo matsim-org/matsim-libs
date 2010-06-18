@@ -254,20 +254,20 @@ public class GraphBuilder {
 		GraphBuilder builder = new GraphBuilder();
 		
 		ArrayList<String> alterTables = new ArrayList<String>();
-		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/SubSample1.fixed.txt");
-		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/Netzwerkgrafik_Alteri_Sub2.txt");
+		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/05-2010/SubSample1.fixed.txt");
+		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/05-2010/SubSample2.txt");
 		
 		ArrayList<String> egoTables = new ArrayList<String>();
 		egoTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/03-2010/SubSample1/egos.txt");
 		egoTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/03-2010/SubSample2/egos.txt");
 		
 		ArrayList<String> sqlDumps = new ArrayList<String>();
-		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/sqlDumpSub1.csv");
-		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/sqlDumpSub2.csv");
+		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/05-2010/snowball.csv");
+//		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/sqlDumpSub2.csv");
 		
 		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = builder.buildGraph(alterTables, egoTables, sqlDumps);
 		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SocialGraphMLWriter());
-		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/graph/graph.graphml");
+		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/05-2010/graph/graph.graphml");
 		
 //		GraphAnalyzer.analyze(graph, new ObservedAnalyzerTask());
 	}

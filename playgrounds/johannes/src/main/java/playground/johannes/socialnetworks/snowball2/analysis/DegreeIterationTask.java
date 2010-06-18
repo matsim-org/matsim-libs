@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.snowball2.analysis;
 
 import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntObjectHashMap;
