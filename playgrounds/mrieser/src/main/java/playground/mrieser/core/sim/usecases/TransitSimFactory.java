@@ -47,14 +47,14 @@ import playground.mrieser.core.sim.network.queueNetwork.QueueNetworkCreator;
 public class TransitSimFactory implements MobsimFactory {
 
 	@Override
-	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Simulation createMobsim(Scenario scenario, EventsManager eventsManager) {
 
-		PlanSimulationImpl planSim = new PlanSimulationImpl(sc, eventsManager);
+		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario, eventsManager);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
 		planSim.setSimEngine(engine);
 
 		// setup network
-		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(sc.getNetwork(), engine, MatsimRandom.getRandom());
+		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(scenario.getNetwork(), engine, MatsimRandom.getRandom());
 		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
 
 		// setup features; order is important!
@@ -71,7 +71,7 @@ public class TransitSimFactory implements MobsimFactory {
 		planSim.setPlanElementHandler(Leg.class, lh);
 
 		// setup DepartureHandlers
-		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(netFeature));
+		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(netFeature, scenario));
 		lh.setDepartureHandler(TransportMode.pt, new TransitDepartureHandler());
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);

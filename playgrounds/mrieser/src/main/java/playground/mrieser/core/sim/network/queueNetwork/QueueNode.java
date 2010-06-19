@@ -66,7 +66,7 @@ import playground.mrieser.core.sim.network.api.SimNode;
 		// Check all incoming links for buffered agents
 		for (Id linkId : this.node.getInLinks().keySet()) {
 			QueueLink link = this.network.getLinks().get(linkId);
-			if (link.getFirstVehicleInBuffer() != null) {
+			if (link.buffer.getFirstVehicleInBuffer() != null) {
 				this.tempLinks[inLinksCounter] = link;
 				inLinksCounter++;
 				inLinksCapSum += link.link.getCapacity(now);
@@ -93,17 +93,17 @@ import playground.mrieser.core.sim.network.api.SimNode;
 					inLinksCapSum -= link.link.getCapacity(now);
 					this.tempLinks[i] = null;
 					//move the link
-					this.clearLinkBuffer(link, now);
+					this.clearLinkBuffer(link.buffer, now);
 					break;
 				}
 			}
 		}
 	}
 
-	private void clearLinkBuffer(final QueueLink link, final double now) {
+	private void clearLinkBuffer(final QueueBuffer buffer, final double now) {
 		SimVehicle veh;
-		while ((veh = link.getFirstVehicleInBuffer()) != null) {
-      if (!moveVehicleOverNode(veh, link, now)) {
+		while ((veh = buffer.getFirstVehicleInBuffer()) != null) {
+      if (!moveVehicleOverNode(veh, buffer, now)) {
         break;
       }
     }
@@ -111,21 +111,21 @@ import playground.mrieser.core.sim.network.api.SimNode;
 
 	/**
 	 * @param vehicle
-	 * @param link
+	 * @param buffer
 	 * @param now
 	 * @return <code>true</code> if the vehicle was successfully moved over the node,
 	 * 	<code>false</code> otherwise (e.g. in case where the next link is jammed)
 	 */
-	private boolean moveVehicleOverNode(final SimVehicle vehicle, final QueueLink link, final double now) {
+	private boolean moveVehicleOverNode(final SimVehicle vehicle, final QueueBuffer buffer, final double now) {
 		Id nextLinkId = vehicle.getDriver().getNextLinkId();
 
     // veh has to move over node
     if (nextLinkId != null) {
     	QueueLink nextLink = this.network.getLinks().get(nextLinkId);
 
-      this.checkNextLinkSemantics(link, nextLink, vehicle);
+      this.checkNextLinkSemantics(buffer.link, nextLink, vehicle);
       if (nextLink.hasSpace()) {
-        link.removeFirstVehicleInBuffer();
+        buffer.removeFirstVehicleInBuffer();
         vehicle.getDriver().notifyMoveToNextLink();
         nextLink.addVehicle(vehicle);
         return true;
@@ -133,17 +133,17 @@ import playground.mrieser.core.sim.network.api.SimNode;
 
       // check if veh is stuck!
 
-      if ((now - link.getBufferLastMovedTime()) > this.network.getStuckTime()) {
+      if ((now - buffer.getLastMovedTime()) > this.network.getStuckTime()) {
         /* We just push the vehicle further after stucktime is over, regardless
          * of if there is space on the next link or not.. optionally we let them
          * die here, we have a config setting for that!
          */
         if (this.network.isRemoveStuckVehicles()) {
-          link.removeFirstVehicleInBuffer();
+          buffer.removeFirstVehicleInBuffer();
           this.network.simEngine.getEventsManager().processEvent(
-              new AgentStuckEventImpl(now, vehicle.getId(), link.getId(), TransportMode.car));
+              new AgentStuckEventImpl(now, vehicle.getId(), buffer.link.getId(), TransportMode.car));
         } else {
-        	link.removeFirstVehicleInBuffer();
+        	buffer.removeFirstVehicleInBuffer();
           vehicle.getDriver().notifyMoveToNextLink();
           nextLink.addVehicle(vehicle);
           return true;
@@ -153,15 +153,15 @@ import playground.mrieser.core.sim.network.api.SimNode;
     }
 
     // --> nextLink == null
-    link.removeFirstVehicleInBuffer();
+    buffer.removeFirstVehicleInBuffer();
     log.error(
         "Agent has no or wrong route! vehicleId=" + vehicle.getId()
-            + " currentLink=" + link.getId().toString()
+            + " currentLink=" + buffer.link.getId().toString()
             + ". The agent is removed from the simulation.");
     return true;
 	}
 
-	protected void checkNextLinkSemantics(final QueueLink currentLink, final QueueLink nextLink, SimVehicle veh){
+	private void checkNextLinkSemantics(final QueueLink currentLink, final QueueLink nextLink, SimVehicle veh){
     if (currentLink.link.getToNode() != nextLink.link.getFromNode()) {
       throw new RuntimeException("Cannot move vehicle " + veh.getId() +
           " from link " + currentLink.getId() + " to link " + nextLink.getId());

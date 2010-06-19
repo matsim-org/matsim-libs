@@ -33,7 +33,6 @@ import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.core.sim.api.SimVehicle;
 import playground.mrieser.core.sim.network.api.SimLink;
@@ -42,7 +41,7 @@ import playground.mrieser.core.sim.network.api.SimLink;
 
 	private final static Logger log = Logger.getLogger(QueueLink.class);
 
-	private final QueueNetwork network;
+	/*package*/ final QueueNetwork network;
 	/*package*/ final Link link;
 
 	/* DRIVING VEHICLE QUEUE */
@@ -58,25 +57,7 @@ import playground.mrieser.core.sim.network.api.SimLink;
 
 	/* BUFFER */
 
-	/**
-	 * Holds all vehicles that are ready to cross the outgoing intersection
-	 */
-	private final Queue<SimVehicle> buffer = new LinkedList<SimVehicle>();
-	private int bufferStorageCapacity = 0;
-	/**
-	 * The (flow) capacity available in one time step to move vehicles into the
-	 * buffer. This value is updated each time step by a call to
-	 * {@link #updateBufferCapacity(double)}.
-	 */
-	private double bufferCap = 0.0;
-
-	/**
-	 * Stores the accumulated fractional parts of the flow capacity. See also
-	 * flowCapFraction.
-	 */
-	private double buffercap_accumulate = 1.0;
-
-	private double bufferLastMovedTime = Time.UNDEFINED_TIME;
+	/*package*/ final QueueBuffer buffer;
 
 	/* WAITING QUEUE = DRIVEWAYS */
 
@@ -88,8 +69,6 @@ import playground.mrieser.core.sim.network.api.SimLink;
 
 	/* TRAFFIC FLOW CHARACTERISTICS */
 
-	private double simulatedFlowCapacity = 0.0;
-	private double flowCapFraction = 0.0;
 	private double freespeedTravelTime = 0.0;
 	private double usedStorageCapacity = 0.0;
 
@@ -100,6 +79,7 @@ import playground.mrieser.core.sim.network.api.SimLink;
 	public QueueLink(final Link link, final QueueNetwork network) {
 		this.link = link;
 		this.network = network;
+		this.buffer = new QueueBuffer(this);
 		recalculateAttributes();
 	}
 
@@ -109,18 +89,16 @@ import playground.mrieser.core.sim.network.api.SimLink;
 
 		this.freespeedTravelTime = length / this.link.getFreespeed(now);
 
-		this.simulatedFlowCapacity = ((LinkImpl)this.link).getFlowCapacity(now);
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.network.simEngine.getTimestepSize() * this.network.getFlowCapFactor();
-		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
-
-		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
+		double simulatedFlowCapacity = ((LinkImpl)this.link).getFlowCapacity(now);
+		simulatedFlowCapacity = simulatedFlowCapacity * this.network.simEngine.getTimestepSize() * this.network.getFlowCapFactor();
+		this.buffer.setFlowCapacity(simulatedFlowCapacity);
 
 		double numberOfLanes = this.link.getNumberOfLanes(now);
 		// first guess at storageCapacity:
 		this.storageCapacity = (length * numberOfLanes) / this.network.getEffectiveCellSize() * this.network.getStorageCapFactor();
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
-		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
+		this.storageCapacity = Math.max(this.storageCapacity, this.buffer.getStorageCapacity());
 
 		/*
 		 * If speed on link is relatively slow, then we need MORE cells than the
@@ -128,7 +106,7 @@ import playground.mrieser.core.sim.network.api.SimLink;
 		 * (aka freeTravelDuration) is 2 seconds. Than I need the spaceCap TWO times
 		 * the flowCap to handle the flowCap.
 		 */
-		double tempStorageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
+		double tempStorageCapacity = this.freespeedTravelTime * simulatedFlowCapacity;
 		if (this.storageCapacity < tempStorageCapacity) {
 			if (spaceCapWarningCount <= 10) {
 				log.warn("Link " + this.link.getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
@@ -183,7 +161,7 @@ import playground.mrieser.core.sim.network.api.SimLink;
 		if (this.vehQueue.remove(vehicle)) {
 			return;
 		}
-		this.buffer.remove(vehicle);
+		this.buffer.removeVehicle(vehicle);
 	}
 
 	@Override
@@ -205,21 +183,16 @@ import playground.mrieser.core.sim.network.api.SimLink;
 
 	@Override
 	public void parkVehicle(SimVehicle vehicle) {
-		this.parkedVehicles.put(vehicle.getId(), vehicle);
+		if (this.vehQueue.remove(vehicle) || this.buffer.removeVehicle(vehicle) || this.waitingList.remove(vehicle)) {
+			this.parkedVehicles.put(vehicle.getId(), vehicle);
+		}
 	}
 
 	@Override
 	public void doSimStep(final double time) {
-		updateBufferCapacity();
+		this.buffer.updateCapacity();
 		moveLinkToBuffer(time);
 		moveWaitToBuffer(time);
-	}
-
-	private void updateBufferCapacity() {
-		this.bufferCap = this.simulatedFlowCapacity;
-		if (this.buffercap_accumulate < 1.0) {
-			this.buffercap_accumulate += this.flowCapFraction;
-		}
 	}
 
 	private void moveLinkToBuffer(final double time) {
@@ -228,16 +201,16 @@ import playground.mrieser.core.sim.network.api.SimLink;
 			if (this.earliestLeaveTimes.get(veh).doubleValue() > time) {
 				return;
 			}
-			if (!hasBufferSpace()) {
+			if (!this.buffer.hasSpace()) {
 				return;
 			}
-			addToBuffer(this.vehQueue.poll(), time);
+			this.buffer.addVehicle(this.vehQueue.poll(), time);
 			this.usedStorageCapacity -= veh.getSizeInEquivalents();
 		} // end while
 	}
 
 	private void moveWaitToBuffer(final double time) {
-		while (hasBufferSpace()) {
+		while (this.buffer.hasSpace()) {
 			SimVehicle vehicle = this.waitingList.poll();
 			if (vehicle == null) {
 				return;
@@ -245,50 +218,18 @@ import playground.mrieser.core.sim.network.api.SimLink;
 
 			this.network.simEngine.getEventsManager().processEvent(
 					new AgentWait2LinkEventImpl(time, vehicle.getId(), this.link.getId(), TransportMode.car));
-			addToBuffer(vehicle, time);
+			this.buffer.addVehicle(vehicle, time);
 		}
 	}
 
-	private boolean hasBufferSpace() {
-		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.bufferCap >= 1.0)
-				|| (this.buffercap_accumulate >= 1.0)));
-	}
-
-	private void addToBuffer(final SimVehicle veh, final double now) {
-		if (this.bufferCap >= 1.0) {
-			this.bufferCap--;
-		} else if (this.buffercap_accumulate >= 1.0) {
-			this.buffercap_accumulate--;
-		} else {
-			throw new IllegalStateException("Buffer of link " + this.link.getId() + " has no space left!");
-		}
-		this.buffer.add(veh);
-		if (this.buffer.size() == 1) {
-			this.bufferLastMovedTime = now;
-		}
-	}
 
 	@Override
 	public Id getId() {
 		return this.link.getId();
 	}
 
-	/*package*/ SimVehicle getFirstVehicleInBuffer() {
-		return this.buffer.peek();
-	}
-
-	/*package*/ SimVehicle removeFirstVehicleInBuffer() {
-		double now = this.network.simEngine.getCurrentTime();
-		SimVehicle veh = this.buffer.poll();
-		this.bufferLastMovedTime = now;
-		return veh;
-	}
-
 	/*package*/ boolean hasSpace() {
 		return this.usedStorageCapacity < this.storageCapacity;
 	}
 
-	/*package*/ double getBufferLastMovedTime() {
-		return this.bufferLastMovedTime;
-	}
 }

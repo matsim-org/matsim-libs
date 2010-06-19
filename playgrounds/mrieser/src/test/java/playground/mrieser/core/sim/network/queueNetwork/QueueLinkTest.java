@@ -43,190 +43,171 @@ public class QueueLinkTest {
 
 	@Test
 	public void testInsertVehicle_atParking() {
-		NetworkLayer net = new NetworkLayer();
-		net.addNode(net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
-		net.addNode(net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0)));
-		Link link = net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
-		link.setLength(1000);
-		link.setFreespeed(10);
-		link.setCapacity(3600.0);
-		link.setNumberOfLanes(1.0);
-		QueueNetwork qnet = new QueueNetwork(new FakeSimEngine(), new Random());
-		QueueLink ql = new QueueLink(link, qnet);
+		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
-		Assert.assertNull(ql.getParkedVehicle(veh1Id));
-		ql.insertVehicle(vehicle1, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_PARKING);
-		Assert.assertEquals(vehicle1, ql.getParkedVehicle(veh1Id));
-		Assert.assertNull(ql.getParkedVehicle(new IdImpl("1980")));
+		Assert.assertNull(f.qlink.getParkedVehicle(veh1Id));
+		f.qlink.insertVehicle(vehicle1, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_PARKING);
+		Assert.assertEquals(vehicle1, f.qlink.getParkedVehicle(veh1Id));
+		Assert.assertNull(f.qlink.getParkedVehicle(new IdImpl("1980")));
 
 		Id veh2Id = new IdImpl(5);
 		SimVehicle vehicle2 = new DefaultSimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1979"))));
 
-		Assert.assertNull(ql.getParkedVehicle(veh2Id));
-		ql.insertVehicle(vehicle2, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_PARKING);
-		Assert.assertEquals(vehicle2, ql.getParkedVehicle(veh2Id));
-		Assert.assertEquals(vehicle1, ql.getParkedVehicle(veh1Id));
-		Assert.assertNull(ql.getParkedVehicle(new IdImpl("1979")));
+		Assert.assertNull(f.qlink.getParkedVehicle(veh2Id));
+		f.qlink.insertVehicle(vehicle2, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_PARKING);
+		Assert.assertEquals(vehicle2, f.qlink.getParkedVehicle(veh2Id));
+		Assert.assertEquals(vehicle1, f.qlink.getParkedVehicle(veh1Id));
+		Assert.assertNull(f.qlink.getParkedVehicle(new IdImpl("1979")));
 	}
 
 	@Test
 	public void testRemoveVehicle_atParking() {
-		NetworkLayer net = new NetworkLayer();
-		net.addNode(net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
-		net.addNode(net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0)));
-		Link link = net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
-		link.setLength(1000);
-		link.setFreespeed(10);
-		link.setCapacity(3600.0);
-		link.setNumberOfLanes(1.0);
-		QueueNetwork qnet = new QueueNetwork(new FakeSimEngine(), new Random());
-		QueueLink ql = new QueueLink(link, qnet);
+		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 		Id veh2Id = new IdImpl(5);
 		SimVehicle vehicle2 = new DefaultSimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1979"))));
-		ql.insertVehicle(vehicle1, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_PARKING);
-		ql.insertVehicle(vehicle2, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_PARKING);
+		f.qlink.insertVehicle(vehicle1, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_PARKING);
+		f.qlink.insertVehicle(vehicle2, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_PARKING);
 
-		Assert.assertEquals(vehicle1, ql.getParkedVehicle(veh1Id));
-		Assert.assertEquals(vehicle2, ql.getParkedVehicle(veh2Id));
+		Assert.assertEquals(vehicle1, f.qlink.getParkedVehicle(veh1Id));
+		Assert.assertEquals(vehicle2, f.qlink.getParkedVehicle(veh2Id));
 
-		ql.removeVehicle(vehicle1);
+		f.qlink.removeVehicle(vehicle1);
 
-		Assert.assertNull(ql.getParkedVehicle(veh1Id));
-		Assert.assertEquals(vehicle2, ql.getParkedVehicle(veh2Id));
+		Assert.assertNull(f.qlink.getParkedVehicle(veh1Id));
+		Assert.assertEquals(vehicle2, f.qlink.getParkedVehicle(veh2Id));
 
-		ql.removeVehicle(vehicle1); // the same again, shouldn't do any harm
+		f.qlink.removeVehicle(vehicle1); // the same again, shouldn't do any harm
 
-		Assert.assertNull(ql.getParkedVehicle(veh1Id));
-		Assert.assertEquals(vehicle2, ql.getParkedVehicle(veh2Id));
+		Assert.assertNull(f.qlink.getParkedVehicle(veh1Id));
+		Assert.assertEquals(vehicle2, f.qlink.getParkedVehicle(veh2Id));
 
-		ql.removeVehicle(vehicle2); // the same again, shouldn't do any harm
+		f.qlink.removeVehicle(vehicle2); // the same again, shouldn't do any harm
 
-		Assert.assertNull(ql.getParkedVehicle(veh1Id));
-		Assert.assertNull(ql.getParkedVehicle(veh2Id));
+		Assert.assertNull(f.qlink.getParkedVehicle(veh1Id));
+		Assert.assertNull(f.qlink.getParkedVehicle(veh2Id));
 	}
 
 	@Test
 	public void testRemoveVehicle_driving() {
-		NetworkLayer net = new NetworkLayer();
-		net.addNode(net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
-		net.addNode(net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0)));
-		Link link = net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
-		link.setLength(1000);
-		link.setFreespeed(10);
-		link.setCapacity(3600.0);
-		link.setNumberOfLanes(1.0);
-		FakeSimEngine engine = new FakeSimEngine();
-		QueueNetwork qnet = new QueueNetwork(engine, new Random());
-		QueueLink ql = new QueueLink(link, qnet);
+		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
-		engine.setCurrentTime(200);
-		ql.addVehicle(vehicle1);
-		ql.doSimStep(250);
-		ql.removeVehicle(vehicle1);
-		ql.doSimStep(300); // vehicle1 should not show up in buffer
-		Assert.assertNull(ql.getFirstVehicleInBuffer());
-		ql.doSimStep(310);
-		Assert.assertNull(ql.getFirstVehicleInBuffer());
+		f.engine.setCurrentTime(200);
+		f.qlink.addVehicle(vehicle1);
+		f.qlink.doSimStep(250);
+		f.qlink.removeVehicle(vehicle1);
+		f.qlink.doSimStep(300); // vehicle1 should not show up in buffer
+		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
+		f.qlink.doSimStep(310);
+		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
 	}
 
 	@Test
 	public void testRemoveVehicle_atWaiting() {
-		NetworkLayer net = new NetworkLayer();
-		net.addNode(net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
-		net.addNode(net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0)));
-		Link link = net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
-		link.setLength(1000);
-		link.setFreespeed(10);
-		link.setCapacity(3600.0);
-		link.setNumberOfLanes(1.0);
-		FakeSimEngine engine = new FakeSimEngine();
-		QueueNetwork qnet = new QueueNetwork(engine, new Random());
-		QueueLink ql = new QueueLink(link, qnet);
+		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 		Id veh2Id = new IdImpl(22);
 		SimVehicle vehicle2 = new DefaultSimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
-		engine.setCurrentTime(200);
-		ql.insertVehicle(vehicle1, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
-		ql.insertVehicle(vehicle2, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
-		ql.doSimStep(201);
-		Assert.assertEquals(vehicle1, ql.getFirstVehicleInBuffer());
-		ql.removeVehicle(vehicle2);
-		ql.doSimStep(202); // vehicle1 should not show up in buffer
-		Assert.assertEquals(vehicle1, ql.removeFirstVehicleInBuffer());
-		Assert.assertNull(ql.getFirstVehicleInBuffer());
-		ql.doSimStep(310);
-		Assert.assertNull(ql.getFirstVehicleInBuffer());
+		f.engine.setCurrentTime(200);
+		f.qlink.insertVehicle(vehicle1, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
+		f.qlink.insertVehicle(vehicle2, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
+		f.qlink.doSimStep(201);
+		Assert.assertEquals(vehicle1, f.qlink.buffer.getFirstVehicleInBuffer());
+		f.qlink.removeVehicle(vehicle2);
+		f.qlink.doSimStep(202); // vehicle1 should not show up in buffer
+		Assert.assertEquals(vehicle1, f.qlink.buffer.removeFirstVehicleInBuffer());
+		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
+		f.qlink.doSimStep(310);
+		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
 	}
 
 	@Test
 	public void testRemoveVehicle_fromBuffer() {
-		NetworkLayer net = new NetworkLayer();
-		net.addNode(net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
-		net.addNode(net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0)));
-		Link link = net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
-		link.setLength(1000);
-		link.setFreespeed(10);
-		link.setCapacity(3600.0);
-		link.setNumberOfLanes(1.0);
-		FakeSimEngine engine = new FakeSimEngine();
-		QueueNetwork qnet = new QueueNetwork(engine, new Random());
-		QueueLink ql = new QueueLink(link, qnet);
+		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
-		engine.setCurrentTime(200);
-		ql.addVehicle(vehicle1);
-		ql.doSimStep(250);
-		ql.doSimStep(300); // vehicle1 should not show up in buffer
-		Assert.assertEquals(vehicle1, ql.getFirstVehicleInBuffer());
-		ql.removeVehicle(vehicle1);
-		Assert.assertNull(ql.getFirstVehicleInBuffer());
+		f.engine.setCurrentTime(200);
+		f.qlink.addVehicle(vehicle1);
+		f.qlink.doSimStep(250);
+		f.qlink.doSimStep(300); // vehicle1 should now show up in buffer
+		Assert.assertEquals(vehicle1, f.qlink.buffer.getFirstVehicleInBuffer());
+		f.qlink.removeVehicle(vehicle1);
+		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
 	}
 
 	@Test
 	public void test_FreeflowSpeed_DrivingSingleVehicle() {
-		NetworkLayer net = new NetworkLayer();
-		net.addNode(net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
-		net.addNode(net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0)));
-		Link link = net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
-		link.setLength(1000);
-		link.setFreespeed(10);
-		link.setCapacity(3600.0);
-		link.setNumberOfLanes(1.0);
-		FakeSimEngine engine = new FakeSimEngine();
-		QueueNetwork qnet = new QueueNetwork(engine, new Random());
-		QueueLink ql = new QueueLink(link, qnet);
+		Fixture f = new Fixture();
 
 		Id veh1Id = new IdImpl(11);
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
-		engine.setCurrentTime(200);
-		ql.addVehicle(vehicle1);
-		Assert.assertNull(ql.getFirstVehicleInBuffer());
-		ql.doSimStep(201);
-		Assert.assertNull(ql.getFirstVehicleInBuffer());
-		ql.doSimStep(202);
-		Assert.assertNull(ql.getFirstVehicleInBuffer());
-		ql.doSimStep(250);
-		Assert.assertNull(ql.getFirstVehicleInBuffer());
-		ql.doSimStep(299);
-		Assert.assertNull(ql.getFirstVehicleInBuffer());
-		ql.doSimStep(300);
-		Assert.assertEquals(vehicle1, ql.getFirstVehicleInBuffer());
-		ql.doSimStep(301);
-		Assert.assertEquals(vehicle1, ql.getFirstVehicleInBuffer());
+		f.engine.setCurrentTime(200);
+		f.qlink.addVehicle(vehicle1);
+		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
+		f.qlink.doSimStep(201);
+		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
+		f.qlink.doSimStep(202);
+		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
+		f.qlink.doSimStep(250);
+		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
+		f.qlink.doSimStep(299);
+		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
+		f.qlink.doSimStep(300);
+		Assert.assertEquals(vehicle1, f.qlink.buffer.getFirstVehicleInBuffer());
+		f.qlink.doSimStep(301);
+		Assert.assertEquals(vehicle1, f.qlink.buffer.getFirstVehicleInBuffer());
+	}
+
+	@Test
+	public void testParkVehicle() {
+		Fixture f = new Fixture();
+
+		Id veh1Id = new IdImpl(11);
+		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		Id veh2Id = new IdImpl(5);
+		SimVehicle vehicle2 = new DefaultSimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1979"))));
+
+		f.qlink.addVehicle(vehicle1);
+		f.qlink.parkVehicle(vehicle1);
+		Assert.assertEquals(vehicle1, f.qlink.getParkedVehicle(veh1Id));
+		f.qlink.parkVehicle(vehicle2); // veh2 is not on link!
+		Assert.assertNull(f.qlink.getParkedVehicle(veh2Id));
+	}
+
+	private static class Fixture {
+
+		/*package*/ final NetworkLayer net;
+		/*package*/ final Link link;
+		/*package*/ final FakeSimEngine engine;
+		/*package*/ final QueueNetwork qnet;
+		/*package*/ final QueueLink qlink;
+
+		/*package*/ Fixture() {
+			this.net = new NetworkLayer();
+			this.net.addNode(this.net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
+			this.net.addNode(this.net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0)));
+			this.link = this.net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
+			this.link.setLength(1000);
+			this.link.setFreespeed(10);
+			this.link.setCapacity(3600.0);
+			this.link.setNumberOfLanes(1.0);
+			this.engine = new FakeSimEngine();
+			this.qnet = new QueueNetwork(this.engine, new Random());
+			this.qlink = new QueueLink(this.link, this.qnet);
+		}
 	}
 }

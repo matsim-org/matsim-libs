@@ -82,7 +82,8 @@ public interface SimLink {
 
 	/**
 	 * Removes a vehicle from the traffic flow, but keeps the vehicle
-	 * registered on that link.
+	 * registered on that link. If the vehicle is not on the link,
+	 * nothing happens.
 	 *
 	 * @param vehicle
 	 * @see SimLink#getParkedVehicle(Id)
