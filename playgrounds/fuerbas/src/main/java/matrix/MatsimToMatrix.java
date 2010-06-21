@@ -53,14 +53,24 @@ public class MatsimToMatrix {
 	
 	System.out.println("LINK ADDIEREN KOMPLETT"+Runtime.getRuntime().freeMemory());
 	
+//	for (int i=0; i<100; i++){
+//		for (int j=0; j<100; j++)
+//			if (linkIdxFromTo[i][j]>0){
+//			System.out.println(linkIdxFromTo[i][j]);
+//			System.out.println(linkList.get(linkIdxFromTo[i][j]).getFreespeed());
+//			System.out.println("COSTS "+(linkList.get(linkIdxFromTo[i][j]).getLength()/linkList.get(linkIdxFromTo[i][j]).getFreespeed()));
+//			if (linkList.get(linkIdxFromTo[i][j]).getLength()/linkList.get(linkIdxFromTo[i][j]).getFreespeed()==0 || linkList.get(linkIdxFromTo[i][j]).getLength()/linkList.get(linkIdxFromTo[i][j]).getFreespeed() == Double.POSITIVE_INFINITY)
+//					System.out.println("COSTS ZERO OR POSITIVE INFINITY!!!");
+//			}
+//	}
 	
 	System.out.println("EDGE ADDIEREN KOMPLETT"+Runtime.getRuntime().freeMemory());
 	
 	class EdgeCost implements EdgeCostFunction {
 
+		private double costs;
 		@Override
 		public double edgeCost(int i, int j) {
-			double costs;
 			int linkIndex = linkIdxFromTo[i][j];  
 			costs=(linkList.get(linkIndex).getLength()/linkList.get(linkIndex).getFreespeed());		
 			return costs;
@@ -79,6 +89,8 @@ public class MatsimToMatrix {
 	
 	MatrixCent.setDijkstraFactory(factory);
 	System.out.println("MATRIX CENT SET FACTORY"+Runtime.getRuntime().freeMemory());
+	
+	
 	
 	MatrixCent.run(y);
 	System.out.println("MATRIX CENT RUN CPLT"+Runtime.getRuntime().freeMemory());
