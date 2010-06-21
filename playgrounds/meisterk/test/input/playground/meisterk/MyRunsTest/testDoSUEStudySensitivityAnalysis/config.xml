@@ -6,14 +6,9 @@
 >
 <config>
 
-	<module name="global">
-		<param name="numberOfThreads" value="0" />
-	</module>
-
 	<module name="controler">
 		<param name="firstIteration" value="0" />
-<!--		<param name="lastIteration" value="1000" />-->
-		<param name="lastIteration" value="10" />
+		<param name="lastIteration" value="2" />
 	</module>
 
 	<module name="network">

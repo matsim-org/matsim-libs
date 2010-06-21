@@ -115,7 +115,6 @@ public class MyRuns {
 
 		MyRuns myRuns = new MyRuns();
 
-		//		myRuns.doSUEStudySensitivityAnalysis(args);
 		//		myRuns.wctr2010(args);
 		myRuns.moveInitDemandToDifferentNetwork(args);
 
@@ -223,12 +222,11 @@ public class MyRuns {
 	/**
 	 * Generates the results of the sensitivity analysis of the SUE study.
 	 */
-	void doSUEStudySensitivityAnalysis(final String[] args) {
+	void doSUEStudySensitivityAnalysis(final String[] args, String outputDirectory) {
 
 		final double[] VARY_BETA = new double[]{2.0, 0.1, 1.0, 4.0, 10.0, Double.MAX_VALUE};
 		final double[] VARY_LEARNING_RATE = new double[]{1.0, 0.1};
 		final String[] VARY_TIME_MODULE = new String[]{"TimeAllocationMutator", "Planomat"};
-		final String OUTPUT_PARENT_DIRECTORY_NAME = "sueStudy";
 
 		for (double beta : VARY_BETA) {
 			for (double learningRate : VARY_LEARNING_RATE) {
@@ -248,8 +246,7 @@ public class MyRuns {
 					}
 
 					testee.getConfig().controler().setOutputDirectory(
-							"output/"
-							+ OUTPUT_PARENT_DIRECTORY_NAME
+							outputDirectory
 							+ "/"
 							+ this.getRunOutputDirectoryName(timingModule, beta, learningRate));
 					testee.getConfig().charyparNagelScoring().setBrainExpBeta(beta);
