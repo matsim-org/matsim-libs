@@ -824,7 +824,6 @@ public class BellmanFordIntervalBasedWithCost extends BellmanFordIntervalBased {
 		}
 
 		this.Tcalc.onoff();
-		
 		// queue to save nodes we have to scan
 		
 		TaskQueue queue;

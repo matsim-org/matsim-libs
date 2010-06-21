@@ -54,6 +54,7 @@ import playground.dressler.Interval.ShadowEdgeFlow;
 import playground.dressler.Interval.SinkIntervals;
 import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.control.FlowCalculationSettings;
+import playground.dressler.util.CPUTimer;
 /**
  * Class representing a dynamic flow on an network with multiple sources and a single sink
  * @author Daniel Dressler, Manuel Schneider
@@ -138,7 +139,10 @@ public class Flow {
 
 	private boolean _storepaths;
 	private boolean _unfoldpaths;
-
+	CPUTimer  Tunfold= new CPUTimer("unfold time");
+	CPUTimer  Topposing = new CPUTimer( "remove time opposing");
+	CPUTimer  Tunloop = new CPUTimer("unlooptime");
+	CPUTimer Taug= new CPUTimer("actual time in method");
 	/**
 	 * TODO use debug mode
 	 * flag for debug mode
@@ -558,7 +562,10 @@ public class Flow {
 		//mapAllPaths();
 	}
 	  int bottleneck = bottleNeckCapacity(TEP);
-	  return this.augment(TEP, bottleneck);
+	  Taug.onoff();
+	  int result= this.augment(TEP, bottleneck);
+	  Taug.onoff();
+	  return result;
 	}
 
 	/**
@@ -1188,9 +1195,12 @@ public class Flow {
 			/* remove loops
 			 */
 		    //TODO may need remapping
+		    this.Topposing.onoff();
 			TEP = removeOpposing(TEP);
+			this.Topposing.onoff();
+			this.Tunloop.onoff();
 			TEP = unloopNoOpposing(TEP);
-
+			this.Tunloop.onoff();
 			boolean onlyForward = true;
 
 			// traverse in order
@@ -1218,7 +1228,7 @@ public class Flow {
 					   throw new RuntimeException("flowToUndo == 0");
 				   }
 				   LinkedList<TimeExpandedPath> unfoldPaths= findReversePath(step);
-				   
+				   Tunfold.onoff();
   				   // search for an appropriate TEP to unfold with
 				   for (TimeExpandedPath otherTEP : unfoldPaths) {
 
@@ -1319,8 +1329,12 @@ public class Flow {
 
 					   if (flowToUndo == 0) break;
 				   }
+				   Tunfold.onoff();
 
+				   
 				   if (flowToUndo > 0) {
+					   
+					   
 					   System.out.println("problem path: " + TEP);
 					   System.out.println("good paths:");
 					   for (TimeExpandedPath tempTEP : goodTEPs) {
@@ -1372,15 +1386,17 @@ public class Flow {
 			// add the good flows:
 			// check for loops and adjust the flow
 			for (TimeExpandedPath good : goodTEPs) {
-			  good = unloopNoOpposing(good);
-			  // paths are probably (it's a for loop) read from the beginning again
-			  // addFirst is better than addLast: interact with recently added TEPs
-			  this._TimeExpandedPaths.addFirst(good);
-			  dumbaugment(good, good.getFlow());
-			  
-			  if(this._settings.mapLinksToTEP){
-				  mapPath(good);
-			  }
+				this.Tunloop.onoff();
+				good = unloopNoOpposing(good);
+				this.Tunloop.onoff();
+				// paths are probably (it's a for loop) read from the beginning again
+				// addFirst is better than addLast: interact with recently added TEPs
+				this._TimeExpandedPaths.addFirst(good);
+				dumbaugment(good, good.getFlow());
+
+				if(this._settings.mapLinksToTEP){
+					mapPath(good);
+				}
 			}
 			goodTEPs.clear();
 

@@ -680,7 +680,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 2;
+		int instance = 441;
 		// 1 = siouxfalls, demand 500
 		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
@@ -703,7 +703,7 @@ public class MultiSourceEAF {
 			sinkid = "supersink";
 		}else if (instance == 11) {
 			networkfile  = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
-			uniformDemands = 10;
+			uniformDemands = 1000;
 			timeStep = 5;
 			flowFactor = 1.0;
 			sinkid = "supersink";
@@ -983,12 +983,12 @@ public class MultiSourceEAF {
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
 		//settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		//settings.sortPathsBeforeAugmenting = true;
-		//settings.checkTouchedNodes = true;
+		settings.checkTouchedNodes = true;
 		//settings.keepPaths = true; // store paths at all!
-		//settings.unfoldPaths = true; // unfold stored paths into forward paths
+		settings.unfoldPaths = true; // unfold stored paths into forward paths
 		settings.delaySinkPropagation = true; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
 		settings.quickCutOff = false; // stop as soon as the first good path is found
-
+		settings.mapLinksToTEP = false; // remember which path uses an edge at a given time
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
 

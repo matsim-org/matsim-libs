@@ -1708,7 +1708,11 @@ public class BellmanFordIntervalBased {
 			"\n  " + this.Tconstructroutetime + 
 			"\n\n  Totalpolls: " + (this._totalpolls) +
 			"\n  Totalnonpolls: " + (this._totalnonpolls) +
-			"\n  Total VertexCleanUp: " + this._totalVertexGain;
+			"\n  Total VertexCleanUp: " + this._totalVertexGain+
+		 "\n \n actual augmentation time: "+this._flow.Taug+
+		 "\n Unfolding time: "+ this._flow.Tunfold+
+		 "\n unlooping time: " +this._flow.Tunloop+
+		 "\n removing time: " + this._flow.Topposing+ "\n \n";
 		//"\n  Totalpreptime (s): "+(this._totalpreptime/1000)+
 		//"\n  Totalcalctime (s): "+(this._totalcalctime/1000);
 		
@@ -1759,6 +1763,10 @@ public class BellmanFordIntervalBased {
 		this.Tconstructroutetime.newiter(); 
 		this.Tpropagate.newiter();
 		this.Tsettrue.newiter();
+		this._flow.Tunfold.newiter();
+		this._flow.Tunloop.newiter();
+		this._flow.Topposing.newiter();
+		this._flow.Taug.newiter();
 		
 		if (lastArrival > this._oldLastArrival) {
 			// nothing needed currently
