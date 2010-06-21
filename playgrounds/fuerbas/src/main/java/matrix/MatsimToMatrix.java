@@ -43,26 +43,31 @@ public class MatsimToMatrix {
 	int linkIdx = 0;
 	for (Link link : network.getLinks().values()) {
 		if (nodeList.contains(link.getFromNode())) {
+			int from; int to;
+			from=nodeList.indexOf(link.getFromNode());
+			to=nodeList.indexOf(link.getToNode());
+			if (!y.getEdge(to, from) || !y.getEdge(from, to)) {
 			y.addEdge(nodeList.indexOf(link.getFromNode()), nodeList.indexOf(link.getToNode()));
 			linkList.add(linkIdx, link);
 			linkIdxFromTo[nodeList.indexOf(link.getFromNode())][nodeList.indexOf(link.getToNode())] = linkIdx;
 			linkIdx++;
 //			System.out.println(linkIdx);
+			}
 		}			
 	}
 	
 	System.out.println("LINK ADDIEREN KOMPLETT"+Runtime.getRuntime().freeMemory());
 	
-//	for (int i=0; i<100; i++){
-//		for (int j=0; j<100; j++)
-//			if (linkIdxFromTo[i][j]>0){
+	for (int i=0; i<100; i++){
+		for (int j=0; j<100; j++)
+			if (linkIdxFromTo[i][j]>0){
 //			System.out.println(linkIdxFromTo[i][j]);
 //			System.out.println(linkList.get(linkIdxFromTo[i][j]).getFreespeed());
-//			System.out.println("COSTS "+(linkList.get(linkIdxFromTo[i][j]).getLength()/linkList.get(linkIdxFromTo[i][j]).getFreespeed()));
-//			if (linkList.get(linkIdxFromTo[i][j]).getLength()/linkList.get(linkIdxFromTo[i][j]).getFreespeed()==0 || linkList.get(linkIdxFromTo[i][j]).getLength()/linkList.get(linkIdxFromTo[i][j]).getFreespeed() == Double.POSITIVE_INFINITY)
-//					System.out.println("COSTS ZERO OR POSITIVE INFINITY!!!");
-//			}
-//	}
+			System.out.println("COSTS "+(linkList.get(linkIdxFromTo[i][j]).getLength()/linkList.get(linkIdxFromTo[i][j]).getFreespeed()));
+			if (linkList.get(linkIdxFromTo[i][j]).getLength()/linkList.get(linkIdxFromTo[i][j]).getFreespeed()==0 || linkList.get(linkIdxFromTo[i][j]).getLength()/linkList.get(linkIdxFromTo[i][j]).getFreespeed() == Double.POSITIVE_INFINITY)
+					System.out.println("COSTS ZERO OR POSITIVE INFINITY!!!");
+			}
+	}
 	
 	System.out.println("EDGE ADDIEREN KOMPLETT"+Runtime.getRuntime().freeMemory());
 	
@@ -74,8 +79,7 @@ public class MatsimToMatrix {
 			int linkIndex = linkIdxFromTo[i][j];  
 			costs=(linkList.get(linkIndex).getLength()/linkList.get(linkIndex).getFreespeed());		
 			return costs;
-		}
-		
+		}		
 	}
 	
 	EdgeCost edgeCost = new EdgeCost();
@@ -89,13 +93,8 @@ public class MatsimToMatrix {
 	
 	MatrixCent.setDijkstraFactory(factory);
 	System.out.println("MATRIX CENT SET FACTORY"+Runtime.getRuntime().freeMemory());
-	
-	
-	
+		
 	MatrixCent.run(y);
 	System.out.println("MATRIX CENT RUN CPLT"+Runtime.getRuntime().freeMemory());
 	}
-	
-	
-
 }
