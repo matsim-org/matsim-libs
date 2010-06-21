@@ -37,6 +37,9 @@ import playground.jjoubert.CommercialTraffic.Activity;
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.CommercialVehicle;
 
+import cern.colt.matrix.impl.DenseObjectMatrix2D;
+import cern.colt.matrix.impl.SparseObjectMatrix2D;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -58,6 +61,11 @@ public class MyThroughTrafficAnalyser {
 	private QuadTree<Coordinate> exitQT;
 	private List<List<Double>> entryLineList;
 	private List<List<Double>> exitLineList;
+	private List<List<Integer>> inOutPairs;
+	private List<List<Integer>> outInPairs;
+	private DenseObjectMatrix2D inOutMatrix;
+	private DenseObjectMatrix2D outInMatrix;
+	
 	
 	public MyThroughTrafficAnalyser(MultiPolygon studyArea, List<Point> gates) {
 		this.studyArea = studyArea;
@@ -72,9 +80,13 @@ public class MyThroughTrafficAnalyser {
 				g.getCoordinates()[0].y, 
 				g.getCoordinates()[2].x, 
 				g.getCoordinates()[2].y);
+		this.activityCounterList = new ArrayList<Integer>();
 		this.entryLineList = new ArrayList<List<Double>>();
 		this.exitLineList = new ArrayList<List<Double>>();
-		this.activityCounterList = new ArrayList<Integer>();
+		this.inOutPairs = new ArrayList<List<Integer>>();
+		this.outInPairs = new ArrayList<List<Integer>>();
+		this.inOutMatrix = new DenseObjectMatrix2D(gates.size(), gates.size());
+		this.outInMatrix = new DenseObjectMatrix2D(gates.size(), gates.size());
 		
 		// Create the basic structure for gate statistics.
 		this.gateStatsIn = new ArrayList<List<Integer>>(gates.size());
@@ -101,6 +113,7 @@ public class MyThroughTrafficAnalyser {
 		GeometryFactory gf = new GeometryFactory();
 		for (Chain c : v.getChains()){
 			Integer activityCounter = null;
+			List<Integer> pair = null;
 			for (int i = 0; i < c.getActivities().size()-1; i++){
 				Activity a1 = c.getActivities().get(i);
 				Activity a2 = c.getActivities().get(i+1);				
@@ -185,6 +198,20 @@ public class MyThroughTrafficAnalyser {
 						}
 						gateStatsIn.get(index).set(hourOfDay+2, gateStatsIn.get(index).get(hourOfDay+2) + 1);
 						
+						// Check whether it is an in-out or out-in pair.
+						if(pair == null){
+							// Start a new in-out list with first entry.
+							pair = new ArrayList<Integer>();
+							pair.add(new Integer(index));
+							pair.add(new Integer(hourOfDay));
+						} else{
+							// It is an out-in list. Finish it, and add to correct list.
+							pair.add(new Integer(index));
+							pair.add(new Integer(hourOfDay));
+							this.outInPairs.add(pair);
+							pair = null;
+						}
+						
 					} else{
 						/*
 						 * It is an exit.
@@ -220,6 +247,20 @@ public class MyThroughTrafficAnalyser {
 							}
 						}
 						gateStatsOut.get(index).set(hourOfDay+2, gateStatsOut.get(index).get(hourOfDay+2) + 1);
+						
+						// Check whether it is an in-out or out-in pair.
+						if(pair == null){
+							// Start a new out-in list with first entry.
+							pair = new ArrayList<Integer>();
+							pair.add(new Integer(index));
+							pair.add(new Integer(hourOfDay));
+						} else{
+							// It is an in-out list. Finish it, and add to correct list.
+							pair.add(new Integer(index));
+							pair.add(new Integer(hourOfDay));
+							this.inOutPairs.add(pair);
+							pair = null;
+						}						
 					}
 
 				} else if (in1 && in2 && activityCounter != null){
@@ -306,10 +347,122 @@ public class MyThroughTrafficAnalyser {
 			e1.printStackTrace();
 		}
 		
+		/*
+		 * Write the in-out and out-in pairs to file. But first, process the
+		 * list into OD matrices.
+		 */
+		processPairToMatrix(inOutPairs, inOutMatrix);
+		processPairToMatrix(outInPairs, outInMatrix);
+		
+		String inOutFilename = location + "InOutPairs.txt";
+		log.info("Writing in-out pairs to " + inOutFilename);
+		try {
+			BufferedWriter inOut = new BufferedWriter(new FileWriter(new File(inOutFilename)));
+			try{
+				inOut.write("InGate,InHour,OutGate,OutHour");
+				inOut.newLine();
+				for (List<Integer> pair : this.inOutPairs) {
+					if(pair.size() == 4){
+						inOut.write(String.valueOf(pair.get(0)));
+						inOut.write(",");
+						inOut.write(String.valueOf(pair.get(1)));
+						inOut.write(",");
+						inOut.write(String.valueOf(pair.get(2)));
+						inOut.write(",");
+						inOut.write(String.valueOf(pair.get(3)));
+						inOut.newLine();
+					}
+				}
+			} finally{
+				inOut.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		inOutFilename = location + "InOutMatrix.txt";
+		log.info("Writing in-out pairs as matrix to " + inOutFilename);
+		try {
+			BufferedWriter inOut = new BufferedWriter(new FileWriter(new File(inOutFilename)));
+			try{
+				for(int row = 0; row < inOutMatrix.rows(); row++){
+					for(int col = 0; col < inOutMatrix.columns() - 1; col++){
+						inOut.write(String.valueOf(inOutMatrix.get(row, col)));
+						inOut.write(",");
+					}
+					inOut.write(String.valueOf(inOutMatrix.get(row, inOutMatrix.columns()-1)));
+					inOut.newLine();
+				}
+			} finally{
+				inOut.close();
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		String outInFilename = location + "OutInPairs.txt";
+		log.info("Writing out-in pairs to " + outInFilename);
+		try {
+			BufferedWriter outIn = new BufferedWriter(new FileWriter(new File(outInFilename)));
+			try{
+				outIn.write("OutGate,OutHour,InGate,InHour");
+				outIn.newLine();
+				for (List<Integer> pair : this.outInPairs) {
+					if(pair.size() == 4){
+						outIn.write(String.valueOf(pair.get(0)));
+						outIn.write(",");
+						outIn.write(String.valueOf(pair.get(1)));
+						outIn.write(",");
+						outIn.write(String.valueOf(pair.get(2)));
+						outIn.write(",");
+						outIn.write(String.valueOf(pair.get(3)));
+						outIn.newLine();
+					}
+				}
+			} finally{
+				outIn.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		outInFilename = location + "OutInMatrix.txt";
+		log.info("Writing out-in pairs as matrix to " + outInFilename);
+		try {
+			BufferedWriter outIn = new BufferedWriter(new FileWriter(new File(outInFilename)));
+			try{
+				for(int row = 0; row < outInMatrix.rows(); row++){
+					for(int col = 0; col < outInMatrix.columns() - 1; col++){
+						outIn.write(String.valueOf(outInMatrix.get(row, col)));
+						outIn.write(",");
+					}
+					outIn.write(String.valueOf(outInMatrix.get(row, outInMatrix.columns()-1)));
+					outIn.newLine();
+				}				
+			} finally{
+				outIn.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 
 	}
 	
+	private void processPairToMatrix(List<List<Integer>> pairs,
+			DenseObjectMatrix2D matrix) {
+		for(int row = 0; row < matrix.rows(); row++){
+			for(int col = 0; col < matrix.columns(); col++){
+				matrix.set(row, col, new Integer(0));
+			}
+		}
+		for(List<Integer> pair : pairs){
+			if(pair.size() == 4){
+				int origin = pair.get(0);
+				int destination = pair.get(2);
+				matrix.set(origin, destination, ((Integer) matrix.get(origin, destination)) + 1);
+			}
+		}		
+	}
+
 	private void writeListToFile(List<List<Double>> list, String location){
 		log.info("Writing list to " + location + "Line.txt");
 		try {
