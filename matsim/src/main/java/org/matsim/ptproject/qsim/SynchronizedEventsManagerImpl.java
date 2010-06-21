@@ -30,6 +30,10 @@ import org.matsim.core.events.handler.EventHandler;
  *
  */
 public class SynchronizedEventsManagerImpl implements EventsManager {
+	// yy I assume this is needed in order to make "processEvent" synchronized.  But could someone please exlain to me
+	// (preferably in javadoc to this class) why it makes sense to maintain both classes, one without the
+	// "synchronized" and one with it?  I assume there is a deeper reason, but without guidance I would assume
+	// that people will just randomly select one or othe other.  Thanks.  kai, jun'10
 
   private final EventsManager delegate;
   
