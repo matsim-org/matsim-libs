@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.lanes;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -73,7 +74,9 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter {
 			jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions11.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
 			super.setMarshallerProperties(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11, m);
-			m.marshal(this.xmlLaneDefinitions, IOUtils.getBufferedWriter(filename));
+			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
+			m.marshal(this.xmlLaneDefinitions, bufout);
+			bufout.close();
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {

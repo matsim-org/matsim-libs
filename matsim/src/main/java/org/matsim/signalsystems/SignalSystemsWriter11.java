@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -68,7 +69,9 @@ public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 			jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystems11.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
 			super.setMarshallerProperties(MatsimSignalSystemsReader.SIGNALSYSTEMS11, m);
-			m.marshal(this.xmlLightSignalSystems, IOUtils.getBufferedWriter(filename)); 
+			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
+			m.marshal(this.xmlLightSignalSystems, bufout);
+			bufout.close();
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {

@@ -43,7 +43,9 @@ public abstract class MatsimJaxbXmlWriter implements MatsimWriter {
 		m.setProperty("jaxb.schemaLocation", MatsimXmlWriter.MATSIM_NAMESPACE + " " + schemaLocation);
 	}
 
-	
+	/**
+	 * Might not work with .gz files if the Writer given to the marshaller is not closed after marshalling. Dg June2010
+	 */
 	public abstract void write(String filename);
 	
 }

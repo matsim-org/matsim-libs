@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -78,7 +79,9 @@ public class LightSignalSystemConfigurationsWriter10 extends MatsimJaxbXmlWriter
 			jc = JAXBContext.newInstance(org.matsim.jaxb.lightsignalsystemsconfig10.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller(); 
 			super.setMarshallerProperties(MatsimSignalSystemConfigurationsReader.SIGNALSYSTEMSCONFIG10, m);
-			m.marshal(this.xmllssconfig, IOUtils.getBufferedWriter(filename)); 
+			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
+			m.marshal(this.xmllssconfig, bufout); 
+			bufout.close();
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
