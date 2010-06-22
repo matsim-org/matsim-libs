@@ -43,8 +43,6 @@ import org.matsim.vis.snapshots.writers.VisLink;
  */
 public class OTFDefaultLinkHandler extends OTFDataReader {
 
-	public static final double LINK_SCALE  = 1.00; 
-	
 	protected OTFDataQuadReceiver quadReceiver = null;
 
 	public OTFDataQuadReceiver getQuadReceiver() {

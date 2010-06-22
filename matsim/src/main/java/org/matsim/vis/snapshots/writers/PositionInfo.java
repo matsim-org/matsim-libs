@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
 /**
@@ -119,7 +118,7 @@ public class PositionInfo implements AgentSnapshotInfo {
 	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final int cnt ) {
 		this.agentId = agentId;
 		this.linkId = link.getId();
-		this.calculatePosition(link, OTFDefaultLinkHandler.LINK_SCALE, distanceOnLink, lane + 2*cnt );
+		this.calculatePosition(link, 1.0, distanceOnLink, lane + 2*cnt );
 	}
 
 	public PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth ) {
@@ -146,7 +145,7 @@ public class PositionInfo implements AgentSnapshotInfo {
 	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState vehicleState ) {
 		this.agentId = agentId;
 		this.linkId = link.getId();
-		this.calculatePosition(link, OTFDefaultLinkHandler.LINK_SCALE, distanceOnLink, lane);
+		this.calculatePosition(link, 1.0, distanceOnLink, lane);
 		this.speed = speed;
 		this.agentState = vehicleState;
 	}

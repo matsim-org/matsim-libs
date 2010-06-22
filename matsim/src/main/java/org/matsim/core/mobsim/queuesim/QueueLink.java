@@ -42,7 +42,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
-import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.VisData;
@@ -683,8 +682,6 @@ class QueueLink implements VisLink, CapacityInformationLink {
 	 */
 	class VisDataImpl implements VisData {
 
-		private final double linkScale = OTFDefaultLinkHandler.LINK_SCALE;
-
 		public Collection<AgentSnapshotInfo> getVehiclePositions(
 				final Collection<AgentSnapshotInfo> positions) {
 			String snapshotStyle = simEngine.getConfig().simulation()
@@ -843,7 +840,7 @@ class QueueLink implements VisLink, CapacityInformationLink {
 						+ QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
 
-				AgentSnapshotInfo position = new PositionInfo(this.linkScale,
+				AgentSnapshotInfo position = new PositionInfo(1.0,
 						veh.getDriver().getPerson().getId(), link, queueEnd,
 						lane, speed,
 						AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
@@ -901,7 +898,7 @@ class QueueLink implements VisLink, CapacityInformationLink {
 				}
 				int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(
 						Time.UNDEFINED_TIME, link));
-				AgentSnapshotInfo position = new PositionInfo(this.linkScale,
+				AgentSnapshotInfo position = new PositionInfo(1.0, 
 						veh.getDriver().getPerson().getId(), link,
 						distanceOnLink, lane, speed,
 						AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
@@ -921,7 +918,7 @@ class QueueLink implements VisLink, CapacityInformationLink {
 			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME,
 					link) + 1; // place them next to the link
 			for (QVehicle veh : QueueLink.this.waitingList) {
-				AgentSnapshotInfo position = new PositionInfo(this.linkScale,
+				AgentSnapshotInfo position = new PositionInfo(1.0, 
 						veh.getDriver().getPerson().getId(), QueueLink.this
 								.getLink(),
 						/* positionOnLink */cellSize, lane, 0.0,
