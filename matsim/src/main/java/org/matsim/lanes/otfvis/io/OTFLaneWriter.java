@@ -44,9 +44,9 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  * @author dgrether
  *
  */
-public class OTFLaneWriter2 extends OTFDataWriter<QLinkInternalI> implements OTFWriterFactory<QLinkInternalI>{
+public class OTFLaneWriter extends OTFDataWriter<QLinkInternalI> implements OTFWriterFactory<QLinkInternalI>{
 	
-	private static final Logger log = Logger.getLogger(OTFLaneWriter2.class);
+	private static final Logger log = Logger.getLogger(OTFLaneWriter.class);
 	
 	public static final boolean DRAW_LINK_TO_LINK_LINES = true;
 	
@@ -54,7 +54,7 @@ public class OTFLaneWriter2 extends OTFDataWriter<QLinkInternalI> implements OTF
 
 	private boolean isQLinkLanesReader;
 	
-	public OTFLaneWriter2(){
+	public OTFLaneWriter(){
 	}
 	
 	@Override
@@ -178,7 +178,7 @@ public class OTFLaneWriter2 extends OTFDataWriter<QLinkInternalI> implements OTF
 
 	@Override
 	public OTFDataWriter<QLinkInternalI> getWriter() {
-		return new OTFLaneWriter2();
+		return new OTFLaneWriter();
 	}
 
 

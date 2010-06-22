@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.otfvis.io.OTFLaneWriter2;
+import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.ptproject.qsim.netsimengine.QLane;
 import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
@@ -34,7 +34,7 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 /**
  * @author dgrether
  */
-public class OTFSignalWriter extends OTFLaneWriter2 {
+public class OTFSignalWriter extends OTFLaneWriter {
 
 	public OTFSignalWriter() {
 	}

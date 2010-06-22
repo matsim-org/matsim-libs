@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer2;
+import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
@@ -34,14 +34,14 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
  * @author dgrether
  *
  */
-public class OTFLaneReader2 extends OTFDataReader {
+public class OTFLaneReader extends OTFDataReader {
 	
-	private static final Logger log = Logger.getLogger(OTFLaneReader2.class);
+	private static final Logger log = Logger.getLogger(OTFLaneReader.class);
 	
-	protected OTFLaneSignalDrawer2 drawer;
+	protected OTFLaneSignalDrawer drawer;
 	protected boolean isQLinkLanesReader;
 
-	public OTFLaneReader2(){
+	public OTFLaneReader(){
 	}
 	
 	@Override
@@ -65,14 +65,14 @@ public class OTFLaneReader2 extends OTFDataReader {
 		if (this.isQLinkLanesReader) {
 			int nrToNodeLanes = in.getInt();
 			for (int i = 0; i < nrToNodeLanes; i++){
-				OTFLaneData2 data = new OTFLaneData2();
+				OTFLaneData data = new OTFLaneData();
 				data.setId(ByteBufferUtils.getString(in));
 				data.setStartPoint(in.getDouble());
 				data.setEndPoint(in.getDouble());
 				data.setAlignment(in.getInt());
 				data.setNumberOfLanes(in.getDouble());
 				
-				if (OTFLaneWriter2.DRAW_LINK_TO_LINK_LINES){
+				if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES){
 					int numberOfToLinks = in.getInt();
 					for (int j = 0; j < numberOfToLinks; j++){
 						double toLinkStartX = in.getDouble();
@@ -92,7 +92,7 @@ public class OTFLaneReader2 extends OTFDataReader {
 	
 	@Override
 	public void connect(OTFDataReceiver receiver) {
-		this.drawer = (OTFLaneSignalDrawer2) receiver;
+		this.drawer = (OTFLaneSignalDrawer) receiver;
 	}
 
 	@Override

@@ -26,16 +26,17 @@ import java.util.Map;
 import javax.media.opengl.GL;
 
 import org.apache.log4j.Logger;
-import org.matsim.lanes.otfvis.io.LaneToLinkData;
-import org.matsim.lanes.otfvis.io.OTFLaneData2;
+import org.matsim.lanes.otfvis.io.OTFLaneToLinkData;
+import org.matsim.lanes.otfvis.io.OTFLaneData;
+import org.matsim.lanes.otfvis.io.OTFLaneLinkData;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 
-public class OTFLaneSignalDrawer2 extends OTFGLDrawableImpl {
+public class OTFLaneSignalDrawer extends OTFGLDrawableImpl {
 
-	private static final Logger log = Logger.getLogger(OTFLaneSignalDrawer2.class);
+	private static final Logger log = Logger.getLogger(OTFLaneSignalDrawer.class);
 	
 	private static final double zCoord = 1.0;
 	private static final double offsetLinkEnd = 6.0;
@@ -43,9 +44,9 @@ public class OTFLaneSignalDrawer2 extends OTFGLDrawableImpl {
 	private static final double offsetLaneStart = 4.5;
 	private static final double offsetLaneEnd = 6.0;
 
-	private Map<String, OTFLaneData2> laneData = new HashMap<String, OTFLaneData2>();
+	private Map<String, OTFLaneData> laneData = new HashMap<String, OTFLaneData>();
 	
-	private OTFLanesLinkData lanesLinkData =  new OTFLanesLinkData();
+	private OTFLaneLinkData lanesLinkData =  new OTFLaneLinkData();
 	
 	private double linkWidth;
 
@@ -67,7 +68,7 @@ public class OTFLaneSignalDrawer2 extends OTFGLDrawableImpl {
 		
 		
 		gl.glColor3d(1.0, 1.0, 0.8);
-		for (OTFLaneData2 ld : this.laneData.values()){
+		for (OTFLaneData ld : this.laneData.values()){
 			double horizontalFraction = this.calculateWidthFraction(ld.getAlignment());
 			Point2D.Double laneStart = calculatePointOnLink(ld.getStartPoint(), horizontalFraction);
 			Point2D.Double laneEnd = calculatePointOnLink(ld.getEndPoint(), horizontalFraction);
@@ -115,7 +116,7 @@ public class OTFLaneSignalDrawer2 extends OTFGLDrawableImpl {
 			//draw link to link lines
 			double x, y;
 			if (ld.getLaneToLinkData() != null) {
-				for (LaneToLinkData toLinkData : ld.getLaneToLinkData()){
+				for (OTFLaneToLinkData toLinkData : ld.getLaneToLinkData()){
 					Point2D.Double startOfToLink = toLinkData.getStartPoint();	
 					x = startOfToLink.x + (0.5 * toLinkData.getNumberOfLanes() *  SimpleStaticNetLayer.cellWidth_m * toLinkData.getNormalVector().x);
 					y = startOfToLink.y + (0.5 * toLinkData.getNumberOfLanes() *  SimpleStaticNetLayer.cellWidth_m * toLinkData.getNormalVector().y);
@@ -143,7 +144,7 @@ public class OTFLaneSignalDrawer2 extends OTFGLDrawableImpl {
 	}
 
 	public void updateGreenState(String id, SignalGroupState state) {
-		OTFLaneData2 lane = this.laneData.get(id);
+		OTFLaneData lane = this.laneData.get(id);
 		if (lane != null) {
 		  lane.setSignalGroupState(state);
 		}
@@ -154,15 +155,15 @@ public class OTFLaneSignalDrawer2 extends OTFGLDrawableImpl {
 
 
 
-	public Map<String, OTFLaneData2> getLaneData() {
+	public Map<String, OTFLaneData> getLaneData() {
 		return laneData;
 	}
 
-	public void addLaneData(OTFLaneData2 data) {
+	public void addLaneData(OTFLaneData data) {
 		this.laneData.put(data.getId(), data);
 	}
 	
-	public OTFLanesLinkData getLanesLinkData(){
+	public OTFLaneLinkData getLanesLinkData(){
 		return this.lanesLinkData;
 	}
 	

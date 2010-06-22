@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.otfvis;
 
-import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer2;
+import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.layer.OTFSignalLayer;
@@ -44,8 +44,8 @@ public class OTFSignalsConnectionManagerFactory implements OTFConnectionManagerF
     OTFConnectionManager connect = this.delegate.createConnectionManager();
     connect.connectQLinkToWriter(OTFSignalWriter.class);
     connect.connectWriterToReader(OTFSignalWriter.class, OTFSignalReader.class);
-    connect.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer2.class);
-    connect.connectReceiverToLayer(OTFLaneSignalDrawer2.class, OTFSignalLayer.class);
+    connect.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer.class);
+    connect.connectReceiverToLayer(OTFLaneSignalDrawer.class, OTFSignalLayer.class);
     return connect;
   }
 

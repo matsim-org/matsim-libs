@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer2;
-import org.matsim.lanes.otfvis.io.OTFLaneReader2;
-import org.matsim.lanes.otfvis.io.OTFLaneWriter2;
+import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
+import org.matsim.lanes.otfvis.io.OTFLaneReader;
+import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.qsim.TransitQSimulation;
@@ -118,12 +118,12 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 					.isUseLanes()
 					&& (!this.queueSimulation.getScenario().getConfig()
 							.scenario().isUseSignalSystems())) {
-				this.connectionManager.connectQLinkToWriter(OTFLaneWriter2.class);
-				this.connectionManager.connectWriterToReader(OTFLaneWriter2.class,
-						OTFLaneReader2.class);
-				this.connectionManager.connectReaderToReceiver(OTFLaneReader2.class,
-						OTFLaneSignalDrawer2.class);
-				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer2.class,
+				this.connectionManager.connectQLinkToWriter(OTFLaneWriter.class);
+				this.connectionManager.connectWriterToReader(OTFLaneWriter.class,
+						OTFLaneReader.class);
+				this.connectionManager.connectReaderToReceiver(OTFLaneReader.class,
+						OTFLaneSignalDrawer.class);
+				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
 						OTFLaneLayer.class);
 				this.queueSimulation.getScenario().getConfig().otfVis().setScaleQuadTreeRect(true);
 			} else if (this.queueSimulation.getScenario().getConfig()
@@ -137,9 +137,9 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 						OTFSignalReader.class);
 				// reader to drawer (or provider to receiver)
 				this.connectionManager.connectReaderToReceiver(OTFSignalReader.class,
-						OTFLaneSignalDrawer2.class);
+						OTFLaneSignalDrawer.class);
 				// drawer -> layer
-				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer2.class,
+				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
 						OTFSignalLayer.class);
 	       this.queueSimulation.getScenario().getConfig().otfVis().setScaleQuadTreeRect(true);
 			}

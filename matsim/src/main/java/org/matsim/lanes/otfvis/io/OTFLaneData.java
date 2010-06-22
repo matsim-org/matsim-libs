@@ -29,17 +29,17 @@ import org.matsim.signalsystems.control.SignalGroupState;
 /**
  * @author dgrether
  */
-public class OTFLaneData2 {
+public class OTFLaneData {
 	private String id;
 	private double endPoint;
 	private double startPoint;
 	private int alignment;
 	private double numberOfLanes;
-	private List<LaneToLinkData> toLinksData;
+	private List<OTFLaneToLinkData> toLinksData;
 	private SignalGroupState state = null;
 
 	
-	public OTFLaneData2() {
+	public OTFLaneData() {
 	}
 	
 	public void setId(String id){
@@ -76,7 +76,7 @@ public class OTFLaneData2 {
 		return this.alignment;
 	}
 	
-	public List<LaneToLinkData> getLaneToLinkData(){
+	public List<OTFLaneToLinkData> getLaneToLinkData(){
 		return this.toLinksData;
 	}
 
@@ -90,9 +90,9 @@ public class OTFLaneData2 {
 
 	public void addToLinkData(double toLinkStartX, double toLinkStartY, double normalX, double normalY, double toLinkNumberOfLanes) {
 		if (this.toLinksData == null) {
-			this.toLinksData = new ArrayList<LaneToLinkData>();
+			this.toLinksData = new ArrayList<OTFLaneToLinkData>();
 		}
-		this.toLinksData.add(new LaneToLinkData(new Point2D.Double(toLinkStartX, toLinkStartY), 
+		this.toLinksData.add(new OTFLaneToLinkData(new Point2D.Double(toLinkStartX, toLinkStartY), 
 				new Point2D.Double(normalX, normalY), toLinkNumberOfLanes));
 	}
 	
