@@ -166,8 +166,12 @@ public class QLane implements QBufferItem {
 		this.laneData = laneData;
 	}
 
-	public Id getLaneId(){
+	public Id getId(){
 		return this.laneData.getId();
+	}
+	
+	public Lane getLane(){
+		return this.laneData;
 	}
 
 	protected void addSignalGroupDefinition(final SignalGroupDefinition signalGroupDefinition) {
@@ -230,7 +234,7 @@ public class QLane implements QBufferItem {
 		if (this.storageCapacity < tempStorageCapacity) {
 	    if (spaceCapWarningCount <= 10) {
 	    	if (!this.isOriginalLane  || (this.toLanes != null)) {
-	    		log.warn("Lane " + this.getLaneId() + " on Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
+	    		log.warn("Lane " + this.getId() + " on Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
 	    	}
 	    	else {
 	    		log.warn("Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
@@ -267,7 +271,7 @@ public class QLane implements QBufferItem {
 		this.meterFromLinkEnd = meters;
 	}
 
-	public double getMeterFromLinkEnd(){
+	public double getEndsAtMeterFromLinkEnd(){
 		return this.meterFromLinkEnd;
 	}
 
@@ -410,7 +414,7 @@ public class QLane implements QBufferItem {
 				if (toQueueLane.hasSpace()) {
 					this.buffer.poll();
 					this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
-					new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
+					new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
 					toQueueLane.addToVehicleQueue(veh, now);
 				}
 				else {
@@ -453,7 +457,7 @@ public class QLane implements QBufferItem {
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		if (this.isFireLaneEvents()) {
 			this.queueLink.getQSimEngine().getQSim().getEventsManager()
-			  .processEvent(new LaneEnterEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
+			  .processEvent(new LaneEnterEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
 		}
 		double departureTime;
 		if (this.isOriginalLane) {
@@ -508,7 +512,7 @@ public class QLane implements QBufferItem {
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if (this.isFireLaneEvents()) {
-			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
+			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
 		}
 		this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId()));
 		return veh;
@@ -701,9 +705,9 @@ public class QLane implements QBufferItem {
 	public static class FromLinkEndComparator implements Comparator<QLane>, Serializable {
     private static final long serialVersionUID = 1L;
     public int compare(final QLane o1, final QLane o2) {
-      if (o1.getMeterFromLinkEnd() < o2.getMeterFromLinkEnd()) {
+      if (o1.getEndsAtMeterFromLinkEnd() < o2.getEndsAtMeterFromLinkEnd()) {
         return -1;
-      } else if (o1.getMeterFromLinkEnd() > o2.getMeterFromLinkEnd()) {
+      } else if (o1.getEndsAtMeterFromLinkEnd() > o2.getEndsAtMeterFromLinkEnd()) {
         return 1;
       } else {
         return 0;
