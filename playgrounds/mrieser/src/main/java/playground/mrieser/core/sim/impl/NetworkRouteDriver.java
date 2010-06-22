@@ -25,24 +25,45 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.mrieser.core.sim.api.DriverAgent;
+import playground.mrieser.core.sim.api.NewSimEngine;
+import playground.mrieser.core.sim.api.PlanAgent;
+import playground.mrieser.core.sim.api.SimVehicle;
+import playground.mrieser.core.sim.network.api.SimLink;
 
 public class NetworkRouteDriver implements DriverAgent {
 
+	private final PlanAgent agent;
+	private final SimVehicle vehicle;
+	private final NewSimEngine simEngine;
 	private final Id[] linkIds;
 	private int nextLinkIndex = 0;
 	private Id nextLinkId = null;
 
-	public NetworkRouteDriver(final NetworkRoute route) {
+	public NetworkRouteDriver(final PlanAgent agent, final NewSimEngine simEngine, final NetworkRoute route, final SimVehicle vehicle) {
+		this.agent = agent;
+		this.simEngine = simEngine;
+		this.vehicle = vehicle;
 		List<Id> tmpIds = route.getLinkIds();
-		this.linkIds = new Id[3 + tmpIds.size()];
+		boolean sameEndAsStart = route.getStartLinkId().equals(route.getEndLinkId());
+		boolean emptyRoute = tmpIds.size() == 0;
+
+		if (sameEndAsStart && emptyRoute) {
+			this.linkIds = new Id[2];
+		} else {
+			this.linkIds = new Id[3 + tmpIds.size()];
+		}
 		this.linkIds[0] = route.getStartLinkId();
 		int index = 1;
 		for (Id id : tmpIds) {
 			this.linkIds[index] = id;
 			index++;
 		}
-		this.linkIds[index] = route.getEndLinkId();
-		this.linkIds[index+1] = null; // sentinel
+		if (sameEndAsStart && emptyRoute) {
+			this.linkIds[index] = null; // sentinel
+		} else {
+			this.linkIds[index] = route.getEndLinkId();
+			this.linkIds[index+1] = null; // sentinel
+		}
 		this.nextLinkId = this.linkIds[this.nextLinkIndex];
 	}
 
@@ -58,6 +79,20 @@ public class NetworkRouteDriver implements DriverAgent {
 			this.nextLinkIndex--;
 		}
 		this.nextLinkId = this.linkIds[this.nextLinkIndex];
+	}
+
+	@Override
+	public double getNextActionOnCurrentLink() {
+		if (this.nextLinkId == null) {
+			return SimLink.POSITION_AT_TO_NODE;
+		}
+		return -1.0;
+	}
+
+	@Override
+	public void handleNextAction(final SimLink link) {
+		link.parkVehicle(this.vehicle);
+		this.simEngine.handleAgent(this.agent);
 	}
 
 }

@@ -22,6 +22,7 @@ package playground.mrieser.core.sim.network.queueNetwork;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.core.sim.api.SimVehicle;
@@ -73,6 +74,7 @@ public class QueueBuffer {
 		double now = this.link.network.simEngine.getCurrentTime();
 		SimVehicle veh = this.buffer.poll();
 		this.lastMovedTime = now;
+		this.link.network.simEngine.getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getId(), this.link.getId()));
 		return veh;
 	}
 

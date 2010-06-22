@@ -34,6 +34,7 @@ import playground.mrieser.core.sim.api.DriverAgent;
 import playground.mrieser.core.sim.api.SimVehicle;
 import playground.mrieser.core.sim.fakes.FakeSimEngine;
 import playground.mrieser.core.sim.fakes.FakeSimVehicle;
+import playground.mrieser.core.sim.network.api.SimLink;
 
 public class QueueNodeTest {
 
@@ -132,19 +133,22 @@ public class QueueNodeTest {
 	}
 
 	/*package*/ static class TestDriverAgent implements DriverAgent {
-
 		/*package*/ int count = 0;
-
 		@Override
 		public Id getNextLinkId() {
 			return new IdImpl(3);
 		}
-
 		@Override
 		public void notifyMoveToNextLink() {
 			this.count++;
 		}
-
+		@Override
+		public double getNextActionOnCurrentLink() {
+			return -1.0;
+		}
+		@Override
+		public void handleNextAction(final SimLink link) {
+		}
 	}
 
 }

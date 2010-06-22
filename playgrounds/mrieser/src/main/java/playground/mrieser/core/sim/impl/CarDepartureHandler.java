@@ -30,6 +30,7 @@ import org.matsim.vehicles.VehicleTypeImpl;
 
 import playground.mrieser.core.sim.api.DepartureHandler;
 import playground.mrieser.core.sim.api.DriverAgent;
+import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.api.SimVehicle;
 import playground.mrieser.core.sim.features.NetworkFeature;
@@ -41,8 +42,10 @@ import playground.mrieser.core.sim.network.api.SimLink;
 public class CarDepartureHandler implements DepartureHandler {
 
 	private final NetworkFeature networkFeature;
+	private final NewSimEngine engine;
 
-	public CarDepartureHandler(final NetworkFeature networkFeature, final Scenario scenario) {
+	public CarDepartureHandler(final NewSimEngine engine, final NetworkFeature networkFeature, final Scenario scenario) {
+		this.engine = engine;
 		this.networkFeature = networkFeature;
 		placeVehicles(scenario);
 	}
@@ -62,12 +65,16 @@ public class CarDepartureHandler implements DepartureHandler {
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 
 		SimLink link = this.networkFeature.getSimNetwork().getLinks().get(route.getStartLinkId());
-		DriverAgent driver = new NetworkRouteDriver(route);
 		SimVehicle simVehicle = link.getParkedVehicle(agent.getPlan().getPerson().getId());// TODO [MR] use vehicleId instead of personId
+		DriverAgent driver = new NetworkRouteDriver(agent, this.engine, route, simVehicle);
 		simVehicle.setDriver(driver);
 
-		simVehicle.getDriver().notifyMoveToNextLink();
-		link.insertVehicle(simVehicle, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE); // current QSim behavior
+		driver.notifyMoveToNextLink();
+		if (driver.getNextLinkId() == null) {
+			this.engine.handleAgent(agent);
+		} else {
+			link.continueVehicle(simVehicle);
+		}
 	}
 
 }

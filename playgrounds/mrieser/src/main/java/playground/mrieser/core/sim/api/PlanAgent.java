@@ -28,6 +28,11 @@ public interface PlanAgent {
 
 	public PlanElement getCurrentPlanElement();
 
+	/**
+	 * Tells the PlanAgent to use the next PlanElement as current PlanElement.
+	 *
+	 * @return the PlanElement becoming the current PlanElement.
+	 */
 	public PlanElement useNextPlanElement();
 
 }

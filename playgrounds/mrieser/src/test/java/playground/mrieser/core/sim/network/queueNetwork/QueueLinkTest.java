@@ -31,6 +31,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleTypeImpl;
 
+import playground.mrieser.core.sim.api.DriverAgent;
 import playground.mrieser.core.sim.api.SimVehicle;
 import playground.mrieser.core.sim.fakes.FakeSimEngine;
 import playground.mrieser.core.sim.impl.DefaultSimVehicle;
@@ -101,7 +102,7 @@ public class QueueLinkTest {
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
 		f.engine.setCurrentTime(200);
-		f.qlink.addVehicle(vehicle1);
+		f.qlink.addVehicleFromIntersection(vehicle1);
 		f.qlink.doSimStep(250);
 		f.qlink.removeVehicle(vehicle1);
 		f.qlink.doSimStep(300); // vehicle1 should not show up in buffer
@@ -138,9 +139,10 @@ public class QueueLinkTest {
 
 		Id veh1Id = new IdImpl(11);
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		vehicle1.setDriver(new FakeDriverAgent());
 
 		f.engine.setCurrentTime(200);
-		f.qlink.addVehicle(vehicle1);
+		f.qlink.addVehicleFromIntersection(vehicle1);
 		f.qlink.doSimStep(250);
 		f.qlink.doSimStep(300); // vehicle1 should now show up in buffer
 		Assert.assertEquals(vehicle1, f.qlink.buffer.getFirstVehicleInBuffer());
@@ -154,9 +156,10 @@ public class QueueLinkTest {
 
 		Id veh1Id = new IdImpl(11);
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+		vehicle1.setDriver(new FakeDriverAgent());
 
 		f.engine.setCurrentTime(200);
-		f.qlink.addVehicle(vehicle1);
+		f.qlink.addVehicleFromIntersection(vehicle1);
 		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
 		f.qlink.doSimStep(201);
 		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
@@ -173,6 +176,34 @@ public class QueueLinkTest {
 	}
 
 	@Test
+	public void testInsertVehicle_DepartingVehicle() {
+		Fixture f = new Fixture();
+
+		Id veh1Id = new IdImpl(11);
+		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+
+		f.engine.setCurrentTime(200);
+		f.qlink.insertVehicle(vehicle1, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
+		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
+		f.qlink.doSimStep(201);
+		Assert.assertEquals(vehicle1, f.qlink.buffer.getFirstVehicleInBuffer());
+	}
+
+	@Test
+	public void testContinueVehicle_fromParking() {
+		Fixture f = new Fixture();
+
+		Id veh1Id = new IdImpl(11);
+		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
+
+		f.engine.setCurrentTime(200);
+		f.qlink.insertVehicle(vehicle1, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_PARKING);
+		Assert.assertEquals(vehicle1, f.qlink.getParkedVehicle(vehicle1.getId()));
+		f.qlink.continueVehicle(vehicle1);
+		Assert.assertNull(f.qlink.getParkedVehicle(vehicle1.getId()));
+	}
+
+	@Test
 	public void testParkVehicle() {
 		Fixture f = new Fixture();
 
@@ -181,7 +212,7 @@ public class QueueLinkTest {
 		Id veh2Id = new IdImpl(5);
 		SimVehicle vehicle2 = new DefaultSimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1979"))));
 
-		f.qlink.addVehicle(vehicle1);
+		f.qlink.addVehicleFromIntersection(vehicle1);
 		f.qlink.parkVehicle(vehicle1);
 		Assert.assertEquals(vehicle1, f.qlink.getParkedVehicle(veh1Id));
 		f.qlink.parkVehicle(vehicle2); // veh2 is not on link!
@@ -210,4 +241,22 @@ public class QueueLinkTest {
 			this.qlink = new QueueLink(this.link, this.qnet);
 		}
 	}
+
+	/*package*/ static class FakeDriverAgent implements DriverAgent {
+		@Override
+		public Id getNextLinkId() {
+			return null;
+		}
+		@Override
+		public void notifyMoveToNextLink() {
+		}
+		@Override
+		public double getNextActionOnCurrentLink() {
+			return -1.0;
+		}
+		@Override
+		public void handleNextAction(final SimLink link) {
+		}
+	}
+
 }

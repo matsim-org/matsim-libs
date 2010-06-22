@@ -47,6 +47,7 @@ public class UseCase2_RefSim {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+//		config.plans().setInputFile("test/scenarios/equil/plans1.xml");
 		ConfigUtils.modifyFilePaths(config, prefix);
 		ScenarioLoader loader = new ScenarioLoaderImpl(config);
 		Scenario scenario = loader.loadScenario();

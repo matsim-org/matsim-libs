@@ -27,6 +27,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 
 import playground.mrieser.core.sim.api.SimVehicle;
 import playground.mrieser.core.sim.fakes.FakeSimEngine;
@@ -71,9 +74,10 @@ public class QueueBufferTest {
 	public void testFlowCapacity() {
 		Fixture f = new Fixture();
 
+		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		SimVehicle[] vehicles = new SimVehicle[8000];
 		for (int i = 0; i < vehicles.length; i++) {
-			vehicles[i] = new DefaultSimVehicle(null);
+			vehicles[i] = new DefaultSimVehicle(new VehicleImpl(new IdImpl(i), defaultVehicleType));
 		}
 
 		doTestFlowCapacity(360, f, vehicles);

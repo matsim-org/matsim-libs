@@ -31,17 +31,20 @@ import playground.mrieser.core.sim.api.DepartureHandler;
 import playground.mrieser.core.sim.api.NewSimEngine;
 import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.api.PlanElementHandler;
+import playground.mrieser.core.sim.api.SimKeepAlive;
 
 /**
  * @author mrieser
  */
-public class LegHandler implements PlanElementHandler {
+public class LegHandler implements PlanElementHandler, SimKeepAlive {
 
 	private final NewSimEngine simEngine;
 	private final ConcurrentHashMap<TransportMode, DepartureHandler> departureHandlers = new ConcurrentHashMap<TransportMode, DepartureHandler>();
+	private int onRoute = 0;
 
 	public LegHandler(final NewSimEngine simEngine) {
 		this.simEngine = simEngine;
+		this.simEngine.addKeepAlive(this);
 	}
 
 	@Override
@@ -70,10 +73,12 @@ public class LegHandler implements PlanElementHandler {
 			throw new NullPointerException("No DepartureHandler registered for mode " + leg.getMode());
 		}
 		depHandler.handleDeparture(agent);
+		this.onRoute++;
 	}
 
 	@Override
 	public void handleEnd(final PlanAgent agent) {
+		this.onRoute--;
 		Leg leg = (Leg) agent.getCurrentPlanElement();
 		EventsManager em = this.simEngine.getEventsManager();
 
@@ -107,6 +112,11 @@ public class LegHandler implements PlanElementHandler {
 
 	/*package*/ DepartureHandler getDepartureHandler(final TransportMode mode) {
 		return this.departureHandlers.get(mode);
+	}
+
+	@Override
+	public boolean keepAlive() {
+		return this.onRoute > 0;
 	}
 
 }

@@ -84,6 +84,10 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 
 		// TODO
 		// init
+		if (this.simEngine == null) {
+			throw new NullPointerException("No SimEngine set! see PlanSimulation.setSimEngine();");
+		}
+
 		// create agents etc.
 		initAgents();
 

@@ -43,7 +43,7 @@ public class NetworkRouteDriverTest {
 		Collections.addAll(linkIds, ids[1], ids[2], ids[3], ids[4], ids[5], ids[6], ids[7], ids[8]);
 		route.setLinkIds(ids[0], linkIds, ids[9]);
 
-		NetworkRouteDriver driver = new NetworkRouteDriver(route);
+		NetworkRouteDriver driver = new NetworkRouteDriver(null, null, route, null);
 		Assert.assertEquals(ids[0], driver.getNextLinkId());
 		Assert.assertEquals(ids[0], driver.getNextLinkId()); // multiple calls should return the same
 		driver.notifyMoveToNextLink();
@@ -67,6 +67,22 @@ public class NetworkRouteDriverTest {
 		driver.notifyMoveToNextLink();
 		Assert.assertNull(driver.getNextLinkId());
 		driver.notifyMoveToNextLink(); // there should not be any crash
+		Assert.assertNull(driver.getNextLinkId());
+	}
+
+	@Test
+	public void testGetNextLinkId_emptyRoute() {
+		Id ids[] = new Id[10];
+		for (int i = 0; i < ids.length; i++) {
+			ids[i] = new IdImpl(i);
+		}
+		NetworkRoute route = new LinkNetworkRouteImpl(ids[0], ids[0]);
+		List<Id> linkIds = new ArrayList<Id>(ids.length);
+		route.setLinkIds(ids[0], linkIds, ids[0]);
+
+		NetworkRouteDriver driver = new NetworkRouteDriver(null, null, route, null);
+		Assert.assertEquals(ids[0], driver.getNextLinkId());
+		driver.notifyMoveToNextLink();
 		Assert.assertNull(driver.getNextLinkId());
 	}
 }

@@ -120,7 +120,7 @@ import playground.mrieser.core.sim.network.api.SimLink;
 
 	}
 
-	/*package*/ void addVehicle(final SimVehicle vehicle) {
+	/*package*/ void addVehicleFromIntersection(final SimVehicle vehicle) {
 		insertVehicle(vehicle, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_IMMEDIATELY);
 	}
 
@@ -151,7 +151,7 @@ import playground.mrieser.core.sim.network.api.SimLink;
 	}
 
 	@Override
-	public void removeVehicle(SimVehicle vehicle) {
+	public void removeVehicle(final SimVehicle vehicle) {
 		if (this.parkedVehicles.remove(vehicle.getId()) != null) {
 			return;
 		}
@@ -165,24 +165,27 @@ import playground.mrieser.core.sim.network.api.SimLink;
 	}
 
 	@Override
-	public void continueVehicle(SimVehicle vehicle) {
+	public void continueVehicle(final SimVehicle vehicle) {
+		if (this.parkedVehicles.remove(vehicle.getId()) != null) {
+			this.waitingList.add(vehicle);
+		} else {
+			// TODO
+		}
+	}
+
+	@Override
+	public void stopVehicle(final SimVehicle vehicle) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void stopVehicle(SimVehicle vehicle) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public SimVehicle getParkedVehicle(Id vehicleId) {
+	public SimVehicle getParkedVehicle(final Id vehicleId) {
 		return this.parkedVehicles.get(vehicleId);
 	}
 
 	@Override
-	public void parkVehicle(SimVehicle vehicle) {
+	public void parkVehicle(final SimVehicle vehicle) {
 		if (this.vehQueue.remove(vehicle) || this.buffer.removeVehicle(vehicle) || this.waitingList.remove(vehicle)) {
 			this.parkedVehicles.put(vehicle.getId(), vehicle);
 		}
@@ -204,8 +207,13 @@ import playground.mrieser.core.sim.network.api.SimLink;
 			if (!this.buffer.hasSpace()) {
 				return;
 			}
-			this.buffer.addVehicle(this.vehQueue.poll(), time);
-			this.usedStorageCapacity -= veh.getSizeInEquivalents();
+			double actionLocation = veh.getDriver().getNextActionOnCurrentLink();
+			if (actionLocation >= 0.0) {
+				veh.getDriver().handleNextAction(this);
+			} else {
+				this.buffer.addVehicle(this.vehQueue.poll(), time);
+				this.usedStorageCapacity -= veh.getSizeInEquivalents();
+			}
 		} // end while
 	}
 

@@ -71,7 +71,7 @@ public class TransitSimFactory implements MobsimFactory {
 		planSim.setPlanElementHandler(Leg.class, lh);
 
 		// setup DepartureHandlers
-		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(netFeature, scenario));
+		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(engine, netFeature, scenario));
 		lh.setDepartureHandler(TransportMode.pt, new TransitDepartureHandler());
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);

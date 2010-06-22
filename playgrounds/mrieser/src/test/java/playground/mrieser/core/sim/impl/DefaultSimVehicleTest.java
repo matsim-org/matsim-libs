@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 
 import playground.mrieser.core.sim.api.DriverAgent;
+import playground.mrieser.core.sim.network.api.SimLink;
 
 /**
  * @author mrieser
@@ -48,6 +49,13 @@ public class DefaultSimVehicleTest {
 		}
 		@Override
 		public void notifyMoveToNextLink() {
+		}
+		@Override
+		public double getNextActionOnCurrentLink() {
+			return -1.0;
+		}
+		@Override
+		public void handleNextAction(final SimLink link) {
 		}
 	}
 }

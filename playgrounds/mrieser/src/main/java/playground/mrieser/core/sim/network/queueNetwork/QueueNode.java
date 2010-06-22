@@ -127,7 +127,7 @@ import playground.mrieser.core.sim.network.api.SimNode;
       if (nextLink.hasSpace()) {
         buffer.removeFirstVehicleInBuffer();
         vehicle.getDriver().notifyMoveToNextLink();
-        nextLink.addVehicle(vehicle);
+        nextLink.addVehicleFromIntersection(vehicle);
         return true;
       }
 
@@ -145,7 +145,7 @@ import playground.mrieser.core.sim.network.api.SimNode;
         } else {
         	buffer.removeFirstVehicleInBuffer();
           vehicle.getDriver().notifyMoveToNextLink();
-          nextLink.addVehicle(vehicle);
+          nextLink.addVehicleFromIntersection(vehicle);
           return true;
         }
       }
