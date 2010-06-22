@@ -172,7 +172,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * @param simEngineFac
 	 */
 	private void init(final Scenario sc, QSimEngineFactory simEngineFac){
-		// yyyy if someone makes this method less protected, can call it with a different scenario than the ctor. kai, jun'10
+		// yyyy if someone makes this method less protected, can call it with a different scenario than the ctor. 
+		// In my view, this is somewhat dangerous.  kai, jun'10
 		
 		log.info("Using QSim...");
 		this.listenerManager = new SimulationListenerManager<QSim>(this);
@@ -219,7 +220,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		if (sc.getConfig().scenario().isUseTransit()){
 			this.transitEngine = new TransitQSimEngine(this);
 			this.addDepartureHandler(this.transitEngine);
-			// yyyy why is there not addition of pt to non teleported modes here?  kai, jun'10
+			// why is there not addition of pt to non teleported modes here?  kai, jun'10
+			// done in TransitQSimEngine.  kai, jun'10
 		}
 
 	}
@@ -229,6 +231,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * @param signalSystems
 	 * @param signalSystemConfigurations
 	 */
+	@Deprecated // Minimally, this method is misnomed, since this may REinitialize the signal engine.  kai, jun'10
 	public void initSignalEngine(final SignalSystems signalSystems, final SignalSystemConfigurations signalSystemConfigurations){
 		this.signalEngine  = new QSimSignalEngine(this);
 		this.signalEngine.setSignalSystems(signalSystems, signalSystemConfigurations);
@@ -625,7 +628,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 *
 	 * @param teleportVehicles
 	 */
-	public void setTeleportVehicles(final boolean teleportVehicles) {
+	/*package*/ void setTeleportVehicles(final boolean teleportVehicles) {
 		this.carDepartureHandler.setTeleportVehicles(teleportVehicles);
 	}
 
@@ -656,14 +659,16 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		return this.scenario;
 	}
 
-	public boolean isUseActivityDurations() {
-		return this.scenario.getConfig().vspExperimental().isUseActivityDurations();
-	}
+//	public boolean isUseActivityDurations() {
+//		return this.scenario.getConfig().vspExperimental().isUseActivityDurations();
+//	}
 
 	public SignalEngine getQSimSignalEngine() {
 		return this.signalEngine;
 	}
 
+	@Override
+	@Deprecated // this is rarely used, and I find it rather unstable anyways.  kai, jun'10
 	public Set<TransportMode> getNotTeleportedModes() {
 		return this.notTeleportedModes;
 	}
@@ -674,7 +679,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 
-	public Integer getIterationNumber() {
+	 Integer getIterationNumber() {
 		return this.iterationNumber;
 	}
 
@@ -703,9 +708,10 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	public void addSnapshotWriter(SnapshotWriter snapshotWriter) {
 		this.snapshotManager.addSnapshotWriter(snapshotWriter);
 	}
-	public double getStuckTime(){
-		return this.stuckTime;
-	}
+
+//	public double getStuckTime(){
+//		return this.stuckTime;
+//	}
 
 	public AgentCounterI getAgentCounter(){
 		return this.agentCounter;

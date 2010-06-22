@@ -262,7 +262,8 @@ public class QPersonAgent implements PersonDriverAgent {
 
 			double departure = 0;
 
-			if (this.simulation.isUseActivityDurations()) {
+//			if (this.simulation.isUseActivityDurations()) {
+			if ( this.simulation.getScenario().getConfig().vspExperimental().isUseActivityDurations() ) {
 				/* The person leaves the activity either 'actDur' later or
 				 * when the end is defined of the activity, whatever comes first. */
 				if (act.getDuration() == Time.UNDEFINED_TIME) {

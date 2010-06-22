@@ -24,8 +24,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.ptproject.qsim.SynchronizedEventsManagerImpl;
 import org.matsim.ptproject.qsim.netsimengine.ParallelQSimEngineFactory;
 
 /*

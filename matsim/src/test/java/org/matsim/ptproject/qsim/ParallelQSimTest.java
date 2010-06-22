@@ -58,6 +58,7 @@ import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;

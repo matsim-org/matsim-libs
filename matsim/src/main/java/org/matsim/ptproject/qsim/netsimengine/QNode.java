@@ -56,11 +56,11 @@ public class QNode implements VisNode {
 	 */
 	private boolean signalized = false;
 
-  private QSimEngine simEngine;
+  private QSimEngineImpl simEngine;
 
 	public QNode(final Node n, final QSimEngine simEngine) {
 		this.node = n;
-		this.simEngine = simEngine;
+		this.simEngine = (QSimEngineImpl) simEngine; // needs to be of correct impl type when it arrives here.  kai, jun'10
 		int nofInLinks = this.node.getInLinks().size();
 		this.inLinksArrayCache = new QLinkInternalI[nofInLinks];
 		this.tempLinks = new QLinkInternalI[nofInLinks];
@@ -196,7 +196,7 @@ public class QNode implements VisNode {
     Id nextLinkId = veh.getDriver().chooseNextLinkId();
     Link currentLink = veh.getCurrentLink();
     if (this.isSignalized() && (!qbufferedItem.hasGreenForToLink(nextLinkId))) {
-    		if (!((now - qbufferedItem.getBufferLastMovedTime()) > this.simEngine.getQSim().getStuckTime())){
+    		if (!((now - qbufferedItem.getBufferLastMovedTime()) > this.simEngine.getStuckTime())){
     			return false;
     		}
     }
@@ -214,7 +214,7 @@ public class QNode implements VisNode {
 
       // check if veh is stuck!
 
-      if ((now - qbufferedItem.getBufferLastMovedTime()) > this.simEngine.getQSim().getStuckTime()) {
+      if ((now - qbufferedItem.getBufferLastMovedTime()) > this.simEngine.getStuckTime()) {
         /* We just push the vehicle further after stucktime is over, regardless
          * of if there is space on the next link or not.. optionally we let them
          * die here, we have a config setting for that!

@@ -42,7 +42,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
  * @author dgrether
  *
  */
-public class QSimSnapshotWriterManager {
+ class QSimSnapshotWriterManager {
   
   private static final Logger log = Logger
       .getLogger(QSimSnapshotWriterManager.class);
@@ -102,17 +102,17 @@ public class QSimSnapshotWriterManager {
   }
   
   
-  public boolean addSnapshotWriter(final SnapshotWriter writer) {
+   boolean addSnapshotWriter(final SnapshotWriter writer) {
     return this.snapshotWriters.add(writer);
   }
 
-  public boolean removeSnapshotWriter(final SnapshotWriter writer) {
+   boolean removeSnapshotWriter(final SnapshotWriter writer) {
     return this.snapshotWriters.remove(writer);
   }
 
 
   
-  public List<SnapshotWriter> getSnapshotWriters() {
+   List<SnapshotWriter> getSnapshotWriters() {
     return snapshotWriters;
   }
 

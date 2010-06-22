@@ -65,12 +65,14 @@ public class QSimEngineImpl implements QSimEngine{
 
   private final AgentSnapshotInfoBuilder positionInfoBuilder;
 private QNetwork qNetwork;
+private final double stucktimeCache;
 
 	public QSimEngineImpl(final QSim sim, final Random random) {
     this.random = random;
     this.qsim = sim;
     this.positionInfoBuilder = new AgentSnapshotInfoBuilder(sim.getScenario().getConfig().getQSimConfigGroup(),
     		((NetworkImpl)sim.getScenario().getNetwork()).getEffectiveCellSize());
+    this.stucktimeCache = sim.getScenario().getConfig().getQSimConfigGroup().getStuckTime();
 	}
 
   @Override
@@ -179,6 +181,13 @@ public void setQNetwork(QNetwork qNetwork2) {
 
 public QNetwork getQNetwork() {
 	return this.qNetwork ;
+}
+
+/**
+ * convenience method so that stuck time can be cached without caching it in every node separately.  kai, jun'10
+ */
+double getStuckTime() {
+	return this.stucktimeCache ;
 }
 
 }

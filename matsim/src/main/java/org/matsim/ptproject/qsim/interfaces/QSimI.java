@@ -59,11 +59,11 @@ public interface QSimI extends IOSimulation {
 	// automatic drivers?  kai, may'10
 	void handleAgentArrival(double now, PersonDriverAgent qPersonAgent);
 
-	/**
-	 * @return
-	 */
-	@Deprecated // yyyyyy seems to me that one should be able to get this via the config object.  kai, may'10
-	boolean isUseActivityDurations();
+//	/**
+//	 * @return
+//	 */
+//	@Deprecated // yyyyyy seems to me that one should be able to get this via the config object.  kai, may'10
+//	boolean isUseActivityDurations();
 
 	/**
 	 * @return
@@ -78,6 +78,7 @@ public interface QSimI extends IOSimulation {
 	/**
 	 * @return
 	 */
+	@Deprecated // this is rarely used, and I find it rather unstable anyways.  kai, jun'10
 	Collection<TransportMode> getNotTeleportedModes();
 
 	/**
@@ -90,10 +91,10 @@ public interface QSimI extends IOSimulation {
 	 */
 	QNetworkI getQNetwork();
 
-	/**
-	 * @return
-	 */
-	@Deprecated // yyyy should be possible to get this from teh config.  kai, may'10
-	double getStuckTime();
+//	/**
+//	 * @return
+//	 */
+//	@Deprecated // yyyy should be possible to get this from teh config.  kai, may'10
+//	double getStuckTime();
 
 }

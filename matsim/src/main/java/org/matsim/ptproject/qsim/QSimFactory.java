@@ -25,7 +25,9 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 
-/**
+/**The MobsimFactory is necessary so that something can be passed to the controler which instantiates this.
+ * Can (presumably) be something much more minimalistic than QSimI.  kai, jun'10
+ * 
  * @author dgrether
  *
  */

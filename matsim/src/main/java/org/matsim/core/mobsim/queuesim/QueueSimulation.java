@@ -691,8 +691,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	}
 
 
-	@Override
-	public double getStuckTime() {
+	double getStuckTime() {
 		return this.getScenario().getConfig().simulation().getStuckTime() ;
 	}
 
