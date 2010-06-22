@@ -1,12 +1,16 @@
 package playground.florian.ScoreStatsHandler;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
+
 import playground.florian.jaxb.scores01.ObjectFactory;
 import playground.florian.jaxb.scores01.XMLScoreType;
 import playground.florian.jaxb.scores01.XMLScores;
@@ -29,7 +33,9 @@ public class ScoreXMLWriter extends MatsimJaxbXmlWriter {
 			jc = JAXBContext.newInstance(playground.florian.jaxb.scores01.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
 			super.setMarshallerProperties(SCHEMALOCATION, m);
-			m.marshal(this.xmlScores,IOUtils.getBufferedWriter(filename));
+			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
+			m.marshal(this.xmlScores, bufout);
+			bufout.close();
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
