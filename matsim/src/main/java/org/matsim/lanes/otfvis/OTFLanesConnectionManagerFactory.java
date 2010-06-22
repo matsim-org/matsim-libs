@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.lanes.otfvis;
 
-import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
-import org.matsim.lanes.otfvis.io.OTFLaneReader;
-import org.matsim.lanes.otfvis.io.OTFLaneWriter;
+import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer2;
+import org.matsim.lanes.otfvis.io.OTFLaneReader2;
+import org.matsim.lanes.otfvis.io.OTFLaneWriter2;
 import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
@@ -42,10 +42,10 @@ public class OTFLanesConnectionManagerFactory implements OTFConnectionManagerFac
   @Override
   public OTFConnectionManager createConnectionManager() {
     OTFConnectionManager connect = this.delegate.createConnectionManager();
-    connect.connectQLinkToWriter(OTFLaneWriter.class);
-    connect.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
-    connect.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
-    connect.connectReceiverToLayer(OTFLaneSignalDrawer.class, OTFLaneLayer.class);
+    connect.connectQLinkToWriter(OTFLaneWriter2.class);
+    connect.connectWriterToReader(OTFLaneWriter2.class, OTFLaneReader2.class);
+    connect.connectReaderToReceiver(OTFLaneReader2.class, OTFLaneSignalDrawer2.class);
+    connect.connectReceiverToLayer(OTFLaneSignalDrawer2.class, OTFLaneLayer.class);
     return connect;
   }
 

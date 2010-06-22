@@ -23,14 +23,14 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.otfvis.io.OTFLaneReader;
+import org.matsim.lanes.otfvis.io.OTFLaneReader2;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
 /**
  * @author dgrether
  */
-public class OTFSignalReader extends OTFLaneReader {
+public class OTFSignalReader extends OTFLaneReader2 {
 
   public OTFSignalReader() {
 	}

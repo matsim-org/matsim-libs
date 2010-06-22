@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOtfLaneData
+ * LaneToLinkData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,51 +20,34 @@
 package org.matsim.lanes.otfvis.io;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.signalsystems.control.SignalGroupState;
 
 
+/**
+ * @author dgrether
+ *
+ */
+public class LaneToLinkData{
 
-public class OTFLaneData {
-	private String id;
-	private Point2D.Double endPoint;
-	private SignalGroupState state = SignalGroupState.RED;
-	private List<Point2D.Double> toLinkStartPoints;
+	private Point2D.Double startPoint;
+	private double numberOfLanes;
+	private Point2D.Double normal;
 
-	public OTFLaneData() {
-		if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES) {
-			this.toLinkStartPoints = new ArrayList<Point2D.Double>();
-		}
+	public LaneToLinkData(Point2D.Double startPoint, Point2D.Double normal, double toLinkNumberOfLanes) {
+		this.startPoint = startPoint;
+		this.normal = normal;
+		this.numberOfLanes = toLinkNumberOfLanes;
 	}
 	
-	public void setId(String id){
-		this.id = id;
+	public Point2D.Double getStartPoint(){
+		return this.startPoint;
+	}
+	
+	public Point2D.Double getNormalVector(){
+		return this.normal;
+	}
+	
+	public double getNumberOfLanes(){
+		return this.numberOfLanes;
 	}
 
-	public void setEndPoint(double endx, double endy) {
-		this.endPoint = new Point2D.Double(endx, endy);
-	}
-
-	public void setSignalGroupState(SignalGroupState state) {
-		this.state = state;
-	}
-	
-	public SignalGroupState getSignalGroupState(){
-		return this.state ;
-	}
-	
-	public Point2D.Double getEndPoint() {
-		return endPoint;
-	}
-	
-	public String getId() {
-		return id;
-	}
-
-	public List<Point2D.Double> getToLinkStartPoints(){
-		return this.toLinkStartPoints;
-	}
-	
 }
