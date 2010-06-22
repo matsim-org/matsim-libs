@@ -24,9 +24,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
@@ -35,12 +33,6 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGenerator;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
-import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
-import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.xml.sax.SAXException;
 
 public class MyNetworkGenerator {
