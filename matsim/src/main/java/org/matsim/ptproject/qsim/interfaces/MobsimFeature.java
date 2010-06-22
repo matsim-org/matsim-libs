@@ -44,10 +44,10 @@ public interface MobsimFeature {
 	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
 	void beforeHandleUnknownLegMode(double now, PersonAgent agent, Link link);
 
-	void afterActivityBegins(PersonAgent agent);
+//	void afterActivityBegins(PersonAgent agent);
 
-	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
-	void afterActivityEnds(PersonAgent agent, double time);
+//	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
+//	void afterActivityEnds(PersonAgent agent, double time);
 	
 	/**
 	 * @deprecated as long as the agent representation of the QSim is not implemented this method provides

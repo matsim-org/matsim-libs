@@ -93,7 +93,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 
 	private void afterConstruct() {
 		qSim.setAgentFactory(new TransitAgentFactory(qSim, this.agents));
-		qSim.getNotTeleportedModes().add(TransportMode.pt);
+//		qSim.getNotTeleportedModes().add(TransportMode.pt);
 	}
 	
 
@@ -233,10 +233,12 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 
 
 	@Override
-	public void handleDeparture(double now, PersonAgent agent, Id linkId, Leg leg) {
+	public boolean handleDeparture(double now, PersonAgent agent, Id linkId, Leg leg) {
 		if (leg.getMode() == TransportMode.pt) {
 			handleAgentPTDeparture(agent, linkId, leg);
+			return true ;
 		}
+		return false ;
 	}
 
 	public TransitStopAgentTracker getAgentTracker() {

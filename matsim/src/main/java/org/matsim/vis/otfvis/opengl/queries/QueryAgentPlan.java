@@ -84,8 +84,8 @@ public class QueryAgentPlan extends AbstractQuery {
 	public OTFQueryResult query() {
 		TeleportationVisData teleportationVisData = visTeleportationData.get(agentId);
 		if (teleportationVisData != null) {
-			double x = teleportationVisData.getX() - OTFServerQuad2.offsetEast;
-			double y = teleportationVisData.getY() - OTFServerQuad2.offsetNorth;
+			double x = teleportationVisData.getEasting() - OTFServerQuad2.offsetEast;
+			double y = teleportationVisData.getNorthing() - OTFServerQuad2.offsetNorth;
 			result.teleportingAgentPosition = new Point2D.Double(x, y);
 			log.debug("Agent teleporting: "+x+" "+y);
 		} else {

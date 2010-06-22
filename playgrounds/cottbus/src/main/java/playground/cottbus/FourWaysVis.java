@@ -71,7 +71,7 @@ public class FourWaysVis {
 		
 		
 		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(scenario, events);
-		client.initSignalEngine(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
+		client.initOrReinitSignalEngine(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
 		client.run();
 		
 		

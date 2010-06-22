@@ -509,9 +509,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	public void scheduleActivityEnd(final PersonDriverAgent agent) {
 		this.activityEndsList.add(agent);
 		int planElementIndex = agent.getPerson().getSelectedPlan().getPlanElements().indexOf(agent.getCurrentPlanElement()) ; // yyyy Aaaarrrrgggghhh
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.afterActivityBegins(agent);
-		}
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//			queueSimulationFeature.afterActivityBegins(agent);
+//		}
 	}
 
 	private void handleActivityEnds(final double time) {
@@ -520,9 +520,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
 				agent.activityEnds(time);
-				for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-					queueSimulationFeature.afterActivityEnds(agent, time);
-				}
+//				for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//					queueSimulationFeature.afterActivityEnds(agent, time);
+//				}
 			} else {
 				return;
 			}

@@ -128,15 +128,16 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
-	protected final PriorityQueue<Tuple<Double, PersonDriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, PersonDriverAgent>>(30, new TeleportationArrivalTimeComparator());
+	protected final PriorityQueue<Tuple<Double, PersonDriverAgent>> teleportationList =
+		new PriorityQueue<Tuple<Double, PersonDriverAgent>>(30, new TeleportationArrivalTimeComparator());
 	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100*3600;
 	private AgentFactory agentFactory;
 	private SimulationListenerManager<QSim> listenerManager;
-	protected final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = new PriorityBlockingQueue<PersonDriverAgent>(500, new DriverAgentDepartureTimeComparator());
+	protected final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = 
+		new PriorityBlockingQueue<PersonDriverAgent>(500, new DriverAgentDepartureTimeComparator());
 	protected Scenario scenario = null;
 	private QSimSignalEngine signalEngine = null;
-	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
 
 	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
@@ -149,13 +150,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 	private AgentCounterI agentCounter;
 
-	private double stuckTime = Double.MAX_VALUE;
-
-	/**
-	 * Initialize the QueueSimulation
-	 * @param scenario
-	 * @param events
-	 */
 	public QSim(final Scenario scenario, final EventsManager events) {
 		this(scenario, events, new DefaultQSimEngineFactory());
 	}
@@ -163,7 +157,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	protected QSim(final Scenario sc, final EventsManager events, final QSimEngineFactory simEngineFac){
 		this.scenario = sc;
 		this.events = events;
-		init(this.scenario, simEngineFac);
+		init(simEngineFac);
 	}
 
 	/**
@@ -171,13 +165,10 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * after assignments of another constructor
 	 * @param simEngineFac
 	 */
-	private void init(final Scenario sc, QSimEngineFactory simEngineFac){
-		// yyyy if someone makes this method less protected, can call it with a different scenario than the ctor. 
-		// In my view, this is somewhat dangerous.  kai, jun'10
-		
+	private void init(QSimEngineFactory simEngineFac){
 		log.info("Using QSim...");
+		Scenario sc = this.getScenario() ;
 		this.listenerManager = new SimulationListenerManager<QSim>(this);
-		this.stuckTime = sc.getConfig().getQSimConfigGroup().getStuckTime();
 		this.agentCounter = new AgentCounter();
 		this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
 
@@ -188,7 +179,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		QNetwork network = null ;
 		if (sc.getConfig().scenario().isUseLanes()) {
 			if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
-				throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
+				throw new IllegalStateException("Lane definitions have to be set if feature is enabled!");
 			}
 			log.info("Lanes enabled...");
 			network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(),
@@ -208,12 +199,11 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 				throw new IllegalStateException(
 						"Signal systems and signal system configurations have to be set if feature is enabled!");
 			}
-			this.initSignalEngine(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
+			this.initOrReinitSignalEngine(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
 		}
 
 		this.agentFactory = new AgentFactory(this);
 
-		this.notTeleportedModes.add(TransportMode.car);
 		this.carDepartureHandler = new CarDepartureHandler(this);
 		addDepartureHandler(this.carDepartureHandler);
 
@@ -231,8 +221,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * @param signalSystems
 	 * @param signalSystemConfigurations
 	 */
-	@Deprecated // Minimally, this method is misnomed, since this may REinitialize the signal engine.  kai, jun'10
-	public void initSignalEngine(final SignalSystems signalSystems, final SignalSystemConfigurations signalSystemConfigurations){
+	@Deprecated // I don't think this is truly necessary at this point.  kai, jun'10
+	public void initOrReinitSignalEngine(final SignalSystems signalSystems, final SignalSystemConfigurations signalSystemConfigurations){
 		this.signalEngine  = new QSimSignalEngine(this);
 		this.signalEngine.setSignalSystems(signalSystems, signalSystemConfigurations);
 	}
@@ -482,9 +472,9 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	public void scheduleActivityEnd(final PersonDriverAgent agent) {
 		this.activityEndsList.add(agent);
 		addToAgentsInActivities(agent);
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.afterActivityBegins(agent);
-		}
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//			queueSimulationFeature.afterActivityBegins(agent);
+//		}
 	}
 
 	private void addToAgentsInActivities(final PersonDriverAgent agent) {
@@ -534,12 +524,12 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 				// ... puts the agent into the global agent tracker data structure, together with the correct stop id.
 				// kai, feb'10)
 
-				for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-
-					queueSimulationFeature.afterActivityEnds(agent, time);
-					// (calls TransitQSimFeature.afterActivityEnds(...), but that does not do anything. kai, feb'10
-
-				}
+//				for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//
+//					queueSimulationFeature.afterActivityEnds(agent, time);
+//					// (calls TransitQSimFeature.afterActivityEnds(...), but that does not do anything. kai, feb'10
+//
+//				}
 			} else {
 				return;
 			}
@@ -560,8 +550,9 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		Leg leg = agent.getCurrentLeg();
 		TransportMode mode = leg.getMode();
 		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, mode));
-		if (this.notTeleportedModes.contains(mode)){
-			this.handleKnownLegModeDeparture(now, agent, linkId, leg);
+//		if (this.notTeleportedModes.contains(mode)){
+		if ( this.handleKnownLegModeDeparture(now, agent, linkId, leg) ) {
+			return ;
 		} else {
 			visAndHandleUnknownLegMode(now, agent, linkId);
 		}
@@ -575,18 +566,16 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		this.teleportationList.add(new Tuple<Double, PersonDriverAgent>(arrivalTime, agent));
 	}
 
-	private void handleKnownLegModeDeparture(final double now, final PersonDriverAgent agent, final Id linkId, final Leg leg) {
+	private boolean handleKnownLegModeDeparture(final double now, final PersonDriverAgent agent, final Id linkId, final Leg leg) {
 		for (DepartureHandler departureHandler : this.departureHandlers) {
-			departureHandler.handleDeparture(now, agent, linkId, leg);
-			// yy so richtig sympathisch ist mir das irgendwie nicht: Wenn sich aus irgendeinem Grunde zwei
-			// handler zustaendig fuehlen, existiert der Agent hinterher doppelt.  kai, apr'10
-			// Suggestion:
-			// if ( departureHandler.handleDeparture(...) == true ) {
-			//     return ;
-			// }
-			// then could leave teleportation as last option, and the unstable "knownLegMode" condition would no longer
-			// be needed.  kai, jun'10
+			if ( departureHandler.handleDeparture(now, agent, linkId, leg) ) {
+				return true ;
+			}
+			// The code is not (yet?) very beautiful.  But structurally, this goes through all departure handlers and tries to
+			// find one that feels responsible.  If it feels responsible, it returns true, and so this method returns true.
+			// Otherwise, this method will return false, and then teleportation will be called. kai, jun'10
 		}
+		return false ;
 	}
 	
 	// ############################################################################################################################
@@ -665,12 +654,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 	public SignalEngine getQSimSignalEngine() {
 		return this.signalEngine;
-	}
-
-	@Override
-	@Deprecated // this is rarely used, and I find it rather unstable anyways.  kai, jun'10
-	public Set<TransportMode> getNotTeleportedModes() {
-		return this.notTeleportedModes;
 	}
 
 	@Override

@@ -46,15 +46,17 @@ public class CarDepartureHandler implements DepartureHandler {
 	}
 
 	@Override
-	public void handleDeparture(double now, PersonAgent agent, Id linkId,
+	public boolean handleDeparture(double now, PersonAgent agent, Id linkId,
 			Leg leg) {
 		if (leg.getMode().equals(TransportMode.car)) {
 			if ( agent instanceof PersonDriverAgent ) {
 				handleCarDeparture(now, (PersonDriverAgent)agent, linkId, leg);
+				return true ;
 			} else {
 				throw new UnsupportedOperationException("wrong agent type to use a car") ;
 			}
 		}
+		return false ;
 	}
 
 	private void handleCarDeparture(double now, PersonDriverAgent agent, Id linkId,

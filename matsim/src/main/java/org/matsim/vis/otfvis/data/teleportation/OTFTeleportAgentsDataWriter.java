@@ -49,8 +49,8 @@ public class OTFTeleportAgentsDataWriter extends OTFDataWriter<Map<Id, Teleporta
 			for (TeleportationVisData d : this.src.values()){
 				ByteBufferUtils.putString(out, d.getId().toString());
 //				log.error("id: " + d.getId() + " x: " + d.getX() + " y: " + d.getY());
-				out.putDouble(d.getX());
-				out.putDouble(d.getY());
+				out.putDouble(d.getEasting());
+				out.putDouble(d.getNorthing());
 			}
 		}
 		else {

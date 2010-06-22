@@ -26,6 +26,6 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 
 public interface DepartureHandler {
 	
-	public void handleDeparture(double now, PersonAgent agent, Id linkId, Leg leg);
+	public boolean handleDeparture(double now, PersonAgent agent, Id linkId, Leg leg);
 
 }

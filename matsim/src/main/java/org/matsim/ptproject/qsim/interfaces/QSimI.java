@@ -75,11 +75,11 @@ public interface QSimI extends IOSimulation {
 	 */
 	void setAgentFactory(AgentFactory agentFactory);
 
-	/**
-	 * @return
-	 */
-	@Deprecated // this is rarely used, and I find it rather unstable anyways.  kai, jun'10
-	Collection<TransportMode> getNotTeleportedModes();
+//	/**
+//	 * @return
+//	 */
+//	@Deprecated // this is rarely used, and I find it rather unstable anyways.  kai, jun'10
+//	Collection<TransportMode> getNotTeleportedModes();
 
 	/**
 	 * @return

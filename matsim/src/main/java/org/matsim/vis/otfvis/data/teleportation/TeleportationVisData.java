@@ -22,16 +22,19 @@ package org.matsim.vis.otfvis.data.teleportation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
  *
  * @author dgrether
  *
  */
-public class TeleportationVisData {
+public class TeleportationVisData implements AgentSnapshotInfo {
 
 	//	private static final Logger log = Logger.getLogger(TeleportationVisData.class);
 
+	private static final long serialVersionUID = 4626450928014698099L;
 	private double stepsize;
 	private double startX;
 	private double startY;
@@ -41,8 +44,10 @@ public class TeleportationVisData {
 	private double currentY;
 	private double starttime;
 	private Id id;
-
-	private double length;
+	private int userDefined;
+	private int type;
+	private double colorval;
+	private AgentState state = AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE ;
 
 	public TeleportationVisData(double now, PersonAgent agent, Link fromLink, Link toLink) {
 		this.starttime = now;
@@ -54,7 +59,7 @@ public class TeleportationVisData {
 		double endY = toLink.getToNode().getCoord().getY();
 		double dX = endX - startX;
 		double dY = endY - startY;
-		length = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
+		double length = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
 		this.stepsize = length / traveltime;
 		this.normalX = dX / length;
 		this.normalY = dY / length;
@@ -71,11 +76,11 @@ public class TeleportationVisData {
 		//		log.error("currentY " + currentY);
 	}
 
-	public double getX() {
+	public double getEasting() {
 		return this.currentX;
 	}
 
-	public double getY() {
+	public double getNorthing() {
 		return this.currentY;
 	}
 
@@ -83,9 +88,9 @@ public class TeleportationVisData {
 		return this.id;
 	}
 
-	public double getLength(){
-		return this.length;
-	}
+	//	public double getLength(){
+	//		return this.length;
+	//	}
 
 	public void calculatePosition(double time) {
 		//		log.error("calc pos time: " + time);
@@ -93,5 +98,55 @@ public class TeleportationVisData {
 		this.currentX = this.startX + (step * this.normalX);
 		this.currentY = this.startY  + (step * this.normalY);
 		//		log.error("currentx: " + this.currentX + " currenty: "+ this.currentY);
+	}
+
+	@Override
+	public AgentState getAgentState() {
+		return this.state ;
+	}
+
+	@Override
+	public double getAzimuth() {
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public double getColorValueBetweenZeroAndOne() {
+		return this.colorval ;
+	}
+
+	@Override
+	public double getElevation() {
+		return 0. ;
+	}
+
+	@Override
+	public int getType() {
+		return this.type ;
+	}
+
+	@Override
+	public int getUserDefined() {
+		return this.userDefined ;
+	}
+
+	@Override
+	public void setAgentState(AgentState state) {
+		this.state = state ;
+	}
+
+	@Override
+	public void setColorValueBetweenZeroAndOne(double tmp) {
+		this.colorval = tmp ;
+	}
+
+	@Override
+	public void setType(int tmp) {
+		this.type = tmp ;
+	}
+
+	@Override
+	public void setUserDefined(int tmp) {
+		this.userDefined = tmp ;
 	}
 }

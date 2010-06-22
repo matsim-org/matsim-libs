@@ -177,7 +177,8 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 
 	@Override
 	public void beforeHandleUnknownLegMode(double now, final PersonAgent agent, Link link) {
-		this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link, this.queueSimulation.getVisNetwork().getNetwork().getLinks().get(agent.getDestinationLinkId())));
+		this.visTeleportationData.put(agent.getPerson().getId() , 
+				new TeleportationVisData(now, agent, link, this.queueSimulation.getVisNetwork().getNetwork().getLinks().get(agent.getDestinationLinkId())));
 	}
 
 	private void visualizeTeleportedAgents(double time) {
@@ -197,19 +198,19 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 		this.doVisualizeTeleportedAgents = active;
 	}
 
-	@Override
-	public void afterActivityBegins(PersonAgent agent) {
-//		currentActivityNumbers.put(agent.getPerson().getId(), planElementIndex);
-	}
+//	@Override
+//	public void afterActivityBegins(PersonAgent agent) {
+////		currentActivityNumbers.put(agent.getPerson().getId(), planElementIndex);
+//	}
 
 //	public LinkedHashMap<Id, Integer> getCurrentActivityNumbers() {
 //		return currentActivityNumbers;
 //	}
 
-	@Override
-	public void afterActivityEnds(PersonAgent agent, double time) {
-//		currentActivityNumbers.remove(agent.getPerson().getId());
-	}
+//	@Override
+//	public void afterActivityEnds(PersonAgent agent, double time) {
+////		currentActivityNumbers.remove(agent.getPerson().getId());
+//	}
 
 	@Override
 	public VisMobsim getVisMobsim() {
