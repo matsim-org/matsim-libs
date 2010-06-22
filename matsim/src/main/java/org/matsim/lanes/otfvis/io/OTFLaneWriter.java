@@ -121,9 +121,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkInternalI> implements OTFW
 				if (DRAW_LINK_TO_LINK_LINES){
 					if (qLane.getLane().getToLinkIds() != null){
 						out.putInt(qLane.getLane().getToLinkIds().size());
-						log.error("link " + qLane.getQLink().getLink().getId() + " link2link for lane " + qLane.getId());
 						for (Id toLinkId :  qLane.getLane().getToLinkIds()){
-							log.error("2linkid: " + toLinkId);
 							Link toLink = ((Network) this.src.getLink().getLayer()).getLinks().get(toLinkId);
 							if (toLink == null) {
 								throw new IllegalStateException("No Link found with id: " + toLinkId + " this is set as toLink of Lane " + qLane.getId() + " on Link " + qLane.getQLink().getLink().getId());
@@ -146,7 +144,6 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkInternalI> implements OTFW
 	}
 	
 	private Point2D.Double calculateNormalOfLink(Link link) {
-		log.error(link);
 		//get coordinates
 		Point2D.Double linkStartPoint = new Point2D.Double(link.getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
 				link.getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
