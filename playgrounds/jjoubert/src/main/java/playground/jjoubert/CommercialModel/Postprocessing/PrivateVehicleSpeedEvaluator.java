@@ -98,6 +98,11 @@ public class PrivateVehicleSpeedEvaluator {
 
 		Map<Id, SAZone> zoneTree = new HashMap<Id, SAZone>();
 
+		/*
+		 *  TODO Check!! I've changed from LinkImpl to Link since it gave an error.
+		 *  I'm not sure if this will give the right output now.
+		 */
+		
 		Map<Id, Link> map = nl.getLinks();
 		for (Id key : map.keySet()) {
 			Link link = map.get(key);

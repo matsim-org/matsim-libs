@@ -32,7 +32,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 
-import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
+//FIXME This no longer exists.
+//import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 
 import playground.jjoubert.Utilities.DateString;
 
@@ -169,21 +170,22 @@ public class AverageEventsToGAP {
 		double total = 0;
 		double avgStdDev;
 		double[] doubles;
-		StandardDeviation sd;
-		for (Integer zone : zoneSequence) {
-			sd	= new StandardDeviation();
-			doubles = new double[RUNS.length];
-			for(int hour = 0; hour < 24; hour++){
-				for(int i = 0; i < RUNS.length; i++){
-					doubles[i] = newStatsMap.get(zone).get(hour).get(i);
-				}
-				double stdDev = sd.evaluate(doubles);
-				counter++;
-				total += stdDev;
-			}
-		}
-		avgStdDev = total / counter;
-		System.out.printf("Done. Avg standard deviation is %2.4f %%\n", avgStdDev);
+		//FIXME StandardDeviation no longer exists.
+//		StandardDeviation sd;
+//		for (Integer zone : zoneSequence) {
+//			sd	= new StandardDeviation();
+//			doubles = new double[RUNS.length];
+//			for(int hour = 0; hour < 24; hour++){
+//				for(int i = 0; i < RUNS.length; i++){
+//					doubles[i] = newStatsMap.get(zone).get(hour).get(i);
+//				}
+//				double stdDev = sd.evaluate(doubles);
+//				counter++;
+//				total += stdDev;
+//			}
+//		}
+//		avgStdDev = total / counter;
+//		System.out.printf("Done. Avg standard deviation is %2.4f %%\n", avgStdDev);
 		
 		
 		/*
