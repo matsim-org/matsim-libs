@@ -39,7 +39,7 @@ public class MatsimLaneDefinitionsWriter {
 	 * @param lanedefs
 	 */
 	public MatsimLaneDefinitionsWriter(LaneDefinitions lanedefs){
-		this.writerDelegate = new LaneDefinitionsWriter11(lanedefs);
+		this.writerDelegate = new LaneDefinitionsWriter20(lanedefs);
 	}
 	
 	
