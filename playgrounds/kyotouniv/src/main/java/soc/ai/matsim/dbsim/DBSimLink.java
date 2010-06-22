@@ -40,7 +40,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
@@ -560,7 +559,7 @@ public class DBSimLink {
 	 */
 	class VisDataImpl implements VisData {
 
-		private final double linkScale =  OTFDefaultLinkHandler.LINK_SCALE;
+		private final double linkScale =  1.0;
 
 		/**
 		 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
