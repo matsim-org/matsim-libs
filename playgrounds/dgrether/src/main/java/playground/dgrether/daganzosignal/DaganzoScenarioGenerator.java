@@ -114,8 +114,10 @@ public class DaganzoScenarioGenerator {
 
 	private static final boolean isUseSignalSystems = true;
 
-	private static final int iterations = 100;
+	private static final int iterations = 0;
 	private static final int iterations2 = 0;
+	
+	private static final int agents = 20;
 
 	private static final int ttBinSize = 1;
 
@@ -203,7 +205,7 @@ public class DaganzoScenarioGenerator {
 //		Link l7 = network.getLinks().get(scenario.createId("7"));
 		PopulationFactory factory = population.getFactory();
 
-		for (int i = 1; i <= 2000; i++) {
+		for (int i = 1; i <= this.agents; i++) {
 			PersonImpl p = (PersonImpl) factory.createPerson(scenario.createId(Integer
 					.toString(i)));
 			// home

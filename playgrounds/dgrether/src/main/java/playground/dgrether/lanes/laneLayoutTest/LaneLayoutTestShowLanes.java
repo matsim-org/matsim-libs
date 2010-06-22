@@ -41,7 +41,7 @@ public class LaneLayoutTestShowLanes {
 	public static void main(String[] args) {
 		Scenario sc = new ScenarioImpl();
 		sc.getConfig().network().setInputFile(LaneLayoutTestFileNames.NETWORK);
-		sc.getConfig().network().setLaneDefinitionsFile(LaneLayoutTestFileNames.LANEDEFINITIONS);
+		sc.getConfig().network().setLaneDefinitionsFile(LaneLayoutTestFileNames.LANEDEFINITIONSV2);
 		sc.getConfig().scenario().setUseLanes(true);
 		sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		sc.getConfig().otfVis().setLinkWidth(50.0f);

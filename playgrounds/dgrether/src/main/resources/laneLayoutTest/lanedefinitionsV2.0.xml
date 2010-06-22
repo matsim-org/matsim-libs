@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <laneDefinitions xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <lanesToLinkAssignment linkIdRef="1">
+    <lanesToLinkAssignment linkIdRef="13">
         <lane id="1">
             <leadsTo>
-                <toLink refId="3"/>
-                <toLink refId="4"/>
+                <toLink refId="34"/>
+                <toLink refId="35"/>
             </leadsTo>
-            <representedLanes number="1.0"/>
+            <representedLanes number="2.0"/>
             <startsAt meterFromLinkEnd="200.0"/>
-            <alignment>1</alignment>
+            <alignment>-1</alignment>
         </lane>
-        <lane id="1.ol">
+        <lane id="13.ol">
             <leadsTo>
                 <toLane refId="2"/>
                 <toLane refId="1"/>
@@ -21,11 +21,47 @@
         </lane>
         <lane id="2">
             <leadsTo>
-                <toLink refId="2"/>
+                <toLink refId="32"/>
             </leadsTo>
-            <representedLanes number="2.0"/>
+            <representedLanes number="1.0"/>
+            <startsAt meterFromLinkEnd="200.0"/>
+            <alignment>1</alignment>
+        </lane>
+    </lanesToLinkAssignment>
+    <lanesToLinkAssignment linkIdRef="35">
+        <lane id="1">
+            <leadsTo>
+                <toLink refId="57"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
             <startsAt meterFromLinkEnd="200.0"/>
             <alignment>-1</alignment>
+        </lane>
+        <lane id="2">
+            <leadsTo>
+                <toLink refId="58"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <startsAt meterFromLinkEnd="200.0"/>
+            <alignment>0</alignment>
+        </lane>
+        <lane id="3">
+            <leadsTo>
+                <toLink refId="56"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <startsAt meterFromLinkEnd="200.0"/>
+            <alignment>1</alignment>
+        </lane>
+        <lane id="35.ol">
+            <leadsTo>
+                <toLane refId="3"/>
+                <toLane refId="2"/>
+                <toLane refId="1"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <startsAt meterFromLinkEnd="500.0"/>
+            <alignment>0</alignment>
         </lane>
     </lanesToLinkAssignment>
 </laneDefinitions>

@@ -19,9 +19,10 @@
  * *********************************************************************** */
 package playground.dgrether.daganzosignal;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.run.OTFVis;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import playground.dgrether.DgOTFVisReplayLastIteration;
 
 
 /**
@@ -32,20 +33,14 @@ public class VisLastIteration {
 
 	/**
 	 * @param args
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public static void main(String[] a) {
+	public static void main(String[] a) throws FileNotFoundException, IOException {
 		DaganzoScenarioGenerator scenarioGenerator = new DaganzoScenarioGenerator();
-		Config config = null;
-		config = new Config();
-		config.addCoreModules();
-		MatsimConfigReader reader = new MatsimConfigReader(config);
-		reader.readFile(scenarioGenerator.configOut);
-		String mvi = config.controler().getOutputDirectory() + 
-		"/ITERS/it." + config.controler().getLastIteration() + 
-		"/" + config.controler().getLastIteration() + ".otfvis.mvi";
-		System.out.println(mvi);
-		String[] args = {mvi};
-		OTFVis.main(args);
+		String outputConfig = scenarioGenerator.outputDirectory + "output_config.xml.gz";
+		String[] args = {outputConfig};
+		DgOTFVisReplayLastIteration.main(args);
 		
 	}
 
