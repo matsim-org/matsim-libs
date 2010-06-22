@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemandGeneration;
+package playground.jjoubert.CommercialTraffic.ChainAnalysis;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,11 +32,11 @@ import java.util.Scanner;
 
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.jjoubert.CommercialDemandGenerator.MyCommercialChainAnalyser;
 import playground.jjoubert.CommercialTraffic.Activity;
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.CommercialVehicle;
 import playground.jjoubert.CommercialTraffic.GPSPoint;
+import playground.jjoubert.CommercialTraffic.ChainAnalysis.MyCommercialChainAnalyser;
 import playground.jjoubert.Utilities.MyXmlConverter;
 
 import cern.colt.matrix.impl.SparseDoubleMatrix3D;

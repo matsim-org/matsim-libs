@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialTraffic;
+package playground.jjoubert.CommercialTraffic.ChainAnalysis;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -27,12 +27,9 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.CommercialTraffic");
+		TestSuite suite = new TestSuite("Tests for playground.jjoubert.CommercialTraffic.ChainAnalysis");
 		
-		suite.addTest(playground.jjoubert.CommercialTraffic.ActivityAnalysis.AllTests.suite());
-		suite.addTest(playground.jjoubert.CommercialTraffic.ChainAnalysis.AllTests.suite());
-		
-		suite.addTestSuite(SelectVehiclesTest.class);
+		suite.addTestSuite(MyCommercialChainAnalyserTest.class);
 		
 		return suite;
 	}
