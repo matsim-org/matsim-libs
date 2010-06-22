@@ -18,9 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemandGenerator;
+package playground.jjoubert.CommercialTraffic.ChainAnalysis;
 
-public class RunMyCommercialDemandGenerator {
+import playground.jjoubert.CommercialDemandGenerator.MyCommercialDemandGeneratorStringBuilder;
+
+public class RunMyCommercialChainAnalyser {
 
 	/**
 	 * This is the old approach (first run at ETH). It will be replaced to run separate 

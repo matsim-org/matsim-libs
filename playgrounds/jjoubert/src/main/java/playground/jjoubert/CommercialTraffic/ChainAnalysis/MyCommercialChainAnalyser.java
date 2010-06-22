@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemandGenerator;
+package playground.jjoubert.CommercialTraffic.ChainAnalysis;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
