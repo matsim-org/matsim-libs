@@ -34,22 +34,16 @@ public class MyRunsTest extends MatsimTestCase {
 
 	@Test
 	public void testDoSUEStudySensitivityAnalysis() {
-		
+
 		String[] args = new String[]{this.getInputDirectory() + "config.xml"};
-		
-		try {
-			MyRuns myRuns = new MyRuns();
-			myRuns.doSUEStudySensitivityAnalysis(args, this.getOutputDirectory());
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.flush();
-			fail("Some excpetion was thrown.");
-		}
+
+		MyRuns myRuns = new MyRuns();
+		myRuns.doSUEStudySensitivityAnalysis(args, this.getOutputDirectory());
 
 		File aRandomResultsFile = new File(this.getOutputDirectory() + "timingModule_Planomat/brainExpBeta_1.0/learningRate_0.1/personTreatment.txt");
 		assertTrue(aRandomResultsFile.exists());
 		aRandomResultsFile = new File(this.getOutputDirectory() + "timingModule_Planomat/brainExpBeta_1.0/learningRate_0.1/ITERS/it.2");
-		
+
 	}
-	
+
 }
