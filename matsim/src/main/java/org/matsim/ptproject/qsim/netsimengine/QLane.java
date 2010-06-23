@@ -667,35 +667,16 @@ public class QLane implements QBufferItem {
    * @author dgrether
    */
   class VisDataImpl implements VisData {
-    /**
-     * Returns a measure for how many vehicles on the link have a travel time
-     * higher than freespeedTraveltime on a scale from 0 to 2. When more then half
-     * of the possible vehicles are delayed, the value 1 will be returned, which
-     * depicts the worst case on a (traditional) scale from 0 to 1.
-     *
-     * @return A measure for the number of vehicles being delayed on this link.
-     */
-    public double getDisplayableTimeCapValue(double time) {
-      int count = QLane.this.buffer.size();
-      for (QVehicle veh : QLane.this.vehQueue) {
-        // Check if veh has reached destination
-        if (veh.getEarliestLinkExitTime() <= time) {
-          count++;
-        }
-      }
-      return count * 2.0 / QLane.this.storageCapacity;
-    }
-
+ 
     public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
 		double time = QLane.this.getQLink().getQSimEngine().getQSim().getSimTimer().getTimeOfDay() ;
 
     	
     	AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLane.this.queueLink.getQSimEngine().getAgentSnapshotInfoBuilder();
     	//the offset of this lane
-    	double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
-
+    	double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLane().getStartsAtMeterFromLinkEnd();// QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
       agentSnapshotInfoBuilder.addVehiclePositionsAsQueue(positions, time, QLane.this.queueLink.getLink(), QLane.this.buffer, QLane.this.vehQueue,
-      		QLane.this.inverseSimulatedFlowCapacity, QLane.this.inverseSimulatedFlowCapacity,
+      		QLane.this.inverseSimulatedFlowCapacity, QLane.this.storageCapacity,
       		QLane.this.bufferStorageCapacity, QLane.this.length, offset, QLane.this.visualizerLane*3, QLane.this.transitQueueLaneFeature);
 
       return positions;

@@ -104,7 +104,7 @@ public class AgentSnapshotInfoBuilder {
 
 		// treat other driving vehicles:
 		positionOtherDrivingVehiclesAsQueue(positions, now, currentQueueEnd, link, vehSpacingAsQueueCache,
-				vehQueue, inverseSimulatedFlowCapacity, offset, laneNumber, transitQueueLaneFeature);
+				vehQueue, inverseSimulatedFlowCapacity, offset, laneNumber, transitQueueLaneFeature, linkLength);
 
 		// yyyy waiting list, transit stops, persons at activity, etc. all do not depend on "queue" vs "equil"
 		// and should thus not be treated in this method. kai, apr'10
@@ -127,14 +127,13 @@ public class AgentSnapshotInfoBuilder {
 	 */
 	private void positionOtherDrivingVehiclesAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
 			double queueEnd, Link link, double vehSpacing, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
-			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature)
+			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double linkLength)
 	{
 		double lastDistance = Double.POSITIVE_INFINITY;
 		double ttfs = link.getLength() / link.getFreespeed(now);
 		for (QVehicle veh : vehQueue) {
 			double travelTime = now - veh.getLinkEnterTime();
-			double distanceOnLink = (ttfs == 0.0 ? 0.0
-					: ((travelTime / ttfs) * link.getLength()));
+			double distanceOnLink = (ttfs == 0.0 ? 0.0	: ((travelTime / ttfs) * linkLength));
 			if (distanceOnLink > queueEnd) { // vehicle is already in queue
 				distanceOnLink = queueEnd;
 				queueEnd -= vehSpacing;
