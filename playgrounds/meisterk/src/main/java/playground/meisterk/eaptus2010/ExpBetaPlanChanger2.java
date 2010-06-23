@@ -41,23 +41,13 @@ public class ExpBetaPlanChanger2 implements PlanSelector {
 	private static final Logger log = Logger.getLogger(ExpBetaPlanChanger2.class);
 
 	private final double beta;
-	static boolean betaFlag = true ;
+	static boolean betaFlag = true;
 
-	
-	//HashMap<String, Double> tableOfAgentsAndProbs = new HashMap<String, Double>();
-	
-	//Double d = tableOfAgentsAndProbs.put("A", new Double(123.4));
-	
-	//public void clearTableOfAgentsAndProbs(){
-	//tableOfAgentsAndProbs.clear();
-	//}
-	
-	//http://www.java2s.com/Code/JavaAPI/java.util/HashMapclear.ht
-	
+	/**
+	 * stores the agents and their decicions for one iteration: 
+	 * 1 stands for the decision of the person of changing the plan, 0 stands for not changing the plan
+	 */
 	private HashMap<Person, Double> tableOfAgentsAndDecisions = new HashMap<Person, Double>(); 
-	//stores the agents and their decicions for one iteration: 
-	//1 stands for the decision of the person of changing the plan, 0 stands for not changing the plan
-	
 	
 	public Map<Person, Double> getTableOfAgentsAndDecisions() {
 		return Collections.unmodifiableMap(this.tableOfAgentsAndDecisions);

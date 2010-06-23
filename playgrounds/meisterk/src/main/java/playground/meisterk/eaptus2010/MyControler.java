@@ -15,6 +15,7 @@ public class MyControler extends Controler {
 	public static final String FILENAME_ChangeProbStats = "changeProbStats.txt";
 	
 	private ChangeProbStats changeProbStats = null;
+	protected int movingAverageSkipAndPeriod = 50;
 	
 	public MyControler(String[] args) {
 		super(args);
@@ -40,11 +41,12 @@ public class MyControler extends Controler {
 			
 		}
 		
-		// optional: Change Prob stats 
-		final boolean GraphCreating = false; 
-		
 		try {
-			this.changeProbStats = new ChangeProbStats(this.population, this.getControlerIO().getOutputFilename(FILENAME_ChangeProbStats), GraphCreating, expBetaChanger2);
+			this.changeProbStats = new ChangeProbStats(
+					this.population, 
+					this.getControlerIO().getOutputFilename(FILENAME_ChangeProbStats), 
+					expBetaChanger2, 
+					this.movingAverageSkipAndPeriod);
 			this.addControlerListener(this.changeProbStats);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
@@ -75,6 +77,14 @@ public class MyControler extends Controler {
 			controler.run();
 		}
 		System.exit(0);
+	}
+
+	public int getMovingAverageSkipAndPeriod() {
+		return movingAverageSkipAndPeriod;
+	}
+
+	public void setMovingAverageSkipAndPeriod(int movingAverageSkipAndPeriod) {
+		this.movingAverageSkipAndPeriod = movingAverageSkipAndPeriod;
 	}
 	
 }

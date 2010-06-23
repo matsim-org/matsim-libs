@@ -22,14 +22,15 @@ package playground.meisterk;
 
 import java.io.File;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
 
 public class MyRunsTest extends MatsimTestCase {
 
-	@Test
+	@Ignore("Not yet implemented") 
+	@Test 
 	public void testMoveInitDemandToDifferentNetwork() {
-		fail("Not yet implemented");
 	}
 
 	@Test

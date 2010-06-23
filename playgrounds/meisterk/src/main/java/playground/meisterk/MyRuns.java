@@ -20,19 +20,16 @@
 
 package playground.meisterk;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -63,10 +60,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
@@ -75,6 +68,7 @@ import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activit
 import org.matsim.run.XY2Links;
 import org.xml.sax.SAXException;
 
+import playground.meisterk.eaptus2010.MyControler;
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
@@ -87,44 +81,75 @@ public class MyRuns {
 	private static Logger logger = Logger.getLogger(MyRuns.class);
 
 	//////////////////////////////////////////////////////////////////////
-	// run method
+	// What is available in this file?
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Config config) throws Exception {
+	private enum Run {
+		/**
+		 * Re-generate equilibration results of semester project of Elias Aptus.
+		 */
+		EAPTUS_2010("eaptus2010"),
+		/**
+		 * Generate initial ivtch demand for ivtch-changed-wu-flama. Used for semester project of Elias Aptus.
+		 */
+		MOVE_DEMAND_TO_NETWORK("moveInitDemandToDifferentNetwork");
+		
+		private final String name;
 
-		//		MyRuns.writeGUESSFile();
-		//		MyRuns.conversionSpeedTest();
-		//		MyRuns.convertPlansV0ToPlansV4();
-		//		MyRuns.produceSTRC2007KML();
+		private Run(String name) {
+			this.name = name;
+		}
 
-		//		MyRuns.setPlansToSameDepTime(config);
-
-		//		this.analyzeModeChainFeasibility(config);
-
-		System.out.println();
-
-	}
-
+		public String getName() {
+			return name;
+		}
+		
+	};
+	
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////
 
 	public static void main(final String[] args) throws Exception {
 
-		//		Config config = Gbl.createConfig(args);
-
 		MyRuns myRuns = new MyRuns();
 
-		//		myRuns.wctr2010(args);
-		myRuns.moveInitDemandToDifferentNetwork(args);
+		boolean validRun = false;
+
+		String desiredRunName = args[0];
+		for (Run run : Run.values()) {
+			if (desiredRunName.equals(run.getName())) {
+				validRun = true;
+			}
+		}
+		if (!validRun) {
+			logger.error("A run with the name \"" + desiredRunName + "\"is not available. Available runs are:");
+			for (Run run : Run.values()) {
+				System.out.println(run.getName());
+			}
+			System.exit(-1);
+		}
+
+		logger.info("Running " + desiredRunName + "...");
+		String[] methodArgs = Arrays.copyOfRange(args, 1, args.length);
+		if (desiredRunName.equals(Run.EAPTUS_2010.getName())) {
+			myRuns.eaptus2010(methodArgs);
+		} else if (desiredRunName.equals(Run.MOVE_DEMAND_TO_NETWORK.getName())) {
+			myRuns.moveInitDemandToDifferentNetwork(methodArgs);
+		}
+		logger.info("Running " + desiredRunName + "...done.");
 
 	}
 
-	/**
-	 * Generate initial ivtch demand for ivtch-changed-wu-flama for semester project of elias aptus
-	 * 
-	 * @param args
-	 */
+	void eaptus2010(final String[] args) {
+
+		MyControler myControler = new MyControler(args);
+		myControler.setCreateGraphs(false);
+		myControler.setOverwriteFiles(true);
+		myControler.run();
+
+	}
+	
 	void moveInitDemandToDifferentNetwork(final String[] args) {
 		
 		// read ivtch demand
@@ -170,55 +195,6 @@ public class MyRuns {
 		
 	}
 	
-	void wctr2010(final String[] args) {
-
-		String sourceFilename = args[0];
-		String destinationFilename = args[1];
-
-		// open source file
-		try {
-			BufferedReader input = new BufferedReader(new FileReader(new File(sourceFilename)));
-			BufferedWriter output = new BufferedWriter(new FileWriter(new File(destinationFilename)));
-
-			String line = null;
-			// ignore header
-			line = input.readLine();
-			output.write(line);
-			
-			while ( (line = input.readLine()) != null) {
-				
-				String[] tokens = StringUtils.explode(line, '\t');
-				Coord ch1903Coord = new CoordImpl(Double.parseDouble(tokens[0]), Double.parseDouble(tokens[1]));
-				CoordinateTransformation trafo = new CH1903LV03toWGS84();
-				Coord wgs84Coord = trafo.transform(ch1903Coord);
-				
-				StringBuffer newLine = new StringBuffer();
-				newLine.append(wgs84Coord.getX());
-				newLine.append('\t');
-				newLine.append(wgs84Coord.getY());
-				for (int i=2; i<tokens.length; i++) {
-					newLine.append('\t');
-					newLine.append(tokens[i]);
-				}
-				newLine.append(System.getProperty("line.separator"));
-				output.write(newLine.toString());
-			}
-			
-			// write stuff to destination file
-
-			input.close();
-			output.close();
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
 	/**
 	 * Generates the results of the sensitivity analysis of the SUE study.
 	 */

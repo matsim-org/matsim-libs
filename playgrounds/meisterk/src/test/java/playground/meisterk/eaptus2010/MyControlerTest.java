@@ -34,30 +34,41 @@ public class MyControlerTest extends MatsimTestCase {
 
 	@Test
 	public void testRun() {
-		
+
 		String[] args = new String[]{this.getInputDirectory() + "config_equil_changeExpBeta0.8.xml"};
-		
+
 		MyControler myControler = new MyControler(args);
 		myControler.getConfig().controler().setOutputDirectory(this.getOutputDirectory());
 		myControler.setCreateGraphs(false);
+		myControler.setMovingAverageSkipAndPeriod(3);
 		myControler.run();
-		
+
 		File file = new File(this.getOutputDirectory() + "changeProbStats.txt");
-		
+
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(file));
+
 			String line = null;
+			int iterationLineCounter = 0;
+
 			while((line = in.readLine()) != null) {
-				String[] tokens = StringUtils.explode(line, '\t');
-				int iterationNumber = Integer.MIN_VALUE;
-				double avgPChange = 0.0;
-				try {
-					iterationNumber = Integer.parseInt(tokens[0]);
-					avgPChange = Double.parseDouble(tokens[1]);
-				} catch (NumberFormatException e) {
-				}
-				if (iterationNumber == 10) {
-					assertEquals(0.007829977628635347, avgPChange, MatsimTestCase.EPSILON);
+
+				if (line.startsWith("#")) {
+					// do nothing in the case of a commented line
+				} else {
+
+					String[] tokens = StringUtils.explode(line, '\t');
+					int iterationNumber = Integer.parseInt(tokens[0]);
+					double changeQuote = Double.parseDouble(tokens[1]);
+					double movingAverage = Double.parseDouble(tokens[2]);
+					assertEquals(iterationLineCounter, iterationNumber);
+					if (iterationLineCounter == 10) {
+						assertEquals(0.006313131313131313, changeQuote, MatsimTestCase.EPSILON);
+						assertEquals(0.0079729152092876, movingAverage, MatsimTestCase.EPSILON);
+					}
+
+					iterationLineCounter++;
+					
 				}
 			}
 			in.close();

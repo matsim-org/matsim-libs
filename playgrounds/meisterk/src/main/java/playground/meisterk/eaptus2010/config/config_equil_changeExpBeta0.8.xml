@@ -2,6 +2,7 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
 		<!ENTITY MATSIMBASE     "../../matsim">
+		<!ENTITY OUTPUTBASE     "output/eaptus2010/equil">
 	]
 >
 <config>
@@ -20,8 +21,9 @@
 	</module>
 
 	<module name="controler">
+		<param name="outputDirectory" value="&OUTPUTBASE;"/>
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="10" />
+		<param name="lastIteration" value="500" />
 	</module>
 
 	<module name="simulation">
