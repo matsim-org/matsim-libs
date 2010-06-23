@@ -43,8 +43,8 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
+import org.matsim.lanes.LaneDefinitionsWriter11;
 import org.matsim.lanes.LanesToLinkAssignment;
-import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
@@ -68,7 +68,7 @@ public class DaganzoScenarioGenerator {
 	private static final Logger log = Logger
 			.getLogger(DaganzoScenarioGenerator.class);
 
-	private static final String DAGANZOBASEDIR = DgPaths.SHAREDSVN + "studies/dgrether/daganzo/";
+	private static final String DAGANZOBASEDIR = DgPaths.SHAREDSVN + "studies/dgrether/daganzo2010/";
 
 	public static final String DAGANZONETWORKFILE = DAGANZOBASEDIR
 			+ "daganzoNetwork.xml";
@@ -170,8 +170,8 @@ public class DaganzoScenarioGenerator {
 			config.network().setLaneDefinitionsFile(LANESOUTPUTFILE);
 			//create the lanes and write them
 			LaneDefinitions lanes = createLanes(scenario);
-			MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(lanes);
-			laneWriter.writeFile(LANESOUTPUTFILE);
+			LaneDefinitionsWriter11 laneWriter = new LaneDefinitionsWriter11(lanes);
+			laneWriter.write(LANESOUTPUTFILE);
 		}
 		if (isUseSignalSystems) {
 			//enable lanes and signal system feature in config
@@ -335,6 +335,7 @@ public class DaganzoScenarioGenerator {
 		Lane link4lane1 = factory.createLane(id1);
 		link4lane1.addToLinkId(id6);
 		link4lane1.setNumberOfRepresentedLanes(3);
+		link4lane1.setStartsAtMeterFromLinkEnd(100.0);
 		lanesForLink4.addLane(link4lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink4);
 		//lanes for link 5
@@ -342,6 +343,7 @@ public class DaganzoScenarioGenerator {
 		Lane link5lane1 = factory.createLane(id1);
 		link5lane1.setNumberOfRepresentedLanes(3);
 		link5lane1.addToLinkId(id6);
+		link5lane1.setStartsAtMeterFromLinkEnd(100.0);
 		lanesForLink5.addLane(link5lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink5);
 		return lanes;

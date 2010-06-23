@@ -80,13 +80,13 @@ public class DaganzoRunner {
 //		controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		controler.setOverwriteFiles(true);
 		Config config = controler.getConfig();
-		this.addListener(controler);
-		this.addQueueSimListener(controler);
+		this.addControlerListener(controler);
+		this.addQSimListener(controler);
 		controler.run();
 //		this.startVisualizer(config);
 	}
 
-	private void addQueueSimListener(final Controler controler) {
+	private void addQSimListener(final Controler controler) {
 		controler.getQueueSimulationListener().add(new SimulationInitializedListener<QSim>() {
 			//add the adaptive controller as events listener
 			public void notifySimulationInitialized(SimulationInitializedEvent<QSim> e) {
@@ -107,7 +107,7 @@ public class DaganzoRunner {
 
 	}
 
-	private void addListener(Controler c) {
+	private void addControlerListener(Controler c) {
 		//add some EventHandler to the EventsManager after the controler is started
 		handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
 		handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
