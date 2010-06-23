@@ -326,7 +326,7 @@ public class MultiSourceEAF {
 		} else {
 			routingAlgo = new BellmanFordIntervalBased(settings, fluss);
 		}
-
+		//TODO set back to 100
 		int VERBOSITY = 100;
 
 		int i;
@@ -346,7 +346,9 @@ public class MultiSourceEAF {
 		Runtime runtime = Runtime.getRuntime();		
 
 		for (i=1; i<=settings.MaxRounds; i++){
-
+			if(i>7000){
+				VERBOSITY=1;
+			}
 			//System.out.println("Iteration " + i);
 
 			Tall.newiter();
@@ -779,6 +781,8 @@ public class MultiSourceEAF {
 		} else if (instance == 441) {
 			networkfile  = "/Users/manuel/testdata/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/Users/manuel/testdata/padang/plans/padang_plans_v20100317.xml.gz";
+			//outputplansfile = "/Users/manuel/Desktop/padang7000rerror5s.xml";
+			//flowfile = "/Users/manuel/Desktop/backpadang5s7000itorgpaths.txt";
 			timeStep = 5;
 			flowFactor = 1.0;
 			sinkid = "en1";
@@ -969,7 +973,7 @@ public class MultiSourceEAF {
 
 		// set additional parameters
 		//settings.TimeHorizon = 2500;
-		//settings.MaxRounds = 1;
+		//settings.MaxRounds = 1000;
 		//settings.checkConsistency = 100;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.
 		settings.useSinkCapacities = false;
@@ -1025,7 +1029,7 @@ public class MultiSourceEAF {
 		
 		fluss = MultiSourceEAF.calcEAFlow(settings, flowpaths);
 		
-		//fluss.writePathflow();
+		fluss.writePathflow(false);
 
 		/* --------- the actual work is done --------- */
 		

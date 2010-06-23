@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -2331,9 +2332,17 @@ public class Flow {
 	/**
 	 * writes the path representation of a flow to Standard Out
 	 */
-	public void writePathflow(){
-		for(TimeExpandedPath path :_TimeExpandedPaths){
-			System.out.println(path.print());
+	public void writePathflow(boolean forward){
+		if(forward){
+			for(TimeExpandedPath path :_TimeExpandedPaths){
+				System.out.println(path.print());
+			}
+		}else{
+			ListIterator<TimeExpandedPath> iterator = this._TimeExpandedPaths.listIterator(this._TimeExpandedPaths.size());
+			while(iterator.hasPrevious()){
+				TimeExpandedPath path = iterator.previous();
+				System.out.println(path.print());
+			}
 		}
 	}
 
