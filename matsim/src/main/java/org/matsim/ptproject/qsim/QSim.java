@@ -540,7 +540,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * Informs the simulation that the specified agent wants to depart from its current activity.
 	 * The simulation can then put the agent onto its vehicle on a link or teleport it to its destination.
 	 * @param now
-	 *
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */

@@ -122,7 +122,8 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 	public void readAgent(ByteBuffer in, SceneGraph graph) {
 		// yyyy there is a very similar method in OTFAgentsListHandler.  with a more robust format, they should be united.  kai, apr'10
-
+		// yyyyyy another writer potentially connected to this reader is in OTFQueueSimLinkAgentsWriter
+		
 		String id = ByteBufferUtils.getString(in);
 		float x = in.getFloat();
 		float y = in.getFloat();
@@ -154,7 +155,9 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
+		// yyyyyy another writer potentially connected to this reader is in OTFQueueSimLinkAgentsWriter
 		super.readDynData(in, graph);
+
 		// read additional agent data
 		this.agents.clear();
 

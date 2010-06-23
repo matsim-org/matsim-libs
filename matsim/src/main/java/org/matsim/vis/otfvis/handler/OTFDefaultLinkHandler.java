@@ -80,6 +80,7 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
+		// yyyyyy another writer potentially connected to this reader is in OTFQueueSimLinkAgentsWriter
 		this.quadReceiver.setColor(in.getFloat());
 	}
 

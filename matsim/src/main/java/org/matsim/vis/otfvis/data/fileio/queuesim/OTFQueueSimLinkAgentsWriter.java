@@ -42,6 +42,9 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<VisLink> implemen
 	// to fix the binary channel has gotten lost.  kai, apr'10
 	// by default, binary output of this class is linked to OTFLinkLanesAgentsNoParkingHandler
 	// so the class can be continued to be used. marcel, apr'10
+	// This is good to know.  But the reader in OTFLinkLanesAgentsNoParkingHandler (in fact inherited from
+	// ODFLinkAgentsHander) _has_ been modified.  This has been done in an attempt to remain compatible, but in fact
+	// we _have_ problems with old *.mvi files.  kai, jun'10
 
 	private static final long serialVersionUID = -7916541567386865404L;
 
