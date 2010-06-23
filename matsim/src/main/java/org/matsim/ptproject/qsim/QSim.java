@@ -25,10 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
@@ -80,9 +78,7 @@ import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.ptproject.qsim.netsimengine.QSimEngineImpl;
 import org.matsim.ptproject.qsim.signalengine.QSimSignalEngine;
-import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.mobsim.SignalEngine;
-import org.matsim.signalsystems.systems.SignalSystems;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -199,7 +195,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 				throw new IllegalStateException(
 						"Signal systems and signal system configurations have to be set if feature is enabled!");
 			}
-			this.initOrReinitSignalEngine(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
+			this.signalEngine  = new QSimSignalEngine(this);
+			this.signalEngine.setSignalSystems(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
 		}
 
 		this.agentFactory = new AgentFactory(this);
@@ -216,16 +213,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 	}
 
-	/**
-	 * Set the signal systems to be used in simulation
-	 * @param signalSystems
-	 * @param signalSystemConfigurations
-	 */
-	@Deprecated // I don't think this is truly necessary at this point.  kai, jun'10
-	public void initOrReinitSignalEngine(final SignalSystems signalSystems, final SignalSystemConfigurations signalSystemConfigurations){
-		this.signalEngine  = new QSimSignalEngine(this);
-		this.signalEngine.setSignalSystems(signalSystems, signalSystemConfigurations);
-	}
 
 	public final void run() {
 		prepareSim();
