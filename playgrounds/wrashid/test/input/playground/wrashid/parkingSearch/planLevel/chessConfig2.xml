@@ -88,13 +88,14 @@
 
 	
 		
-		<param name="ModuleProbability_1" value="0.0" />
+		<param name="ModuleProbability_1" value="0.1" />
 		<param name="Module_1" value="ReRoute" />
 		
-		<param name="ModuleProbability_2" value="0.9" />
+		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="BestScore" />
 		
-		
+		<param name="ModuleProbability_3" value="0.8" />
+		<param name="Module_3" value="playground.wrashid.parkingSearch.planLevel.replanning.ParkingPlanStrategy" />
 
 	
 	</module>
