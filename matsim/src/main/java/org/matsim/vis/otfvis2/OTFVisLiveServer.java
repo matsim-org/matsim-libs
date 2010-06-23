@@ -10,6 +10,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -42,6 +43,8 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	private Scenario scenario;
 
 	private SnapshotReceiver snapshotReceiver;
+
+	private SnapshotGenerator snapshotGenerator;
 	
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
 		
@@ -235,6 +238,9 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	@Override
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
 		System.out.println("Requested: " + time);
+		if (snapshotGenerator != null) {
+			snapshotGenerator.skipUntil(time);
+		}
 		while(nextTimeStep == null || nextTimeStep.time < time) {
 			try {
 				nextTimeStep = timeStepBuffer.take();
@@ -253,6 +259,10 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	public SnapshotReceiver getSnapshotReceiver() {
 		return snapshotReceiver;
+	}
+
+	public void setSnapshotGenerator(SnapshotGenerator snapshotGenerator) {
+		this.snapshotGenerator = snapshotGenerator;
 	}
 
 }

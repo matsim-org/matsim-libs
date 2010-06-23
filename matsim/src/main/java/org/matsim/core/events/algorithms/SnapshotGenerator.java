@@ -46,7 +46,6 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
@@ -64,6 +63,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	private final double capCorrectionFactor;
 	private final double storageCapFactor;
 	private final String snapshotStyle;
+	private double skipUntil = 0.0;
 
 	public SnapshotGenerator(final Network network, final double snapshotPeriod, final SimulationConfigGroup config) {
 		this.network = network;
@@ -150,15 +150,16 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	}
 
 	private void doSnapshot(final double time) {
-		System.out.println("create snapshot at " + Time.writeTime(time));
-		if (!this.snapshotWriters.isEmpty()) {
-			Collection<PositionInfo> positions = getVehiclePositions(time);
-			for (SnapshotWriter writer : this.snapshotWriters) {
-				writer.beginSnapshot(time);
-				for (PositionInfo position : positions) {
-					writer.addAgent(position);
+		if (time >= skipUntil) {
+			if (!this.snapshotWriters.isEmpty()) {
+				Collection<PositionInfo> positions = getVehiclePositions(time);
+				for (SnapshotWriter writer : this.snapshotWriters) {
+					writer.beginSnapshot(time);
+					for (PositionInfo position : positions) {
+						writer.addAgent(position);
+					}
+					writer.endSnapshot();
 				}
-				writer.endSnapshot();
 			}
 		}
 	}
@@ -183,6 +184,18 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		for (SnapshotWriter writer : this.snapshotWriters) {
 			writer.finish();
 		}
+	}
+	
+	/**
+	 * 
+	 * Allow this SnapshotGenerator to skip all snapshots up to, but not including, a give timestep.
+	 * This is especially useful for interactive settings where a user may fast-forward.
+	 * Snapshot generation is one of the most expensive parts of mobility simulations, so this saves a lot of time. 
+	 * 
+	 * @param when The earliest timestep at which the caller will be interested in snapshots again.
+	 */
+	public void skipUntil(final double when) {
+		this.skipUntil = when;
 	}
 
 	private static class EventLink {
