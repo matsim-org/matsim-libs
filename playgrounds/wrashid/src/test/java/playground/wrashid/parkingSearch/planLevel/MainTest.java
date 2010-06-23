@@ -38,6 +38,12 @@ public class MainTest extends MatsimTestCase {
 		eventHandlerAdder.addEventHandler(new ParkingBookKeeper(controler));
 		controler.addControlerListener(eventHandlerAdder);
 		
+		// build structure for parking ranking.
+		// (needed for the above task: build structure for mapping from links to facilities)
+		
+		
+		
+		
 		
 		
 		controler.run();
