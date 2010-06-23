@@ -298,8 +298,11 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 
 
 	@Override
-	public int getLastTime() {		
-		return this.getLast().getHighBound();		
+	public int getLastTime() {	
+		if (this.getLast().getFlow() == 0) {
+			return this.getLast().getLowBound();
+		}
+		return this.getLast().getHighBound(); // usually the TimeHorizon!		
 	}
 
 
