@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
@@ -191,15 +192,20 @@ public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
 				DefaultPlanBasedSignalSystemController controler = new DefaultPlanBasedSignalSystemController(config);
 				systemControler = controler;
 			}
-			if (systemControler != null){
+			if (systemControler != null) {
 				this.initSignalSystemControlerDefaults(systemControler, config);
 				this.signalSystemControlerBySystemId.put(config.getSignalSystemId(), systemControler);
 				systemControler.setSignalEngine(this);
 				if (systemControler instanceof SimulationListener) {
 					this.qSimulation.addQueueSimulationListeners((SimulationListener)systemControler);
 				}
+				if (systemControler instanceof EventHandler){
+					this.getEvents().removeHandler((EventHandler) systemControler);
+					this.getEvents().addHandler((EventHandler) systemControler);
+				}
 				//add controller to signal groups
 				List<SignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
+				
 				if ((groups == null) || groups.isEmpty()) {
 					String message = "SignalSystemControler for SignalSystem Id: " + config.getSignalSystemId() + " without any SignalGroups defined in SignalSystemConfiguration!";
 					log.warn(message);

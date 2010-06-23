@@ -52,7 +52,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLinkInternalI> implements OTFW
 	
 	private double linkScale = 1.0;
 
-	private boolean isQLinkLanesReader;
+	protected boolean isQLinkLanesReader;
 	
 	public OTFLaneWriter(){
 	}

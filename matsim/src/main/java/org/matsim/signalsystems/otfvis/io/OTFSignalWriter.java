@@ -41,10 +41,10 @@ public class OTFSignalWriter extends OTFLaneWriter {
 
 	@Override
 	public void writeDynData(ByteBuffer out) throws IOException {
-		if (this.src instanceof QLinkLanesImpl){
+		if (this.isQLinkLanesReader){
 			int numberOfToNodeQueueLanes = ((QLinkLanesImpl)this.src).getToNodeQueueLanes().size();
 			out.putInt(numberOfToNodeQueueLanes);
-			if (numberOfToNodeQueueLanes > 1) {
+//			if (numberOfToNodeQueueLanes > 1) {
 				for (QLane ql : ((QLinkLanesImpl)this.src).getToNodeQueueLanes()){
 					ByteBufferUtils.putString(out, ql.getId().toString());
 					SignalGroupDefinition sg = ql.getSignalGroups().values().iterator().next();
@@ -62,7 +62,7 @@ public class OTFSignalWriter extends OTFLaneWriter {
 						out.putInt(3);
 					}
 				}
-			}
+//			}
 		}
 	}
 

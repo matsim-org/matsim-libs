@@ -39,9 +39,8 @@ public class OTFSignalReader extends OTFLaneReader {
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 		if (this.isQLinkLanesReader){
 			int numberOfLanes = in.getInt();
-			if (numberOfLanes > 1) {
+//			if (numberOfLanes > 1) {
 				String id;
-				boolean green;
 				for (int i = 0; i < numberOfLanes; i++) {
 					id = ByteBufferUtils.getString(in);
 					int stateInt = in.getInt();
@@ -60,7 +59,7 @@ public class OTFSignalReader extends OTFLaneReader {
 					}
 					this.drawer.updateGreenState(id, state);
 				}
-			}
+//			}
 		}
 	}
 }
