@@ -22,8 +22,7 @@ package playground.cottbus;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-
-import playground.dgrether.signalVis.DgOnTheFlyQueueSimQuad;
+import org.matsim.vis.otfvis.OTFVisQSim;
 
 /**
  * @author	rschneid-btu
@@ -70,8 +69,7 @@ public class FourWaysVis {
 		EventsManagerImpl events = new EventsManagerImpl();
 		
 		
-		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(scenario, events);
-		client.initOrReinitSignalEngine(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
+		OTFVisQSim client = new OTFVisQSim(scenario, events);
 		client.run();
 		
 		
