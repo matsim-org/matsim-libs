@@ -482,20 +482,13 @@ public class QLinkLanesImpl implements QLinkInternalI {
 	 */
 	class VisDataImpl implements VisData {
 
-//		public double getDisplayableTimeCapValue(double time) {
-//			return originalLane.visdata.getDisplayableTimeCapValue(time);
-//		}
-
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
-//			double time = QLinkLanesImpl.this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay() ;
-
 
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
 		  for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
 		    lane.visdata.getVehiclePositions(positions);
 		  }
-
 		  int cnt2 = 0;
   		// treat vehicles from waiting list:
 		  agentSnapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkLanesImpl.this.link, cnt2,
