@@ -57,7 +57,6 @@ public class ActivityHandler implements PlanElementHandler, SimFeature, SimKeepA
 	@Override
 	public void handleStart(final PlanAgent agent) {
 		Activity act = (Activity) agent.getCurrentPlanElement();
-		EventsManager em = this.simEngine.getEventsManager();
 		double endTime = calculateActivityEndTime(act);
 		if (endTime != Time.UNDEFINED_TIME) {
 			this.activityEndsList.put(new ActivityData(endTime, agent));
@@ -69,16 +68,23 @@ public class ActivityHandler implements PlanElementHandler, SimFeature, SimKeepA
 						"personId = " + agent.getPlan().getPerson().getId() + ". Activity = " + act);
 			}
 		}
-		em.processEvent(em.getFactory().createActivityStartEvent(this.simEngine.getCurrentTime(),
-				agent.getPlan().getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+		if (act != agent.getPlan().getPlanElements().get(0)) {
+			// do not generate event for first activity
+			EventsManager em = this.simEngine.getEventsManager();
+			em.processEvent(em.getFactory().createActivityStartEvent(this.simEngine.getCurrentTime(),
+					agent.getPlan().getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+		}
 	}
 
 	@Override
 	public void handleEnd(final PlanAgent agent) {
 		Activity act = (Activity) agent.getCurrentPlanElement();
-		EventsManager em = this.simEngine.getEventsManager();
-		em.processEvent(em.getFactory().createActivityEndEvent(this.simEngine.getCurrentTime(),
-				agent.getPlan().getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+		if (act != agent.getPlan().getPlanElements().get(agent.getPlan().getPlanElements().size() - 1)) {
+			// do not generate event for last plan element
+			EventsManager em = this.simEngine.getEventsManager();
+			em.processEvent(em.getFactory().createActivityEndEvent(this.simEngine.getCurrentTime(),
+					agent.getPlan().getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+		}
 	}
 
 	@Override
@@ -139,7 +145,13 @@ public class ActivityHandler implements PlanElementHandler, SimFeature, SimKeepA
 
 		@Override
 		public int compareTo(ActivityData o) {
-			return Double.compare(this.endTime, o.endTime);
+			if (this.endTime < o.endTime) {
+				return -1;
+			}
+			if (this.endTime > o.endTime) {
+				return +1;
+			}
+			return -this.agent.getPlan().getPerson().getId().compareTo(o.agent.getPlan().getPerson().getId()); // the '-' is for backwards compatibility
 		}
 
 		@Override
@@ -149,6 +161,11 @@ public class ActivityHandler implements PlanElementHandler, SimFeature, SimKeepA
 			}
 			ActivityData data = (ActivityData) obj;
 			return (this.agent == data.agent) && (this.endTime == data.endTime);
+		}
+
+		@Override
+		public int hashCode() {
+			return this.agent.hashCode();
 		}
 	}
 

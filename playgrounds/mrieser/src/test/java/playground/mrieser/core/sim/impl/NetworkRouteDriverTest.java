@@ -30,6 +30,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
+/**
+ * @author mrieser
+ */
 public class NetworkRouteDriverTest {
 
 	@Test

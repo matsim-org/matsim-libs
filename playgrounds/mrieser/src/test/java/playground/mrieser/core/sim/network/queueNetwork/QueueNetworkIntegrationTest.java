@@ -17,43 +17,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.sim.fakes;
+package playground.mrieser.core.sim.network.queueNetwork;
 
-import org.matsim.api.core.v01.Id;
-
-import playground.mrieser.core.sim.api.DriverAgent;
-import playground.mrieser.core.sim.api.SimVehicle;
-
-/**
- * @author mrieser
- */
-public class FakeSimVehicle implements SimVehicle {
-
-	private DriverAgent driver = null;
-	private final Id id;
-
-	public FakeSimVehicle(final Id id) {
-		this.id = id;
-	}
-
-	@Override
-	public DriverAgent getDriver() {
-		return this.driver;
-	}
-
-	@Override
-	public Id getId() {
-		return this.id;
-	}
-
-	@Override
-	public double getSizeInEquivalents() {
-		return 1.0;
-	}
-
-	@Override
-	public void setDriver(DriverAgent driver) {
-		this.driver = driver;
-	}
+public class QueueNetworkIntegrationTest {
 
 }

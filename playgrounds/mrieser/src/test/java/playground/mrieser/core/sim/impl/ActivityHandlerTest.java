@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -37,6 +38,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
 
 import playground.mrieser.core.sim.api.PlanAgent;
@@ -51,21 +53,22 @@ public class ActivityHandlerTest {
 	public void testHandleStartHandleEnd() {
 		Fixture f = new Fixture();
 		FakeSimEngine engine = new FakeSimEngine();
-		EventsCounter eventsCounter = new EventsCounter();
-		engine.getEventsManager().addHandler(eventsCounter);
+		EventsCollector eventsCollector = new EventsCollector();
+		engine.getEventsManager().addHandler(eventsCollector);
 		ActivityHandler ah = new ActivityHandler(engine);
 
-		Assert.assertEquals(0, eventsCounter.count);
+		Assert.assertEquals(0, eventsCollector.getEvents().size());
 		Assert.assertEquals(0, engine.countHandleAgent);
 
 		Assert.assertEquals(f.firstHomeAct, f.agent1.useNextPlanElement());
 
 		ah.handleStart(f.agent1);
-		Assert.assertEquals(1, eventsCounter.count);
+		Assert.assertEquals("First Activity Start must not generate event.", 0, eventsCollector.getEvents().size());
 		Assert.assertEquals(0, engine.countHandleAgent);
 
 		ah.handleEnd(f.agent1);
-		Assert.assertEquals(2, eventsCounter.count);
+		Assert.assertEquals(1, eventsCollector.getEvents().size());
+		Assert.assertTrue(eventsCollector.getEvents().get(0) instanceof ActivityEndEvent);
 		Assert.assertEquals(0, engine.countHandleAgent);
 
 		f.agent1.useNextPlanElement(); // leg
@@ -73,11 +76,11 @@ public class ActivityHandlerTest {
 		Assert.assertEquals(f.workAct, f.agent1.useNextPlanElement());
 
 		ah.handleStart(f.agent1);
-		Assert.assertEquals(3, eventsCounter.count);
+		Assert.assertEquals(2, eventsCollector.getEvents().size());
 		Assert.assertEquals(0, engine.countHandleAgent);
 
 		ah.handleEnd(f.agent1);
-		Assert.assertEquals(4, eventsCounter.count);
+		Assert.assertEquals(3, eventsCollector.getEvents().size());
 		Assert.assertEquals(0, engine.countHandleAgent);
 
 		f.agent1.useNextPlanElement(); // leg
@@ -85,11 +88,11 @@ public class ActivityHandlerTest {
 		Assert.assertEquals(f.lastHomeAct, f.agent1.useNextPlanElement());
 
 		ah.handleStart(f.agent1);
-		Assert.assertEquals(5, eventsCounter.count);
+		Assert.assertEquals(4, eventsCollector.getEvents().size());
 		Assert.assertEquals(0, engine.countHandleAgent);
 
 		ah.handleEnd(f.agent1);
-		Assert.assertEquals(6, eventsCounter.count);
+		Assert.assertEquals("Last Activity End must not generate event.", 4, eventsCollector.getEvents().size());
 		Assert.assertEquals(0, engine.countHandleAgent);
 	}
 

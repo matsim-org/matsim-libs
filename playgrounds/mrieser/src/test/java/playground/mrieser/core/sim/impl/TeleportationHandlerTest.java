@@ -34,6 +34,9 @@ import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.fakes.FakeSimEngine;
 import playground.mrieser.core.sim.impl.TimestepSimEngineTest.CountingPlanElementHandler;
 
+/**
+ * @author mrieser
+ */
 public class TeleportationHandlerTest {
 
 	@Test

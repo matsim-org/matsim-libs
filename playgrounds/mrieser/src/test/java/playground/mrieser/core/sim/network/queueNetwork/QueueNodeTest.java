@@ -36,8 +36,10 @@ import playground.mrieser.core.sim.fakes.FakeSimEngine;
 import playground.mrieser.core.sim.fakes.FakeSimVehicle;
 import playground.mrieser.core.sim.network.api.SimLink;
 
+/**
+ * @author mrieser
+ */
 public class QueueNodeTest {
-
 
 	@Test
 	public void testMoveNode_singleCarAwaiting() {

@@ -134,7 +134,7 @@ import playground.mrieser.core.sim.network.api.SimLink;
 		if (position == SimLink.POSITION_AT_FROM_NODE) {
 			// vehicle enters from intersection
 			this.vehQueue.add(vehicle);
-			double earliestLeaveTime = now + this.freespeedTravelTime;
+			double earliestLeaveTime = (int) (now + this.freespeedTravelTime); // (int) for backwards compatibility
 			this.earliestLeaveTimes.put(vehicle, earliestLeaveTime);
 			this.usedStorageCapacity += vehicle.getSizeInEquivalents();
 			this.network.simEngine.getEventsManager().processEvent(

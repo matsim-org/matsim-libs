@@ -39,7 +39,7 @@ public class TeleportOnlySimFactory implements MobsimFactory {
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
 
-		PlanSimulationImpl planSim = new PlanSimulationImpl(sc, eventsManager);
+		PlanSimulationImpl planSim = new PlanSimulationImpl(sc);
 
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
 		planSim.setSimEngine(engine);

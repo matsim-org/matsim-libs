@@ -43,6 +43,9 @@ import playground.mrieser.core.sim.network.api.SimLink;
 import playground.mrieser.core.sim.network.api.SimNetwork;
 import playground.mrieser.core.sim.network.queueNetwork.QueueNetworkCreator;
 
+/**
+ * @author mrieser
+ */
 public class IntegrationTest {
 
 	@Test
@@ -53,7 +56,7 @@ public class IntegrationTest {
 		EventsManager events = new EventsManagerImpl();
 
 		/* setup start */
-		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario, events);
+		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
 		planSim.setSimEngine(engine);
 
@@ -95,7 +98,7 @@ public class IntegrationTest {
 		EventsManager events = new EventsManagerImpl();
 
 		/* setup start */
-		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario, events);
+		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
 		planSim.setSimEngine(engine);
 
@@ -133,7 +136,7 @@ public class IntegrationTest {
 		events.addHandler(new EventsLogger());
 
 		/* setup start */
-		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario, events);
+		PlanSimulationImpl planSim = new PlanSimulationImpl(f.scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, events);
 		planSim.setSimEngine(engine);
 

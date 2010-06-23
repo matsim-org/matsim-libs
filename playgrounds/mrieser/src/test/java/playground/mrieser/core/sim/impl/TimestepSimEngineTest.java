@@ -35,6 +35,9 @@ import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.api.PlanElementHandler;
 import playground.mrieser.core.sim.api.PlanSimulation;
 
+/**
+ * @author mrieser
+ */
 public class TimestepSimEngineTest {
 	@Test
 	public void testHandleNextPlanElement_singlePlan() {
@@ -49,7 +52,7 @@ public class TimestepSimEngineTest {
 		plan.addActivity(new ActivityImpl("home", c));
 		PlanAgent agent = new DefaultPlanAgent(plan);
 
-		PlanSimulation planSim = new PlanSimulationImpl(null, null);
+		PlanSimulation planSim = new PlanSimulationImpl(null);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, null);
 		CountingPlanElementHandler actHandler = new CountingPlanElementHandler();
 		CountingPlanElementHandler legHandler = new CountingPlanElementHandler();
@@ -98,7 +101,7 @@ public class TimestepSimEngineTest {
 		plan2.addActivity(new ActivityImpl("home", c));
 		PlanAgent agent2 = new DefaultPlanAgent(plan2);
 
-		PlanSimulation planSim = new PlanSimulationImpl(null, null);
+		PlanSimulation planSim = new PlanSimulationImpl(null);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, null);
 		CountingPlanElementHandler actHandler = new CountingPlanElementHandler();
 		CountingPlanElementHandler legHandler = new CountingPlanElementHandler();

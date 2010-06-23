@@ -51,6 +51,9 @@ import playground.mrieser.core.sim.features.NetworkFeature;
 import playground.mrieser.core.sim.network.api.SimLink;
 import playground.mrieser.core.sim.network.queueNetwork.QueueNetworkCreator;
 
+/**
+ * @author mrieser
+ */
 public class CarDepartureHandlerTest {
 
 	@Test
@@ -162,7 +165,7 @@ public class CarDepartureHandlerTest {
 			network.addLink(setLinkAttributes(netFactory.createLink(this.ids[4], this.ids[4], this.ids[5]), 500.0, 3600.0, 10.0, 1));
 
 			EventsManager events = new EventsManagerImpl();
-			this.sim = new PlanSimulationImpl(this.scenario, events);
+			this.sim = new PlanSimulationImpl(this.scenario);
 			this.simEngine = new DefaultTimestepSimEngine(sim, events);
 			this.networkFeature = new DefaultNetworkFeature(QueueNetworkCreator.createQueueNetwork(network, simEngine, new Random(1)));
 		}

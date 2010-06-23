@@ -52,13 +52,17 @@ public class UseCase2_RefSim {
 		ScenarioLoader loader = new ScenarioLoaderImpl(config);
 		Scenario scenario = loader.loadScenario();
 		EventsManager events = new EventsManagerImpl();
-		EventWriterXML ew = new EventWriterXML("testEvents.xml");
+		EventWriterXML ew = new EventWriterXML("testEventsNew.xml");
 		events.addHandler(ew);
 
 		/* **************************************************************** */
 
 		Simulation sim = new RefSimFactory().createMobsim(scenario, events);
 		sim.run(); // replace with PlanSimulation.runSim();
+
+//		config.setQSimConfigGroup(new QSimConfigGroup());
+//		Simulation oldSim = new QSimFactory().createMobsim(scenario, events);
+//		oldSim.run();
 
 		/* **************************************************************** */
 

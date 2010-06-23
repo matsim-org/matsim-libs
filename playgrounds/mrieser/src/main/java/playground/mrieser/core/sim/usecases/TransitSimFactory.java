@@ -49,7 +49,7 @@ public class TransitSimFactory implements MobsimFactory {
 	@Override
 	public Simulation createMobsim(Scenario scenario, EventsManager eventsManager) {
 
-		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario, eventsManager);
+		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
 		planSim.setSimEngine(engine);
 

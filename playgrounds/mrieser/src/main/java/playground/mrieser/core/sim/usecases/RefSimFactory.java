@@ -45,7 +45,7 @@ public class RefSimFactory implements MobsimFactory {
 	@Override
 	public Simulation createMobsim(final Scenario scenario, final EventsManager eventsManager) {
 
-		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario, eventsManager);
+		PlanSimulationImpl planSim = new PlanSimulationImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
 		planSim.setSimEngine(engine);
 
@@ -55,7 +55,6 @@ public class RefSimFactory implements MobsimFactory {
 
 		// setup features; order is important!
 		planSim.addSimFeature(new StatusFeature());
-		planSim.addSimFeature(netFeature);
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
@@ -63,6 +62,8 @@ public class RefSimFactory implements MobsimFactory {
 		planSim.setPlanElementHandler(Activity.class, ah);
 		planSim.setPlanElementHandler(Leg.class, lh);
 		planSim.addSimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
+
+		planSim.addSimFeature(netFeature); // order of features is important!
 
 		// setup DepartureHandlers
 		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(engine, netFeature, scenario));

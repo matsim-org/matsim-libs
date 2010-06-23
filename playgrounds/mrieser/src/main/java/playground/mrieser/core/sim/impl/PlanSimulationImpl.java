@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Simulation;
 
 import playground.mrieser.core.sim.api.NewSimEngine;
@@ -49,7 +48,7 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 	private final ClassBasedMap<PlanElement, PlanElementHandler> peHandlers = new ClassBasedMap<PlanElement, PlanElementHandler>();
 	private final LinkedList<SimFeature> simFeatures = new LinkedList<SimFeature>();
 
-	public PlanSimulationImpl(final Scenario scenario, final EventsManager events) {
+	public PlanSimulationImpl(final Scenario scenario) {
 		this.scenario = scenario;
 	}
 

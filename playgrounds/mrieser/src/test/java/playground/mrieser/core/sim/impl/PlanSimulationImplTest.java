@@ -37,7 +37,7 @@ public class PlanSimulationImplTest {
 
 	@Test
 	public void testSetGetPlanElementHandler_Interfaces() {
-		PlanSimulationImpl sim = new PlanSimulationImpl(null, null);
+		PlanSimulationImpl sim = new PlanSimulationImpl(null);
 		Assert.assertNull(sim.getPlanElementHandler(PlanElement.class));
 		Assert.assertNull(sim.getPlanElementHandler(Activity.class));
 		Assert.assertNull(sim.getPlanElementHandler(Leg.class));
@@ -58,7 +58,7 @@ public class PlanSimulationImplTest {
 
 	@Test
 	public void testSetGetPlanElementHandler_Implementations() {
-		PlanSimulationImpl sim = new PlanSimulationImpl(null, null);
+		PlanSimulationImpl sim = new PlanSimulationImpl(null);
 		Assert.assertNull(sim.getPlanElementHandler(Activity.class));
 		Assert.assertNull(sim.getPlanElementHandler(Leg.class));
 
@@ -76,7 +76,7 @@ public class PlanSimulationImplTest {
 
 	@Test
 	public void testRemovePlanElementHandler() {
-		PlanSimulationImpl sim = new PlanSimulationImpl(null, null);
+		PlanSimulationImpl sim = new PlanSimulationImpl(null);
 		CountingPlanElementHandler actHandler = new CountingPlanElementHandler();
 		CountingPlanElementHandler legHandler = new CountingPlanElementHandler();
 
@@ -96,7 +96,7 @@ public class PlanSimulationImplTest {
 
 	@Test
 	public void testSetPlanElementHandler_replace() {
-		PlanSimulationImpl sim = new PlanSimulationImpl(null, null);
+		PlanSimulationImpl sim = new PlanSimulationImpl(null);
 		CountingPlanElementHandler actHandler1 = new CountingPlanElementHandler();
 		CountingPlanElementHandler actHandler2 = new CountingPlanElementHandler();
 		CountingPlanElementHandler legHandler = new CountingPlanElementHandler();

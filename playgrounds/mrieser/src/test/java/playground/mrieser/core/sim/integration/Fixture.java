@@ -39,6 +39,9 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
+/**
+ * @author mrieser
+ */
 /*package*/ class Fixture {
 
 	private final Id[] ids = new Id[10];

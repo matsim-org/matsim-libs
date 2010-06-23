@@ -35,6 +35,9 @@ import playground.mrieser.core.sim.api.SimVehicle;
 import playground.mrieser.core.sim.fakes.FakeSimEngine;
 import playground.mrieser.core.sim.impl.DefaultSimVehicle;
 
+/**
+ * @author mrieser
+ */
 public class QueueBufferTest {
 
 	@Test
