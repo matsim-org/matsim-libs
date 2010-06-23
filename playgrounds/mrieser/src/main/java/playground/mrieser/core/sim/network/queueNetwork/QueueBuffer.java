@@ -30,7 +30,7 @@ import playground.mrieser.core.sim.api.SimVehicle;
 /**
  * @author mrieser
  */
-public class QueueBuffer {
+/*package*/ class QueueBuffer {
 
 	/*package*/ final QueueLink link;
 
