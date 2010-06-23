@@ -221,8 +221,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		boolean doContinue = true;
 		double time = this.simTimer.getTimeOfDay();
 		while (doContinue) {
-			beforeSimStep(time);
 			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
+			beforeSimStep(time);
 			doContinue = doSimStep(time);
 			afterSimStep(time);
 			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
