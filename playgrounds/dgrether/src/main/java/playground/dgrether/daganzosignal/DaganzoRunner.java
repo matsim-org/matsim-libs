@@ -33,12 +33,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 
 import playground.dgrether.analysis.charts.DgTravelTimeCalculatorChart;
@@ -81,31 +76,29 @@ public class DaganzoRunner {
 		controler.setOverwriteFiles(true);
 		Config config = controler.getConfig();
 		this.addControlerListener(controler);
-		this.addQSimListener(controler);
+//		this.addQSimListener(controler);
 		controler.run();
 //		this.startVisualizer(config);
 	}
 
-	private void addQSimListener(final Controler controler) {
-		controler.getQueueSimulationListener().add(new SimulationInitializedListener<QSim>() {
-			//add the adaptive controller as events listener
-			public void notifySimulationInitialized(SimulationInitializedEvent<QSim> e) {
-				QSim qs = e.getQueueSimulation();
-				AdaptiveController adaptiveController = (AdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
-				controler.getEvents().addHandler(adaptiveController);
-			}
-		});
-		//remove the adaptive controller
-		controler.getQueueSimulationListener().add(new SimulationBeforeCleanupListener<QSim>() {
-			public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QSim> e) {
-				QSim qs = e.getQueueSimulation();
-				AdaptiveController adaptiveController = (AdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
-				controler.getEvents().removeHandler(adaptiveController);
-			}
-		});
-
-
-	}
+//	private void addQSimListener(final Controler controler) {
+//		controler.getQueueSimulationListener().add(new SimulationInitializedListener<QSim>() {
+//			//add the adaptive controller as events listener
+//			public void notifySimulationInitialized(SimulationInitializedEvent<QSim> e) {
+//				QSim qs = e.getQueueSimulation();
+//				AdaptiveController adaptiveController = (AdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+//				controler.getEvents().addHandler(adaptiveController);
+//			}
+//		});
+//		//remove the adaptive controller
+//		controler.getQueueSimulationListener().add(new SimulationBeforeCleanupListener<QSim>() {
+//			public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QSim> e) {
+//				QSim qs = e.getQueueSimulation();
+//				AdaptiveController adaptiveController = (AdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+//				controler.getEvents().removeHandler(adaptiveController);
+//			}
+//		});
+//	}
 
 	private void addControlerListener(Controler c) {
 		//add some EventHandler to the EventsManager after the controler is started
@@ -123,8 +116,6 @@ public class DaganzoRunner {
 				e.getControler().getEvents().addHandler(handler3);
 				e.getControler().getEvents().addHandler(handler4);
 				e.getControler().getEvents().addHandler(signalGreenSplitHandler);
-
-				
 			}
 		});
 		
