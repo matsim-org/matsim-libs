@@ -37,8 +37,6 @@ public interface DgPaths {
 	
 	final String SHAREDSVN = SCMWORKSPACE + "shared-svn/";
 
-
-  
   final String RUNBASE = SCMWORKSPACE + "runs-svn/";
 
   final String IVTCHNET = SHAREDSVN + "studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
