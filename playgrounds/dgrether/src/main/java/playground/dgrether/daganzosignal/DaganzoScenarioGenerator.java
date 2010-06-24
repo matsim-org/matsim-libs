@@ -106,7 +106,7 @@ public class DaganzoScenarioGenerator {
 
 	public String configOut, plansOut, outputDirectory;
 
-	public static boolean isAlternativeRouteEnabled = false;
+	public static boolean isAlternativeRouteEnabled = true;
 
 	private static final boolean isUsePlansOnly = true;
 
@@ -114,10 +114,10 @@ public class DaganzoScenarioGenerator {
 
 	private static final boolean isUseSignalSystems = true;
 
-	private static final int iterations = 0;
+	private static final int iterations = 100;
 	private static final int iterations2 = 0;
 	
-	private static final int agents = 20;
+	private static final int agents = 5000;
 
 	private static final int ttBinSize = 1;
 
@@ -130,16 +130,28 @@ public class DaganzoScenarioGenerator {
 	}
 
 	private void init() {
+		String baseString = "daganzo_";
 		if (isAlternativeRouteEnabled) {
-			plansOut = PLANS2OUT;
-			configOut = CONFIG2OUT;
-			outputDirectory = OUTPUTDIRECTORYALTERNATIVEROUTE;
+			baseString += "alternativeRoute_";
+//			plansOut = PLANS2OUT;
+//			configOut = CONFIG2OUT;
+//			outputDirectory = OUTPUTDIRECTORYALTERNATIVEROUTE;
 		}
 		else {
-			plansOut = PLANS1OUT;
-			configOut = CONFIG1OUT;
-			outputDirectory = OUTPUTDIRECTORYNORMALROUTE;
+			baseString += "normalRoute_";
+//			plansOut = PLANS1OUT;
+//			configOut = CONFIG1OUT;
+//			outputDirectory = OUTPUTDIRECTORYNORMALROUTE;
 		}
+		baseString += "usePlansOnly-" + Boolean.toString(isUsePlansOnly) + "_";
+		baseString += "noAgents-" + Integer.toString(agents) + "_";
+		baseString += "iterations-" + Integer.toString(iterations) + "_";
+		baseString += "p-" + AdaptiveController.p + "_";
+		baseString += "ttbinsize-" + ttBinSize;
+		
+		configOut = DAGANZOBASEDIR + "config_" + baseString + ".xml";
+		plansOut = DAGANZOBASEDIR + "plans_" + baseString + ".xml";
+		outputDirectory = DAGANZOBASEDIR + baseString + "/";
 	}
 
 	private void createIds(ScenarioImpl sc){
@@ -221,8 +233,8 @@ public class DaganzoScenarioGenerator {
 			  p.addPlan(plan);
         plan2 = this.createPlan(true, factory, homeEndTime, network);
         p.addPlan(plan2);
-        plan.setScore(-0.2733333333333334);
-        plan2.setScore(-0.2733333333333334);
+//        plan.setScore(-0.2733333333333334);
+//        plan2.setScore(-0.2733333333333334);
         if (isAlternativeRouteEnabled){
           plan.setSelected(false);
           plan2.setSelected(true);
@@ -301,9 +313,9 @@ public class DaganzoScenarioGenerator {
 
 		// configure simulation and snapshot writing
 		config.setQSimConfigGroup(new QSimConfigGroup());
-		config.getQSimConfigGroup().setSnapshotFormat("otfvis");
-		config.getQSimConfigGroup().setSnapshotPeriod(60.0);
-		config.getQSimConfigGroup().setSnapshotStyle("queue");
+//		config.getQSimConfigGroup().setSnapshotFormat("otfvis");
+//		config.getQSimConfigGroup().setSnapshotPeriod(60.0);
+//		config.getQSimConfigGroup().setSnapshotStyle("queue");
 //    config.getQSimConfigGroup().setSnapshotFormat(null);
 		// configure strategies for replanning
 		config.strategy().setMaxAgentPlanMemorySize(4);
