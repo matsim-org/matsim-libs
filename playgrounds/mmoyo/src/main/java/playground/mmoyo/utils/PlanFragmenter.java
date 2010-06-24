@@ -25,7 +25,9 @@ public class PlanFragmenter {
 	public Population run(Population population){
 		ScenarioImpl tempScenario =new ScenarioImpl();
 		PopulationImpl newPopulation = new PopulationImpl(tempScenario);
-
+		
+		System.out.println("plans before fragmentation: " + population.getPersons().size());
+		
 		for (Person person : population.getPersons().values()) {
 			char suffix = 'a';
 			Person clonPerson=null;
@@ -63,20 +65,21 @@ public class PlanFragmenter {
 				}
 			}
 		}
-		//tempScenario= null;
+		System.out.println("plans after fragmentation: " + newPopulation.getPersons().size());
+		
 		return newPopulation;
 	}
 
 	public static void main(String[] args) {
 		//String configFile = args[0];
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_5x_subset_xy2links_ptplansonly/config/config_Berlin5x_moyo.xml";
+		String configFile = "../playgrounds/mmoyo/output/best/configs/config_best.xml";
 
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
 		ScenarioImpl scenario = scenarioLoader.getScenario();
 		scenarioLoader.loadScenario();
 		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));
 
-		String outputFile = "../playgrounds/mmoyo/output/Berlin5x_20_moyo85_15Fragmented.xml";
+		String outputFile = "../playgrounds/mmoyo/output/best/fragmented.xml";
 		System.out.println("writing output plan file..." + outputFile);
 		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write(outputFile) ;

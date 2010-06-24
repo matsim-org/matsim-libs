@@ -3,13 +3,13 @@ package playground.mmoyo.utils;
 import java.io.*;
 import java.util.zip.*;
 
-class KMZ_Extractor {
+/**Extracts only station counts graphs and error graphs from a kmz file*/
+public class KMZ_Extractor {
 	String ERR_PREFIX = "error";
 	String POINT = ".";
     String kmzFile;
     String outputDir;
 	
-    /**Extracts only station counts graphs and error graphs from a kmz file*/
     public KMZ_Extractor( String kmzFile, String outputDir){
     	this.kmzFile = kmzFile;
     	this.outputDir = outputDir;

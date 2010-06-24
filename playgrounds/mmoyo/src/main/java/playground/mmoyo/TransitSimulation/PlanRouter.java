@@ -43,6 +43,7 @@ public class PlanRouter {
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 
+		PTValues.routerCalculator =1;
 		System.out.println( PTValues.routerCalculator );
 		switch (PTValues.routerCalculator){
 			case 1:  //rieser
@@ -58,18 +59,19 @@ public class PlanRouter {
 		router.run(scenario.getPopulation());
 
 		//write plan
-		/*
+		
 		System.out.println("writing output plan file..." + routedPlansFile);
 		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()) ;
 		popwriter.write(routedPlansFile) ;
-		*/
+	
 		
 		//write fragmented version of the plan
+		/*
 		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));		
 		System.out.println("writing output plan file..." + routedPlansFile + "frag");
 		PopulationWriter popwriter2 = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()) ;
 		popwriter2.write(routedPlansFile) ;
-		
+		*/
 		new FileCompressor().run(routedPlansFile);  
 		System.out.println("done");
 	}
@@ -82,7 +84,7 @@ public class PlanRouter {
 		if (args.length>0){
 			configFile = args[0];
 		}else {
-			//configFile = "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/config.xml";
+			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/config.xml";
 		}
 
 		ScenarioImpl scenarioImpl = new TransScenarioLoader ().loadScenario(configFile); 

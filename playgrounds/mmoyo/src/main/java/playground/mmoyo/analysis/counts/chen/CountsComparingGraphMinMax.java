@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import javax.imageio.ImageIO;
 
+import playground.mmoyo.utils.KMZ_Extractor;
+
 /** Joins graphs of kml files of different cost calculations in order to compare them **/
 
 /*
@@ -19,45 +21,47 @@ import javax.imageio.ImageIO;
  * error graphs
  * optimize the 
  */
-
 public class CountsComparingGraphMinMax {
-	final String SEPARATOR = "/";
-	final String POINT = ".";
-	final String TYPE_ALIGHT = " Alight";
-	final String TYPE_BOARD = " Board";
-	final String TYPE_OCUPP = " Occup";
-	final String READING = "reading: ";
-	final String CREATING = "creating graph: ";
-	final String A_SUF= "a";
-	final String B_SUF= "b";
-	final String O_SUF= "o";
-	final String SVN = ".svn";
-	final String INFO = "info.txt";
-	final String OCUP_ERROR_TYPE = "errorGraphErrorBiasOccupancy";
-	final String BOARD_ERROR_TYPE = "errorGraphErrorBiasBoarding";
-	final String ALIGHT_ERROR_TYPE = "errorGraphErrorBiasAlighting";
-	
 	//assumes:
 	//1-all graphs were extracted into dir "/ITERS/it.0/graphs/"
 	//2.-folders of graph combination start with a 4 char prefix like "time" "sec_"  plus the value vgr "time0.0", "sec_60.0"
-	final String VARIABLE = "sec_";
 	double firstValue;
 	double lastValue;
+	private String minMaxDirPath;
+	final String PNG = ".png";
 	
-	private void createComparingGraphs(final String dirPath) throws IOException{
-		File dir = new File(dirPath);    	
-		System.out.println("dir" + dir.getPath());
-		String ITERPATH = "/ITERS/it.0/graphs/";   
+	public void createComparingGraphs(final String runsDir, final String indVarPrefix) throws IOException{
+		final String READING = "reading: ";
+		final String A_SUF= "a";
+		final String B_SUF= "b";
+		final String O_SUF= "o";
+		final String INFO = "info.txt";
+		final String SVN = ".svn";
+		final String OCUP_ERROR_TYPE = "errorGraphErrorBiasOccupancy";
+		final String BOARD_ERROR_TYPE = "errorGraphErrorBiasBoarding";
+		final String ALIGHT_ERROR_TYPE = "errorGraphErrorBiasAlighting";
+		final String SEPARATOR = "/";
+		final String POINT = ".";
+		final String it0Dir = "/ITERS/it.0";
+		final String graphsDir = "/graphs/";
+		final String kmzFile = "/0.countscompare.kmz";
 
+		File runsDirFileObj = new File(runsDir);    	
+		this.minMaxDirPath = runsDirFileObj.getParent()+ SEPARATOR + "comparingMinMax/" ;
+		System.out.println("dir" + runsDirFileObj.getPath());
+		
+		//create comparingMinMax directory
+		File minMaxDirFileObj = new File (this.minMaxDirPath);
+		if (!minMaxDirFileObj.exists()){minMaxDirFileObj.mkdir(); }
+		minMaxDirFileObj = null;	
+		
 		/*
 		int alightNum=0;
 		int boardsNum=0;
 		int ocupNum=0;
 		*/
-		
+
 		//find all graphs and store their location in a mapped list
-		//Map <String, List<GraphData>> bufImgMap = new TreeMap <String, List<GraphData>>();
-		
 		Map <String, List<GraphData>> boardBufImgMap = new TreeMap <String, List<GraphData>>();
 		Map <String, List<GraphData>> ocupBufImgMap = new TreeMap <String, List<GraphData>>();
 		Map <String, List<GraphData>> alightBufImgMap = new TreeMap <String, List<GraphData>>();
@@ -68,15 +72,24 @@ public class CountsComparingGraphMinMax {
 		
 		List<Double> variableList = new ArrayList<Double>();
 		
-		for (int i= 0; i< dir.list().length ; i++){
-			System.out.println (READING + dir.list()[i]);
-			String coeffCombination = dir.list()[i];
+		for (int i= 0; i< runsDirFileObj.list().length ; i++){
+			System.out.println (READING + runsDirFileObj.list()[i]);
+			String coeffCombination = runsDirFileObj.list()[i];
 			if (!(coeffCombination.equals(SVN) || coeffCombination.equals(INFO))){
-				File graphDir1 = new File(dirPath + SEPARATOR +  coeffCombination + ITERPATH);   ///graphs folder
-				for (int ii= 0; ii< graphDir1.list().length; ii++){
-					String graphName= graphDir1.list()[ii];
+
+				//uncompress the counts graph from countscompare.kmz file  into the  folder of iteration 0*/
+				String iter0_dir = runsDir + SEPARATOR + coeffCombination + it0Dir;
+				String graphDirPath = iter0_dir +  graphsDir;
+				System.out.println(graphDirPath);
+				File graphDirFileObj = new File(graphDirPath); 
+				graphDirFileObj.mkdir();
+				KMZ_Extractor kmz_Extractor = new KMZ_Extractor(iter0_dir + kmzFile, graphDirPath);    
+				kmz_Extractor.extractGraphs();		
+				
+				for (int ii= 0; ii< graphDirFileObj.list().length; ii++){
+					String graphName= graphDirFileObj.list()[ii];
 					if (!(graphName.equals(SVN) || graphName.equals(INFO))){
-						String filePath = graphDir1 + SEPARATOR + graphName;
+						String filePath = graphDirFileObj.getPath() + SEPARATOR + graphName;
 						System.out.println(READING + filePath);
 
 						//find out type (
@@ -86,46 +99,45 @@ public class CountsComparingGraphMinMax {
 							if (!alightBufImgMap.containsKey(graphName)){
 								alightBufImgMap.put(graphName,  new ArrayList<GraphData>());
 							}
-							alightBufImgMap.get(graphName).add(new GraphData(filePath, coeffCombination));
+							alightBufImgMap.get(graphName).add(new GraphData(filePath, coeffCombination, indVarPrefix));
 							//alightNum++;
 						
 						}else if (suffix.equals(B_SUF)){
 							if (!boardBufImgMap.containsKey(graphName)){
 								boardBufImgMap.put(graphName,  new ArrayList<GraphData>());
 							}
-							boardBufImgMap.get(graphName).add(new GraphData(filePath, coeffCombination));
+							boardBufImgMap.get(graphName).add(new GraphData(filePath, coeffCombination, indVarPrefix));
 							//boardsNum++;
 
 						}else if (suffix.equals(O_SUF)){
 							if (!ocupBufImgMap.containsKey(graphName)){
 								ocupBufImgMap.put(graphName,  new ArrayList<GraphData>());
 							}
-							ocupBufImgMap.get(graphName).add(new GraphData(filePath, coeffCombination));
+							ocupBufImgMap.get(graphName).add(new GraphData(filePath, coeffCombination, indVarPrefix));
 							//ocupNum++;
 						
-						}else if (graphName.equals(ALIGHT_ERROR_TYPE + ".png")){
+						}else if (graphName.equals(ALIGHT_ERROR_TYPE + PNG)){
 							if (!alightErrorBufImgMap.containsKey(ALIGHT_ERROR_TYPE)){
 								alightErrorBufImgMap.put(ALIGHT_ERROR_TYPE,  new ArrayList<GraphData>());
 							}
-							alightErrorBufImgMap.get(ALIGHT_ERROR_TYPE).add(new GraphData(filePath, coeffCombination));
+							alightErrorBufImgMap.get(ALIGHT_ERROR_TYPE).add(new GraphData(filePath, coeffCombination, indVarPrefix));
 							
-						}else if (graphName.equals(BOARD_ERROR_TYPE + ".png")){
+						}else if (graphName.equals(BOARD_ERROR_TYPE + PNG)){
 							if (!boardErrorBufImgMap.containsKey(BOARD_ERROR_TYPE)){
 								boardErrorBufImgMap.put(BOARD_ERROR_TYPE,  new ArrayList<GraphData>());
 							}
-							boardErrorBufImgMap.get(BOARD_ERROR_TYPE).add(new GraphData(filePath, coeffCombination));
+							boardErrorBufImgMap.get(BOARD_ERROR_TYPE).add(new GraphData(filePath, coeffCombination, indVarPrefix));
 							
-						}else if (graphName.equals(OCUP_ERROR_TYPE + ".png")){
+						}else if (graphName.equals(OCUP_ERROR_TYPE + PNG)){
 							if (!ocupErrorBufImgMap.containsKey(OCUP_ERROR_TYPE)){
 								ocupErrorBufImgMap.put(OCUP_ERROR_TYPE,  new ArrayList<GraphData>());
 							}
-							ocupErrorBufImgMap.get(OCUP_ERROR_TYPE).add(new GraphData(filePath, coeffCombination));
+							ocupErrorBufImgMap.get(OCUP_ERROR_TYPE).add(new GraphData(filePath, coeffCombination, indVarPrefix));
 						}
 							
 						variableList.add(Double.parseDouble(coeffCombination.substring(4)));
 					}
 				}
-				
 			}
 		}
 		
@@ -134,37 +146,40 @@ public class CountsComparingGraphMinMax {
 		firstValue= variableList.get(0).doubleValue();
 		lastValue= variableList.get(variableList.size()-1).doubleValue();
 		
-		createGraph(TYPE_BOARD, boardBufImgMap);
-		createGraph(TYPE_ALIGHT, alightBufImgMap);
-		createGraph(TYPE_OCUPP, ocupBufImgMap);
+		createGraph(" Board", boardBufImgMap, indVarPrefix);
+		createGraph(" Alight", alightBufImgMap, indVarPrefix);
+		createGraph(" Occup", ocupBufImgMap, indVarPrefix);
 		
-		createGraph(BOARD_ERROR_TYPE, boardErrorBufImgMap);		
-		createGraph(OCUP_ERROR_TYPE, ocupErrorBufImgMap);
-		createGraph(ALIGHT_ERROR_TYPE, alightErrorBufImgMap);
+		createGraph(BOARD_ERROR_TYPE, boardErrorBufImgMap, indVarPrefix);		
+		createGraph(OCUP_ERROR_TYPE, ocupErrorBufImgMap, indVarPrefix);
+		createGraph(ALIGHT_ERROR_TYPE, alightErrorBufImgMap, indVarPrefix);
 	}
 	
-	private void createGraph(String type, Map <String, List<GraphData>> bufImgMap) throws IOException{
+	private void createGraph(String type, Map <String, List<GraphData>> bufImgMap, String indVarPrefix) throws IOException{
 		int posY=0;
 		boolean first=true;
 		
 		BufferedImage buffImage = new BufferedImage( 400+400, (bufImgMap.size()*300) + 15, BufferedImage.TYPE_INT_RGB); 
 		
 		Graphics graphics = buffImage.getGraphics();
-		for(Map.Entry <String,List<GraphData>> entry: bufImgMap.entrySet()){
-			String key = entry.getKey(); 
-			List<GraphData> graphPathList = entry.getValue();
-			Collections.sort(graphPathList);
+
+		//for(Map.Entry <String,List<GraphData>> entry: bufImgMap.entrySet()){
+		for (List<GraphData> graphPathList : bufImgMap.values()) {
+			///String key = entry.getKey(); 
+			///List<GraphData> graphPathList = entry.getValue();
+			///Collections.sort(graphPathList);
 			//GraphData firstGraph = graphPathList.get(0);
 			//GraphData lastGraph = graphPathList.get(graphPathList.size()-1);
 			
 			if (first){
-				BufferedImage head1= createHeader(VARIABLE + firstValue + " "  + type);
-				BufferedImage head2= createHeader(VARIABLE + lastValue + " "  + type);
+				BufferedImage head1= createHeader(indVarPrefix + firstValue + " "  + type);
+				BufferedImage head2= createHeader(indVarPrefix + lastValue + " "  + type);
 				graphics.drawImage(head1, 0, 0, null);
 				graphics.drawImage(head2, 400, 0, null);
 				posY= 15;
 				first=false;
 			}
+			
 			BufferedImage firstGraphImg = ImageIO.read(new File(graphPathList.get(0).getFilePath()));
 			BufferedImage lastGraphImg = ImageIO.read(new File(graphPathList.get(graphPathList.size()-1).getFilePath()));
 			
@@ -173,7 +188,7 @@ public class CountsComparingGraphMinMax {
 			posY +=300;
 		}	
 		graphics.dispose();
-		File outputFile1 = new File("../playgrounds/mmoyo/output/fifth/prueba/" + type + ".png");
+		File outputFile1 = new File(this.minMaxDirPath + type + PNG);
 		ImageIO.write(buffImage,"png", outputFile1);		
 	}
 	
@@ -188,51 +203,24 @@ public class CountsComparingGraphMinMax {
 		return headImage;
 	}
 	
-	class GraphData implements Comparable<GraphData>{
-		String coeffCombination;
-		String filePath;
-		double variableValue;
-		
-		GraphData(String filePath, String coeffCombination){
-			this.filePath =  filePath;
-			this.coeffCombination = coeffCombination;
-	
-			if (coeffCombination.startsWith(VARIABLE)){ //make sure that the time combination starts with a prefix
-				variableValue = Double.parseDouble(coeffCombination.substring(4));
-			}
-		}
-
-		private String getCoeffCombination() {
-			return coeffCombination;
-		}
-
-		private String getFilePath() {
-			return filePath;
-		}
-
-		private double getTimePriority(){
-			return this.variableValue;	
-		}
-		
-		@Override
-		public int compareTo(GraphData otherGraphData) {
-		    return Double.compare(variableValue, otherGraphData.getTimePriority());
-		}
-	}
-	
 	public static void main(String[] args) {
-		//String dir = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/KMZ_counts_scalefactor50";
-		String dir = "../playgrounds/mmoyo/output/fifth/output";
+		String runsDir;
+		String indVarPrefix;
+		
+		if (args.length==2){
+			runsDir = args[0];
+			indVarPrefix = args[1];
+		}else{
+			//runsDir = "../playgrounds/mmoyo/output/@prueba/output";
+			runsDir = "../playgrounds/mmoyo/output/dist50/runs";
+			indVarPrefix =  "dist"; 
+		}
+		
 		try {
-			new CountsComparingGraphMinMax().createComparingGraphs(dir);
+			new CountsComparingGraphMinMax().createComparingGraphs(runsDir, indVarPrefix);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
 }
-
-
-
-	
-

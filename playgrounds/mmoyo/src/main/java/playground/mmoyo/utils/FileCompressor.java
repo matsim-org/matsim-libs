@@ -25,21 +25,33 @@ public class FileCompressor {
 	}
 	
 	//stores in the same directory and deletes original file 
-	public void run(String inputFile){
+	public String run(String inputFile){
 		File file = new File(inputFile);
-		String output = file.getParent()  + "/" + file.getName() + ".gz";
+		String output = file.getPath() + ".gz";
 		try {
 			run (inputFile, output);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (!file.delete()); 
+
 		//wait some time
-		System.out.println( file + " could not be deleted");
+		/*
+		try {
+			Thread.currentThread();
+			Thread.sleep(1000);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		*/
+		if (!file.delete()){
+			System.out.println( file + " could not be deleted");	
+		} 
+		return output;
 	}
 	
 	public static void main(String[] args) {
-		String inputFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/parameters_analysis with increasing time priority.xls";
+		String inputFile = "../playgrounds/mmoyo/output/sixth/comparingMinMax";
 		new FileCompressor().run(inputFile);
 	}
 

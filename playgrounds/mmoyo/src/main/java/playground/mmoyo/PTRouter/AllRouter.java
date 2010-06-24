@@ -1,4 +1,4 @@
-package playground.mmoyo.analysis.comp;
+package playground.mmoyo.PTRouter;
 
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,20 +27,11 @@ public class AllRouter {
 		}else{
 			configFile = "../playgrounds/mmoyo/output/comparison/Berlin/16plans/0config_5x_4plans.xml";
 		}
-		
-		/*
-		PTValues.scenarioName ="time100dist0CORRECTO";
-		PTValues.routerCalculator = 3;
-		PTValues.timeCoefficient = 1.0;
-		PTValues.distanceCoefficient=0.0;
-		//PlanRouter.main(new String[]{configFile});
-		*/
-		
+				
 		configFile = "../playgrounds/mmoyo/output/comparison/Berlin/16plans/0config_5x_4plans.xml";
-		PTValues.scenarioName ="marcels";
+		PTValues.scenarioName ="standard";
 		PTValues.routerCalculator = 1;
 		PlanRouter.main(new String[]{configFile});
-		
 		
 		/*
 		PTValues.routerCalculator = 3;
@@ -55,9 +46,3 @@ public class AllRouter {
 		*/
 	}
 }
-
-/*
-	//shut down ms-windows
-	Runtime runtime = Runtime.getRuntime();
-	runtime.exec("shutdown -s -t 60 -f");  
-*/

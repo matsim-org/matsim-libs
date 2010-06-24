@@ -5,11 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -17,10 +15,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.mmoyo.utils.PlanFragmenter;
 
@@ -45,11 +41,22 @@ public class PopulationPtAnalyzer {
 		int walkDistance = 0;
 		
 		Population population = this.scenario.getPopulation();
-		final int numAgents = population.getPersons().size();
+		final int plansBefFragm = population.getPersons().size();
+		
+		/*
+		//Get rid of only car plans
+		PlansFilterByLegMode plansFilter = new PlansFilterByLegMode( TransportMode.car, PlansFilterByLegMode.FilterType.removeAllPlansWithMode) ;
+		plansFilter.run(population);
+		//write this real working plan
+		PopulationWriter popwriter = new PopulationWriter(population, scenario.getNetwork());
+		popwriter.write("../playgrounds/mmoyo/output/marcel/job14/Berlin5xRemovedautos.xml") ;
+		
+		System.out.println("after removing cars: " + population.getPersons().size());
+		*/
 		
 		//plans must be fragmented
 		new PlanFragmenter().run(population);
-		
+		 
 		for (Person person : population.getPersons().values() ){
 			Plan plan =  person.getSelectedPlan();  
 			Activity aAct = ((Activity)plan.getPlanElements().get(0));
@@ -107,7 +114,7 @@ public class PopulationPtAnalyzer {
 			}//for planelement
 		}//	for person
 
-		System.out.println("Agents:  \t" + numAgents);
+		System.out.println("plansBeforeFragm:  \t" + plansBefFragm);
 		System.out.println("trips:  \t" + population.getPersons().size());
 		System.out.println("PTconnections:\t" + (population.getPersons().size()- directWalks));
 		System.out.println("directWalks:  \t" + directWalks);
@@ -122,9 +129,9 @@ public class PopulationPtAnalyzer {
 		String TAB= "\t";
 		try { 
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(scenario.getConfig().controler().getOutputDirectory()+ "/" + outputFile + ".txt")); 
-			 bufferedWriter.write("agents:\ttrips\tPTconnections:\tdirectWalks\travelTime:\ttravelDist:\ttransfers:\tdetTransfers:\twalkTime:\twalkDistance:\twaitTime:\n");
-			 bufferedWriter.write("\n" + numAgents + TAB + population.getPersons().size() + TAB + (population.getPersons().size()- directWalks) + TAB+ directWalks + TAB + travelTime + TAB + travelDistance + TAB + transfers + TAB + detTransfers + TAB + walkTime + TAB + walkDistance + TAB + waitTime); 
-			 bufferedWriter.close(); 
+			bufferedWriter.write("plansBefFragm:\ttrips\tPTconnections:\tdirectWalks\travelTime:\ttravelDist:\ttransfers:\tdetTransfers:\twalkTime:\twalkDistance:\twaitTime:\n");
+			bufferedWriter.write("\n" + plansBefFragm + TAB + population.getPersons().size() + TAB + (population.getPersons().size()- directWalks) + TAB+ directWalks + TAB + travelTime + TAB + travelDistance + TAB + transfers + TAB + detTransfers + TAB + walkTime + TAB + walkDistance + TAB + waitTime); 
+			bufferedWriter.close(); 
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
@@ -158,17 +165,14 @@ public class PopulationPtAnalyzer {
 		if (args.length==1){
 			configFile = args[0];
 		}else{
-			configFile = "../playgrounds/mmoyo/output/fouth/config.xml";
+			configFile = "../playgrounds/mmoyo/output/runs/config.xml";
 		}
 		
 		//for many scenarios resulted from incrementing time priority
-		loadManyScenarios(configFile);
+		//loadManyScenarios(configFile);
 
 		//for one scenario
-		//loadOneScenario(configFile);
+		loadOneScenario(configFile);
 		
-		//shut down ms-windows
-		Runtime runtime = Runtime.getRuntime();
-		runtime.exec("shutdown -s -t 60 -f");
 	}
 }

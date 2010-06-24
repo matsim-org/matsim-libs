@@ -57,30 +57,10 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
  */
 public class AdaptedTransitRouter extends TransitRouter {
 
-	/*
-	// private final TransitSchedule schedule;
-//	private final TransitRouterNetwork adaptedTransitNetwork;
-
-//	private final Map<TransitRouterNetworkLink, Tuple<TransitLine, TransitRoute>> linkMappings;
-//	private final Map<TransitRouterNetworkNode, TransitStopFacility> nodeMappings;
-
-//	private final MultiNodeDijkstra dijkstra;
-//	private final AdaptedTransitRouterNetworkTravelTimeCost ttCalculator;
-
-	// private final MyTransitRouterConfig getConfig() ;
-	*/
-
 	public AdaptedTransitRouter(MyTransitRouterConfig myTRConfig, final TransitSchedule schedule) {
 		super(schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig));
-		/*
-		// this.schedule = schedule;
-		// this.getConfig() = myTrConfig ;
-//		this.linkMappings = new HashMap<TransitRouterNetworkLink, Tuple<TransitLine, TransitRoute>>();
-//		this.nodeMappings = new HashMap<TransitRouterNetworkNode, TransitStopFacility>();
-//		this.adaptedTransitNetwork = buildNetwork();
-//		this.ttCalculator = new AdaptedTransitRouterNetworkTravelTimeCost((MyTransitRouterConfig)this.getConfig());
-//		this.dijkstra = new MultiNodeDijkstra(this.adaptedTransitNetwork, this.ttCalculator, this.ttCalculator);
-		 */
+		
+		//attention : the transit network is created first in the upper class   with "this.adaptedTransitNetwork = buildNetwork()";
 	}
 
 	@Override
@@ -148,122 +128,6 @@ public class AdaptedTransitRouter extends TransitRouter {
 		return convert( departureTime, p, fromCoord, toCoord ) ;
 	}
 
-		/*
-		
-		// now convert the path back into a series of legs with correct routes
-		double time = departureTime;
-		List<Leg> legs = new ArrayList<Leg>();
-		Leg leg = null;
-
-		TransitLine line = null;
-		TransitRoute route = null;
-		TransitStopFacility accessStop = null;
-		TransitRouteStop transitRouteStart = null;
-		Link prevLink = null;
-		int transitLegCnt = 0;
-		double ptRouteDistance = 0;
-		for (Link link : p.links) {
-			Tuple<TransitLine, TransitRoute> lineData = this.getLinkMappings().get(link);
-			// TransitStopFacility nodeData =
-			// this.nodeMappings.get(((TransitRouterNetworkWrapper.NodeWrapper)link.getToNode()).node);
-			if (lineData == null) {
-				TransitStopFacility egressStop = this.getNodeMappings().get(link.getFromNode());
-				// it must be one of the "transfer" links. finish the pt leg, if there was one before...
-				if (route != null) {
-					leg = new LegImpl(TransportMode.pt);
-					ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
-					ptRoute.setDistance(ptRouteDistance);
-					leg.setRoute(ptRoute);
-					double arrivalOffset = (((TransitRouterNetworkLink) link).getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? ((TransitRouterNetworkLink) link).fromNode.stop
-							.getArrivalOffset()
-							: ((TransitRouterNetworkLink) link).fromNode.stop.getDepartureOffset();
-					double arrivalTime = this.getTtCalculator().getNextDepartureTime(route, transitRouteStart, time)
-							+ (arrivalOffset - transitRouteStart.getDepartureOffset());
-					leg.setTravelTime(arrivalTime - time);
-					time = arrivalTime;
-					legs.add(leg);
-					transitLegCnt++;
-					accessStop = egressStop;
-					ptRouteDistance = 0;
-				}
-				line = null;
-				route = null;
-				transitRouteStart = null;
-			} else {
-				if (lineData.getSecond() != route) {
-					// the line changed
-					TransitStopFacility egressStop = this.getNodeMappings().get(((TransitRouterNetworkLink) link).getFromNode());
-					if (route == null) {
-						// previously, the agent was on a transfer, add the walk leg
-						transitRouteStart = ((TransitRouterNetworkLink) link).getFromNode().stop;
-						if (accessStop != egressStop) {
-							if (accessStop != null) {
-								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord())
-										/ this.getConfig().beelineWalkSpeed;
-								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
-								leg.setRoute(walkRoute);
-								leg.setTravelTime(walkTime);
-								time += walkTime;
-								legs.add(leg);
-							} else { // accessStop == null, so it must be the first walk-leg
-								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(fromCoord, egressStop.getCoord())
-										/ this.getConfig().beelineWalkSpeed;
-								leg.setTravelTime(walkTime);
-								time += walkTime;
-								legs.add(leg);
-							}
-						}
-					}
-					line = lineData.getFirst();
-					route = lineData.getSecond();
-					accessStop = egressStop;
-				}
-				ptRouteDistance += link.getLength();
-			}
-			prevLink = link;
-		}
-		if (route != null) {
-			// the last part of the path was with a transit route, so add the pt-leg and final walk-leg
-			leg = new LegImpl(TransportMode.pt);
-			TransitStopFacility egressStop = this.getNodeMappings().get(((TransitRouterNetworkLink) prevLink).getToNode());
-			ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
-			ptRoute.setDistance(ptRouteDistance);
-			leg.setRoute(ptRoute);
-			double arrivalOffset = (((TransitRouterNetworkLink) prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? ((TransitRouterNetworkLink) prevLink).toNode.stop
-					.getArrivalOffset()
-					: ((TransitRouterNetworkLink) prevLink).toNode.stop.getDepartureOffset();
-			double arrivalTime = this.getTtCalculator().getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
-			leg.setTravelTime(arrivalTime - time);
-			legs.add(leg);
-			transitLegCnt++;
-			accessStop = egressStop;
-			ptRouteDistance = 0;
-		}
-		if (prevLink != null) {
-			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime;
-			if (accessStop == null) {
-				walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.getConfig().beelineWalkSpeed;
-			} else {
-				walkTime = CoordUtils.calcDistance(accessStop.getCoord(), toCoord) / this.getConfig().beelineWalkSpeed;
-			}
-			leg.setTravelTime(walkTime);
-			legs.add(leg);
-		}
-		if (transitLegCnt == 0) {
-			// it seems, the agent only walked
-			legs.clear();
-			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.getConfig().beelineWalkSpeed;
-			leg.setTravelTime(walkTime);
-			legs.add(leg);
-		}
-		return legs;
-	}
-	*/
-
 	/**necessary to override since it uses a different algo than marcel.  kai, apr'10 
 	 * 
 	 */
@@ -313,9 +177,10 @@ public class AdaptedTransitRouter extends TransitRouter {
 		}
 
 		System.out.println("\n\n\n\ntransfers:" + transfers);
-		System.out.println("transit router network statistics:");
+		System.out.println("adapted router network statistics:");
 		System.out.println(" # nodes: " + network.getNodes().size());
 		System.out.println(" # links: " + network.getLinks().size());
+		System.out.println(" # transfer links: " + toBeAdded.size());
 
 		return network;
 	}
