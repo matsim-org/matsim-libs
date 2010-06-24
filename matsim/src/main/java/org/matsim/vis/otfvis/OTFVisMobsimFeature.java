@@ -64,7 +64,8 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 
 	private VisMobsim queueSimulation;
 
-	private final LinkedHashMap<Id, TeleportationVisData> visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
+	private final LinkedHashMap<Id, TeleportationVisData> visTeleportationData = 
+		new LinkedHashMap<Id, TeleportationVisData>();
 
 //	private final LinkedHashMap<Id, Integer> currentActivityNumbers = new LinkedHashMap<Id, Integer>();
 
@@ -185,6 +186,7 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 		if (this.doVisualizeTeleportedAgents) {
 			this.teleportationWriter.setSrc(this.visTeleportationData);
 		}
+		// yyyy is it necessary to call the following when teleported agents are not visualized?
 		for (TeleportationVisData teleportationVisData : visTeleportationData.values()) {
 			teleportationVisData.calculatePosition(time);
 		}
