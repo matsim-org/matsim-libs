@@ -258,7 +258,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	}
 
 	@Override
-	protected final Map<String, String> getComments() {
+	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(PERFORMING,"[utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of time if agent is doing nothing.");
 		map.put(TRAVELING, "[utils/hr] utility offset of traveling by car.  normally negative.  this comes on top of the opportunity cost of time") ;

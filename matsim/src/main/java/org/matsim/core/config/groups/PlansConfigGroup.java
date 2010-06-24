@@ -57,7 +57,7 @@ public class PlansConfigGroup extends Module {
 	}
 
 	@Override
-	protected Map<String, String> getComments() {
+	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(OUTPUT_FILE, "Path where plans file should be written to.  As far as I know, this variable is ignored when the controler is used.");
 		return map;

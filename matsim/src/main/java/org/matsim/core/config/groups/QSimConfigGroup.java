@@ -144,7 +144,7 @@ public class QSimConfigGroup extends Module {
 	}
 
 	@Override
-	protected final Map<String, String> getComments() {
+	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(SNAPSHOT_STYLE,"snapshotStyle: `equidist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link)");
 		map.put(NUMBER_OF_THREADS, "Use number of threads > 1 for parallel version using the specified number of threads");

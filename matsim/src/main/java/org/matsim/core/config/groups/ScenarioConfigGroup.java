@@ -85,7 +85,7 @@ public class ScenarioConfigGroup extends Module {
 	}
 
 	@Override
-	protected Map<String, String> getComments() {
+	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(USE_LANES, "Set this parameter to true if lanes should be used, false if not.");
 		map.put(USE_SIGNALSYSTMES, "Set this parameter to true if signal systems should be used, false if not.");

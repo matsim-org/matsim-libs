@@ -58,7 +58,7 @@ public class VspExperimentalConfigGroup extends Module {
 	}
 
 	@Override
-	protected Map<String, String> getComments() {
+	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(USE_ACTIVITY_DURATIONS, "Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
 

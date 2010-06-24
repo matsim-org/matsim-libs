@@ -103,7 +103,7 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 	}
 
 	@Override
-	protected final Map<String, String> getComments() {
+	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(TRAVEL_TIME_BIN_SIZE, "The size of the time bin (in sec) into which the link travel times are aggregated for the router") ;
 		return map;

@@ -153,7 +153,7 @@ public class ControlerConfigGroup extends Module {
 	}
 
 	@Override
-	protected final Map<String, String> getComments() {
+	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + " or " + RoutingAlgorithmType.AStarLandmarks);
 		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");

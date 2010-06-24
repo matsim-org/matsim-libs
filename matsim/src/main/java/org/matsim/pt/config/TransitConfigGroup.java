@@ -106,7 +106,7 @@ public class TransitConfigGroup extends Module {
 	}
 
 	@Override
-	protected Map<String, String> getComments() {
+	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		comments.put(TRANSIT_SCHEDULE_FILE, "Input file containing the transit schedule to be simulated.");
 		comments.put(VEHICLES_FILE, "Input file containing the vehicles used by the departures in the transit schedule.");

@@ -153,7 +153,7 @@ public class StrategyConfigGroup extends Module {
 	}
 
 	@Override
-	protected final Map<String, String> getComments() {
+	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
 		for (Map.Entry<Id, StrategySettings>  entry : this.settings.entrySet()) {

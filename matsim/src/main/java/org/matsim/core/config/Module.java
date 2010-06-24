@@ -106,7 +106,7 @@ public class Module  implements Serializable{
 	/**
 	 * @return a Map containing description to some or all parameters return in {@link #getParams()}.
 	 */
-	protected Map<String, String> getComments() {
+	public Map<String, String> getComments() {
 		return new HashMap<String, String>();
 	}
 
