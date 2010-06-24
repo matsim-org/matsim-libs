@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.daganzosignal;
 
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -27,6 +29,7 @@ import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.SignalGroupStateChangedEventImpl;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
@@ -51,9 +54,14 @@ public class AdaptiveController extends
 	private final Id id4 = new IdImpl("4");
 	private final Id id5 = new IdImpl("5");
 	private int vehOnLink5Lane1 = 0;
+
+	private Random random;
+	
+	public final static double p = 0.95;
 	
 	public AdaptiveController(AdaptiveSignalSystemControlInfo controlInfo) {
 		super(controlInfo);
+		this.random = MatsimRandom.getLocalInstance();
 	}
 
 
@@ -73,11 +81,12 @@ public class AdaptiveController extends
 
   @Override
   public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
-    for (SignalGroupDefinition signalGroup : this.getSignalGroups().values()){
+  	double rand = random.nextDouble();
+  	for (SignalGroupDefinition signalGroup : this.getSignalGroups().values()){
       SignalGroupState oldState = this.getSignalGroupStates().get(signalGroup);
       SignalGroupState newState = null;
       if (signalGroup.getLinkRefId().equals(id5)){
-        if (vehOnLink5Lane1 > 0) {
+        if (vehOnLink5Lane1 > 0 && (rand > p)/**/) {
           newState = SignalGroupState.GREEN;
         }
         else {
@@ -85,7 +94,7 @@ public class AdaptiveController extends
         }
       }
       else if (signalGroup.getLinkRefId().equals(id4)){
-        if (vehOnLink5Lane1 > 0){
+        if (vehOnLink5Lane1 > 0 && (rand > p)/**/){
           newState = SignalGroupState.RED;
         }
         else {
