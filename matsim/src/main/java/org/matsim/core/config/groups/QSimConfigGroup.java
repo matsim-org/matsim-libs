@@ -127,7 +127,7 @@ public class QSimConfigGroup extends Module {
 	}
 
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(START_TIME, getValue(START_TIME));
 		map.put(END_TIME, getValue(END_TIME));
@@ -254,7 +254,7 @@ public class QSimConfigGroup extends Module {
   }
 
 
-  public void setNumberOfThreads(int numberOfThreads) {
+  public void setNumberOfThreads(final int numberOfThreads) {
     this.numberOfThreads = numberOfThreads;
   }
 

@@ -25,9 +25,9 @@ import org.matsim.core.config.Module;
 
 
 /**
- * This config Module can be used to specify the paths to the 
+ * This config Module can be used to specify the paths to the
  * xml files configuring the signal systems.
- * 
+ *
  * @author dgrether
  *
  */
@@ -39,10 +39,10 @@ public class SignalSystemsConfigGroup extends Module {
 	private static final String SIGNALSYSTEMCONFIGFILE = "signalsystemsconfiguration";
 
 	public static final String GROUPNAME = "signalsystems";
-	
+
 	private String signalSystemFile;
 	private String signalSystemConfigFile;
-	
+
 	public SignalSystemsConfigGroup() {
 		super(GROUPNAME);
 	}
@@ -64,9 +64,9 @@ public class SignalSystemsConfigGroup extends Module {
 			throw new IllegalArgumentException("The key : " + key + " is not supported by this config group");
 		}
 	}
-	
+
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(SIGNALSYSTEMFILE, this.getSignalSystemFile());
 		map.put(SIGNALSYSTEMCONFIGFILE, this.getSignalSystemConfigFile());
@@ -81,26 +81,26 @@ public class SignalSystemsConfigGroup extends Module {
 	}
 
 	public String getSignalSystemFile() {
-		return signalSystemFile;
+		return this.signalSystemFile;
 	}
 
 
-	
-	public void setSignalSystemFile(String signalSystemFile) {
+
+	public void setSignalSystemFile(final String signalSystemFile) {
 		this.signalSystemFile = signalSystemFile;
 	}
 
 
-	
+
 	public String getSignalSystemConfigFile() {
-		return signalSystemConfigFile;
+		return this.signalSystemConfigFile;
 	}
 
 
-	
-	public void setSignalSystemConfigFile(String signalSystemConfigFile) {
+
+	public void setSignalSystemConfigFile(final String signalSystemConfigFile) {
 		this.signalSystemConfigFile = signalSystemConfigFile;
 	}
-	
-	
+
+
 }

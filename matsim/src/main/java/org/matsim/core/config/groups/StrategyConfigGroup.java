@@ -133,7 +133,7 @@ public class StrategyConfigGroup extends Module {
 	}
 
 	@Override
-	protected TreeMap<String, String> getParams() {
+	public TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(MAX_AGENT_PLAN_MEMORY_SIZE, getValue(MAX_AGENT_PLAN_MEMORY_SIZE));
 		for (Map.Entry<Id, StrategySettings>  entry : this.settings.entrySet()) {
@@ -151,7 +151,7 @@ public class StrategyConfigGroup extends Module {
 		this.addParameterToMap(map, EXTERNAL_EXE_TIME_OUT);
 		return map;
 	}
-	
+
 	@Override
 	protected final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
@@ -191,14 +191,14 @@ public class StrategyConfigGroup extends Module {
 			}
 		}
 	}
-	
+
 	/**
 	 * Adds the StrategySettings given as parameter to the map storing the settings for the strategies.
 	 * An IllegalArgumentException is thrown, if a StrategySEttings instance with the id of the parameter
 	 * already exists in the map.
 	 * @param stratSets
 	 */
-	public void addStrategySettings(StrategySettings stratSets) {
+	public void addStrategySettings(final StrategySettings stratSets) {
 		if (this.settings.containsKey(stratSets.getId())) {
 			throw new IllegalArgumentException("A strategy with id: " + stratSets.getId() + " is already configured!");
 		}
@@ -257,10 +257,10 @@ public class StrategyConfigGroup extends Module {
 		private int disableAfter = -1;
 		private String exePath = null;
 
-		public StrategySettings(Id id) {
+		public StrategySettings(final Id id) {
 			this.id = id;
 		}
-		
+
 		public void setProbability(final double probability) {
 			this.probability = probability;
 		}
@@ -292,12 +292,12 @@ public class StrategyConfigGroup extends Module {
 		public String getExePath() {
 			return this.exePath;
 		}
-		
+
 		public Id getId() {
-			return id;
+			return this.id;
 		}
-		
-		public void setId(Id id) {
+
+		public void setId(final Id id) {
 			this.id = id;
 		}
 

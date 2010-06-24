@@ -97,7 +97,7 @@ public class TransitConfigGroup extends Module {
 	}
 
 	@Override
-	protected Map<String, String> getParams() {
+	public Map<String, String> getParams() {
 		Map<String, String> params = super.getParams();
 		addParameterToMap(params, TRANSIT_SCHEDULE_FILE);
 		addParameterToMap(params, VEHICLES_FILE);

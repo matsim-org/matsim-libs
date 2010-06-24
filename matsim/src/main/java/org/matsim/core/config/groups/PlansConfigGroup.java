@@ -51,7 +51,7 @@ public class PlansConfigGroup extends Module {
 
 	private static final Logger log = Logger.getLogger(PlansConfigGroup.class);
 
-	
+
 	public PlansConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -73,7 +73,7 @@ public class PlansConfigGroup extends Module {
 			return getOutputFile();
 		} else if (OUTPUT_VERSION.equals(key)) {
 			return getOutputVersion();
-		} 
+		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -105,7 +105,7 @@ public class PlansConfigGroup extends Module {
 	}
 
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(OUTPUT_SAMPLE, getValue(OUTPUT_SAMPLE));
 		addParameterToMap(map, INPUT_FILE);

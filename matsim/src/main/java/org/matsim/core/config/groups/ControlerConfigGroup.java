@@ -139,7 +139,7 @@ public class ControlerConfigGroup extends Module {
 	}
 
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(OUTPUT_DIRECTORY, getValue(OUTPUT_DIRECTORY));
 		map.put(FIRST_ITERATION, getValue(FIRST_ITERATION));

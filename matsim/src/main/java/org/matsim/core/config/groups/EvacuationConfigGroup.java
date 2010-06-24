@@ -96,7 +96,7 @@ public class EvacuationConfigGroup extends Module {
 	private static final String SOCIAL_COST_OPTIMIZATION = "socialCostOptimization";
 
 	private static final String GENERATE_EVAC_NET_FROM_SWW_FILE = "generateEvacNetFromSWWFile";
-	
+
 	private static final String LOAD_POPULATION_FROM_SHAPE_FILE = "loadPopulationFromShapeFile";
 
 	/**
@@ -140,7 +140,7 @@ public class EvacuationConfigGroup extends Module {
 	private boolean socialCostOptimization = false;
 
 	private boolean generateEvacNetFromSWWFile = false;
-	
+
 	private boolean loadPopulationFromShapeFile = false;
 
 
@@ -236,7 +236,7 @@ public class EvacuationConfigGroup extends Module {
 
 
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(EVACUATION_AREA_FILE, getValue(EVACUATION_AREA_FILE));
 		map.put(BUILDINGS_FILE, getValue(BUILDINGS_FILE));
@@ -270,29 +270,29 @@ public class EvacuationConfigGroup extends Module {
 	 * @param evacuationAreaFile
 	 * the evacuation area filename to set
 	 */
-	public void setEvacuationAreaFile(String evacuationAreaFile) {
+	public void setEvacuationAreaFile(final String evacuationAreaFile) {
 		this.evacuationAreaFile = evacuationAreaFile;
 
 	}
 
-	public void setSWWRoot(String sWWRoot) {
+	public void setSWWRoot(final String sWWRoot) {
 		this.sWWRoot = sWWRoot;
 	}
-	public void setSWWFilePrefix(String sWWFilePrefix) {
+	public void setSWWFilePrefix(final String sWWFilePrefix) {
 		this.sWWFilePrefix = sWWFilePrefix;
 	}
-	public void setSWWFileSuffix(String sWWFileSuffix) {
+	public void setSWWFileSuffix(final String sWWFileSuffix) {
 		this.sWWFileSuffix = sWWFileSuffix;
 	}
-	public void setSWWFileCount(String sWWFileCount) {
+	public void setSWWFileCount(final String sWWFileCount) {
 		this.sWWFileCount = Integer.parseInt(sWWFileCount);
 	}
 
-	public void setSWWOffsetEast(String sWWOffsetEast) {
+	public void setSWWOffsetEast(final String sWWOffsetEast) {
 		this.sWWOffsetEast = Double.parseDouble(sWWOffsetEast);
 	}
 
-	public void setSWWOffsetNorth(String sWWOffsetNorth) {
+	public void setSWWOffsetNorth(final String sWWOffsetNorth) {
 		this.sWWOffsetNorth = Double.parseDouble(sWWOffsetNorth);
 	}
 
@@ -316,15 +316,15 @@ public class EvacuationConfigGroup extends Module {
 	}
 
 
-	public void setLoadShelters(String loadShelters) {
+	public void setLoadShelters(final String loadShelters) {
 		this.loadShelters = Boolean.parseBoolean(loadShelters);
 	}
 
-	public void setRiskMinimization(String riskMinimization) {
+	public void setRiskMinimization(final String riskMinimization) {
 		this.riskMinimization = Boolean.parseBoolean(riskMinimization);
 	}
 
-	public void setSocialCostOptimization(String socialCostOptimization) {
+	public void setSocialCostOptimization(final String socialCostOptimization) {
 		this.socialCostOptimization = Boolean.parseBoolean(socialCostOptimization);
 	}
 
@@ -344,18 +344,18 @@ public class EvacuationConfigGroup extends Module {
 		return this.generateEvacNetFromSWWFile;
 	}
 
-	public void setGenerateEvacNetFromSWWFile(String generateEvacNetFromSWWFile) {
+	public void setGenerateEvacNetFromSWWFile(final String generateEvacNetFromSWWFile) {
 		this.generateEvacNetFromSWWFile = Boolean.parseBoolean(generateEvacNetFromSWWFile);
 	}
 
 	public boolean isLoadPopulationFromShapeFile() {
 		return this.loadPopulationFromShapeFile;
 	}
-	
-	private void setLoadPopulationFromShapeFile(String loadPopulationFromShapeFile) {
+
+	private void setLoadPopulationFromShapeFile(final String loadPopulationFromShapeFile) {
 		this.loadPopulationFromShapeFile = Boolean.parseBoolean(loadPopulationFromShapeFile);
 	}
-	
+
 	/**
 	 *
 	 * @return the shapes of the buildings
@@ -369,7 +369,7 @@ public class EvacuationConfigGroup extends Module {
 	 * @param buildingsFile
 	 * the shapes of the buildings
 	 */
-	public void setBuildingsFile(String buildingsFile) {
+	public void setBuildingsFile(final String buildingsFile) {
 		this.buildingsFile = buildingsFile;
 	}
 
@@ -387,7 +387,7 @@ public class EvacuationConfigGroup extends Module {
 	 * @param shorelineFile
 	 * the shapes of the evac decsion zones
 	 */
-	public void setEvacDecsionZonesFile(String evacDecsionZonesFile) {
+	public void setEvacDecsionZonesFile(final String evacDecsionZonesFile) {
 		this.evacDecisionZonesFile = evacDecsionZonesFile;
 	}
 
@@ -404,7 +404,7 @@ public class EvacuationConfigGroup extends Module {
 	 * @param scenario
 	 * the type of the scenario (i.e. day or night)
 	 */
-	public void setEvacuationScenario(String scenario) {
+	public void setEvacuationScenario(final String scenario) {
 		if (scenario.equals("day")) {
 			this.scenario = EvacuationScenario.day;
 		} else if (scenario.equals("night")) {
@@ -428,7 +428,7 @@ public class EvacuationConfigGroup extends Module {
 	 *
 	 * @param sampleSize
 	 */
-	public void setSampleSize(String sampleSize) {
+	public void setSampleSize(final String sampleSize) {
 		this.sampleSize = Double.parseDouble(sampleSize);
 	}
 
@@ -444,7 +444,7 @@ public class EvacuationConfigGroup extends Module {
 	 *
 	 * @param buffer size
 	 */
-	public void setBufferSize(String bufferSize) {
+	public void setBufferSize(final String bufferSize) {
 		this.bufferSize = Double.parseDouble(bufferSize);
 	}
 }

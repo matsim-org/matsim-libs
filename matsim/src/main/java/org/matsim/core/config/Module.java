@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 
 /**
  * Implements a generic config-group that stores all parameters in a simple Map.
- * 
+ *
  * @author mrieser
  * @author balmermi
  */
@@ -43,7 +43,7 @@ public class Module  implements Serializable{
 
 	private final String name;
 	private final TreeMap<String,String> params;
-	
+
 	private final static Logger log = Logger.getLogger(Module.class);
 
 	public Module(final String name) {
@@ -99,10 +99,10 @@ public class Module  implements Serializable{
 	}
 
 	/** @return a Map containing all parameters and their values known to this config group. */
-	protected Map<String, String> getParams() {
+	public Map<String, String> getParams() {
 		return this.params;
 	}
-	
+
 	/**
 	 * @return a Map containing description to some or all parameters return in {@link #getParams()}.
 	 */

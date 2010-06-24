@@ -262,7 +262,7 @@ public class Config {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	protected final TreeMap<String, Module> getModules() {
+	public final TreeMap<String, Module> getModules() {
 		return this.modules;
 	}
 
@@ -436,7 +436,7 @@ public class Config {
 	}
 
 	public final PlanomatConfigGroup planomat() {
-		return planomat;
+		return this.planomat;
 	}
 
 	public SignalSystemsConfigGroup signalSystems() {
@@ -452,7 +452,7 @@ public class Config {
 	}
 
 	public void addConfigConsistencyChecker(
-			ConfigConsistencyChecker checker) {
+			final ConfigConsistencyChecker checker) {
 		this.consistencyCheckers.add(checker);
 	}
 
@@ -470,10 +470,10 @@ public class Config {
 
 
   public QSimConfigGroup getQSimConfigGroup() {
-    return qSimConfigGroup;
+    return this.qSimConfigGroup;
   }
 
-  public void setQSimConfigGroup(QSimConfigGroup qSimConfigGroup) {
+  public void setQSimConfigGroup(final QSimConfigGroup qSimConfigGroup) {
     this.qSimConfigGroup = qSimConfigGroup;
     this.modules.put(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
   }

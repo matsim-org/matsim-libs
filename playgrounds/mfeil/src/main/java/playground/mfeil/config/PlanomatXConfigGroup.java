@@ -26,11 +26,11 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class PlanomatXConfigGroup extends Module {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "planomatX";
-	
+
 	/* Name of parameters */
 	private static final String NEIGHBOURHOOD_SIZE = "neighbourhood_size";
 	private static final String MAX_ITERATIONS = "max_iterations";
@@ -42,7 +42,7 @@ public class PlanomatXConfigGroup extends Module {
 	private static final String LC_MODE = "lc_mode";
 	private static final String LC_SET_SIZE = "lc_set_size";
 	private static final String ACT_TYPES = "act_types";
-	
+
 	//default values
 	// TODO all "static" to be removed later, only bypassing solution
 	private static String neighbourhood_size = "10";
@@ -55,9 +55,9 @@ public class PlanomatXConfigGroup extends Module {
 	private static String lc_mode = "fullLC";
 	private static String lc_set_size = "5";
 	private static String act_types = "customized";
-	
+
 	private final static Logger log = Logger.getLogger(PlanomatXConfigGroup.class);
-	
+
 
 	public PlanomatXConfigGroup() {
 		super(GROUP_NAME);
@@ -97,7 +97,7 @@ public class PlanomatXConfigGroup extends Module {
 		}
 		throw new IllegalArgumentException(key);
 	}
-	
+
 	@Override
 	public void addParam(final String key, final String value) {
 		if (NEIGHBOURHOOD_SIZE.equals(key)) {
@@ -107,8 +107,8 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				setNeighbourhoodSize(value);
 			}
-			
-			
+
+
 		} else if (MAX_ITERATIONS.equals(key)) {
 			if (Integer.parseInt(value) < 1) {
 				log.warn("Parameter MAX_ITERATIONS has been set to "+value+" but must be equal to or greater than 1. The default value of 20 will be used instead.");
@@ -116,8 +116,8 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				setMaxIterations(value);
 			}
-			
-			
+
+
 		} else if (WEIGHT_CHANGE_ORDER.equals(key)) {
 			if ((Double.parseDouble(value)) < 0 || (Double.parseDouble(value)) > 1) {
 				log.warn("Parameter WEIGHT_CHANGE_ORDER has been set to "+value+" but must be between 0 and 1. The default value of 0.2 will be used instead.");
@@ -125,7 +125,7 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				setWeightChangeOrder(value);
 			}
-			
+
 		} else if (WEIGHT_CHANGE_NUMBER.equals(key)) {
 			if ((Double.parseDouble(value)) < 0 || (Double.parseDouble(value)) > 1) {
 				log.warn("Parameter WEIGHT_CHANGE_NUMBER has been set to "+value+" but must be between 0 and 1. The default value of 0.6 will be used instead.");
@@ -141,7 +141,7 @@ public class PlanomatXConfigGroup extends Module {
 				double newNumber = Double.parseDouble(value)/sum;
 				setWeightChangeNumber(newNumber+"");
 			}
-			
+
 		} else if (WEIGHT_INC_NUMBER.equals(key)) {
 			if ((Double.parseDouble(value)) < 0 || (Double.parseDouble(value)) > 1) {
 				log.warn("Parameter WEIGHT_INC_NUMBER has been set to "+value+" but must be between 0 and 1. The default value of 0.5 will be used instead.");
@@ -149,7 +149,7 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				setWeightIncNumber(value);
 			}
-			
+
 		} else if (TIMER.equals(key)) {
 			if (value.equals("Planomat") || value.equals("TimeModeChoicer") || value.equals("TimeOptimizer")) {
 				setTimer(value);
@@ -157,7 +157,7 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				log.warn(value+" is no valid TIMER. Default TimeModeChoicer will be used instead.");
 			}
-			
+
 		} else if (FINAL_TIMER.equals(key)) {
 			if (value.equals("Planomat") || value.equals("TimeModechoicer") || value.equals("TimeOptimizer") || value.equals("none")) {
 				setFinalTimer(value);
@@ -165,7 +165,7 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				log.warn(value+" is no valid FINAL_TIMER. Final timeing will be skipped.");
 			}
-			
+
 		} else if (LC_MODE.equals(key)) {
 			if (value.equals("fullLC") || value.equals("reducedLC")) {
 				setLCMode(value);
@@ -173,7 +173,7 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				log.warn(value+" is no valid LC_MODE. Default reducedLC will be used instead.");
 			}
-			
+
 		} else if (LC_SET_SIZE.equals(key)) {
 			if (Integer.parseInt(value)<1) {
 				log.warn("Parameter LC_SET_SIZE has been set to "+value+" but must be equal to or greater than 1. The default value of 1 will be used instead.");
@@ -181,7 +181,7 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				setLCSetSize(value);
 			}
-			
+
 		} else if (ACT_TYPES.equals(key)) {
 			if (value.equals("knowledge") || value.equals("all") || value.equals("customized")) {
 				setActTypes(value);
@@ -189,12 +189,12 @@ public class PlanomatXConfigGroup extends Module {
 			else {
 				log.warn(value+" is no valid ACT_TYPES parameter. \"All\" activity types will be used instead.");
 			}
-			
+
 		} else throw new IllegalArgumentException(key);
 	}
-	
+
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		this.addParameterToMap(map, NEIGHBOURHOOD_SIZE);
 		this.addParameterToMap(map, MAX_ITERATIONS);
@@ -208,7 +208,7 @@ public class PlanomatXConfigGroup extends Module {
 		this.addParameterToMap(map, ACT_TYPES);
 		return map;
 	}
-	
+
 	// TODO all "static" to be removed later, only bypassing solution
 	public static String getNeighbourhoodSize() {
 		return neighbourhood_size;
@@ -237,37 +237,37 @@ public class PlanomatXConfigGroup extends Module {
 	public static String getWeightIncNumber() {
 		return weight_inc_number;
 	}
-	public void setWeightIncNumber(String weight) {
+	public void setWeightIncNumber(final String weight) {
 		this.weight_inc_number = weight;
 	}
 	public static String getTimer() {
 		return timer;
 	}
-	public void setTimer(String timer) {
+	public void setTimer(final String timer) {
 		this.timer = timer;
 	}
 	public static String getFinalTimer() {
 		return final_timer;
 	}
-	public void setFinalTimer(String finalTimer) {
+	public void setFinalTimer(final String finalTimer) {
 		this.final_timer = finalTimer;
 	}
 	public static String getLCMode() {
 		return lc_mode;
 	}
-	public void setLCMode(String mode) {
+	public void setLCMode(final String mode) {
 		this.lc_mode = mode;
 	}
 	public static String getLCSetSize() {
 		return lc_set_size;
 	}
-	public void setLCSetSize(String size) {
+	public void setLCSetSize(final String size) {
 		this.lc_set_size = size;
 	}
 	public static String getActTypes() {
 		return act_types;
 	}
-	public void setActTypes(String size) {
+	public void setActTypes(final String size) {
 		this.act_types = size;
 	}
 }

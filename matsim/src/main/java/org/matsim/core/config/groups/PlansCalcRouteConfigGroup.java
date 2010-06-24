@@ -90,7 +90,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 	}
 
 	@Override
-	protected final Map<String, String> getParams() {
+	public final Map<String, String> getParams() {
 		Map<String, String> map = super.getParams();
 		super.addParameterToMap(map, PT_SPEED_FACTOR);
 		super.addParameterToMap(map, WALK_SPEED);
@@ -104,30 +104,30 @@ public class PlansCalcRouteConfigGroup extends Module {
 	}
 
 	public double getWalkSpeed() {
-		return walkSpeed;
+		return this.walkSpeed;
 	}
 
-	public void setWalkSpeed(double walkSpeed) {
+	public void setWalkSpeed(final double walkSpeed) {
 		this.walkSpeed = walkSpeed;
 	}
 
 	public double getBikeSpeed() {
-		return bikeSpeed;
+		return this.bikeSpeed;
 	}
 
-	public void setBikeSpeed(double bikeSpeed) {
+	public void setBikeSpeed(final double bikeSpeed) {
 		this.bikeSpeed = bikeSpeed;
 	}
 
 	public double getUndefinedModeSpeed() {
-		return undefinedModeSpeed;
+		return this.undefinedModeSpeed;
 	}
 
-	public void setUndefinedModeSpeed(double undefinedModeSpeed) {
+	public void setUndefinedModeSpeed(final double undefinedModeSpeed) {
 		this.undefinedModeSpeed = undefinedModeSpeed;
 	}
 
-	public void setPtSpeedFactor(double ptSpeedFactor) {
+	public void setPtSpeedFactor(final double ptSpeedFactor) {
 		this.ptSpeedFactor = ptSpeedFactor;
 	}
 

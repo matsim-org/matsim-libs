@@ -56,7 +56,7 @@ public class RoadPricingConfigGroup extends Module {
 	}
 
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		if (this.tollLinksFile != null) {
 			map.put(TOLL_LINKS_FILE, getValue(TOLL_LINKS_FILE));

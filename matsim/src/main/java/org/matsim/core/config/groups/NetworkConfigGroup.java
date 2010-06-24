@@ -41,7 +41,7 @@ public class NetworkConfigGroup extends Module {
 	private static final String TIME_VARIANT_NETWORK = "timeVariantNetwork";
 	private static final String CHANGE_EVENTS_INPUT_FILE = "inputChangeEventsFile";
 	private static final String CHANGE_EVENTS_OUTPUT_FILE = "outputChangeEventsFile";
-	
+
 	public static final String LANEDEFINITIONSINPUTFILE = "laneDefinitionsFile";
 
 	private String inputFile = null;
@@ -102,7 +102,7 @@ public class NetworkConfigGroup extends Module {
 	}
 
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(NetworkConfigGroup.INPUT_FILE, getValue(NetworkConfigGroup.INPUT_FILE));
 		map.put(NetworkConfigGroup.OUTPUT_FILE, getValue(NetworkConfigGroup.OUTPUT_FILE));
@@ -150,10 +150,10 @@ public class NetworkConfigGroup extends Module {
 		return this.timeVariantNetwork;
 	}
 
-	public void setLaneDefinitionsFile(String laneDefinitions) {
+	public void setLaneDefinitionsFile(final String laneDefinitions) {
 		this.laneDefinitionsFile = laneDefinitions;
 	}
-	
+
 	public String getLaneDefinitionsFile(){
 		return this.laneDefinitionsFile;
 	}

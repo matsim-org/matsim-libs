@@ -83,7 +83,7 @@ public class GlobalConfigGroup extends Module {
 	}
 
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(RANDOM_SEED, getValue(RANDOM_SEED));
 		addParameterToMap(map, LOCAL_DTD_BASE);

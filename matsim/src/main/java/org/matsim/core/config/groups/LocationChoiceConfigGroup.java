@@ -31,9 +31,9 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "locationchoice";
-	
+
 	// true; false
-	private static final String CONSTRAINED = "constrained";	
+	private static final String CONSTRAINED = "constrained";
 	private static final String RESTR_FCN_FACTOR = "restraintFcnFactor";
 	private static final String RESTR_FCN_EXP = "restraintFcnExp";
 	private static final String SCALEFACTOR = "scaleFactor";
@@ -59,9 +59,9 @@ public class LocationChoiceConfigGroup extends Module {
 	private String centerNode = "null";
 	private String radius = "null";
 	private String flexible_types = "null";
-	
+
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
-	
+
 
 	public LocationChoiceConfigGroup() {
 		super(GROUP_NAME);
@@ -118,23 +118,23 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setMode(value);
 			}
-			
-			
+
+
 		} else if (RESTR_FCN_FACTOR.equals(key)) {
 			if (Double.parseDouble(value) < 0.0) {
 				log.warn("Restraint function factor is negative! " +
 						"This means: The more people are in a facility, the more attractive the facility is expected to be");
 			}
 			setRestraintFcnFactor(value);
-			
-			
+
+
 		} else if (RESTR_FCN_EXP.equals(key)) {
 			if (Double.parseDouble(value) < 0.0) {
 				log.warn("Restraint function exponent is negative! " +
 						"This means: The penalty gets smaller the more people are in a facility.");
 			}
 			setRestraintFcnExp(value);
-			
+
 		} else if (SCALEFACTOR.equals(key)) {
 			if (Double.parseDouble(value) < 1) {
 				log.warn("Scale factor must be greater than 1! Scale factor is set to default value 1");
@@ -143,7 +143,7 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setScaleFactor(value);
 			}
-			
+
 		} else if (RECURSIONTRAVELSPEEDCHANGE.equals(key)) {
 			if (Double.parseDouble(value) < 0.0 || Double.parseDouble(value) > 1.0 ) {
 				log.warn("'recursionTravelSpeedChange' must be [0..1]! Set to default value 0.1");
@@ -160,7 +160,7 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setRecursionTravelSpeed(value);
 			}
-			
+
 		} else if (MAX_RECURSIONS.equals(key)) {
 			if (Double.parseDouble(value) < 0.0) {
 				log.warn("'max_recursions' must be greater than 0! Set to default value 10");
@@ -195,16 +195,16 @@ public class LocationChoiceConfigGroup extends Module {
 			}
 			else {
 				setFlexibleTypes(value);
-			}		
+			}
 		}
-		else		
+		else
 		{
 			throw new IllegalArgumentException(key);
 		}
 	}
 
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		this.addParameterToMap(map, CONSTRAINED);
 		this.addParameterToMap(map, RESTR_FCN_FACTOR);
@@ -247,51 +247,51 @@ public class LocationChoiceConfigGroup extends Module {
 		this.scaleFactor = scaleFactor;
 	}
 	public String getRecursionTravelSpeedChange() {
-		return recursionTravelSpeedChange;
+		return this.recursionTravelSpeedChange;
 	}
-	public void setRecursionTravelSpeedChange(String recursionTravelSpeedChange) {
+	public void setRecursionTravelSpeedChange(final String recursionTravelSpeedChange) {
 		this.recursionTravelSpeedChange = recursionTravelSpeedChange;
 	}
 	public String getMaxRecursions() {
-		return maxRecursions;
+		return this.maxRecursions;
 	}
-	public void setMaxRecursions(String maxRecursions) {
+	public void setMaxRecursions(final String maxRecursions) {
 		this.maxRecursions = maxRecursions;
 	}
 	public String getRecursionTravelSpeed() {
-		return recursionTravelSpeed;
+		return this.recursionTravelSpeed;
 	}
-	public void setRecursionTravelSpeed(String recursionTravelSpeed) {
+	public void setRecursionTravelSpeed(final String recursionTravelSpeed) {
 		this.recursionTravelSpeed = recursionTravelSpeed;
 	}
 	public String getFixByActType() {
-		return fixByActType;
+		return this.fixByActType;
 	}
-	public void setFixByActType(String fixByActType) {
+	public void setFixByActType(final String fixByActType) {
 		this.fixByActType = fixByActType;
 	}
-	public void setSimpleTG(String simple_tg) {
+	public void setSimpleTG(final String simple_tg) {
 		this.simple_tg = simple_tg;
 	}
 	public String getSimpleTG() {
 		return this.simple_tg;
 	}
 	public String getCenterNode() {
-		return centerNode;
+		return this.centerNode;
 	}
-	public void setCenterNode(String centerNode) {
+	public void setCenterNode(final String centerNode) {
 		this.centerNode = centerNode;
 	}
 	public String getRadius() {
-		return radius;
+		return this.radius;
 	}
-	public void setRadius(String radius) {
+	public void setRadius(final String radius) {
 		this.radius = radius;
 	}
 	public String getFlexibleTypes() {
-		return flexible_types;
+		return this.flexible_types;
 	}
-	public void setFlexibleTypes(String flexibleTypes) {
+	public void setFlexibleTypes(final String flexibleTypes) {
 		this.flexible_types = flexibleTypes;
 	}
 }

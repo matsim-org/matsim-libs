@@ -21,22 +21,23 @@
 package playground.mfeil.config;
 
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class TimeOptimizerConfigGroup extends Module {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "planomatX";
-	
+
 	/* Name of parameters */
 	private static final String NEIGHBOURHOOD_SIZE = "neighbourhood_size";
 	private static final String MAX_ITERATIONS = "max_iterations";
 	private static final String STOP_CRITERION = "stop_criterion";
 	private static final String OFFSET = "offset";
 
-	
+
 	//default values
 	// TODO all "static" to be removed later, only bypassing solution
 	private static String neighbourhood_size = "10";
@@ -44,9 +45,9 @@ public class TimeOptimizerConfigGroup extends Module {
 	private static String stop_criterion = "5";
 	private static String offset = "900";
 
-	
+
 	private final static Logger log = Logger.getLogger(TimeOptimizerConfigGroup.class);
-	
+
 
 	public TimeOptimizerConfigGroup() {
 		super(GROUP_NAME);
@@ -68,7 +69,7 @@ public class TimeOptimizerConfigGroup extends Module {
 		}
 		throw new IllegalArgumentException(key);
 	}
-	
+
 	@Override
 	public void addParam(final String key, final String value) {
 		if (NEIGHBOURHOOD_SIZE.equals(key)) {
@@ -78,8 +79,8 @@ public class TimeOptimizerConfigGroup extends Module {
 			else {
 				setNeighbourhoodSize(value);
 			}
-			
-			
+
+
 		} else if (MAX_ITERATIONS.equals(key)) {
 			if (Integer.parseInt(value) < 1) {
 				log.warn("Parameter MAX_ITERATIONS has been set to "+value+" but must be equal to or greater than 1. The default value of 30 will be used instead.");
@@ -87,8 +88,8 @@ public class TimeOptimizerConfigGroup extends Module {
 			else {
 				setMaxIterations(value);
 			}
-			
-			
+
+
 		} else if (STOP_CRITERION.equals(key)) {
 			if ((Integer.parseInt(value)) < 1) {
 				log.warn("Parameter STOP_CRITERION has been set to "+value+" but must be equal to or greater than 1. The default value of 5 will be used instead.");
@@ -96,7 +97,7 @@ public class TimeOptimizerConfigGroup extends Module {
 			else {
 				setStopCriterion(value);
 			}
-			
+
 		} else if (OFFSET.equals(key)) {
 			if ((Double.parseDouble(value)) < 1) {
 				log.warn("Parameter OFFSET has been set to "+value+"sec but must be equal to or greater than 1sec. The default value of 1800sec (=1/2hour) will be used instead.");
@@ -104,12 +105,12 @@ public class TimeOptimizerConfigGroup extends Module {
 			else {
 				setOffset(value);
 			}
-			
+
 		} else throw new IllegalArgumentException(key);
 	}
-	
+
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		this.addParameterToMap(map, NEIGHBOURHOOD_SIZE);
 		this.addParameterToMap(map, MAX_ITERATIONS);
@@ -117,7 +118,7 @@ public class TimeOptimizerConfigGroup extends Module {
 		this.addParameterToMap(map, OFFSET);
 		return map;
 	}
-	
+
 	// TODO all "static" to be removed later, only bypassing solution
 	public static String getNeighbourhoodSize() {
 		return neighbourhood_size;

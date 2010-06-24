@@ -23,8 +23,8 @@ package org.matsim.core.config.groups;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimParameters;
@@ -35,10 +35,10 @@ import org.matsim.core.utils.misc.Time;
 public class CharyparNagelScoringConfigGroup extends Module {
 
 	private static final Logger log = Logger.getLogger(CharyparNagelScoringConfigGroup.class);
-	
+
 	private static final long serialVersionUID = 1L;
 
-	public static final String GROUP_NAME = "planCalcScore"; 
+	public static final String GROUP_NAME = "planCalcScore";
 	// TODO [MR] switch to better name
 
 	private static final String LEARNING_RATE = "learningRate";
@@ -54,8 +54,8 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private static final String MARGINAL_UTL_OF_DISTANCE_CAR = "marginalUtlOfDistanceCar";
 	private static final String MARGINAL_UTL_OF_DISTANCE_PT = "marginalUtlOfDistancePt";
 	private static final String MARGINAL_UTL_OF_DISTANCE_WALK = "marginalUtlOfDistanceWalk";
-	
-	
+
+
 	@Deprecated
 	private static final String MARGINAL_UTL_OF_DISTANCE = "marginalUtlOfDistance";
 	@Deprecated
@@ -179,8 +179,8 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		} else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
 			setMarginalUtlOfDistanceWalk(Double.parseDouble(value));
 		}	else if (MARGINAL_UTL_OF_DISTANCE.equals(key)) {
-			if ( margUtlDistCnt < 1 ) {
-				margUtlDistCnt++ ;
+			if ( this.margUtlDistCnt < 1 ) {
+				this.margUtlDistCnt++ ;
 				log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead.");
 				log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!");
 			}
@@ -227,7 +227,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	}
 
 	@Override
-	protected TreeMap<String, String> getParams() {
+	public TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 
 		map.put(LEARNING_RATE, getValue(LEARNING_RATE));
@@ -256,7 +256,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		}
 		return map;
 	}
-	
+
 	@Override
 	protected final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
@@ -269,11 +269,11 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		map.put(WAITING, "[utils/hr] utility offset for waiting.  this comes on top of the opportunity cost of time.  Probably implemented correctly, but not tested.") ;
 		map.put(BRAIN_EXP_BETA, "[1/utils] conversion factor of utility model for use in logit-based choice model.  Set to 1 if your utl function is estimated") ;
 		map.put(LEARNING_RATE, "new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates close to zero emulate score averaging, but slow down initial convergence") ;
-		
+
 		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
 		map.put(MARGINAL_UTL_OF_DISTANCE_PT, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
 		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
-		
+
 		return map ;
 	}
 
@@ -399,7 +399,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {
 		this.marginalUtlOfDistanceWalk = marginalUtlOfDistanceWalk;
 	}
-	
+
 	/**
 	 * @return the marginal utility of distance for mode pt per meter
 	 */
@@ -424,13 +424,13 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	public void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
 		this.marginalUtlOfDistanceCar = marginalUtlOfDistanceCar;
 	}
-	
+
 	public double getWaiting() {
 		return this.waiting;
 	}
 	private static int setWaitingCnt=0 ;
 	public void setWaiting(final double waiting) {
-		if ( (earlyDeparture != 0.) && (setWaitingCnt<1) ) {
+		if ( (this.earlyDeparture != 0.) && (setWaitingCnt<1) ) {
 			setWaitingCnt++ ;
 			log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +
 					"but there is as of now no indication that it makes the results more realistic." + Gbl.ONLYONCE );

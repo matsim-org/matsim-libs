@@ -125,7 +125,7 @@ public class CountsConfigGroup extends Module {
 	}
 
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		this.addParameterToMap(map, OUTPUTFORMAT);
 		this.addParameterToMap(map, OUTFILE);

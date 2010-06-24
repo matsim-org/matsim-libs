@@ -53,7 +53,7 @@ public class SocNetConfigGroup extends Module {
 	private static final String SN_INPUT_DIR = "inputSocNetDir";
 	private static final String SN_INIT_ITER = "inputIter";
 	private static final String BETA1 ="betafriendfoe";
-	private static final String BETA2 =	"betanfriends"; 
+	private static final String BETA2 =	"betanfriends";
 	private static final String BETA3 ="betalognfriends";
 	private static final String BETA4 ="betatimewithfriends";
 	private static final String SN_ALPHA ="euclid_alpha";
@@ -231,7 +231,7 @@ public class SocNetConfigGroup extends Module {
 	}
 
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		addParameterToMap(map, SOCNET_GRAPHALGO);
 		addParameterToMap(map, SOCNET_KBAR);

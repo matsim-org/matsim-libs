@@ -53,7 +53,7 @@ public class TemplateConfigGroup extends org.matsim.core.config.Module {
 	}
 
 	@Override
-	protected Map<String, String> getParams() {
+	public Map<String, String> getParams() {
 		Map<String, String> map = new LinkedHashMap<String, String>(5);
 		map.put(SOMEVALUE_NAME, getValue(SOMEVALUE_NAME));
 		return map;

@@ -34,7 +34,7 @@ public class ScenarioConfigGroup extends Module {
 	private static final long serialVersionUID = -1279388236689564520L;
 
 	public static final String GROUP_NAME = "scenario";
-	
+
 	private static final String USE_LANES = "useLanes";
 	private static final String USE_SIGNALSYSTMES = "useSignalsystems";
 	private static final String USE_ROADPRICING = "useRoadpricing";
@@ -42,7 +42,7 @@ public class ScenarioConfigGroup extends Module {
 	private static final String USE_HOUSEHOLDS = "useHouseholds";
 	private static final String USE_KNOWLEDGE = "useKnowledge";
 	private static final String USE_TRANSIT = "useTransit";
-	
+
 	private boolean useLanes = false;
 	private boolean useSignalSystems = false;
 	private boolean useRoadpricing = false;
@@ -50,14 +50,14 @@ public class ScenarioConfigGroup extends Module {
 	private boolean useVehicles = false;
 	private boolean useKnowledge = true;
 	private boolean useTransit = false;
-	
-	
+
+
 	public ScenarioConfigGroup() {
 		super(GROUP_NAME);
 	}
 
 	@Override
-	public void addParam(String key, String value) {
+	public void addParam(final String key, final String value) {
 		if (USE_LANES.equalsIgnoreCase(key)){
 			this.useLanes = Boolean.parseBoolean(value.trim());
 		}
@@ -98,7 +98,7 @@ public class ScenarioConfigGroup extends Module {
 	}
 
 	@Override
-	public String getValue(String key) {
+	public String getValue(final String key) {
 		if (USE_LANES.equalsIgnoreCase(key)){
 			return Boolean.toString(this.isUseLanes());
 		}
@@ -126,7 +126,7 @@ public class ScenarioConfigGroup extends Module {
 	}
 
 	@Override
-	protected Map<String, String> getParams() {
+	public Map<String, String> getParams() {
 		TreeMap<String, String> m = new TreeMap<String, String>();
 		m.put(USE_LANES, getValue(USE_LANES));
 		m.put(USE_SIGNALSYSTMES, getValue(USE_SIGNALSYSTMES));
@@ -137,28 +137,28 @@ public class ScenarioConfigGroup extends Module {
 		m.put(USE_TRANSIT, this.getValue(USE_TRANSIT));
 		return m;
 	}
-	
+
 	public boolean isUseLanes() {
-		return useLanes;
+		return this.useLanes;
 	}
-	
-	public void setUseLanes(boolean useLanes) {
+
+	public void setUseLanes(final boolean useLanes) {
 		this.useLanes = useLanes;
 	}
 
 	public boolean isUseSignalSystems() {
-		return useSignalSystems;
+		return this.useSignalSystems;
 	}
 
-	public void setUseSignalSystems(boolean useSignalSystems) {
+	public void setUseSignalSystems(final boolean useSignalSystems) {
 		this.useSignalSystems = useSignalSystems;
 	}
-	
+
 	public boolean isUseRoadpricing() {
-		return useRoadpricing;
+		return this.useRoadpricing;
 	}
-	
-	public void setUseRoadpricing(boolean useRoadpricing) {
+
+	public void setUseRoadpricing(final boolean useRoadpricing) {
 		this.useRoadpricing = useRoadpricing;
 	}
 
@@ -178,20 +178,20 @@ public class ScenarioConfigGroup extends Module {
 		return this.useTransit;
 	}
 
-	public void setUseHouseholds(boolean b) {
+	public void setUseHouseholds(final boolean b) {
 		this.useHouseholds = b;
 	}
-	
-	public void setUseVehicles(boolean b) {
+
+	public void setUseVehicles(final boolean b) {
 		this.useVehicles = b;
 	}
-	
-	public void setUseKnowledge(boolean b) {
+
+	public void setUseKnowledge(final boolean b) {
 		this.useKnowledge = b;
 	}
-	
-	public void setUseTransit(boolean b) {
+
+	public void setUseTransit(final boolean b) {
 		this.useTransit = b;
 	}
-	
+
 }

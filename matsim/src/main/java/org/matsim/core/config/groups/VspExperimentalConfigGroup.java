@@ -41,18 +41,18 @@ public class VspExperimentalConfigGroup extends Module {
 	private static final String CHAIN_BASED_MODES = "chainBasedModes";
 
 	private static final String OFFSET_WALK = "offsetWalk";
-	
-	
+
+
 	private boolean useActivityDurations = true;
-	
+
 	private String inputMZ05File = "";
-	
+
 	private String modesForSubTourModeChoice = "car, pt";
 	private String chainBasedModes = "car";
 
 	private double offsetWalk = 0d;
-	
-	
+
+
 	public VspExperimentalConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -61,12 +61,12 @@ public class VspExperimentalConfigGroup extends Module {
 	protected Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(USE_ACTIVITY_DURATIONS, "Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
-		
+
 		map.put(INPUT_MZ05_FILE, "Set this filename of MZ05 daily analysis");
-		
+
 		map.put(MODES_FOR_SUBTOURMODECHOICE, "set the traffic mode option for subTourModeChoice");
 		map.put(CHAIN_BASED_MODES, "set chainBasedModes, e.g. \"car,bike\", \"car\"");
-		
+
 		map.put(OFFSET_WALK, "set offset for mode \"walk\" in leg scoring function");
 		return map;
 	}
@@ -104,56 +104,56 @@ public class VspExperimentalConfigGroup extends Module {
 	}
 
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(USE_ACTIVITY_DURATIONS, getValue(USE_ACTIVITY_DURATIONS));
-		
+
 		map.put(INPUT_MZ05_FILE, getValue(INPUT_MZ05_FILE));
-		
+
 		map.put(MODES_FOR_SUBTOURMODECHOICE, getValue(MODES_FOR_SUBTOURMODECHOICE));
 		map.put(CHAIN_BASED_MODES, getValue(CHAIN_BASED_MODES));
-		
+
 		map.put(OFFSET_WALK, getValue(OFFSET_WALK));
 		return map;
 	}
 
 	public boolean isUseActivityDurations() {
-		return useActivityDurations;
+		return this.useActivityDurations;
 	}
 
-	public void setUseActivityDurations(boolean useActivityDurations) {
+	public void setUseActivityDurations(final boolean useActivityDurations) {
 		this.useActivityDurations = useActivityDurations;
 	}
 
 	public String getInputMZ05File() {
-		return inputMZ05File;
+		return this.inputMZ05File;
 	}
 
-	public void setInputMZ05File(String inputMZ05File) {
+	public void setInputMZ05File(final String inputMZ05File) {
 		this.inputMZ05File = inputMZ05File;
 	}
 
 	public String getModesForSubTourModeChoice() {
-		return modesForSubTourModeChoice;
+		return this.modesForSubTourModeChoice;
 	}
 
-	public void setModesForSubTourModeChoice(String modesForSubTourModeChoice) {
+	public void setModesForSubTourModeChoice(final String modesForSubTourModeChoice) {
 		this.modesForSubTourModeChoice = modesForSubTourModeChoice;
 	}
 
 	public String getChainBasedModes() {
-		return chainBasedModes;
+		return this.chainBasedModes;
 	}
 
-	public void setChainBasedModes(String chainBasedModes) {
+	public void setChainBasedModes(final String chainBasedModes) {
 		this.chainBasedModes = chainBasedModes;
 	}
 
 	public double getOffsetWalk() {
-		return offsetWalk;
+		return this.offsetWalk;
 	}
 
-	public void setOffsetWalk(double offsetWalk) {
+	public void setOffsetWalk(final double offsetWalk) {
 		this.offsetWalk = offsetWalk;
 	}
 

@@ -34,13 +34,13 @@ import org.matsim.vis.otfvis.opengl.gl.Point3f;
 
 /**
  * A config module holding all preferences for the OTFVis.
- * 
+ *
  * @author dstrippgen
  *
  */
 public class OTFVisConfigGroup extends Module {
 	private static final Logger log = Logger.getLogger(OTFVisConfigGroup.class);
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "otfvis";
@@ -56,7 +56,7 @@ public class OTFVisConfigGroup extends Module {
   public static final String BIG_TIME_STEP = "bigTimeStep";
   public static final String SHOW_TELEPORTATION = "showTeleportation";
   public static final String LINK_WIDTH = "linkWidth";
-  
+
   private  float agentSize = 120.f;
   private  String middleMouseFunc = "Pan";
   private  String leftMouseFunc = "Zoom";
@@ -83,26 +83,26 @@ public class OTFVisConfigGroup extends Module {
   private boolean drawScaleBar = false;
   private boolean showTeleportedAgents = false;
 
-  private List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
+  private final List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
 
   private boolean scaleQuadTreeRect;
-	
+
   public OTFVisConfigGroup() {
     super(GROUP_NAME);
   }
-	
+
 	public List<ZoomEntry> getZooms() {
 		return this.zooms;
 	}
-	public void addZoom(ZoomEntry entry) {
+	public void addZoom(final ZoomEntry entry) {
 		setModified();
 		this.zooms.add(entry);
 	}
-	public void deleteZoom(ZoomEntry entry) {
+	public void deleteZoom(final ZoomEntry entry) {
 		setModified();
 		this.zooms.remove(entry);
 	}
-	public Point3f getZoomValue(String zoomName) {
+	public Point3f getZoomValue(final String zoomName) {
 		Point3f result = null;
 		for(ZoomEntry entry : this.zooms) {
 			if(entry.getName().equals(zoomName)) {
@@ -121,13 +121,13 @@ public class OTFVisConfigGroup extends Module {
 	/**
 	 * @param delay_ms the delay_ms to set
 	 */
-	public void setDelay_ms(int delay_ms) {
+	public void setDelay_ms(final int delay_ms) {
 		this.delay_ms = delay_ms;
 	}
 	public boolean isCachingAllowed() {
 		return this.cachingAllowed;
 	}
-	public void setCachingAllowed(boolean cachingAllowed) {
+	public void setCachingAllowed(final boolean cachingAllowed) {
 		this.cachingAllowed = cachingAllowed;
 	}
 	/**
@@ -142,14 +142,14 @@ public class OTFVisConfigGroup extends Module {
 	private void setModified() {
 		this.modified = true;
 	}
-	
+
 	/**
 	 * @param modified the modified to unset
 	 */
 	public void clearModified() {
 		this.modified = false;
 	}
-	
+
 	@Override
 	public String getValue(final String key) {
 		if (AGENT_SIZE.equals(key)) {
@@ -160,7 +160,7 @@ public class OTFVisConfigGroup extends Module {
 			return this.leftMouseFunc;
 		}  else if (RIGHT_MOUSE_FUNC.equals(key)) {
 			return this.rightMouseFunc;
-		} 
+		}
 		else if (SHOW_TELEPORTATION.equalsIgnoreCase(key)){
 			return Boolean.toString(this.showTeleportedAgents);
 		}
@@ -182,7 +182,7 @@ public class OTFVisConfigGroup extends Module {
 			this.leftMouseFunc = value;
 		}  else if (RIGHT_MOUSE_FUNC.equals(key)) {
 			this.rightMouseFunc = value;
-		} 
+		}
 		else if (SHOW_TELEPORTATION.equalsIgnoreCase(key)){
 			this.showTeleportedAgents = Boolean.parseBoolean(value);
 		}
@@ -195,7 +195,7 @@ public class OTFVisConfigGroup extends Module {
 	}
 
 	@Override
-	protected final TreeMap<String, String> getParams() {
+	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(AGENT_SIZE, getValue(AGENT_SIZE));
 		map.put(LEFT_MOUSE_FUNC, getValue(LEFT_MOUSE_FUNC));
@@ -205,12 +205,12 @@ public class OTFVisConfigGroup extends Module {
 		map.put(LINK_WIDTH, this.getValue(LINK_WIDTH));
 		return map;
 	}
-	
+
 	@Override
 	protected final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(AGENT_SIZE, "The (initial) size of the agents.  Only a range of numbers is allowed, otherwise otfvis aborts"
-				+ " rather ungracefully, or displays no agents at all." ) ; 
+				+ " rather ungracefully, or displays no agents at all." ) ;
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
 		return map ;
 	}
@@ -221,7 +221,7 @@ public class OTFVisConfigGroup extends Module {
 		return this.agentSize;
 	}
 
-	public void setAgentSize(float agentSize) {
+	public void setAgentSize(final float agentSize) {
 		if(this.agentSize != agentSize) setModified();
 		this.agentSize = agentSize;
 	}
@@ -230,7 +230,7 @@ public class OTFVisConfigGroup extends Module {
 		return this.middleMouseFunc;
 	}
 
-	public void setMiddleMouseFunc(String middleMouseFunc) {
+	public void setMiddleMouseFunc(final String middleMouseFunc) {
 		if(this.middleMouseFunc.equals(middleMouseFunc)) setModified();
 		this.middleMouseFunc = middleMouseFunc;
 	}
@@ -239,7 +239,7 @@ public class OTFVisConfigGroup extends Module {
 		return this.leftMouseFunc;
 	}
 
-	public void setLeftMouseFunc(String leftMouseFunc) {
+	public void setLeftMouseFunc(final String leftMouseFunc) {
 		if(this.leftMouseFunc.equals(leftMouseFunc)) setModified();
 		this.leftMouseFunc = leftMouseFunc;
 	}
@@ -248,7 +248,7 @@ public class OTFVisConfigGroup extends Module {
 		return this.rightMouseFunc;
 	}
 
-	public void setRightMouseFunc(String rightMouseFunc) {
+	public void setRightMouseFunc(final String rightMouseFunc) {
 		if(this.rightMouseFunc.equals(rightMouseFunc)) setModified();
 		this.rightMouseFunc = rightMouseFunc;
 	}
@@ -263,7 +263,7 @@ public class OTFVisConfigGroup extends Module {
 	/**
 	 * @param fileVersion the fileVersion to set
 	 */
-	public void setFileVersion(int fileVersion) {
+	public void setFileVersion(final int fileVersion) {
 		log.info("File (major) version is: " + fileVersion ) ;
 		this.fileVersion = fileVersion;
 	}
@@ -278,7 +278,7 @@ public class OTFVisConfigGroup extends Module {
 	/**
 	 * @param fileMinorVersion the fileMinorVersion to set
 	 */
-	public void setFileMinorVersion(int fileMinorVersion) {
+	public void setFileMinorVersion(final int fileMinorVersion) {
 		log.info("File minor version is: " + fileMinorVersion ) ;
 		this.fileMinorVersion = fileMinorVersion;
 	}
@@ -293,7 +293,7 @@ public class OTFVisConfigGroup extends Module {
 	/**
 	 * @param bigTimeStep the bigTimeStep to set
 	 */
-	public void setBigTimeStep(int bigTimeStep) {
+	public void setBigTimeStep(final int bigTimeStep) {
 		if(this.bigTimeStep != bigTimeStep) setModified();
 		this.bigTimeStep = bigTimeStep;
 	}
@@ -308,7 +308,7 @@ public class OTFVisConfigGroup extends Module {
 	/**
 	 * @param queryType the queryType to set
 	 */
-	public void setQueryType(String queryType) {
+	public void setQueryType(final String queryType) {
 		this.queryType = queryType;
 	}
 
@@ -322,7 +322,7 @@ public class OTFVisConfigGroup extends Module {
 	/**
 	 * @param multipleSelect the multipleSelect to set
 	 */
-	public void setMultipleSelect(boolean multipleSelect) {
+	public void setMultipleSelect(final boolean multipleSelect) {
 		this.multipleSelect = multipleSelect;
 	}
 
@@ -363,7 +363,7 @@ public class OTFVisConfigGroup extends Module {
 	/**
 	 * @param showParking the showParking to set
 	 */
-	public void setShowParking(boolean showParking) {
+	public void setShowParking(final boolean showParking) {
 		setModified();
 		this.showParking = showParking;
 	}
@@ -378,68 +378,68 @@ public class OTFVisConfigGroup extends Module {
 	/**
 	 * @param drawLinkIds the drawLinkIds to set
 	 */
-	public void setDrawLinkIds(boolean drawLinkIds) {
+	public void setDrawLinkIds(final boolean drawLinkIds) {
 		setModified();
 		this.drawLinkIds = drawLinkIds;
 	}
 
-	public void setDrawOverlays(boolean drawOverlays) {
+	public void setDrawOverlays(final boolean drawOverlays) {
 		setModified();
 		this.drawOverlays = drawOverlays;
 	}
-	
+
 	public boolean drawOverlays() {
 		return this.drawOverlays;
 	}
-	public void setDrawTime(boolean draw) {
+	public void setDrawTime(final boolean draw) {
 		setModified();
 		this.drawTime = draw;
 	}
-	
+
 	public boolean drawTime() {
 		return this.drawTime;
 	}
 
-	public boolean setRenderImages(boolean render) {
+	public boolean setRenderImages(final boolean render) {
 		setModified();
 		return this.renderImages = render;
 	}
-	
+
 	public boolean renderImages() {
 		return this.renderImages;
 	}
-	
-	public void setDrawScaleBar(boolean drawScaleBar) {
+
+	public void setDrawScaleBar(final boolean drawScaleBar) {
 		setModified();
 		this.drawScaleBar = drawScaleBar;
 	}
-	
+
 	public boolean drawScaleBar() {
 		return this.drawScaleBar ;
 	}
 	public boolean isShowTeleportedAgents() {
 		return this.showTeleportedAgents ;
 	}
-	
-	public void setShowTeleportedAgents(boolean showTeleportation){
+
+	public void setShowTeleportedAgents(final boolean showTeleportation){
 		this.showTeleportedAgents = showTeleportation;
 	}
 
-	public void setDrawTransitFacilities(boolean drawTransitFacilities) {
+	public void setDrawTransitFacilities(final boolean drawTransitFacilities) {
 		this.drawTransitFacilities = drawTransitFacilities;
 	}
 
 	public boolean drawTransitFacilities() {
-		return drawTransitFacilities;
+		return this.drawTransitFacilities;
 	}
 
   public boolean isScaleQuadTreeRect() {
     return this.scaleQuadTreeRect;
   }
-  
-  public void setScaleQuadTreeRect(boolean doScale){
+
+  public void setScaleQuadTreeRect(final boolean doScale){
     this.scaleQuadTreeRect = doScale;
   }
-  
+
 
 }
