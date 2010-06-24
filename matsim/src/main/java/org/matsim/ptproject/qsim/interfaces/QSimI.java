@@ -19,11 +19,8 @@
 
 package org.matsim.ptproject.qsim.interfaces;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
