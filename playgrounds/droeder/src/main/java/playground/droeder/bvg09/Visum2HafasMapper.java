@@ -53,10 +53,10 @@ import playground.droeder.DaPaths;
  * @author droeder
  *
  */
-public class DaVisum2HafasMapper {
+public class Visum2HafasMapper{
 	
 	private static final Logger log = Logger
-			.getLogger(DaVisum2HafasMapper.class);
+			.getLogger(Visum2HafasMapper.class);
 	
 	private static String PATH = DaPaths.OUTPUT + "bvg09/";
  	
@@ -80,7 +80,7 @@ public class DaVisum2HafasMapper {
 	private Map<Id, Map<Id, Id>> visum2HafasMap = null;
 	private Map<Id, List<Id>> matchedRoutes = null;
 
-	public DaVisum2HafasMapper(){
+	public Visum2HafasMapper(){
 		visumSc.getConfig().scenario().setUseTransit(true);
 		readSchedule(VISUM, visumSc);
 		hafasSc.getConfig().scenario().setUseTransit(true);
@@ -89,7 +89,7 @@ public class DaVisum2HafasMapper {
 	}
 	
 	public static void main(String[] args){
-		DaVisum2HafasMapper mapper = new DaVisum2HafasMapper();
+		Visum2HafasMapper mapper = new Visum2HafasMapper();
 		mapper.run();
 		mapper.test();
 	}

@@ -23,9 +23,9 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -53,49 +52,58 @@ import playground.droeder.DaPaths;
  * @author droeder
  *
  */
-public class DaVisum2HafasMapper2 {
+public abstract class AbstractDaVisum2HafasMapper {
 	
-	private static final Logger log = Logger
-			.getLogger(DaVisum2HafasMapper2.class);
+	protected static final Logger log = Logger.getLogger(DaVisum2HafasMapper1.class);
+	
 	
 	private static String PATH = DaPaths.OUTPUT + "bvg09/";
  	
 	private static String VISUM = PATH + "intermediateTransitSchedule.xml";
 	private static String HAFAS = PATH + "transitSchedule-HAFAS-Coord.xml";
 	
+	private String UNMATCHED = PATH + "unmatchedLines.txt";
+	private String MATCHED = PATH + "matchedRoutes.txt";
+	
 	private ScenarioImpl visumSc = new ScenarioImpl();
 	private ScenarioImpl hafasSc = new ScenarioImpl();
 	
 	final Id NOTMATCHED = new IdImpl("notMatched");
 	
-	private Map<Id, Id> preVisum2HafasMap = null;
+	protected Map<Id, Id> preVisum2HafasMap = null;
 	
 	private SortedMap<Id, Id> vis2HafLines = null;
 	private Map<Id, Map<Id, Id>> vRoute2vis2hafStops = null;
 	private Map<Id, Id> vis2hafRoutes = null;
+	private Map<Id, Id> vRoute2vLine = null;
+	private Collection<Id> unmatched = null;
 	
-	
-	
-	
-	private final double distToMatch = 100.0; 
+	private final double distToMatch;
 
-	public DaVisum2HafasMapper2(){
+
+	public AbstractDaVisum2HafasMapper(double dist2Match){
 		visumSc.getConfig().scenario().setUseTransit(true);
 		readSchedule(VISUM, visumSc);
 		hafasSc.getConfig().scenario().setUseTransit(true);
 		readSchedule(HAFAS, hafasSc);
 		this.createHafasLineIdsFromVisum();
+		this.distToMatch = dist2Match;
 	}
 	
-	public static void main(String[] args){
-		DaVisum2HafasMapper2 mapper = new DaVisum2HafasMapper2();
-		mapper.run();
-	}
+//	public static void main(String[] args){
+//		DaVisum2HafasMapper2 mapper = new DaVisum2HafasMapper2();
+//		mapper.run();
+//	}
 	
 	public void run(){
 		this.createHafasLineIdsFromVisum();
 		this.preMatchStops();
 		this.matchLines();
+		this.analyseResults();
+		this.unmatched2txt();
+		this.matched2txt();
+
+//		this.test();
 	}
 	
 	public Map<Id, Id> getPrematchedStops(){
@@ -109,13 +117,18 @@ public class DaVisum2HafasMapper2 {
 	}
 	
 	private void matchLines(){
+		vis2hafRoutes = new HashMap<Id, Id>();
+		vRoute2vis2hafStops = new HashMap<Id, Map<Id,Id>>();
+		vRoute2vLine = new HashMap<Id, Id>();
+		unmatched = new ArrayList<Id>();
 		
 		for (Entry<Id, Id> lines : vis2HafLines.entrySet()){
 			Map<Id, Id> matched = tryToMatchAllRoutes(lines.getKey(), lines.getValue());
-			if(matched.size() != visumSc.getTransitSchedule().getTransitLines().get(lines.getKey()).getRoutes().size()){
-				log.error("only " + matched.size() + " of " + visumSc.getTransitSchedule().getTransitLines().get(lines.getKey()).getRoutes().size() + " where matched");
+			if(matched.containsValue(null)){
+				log.error("not all visum routes are matched for visum Line " + lines.getKey() + "!");
+				unmatched.add(lines.getKey());
 			}else {
-				log.info("all visum routes are matched!");
+				log.info("all visum routes are matched for visum Line " + lines.getKey() + "!");
 			}
 			vis2hafRoutes.putAll(matched);
 		}
@@ -129,9 +142,11 @@ public class DaVisum2HafasMapper2 {
 			Id matched = searchBestFittingRoute(visRoute, hafLine);
 			if(matched == null){
 				log.error("not able to match a HafasRoute to VisumRoute " + visRoute.getId() + " for visum Line " + visLine); 
+				matchedRoutes.put(visRoute.getId(), matched);
 			}else{
-				log.info("matched hafasRoute " + matched + " to visRoute " + visRoute + " for visum Line " + visLine);
+				log.info("matched hafasRoute " + matched + " to visRoute " + visRoute.getId() + " for visum Line " + visLine);
 				matchedRoutes.put(visRoute.getId() , matched);
+				vRoute2vLine.put(visRoute.getId(), visLine);
 			}
 		}
 		
@@ -144,6 +159,9 @@ public class DaVisum2HafasMapper2 {
 		double avDist = Double.POSITIVE_INFINITY;
 		
 		for(TransitRoute hafRoute : hafasSc.getTransitSchedule().getTransitLines().get(hafLine).getRoutes().values()){
+			if(hafRoute.getId().equals(new IdImpl("02525")) || hafRoute.getId().equals(new IdImpl("02729"))){
+				log.info("Stop here");
+			}
 			Map<Id, Id> temp = tryToMatchRoute(visRoute, hafRoute);
 			if(!(temp == null)){
 				double tempDist = getAvDist(temp);
@@ -151,19 +169,59 @@ public class DaVisum2HafasMapper2 {
 					avDist = tempDist;
 					routeId = hafRoute.getId();
 					vRoute2vis2hafStops.put(visRoute.getId(), temp);
+					return routeId;
+				}else{
+					vRoute2vis2hafStops.put(visRoute.getId(), temp);
 				}
 			}
 		}
-		
 		return routeId;
 	}
 	
-	private Map<Id, Id> tryToMatchRoute(TransitRoute visRoute, TransitRoute hafRoute){
+	protected abstract Map<Id, Id> tryToMatchRoute(TransitRoute visRoute, TransitRoute hafRoute);
+	
+	private void analyseResults(){
+		Map<Id, Id> temp;
+		int all = 0;
+		int part = 0;
+		int no = 0;
 		
+		for(Id id : vis2HafLines.keySet()) {
+			TransitLine vLine = visumSc.getTransitSchedule().getTransitLines().get(id);
+			double avOfAv = 0;
+			int i = 0;
+			for (Id vRoute : vLine.getRoutes().keySet()){
+				double av = 0;
+				temp = vRoute2vis2hafStops.get(vRoute);
+				if(!(temp == null)){
+					av = getAvDist(temp);
+					i++;
+					log.info("average distance of matched Stops for route " + vRoute + " on line " + vLine.getId() + " is " + av + " m!");
+				}else{
+					log.warn("route " + vRoute + " on line " + vLine.getId() + " was not matched!");
+				}
+				avOfAv +=av;
+			}
+
+			avOfAv = avOfAv/i;
+			if(i == 0){
+				log.error("no route was matched for line " +id + "!");
+				no++;
+			}else if(i<vLine.getRoutes().size()){
+				log.warn(i + " of " + vLine.getRoutes().size() + " routes where matched for route " + vLine.getId() + 
+						"! The average of the average distance for all matched routes is " + avOfAv + " m!");
+				part++;
+			}else{
+				log.info("all routes where matched for route " + vLine.getId() + 
+						"! The average of the average distance for all matched routes is " + avOfAv + " m!");
+				all++;
+			}
+		}
 		
+		log.info(all + " lines complete matched"); 
+		log.info(part + " lines matched partially"); 
+		log.info(no + " lines not matched");
 		
-		
-		return null;
 	}
 	
 	private void preMatchStops(){
@@ -187,10 +245,12 @@ public class DaVisum2HafasMapper2 {
 		
 		//check if a hafasStop is matched to different VisumStops
 		List<Id> v = new ArrayList<Id>();
-		for(Id h : preVisum2HafasMap.values()){
+		for(Entry<Id, Id> one : preVisum2HafasMap.entrySet()){
 			List<Id> temp = new ArrayList<Id>();
-			for (Entry<Id, Id> e : preVisum2HafasMap.entrySet()){
-				if(e.getValue().equals(h)) temp.add(e.getKey());
+			for (Entry<Id, Id> two : preVisum2HafasMap.entrySet()){
+				if(two.getValue().equals(one.getValue()) && !(two.getKey().equals(one.getKey()))) {
+					temp.add(two.getKey());
+				}
 			}
 			if (temp.size() > 1) v.addAll(temp);
 		}
@@ -200,7 +260,6 @@ public class DaVisum2HafasMapper2 {
 			this.preVisum2HafasMap.remove(id);
 		}
 		
-		System.out.println(preVisum2HafasMap.size());
 	}
 	
 	private double getAvDist(Map<Id, Id> stops){
@@ -309,11 +368,86 @@ public class DaVisum2HafasMapper2 {
 		return equal;
 	}
 	
+	private void unmatched2txt(){
+		BufferedWriter writer;
+		
+		try {
+			writer = IOUtils.getBufferedWriter(UNMATCHED);
+			
+			for(Id id : unmatched){
+				writer.write("visumLine: " + id);
+				writer.newLine();
+				for(TransitRoute route : visumSc.getTransitSchedule().getTransitLines().get(id).getRoutes().values()){
+					writer.write(route.getId() + "\t");
+					for(TransitRouteStop stop : route.getStops()){
+						writer.write(stop.getStopFacility().getId() + "\t");
+					}
+					writer.newLine();
+				}
+				
+				for(TransitRoute route : hafasSc.getTransitSchedule().getTransitLines().get(vis2HafLines.get(id)).getRoutes().values()){
+					writer.write(route.getId() + "\t");
+					for(TransitRouteStop stop : route.getStops()){
+						writer.write(stop.getStopFacility().getId() + "\t");
+					}
+					writer.newLine();
+				}
+				writer.newLine();
+			}
+			
+			writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void matched2txt(){
+		BufferedWriter writer;
+		
+		try {
+			writer = IOUtils.getBufferedWriter(MATCHED);
+			
+			for(Entry<Id, Id> e : vRoute2vLine.entrySet()){
+				if(!(e.getValue() == null) ){
+					writer.write(e.getKey() + "\t");
+					for(TransitRouteStop stop : visumSc.getTransitSchedule().getTransitLines().get(e.getValue()).getRoutes().get(e.getKey()).getStops()){
+						writer.write(stop.getStopFacility().getId().toString() + "\t");
+					}
+					writer.newLine();
+					
+					writer.write(vis2hafRoutes.get(e.getKey()) + "\t");
+					for(TransitRouteStop stop : hafasSc.getTransitSchedule().getTransitLines().get(vis2HafLines.get(e.getValue())).getRoutes().get(vis2hafRoutes.get(e.getKey())).getStops()){
+						writer.write(stop.getStopFacility().getId().toString() + "\t");
+					}
+					writer.newLine();
+					writer.newLine();
+				}
+			}
+			
+			writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	
-//	private void test (){
-//		System.out.println(checkFacsById(new IdImpl("533520"), new IdImpl("9053352")));
-//		System.out.println(getDist(new IdImpl("533520"), new IdImpl("9053352")));
-//	}
 	
+	private void test(){
+		
+		Id v = new IdImpl("792020");
+		Id h = new IdImpl("9079202");
+		System.out.println(this.checkFacsById(v, h));
+		System.out.println(this.getDist(v, h));
+		System.out.println(preVisum2HafasMap.size());
+		System.out.println(preVisum2HafasMap.get(v));
+
+	}
 }

@@ -109,7 +109,7 @@ public class DaVisumHafasScheduleMerger {
 	
 	private void treatAllRoutes(){		
 		
-		DaVisum2HafasMapper mapper = new DaVisum2HafasMapper();
+		Visum2HafasMapper mapper = new Visum2HafasMapper();
 		Map<Id, Map<Id, Id>> visum2HafasMap = mapper.getVisum2HafasMap();
 		Map<Id, Id> visum2hafasLineIds = mapper.getMatchedLines();
 		

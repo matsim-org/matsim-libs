@@ -93,7 +93,7 @@ public class StopsAndRoutes2Shape{
 		hSc.getConfig().scenario().setUseTransit(true);
 		this.readSchedule(HAFASSCHEDULEFILE, hSc);
 		
-		DaVisum2HafasMapper2 mapper = new DaVisum2HafasMapper2();
+		DaVisum2HafasMapper1 mapper = new DaVisum2HafasMapper1();
 		this.lines = mapper.getVis2HafLines();
 		this.preMatchedStops = mapper.getPrematchedStops();
 	}
