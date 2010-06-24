@@ -79,6 +79,16 @@ public class TimeExpandedPath {
 	public TimeExpandedPath(){
 		this._flow = 0;
 		this._steps = new LinkedList<PathStep>();
+		this.startTime = 0;
+	}
+	
+	/**
+	 * Copy Constructor, but note that the PathSteps are still the same objects
+	 */
+	public TimeExpandedPath(TimeExpandedPath other) {
+	  this._flow = other._flow;
+	  this._steps = new LinkedList<PathStep>(other._steps);
+	  this.startTime = other.startTime;
 	}
 	
 	/**

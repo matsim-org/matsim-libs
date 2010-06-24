@@ -148,7 +148,7 @@ public class Flow {
 	 * TODO use debug mode
 	 * flag for debug mode
 	 */
-	@SuppressWarnings("unused")
+	
 	private static int _debug = 0;
 
 
@@ -1148,6 +1148,17 @@ public class Flow {
 
 		// TEPs that need processing
 		LinkedList<TimeExpandedPath> unfinishedTEPs = new LinkedList<TimeExpandedPath>();
+		
+		// BIG DEBUG FIXME
+		// only augment a single flow unit, but multiple times
+		/* if (_debug > 0) {
+			while (TEPtoAdd.getFlow() > 1) {
+				TimeExpandedPath newTEP = new TimeExpandedPath(TEPtoAdd);
+				newTEP.setFlow(1);
+				TEPtoAdd.setFlow(TEPtoAdd.getFlow() - 1);
+			}
+		}*/
+		
 		unfinishedTEPs.add(TEPtoAdd);
 
 		if (_debug > 0) {
@@ -1302,7 +1313,7 @@ public class Flow {
 
 							   otherHead.addTailToPath(myTail);
 							   otherHead.setFlow(augment);
-							   unfinishedTEPs.add(otherHead);
+							   unfinishedTEPs.addFirst(otherHead); // process things in DFS, not BFS order. (Can bug with BFS.) 
 
 							   // adjust the flow on the edges and the flow on the (still) stored TEP
 							   dumbaugment(otherTEP, -augment);
