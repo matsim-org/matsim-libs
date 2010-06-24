@@ -232,6 +232,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		}
 		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
 		cleanupSim(time);
+
 		//delete reference to clear memory
 		this.listenerManager = null;
 	}
@@ -366,12 +367,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 	protected void beforeSimStep(final double time) {
-		if ( this.changeEventsEngine != null ) {
-			this.changeEventsEngine.doSimStep(time);
-		}
-		if (this.signalEngine != null) {
-			this.signalEngine.doSimStep(time);
-		}
+		// left empty for inheritance
 	}
 
 
@@ -382,17 +378,19 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * @return true if the simulation needs to continue
 	 */
 	protected final boolean doSimStep(final double time) { // do not overwrite in inheritance.
-		this.moveVehiclesWithUnknownLegMode(time);
+		if ( this.changeEventsEngine != null ) {
+			this.changeEventsEngine.doSimStep(time);
+		}
+		if (this.signalEngine != null) {
+			this.signalEngine.doSimStep(time);
+		}
+		this.handleTeleportationArrivals(time);
 		this.handleActivityEnds(time);
 		if ( this.netEngine != null ) {
 			this.netEngine.doSimStep(time);
 		}
 
 		this.printSimLog(time);
-		return (this.agentCounter.isLiving() && (this.stopTime > time));
-	}
-
-	protected void afterSimStep(final double time) {
 		if (time >= this.snapshotTime) {
 			this.snapshotTime += this.snapshotPeriod;
 			doSnapshot(time);
@@ -401,14 +399,19 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterAfterSimStep(time);
 		}
+		return (this.agentCounter.isLiving() && (this.stopTime > time));
+	}
+
+	protected void afterSimStep(final double time) {
+		// left empty for inheritance
 	}
 
 	private void doSnapshot(final double time) {
 		if (!this.snapshotManager.getSnapshotWriters().isEmpty()) {
-		  Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-	    for (QLinkInternalI link : this.getQNetwork().getLinks().values()) {
-	      link.getVisData().getVehiclePositions( positions);
-	    }
+			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+			for (QLinkInternalI link : this.getQNetwork().getLinks().values()) {
+				link.getVisData().getVehiclePositions( positions);
+			}
 			for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
 				writer.beginSnapshot(time);
 				for (AgentSnapshotInfo position : positions) {
@@ -419,7 +422,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		}
 	}
 
-	protected void moveVehiclesWithUnknownLegMode(final double now) {
+	protected void handleTeleportationArrivals(final double now) {
 		while (this.teleportationList.peek() != null ) {
 			Tuple<Double, PersonDriverAgent> entry = this.teleportationList.peek();
 			if (entry.getFirst().doubleValue() <= now) {
