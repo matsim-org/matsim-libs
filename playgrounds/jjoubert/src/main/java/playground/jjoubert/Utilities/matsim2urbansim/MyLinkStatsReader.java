@@ -20,7 +20,13 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
+import org.apache.log4j.Logger;
+
 public class MyLinkStatsReader {
+	private final Logger log = Logger.getLogger(MyLinkStatsReader.class);
+	
+	public MyLinkStatsReader(String hours) {
+	}
 
 }
 
