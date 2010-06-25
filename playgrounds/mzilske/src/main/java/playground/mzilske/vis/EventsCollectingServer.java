@@ -1,7 +1,6 @@
 package playground.mzilske.vis;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
@@ -120,7 +119,7 @@ public final class EventsCollectingServer implements OTFServerRemote {
 		quadTree = new MyQuadTree();
 		quadTree.initQuadTree();
 		try {
-			tempFile = createTempDirectory();
+			tempFile = DirectoryUtils.createTempDirectory();
 			db = new MovieDatabase(tempFile);
 			MovieView view = new MovieView(db);
 			timeSteps = view.getTimeStepMap();
@@ -219,46 +218,9 @@ public final class EventsCollectingServer implements OTFServerRemote {
 		return new OTFVisConfigGroup();
 	}
 
-	public static File createTempDirectory() {
-		final File temp;
-
-		try {
-			temp = File.createTempFile("otfvis", Long.toString(System.nanoTime()));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		if (!(temp.delete())) {
-			throw new RuntimeException("Could not delete temp file: "
-					+ temp.getAbsolutePath());
-		}
-
-		if (!(temp.mkdir())) {
-			throw new RuntimeException("Could not create temp directory: "
-					+ temp.getAbsolutePath());
-		}
-
-		return (temp);
-	}
-	
-	static public boolean deleteDirectory(File path) {
-	    if( path.exists() ) {
-	      File[] files = path.listFiles();
-	      for(int i=0; i<files.length; i++) {
-	         if(files[i].isDirectory()) {
-	           deleteDirectory(files[i]);
-	         }
-	         else {
-	           files[i].delete();
-	         }
-	      }
-	    }
-	    return( path.delete() );
-	  }
-
 	public void close() {
 		db.close();
-		deleteDirectory(tempFile);
+		DirectoryUtils.deleteDirectory(tempFile);
 	}
 
 }

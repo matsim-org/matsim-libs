@@ -129,7 +129,7 @@ public class GeneratePopulation {
 			for (Person person : caze.members) {
 				household.getMemberIds().add(person.getId());
 			}
-			household.setIncome(households.getFactory().createIncome(caze.income, IncomePeriod.year));
+			household.setIncome(households.getFactory().createIncome(caze.income, IncomePeriod.month));
 			households.getHouseholds().put(householdId, household);
 		}
 		HouseholdsWriterV10 writer = new HouseholdsWriterV10(households);
@@ -137,21 +137,34 @@ public class GeneratePopulation {
 	}
 
 	private void dropPlanlessPeople() {
+		logger.info("There are " + persons.size() + " good-looking people.");
+		int mPeople = 0;
+		for (Case caze : cases.values()) {
+			mPeople += caze.members.size();
+		}
+		logger.info("We have " + mPeople + " in households.");
 		Iterator<Map.Entry<String, Case>> i = cases.entrySet().iterator();
 		while (i.hasNext()) {
 			Map.Entry<String, Case> household = i.next();
-			Iterator<Person> ii = household.getValue().members.iterator();
+			Collection<Person> members = household.getValue().members;
+			Iterator<Person> ii = members.iterator();
 			while (ii.hasNext()) {
 				Person person = ii.next();
 				if (person.getPlans().isEmpty()) {
 					ii.remove();
 					persons.remove(person.getId());
-					if (!ii.hasNext()) {
-						i.remove();
-					}
 				}
 			}
+			if (members.isEmpty()) {
+				i.remove();
+			}
 		}
+		logger.info("There are " + persons.size() + " good-looking people.");
+		int nPeople = 0;
+		for (Case caze : cases.values()) {
+			nPeople += caze.members.size();
+		}
+		logger.info("We have " + nPeople + " in households.");
 	}
 
 	private void addPopulationToScenario() {
@@ -189,6 +202,7 @@ public class GeneratePopulation {
 	}
 	
 	private void addPlans() {
+		logger.info("Got " + plans.size() + " plans.");
 		for (Map.Entry<Id, Plan> entry : plans.entrySet()) {
 			Id personId = entry.getKey();
 			Plan plan = entry.getValue();
@@ -197,10 +211,10 @@ public class GeneratePopulation {
 				if (planElement instanceof Activity) {
 					Activity activity = (Activity) planElement;
 					if (activity.getCoord() == null) {
-						logger.warn("Dumped a plan because of a coordinateless activity.");
+						logger.trace("Dumped a plan because of a coordinateless activity.");
 						isGood = false;
 					} else if (activity.getEndTime() == 362340) { //  99:99 Uhr
-						logger.warn("Dumped a plan because of invalid activity time.");
+						logger.trace("Dumped a plan because of invalid activity time.");
 						isGood = false;
 					}
 				}
@@ -311,7 +325,7 @@ public class GeneratePopulation {
 		Leg leg = factory.createLeg(parseLegMode(dRow[D_W05]));
 		final double travelTime = Double.parseDouble(dRow[D_WEGDAUER]);
 		if (travelTime > 999990) {
-			System.out.println("Zeit falsch.");
+			logger.trace("Zeit falsch.");
 		} else {
 			leg.setTravelTime(travelTime * 60);
 		}
@@ -352,8 +366,7 @@ public class GeneratePopulation {
 			return TransportMode.ride;
 		} else if (hauptverkehrsmittel.equals("10")) {
 			// Schiff, Bahn, Bus, Flugzeug
-			// return TransportMode.pt;
-			return TransportMode.car;
+			return TransportMode.pt;
 		} else if (hauptverkehrsmittel.equals("11")) {
 			// other
 			return TransportMode.undefined;

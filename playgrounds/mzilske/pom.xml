@@ -1,43 +1,73 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <groupId>org.matsim</groupId>
-    <artifactId>playgrounds</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>playground</groupId>
-  <artifactId>mzilske</artifactId>
-  <name>mzilske</name>
-  <version>0.2.0-SNAPSHOT</version>
-  <repositories>
-    <repository>
-      <id>oracleReleases</id>
-      <name>Oracle Released Java Packages</name>
-      <url>http://download.oracle.com/maven</url>
-      <layout>default</layout>
-    </repository>
-  </repositories>
-  <dependencies>
-  	<dependency>
-  		<groupId>playground</groupId>
-  		<artifactId>mrieser</artifactId>
-  		<version>0.2.0-SNAPSHOT</version>
-  		<scope>compile</scope>
-  	</dependency>
-    <dependency>
-      <groupId>com.sleepycat</groupId>
-      <artifactId>je</artifactId>
-      <version>4.0.92</version>
-    </dependency>
-    <dependency>
-      <groupId>trove</groupId>
-      <artifactId>trove</artifactId>
-      <version>2.0.3</version>
-    </dependency>
-    <dependency>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>org.matsim</groupId>
+		<artifactId>playgrounds</artifactId>
+		<version>0.2.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>playground</groupId>
+	<artifactId>mzilske</artifactId>
+	<name>mzilske</name>
+	<version>0.2.0-SNAPSHOT</version>
+	<repositories>
+		<repository>
+			<id>oracleReleases</id>
+			<name>Oracle Released Java Packages</name>
+			<url>http://download.oracle.com/maven</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>neo4j-public-repository</id>
+			<url>http://m2.neo4j.org </url>
+		</repository>
+		<repository>
+			<id>openstreetmap-snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
+		</repository>
+	</repositories>
+	<dependencies>
+		<dependency>
+			<groupId>playground</groupId>
+			<artifactId>christoph</artifactId>
+			<version>0.2.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>playground</groupId>
+			<artifactId>mrieser</artifactId>
+			<version>0.2.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sleepycat</groupId>
+			<artifactId>je</artifactId>
+			<version>4.0.92</version>
+		</dependency>
+		<dependency>
+			<groupId>trove</groupId>
+			<artifactId>trove</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-kernel</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-index</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt2-postgis</artifactId>
 			<version>2.3.5</version>
 		</dependency>
-  </dependencies>
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis</artifactId>
+			<version>0.32.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 </project>

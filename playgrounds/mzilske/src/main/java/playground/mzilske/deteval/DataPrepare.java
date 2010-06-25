@@ -2,6 +2,7 @@ package playground.mzilske.deteval;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -26,7 +27,9 @@ import playground.mzilske.bvg09.VisumNetworkRowHandler;
 public class DataPrepare {
 	
 	private static final Logger log = Logger.getLogger(DataPrepare.class);
-
+	
+	
+	private static final Collection<String> usedIds = new ArrayList<String>();
 	private static final Collection<String> irrelevantIds = Arrays.asList("0", "1", "2", "3", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99");
 
 	private static String OutPath = "../detailedEval/net/";
@@ -87,13 +90,14 @@ public class DataPrepare {
 				double capacity = getCapacity(edgeTypeId);
 				if (isEdgeTypeRelevant(edgeTypeId)) {
 					network.createAndAddLink(id, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId), length, freespeed, capacity, 1);
+					usedIds.add(edgeTypeIdString);
 				}
 			}
 			
 		};
 		streamingVisumNetworkReader.addRowHandler("STRECKE", edgeRowHandler);
 		streamingVisumNetworkReader.read(InVisumNetFile);
-		network.setCapacityPeriod(24*3600);
+		network.setCapacityPeriod(16*3600);
 	}
 
 	private boolean isEdgeTypeRelevant(Id edgeTypeId) {
@@ -150,6 +154,7 @@ public class DataPrepare {
 		app.readVisumNetwork();
 		app.convertNetwork();
 		app.cleanNetwork();
+		app.dumpEdgeTypes();
 		try {
 			app.writeNetwork();
 		} catch (FileNotFoundException e) {
@@ -158,6 +163,17 @@ public class DataPrepare {
 			e.printStackTrace();
 		}
 		log.info("done.");
+	}
+
+	private void dumpEdgeTypes() {
+		for (String usedEdgeId : usedIds) {
+			System.out.print(usedEdgeId + " ");
+		}
+		for (EdgeType edgeType : visumNetwork.edgeTypes.values()) {
+			if (usedIds.contains(edgeType.id.toString())) {
+				System.out.println(edgeType.id + "   " + edgeType.v0IV + "  " + edgeType.kapIV);
+			}
+		}
 	}
 
 	private void cleanNetwork() {

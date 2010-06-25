@@ -16,19 +16,21 @@ import org.matsim.vis.otfvis2.OTFVisClient;
 public class LiveMain {
 	
 	public static void main(String[] args) throws InterruptedException, InvocationTargetException {
-//		 String fileName = "../../detailedEval/Net/network.xml.gz";
-//		 String eventsFileName = "../../run950/it.1000/950.1000.events.txt.gz";
-//		
+
 //		 String fileName = "../../run749/749.output_network.xml.gz";
 //		 String eventsFileName = "../../run749/it.1000/749.1000.events.txt.gz";
 //		
-//		String networkFileName = "../../matsim/output/example5/output_network.xml.gz";
-//		String eventsFileName = "../../matsim/output/example5/ITERS/it.10/10.events.xml.gz";
-//		String populationFileName = "../../matsim/output/example5/output_plans.xml.gz";
+		String networkFileName = "../../matsim/output/example5/output_network.xml.gz";
+		String eventsFileName = "../../matsim/output/example5/ITERS/it.10/10.events.xml.gz";
+		String populationFileName = "../../matsim/output/example5/output_plans.xml.gz";
 		
-		String networkFileName = "../../run1052/output_network.xml.gz";
-		String eventsFileName = "../../run1052/ITERS/it.0/0.events.xml";
-		String populationFileName = "../../run1052/output_plans.xml.gz";
+//		String networkFileName = "../../network-ivtch/ivtch-osm.xml";
+//		String eventsFileName = "../../run657/it.1000/1000.events.txt.gz";
+//		String populationFileName = "../../run657/it.1000/1000.plans.xml.gz";
+		
+//		String networkFileName = "output/brandenburg/output_network.xml.gz";
+//		String eventsFileName = "output/brandenburg/ITERS/it.10/10.events.txt.gz";
+//		String populationFileName = "output/brandenburg/output_plans.xml.gz";
 		
 		double snapshotPeriod = 60;
 		SimulationConfigGroup simulationConfigGroup = new SimulationConfigGroup();
@@ -44,6 +46,7 @@ public class LiveMain {
 		SnapshotGenerator snapshotGenerator = new SnapshotGenerator(scenario.getNetwork(), (int) snapshotPeriod, simulationConfigGroup); 
 		snapshotGenerator.addSnapshotWriter(server.getSnapshotReceiver());
 		events.addHandler(snapshotGenerator);
+		server.setSnapshotGenerator(snapshotGenerator);
 		
 		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", server);
 		
