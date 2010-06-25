@@ -93,6 +93,20 @@ public class AnaTravelTimeOfPassenger {
 			anaNormal.addEventHandler(new PassengerTTAnaEventHandler("veh_18", "0:00", "30:00"));
 			anaNormal.run();
 			
+			AnaTravelTimeOfPassenger anaDeparture = new AnaTravelTimeOfPassenger(writer, "d:/Berlin/Intervalltakt/analysis/woDeparture/0.events.xml.gz");		
+			anaDeparture.addEventHandler(new PassengerTTAnaEventHandler("veh_17", "8:30", "9:32"));
+			anaDeparture.addEventHandler(new PassengerTTAnaEventHandler("veh_14", "8:29", "9:32"));
+			anaDeparture.addEventHandler(new PassengerTTAnaEventHandler("veh_15", "8:40", "9:39"));
+			
+			anaDeparture.addEventHandler(new PassengerTTAnaEventHandler("veh_8", "0:00", "30:00"));
+			anaDeparture.addEventHandler(new PassengerTTAnaEventHandler("veh_9", "0:00", "30:00"));
+			anaDeparture.addEventHandler(new PassengerTTAnaEventHandler("veh_13", "0:00", "30:00"));
+			anaDeparture.addEventHandler(new PassengerTTAnaEventHandler("veh_14", "0:00", "30:00"));
+			anaDeparture.addEventHandler(new PassengerTTAnaEventHandler("veh_15", "0:00", "30:00"));
+			anaDeparture.addEventHandler(new PassengerTTAnaEventHandler("veh_16", "0:00", "30:00"));
+			anaDeparture.addEventHandler(new PassengerTTAnaEventHandler("veh_17", "0:00", "30:00"));
+			anaDeparture.addEventHandler(new PassengerTTAnaEventHandler("veh_18", "0:00", "30:00"));
+			anaDeparture.run();			
 			
 			AnaTravelTimeOfPassenger anaBaseCase = new AnaTravelTimeOfPassenger(writer, "d:/Berlin/Intervalltakt/analysis/basecase/0.events.xml.gz");
 			anaBaseCase.addEventHandler(new PassengerTTAnaEventHandler("veh_17", "8:30", "9:31"));
