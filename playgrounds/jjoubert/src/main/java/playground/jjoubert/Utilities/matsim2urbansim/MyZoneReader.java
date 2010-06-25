@@ -18,33 +18,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities;
+package playground.jjoubert.Utilities.matsim2urbansim;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.jjoubert.CommercialTraffic.SAZone;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class MyGapReader {
+public class MyZoneReader {
 
+	private final Logger log = Logger.getLogger(MyZoneReader.class);
 	private String areaName;
 	private int idField;
 	private String shapefile;
-	private ArrayList<SAZone> zones;
-	private final Logger log = Logger.getLogger(MyGapReader.class);
+	private Collection<MyZone> zones;
 	private QuadTree<SAZone> quadTree;
 
 	private double xMin = Double.POSITIVE_INFINITY;
@@ -53,8 +55,9 @@ public class MyGapReader {
 	private double yMax = Double.NEGATIVE_INFINITY;
 	
 	
-	public MyGapReader(String area, String filename){
-		this.areaName = area;
+	public MyZoneReader(String areaName, String shapefile){
+		this.areaName = areaName;
+		this.shapefile = shapefile;
 
 		/*===========================================================
 		 * Id field index for the different provinces:
@@ -66,7 +69,7 @@ public class MyGapReader {
 		 *		SA: ?
 		 *-----------------------------------------------------------
 		 * Transport zone Ids:
-		 * 		eThekwini:
+		 * 		eThekwini: 1
 		 *===========================================================
 		 */
 		if(this.areaName.equalsIgnoreCase("Gauteng") ||
@@ -79,49 +82,48 @@ public class MyGapReader {
 			throw new RuntimeException("The given area name does not have a known ID field!!");
 		}
 		
-		File file = new File(filename);
+		File file = new File(shapefile);
 		if(file.exists()){
-		this.shapefile = filename;
+		this.shapefile = shapefile;
 		} else{
-			throw new RuntimeException("The shapefile " + filename + " does not exist!!");
+			throw new RuntimeException("The shapefile " + shapefile + " does not exist!!");
 		}
 		
-		readGapShapefile();
-		buildQuadTree();
+		readZones();
+//		buildQuadTree();
 	}
 	
-	private void buildQuadTree() {
-		log.info("Building QuadTree<SAZone> from read mesozones.");
-		this.quadTree = new QuadTree<SAZone>(this.xMin, this.yMin, this.xMax, this.yMax);
-		for (SAZone zone : this.zones) {
-			this.quadTree.put(zone.getCentroid().getX(), zone.getCentroid().getY(), zone); 
-		}
-		log.info("QuadTree<SAZone> completed.");
-	}
+//	private void buildQuadTree() {
+//		log.info("Building QuadTree<SAZone> from read mesozones.");
+//		this.quadTree = new QuadTree<SAZone>(this.xMin, this.yMin, this.xMax, this.yMax);
+//		for (SAZone zone : this.zones) {
+//			this.quadTree.put(zone.getCentroid().getX(), zone.getCentroid().getY(), zone); 
+//		}
+//		log.info("QuadTree<SAZone> completed.");
+//	}
 
+	
 	@SuppressWarnings("unchecked")
-	private void readGapShapefile (){
-		String startMessage = "Start reading shapefile for " + this.areaName;
-		log.info(startMessage);
-		
-		this.zones = new ArrayList<SAZone>();
+	private void readZones (){
+		log.info("Reading shapefile " + this.shapefile);		
+		this.zones = new ArrayList<MyZone>();
 		FeatureSource fs = null;
 		MultiPolygon mp = null;
-		GeometryFactory gf = new GeometryFactory();
 		try {	
 			fs = ShapeFileReader.readDataFile( this.shapefile );
-			ArrayList<Object> objectArray = (ArrayList<Object>) fs.getFeatures().getAttribute(0);
-			for (int i = 0; i < objectArray.size(); i++) {
-				Object thisZone = objectArray.get(i);
-				// For GAP files, field [1] contains the GAP_ID
-				String name = String.valueOf( ((Feature) thisZone).getAttribute( this.idField ) ); 
-				Geometry shape = ((Feature) thisZone).getDefaultGeometry();
+			Collection<Object> objectArray = (ArrayList<Object>) fs.getFeatures().getAttribute(0);
+			for (Object o : objectArray) {
+				String name = String.valueOf(Math.round(Float.parseFloat(String.valueOf(((Feature) o).getAttribute( this.idField ))))); 
+				Geometry shape = ((Feature) o).getDefaultGeometry();
 				if( shape instanceof MultiPolygon ){
 					mp = (MultiPolygon)shape;
 					if( !mp.isSimple() ){
 						log.warn("This polygon is NOT simple!" );
 					}
-					Polygon polygonArray[] = new Polygon[mp.getNumGeometries()];
+					if(mp.getNumGeometries() > 1){
+						log.warn("MultiPolygon " + name + " has more than one polygon.");
+					}
+					Polygon[] polygonArray = new Polygon[mp.getNumGeometries()];
 					for(int j = 0; j < mp.getNumGeometries(); j++ ){
 						if(mp.getGeometryN(j) instanceof Polygon ){
 							polygonArray[j] = (Polygon) mp.getGeometryN(j);							
@@ -129,9 +131,9 @@ public class MyGapReader {
 							log.warn("Subset of multipolygon is NOT a polygon.");
 						}
 					}
-					SAZone newZone = new SAZone(polygonArray, gf, name, 0);
-					
-					this.zones.add( newZone );
+					MyZone newZone = new MyZone(polygonArray, mp.getFactory(), new IdImpl(name));
+					zones.add(newZone);
+
 					/*
 					 * Determine the extent of the QuadTree.
 					 */
@@ -147,29 +149,33 @@ public class MyGapReader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
-		log.info("Done reading shapefile.");
+		log.info("Done reading " + shapefile);
 	}
 	
-	public SAZone getZone(String id){
-		SAZone result = null;
-		for (SAZone aZone : this.zones) {
-			if(aZone.getName().equalsIgnoreCase(id)){
-				result = aZone;
-			}
-		}
-		if(result == null){
-			String errorMessage = "Could not find the requested mesozone: " + id;
-			log.error(errorMessage);
-		}
-		return result;
-	}
-	
-	public ArrayList<SAZone> getAllZones() {
-		return this.zones;
-	}
+//	public SAZone getZone(String id){
+//		SAZone result = null;
+//		for (SAZone aZone : this.zones) {
+//			if(aZone.getName().equalsIgnoreCase(id)){
+//				result = aZone;
+//			}
+//		}
+//		if(result == null){
+//			String errorMessage = "Could not find the requested mesozone: " + id;
+//			log.error(errorMessage);
+//		}
+//		return result;
+//	}
+//	
+//	public ArrayList<SAZone> getAllZones() {
+//		return this.zones;
+//	}
 	
 	public QuadTree<SAZone> getGapQuadTree() {
 		return quadTree;
+	}
+	
+	public Collection<MyZone> getZones(){
+		return this.zones;
 	}
 
 

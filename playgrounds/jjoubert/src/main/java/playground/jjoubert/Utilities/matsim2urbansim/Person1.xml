@@ -1,0 +1,74 @@
+  <?xml version="1.0" encoding="utf-8" ?> 
+  <!DOCTYPE plans (View Source for full doctype...)> 
+- <plans xml:lang="de-CH">
+- <!--  ====================================================================== 
+  --> 
+- <person id="0">
+- <plan score="130.28244701886186" selected="no">
+  <act type="home" link="14864" x="601382.311797" y="7191306.14916" end_time="06:00:00" /> 
+- <leg mode="car" dep_time="06:00:00" trav_time="00:18:26" arr_time="06:18:26">
+  <route dist="15960.0" trav_time="00:18:26">2301 2959 12300 6424 12299 2273 6425 2298 2374 2913 7094</route> 
+  </leg>
+  <act type="work" link="2879" x="602662.239617" y="7177012.133265" dur="09:00:00" /> 
+- <leg mode="car" dep_time="15:18:26" trav_time="00:19:35" arr_time="15:38:01">
+  <route dist="17790.0" trav_time="00:19:35">2380 7094 2913 2374 2298 6425 2273 2961 2968 1</route> 
+  </leg>
+  <act type="home" link="14864" x="601382.311797" y="7191306.14916" /> 
+  </plan>
+- <plan score="130.28216783699554" selected="no">
+  <act type="home" link="14864" x="601382.311797" y="7191306.14916" end_time="06:00:00" /> 
+- <leg mode="car" dep_time="06:00:00" trav_time="00:18:55" arr_time="06:18:55">
+  <route dist="15960.0" trav_time="00:18:55">2301 2959 12300 6424 12299 2273 6425 2298 2374 2913 7094</route> 
+  </leg>
+  <act type="work" link="2879" x="602662.239617" y="7177012.133265" dur="09:00:00" /> 
+- <leg mode="car" dep_time="15:18:55" trav_time="00:19:21" arr_time="15:38:16">
+  <route dist="17790.0" trav_time="00:19:21">2380 7094 2913 2374 2298 6425 2273 2961 2968 1</route> 
+  </leg>
+  <act type="home" link="14864" x="601382.311797" y="7191306.14916" /> 
+  </plan>
+- <plan score="130.44796771902085" selected="no">
+  <act type="home" link="14864" x="601382.311797" y="7191306.14916" end_time="06:00:00" /> 
+- <leg mode="car" dep_time="06:00:00" trav_time="00:20:01" arr_time="06:20:01">
+  <route dist="15960.0" trav_time="00:20:01">2301 2959 12300 6424 12299 2273 6425 2298 2374 2913 7094</route> 
+  </leg>
+  <act type="work" link="2879" x="602662.239617" y="7177012.133265" dur="09:00:00" /> 
+- <leg mode="car" dep_time="15:20:01" trav_time="00:19:10" arr_time="15:39:11">
+  <route dist="17790.0" trav_time="00:19:10">2380 7094 2913 2374 2298 6425 2273 2961 2968 1</route> 
+  </leg>
+  <act type="home" link="14864" x="601382.311797" y="7191306.14916" /> 
+  </plan>
+- <plan score="130.30226824884826" selected="no">
+  <act type="home" link="14864" x="601382.311797" y="7191306.14916" end_time="06:00:00" /> 
+- <leg mode="car" dep_time="06:00:00" trav_time="00:18:55" arr_time="06:18:55">
+  <route dist="15960.0" trav_time="00:18:55">2301 2959 12300 6424 12299 2273 6425 2298 2374 2913 7094</route> 
+  </leg>
+  <act type="work" link="2879" x="602662.239617" y="7177012.133265" dur="09:00:00" /> 
+- <leg mode="car" dep_time="15:18:55" trav_time="00:19:43" arr_time="15:38:38">
+  <route dist="17790.0" trav_time="00:19:43">2380 7094 2913 2374 2298 6425 2273 2961 2968 1</route> 
+  </leg>
+  <act type="home" link="14864" x="601382.311797" y="7191306.14916" /> 
+  </plan>
+- <plan score="130.29253161869025" selected="no">
+  <act type="home" link="14864" x="601382.311797" y="7191306.14916" end_time="06:00:00" /> 
+- <leg mode="car" dep_time="06:00:00" trav_time="00:19:42" arr_time="06:19:42">
+  <route dist="15960.0" trav_time="00:19:42">2301 2959 12300 6424 12299 2273 6425 2298 2374 2913 7094</route> 
+  </leg>
+  <act type="work" link="2879" x="602662.239617" y="7177012.133265" dur="09:00:00" /> 
+- <leg mode="car" dep_time="15:19:42" trav_time="00:19:29" arr_time="15:39:11">
+  <route dist="17790.0" trav_time="00:19:29">2380 7094 2913 2374 2298 6425 2273 2961 2968 1</route> 
+  </leg>
+  <act type="home" link="14864" x="601382.311797" y="7191306.14916" /> 
+  </plan>
+- <plan score="130.28244701886186" selected="yes">
+  <act type="home" link="14864" x="601382.311797" y="7191306.14916" end_time="06:00:00" /> 
+- <leg mode="car" dep_time="06:00:00" trav_time="00:19:41" arr_time="06:19:41">
+  <route dist="15960.0" trav_time="00:19:41">2301 2959 12300 6424 12299 2273 6425 2298 2374 2913 7094</route> 
+  </leg>
+  <act type="work" link="2879" x="602662.239617" y="7177012.133265" dur="09:00:00" /> 
+- <leg mode="car" dep_time="15:19:41" trav_time="00:19:12" arr_time="15:38:53">
+  <route dist="17790.0" trav_time="00:19:12">2380 7094 2913 2374 2298 6425 2273 2961 2968 1</route> 
+  </leg>
+  <act type="home" link="14864" x="601382.311797" y="7191306.14916" /> 
+  </plan>
+  </person>
+  </plans>
