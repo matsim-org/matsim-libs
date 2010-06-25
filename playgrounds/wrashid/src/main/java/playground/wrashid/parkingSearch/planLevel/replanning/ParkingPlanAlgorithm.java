@@ -23,12 +23,26 @@ package playground.wrashid.parkingSearch.planLevel.replanning;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import playground.wrashid.lib.GlobalRegistry;
 
 public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
 	public void run(final Plan plan) {
+		
+		replaceParking(plan);
+		
+		/*
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
 				Activity activity = (Activity) pe;
@@ -36,6 +50,60 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 				return; // we only want to change the end time of the very first activity
 			}
 		}
+		*/
 	}
+	
+	
+	
+	private void replaceParking(final Plan plan){
+		ActivityImpl newParkingActivity=new ActivityImpl("parking",new CoordImpl(0, 1500));
+		newParkingActivity.setFacilityId(new IdImpl("2"));
+		newParkingActivity.setDuration(60);
+		
+		Activity activity = null;
+		int index=0;
+		
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				activity = (Activity) pe;
+				if (activity.getFacilityId().equals(new IdImpl("36")) && activity.getType().equalsIgnoreCase("parking")){
+					index=plan.getPlanElements().indexOf(activity);
+					break;
+				}
+			}
+		}
+		
+		plan.getPlanElements().remove(index);
+		plan.getPlanElements().add(index,newParkingActivity);
+		
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				activity = (Activity) pe;
+				if (activity.getFacilityId().equals(new IdImpl("36")) && activity.getType().equalsIgnoreCase("parking")){
+					index=plan.getPlanElements().indexOf(activity);
+					break;
+				}
+			}
+		}
+		
+		plan.getPlanElements().remove(index);
+		plan.getPlanElements().add(index,newParkingActivity);
+		
+		Controler controler=GlobalRegistry.controler;
+		
+		TravelTimeDistanceCostCalculator ttdcc=new TravelTimeDistanceCostCalculator(controler.getTravelTimeCalculator(),controler.getConfig().charyparNagelScoring());
+		
+		LeastCostPathCalculator lcpc= controler.getLeastCostPathCalculatorFactory().createPathCalculator(controler.getNetwork(), ttdcc , controler.getTravelTimeCalculator());
+		
+		NetworkFactoryImpl nfi=controler.getNetwork().getFactory();
+		
+		// cont here!!!!
+		// see class PlansCalcRoute, zeilen 254
+		// make a method, which does it...
+		
+		
+		// TODO: change parking of all people!!
+	} 
+	
 
 }

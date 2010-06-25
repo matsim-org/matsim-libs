@@ -19,10 +19,12 @@ package playground.wrashid.parkingSearch.planLevel;
  *                                                                         *
  * *********************************************************************** */
 
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
+import playground.wrashid.lib.GlobalRegistry;
 
 public class MainTest extends MatsimTestCase {
  
@@ -40,11 +42,9 @@ public class MainTest extends MatsimTestCase {
 		
 		// build structure for parking ranking.
 		// (needed for the above task: build structure for mapping from links to facilities)
-		
-		
-		
-		
-		
+		Object a=controler.getFacilities().getFacilities().get(new IdImpl("2"));
+				
+		GlobalRegistry.controler=controler;
 		
 		controler.run();
 	}
