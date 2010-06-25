@@ -47,6 +47,10 @@ public class M2UStringbuilder {
 		return root + studyArea + "/" + version + "/networkEmme.xml";
 	}
 
+	public String getPlansFile() {
+		return root + studyArea + "/" + version + "/plans.xml";
+	}
+
 
 }
 
