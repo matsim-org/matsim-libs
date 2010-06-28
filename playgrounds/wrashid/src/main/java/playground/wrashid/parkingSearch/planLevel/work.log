@@ -21,6 +21,15 @@ TODO:
 These parkings are all assigned a constant capacity.
 
 
+- Keep track of occupancy at the parkings - This is needed for the replanning. 
+Think, backwards from replanning, what is needed there and then continue this.
+
+- How to find all parkings belonging to a link? Mainain a map, 
+which gives for a linkId the corresponding parking facilities (ids). 
+see what is really needed in this regard.
+
+- 
+
 
 
  
