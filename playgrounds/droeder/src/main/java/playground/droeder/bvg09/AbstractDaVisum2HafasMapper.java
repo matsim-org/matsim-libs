@@ -116,6 +116,11 @@ public abstract class AbstractDaVisum2HafasMapper {
 		return vis2HafLines;
 	}
 	
+	public Map<Id, Map<Id, Id>> getVisRoute2Vis2HafStops(){
+		if (vRoute2vis2hafStops == null) this.run();
+		return vRoute2vis2hafStops;
+	}
+	
 	private void matchLines(){
 		vis2hafRoutes = new HashMap<Id, Id>();
 		vRoute2vis2hafStops = new HashMap<Id, Map<Id,Id>>();
@@ -273,7 +278,7 @@ public abstract class AbstractDaVisum2HafasMapper {
 		return dist;
 	}
 	
-	private double getDist(Id vStop, Id hStop){
+	protected double getDist(Id vStop, Id hStop){
 		Coord v = visumSc.getTransitSchedule().getFacilities().get(vStop).getCoord();
 		Coord h = hafasSc.getTransitSchedule().getFacilities().get(hStop).getCoord();
 		
