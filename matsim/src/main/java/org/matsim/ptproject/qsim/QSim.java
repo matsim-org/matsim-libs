@@ -334,6 +334,10 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		if (this.transitEngine != null) { // yyyy do after features
 			this.transitEngine.afterSim();
 		}
+		
+		if (this.signalEngine != null) {
+			this.signalEngine.afterSim();
+		}
 
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) { // yyyy features should be replaced by listeners
 			queueSimulationFeature.beforeCleanupSim();

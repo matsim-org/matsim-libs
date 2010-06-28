@@ -285,7 +285,11 @@ public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
 
   @Override
   public void afterSim() {
-    //nothing to do
+  	for (SignalSystemController systemControler : this.signalSystemControlerBySystemId.values()) {
+  		if (systemControler instanceof EventHandler){
+				this.getEvents().removeHandler((EventHandler) systemControler);
+			}
+  	}
   }
 
   @Override
