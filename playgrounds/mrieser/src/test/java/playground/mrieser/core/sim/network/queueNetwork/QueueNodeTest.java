@@ -84,6 +84,88 @@ public class QueueNodeTest {
 		Assert.assertEquals(veh2, f.qlink3.getParkedVehicle(veh2.getId()));
 	}
 
+	@Test
+	public void test_Deadlock() {
+		Fixture f = new Fixture();
+
+		SimVehicle veh1 = new FakeSimVehicle(new IdImpl(5));
+		TestDriverAgent driver1 = new TestDriverAgent();
+		veh1.setDriver(driver1);
+
+		while (f.qlink3.hasSpace()) {
+			f.qlink3.addVehicleFromIntersection(new FakeSimVehicle(new IdImpl("foo")));
+		}
+
+		f.qlink1.buffer.setFlowCapacity(1.0);
+		f.qlink1.buffer.updateCapacity();
+		f.qlink1.buffer.addVehicle(veh1, 0);
+		Assert.assertEquals(0, driver1.count);
+		Assert.assertFalse(f.qlink1.buffer.hasSpace());
+		f.qlink1.buffer.updateCapacity();
+		f.qnode.moveNode(10, new Random(1));
+		Assert.assertEquals(0, driver1.count);
+		f.qlink1.buffer.updateCapacity();
+		f.qnode.moveNode(50, new Random(1));
+		Assert.assertEquals(0, driver1.count);
+		f.qlink1.buffer.updateCapacity();
+		f.qnode.moveNode(99, new Random(1));
+		Assert.assertEquals(0, driver1.count);
+		Assert.assertFalse(f.qlink1.buffer.hasSpace());
+		f.qlink1.buffer.updateCapacity();
+		f.qnode.moveNode(100, new Random(1)); // not moved to next link
+		Assert.assertEquals(0, driver1.count);
+		Assert.assertFalse(f.qlink1.buffer.hasSpace());
+		f.qlink1.buffer.updateCapacity();
+		f.qnode.moveNode(101, new Random(1));
+		Assert.assertEquals(0, driver1.count); // not moved to next link
+		f.qlink1.buffer.updateCapacity();
+		Assert.assertTrue(f.qlink1.buffer.hasSpace()); // but no longer in buffer
+		f.qlink3.parkVehicle(veh1); // should not be able to park, as it is not there
+		Assert.assertNull(f.qlink3.getParkedVehicle(veh1.getId())); // so we should get null back
+	}
+
+	@Test
+	public void test_Deadlock_nonDefaultStuckTime() {
+		Fixture f = new Fixture();
+
+		f.qnet.setStuckTime(20);
+
+		SimVehicle veh1 = new FakeSimVehicle(new IdImpl(5));
+		TestDriverAgent driver1 = new TestDriverAgent();
+		veh1.setDriver(driver1);
+
+		while (f.qlink3.hasSpace()) {
+			f.qlink3.addVehicleFromIntersection(new FakeSimVehicle(new IdImpl("foo")));
+		}
+
+		f.qlink1.buffer.setFlowCapacity(1.0);
+		f.qlink1.buffer.updateCapacity();
+		f.qlink1.buffer.addVehicle(veh1, 0);
+		Assert.assertEquals(0, driver1.count);
+		Assert.assertFalse(f.qlink1.buffer.hasSpace());
+		f.qlink1.buffer.updateCapacity();
+		f.qnode.moveNode(10, new Random(1));
+		Assert.assertEquals(0, driver1.count);
+		f.qlink1.buffer.updateCapacity();
+		f.qnode.moveNode(5, new Random(1));
+		Assert.assertEquals(0, driver1.count);
+		f.qlink1.buffer.updateCapacity();
+		f.qnode.moveNode(19, new Random(1));
+		Assert.assertEquals(0, driver1.count);
+		Assert.assertFalse(f.qlink1.buffer.hasSpace());
+		f.qlink1.buffer.updateCapacity();
+		f.qnode.moveNode(20, new Random(1)); // not moved to next link
+		Assert.assertEquals(0, driver1.count);
+		Assert.assertFalse(f.qlink1.buffer.hasSpace());
+		f.qlink1.buffer.updateCapacity();
+		f.qnode.moveNode(21, new Random(1));
+		Assert.assertEquals(0, driver1.count); // not moved to next link
+		f.qlink1.buffer.updateCapacity();
+		Assert.assertTrue(f.qlink1.buffer.hasSpace()); // but no longer in buffer
+		f.qlink3.parkVehicle(veh1); // should not be able to park, as it is not there
+		Assert.assertNull(f.qlink3.getParkedVehicle(veh1.getId())); // so we should get null back
+	}
+
 	private static class Fixture {
 
 		/*package*/ final NetworkLayer net;

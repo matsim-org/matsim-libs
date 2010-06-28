@@ -27,12 +27,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
 import playground.mrieser.core.sim.api.SimVehicle;
 import playground.mrieser.core.sim.fakes.FakeSimEngine;
+import playground.mrieser.core.sim.fakes.FakeSimVehicle;
 import playground.mrieser.core.sim.impl.DefaultSimVehicle;
 
 /**
@@ -159,6 +162,28 @@ public class QueueBufferTest {
 		}
 		Assert.assertEquals(2880, cntExtract);
 
+	}
+
+	@Test
+	public void testGetLastMovedTime() {
+		Fixture f = new Fixture();
+		QueueBuffer buffer = new QueueBuffer(f.qlink);
+		buffer.setFlowCapacity(2.0);
+		buffer.updateCapacity();
+
+		Assert.assertEquals("lastMovedTimes should be undefined before first doSimStep().", Time.UNDEFINED_TIME, buffer.getLastMovedTime(), MatsimTestUtils.EPSILON);
+		f.engine.setCurrentTime(10.0);
+		buffer.addVehicle(new FakeSimVehicle(new IdImpl(5)), 10.0);
+		Assert.assertEquals("lastMovedTimes should represent enter-time.", 10.0, buffer.getLastMovedTime(), MatsimTestUtils.EPSILON);
+		f.engine.setCurrentTime(20.0);
+		buffer.addVehicle(new FakeSimVehicle(new IdImpl(11)), 20.0);
+		Assert.assertEquals("lastMovedTimes should represent enter-time of first vehicle.", 10.0, buffer.getLastMovedTime(), MatsimTestUtils.EPSILON);
+		f.engine.setCurrentTime(50.0);
+		buffer.removeFirstVehicleInBuffer();
+		Assert.assertEquals("lastMovedTimes should represent time first vehicle left.", 50.0, buffer.getLastMovedTime(), MatsimTestUtils.EPSILON);
+		f.engine.setCurrentTime(60.0 + f.qnet.getStuckTime());
+		buffer.removeFirstVehicleInBuffer();
+		Assert.assertEquals("lastMovedTimes should represent time when last vehicle left.", f.engine.getCurrentTime(), buffer.getLastMovedTime(), MatsimTestUtils.EPSILON);
 	}
 
 	private static class Fixture {
