@@ -21,6 +21,9 @@
 package org.matsim.vis.otfvis2;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.io.Serializable;
@@ -52,6 +55,7 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.gui.NetJComponent;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
@@ -159,8 +163,45 @@ public final class QueryAgentPlan extends AbstractQuery {
 		public void draw(OTFDrawer drawer) {
 			if (drawer instanceof OTFOGLDrawer) {
 				drawWithGLDrawer((OTFOGLDrawer) drawer);
+			} else if (drawer instanceof NetJComponent){
+				drawWithNetJComponent((NetJComponent)drawer);
 			} else {
 				log.error("cannot draw query cause no OTFOGLDrawer is used!");
+			}
+		}
+
+		protected void drawWithNetJComponent(NetJComponent drawer) {
+			Graphics2D g2d = (Graphics2D)drawer.getG2D();
+			float lineWidth = this.getLineWidth(); 
+			for (MyInfoText act: this.acts){
+				// Transform the act-koordinates
+				int transformedX = (int)(act.east - drawer.getQuad().offsetEast - 3*lineWidth);
+				int transformedY = (int)(act.north - drawer.getQuad().offsetNorth - 3*lineWidth);
+				// draw the act-locations
+				g2d.setColor(Color.RED);
+				g2d.fillOval(transformedX, transformedY, 4*(int)lineWidth, 4*(int)lineWidth);
+				g2d.drawLine(transformedX + (int)lineWidth, transformedY + (int)lineWidth, (int)(transformedX + 450/drawer.getScale()), (int)(transformedY + 450/drawer.getScale()));
+				// print the name of the act
+				java.awt.Font font_old = g2d.getFont();
+				AffineTransform tx = new AffineTransform(1,0,0,-1,0,0);
+				g2d.transform(tx);
+				java.awt.Font font = new java.awt.Font("Arial Unicode MS", java.awt.Font.PLAIN, (int)(270/drawer.getScale()));
+				g2d.setFont(font);
+				g2d.drawString(act.name, transformedX + 16*30/drawer.getScale(), -(transformedY + 16*30/drawer.getScale()));
+				try {
+					tx.invert();
+				} catch (NoninvertibleTransformException e) {
+					e.printStackTrace();
+				}
+				g2d.transform(tx);
+				g2d.setFont(font_old);
+				// draw plan
+				if(hasPlan){
+					g2d.setColor(Color.BLUE);
+					for(int i=0; i<(vertex.length-2)/2;i++){
+						g2d.drawLine((int)(vertex[2*i] - drawer.getQuad().offsetEast), (int)(vertex[2*i+1] - drawer.getQuad().offsetNorth), (int)(vertex[2*i+2] - drawer.getQuad().offsetEast), (int)(vertex[2*i+3] - drawer.getQuad().offsetNorth));
+					}
+				}
 			}
 		}
 

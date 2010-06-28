@@ -297,7 +297,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		mouseMan.drawElements(g2);
 		g2.setTransform(originalTransform);
 	}
-
+	
 	@Override
 	public Component getComponent() {
 		return networkScrollPane;
@@ -306,6 +306,14 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	@Override
 	public OTFClientQuad getQuad() {
 		return quad;
+	}
+	
+	public  Graphics2D getG2D() {
+		return OTFSwingDrawable.g2d;
+	}
+	
+	public float getScale(){
+		return networkScrollPane.getScale();
 	}
 
 	@Override
@@ -468,9 +476,10 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			//			final int lane = (RANDOMIZE_LANES ? (agent.hashCode()
 			//			% lanes + 1) : agent.getLane());
 
-
+			
 			final double agentWidth = linkWidth *0.9;
 			final double agentLength = agentWidth*0.9;
+			float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
 			final double offsetX = - 0.5 * agentLength;
 
 			// there is only ONE displayvalue!
@@ -479,7 +488,8 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			} else {
 				display.setColor(color);
 			}
-			display.fillOval((int)Math.round(pos.x + offsetX), (int)pos.y, (int)Math.round(agentLength), (int)Math.round(agentWidth));
+//			display.fillOval((int)Math.round(pos.x + offsetX), (int)pos.y, (int)Math.round(agentLength), (int)Math.round(agentWidth));
+			display.fillOval((int)Math.round(pos.x + offsetX), (int)pos.y, (int)Math.round(agentSize), (int)Math.round(agentSize));
 		}
 
 	}
