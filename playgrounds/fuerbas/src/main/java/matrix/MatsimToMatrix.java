@@ -67,6 +67,8 @@ public class MatsimToMatrix {
 //			costList.add(nodeList.indexOf(link.getFromNode()), new HashMap<Integer, Double>());
 			
 			costList.get(from).put((to), link.getLength()/link.getFreespeed());
+			costList.get(to).put((from), link.getLength()/link.getFreespeed());
+		
 			
 //			System.out.println("FROM "+from+" TO "+to);		
 //			System.out.println(costList.get(from).get(to));
