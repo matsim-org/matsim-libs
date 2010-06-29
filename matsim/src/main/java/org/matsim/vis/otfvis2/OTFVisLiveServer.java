@@ -114,7 +114,6 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 		private void putTimeStep(TimeStep timeStep2) {
 			if (!synchedPlayback) {
-				System.out.println("Clearing.");
 				timeStepBuffer.clear();
 				nextTimeStep = timeStep;
 			}
@@ -156,14 +155,12 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	@Override
 	public void pause() throws RemoteException {
 		synchedPlayback = true;
-		System.out.println("pause");
 	}
 
 	@Override
 	public void play() throws RemoteException {
 		synchedPlayback = false;
 		timeStepBuffer.clear();
-		System.out.println("play");
 	}
 
 	@Override
@@ -173,7 +170,6 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	@Override
 	public boolean requestControllerStatus(int status) throws RemoteException {
-		System.out.println("Request controller status: "+status);
 		return false;
 	}
 
@@ -237,14 +233,12 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	@Override
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
-		System.out.println("Requested: " + time);
 		if (snapshotGenerator != null) {
 			snapshotGenerator.skipUntil(time);
 		}
 		while(nextTimeStep == null || nextTimeStep.time < time) {
 			try {
 				nextTimeStep = timeStepBuffer.take();
-				System.out.println("Got: " + nextTimeStep.time);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
