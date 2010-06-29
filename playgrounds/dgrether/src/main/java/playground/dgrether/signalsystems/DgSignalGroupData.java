@@ -35,30 +35,30 @@ public class DgSignalGroupData {
   private SignalGroupState oldState = null;
   
   private double oldStateOnTime = 0.0;
+
+  private double [] stateTimeArray = new double[SignalGroupState.values().length];
   
-  private Map<SignalGroupState, Double> stateTimeMap = new HashMap<SignalGroupState, Double>();
   
   public DgSignalGroupData(){
-  	for (SignalGroupState state : SignalGroupState.values()){
-  		this.stateTimeMap.put(state, 0.0);
-  	}
   }
   
   public void processStateChange(SignalGroupStateChangedEvent e) {
-  	Double stateTimeSum = null;
   	double time = e.getTime();
   	SignalGroupState newState = e.getNewState();
   	if (oldState != null){
-  		stateTimeSum = stateTimeMap.get(oldState);
-  		stateTimeSum = stateTimeSum + (e.getTime() - oldStateOnTime);
-  		stateTimeMap.put(oldState, stateTimeSum);
+  		stateTimeArray[oldState.ordinal()] += (time - oldStateOnTime);
     }
   	oldStateOnTime = time;
     oldState = newState;
   }
 
   
-  public Map<SignalGroupState, Double> getStateTimeMap() {
-    return stateTimeMap;
+
+	public Map<SignalGroupState, Double> getStateTimeMap() {
+		Map<SignalGroupState, Double> map = new HashMap<SignalGroupState, Double>();
+		for (SignalGroupState state : SignalGroupState.values()){
+			map.put(state, this.stateTimeArray[state.ordinal()]);
+		}
+    return map;
   }
 }
