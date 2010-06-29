@@ -332,7 +332,7 @@ public class DBSimLink {
 			}
 
 			DBSimulation.getEvents().processEvent(
-					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
 			addToBuffer(veh, now);
 		}
 	}

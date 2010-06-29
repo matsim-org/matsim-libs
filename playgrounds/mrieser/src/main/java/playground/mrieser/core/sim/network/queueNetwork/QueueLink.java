@@ -27,7 +27,6 @@ import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
@@ -225,7 +224,7 @@ import playground.mrieser.core.sim.network.api.SimLink;
 			}
 
 			this.network.simEngine.getEventsManager().processEvent(
-					new AgentWait2LinkEventImpl(time, vehicle.getId(), this.link.getId(), TransportMode.car));
+					new AgentWait2LinkEventImpl(time, vehicle.getId(), this.link.getId()));
 			this.buffer.addVehicle(vehicle, time);
 		}
 	}
