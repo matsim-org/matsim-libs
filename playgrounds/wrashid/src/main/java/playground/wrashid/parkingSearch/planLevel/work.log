@@ -7,18 +7,38 @@ TODO:
 4.) add per agent utility functions.
 
 
+========================================================
+- Main test is not running!!!!
+	=> the destination is fine, rerouting should happen for this.
+	CONTINUE AT: playground.wrashid.parkingSearch.planLevel.replanning.ParkingPlanAlgorithm line 100.
 
+- we need a method to replace parking 1 by parking 2 during replanning
+(input: old plan + specification of old parking in the plan and the new parking - output should be altered plan).
+=> the route needs also adaptation in this case.
+=========================================================
+- make method, which gets as input the starting time and end time of an activity and gives as output, how much needs to be paid.
+- inorder to find out how much needs to be paid, we need to implement integration of linear functions (which are already implemented). This should be possible.
+- I also need to implement time-of-use (e.g. how much it costs). => auch im paper erwähnen, falls nicht bereits gemacht.
+=========================================================
 
-
-
-
-
-
+=====================================================
 
 1.) A facilities file was generated at 
 /playgrounds/wrashid/test/input/playground/wrashid/parkingSearch/planLevel/berlinFacilities.xml
 (each node was assigned a parking lot of capacity 67). => 2 times the number of links (no problem). 
 These parkings are all assigned a constant capacity.
+
+
+- list of parkings close to target.
+- statistics of occupancy needed for replanning / scoring?
+
+
+- make function to find the set of parkings arround a destination link/facility. 
+input: facilityId, numberOfParkings required, output: list of facility Ids.
+=> this list do not necessary need to be sorted according to distance from the 
+destination, because we will add price and distance score on top of it. only afterwards it needs to be sortable.
+=> implement that sortable!!!
+
 
 
 - Keep track of occupancy at the parkings - This is needed for the replanning. 
@@ -28,11 +48,24 @@ Think, backwards from replanning, what is needed there and then continue this.
 which gives for a linkId the corresponding parking facilities (ids). 
 see what is really needed in this regard.
 
-- 
+
+
+open questions
+==============
+- do we have a different internal scaling factor and a different one for scoring?
 
 
 
- 
+some thing, which are not implementing (but which we could)
+======================================
+- distances are perceived by humans not in an exact way.
+As a heuristic we could change the actual distance in the head of a person to a parking place by 10% at random.
+This would allow for better choice between parkings, which is only located 1 meter futher away than an other and would also lead to better balancing.
+
+- sometimes people have to go back to the parking to change the coins or the parking card.
+This we could implement, but we need a reason, why we should do so => z.B. in discussion erwähnen?
+
+
 
 
 
