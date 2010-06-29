@@ -25,8 +25,10 @@ package org.matsim.contrib.sna.graph.generators;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import org.matsim.contrib.sna.graph.Edge;
@@ -49,14 +51,31 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 
 	private GraphBuilder<G, V, E> builder;
 
+	private boolean randomDraw = false;
+
 	/**
-	 * Creates a new random graph generatr.
+	 * Creates a new random graph generator.
 	 * 
 	 * @param builder
 	 *            a graph builder to create new graphs.
 	 */
 	public ErdosRenyiGenerator(GraphBuilder<G, V, E> builder) {
 		this.builder = builder;
+	}
+
+	/**
+	 * Sets the mode of the generator to "random draw". Per default the
+	 * generator will iterate over all possible edges an insert edges with the
+	 * given probability. If <tt>randomDraw</tt> is set to <tt>true</tt> the
+	 * generator will randomly draw <tt>p * n * (n - 1) / 2</tt> distinct pairs
+	 * of vertices and connect them with edges.
+	 * 
+	 * @param randomDraw
+	 *            <tt>true</tt> if the generator should operate in the
+	 *            "random draw" mode, <tt>false</tt> otherwise.
+	 */
+	public void setRandomDrawMode(boolean randomDraw) {
+		this.randomDraw = randomDraw;
 	}
 
 	/**
@@ -91,8 +110,15 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 	 *            a random seed
 	 * @return a graph with randomly inserted edges.
 	 */
-	@SuppressWarnings("unchecked")
 	public G generate(G graph, double p, long randomSeed) {
+		if (randomDraw)
+			return randomDraw(graph, p, randomSeed);
+		else
+			return enumerate(graph, p, randomSeed);
+	}
+
+	@SuppressWarnings("unchecked")
+	private G enumerate(G graph, double p, long randomSeed) {
 		LinkedList<V> pending = new LinkedList<V>();
 		pending.addAll((Collection<? extends V>) graph.getVertices());
 
@@ -107,12 +133,32 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 		}
 
 		return graph;
+	}
 
+	@SuppressWarnings("unchecked")
+	private G randomDraw(G graph, double p, long randomSeed) {
+		int n = graph.getVertices().size();
+		long M = n * (n - 1) / 2;
+		int m = (int) (p * M);
+
+		Random random = new Random(randomSeed);
+		List<V> vertices = new ArrayList<V>((Collection<? extends V>) graph.getVertices());
+		for (int i = 0; i < m; i++) {
+			E edge = null;
+			while (edge == null) {
+				V vi = vertices.get(random.nextInt(n));
+				V vj = vertices.get(random.nextInt(n));
+				edge = builder.addEdge(graph, vi, vj);
+			}
+		}
+
+		return graph;
 	}
 
 	/**
 	 * Main-method to create random graphs.<br>
-	 * Usage: ErdosRenyiGenerator graphMLFile numVertices probability [randomSeed]
+	 * Usage: ErdosRenyiGenerator graphMLFile numVertices probability
+	 * [randomSeed]
 	 * 
 	 * @param args
 	 *            command line arguments.

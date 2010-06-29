@@ -47,7 +47,7 @@ public class SampledGraphML {
 	public static void applyDetectedState(SampledVertex v, Attributes attrs) {
 		String str = attrs.getValue(DETECTED_ATTR);
 		if(str != null)
-			v.detect(Integer.parseInt(str));
+			v.detect(new Integer(str));
 	}
 	
 	/**
@@ -60,7 +60,7 @@ public class SampledGraphML {
 	public static void applySampledState(SampledVertex v, Attributes attrs) {
 		String str = attrs.getValue(SAMPLED_ATTR);
 		if(str != null)
-			v.sample(Integer.parseInt(str));
+			v.sample(new Integer(str));
 	}
 
 	/**
@@ -70,13 +70,10 @@ public class SampledGraphML {
 	 * @param attributes the attributes data.
 	 */
 	public static void addSnowballAttributesData(SampledVertex v, List<Tuple<String, String>> attributes) {
-		int detected = v.getIterationDetected();
-		int sampled = v.getIterationSampled();
-		
-		if(detected > -1)
-			attributes.add(new Tuple<String, String>(DETECTED_ATTR, String.valueOf(detected)));
-		if(sampled > -1)
-			attributes.add(new Tuple<String, String>(SAMPLED_ATTR, String.valueOf(sampled)));
+		if(v.isDetected())
+			attributes.add(new Tuple<String, String>(DETECTED_ATTR, String.valueOf(v.getIterationDetected())));
+		if(v.isSampled())
+			attributes.add(new Tuple<String, String>(SAMPLED_ATTR, String.valueOf(v.getIterationSampled())));
 		
 	}
 }

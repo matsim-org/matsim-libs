@@ -43,14 +43,14 @@ public interface SampledVertex extends Vertex {
 	public List<? extends SampledVertex> getNeighbours();
 	
 	/**
-	 * @see {@link SnowballAttributes#detect(int)}
+	 * @see {@link SnowballAttributes#detect(Integer)}
 	 */
-	public void detect(int iteration);
+	public void detect(Integer iteration);
 	
 	/**
 	 * @see {@link SnowballAttributes#getIterationDeteted()}
 	 */
-	public int getIterationDetected();
+	public Integer getIterationDetected();
 	
 	/**
 	 * @see {@link SnowballAttributes#isDetected()}
@@ -58,14 +58,14 @@ public interface SampledVertex extends Vertex {
 	public boolean isDetected();
 	
 	/**
-	 * @see {@link SnowballAttributes#sample(int)}
+	 * @see {@link SnowballAttributes#sample(Integer)}
 	 */
-	public void sample(int iteration);
+	public void sample(Integer iteration);
 	
 	/**
 	 * @see {@link SnowballAttributes#getIterationSampled()}
 	 */
-	public int getIterationSampled();
+	public Integer getIterationSampled();
 	
 	/**
 	 * @see {@link SnowballAttributes#isSampled()}

@@ -27,9 +27,9 @@ package org.matsim.contrib.sna.snowball;
  */
 public class SnowballAttributes {
 
-	private int detected = -1;
+	private Integer detected;
 
-	private int sampled = -1;
+	private Integer sampled;
 
 	/**
 	 * Sets this element as detected in <tt>interation</tt>, i.e. another
@@ -39,7 +39,7 @@ public class SnowballAttributes {
 	 * @param iteration
 	 *            the iteration in which this element has been detected.
 	 */
-	public void detect(int iteration) {
+	public void detect(Integer iteration) {
 		detected = iteration;
 	}
 
@@ -49,7 +49,7 @@ public class SnowballAttributes {
 	 * @return the iteration in which this element was sampled, or -1 if this
 	 *         element has not been detected yet.
 	 */
-	public int getIterationDeteted() {
+	public Integer getIterationDeteted() {
 		return detected;
 	}
 
@@ -60,7 +60,7 @@ public class SnowballAttributes {
 	 *         otherwise.
 	 */
 	public boolean isDetected() {
-		return (detected > -1);
+		return detected != null;
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class SnowballAttributes {
 	 * @param iteration
 	 *            the iteration in which this element has been sampled.
 	 */
-	public void sample(int iteration) {
+	public void sample(Integer iteration) {
 		sampled = iteration;
 	}
 
@@ -78,7 +78,7 @@ public class SnowballAttributes {
 	 * 
 	 * @return the iteration in which this element has been sampled.
 	 */
-	public int getIterationSampled() {
+	public Integer getIterationSampled() {
 		return sampled;
 	}
 
@@ -89,6 +89,6 @@ public class SnowballAttributes {
 	 *         otherwise.
 	 */
 	public boolean isSampled() {
-		return sampled > -1;
+		return sampled != null;
 	}
 }
