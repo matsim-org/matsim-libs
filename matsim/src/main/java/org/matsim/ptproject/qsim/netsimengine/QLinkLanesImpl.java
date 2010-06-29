@@ -335,8 +335,7 @@ public class QLinkLanesImpl implements QLinkInternalI {
 			}
 
 			this.getQSimEngine().getQSim().getEventsManager().processEvent(
-			new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId(),
-					veh.getDriver().getCurrentLeg().getMode()));
+			new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
 			boolean handled = this.originalLane.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
 			if (!handled) {
 				this.originalLane.addToBuffer(veh, now);

@@ -63,8 +63,8 @@ public class EventsFactoryImpl implements EventsFactory {
 		return new AgentStuckEventImpl(time, agentId, linkId, legMode);
 	}
 
-	public AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId, final TransportMode legMode) {
-		return new AgentWait2LinkEventImpl(time, agentId, linkId, legMode);
+	public AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId) {
+		return new AgentWait2LinkEventImpl(time, agentId, linkId);
 	}
 
 	public LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId) {

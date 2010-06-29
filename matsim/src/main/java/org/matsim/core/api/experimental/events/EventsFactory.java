@@ -37,7 +37,7 @@ public interface EventsFactory extends MatsimFactory {
 
 	AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final TransportMode legMode);
 
-	AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId, final TransportMode legMode);
+	AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId);
 
 	AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final TransportMode legMode);
 

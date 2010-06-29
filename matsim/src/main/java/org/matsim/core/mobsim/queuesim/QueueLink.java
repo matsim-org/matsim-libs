@@ -388,8 +388,7 @@ class QueueLink implements VisLink, CapacityInformationLink {
 
 			QueueSimulation.getEvents().processEvent(
 					new AgentWait2LinkEventImpl(now, veh.getDriver()
-							.getPerson().getId(), this.getLink().getId(), veh
-							.getDriver().getCurrentLeg().getMode()));
+							.getPerson().getId(), this.getLink().getId()));
 			addToBuffer(veh, now);
 		}
 	}

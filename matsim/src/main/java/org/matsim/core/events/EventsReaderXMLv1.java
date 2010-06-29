@@ -103,12 +103,9 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 					new IdImpl(atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_LINK)),
 					mode));
 		} else if (AgentWait2LinkEventImpl.EVENT_TYPE.equals(eventType)) {
-			String legMode = atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_LEGMODE);
-			TransportMode mode = legMode == null ? null : TransportMode.valueOf(legMode);
 			this.events.processEvent(this.builder.createAgentWait2LinkEvent(time,
 					new IdImpl(atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_LINK)),
-					mode));
+					new IdImpl(atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_LINK))));
 		} else if (AgentStuckEventImpl.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(AgentStuckEventImpl.ATTRIBUTE_LEGMODE);
 			TransportMode mode = legMode == null ? null : TransportMode.valueOf(legMode);
