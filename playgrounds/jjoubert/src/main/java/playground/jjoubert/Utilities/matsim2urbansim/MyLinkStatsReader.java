@@ -23,14 +23,14 @@ package playground.jjoubert.Utilities.matsim2urbansim;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.IOException;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.IOUtils;
 
 public class MyLinkStatsReader {
 	private final Logger log = Logger.getLogger(MyLinkStatsReader.class);
@@ -51,13 +51,14 @@ public class MyLinkStatsReader {
 	public void readLinkStatsTravelTime(){
 		log.info("Reading link statistics from " + this.file.getAbsolutePath());
 		Integer index = null;
-		Scanner input;
+		BufferedReader input;
 		int linkCounter = 0;
 		int linkMultiplier = 1;
 		try {
-			input = new Scanner(new BufferedReader(new FileReader(this.file)));
+			input = IOUtils.getBufferedReader(file.getAbsolutePath());
+//			input = new Scanner(new BufferedReader(new FileReader(this.file)));
 			try{
-				String[] header = input.nextLine().split("\t");
+				String[] header = input.readLine().split("\t");
 				/*
 				 * First find the column index in which the appropriate travel time 
 				 * occurs.
@@ -80,8 +81,9 @@ public class MyLinkStatsReader {
 				/* 
 				 * Now process the links, adding each to a map.
 				 */
-				while(input.hasNextLine()){
-					String[] line = input.nextLine().split("\t");
+				String theLine= null; 
+				while( (theLine = input.readLine()) != null ){
+					String line[] = theLine.split("\t");
 					if(line.length == header.length){
 						travelTimes.put(new IdImpl(line[0]), Double.parseDouble(line[index]));
 					}
@@ -97,6 +99,8 @@ public class MyLinkStatsReader {
 			}
 			log.info("   Links processed: " + linkCounter + " (Done)");		
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

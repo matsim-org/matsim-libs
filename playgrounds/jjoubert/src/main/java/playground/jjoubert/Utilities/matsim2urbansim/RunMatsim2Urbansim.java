@@ -20,6 +20,7 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -27,10 +28,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 
@@ -69,8 +72,9 @@ public class RunMatsim2Urbansim {
 		M2UStringbuilder sb = new M2UStringbuilder(root, studyAreaName, version);
 		
 		// Read the transportation zones. 
-//		MyZoneReader r = new MyZoneReader(studyAreaName, sb.getShapefile());
-//		Collection<MyZone> zones = r.getZones();
+		MyZoneReader r = new MyZoneReader(sb.getShapefile());
+		r.readZones(sb.getIdField());
+		Collection<MyZone> zones = r.getZones();
 		
 		/* 
 		 * TODO Write procedure.
@@ -82,7 +86,7 @@ public class RunMatsim2Urbansim {
 		Scenario s = new ScenarioImpl();
 		Population pop = s.getPopulation();
 		MatsimPopulationReader mpr = new MatsimPopulationReader(s);
-		mpr.readFile(sb.getPlansFile());
+		mpr.readFile(sb.getPlansFile("10"));
 		Map<Id, ? extends Person> persons = pop.getPersons();
 		int personCounter = 0;
 		int personMultiplier = 1;
@@ -95,22 +99,22 @@ public class RunMatsim2Urbansim {
 				log.info("   persons processed: " + personCounter);
 				personMultiplier *= 2;
 			}
-			
 		}
 		log.info("   persons processed: " + personCounter + " (Done)");
 		
 		// Read the network.
-//		Scenario s = new ScenarioImpl();
-//		Network n = s.getNetwork();
-//		MatsimNetworkReader nr = new MatsimNetworkReader(s);
-//		nr.readFile(sb.getEmmeNetworkFilename());
+		Network n = s.getNetwork();
+		MatsimNetworkReader nr = new MatsimNetworkReader(s);
+		nr.readFile(sb.getEmmeNetworkFilename());
 		
 		// Read the link statistics;
-		MyLinkStatsReader mlsr = new MyLinkStatsReader("/home/johan/MATSim/Data/linkstats.txt", hours);
+		String linkStatsFilename = root + studyAreaName + "/" + version + "/linkstats.txt.gz";
+		MyLinkStatsReader mlsr = new MyLinkStatsReader(linkStatsFilename, hours);
 		mlsr.readLinkStatsTravelTime();
 		Map<Id,Double> tt = mlsr.getTravelTimeMap();
+		
+		log.info("Process complete.");
 	}
 	
-
 }
 

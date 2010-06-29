@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * M2UStringbuilder.java
+ * MyZoneTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,48 +20,42 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
-public class M2UStringbuilder {
-	private String root;
-	private String studyArea;
-	private String version;
-	
-	public M2UStringbuilder(String root, String studyArea, String version) {
-		this.root = root;
-		this.studyArea = studyArea;
-		this.version = version;
-	}
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.testcases.MatsimTestCase;
 
-	public String getShapefile(){
-		return root + "Shapefiles/" + studyArea + "/" + "TransportZone_UTM.shp";
-	}
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 
-	public String getFullNetworkFilename() {
-		return root + studyArea + "/" + version + "/networkFull.xml";
-	}
-	
-	public String getSmallNetworkFilename() {
-		return root + studyArea + "/" + version + "/networkSmall.xml";
+public class MyZoneTest extends MatsimTestCase{
+	private GeometryFactory gf = new GeometryFactory();
+	private Polygon[] ps = setupPolygon();
+	private Id id = new IdImpl("0");
+
+	public void testMyZoneConstructor(){
+		MyZone mz = new MyZone(ps, gf, id);
+		assertEquals("MyZone not created.", true, mz != null);
+		assertEquals("Id of MyZone of wrong type.", IdImpl.class, mz.getId().getClass());
 	}
 	
-	public String getEmmeNetworkFilename() {
-		return root + studyArea + "/" + version + "/networkEmme.xml";
-	}
-
-	public String getPlansFile(String percentage) {
-		return root + studyArea + "/" + version + "/plans" + percentage + ".xml.gz";
+	public void testGetId(){
+		MyZone mz = new MyZone(ps, gf, id);
+		assertEquals("Wrong Id returned.", true, mz.getId().equals(id));
+		assertEquals("Id not unique.", false, mz.getId().equals("0"));
 	}
 	
-	public Integer getIdField(){
-		Integer result = null;
-		if(studyArea=="eThekwini"){
-			result = 1;
-		}
-		if(result==null){
-			throw new RuntimeException("Can not find Id index for " + studyArea + " shapefile.");
-		}
-		return result;
+	private Polygon[] setupPolygon(){
+		Coordinate c1 = new Coordinate(0,0);
+		Coordinate c2 = new Coordinate(5,0);
+		Coordinate c3 = new Coordinate(5,5);
+		Coordinate c4 = new Coordinate(0,5);		
+		Coordinate[] ca1 = {c1, c2, c3, c4, c1};		
+		LinearRing lr1 = gf.createLinearRing(ca1);
+		Polygon p1 = gf.createPolygon(lr1, null);
+		Polygon[] ps = {p1};
+		return ps;
 	}
-
-
 }
 

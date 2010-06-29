@@ -18,24 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities;
+package playground.jjoubert.Utilities.matsim2urbansim;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-
 public class AllTests {
-		
+	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities");
+		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities.matsim2urbansim");
 		
-		suite.addTestSuite(MyXmlConverterTest.class);
-		suite.addTestSuite(MyVehicleIdentifierTest.class);
-		suite.addTestSuite(MyFileSamplerTest.class);
-		
-		suite.addTest(playground.jjoubert.Utilities.KernelDensityEstimation.AllTests.suite());
-		suite.addTest(playground.jjoubert.Utilities.matsim2urbansim.AllTests.suite());
+		// TODO Update test name(s).
+		suite.addTestSuite(MyZoneTest.class);
+		suite.addTestSuite(MyZoneReaderTest.class);
+		suite.addTestSuite(MyPlansProcessorTest.class);
 		
 		return suite;
 	}
+
 }

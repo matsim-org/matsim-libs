@@ -40,7 +40,7 @@ public class MyZone extends MultiPolygon{
 		this.id = id;
 	}
 	
-	public Id get(Id id){
+	public Id getId(){
 		return this.id;
 	}
 	

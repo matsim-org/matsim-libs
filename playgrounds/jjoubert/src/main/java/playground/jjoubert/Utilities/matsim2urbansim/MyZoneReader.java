@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
@@ -34,7 +35,6 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.jjoubert.CommercialTraffic.SAZone;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -43,10 +43,8 @@ import com.vividsolutions.jts.geom.Polygon;
 public class MyZoneReader {
 
 	private final Logger log = Logger.getLogger(MyZoneReader.class);
-	private String areaName;
-	private int idField;
 	private String shapefile;
-	private Collection<MyZone> zones;
+	private List<MyZone> zones;
 	private QuadTree<SAZone> quadTree;
 
 	private double xMin = Double.POSITIVE_INFINITY;
@@ -55,32 +53,8 @@ public class MyZoneReader {
 	private double yMax = Double.NEGATIVE_INFINITY;
 	
 	
-	public MyZoneReader(String areaName, String shapefile){
-		this.areaName = areaName;
+	public MyZoneReader(String shapefile){
 		this.shapefile = shapefile;
-
-		/*===========================================================
-		 * Id field index for the different provinces:
-		 *-----------------------------------------------------------
-		 * GAP Ids
-		 * 		Gauteng: 1
-		 * 		KZN: 2
-		 *		Western Cape: 2
-		 *		SA: ?
-		 *-----------------------------------------------------------
-		 * Transport zone Ids:
-		 * 		eThekwini: 1
-		 *===========================================================
-		 */
-		if(this.areaName.equalsIgnoreCase("Gauteng") ||
-			this.areaName.equalsIgnoreCase("eThekwini")){
-			this.idField = 1;
-		} else if(this.areaName.equalsIgnoreCase("KZN") ||
-				  this.areaName.equalsIgnoreCase("WesternCape") ){
-			this.idField = 2;
-		} else{
-			throw new RuntimeException("The given area name does not have a known ID field!!");
-		}
 		
 		File file = new File(shapefile);
 		if(file.exists()){
@@ -88,9 +62,6 @@ public class MyZoneReader {
 		} else{
 			throw new RuntimeException("The shapefile " + shapefile + " does not exist!!");
 		}
-		
-		readZones();
-//		buildQuadTree();
 	}
 	
 //	private void buildQuadTree() {
@@ -102,9 +73,18 @@ public class MyZoneReader {
 //		log.info("QuadTree<SAZone> completed.");
 //	}
 
-	
+	/**
+	 * Read the shapefile. Known Id fields:
+	 * <ul>
+	 * 		<li> eThekwini transport zones - 1
+	 * 		<li> Gauteng GAP zones - 1
+	 * 		<li> KwazuluNatal GAP - 2
+	 * 		<li> Western Cape GAP - 2
+	 * 		<li> MATSim test - 1 
+	 * </ul>
+	 */
 	@SuppressWarnings("unchecked")
-	private void readZones (){
+	public void readZones (int idField){
 		log.info("Reading shapefile " + this.shapefile);		
 		this.zones = new ArrayList<MyZone>();
 		FeatureSource fs = null;
@@ -113,7 +93,7 @@ public class MyZoneReader {
 			fs = ShapeFileReader.readDataFile( this.shapefile );
 			Collection<Object> objectArray = (ArrayList<Object>) fs.getFeatures().getAttribute(0);
 			for (Object o : objectArray) {
-				String name = String.valueOf(Math.round(Float.parseFloat(String.valueOf(((Feature) o).getAttribute( this.idField ))))); 
+				String name = String.valueOf(Math.round(Float.parseFloat(String.valueOf(((Feature) o).getAttribute( idField ))))); 
 				Geometry shape = ((Feature) o).getDefaultGeometry();
 				if( shape instanceof MultiPolygon ){
 					mp = (MultiPolygon)shape;
@@ -176,6 +156,10 @@ public class MyZoneReader {
 	
 	public Collection<MyZone> getZones(){
 		return this.zones;
+	}
+
+	public String getShapefileName() {
+		return this.shapefile;
 	}
 
 
