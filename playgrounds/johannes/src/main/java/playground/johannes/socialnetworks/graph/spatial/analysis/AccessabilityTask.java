@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KMLSampledComponents.java
+ * AccessabilityTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,57 +17,65 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.spatial.io;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import gnu.trove.TIntIntHashMap;
-
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-import net.opengis.kml._2.FolderType;
-
+import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.graph.spatial.io.KMLComponents;
+import playground.johannes.socialnetworks.gis.SpatialCostFunction;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public class KMLSampledComponents extends KMLComponents {
+public class AccessabilityTask extends ModuleAnalyzerTask<Accessability> {
 
+	private Set<Point> choiceSet;;
+	
+	private boolean graphAsChoiceSet;
+	
+	private SpatialCostFunction costFunction;
+	
+	public AccessabilityTask(SpatialCostFunction costFunction) {
+		setModule(new Accessability());
+		this.costFunction = costFunction;
+		graphAsChoiceSet = true;
+	}
+	
+	public AccessabilityTask(SpatialCostFunction costFunction, Set<Point> choiceSet) {
+		this(costFunction);
+		graphAsChoiceSet = false;
+		this.choiceSet = choiceSet;
+	}
+	
 	@Override
-	public void addDetail(FolderType kmlFolder,	Set<? extends SpatialVertex> partition) {
-		TIntIntHashMap detected = new TIntIntHashMap();
-		TIntIntHashMap sampled = new TIntIntHashMap();
-		for(Vertex v : partition) {
-			SampledVertex vertex = (SampledVertex)v;
-			if(vertex.isSampled())
-				sampled.adjustOrPutValue(vertex.getIterationSampled(), 1, 1);
+	public void analyze(Graph graph, Map<String, Double> stats) {
+		if(getOutputDirectory() != null) {
 			
-			if(vertex.isDetected())
-				detected.adjustOrPutValue(vertex.getIterationDetected(), 1, 1);
+			if(graphAsChoiceSet) {
+				choiceSet = new HashSet<Point>();
+				for(Vertex vertex : graph.getVertices())
+					choiceSet.add(((SpatialVertex) vertex).getPoint());
+			}
+			
+			Distribution distr = module.distribution((Set<? extends SpatialVertex>) graph.getVertices(), costFunction, choiceSet);
+			
+			try {
+				writeHistograms(distr, (distr.max() - distr.min())/20.0, false, "access");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		
-		int keys[] = sampled.keys();
-		Arrays.sort(keys);
-		StringBuilder builder = new StringBuilder();
-		builder.append("<table><tr><th>Iteration</th><th>Sampled</th><th>Detected</th></tr>");
-		for(int key : keys) {
-			builder.append("<tr><td>");
-			builder.append(String.valueOf(key));
-			builder.append("</td><td>");
-			builder.append(String.valueOf(sampled.get(key)));
-			builder.append("</td><td>");
-			builder.append(String.valueOf(detected.get(key)));
-			builder.append("</td></tr>");
-		}
-		builder.append("</table>");
-		
-		kmlFolder.setDescription(builder.toString());
-		kmlFolder.setName(String.format("n=%1$s, seeds=%2$s", partition.size(), sampled.get(0)));
 	}
 
 }

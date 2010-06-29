@@ -50,26 +50,28 @@ public class DegreeIterationTask extends ModuleAnalyzerTask<Degree> {
 		TIntObjectHashMap<Set<SampledVertex>> verticesIt = new TIntObjectHashMap<Set<SampledVertex>>();
 		TIntObjectHashMap<Set<SampledVertex>> verticesItAcc = new TIntObjectHashMap<Set<SampledVertex>>();
 		
-		for(Vertex vertex : graph.getVertices()) {
-			int it = ((SampledVertex)vertex).getIterationSampled();
-			
-			Set<SampledVertex> vertices = verticesIt.get(it); 
-			if(vertices == null) {
-				vertices = new HashSet<SampledVertex>();
-				verticesIt.put(it, vertices);
+		for (Vertex vertex : graph.getVertices()) {
+			if (((SampledVertex) vertex).isSampled()) {
+				int it = ((SampledVertex) vertex).getIterationSampled();
+
+				Set<SampledVertex> vertices = verticesIt.get(it);
+				if (vertices == null) {
+					vertices = new HashSet<SampledVertex>();
+					verticesIt.put(it, vertices);
+				}
+				vertices.add((SampledVertex) vertex);
+
+				// for(int it2 = 0; it2 <= it; it2++) {
+				// vertices = verticesItAcc.get(it2);
+				// if(vertices == null) {
+				// vertices = new HashSet<SampledVertex>();
+				// verticesItAcc.put(it2, vertices);
+				// }
+				// vertices.add((SampledVertex)vertex);
+				// }
 			}
-			vertices.add((SampledVertex)vertex);
-			
-//			for(int it2 = 0; it2 <= it; it2++) {
-//				vertices = verticesItAcc.get(it2); 
-//				if(vertices == null) {
-//					vertices = new HashSet<SampledVertex>();
-//					verticesItAcc.put(it2, vertices);
-//				}
-//				vertices.add((SampledVertex)vertex);
-//			}
 		}
-		verticesIt.remove(-1);
+//		verticesIt.remove(-1);
 		int keys[] = verticesIt.keys();
 		Arrays.sort(keys);
 		for(int it : keys) {

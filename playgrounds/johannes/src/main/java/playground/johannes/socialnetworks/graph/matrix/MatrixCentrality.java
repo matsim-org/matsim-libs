@@ -37,6 +37,8 @@ import org.matsim.contrib.sna.graph.matrix.Dijkstra;
  * matrix. The calculation includes closeness, vertex and edge betweenness,
  * radius and diameter.
  * 
+ * NOTE: This class does not work with multiple edges between one vertex pair!
+ * 
  * @author illenberger
  * 
  */
@@ -367,6 +369,8 @@ public class MatrixCentrality {
 					 * extract all paths
 					 */
 					int[][] matrix = new int[pathLength][pathCount];
+//					System.out.println("len: " + pathLength);
+//					System.out.println("count: " + pathCount);
 					pathExtractor.run(dijkstra.getSpanningTree(), matrix, j);
 					/*
 					 * increase betweenness values for each passed vertex and

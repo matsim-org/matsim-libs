@@ -93,14 +93,16 @@ public class VertexSamplingCounter implements SamplerListener {
 			estimator.update(sampler.getSampledGraph());
 			
 			for(VertexDecorator<?> v : sampler.getSampledGraph().getVertices()) {
-				int it_v = ((SampledVertex)v).getIterationSampled();
-				if(it_v != -1 && it_v <= it) {
-					Vertex delegate = v.getDelegate();
-					int[] counts = countTable.get(delegate);
-					counts[it - 1]++;
-					
-					double[] probas = probaTable.get(delegate);
-					probas[it - 1] += estimator.getProbability((SampledVertex) v);
+				if (((SampledVertex) v).isSampled()) {
+					int it_v = ((SampledVertex) v).getIterationSampled();
+					if (it_v != -1 && it_v <= it) {
+						Vertex delegate = v.getDelegate();
+						int[] counts = countTable.get(delegate);
+						counts[it - 1]++;
+
+						double[] probas = probaTable.get(delegate);
+						probas[it - 1] += estimator.getProbability((SampledVertex) v);
+					}
 				}
 			}
 		}

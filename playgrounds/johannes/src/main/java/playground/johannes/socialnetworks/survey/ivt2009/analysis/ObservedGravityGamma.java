@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BeelineCostFunction.java
+ * ObservedGravityGamma.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
+import gnu.trove.TObjectDoubleHashMap;
 
-import com.vividsolutions.jts.geom.Point;
+import java.util.Set;
+
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.SampledVertex;
+
+import playground.johannes.socialnetworks.graph.spatial.analysis.GravityGamma;
+import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
 
 /**
  * @author illenberger
  *
  */
-public class BeelineCostFunction implements SpatialCostFunction {
+public class ObservedGravityGamma extends GravityGamma {
 
-	private DistanceCalculator calculator = new OrthodromicDistanceCalculator();
-	
-	private Discretizer discretizer = new LinearDiscretizer(1000.0);
-	
-	public void setDistanceCalculator(DistanceCalculator calculator) {
-		this.calculator = calculator;
-	}
-	
 	@Override
-	public double costs(Point p1, Point p2) {
-		return discretizer.discretize(calculator.distance(p1, p2));
+	public TObjectDoubleHashMap<SpatialVertex> values(Set<? extends SpatialVertex> vertices) {
+		return super.values((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Set<? extends SampledVertex>)vertices));
+	}
+
+	@Override
+	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
+		return super.distribution((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Set<? extends SampledVertex>)vertices));
 	}
 
 }

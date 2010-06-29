@@ -87,7 +87,7 @@ public class GraphBuilderTXT {
 //			vertex.detect(Math.max(0, vertex.getIterationSampled() - 1));
 			
 			vProj.sample(infereIterationSampled(data.id));
-			vProj.detect(Math.max(0, vProj.getIterationSampled() - 1));
+			vProj.detect(vProj.getIterationSampled() - 1);
 			mapping.put(vertex, vProj);
 			
 			if(egos.put(data.id, vertex) != null) {
@@ -177,7 +177,7 @@ public class GraphBuilderTXT {
 		return person;
 	}
 	
-	private int infereIterationSampled(Integer id) {
+	private Integer infereIterationSampled(Integer id) {
 		if(id >= 0 && id < 1000)
 			return 0;
 		else if(id >= 1000 && id < 10000)
@@ -186,7 +186,7 @@ public class GraphBuilderTXT {
 			return 2;
 		else {
 			logger.warn(String.format("Cannot infere sampling iteration (%1$s)", id));
-			return -1;
+			return null;
 		}
 	}
 	

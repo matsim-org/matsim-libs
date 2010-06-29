@@ -121,7 +121,7 @@ public class GraphBuilder {
 			 */
 			if(vRecord.isEgo()) {
 				vProj.sample(infereIterationSampled(new Integer(vRecord.id)));
-				vProj.detect(Math.max(0, vProj.getIterationSampled() - 1));
+				vProj.detect(vProj.getIterationSampled() - 1);
 			}
 			
 			projMap.put(vertex, vProj);
@@ -190,7 +190,7 @@ public class GraphBuilder {
 		return person;
 	}
 	
-	private int infereIterationSampled(Integer id) {
+	private Integer infereIterationSampled(Integer id) {
 		if(id >= 0 && id < 1000)
 			return 0;
 		else if(id >= 1000 && id < 10000)
@@ -199,7 +199,7 @@ public class GraphBuilder {
 			return 2;
 		else {
 			logger.warn(String.format("Cannot infere sampling iteration (%1$s)", id));
-			return -1;
+			return null;
 		}
 	}
 	

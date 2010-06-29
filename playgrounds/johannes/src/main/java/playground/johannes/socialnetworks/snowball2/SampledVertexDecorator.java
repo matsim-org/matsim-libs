@@ -42,17 +42,17 @@ public class SampledVertexDecorator<V extends Vertex> extends VertexDecorator<V>
 	}
 
 	@Override
-	public void detect(int iteration) {
+	public void detect(Integer iteration) {
 		attributes.detect(iteration);
 	}
 
 	@Override
-	public int getIterationDetected() {
+	public Integer getIterationDetected() {
 		return attributes.getIterationDeteted();
 	}
 
 	@Override
-	public int getIterationSampled() {
+	public Integer getIterationSampled() {
 		return attributes.getIterationSampled();
 	}
 
@@ -67,7 +67,7 @@ public class SampledVertexDecorator<V extends Vertex> extends VertexDecorator<V>
 	}
 
 	@Override
-	public void sample(int iteration) {
+	public void sample(Integer iteration) {
 		attributes.sample(iteration);
 	}
 

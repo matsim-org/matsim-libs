@@ -39,6 +39,7 @@ public class EndTimeMutator {
 		int numActs = Math.max(0, (plan.getPlanElements().size() - 1) / 2);
 		if (numActs > 1) {
 			int idx = random.nextInt(numActs - 1);
+			idx = idx * 2;
 			Activity act = (Activity) plan.getPlanElements().get(idx);
 			if (act.getType().equalsIgnoreCase(type)) {
 				double epsilon;

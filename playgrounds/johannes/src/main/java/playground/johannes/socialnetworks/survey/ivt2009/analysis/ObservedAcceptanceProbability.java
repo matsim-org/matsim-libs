@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BeelineCostFunction.java
+ * ObservedAcceptanceProbability.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,10 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
+import java.util.Set;
+
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.SampledVertex;
+
+import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbability;
+import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -28,19 +34,11 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  *
  */
-public class BeelineCostFunction implements SpatialCostFunction {
+public class ObservedAcceptanceProbability extends AcceptanceProbability {
 
-	private DistanceCalculator calculator = new OrthodromicDistanceCalculator();
-	
-	private Discretizer discretizer = new LinearDiscretizer(1000.0);
-	
-	public void setDistanceCalculator(DistanceCalculator calculator) {
-		this.calculator = calculator;
-	}
-	
 	@Override
-	public double costs(Point p1, Point p2) {
-		return discretizer.discretize(calculator.distance(p1, p2));
+	public Distribution distribution(Set<? extends SpatialVertex> vertices, Set<Point> choiceSet) {
+		return super.distribution((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Set<? extends SampledVertex>)vertices), choiceSet);
 	}
 
 }

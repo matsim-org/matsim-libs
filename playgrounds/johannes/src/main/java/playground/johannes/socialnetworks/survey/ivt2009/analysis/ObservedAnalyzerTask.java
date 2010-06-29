@@ -28,12 +28,15 @@ import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 
 import playground.johannes.socialnetworks.gis.BeelineCostFunction;
+import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AccessabilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeAccessabilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeDensityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCostsTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.GravityGammaTask;
 import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCostFunction;
 import playground.johannes.socialnetworks.snowball2.analysis.DegreeIterationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
@@ -99,6 +102,15 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		addTask(costs);
 		
 		addTask(new SeedConnectionTask());
+		
+//		AccessabilityTask accessTask = new AccessabilityTask(new GravityCostFunction(1.6, 1.0), choiceSet);
+		AccessabilityTask accessTask = new AccessabilityTask(new BeelineCostFunction(), choiceSet);
+		accessTask.setModule(new ObservedAccessability());
+		addTask(accessTask);
+		
+		GravityGammaTask gammaTask = new GravityGammaTask();
+		gammaTask.setModule(new ObservedGravityGamma());
+		addTask(gammaTask);
 	}
 
 }

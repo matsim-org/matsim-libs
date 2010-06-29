@@ -92,7 +92,7 @@ public class SnowballMovie2 {
 		VertexPartition seedGenerator = new VertexPartition() {
 			
 			@Override
-			public <V extends Vertex> Set<V> getPartition(Set<V> vertices) {
+			public <V extends Vertex> Set<V> partition(Set<V> vertices) {
 				Set<V> seeds = new java.util.HashSet<V>();
 				seeds.add((V) seed1);
 				seeds.add((V) seed2);

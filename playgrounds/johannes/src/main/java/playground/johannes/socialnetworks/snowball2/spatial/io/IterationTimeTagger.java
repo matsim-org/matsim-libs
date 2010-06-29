@@ -45,6 +45,7 @@ public class IterationTimeTagger implements SamplerListener {
 	
 	@Override
 	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
+		if(vertex.isSampled()) {
 		String time = String.valueOf(vertex.getIterationSampled());
 		for(SampledEdgeDecorator<?> edge : vertex.getEdges()) {
 			if(!timeTags.containsKey(edge.getDelegate()))
@@ -55,6 +56,7 @@ public class IterationTimeTagger implements SamplerListener {
 				timeTags.put(v, time);
 			
 //			timeCode++;
+		}
 		}
 		return true;
 	}

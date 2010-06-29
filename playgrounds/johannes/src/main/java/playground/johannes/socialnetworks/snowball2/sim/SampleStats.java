@@ -21,7 +21,6 @@ package playground.johannes.socialnetworks.snowball2.sim;
 
 import gnu.trove.TIntIntHashMap;
 
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
@@ -50,13 +49,17 @@ public class SampleStats {
 		detectedAccumulated = new TIntIntHashMap();
 		
 		maxIteration = 0;
-		for(Vertex vertex : graph.getVertices()) {
-			sampled.adjustOrPutValue(((SampledVertex)vertex).getIterationSampled(), 1, 1);
-			detected.adjustOrPutValue(((SampledVertex)vertex).getIterationDetected(), 1, 1);
-			maxIteration = Math.max(maxIteration, ((SampledVertex)vertex).getIterationSampled());
+		for(SampledVertex vertex : graph.getVertices()) {
+			if(vertex.isSampled()) {
+				sampled.adjustOrPutValue(vertex.getIterationSampled(), 1, 1);
+				maxIteration = Math.max(maxIteration, vertex.getIterationSampled());
+			}
+			if(vertex.isDetected())
+				detected.adjustOrPutValue(vertex.getIterationDetected(), 1, 1);
+			
 		}
 		
-		detected.adjustValue(0, - sampled.get(0));
+//		detected.adjustValue(0, - sampled.get(0));
 		
 		for(int i = 0; i <= maxIteration; i++) {
 			sampledAccumulated.put(i, sampledAccumulated.get(i - 1) + sampled.get(i));
@@ -65,7 +68,7 @@ public class SampleStats {
 		
 		responseRate = 1;
 		if(maxIteration > 0)
-			responseRate = sampledAccumulated.get(maxIteration)/(double)(detectedAccumulated.get(maxIteration - 1) + sampled.get(0));
+			responseRate = sampledAccumulated.get(maxIteration)/(double)(detectedAccumulated.get(maxIteration - 1));
 	}
 	
 	public int getNumSampled(int iteration) {

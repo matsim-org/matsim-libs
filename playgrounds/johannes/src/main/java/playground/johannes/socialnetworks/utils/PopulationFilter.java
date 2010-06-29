@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BeelineCostFunction.java
+ * PopulationFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package playground.johannes.socialnetworks.utils;
 
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
+import java.io.IOException;
 
-import com.vividsolutions.jts.geom.Point;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.xml.sax.SAXException;
 
 /**
  * @author illenberger
  *
  */
-public class BeelineCostFunction implements SpatialCostFunction {
+public class PopulationFilter {
 
-	private DistanceCalculator calculator = new OrthodromicDistanceCalculator();
-	
-	private Discretizer discretizer = new LinearDiscretizer(1000.0);
-	
-	public void setDistanceCalculator(DistanceCalculator calculator) {
-		this.calculator = calculator;
+	public static void main(String args[]) throws SAXException, ParserConfigurationException, IOException {
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
+		loader.loadScenario();
+		Scenario scenario = loader.getScenario();
+		
+//		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
+//		netReader.parse(args[0]);
+		
+//		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
+//		reader.readFile(args[1]);
+		
+		double f = Double.parseDouble(args[1]);
+		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), f).write(scenario.getConfig().getParam("plans", "outputPlansFile"));
 	}
-	
-	@Override
-	public double costs(Point p1, Point p2) {
-		return discretizer.discretize(calculator.distance(p1, p2));
-	}
-
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BeelineCostFunction.java
+ * GravityGammaTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
-import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
 
 /**
  * @author illenberger
  *
  */
-public class BeelineCostFunction implements SpatialCostFunction {
+public class GravityGammaTask extends ModuleAnalyzerTask<GravityGamma> {
 
-	private DistanceCalculator calculator = new OrthodromicDistanceCalculator();
-	
-	private Discretizer discretizer = new LinearDiscretizer(1000.0);
-	
-	public void setDistanceCalculator(DistanceCalculator calculator) {
-		this.calculator = calculator;
-	}
-	
 	@Override
-	public double costs(Point p1, Point p2) {
-		return discretizer.discretize(calculator.distance(p1, p2));
+	public void analyze(Graph graph, Map<String, Double> stats) {
+		if(getOutputDirectory() != null) {
+			Distribution distr = module.distribution((Set<? extends SpatialVertex>) graph.getVertices());
+			try {
+				writeHistograms(distr, 0.2, false, "gamma");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.err.println("No output dir!");
+		}
 	}
 
 }

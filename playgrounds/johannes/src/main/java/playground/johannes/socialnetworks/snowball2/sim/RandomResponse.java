@@ -41,7 +41,7 @@ public class RandomResponse implements VertexPartition {
 	}
 	
 	@Override
-	public <V extends Vertex> Set<V> getPartition(Set<V> vertices) {
+	public <V extends Vertex> Set<V> partition(Set<V> vertices) {
 		Set<V> responding = new HashSet<V>();
 		for(V vertex : vertices) {
 			if(random.nextDouble() < responseRate) {

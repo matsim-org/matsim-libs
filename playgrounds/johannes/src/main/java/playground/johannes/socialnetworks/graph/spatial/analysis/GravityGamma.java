@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BeelineCostFunction.java
+ * GravityGamma.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,60 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.util.Set;
+
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
+
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 import playground.johannes.socialnetworks.statistics.Discretizer;
 import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public class BeelineCostFunction implements SpatialCostFunction {
+public class GravityGamma {
 
-	private DistanceCalculator calculator = new OrthodromicDistanceCalculator();
-	
 	private Discretizer discretizer = new LinearDiscretizer(1000.0);
 	
-	public void setDistanceCalculator(DistanceCalculator calculator) {
-		this.calculator = calculator;
+	private DistanceCalculator calculator = new OrthodromicDistanceCalculator();
+	
+	private final double constant = 1.0;
+	
+	private final double budget = 65.0;
+	
+	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
+		Distribution distr = new Distribution();
+		distr.addAll(values(vertices).getValues());
+		return distr;
 	}
 	
-	@Override
-	public double costs(Point p1, Point p2) {
-		return discretizer.discretize(calculator.distance(p1, p2));
+	public TObjectDoubleHashMap<SpatialVertex> values(Set<? extends SpatialVertex> vertices) {
+		TObjectDoubleHashMap<SpatialVertex> values = new TObjectDoubleHashMap<SpatialVertex>(vertices.size());
+		double totalsum = 0;
+		double totalconst = 0;
+		for(SpatialVertex vertex : vertices) {
+			double sum = 0;
+			for(SpatialVertex neighbor : vertex.getNeighbours()) {
+				double d = Math.max(1.0, discretizer.discretize(calculator.distance(vertex.getPoint(), neighbor.getPoint())));
+				sum += Math.log(d);
+			}
+			
+			double val = (budget - vertex.getNeighbours().size() * constant) / sum;
+			values.put(vertex, val);
+			
+			totalsum += sum;
+			totalconst += vertex.getNeighbours().size() * constant;
+		}
+		
+		double gamma = (vertices.size() * budget - totalconst)/totalsum;
+		System.err.println("gamma = " + gamma);
+		return values;
 	}
-
 }

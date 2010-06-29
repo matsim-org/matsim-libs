@@ -20,10 +20,12 @@
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
 
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.math.Distribution;
 
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 
@@ -34,6 +36,18 @@ import com.vividsolutions.jts.geom.Point;
  *
  */
 public class Accessability {
+	
+	public Distribution distribution(Set<? extends SpatialVertex> vertices, SpatialCostFunction costFunction, Set<Point> opportunities) {
+		TObjectDoubleHashMap<SpatialVertex> values = values(vertices, costFunction, opportunities);
+		TObjectDoubleIterator<SpatialVertex> it = values.iterator();
+		Distribution distr = new Distribution();
+		for(int i = 0; i < values.size(); i++) {
+			it.advance();
+			distr.add(it.value());
+		}
+		
+		return distr;
+	}
 
 	public TObjectDoubleHashMap<SpatialVertex> values(Set<? extends SpatialVertex> vertices, SpatialCostFunction costFunction, Set<Point> opportunities) {
 		TObjectDoubleHashMap<SpatialVertex> values = new TObjectDoubleHashMap<SpatialVertex>(vertices.size());

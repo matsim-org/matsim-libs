@@ -22,7 +22,6 @@ package playground.johannes.socialnetworks.sim.interaction;
 import gnu.trove.TObjectIntIterator;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -37,7 +36,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -46,14 +44,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -64,13 +63,13 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.xml.sax.SAXException;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * @author illenberger
@@ -80,16 +79,16 @@ public class PseudoSim {
 
 	private static final Logger logger = Logger.getLogger(PseudoSim.class);
 
-	private Queue<ActivityEvent> eventQueue;
+	private Queue<Event> eventQueue;
 
 	private Network network;
 
 	// private TravelTime travelTime;
 
-	private final Comparator<? super ActivityEvent> comparator = new Comparator<ActivityEvent>() {
+	private final Comparator<? super Event> comparator = new Comparator<Event>() {
 
 		@Override
-		public int compare(ActivityEvent o1, ActivityEvent o2) {
+		public int compare(Event o1, Event o2) {
 			double r = o1.getTime() - o2.getTime();
 			if (r > 0)
 				return 1;
@@ -98,8 +97,9 @@ public class PseudoSim {
 			else {
 				if (o1 == o2)
 					return 0;
-				else
+				else {
 					return o2.hashCode() - o1.hashCode();
+				}
 			}
 		}
 	};
@@ -108,7 +108,7 @@ public class PseudoSim {
 		this.network = network;
 
 		eventManager.resetHandlers(0);
-		eventQueue = new PriorityQueue<ActivityEvent>(population.getPersons().size(), comparator);
+		eventQueue = new PriorityQueue<Event>(population.getPersons().size(), comparator);
 
 		logger.info("Creating events...");
 
@@ -145,22 +145,38 @@ public class PseudoSim {
 						endTime = 86400;
 					}
 					
+					if(i > 0) {
+						AgentArrivalEvent arrivalEvent = new AgentArrivalEventImpl(startTime-1, person.getId(), act.getLinkId(), TransportMode.car);
+//						eventQueue.add(arrivalEvent);
+						eventManager.processEvent(arrivalEvent);
+					}
 					ActivityEvent startEvent = new ActivityStartEventImpl(startTime, person.getId(), act.getLinkId(),
 							act.getFacilityId(), act.getType());
+					eventManager.processEvent(startEvent);
+//					if(startTime == endTime)
+//						endTime++;
+					
 					ActivityEvent endEvent = new ActivityEndEventImpl(endTime, person.getId(), act.getLinkId(), act
 							.getFacilityId(), act.getType());
-
-					eventQueue.add(startEvent);
-					eventQueue.add(endEvent);
-					lastEndTime = endEvent.getTime();
+					eventManager.processEvent(endEvent);
+					
+//					eventQueue.add(startEvent);
+//					eventQueue.add(endEvent);
+					if(i < elements.size()-1) {
+//						endTime++;
+						AgentDepartureEvent deparutreEvent = new AgentDepartureEventImpl(endTime, person.getId(), act.getLinkId(), TransportMode.car);
+//						eventQueue.add(deparutreEvent);
+						eventManager.processEvent(deparutreEvent);
+					}
+					lastEndTime = endTime;
 				}
 			}
 		}
 
-		logger.info("Processing events...");
-
-		for (ActivityEvent event : eventQueue)
-			eventManager.processEvent(event);
+//		logger.info("Processing events...");
+//
+//		for (Event event : eventQueue)
+//			eventManager.processEvent(event);
 	}
 
 	private double calcRouteTravelTime(LinkNetworkRoute route, double startTime, TravelTime travelTime) {

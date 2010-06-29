@@ -46,6 +46,7 @@ public class JointActivityScorer implements BasicScoring {
 	
 	public JointActivityScorer(Person person, VisitorTracker tracker, Map<Person, SocialVertex> vertexMapping) {
 		this.person = person;
+		this.tracker = tracker;
 		
 		SocialVertex vertex = vertexMapping.get(person);
 		friends = new HashSet<Person>();

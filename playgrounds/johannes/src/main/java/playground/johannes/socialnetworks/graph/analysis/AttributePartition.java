@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BeelineCostFunction.java
+ * AttributePartition.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package playground.johannes.socialnetworks.graph.analysis;
+
+import gnu.trove.TDoubleObjectHashMap;
+import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import org.matsim.contrib.sna.graph.Vertex;
 
 import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public class BeelineCostFunction implements SpatialCostFunction {
+public class AttributePartition {
 
-	private DistanceCalculator calculator = new OrthodromicDistanceCalculator();
+	private Discretizer discritizer;
 	
-	private Discretizer discretizer = new LinearDiscretizer(1000.0);
-	
-	public void setDistanceCalculator(DistanceCalculator calculator) {
-		this.calculator = calculator;
+	public AttributePartition(Discretizer discretizer) {
+		this.discritizer = discretizer;
 	}
 	
-	@Override
-	public double costs(Point p1, Point p2) {
-		return discretizer.discretize(calculator.distance(p1, p2));
+	
+	public <V extends Vertex> TDoubleObjectHashMap<Set<V>> partition(TObjectDoubleHashMap<V> vertices) {
+		TDoubleObjectHashMap<Set<V>> partitions = new TDoubleObjectHashMap<Set<V>>();
+		
+		TObjectDoubleIterator<V> it = vertices.iterator();
+		for(int i = 0; i < vertices.size(); i++) {
+			it.advance();
+			double bin = discritizer.discretize(it.value());
+			Set<V> partition = partitions.get(bin);
+			if(partition == null) {
+				partition = new HashSet<V>();
+				partitions.put(bin, partition);
+			}
+			partition.add(it.key());
+		}
+		return partitions;
 	}
 
 }

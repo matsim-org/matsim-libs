@@ -52,15 +52,18 @@ public class WaveSizeTask extends AnalyzerTask {
 		TIntIntHashMap detected = new TIntIntHashMap();
 		TIntIntHashMap sampled = new TIntIntHashMap();
 		for(Vertex v : graph.getVertices()) {
-			sampled.adjustOrPutValue(((SampledVertex)v).getIterationSampled(), 1, 1);
-			detected.adjustOrPutValue(((SampledVertex)v).getIterationDetected(), 1, 1);
+			if(((SampledVertex)v).isSampled())
+				sampled.adjustOrPutValue(((SampledVertex)v).getIterationSampled(), 1, 1);
+			
+			if(((SampledVertex)v).isDetected())
+				detected.adjustOrPutValue(((SampledVertex)v).getIterationDetected(), 1, 1);
 		}
 		
 		int detectedTotal = 0;
 		TIntIntIterator it = detected.iterator();
 		for(int i = 0; i < detected.size(); i++) {
 			it.advance();
-			if(it.key() > -1)
+//			if(it.key() > -1)
 				detectedTotal += it.value();
 		}
 		
@@ -68,7 +71,7 @@ public class WaveSizeTask extends AnalyzerTask {
 		it = sampled.iterator();
 		for(int i = 0; i < sampled.size(); i++) {
 			it.advance();
-			if(it.key() > -1)
+//			if(it.key() > -1)
 				sampledTotal += it.value();
 		}
 		

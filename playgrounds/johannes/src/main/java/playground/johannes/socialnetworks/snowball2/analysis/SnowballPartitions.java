@@ -46,33 +46,39 @@ public class SnowballPartitions {
 	
 	public static <V extends SampledVertex> Set<V> createSampledPartition(Collection<V> vertices, int iteration) {
 		Set<V> partition = new HashSet<V>();
-		for(V vertex : vertices) {
-			if(vertex.getIterationSampled() == iteration)
-				partition.add(vertex);
+		for (V vertex : vertices) {
+			if (vertex.isSampled()) {
+				if (vertex.getIterationSampled() == iteration)
+					partition.add(vertex);
+			}
 		}
 		return partition;
 	}
 	
 	public static <V extends SampledVertex> Set<V> createDetectedPartition(Collection<V> vertices, int iteration) {
 		Set<V> partition = new HashSet<V>();
-		for(V vertex : vertices) {
-			if(vertex.getIterationDetected() == iteration)
-				vertices.add(vertex);
+		for (V vertex : vertices) {
+			if (vertex.isDetected()) {
+				if (vertex.getIterationDetected() == iteration)
+					vertices.add(vertex);
+			}
 		}
 		return partition;
 	}
 	
 	public static <V extends SampledVertex> List<Set<V>> createSampledPartitions(Collection<V> vertices) {
 		TIntObjectHashMap<Set<V>> partitions = new TIntObjectHashMap<Set<V>>();
-		for(V vertex : vertices) {
-			int it = vertex.getIterationSampled();
-			Set<V> partition = partitions.get(it);
-			if(partition == null) {
-				partition = new HashSet<V>();
-				partitions.put(it, partition);
+		for (V vertex : vertices) {
+			if (vertex.isSampled()) {
+				int it = vertex.getIterationSampled();
+				Set<V> partition = partitions.get(it);
+				if (partition == null) {
+					partition = new HashSet<V>();
+					partitions.put(it, partition);
+				}
+
+				partition.add(vertex);
 			}
-			
-			partition.add(vertex);
 		}
 		
 		List<Set<V>> list = new ArrayList<Set<V>>(partitions.size());

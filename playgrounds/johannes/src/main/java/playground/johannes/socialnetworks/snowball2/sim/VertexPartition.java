@@ -29,6 +29,6 @@ import org.matsim.contrib.sna.graph.Vertex;
  */
 public interface VertexPartition {
 
-	public <V extends Vertex> Set<V> getPartition(Set<V> vertices);
+	public <V extends Vertex> Set<V> partition(Set<V> vertices);
 	
 }

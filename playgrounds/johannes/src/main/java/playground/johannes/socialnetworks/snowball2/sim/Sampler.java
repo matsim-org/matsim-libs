@@ -156,19 +156,19 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		if(responseGenerator == null)
 			responseGenerator = new AllResponding();
 		
-		Set<V> responsive = (Set<V>) responseGenerator.getPartition(graph.getVertices());
+		Set<V> responsive = (Set<V>) responseGenerator.partition(graph.getVertices());
 		for(V vertex : responsive) {
 			taggedGraph.getVertex(vertex).setResponsive(true);
 		}
 		/*
 		 * draw the seed vertices
 		 */
-		Set<V> seeds = (Set<V>) seedGenerator.getPartition(responsive);
+		Set<V> seeds = (Set<V>) seedGenerator.partition(responsive);
 		Set<TaggedVertex> taggedSeeds = new HashSet<TaggedVertex>();
 		for(V vertex : seeds) {
 			TaggedVertex taggedVertex = taggedGraph.getVertex(vertex);
 			SampledVertexDecorator<V> sampledVertex = builder.addVertex(sampledGraph, vertex);
-			sampledVertex.detect(0);
+			sampledVertex.detect(-1);
 			sampledVertex.setSeed(sampledVertex);
 			taggedVertex.setProjection(sampledVertex);
 			taggedSeeds.add(taggedVertex);
@@ -341,7 +341,7 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 	private static class AllResponding implements VertexPartition {
 
 		@Override
-		public <V extends Vertex> Set<V> getPartition(Set<V> vertices) {
+		public <V extends Vertex> Set<V> partition(Set<V> vertices) {
 			return vertices;
 		}
 		

@@ -44,7 +44,7 @@ public class RandomSeedGenerator implements VertexPartition {
 	}
 	
 	@Override
-	public <V extends Vertex> Set<V> getPartition(Set<V> vertices) {
+	public <V extends Vertex> Set<V> partition(Set<V> vertices) {
 		List<V> list = new ArrayList<V>(vertices);
 		Collections.shuffle(list, random);
 		Set<V> seeds = new HashSet<V>();
