@@ -24,11 +24,13 @@ public class M2UStringbuilder {
 	private String root;
 	private String studyArea;
 	private String version;
+	private String percentage;
 	
-	public M2UStringbuilder(String root, String studyArea, String version) {
+	public M2UStringbuilder(String root, String studyArea, String version, String percentage) {
 		this.root = root;
 		this.studyArea = studyArea;
 		this.version = version;
+		this.percentage = percentage;
 	}
 
 	public String getShapefile(){
@@ -36,30 +38,34 @@ public class M2UStringbuilder {
 	}
 
 	public String getFullNetworkFilename() {
-		return root + studyArea + "/" + version + "/networkFull.xml";
+		return root + studyArea + "/" + version + "/output_networkFull.xml";
 	}
 	
 	public String getSmallNetworkFilename() {
-		return root + studyArea + "/" + version + "/networkSmall.xml";
+		return root + studyArea + "/" + version + "/output_networkSmall.xml";
 	}
 	
 	public String getEmmeNetworkFilename() {
-		return root + studyArea + "/" + version + "/networkEmme.xml";
+		return root + studyArea + "/" + version + "/output_network_" + percentage + "_Emme.xml.gz";
 	}
 
-	public String getPlansFile(String percentage) {
-		return root + studyArea + "/" + version + "/plans" + percentage + ".xml.gz";
+	public String getPlansFile() {
+		return root + studyArea + "/" + version + "/output_plans_" + percentage + ".xml.gz";
 	}
 	
 	public Integer getIdField(){
 		Integer result = null;
-		if(studyArea=="eThekwini"){
+		if(studyArea.equalsIgnoreCase("eThekwini")){
 			result = 1;
 		}
 		if(result==null){
 			throw new RuntimeException("Can not find Id index for " + studyArea + " shapefile.");
 		}
 		return result;
+	}
+
+	public String getDbfOutputFile() {
+		return root + studyArea + "/" + version + "/TravelTimeDbf.dbf";
 	}
 
 

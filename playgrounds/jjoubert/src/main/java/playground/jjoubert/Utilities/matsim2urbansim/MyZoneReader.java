@@ -154,7 +154,7 @@ public class MyZoneReader {
 		return quadTree;
 	}
 	
-	public Collection<MyZone> getZones(){
+	public List<MyZone> getZones(){
 		return this.zones;
 	}
 

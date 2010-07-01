@@ -70,24 +70,17 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		setupTest();
 		MyPlansProcessor mpp = new MyPlansProcessor(scenario, zones);
 		mpp.processPlans();
-		assertEquals("Wrong travel time from zone 1 to 1.", 0.0, mpp.getOdMatrix().get(0, 0));
-		assertEquals("Wrong travel time from zone 1 to 2.", 0.0, mpp.getOdMatrix().get(0, 1));
-		assertEquals("Wrong travel time from zone 1 to 3.", 0.0, mpp.getOdMatrix().get(0, 2));
-		assertEquals("Wrong travel time from zone 1 to 4.", 30.0, mpp.getOdMatrix().get(0, 3));
-		assertEquals("Wrong travel time from zone 2 to 1.", 0.0, mpp.getOdMatrix().get(1, 0));
-		assertEquals("Wrong travel time from zone 2 to 2.", 0.0, mpp.getOdMatrix().get(1, 1));
-		assertEquals("Wrong travel time from zone 2 to 3.", 0.0, mpp.getOdMatrix().get(1, 2));
-		assertEquals("Wrong travel time from zone 2 to 4.", 0.0, mpp.getOdMatrix().get(1, 3));
-		assertEquals("Wrong travel time from zone 3 to 1.", 0.0, mpp.getOdMatrix().get(2, 0));
-		assertEquals("Wrong travel time from zone 3 to 2.", 0.0, mpp.getOdMatrix().get(2, 1));
-		assertEquals("Wrong travel time from zone 3 to 3.", 0.0, mpp.getOdMatrix().get(2, 2));
-		assertEquals("Wrong travel time from zone 3 to 4.", 0.0, mpp.getOdMatrix().get(2, 3));
-		assertEquals("Wrong travel time from zone 4 to 1.", 10.0, mpp.getOdMatrix().get(3, 0));
-		assertEquals("Wrong travel time from zone 4 to 2.", 0.0, mpp.getOdMatrix().get(3, 1));
-		assertEquals("Wrong travel time from zone 4 to 3.", 0.0, mpp.getOdMatrix().get(3, 2));
-		assertEquals("Wrong travel time from zone 4 to 4.", 0.0, mpp.getOdMatrix().get(3, 3));
+		assertEquals("Wrong travel time from zone 1 to 4.", ((30.0 + 40.0)*60)/2, mpp.getAvgOdTravelTime(0, 3));
+		assertEquals("Wrong travel time from zone 4 to 1.", ((10.0 + 20.0)*60)/2, mpp.getAvgOdTravelTime(3, 0));
 	}
 	
+	public void testWriteOdMatrixToDbf(){
+		setupTest();
+		MyPlansProcessor mpp = new MyPlansProcessor(scenario, zones);
+		mpp.processPlans();
+		mpp.writeOdMatrixToDbf(getOutputDirectory() + "testDbf.dbf");
+		assertTrue("Dbf table file does not exist", ((new File(getOutputDirectory() + "testDbf.dbf")).exists()));
+	}
 	
 
 	/**
@@ -140,7 +133,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		//---------------------------------------------------------------------
 		Population p = scenario.getPopulation();
 		PopulationFactory pf = p.getFactory();
-		
+		//---------------------------------------------------------------------
 		// Person 1.
 		//---------------------------------------------------------------------
 		Person p1 = pf.createPerson(new IdImpl("0"));
@@ -179,6 +172,46 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		p1.addPlan(plan);
 		plan.setSelected(true);
 		p.addPerson(p1);
+		//---------------------------------------------------------------------
+		// Person 2. Same characteristics as Person 1, but he (or SHE, rather)
+		// travels a bit slower ;-)
+		//---------------------------------------------------------------------
+		Person p2 = pf.createPerson(new IdImpl("1"));
+		plan = pf.createPlan();
+		// Home.
+		a1 = new ActivityImpl("home", new CoordImpl(1.0, 1.0)); a1.setEndTime(6*3600);
+		plan.addActivity(a1);
+		// Home -> work.
+		l1 = new LegImpl(TransportMode.car);
+		homeLink = n.getLinks().get(new IdImpl("12"));
+		workLink = n.getLinks().get(new IdImpl("43"));
+		hwLinks = new ArrayList<Id>();
+		hwLinks.add(n.getLinks().get(new IdImpl("24")).getId());
+		nr1 = new LinkNetworkRouteImpl(homeLink.getId(), workLink.getId());
+		nr1.setLinkIds(homeLink.getId(), hwLinks, workLink.getId());
+		l1.setRoute(nr1);
+		l1.setTravelTime(40.0*60.0);
+		plan.addLeg(l1);
+		// TODO Try dijkstra here.	
+		// Work.
+		a2 = new ActivityImpl("work", new CoordImpl(9.0, 9.0)); 
+		a2.setStartTime(7*3600);
+		a2.setEndTime(16*3600);
+		plan.addActivity(a2);
+		// Work -> home.
+		l2 = new LegImpl(TransportMode.car);
+		nr2 = new LinkNetworkRouteImpl(workLink.getId(), homeLink.getId());
+		l2.setRoute(nr2);
+		l2.setTravelTime(20.0*60.0);
+		plan.addLeg(l2);
+		// Home.
+		a3 = new ActivityImpl("home", new CoordImpl(1.0, 1.0));
+		a3.setStartTime(17*3600);
+		plan.addActivity(a3);
+		//---------------------------------------------------------------------
+		p2.addPlan(plan);
+		plan.setSelected(true);
+		p.addPerson(p2);
 
 		PopulationWriter pw = new PopulationWriter(p, n);
 		pw.writeFileV4(getOutputDirectory() + "/populationTest.xml");

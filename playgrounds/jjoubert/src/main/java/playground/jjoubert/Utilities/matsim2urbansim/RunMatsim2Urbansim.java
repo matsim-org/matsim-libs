@@ -20,7 +20,6 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -29,13 +28,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 
 public class RunMatsim2Urbansim {
 	private final static Logger log = Logger.getLogger(RunMatsim2Urbansim.class);
@@ -43,6 +38,7 @@ public class RunMatsim2Urbansim {
 	private static String studyAreaName;
 	private static String version;
 	private static String hours;
+	private static String percentage;
 	
 	/**
 	 * Class to read zones from shapefiles, and determining the interzone 
@@ -60,7 +56,7 @@ public class RunMatsim2Urbansim {
 	 * </ol>
 	 */
 	public static void main(String[] args){
-		int numberOfArguments = 4;
+		int numberOfArguments = 5;
 		if(args.length != numberOfArguments){
 			throw new RuntimeException("Incorrect number of arguments provided.");
 		} else{
@@ -68,13 +64,14 @@ public class RunMatsim2Urbansim {
 			studyAreaName = args[1];
 			version = args[2];
 			hours = args[3];
+			percentage = args[4];
 		}
-		M2UStringbuilder sb = new M2UStringbuilder(root, studyAreaName, version);
+		M2UStringbuilder sb = new M2UStringbuilder(root, studyAreaName, version, percentage);
 		
 		// Read the transportation zones. 
 		MyZoneReader r = new MyZoneReader(sb.getShapefile());
 		r.readZones(sb.getIdField());
-		Collection<MyZone> zones = r.getZones();
+		List<MyZone> zones = r.getZones();
 		
 		/* 
 		 * TODO Write procedure.
@@ -84,28 +81,17 @@ public class RunMatsim2Urbansim {
 		 * TODO Check if only specific hours must be calculated. 
 		 */
 		Scenario s = new ScenarioImpl();
-		Population pop = s.getPopulation();
-		MatsimPopulationReader mpr = new MatsimPopulationReader(s);
-		mpr.readFile(sb.getPlansFile("10"));
-		Map<Id, ? extends Person> persons = pop.getPersons();
-		int personCounter = 0;
-		int personMultiplier = 1;
-		for(Person p : persons.values()){
-			List<PlanElement> pe = p.getSelectedPlan().getPlanElements();
-			// TODO Alright, now handle the plans.
-			
-			// Report progress.
-			if(++personCounter == personMultiplier){
-				log.info("   persons processed: " + personCounter);
-				personMultiplier *= 2;
-			}
-		}
-		log.info("   persons processed: " + personCounter + " (Done)");
-		
 		// Read the network.
 		Network n = s.getNetwork();
 		MatsimNetworkReader nr = new MatsimNetworkReader(s);
 		nr.readFile(sb.getEmmeNetworkFilename());
+		// Read plans file.
+		Population pop = s.getPopulation();
+		MatsimPopulationReader mpr = new MatsimPopulationReader(s);
+		mpr.readFile(sb.getPlansFile());
+		MyPlansProcessor mpp = new MyPlansProcessor(s, zones);
+		mpp.processPlans();
+		mpp.writeOdMatrixToDbf(sb.getDbfOutputFile());
 		
 		// Read the link statistics;
 		String linkStatsFilename = root + studyAreaName + "/" + version + "/linkstats.txt.gz";
