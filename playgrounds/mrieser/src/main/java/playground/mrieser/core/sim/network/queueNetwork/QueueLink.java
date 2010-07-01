@@ -203,12 +203,11 @@ import playground.mrieser.core.sim.network.api.SimLink;
 			if (this.earliestLeaveTimes.get(veh).doubleValue() > time) {
 				return;
 			}
-			if (!this.buffer.hasSpace()) {
-				return;
-			}
 			double actionLocation = veh.getDriver().getNextActionOnCurrentLink();
 			if (actionLocation >= 0.0) {
 				veh.getDriver().handleNextAction(this);
+			} else if (!this.buffer.hasSpace()) {
+				return;
 			} else {
 				this.buffer.addVehicle(this.vehQueue.poll(), time);
 				this.usedStorageCapacity -= veh.getSizeInEquivalents();

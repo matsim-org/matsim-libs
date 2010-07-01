@@ -66,12 +66,15 @@ public class RefSimFactory implements MobsimFactory {
 		planSim.addSimFeature(netFeature); // order of features is important!
 
 		// setup DepartureHandlers
-		lh.setDepartureHandler(TransportMode.car, new CarDepartureHandler(engine, netFeature, scenario));
+		CarDepartureHandler carHandler = new CarDepartureHandler(engine, netFeature, scenario);
+		carHandler.setTeleportVehicles(true);
+		lh.setDepartureHandler(TransportMode.car, carHandler);
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
 		planSim.addSimFeature(teleporter); // how should a user know teleporter is a simfeature?
 		lh.setDepartureHandler(TransportMode.pt, teleporter);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);
 		lh.setDepartureHandler(TransportMode.bike, teleporter);
+		lh.setDepartureHandler(TransportMode.ride, teleporter);
 
 		return planSim;
 	}

@@ -26,6 +26,7 @@ import java.util.Random;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Level;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,6 +41,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.testcases.utils.LogCounter;
 
 import playground.mrieser.core.sim.api.PlanAgent;
 import playground.mrieser.core.sim.api.PlanElementHandler;
@@ -135,6 +137,232 @@ public class CarDepartureHandlerTest {
 		Assert.assertEquals("vehicle should still be parked.", veh, link.getParkedVehicle(veh.getId()));
 	}
 
+	@Test
+	public void testHandleDeparture_vehicleConsistency() {
+		Fixture f = new Fixture();
+		CountingPlanElementHandler legCounter = new CountingPlanElementHandler();
+		CountingPlanElementHandler actCounter = new CountingPlanElementHandler();
+		f.sim.setPlanElementHandler(Leg.class, legCounter);
+		f.sim.setPlanElementHandler(Activity.class, actCounter);
+
+		CarDepartureHandler cdh = new CarDepartureHandler(f.simEngine, f.networkFeature, f.scenario);
+
+		Plan plan = f.scenario.getPopulation().getFactory().createPlan();
+
+		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("home", f.ids[0]));
+
+		Leg leg = f.scenario.getPopulation().getFactory().createLeg(TransportMode.car);
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(f.ids[0], f.ids[2]);
+		List<Id> linkIds = new ArrayList<Id>(1);
+		Collections.addAll(linkIds, f.ids[1]);
+		route.setLinkIds(f.ids[0], linkIds, f.ids[2]);
+		leg.setRoute(route);
+		plan.addLeg(leg);
+
+		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("work", f.ids[2]));
+
+		leg = f.scenario.getPopulation().getFactory().createLeg(TransportMode.car);
+		route = new LinkNetworkRouteImpl(f.ids[2], f.ids[3]);
+		route.setLinkIds(f.ids[2], new ArrayList<Id>(0), f.ids[3]);
+		leg.setRoute(route);
+		plan.addLeg(leg);
+
+		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("leisure", f.ids[3]));
+
+		leg = f.scenario.getPopulation().getFactory().createLeg(TransportMode.car);
+		route = new LinkNetworkRouteImpl(f.ids[3], f.ids[4]);
+		route.setLinkIds(f.ids[3], new ArrayList<Id>(0), f.ids[4]);
+		leg.setRoute(route);
+		plan.addLeg(leg);
+
+		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("shop", f.ids[4]));
+
+		Id personId = f.ids[0];
+		plan.setPerson(f.scenario.getPopulation().getFactory().createPerson(personId));
+		PlanAgent agent = new DefaultPlanAgent(plan);
+
+		f.networkFeature.doSimStep(0);
+
+		agent.useNextPlanElement(); // home
+		agent.useNextPlanElement(); // leg
+		cdh.handleDeparture(agent);
+
+		f.networkFeature.doSimStep(10); // agent moved to link0.buffer
+		f.networkFeature.doSimStep(11); // agent moved to link1
+		f.networkFeature.doSimStep(100); // agent moved to link1.buffer
+		f.networkFeature.doSimStep(101); // agent moved to link2
+		f.networkFeature.doSimStep(200); // agent arrives, work
+
+		SimVehicle vehicle = f.networkFeature.getSimNetwork().getLinks().get(f.ids[2]).getParkedVehicle(personId);
+		Assert.assertNotNull(vehicle);
+
+		Assert.assertTrue(agent.useNextPlanElement() instanceof Leg); // leg
+		cdh.handleDeparture(agent);
+
+		f.networkFeature.doSimStep(210); // agent moved to link2.buffer
+		f.networkFeature.doSimStep(211); // agent moved to link3
+		f.networkFeature.doSimStep(300); // agent arrives, leisure
+
+		Assert.assertEquals(vehicle, f.networkFeature.getSimNetwork().getLinks().get(f.ids[3]).getParkedVehicle(personId));
+		Assert.assertTrue(agent.useNextPlanElement() instanceof Leg); // leg
+		cdh.handleDeparture(agent);
+
+		f.networkFeature.doSimStep(310); // agent moved to link3.buffer
+		f.networkFeature.doSimStep(311); // agent moved to link4
+		f.networkFeature.doSimStep(400); // agent arrives, shop
+
+		Assert.assertEquals(vehicle, f.networkFeature.getSimNetwork().getLinks().get(f.ids[4]).getParkedVehicle(personId));
+		Assert.assertNull(agent.useNextPlanElement());
+	}
+
+	@Test
+	public void testHandleDeparture_vehicleConsistency_NoTeleportation() {
+		Fixture f = new Fixture();
+		CountingPlanElementHandler legCounter = new CountingPlanElementHandler();
+		CountingPlanElementHandler actCounter = new CountingPlanElementHandler();
+		f.sim.setPlanElementHandler(Leg.class, legCounter);
+		f.sim.setPlanElementHandler(Activity.class, actCounter);
+
+		CarDepartureHandler cdh = new CarDepartureHandler(f.simEngine, f.networkFeature, f.scenario);
+
+		Plan plan = f.scenario.getPopulation().getFactory().createPlan();
+
+		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("home", f.ids[0]));
+
+		Leg leg = f.scenario.getPopulation().getFactory().createLeg(TransportMode.car);
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(f.ids[0], f.ids[2]);
+		List<Id> linkIds = new ArrayList<Id>(1);
+		Collections.addAll(linkIds, f.ids[1]);
+		route.setLinkIds(f.ids[0], linkIds, f.ids[2]);
+		leg.setRoute(route);
+		plan.addLeg(leg);
+
+		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("work", f.ids[2]));
+
+		leg = f.scenario.getPopulation().getFactory().createLeg(TransportMode.walk); // WALK, vehicle will be missing!
+		leg.setTravelTime(5.0);
+		plan.addLeg(leg);
+
+		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("leisure", f.ids[3]));
+
+		leg = f.scenario.getPopulation().getFactory().createLeg(TransportMode.car);
+		route = new LinkNetworkRouteImpl(f.ids[3], f.ids[4]);
+		route.setLinkIds(f.ids[3], new ArrayList<Id>(0), f.ids[4]);
+		leg.setRoute(route);
+		plan.addLeg(leg);
+
+		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("shop", f.ids[4]));
+
+		Id personId = f.ids[0];
+		plan.setPerson(f.scenario.getPopulation().getFactory().createPerson(personId));
+		PlanAgent agent = new DefaultPlanAgent(plan);
+
+		f.networkFeature.doSimStep(0);
+
+		agent.useNextPlanElement(); // home
+		agent.useNextPlanElement(); // leg car
+		cdh.handleDeparture(agent);
+
+		f.networkFeature.doSimStep(10); // agent moved to link0.buffer
+		f.networkFeature.doSimStep(11); // agent moved to link1
+		f.networkFeature.doSimStep(100); // agent moved to link1.buffer
+		f.networkFeature.doSimStep(101); // agent moved to link2
+		f.networkFeature.doSimStep(200); // agent arrives, work
+
+		SimVehicle vehicle = f.networkFeature.getSimNetwork().getLinks().get(f.ids[2]).getParkedVehicle(personId);
+		Assert.assertNotNull(vehicle);
+
+		Assert.assertTrue(agent.useNextPlanElement() instanceof Leg); // leg walk
+		Assert.assertTrue(agent.useNextPlanElement() instanceof Activity); // leisure
+		Assert.assertTrue(agent.useNextPlanElement() instanceof Leg); // leg walk
+
+		LogCounter counter = new LogCounter(Level.ERROR);
+		counter.activiate();
+		cdh.handleDeparture(agent);
+		counter.deactiviate();
+		Assert.assertEquals(1, counter.getErrorCount());
+	}
+
+	@Test
+	public void testHandleDeparture_vehicleConsistency_WithTeleportation() {
+		Fixture f = new Fixture();
+		CountingPlanElementHandler legCounter = new CountingPlanElementHandler();
+		CountingPlanElementHandler actCounter = new CountingPlanElementHandler();
+		f.sim.setPlanElementHandler(Leg.class, legCounter);
+		f.sim.setPlanElementHandler(Activity.class, actCounter);
+
+		CarDepartureHandler cdh = new CarDepartureHandler(f.simEngine, f.networkFeature, f.scenario);
+		cdh.setTeleportVehicles(true);
+
+		Plan plan = f.scenario.getPopulation().getFactory().createPlan();
+
+		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("home", f.ids[0]));
+
+		Leg leg = f.scenario.getPopulation().getFactory().createLeg(TransportMode.car);
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(f.ids[0], f.ids[2]);
+		List<Id> linkIds = new ArrayList<Id>(1);
+		Collections.addAll(linkIds, f.ids[1]);
+		route.setLinkIds(f.ids[0], linkIds, f.ids[2]);
+		leg.setRoute(route);
+		plan.addLeg(leg);
+
+		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("work", f.ids[2]));
+
+		leg = f.scenario.getPopulation().getFactory().createLeg(TransportMode.walk); // WALK, vehicle will be missing!
+		leg.setTravelTime(5.0);
+		plan.addLeg(leg);
+
+		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("leisure", f.ids[3]));
+
+		leg = f.scenario.getPopulation().getFactory().createLeg(TransportMode.car);
+		route = new LinkNetworkRouteImpl(f.ids[3], f.ids[4]);
+		route.setLinkIds(f.ids[3], new ArrayList<Id>(0), f.ids[4]);
+		leg.setRoute(route);
+		plan.addLeg(leg);
+
+		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("shop", f.ids[4]));
+
+		Id personId = f.ids[0];
+		plan.setPerson(f.scenario.getPopulation().getFactory().createPerson(personId));
+		PlanAgent agent = new DefaultPlanAgent(plan);
+
+		f.networkFeature.doSimStep(0);
+
+		agent.useNextPlanElement(); // home
+		agent.useNextPlanElement(); // leg car
+		cdh.handleDeparture(agent);
+
+		f.networkFeature.doSimStep(10); // agent moved to link0.buffer
+		f.networkFeature.doSimStep(11); // agent moved to link1
+		f.networkFeature.doSimStep(100); // agent moved to link1.buffer
+		f.networkFeature.doSimStep(101); // agent moved to link2
+		f.networkFeature.doSimStep(200); // agent arrives, work
+
+		SimVehicle vehicle = f.networkFeature.getSimNetwork().getLinks().get(f.ids[2]).getParkedVehicle(personId);
+		Assert.assertNotNull(vehicle);
+
+		Assert.assertTrue(agent.useNextPlanElement() instanceof Leg); // leg walk
+		Assert.assertTrue(agent.useNextPlanElement() instanceof Activity); // leisure
+		Assert.assertTrue(agent.useNextPlanElement() instanceof Leg); // leg walk
+
+		LogCounter counter = new LogCounter(Level.WARN);
+		counter.activiate();
+		cdh.handleDeparture(agent); // vehicle will be teleported from link2 to link3
+		counter.deactiviate();
+		Assert.assertEquals(1, counter.getWarnCount());
+
+		f.networkFeature.doSimStep(310); // agent moved to link3.buffer
+		f.networkFeature.doSimStep(311); // agent moved to link4
+		f.networkFeature.doSimStep(400); // agent arrives, work
+
+		Assert.assertEquals(vehicle, f.networkFeature.getSimNetwork().getLinks().get(f.ids[4]).getParkedVehicle(personId));
+	}
+
+	/**
+	 * Creates a simple network with 6 nodes and 5 links in a row.
+	 *
+	 * @author mrieser
+	 */
 	private static class Fixture {
 
 		public final Id[] ids = new Id[10];
@@ -146,7 +374,7 @@ public class CarDepartureHandlerTest {
 		public Fixture() {
 			this.scenario = new ScenarioImpl();
 
-			for (int i = 0; i < ids.length; i++) {
+			for (int i = 0; i < this.ids.length; i++) {
 				this.ids[i] = this.scenario.createId(Integer.toString(i));
 			}
 
@@ -166,8 +394,8 @@ public class CarDepartureHandlerTest {
 
 			EventsManager events = new EventsManagerImpl();
 			this.sim = new PlanSimulationImpl(this.scenario);
-			this.simEngine = new DefaultTimestepSimEngine(sim, events);
-			this.networkFeature = new DefaultNetworkFeature(QueueNetworkCreator.createQueueNetwork(network, simEngine, new Random(1)));
+			this.simEngine = new DefaultTimestepSimEngine(this.sim, events);
+			this.networkFeature = new DefaultNetworkFeature(QueueNetworkCreator.createQueueNetwork(network, this.simEngine, new Random(1)));
 		}
 
 		private static Link setLinkAttributes(final Link link, final double length, final double capacity, final double freespeed, final int nOfLanes) {

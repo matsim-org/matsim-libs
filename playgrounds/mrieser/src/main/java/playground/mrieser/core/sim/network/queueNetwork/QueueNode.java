@@ -19,6 +19,9 @@
 
 package playground.mrieser.core.sim.network.queueNetwork;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -34,14 +37,24 @@ import playground.mrieser.core.sim.network.api.SimNode;
 
 	private final static Logger log = Logger.getLogger(QueueNode.class);
 
+	private final static QueueLinkIdComparator linkIdComparator = new QueueLinkIdComparator();
+
 	private final QueueNetwork network;
 	private final Node node;
+	private final QueueLink[] inLinks;
 	private final QueueLink[] tempLinks;
 
 	public QueueNode(final Node node, final QueueNetwork network) {
 		this.node = node;
 		this.network = network;
+		this.inLinks = new QueueLink[node.getInLinks().size()];
 		this.tempLinks = new QueueLink[node.getInLinks().size()];
+		int idx = 0;
+		for (Id linkId : this.node.getInLinks().keySet()) {
+			this.inLinks[idx] = this.network.getLinks().get(linkId);
+			idx++;
+		}
+		Arrays.sort(this.inLinks, linkIdComparator); // make it deterministic
 	}
 
 	/**
@@ -64,8 +77,7 @@ import playground.mrieser.core.sim.network.api.SimNode;
 		int inLinksCounter = 0;
 		double inLinksCapSum = 0.0;
 		// Check all incoming links for buffered agents
-		for (Id linkId : this.node.getInLinks().keySet()) {
-			QueueLink link = this.network.getLinks().get(linkId);
+		for (QueueLink link : this.inLinks) {
 			if (link.buffer.getFirstVehicleInBuffer() != null) {
 				this.tempLinks[inLinksCounter] = link;
 				inLinksCounter++;
@@ -74,19 +86,20 @@ import playground.mrieser.core.sim.network.api.SimNode;
 		}
 
 		if (inLinksCounter == 0) {
-//			this.active = false;
 			return; // Nothing to do
 		}
 
 		int auxCounter = 0;
 		// randomize based on capacity
 		while (auxCounter < inLinksCounter) {
-			double rndNum = random.nextDouble() * inLinksCapSum;
+			double rnd = random.nextDouble();
+			double rndNum = rnd * inLinksCapSum;
 			double selCap = 0.0;
 			for (int i = 0; i < inLinksCounter; i++) {
 				QueueLink link = this.tempLinks[i];
-				if (link == null)
+				if (link == null) {
 					continue;
+				}
 				selCap += link.link.getCapacity(now);
 				if (selCap >= rndNum) {
 					auxCounter++;
@@ -161,7 +174,7 @@ import playground.mrieser.core.sim.network.api.SimNode;
     return true;
 	}
 
-	private void checkNextLinkSemantics(final QueueLink currentLink, final QueueLink nextLink, SimVehicle veh){
+	private void checkNextLinkSemantics(final QueueLink currentLink, final QueueLink nextLink, final SimVehicle veh){
     if (currentLink.link.getToNode() != nextLink.link.getFromNode()) {
       throw new RuntimeException("Cannot move vehicle " + veh.getId() +
           " from link " + currentLink.getId() + " to link " + nextLink.getId());
@@ -171,6 +184,14 @@ import playground.mrieser.core.sim.network.api.SimNode;
 	@Override
 	public Id getId() {
 		return this.node.getId();
+	}
+
+	protected static class QueueLinkIdComparator implements Comparator<QueueLink>, Serializable {
+		private static final long serialVersionUID = 1L;
+		@Override
+		public int compare(final QueueLink o1, final QueueLink o2) {
+			return o1.link.getId().compareTo(o2.link.getId());
+		}
 	}
 
 }

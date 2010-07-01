@@ -19,9 +19,13 @@
 
 package playground.mrieser.core.sim.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.VehicleImpl;
@@ -37,26 +41,41 @@ import playground.mrieser.core.sim.features.NetworkFeature;
 import playground.mrieser.core.sim.network.api.SimLink;
 
 /**
+ * This DepartureHandler assigns departing agents to a vehicle which is placed on
+ * the network to be moved around. A vehicle will be created for each agent the first
+ * time no vehicle can be found on the departing link. *
+ * <br />
+ * Requirements / Assumptions of the code:
+ * <ul>
+ * 	<li>handleDeparture() assumes the currentPlanElement of agents to be of type {@link Leg}</li>
+ *  <li>handleDeparture() assumes the route of legs to be of type {@link NetworkRoute}</li>
+ * </ul>
+ *
  * @author mrieser
  */
 public class CarDepartureHandler implements DepartureHandler {
 
+	private final static Logger log = Logger.getLogger(CarDepartureHandler.class);
+
 	private final NetworkFeature networkFeature;
 	private final NewSimEngine engine;
+	private final Map<Id, Id> vehicleLocations;
+	private final VehicleType defaultVehicleType;
+	private boolean teleportVehicles = false;
 
 	public CarDepartureHandler(final NewSimEngine engine, final NetworkFeature networkFeature, final Scenario scenario) {
 		this.engine = engine;
 		this.networkFeature = networkFeature;
-		placeVehicles(scenario);
+		this.vehicleLocations = new HashMap<Id, Id>((int) (scenario.getPopulation().getPersons().size() * 1.4));
+		this.defaultVehicleType = new VehicleTypeImpl(new IdImpl("auto-generated vehicle"));
 	}
 
-	private void placeVehicles(final Scenario scenario) {
-		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		for (Person p : scenario.getPopulation().getPersons().values()) {
-			SimVehicle veh = new DefaultSimVehicle(new VehicleImpl(p.getId(), defaultVehicleType));
-			SimLink link = this.networkFeature.getSimNetwork().getLinks().get(((Leg) p.getSelectedPlan().getPlanElements().get(1)).getRoute().getStartLinkId()); // TODO [MR] improve initialization
-			link.insertVehicle(veh, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_PARKING);
-		}
+	public void setTeleportVehicles(final boolean teleportVehicles) {
+		this.teleportVehicles = teleportVehicles;
+	}
+
+	public boolean isTeleportVehicles() {
+		return this.teleportVehicles;
 	}
 
 	@Override
@@ -65,7 +84,25 @@ public class CarDepartureHandler implements DepartureHandler {
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 
 		SimLink link = this.networkFeature.getSimNetwork().getLinks().get(route.getStartLinkId());
-		SimVehicle simVehicle = link.getParkedVehicle(agent.getPlan().getPerson().getId());// TODO [MR] use vehicleId instead of personId
+		Id vehId = agent.getPlan().getPerson().getId(); // TODO [MR] use vehicleId instead of personId
+		SimVehicle simVehicle = link.getParkedVehicle(vehId);
+		if (simVehicle == null) {
+			Id linkId = this.vehicleLocations.get(vehId);
+			if (linkId == null) {
+				simVehicle = new DefaultSimVehicle(new VehicleImpl(vehId, this.defaultVehicleType));
+				link.insertVehicle(simVehicle, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_PARKING);
+			} else if (this.teleportVehicles) {
+				log.warn("Agent departs on link " + route.getStartLinkId() + ", but vehicle is on link " + linkId + ". Teleporting the vehicle.");
+				SimLink link2 = this.networkFeature.getSimNetwork().getLinks().get(linkId);
+				simVehicle = link2.getParkedVehicle(vehId);
+				link2.removeVehicle(simVehicle);
+				link.insertVehicle(simVehicle, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_PARKING);
+			} else {
+				log.error("Agent departs on link " + route.getStartLinkId() + ", but vehicle is on link " + linkId + ". Agent is removed from simulation.");
+				return;
+			}
+		}
+		this.vehicleLocations.put(vehId, route.getEndLinkId()); // vehicle should show up there later
 		DriverAgent driver = new NetworkRouteDriver(agent, this.engine, route, simVehicle);
 		simVehicle.setDriver(driver);
 

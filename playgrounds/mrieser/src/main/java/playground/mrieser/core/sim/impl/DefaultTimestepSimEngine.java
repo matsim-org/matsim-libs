@@ -95,7 +95,7 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 	@Override
 	public void runSim() {
 
-		this.time = 0.0;
+		this.time = 8.0 * 3600.0;  // TODO [MR] remove sim-start-time hack
 
 		List<SimFeature> tmpList = this.sim.getSimFeatures();
 		SimFeature[] simFeatures = tmpList.toArray(new SimFeature[tmpList.size()]);
@@ -111,7 +111,7 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 				feature.doSimStep(this.time);
 			}
 			running = keepAlive();
-			if (this.time > 40.0 * 3600) {  // TODO [MR] remove sim-end-time hack
+			if (this.time >= 45.0 * 3600) {  // TODO [MR] remove sim-end-time hack
 				running = false;
 			}
 			if (running) {

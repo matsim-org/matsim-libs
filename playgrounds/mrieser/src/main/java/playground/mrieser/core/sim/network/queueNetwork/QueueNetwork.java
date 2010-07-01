@@ -19,7 +19,7 @@
 
 package playground.mrieser.core.sim.network.queueNetwork;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -45,13 +45,13 @@ import playground.mrieser.core.sim.network.api.SimNetwork;
 
 	public QueueNetwork(final TimestepSimEngine simEngine, final Random random) {
 		this.simEngine = simEngine;
-		this.links = new HashMap<Id, QueueLink>();
-		this.nodes = new HashMap<Id, QueueNode>();
+		this.links = new LinkedHashMap<Id, QueueLink>();
+		this.nodes = new LinkedHashMap<Id, QueueNode>();
 		this.random = random;
 	}
 
 	@Override
-	public void doSimStep(double time) {
+	public void doSimStep(final double time) {
 		for (QueueNode node : this.nodes.values()) {
 			node.moveNode(time, this.random);
 		}
@@ -78,7 +78,7 @@ import playground.mrieser.core.sim.network.api.SimNetwork;
 		this.nodes.put(node.getId(), node);
 	}
 
-	public void setFlowCapFactor(double flowCapFactor) {
+	public void setFlowCapFactor(final double flowCapFactor) {
 		this.flowCapFactor = flowCapFactor;
 	}
 
@@ -86,20 +86,20 @@ import playground.mrieser.core.sim.network.api.SimNetwork;
 		return this.flowCapFactor;
 	}
 
-	public void setStorageCapFactor(double storageCapFactor) {
+	public void setStorageCapFactor(final double storageCapFactor) {
 		this.storageCapFactor = storageCapFactor;
 	}
 
 	public double getStorageCapFactor() {
-		return storageCapFactor;
+		return this.storageCapFactor;
 	}
 
-	public void setEffectiveCellSize(double effectiveCellSize) {
+	public void setEffectiveCellSize(final double effectiveCellSize) {
 		this.effectiveCellSize = effectiveCellSize;
 	}
 
 	public double getEffectiveCellSize() {
-		return effectiveCellSize;
+		return this.effectiveCellSize;
 	}
 
 	public boolean isRemoveStuckVehicles() {
