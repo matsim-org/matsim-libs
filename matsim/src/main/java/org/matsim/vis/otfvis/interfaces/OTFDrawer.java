@@ -45,4 +45,6 @@ public interface OTFDrawer {
 	public void clearCache();
 	public void handleClick(Rectangle currentRect, int button);
 	public void setQueryHandler(OTFQueryHandler queryHandler);
+	public void setScale(float scale);
+	public float getScale();
 }

@@ -743,6 +743,14 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	public OTFClientQuad getQuad() {
 		return this.clientQ;
 	}
+	
+	public float getScale(){
+		return this.mouseMan.getScale();
+	}
+	
+	public void setScale(float scale){
+		this.mouseMan.scaleNetwork(scale);
+	}
 
 	public Point3f getView() {
 		return this.mouseMan.getView();

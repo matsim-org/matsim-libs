@@ -80,12 +80,15 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private static final String STEP_BB = "step_bb";
 	private static final String STEP_B = "step_b";
 	private static final String FULLSCREEN = "fullscreen";
+	private static final String SCALE = "scale";
 
 	private transient MovieTimer movieTimer = null;
 
 	private JButton playButton;
 
 	private JFormattedTextField timeField;
+	
+	private JFormattedTextField scaleField;
 
 	private int simTime = 0;
 
@@ -180,8 +183,21 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			timeField.addActionListener( this );
 
 			createCheckBoxes();
-
 			add(new JLabel(this.masterHostControl.getAddress()));
+			
+			JLabel lab = new JLabel("Scale: ");
+			lab.setMaximumSize(new Dimension(100,30));
+			lab.setMinimumSize(new Dimension(80,30));
+			lab.setHorizontalAlignment(JLabel.RIGHT);
+			add(lab);
+			scaleField = new JFormattedTextField("1.0");
+			scaleField.setMaximumSize(new Dimension(50,30));
+			scaleField.setMinimumSize(new Dimension(30,30));
+			scaleField.setActionCommand(SCALE);
+			scaleField.setHorizontalAlignment(JTextField.CENTER);
+			add( scaleField );
+			scaleField.addActionListener( this );
+			
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -235,6 +251,17 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			timeField.setText(Time.writeTime(simTime));
 			break;
 		}
+	}
+	
+	public void updateScaleLabel(){
+		float scale = 1.f;
+		for(OTFDrawer drawer: this.masterHostControl.getDrawer().values()){
+			if (drawer.getScale() != 0){
+				scale = drawer.getScale();
+			}
+		}
+		scale = (float)(Math.round(scale*100))/100;
+		this.scaleField.setText(String.valueOf(scale));
 	}
 
 	// ---------- IMPLEMENTATION OF ActionListener INTERFACE ----------
@@ -405,6 +432,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}.start();
 	}
 
+	private void changed_SCALE(ActionEvent event) {
+		String newScale = ((JFormattedTextField) event.getSource()).getText();
+		for(OTFDrawer drawer: this.masterHostControl.getDrawer().values()){
+			drawer.setScale(Float.parseFloat(newScale));
+		}
+	}
+
 	public void actionPerformed(ActionEvent event) {
 		String command = event.getActionCommand();
 		try {
@@ -428,6 +462,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				pressed_FULLSCREEN();
 			} else if (command.equals(SET_TIME))
 				changed_SET_TIME(event);
+			else if (command.equals(SCALE))
+				changed_SCALE(event);
 		} catch (IOException e) {
 			log.error("ControlToolbar encountered problem.");
 			e.printStackTrace();
@@ -532,6 +568,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 							if (!slave.equals(masterHostControl))
 								slave.getOTFServer().requestNewTime(simTime, OTFServerRemote.TimePreference.LATER);
 						}
+						updateScaleLabel();
 						updateTimeLabel();
 						if (simTime != actTime) {
 							repaint();

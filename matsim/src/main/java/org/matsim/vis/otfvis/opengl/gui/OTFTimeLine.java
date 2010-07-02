@@ -247,6 +247,17 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	public void setQueryHandler(OTFQueryHandler queryHandler) {
 		// Empty because .. well, because this method implements OTFDrawer although it shouldn't.
 	}
+
+	@Override
+	public float getScale() {
+		// Empty because .. well, because this method implements OTFDrawer although it shouldn't.
+		return 0;
+	}
+
+	@Override
+	public void setScale(float scale) {
+		// Empty because .. well, because this method implements OTFDrawer although it shouldn't.
+	}
 	
 	
 	

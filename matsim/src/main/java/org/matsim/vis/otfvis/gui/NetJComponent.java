@@ -43,6 +43,7 @@ import java.awt.geom.Point2D.Double;
 import java.rmi.RemoteException;
 
 import javax.swing.JComponent;
+import javax.swing.JScrollPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -92,30 +93,92 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	}
 
 
-	public static class MyNetVisScrollPane extends NetVisScrollPane implements NetVisResizable {
+	public static class MyNetVisScrollPane extends JScrollPane implements NetVisResizable {
 
 		private float scale = 1.f;
+		private final NetJComponent networkComponent;
+		
 		public MyNetVisScrollPane(NetJComponent networkComponent) {
 			super(networkComponent);
+			this.networkComponent = networkComponent;
 		}
+		
+	    public void moveNetwork(int deltax, int deltay) {
+	        Rectangle rect = getViewport().getViewRect();
+	        rect.setLocation(rect.x + deltax, rect.y + deltay);
+	        getViewport().scrollRectToVisible(rect);
+	        getViewport().setViewPosition(rect.getLocation());
+	    }
+	    
+	    public void updateViewClipRect() {
+	        Dimension prefSize = networkComponent.getPreferredSize();
+	        Rectangle rect = getViewport().getViewRect();
+
+	        double relX = rect.getX() / prefSize.getWidth();
+	        double relY = rect.getY() / prefSize.getHeight();
+
+	        networkComponent.setViewClipCoords(relX, relY, relX
+	                + rect.getWidth() / prefSize.getWidth(), relY
+	                + rect.getHeight() / prefSize.getHeight());
+	    }
 
 		@Override
 		public void scaleNetwork(float scale){
 			this.scale = scale;
 			System.out.println("Scale " + this.scale);
-			super.scaleNetwork(scale);
-		}
+	        Dimension prefSize = networkComponent.getPreferredSize();
+	        Rectangle rect = getViewport().getViewRect();
+	        double relX = rect.getX() / prefSize.getWidth();
+	        double relY = rect.getY() / prefSize.getHeight();
+	        networkComponent.scale(scale);
+	        networkComponent.revalidate();
+	        Dimension prefSize2 = networkComponent.getPreferredSize();
+	        networkComponent.setViewClipCoords(relX, relY, relX
+	                + rect.getWidth() / prefSize2.getWidth(), relY
+	                + rect.getHeight() / prefSize2.getHeight());
+	        rect.x = (int) (relX * prefSize2.getWidth() + 0.5 * (rect.getWidth() * (prefSize2
+	                .getWidth()
+	                / prefSize.getWidth() - 1.)));
+	        rect.y = (int) (relY * prefSize2.getHeight() + 0.5 * (rect.getHeight() * (prefSize2
+	                .getHeight()
+	                / prefSize.getHeight() - 1.)));
 
+	        getViewport().setViewPosition(rect.getLocation());
+
+	        revalidate();
+	        repaint();
+		}
+		
 		@Override
 		public float getScale() {
 			return scale;
 		}
 
-		@Override
 		public float scaleNetwork(Rectangle destrect, float factor) {
-			this.scale = super.scaleNetwork(destrect, factor);
+	        Dimension prefSize = networkComponent.getPreferredSize();
+	        Rectangle rect = getViewport().getViewRect();
+	        double relX = (destrect.getX() + rect.getX()) / prefSize.getWidth();
+	        double relY = (destrect.getY() + rect.getY()) / prefSize.getHeight();
+	        factor *=  Math.min((double) rect.width / destrect.width,
+	                        (double) rect.height / destrect.height);
+	        networkComponent.scale(factor);
+	        networkComponent.revalidate();
+	        Dimension prefSize2 = networkComponent.getPreferredSize();
+	        networkComponent.setViewClipCoords(relX, relY, relX
+	                + rect.getWidth() / prefSize2.getWidth(), relY
+	                + rect.getHeight() / prefSize2.getHeight());
+	        Point erg = new Point();
+	        erg.x = (int) (relX * prefSize2.getWidth());
+	        erg.y = (int) (relY * prefSize2.getHeight());
+	        rect.setLocation(erg.x, erg.y);
+	        getViewport().scrollRectToVisible(rect);
+	        getViewport().setViewPosition(erg);
+	        getViewport().toViewCoordinates(erg);
+	        revalidate();
+	        repaint();
+			this.scale = factor;
 			System.out.println("Scale " + this.scale);
-			return this.scale;
+	        return this.scale;
 		}
 
 	}
@@ -187,13 +250,17 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		networkScrollPane.addMouseWheelListener(mouseMan);
 	}
 
-	public void scale(double factor) {
+	private void scale(double factor) {
 		if (factor > 0) {
 			int scaledWidth = (int) Math.round(factor * frameDefaultWidth);
 			int scaledHeight = (int) Math.round(factor * frameDefaultHeight);
 
 			this.setPreferredSize(new Dimension(scaledWidth, scaledHeight));
 		}
+	}
+	
+	public void setScale(float factor){
+		this.networkScrollPane.scaleNetwork(factor);
 	}
 
 	// -------------------- COORDINATE TRANSFORMATION --------------------
