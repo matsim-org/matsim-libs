@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * MyZoneToZoneRouterTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,21 +20,34 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.List;
 
-public class AllTests {
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.testcases.MatsimTestCase;
+
+
+public class MyZoneToZoneRouterTest extends MatsimTestCase{
+	private Scenario scenario;
+	private List<MyZone> zones;
 	
-	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities.matsim2urbansim");
-		
-		// TODO Update test name(s).
-		suite.addTestSuite(MyZoneTest.class);
-		suite.addTestSuite(MyZoneReaderTest.class);
-		suite.addTestSuite(MyPlansProcessorTest.class);
-		suite.addTestSuite(MyZoneToZoneRouterTest.class);
-		
-		return suite;
+	public void testMyZoneToZoneRouterConstructor(){
+		// TODO Test constructor. Want a routable network at this point.
+		setupTest();
+		MyZoneToZoneRouter mzzr = new MyZoneToZoneRouter(scenario, zones);
 	}
-
+	
+	public void testFindZoneToZoneTravelTime(){
+		// TODO Test of we can successfully find the inter-zonal travel time.
+	}
+	
+	public void testFindIntraZonalTravelTime(){
+		// TODO Test if we can successfully find the intra-zonal travel time.
+	}
+	
+	private void setupTest(){
+		
+	}
+	
+	
+	
 }

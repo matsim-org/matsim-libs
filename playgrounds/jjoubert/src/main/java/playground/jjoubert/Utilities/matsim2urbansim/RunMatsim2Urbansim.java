@@ -96,7 +96,7 @@ public class RunMatsim2Urbansim {
 		// Read the link statistics;
 		String linkStatsFilename = root + studyAreaName + "/" + version + "/linkstats.txt.gz";
 		MyLinkStatsReader mlsr = new MyLinkStatsReader(linkStatsFilename, hours);
-		mlsr.readLinkStatsTravelTime();
+		mlsr.readLinkStatsTravelTime(hours);
 		Map<Id,Double> tt = mlsr.getTravelTimeMap();
 		
 		log.info("Process complete.");

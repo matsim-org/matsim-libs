@@ -35,7 +35,6 @@ import org.matsim.core.utils.io.IOUtils;
 public class MyLinkStatsReader {
 	private final Logger log = Logger.getLogger(MyLinkStatsReader.class);
 	private File file;
-	private String hours;
 	private Map<Id, Double> travelTimes;
 	
 	public MyLinkStatsReader(String filename, String hours) {
@@ -44,11 +43,10 @@ public class MyLinkStatsReader {
 			throw new RuntimeException("The link stats file " + f.getAbsolutePath() + " does not exist");
 		}
 		this.file = f;
-		this.hours = hours;
 		travelTimes = new TreeMap<Id, Double>();
 	}
 	
-	public void readLinkStatsTravelTime(){
+	public void readLinkStatsTravelTime(final String hour){
 		log.info("Reading link statistics from " + this.file.getAbsolutePath());
 		Integer index = null;
 		BufferedReader input;
@@ -65,7 +63,7 @@ public class MyLinkStatsReader {
 				 */
 				boolean found = false;
 				int i = 0;
-				String s = "TRAVELTIME" + this.hours + "avg";
+				String s = "TRAVELTIME" + hour + "avg";
 				while(!found && i < header.length){
 					if(header[i].equalsIgnoreCase(s)){
 						index = i;
@@ -110,7 +108,12 @@ public class MyLinkStatsReader {
 	}
 	
 	public String toString(){
-		return "MyLinkStatsReader for hours " + hours + " from " + file.getAbsolutePath();
+		return "MyLinkStatsReader from " + file.getAbsolutePath();
+	}
+
+	public void buildTravelTimeDataObject() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
