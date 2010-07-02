@@ -4,10 +4,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.SnapshotGenerator;
+import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
+import org.matsim.vis.otfvis2.OTFVisClient;
+import org.matsim.vis.otfvis2.OTFVisLiveServer;
 import org.neo4j.graphdb.Transaction;
 
 public class NeoLiveMain {
@@ -33,46 +36,22 @@ public class NeoLiveMain {
 				EventsManagerImpl events = new EventsManagerImpl();
 
 
-//				final OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
-//				SnapshotGenerator snapshotGenerator = new SnapshotGenerator(scenario.getNetwork(), (int) snapshotPeriod, simulationConfigGroup); 
-//				snapshotGenerator.addSnapshotWriter(server.getSnapshotReceiver());
-//				events.addHandler(snapshotGenerator);
-//				server.setSnapshotGenerator(snapshotGenerator);
-//
-//				OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", new NeoOTFLiveServerTransactionWrapper(server, scenario));
-//
-//				OTFVisClient client = new OTFVisClient();
-//				client.setHostConnectionManager(hostConnectionManager);
-//				client.setSwing(false);
-//				client.run();
-//
-//				System.out.println("Reading...");
-//				new MatsimEventsReader(events).readFile(eventsFileName);
-				
-				int i=0;
-				for (Link link : scenario.getNetwork().getLinks().values()) {
-					i++;
-					Node fromNode = link.getFromNode();
-				//	Id fromId = fromNode.getId();
-					Node toNode = link.getToNode();
-			//		Id toId = toNode.getId();
-//					Coord from = link.getFromNode().getCoord();
-//					Coord to = link.getToNode().getCoord();
-					if (i % 1000 == 0)
-						System.out.println(
-								""
-							//	+ from 
-							//	+ fromId
-								+ fromNode
-								+ " " 
-							//	+ to 
-							//	+ toId
-								+ toNode
-								+ " " 
-								+ i);
-						
-				}
-				
+				final OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
+				SnapshotGenerator snapshotGenerator = new SnapshotGenerator(scenario.getNetwork(), (int) snapshotPeriod, simulationConfigGroup); 
+				snapshotGenerator.addSnapshotWriter(server.getSnapshotReceiver());
+				events.addHandler(snapshotGenerator);
+				server.setSnapshotGenerator(snapshotGenerator);
+
+				OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", new NeoOTFLiveServerTransactionWrapper(server, scenario));
+
+				OTFVisClient client = new OTFVisClient();
+				client.setHostConnectionManager(hostConnectionManager);
+				client.setSwing(false);
+				client.run();
+
+				System.out.println("Reading...");
+				new MatsimEventsReader(events).readFile(eventsFileName);
+	
 				tx.success();
 			} finally {
 				tx.finish();
