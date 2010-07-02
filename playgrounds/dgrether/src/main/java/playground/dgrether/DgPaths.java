@@ -58,4 +58,10 @@ public interface DgPaths {
   final String GERSHENSONOUTPUT = STUDIESDG + "gershenson/output/";
 
 	final String RUNSSVN = RUNBASE;
+	
+	final String CLUSTERBASE = "/homes/extern/grether/netils/";
+	
+	final String CLUSTERSVN = CLUSTERBASE;
+	
+	final String CLUSTER_MATSIM_OUTPUT = CLUSTERBASE + "matsimOutput/";
 }
