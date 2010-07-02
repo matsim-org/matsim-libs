@@ -119,7 +119,13 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	public void reset(final int iteration) {
 		this.eventLinks.clear();
 		for (Link link : this.network.getLinks().values()) {
-			this.eventLinks.put(link.getId(), new EventLink(link, this.capCorrectionFactor, ((NetworkImpl)this.network).getEffectiveCellSize(), this.storageCapFactor));
+			final double effectiveCellSize;
+			if (this.network instanceof NetworkImpl) {
+				effectiveCellSize = ((NetworkImpl)this.network).getEffectiveCellSize();
+			} else {
+				effectiveCellSize = 7.5;
+			}
+			this.eventLinks.put(link.getId(), new EventLink(link, this.capCorrectionFactor, effectiveCellSize, this.storageCapFactor));
 		}
 		this.linkList.clear();
 		this.linkList.addAll(eventLinks.values());

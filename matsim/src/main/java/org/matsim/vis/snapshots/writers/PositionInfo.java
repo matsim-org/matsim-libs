@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
 /**
@@ -218,7 +219,11 @@ public class PositionInfo implements AgentSnapshotInfo {
 		// (And this is, in my view, the right place to correct this.)  kai, apr'10
 		double correction = 0. ;
 		if ( link.getLength() != 0 ){
-			correction = ((LinkImpl)link).getEuklideanDistance() / link.getLength();
+			if (link instanceof LinkImpl) {
+				correction = ((LinkImpl)link).getEuklideanDistance() / link.getLength();
+			} else  {
+				correction = CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()) / link.getLength();
+			}
 		}
 		
 		// "link scale" is not from me.  Presumably, it "pulls back" the drawing of the vehicles from the nodes on
