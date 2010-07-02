@@ -38,7 +38,13 @@ public class VisLastIteration {
 	 */
 	public static void main(String[] a) throws FileNotFoundException, IOException {
 		DaganzoScenarioGenerator scenarioGenerator = new DaganzoScenarioGenerator();
-		String outputConfig = scenarioGenerator.outputDirectory + "output_config.xml.gz";
+		String outputConfig = null ;
+		if (scenarioGenerator.runId == null) {
+			outputConfig = scenarioGenerator.outputDirectory + "output_config.xml.gz";
+		}
+		else {
+			outputConfig = scenarioGenerator.outputDirectory +  scenarioGenerator.runId + ".output_config.xml.gz";
+		}
 		String[] args = {outputConfig};
 		DgOTFVisReplayLastIteration.main(args);
 		
