@@ -13,12 +13,16 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.neo4j.index.lucene.LuceneIndexBatchInserter;
 import org.neo4j.kernel.impl.batchinsert.BatchInserter;
+
+import playground.mzilske.neo.NeoBatchNetworkImpl.BasicNetworkRoute;
 
 public class NeoBatchPopulationImpl implements Population {
  
@@ -88,8 +92,7 @@ public class NeoBatchPopulationImpl implements Population {
 				if (pe instanceof Activity) {
 					properties.clear();
 					Activity act = (Activity) pe;
-					// planNodes.add(inserter.createNode(properties));
-					
+					properties.put(NeoActivityImpl.KEY_TYPE, act.getType());
 					long id = inserter.createNode(properties);
 					if (previous == null) {
 						inserter.createRelationship(planId, id, RelationshipTypes.PLAN_TO_FIRST_ACTIVITY, null);
@@ -97,6 +100,10 @@ public class NeoBatchPopulationImpl implements Population {
 						inserter.createRelationship(previous, id, RelationshipTypes.NEXT_PLAN_ELEMENT, null);
 					}
 					inserter.createRelationship(planId, id, RelationshipTypes.PLAN_TO_ACTIVITY, null);
+					if (act.getLinkId() != null) {
+						long linkid = index.getSingleNode(NeoLinkImpl.KEY_ID, act.getLinkId());
+						inserter.createRelationship(id, linkid, RelationshipTypes.TAKES_PLACE_AT, null);
+					}
 					previous = id;
 				} else if (pe instanceof Leg) {
 					properties.clear();
@@ -110,12 +117,33 @@ public class NeoBatchPopulationImpl implements Population {
 						inserter.createRelationship(previous, id, RelationshipTypes.NEXT_PLAN_ELEMENT, null);
 					}
 					inserter.createRelationship(planId, id, RelationshipTypes.PLAN_TO_LEG, null);
+					Route route = leg.getRoute();
+					if (route != null) {
+						long routeId = insertRoute(route);
+						inserter.createRelationship(id, routeId, RelationshipTypes.LEG_TO_ROUTE, null);
+					}
 					previous = id;
 				}
 			}
 			
 		}
 		
+	}
+
+	private long insertRoute(Route route) {
+		properties.clear();
+		if (route instanceof NetworkRoute) {
+			BasicNetworkRoute networkRoute = (BasicNetworkRoute) route;
+			properties.put(NeoNetworkRouteImpl.KEY_DESCRIPTION, networkRoute.routeDescription);
+		}
+		long routeId = inserter.createNode(properties);
+		if (route instanceof NetworkRoute) {
+			long startlinkid = index.getSingleNode(NeoLinkImpl.KEY_ID, route.getStartLinkId());
+			long endlinkid = index.getSingleNode(NeoLinkImpl.KEY_ID, route.getEndLinkId());
+			inserter.createRelationship(routeId, startlinkid, RelationshipTypes.START_LINK, properties);
+			inserter.createRelationship(routeId, endlinkid, RelationshipTypes.END_LINK, properties);
+		}
+		return routeId;
 	}
 
 	@Override

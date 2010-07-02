@@ -3,7 +3,9 @@ package playground.mzilske.neo;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 public class NeoLegImpl implements Leg {
 
@@ -28,8 +30,12 @@ public class NeoLegImpl implements Leg {
 
 	@Override
 	public Route getRoute() {
-		// TODO Auto-generated method stub
-		return null;
+		Relationship r = this.underlyingNode.getSingleRelationship(RelationshipTypes.LEG_TO_ROUTE, Direction.OUTGOING);
+		if (r != null) {
+			return new NeoNetworkRouteImpl(r.getEndNode());
+		} else {
+			return null;
+		}
 	}
 
 	@Override

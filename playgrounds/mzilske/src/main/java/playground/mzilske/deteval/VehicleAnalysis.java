@@ -14,6 +14,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
+import org.neo4j.graphdb.Transaction;
 
 import playground.mzilske.neo.NeoScenario;
 
@@ -25,7 +26,14 @@ public class VehicleAnalysis {
 
 		String eventsFileName = "../../run951/it.100/951.100.events.txt.gz";
 
-		final NeoScenario scenario = new NeoScenario("output/neo");
+		Map<String,String> config = new HashMap<String,String>();
+		config.put("neostore.nodestore.db.mapped_memory","80M");
+		config.put("neostore.relationshipstore.db.mapped_memory","750M");
+		config.put("neostore.propertystore.db.mapped_memory","0M");
+		config.put("neostore.propertystore.db.strings.mapped_memory","0M");
+		config.put("neostore.propertystore.db.arrays.mapped_memory","0M");
+		
+		final NeoScenario scenario = new NeoScenario("output/neo", config);
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 
 			@Override
@@ -65,16 +73,16 @@ public class VehicleAnalysis {
 
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {
-				scenario.beginTx();
+				Transaction tx = scenario.beginTx();
 				try {
 					Person person = scenario.getPopulation().getPersons().get(event.getPersonId());
 					Plan plan = person.getSelectedPlan();
 					System.out.println(person.getId());
 					Leg leg = (Leg) plan.getPlanElements().get(2*currentLegs.get(event.getPersonId()) -1);
 					System.out.println(leg.getMode());
-					scenario.success();
+					tx.success();
 				} finally {
-					scenario.finish();
+					tx.finish();
 				}
 			}
 		});

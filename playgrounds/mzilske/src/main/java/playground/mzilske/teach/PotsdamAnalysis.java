@@ -18,12 +18,14 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -47,6 +49,7 @@ public class PotsdamAnalysis implements Runnable {
 
 	@Override
 	public void run() {
+		String populationFileName = "output/brandenburg/output_plans.xml";
 		String eventsFile1 = "output/brandenburg/ITERS/it.20/20.events.txt.gz";
 		String eventsFile2 = "output/brandenburg-broken-bridge/ITERS/it.50/50.events.txt.gz";
 		EventsManager before = new EventsManagerImpl();
@@ -56,6 +59,10 @@ public class PotsdamAnalysis implements Runnable {
 		String network = "inputs/brandenburg/network.xml";
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario).readFile(network);
+		new MatsimPopulationReader(scenario).readFile(populationFileName);
+		
+		Population population = scenario.getPopulation();
+		
 		for (Entry<Id, Link> entry : scenario.getNetwork().getLinks().entrySet()) {
 			linkDeltas.put(entry.getKey(), new AnalysisLink());
 		}

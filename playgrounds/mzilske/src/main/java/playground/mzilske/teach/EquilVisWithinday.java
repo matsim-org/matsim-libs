@@ -1,16 +1,24 @@
 package playground.mzilske.teach;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
@@ -30,6 +38,8 @@ import playground.christoph.withinday.replanning.parallel.ParallelDuringLegRepla
 
 public class EquilVisWithinday implements Runnable {
 	
+	private Scenario scenario;
+
 	private final class MyWithinDayDuringLegReplanner extends
 			WithinDayDuringLegReplanner {
 		private MyWithinDayDuringLegReplanner(Id id, Scenario scenario) {
@@ -45,8 +55,37 @@ public class EquilVisWithinday implements Runnable {
 
 		@Override
 		public boolean doReplanning(PersonDriverAgent driverAgent) {
-			planAlgorithm.run(driverAgent.getPerson().getSelectedPlan());
+			Id personId = new IdImpl("98");
+			if (personId.equals(driverAgent.getPerson().getId())) {
+				List<Id> route = ((LinkNetworkRoute) driverAgent.getCurrentLeg().getRoute()).getLinkIds();
+				Id id = driverAgent.getCurrentLinkId();
+				if (new IdImpl("6").equals(id)) {
+					stellAb(driverAgent);
+					((QPersonAgent) driverAgent).resetCaches();
+				}
+			}
 			return true;
+		}
+
+		private void stellAb(PersonDriverAgent driverAgent) {
+			Id currentLinkId = driverAgent.getCurrentLinkId();
+			PlanImpl plan = (PlanImpl) driverAgent.getPerson().getSelectedPlan();
+			Leg currentLeg = driverAgent.getCurrentLeg();
+			Route route = currentLeg.getRoute();
+			NetworkFactoryImpl networkFactory = (NetworkFactoryImpl) scenario.getNetwork().getFactory();
+			
+			Route newRoute = networkFactory.createRoute(TransportMode.car, route.getStartLinkId(), currentLinkId);
+			currentLeg.setRoute(newRoute);
+			Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("umsteigen", currentLinkId);
+			activity.setEndTime(0);
+			// Route newWalkRoute = networkFactory.createRoute(TransportMode.walk, currentLinkId, route.getEndLinkId());
+			Leg newLeg = scenario.getPopulation().getFactory().createLeg(TransportMode.walk);
+			// newLeg.setRoute(newWalkRoute);
+			newLeg.setTravelTime(30);
+			
+			plan.getPlanElements().add(plan.getPlanElements().indexOf(currentLeg)+1, activity);
+			plan.getPlanElements().add(plan.getPlanElements().indexOf(activity)+1, newLeg);
+			System.out.println("Replanned.");
 		}
 	}
 
@@ -60,7 +99,7 @@ public class EquilVisWithinday implements Runnable {
 		String configFileName = "./examples/tutorial/config/example5-config.xml";
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(configFileName);
 		loader.loadScenario();
-		Scenario scenario = loader.getScenario();
+		scenario = loader.getScenario();
 		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
 		qSimConfigGroup.setSnapshotPeriod(1);
 		scenario.getConfig().setQSimConfigGroup(qSimConfigGroup);
@@ -68,14 +107,7 @@ public class EquilVisWithinday implements Runnable {
 		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
 		
 		final WithinDayDuringLegReplanner duringLegReplanner = new MyWithinDayDuringLegReplanner(ReplanningIdGenerator.getNextId(), scenario);
-		duringLegReplanner.setReplanner(new PlanAlgorithm() {
 
-			@Override
-			public void run(Plan plan) {
-				System.out.println("Replanning "+plan.getPerson().getId());
-			}
-			
-		});
 
 		// WithinDayQSim queueSimulation = (WithinDayQSim) new WithinDayQSim(scenario, events);
 		
@@ -120,7 +152,7 @@ public class EquilVisWithinday implements Runnable {
 		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager(configFileName, server);
 		OTFVisClient client = new OTFVisClient();
 		client.setHostConnectionManager(hostConnectionManager);
-		client.setSwing(true);
+		client.setSwing(false);
 		client.run();
 		
 		

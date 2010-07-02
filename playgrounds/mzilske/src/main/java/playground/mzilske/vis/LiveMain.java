@@ -22,7 +22,7 @@ public class LiveMain {
 //		
 		String networkFileName = "../../matsim/output/example5/output_network.xml.gz";
 		String eventsFileName = "../../matsim/output/example5/ITERS/it.10/10.events.xml.gz";
-		String populationFileName = "../../matsim/output/example5/output_plans.xml.gz";
+		String populationFileName = "../../matsim/output/example5/wurst.xml";
 		
 //		String networkFileName = "../../network-ivtch/ivtch-osm.xml";
 //		String eventsFileName = "../../run657/it.1000/1000.events.txt.gz";

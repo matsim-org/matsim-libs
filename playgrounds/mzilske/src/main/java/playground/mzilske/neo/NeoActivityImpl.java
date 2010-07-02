@@ -2,12 +2,15 @@ package playground.mzilske.neo;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 public class NeoActivityImpl implements Activity {
 
-	static final String KEY_COORD = "KEY_COORD";
+	static final String KEY_TYPE = "type";
 	
 	final private Node underlyingNode;
 
@@ -17,55 +20,53 @@ public class NeoActivityImpl implements Activity {
 
 	@Override
 	public Coord getCoord() {
-		return (Coord) underlyingNode.getProperty(KEY_COORD);
+		return null;
 	}
 
 	@Override
 	public double getEndTime() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new RuntimeException();
 	}
 
 	@Override
 	public Id getFacilityId() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException();
 	}
 
 	@Override
 	public Id getLinkId() {
-		// TODO Auto-generated method stub
-		return null;
+		Relationship r = this.underlyingNode.getSingleRelationship(RelationshipTypes.TAKES_PLACE_AT, Direction.OUTGOING);
+		if (r != null) {
+			Link link = new NeoLinkImpl(r.getEndNode());
+			return link.getId();
+		} else {
+			return null;
+		}
 	}
 
 	@Override
 	public double getStartTime() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new RuntimeException();
 	}
 
 	@Override
 	public String getType() {
-		// TODO Auto-generated method stub
-		return null;
+		return (String) underlyingNode.getProperty(KEY_TYPE);
 	}
 
 	@Override
 	public void setEndTime(double seconds) {
-		// TODO Auto-generated method stub
-
+		throw new RuntimeException();
 	}
 
 	@Override
 	public void setStartTime(double seconds) {
-		// TODO Auto-generated method stub
-
+		throw new RuntimeException();
 	}
 
 	@Override
 	public void setType(String type) {
-		// TODO Auto-generated method stub
-
+		throw new RuntimeException();
 	}
 
 	public Node getUnderlyingNode() {
@@ -73,7 +74,7 @@ public class NeoActivityImpl implements Activity {
 	}
 
 	public void setCoord(Coord coord) {
-		underlyingNode.setProperty(KEY_COORD, coord);
+		throw new RuntimeException();
 	}
 
 }

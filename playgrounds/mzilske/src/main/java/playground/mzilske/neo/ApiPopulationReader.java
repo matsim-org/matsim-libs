@@ -44,19 +44,18 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.Desires;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import playground.mzilske.neo.NeoBatchNetworkImpl.BasicNetworkRoute;
 
 /**
  * A reader for plans files of MATSim according to <code>plans_v4.dtd</code>.
@@ -255,7 +254,9 @@ public class ApiPopulationReader extends MatsimXmlParser implements PopulationRe
 		this.routeDescription = null;
 		this.currplan = this.scenario.getPopulation().getFactory().createPlan();
 		this.currperson.addPlan(this.currplan);
-		this.currplan.setSelected(selected);
+		if (selected) {
+			this.currplan.setSelected(selected);
+		}
 		
 		String scoreString = atts.getValue("score");
 		if (scoreString != null) {
@@ -292,7 +293,15 @@ public class ApiPopulationReader extends MatsimXmlParser implements PopulationRe
 			if (this.currRoute instanceof GenericRoute) {
 				((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
 			} else if (this.currRoute instanceof NetworkRoute) {
-	//			((NetworkRoute) this.currRoute).setLinkIds(startLinkId, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, this.routeDescription))), endLinkId);
+//				List<Node> nodes = NetworkUtils.getNodes(this.network, this.routeDescription);
+//				List<Link> linksFromNodes = RouteUtils.getLinksFromNodes(nodes);
+//				List<Id> linkIds = NetworkUtils.getLinkIds(linksFromNodes);
+//				((NetworkRoute) this.currRoute).setLinkIds(startLinkId, linkIds, endLinkId);
+				
+				BasicNetworkRoute basicNetworkRoute = (BasicNetworkRoute) this.currRoute;
+				basicNetworkRoute.setStartLinkId(startLinkId);
+				basicNetworkRoute.setEndLinkId(endLinkId);
+				basicNetworkRoute.routeDescription = this.routeDescription.trim();
 			} else {
 				throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
 			}
@@ -313,7 +322,7 @@ public class ApiPopulationReader extends MatsimXmlParser implements PopulationRe
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currRoute = ((NetworkFactoryImpl) this.network.getFactory()).createRoute(this.currleg.getMode(), null, null);
+		this.currRoute = ((RouteSupportingNetworkFactory) this.network.getFactory()).createRoute();
 		this.currleg.setRoute(this.currRoute);
 		if (atts.getValue("dist") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));

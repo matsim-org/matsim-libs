@@ -14,13 +14,14 @@ public class ScenarioXML2Neo {
 	
 		
 //		String networkFileName = "../../matsim/output/example5/output_network.xml.gz";
-//		String populationFileName = "../../matsim/output/example5/output_plans.xml.gz";
+//		String populationFileName = "../../matsim/output/example5/wurst.xml";
 		
 		String directory = "output/neo";
 		DirectoryUtils.deleteDirectory(new File(directory));
 		NeoBatchScenario scenario = new NeoBatchScenario(directory);
 		try {
-	//			new MatsimNetworkReader(scenario).readFile(networkFileName);
+				new ApiNetworkReader(scenario).readFile(networkFileName);
+				scenario.vacuum();
 				new ApiPopulationReader(scenario).readFile(populationFileName);
 		} finally {
 			scenario.shutdown();
