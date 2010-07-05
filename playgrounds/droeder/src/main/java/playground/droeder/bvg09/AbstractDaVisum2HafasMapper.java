@@ -128,14 +128,18 @@ public abstract class AbstractDaVisum2HafasMapper {
 		unmatched = new ArrayList<Id>();
 		
 		for (Entry<Id, Id> lines : vis2HafLines.entrySet()){
-			Map<Id, Id> matched = tryToMatchAllRoutes(lines.getKey(), lines.getValue());
-			if(matched.containsValue(null)){
-				log.error("not all visum routes are matched for visum Line " + lines.getKey() + "!");
-				unmatched.add(lines.getKey());
-			}else {
-				log.info("all visum routes are matched for visum Line " + lines.getKey() + "!");
+			if (lines.getKey().equals(new IdImpl("U-9"))){
+				Map<Id, Id> matched = tryToMatchAllRoutes(lines.getKey(), lines.getValue());
+				if(matched.containsValue(null)){
+					log.error("not all visum routes are matched for visum Line " + lines.getKey() + "!");
+					unmatched.add(lines.getKey());
+				}else {
+					log.info("all visum routes are matched for visum Line " + lines.getKey() + "!");
+				}
+				vis2hafRoutes.putAll(matched);
+			}else{
+				log.error("nö!");
 			}
-			vis2hafRoutes.putAll(matched);
 		}
 		
 	}
@@ -164,9 +168,6 @@ public abstract class AbstractDaVisum2HafasMapper {
 		double avDist = Double.POSITIVE_INFINITY;
 		
 		for(TransitRoute hafRoute : hafasSc.getTransitSchedule().getTransitLines().get(hafLine).getRoutes().values()){
-			if(hafRoute.getId().equals(new IdImpl("02525")) || hafRoute.getId().equals(new IdImpl("02729"))){
-				log.info("Stop here");
-			}
 			Map<Id, Id> temp = tryToMatchRoute(visRoute, hafRoute);
 			if(!(temp == null)){
 				double tempDist = getAvDist(temp);
