@@ -53,28 +53,27 @@ public class RefSimFactory implements MobsimFactory {
 		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(scenario.getNetwork(), engine, MatsimRandom.getRandom());
 		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
 
-		// setup features; order is important!
-		planSim.addSimFeature(new StatusFeature());
-
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
 		LegHandler lh = new LegHandler(engine);
 		planSim.setPlanElementHandler(Activity.class, ah);
 		planSim.setPlanElementHandler(Leg.class, lh);
-		planSim.addSimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
-
-		planSim.addSimFeature(netFeature); // order of features is important!
 
 		// setup DepartureHandlers
 		CarDepartureHandler carHandler = new CarDepartureHandler(engine, netFeature, scenario);
 		carHandler.setTeleportVehicles(true);
 		lh.setDepartureHandler(TransportMode.car, carHandler);
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
-		planSim.addSimFeature(teleporter); // how should a user know teleporter is a simfeature?
 		lh.setDepartureHandler(TransportMode.pt, teleporter);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);
 		lh.setDepartureHandler(TransportMode.bike, teleporter);
 		lh.setDepartureHandler(TransportMode.ride, teleporter);
+
+		// register all features at the end in the right order
+		planSim.addSimFeature(new StatusFeature());
+		planSim.addSimFeature(teleporter); // how should a user know teleporter is a simfeature?
+		planSim.addSimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
+		planSim.addSimFeature(netFeature); // order of features is important!
 
 		return planSim;
 	}

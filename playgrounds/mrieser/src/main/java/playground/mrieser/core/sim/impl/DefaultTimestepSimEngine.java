@@ -111,7 +111,7 @@ public class DefaultTimestepSimEngine implements TimestepSimEngine {
 				feature.doSimStep(this.time);
 			}
 			running = keepAlive();
-			if (this.time >= 45.0 * 3600) {  // TODO [MR] remove sim-end-time hack
+			if (this.time >= 55.0 * 3600) {  // TODO [MR] remove sim-end-time hack
 				running = false;
 			}
 			if (running) {

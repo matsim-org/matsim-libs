@@ -219,6 +219,53 @@ public class QueueLinkTest {
 		Assert.assertNull(f.qlink.getParkedVehicle(veh2Id));
 	}
 
+	@Test
+	public void testHasSpace() {
+
+		NetworkLayer net = new NetworkLayer();
+		net.addNode(net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
+		net.addNode(net.getFactory().createNode(new IdImpl(2), new CoordImpl(100, 0)));
+		Link link = net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
+		link.setLength(100);
+		link.setFreespeed(10);
+		link.setCapacity(3600.0);
+		link.setNumberOfLanes(1.0);
+		FakeSimEngine engine = new FakeSimEngine();
+		QueueNetwork qnet = new QueueNetwork(engine, new Random());
+		QueueLink qlink = new QueueLink(link, qnet);
+
+		VehicleTypeImpl vehType = new VehicleTypeImpl(new IdImpl("5-11"));
+		SimVehicle[] vehicles = new SimVehicle[20];
+		Id[] ids = new Id[vehicles.length];
+		for (int i = 0; i < vehicles.length; i++) {
+			ids[i] = new IdImpl(i);
+			vehicles[i] = new DefaultSimVehicle(new VehicleImpl(ids[i], vehType));
+			vehicles[i].setDriver(new FakeDriverAgent());
+		}
+
+		// qlink: 100m / 7.5m/veh = 13.6 veh
+		for (int i = 0; i < 14; i++) {
+			Assert.assertTrue(qlink.hasSpace());
+			qlink.addVehicleFromIntersection(vehicles[i]);
+		}
+		Assert.assertFalse(qlink.hasSpace());
+
+		// move one vehicle to the buffer
+		qlink.buffer.updateCapacity();
+		Assert.assertNull(qlink.buffer.getFirstVehicleInBuffer());
+		qlink.doSimStep(11.0);
+		Assert.assertNotNull(qlink.buffer.getFirstVehicleInBuffer());
+		Assert.assertTrue(qlink.hasSpace());
+		qlink.addVehicleFromIntersection(vehicles[14]);
+		Assert.assertFalse(qlink.hasSpace());
+
+		// park one vehicle on the link
+		qlink.parkVehicle(vehicles[6]);
+		Assert.assertTrue(qlink.hasSpace());
+		qlink.addVehicleFromIntersection(vehicles[15]);
+		Assert.assertFalse(qlink.hasSpace());
+	}
+
 	private static class Fixture {
 
 		/*package*/ final NetworkLayer net;

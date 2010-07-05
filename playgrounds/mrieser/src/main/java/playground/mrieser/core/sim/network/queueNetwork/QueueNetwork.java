@@ -19,6 +19,8 @@
 
 package playground.mrieser.core.sim.network.queueNetwork;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -36,6 +38,7 @@ import playground.mrieser.core.sim.network.api.SimNetwork;
 	protected final TimestepSimEngine simEngine;
 	private final Map<Id, QueueLink> links;
 	private final Map<Id, QueueNode> nodes;
+	private QueueNode[] nodesArray = null;
 	private double flowCapFactor = 1.0;
 	private double storageCapFactor = 1.0;
 	private double effectiveCellSize = 7.5;
@@ -52,12 +55,26 @@ import playground.mrieser.core.sim.network.api.SimNetwork;
 
 	@Override
 	public void doSimStep(final double time) {
-		for (QueueNode node : this.nodes.values()) {
+		if (this.nodesArray == null) {
+			initialize();
+		}
+		for (QueueNode node : this.nodesArray) {
 			node.moveNode(time, this.random);
 		}
 		for (QueueLink link : this.links.values()) {
 			link.doSimStep(time);
 		}
+	}
+
+	private void initialize() {
+		this.nodesArray = this.nodes.values().toArray(new QueueNode[this.nodes.size()]);
+    // sort the nodes for deterministic order / results
+    Arrays.sort(this.nodesArray, new Comparator<QueueNode>() {
+      @Override
+			public int compare(final QueueNode o1, final QueueNode o2) {
+        return o1.getId().compareTo(o2.getId());
+      }
+    });
 	}
 
 	@Override

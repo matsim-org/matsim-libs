@@ -34,9 +34,15 @@ public class DefaultSimVehicle implements SimVehicle {
 
 	private final Vehicle vehicle;
 	private DriverAgent driver = null;
+	private final double sizeInEquivalents;
 
 	public DefaultSimVehicle(final Vehicle vehicle) {
+		this(vehicle, 1.0);
+	}
+
+	public DefaultSimVehicle(final Vehicle vehicle, final double vehicleSizeInEquivalents) {
 		this.vehicle = vehicle;
+		this.sizeInEquivalents = vehicleSizeInEquivalents;
 	}
 
 	@Override
@@ -44,17 +50,19 @@ public class DefaultSimVehicle implements SimVehicle {
 		return this.vehicle.getId();
 	}
 
+	@Override
 	public DriverAgent getDriver() {
 		return this.driver;
 	}
 
-	public void setDriver(DriverAgent driver) {
+	@Override
+	public void setDriver(final DriverAgent driver) {
 		this.driver = driver;
 	}
 
 	@Override
 	public double getSizeInEquivalents() {
-		return 1.0;
+		return this.sizeInEquivalents;
 	}
 
 }

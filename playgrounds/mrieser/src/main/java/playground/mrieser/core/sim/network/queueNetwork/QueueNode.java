@@ -93,6 +93,7 @@ import playground.mrieser.core.sim.network.api.SimNode;
 		// randomize based on capacity
 		while (auxCounter < inLinksCounter) {
 			double rnd = random.nextDouble();
+//			System.out.println(now + "  NODE " + this.node.getId() + "  RND " + rnd);
 			double rndNum = rnd * inLinksCapSum;
 			double selCap = 0.0;
 			for (int i = 0; i < inLinksCounter; i++) {
@@ -100,6 +101,7 @@ import playground.mrieser.core.sim.network.api.SimNode;
 				if (link == null) {
 					continue;
 				}
+//				System.out.println("          LINK " + link.link.getId() + "  CAP " + link.link.getCapacity());
 				selCap += link.link.getCapacity(now);
 				if (selCap >= rndNum) {
 					auxCounter++;
@@ -117,6 +119,7 @@ import playground.mrieser.core.sim.network.api.SimNode;
 		SimVehicle veh;
 		while ((veh = buffer.getFirstVehicleInBuffer()) != null) {
       if (!moveVehicleOverNode(veh, buffer, now)) {
+//      	System.out.println("       MOVE failed.");
         break;
       }
     }
@@ -141,7 +144,10 @@ import playground.mrieser.core.sim.network.api.SimNode;
         buffer.removeFirstVehicleInBuffer();
         vehicle.getDriver().notifyMoveToNextLink();
         nextLink.addVehicleFromIntersection(vehicle);
+//        System.out.println("      MOVE  VEH " + vehicle.getId());
         return true;
+      } else {
+//      	System.out.println("         next link has no space");
       }
 
       // check if veh is stuck!
@@ -152,7 +158,7 @@ import playground.mrieser.core.sim.network.api.SimNode;
          * die here, we have a config setting for that!
          */
         if (this.network.isRemoveStuckVehicles()) {
-          buffer.removeFirstVehicleInBuffer();
+        	buffer.link.removeVehicle(vehicle);
           this.network.simEngine.getEventsManager().processEvent(
               new AgentStuckEventImpl(now, vehicle.getId(), buffer.link.getId(), TransportMode.car));
         } else {

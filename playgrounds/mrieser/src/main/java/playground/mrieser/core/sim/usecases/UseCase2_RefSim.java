@@ -50,7 +50,7 @@ public class UseCase2_RefSim {
 			throw new RuntimeException(e);
 		}
 //		config.plans().setInputFile("test/scenarios/equil/plans1.xml");
-		config.plans().setInputFile("test/scenarios/berlin/plans_hwh_sample.xml");
+//		config.plans().setInputFile("test/scenarios/berlin/plans_hwh_sample.xml");
 		ConfigUtils.modifyFilePaths(config, prefix);
 		ScenarioLoader loader = new ScenarioLoaderImpl(config);
 		Scenario scenario = loader.loadScenario();
@@ -68,6 +68,7 @@ public class UseCase2_RefSim {
 			ew = new EventWriterXML("testEventsOldBln.xml");
 			events.addHandler(ew);
 			config.setQSimConfigGroup(new QSimConfigGroup());
+//			config.getQSimConfigGroup().setEndTime(10.0 * 3600);
 			Simulation oldSim = new QSimFactory().createMobsim(scenario, events);
 			oldSim.run();
 		}

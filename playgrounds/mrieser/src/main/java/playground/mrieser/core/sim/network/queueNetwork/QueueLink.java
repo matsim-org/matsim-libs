@@ -140,6 +140,7 @@ import playground.mrieser.core.sim.network.api.SimLink;
 					new LinkEnterEventImpl(now, vehicle.getId(), this.link.getId()));
 		} else {
 			if (priority == SimLink.PRIORITY_IMMEDIATELY) {
+				this.usedStorageCapacity += vehicle.getSizeInEquivalents();
 				// vehicle enters from a driveway
 				this.vehQueue.addFirst(vehicle);
 			} else {
@@ -185,7 +186,10 @@ import playground.mrieser.core.sim.network.api.SimLink;
 
 	@Override
 	public void parkVehicle(final SimVehicle vehicle) {
-		if (this.vehQueue.remove(vehicle) || this.buffer.removeVehicle(vehicle) || this.waitingList.remove(vehicle)) {
+		if (this.vehQueue.remove(vehicle)) {
+			this.usedStorageCapacity -= vehicle.getSizeInEquivalents();
+			this.parkedVehicles.put(vehicle.getId(), vehicle);
+		} else if (this.buffer.removeVehicle(vehicle) || this.waitingList.remove(vehicle)) {
 			this.parkedVehicles.put(vehicle.getId(), vehicle);
 		}
 	}
