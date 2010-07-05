@@ -62,7 +62,6 @@
 		<param name="outputPlansFile" value="&OUTPUTBASE;/output_plans.xml" />
 		<param name="outputVersion" value="v4" />
 		<param name="outputSample" value="1.00" />
-		<param name="switchOffPlansStreaming" value="yes" />
 	</module> <!-- plans -->
 	
 <!-- ====================================================================== -->

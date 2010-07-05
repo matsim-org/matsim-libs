@@ -40,7 +40,7 @@
 		<param name="traveling" value="-0.97" />
 		<param name="waiting" value="-0" />
 <!--		<param name="tollCost" value="-0.12" />-->
-		<param name="marginalUtlOfDistance" value="-0.00012" /><!-- in this case equal to fuel costs per trip -->
+		<param name="marginalUtlOfDistanceCar" value="-0.00012" /><!-- in this case equal to fuel costs per trip -->
 		
 		
 		<param name="activityType_0"            value="h" /> <!-- home -->

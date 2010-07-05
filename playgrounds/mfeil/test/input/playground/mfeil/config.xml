@@ -4,7 +4,6 @@
 
 	<module name="global">
 		<param name="randomSeed" value="4711" />
-		<param name="outputTimeFormat" value="HH:mm:ss" />
 		<param name="coordinateSystem" value="Atlantis" />
 		<param name="numberOfThreads" value="2" />
 	</module>
@@ -32,9 +31,6 @@
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
-	
-		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "otfvis"/> <!-- netvis, googleearth, transims -->
 	</module>
 	
 

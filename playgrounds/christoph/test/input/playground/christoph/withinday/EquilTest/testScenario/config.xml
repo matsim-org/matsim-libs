@@ -47,14 +47,6 @@
 		-->
 		<param name="numberOfThreads" value="1" />
 		<param name="removeStuckVehicles" value="true" />
-		<param name="snapshotFormat" value="" />
-		<!--
-			snapshotStyle: `equidist' (vehicles equidistant on link) or `queue'
-			(vehicles queued at end of link)
-		-->
-		<param name="snapshotStyle" value="equiDist" />
-		<param name="snapshotfile" value="Snapshot" />
-		<param name="snapshotperiod" value="00:00:00" />
 		<param name="startTime" value="00:00:00" />
 		<param name="storageCapacityFactor" value="0.05" />
 		<param name="stuckTime" value="100.0" />
