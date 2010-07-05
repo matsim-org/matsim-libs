@@ -29,8 +29,6 @@ import org.matsim.core.utils.misc.Time;
 
 public class QSimConfigGroup extends Module {
 
-	private final static Logger log = Logger.getLogger(QSimConfigGroup.class);
-
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "qsim";
@@ -40,7 +38,6 @@ public class QSimConfigGroup extends Module {
 	private static final String TIME_STEP_SIZE = "timeStepSize";
 	private static final String SNAPSHOT_PERIOD = "snapshotperiod";
 	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
-	private static final String SNAPSHOT_FILE = "snapshotfile";
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
 	private static final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
@@ -89,8 +86,6 @@ public class QSimConfigGroup extends Module {
 			setRemoveStuckVehicles(Boolean.parseBoolean(value));
 		} else if (NUMBER_OF_THREADS.equals(key)){
 		  setNumberOfThreads(Integer.parseInt(value));
-		} else if (SNAPSHOT_FILE.equals(key)) {
-			log.warn("The config option " + key + " is no longer supported and should be removed from the configuration file.");
 		}	else {
 			throw new IllegalArgumentException(key);
 		}

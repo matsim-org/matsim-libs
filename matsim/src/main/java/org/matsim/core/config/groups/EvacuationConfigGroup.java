@@ -22,12 +22,9 @@ package org.matsim.core.config.groups;
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class EvacuationConfigGroup extends Module {
-
-	private final static Logger log = Logger.getLogger(EvacuationConfigGroup.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -44,12 +41,6 @@ public class EvacuationConfigGroup extends Module {
 	 * file name of the evacutation area file
 	 */
 	private String evacuationAreaFile;
-
-	/**
-	 * name of the flooding data file parameter in config
-	 */
-	private static final String FLOODING_DATA_FILE = "floodingDataFile";
-
 
 	/**
 	 * name of the buildings shape file in config
@@ -195,8 +186,6 @@ public class EvacuationConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (EVACUATION_AREA_FILE.equals(key)) {
 			setEvacuationAreaFile(value.replace('\\', '/'));
-		}else if(FLOODING_DATA_FILE.equals(key)){
-			log.warn("The parameter " + FLOODING_DATA_FILE + " in the group " + GROUP_NAME + " is no longer supported and should be removed from the config file.");
 		}else if(BUILDINGS_FILE.equals(key)){
 			setBuildingsFile(value.replace('\\', '/'));
 		}else if(EVACUATION_DECISION_ZONES.equals(key)){

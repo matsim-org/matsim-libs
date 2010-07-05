@@ -19,7 +19,7 @@
 		<param name="endTime" value="00:00:00" />
 
 		<param name="snapshotperiod" value="00:01:00" /> <!-- 00:00:00 means NO snapshot writing -->
-		<param name="snapshotFormat" value="googleearth,netvis,transims" /> <!-- netvis, googleearth, transims, plansfile -->
+		<param name="snapshotFormat" value="googleearth,transims" /> <!-- googleearth, transims, plansfile -->
 
 		<param name="flowCapacityFactor" value="0.1" />
 		<param name="storageCapacityFactor" value="0.1" />
@@ -56,7 +56,6 @@
 		<param name="earlyDeparture" value="-0" />
 		<param name="performing" value="0" />
 		<param name="traveling" value="-6" />
-		<param name="distanceCost" value="0" />
 		<param name="waiting" value="-6" />
 
 		<param name="activityType_0" value="h" /> <!-- home -->

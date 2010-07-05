@@ -22,7 +22,6 @@ package org.matsim.core.config.groups;
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class MatricesConfigGroup extends Module {
@@ -33,15 +32,9 @@ public class MatricesConfigGroup extends Module {
 
 	private static final String INPUT_FILE= "inputMatricesFile";
 	private static final String OUTPUT_FILE = "outputMatricesFile";
-	private static final String LOCAL_INPUT_DTD = "localInputDTD";
-	private static final String INPUT_VERSION = "inputVersion";
-	private static final String OUTPUT_DTD = "outputMatricesDTD";
-	private static final String OUTPUT_VERSION = "outputVersion";
 
 	private String inputFile = null;
 	private String outputFile = null;
-
-	private static final Logger log = Logger.getLogger(MatricesConfigGroup.class);
 
 	public MatricesConfigGroup() {
 		super(MatricesConfigGroup.GROUP_NAME);
@@ -64,8 +57,6 @@ public class MatricesConfigGroup extends Module {
 			setInputFile(value.replace('\\', '/'));
 		} else if (OUTPUT_FILE.equals(key)) {
 			setOutputFile(value.replace('\\', '/'));
-		} else if (LOCAL_INPUT_DTD.equals(key) || INPUT_VERSION.equals(key) || OUTPUT_DTD.equals(key) || OUTPUT_VERSION.equals(key)) {
-			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}

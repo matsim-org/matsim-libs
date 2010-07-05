@@ -22,7 +22,6 @@ package org.matsim.core.config.groups;
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class NetworkConfigGroup extends Module {
@@ -33,10 +32,6 @@ public class NetworkConfigGroup extends Module {
 
 	private static final String INPUT_FILE= "inputNetworkFile";
 	private static final String OUTPUT_FILE = "outputNetworkFile";
-
-	private static final String LOCAL_INPUT_DTD = "localInputDTD";
-	private static final String OUTPUT_DTD = "outputNetworkDTD";
-	private static final String OUTPUT_VERSION = "outputVersion";
 
 	private static final String TIME_VARIANT_NETWORK = "timeVariantNetwork";
 	private static final String CHANGE_EVENTS_INPUT_FILE = "inputChangeEventsFile";
@@ -53,8 +48,6 @@ public class NetworkConfigGroup extends Module {
 	private boolean timeVariantNetwork = false;
 
 	private String laneDefinitionsFile = null;
-
-	private static final Logger log = Logger.getLogger(NetworkConfigGroup.class);
 
 	public NetworkConfigGroup() {
 		super(NetworkConfigGroup.GROUP_NAME);
@@ -86,8 +79,6 @@ public class NetworkConfigGroup extends Module {
 			setInputFile(value.replace('\\', '/'));
 		} else if (NetworkConfigGroup.OUTPUT_FILE.equals(key)) {
 			setOutputFile(value.replace('\\', '/'));
-		} else if (NetworkConfigGroup.LOCAL_INPUT_DTD.equals(key) || NetworkConfigGroup.OUTPUT_DTD.equals(key) || NetworkConfigGroup.OUTPUT_VERSION.equals(key)) {
-			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else if (NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE.equals(key)) {
 			setChangeEventInputFile(value.replace('\\', '/'));
 		} else if (NetworkConfigGroup.CHANGE_EVENTS_OUTPUT_FILE.equals(key)) {

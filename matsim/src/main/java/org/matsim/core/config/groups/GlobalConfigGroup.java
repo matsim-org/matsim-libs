@@ -22,7 +22,6 @@ package org.matsim.core.config.groups;
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class GlobalConfigGroup extends Module {
@@ -36,10 +35,7 @@ public class GlobalConfigGroup extends Module {
 	}
 
 	private static final String RANDOM_SEED = "randomSeed";
-	private static final String OUTPUT_TIME_FORMAT = "outputTimeFormat"; // usage deprecated
-	private static final String GLOBAL_DTD_BASE = "globalDTDBase";  // usage deprecated
 	private static final String LOCAL_DTD_BASE = "localDTDBase";
-	private static final String USE_ROAD_PRICING = "useRoadPricing"; // usage deprecated
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String COORDINATE_SYSTEM = "coordinateSystem";
 
@@ -47,8 +43,6 @@ public class GlobalConfigGroup extends Module {
 	private String localDtdBase = "dtd/";
 	private int numberOfThreads = 2;
 	private String coordinateSystem = "Atlantis";
-
-	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
 	@Override
 	public String getValue(final String key) {
@@ -69,8 +63,6 @@ public class GlobalConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (RANDOM_SEED.equals(key)) {
 			setRandomSeed(Long.parseLong(value));
-		} else if (OUTPUT_TIME_FORMAT.equals(key) || GLOBAL_DTD_BASE.equals(key) || USE_ROAD_PRICING.equals(key)) {
-			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer supported and should be removed from the configuration file.");
 		} else if (LOCAL_DTD_BASE.equals(key)) {
 			setLocalDtdBase(value);
 		} else if (NUMBER_OF_THREADS.equals(key)) {

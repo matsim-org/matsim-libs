@@ -22,7 +22,6 @@ package org.matsim.core.config.groups;
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 /**
@@ -34,18 +33,11 @@ public class CountsConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "counts";
 
-	private static final String LINKATTS = "linkattributes";
 	private static final String OUTPUTFORMAT = "outputformat";
 	private static final String OUTFILE = "outputCountsFile";
-	private static final String TIMEFILTER = "timeFilter";
 	private static final String DISTANCEFILTER = "distanceFilter";
 	private static final String DISTANCEFITLERCENTERNODE = "distanceFilterCenterNode";
-	private static final String VISIBLETIMESTEP = "visibleTimeStep";
-	private static final String ITERATIONNUMBER = "iterationNumber";
 	private static final String COUNTSINPUTFILENAME = "inputCountsFile";
-	private static final String LOCALINPUTXSD = "localInputXSD";
-	private static final String OUTPUTCOUNTSXSD = "outputCountsXSD";
-	private static final String OUTPUTVERSION = "outputVersion";
 	private static final String COUNTSSCALEFACTOR = "countsScaleFactor";
 
 	private String outputFile;
@@ -70,8 +62,6 @@ public class CountsConfigGroup extends Module {
 	 * the scaling for the counts
 	 */
 	private double countsScaleFactor = 1.0;
-
-	private static final Logger log = Logger.getLogger(CountsConfigGroup.class);
 
 	public CountsConfigGroup() {
 		super(GROUP_NAME);
@@ -117,8 +107,6 @@ public class CountsConfigGroup extends Module {
 			setCountsFileName(value.replace('\\', '/'));
 		} else if (COUNTSSCALEFACTOR.equals(key)) {
 			this.setCountsScaleFactor(Double.parseDouble(value));
-		} else if (TIMEFILTER.equals(key) || LINKATTS.equals(key) || VISIBLETIMESTEP.equals(key) || ITERATIONNUMBER.equals(key) || LOCALINPUTXSD.equals(key) || OUTPUTCOUNTSXSD.equals(key) || OUTPUTVERSION.equals(key)) {
-			log.warn("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}

@@ -80,10 +80,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 			setBikeSpeed(Double.parseDouble(value));
 		} else if (UNDEFINED_MODE_SPEED.equals(key)) {
 			setUndefinedModeSpeed(Double.parseDouble(value));
-		} else if (key.endsWith("Factor")) {
-			throw new IllegalArgumentException("The parameter " + key + " does no longer exist. It was renamed to " + key.substring(0, key.length() - 6) + " to indicate that it is NOT a factor but the actual speed.");
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException(key);
 		}
 

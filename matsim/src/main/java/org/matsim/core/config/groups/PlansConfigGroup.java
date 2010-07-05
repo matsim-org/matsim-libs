@@ -23,7 +23,6 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class PlansConfigGroup extends Module {
@@ -32,25 +31,17 @@ public class PlansConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "plans";
 
-	private static final String SWITCH_OFF_PLANS_STREAMING = "switchOffPlansStreaming";
 	private static final String OUTPUT_SAMPLE = "outputSample";
 
 	private static final String INPUT_FILE= "inputPlansFile";
 	private static final String OUTPUT_FILE = "outputPlansFile";
 	private static final String OUTPUT_VERSION = "outputVersion";
 
-	private static final String LOCAL_INPUT_DTD = "localInputDTD";
-	private static final String INPUT_VERSION = "inputVersion";
-	private static final String OUTPUT_DTD = "outputPlansDTD";
-
 	private double outputSample = 1.0;
 
 	private String inputFile = null;
 	private String outputFile = null;
 	private String outputVersion = "v4"; // use the newest version by default
-
-	private static final Logger log = Logger.getLogger(PlansConfigGroup.class);
-
 
 	public PlansConfigGroup() {
 		super(GROUP_NAME);
@@ -81,14 +72,7 @@ public class PlansConfigGroup extends Module {
 
 	@Override
 	public void addParam(final String key, final String value) {
-		if (SWITCH_OFF_PLANS_STREAMING.equals(key)) {
-			if ("yes".equals(value) || "true".equals(value)) {
-				log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer supported and should be removed from the configuration file.");
-			} else {
-				log.warn("The parameter " + key + " in module " + GROUP_NAME + " can no longer be configured in the config-file. If you want to use streaming, use the appropriate constructor in PopulationImpl and remove the setting in the config-file.");
-				throw new RuntimeException("plans-streaming is no longer supported from the config-file. see logfile for more informations.");
-			}
-		} else if (OUTPUT_SAMPLE.equals(key)) {
+		if (OUTPUT_SAMPLE.equals(key)) {
 			setOutputSample(Double.parseDouble(value));
 		} else if (INPUT_FILE.equals(key)) {
 			setInputFile(value.replace('\\', '/'));
@@ -96,10 +80,7 @@ public class PlansConfigGroup extends Module {
 			setOutputFile(value.replace('\\', '/'));
 		} else if (OUTPUT_VERSION.equals(key)) {
 			setOutputVersion(value);
-		} else if (LOCAL_INPUT_DTD.equals(key) || INPUT_VERSION.equals(key) || OUTPUT_DTD.equals(key)) {
-			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException(key);
 		}
 	}

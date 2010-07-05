@@ -31,8 +31,6 @@ public class SimulationConfigGroup extends Module {
 
 	private static final long serialVersionUID = 1L;
 
-	private final static Logger log = Logger.getLogger(SimulationConfigGroup.class);
-
 	public static final String GROUP_NAME = "simulation";
 
 	private static final String START_TIME = "startTime";
@@ -40,7 +38,6 @@ public class SimulationConfigGroup extends Module {
 	private static final String TIME_STEP_SIZE = "timeStepSize";
 	private static final String SNAPSHOT_PERIOD = "snapshotperiod";
 	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
-	private static final String SNAPSHOT_FILE = "snapshotfile";
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
 	private static final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
@@ -48,18 +45,6 @@ public class SimulationConfigGroup extends Module {
 	private static final String REMOVE_STUCK_VEHICLES = "removeStuckVehicles";
 	private static final String EXTERNAL_EXE = "externalExe";
 	private static final String TIMEOUT = "timeout";
-	private static final String MOVE_WAIT_FIRST = "moveWaitFirst";
-
-	// deprecated options
-	private static final String SHELLTYPE = "shellType";
-	private static final String JAVACLASSPATH = "classPath";
-	private static final String JVMOPTIONS = "JVMOptions";
-	private static final String CLIENTLIST = "clientList";
-	private static final String LOCALCONFIG = "localConfig";
-	private static final String LOCALCONFIGDTD = "localConfigDTD";
-	private static final String EXE_PATH = "exePath";
-	private static final String EVACUATION_TIME = "evacuationTime";
-	// end of deprecated options
 
 	private double startTime = Time.UNDEFINED_TIME;
 	private double endTime = Time.UNDEFINED_TIME;
@@ -104,11 +89,6 @@ public class SimulationConfigGroup extends Module {
 			setExternalExe(value);
 		} else if (TIMEOUT.equals(key)) {
 			setExternalTimeOut(Integer.parseInt(value));
-		} else if (MOVE_WAIT_FIRST.equals(key) || EVACUATION_TIME.equals(key) || SNAPSHOT_FILE.equals(key)) {
-			log.warn("The config option " + key + " is no longer supported and should be removed from the configuration file.");
-		} else if (SHELLTYPE.equals(key) || JAVACLASSPATH.equals(key) || JVMOPTIONS.equals(key)
-				|| CLIENTLIST.equals(key) || LOCALCONFIG.equals(key) || LOCALCONFIGDTD.equals(key) || EXE_PATH.equals(key)) {
-			log.warn("The config options for the parallel mobsim are no longer supported.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}

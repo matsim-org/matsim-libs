@@ -39,7 +39,6 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "planCalcScore";
-	// TODO [MR] switch to better name
 
 	private static final String LEARNING_RATE = "learningRate";
 	private static final String BRAIN_EXP_BETA = "BrainExpBeta";
@@ -54,14 +53,6 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private static final String MARGINAL_UTL_OF_DISTANCE_CAR = "marginalUtlOfDistanceCar";
 	private static final String MARGINAL_UTL_OF_DISTANCE_PT = "marginalUtlOfDistancePt";
 	private static final String MARGINAL_UTL_OF_DISTANCE_WALK = "marginalUtlOfDistanceWalk";
-
-
-	@Deprecated
-	private static final String MARGINAL_UTL_OF_DISTANCE = "marginalUtlOfDistance";
-	@Deprecated
-	private static final String DISTANCE_COST = "distanceCost";
-	@Deprecated
-	private static final String NUM_ACTIVITIES = "numActivities";
 
 	private static final String ACTIVITY_TYPE = "activityType_";
 	private static final String ACTIVITY_PRIORITY = "activityPriority_";
@@ -92,8 +83,6 @@ public class CharyparNagelScoringConfigGroup extends Module {
 
 	private final HashMap<String, ActivityParams> activityTypes = new HashMap<String, ActivityParams>();
 	private final HashMap<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
-
-	private int margUtlDistCnt = 0 ;
 
 	@Override
 	public String getValue(final String key) {
@@ -178,23 +167,8 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			setMarginalUtlOfDistancePt(Double.parseDouble(value));
 		} else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
 			setMarginalUtlOfDistanceWalk(Double.parseDouble(value));
-		}	else if (MARGINAL_UTL_OF_DISTANCE.equals(key)) {
-			if ( this.margUtlDistCnt < 1 ) {
-				this.margUtlDistCnt++ ;
-				log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead.");
-				log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!");
-			}
-			setMarginalUtlOfDistanceCar(Double.parseDouble(value));
-		} else if (DISTANCE_COST.equals(key)) {
-			log.warn("The parameter " + DISTANCE_COST + " in module " + GROUP_NAME + " should be replaced by the parameter " + MARGINAL_UTL_OF_DISTANCE_CAR + ".");
-			log.warn("Please change your config file. Take care to also negate the value of the parameter! distanceCost was specified as 'Money per kilometer', marginalUtlOfDistance is 'Money per METER'!!!");
-			double newValue = -Double.parseDouble(value) / 1000.0;
-			log.warn("We will set now the parameter '" + MARGINAL_UTL_OF_DISTANCE_CAR + "' to the value " + newValue);
-			setMarginalUtlOfDistanceCar(newValue);
 		} else if (WAITING.equals(key)) {
 			setWaiting(Double.parseDouble(value));
-		} else if (NUM_ACTIVITIES.equals(key)) {
-			log.warn("The parameter " + NUM_ACTIVITIES + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), true);
 			this.activityTypes.remove(actParams.getType());

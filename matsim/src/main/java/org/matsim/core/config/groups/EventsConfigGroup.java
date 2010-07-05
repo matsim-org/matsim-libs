@@ -22,7 +22,6 @@ package org.matsim.core.config.groups;
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class EventsConfigGroup extends Module {
@@ -33,13 +32,8 @@ public class EventsConfigGroup extends Module {
 
 	private static final String INPUT_FILE= "inputFile";
 
-	private static final String INPUT_FORMAT= "inputFormat";
-	private static final String OUTPUT_FORMAT = "outputFormat";
-	private static final String OUTPUT_FILE = "outputFile";
-
 	private String inputFile = null;
 
-	private static final Logger log = Logger.getLogger(EventsConfigGroup.class);
 
 	public EventsConfigGroup() {
 		super(EventsConfigGroup.GROUP_NAME);
@@ -57,8 +51,6 @@ public class EventsConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (EventsConfigGroup.INPUT_FILE.equals(key)) {
 			setInputFile(value.replace('\\', '/'));
-		} else if (EventsConfigGroup.OUTPUT_FORMAT.equals(key) || EventsConfigGroup.INPUT_FORMAT.equals(key) || EventsConfigGroup.OUTPUT_FILE.equals(key)) {
-			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}
