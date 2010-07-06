@@ -50,7 +50,7 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 	/*package*/ final static String CONFIG_MODULE = "changeLegMode";
 	/*package*/ final static String CONFIG_PARAM_MODES = "modes";
 
-	private TransportMode[] availableModes = new TransportMode[] { TransportMode.car, TransportMode.pt };
+	private String[] availableModes = new String[] { TransportMode.car, TransportMode.pt };
 
 	public ChangeLegMode(final Config config) {
 		super(config.global().getNumberOfThreads());
@@ -61,9 +61,9 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 		// if there was anything in there, replace the default availableModes by the entries in the config file:
 		if (modes != null) {
 			String[] parts = StringUtils.explode(modes, ',');
-			this.availableModes = new TransportMode[parts.length];
+			this.availableModes = new String[parts.length];
 			for (int i = 0, n = parts.length; i < n; i++) {
-				this.availableModes[i] = TransportMode.valueOf(parts[i].trim());
+				this.availableModes[i] = parts[i].trim().intern();
 			}
 		}
 

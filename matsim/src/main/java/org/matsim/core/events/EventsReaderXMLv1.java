@@ -22,7 +22,6 @@ package org.matsim.core.events;
 
 import java.util.Stack;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -90,14 +89,14 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 					atts.getValue(ActivityStartEventImpl.ATTRIBUTE_ACTTYPE)));
 		} else if (AgentArrivalEventImpl.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(AgentArrivalEventImpl.ATTRIBUTE_LEGMODE);
-			TransportMode mode = legMode == null ? null : TransportMode.valueOf(legMode);
+			String mode = legMode == null ? null : legMode.intern();
 			this.events.processEvent(this.builder.createAgentArrivalEvent(time,
 					new IdImpl(atts.getValue(AgentArrivalEventImpl.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(AgentArrivalEventImpl.ATTRIBUTE_LINK)),
 					mode));
 		} else if (AgentDepartureEventImpl.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_LEGMODE);
-			TransportMode mode = legMode == null ? null : TransportMode.valueOf(legMode);
+			String mode = legMode == null ? null : legMode.intern();
 			this.events.processEvent(this.builder.createAgentDepartureEvent(time,
 					new IdImpl(atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_LINK)),
@@ -108,7 +107,7 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 					new IdImpl(atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_LINK))));
 		} else if (AgentStuckEventImpl.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(AgentStuckEventImpl.ATTRIBUTE_LEGMODE);
-			TransportMode mode = legMode == null ? null : TransportMode.valueOf(legMode);
+			String mode = legMode == null ? null : legMode.intern();
 			this.events.processEvent(this.builder.createAgentStuckEvent(time,
 					new IdImpl(atts.getValue(AgentStuckEventImpl.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(AgentStuckEventImpl.ATTRIBUTE_LINK)),

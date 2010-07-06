@@ -22,7 +22,7 @@ package org.matsim.population.algorithms;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -45,14 +45,22 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 
 	private static class Candidate {
 		Integer subTourIndex;
-		TransportMode newTransportMode;
+		String newTransportMode;
 	}
 
-	private static Collection<TransportMode> CHAIN_BASED_MODES = EnumSet.of(TransportMode.car, TransportMode.miv, TransportMode.bike, TransportMode.motorbike);
-	private final TransportMode[] possibleModes;
+	private final static Collection<String> CHAIN_BASED_MODES;
+	private final String[] possibleModes;
 	private final Random rng;
 	private boolean changeOnlyOneSubtour = false;
 	private PlanAnalyzeSubtours planAnalyzeSubtours;
+
+	static {
+		CHAIN_BASED_MODES = new HashSet<String>();
+		CHAIN_BASED_MODES.add(TransportMode.car);
+		CHAIN_BASED_MODES.add("miv");
+		CHAIN_BASED_MODES.add(TransportMode.bike);
+		CHAIN_BASED_MODES.add("motorbike");
+	}
 
 	/**
 	 * @param possibleModes
@@ -60,12 +68,13 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 	 * @see TransportMode
 	 * @see MatsimRandom
 	 */
-	public ChooseRandomLegMode(final TransportMode[] possibleModes, final Random rng) {
+	public ChooseRandomLegMode(final String[] possibleModes, final Random rng) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
 		this.planAnalyzeSubtours = new PlanAnalyzeSubtours();
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		if (plan.getPlanElements().size() > 1) {
 			if (changeOnlyOneSubtour) {
@@ -74,8 +83,7 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 				if (!candidates.isEmpty()) {
 					Candidate whatToDo = candidates.get(rng.nextInt(candidates
 							.size()));
-					List<PlanElement> subTour = planAnalyzeSubtours.getSubtours()
-					.get(whatToDo.subTourIndex);
+					List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(whatToDo.subTourIndex);
 					changeLegModeTo(subTour, whatToDo.newTransportMode);
 				}
 			} else {
@@ -97,16 +105,16 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 			}
 			List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(subTourIndex);
 			Integer parentSubtourIndex = planAnalyzeSubtours.getParentTours().get(subTourIndex);
-			Set<TransportMode> usableChainBasedModes = EnumSet.noneOf(TransportMode.class);
+			Set<String> usableChainBasedModes = new HashSet<String>();
 			if (parentSubtourIndex == null) {
 				usableChainBasedModes.addAll(CHAIN_BASED_MODES);
 			} else {
 				List<PlanElement> parentSubtour = planAnalyzeSubtours.getSubtours().get(parentSubtourIndex);
-				TransportMode mode = getTransportMode(parentSubtour);
+				String mode = getTransportMode(parentSubtour);
 				usableChainBasedModes.add(mode);
 			}
-			Set<TransportMode> usableModes = EnumSet.noneOf(TransportMode.class);
-			for (TransportMode candidate : possibleModes) {
+			Set<String> usableModes = new HashSet<String>();
+			for (String candidate : possibleModes) {
 				if (CHAIN_BASED_MODES.contains(candidate)) {
 					if (usableChainBasedModes.contains(candidate)) {
 						usableModes.add(candidate);
@@ -116,7 +124,7 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 				}
 			}
 			usableModes.remove(getTransportMode(subTour));
-			for (TransportMode transportMode : usableModes) {
+			for (String transportMode : usableModes) {
 				Candidate candidate = new Candidate();
 				candidate.subTourIndex = subTourIndex;
 				candidate.newTransportMode = transportMode;
@@ -127,17 +135,17 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 	}
 
 	private void changeToRandomLegMode(List<PlanElement> tour) {
-		final TransportMode currentMode = getTransportMode(tour);
+		final String currentMode = getTransportMode(tour);
 		int newModeIdx = chooseModeOtherThan(currentMode);
-		TransportMode newMode = this.possibleModes[newModeIdx];
+		String newMode = this.possibleModes[newModeIdx];
 		changeLegModeTo(tour, newMode);
 	}
 
-	private TransportMode getTransportMode(List<PlanElement> tour) {
+	private String getTransportMode(final List<PlanElement> tour) {
 		return ((Leg) (tour.get(1))).getMode();
 	}
 
-	private void changeLegModeTo(List<PlanElement> tour, TransportMode newMode) {
+	private void changeLegModeTo(final List<PlanElement> tour, final String newMode) {
 		for (PlanElement pe : tour) {
 			if (pe instanceof Leg) {
 				((Leg) pe).setMode(newMode);
@@ -145,7 +153,7 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 		}
 	}
 
-	private int chooseModeOtherThan(final TransportMode currentMode) {
+	private int chooseModeOtherThan(final String currentMode) {
 		int newModeIdx = this.rng.nextInt(this.possibleModes.length - 1);
 		for (int i = 0; i <= newModeIdx; i++) {
 			if (this.possibleModes[i].equals(currentMode)) {

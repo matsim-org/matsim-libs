@@ -20,7 +20,7 @@
 
 package org.matsim.planomat;
 
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -103,6 +103,7 @@ public class Planomat implements PlanAlgorithm {
 		this.seedGenerator = MatsimRandom.getLocalInstance();
 	}
 
+	@Override
 	public void run(final Plan plan) {
 
 		if (this.doLogging) {
@@ -118,7 +119,7 @@ public class Planomat implements PlanAlgorithm {
 
 		// perform subtour analysis only if mode choice on subtour basis is optimized
 		// (if only times are optimized, subtour analysis is not necessary)
-		TransportMode[] possibleModes = this.getPossibleModes(plan);
+		String[] possibleModes = this.getPossibleModes(plan);
 
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
 		if (possibleModes.length > 0) {
@@ -175,23 +176,20 @@ public class Planomat implements PlanAlgorithm {
 	}
 
 	/**
-	 * TODO refactor all "possibleModes" operations to EnumSet rather than arrays
+	 * TODO refactor all "possibleModes" operations to Set rather than arrays
 	 * @param plan
 	 * @return
 	 */
-	protected TransportMode[] getPossibleModes(final Plan plan) {
+	protected String[] getPossibleModes(final Plan plan) {
 
 		// remove car option for agents that have no car available
-		EnumSet<TransportMode> possibleModesEnumSet = this.planomatConfigGroup.getPossibleModes().clone();
+		HashSet<String> possibleModes = new HashSet<String>(this.planomatConfigGroup.getPossibleModes());
 
 		String carAvail = ((PersonImpl) plan.getPerson()).getCarAvail();
 		if ("never".equals(carAvail)) {
-			possibleModesEnumSet.remove(TransportMode.car);
+			possibleModes.remove(TransportMode.car);
 		}
-		TransportMode[] possibleModes = possibleModesEnumSet.toArray(new TransportMode[possibleModesEnumSet.size()]);
-
-		return possibleModes;
-
+		return possibleModes.toArray(new String[possibleModes.size()]);
 	}
 
 	private IChromosome evolveAndReturnFittest(final Genotype population) {
@@ -200,7 +198,6 @@ public class Planomat implements PlanAlgorithm {
 			population.evolve();
 		}
 		return population.getFittestChromosome();
-
 	}
 
 	protected double stepThroughPlan(
@@ -209,7 +206,7 @@ public class Planomat implements PlanAlgorithm {
 			final Plan plan,
 			final PlanAnalyzeSubtours planAnalyzeSubtours,
 			final LegTravelTimeEstimator legTravelTimeEstimator,
-			final TransportMode[] possibleModes) {
+			final String[] possibleModes) {
 
 		// TODO comment this
 		double positionInTimeInterval = 0.5;
@@ -273,7 +270,7 @@ public class Planomat implements PlanAlgorithm {
 				leg.setDepartureTime(now);
 			}
 
-			TransportMode desiredMode = leg.getMode();
+			String desiredMode = leg.getMode();
 			if (planAnalyzeSubtours != null) {
 				// set mode
 				int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[geneIndex - 1];

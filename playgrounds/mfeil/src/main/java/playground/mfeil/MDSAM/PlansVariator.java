@@ -65,7 +65,7 @@ public class PlansVariator implements PlanAlgorithm {
 	private final LocationMutatorwChoiceSet locator;
 	private final PlansCalcRoute router;
 	private final List<String> actTypes;
-	private final TransportMode[] possibleModes;
+	private final String[] possibleModes;
 	private final double maxWalkingDistance;
 	private final TimeOptimizer timer;
 
@@ -88,6 +88,7 @@ public class PlansVariator implements PlanAlgorithm {
 	}
 
 
+	@Override
 	public void run (Plan plan){
 
 		/* Ensure that noOfMaxActs is greater or equal than the noOfActs of current plan */
@@ -354,7 +355,7 @@ public class PlansVariator implements PlanAlgorithm {
 
 		/* Selection of mode to be inserted */
 		// Current mode
-		TransportMode currentMode;
+		String currentMode;
 		int j=-1;
 		do {
 			j+=2;

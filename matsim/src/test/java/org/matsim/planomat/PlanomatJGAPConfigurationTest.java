@@ -29,7 +29,6 @@ import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.MutationOperator;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -95,7 +94,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
 		Planomat testee = new Planomat(null, null, planomatConfigGroup, null, this.scenario.getNetwork());
 
-		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
+		String[] possibleModes = testee.getPossibleModes(testPlan);
 
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
 		if (possibleModes.length > 0) {

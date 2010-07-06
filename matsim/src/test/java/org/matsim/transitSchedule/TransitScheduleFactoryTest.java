@@ -73,7 +73,7 @@ public class TransitScheduleFactoryTest {
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitRouteStop stop1 = new TransitRouteStopImpl(null, 50, 60);
 		stops.add(stop1);
-		TransportMode mode = TransportMode.pt;
+		String mode = TransportMode.pt;
 		TransitRoute tRoute = builder.createTransitRoute(id, route, stops, mode);
 		Assert.assertEquals(id, tRoute.getId());
 		Assert.assertEquals(route, tRoute.getRoute());

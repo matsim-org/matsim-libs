@@ -23,7 +23,6 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -98,9 +97,11 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 
 	private final HashMap<LegTravelTimeEntry, Double> legTravelTimeEstimations = new HashMap<LegTravelTimeEntry, Double>();
 
+	@Override
 	public void reset(final int iteration) {
 	}
 
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 
 		DepartureEvent depEvent = new DepartureEvent(event.getPersonId());
@@ -109,6 +110,7 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 		this.departureEventsLinkIDs.put(depEvent, event.getLinkId());
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 
 		Id agentId = event.getPersonId();
@@ -133,7 +135,7 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 
 	@Override
 	public LegImpl getNewLeg(
-			TransportMode mode,
+			String mode,
 			Activity actOrigin,
 			Activity actDestination,
 			int legPlanElementIndex,

@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -66,7 +65,7 @@ import playground.mzilske.neo.NeoBatchNetworkImpl.BasicNetworkRoute;
 public class ApiPopulationReader extends MatsimXmlParser implements PopulationReader {
 
 	int nPersons = 0;
-	
+
 	private final static String PLANS = "plans";
 	private final static String PERSON = "person";
 	private final static String TRAVELCARD = "travelcard";
@@ -185,6 +184,7 @@ public class ApiPopulationReader extends MatsimXmlParser implements PopulationRe
 	 *
 	 * @param filename The name of the file to parse.
 	 */
+	@Override
 	public void readFile(final String filename) {
 		try {
 			parse(filename);
@@ -209,7 +209,7 @@ public class ApiPopulationReader extends MatsimXmlParser implements PopulationRe
 	}
 
 	private void startTravelcard(final Attributes atts) {
-		
+
 	}
 
 	private void startActDur(final Attributes atts) {
@@ -257,7 +257,7 @@ public class ApiPopulationReader extends MatsimXmlParser implements PopulationRe
 		if (selected) {
 			this.currplan.setSelected(selected);
 		}
-		
+
 		String scoreString = atts.getValue("score");
 		if (scoreString != null) {
 			double score = Double.parseDouble(scoreString);
@@ -297,7 +297,7 @@ public class ApiPopulationReader extends MatsimXmlParser implements PopulationRe
 //				List<Link> linksFromNodes = RouteUtils.getLinksFromNodes(nodes);
 //				List<Id> linkIds = NetworkUtils.getLinkIds(linksFromNodes);
 //				((NetworkRoute) this.currRoute).setLinkIds(startLinkId, linkIds, endLinkId);
-				
+
 				BasicNetworkRoute basicNetworkRoute = (BasicNetworkRoute) this.currRoute;
 				basicNetworkRoute.setStartLinkId(startLinkId);
 				basicNetworkRoute.setEndLinkId(endLinkId);
@@ -315,7 +315,7 @@ public class ApiPopulationReader extends MatsimXmlParser implements PopulationRe
 		if (mode.equals("undef")) {
 			mode = "undefined";
 		}
-		this.currleg = this.scenario.getPopulation().getFactory().createLeg(TransportMode.valueOf(mode));
+		this.currleg = this.scenario.getPopulation().getFactory().createLeg(mode);
 		this.currplan.addLeg(this.currleg);
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));

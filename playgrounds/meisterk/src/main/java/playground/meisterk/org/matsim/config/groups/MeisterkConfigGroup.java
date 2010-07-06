@@ -20,19 +20,16 @@
 
 package playground.meisterk.org.matsim.config.groups;
 
-import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 
 public class MeisterkConfigGroup extends Module {
 
-	/**
-	 * default serial version uid
-	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String GROUP_NAME = "meisterk";
 
 	private final static Logger logger = Logger.getLogger(MeisterkConfigGroup.class);
@@ -44,16 +41,16 @@ public class MeisterkConfigGroup extends Module {
 			super.addParam(param.parameterName, param.defaultValue);
 		}
 	}
-	
+
 	public enum MeisterkConfigParameter {
-		
+
 		CHAIN_BASED_MODES("chainBasedModes", "car,bike", ""),
 		INPUT_SECOND_NETWORK_FILE("inputSecondNetworkFile", "", "");
-		
+
 		private final String parameterName;
 		private final String defaultValue;
 		private String actualValue;
-		
+
 		private MeisterkConfigParameter(String parameterName,
 				String defaultValue, String actualValue) {
 			this.parameterName = parameterName;
@@ -76,9 +73,9 @@ public class MeisterkConfigGroup extends Module {
 		public String getDefaultValue() {
 			return defaultValue;
 		}
-		
+
 	}
-	
+
 	@Override
 	public void addParam(String param_name, String value) {
 
@@ -100,27 +97,27 @@ public class MeisterkConfigGroup extends Module {
 		}
 
 	}
-	
-	private EnumSet<TransportMode> cachedChainBasedModes = null;
 
-	public EnumSet<TransportMode> getChainBasedModes() {
+	private Set<String> cachedChainBasedModes = null;
+
+	public Set<String> getChainBasedModes() {
 
 		if (this.cachedChainBasedModes == null) {
-			this.cachedChainBasedModes = EnumSet.noneOf(TransportMode.class);
-			
+			this.cachedChainBasedModes = new HashSet<String>();
+
 			if (MeisterkConfigParameter.CHAIN_BASED_MODES.getActualValue().length() > 0) {
 				String[] chainBasedModesStringArray = MeisterkConfigParameter.CHAIN_BASED_MODES.getActualValue().split(",");
 				for (int ii=0; ii < chainBasedModesStringArray.length; ii++) {
-					this.cachedChainBasedModes.add(TransportMode.valueOf(chainBasedModesStringArray[ii]));
+					this.cachedChainBasedModes.add(chainBasedModesStringArray[ii].intern());
 				}
 			}
 		}
-		
+
 		return cachedChainBasedModes;
 	}
-	
+
 	public void setChainBasedModes(String chainBasedModes) {
 		MeisterkConfigParameter.CHAIN_BASED_MODES.setActualValue(chainBasedModes);
 	}
-	
+
 }

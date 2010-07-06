@@ -27,7 +27,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -91,7 +90,7 @@ public class PlanImpl implements Plan {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public LegImpl createAndAddLeg(final TransportMode mode) {
+	public LegImpl createAndAddLeg(final String mode) {
 		verifyCreateLeg();
 		LegImpl leg = new LegImpl(mode);
 		// Override leg number with an appropriate value

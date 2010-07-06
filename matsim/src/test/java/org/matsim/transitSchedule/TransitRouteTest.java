@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -56,7 +55,7 @@ public class TransitRouteTest extends MatsimTestCase {
 	 * @param mode
 	 * @return a new instance of a TransitRoute with the given attributes
 	 */
-	protected TransitRoute createTransitRoute(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode) {
+	protected TransitRoute createTransitRoute(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final String mode) {
 		return new TransitRouteImpl(id, route, stops, mode);
 	}
 
@@ -69,12 +68,12 @@ public class TransitRouteTest extends MatsimTestCase {
 		TransitRouteStop stop = new TransitRouteStopImpl(null, 50, 60);
 		stops.add(stop);
 
-		TransitRoute tRoute = createTransitRoute(id, route, stops, TransportMode.train);
+		TransitRoute tRoute = createTransitRoute(id, route, stops, "train");
 		assertEquals("wrong id.", id.toString(), tRoute.getId().toString());
 		assertEquals("wrong route.", route, tRoute.getRoute());
 		assertEquals(stops.size(), tRoute.getStops().size());
 		assertEquals(stop, tRoute.getStops().get(0));
-		assertEquals(TransportMode.train, tRoute.getTransportMode());
+		assertEquals("train", tRoute.getTransportMode());
 	}
 
 	public void testDescription() {
@@ -91,10 +90,10 @@ public class TransitRouteTest extends MatsimTestCase {
 	public void testTransportMode() {
 		Fixture f = new Fixture();
 		// test default of Fixture
-		assertEquals(TransportMode.train, f.tRoute.getTransportMode());
+		assertEquals("train", f.tRoute.getTransportMode());
 		// test some different from default
-		f.tRoute.setTransportMode(TransportMode.tram);
-		assertEquals(TransportMode.tram, f.tRoute.getTransportMode());
+		f.tRoute.setTransportMode("tram");
+		assertEquals("tram", f.tRoute.getTransportMode());
 	}
 
 	public void testAddDepartures() {
@@ -202,7 +201,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		stops.add(stop2);
 		stops.add(stop3);
 
-		TransitRoute tRoute = createTransitRoute(id, route, stops, TransportMode.train);
+		TransitRoute tRoute = createTransitRoute(id, route, stops, "train");
 		assertEquals(stops.size(), tRoute.getStops().size());
 
 		// test order
@@ -248,7 +247,7 @@ public class TransitRouteTest extends MatsimTestCase {
 			TransitRouteStop stop = new TransitRouteStopImpl(null, 50, 60);
 			this.stops.add(stop);
 
-			this.tRoute = createTransitRoute(id, route, this.stops, TransportMode.train);
+			this.tRoute = createTransitRoute(id, route, this.stops, "train");
 		}
 	}
 }

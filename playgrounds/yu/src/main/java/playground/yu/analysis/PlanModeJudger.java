@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -13,12 +13,12 @@ import org.matsim.api.core.v01.population.PlanElement;
 /**
  * judge, which transport mode was taken. This class can only be used with
  * plansfile, in that an agent only can take one transport mode in a day.
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class PlanModeJudger {
-	private static boolean useMode(Plan plan, TransportMode mode) {
+	private static boolean useMode(Plan plan, String mode) {
 		for (Iterator<PlanElement> li = plan.getPlanElements().iterator(); li
 				.hasNext();) {
 			Object o = li.next();
@@ -32,17 +32,17 @@ public class PlanModeJudger {
 		return true;
 	}
 
-	public static TransportMode getMode(Plan plan) {
-		TransportMode tmpMode = null;
+	public static String getMode(Plan plan) {
+		String tmpMode = null;
 		for (Iterator<PlanElement> li = plan.getPlanElements().iterator(); li
 				.hasNext();) {
 			Object o = li.next();
 			if (o instanceof Leg) {
 				Leg l = (Leg) o;
-				TransportMode tmpMode2 = l.getMode();
+				String tmpMode2 = l.getMode();
 				if (tmpMode != null) {
 					if (!tmpMode.equals(tmpMode2)) {
-						return TransportMode.undefined;
+						return "undefined";
 					}
 				} else
 					tmpMode = tmpMode2;
@@ -60,7 +60,7 @@ public class PlanModeJudger {
 	}
 
 	public static boolean useMiv(Plan plan) {
-		return useMode(plan, TransportMode.miv);
+		return useMode(plan, "miv");
 	}
 
 	public static boolean useRide(Plan plan) {
@@ -68,19 +68,19 @@ public class PlanModeJudger {
 	}
 
 	public static boolean useMotorbike(Plan plan) {
-		return useMode(plan, TransportMode.motorbike);
+		return useMode(plan, "motorbike");
 	}
 
 	public static boolean useTrain(Plan plan) {
-		return useMode(plan, TransportMode.train);
+		return useMode(plan, "train");
 	}
 
 	public static boolean useBus(Plan plan) {
-		return useMode(plan, TransportMode.bus);
+		return useMode(plan, "bus");
 	}
 
 	public static boolean useTram(Plan plan) {
-		return useMode(plan, TransportMode.tram);
+		return useMode(plan, "tram");
 	}
 
 	public static boolean useBike(Plan plan) {
@@ -92,6 +92,6 @@ public class PlanModeJudger {
 	}
 
 	public static boolean useUndefined(Plan plan) {
-		return useMode(plan, TransportMode.undefined);
+		return useMode(plan, "undefined");
 	}
 }

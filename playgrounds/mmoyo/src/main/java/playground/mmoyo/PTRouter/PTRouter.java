@@ -2,9 +2,7 @@ package playground.mmoyo.PTRouter;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -16,18 +14,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.pt.router.MultiNodeDijkstra;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -63,7 +56,7 @@ public class PTRouter{
 		this.ptTravelCost = new PTTravelCost(ptTravelTime);
 		this.myDijkstra = new MyDijkstra(this.logicNet, ptTravelCost, ptTravelTime);
 		//this.multiNodeDijkstra = new MultiNodeDijkstra(this.logicNet, ptTravelCost, ptTravelTime);
-		
+
 		Coord firstCoord = logicNet.getNodes().values().iterator().next().getCoord();
 		this.originNode=  new Station(new IdImpl(ORIGIN_ID), firstCoord);		//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
 		this.destinationNode=  new Station(new IdImpl(DESTINATION_ID), firstCoord);	//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
@@ -113,7 +106,7 @@ public class PTRouter{
 				if (i>1){
 					if (ptLink.getAliasType() != lastLinkType){
 						//if (!lastLinkType.equals("Transfer")){    //transfers will not be described in legs ??<-
-						TransportMode mode;
+						String mode;
 						if (lastLinkType==2){mode= TransportMode.pt;}else{mode= TransportMode.transit_walk;} // must be undefined
 							legList.add(createLeg(mode, linkList, depTime, time));
 						//}
@@ -155,7 +148,7 @@ public class PTRouter{
 		Path path = myDijkstra.calcLeastCostPath(originNode, destinationNode, time);
 		///////////////////////////////////////
 
-		
+
 		////////////use multinode dijstra
 		/*
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
@@ -165,7 +158,7 @@ public class PTRouter{
 			double initialCost = - (initialTime * PTValues.walkCoefficient);
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + time));
 		}
-		
+
 		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
 		for (NodeImpl node : nearDestinationStops) {
 			double distance = CoordUtils.calcDistance(coord2, node.getCoord());
@@ -175,9 +168,9 @@ public class PTRouter{
 		}
 		*/
 		//Path path = this.multiNodeDijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes);
-		
+
 		////////////////////////////////////
-		
+
 		removeWalkLinks(walkLinksFromOrigin);
 		removeWalkLinks(walkLinksToDestination);
 		if (path!=null){
@@ -235,7 +228,7 @@ public class PTRouter{
 		}
 	}
 
-	private LegImpl createLeg(TransportMode mode, final List<PTLink> routeLinks, final double depTime, final double arrivTime){
+	private LegImpl createLeg(String mode, final List<PTLink> routeLinks, final double depTime, final double arrivTime){
 		PTLink firstLink = routeLinks.get(0);
 		//double travTime= arrivTime - depTime;
 		//List<Node> routeNodeList = new ArrayList<Node>();
@@ -262,7 +255,7 @@ public class PTRouter{
 			ptRoute.setDistance(distance);
 			//ptRoute.setTravelTime(travTime);
 		}else{        						//walking links : access, transfer, detTransfer, egress
-			leg = new LegImpl(TransportMode.transit_walk);   
+			leg = new LegImpl(TransportMode.transit_walk);
 			leg.setTravelTime(firstLink.getWalkTime());
 			GenericRouteImpl transitWalkRoute;
 			if (firstLink.getAliasType() ==3 || firstLink.getAliasType() ==4){  //transfers
@@ -281,7 +274,7 @@ public class PTRouter{
 		return leg;
 	}
 
-	private LegImpl createLeg2(boolean isStandardLeg, TransportMode mode, TransitLine line, TransitRoute route, TransitStopFacility accessStop , TransitStopFacility egressStop,  final List<PTLink> routeLinks){
+	private LegImpl createLeg2(boolean isStandardLeg, String mode, TransitLine line, TransitRoute route, TransitStopFacility accessStop , TransitStopFacility egressStop,  final List<PTLink> routeLinks){
 		double distance=0;
 		double travelTime=0;
 

@@ -40,10 +40,10 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -165,6 +165,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		}
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		handlePlan(plan.getPerson(), plan);
 	}
@@ -218,7 +219,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	}
 
 	/**
-	 * @param person TODO
+	 * @param person
 	 * @param leg the leg to calculate the route for.
 	 * @param fromAct the Act the leg starts
 	 * @param toAct the Act the leg ends
@@ -226,19 +227,19 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * @return the estimated travel time for this leg
 	 */
 	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		TransportMode legmode = leg.getMode();
+		String legmode = leg.getMode();
 
-		if (legmode == TransportMode.car) {
+		if (TransportMode.car.equals(legmode)) {
 			return handleCarLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == TransportMode.ride) {
+		} else if (TransportMode.ride.equals(legmode)) {
 			return handleRideLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == TransportMode.pt) {
+		} else if (TransportMode.pt.equals(legmode)) {
 			return handlePtLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == TransportMode.walk) {
+		} else if (TransportMode.walk.equals(legmode)) {
 			return handleWalkLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == TransportMode.bike) {
+		} else if (TransportMode.bike.equals(legmode)) {
 			return handleBikeLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == TransportMode.undefined) {
+		} else if ("undefined".equals(legmode)) {
 			/* balmermi: No clue how to handle legs with 'undef' mode
 			 *                Therefore, handle it similar like bike mode with 50 km/h
 			 *                and no route assigned  */
@@ -373,7 +374,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		// make simple assumption about distance and a dummy speed (50 km/h)
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		// create an empty route, but with realistic traveltime
-		Route route = this.routeFactory.createRoute(TransportMode.undefined, fromAct.getLinkId(), toAct.getLinkId());
+		Route route = this.routeFactory.createRoute("undefined", fromAct.getLinkId(), toAct.getLinkId());
 		int travTime = (int)(dist / this.configGroup.getUndefinedModeSpeed());
 		route.setTravelTime(travTime);
 		route.setDistance(dist * 1.5);

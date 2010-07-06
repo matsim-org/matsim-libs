@@ -26,11 +26,9 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.analysis.TransitLoad;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.api.Departure;
@@ -63,7 +61,7 @@ public class TransitLoadTest {
 				, factory.createTransitRouteStop(stop3, 360, 360)
 				, factory.createTransitRouteStop(stop4, 360, 360));
 		TransitLine line1 = factory.createTransitLine(id[1]);
-		TransitRoute route1 = factory.createTransitRoute(id[1], null, stops, TransportMode.bus);
+		TransitRoute route1 = factory.createTransitRoute(id[1], null, stops, "bus");
 		Departure dep1 = factory.createDeparture(id[1], 7.0*3600);
 		Departure dep2 = factory.createDeparture(id[2], 8.0*3600);
 		Id vehicleIdDep1 = id[0];

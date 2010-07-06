@@ -20,8 +20,6 @@
 
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.core.v01.TransportMode;
-
 /**
  * @author mrieser
  */
@@ -31,6 +29,6 @@ public interface AgentWait2LinkEvent extends AgentEvent {
 	 * This method always returns null and should not be used.
 	 */
 	@Override @Deprecated
-	public TransportMode getLegMode();
+	public String getLegMode();
 
 }

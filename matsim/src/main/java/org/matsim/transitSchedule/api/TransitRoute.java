@@ -25,12 +25,11 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * Describes a route of a transit line, including its stops and the departures along this route.
- * 
+ *
  * @author mrieser
  */
 public interface TransitRoute extends Identifiable {
@@ -41,18 +40,18 @@ public interface TransitRoute extends Identifiable {
 
 	/**
 	 * Sets the transport mode with which this transit route is handled, e.g.
-	 * {@link TransportMode#bus} or {@link TransportMode#train}.
+	 * <code>bus</code> or <code>train</code>.
 	 *
 	 * @param mode
 	 */
-	public abstract void setTransportMode(final TransportMode mode);
+	public abstract void setTransportMode(final String mode);
 
-	public abstract TransportMode getTransportMode();
+	public abstract String getTransportMode();
 
 	public abstract void addDeparture(final Departure departure);
 
 	public abstract boolean removeDeparture(final Departure departure);
-	
+
 	/**
 	 * @return an immutable Map of all departures assigned to this route
 	 */

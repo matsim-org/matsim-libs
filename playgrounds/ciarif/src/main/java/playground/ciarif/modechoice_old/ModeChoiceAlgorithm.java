@@ -141,7 +141,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 			} else if (index == 4) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
 					LegImpl leg = (LegImpl)acts_legs.get(i);
-					leg.setMode(TransportMode.undefined);
+					leg.setMode("undefined");
 				}
 			}
 		}

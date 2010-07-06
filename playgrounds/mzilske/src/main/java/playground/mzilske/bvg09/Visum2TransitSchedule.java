@@ -5,13 +5,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -43,13 +42,13 @@ public class Visum2TransitSchedule {
 	private final TransitSchedule schedule;
 	private final Vehicles vehicles;
 	private final CoordinateTransformation coordinateTransformation = new IdentityTransformation();
-	private final Map<String, TransportMode> transportModes = new HashMap<String, TransportMode>();
+	private final Map<String, String> transportModes = new HashMap<String, String>();
 	private final VehicleType defaultVehicleType;
 	private final TransitScheduleFactory builder;
 	private Map<Id, TransitStopFacility> stopFacilities;
 	private long nextVehicleId;
 	private Collection<String> transitLineFilter = null;
-	
+
 	public Visum2TransitSchedule(final VisumNetwork visum, final TransitSchedule schedule, final Vehicles vehicles) {
 		this.visum = visum;
 		this.schedule = schedule;
@@ -62,7 +61,7 @@ public class Visum2TransitSchedule {
 		builder = this.schedule.getFactory();
 	}
 
-	public void registerTransportMode(final String visumTransportMode, final TransportMode transportMode) {
+	public void registerTransportMode(final String visumTransportMode, final String transportMode) {
 		this.transportModes.put(visumTransportMode, transportMode);
 	}
 
@@ -120,12 +119,12 @@ public class Visum2TransitSchedule {
 		if (vehCombination == null) {
 			log.warn("Could not find vehicle combination with id=" + timeProfile.vehCombNr + " used in line " + line.id.toString() + ". Using default type " + line.tCode + " vehicle.");
 			vehType = this.vehicles.getVehicleTypes().get(new IdImpl(line.tCode));
-			
+
 			if(vehType == null){
 				vehType = defaultVehicleType;
-				log.warn("Could not find default vehicle for line type " + line.tCode + " used in line " + line.id.toString() + ". Using the first vehicle type available!");	
-			}			
-			
+				log.warn("Could not find default vehicle for line type " + line.tCode + " used in line " + line.id.toString() + ". Using the first vehicle type available!");
+			}
+
 		} else {
 			vehType = this.vehicles.getVehicleTypes().get(new IdImpl(vehCombination.id));
 		}
@@ -165,7 +164,7 @@ public class Visum2TransitSchedule {
 				} // else, this TimeProfileItem corresponds to a LineRouteItem without a stop.
 			}
 		}
-		TransportMode mode = this.transportModes.get(line.tCode);
+		String mode = this.transportModes.get(line.tCode);
 		if (mode == null) {
 			log.error("Could not find TransportMode for " + line.tCode + ", more info: " + line.id);
 		}
@@ -200,7 +199,7 @@ public class Visum2TransitSchedule {
 			type.setCapacity(capacity);
 			this.vehicles.getVehicleTypes().put(type.getId(), type);
 		}
-		
+
 		// add default types
 		for (Entry<String, VehicleType> entry : DefaultVehTypes.getDefaultVehicleTypes().entrySet()) {
 			this.vehicles.getVehicleTypes().put(new IdImpl(entry.getKey()), entry.getValue());
@@ -214,7 +213,7 @@ public class Visum2TransitSchedule {
 	public void setTransitLineFilter(Collection<String> transitLineFilter) {
 		this.transitLineFilter = transitLineFilter;
 	}
-	
+
 }
 
 

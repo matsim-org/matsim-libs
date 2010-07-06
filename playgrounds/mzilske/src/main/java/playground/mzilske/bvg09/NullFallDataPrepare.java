@@ -164,16 +164,16 @@ public class NullFallDataPrepare {
 		converter.setTransitLineFilter(transitLineFilter);
 		// configure how transport modes must be converted
 		// the ones for Berlin
-		converter.registerTransportMode("B", TransportMode.bus); // Bus Berlin
+		converter.registerTransportMode("B", "bus"); // Bus Berlin
 		converter.registerTransportMode("F", TransportMode.walk); // Fuss
 //		converter.registerTransportMode("K", TransportMode.bus);
 //		converter.registerTransportMode("L", TransportMode.other);
-		converter.registerTransportMode("P", TransportMode.bus); // Bus Umland
-		converter.registerTransportMode("R", TransportMode.train); // Regionalbahn
-		converter.registerTransportMode("S", TransportMode.train); // S-Bahn
-		converter.registerTransportMode("T", TransportMode.tram); // Tram Berlin
-		converter.registerTransportMode("U", TransportMode.train); // U-Bahn
-		converter.registerTransportMode("V", TransportMode.tram); // Tram Umland
+		converter.registerTransportMode("P", "bus"); // Bus Umland
+		converter.registerTransportMode("R", "train"); // Regionalbahn
+		converter.registerTransportMode("S", "train"); // S-Bahn
+		converter.registerTransportMode("T", "tram"); // Tram Berlin
+		converter.registerTransportMode("U", "train"); // U-Bahn
+		converter.registerTransportMode("V", "tram"); // Tram Umland
 //		converter.registerTransportMode("W", TransportMode.bus);
 //		converter.registerTransportMode("Z", TransportMode.train);
 		converter.convert();

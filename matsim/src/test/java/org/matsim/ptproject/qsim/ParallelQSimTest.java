@@ -191,8 +191,8 @@ public class ParallelQSimTest extends TestCase {
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
-		LegImpl leg = plan.createAndAddLeg(TransportMode.other);
-		Route route = f.network.getFactory().createRoute(TransportMode.undefined, f.link1.getId(), f.link3.getId()); // TODO [MR] use different factory/mode here
+		LegImpl leg = plan.createAndAddLeg("other");
+		Route route = f.network.getFactory().createRoute("undefined", f.link1.getId(), f.link3.getId()); // TODO [MR] use different factory/mode here
 		leg.setRoute(route);
 		leg.setTravelTime(15.0);
 		plan.createAndAddActivity("w", f.link3.getId());
@@ -279,9 +279,11 @@ public class ParallelQSimTest extends TestCase {
 
 	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {
 		public final ArrayList<LinkEnterEvent> events = new ArrayList<LinkEnterEvent>();
+		@Override
 		public void handleEvent(final LinkEnterEvent event) {
 			this.events.add(event);
 		}
+		@Override
 		public void reset(final int iteration) {
 			this.events.clear();
 		}
@@ -603,7 +605,7 @@ public class ParallelQSimTest extends TestCase {
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
-		LegImpl l1 = plan.createAndAddLeg(TransportMode.other);
+		LegImpl l1 = plan.createAndAddLeg("other");
 		l1.setTravelTime(10);
 		l1.setRoute(f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link2.getId()));
 		ActivityImpl a2 = plan.createAndAddActivity("w", f.link2.getId());
@@ -656,7 +658,7 @@ public class ParallelQSimTest extends TestCase {
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
-		LegImpl l1 = plan.createAndAddLeg(TransportMode.other);
+		LegImpl l1 = plan.createAndAddLeg("other");
 		l1.setTravelTime(10);
 		l1.setRoute(f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link2.getId())); // TODO [MR] use different factory / TransportationMode
 		ActivityImpl a2 = plan.createAndAddActivity("w", f.link2.getId());
@@ -1191,10 +1193,12 @@ public class ParallelQSimTest extends TestCase {
 			this.linkId = linkId;
 		}
 
+		@Override
 		public void handleEvent(final LinkEnterEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) this.counter++;
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			this.counter = 0;
 		}
@@ -1208,6 +1212,7 @@ public class ParallelQSimTest extends TestCase {
 		public Event firstEvent = null;
 		public Event lastEvent = null;
 
+		@Override
 		public void handleEvent(final Event event) {
 			if (firstEvent == null) {
 				firstEvent = event;
@@ -1215,6 +1220,7 @@ public class ParallelQSimTest extends TestCase {
 			lastEvent = event;
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			firstEvent = null;
 			lastEvent = null;

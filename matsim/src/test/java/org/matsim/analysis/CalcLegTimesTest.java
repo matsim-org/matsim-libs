@@ -59,13 +59,13 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		this.population.addPerson(person);
 		PlanImpl plan = person.createAndAddPlan(true);
 		plan.createAndAddActivity("act1", new CoordImpl(100.0, 100.0));
-		plan.createAndAddLeg(TransportMode.undefined);
+		plan.createAndAddLeg("undefined");
 		plan.createAndAddActivity("act2", new CoordImpl(200.0, 200.0));
-		plan.createAndAddLeg(TransportMode.undefined);
+		plan.createAndAddLeg("undefined");
 		plan.createAndAddActivity("act3", new CoordImpl(200.0, 200.0));
-		plan.createAndAddLeg(TransportMode.undefined);
+		plan.createAndAddLeg("undefined");
 		plan.createAndAddActivity("act4", new CoordImpl(200.0, 200.0));
-		plan.createAndAddLeg(TransportMode.undefined);
+		plan.createAndAddLeg("undefined");
 		plan.createAndAddActivity("act5", new CoordImpl(200.0, 200.0));
 		this.network = s.getNetwork();
 		Node fromNode = this.network.getFactory().createNode(new IdImpl("123456"), new CoordImpl(100.0, 100.0));

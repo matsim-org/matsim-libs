@@ -47,11 +47,11 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 		String mode = "";
 
 		if (PlanModeJudger.useCar(plan))
-			mode = TransportMode.car.name();
+			mode = TransportMode.car;
 		else if (PlanModeJudger.usePt(plan))
-			mode = TransportMode.pt.name();
+			mode = TransportMode.pt;
 		else if (PlanModeJudger.useWalk(plan))
-			mode = TransportMode.walk.name();
+			mode = TransportMode.walk;
 
 		if (endTime ==
 		// 21600.0
@@ -59,9 +59,9 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 			writer.writeln(homeLoc.getX() + "\t" + homeLoc.getY() + "\t" + mode
 					+ "\t6\t" + travelTime);
 			am6hTravelTime += travelTime;
-			if (mode.equals(TransportMode.car.name()))
+			if (mode.equals(TransportMode.car))
 				car6hCount++;
-			if (mode.equals(TransportMode.pt.name()))
+			if (mode.equals(TransportMode.pt))
 				pt6hCount++;
 		} else {
 			writer.writeln(homeLoc.getX() + "\t" + homeLoc.getY() + "\t" + mode

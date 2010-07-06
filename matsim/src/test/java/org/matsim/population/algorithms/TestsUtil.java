@@ -3,7 +3,6 @@ package org.matsim.population.algorithms;
 import java.util.List;
 
 import org.junit.Ignore;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -19,7 +18,7 @@ import org.matsim.world.Location;
 @Ignore
 public class TestsUtil {
 
-	static PlanImpl createPlan(Layer layer, PersonImpl person, TransportMode mode,
+	static PlanImpl createPlan(Layer layer, PersonImpl person, String mode,
 			String facString, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		String[] locationIdSequence = facString.split(" ");

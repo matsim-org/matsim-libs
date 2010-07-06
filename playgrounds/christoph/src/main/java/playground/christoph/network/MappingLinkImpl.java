@@ -5,7 +5,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
@@ -50,7 +49,7 @@ public class MappingLinkImpl extends MappingLink {
 	}
 
 	@Override
-	public Set<TransportMode> getAllowedModes() {
+	public Set<String> getAllowedModes() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -99,7 +98,7 @@ public class MappingLinkImpl extends MappingLink {
 	}
 
 	@Override
-	public void setAllowedModes(Set<TransportMode> modes) {
+	public void setAllowedModes(Set<String> modes) {
 		// TODO Auto-generated method stub
 
 	}

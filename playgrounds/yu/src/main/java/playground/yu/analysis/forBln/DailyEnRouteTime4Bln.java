@@ -107,9 +107,8 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 					time = 0;
 				// if (bl.getDepartureTime() < 86400) {
 				dayTime += time;
-				TransportMode mode = bl.getMode();
-				switch (mode) {
-				case car:
+				String mode = bl.getMode();
+				if (TransportMode.car.equals("mode")) {
 					carTime += time;
 					carDayTime += time;
 					switch (at) {
@@ -154,8 +153,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 						break;
 					}
 					carLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					break;
-				case pt:
+				} else if (TransportMode.pt.equals(mode)) {
 					ptTime += time;
 					ptDayTime += time;
 					switch (at) {
@@ -200,8 +198,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 						break;
 					}
 					ptLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					break;
-				case walk:
+				} else if (TransportMode.walk.equals(mode)) {
 					wlkTime += time;
 					wlkDayTime += time;
 					switch (at) {
@@ -246,8 +243,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 						break;
 					}
 					wlkLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					break;
-				case bike:
+				} else if (TransportMode.bike.equals(mode)) {
 					bikeTime += time;
 					bikeDayTime += time;
 					switch (at) {
@@ -292,8 +288,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 						break;
 					}
 					bikeLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					break;
-				default:
+				} else {
 					othersTime += time;
 					othersDayTime += time;
 					switch (at) {
@@ -338,7 +333,6 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 						break;
 					}
 					othersLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					break;
 				}
 			}
 		for (int i = 0; i <= Math.min(100, (int) dayTime); i++)
@@ -390,10 +384,8 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		pieChart.saveAsPng(
 				outputFilename + "dailyEnRouteTimeModalSplitPie.png", 800, 600);
 
-		sw
-				.writeln("--travel destination and modal split--daily on route time--");
-		sw
-				.writeln("mode\thome\twork\tshopping\teducation\tleisure\tother\tnot specified\tbusiness\tEinkauf sonstiges\tFreizeit(Sport usw.)\tsee a doctor\tholiday/journey\tmultiple");
+		sw.writeln("--travel destination and modal split--daily on route time--");
+		sw.writeln("mode\thome\twork\tshopping\teducation\tleisure\tother\tnot specified\tbusiness\tEinkauf sonstiges\tFreizeit(Sport usw.)\tsee a doctor\tholiday/journey\tmultiple");
 		sw.writeln("car\t" + carHomeTime + "\t" + carWorkTime + "\t"
 				+ carShopTime + "\t" + carEducTime + "\t" + carLeisTime + "\t"
 				+ carOtherTime + "\t" + carNotSpecifiedTime + "\t"

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.pt.qsim;
 
 import java.util.Iterator;
@@ -25,24 +44,22 @@ import org.matsim.transitSchedule.api.TransitRoute;
 
 
 /**
- * 
  * @author michaz
- *
  */
 public class UmlaufDriver extends AbstractTransitDriver {
-	
+
 	private static class PlanBuilder {
-		
+
 		PlanImpl plan = new PlanImpl();
-		
-		TransportMode transportMode = TransportMode.car;
-		
+
+		String transportMode = TransportMode.car;
+
 		String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
-		
+
 		public void addTrip(NetworkRoute networkRoute) {
 			if (!plan.getPlanElements().isEmpty()) {
 				Activity lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
-				assert lastActivity.getLinkId().equals(networkRoute.getStartLinkId());	
+				assert lastActivity.getLinkId().equals(networkRoute.getStartLinkId());
 			} else {
 				Activity activity = new ActivityImpl(activityType, networkRoute.getStartLinkId());
 				plan.addActivity(activity);
@@ -57,20 +74,20 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		public PlanImpl build() {
 			return plan;
 		}
-		
+
 	}
-	
+
 	public static class LegIterator implements Iterator<Leg> {
 
 		private Iterator<PlanElement> i;
-		
+
 		public LegIterator(Plan plan) {
 			this.i = plan.getPlanElements().iterator();
 			if (i.hasNext()) {
 				i.next();
 			}
 		}
-		
+
 		@Override
 		public boolean hasNext() {
 			return i.hasNext();
@@ -87,7 +104,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}
-		
+
 	}
 
 	private final Umlauf umlauf;
@@ -156,7 +173,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	public Leg getCurrentLeg() {
 		return this.currentLeg;
 	}
-	
+
 	@Override
 	public PlanElement getCurrentPlanElement() {
 		return this.currentLeg ; // always a leg (?)

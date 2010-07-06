@@ -59,7 +59,7 @@ public class PlansCalcRouteFT extends PlansCalcRoute{
 	@Override
 	public double handleLeg(Person person,final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 
-		TransportMode mode = leg.getMode();
+		String mode = leg.getMode();
 
 		if (!FT_MODES.contains(mode)) {
 			throw new RuntimeException("cannot handle legmode '" + mode.toString() + "'.");

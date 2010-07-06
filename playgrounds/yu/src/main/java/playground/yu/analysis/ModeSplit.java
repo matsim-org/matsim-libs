@@ -66,6 +66,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements
 		run(person.getSelectedPlan());
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		boolean inRange = false;
 		if (toll != null)
@@ -73,33 +74,27 @@ public class ModeSplit extends AbstractPersonAlgorithm implements
 					.getLinkId(), toll);
 		for (PlanElement pe : plan.getPlanElements())
 			if (pe instanceof Leg) {
-				TransportMode m = ((Leg) pe).getMode();
-				switch (m) {
-				case car:
+				String m = ((Leg) pe).getMode();
+				if (TransportMode.car.equals(m)) {
 					carLegs++;
 					if (inRange)
 						tollCarLegs++;
-					break;
-				case pt:
+				} else if (TransportMode.pt.equals(m)) {
 					ptLegs++;
 					if (inRange)
 						tollPtLegs++;
-					break;
-				case walk:
+				} else if (TransportMode.walk.equals(m)) {
 					wlkLegs++;
 					if (inRange)
 						tollWlkLegs++;
-					break;
-				case bike:
+				} else if (TransportMode.bike.equals(m)) {
 					bikeLegs++;
 					if (inRange)
 						tollBikeLegs++;
-					break;
-				default:
+				} else {
 					othersLegs++;
 					if (inRange)
 						tollOthersLegs++;
-					break;
 				}
 			}
 	}

@@ -20,7 +20,8 @@
 
 package playground.balmermi;
 
-import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
@@ -51,7 +52,10 @@ public class CleanNetwork {
 
 		NetworkLayer subNet = new NetworkLayer();
 
-		new TransportModeNetworkFilter(network).filter(subNet,EnumSet.of(TransportMode.car));
+		Set<String> modes = new HashSet<String>();
+		modes.add(TransportMode.car);
+
+		new TransportModeNetworkFilter(network).filter(subNet, modes);
 //		new NetworkAdaptLength().run(network);
 //		new NetworkDoubleLinks("-dl").run(network);
 //		new NetworkThinner().run(network,counts);

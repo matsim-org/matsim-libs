@@ -129,7 +129,7 @@ public class AsciiToPlan {
 				case 1: plan.addLeg(pb.createLeg(TransportMode.walk)); break;
 				case 2: plan.addLeg(pb.createLeg(TransportMode.car)); break;
 				case 3: plan.addLeg(pb.createLeg(TransportMode.pt)); break;
-				case 4: plan.addLeg(pb.createLeg(TransportMode.undefined)); break;
+				case 4: plan.addLeg(pb.createLeg("undefined")); break;
 				default: plan.addLeg(pb.createLeg(TransportMode.car));
 			}
 
@@ -153,7 +153,7 @@ public class AsciiToPlan {
 				case 1: plan.addLeg(pb.createLeg(TransportMode.walk)); break;
 				case 2: plan.addLeg(pb.createLeg(TransportMode.car)); break;
 				case 3: plan.addLeg(pb.createLeg(TransportMode.pt)); break;
-				case 4: plan.addLeg(pb.createLeg(TransportMode.undefined)); break;
+				case 4: plan.addLeg(pb.createLeg("undefined")); break;
 				default: plan.addLeg(pb.createLeg(TransportMode.car));
 			}
 

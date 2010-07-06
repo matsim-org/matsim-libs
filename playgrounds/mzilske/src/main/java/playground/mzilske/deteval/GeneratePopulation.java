@@ -40,43 +40,43 @@ import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import com.vividsolutions.jts.geom.Point;
 
 public class GeneratePopulation {
-	
+
 	private static Logger logger = Logger.getLogger(GeneratePopulation.class);
 
 	private static final String MID_PERSONENDATENSATZ = "../detailedEval/eingangsdaten/MidMUC_2002/MiD2002_Personendatensatz_MUC.csv";
-	
+
 	private static final String MID_HAUSHALTSDATENSATZ = "../detailedEval/eingangsdaten/MidMUC_2002/MiD2002_Haushaltsdatensatz_MUC.csv";
-	
+
 	private static final String MID_WEGEDATENSATZ = "../detailedEval/eingangsdaten/MidMUC_2002/MiD2002_Wegedatensatz_MUC.csv";
-	
+
 	private static final String MID_WEGEKODIERUNG = "../detailedEval/eingangsdaten/MidMUC_2002/Mid2002_Wegekodierung_MUC-LH.csv";
-		
+
 	private static final String MID_VERKEHRSZELLEN = "../detailedEval/Net/shapeFromVISUM/Verkehrszellen_Umrisse_zone.SHP";
 
 	private static final String PLANS = "../detailedEval/pop/befragte-personen/plans.xml";
-	
+
 	private static final String HOUSEHOLDS_FILE = "../detailedEval/pop/befragte-personen/households.xml";
-	
+
 	private static final String CLONED_PLANS = "../detailedEval/pop/140k-synthetische-personen/plans.xml";
 
 	private static final String CLONED_HOUSEHOLDS_FILE = "../detailedEval/pop/140k-synthetische-personen/households.xml";
-	
+
 	private static final Integer NUMBER_OF_SIMULATED_PEOPLE = 140000;
-	
+
 	private Random random = new Random();
 
 	private Scenario scenario = new ScenarioImpl();
-	
+
 	private Map<String, Case> cases = new HashMap<String, Case>();
-	
+
 	private Households households = new HouseholdsImpl();
-	
+
 	private Map<Id, Person> persons = new HashMap<Id, Person>();
-	
+
 	private Map<Id, Plan> plans = new HashMap<Id, Plan>();
-	
+
 	private Map<Integer, Feature> verkehrszellen = new HashMap<Integer, Feature>();
-	
+
 	private Map<Activity, Integer> activity2verkehrszelle = new HashMap<Activity, Integer>();
 
 	public static void main(String[] args) throws IOException {
@@ -110,8 +110,8 @@ public class GeneratePopulation {
 		generatePopulation.mutateTimes();
 		generatePopulation.addAndWriteHouseholds(CLONED_HOUSEHOLDS_FILE);
 		generatePopulation.writePlans(CLONED_PLANS);
-	}	
-	
+	}
+
 	private void mutateTimes() {
 		PlanMutateTimeAllocation planMutateTimeAllocation = new PlanMutateTimeAllocation(15 * 60, random);
 		planMutateTimeAllocation.setUseActivityDurations(false);
@@ -174,7 +174,7 @@ public class GeneratePopulation {
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void parseVerkehrszellen() {
 		FeatureSource fts;
@@ -200,7 +200,7 @@ public class GeneratePopulation {
 		} while (!ft.getDefaultGeometry().contains(p));
 		return p;
 	}
-	
+
 	private void addPlans() {
 		logger.info("Got " + plans.size() + " plans.");
 		for (Map.Entry<Id, Plan> entry : plans.entrySet()) {
@@ -266,7 +266,7 @@ public class GeneratePopulation {
 			}
 
 		});
-		
+
 		Iterator<String[]> iKodierung = wegekodierungRows.iterator();
 		Iterator<String[]> iDatensatz = wegedatensatzRows.iterator();
 		while (iKodierung.hasNext()) {
@@ -280,19 +280,19 @@ public class GeneratePopulation {
 	private static final int K_CASEID = 0;
 
 	private static final int K_PID = 1;
-	
+
 	private static final int K_VONVBEZ = 6;
-	
+
 	private static final int K_NACHVBEZ = 7;
-	
-	private static final int D_W03_HS = 51; 
-	
-	private static final int D_W03_MS = 52; 
-	
+
+	private static final int D_W03_HS = 51;
+
+	private static final int D_W03_MS = 52;
+
 	private static final int D_W04 = 6; // Wegzweck
-	
+
 	private static final int D_W05 = 61; // Hauptverkehrsmittel
-	
+
 	private static final int D_WEGDAUER = 56;
 
 	private Random rnd = new Random();
@@ -338,7 +338,7 @@ public class GeneratePopulation {
 		plan.addActivity(activity);
 	}
 
-	private TransportMode parseLegMode(String hauptverkehrsmittel) {
+	private String parseLegMode(String hauptverkehrsmittel) {
 		if (hauptverkehrsmittel.equals("1")) {
 			return TransportMode.walk;
 		} else if (hauptverkehrsmittel.equals("2")) {
@@ -369,12 +369,12 @@ public class GeneratePopulation {
 			return TransportMode.pt;
 		} else if (hauptverkehrsmittel.equals("11")) {
 			// other
-			return TransportMode.undefined;
+			return "undefined";
 		} else if (hauptverkehrsmittel.equals("97")) {
-			return TransportMode.undefined;
+			return "undefined";
 		} else {
 			logger.warn(hauptverkehrsmittel);
-			return TransportMode.undefined;
+			return "undefined";
 		}
 	}
 
@@ -440,7 +440,7 @@ public class GeneratePopulation {
 		Activity lastActivity = (Activity) plan.getPlanElements().get(nPlanElements - 1);
 		return lastActivity;
 	}
-	
+
 	private void parseHouseholds() throws IOException {
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(MID_HAUSHALTSDATENSATZ);
@@ -448,13 +448,13 @@ public class GeneratePopulation {
 		new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
 
 			private static final int CASEID = 0;
-			
+
 			private static final int H_H07 = 120;
-			
+
 			private static final int H_H071 = 121; // Einkommen in DM
-			
+
 			private static final int H_H072 = 125; // Einkommen in Euro
-			
+
 			@Override
 			public void startRow(String[] row) {
 				check(row);
@@ -489,7 +489,7 @@ public class GeneratePopulation {
 				}
 				cases.put(caseid, household);
 			}
-			
+
 		});
 	}
 
@@ -499,15 +499,15 @@ public class GeneratePopulation {
 		tabFileParserConfig.setFileName(MID_PERSONENDATENSATZ);
 		tabFileParserConfig.setDelimiterTags(new String[] {";"});
 		new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
-			
+
 			private static final int CASEID = 0;
 
 			private static final int PID = 1;
-			
+
 			private static final int PALTER = 112;
 
 			private static final int PSEX = 113;
-			
+
 			@Override
 			public void startRow(String[] row) {
 				check(row);
@@ -542,22 +542,22 @@ public class GeneratePopulation {
 				} else {
 					// unknown
 				}
-				
+
 				Case household = cases.get(caseid);
 				household.members.add(person);
 				persons.put(id, person);
 			}
-			
+
 		});
 	}
-	
+
 	private void multiplyPopulation() {
 		Integer householdId = 0;
 		Integer personId = 0;
 		Map<String, Case> householdSeeds = new HashMap<String, Case>(cases);
 		cases.clear();
 		persons.clear();
-		HashMap<String, Case> newCases = new HashMap<String, Case>(); 
+		HashMap<String, Case> newCases = new HashMap<String, Case>();
 		while (personId < NUMBER_OF_SIMULATED_PEOPLE) {
 			for (Map.Entry<String, Case> haushalt : householdSeeds.entrySet()) {
 				Integer homeCell = determineHomeCell(haushalt.getValue());
@@ -629,7 +629,7 @@ public class GeneratePopulation {
 		Point point = getRandomPointInFeature(rnd, verkehrszellen.get(integer));
 		return scenario.createCoord(point.getX(), point.getY());
 	}
-	
+
 	private Coord createCentroidCoordIfAvailable(Integer integer) {
 		Feature verkehrszelle = verkehrszellen.get(integer);
 		if (verkehrszelle != null) {

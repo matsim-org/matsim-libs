@@ -59,6 +59,7 @@ public class PopulationReaderKutter implements PopulationReader {
 		this.rowHandler = new PersonRowHandler(scenario);
 	}
 
+	@Override
 	public final void readFile(final String dirname) {
 		for (int zw = 1; zw < 17; zw++) {
 			for (int pg = 1; pg < 73; pg++) {
@@ -165,7 +166,7 @@ public class PopulationReaderKutter implements PopulationReader {
 				8*3600, 8*3600, 9*3600, 1800, 3600+1800, 1800, 1800, /* 6-12 */
 				6*3600, 3*3600, 2*3600, 2*3600, 5*3600 /* 13-17 */
 		};
-		private final TransportMode[] legModes = {TransportMode.undefined, TransportMode.walk, TransportMode.bike, TransportMode.car, TransportMode.ride, TransportMode.pt, TransportMode.pt};
+		private final String[] legModes = {"undefined", TransportMode.walk, TransportMode.bike, TransportMode.car, TransportMode.ride, TransportMode.pt, TransportMode.pt};
 		private PersonImpl currPerson = null;
 		private PlanImpl currPlan = null;
 		private Coord currHome = null;
@@ -209,7 +210,7 @@ public class PopulationReaderKutter implements PopulationReader {
 		}
 
 		private void handleActivity(final int acttype, final int cellid, final int legmode) {
-			TransportMode mode = this.legModes[legmode];
+			String mode = this.legModes[legmode];
 
 			int arrTime = this.currTime;
 			int travTime = 0;
@@ -340,6 +341,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			handleActivity(99, cellid, legmode); // cellid will be ignored, because the person goes home (there is only one home!)
 		}
 
+		@Override
 		public void startRow(final String[] row) {
 			if (row == null) {
 				throw new RuntimeException("row is null");

@@ -124,6 +124,7 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 		this.toll = toll;
 	}
 
+	@Override
 	protected ActType getLegIntent(PlanImpl plan, Leg currentLeg) {
 		ActType intent = null;
 		String tmpActType = plan.getNextActivity(currentLeg).getType();
@@ -162,9 +163,8 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 											.getLinkId()).getCoord()) * 1.5 / 1000.0;
 				}
 
-				TransportMode mode = bl.getMode();
-				switch (mode) {
-				case car:
+				String mode = bl.getMode();
+				if (TransportMode.car.equals(mode)) {
 					carDist += dist;
 					carDayDist += dist;
 					switch (legIntent) {
@@ -209,8 +209,7 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 						break;
 					}
 					carLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				case pt:
+				} else if (TransportMode.pt.equals(mode)) {
 					ptDist += dist;
 					ptDayDist += dist;
 					switch (legIntent) {
@@ -255,8 +254,7 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 						break;
 					}
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				case walk:
+				} else if (TransportMode.walk.equals(mode)) {
 					wlkDist += dist;
 					wlkDayDist += dist;
 					switch (legIntent) {
@@ -301,8 +299,7 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 						break;
 					}
 					wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				case bike:
+				} else if (TransportMode.bike.equals(mode)) {
 					bikeDist += dist;
 					bikeDayDist += dist;
 					switch (legIntent) {
@@ -347,8 +344,7 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 						break;
 					}
 					bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				case ride:
+				} else if (TransportMode.ride.equals(mode)) {
 					rideDist += dist;
 					rideDayDist += dist;
 					switch (legIntent) {
@@ -393,8 +389,7 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 						break;
 					}
 					rideLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				default:
+				} else {
 					othersDist += dist;
 					othersDayDist += dist;
 					switch (legIntent) {
@@ -439,7 +434,6 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 						break;
 					}
 					othersLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
 				}
 				dayDist += dist;
 			}

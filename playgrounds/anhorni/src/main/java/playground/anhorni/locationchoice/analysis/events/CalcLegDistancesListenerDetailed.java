@@ -39,21 +39,23 @@ public class CalcLegDistancesListenerDetailed implements StartupListener, AfterM
 	final private String filename;
 	private BufferedWriter out;
 	private CalcLegDistances calcLegDistances;
-	private String actTypes [] = {"shop", "shop_grocery", "shop_nongrocery", "leisure", "work", "education", "home"};	
-	
+	private String actTypes [] = {"shop", "shop_grocery", "shop_nongrocery", "leisure", "work", "education", "home"};
+	private String[] modes = {TransportMode.car, TransportMode.ride, TransportMode.bike, TransportMode.walk, TransportMode.transit_walk, TransportMode.pt};
+
 	public CalcLegDistancesListenerDetailed(String filename) {
 		super();
 		this.filename = filename;
 	}
+	@Override
 	public void notifyStartup(StartupEvent event) {
 
 		try {
 			this.out = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename(this.filename));
 			this.out.write("#iteration");
-			
+
 			for (int i = 0; i < actTypes.length; i++) {
-				for (TransportMode mode : TransportMode.values()) {
-					this.out.write("\t" + mode.toString() + "_" + actTypes[i]);
+				for (String mode : this.modes) {
+					this.out.write("\t" + mode + "_" + actTypes[i]);
 				}
 			}
 			this.out.write(System.getProperty("line.separator"));
@@ -61,24 +63,25 @@ public class CalcLegDistancesListenerDetailed implements StartupListener, AfterM
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}		
+		}
 		this.calcLegDistances = new CalcLegDistances(event.getControler().getPopulation());
 		event.getControler().getEvents().addHandler(this.calcLegDistances);
 
 	}
-	
+
+	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		
+
 		TreeMap<String, Double> avgTripDistances = this.calcLegDistances.getAverageTripDistancesByModeAndActType();
 		String str;
-		
+
 		try {
-			this.out.write(Integer.toString(event.getIteration()));			
+			this.out.write(Integer.toString(event.getIteration()));
 			for (int i = 0; i < actTypes.length; i++) {
-				for (TransportMode mode : TransportMode.values()) {
-					
-					String key = mode.toString() + "_" + actTypes[i];
-					
+				for (String mode : this.modes) {
+
+					String key = mode + "_" + actTypes[i];
+
 					if (avgTripDistances.containsKey(key)) {
 						str = avgTripDistances.get(key).toString();
 					} else {
@@ -94,6 +97,7 @@ public class CalcLegDistancesListenerDetailed implements StartupListener, AfterM
 		}
 	}
 
+	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		try {
 			this.out.close();

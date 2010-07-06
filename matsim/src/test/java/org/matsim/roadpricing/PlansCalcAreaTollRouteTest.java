@@ -83,7 +83,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) leg2.getRoute());
 
 		// case 3: change the second leg to a non-car mode, than it should be the same as case 1
-		TransportMode oldMode = leg2.getMode();
+		String oldMode = leg2.getMode();
 		leg2.setMode(TransportMode.pt);
 		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) leg1.getRoute());

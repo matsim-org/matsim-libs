@@ -42,26 +42,28 @@ import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFr
 public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimListener, ShutdownListener, IterationEndsListener {
 
 	public static final double[] timeBins = new double[]{
-		0.0 * 60.0, 
-		5.0 * 60.0, 
-		10.0 * 60.0, 
-		15.0 * 60.0, 
-		20.0 * 60.0, 
-		25.0 * 60.0, 
-		30.0 * 60.0, 
-		60.0 * 60.0, 
-		120.0 * 60.0, 
-		240.0 * 60.0, 
-		480.0 * 60.0, 
-		960.0 * 60.0, 
+		0.0 * 60.0,
+		5.0 * 60.0,
+		10.0 * 60.0,
+		15.0 * 60.0,
+		20.0 * 60.0,
+		25.0 * 60.0,
+		30.0 * 60.0,
+		60.0 * 60.0,
+		120.0 * 60.0,
+		240.0 * 60.0,
+		480.0 * 60.0,
+		960.0 * 60.0,
 	};
 
 	final private String averagesSummaryFilename;
 	final private String travelTimeDistributionFilename;
-	
+
 	private PrintStream iterationSummaryOut;
 	private CalcLegTimesKTI calcLegTimesKTI;
-	
+
+	private String[] modes = {TransportMode.car, TransportMode.ride, TransportMode.bike, TransportMode.walk, TransportMode.transit_walk, TransportMode.pt};
+
 	private final static Logger log = Logger.getLogger(CalcLegTimesKTIListener.class);
 
 	public CalcLegTimesKTIListener(String averagesSummaryFilename, String travelTimeDistributionFilename) {
@@ -69,33 +71,35 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 		this.averagesSummaryFilename = averagesSummaryFilename;
 		this.travelTimeDistributionFilename = travelTimeDistributionFilename;
 	}
-	
+
+	@Override
 	public void notifyStartup(StartupEvent event) {
 
 		try {
 			this.iterationSummaryOut = new PrintStream(event.getControler().getControlerIO().getOutputFilename(this.averagesSummaryFilename));
 			this.iterationSummaryOut.print("#iteration\tall");
-			for (TransportMode mode : TransportMode.values()) {
-				this.iterationSummaryOut.print("\t" + mode.toString());
+			for (String mode : modes) {
+				this.iterationSummaryOut.print("\t" + mode);
 			}
 			this.iterationSummaryOut.println();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+
 		this.calcLegTimesKTI = new CalcLegTimesKTI(event.getControler().getPopulation(), iterationSummaryOut);
 		event.getControler().getEvents().addHandler(this.calcLegTimesKTI);
 
 	}
-	
+
+	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		
-		TreeMap<TransportMode, Double> avgTripDurations = this.calcLegTimesKTI.getAverageTripDurationsByMode();
+
+		TreeMap<String, Double> avgTripDurations = this.calcLegTimesKTI.getAverageTripDurationsByMode();
 		String str;
-		
+
 		this.iterationSummaryOut.print(Integer.toString(event.getIteration()));
 		this.iterationSummaryOut.print("\t" + Time.writeTime(this.calcLegTimesKTI.getAverageOverallTripDuration()));
-		for (TransportMode mode : TransportMode.values()) {
+		for (String mode : modes) {
 			if (avgTripDurations.containsKey(mode)) {
 				str = Time.writeTime(avgTripDurations.get(mode));
 			} else {
@@ -107,8 +111,9 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 		this.iterationSummaryOut.flush();
 	}
 
+	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		
+
 		if (event.getIteration() % 10 == 0) {
 
 			PrintStream out = null;
@@ -123,11 +128,12 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 			this.calcLegTimesKTI.printDeciles(true, out);
 			out.close();
 			log.info("Writing results file...done.");
-			
+
 		}
-		
+
 	}
 
+	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		this.iterationSummaryOut.close();
 	}

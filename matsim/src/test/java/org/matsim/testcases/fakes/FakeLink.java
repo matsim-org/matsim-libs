@@ -20,7 +20,7 @@
 
 package org.matsim.testcases.fakes;
 
-import java.util.EnumSet;
+import java.util.Collections;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -74,8 +74,8 @@ public class FakeLink implements Link {
 	}
 
 	@Override
-	public Set<TransportMode> getAllowedModes() {
-		return EnumSet.of(TransportMode.car);
+	public Set<String> getAllowedModes() {
+		return Collections.singleton(TransportMode.car);
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class FakeLink implements Link {
 	}
 
 	@Override
-	public void setAllowedModes(final Set<TransportMode> modes) {
+	public void setAllowedModes(final Set<String> modes) {
 		throw new UnsupportedOperationException();
 	}
 

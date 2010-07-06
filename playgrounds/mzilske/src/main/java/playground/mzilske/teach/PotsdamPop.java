@@ -25,11 +25,10 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
 public class PotsdamPop implements Runnable {
-	
+
 	private static Point getRandomPointInFeature(Random rnd, Geometry g) {
 		Point p = null;
 		double x, y;
@@ -43,7 +42,7 @@ public class PotsdamPop implements Runnable {
 
 	public static enum Zone {
 		P(12054, 72899, 56183, 7836764, 946314), PM(12069, 53526, 75379, 4041652, 166538), HVL(12063, 36142, 54661, 722754, 5624), BRB(12051, 26109, 23207, 364595, 123200), TF(12072, 50778, 61022, 1040648, 49912), B(11000, 1106163, 1002809, 4085592, 691178);
-		
+
 		public final int rel_id;
 		public final int ptWorkTripsPerDay;
 		public final int workplaces;
@@ -54,22 +53,22 @@ public class PotsdamPop implements Runnable {
 			this.rel_id = rel_id;
 			this.workplaces = workplaces;
 			this.workingPopulation = workingPopulation;
-			this.carWorkTripsPerDay = (int) (carWorkTripsPerYear / 255);
-			this.ptWorkTripsPerDay = (int) (ptWorkTripsPerYear / 255);
+			this.carWorkTripsPerDay = (carWorkTripsPerYear / 255);
+			this.ptWorkTripsPerDay = (ptWorkTripsPerYear / 255);
 		}
-		
+
 	}
-	
+
 	private static EnumSet<Zone> zones = EnumSet.allOf(Zone.class);
-	
+
 	private static Map<Zone, Geometry> zoneGeometries = new EnumMap<Zone, Geometry>(Zone.class);
 
 	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S);
-	
+
 	private Scenario scenario;
 
 	private Population population;
-	
+
 	static {
 		Random r = new Random();
 		GeometryFactory geometryFactory= new GeometryFactory();
@@ -92,14 +91,14 @@ public class PotsdamPop implements Runnable {
 //			throw new RuntimeException(e);
 //		}
 	}
-	
-	
+
+
 	public static void main(String[] args) {
 		PotsdamPop potsdamPop = new PotsdamPop();
 		potsdamPop.run();
 	}
-	
-	
+
+
 
 	@Override
 	public void run() {
@@ -142,7 +141,7 @@ public class PotsdamPop implements Runnable {
 		System.out.println("outCar: " + amount);
 		return amount;
 	}
-	
+
 	private int getPtQuantityIn(Zone sink) {
 		int amount = sink.ptWorkTripsPerDay - getPtQuantityOut(sink);
 		System.out.println("inPt: " + amount);
@@ -174,7 +173,7 @@ public class PotsdamPop implements Runnable {
 			population.addPerson(person);
 		}
 	}
-	
+
 	private void createFromToPt(Zone source, Zone sink, int quantity) {
 		for (int i=0; i<quantity; i++) {
 			Person person = population.getFactory().createPerson(createId(source, sink, i, TransportMode.pt));
@@ -200,7 +199,7 @@ public class PotsdamPop implements Runnable {
 		Leg leg = population.getFactory().createLeg(TransportMode.pt);
 		return leg;
 	}
-	
+
 	private Activity createWork(Coord workLocation) {
 		Activity activity = population.getFactory().createActivityFromCoord("work", workLocation);
 		activity.setEndTime(17*60*60);
@@ -220,7 +219,7 @@ public class PotsdamPop implements Runnable {
 		return ct.transform(coordImpl);
 	}
 
-	private Id createId(Zone source, Zone sink, int i, TransportMode transportMode) {
+	private Id createId(Zone source, Zone sink, int i, String transportMode) {
 		return new IdImpl(transportMode + "_" + source + "_" + sink + "_" + i);
 	}
 

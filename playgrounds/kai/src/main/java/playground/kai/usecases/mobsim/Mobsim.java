@@ -16,30 +16,30 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 
 public class Mobsim {
 	private static final Logger log = Logger.getLogger(Mobsim.class);
-	
+
 	private Scenario sc ;
 	private EventsManager ev ;
-	
+
 	public Mobsim( Scenario sc, EventsManager ev ) {
 		this.sc = sc ;
 		this.ev = ev ;
 	}
-	
+
 	public void run() {
 		// getting the network info should be w/o problems
-		
+
 		// getting the plans info should be w/o problems
-				
+
 		// the following tests the events generation
 		EventsFactory eb = this.ev.getFactory();
 
 		Id agentId = sc.createId("agentId");
 		Id linkId = sc.createId("linkId");
 		Id facilityId = sc.createId("facilityId");
-		TransportMode legMode = TransportMode.car;
+		String legMode = TransportMode.car;
 		double time = 1. ;
-		
-		ActivityEndEvent aee = eb.createActivityEndEvent( time, agentId, linkId, facilityId, "actType" ) ; 
+
+		ActivityEndEvent aee = eb.createActivityEndEvent( time, agentId, linkId, facilityId, "actType" ) ;
 		ev.processEvent( aee ) ;
 
 		AgentDepartureEvent ade = eb.createAgentDepartureEvent( time, agentId, linkId, legMode ) ;
@@ -59,15 +59,15 @@ public class Mobsim {
 		// (Since ctors cannot be in interfaces, would need to replace them by create methods.)
 
 
-		// Using typed constructors means that an external mobsim writer needs to maintain the 
-		// BasicPersons & BasicLinks, because those cannot be generated from the interfaces but would need to be 
+		// Using typed constructors means that an external mobsim writer needs to maintain the
+		// BasicPersons & BasicLinks, because those cannot be generated from the interfaces but would need to be
 		// maintained.
 
 		// TODO: Also: If we want to allow external mobsim writers access to snapshot writers etc., we need even
 		// more interfaces.
 
 		// Looks fairly hopeless for the time being ...
-			
+
 	}
-	
+
 }

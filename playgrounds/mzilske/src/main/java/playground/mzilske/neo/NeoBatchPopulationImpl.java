@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -25,9 +24,9 @@ import org.neo4j.kernel.impl.batchinsert.BatchInserter;
 import playground.mzilske.neo.NeoBatchNetworkImpl.BasicNetworkRoute;
 
 public class NeoBatchPopulationImpl implements Population {
- 
+
 	private final PopulationFactory factory;
-	
+
 	private final long underlyingNode;
 
 	private BatchInserter inserter;
@@ -35,7 +34,7 @@ public class NeoBatchPopulationImpl implements Population {
 	private Map<String,Object> properties = new HashMap<String,Object>();
 
 	private LuceneIndexBatchInserter index;
-	
+
 	public NeoBatchPopulationImpl(BatchInserter inserter, LuceneIndexBatchInserter index, long populationNode) {
 		this.underlyingNode = populationNode;
 		this.inserter = inserter;
@@ -53,7 +52,7 @@ public class NeoBatchPopulationImpl implements Population {
 			}
 
 			@Override
-			public Leg createLeg(TransportMode legMode) {
+			public Leg createLeg(String legMode) {
 				return new LegImpl(legMode);
 			}
 
@@ -66,9 +65,9 @@ public class NeoBatchPopulationImpl implements Population {
 			public Plan createPlan() {
 				return new PlanImpl();
 			}
-			
+
 		};
-		
+
 	}
 
 	@Override
@@ -79,14 +78,14 @@ public class NeoBatchPopulationImpl implements Population {
 		index.index(personId, NeoPersonImpl.KEY_ID, p.getId());
 
 		inserter.createRelationship(underlyingNode, personId, RelationshipTypes.POPULATION_TO_PERSON, null);
-		
+
 		for (Plan plan : p.getPlans()) {
 			properties.clear();
 			properties.put(NeoPlanImpl.KEY_SCORE, plan.getScore());
 			properties.put(NeoPlanImpl.KEY_SELECTED, plan.isSelected());
 			long planId = inserter.createNode(properties);
 			inserter.createRelationship(personId, planId, RelationshipTypes.PERSON_TO_PLAN, null);
-			
+
 			Long previous = null;
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
@@ -125,9 +124,9 @@ public class NeoBatchPopulationImpl implements Population {
 					previous = id;
 				}
 			}
-			
+
 		}
-		
+
 	}
 
 	private long insertRoute(Route route) {

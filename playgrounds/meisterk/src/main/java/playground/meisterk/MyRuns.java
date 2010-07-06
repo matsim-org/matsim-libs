@@ -31,7 +31,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -63,8 +62,8 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
-import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
+import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.run.XY2Links;
 import org.xml.sax.SAXException;
 
@@ -93,7 +92,7 @@ public class MyRuns {
 		 * Generate initial ivtch demand for ivtch-changed-wu-flama. Used for semester project of Elias Aptus.
 		 */
 		MOVE_DEMAND_TO_NETWORK("moveInitDemandToDifferentNetwork");
-		
+
 		private final String name;
 
 		private Run(String name) {
@@ -103,9 +102,9 @@ public class MyRuns {
 		public String getName() {
 			return name;
 		}
-		
+
 	};
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////
@@ -149,9 +148,9 @@ public class MyRuns {
 		myControler.run();
 
 	}
-	
+
 	void moveInitDemandToDifferentNetwork(final String[] args) {
-		
+
 		// read ivtch demand
 		ScenarioImpl scenario = new ScenarioImpl();
 		Config config = scenario.getConfig();
@@ -167,11 +166,11 @@ public class MyRuns {
 
 		Population population = scenario.getPopulation();
 		Network network = scenario.getNetwork();
-		
+
 		// remove links and routes
 		PersonRemoveLinkAndRoute personRemoveLinkAndRoute = new PersonRemoveLinkAndRoute();
 		personRemoveLinkAndRoute.run(population);
-		
+
 		// switch to new network in scenario
 		ScenarioImpl scenario2 = new ScenarioImpl();
 		try {
@@ -189,12 +188,12 @@ public class MyRuns {
 		scenario.setNetwork(scenario2.getNetwork());
 		// run XY2Links
 		XY2Links xY2Links = new XY2Links();
-		
+
 		// write out new initial demand
 		new PopulationWriter(population, network).write(scenario.getConfig().plans().getOutputFile());
-		
+
 	}
-	
+
 	/**
 	 * Generates the results of the sensitivity analysis of the SUE study.
 	 */
@@ -239,9 +238,9 @@ public class MyRuns {
 	}
 
 	String getRunOutputDirectoryName(final String timingModule, final double beta, final double learningRate) {
-		return 
-		"timingModule_" + timingModule + "/" + 
-		"brainExpBeta_" + Double.toString(beta) + "/" + 
+		return
+		"timingModule_" + timingModule + "/" +
+		"brainExpBeta_" + Double.toString(beta) + "/" +
 		"learningRate_" + Double.toString(learningRate);
 
 	}
@@ -365,18 +364,19 @@ public class MyRuns {
 			this.network = network;
 		}
 
+		@Override
 		public void run(Person person) {
 
 			Plan selectedPlan = person.getSelectedPlan();
 
-			ArrayList<TransportMode> modeChain = new ArrayList<TransportMode>();
+			ArrayList<String> modeChain = new ArrayList<String>();
 			for (PlanElement pe : selectedPlan.getPlanElements()) {
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
 					modeChain.add(leg.getMode());
 				}
 			}
-			TransportMode[] candidate = new TransportMode[modeChain.size()];
+			String[] candidate = new String[modeChain.size()];
 			candidate = modeChain.toArray(candidate);
 
 			MeisterkConfigGroup meisterkConfigGroup = new MeisterkConfigGroup();

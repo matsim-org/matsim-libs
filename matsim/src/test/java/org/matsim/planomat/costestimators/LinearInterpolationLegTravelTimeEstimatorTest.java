@@ -37,7 +37,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -82,7 +81,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 		ActivityImpl workActivity = new ActivityImpl("work", new IdImpl("5006"));
 		workActivity.setCoord(new CoordImpl(35000.0, 10000.0));
 
-		for (TransportMode mode : new TransportMode[]{TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk, TransportMode.car}) {
+		for (String mode : new String[]{TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk, TransportMode.car}) {
 			logger.info(mode.toString());
 			for (String str : new String[] {
 					"06:10:00",
@@ -97,20 +96,15 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 						dummyPersonId, Time.parseTime(str), homeActivity,
 						workActivity, legIntermediate, Boolean.FALSE);
 
-				switch(mode) {
-				case car:
+				if (TransportMode.car.equals(mode)) {
 					assertEquals(Time.parseTime("02:00:00"), travelTime);
-					break;
-				case pt:
+				} else if (TransportMode.pt.equals(mode)) {
 					assertEquals(Time.parseTime("04:00:00"), travelTime);
-					break;
-				case bike:
+				} else if (TransportMode.bike.equals(mode)) {
 					assertEquals(Time.parseTime("01:59:59"), travelTime);
-					break;
-				case walk:
+				} else if (TransportMode.walk.equals(mode)) {
 					assertEquals(Time.parseTime("10:00:00"), travelTime);
-					break;
-				default:
+				} else {
 					fail("unexpected mode.");
 				}
 

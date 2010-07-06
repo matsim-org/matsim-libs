@@ -1,7 +1,6 @@
 package playground.mzilske.neo;
 
 import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -65,7 +63,7 @@ public class NeoBatchNetworkImpl implements Network {
 							outLinks.put(linkId, link);
 						}
 					}
-					
+
 				}
 			}
 			return outLinks;
@@ -85,8 +83,8 @@ public class NeoBatchNetworkImpl implements Network {
 		public boolean equals(Object obj) {
 			return id.equals(((BasicNode) obj).id);
 		}
-		
-		
+
+
 
 	}
 
@@ -108,7 +106,7 @@ public class NeoBatchNetworkImpl implements Network {
 		private double length;
 
 		@Override
-		public Set<TransportMode> getAllowedModes() {
+		public Set<String> getAllowedModes() {
 			throw new RuntimeException();
 		}
 
@@ -158,7 +156,7 @@ public class NeoBatchNetworkImpl implements Network {
 		}
 
 		@Override
-		public void setAllowedModes(Set<TransportMode> modes) {
+		public void setAllowedModes(Set<String> modes) {
 			// TODO: allowed Modes
 		}
 
@@ -206,15 +204,15 @@ public class NeoBatchNetworkImpl implements Network {
 		public Id getId() {
 			return this.id;
 		}
-		
+
 	}
-	
+
 	final class BasicNetworkRoute implements NetworkRoute {
-		
+
 		private double distance;
 
 		private double travelTime;
-		
+
 		String routeDescription;
 
 		private Id startLinkId;
@@ -304,9 +302,9 @@ public class NeoBatchNetworkImpl implements Network {
 		public RouteWRefs clone() {
 			throw new RuntimeException();
 		}
-		
-		
-		
+
+
+
 	}
 
 	private BatchInserter inserter;
@@ -314,9 +312,9 @@ public class NeoBatchNetworkImpl implements Network {
 	private Map<String,Object> properties = new HashMap<String,Object>();
 
 	private LuceneIndexBatchInserter index;
-	
+
 	private boolean inLinkMode = false;
-	
+
 	long nodeRoot;
 	long linkRoot;
 
@@ -348,7 +346,7 @@ public class NeoBatchNetworkImpl implements Network {
 		index.index(link, NeoLinkImpl.KEY_ID, idString);
 		inserter.createRelationship(fromNode, link, RelationshipTypes.LINK_TO, null);
 		inserter.createRelationship(link, toNode, RelationshipTypes.LINK_TO, null);
-		
+
 	}
 
 	private void goToLinkMode() {
@@ -408,7 +406,7 @@ public class NeoBatchNetworkImpl implements Network {
 			public Route createRoute() {
 				return new BasicNetworkRoute();
 			}
-			
+
 		};
 	}
 
@@ -430,7 +428,7 @@ public class NeoBatchNetworkImpl implements Network {
 			public Node get(Object key) {
 				return new BasicNode((Id) key, null);
 			}
-			
+
 		};
 	}
 

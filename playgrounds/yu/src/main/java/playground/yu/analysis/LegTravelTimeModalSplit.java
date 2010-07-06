@@ -119,6 +119,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		this.toll = toll;
 	}
 
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		if (toll != null) {
 			// only inhabitant from Kanton
@@ -132,10 +133,12 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 					.getTime());
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		this.tmpDptTimes.clear();
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		double arrTime = event.getTime();
 		String agentId = event.getPersonId().toString();
@@ -157,28 +160,22 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 
 			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
 					.getSelectedPlan();
-			TransportMode mode = PlanModeJudger.getMode(selectedplan);
-			switch (mode) {
-			case car:
+			String mode = PlanModeJudger.getMode(selectedplan);
+			if (TransportMode.car.equals(mode)) {
 				this.carTravelTimes[binIdx] += travelTime;
 				this.carArrCount[binIdx]++;
-				break;
-			case pt:
+			} else if (TransportMode.pt.equals(mode)) {
 				this.ptTravelTimes[binIdx] += travelTime;
 				this.ptArrCount[binIdx]++;
-				break;
-			case walk:
+			} else if (TransportMode.walk.equals(mode)) {
 				wlkTravelTimes[binIdx] += travelTime;
 				wlkArrCount[binIdx]++;
-				break;
-			case bike:
+			} else if (TransportMode.bike.equals(mode)) {
 				bikeTravelTimes[binIdx] += travelTime;
 				bikeArrCount[binIdx]++;
-				break;
-			default:
+			} else {
 				this.othersTravelTimes[binIdx] += travelTime;
 				this.othersArrCount[binIdx]++;
-				break;
 			}
 		}
 	}

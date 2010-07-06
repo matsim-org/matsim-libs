@@ -33,7 +33,6 @@ import org.jgap.impl.GABreeder;
 import org.jgap.impl.IntegerGene;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -49,7 +48,7 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			PlanAnalyzeSubtours planAnalyzeSubtours,
 			long seed,
 			int numTimeIntervals,
-			TransportMode[] possibleModes,
+			String[] possibleModes,
 			PlanomatConfigGroup planomatConfigGroup) {
 
 		// JGAP Configuration object is initialized without an id. This means there can be only one configuration object per thread, which is what we want.

@@ -118,6 +118,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 		}
 	}
 
+	@Override
 	public void run(Plan plan) {
 		List<? extends PlanElement> actsLegs = plan.getPlanElements();
 		for (int j=0; j<actsLegs.size(); j=j+2) {
@@ -132,7 +133,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 			}
 			if (j > 0) {
 				LegImpl leg = (LegImpl)actsLegs.get(j-1);
-				TransportMode legMode = leg.getMode();
+				String legMode = leg.getMode();
 				idx = getLegModeIndex(legMode);
 				if ((idx >= 0) && (dur >= 0)) {
 					this.legModeCnt[idx]++;
@@ -160,7 +161,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 		return -1;
 	}
 
-	private final int getLegModeIndex(TransportMode legMode) {
+	private final int getLegModeIndex(final String legMode) {
 		for (int i = 0; i < this.nLegModes; i++) {
 			if (legMode.equals(this.legModes[i])) {
 				return i;

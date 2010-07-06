@@ -1,9 +1,10 @@
 package playground.mmoyo.TransitSimulation;
 
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
@@ -57,13 +58,15 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 		this.transitConfig = transitConfig;
 		this.transitRouter = new PTRouter(schedule);
 
+		Set<String> modes = new HashSet<String>();
+		modes.add(TransportMode.car);
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
 		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(modes);
 		}
 		routeAlgo = super.getPtFreeflowLeastCostPathCalculator();
 		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(modes);
 		}
 	}
 

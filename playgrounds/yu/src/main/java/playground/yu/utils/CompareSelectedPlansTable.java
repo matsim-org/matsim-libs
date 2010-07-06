@@ -25,7 +25,6 @@ import java.io.IOException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -167,14 +166,12 @@ public class CompareSelectedPlansTable {
 				out.write(d1 + ";");
 				out.write(Double.toString(d1 - d0) + ";");
 
-				TransportMode mode0 = PlanModeJudger.getMode(person
-						.getSelectedPlan());
+				String mode0 = PlanModeJudger.getMode(person.getSelectedPlan());
 				String tp0 = ((PlanModeJudger.useCar(person.getSelectedPlan()) || PlanModeJudger
 						.usePt(person.getSelectedPlan())) ? mode0 : "-")
 						.toString();
 				out.write(tp0 + ";");
-				TransportMode mode1 = PlanModeJudger.getMode(person_comp
-						.getSelectedPlan());
+				String mode1 = PlanModeJudger.getMode(person_comp.getSelectedPlan());
 				String tp1 = ((PlanModeJudger.useCar(person_comp
 						.getSelectedPlan()) || PlanModeJudger.usePt(person_comp
 						.getSelectedPlan())) ? mode1 : "-").toString();

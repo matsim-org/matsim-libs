@@ -30,7 +30,6 @@ import java.util.Stack;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -305,7 +304,7 @@ public class TransitScheduleReaderV1Test {
 		assertNotNull(route1);
 		assertEquals(routeId1, route1.getId());
 		assertNull(route1.getDescription());
-		assertEquals(TransportMode.bus, route1.getTransportMode());
+		assertEquals("bus", route1.getTransportMode());
 		assertEquals(0, route1.getStops().size());
 		assertNull(route1.getRoute());
 		assertEquals(0, route1.getDepartures().size());
@@ -357,12 +356,12 @@ public class TransitScheduleReaderV1Test {
 		TransitRoute route1 = line.getRoutes().get(routeId1);
 		assertNotNull(route1);
 		assertEquals(routeId1, route1.getId());
-		assertEquals(TransportMode.bus, route1.getTransportMode());
+		assertEquals("bus", route1.getTransportMode());
 
 		TransitRoute route2 = line.getRoutes().get(routeId2);
 		assertNotNull(route2);
 		assertEquals(routeId2, route2.getId());
-		assertEquals(TransportMode.train, route2.getTransportMode());
+		assertEquals("train", route2.getTransportMode());
 
 	}
 

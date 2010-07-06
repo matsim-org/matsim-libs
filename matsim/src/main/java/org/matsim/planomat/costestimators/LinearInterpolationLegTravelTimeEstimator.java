@@ -20,8 +20,9 @@
 
 package org.matsim.planomat.costestimators;
 
-import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.zip.Adler32;
 
 import org.apache.log4j.Logger;
@@ -62,7 +63,7 @@ LegTravelTimeEstimator {
 	 *
 	 * TODO possibly a MATSim config parameter
 	 */
-	public static final EnumSet<TransportMode> MODES_WITH_VARIABLE_TRAVEL_TIME = EnumSet.of(TransportMode.car);
+	public static final Set<String> MODES_WITH_VARIABLE_TRAVEL_TIME;
 
 	protected final TravelTime linkTravelTimeEstimator;
 	protected final DepartureDelayAverageCalculator tDepDelayCalc;
@@ -73,6 +74,11 @@ LegTravelTimeEstimator {
 	private boolean doLogging = false;
 
 	private final static Logger logger = Logger.getLogger(LinearInterpolationLegTravelTimeEstimator.class);
+
+	static {
+		MODES_WITH_VARIABLE_TRAVEL_TIME = new HashSet<String>();
+		MODES_WITH_VARIABLE_TRAVEL_TIME.add(TransportMode.car);
+	}
 
 	public LinearInterpolationLegTravelTimeEstimator(
 			TravelTime linkTravelTimeEstimator,
@@ -92,12 +98,12 @@ LegTravelTimeEstimator {
 
 		private final Location origin;
 		private final Location destination;
-		private final TransportMode mode;
+		private final String mode;
 		private final double departureTime;
 		private final int hash;
 
 		public DynamicODMatrixEntry(Location origin, Location destination,
-				TransportMode mode, double departureTime) {
+				String mode, double departureTime) {
 			super();
 			this.origin = origin;
 			this.destination = destination;
@@ -143,7 +149,7 @@ LegTravelTimeEstimator {
 	}
 
 	private final HashMap<DynamicODMatrixEntry, Double> dynamicODMatrix = new HashMap<DynamicODMatrixEntry, Double>();
-	private final HashMap<Leg, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<Leg, HashMap<TransportMode, Double>>();
+	private final HashMap<Leg, HashMap<String, Double>> travelTimeCache = new HashMap<Leg, HashMap<String, Double>>();
 
 	protected double getInterpolation(Person person, double departureTime, Activity actOrigin, Activity actDestination, Leg legIntermediate) {
 
@@ -223,11 +229,11 @@ LegTravelTimeEstimator {
 
 		} else {
 
-			HashMap<TransportMode, Double> legInformation = null;
+			HashMap<String, Double> legInformation = null;
 			if (this.travelTimeCache.containsKey(legIntermediate)) {
 				legInformation = this.travelTimeCache.get(legIntermediate);
 			} else {
-				legInformation = new HashMap<TransportMode, Double>();
+				legInformation = new HashMap<String, Double>();
 				this.travelTimeCache.put(legIntermediate, legInformation);
 			}
 			if (legInformation.containsKey(legIntermediate.getMode())) {
@@ -267,7 +273,7 @@ LegTravelTimeEstimator {
 	}
 
 	@Override
-	public LegImpl getNewLeg(TransportMode mode, Activity actOrigin,
+	public LegImpl getNewLeg(String mode, Activity actOrigin,
 			Activity actDestination, int legPlanElementIndex, double departureTime) {
 		// not implemented here
 		return null;

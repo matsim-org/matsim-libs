@@ -19,12 +19,12 @@
  * *********************************************************************** */package playground.wisinee.ipftest;
 
 import junit.framework.TestCase;
-import playground.wisinee.IPF.*;
+import playground.wisinee.IPF.RunIPF;
 
 public class RunIpfTest extends TestCase {
 
-	private final static String testPropertyFile = "./test/scenarios/ipf/TestParameter.xml";	
-	
+	private final static String testPropertyFile = "./test/input/ipf/TestParameter.xml";
+
 	public void testRunIpfCal() {
 		RunIPF ipftest = new RunIPF();
 		ipftest.runIpfCal(testPropertyFile);

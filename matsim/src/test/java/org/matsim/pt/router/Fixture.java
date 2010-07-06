@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -256,7 +255,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			stops.add(this.builder.createTransitRouteStop(this.stopFacilities[4], Time.UNDEFINED_TIME, 0.0));
 			stops.add(this.builder.createTransitRouteStop(this.stopFacilities[12], Time.UNDEFINED_TIME, 9.0*60));
-			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("red C > G"), netRoute, stops, TransportMode.train);
+			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("red C > G"), netRoute, stops, "train");
 			this.redLine.addRoute(route);
 
 			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r>01"), 6.0*3600));
@@ -272,7 +271,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			stops.add(this.builder.createTransitRouteStop(this.stopFacilities[13], Time.UNDEFINED_TIME, 0.0));
 			stops.add(this.builder.createTransitRouteStop(this.stopFacilities[5], Time.UNDEFINED_TIME, 9.0*60));
-			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("red G > C"), netRoute, stops, TransportMode.train);
+			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("red G > C"), netRoute, stops, "train");
 			this.redLine.addRoute(route);
 
 			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<01"), 6.0*3600 + 10.0*60));
@@ -319,7 +318,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[16], 58.0 * 60, Time.UNDEFINED_TIME);
 			stop.setAwaitDepartureTime(true);
 			stops.add(stop);
-			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("blue A > I"), netRoute, stops, TransportMode.train);
+			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("blue A > I"), netRoute, stops, "train");
 			this.blueLine.addRoute(route);
 
 			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>01"), 5.0*3600 +  6.0*60));
@@ -372,7 +371,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[ 1], 58.0 * 60, Time.UNDEFINED_TIME);
 			stop.setAwaitDepartureTime(true);
 			stops.add(stop);
-			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("blue I > A"), netRoute, stops, TransportMode.train);
+			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("blue I > A"), netRoute, stops, "train");
 			this.blueLine.addRoute(route);
 
 			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<01"), 5.0*3600 + 16.0*60));
@@ -423,7 +422,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 			stops.add(stop);
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[18], 59.0*60, Time.UNDEFINED_TIME);
 			stops.add(stop);
-			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("green clockwise"), netRoute, stops, TransportMode.train);
+			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("green clockwise"), netRoute, stops, "train");
 			this.greenLine.addRoute(route);
 
 			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>01"), 5.0*3600 + 01.0*60));

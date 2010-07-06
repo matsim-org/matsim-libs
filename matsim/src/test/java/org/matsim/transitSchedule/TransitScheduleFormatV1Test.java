@@ -27,7 +27,6 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -93,7 +92,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		stops.add(routeStop3);
 		stops.add(builder.createTransitRouteStop(stop4, 400, Time.UNDEFINED_TIME));
 
-		TransitRoute route1 = builder.createTransitRoute(new IdImpl(1), null, stops, TransportMode.bus);
+		TransitRoute route1 = builder.createTransitRoute(new IdImpl(1), null, stops, "bus");
 		route1.setDescription("Just a comment.");
 
 		route1.addDeparture(builder.createDeparture(new IdImpl("2"), 7.0*3600));
@@ -125,7 +124,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		links.add(l2.getId());
 		links.add(l3.getId());
 		route.setLinkIds(l1.getId(), links, l4.getId());
-		TransitRoute route2 = builder.createTransitRoute(new IdImpl(2), route, stops, TransportMode.bus);
+		TransitRoute route2 = builder.createTransitRoute(new IdImpl(2), route, stops, "bus");
 		line1.addRoute(route2);
 		stop1.setLinkId(l1.getId());
 

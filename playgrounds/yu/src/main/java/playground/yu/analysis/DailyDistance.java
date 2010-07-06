@@ -160,6 +160,7 @@ public class DailyDistance extends DailyAnalysis {
 		}
 	}
 
+	@Override
 	public void run(final Plan p) {
 		PlanImpl plan = (PlanImpl) p;
 		double dayDist = 0.0;
@@ -188,9 +189,8 @@ public class DailyDistance extends DailyAnalysis {
 											.getLinkId()).getCoord()) * 1.5 / 1000.0;
 				}
 
-				TransportMode mode = bl.getMode();
-				switch (mode) {
-				case car:
+				String mode = bl.getMode();
+				if (TransportMode.car.equals(mode)) {
 					carDist += dist;
 					carDayDist += dist;
 					switch (legIntent) {
@@ -214,8 +214,7 @@ public class DailyDistance extends DailyAnalysis {
 						break;
 					}
 					carLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				case pt:
+				} else if (TransportMode.pt.equals(mode)) {
 					ptDist += dist;
 					ptDayDist += dist;
 					switch (legIntent) {
@@ -239,8 +238,7 @@ public class DailyDistance extends DailyAnalysis {
 						break;
 					}
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				case walk:
+				} else if (TransportMode.walk.equals(mode)) {
 					dist = CoordUtils.calcDistance(this.network.getLinks().get(
 							plan.getPreviousActivity(bl).getLinkId())
 							.getCoord(), this.network.getLinks().get(
@@ -268,8 +266,7 @@ public class DailyDistance extends DailyAnalysis {
 						break;
 					}
 					wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				case bike:
+				} else if (TransportMode.bike.equals(mode)) {
 					dist = CoordUtils.calcDistance(this.network.getLinks().get(
 							plan.getPreviousActivity(bl).getLinkId())
 							.getCoord(), this.network.getLinks().get(
@@ -297,8 +294,7 @@ public class DailyDistance extends DailyAnalysis {
 						break;
 					}
 					bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				default:
+				} else {
 					dist = CoordUtils.calcDistance(this.network.getLinks().get(
 							plan.getPreviousActivity(bl).getLinkId())
 							.getCoord(), this.network.getLinks().get(
@@ -326,7 +322,6 @@ public class DailyDistance extends DailyAnalysis {
 						break;
 					}
 					othersLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
 				}
 				dayDist += dist;
 			}

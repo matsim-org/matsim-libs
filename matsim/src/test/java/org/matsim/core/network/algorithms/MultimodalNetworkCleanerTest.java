@@ -19,7 +19,8 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.EnumSet;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -43,7 +44,7 @@ public class MultimodalNetworkCleanerTest {
 		Network network = f.scenario.getNetwork();
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
-		cleaner.run(EnumSet.of(TransportMode.car));
+		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -67,7 +68,7 @@ public class MultimodalNetworkCleanerTest {
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
-		cleaner.run(EnumSet.of(TransportMode.car));
+		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 9, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -81,7 +82,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[10]).getAllowedModes());
 		Assert.assertNull(network.getLinks().get(f.ids[11]));
 
-		cleaner.run(EnumSet.of(TransportMode.walk));
+		cleaner.run(createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -103,7 +104,7 @@ public class MultimodalNetworkCleanerTest {
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
-		cleaner.run(EnumSet.of(TransportMode.other));
+		cleaner.run(createHashSet("other"));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -131,7 +132,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals("wrong number of links.", 10, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 8, network.getNodes().size());
 
-		cleaner.run(EnumSet.of(TransportMode.car));
+		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 9, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -145,7 +146,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[11]).getAllowedModes());
 		Assert.assertNull(network.getLinks().get(f.ids[10]));
 
-		cleaner.run(EnumSet.of(TransportMode.walk));
+		cleaner.run(createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -170,7 +171,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 
-		cleaner.run(EnumSet.of(TransportMode.car));
+		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 		Assert.assertEquals(f.modesCW, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -182,7 +183,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes()); // only remove mode, not link!
 
-		cleaner.run(EnumSet.of(TransportMode.walk));
+		cleaner.run(createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes()); // only remove mode, not link!
@@ -214,7 +215,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 8, network.getNodes().size());
 
-		cleaner.run(EnumSet.of(TransportMode.walk));
+		cleaner.run(createHashSet(TransportMode.walk));
 
 		Assert.assertEquals("wrong number of links.", 10, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
@@ -231,7 +232,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertNull(network.getLinks().get(f.ids[12]));
 		Assert.assertNull(network.getLinks().get(f.ids[13]));
 
-		cleaner.run(EnumSet.of(TransportMode.car));
+		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -262,7 +263,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals("wrong number of links.", 10, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 8, network.getNodes().size());
 
-		cleaner.run(EnumSet.of(TransportMode.car));
+		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 9, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -276,7 +277,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[11]).getAllowedModes());
 		Assert.assertNull(network.getLinks().get(f.ids[10]));
 
-		cleaner.run(EnumSet.of(TransportMode.walk));
+		cleaner.run(createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -309,7 +310,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 8, network.getNodes().size());
 
-		cleaner.run(EnumSet.of(TransportMode.walk));
+		cleaner.run(createHashSet(TransportMode.walk));
 
 		Assert.assertEquals("wrong number of links.", 10, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
@@ -326,7 +327,7 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertNull(network.getLinks().get(f.ids[12]));
 		Assert.assertNull(network.getLinks().get(f.ids[13]));
 
-		cleaner.run(EnumSet.of(TransportMode.car));
+		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -348,7 +349,7 @@ public class MultimodalNetworkCleanerTest {
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
-		cleaner.run(EnumSet.of(TransportMode.car, TransportMode.walk));
+		cleaner.run(createHashSet(TransportMode.car, TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 9, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -379,7 +380,7 @@ public class MultimodalNetworkCleanerTest {
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
-		cleaner.run(EnumSet.of(TransportMode.car, TransportMode.walk));
+		cleaner.run(createHashSet(TransportMode.car, TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 9, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -410,7 +411,7 @@ public class MultimodalNetworkCleanerTest {
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
-		cleaner.run(EnumSet.of(TransportMode.car, TransportMode.walk));
+		cleaner.run(createHashSet(TransportMode.car, TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 9, network.getNodes().size());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
@@ -434,7 +435,7 @@ public class MultimodalNetworkCleanerTest {
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
-		cleaner.run(EnumSet.noneOf(TransportMode.class));
+		cleaner.run(new HashSet<String>());
 		// nothing should have changed from the initialization
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
@@ -455,7 +456,7 @@ public class MultimodalNetworkCleanerTest {
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
-		cleaner.run(EnumSet.of(TransportMode.pt));
+		cleaner.run(Collections.singleton(TransportMode.pt));
 		// nothing should have changed from the initialization
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
@@ -481,9 +482,9 @@ public class MultimodalNetworkCleanerTest {
 		network.addNode(factory.createNode(id1, scenario.createCoord(  0, 100)));
 		network.addNode(factory.createNode(id2, scenario.createCoord(100, 100)));
 		network.addLink(factory.createLink(id1, id1, id2));
-		network.getLinks().get(id1).setAllowedModes(EnumSet.of(TransportMode.car));
+		network.getLinks().get(id1).setAllowedModes(Collections.singleton(TransportMode.car));
 
-		new MultimodalNetworkCleaner(network).run(EnumSet.of(TransportMode.car));
+		new MultimodalNetworkCleaner(network).run(Collections.singleton(TransportMode.car));
 		/* a single link is no complete network, as the link's
 		 * from-node cannot be reached by the link's to-node
 		 * */
@@ -516,9 +517,9 @@ public class MultimodalNetworkCleanerTest {
 
 		/*package*/ final Scenario scenario = new ScenarioImpl();
 		/*package*/ final Id[] ids = new Id[21];
-		/*package*/ final Set<TransportMode> modesC = EnumSet.of(TransportMode.car);
-		/*package*/ final Set<TransportMode> modesW = EnumSet.of(TransportMode.walk);
-		/*package*/ final Set<TransportMode> modesCW = EnumSet.of(TransportMode.car, TransportMode.walk);
+		/*package*/ final Set<String> modesC = createHashSet(TransportMode.car);
+		/*package*/ final Set<String> modesW = createHashSet(TransportMode.walk);
+		/*package*/ final Set<String> modesCW = createHashSet(TransportMode.car, TransportMode.walk);
 
 		/*package*/ Fixture() {
 
@@ -600,5 +601,13 @@ public class MultimodalNetworkCleanerTest {
 			network.getLinks().get(this.ids[11]).setAllowedModes(this.modesC);
 			network.getLinks().get(this.ids[12]).setAllowedModes(this.modesW);
 		}
+	}
+
+	private static Set<String> createHashSet(String... mode) {
+		HashSet<String> set = new HashSet<String>();
+		for (String m : mode) {
+			set.add(m);
+		}
+		return set;
 	}
 }

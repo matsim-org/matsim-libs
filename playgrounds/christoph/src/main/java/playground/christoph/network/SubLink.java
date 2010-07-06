@@ -4,7 +4,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -83,13 +82,13 @@ public class SubLink implements Link{
 	}
 
 	@Override
-	public Set<TransportMode> getAllowedModes()
+	public Set<String> getAllowedModes()
 	{
 		return this.parentLink.getAllowedModes();
 	}
 
 	@Override
-	public void setAllowedModes(Set<TransportMode> modes)
+	public void setAllowedModes(Set<String> modes)
 	{
 		// nothing to do...
 	}

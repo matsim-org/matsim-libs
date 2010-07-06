@@ -30,7 +30,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -64,7 +63,7 @@ public class MultimodalNetworkCleaner {
 	 *
 	 * @param modes
 	 */
-	public void run(final Set<TransportMode> modes) {
+	public void run(final Set<String> modes) {
 		final Map<Id, Link> visitedLinks = new TreeMap<Id, Link>();
 		Map<Id, Link> biggestCluster = new TreeMap<Id, Link>();
 
@@ -98,7 +97,7 @@ public class MultimodalNetworkCleaner {
 		List<Link> allLinks = new ArrayList<Link>(this.network.getLinks().values());
 		for (Link link : allLinks) {
 			if (!biggestCluster.containsKey(link.getId())) {
-				Set<TransportMode> reducedModes = link.getAllowedModes();
+				Set<String> reducedModes = link.getAllowedModes();
 				reducedModes.removeAll(modes);
 				link.setAllowedModes(reducedModes);
 				if (reducedModes.isEmpty()) {
@@ -126,7 +125,7 @@ public class MultimodalNetworkCleaner {
 	 * @param modes the set of modes that are allowed to
 	 * @return cluster of links <pre>startLink</pre> is part of
 	 */
-	private Map<Id, Link> findCluster(final Link startLink, final Set<TransportMode> modes) {
+	private Map<Id, Link> findCluster(final Link startLink, final Set<String> modes) {
 
 		final Map<Id, DoubleFlagRole> linkRoles = new HashMap<Id, DoubleFlagRole>(this.network.getLinks().size());
 

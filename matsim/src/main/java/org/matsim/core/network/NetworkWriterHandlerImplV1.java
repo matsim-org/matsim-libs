@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Set;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -136,11 +135,11 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 		out.write(" permlanes=\"" + link.getNumberOfLanes() + "\"");
 		out.write(" oneway=\"1\"");
 
-		Set<TransportMode> modes = link.getAllowedModes();
+		Set<String> modes = link.getAllowedModes();
 		if (modes != null) {
 			StringBuffer buffer = new StringBuffer();
 			int counter = 0;
-			for (TransportMode mode : modes) {
+			for (String mode : modes) {
 				if (counter > 0) {
 					buffer.append(',');
 				}

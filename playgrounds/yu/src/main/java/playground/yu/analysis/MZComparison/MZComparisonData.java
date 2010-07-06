@@ -78,6 +78,7 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 		run(pl);
 	}
 
+	@Override
 	public void run(Plan p) {
 		PlanImpl plan = (PlanImpl) p;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -85,7 +86,7 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 				double legDist = ((Leg) pe).getRoute().getDistance();// leg
 				// distance
 				// [m]
-				String legMode = ((Leg) pe).getMode().name();
+				String legMode = ((Leg) pe).getMode();
 				double legTime = ((Leg) pe).getTravelTime() / 60.0;// travel
 				// time
 				// [min]

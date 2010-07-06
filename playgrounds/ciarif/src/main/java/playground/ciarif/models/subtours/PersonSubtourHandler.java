@@ -12,12 +12,12 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class PersonSubtourHandler {
-	
-	
+
+
 	//////////////////////////////////////////////////////////////////////
 	// Member variables
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private PersonSubtour pers_sub = new PersonSubtour(); //qui vanno i subtours
 	private static final String E = "e";
 	private static final String W = "w";
@@ -28,24 +28,24 @@ public class PersonSubtourHandler {
 	//private static final String CAR = "car";
 	//private static final String BIKE = "bike";
 	//private static final String WALK = "walk";
-		
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public PersonSubtourHandler (){
-		
+
 	}
-	
-	
+
+
 	//////////////////////////////////////////////////////////////////////
 	// Private Methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private final void handleSubTours(final Plan plan, final TreeMap<Integer, ArrayList<Integer>> subtours, int subtour_idx) {
-		
+
 		// setting subtour parameters
-		
+
 		//TreeMap<Integer, Integer> modeSubTours = new TreeMap<Integer, Integer>();
 		for (int i=subtour_idx-1; i>=0; i=i-1) {
 			Subtour sub = new Subtour();
@@ -61,7 +61,7 @@ public class PersonSubtourHandler {
 			Coord start = ((ActivityImpl)plan.getPlanElements().get(subtour.get(0))).getCoord();
 			Coord prev = start;
 			String type = null;
-			for (int k=1; k<subtour.size()-1; k=k+1) { 
+			for (int k=1; k<subtour.size()-1; k=k+1) {
 				type = ((ActivityImpl)plan.getPlanElements().get(subtour.get(k))).getType().substring(0,1);
 				if (mainpurpose == 1){
 					if (type.equals(W)) { mainpurpose = 0;}
@@ -74,13 +74,13 @@ public class PersonSubtourHandler {
 					if (type.equals(W)) {mainpurpose = 0;}
 					else if (type.equals(E)) {mainpurpose = 1;}
 					else if (type.equals(S)) {mainpurpose = 2;}
-				} 
+				}
 				Coord curr = ((ActivityImpl)plan.getPlanElements().get(subtour.get(k))).getCoord();
 				if (curr.getX()>0 && curr.getY()>0) {d = d + CoordUtils.calcDistance(curr, prev);}
 				prev = curr;
-				
+
 				// Getting the main mode at the sub-tour level
-				TransportMode mode =((LegImpl)plan.getPlanElements().get(subtour.get(k)-1)).getMode();
+				String mode =((LegImpl)plan.getPlanElements().get(subtour.get(k)-1)).getMode();
 				int license = 0;
 				if (((PersonImpl) plan.getPerson()).hasLicense()){license =1;}
 				int modechoice = 0;
@@ -96,7 +96,7 @@ public class PersonSubtourHandler {
 			if (prev.getX()>0 && prev.getY()>0) {d = d + CoordUtils.calcDistance(start, prev);}// In the for-cycle the trip to home is not accounted
 			d = d/1000.0; // distance in the model is in Km
 			sub.setDistance(d);
-			
+
 			// Defining previous sub-tour
 			 // The sub-tour starts at the agent's home location
 			int prev_subtour = -1;
@@ -108,12 +108,12 @@ public class PersonSubtourHandler {
 						System.out.println ("prev_subtour = " + subtours.get(j));
 						prev_subtour = j; break;
 					}
-				}  
+				}
 			}
 			sub.setPrev_subtour(prev_subtour);
 			System.out.println ("prev_subtour = " + prev_subtour);
 			pers_sub.setSubtour(sub);
-			
+
 
 			//System.out.println ("prev_subtour idx = " + sub.getPrev_subtour());
 			System.out .println ("index i = " + i);
@@ -129,19 +129,19 @@ public class PersonSubtourHandler {
 						System.out.println ("prev_mode = " + prev_mode);
 						pers_sub.getSubtours().get(i).setPrev_mode(prev_mode);
 					}
-				}	
+				}
 			}
 			else {
 				pers_sub.getSubtours().get(i).setPrev_mode(-1);
 			}
 		}
-	
+
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// Run Methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public void run (final Plan plan, final TreeMap<Integer, ArrayList<Integer>> subtours, int subtour_idx) {
 		handleSubTours(plan,subtours,subtour_idx);
 	}
@@ -149,7 +149,7 @@ public class PersonSubtourHandler {
 	//////////////////////////////////////////////////////////////////////
 	// Get Methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public PersonSubtour getPers_sub() {
 		return pers_sub;
 	}

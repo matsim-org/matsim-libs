@@ -21,7 +21,6 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -44,7 +43,7 @@ public abstract class AbstractLegTravelTimeEstimator implements
 
 	@Override
 	public abstract LegImpl getNewLeg(
-			TransportMode mode,
+			String mode,
 			Activity actOrigin,
 			Activity actDestination,
 			int legPlanElementIndex,

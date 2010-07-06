@@ -20,7 +20,7 @@
 
 package playground.meisterk.kti.router;
 
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
@@ -55,15 +55,19 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	 *
 	 * Use this set to check whether the mode of a leg is allowed or not.
 	 */
-	public static final EnumSet<TransportMode> KTI_MODES = EnumSet.of(
-			TransportMode.car,
-			TransportMode.bike,
-			TransportMode.pt,
-			TransportMode.walk,
-			TransportMode.ride);
+	public static final HashSet<String> KTI_MODES;
 
 	private final Network network;
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
+
+	static {
+		KTI_MODES = new HashSet<String>();
+		KTI_MODES.add(TransportMode.car);
+		KTI_MODES.add(TransportMode.bike);
+		KTI_MODES.add(TransportMode.pt);
+		KTI_MODES.add(TransportMode.walk);
+		KTI_MODES.add(TransportMode.ride);
+	}
 
 	public PlansCalcRouteKti(
 			final PlansCalcRouteConfigGroup group,
@@ -80,7 +84,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	@Override
 	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 
-		TransportMode mode = leg.getMode();
+		String mode = leg.getMode();
 
 		// TODO meisterk: This is a shortcut. Please find a general solution for that. [balmermi]
 //		if (mode == TransportMode.ride) { mode = TransportMode.car; }

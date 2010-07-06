@@ -20,7 +20,7 @@
 
 package org.matsim.core.basic.v01.network;
 
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.TransportMode;
@@ -45,20 +45,24 @@ public class BasicLinkImplTest extends MatsimTestCase {
 		Link l = network.createAndAddLink(new IdImpl(1), n1, n2, 1000, 10, 3600, 1);
 
 		// test default
-		Set<TransportMode> modes = l.getAllowedModes();
+		Set<String> modes = l.getAllowedModes();
 		assertEquals("wrong number of default entries.", 1, modes.size());
 		assertTrue("wrong default.", modes.contains(TransportMode.car));
 
 		// test set/get empty list
-		l.setAllowedModes(EnumSet.noneOf(TransportMode.class));
+		l.setAllowedModes(new HashSet<String>());
 		modes = l.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 0, modes.size());
 
 		// test set/get list with entries
-		l.setAllowedModes(EnumSet.of(TransportMode.bus, TransportMode.car, TransportMode.bike));
+		modes = new HashSet<String>();
+		modes.add(TransportMode.walk);
+		modes.add(TransportMode.car);
+		modes.add(TransportMode.bike);
+		l.setAllowedModes(modes);
 		modes = l.getAllowedModes();
 		assertEquals("wrong number of allowed modes", 3, modes.size());
-		assertTrue(modes.contains(TransportMode.bus));
+		assertTrue(modes.contains(TransportMode.walk));
 		assertTrue(modes.contains(TransportMode.car));
 		assertTrue(modes.contains(TransportMode.bike));
 	}

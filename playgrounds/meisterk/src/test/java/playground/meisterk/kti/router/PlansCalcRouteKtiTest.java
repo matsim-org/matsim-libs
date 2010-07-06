@@ -41,13 +41,13 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 	private Config config = null;
 	private NetworkLayer network = null;
 	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
 		config = super.loadConfig(null);
-		
+
 		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
 		ktiConfigGroup.setUsePlansCalcRouteKti(true);
 		ktiConfigGroup.setPtHaltestellenFilename(this.getClassInputDirectory() + "haltestellen.txt");
@@ -56,7 +56,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
 
 		network = new NetworkLayer();
-		
+
 		network.createAndAddNode(new IdImpl(1), new CoordImpl(1000.0, 1000.0));
 		network.createAndAddNode(new IdImpl(2), new CoordImpl(1100.0, 1100.0));
 		network.createAndAddNode(new IdImpl(3), new CoordImpl(1200.0, 1200.0));
@@ -70,9 +70,9 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 
 		KtiPtRouteFactory ktiPtRouteFactory = new KtiPtRouteFactory(plansCalcRouteKtiInfo);
 		network.getFactory().setRouteFactory(TransportMode.pt, ktiPtRouteFactory);
-		
+
 	}
-	
+
 
 	@Override
 	protected void tearDown() throws Exception {
@@ -81,53 +81,49 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		plansCalcRouteKtiInfo = null;
 		network = null;
 		config = null;
-		
+
 	}
 
 	public void testHandleLeg() {
-		
+
 		double departureTime = Time.parseTime("06:00:00");
-		
+
 		PlansCalcRouteKti testee = new PlansCalcRouteKti(
-				config.plansCalcRoute(), 
-				network, 
-				null, 
-				null, 
-				new DijkstraFactory(), 
+				config.plansCalcRoute(),
+				network,
+				null,
+				null,
+				new DijkstraFactory(),
 				plansCalcRouteKtiInfo);
-		
-		
-		for (TransportMode mode : TransportMode.values()) {
+
+
+		for (String mode : new String[] { TransportMode.car, TransportMode.ride, TransportMode.bike, TransportMode.walk, TransportMode.transit_walk, TransportMode.pt }) {
 			Person person = new PersonImpl(new IdImpl("1"));
 			LegImpl leg = new LegImpl(mode);
 			ActivityImpl fromAct = new ActivityImpl("home", new IdImpl("1"));
 			fromAct.setCoord(new CoordImpl(1050.0, 1050.0));
 			ActivityImpl toAct = new ActivityImpl("work", new IdImpl("1"));
 			toAct.setCoord(new CoordImpl(1052.0, 1052.0));
-			
+
 			try {
 				double travelTime = testee.handleLeg(person, leg, fromAct, toAct, departureTime);
-				assertEquals("Wrong returned travel time for mode \"" + mode.toString() + "\".", 0.0, travelTime);
-				assertEquals("Wrong leg departure time for mode \"" + mode.toString() + "\".", departureTime, leg.getDepartureTime());
-				assertEquals("Wrong leg travel time for mode \"" + mode.toString() + "\".", 0.0, leg.getTravelTime());
-				assertEquals("Wrong leg arrival time for mode \"" + mode.toString() + "\".", departureTime, leg.getArrivalTime());
-				assertEquals("Wrong distance for mode \"" + mode.toString() + "\".", 0.0, leg.getRoute().getDistance());
+				assertEquals("Wrong returned travel time for mode \"" + mode + "\".", 0.0, travelTime);
+				assertEquals("Wrong leg departure time for mode \"" + mode + "\".", departureTime, leg.getDepartureTime());
+				assertEquals("Wrong leg travel time for mode \"" + mode + "\".", 0.0, leg.getTravelTime());
+				assertEquals("Wrong leg arrival time for mode \"" + mode + "\".", departureTime, leg.getArrivalTime());
+				assertEquals("Wrong distance for mode \"" + mode + "\".", 0.0, leg.getRoute().getDistance());
 			} catch (RuntimeException e) {
 				System.out.println(e.toString());
 			}
-			
 		}
-		
-		
-		
 	}
-	
+
 	public void testHandleSwissPtLeg() {
-		
+
 		PersonImpl person = new PersonImpl(new IdImpl("123"));
 		PlanImpl plan = new PlanImpl();
 		person.addPlan(plan);
-		
+
 		ActivityImpl home = new ActivityImpl("home", new IdImpl("1"));
 		home.setCoord(new CoordImpl(1050.0, 1050.0));
 		ActivityImpl work = new ActivityImpl("work", new IdImpl("2"));
@@ -140,30 +136,30 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		plan.addActivity(work);
 
 		PlansCalcRouteKti testee = new PlansCalcRouteKti(
-				config.plansCalcRoute(), 
-				network, 
-				null, 
-				null, 
-				new DijkstraFactory(), 
+				config.plansCalcRoute(),
+				network,
+				null,
+				null,
+				new DijkstraFactory(),
 				plansCalcRouteKtiInfo);
-		
+
 		testee.handleLeg(person, leg, home, work, Time.parseTime("12:34:56"));
-		
+
 		String actualRouteDescription = ((KtiPtRoute) leg.getRoute()).getRouteDescription();
 		String expectedRouteDescription = "kti=8503006=26101=300.0=26102=8503015";
 		assertEquals(expectedRouteDescription, actualRouteDescription);
-		
+
 	}
 
 	public void testGetTimeInVehicle() {
-		
+
 		double expectedTimeInVehicle = 300.0;
 
 		KtiPtRoute route = new KtiPtRoute(null, null, this.plansCalcRouteKtiInfo);
 		route.setRouteDescription(null, "kti=8503006=26101=300.0=26102=8503015", null);
-		
+
 //		assertEquals(expectedTimeInVehicle, route.getPtMatrixInVehicleTime());
 		assertNull(route.getInVehicleTime());
 	}
-	
+
 }

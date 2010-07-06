@@ -4,7 +4,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -18,7 +17,7 @@ public class NeoLinkImpl implements Link {
 	static final String KEY_CAPACITY = "capacity";
 	static final String KEY_FREESPEED = "freespeed";
 	static final String KEY_LANES = "lanes";
-	
+
 	private org.neo4j.graphdb.Node underlyingNode;
 
 	public NeoLinkImpl(org.neo4j.graphdb.Node nextNode) {
@@ -26,7 +25,7 @@ public class NeoLinkImpl implements Link {
 	}
 
 	@Override
-	public Set<TransportMode> getAllowedModes() {
+	public Set<String> getAllowedModes() {
 		throw new RuntimeException();
 	}
 
@@ -78,7 +77,7 @@ public class NeoLinkImpl implements Link {
 	}
 
 	@Override
-	public void setAllowedModes(Set<TransportMode> modes) {
+	public void setAllowedModes(Set<String> modes) {
 		throw new RuntimeException();
 	}
 

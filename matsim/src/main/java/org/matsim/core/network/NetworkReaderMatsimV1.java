@@ -21,7 +21,7 @@
 package org.matsim.core.network;
 
 import java.io.IOException;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
@@ -29,7 +29,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -168,11 +167,11 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		if (atts.getValue("modes") != null) {
 			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');
 			if ((strModes.length == 1) && strModes[0].equals("")) {
-				l.setAllowedModes(EnumSet.noneOf(TransportMode.class));
+				l.setAllowedModes(new HashSet<String>());
 			} else {
-				Set<TransportMode> modes = EnumSet.noneOf(TransportMode.class);
+				Set<String> modes = new HashSet<String>();
 				for (int i = 0, n = strModes.length; i < n; i++) {
-					modes.add(TransportMode.valueOf(strModes[i].trim()));
+					modes.add(strModes[i].trim().intern());
 				}
 				l.setAllowedModes(modes);
 			}

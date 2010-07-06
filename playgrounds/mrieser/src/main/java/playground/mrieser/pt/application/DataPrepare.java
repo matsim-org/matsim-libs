@@ -97,18 +97,18 @@ public class DataPrepare {
 
 			// configure how transport modes must be converted
 			// the ones for Berlin
-			converter.registerTransportMode("B", TransportMode.bus);
+			converter.registerTransportMode("B", "bus");
 			converter.registerTransportMode("F", TransportMode.walk);
-			converter.registerTransportMode("K", TransportMode.bus);
-			converter.registerTransportMode("L", TransportMode.other);
+			converter.registerTransportMode("K", "bus");
+			converter.registerTransportMode("L", "other");
 			converter.registerTransportMode("P", TransportMode.car);
 			converter.registerTransportMode("R", TransportMode.bike);
-			converter.registerTransportMode("S", TransportMode.train);
-			converter.registerTransportMode("T", TransportMode.tram);
-			converter.registerTransportMode("U", TransportMode.train);
-			converter.registerTransportMode("V", TransportMode.other);
-			converter.registerTransportMode("W", TransportMode.bus);
-			converter.registerTransportMode("Z", TransportMode.train);
+			converter.registerTransportMode("S", "train");
+			converter.registerTransportMode("T", "tram");
+			converter.registerTransportMode("U", "train");
+			converter.registerTransportMode("V", "other");
+			converter.registerTransportMode("W", "bus");
+			converter.registerTransportMode("Z", "train");
 
 			// the ones for Zurich
 //			converter.registerTransportMode("B", TransportMode.bus); // BUS

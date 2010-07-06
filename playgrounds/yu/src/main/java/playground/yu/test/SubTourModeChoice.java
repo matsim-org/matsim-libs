@@ -19,14 +19,15 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.test;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -45,15 +46,14 @@ import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeC
 
 /**
  * uses {@code PlanAnalyzeTourModeChoiceSet} to realize "subtour mode choice"
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class SubTourModeChoice extends AbstractMultithreadedModule {
 	private Config config;
-	private EnumSet<TransportMode> availableModes = EnumSet.of(
-			TransportMode.car, TransportMode.pt), chainBasedModes = EnumSet
-			.of(TransportMode.car);
+	private Set<String> availableModes;
+	private Set<String> chainBasedModes;
 	private ActivityFacilities facilities;
 	private Network network;
 	private Random random = MatsimRandom.getLocalInstance();
@@ -61,6 +61,14 @@ public class SubTourModeChoice extends AbstractMultithreadedModule {
 	public SubTourModeChoice(final Config config,
 			ActivityFacilities facilities, Network network) {
 		super(config.global().getNumberOfThreads());
+
+		this.availableModes = new HashSet<String>();
+		this.availableModes.add(TransportMode.car);
+		this.availableModes.add(TransportMode.pt);
+
+		this.chainBasedModes = new HashSet<String>();
+		this.chainBasedModes.add(TransportMode.car);
+
 		this.config = config;
 		this.facilities = facilities;
 		this.network = network;
@@ -68,19 +76,18 @@ public class SubTourModeChoice extends AbstractMultithreadedModule {
 		String modes = config.vspExperimental().getModesForSubTourModeChoice();
 		if (modes != null) {
 			String[] parts = StringUtils.explode(modes, ',');
-			this.availableModes = EnumSet.noneOf(TransportMode.class);
+			this.availableModes = new HashSet<String>();
 			for (int i = 0, n = parts.length; i < n; i++) {
-				this.availableModes.add(TransportMode.valueOf(parts[i].trim()));
+				this.availableModes.add(parts[i].trim().intern());
 			}
 		}
 
 		String chainModes = config.vspExperimental().getChainBasedModes();
 		if (chainModes != null) {
 			String[] parts = StringUtils.explode(chainModes, ',');
-			this.chainBasedModes = EnumSet.noneOf(TransportMode.class);
+			this.chainBasedModes = new HashSet<String>();
 			for (int i = 0, n = parts.length; i < n; i++) {
-				this.chainBasedModes
-						.add(TransportMode.valueOf(parts[i].trim()));
+				this.chainBasedModes.add(parts[i].trim().intern());
 			}
 		}
 	}
@@ -97,7 +104,7 @@ public class SubTourModeChoice extends AbstractMultithreadedModule {
 		private PlanAnalyzeTourModeChoiceSet patmcs;
 
 		public ChooseRandomTourModeSet(
-				final EnumSet<TransportMode> chainBasedModes,
+				final Set<String> chainBasedModes,
 				final PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer,
 				final ActivityFacilities facilities, final Network network) {
 			patmcs = new PlanAnalyzeTourModeChoiceSet(chainBasedModes,
@@ -108,15 +115,15 @@ public class SubTourModeChoice extends AbstractMultithreadedModule {
 		@Override
 		public void run(Plan plan) {
 			this.patmcs.run(plan);
-			ArrayList<TransportMode[]> choiceSet = this.patmcs.getChoiceSet();
+			ArrayList<String[]> choiceSet = this.patmcs.getChoiceSet();
 
 			List<PlanElement> pes = plan.getPlanElements();
 			int legsSize = (pes.size() - 1) / 2;
-			TransportMode[] currentModes = new TransportMode[legsSize];
+			String[] currentModes = new String[legsSize];
 			for (int i = 0; i < legsSize; i++)
 				currentModes[i] = ((Leg) pes.get(2 * i + 1)).getMode();
 
-			TransportMode[] randomModes = currentModes;
+			String[] randomModes = currentModes;
 			do {
 				randomModes = choiceSet.get(random.nextInt(choiceSet.size()));
 			} while (currentModes.equals(randomModes));

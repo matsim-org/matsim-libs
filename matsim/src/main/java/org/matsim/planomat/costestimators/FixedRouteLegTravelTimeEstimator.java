@@ -20,9 +20,9 @@
 
 package org.matsim.planomat.costestimators;
 
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,8 +37,8 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.NetworkUtils;
 
 /**
@@ -74,21 +74,21 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 
 	}
 
-	private HashMap<Integer, EnumMap<TransportMode, LegImpl>> fixedRoutes = new HashMap<Integer, EnumMap<TransportMode, LegImpl>>();
+	private HashMap<Integer, Map<String, LegImpl>> fixedRoutes = new HashMap<Integer, Map<String, LegImpl>>();
 
 	@Override
 	public LegImpl getNewLeg(
-			TransportMode mode,
+			String mode,
 			Activity actOrigin,
 			Activity actDestination,
 			int legPlanElementIndex,
 			double departureTime) {
 
-		EnumMap<TransportMode, LegImpl> legInformation = null;
+		Map<String, LegImpl> legInformation = null;
 		if (this.fixedRoutes.containsKey(legPlanElementIndex)) {
 			legInformation = this.fixedRoutes.get(legPlanElementIndex);
 		} else {
-			legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
+			legInformation = new HashMap<String, LegImpl>();
 			this.fixedRoutes.put(legPlanElementIndex, legInformation);
 		}
 
@@ -167,7 +167,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 				newRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds(path.links), endLink.getId());
 				newLeg.setRoute(newRoute);
 
-				EnumMap<TransportMode, LegImpl> legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
+				Map<String, LegImpl> legInformation = new HashMap<String, LegImpl>();
 				legInformation.put(legIntermediate.getMode(), newLeg);
 
 				this.fixedRoutes.put(legIndex, legInformation);
@@ -244,7 +244,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 					// TODO this should be possible for all types of routes. Then we could cache e.g. the original pt routes, too.
 					// however, LegImpl cloning constructor does not yet handle generic routes correctly
 					if (leg.getRoute() instanceof NetworkRoute) {
-						EnumMap<TransportMode, LegImpl> legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
+						Map<String, LegImpl> legInformation = new HashMap<String, LegImpl>();
 						legInformation.put(leg.getMode(), new LegImpl(leg));
 						this.fixedRoutes.put(((PlanImpl) this.plan).getActLegIndex(leg), legInformation);
 					}

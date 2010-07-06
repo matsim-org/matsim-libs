@@ -97,7 +97,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  */
 public class QueueSimulation implements IOSimulation, ObservableSimulation, CapacityInformationMobsim, VisMobsim, AcceptsFeatures, QSimI {
 	// yyyy not sure if I want this public but something has to give for integration with OTFVis.  kai, may'10
-	
+
 	private int snapshotPeriod = 0;
 	private double snapshotTime = 0.0; 	/* time since lasat snapshot */
 
@@ -143,11 +143,11 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 
 	private boolean useActivityDurations = true;
 
-	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
+	private final Set<String> notTeleportedModes = new HashSet<String>();
 
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
-	
+
 	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>() ;
 	private AgentCounterI agentCounter = new AgentCounter() ;
 	private SimTimerI simTimer ;
@@ -167,21 +167,21 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		this.config = scenario.getConfig();
 		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
 //		AbstractSimulation.reset(this.config.simulation().getStuckTime());
-		
+
 //		this.agentCounter.setLiving(0);
 //		this.agentCounter.setLost(0);
 		this.agentCounter.reset();
-		
+
 //		SimulationTimer.resetStatic(this.config.simulation().getTimeStepSize());
 		simTimer = StaticFactoriesContainer.createSimulationTimer(this.config.simulation().getTimeStepSize()) ;
-		
+
 		setEvents(events);
 		this.population = scenario.getPopulation();
 
 		this.networkLayer = scenario.getNetwork();
 
 		this.network = new QueueNetwork(this.networkLayer, factory, this);
-		
+
 		this.agentFactory = new AgentFactory( this);
 
 		this.notTeleportedModes.add(TransportMode.car);
@@ -200,13 +200,14 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	}
 
 
+	@Override
 	public final void run() {
 		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
 		//do iterations
 		boolean cont = true;
 		while (cont) {
-			
+
 //			double time = this.simTimer.getTimeOfDayStatic();
 			double time = simTimer.getTimeOfDay() ;
 
@@ -246,7 +247,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 				qlink.addParkedVehicle(veh);
 			}
 		}
-		
+
 
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			for (PersonAgent agent : agents) {
@@ -342,7 +343,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		createSnapshotwriter();
 
 		prepareNetworkChangeEventsQueue();
-		
+
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.afterPrepareSim();
 		}
@@ -439,7 +440,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	/* package */ static final EventsManager getEvents() {
 		return events;
 	}
-	
+
+	@Override
 	public EventsManager getEventsManager() {
 		return this.events ;
 	}
@@ -481,6 +483,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	 * @param now
 	 * @param agent
 	 */
+	@Override
 	public void handleAgentArrival(final double now, PersonDriverAgent agent){
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeHandleAgentArrival(agent);
@@ -506,6 +509,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	 *
 	 * @see PersonDriverAgent#getDepartureTime()
 	 */
+	@Override
 	public void scheduleActivityEnd(final PersonDriverAgent agent) {
 		this.activityEndsList.add(agent);
 		int planElementIndex = agent.getPerson().getSelectedPlan().getPlanElements().indexOf(agent.getCurrentPlanElement()) ; // yyyy Aaaarrrrgggghhh
@@ -537,9 +541,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
+	@Override
 	public void agentDeparts(double now, final PersonDriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
-		TransportMode mode = leg.getMode();
+		String mode = leg.getMode();
 		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, leg.getMode()));
 		if (this.notTeleportedModes.contains(mode)){
 			this.handleKnownLegModeDeparture(now, agent, linkId, mode);
@@ -549,7 +554,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		}
 	}
 
-	protected void handleKnownLegModeDeparture(double now, PersonDriverAgent agent, Id linkId, TransportMode mode) {
+	protected void handleKnownLegModeDeparture(double now, PersonDriverAgent agent, Id linkId, String mode) {
 		Leg leg = agent.getCurrentLeg();
 		if (mode.equals(TransportMode.car)) {
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
@@ -589,6 +594,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		}
 	}
 
+	@Override
 	public void addSnapshotWriter(final SnapshotWriter writer) {
 		this.snapshotWriters.add(writer);
 	}
@@ -614,6 +620,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 
 	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PersonDriverAgent>>, Serializable {
 		private static final long serialVersionUID = 1L;
+		@Override
 		public int compare(final Tuple<Double, PersonDriverAgent> o1, final Tuple<Double, PersonDriverAgent> o2) {
 			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
 			if (ret == 0) {
@@ -626,15 +633,18 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 	QueueNetwork getQueueNetwork() {
 		return this.network;
 	}
-	
+
+	@Override
 	public VisNetwork getVisNetwork() {
 		return this.network ;
 	}
-	
+
+	@Override
 	public CapacityInformationNetwork getCapacityInformationNetwork() {
 		return this.network ;
 	}
 
+	@Override
 	public Scenario getScenario() {
 		return this.scenario;
 	}
@@ -649,7 +659,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		log.info("QueueSimulation is working with activity durations: " + this.isUseActivityDurations());
 	}
 
-	public Set<TransportMode> getNotTeleportedModes() {
+	public Set<String> getNotTeleportedModes() {
 		return notTeleportedModes;
 	}
 
@@ -658,10 +668,12 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		return iterationNumber;
 	}
 
+	@Override
 	public void setIterationNumber(Integer iterationNumber) {
 		this.iterationNumber = iterationNumber;
 	}
 
+	@Override
 	public void setControlerIO(ControlerIO controlerIO) {
 		this.controlerIO = controlerIO;
 	}

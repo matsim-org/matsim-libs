@@ -20,16 +20,15 @@
 
 package org.matsim.api.core.v01.population;
 
-import org.matsim.api.core.v01.TransportMode;
 
 public interface Leg extends PlanElement {
 
-	public TransportMode getMode();
+	public String getMode();
 
-	/**Sets the mode of the leg. No consistency check is done; in particular, the route or travel time info from 
+	/**Sets the mode of the leg. No consistency check is done; in particular, the route or travel time info from
 	 * a different mode may remain in place.
 	 */
-	public void setMode(TransportMode mode);
+	public void setMode(String mode);
 
 	public Route getRoute();
 

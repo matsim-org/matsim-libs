@@ -1,6 +1,5 @@
 package playground.mzilske.neo;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.neo4j.graphdb.Direction;
@@ -10,7 +9,7 @@ import org.neo4j.graphdb.Relationship;
 public class NeoLegImpl implements Leg {
 
 	static final String KEY_MODE = "mode";
-	
+
 	final private Node underlyingNode;
 
 	public NeoLegImpl(Node endNode) {
@@ -24,8 +23,8 @@ public class NeoLegImpl implements Leg {
 	}
 
 	@Override
-	public TransportMode getMode() {
-		return TransportMode.valueOf((String) underlyingNode.getProperty(KEY_MODE));
+	public String getMode() {
+		return (String) underlyingNode.getProperty(KEY_MODE);
 	}
 
 	@Override
@@ -51,8 +50,8 @@ public class NeoLegImpl implements Leg {
 	}
 
 	@Override
-	public void setMode(TransportMode mode) {
-		underlyingNode.setProperty(KEY_MODE, mode.name());
+	public void setMode(String mode) {
+		underlyingNode.setProperty(KEY_MODE, mode);
 	}
 
 	@Override

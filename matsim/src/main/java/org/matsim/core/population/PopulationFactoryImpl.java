@@ -24,7 +24,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -76,7 +75,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	}
 
 	@Override
-	public Leg createLeg(final TransportMode legMode) {
+	public Leg createLeg(final String legMode) {
 		return new LegImpl(legMode);
 	}
 

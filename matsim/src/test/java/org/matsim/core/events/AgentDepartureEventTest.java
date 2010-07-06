@@ -31,10 +31,10 @@ public class AgentDepartureEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		final AgentDepartureEventImpl event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
-				new AgentDepartureEventImpl(25669.05, new IdImpl("921"), new IdImpl("390"), TransportMode.train));
+				new AgentDepartureEventImpl(25669.05, new IdImpl("921"), new IdImpl("390"), TransportMode.bike));
 		assertEquals(25669.05, event.getTime(), EPSILON);
 		assertEquals("921", event.getPersonId().toString());
 		assertEquals("390", event.getLinkId().toString());
-		assertEquals("train", event.getLegMode().toString());
+		assertEquals("bike", event.getLegMode().toString());
 	}
 }

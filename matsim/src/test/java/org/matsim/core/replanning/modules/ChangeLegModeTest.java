@@ -40,7 +40,7 @@ public class ChangeLegModeTest extends MatsimTestCase {
 		config.global().setNumberOfThreads(0);
 
 		final ChangeLegMode module = new ChangeLegMode(config);
-		final TransportMode[] modes = new TransportMode[] {TransportMode.car, TransportMode.pt};
+		final String[] modes = new String[] {TransportMode.car, TransportMode.pt};
 		runTest(module, modes);
 	}
 
@@ -50,11 +50,11 @@ public class ChangeLegModeTest extends MatsimTestCase {
 		config.setParam(ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
 
 		final ChangeLegMode module = new ChangeLegMode(config);
-		final TransportMode[] modes = new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
+		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 		runTest(module, modes);
 	}
 
-	private void runTest(final ChangeLegMode module, final TransportMode[] possibleModes) {
+	private void runTest(final ChangeLegMode module, final String[] possibleModes) {
 		module.prepareReplanning();
 
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
@@ -62,8 +62,8 @@ public class ChangeLegModeTest extends MatsimTestCase {
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("work", new CoordImpl(0, 0));
 
-		HashMap<TransportMode, Integer> counter = new HashMap<TransportMode, Integer>();
-		for (TransportMode mode : possibleModes) {
+		HashMap<String, Integer> counter = new HashMap<String, Integer>();
+		for (String mode : possibleModes) {
 			counter.put(mode, Integer.valueOf(0));
 		}
 
@@ -74,9 +74,9 @@ public class ChangeLegModeTest extends MatsimTestCase {
 			counter.put(leg.getMode(), Integer.valueOf(count.intValue() + 1));
 		}
 
-		for (Map.Entry<TransportMode, Integer> entry : counter.entrySet()) {
+		for (Map.Entry<String, Integer> entry : counter.entrySet()) {
 			int count = entry.getValue().intValue();
-			assertTrue("mode " + entry.getKey().toString() + " was never chosen.", count > 0);
+			assertTrue("mode " + entry.getKey() + " was never chosen.", count > 0);
 		}
 	}
 }

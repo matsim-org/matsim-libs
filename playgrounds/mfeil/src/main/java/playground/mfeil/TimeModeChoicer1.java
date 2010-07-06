@@ -73,7 +73,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	protected static final Logger 			log = Logger.getLogger(TimeModeChoicer1.class);
 	protected final double					maxWalkingDistance;
 	protected final String					modeChoice;
-	protected final TransportMode[]			possibleModes;
+	protected final String[]			possibleModes;
 	protected List<LinkNetworkRouteImpl> 	routes;
 	private final Network 					network;
 	protected PrintStream 					stream;
@@ -203,6 +203,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	//////////////////////////////////////////////////////////////////////
 
 
+	@Override
 	public void run (Plan basePlan){
 
 	//	if (basePlan.getPerson().getId().toString().equals("1062251") ||
@@ -700,8 +701,8 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			PlanAnalyzeSubtours planAnalyzeSubtours, int[]subtourDis){
 		List<? extends PlanElement> actslegsResult = this.copyActsLegs(actslegs);
 		double score=-100000;
-		TransportMode subtour1=this.possibleModes[0];
-		TransportMode subtour2=this.possibleModes[0];
+		String subtour1=this.possibleModes[0];
+		String subtour2=this.possibleModes[0];
 
 		/* outer loop */
 		int distanceOuter = subtourDis[planAnalyzeSubtours.getSubtourIndexation()[outer/2]];

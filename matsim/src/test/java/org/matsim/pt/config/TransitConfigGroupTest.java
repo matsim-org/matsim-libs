@@ -20,7 +20,7 @@
 
 package org.matsim.pt.config;
 
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -102,24 +102,24 @@ public class TransitConfigGroupTest extends TestCase {
 
 	public void testTransitModes() {
 		TransitConfigGroup cg = new TransitConfigGroup();
-		Set<TransportMode> modes;
+		Set<String> modes;
 		// test initial value
 		modes = cg.getTransitModes();
-		assertEquals(4, modes.size());
+		assertEquals(1, modes.size());
 		assertTrue(modes.contains(TransportMode.pt));
-		assertTrue(modes.contains(TransportMode.bus));
-		assertTrue(modes.contains(TransportMode.train));
-		assertTrue(modes.contains(TransportMode.tram));
-		assertEquals("pt,train,bus,tram", cg.getValue(TransitConfigGroup.TRANSIT_MODES));
+		assertEquals("pt", cg.getValue(TransitConfigGroup.TRANSIT_MODES));
 		// test setting with setTransitModes
-		cg.setTransitModes(EnumSet.of(TransportMode.bus, TransportMode.train));
+		modes = new HashSet<String>();
+		modes.add("bus");
+		modes.add("train");
+		cg.setTransitModes(modes);
 		modes = cg.getTransitModes();
 		assertEquals(2, modes.size());
-		assertTrue(modes.contains(TransportMode.bus));
-		assertTrue(modes.contains(TransportMode.train));
-		assertEquals("train,bus", cg.getValue(TransitConfigGroup.TRANSIT_MODES));
+		assertTrue(modes.contains("bus"));
+		assertTrue(modes.contains("train"));
+		assertEquals("bus,train", cg.getValue(TransitConfigGroup.TRANSIT_MODES));
 		// test setting to none
-		cg.setTransitModes(EnumSet.noneOf(TransportMode.class));
+		cg.setTransitModes(new HashSet<String>());
 		modes = cg.getTransitModes();
 		assertEquals(0, modes.size());
 		assertEquals("", cg.getValue(TransitConfigGroup.TRANSIT_MODES));
@@ -127,10 +127,10 @@ public class TransitConfigGroupTest extends TestCase {
 		cg.addParam(TransitConfigGroup.TRANSIT_MODES, "tram,bus,train");
 		modes = cg.getTransitModes();
 		assertEquals(3, modes.size());
-		assertTrue(modes.contains(TransportMode.bus));
-		assertTrue(modes.contains(TransportMode.tram));
-		assertTrue(modes.contains(TransportMode.train));
-		assertEquals("train,bus,tram", cg.getValue(TransitConfigGroup.TRANSIT_MODES));
+		assertTrue(modes.contains("bus"));
+		assertTrue(modes.contains("tram"));
+		assertTrue(modes.contains("train"));
+		assertEquals("tram,bus,train", cg.getValue(TransitConfigGroup.TRANSIT_MODES));
 		// test setting to none
 		cg.addParam(TransitConfigGroup.TRANSIT_MODES, "");
 		modes = cg.getTransitModes();
@@ -141,10 +141,10 @@ public class TransitConfigGroupTest extends TestCase {
 		modes = cg.getTransitModes();
 		assertEquals(4, modes.size());
 		assertTrue(modes.contains(TransportMode.pt));
-		assertTrue(modes.contains(TransportMode.bus));
-		assertTrue(modes.contains(TransportMode.tram));
-		assertTrue(modes.contains(TransportMode.train));
-		assertEquals("pt,train,bus,tram", cg.getValue(TransitConfigGroup.TRANSIT_MODES));
+		assertTrue(modes.contains("bus"));
+		assertTrue(modes.contains("tram"));
+		assertTrue(modes.contains("train"));
+		assertEquals("tram,pt,bus,train", cg.getValue(TransitConfigGroup.TRANSIT_MODES));
 		// test setting to non-conform none
 		cg.addParam(TransitConfigGroup.TRANSIT_MODES, "  \t ");
 		modes = cg.getTransitModes();

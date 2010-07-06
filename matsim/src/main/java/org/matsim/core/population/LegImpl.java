@@ -20,7 +20,6 @@
 
 package org.matsim.core.population;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.RouteWRefs;
@@ -32,12 +31,12 @@ public class LegImpl implements Leg {
 
 	private double depTime = Time.UNDEFINED_TIME;
 	private double travTime = Time.UNDEFINED_TIME;
-	private TransportMode mode;
+	private String mode;
 
 	private double arrTime = Time.UNDEFINED_TIME;
 
-	public LegImpl(final TransportMode mode) {
-		this.mode = mode;
+	public LegImpl(final String transportMode) {
+		this.mode = transportMode;
 	}
 
 	/**
@@ -56,13 +55,13 @@ public class LegImpl implements Leg {
 	}
 
 	@Override
-	public final TransportMode getMode() {
+	public final String getMode() {
 		return this.mode;
 	}
 
 	@Override
-	public final void setMode(TransportMode mode) {
-		this.mode = mode;
+	public final void setMode(String transportMode) {
+		this.mode = transportMode;
 	}
 
 	@Override

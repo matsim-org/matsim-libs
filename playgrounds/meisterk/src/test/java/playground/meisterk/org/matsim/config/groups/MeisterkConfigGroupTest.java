@@ -20,8 +20,9 @@
 
 package playground.meisterk.org.matsim.config.groups;
 
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.testcases.MatsimTestCase;
@@ -29,7 +30,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class MeisterkConfigGroupTest extends MatsimTestCase {
 
 	private MeisterkConfigGroup meisterk;
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -44,14 +45,14 @@ public class MeisterkConfigGroupTest extends MatsimTestCase {
 
 	public void testMeisterkConfigGroup() {
 
-		EnumSet<TransportMode> expected = EnumSet.of(TransportMode.car, TransportMode.bike);
+		Set<String> expected = createHashSet(TransportMode.car, TransportMode.bike);
 		this.runTest(expected);
 	}
-	
+
 	public void testAddParam() {
 
 		this.meisterk.addParam(MeisterkConfigGroup.MeisterkConfigParameter.CHAIN_BASED_MODES.getParameterName(), "miv");
-		EnumSet<TransportMode> expected = EnumSet.of(TransportMode.miv);
+		Set<String> expected = createHashSet("miv");
 		this.runTest(expected);
 
 	}
@@ -59,21 +60,29 @@ public class MeisterkConfigGroupTest extends MatsimTestCase {
 	public void testAddEmptyParam() {
 
 		this.meisterk.addParam(MeisterkConfigGroup.MeisterkConfigParameter.CHAIN_BASED_MODES.getParameterName(), "");
-		EnumSet<TransportMode> expected = EnumSet.noneOf(TransportMode.class);
+		Set<String> expected = new HashSet<String>();
 		this.runTest(expected);
 
 	}
-	
-	private void runTest(EnumSet<TransportMode> expected) {
 
-		EnumSet<TransportMode> actual = this.meisterk.getChainBasedModes();
+	private void runTest(Set<String> expected) {
+
+		Set<String> actual = this.meisterk.getChainBasedModes();
 		assertEquals(actual.size(), expected.size());
-		Iterator<TransportMode> modeIterator = actual.iterator();
+		Iterator<String> modeIterator = actual.iterator();
 		while (modeIterator.hasNext()) {
-			TransportMode mode = modeIterator.next();
+			String mode = modeIterator.next();
 			assertTrue(expected.contains(mode));
 		}
-		
+
 	}
-	
+
+	public static final Set<String> createHashSet(String... modes) {
+		Set<String> set = new HashSet<String>();
+		for (String m : modes) {
+			set.add(m);
+		}
+		return set;
+	}
+
 }

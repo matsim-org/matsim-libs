@@ -20,7 +20,6 @@
 package org.matsim.core.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -39,42 +38,48 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
  */
 public class EventsFactoryImpl implements EventsFactory {
 
+	@Override
 	public ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, Id facilityId, String acttype) {
 		return new ActivityEndEventImpl(time, agentId, linkId, facilityId, acttype);
 	}
 
+	@Override
 	public ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, Id facilityId, String acttype) {
 		return new ActivityStartEventImpl(time, agentId, linkId, facilityId, acttype);
 	}
 
-	public AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final TransportMode legMode) {
+	public AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final String legMode) {
 		return new AgentArrivalEventImpl(time, agentId, linkId, legMode);
 	}
 
-	public AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final TransportMode legMode) {
+	public AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final String legMode) {
 		return new AgentDepartureEventImpl(time, agentId, linkId, legMode);
 	}
 
+	@Override
 	public AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney) {
 		return new AgentMoneyEventImpl(time, agentId, amountMoney);
 	}
 
-	public AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final TransportMode legMode) {
+	public AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final String legMode) {
 		return new AgentStuckEventImpl(time, agentId, linkId, legMode);
 	}
 
+	@Override
 	public AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId) {
 		return new AgentWait2LinkEventImpl(time, agentId, linkId);
 	}
 
+	@Override
 	public LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId) {
 		return new LinkEnterEventImpl(time, agentId, linkId);
 	}
 
+	@Override
 	public LinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId) {
 		return new LinkLeaveEventImpl(time, agentId, linkId);
 	}
-	
+
 	public PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId, final Id transitRouteId) {
 		PersonEntersVehicleEventImpl e = new PersonEntersVehicleEventImpl(time, personId, vehicleId, transitRouteId);
 		return e;
@@ -84,14 +89,14 @@ public class EventsFactoryImpl implements EventsFactory {
 		PersonLeavesVehicleEventImpl e = new PersonLeavesVehicleEventImpl(time, personId, vehicleId, transitRouteId);
 		return e;
 	}
-	
+
 	public VehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId, final double delay) {
 		return new VehicleArrivesAtFacilityEventImpl(time, vehicleId, facilityId, delay);
 	}
-	
+
 	public VehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId, final double delay) {
 		return new VehicleDepartsAtFacilityEventImpl(time, vehicleId, facilityId, delay);
 	}
 
-	
+
 }

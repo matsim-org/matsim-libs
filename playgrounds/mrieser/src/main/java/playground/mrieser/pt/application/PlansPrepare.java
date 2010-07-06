@@ -125,7 +125,7 @@ public class PlansPrepare {
 		plansWriter.closeStreaming();
 	}
 
-	public void filterMode(final String fromFile, final String toFile, final TransportMode mode) {
+	public void filterMode(final String fromFile, final String toFile, final String mode) {
 
 		Population pop = new ScenarioImpl().getPopulation();
 

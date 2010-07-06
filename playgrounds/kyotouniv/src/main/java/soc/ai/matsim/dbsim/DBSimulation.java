@@ -127,7 +127,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 
 	private boolean useActivityDurations = true;
 
-	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
+	private final Set<String> notTeleportedModes = new HashSet<String>();
 
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
@@ -162,11 +162,13 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 	 * listener to this QueueSimulation instance.
 	 * @param listeners
 	 */
+	@Override
 	public void addQueueSimulationListeners(final SimulationListener listener){
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
 
+	@Override
 	public final void run() {
 		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
@@ -470,7 +472,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 	 */
 	protected void agentDeparts(double now, final DriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
-		TransportMode mode = leg.getMode();
+		String mode = leg.getMode();
 		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, leg.getMode()));
 		if (this.notTeleportedModes.contains(mode)){
 			this.handleKnownLegModeDeparture(now, agent, linkId, mode);
@@ -480,7 +482,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 		}
 	}
 
-	protected void handleKnownLegModeDeparture(double now, DriverAgent agent, Id linkId, TransportMode mode) {
+	protected void handleKnownLegModeDeparture(double now, DriverAgent agent, Id linkId, String mode) {
 		Leg leg = agent.getCurrentLeg();
 		if (mode.equals(TransportMode.car)) {
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
@@ -549,6 +551,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 
 	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, DriverAgent>>, Serializable {
 		private static final long serialVersionUID = 1L;
+		@Override
 		public int compare(final Tuple<Double, DriverAgent> o1, final Tuple<Double, DriverAgent> o2) {
 			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
 			if (ret == 0) {
@@ -576,7 +579,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 		log.info("QueueSimulation is working with activity durations: " + this.isUseActivityDurations());
 	}
 
-	public Set<TransportMode> getNotTeleportedModes() {
+	public Set<String> getNotTeleportedModes() {
 		return notTeleportedModes;
 	}
 
@@ -585,10 +588,12 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 		return iterationNumber;
 	}
 
+	@Override
 	public void setIterationNumber(Integer iterationNumber) {
 		this.iterationNumber = iterationNumber;
 	}
 
+	@Override
 	public void setControlerIO(ControlerIO controlerIO) {
 		this.controlerIO = controlerIO;
 	}

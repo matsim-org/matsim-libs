@@ -21,7 +21,8 @@
 package org.matsim.pt.config;
 
 import java.util.Collections;
-import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,11 +46,13 @@ public class TransitConfigGroup extends Module {
 	private String transitScheduleFile = null;
 	private String vehiclesFile = null;
 
-	private Set<TransportMode> transitModes = Collections.unmodifiableSet(
-			EnumSet.of(TransportMode.pt, TransportMode.bus, TransportMode.train, TransportMode.tram));
+	private Set<String> transitModes;
 
 	public TransitConfigGroup() {
 		super(GROUP_NAME);
+		Set<String> modes = new LinkedHashSet<String>();
+		modes.add(TransportMode.pt);
+		this.transitModes = Collections.unmodifiableSet(modes);
 	}
 
 	@Override
@@ -60,11 +63,11 @@ public class TransitConfigGroup extends Module {
 				setVehiclesFile(value);
 		} else if (TRANSIT_MODES.equals(paramName)) {
 			String[] parts = StringUtils.explode(value, ',');
-			Set<TransportMode> tModes = EnumSet.noneOf(TransportMode.class);
+			Set<String> tModes = new LinkedHashSet<String>();
 			for (String part : parts) {
 				String trimmed = part.trim();
 				if (trimmed.length() > 0) {
-					tModes.add(TransportMode.valueOf(trimmed));
+					tModes.add(trimmed.intern());
 				}
 			}
 			this.transitModes = Collections.unmodifiableSet(tModes);
@@ -84,7 +87,7 @@ public class TransitConfigGroup extends Module {
 		if (TRANSIT_MODES.equals(paramName)) {
 			boolean isFirst = true;
 			StringBuilder str = new StringBuilder();
-			for (TransportMode mode : this.transitModes) {
+			for (String mode : this.transitModes) {
 				if (!isFirst) {
 					str.append(',');
 				}
@@ -130,11 +133,11 @@ public class TransitConfigGroup extends Module {
 		return this.vehiclesFile;
 	}
 
-	public void setTransitModes(final Set<TransportMode> modes) {
-		this.transitModes = Collections.unmodifiableSet(EnumSet.copyOf(modes));
+	public void setTransitModes(final Set<String> modes) {
+		this.transitModes = Collections.unmodifiableSet(new HashSet(modes));
 	}
 
-	public Set<TransportMode> getTransitModes() {
+	public Set<String> getTransitModes() {
 		return this.transitModes;
 	}
 

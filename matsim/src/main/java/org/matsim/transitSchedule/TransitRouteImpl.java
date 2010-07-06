@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -37,7 +36,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**
  * Describes a route of a transit line, including its stops and the departures along this route.
- * 
+ *
  * @author mrieser
  */
 public class TransitRouteImpl implements TransitRoute {
@@ -47,43 +46,49 @@ public class TransitRouteImpl implements TransitRoute {
 	private final List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 	private String description = null;
 	private final Map<Id, Departure> departures = new TreeMap<Id, Departure>();
-	private TransportMode transportMode;
+	private String transportMode;
 	private String lineRouteName;
 	private String direction;
 
-	protected TransitRouteImpl(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode) {
+	protected TransitRouteImpl(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final String transportMode) {
 		this.routeId = id;
 		this.route = route;
 		this.stops.addAll(stops);
-		this.transportMode = mode;
+		this.transportMode = transportMode;
 	}
 
+	@Override
 	public Id getId() {
 		return this.routeId;
 	}
 
+	@Override
 	public void setDescription(final String description) {
 		this.description = description;
 	}
 
+	@Override
 	public String getDescription() {
 		return this.description;
 	}
 
 	/**
 	 * Sets the transport mode with which this transit route is handled, e.g.
-	 * {@link TransportMode#bus} or {@link TransportMode#train}.
+	 * <code>bus</code> or <code>train</code>.
 	 *
 	 * @param mode
 	 */
-	public void setTransportMode(final TransportMode mode) {
+	@Override
+	public void setTransportMode(final String mode) {
 		this.transportMode = mode;
 	}
 
-	public TransportMode getTransportMode() {
+	@Override
+	public String getTransportMode() {
 		return this.transportMode;
 	}
 
+	@Override
 	public void addDeparture(final Departure departure) {
 		final Id id = departure.getId();
 		if (this.departures.containsKey(id)) {
@@ -92,26 +97,32 @@ public class TransitRouteImpl implements TransitRoute {
 		this.departures.put(id, departure);
 	}
 
+	@Override
 	public boolean removeDeparture(final Departure departure) {
 		return null != this.departures.remove(departure.getId());
 	}
-	
+
+	@Override
 	public Map<Id, Departure> getDepartures() {
 		return Collections.unmodifiableMap(this.departures);
 	}
 
+	@Override
 	public NetworkRoute getRoute() {
 		return this.route;
 	}
 
+	@Override
 	public void setRoute(final NetworkRoute route) {
 		this.route = route;
 	}
 
+	@Override
 	public List<TransitRouteStop> getStops() {
 		return Collections.unmodifiableList(this.stops);
 	}
 
+	@Override
 	public TransitRouteStop getStop(final TransitStopFacility stop) {
 		for (TransitRouteStop trStop : this.stops) {
 			if (stop == trStop.getStopFacility()) {

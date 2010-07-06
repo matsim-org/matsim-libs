@@ -210,7 +210,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 
 			// getting the chosen mode
 			int modechoice = model.calcModeChoice();
-			TransportMode mode = null;
+			String mode = null;
 			if (modechoice == 0) { mode = TransportMode.car; }
 			else if (modechoice == 1) { mode = TransportMode.pt; }
 			else if (modechoice == 2) { mode = TransportMode.ride; }
@@ -254,6 +254,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 	}
 
 
+	@Override
 	public void run(Plan plan){
 	}
 }

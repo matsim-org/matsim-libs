@@ -126,7 +126,7 @@ public class AccessEgressDemo {
 			linkList.add(this.ids[i]);
 		}
 		networkRoute.setLinkIds(startLink.getId(), linkList, endLink.getId());
-		TransitRoute tRoute = builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
+		TransitRoute tRoute = builder.createTransitRoute(this.ids[1], networkRoute, stopList, "bus");
 
 		TransitLine tLine = builder.createTransitLine(this.ids[1]);
 		tLine.addRoute(tRoute);

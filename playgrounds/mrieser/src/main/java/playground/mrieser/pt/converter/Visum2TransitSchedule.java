@@ -28,7 +28,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -40,10 +39,10 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.VehicleCombination;
@@ -58,7 +57,7 @@ public class Visum2TransitSchedule {
 	private final Vehicles vehicles;
 	//	private final CoordinateTransformation coordinateTransformation = new Kilometer2MeterTransformation();
 	private final CoordinateTransformation coordinateTransformation = new IdentityTransformation();
-	private final Map<String, TransportMode> transportModes = new HashMap<String, TransportMode>();
+	private final Map<String, String> transportModes = new HashMap<String, String>();
 
 	public Visum2TransitSchedule(final VisumNetwork visum, final TransitSchedule schedule, final Vehicles vehicles) {
 		this.visum = visum;
@@ -66,7 +65,7 @@ public class Visum2TransitSchedule {
 		this.vehicles = vehicles;
 	}
 
-	public void registerTransportMode(final String visumTransportMode, final TransportMode transportMode) {
+	public void registerTransportMode(final String visumTransportMode, final String transportMode) {
 		this.transportModes.put(visumTransportMode, transportMode);
 	}
 
@@ -123,7 +122,7 @@ public class Visum2TransitSchedule {
 								stops.add(s);
 							}
 						}
-						TransportMode mode = this.transportModes.get(line.tCode);
+						String mode = this.transportModes.get(line.tCode);
 						if (mode == null) {
 							log.error("Could not find TransportMode for " + line.tCode + ", more info: " + line.id);
 						}

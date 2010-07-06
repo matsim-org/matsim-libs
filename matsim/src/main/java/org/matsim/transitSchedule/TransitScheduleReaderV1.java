@@ -139,7 +139,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		if (Constants.DESCRIPTION.equals(name) && Constants.TRANSIT_ROUTE.equals(context.peek())) {
 			this.currentTransitRoute.description = content;
 		} else if (Constants.TRANSPORT_MODE.equals(name)) {
-			this.currentTransitRoute.mode = TransportMode.valueOf(content);
+			this.currentTransitRoute.mode = content.intern();
 		} else if (Constants.TRANSIT_ROUTE.equals(name)) {
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(this.currentTransitRoute.stops.size());
 			for (TempStop tStop : this.currentTransitRoute.stops) {
@@ -169,7 +169,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		protected String description = null;
 		protected Map<Id, Departure> departures = new LinkedHashMap<Id, Departure>();
 		/*package*/ List<TempStop> stops = new ArrayList<TempStop>();
-		/*package*/ TransportMode mode = null;
+		/*package*/ String mode = null;
 
 		protected TempTransitRoute(final Id id) {
 			this.id = id;

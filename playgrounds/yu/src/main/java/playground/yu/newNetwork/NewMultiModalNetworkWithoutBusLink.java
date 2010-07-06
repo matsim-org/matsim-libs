@@ -41,8 +41,8 @@ public class NewMultiModalNetworkWithoutBusLink {
 		if (link != null) {
 			// System.out.println("linkId:\t" + link.getId());
 			System.out.println("link prior modes:\t" + link.getAllowedModes());
-			Set<TransportMode> modes = link.getAllowedModes();
-			modes.add(TransportMode.bus);
+			Set<String> modes = link.getAllowedModes();
+			modes.add("bus");
 			link.setAllowedModes(modes);
 			System.out.println("link posterior modes:\t"
 					+ link.getAllowedModes());
@@ -50,10 +50,10 @@ public class NewMultiModalNetworkWithoutBusLink {
 		}
 	}
 
-	private static void handleOtherPtLink(Link link, TransportMode mode) {
+	private static void handleOtherPtLink(Link link, String mode) {
 		if (link != null) {
 			System.out.println("link prior modes:\t" + link.getAllowedModes());
-			Set<TransportMode> modes = link.getAllowedModes();
+			Set<String> modes = link.getAllowedModes();
 			modes.add(mode);
 			link.setAllowedModes(modes);
 			System.out.println("link posterior modes:\t"
@@ -62,9 +62,9 @@ public class NewMultiModalNetworkWithoutBusLink {
 	}
 
 	private static void handleRoute(TransitRoute route, Network network) {
-		TransportMode tm = route.getTransportMode();
+		String tm = route.getTransportMode();
 		NetworkRoute nrwr = route.getRoute();
-		if (tm.equals(TransportMode.bus)) {
+		if (tm.equals("bus")) {
 			handleBusLink(network.getLinks().get(nrwr.getStartLinkId()));
 			for (Id linkId : nrwr.getLinkIds()) {
 				Link link = network.getLinks().get(linkId);
@@ -83,13 +83,13 @@ public class NewMultiModalNetworkWithoutBusLink {
 	}
 
 	private static void checkLinks2delete() {
-		Set<TransportMode> modes = new HashSet<TransportMode>();
+		Set<String> modes = new HashSet<String>();
 		modes.add(TransportMode.pt);
-		modes.add(TransportMode.bus);
+		modes.add("bus");
 		Set<Link> tmpSet = new HashSet<Link>();
 		tmpSet.addAll(busLinks2delete);
 		for (Link link : tmpSet) {
-			for (TransportMode mode : link.getAllowedModes()) {
+			for (String mode : link.getAllowedModes()) {
 				if (!modes.contains(mode)) {
 					busLinks2delete.remove(link);
 					break;

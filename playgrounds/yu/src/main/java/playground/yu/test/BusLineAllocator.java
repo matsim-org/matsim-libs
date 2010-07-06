@@ -30,8 +30,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -58,9 +58,9 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -82,6 +82,7 @@ import playground.yu.utils.io.SimpleWriter;
 public class BusLineAllocator {
 	private class TravelCostFunctionDistance implements TravelCost {
 		/** returns only the link length */
+		@Override
 		public double getLinkTravelCost(Link link, double time) {
 			return link.getLength();
 		}
@@ -89,6 +90,7 @@ public class BusLineAllocator {
 
 	private class TravelTimeFunctionFree implements TravelTime {
 		/** returns only freespeedtraveltime */
+		@Override
 		public double getLinkTravelTime(Link link, double time) {
 			return ((LinkImpl) link).getFreespeedTravelTime();
 		}
@@ -130,7 +132,7 @@ public class BusLineAllocator {
 	private final TransitSchedule schedule;
 	private boolean hasStartLink = false;
 	private final Network multiModalNetwork;
-	private static Set<TransportMode> modes = new HashSet<TransportMode>();
+	private static Set<String> modes = new HashSet<String>();
 
 	/**
 	 * @param netWithoutBus
@@ -154,7 +156,7 @@ public class BusLineAllocator {
 				new TravelCostFunctionDistance(), new TravelTimeFunctionFree());
 		modes.add(TransportMode.car);
 		// modes.add(TransportMode.pt);
-		modes.add(TransportMode.bus);
+		modes.add("bus");
 	}
 
 	protected void allocateAllRouteLinks() {
@@ -511,7 +513,7 @@ public class BusLineAllocator {
 		Map<Id, List<Tuple<Link, Tuple<Coord, Coord>>>> coordPairs = new HashMap<Id, List<Tuple<Link, Tuple<Coord, Coord>>>>();
 		for (TransitLine ptLine : schedule.getTransitLines().values()) {
 			for (TransitRoute ptRoute : ptLine.getRoutes().values()) {
-				if (ptRoute.getTransportMode().equals(TransportMode.bus)) {
+				if (ptRoute.getTransportMode().equals("bus")) {
 					Id ptRouteId = ptRoute.getId();
 					List<Tuple<Link, Tuple<Coord, Coord>>> ptLinkCoordPairs = coordPairs
 							.get(ptRouteId);

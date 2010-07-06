@@ -72,6 +72,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ActLocationFalsifier;
@@ -625,11 +626,39 @@ public class MyRuns {
 
 	}
 
-//	public static void someMethod(List<Integer> list) {
-//		System.out.println(list.size());
-//		list = new ArrayList<Integer>();
-//		System.out.println(list.size());
-//	}
+	public static void someMethod(final List<Integer> list) {
+//		Config config = new Config();
+//		TravelTimeCalculator traveltime = new TravelTimeCalculator(network, config.travelTimeCalculator());
+//		EventsManager events = new EventsManagerImpl();
+//		events.addHandler(traveltime);
+//		new MatsimEventsReader(events).readFile("0.events.txt.gz");
+//
+//		TravelCost costFunction = new TravelTimeDistanceCostCalculator(traveltime, config.charyparNagelScoring());
+//		Dijkstra router = new Dijkstra(network, costFunction, traveltime);
+//		router.calcLeastCostPath(fromNode, toNode, startTime);
+//
+//		for (Person person : population.getPersons().value()) {
+//			Plan plan = person.getSelectedPlan();
+//			for (PlanElement pe : plan.getPlanElements()) {
+//				if (pe instanceof Leg) {
+//					Leg leg = (Leg) pe;
+//					if (leg.getRoute() instanceof NetworkRoute) {
+//						NetworkRoute route = (NetworkRoute) leg.getRoute();
+//						double currentTime = leg.getDepartureTime();
+//						double traveltime = 0.0;
+//						// TODO handle start link of route
+//						for (Id linkId : route.getLinkIds()) {
+//							double linkTravelTime = linkstats.getLinkTravelTime(linkId, currentTime);
+//							traveltime = traveltime + linkTravelTime;
+//							currentTime = currentTime + linkTravelTime;
+//						}
+//						// TODO handle end link of route
+//					}
+//				}
+//			}
+//		}
+
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// main
@@ -723,7 +752,7 @@ public class MyRuns {
 
 		Gbl.printSystemInfo();
 
-//		Scenario scenario = new ScenarioImpl();
+		//		Scenario scenario = new ScenarioImpl();
 //		OsmNetworkReader osmReader = new OsmNetworkReader(scenario.getNetwork(), new WGS84toCH1903LV03());
 //		osmReader.setKeepPaths(false);
 //		try {
@@ -739,7 +768,12 @@ public class MyRuns {
 //		OTFVis.main(new String[]{"/Users/mrieser/Downloads/switzerland.xml"});
 
 
-		new MatsimPopulationReader(new ScenarioImpl()).readFile("/data/coding/eclipse35/MATSim/examples/equil/plans100.xml");
+		try {
+			ConfigUtils.loadConfig("../mfeil/test/input/playground/mfeil/config.xml");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+//		new MatsimPopulationReader(new ScenarioImpl()).readFile("/data/coding/eclipse35/MATSim/examples/equil/plans100.xml");
 
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();

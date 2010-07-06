@@ -1,7 +1,26 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mzilske.neo;
 
 import java.io.IOException;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
@@ -9,7 +28,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -89,7 +107,7 @@ public class ApiNetworkReader extends MatsimXmlParser {
 
 	private void setCapacityPeriod(double parseTime) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void startLinks(final Attributes atts) {
@@ -124,12 +142,12 @@ public class ApiNetworkReader extends MatsimXmlParser {
 
 	private void setEffectiveLaneWidth(double d) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void setEffectiveCellSize(double d) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void startNode(final Attributes atts) {
@@ -143,12 +161,12 @@ public class ApiNetworkReader extends MatsimXmlParser {
 
 	private void setOrigId(Node node2, String value) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void setType(Node node2, String value) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void startLink(final Attributes atts) {
@@ -163,11 +181,11 @@ public class ApiNetworkReader extends MatsimXmlParser {
 		if (atts.getValue("modes") != null) {
 			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');
 			if ((strModes.length == 1) && strModes[0].equals("")) {
-				l.setAllowedModes(EnumSet.noneOf(TransportMode.class));
+				l.setAllowedModes(new HashSet<String>());
 			} else {
-				Set<TransportMode> modes = EnumSet.noneOf(TransportMode.class);
+				Set<String> modes = new HashSet<String>();
 				for (int i = 0, n = strModes.length; i < n; i++) {
-					modes.add(TransportMode.valueOf(strModes[i].trim()));
+					modes.add(strModes[i].trim().intern());
 				}
 				l.setAllowedModes(modes);
 			}
@@ -185,12 +203,12 @@ public class ApiNetworkReader extends MatsimXmlParser {
 
 	private void setType(Link l, String value) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void setOrigId(Link l, String value) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis.pt;
 
@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -44,12 +43,12 @@ import org.matsim.core.utils.charts.XYLineChart;
 /**
  * Counts the number of person and ptDriver departed, arrived or got stuck per
  * time bin based on events.
- * 
+ *
  * @author yu
  */
 public class LegHisto implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, AgentStuckEventHandler {
-	private final Map<TransportMode, ModeData> data = new HashMap<TransportMode, ModeData>(
+	private final Map<String, ModeData> data = new HashMap<String, ModeData>(
 			5, 0.85f);
 	private int binSize, nofBins;
 	private ModeData drvrModesData;
@@ -89,7 +88,7 @@ public class LegHisto implements AgentDepartureEventHandler,
 		return bin;
 	}
 
-	private ModeData getDataForMode(TransportMode legMode) {
+	private ModeData getDataForMode(String legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
 			modeData = new ModeData(nofBins + 1); // +1 for all times out of our
@@ -109,6 +108,7 @@ public class LegHisto implements AgentDepartureEventHandler,
 		return enRoutes;
 	}
 
+	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		int index = getBinIndex(event.getTime());
 		if (event.getPersonId().toString().startsWith("pt"))
@@ -119,6 +119,7 @@ public class LegHisto implements AgentDepartureEventHandler,
 		}
 	}
 
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		int index = getBinIndex(event.getTime());
 		if (event.getPersonId().toString().startsWith("pt"))
@@ -129,6 +130,7 @@ public class LegHisto implements AgentDepartureEventHandler,
 		}
 	}
 
+	@Override
 	public void handleEvent(AgentStuckEvent event) {
 		int index = getBinIndex(event.getTime());
 		if (event.getPersonId().toString().startsWith("pt"))
@@ -139,6 +141,7 @@ public class LegHisto implements AgentDepartureEventHandler,
 		}
 	}
 
+	@Override
 	public void reset(int iteration) {
 	}
 
@@ -162,11 +165,11 @@ public class LegHisto implements AgentDepartureEventHandler,
 		chartS.addSeries("ptDriver", xs, drvrModesData.countsStuck);
 		chartE.addSeries("ptDriver", xs, getEnRoutes(drvrModesData));
 
-		List<TransportMode> modes = new ArrayList<TransportMode>();
+		List<String> modes = new ArrayList<String>();
 		modes.addAll(data.keySet());
 		Collections.sort(modes);
 
-		for (TransportMode mode : modes) {
+		for (String mode : modes) {
 			String modeName = mode.toString();
 			ModeData modeData = data.get(mode);
 			chartA.addSeries(modeName, xs, modeData.countsArr);

@@ -73,15 +73,14 @@ import playground.yu.utils.io.SimpleWriter;
 public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 	private final static String CONFIG_MODULE = "changeLegModeWithParkLocation";
 	private final static String CONFIG_PARAM_MODES = "modes";
-	private TransportMode[] availableModes = new TransportMode[] {
-			TransportMode.car, TransportMode.pt };
+	private String[] availableModes = new String[] {TransportMode.car, TransportMode.pt };
 	private final Network network;
 
 	/**
 	 * @param availableModes
 	 *            an array for TransportMode
 	 */
-	public ChangeLegModeWithParkLocation(final Config config, final Network network, final TransportMode[] availableModes) {
+	public ChangeLegModeWithParkLocation(final Config config, final Network network, final String[] availableModes) {
 		super(config.global());
 		this.network = network;
 		this.availableModes = availableModes.clone();
@@ -93,9 +92,9 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		String modes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
 		if (modes != null) {
 			String[] parts = StringUtils.explode(modes, ',');
-			this.availableModes = new TransportMode[parts.length];
+			this.availableModes = new String[parts.length];
 			for (int i = 0, n = parts.length; i < n; i++) {
-				this.availableModes[i] = TransportMode.valueOf(parts[i].trim());
+				this.availableModes[i] = parts[i].trim().intern();
 			}
 		}
 	}
@@ -119,18 +118,19 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 	private static class ChooseRandomLegModeWithParkLink implements
 			PlanAlgorithm {
-		private final TransportMode[] possibleModes;
+		private final String[] possibleModes;
 		private final Network network;
 
 		private final Random rnd;
 
-		public ChooseRandomLegModeWithParkLink(final TransportMode[] possibleModes,
+		public ChooseRandomLegModeWithParkLink(final String[] possibleModes,
 				final Random rnd, final Network network) {
 			this.possibleModes = possibleModes;
 			this.rnd = rnd;
 			this.network = network;
 		}
 
+		@Override
 		public void run(final Plan plan) {
 			List<PlanElement> pes = plan.getPlanElements();
 			int peSize = pes.size();
@@ -149,9 +149,9 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 					// changed.
 					int legIdx = this.rnd.nextInt(peSize / 2) * 2 + 1;
 
-					TransportMode crtMode = ((Leg) copyPlan.getPlanElements()
+					String crtMode = ((Leg) copyPlan.getPlanElements()
 							.get(legIdx)).getMode();
-					TransportMode newMode = crtMode;
+					String newMode = crtMode;
 					while (newMode.equals(crtMode)) {
 						newMode = this.possibleModes[this.rnd
 								.nextInt(this.possibleModes.length)];
@@ -173,7 +173,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		}
 
 		private boolean changeUnCar2UnCar(final PlanImpl plan, final int legIdx,
-				final TransportMode mode) {
+				final String mode) {
 			PlanElement pe = plan.getPlanElements().get(legIdx);
 			if (pe != null) {
 				((Leg) pe).setMode(mode);
@@ -183,7 +183,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		}
 
 		private boolean changeCar2UnCar(final PlanImpl plan, final int legIdx,
-				final TransportMode mode) {
+				final String mode) {
 			CarLegChain clc = new CarLegChain(plan);
 
 			// System.out.println("personId:\t" + personId + "\tcarChain:\t"
@@ -284,10 +284,10 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		 */
 
 		private boolean setLegRandomModeWithoutModeA(final PlanImpl plan,
-				final Tuple<Integer, Integer> tuple, final TransportMode modeA) {
+				final Tuple<Integer, Integer> tuple, final String modeA) {
 			boolean toReturn = true;
 			for (int i = tuple.getFirst() + 1; i < tuple.getSecond(); i += 2) {
-				TransportMode newMode = this.possibleModes[this.rnd
+				String newMode = this.possibleModes[this.rnd
 						.nextInt(this.possibleModes.length)];
 				while (modeA.equals(newMode))
 					newMode = this.possibleModes[this.rnd.nextInt(this.possibleModes.length)];
@@ -475,7 +475,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		}
 
 		private static boolean setLegChainMode(final PlanImpl plan, final int leftActIdx,
-				final int rightActIdx, final TransportMode mode) {
+				final int rightActIdx, final String mode) {
 			if (leftActIdx % 2 != 0 || rightActIdx % 2 != 0 || leftActIdx < 0
 					|| rightActIdx > plan.getPlanElements().size()) {
 				throw new RuntimeException(
@@ -487,7 +487,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		}
 
 		private static boolean setLegMode(final PlanImpl plan, final int legIdx,
-				final TransportMode mode) {
+				final String mode) {
 			List<PlanElement> pes = plan.getPlanElements();
 			int size = pes.size();
 			if (legIdx % 2 == 0 || legIdx < 0 || legIdx > size) {
@@ -678,6 +678,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		private SimpleWriter writer = null;
 		private Set<String> patterns;
 
+		@Override
 		public void notifyStartup(final StartupEvent event) {
 			this.writer = new SimpleWriter(event.getControler().getControlerIO()
 					.getOutputFilename("legModesPattern.txt"));
@@ -685,6 +686,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			this.patterns = new HashSet<String>();
 		}
 
+		@Override
 		public void notifyIterationEnds(final IterationEndsEvent event) {
 			Controler ctl = event.getControler();
 			// int itr = event.getIteration();
@@ -702,6 +704,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			}
 		}
 
+		@Override
 		public void notifyShutdown(final ShutdownEvent event) {
 			this.writer.writeln("--------------------------------");
 			for (String s : this.patterns) {

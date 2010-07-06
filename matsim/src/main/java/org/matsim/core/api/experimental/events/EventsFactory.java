@@ -20,7 +20,6 @@
 package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimFactory;
 
 
@@ -35,13 +34,13 @@ public interface EventsFactory extends MatsimFactory {
 
 	LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId);
 
-	AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final TransportMode legMode);
+	AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final String legMode);
 
 	AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId);
 
-	AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final TransportMode legMode);
+	AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final String legMode);
 
-	AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final TransportMode legMode);
+	AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final String legMode);
 
 	ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, final Id facilityId, String acttype);
 
@@ -50,11 +49,11 @@ public interface EventsFactory extends MatsimFactory {
 	AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney);
 
 	// the following are not (yet) in the api?
-	
+
 //	BasicPersonEntersVehicleEvent createPersonEntersVehicleEvent(double time, Id personId, Id vehicleId);
 //	BasicPersonLeavesVehicleEvent createPersonLeavesVehicleEvent(double time, Id personId, Id vehicleId);
 //
 //	BasicVehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(double time, Id vehicleId, Id facilityId);
 //	BasicVehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(double time, Id vehicleId, Id facilityId);
-	
+
 }

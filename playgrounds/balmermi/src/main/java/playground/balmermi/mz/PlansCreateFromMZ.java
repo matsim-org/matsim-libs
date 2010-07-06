@@ -154,13 +154,13 @@ public class PlansCreateFromMZ {
 
 				// trip mode type
 				int m = Integer.parseInt(entries[12].trim());
-				TransportMode mode = null;
+				String mode = null;
 				if (m == 1) { mode = TransportMode.walk; }
 				else if (m == 2) { mode = TransportMode.bike; }
 				else if (m == 3) { mode = TransportMode.car; }
 				else if (m == 4) { mode = TransportMode.pt; }
 				else if (m == 5) { mode = TransportMode.ride; }
-				else if (m == 6) { mode = TransportMode.undefined; }
+				else if (m == 6) { mode = "undefined"; }
 				else { Gbl.errorMsg("pid=" + pid + ": m=" + m + " not known!"); }
 
 				// micro census person weight

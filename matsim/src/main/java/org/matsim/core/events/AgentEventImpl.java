@@ -23,7 +23,6 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.AgentEvent;
 
 public abstract class AgentEventImpl extends PersonEventImpl implements AgentEvent {
@@ -32,9 +31,9 @@ public abstract class AgentEventImpl extends PersonEventImpl implements AgentEve
 	public static final String ATTRIBUTE_LEGMODE = "legMode";
 
 	private final Id linkId;
-	private final TransportMode legMode;
+	private final String legMode;
 
-	AgentEventImpl(final double time, final Id agentId, final Id linkId, final TransportMode legMode) {
+	AgentEventImpl(final double time, final Id agentId, final Id linkId, final String legMode) {
 		super(time, agentId);
 		this.linkId = linkId;
 		this.legMode = legMode;
@@ -50,10 +49,12 @@ public abstract class AgentEventImpl extends PersonEventImpl implements AgentEve
 		return attr;
 	}
 
-	public TransportMode getLegMode() {
+	@Override
+	public String getLegMode() {
 		return this.legMode;
 	}
 
+	@Override
 	public Id getLinkId() {
 		return this.linkId;
 	}

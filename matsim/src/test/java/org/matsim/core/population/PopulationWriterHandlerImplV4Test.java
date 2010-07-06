@@ -21,7 +21,6 @@
 package org.matsim.core.population;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -52,7 +51,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		PlanImpl plan = (PlanImpl) pb.createPlan();
 		plan.setPerson(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", link1.getId()));
-		Leg leg = pb.createLeg(TransportMode.undefined);
+		Leg leg = pb.createLeg("undefined");
 		Route route = new GenericRouteImpl(link1.getId(), link2.getId());
 		route.setTravelTime(123);
 		leg.setRoute(route);

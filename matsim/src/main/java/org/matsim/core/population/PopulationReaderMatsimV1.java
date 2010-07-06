@@ -142,6 +142,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	 * @param filename
 	 *          The name of the file to parse.
 	 */
+	@Override
 	public void readFile(final String filename) {
 		try {
 			parse(filename);
@@ -221,7 +222,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startLeg(final Attributes atts) {
-		this.currleg = this.currplan.createAndAddLeg(TransportMode.valueOf(atts.getValue("mode").toLowerCase(Locale.ROOT)));
+		this.currleg = this.currplan.createAndAddLeg(atts.getValue("mode").toLowerCase(Locale.ROOT).intern());
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
 		this.currleg.setArrivalTime(Time.parseTime(atts.getValue("arr_time")));

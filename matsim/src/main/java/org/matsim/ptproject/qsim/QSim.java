@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -130,7 +129,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	private double stopTime = 100*3600;
 	private AgentFactory agentFactory;
 	private SimulationListenerManager<QSim> listenerManager;
-	protected final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = 
+	protected final PriorityBlockingQueue<PersonDriverAgent> activityEndsList =
 		new PriorityBlockingQueue<PersonDriverAgent>(500, new DriverAgentDepartureTimeComparator());
 	protected Scenario scenario = null;
 	private QSimSignalEngine signalEngine = null;
@@ -184,11 +183,11 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		else {
 			network = new QNetwork(this);
 		}
-		
+
 		// then tell the QNetwork to use the simEngine (this also creates qlinks and qnodes)
 		network.initialize(this.netEngine);
 
-		
+
 		if (sc.getConfig().scenario().isUseSignalSystems()) {
 			if ((((ScenarioImpl)sc).getSignalSystems() == null)
 					|| (((ScenarioImpl)sc).getSignalSystemConfigurations() == null)) {
@@ -214,6 +213,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 
+	@Override
 	public final void run() {
 		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
@@ -334,7 +334,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		if (this.transitEngine != null) { // yyyy do after features
 			this.transitEngine.afterSim();
 		}
-		
+
 		if (this.signalEngine != null) {
 			this.signalEngine.afterSim();
 		}
@@ -342,7 +342,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) { // yyyy features should be replaced by listeners
 			queueSimulationFeature.beforeCleanupSim();
 		}
-		
+
 		if ( this.netEngine != null ) {
 			this.netEngine.afterSim();
 		}
@@ -446,6 +446,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * @param now
 	 * @param agent
 	 */
+	@Override
 	public void handleAgentArrival(final double now, final PersonDriverAgent agent) {
 		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 			queueSimulationFeature.beforeHandleAgentArrival(agent);
@@ -462,6 +463,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 *
 	 * @see PersonDriverAgent#getDepartureTime()
 	 */
+	@Override
 	@Deprecated // yyyyyy imho, planElementIndex does not make sense as argument.  imho, should be a Person.  kai, may'10
 	public void scheduleActivityEnd(final PersonDriverAgent agent) {
 		this.activityEndsList.add(agent);
@@ -537,11 +539,12 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
+	@Override
 	@Deprecated // unclear if this is "actEnd" or "departure"!  kai, may'10
 	// depending on this, it is a "PersonAgent" or "DriverAgent".  kai, may'10
 	public void agentDeparts(final double now, final PersonDriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
-		TransportMode mode = leg.getMode();
+		String mode = leg.getMode();
 		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, mode));
 //		if (this.notTeleportedModes.contains(mode)){
 		if ( this.handleKnownLegModeDeparture(now, agent, linkId, leg) ) {
@@ -570,7 +573,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		}
 		return false ;
 	}
-	
+
 	// ############################################################################################################################
 	// utility methods (presumably no state change)
 	// ############################################################################################################################
@@ -592,10 +595,12 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	// no real functionality beyond this point
 	// ############################################################################################################################
 
+	@Override
 	public final EventsManager getEventsManager(){
 		  return events;
 		}
 
+	@Override
 	public void setAgentFactory(final AgentFactory fac) {
 		this.agentFactory = fac;
 	}
@@ -616,6 +621,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PersonDriverAgent>>, Serializable {
 		private static final long serialVersionUID = 1L;
+		@Override
 		public int compare(final Tuple<Double, PersonDriverAgent> o1, final Tuple<Double, PersonDriverAgent> o2) {
 			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
 			if (ret == 0) {
@@ -625,6 +631,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		}
 	}
 
+	@Override
 	public QNetwork getQNetwork() {
 		if ( this.netEngine != null ) {
 			return this.netEngine.getQNetwork() ;
@@ -633,10 +640,12 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		}
 	}
 
+	@Override
 	public VisNetwork getVisNetwork() {
 		return this.netEngine.getQNetwork() ;
 	}
 
+	@Override
 	public Scenario getScenario() {
 		return this.scenario;
 	}
@@ -660,14 +669,17 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 
+	@Override
 	public void setIterationNumber(final Integer iterationNumber) {
 		this.iterationNumber = iterationNumber;
 	}
 
+	@Override
 	public void setControlerIO(final ControlerIO controlerIO) {
 		this.controlerIO = controlerIO;
 	}
 
+	@Override
 	public SimTimerI getSimTimer() {
 		return this.simTimer ;
 	}
@@ -689,6 +701,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 //		return this.stuckTime;
 //	}
 
+	@Override
 	public AgentCounterI getAgentCounter(){
 		return this.agentCounter;
 	}
@@ -702,6 +715,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * listener to this QueueSimulation instance.
 	 * @param listeners
 	 */
+	@Override
 	public void addQueueSimulationListeners(final SimulationListener listener){
 		this.listenerManager.addQueueSimulationListener(listener);
 	}

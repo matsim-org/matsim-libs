@@ -43,11 +43,7 @@ import org.matsim.core.population.PersonImpl;
 public class PlansFilterByLegMode {
 	private static final Logger log = Logger.getLogger(PlansFilterByLegMode.class);
 
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-	private TransportMode legMode;
+	private String legMode;
 //	private boolean exclusiveFilter;
 
 	// optimization: instead of doing a String.equals() every time, we do it once and store the result
@@ -73,7 +69,7 @@ public class PlansFilterByLegMode {
 	 * @deprecated use other constructor instead (in my view).  kai, jan'10
 	 */
 	@Deprecated // use other constructor instead (in my view).  kai, jan'10
-	public PlansFilterByLegMode(final TransportMode legMode, final boolean exclusiveFilter) {
+	public PlansFilterByLegMode(final String legMode, final boolean exclusiveFilter) {
 		super();
 		this.legMode = legMode;
 //		this.exclusiveFilter = exclusiveFilter;
@@ -86,7 +82,8 @@ public class PlansFilterByLegMode {
 
 	public FilterType filterType ;
 	public enum FilterType { keepAllPlansWithMode, removeAllPlansWithMode, keepPlansWithOnlyThisMode }
-	public PlansFilterByLegMode( final TransportMode legMode, final FilterType filterType ) {
+
+	public PlansFilterByLegMode(final String legMode, final FilterType filterType) {
 		super() ;
 		this.legMode = legMode ;
 		this.filterType = filterType ;

@@ -19,7 +19,7 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -44,7 +44,7 @@ public class TransportModeNetworkFilterTest {
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
 		Network subNetwork = new ScenarioImpl().getNetwork();
-		filter.filter(subNetwork, EnumSet.of(TransportMode.car));
+		filter.filter(subNetwork, createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of nodes.", 13, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 14, subNetwork.getLinks().size());
 		Assert.assertTrue(subNetwork.getLinks().containsKey(f.ids[1]));
@@ -83,7 +83,7 @@ public class TransportModeNetworkFilterTest {
 		Assert.assertNotNull(subNetwork.getNodes().get(f.ids[7]).getOutLinks().get(f.ids[7]));
 
 		subNetwork = new ScenarioImpl().getNetwork();
-		filter.filter(subNetwork, EnumSet.of(TransportMode.bike));
+		filter.filter(subNetwork, createHashSet(TransportMode.bike));
 		Assert.assertEquals("wrong number of nodes.", 9, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 8, subNetwork.getLinks().size());
 		Assert.assertTrue(subNetwork.getLinks().containsKey(f.ids[13]));
@@ -108,7 +108,7 @@ public class TransportModeNetworkFilterTest {
 		Assert.assertNotNull(subNetwork.getNodes().get(f.ids[4]).getOutLinks().get(f.ids[4]));
 
 		subNetwork = new ScenarioImpl().getNetwork();
-		filter.filter(subNetwork, EnumSet.of(TransportMode.walk));
+		filter.filter(subNetwork, createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of nodes.", 5, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 4, subNetwork.getLinks().size());
 		Assert.assertTrue(subNetwork.getLinks().containsKey(f.ids[13]));
@@ -136,7 +136,7 @@ public class TransportModeNetworkFilterTest {
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
 		Network subNetwork = new ScenarioImpl().getNetwork();
-		filter.filter(subNetwork, EnumSet.of(TransportMode.car, TransportMode.bike));
+		filter.filter(subNetwork, createHashSet(TransportMode.car, TransportMode.bike));
 		Assert.assertEquals("wrong number of nodes.", 13, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 15, subNetwork.getLinks().size());
 		Assert.assertTrue(subNetwork.getLinks().containsKey(f.ids[1]));
@@ -176,7 +176,7 @@ public class TransportModeNetworkFilterTest {
 		Assert.assertNotNull(subNetwork.getNodes().get(f.ids[10]).getInLinks().get(f.ids[9]));
 
 		subNetwork = new ScenarioImpl().getNetwork();
-		filter.filter(subNetwork, EnumSet.of(TransportMode.bike, TransportMode.walk));
+		filter.filter(subNetwork, createHashSet(TransportMode.bike, TransportMode.walk));
 		Assert.assertEquals("wrong number of nodes.", 9, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 10, subNetwork.getLinks().size());
 		Assert.assertFalse(subNetwork.getLinks().containsKey(f.ids[1]));
@@ -217,7 +217,7 @@ public class TransportModeNetworkFilterTest {
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
 		Network subNetwork = new ScenarioImpl().getNetwork();
-		filter.filter(subNetwork, EnumSet.noneOf(TransportMode.class));
+		filter.filter(subNetwork, new HashSet<String>());
 		Assert.assertEquals("wrong number of nodes.", 0, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 0, subNetwork.getLinks().size());
 	}
@@ -228,7 +228,7 @@ public class TransportModeNetworkFilterTest {
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
 		Network subNetwork = new ScenarioImpl().getNetwork();
-		filter.filter(subNetwork, EnumSet.of(TransportMode.walk, TransportMode.pt, TransportMode.motorbike));
+		filter.filter(subNetwork, createHashSet(TransportMode.walk, TransportMode.pt, "motorbike"));
 		Assert.assertEquals("wrong number of nodes.", 5, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 4, subNetwork.getLinks().size());
 		Assert.assertTrue(subNetwork.getLinks().containsKey(f.ids[13]));
@@ -256,7 +256,7 @@ public class TransportModeNetworkFilterTest {
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(f.scenario.getNetwork());
 
 		Network subNetwork = new ScenarioImpl().getNetwork();
-		filter.filter(subNetwork, EnumSet.of(TransportMode.pt, TransportMode.motorbike));
+		filter.filter(subNetwork, createHashSet(TransportMode.pt, "motorbike"));
 		Assert.assertEquals("wrong number of nodes.", 0, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 0, subNetwork.getLinks().size());
 	}
@@ -290,13 +290,13 @@ public class TransportModeNetworkFilterTest {
 	private static class Fixture {
 		/*package*/ final Scenario scenario = new ScenarioImpl();
 		/*package*/ final Id[] ids = new Id[17];
-		/*package*/ final Set<TransportMode> modesC = EnumSet.of(TransportMode.car);
-		/*package*/ final Set<TransportMode> modesCB = EnumSet.of(TransportMode.car, TransportMode.bike);
-		/*package*/ final Set<TransportMode> modesCBW = EnumSet.of(TransportMode.car, TransportMode.bike, TransportMode.walk);
-		/*package*/ final Set<TransportMode> modesCW = EnumSet.of(TransportMode.car, TransportMode.walk);
-		/*package*/ final Set<TransportMode> modesW = EnumSet.of(TransportMode.walk);
-		/*package*/ final Set<TransportMode> modesWB = EnumSet.of(TransportMode.walk, TransportMode.bike);
-		/*package*/ final Set<TransportMode> modesB = EnumSet.of(TransportMode.bike);
+		/*package*/ final Set<String> modesC = createHashSet(TransportMode.car);
+		/*package*/ final Set<String> modesCB = createHashSet(TransportMode.car, TransportMode.bike);
+		/*package*/ final Set<String> modesCBW = createHashSet(TransportMode.car, TransportMode.bike, TransportMode.walk);
+		/*package*/ final Set<String> modesCW = createHashSet(TransportMode.car, TransportMode.walk);
+		/*package*/ final Set<String> modesW = createHashSet(TransportMode.walk);
+		/*package*/ final Set<String> modesWB = createHashSet(TransportMode.walk, TransportMode.bike);
+		/*package*/ final Set<String> modesB = createHashSet(TransportMode.bike);
 
 		/*package*/ Fixture() {
 			for (int i = 0; i < ids.length; i++) {
@@ -338,7 +338,7 @@ public class TransportModeNetworkFilterTest {
 			network.addLink(createLink(factory, this.ids[16], this.ids[10], this.ids[13], this.modesCBW));
 		}
 
-		private Link createLink(final NetworkFactory factory, final Id id, final Id fromNodeId, final Id toNodeId, final Set<TransportMode> modes) {
+		private Link createLink(final NetworkFactory factory, final Id id, final Id fromNodeId, final Id toNodeId, final Set<String> modes) {
 			Link link = factory.createLink(id, fromNodeId, toNodeId);
 			link.setAllowedModes(modes);
 			link.setCapacity(2000.0);
@@ -348,6 +348,14 @@ public class TransportModeNetworkFilterTest {
 			return link;
 		}
 
+	}
+
+	public static Set<String> createHashSet(String... modes) {
+		Set<String> set = new HashSet<String>();
+		for (String m : modes) {
+			set.add(m);
+		}
+		return set;
 	}
 
 }

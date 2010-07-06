@@ -22,7 +22,7 @@ package org.matsim.core.network;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -53,7 +53,7 @@ public class LinkImpl extends AbstractLocation implements Link {
 	protected double capacity = Double.NaN;
 	protected double nofLanes = Double.NaN;
 
-	protected EnumSet<TransportMode> allowedModes = EnumSet.of(TransportMode.car);
+	protected HashSet<String> allowedModes = new HashSet<String>();
 
 	private double flowCapacity;
 
@@ -85,6 +85,7 @@ public class LinkImpl extends AbstractLocation implements Link {
 		this.to = to;
 
 		// set attributes and do semantic checks
+		this.allowedModes.add(TransportMode.car);
 		this.setLength(length);
 		this.setFreespeed(freespeed);
 		this.setCapacity(capacity);
@@ -293,12 +294,12 @@ public class LinkImpl extends AbstractLocation implements Link {
 	}
 
 	@Override
-	public final Set<TransportMode> getAllowedModes() {
-		return this.allowedModes.clone();
+	public final Set<String> getAllowedModes() {
+		return new HashSet<String>(this.allowedModes);
 	}
 
 	@Override
-	public final void setAllowedModes(final Set<TransportMode> modes) {
+	public final void setAllowedModes(final Set<String> modes) {
 		this.allowedModes.clear();
 		this.allowedModes.addAll(modes);
 	}

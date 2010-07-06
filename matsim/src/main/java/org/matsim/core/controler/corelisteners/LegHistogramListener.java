@@ -22,7 +22,6 @@ package org.matsim.core.controler.corelisteners;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -51,16 +50,18 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 		this.events.addHandler(this.histogram);
 	}
 
+	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		this.histogram.reset(event.getIteration());
 	}
 
+	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.histogram.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "legHistogram.txt"));
 		this.printStats();
 		if (this.outputGraph) {
 			this.histogram.writeGraphic(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "legHistogram_all.png"));
-			for (TransportMode legMode : this.histogram.getLegModes()) {
+			for (String legMode : this.histogram.getLegModes()) {
 				this.histogram.writeGraphic(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "legHistogram_" + legMode.toString() + ".png"), legMode);
 			}
 		}
@@ -73,7 +74,7 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 			nofLegs += nofDepartures;
 		}
 		log.info("number of legs:\t"  + nofLegs + "\t100%");
-		for (TransportMode legMode : TransportMode.values()) {
+		for (String legMode : this.histogram.getLegModes()) {
 			int nofModeLegs = 0;
 			for (int nofDepartures : this.histogram.getDepartures(legMode)) {
 				nofModeLegs += nofDepartures;

@@ -40,7 +40,7 @@ public class NetworkFactoryImpl implements NetworkFactory {
 
 	private LinkFactory linkFactory = null;
 
-	private final Map<TransportMode, RouteFactory> routeFactories = new HashMap<TransportMode, RouteFactory>();
+	private final Map<String, RouteFactory> routeFactories = new HashMap<String, RouteFactory>();
 	private RouteFactory defaultFactory = new GenericRouteFactory();
 
 	private NetworkLayer network;
@@ -52,6 +52,7 @@ public class NetworkFactoryImpl implements NetworkFactory {
 		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());
 	}
 
+	@Override
 	public NodeImpl createNode(final Id id, final Coord coord) {
 		NodeImpl node = new NodeImpl(id);
 		node.setCoord(coord) ;
@@ -61,6 +62,7 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	/**
 	 * TODO how to set other attributes of link consistently without invalidating time variant attributes
 	 */
+	@Override
 	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId) {
 		return this.linkFactory.createLink(id, this.network.getNodes().get(fromNodeId), this.network.getNodes().get(toNodeId), this.network, 1.0, 1.0, 1.0, 1.0);
 	}
@@ -72,15 +74,15 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	}
 
 	/**
-	 * @param mode the transport mode the route should be for
+	 * @param transportMode the transport mode the route should be for
 	 * @param startLink the link where the route starts
 	 * @param endLink the link where the route ends
 	 * @return a new Route for the specified mode
 	 *
-	 * @see #setRouteFactory(TransportMode, RouteFactory)
+	 * @see #setRouteFactory(String, RouteFactory)
 	 */
-	public Route createRoute(final TransportMode mode, final Id startLinkId, final Id endLinkId) {
-		RouteFactory factory = this.routeFactories.get(mode);
+	public Route createRoute(final String transportMode, final Id startLinkId, final Id endLinkId) {
+		RouteFactory factory = this.routeFactories.get(transportMode);
 		if (factory == null) {
 			factory = this.defaultFactory;
 		}
@@ -92,17 +94,17 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	 * the existing entry for this <code>mode</code> will be deleted. If <code>mode</code> is <code>null</code>,
 	 * then the default factory is set that is used if no specific RouteFactory for a mode is set.
 	 *
-	 * @param mode
+	 * @param transportMode
 	 * @param factory
 	 */
-	public void setRouteFactory(final TransportMode mode, final RouteFactory factory) {
-		if (mode == null) {
+	public void setRouteFactory(final String transportMode, final RouteFactory factory) {
+		if (transportMode == null) {
 			this.defaultFactory = factory;
 		} else {
 			if (factory == null) {
-				this.routeFactories.remove(mode);
+				this.routeFactories.remove(transportMode);
 			} else {
-				this.routeFactories.put(mode, factory);
+				this.routeFactories.put(transportMode, factory);
 			}
 		}
 	}

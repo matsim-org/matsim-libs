@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 
@@ -37,7 +36,7 @@ public interface TransitScheduleFactory extends MatsimFactory {
 
 	public abstract TransitLine createTransitLine(final Id lineId);
 
-	public abstract TransitRoute createTransitRoute(final Id routeId, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode);
+	public abstract TransitRoute createTransitRoute(final Id routeId, final NetworkRoute route, final List<TransitRouteStop> stops, final String mode);
 
 	public abstract TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay);
 

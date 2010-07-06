@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -33,15 +33,14 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.core.utils.misc.Time;
 
 import playground.yu.utils.DebugTools;
 
 /**
  * monitor distance and time of leg
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class PersonPlanMonitor4travelingCarPt {
 	private double legDepTime, legArrTime = Double.NaN,
@@ -54,7 +53,7 @@ public class PersonPlanMonitor4travelingCarPt {
 	private boolean stuck = false;
 
 	/**
-	 * 
+	 *
 	 */
 	public PersonPlanMonitor4travelingCarPt(Plan plan) {
 		idx = -1;
@@ -71,8 +70,7 @@ public class PersonPlanMonitor4travelingCarPt {
 		this.legArrTime = arrTime;
 		if (this.idx % 2 == 0)
 			throw new RuntimeException("idx should not be an even number");
-		TransportMode mode = ((Leg) this.plan.getPlanElements().get(idx))
-				.getMode();
+		String mode = ((Leg) this.plan.getPlanElements().get(idx)).getMode();
 
 		if (mode.equals(TransportMode.car))
 			this.legDurCar += this.calcLegTravelTime_h();

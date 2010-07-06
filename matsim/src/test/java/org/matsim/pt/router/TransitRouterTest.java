@@ -444,7 +444,7 @@ public class TransitRouterTest extends TestCase {
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
 					stops.add(sb.createTransitRouteStop(this.stop1, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop2, 50, 50));
-					TransitRoute tRoute = sb.createTransitRoute(this.scenario.createId("1a"), netRoute, stops, TransportMode.bus);
+					TransitRoute tRoute = sb.createTransitRoute(this.scenario.createId("1a"), netRoute, stops, "bus");
 					tRoute.addDeparture(sb.createDeparture(this.scenario.createId("1a1"), 1000));
 					tLine.addRoute(tRoute);
 				}
@@ -459,7 +459,7 @@ public class TransitRouterTest extends TestCase {
 					stops.add(sb.createTransitRouteStop(this.stop3, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop4, 50, 50));
 					stops.add(sb.createTransitRouteStop(this.stop5, 100, 100));
-					TransitRoute tRoute = sb.createTransitRoute(this.scenario.createId("2a"), netRoute, stops, TransportMode.bus);
+					TransitRoute tRoute = sb.createTransitRoute(this.scenario.createId("2a"), netRoute, stops, "bus");
 					tRoute.addDeparture(sb.createDeparture(this.scenario.createId("2a1"), 1000));
 					tLine.addRoute(tRoute);
 				}
@@ -473,7 +473,7 @@ public class TransitRouterTest extends TestCase {
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
 					stops.add(sb.createTransitRouteStop(this.stop6, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop7, 50, 50));
-					TransitRoute tRoute = sb.createTransitRoute(this.scenario.createId("3a"), netRoute, stops, TransportMode.train);
+					TransitRoute tRoute = sb.createTransitRoute(this.scenario.createId("3a"), netRoute, stops, "train");
 					tRoute.addDeparture(sb.createDeparture(this.scenario.createId("3a1"), 1070));
 					tLine.addRoute(tRoute);
 				}

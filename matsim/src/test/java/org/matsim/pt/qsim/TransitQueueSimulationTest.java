@@ -633,7 +633,7 @@ public class TransitQueueSimulationTest {
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
 		stops.add(stop1);
 		stops.add(stop2);
-		TransitRoute tRoute = sb.createTransitRoute(scenario.createId("1"), route, stops, TransportMode.bus);
+		TransitRoute tRoute = sb.createTransitRoute(scenario.createId("1"), route, stops, "bus");
 		Departure dep = sb.createDeparture(scenario.createId("1"), depTime);
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -665,6 +665,7 @@ public class TransitQueueSimulationTest {
 		public Event firstEvent = null;
 		public Event lastEvent = null;
 
+		@Override
 		public void handleEvent(final Event event) {
 			if (firstEvent == null) {
 				firstEvent = event;
@@ -672,6 +673,7 @@ public class TransitQueueSimulationTest {
 			lastEvent = event;
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			firstEvent = null;
 			lastEvent = null;
@@ -722,7 +724,7 @@ public class TransitQueueSimulationTest {
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
 		stops.add(stop1);
 		stops.add(stop2);
-		TransitRoute tRoute = sb.createTransitRoute(scenario.createId("1"), route, stops, TransportMode.bus);
+		TransitRoute tRoute = sb.createTransitRoute(scenario.createId("1"), route, stops, "bus");
 		Departure dep = sb.createDeparture(scenario.createId("1"), depTime);
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);

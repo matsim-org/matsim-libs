@@ -1,14 +1,14 @@
 package org.matsim.core.config.groups;
 
-import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 
 /**
  * Provides access to planomat config parameters.
- * 
+ *
  * @author meisterk
  *
  */
@@ -22,7 +22,7 @@ public class PlanomatConfigGroup extends Module {
 
 	/**
 	 * Enumeration of different specifications of traffic flow simulations how trips in activity plans are interpreted.
-	 * 
+	 *
 	 * @author meisterk
 	 *
 	 */
@@ -35,11 +35,11 @@ public class PlanomatConfigGroup extends Module {
 		 * <li> The link of the destination activity is simulated, and thus has to be included in this leg travel time estimation.
 		 * </ul>
 		 */
-		CetinCompatible, 
+		CetinCompatible,
 		/**
 		 * Use this value if events should be interpreted the way they are simulated in traffic flow simulations based on the specification in:<br>
-		 * Charypar, D., K. W. Axhausen and K. Nagel (2007) 
-		 * Event-driven queue-based traffic flow microsimulation, 
+		 * Charypar, D., K. W. Axhausen and K. Nagel (2007)
+		 * Event-driven queue-based traffic flow microsimulation,
 		 * paper presented at the 86th Annual Meeting of the Transportation Research Board, Washington, D.C., January 2007.<br>
 		 * <ul>
 		 * <li> The link of the origin activity is simulated, and thus has to be included in this leg travel time estimation.
@@ -47,7 +47,7 @@ public class PlanomatConfigGroup extends Module {
 		 * </ul>
 		 */
 		CharyparEtAlCompatible;
-	} 
+	}
 
 	public static enum RoutingCapability {
 		fixedRoute,
@@ -61,7 +61,7 @@ public class PlanomatConfigGroup extends Module {
 
 	/**
 	 * Holds all planomat parameter names, and their default values.
-	 * 
+	 *
 	 * @author meisterk
 	 */
 	public enum PlanomatConfigParameter {
@@ -102,7 +102,7 @@ public class PlanomatConfigGroup extends Module {
 		 * <h3>Default value</h3>
 		 * ""
 		 * <h3>Notes</h3>
-		 * Planomat will produce no other leg modes than those listed in the value of this parameter. 
+		 * Planomat will produce no other leg modes than those listed in the value of this parameter.
 		 * When set to its default value, leg modes remain untouched, and planomat will only perform time optimization.
 		 */
 		POSSIBLE_MODES("possibleModes", ""),
@@ -113,7 +113,7 @@ public class PlanomatConfigGroup extends Module {
 		 * <h3>Default value</h3>
 		 * "7"
 		 * <h3>Notes</h3>
-		 * The maximum possible duration of an activity is 24 hours. This duration is separated into time bins. 
+		 * The maximum possible duration of an activity is 24 hours. This duration is separated into time bins.
 		 * The number of time bins is 2^levelOfTimeResolution. So a value of 6 gives 2^6 = 64 time bins.
 		 * The higher this parameter is chosen, the shorter is a time bin and the more precise the optimal solution can be approached.
 		 * It is suggested to leave this parameter at its default value. A change in it becomes useful only if the above mentioned
@@ -130,7 +130,7 @@ public class PlanomatConfigGroup extends Module {
 		 * <h3>Default value</h3>
 		 * <code>CetinCompatible</code>
 		 * <h3>Notes</h3>
-		 * Different implementations of traffic flow simulations use different interpretations of trips.  
+		 * Different implementations of traffic flow simulations use different interpretations of trips.
 		 * Planomat has to use the same interpretation as the used traffic flow simulation.
 		 */
 		SIM_LEG_INTERPRETATION("simLegInterpretation", PlanomatConfigGroup.SimLegInterpretation.CetinCompatible.toString()),
@@ -153,7 +153,7 @@ public class PlanomatConfigGroup extends Module {
 		 * <h3>Default value</h3>
 		 * "facility"
 		 * <h3>To do</h3>
-		 * TODO This parameter does not really belong to the planomat config group, but can be used by whatever algorithm. Might be moved to {@link GlobalConfigGroup}. 
+		 * TODO This parameter does not really belong to the planomat config group, but can be used by whatever algorithm. Might be moved to {@link GlobalConfigGroup}.
 		 */
 		TRIP_STRUCTURE_ANALYSIS_LAYER("tripStructureAnalysisLayer", PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.toString());
 
@@ -161,7 +161,7 @@ public class PlanomatConfigGroup extends Module {
 		private final String parameterName;
 		private final String defaultValue;
 
-		private PlanomatConfigParameter(String parameterName, String defaultValue) {
+		private PlanomatConfigParameter(final String parameterName, final String defaultValue) {
 			this.parameterName = parameterName;
 			this.defaultValue = defaultValue;
 		}
@@ -170,14 +170,14 @@ public class PlanomatConfigGroup extends Module {
 		 * @return the default string value of this parameter
 		 */
 		public String getDefaultValue() {
-			return defaultValue;
+			return this.defaultValue;
 		}
 
 		/**
 		 * @return the identifier of this parameter
 		 */
 		public String getParameterName() {
-			return parameterName;
+			return this.parameterName;
 		}
 
 	}
@@ -187,7 +187,7 @@ public class PlanomatConfigGroup extends Module {
 
 	public PlanomatConfigGroup() {
 		super(PlanomatConfigGroup.GROUP_NAME);
-		
+
 		for (PlanomatConfigParameter param : PlanomatConfigParameter.values()) {
 			super.addParam(param.getParameterName(), param.getDefaultValue());
 		}
@@ -219,18 +219,18 @@ public class PlanomatConfigGroup extends Module {
 		return Integer.parseInt(this.getParams().get(PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getParameterName()));
 	}
 
-	private EnumSet<TransportMode> cachedPossibleModes = null;
+	private HashSet<String> cachedPossibleModes = null;
 
-	public EnumSet<TransportMode> getPossibleModes() {
+	public Set<String> getPossibleModes() {
 
 		if (this.cachedPossibleModes == null) {
 
-			this.cachedPossibleModes = EnumSet.noneOf(TransportMode.class);
+			this.cachedPossibleModes = new HashSet<String>();
 
 			if (!super.getParams().get(PlanomatConfigParameter.POSSIBLE_MODES.getParameterName()).equals(PlanomatConfigParameter.POSSIBLE_MODES.getDefaultValue())) {
 				String[] possibleModesStringArray = super.getParams().get(PlanomatConfigParameter.POSSIBLE_MODES.getParameterName()).split(",");
 				for (int ii=0; ii < possibleModesStringArray.length; ii++) {
-					this.cachedPossibleModes.add(TransportMode.valueOf(possibleModesStringArray[ii]));
+					this.cachedPossibleModes.add(possibleModesStringArray[ii].intern());
 				}
 			}
 
@@ -241,22 +241,22 @@ public class PlanomatConfigGroup extends Module {
 
 	}
 
-	public void setPossibleModes(String possibleModes) {
+	public void setPossibleModes(final String possibleModes) {
 		super.addParam(PlanomatConfigParameter.POSSIBLE_MODES.getParameterName(), possibleModes);
 	}
 
 	public SimLegInterpretation getSimLegInterpretation() {
 		return SimLegInterpretation.valueOf(super.getParams().get(PlanomatConfigParameter.SIM_LEG_INTERPRETATION.getParameterName()));
 	}
-	
+
 	public RoutingCapability getRoutingCapability() {
 		return RoutingCapability.valueOf(super.getParams().get(PlanomatConfigParameter.ROUTING_CAPABILITY.getParameterName()));
 	}
-	
-	public void setRoutingCapability(PlanomatConfigGroup.RoutingCapability routingCapability) {
+
+	public void setRoutingCapability(final PlanomatConfigGroup.RoutingCapability routingCapability) {
 		super.addParam(PlanomatConfigParameter.ROUTING_CAPABILITY.getParameterName(), routingCapability.toString());
 	}
-	
+
 	public int getLevelOfTimeResolution() {
 		return Integer.parseInt(super.getParams().get(PlanomatConfigParameter.LEVEL_OF_TIME_RESOLUTION.getParameterName()));
 	}
@@ -265,19 +265,19 @@ public class PlanomatConfigGroup extends Module {
 		return Boolean.parseBoolean(super.getParams().get(PlanomatConfigParameter.DO_LOGGING.getParameterName()));
 	}
 
-	public void setDoLogging(boolean doLogging) {
+	public void setDoLogging(final boolean doLogging) {
 		super.addParam(PlanomatConfigParameter.DO_LOGGING.getParameterName(), Boolean.toString(doLogging));
 	}
-	
+
 	public int getPopSize() {
 		return Integer.parseInt(super.getParams().get(PlanomatConfigParameter.POPSIZE.getParameterName()));
 	}
 
-	public void setPopSize(int i) {
+	public void setPopSize(final int i) {
 		super.addParam(PlanomatConfigParameter.POPSIZE.getParameterName(), Integer.toString(i));
 	}
 
-	public void setJgapMaxGenerations(int i) {
+	public void setJgapMaxGenerations(final int i) {
 		super.addParam(PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getParameterName(), Integer.toString(i));
 	}
 
@@ -285,11 +285,11 @@ public class PlanomatConfigGroup extends Module {
 		return TripStructureAnalysisLayerOption.valueOf(super.getParams().get(PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.getParameterName()));
 	}
 
-	public void setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption newValue) {
+	public void setTripStructureAnalysisLayer(final PlanomatConfigGroup.TripStructureAnalysisLayerOption newValue) {
 		super.addParam(PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.getParameterName(), newValue.toString());
 	}
 
-	public void setSimLegInterpretation(PlanomatConfigGroup.SimLegInterpretation newValue) {
+	public void setSimLegInterpretation(final PlanomatConfigGroup.SimLegInterpretation newValue) {
 		super.addParam(PlanomatConfigParameter.SIM_LEG_INTERPRETATION.getParameterName(), newValue.toString());
 	}
 

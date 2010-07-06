@@ -140,7 +140,7 @@ public class BlockingStopDemo {
 			linkIdList.add(this.ids[i]);
 		}
 		networkRoute.setLinkIds(startLink.getId(), linkIdList, endLink.getId());
-		TransitRoute tRoute1 = builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
+		TransitRoute tRoute1 = builder.createTransitRoute(this.ids[1], networkRoute, stopList, "bus");
 
 		TransitLine tLine1 = builder.createTransitLine(this.ids[1]);
 		tLine1.addRoute(tRoute1);
@@ -167,7 +167,7 @@ public class BlockingStopDemo {
 			linkIdList.add(this.ids[i]);
 		}
 		networkRoute.setLinkIds(startLink.getId(), linkIdList, endLink.getId());
-		TransitRoute tRoute2 = builder.createTransitRoute(this.ids[2], networkRoute, stopList, TransportMode.bus);
+		TransitRoute tRoute2 = builder.createTransitRoute(this.ids[2], networkRoute, stopList, "bus");
 
 		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
 		tLine2.addRoute(tRoute2);

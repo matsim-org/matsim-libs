@@ -58,37 +58,31 @@ public class ModeSplit4Muc extends ModeSplit implements Analysis4Muc {
 					.getLinkId(), toll);
 		for (PlanElement pe : plan.getPlanElements())
 			if (pe instanceof Leg) {
-				TransportMode m = ((Leg) pe).getMode();
-				switch (m) {
-				case car:
+				String m = ((Leg) pe).getMode();
+				if (TransportMode.car.equals(m)) {
 					carLegs++;
 					if (inRange)
 						tollCarLegs++;
-					break;
-				case pt:
+				} else if (TransportMode.pt.equals(m)) {
 					ptLegs++;
 					if (inRange)
 						tollPtLegs++;
-					break;
-				case walk:
+				} else if (TransportMode.walk.equals(m)) {
 					wlkLegs++;
 					if (inRange)
 						tollWlkLegs++;
-					break;
-				case bike:
+				} else if (TransportMode.bike.equals(m)) {
 					bikeLegs++;
 					if (inRange)
 						tollBikeLegs++;
-					break;
-				case ride:
+				} else if (TransportMode.ride.equals(m)) {
 					rideLegs++;
 					if (inRange)
 						tollRideLegs++;
-				default:
+				} else {
 					othersLegs++;
 					if (inRange)
 						tollOthersLegs++;
-					break;
 				}
 			}
 	}

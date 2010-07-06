@@ -114,7 +114,7 @@ public class GreedyUmlaufBuilderTest {
 		stopList.add(builder.createTransitRouteStop(stop3, 90, 100));
 		stopList.add(builder.createTransitRouteStop(stop4, 290, 300));
 		stopList.add(builder.createTransitRouteStop(stop6, 390, Time.UNDEFINED_TIME));
-		TransitRoute tRoute2 = builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
+		TransitRoute tRoute2 = builder.createTransitRoute(this.ids[1], networkRoute, stopList, "bus");
 		tLine2.addRoute(tRoute2);
 		tRoute2.addDeparture(builder.createDeparture(this.ids[1], Time.parseTime("07:02:00")));
 		tRoute2.addDeparture(builder.createDeparture(this.ids[2], Time.parseTime("07:12:00")));
@@ -129,7 +129,7 @@ public class GreedyUmlaufBuilderTest {
 		stopList.add(builder.createTransitRouteStop(stop4, 100, 110));
 		stopList.add(builder.createTransitRouteStop(stop3, 300, 310));
 		stopList.add(builder.createTransitRouteStop(stop2, 390, Time.UNDEFINED_TIME));
-		TransitRoute tRoute2a = builder.createTransitRoute(this.ids[2], networkRoute, stopList, TransportMode.bus);
+		TransitRoute tRoute2a = builder.createTransitRoute(this.ids[2], networkRoute, stopList, "bus");
 		tLine2.addRoute(tRoute2a);
 		tRoute2a.addDeparture(builder.createDeparture(this.ids[1], Time.parseTime("07:18:00")));
 		tRoute2a.addDeparture(builder.createDeparture(this.ids[2], Time.parseTime("07:28:00")));

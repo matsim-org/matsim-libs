@@ -22,9 +22,11 @@ package playground.meisterk.org.matsim.population.algorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -106,7 +108,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 	protected void runDemo(Layer layer, ActivityFacilities facilities, Network network) {
 
-		HashMap<String, ArrayList<TransportMode[]>> testCases = new HashMap<String, ArrayList<TransportMode[]>>();
+		HashMap<String, ArrayList<String[]>> testCases = new HashMap<String, ArrayList<String[]>>();
 
 		////////////////////////////////////////////////////////////////
 		//
@@ -114,13 +116,13 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		//
 		////////////////////////////////////////////////////////////////
 		String testedActChainLocations = "1 2 1";
-		ArrayList<TransportMode[]> expectedTourModeOptions = new ArrayList<TransportMode[]>();
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk});
+		ArrayList<String[]> expectedTourModeOptions = new ArrayList<String[]>();
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk});
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 
 		////////////////////////////////////////////////////////////////
@@ -129,17 +131,17 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		//
 		////////////////////////////////////////////////////////////////
 		testedActChainLocations = "1 2 20 1";
-		expectedTourModeOptions = new ArrayList<TransportMode[]>();
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions = new ArrayList<String[]>();
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.walk});
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 
 		////////////////////////////////////////////////////////////////
@@ -149,54 +151,54 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		////////////////////////////////////////////////////////////////
 
 		testedActChainLocations = "1 2 1 2 1";
-		expectedTourModeOptions = new ArrayList<TransportMode[]>();
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.walk, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.pt, TransportMode.pt, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.pt, TransportMode.walk, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.walk, TransportMode.pt, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.walk, TransportMode.walk, TransportMode.car});
+		expectedTourModeOptions = new ArrayList<String[]>();
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.pt, TransportMode.pt, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.pt, TransportMode.walk, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.walk, TransportMode.pt, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.walk, TransportMode.walk, TransportMode.car});
 
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.walk, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.walk, TransportMode.walk});
 
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.pt, TransportMode.pt, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.pt, TransportMode.walk, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.walk, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.walk, TransportMode.pt, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.walk, TransportMode.walk, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.pt, TransportMode.pt, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.pt, TransportMode.walk, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.walk, TransportMode.pt, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.walk, TransportMode.walk, TransportMode.bike});
 
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.walk, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.walk, TransportMode.walk});
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 
 		////////////////////////////////////////////////////////////////
@@ -205,46 +207,46 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		//
 		////////////////////////////////////////////////////////////////
 		testedActChainLocations = "1 2 1 3 1";
-		expectedTourModeOptions = new ArrayList<TransportMode[]>();
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions = new ArrayList<String[]>();
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.walk, TransportMode.walk});
 
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.walk, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.walk, TransportMode.walk});
 
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.walk, TransportMode.walk});
 
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.walk, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.walk, TransportMode.walk});
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 
 		////////////////////////////////////////////////////////////////
@@ -253,17 +255,17 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		//
 		////////////////////////////////////////////////////////////////
 		testedActChainLocations = "1 2 3 4";
-		expectedTourModeOptions = new ArrayList<TransportMode[]>();
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions = new ArrayList<String[]>();
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.walk});
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 
 		////////////////////////////////////////////////////////////////
@@ -272,25 +274,25 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		//
 		////////////////////////////////////////////////////////////////
 		testedActChainLocations = "1 2 2 1";
-		expectedTourModeOptions = new ArrayList<TransportMode[]>();
+		expectedTourModeOptions = new ArrayList<String[]>();
 
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.pt, TransportMode.car});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.walk, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.pt, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.walk, TransportMode.car});
 
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.pt, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.pt, TransportMode.walk, TransportMode.walk});
 
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.pt, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.walk, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.pt, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.walk, TransportMode.bike});
 
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.pt, TransportMode.walk});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.pt});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.walk, TransportMode.walk, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.pt, TransportMode.walk});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.pt});
+		expectedTourModeOptions.add(new String[]{TransportMode.walk, TransportMode.walk, TransportMode.walk});
 
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 
@@ -300,13 +302,13 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		//
 		////////////////////////////////////////////////////////////////
 		testedActChainLocations = "1 2 3 4 3 2 1";
-		expectedTourModeOptions = new ArrayList<TransportMode[]>();
+		expectedTourModeOptions = new ArrayList<String[]>();
 
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car});
+		expectedTourModeOptions.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car});
 
 		int variableLegs = 2;
 		for (int ii = 0; ii < (int) Math.pow(2, variableLegs); ii++) {
-			TransportMode[] combination = new TransportMode[testedActChainLocations.split(" ").length - 1];
+			String[] combination = new String[testedActChainLocations.split(" ").length - 1];
 			combination[0] = combination[1] = combination[4] = combination[5] = TransportMode.car;
 			for (int jj = 0; jj < variableLegs ; jj++) {
 				combination[jj + 2] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk;
@@ -316,7 +318,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		variableLegs = 4;
 		for (int ii = 0; ii < (int) Math.pow(2, variableLegs); ii++) {
-			TransportMode[] combination = new TransportMode[testedActChainLocations.split(" ").length - 1];
+			String[] combination = new String[testedActChainLocations.split(" ").length - 1];
 			combination[0] = combination[5] = TransportMode.car;
 			for (int jj = 0; jj < variableLegs ; jj++) {
 				combination[jj + 1] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk;
@@ -326,7 +328,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		variableLegs = 5;
 		for (int ii = 0; ii < (int) Math.pow(2, variableLegs); ii++) {
-			TransportMode[] combination = new TransportMode[testedActChainLocations.split(" ").length - 1];
+			String[] combination = new String[testedActChainLocations.split(" ").length - 1];
 			combination[0] = TransportMode.pt;
 			for (int jj = 0; jj < variableLegs; jj++) {
 				combination[jj + 1] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk;
@@ -336,7 +338,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		variableLegs = 3;
 		for (int ii = 0; ii < (int) Math.pow(2, variableLegs); ii++) {
-			TransportMode[] combination = new TransportMode[testedActChainLocations.split(" ").length - 1];
+			String[] combination = new String[testedActChainLocations.split(" ").length - 1];
 			combination[0] = combination[5] = TransportMode.bike;
 			combination[1] = TransportMode.pt;
 			for (int jj = 0; jj < variableLegs; jj++) {
@@ -345,15 +347,15 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			expectedTourModeOptions.add(combination);
 		}
 
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.pt, TransportMode.pt, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.bike, TransportMode.bike, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.walk, TransportMode.pt, TransportMode.bike, TransportMode.bike});
-		expectedTourModeOptions.add(new TransportMode[]{TransportMode.bike, TransportMode.bike, TransportMode.walk, TransportMode.walk, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.pt, TransportMode.pt, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.bike, TransportMode.bike, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.walk, TransportMode.pt, TransportMode.bike, TransportMode.bike});
+		expectedTourModeOptions.add(new String[]{TransportMode.bike, TransportMode.bike, TransportMode.walk, TransportMode.walk, TransportMode.bike, TransportMode.bike});
 
 		variableLegs = 3;
 		for (int ii = 0; ii < (int) Math.pow(2, variableLegs); ii++) {
-			TransportMode[] combination = new TransportMode[testedActChainLocations.split(" ").length - 1];
+			String[] combination = new String[testedActChainLocations.split(" ").length - 1];
 			combination[0] = combination[5] = TransportMode.bike;
 			combination[1] = TransportMode.walk;
 			for (int jj = 0; jj < variableLegs; jj++) {
@@ -364,7 +366,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		variableLegs = 5;
 		for (int ii = 0; ii < (int) Math.pow(2, variableLegs); ii++) {
-			TransportMode[] combination = new TransportMode[testedActChainLocations.split(" ").length - 1];
+			String[] combination = new String[testedActChainLocations.split(" ").length - 1];
 			combination[0] = TransportMode.walk;
 			for (int jj = 0; jj < variableLegs; jj++) {
 				combination[jj + 1] = (((ii & ((int) Math.pow(2, variableLegs - (jj + 1)))) == 0)) ? TransportMode.pt : TransportMode.walk;
@@ -375,12 +377,16 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 
 		PlanAnalyzeTourModeChoiceSet testee = new PlanAnalyzeTourModeChoiceSet(new MeisterkConfigGroup().getChainBasedModes(), this.config.planomat().getTripStructureAnalysisLayer(), facilities, network);
-		EnumSet<TransportMode> possibleModes = EnumSet.of(TransportMode.walk, TransportMode.bike, TransportMode.pt, TransportMode.car);
+		Set<String> possibleModes = new LinkedHashSet<String>();
+		possibleModes.add(TransportMode.car);
+		possibleModes.add(TransportMode.pt);
+		possibleModes.add(TransportMode.bike);
+		possibleModes.add(TransportMode.walk);
 		testee.setModeSet(possibleModes);
 
 //		testee.setDoLogging(true);
 
-		for (Entry<String, ArrayList<TransportMode[]>> entry : testCases.entrySet()) {
+		for (Entry<String, ArrayList<String[]>> entry : testCases.entrySet()) {
 
 			String facString  = entry.getKey();
 			log.info("Testing location sequence: " + facString);
@@ -389,12 +395,13 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 			testee.run(plan);
 
-			ArrayList<TransportMode[]> actual = testee.getChoiceSet();
+			ArrayList<String[]> actual = testee.getChoiceSet();
 			assertEquals(entry.getValue().size(), actual.size());
-			assertTrue(Arrays.deepEquals(
-					entry.getValue().toArray(new TransportMode[0][0]),
-					actual.toArray(new TransportMode[0][0])));
-
+			for (int i = 0; i < entry.getValue().size(); i++) {
+				String[] a = actual.get(i);
+				String[] e = entry.getValue().get(i);
+				assertTrue(Arrays.deepEquals(e, a));
+			}
 		}
 
 	}
@@ -413,11 +420,13 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		String facString = "1 2 3 4 3 2 1";
 		PlanImpl testPlan = this.generateTestPlan(facString, network);
-		EnumSet<TransportMode> chainBasedModes = EnumSet.of(TransportMode.bike, TransportMode.car);
+		Set<String> chainBasedModes = new HashSet<String>();
+		chainBasedModes.add(TransportMode.bike);
+		chainBasedModes.add(TransportMode.car);
 
-		HashMap<TransportMode[], Boolean> candidates = new HashMap<TransportMode[], Boolean>();
+		HashMap<String[], Boolean> candidates = new HashMap<String[], Boolean>();
 		candidates.put(
-				new TransportMode[]{
+				new String[]{
 						TransportMode.car,
 						TransportMode.car,
 						TransportMode.car,
@@ -426,7 +435,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 						TransportMode.car},
 				true);
 		candidates.put(
-				new TransportMode[]{
+				new String[]{
 						TransportMode.car,
 						TransportMode.pt,
 						TransportMode.car,
@@ -435,7 +444,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 						TransportMode.car},
 				false);
 		candidates.put(
-				new TransportMode[]{
+				new String[]{
 						TransportMode.car,
 						TransportMode.pt,
 						TransportMode.walk,
@@ -444,7 +453,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 						TransportMode.car},
 				true);
 		candidates.put(
-				new TransportMode[]{
+				new String[]{
 						TransportMode.car,
 						TransportMode.pt,
 						TransportMode.walk,
@@ -453,7 +462,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 						TransportMode.walk},
 				false);
 
-		for (TransportMode[] candidate : candidates.keySet()) {
+		for (String[] candidate : candidates.keySet()) {
 			assertEquals(
 					Boolean.valueOf(PlanAnalyzeTourModeChoiceSet.isModeChainFeasible(testPlan, candidate, chainBasedModes, this.config.planomat().getTripStructureAnalysisLayer(), facilities, network)),
 					candidates.get(candidate));
@@ -481,7 +490,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			}
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {
-				plan.createAndAddLeg(TransportMode.undefined);
+				plan.createAndAddLeg("undefined");
 			}
 		}
 

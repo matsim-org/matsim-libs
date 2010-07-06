@@ -35,7 +35,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -160,7 +159,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 	// }
 
 	protected Feature getLegFeature(final Leg leg, final String id) {
-		TransportMode mode = leg.getMode();
+		String mode = leg.getMode();
 		Double depTime = leg.getDepartureTime();
 		Double travTime = leg.getTravelTime();
 		Double dist = leg.getRoute().getDistance();

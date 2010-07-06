@@ -77,8 +77,8 @@ public class TransitRouteFinder {
 		return legList;
 	}
 
-	private TransportMode selectMode(final String linkType){
-		TransportMode mode = null;
+	private String selectMode(final String linkType){
+		String mode = null;
 		if (linkType.equals(PTValues.STANDARD_STR)){
 			mode=  TransportMode.pt;
 		}else{
@@ -87,7 +87,7 @@ public class TransitRouteFinder {
 		return mode;
 	}
 
-	private LegImpl createLeg(TransportMode mode, final List<Link> routeLinks, final double depTime, final double arrivTime){
+	private LegImpl createLeg(String mode, final List<Link> routeLinks, final double depTime, final double arrivTime){
 		double travTime= arrivTime - depTime;
 		List<Node> routeNodeList = new ArrayList<Node>();
 

@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -100,31 +101,21 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 		allCount[binIdx]++;
 		Integer itg = legCounts.get(ae.getPersonId());
 		if (itg != null) {
-			switch (((LegImpl) plan.getPlanElements().get(2 * itg + 1))
-					.getMode()) {
-			case car:
+			String mode = ((LegImpl) plan.getPlanElements().get(2 * itg + 1)).getMode();
+			if (TransportMode.car.equals(mode)) {
 				carCount[binIdx]++;
-				break;
-			case pt:
+			} else if (TransportMode.pt.equals(mode)) {
 				if (ptCount != null)
 					ptCount[binIdx]++;
-				break;
-			case walk:
+			} else if (TransportMode.walk.equals(mode)) {
 				if (wlkCount != null)
 					wlkCount[binIdx]++;
-				break;
-			case bike:
+			} else if (TransportMode.bike.equals(mode)) {
 				if (bikeCount != null)
 					bikeCount[binIdx]++;
-				break;
-			case ride:
-				if (rideCount != null)
-					rideCount[binIdx]++;
-				break;
-			default:
+			} else {
 				if (othersCount != null)
 					othersCount[binIdx]++;
-				break;
 			}
 		}
 	}

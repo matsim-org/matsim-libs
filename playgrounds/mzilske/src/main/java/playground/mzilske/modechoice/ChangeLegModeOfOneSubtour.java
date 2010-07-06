@@ -7,8 +7,8 @@ import org.matsim.population.algorithms.ChooseRandomLegMode;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ChangeLegModeOfOneSubtour extends AbstractMultithreadedModule {
-	
-	private TransportMode[] availableModes = new TransportMode[] { TransportMode.car, TransportMode.pt };
+
+	private String[] availableModes = new String[] { TransportMode.car, TransportMode.pt };
 
 	public ChangeLegModeOfOneSubtour() {
 		super(1);

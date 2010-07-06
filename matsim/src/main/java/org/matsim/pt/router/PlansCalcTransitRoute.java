@@ -20,7 +20,7 @@
 
 package org.matsim.pt.router;
 
-import java.util.EnumSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,11 +84,11 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
 		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(Collections.singleton(TransportMode.car));
 		}
 		routeAlgo = super.getPtFreeflowLeastCostPathCalculator();
 		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(Collections.singleton(TransportMode.car));
 		}
 	}
 

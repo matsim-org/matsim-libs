@@ -30,7 +30,6 @@ import org.jgap.impl.IntegerGene;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -210,7 +209,7 @@ public class PlanomatTest extends MatsimTestCase {
 		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
 		Planomat testee = new Planomat(null, null, planomatConfigGroup, null, this.scenario.getNetwork());
 
-		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
+		String[] possibleModes = testee.getPossibleModes(testPlan);
 
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
 		if (possibleModes.length > 0) {
@@ -334,11 +333,13 @@ public class PlanomatTest extends MatsimTestCase {
 			this.scenario = scenario;
 		}
 
+		@Override
 		public void handleEvent(PersonEvent event) {
 			if (!this.scenario.getPopulation().getPersons().containsKey(event.getPersonId()))
 			  this.scenario.getPopulation().addPerson(this.scenario.getPopulation().getFactory().createPerson(event.getPersonId()));
 		}
 
+		@Override
 		public void reset(int iteration) {
 
 		}

@@ -58,7 +58,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	private int iteration = 0;
 	private final int binSize;
 	private final int nofBins;
-	private final Map<TransportMode, ModeData> data = new HashMap<TransportMode, ModeData>(5, 0.85f);
+	private final Map<String, ModeData> data = new HashMap<String, ModeData>(5, 0.85f);
 	private ModeData allModesData = null;
 
 	/**
@@ -85,36 +85,40 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 
 	/* Implementation of EventHandler-Interfaces */
 
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		int index = getBinIndex(event.getTime());
-		allModesData.countsDep[index]++;
+		this.allModesData.countsDep[index]++;
 		if (event.getLegMode() != null) {
 			ModeData modeData = getDataForMode(event.getLegMode());
 			modeData.countsDep[index]++;
 		}
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		int index = getBinIndex(event.getTime());
-		allModesData.countsArr[index]++;
+		this.allModesData.countsArr[index]++;
 		if (event.getLegMode() != null) {
 			ModeData modeData = getDataForMode(event.getLegMode());
 			modeData.countsArr[index]++;
 		}
 	}
 
+	@Override
 	public void handleEvent(final AgentStuckEvent event) {
 		int index = getBinIndex(event.getTime());
-		allModesData.countsStuck[index]++;
+		this.allModesData.countsStuck[index]++;
 		if (event.getLegMode() != null) {
 			ModeData modeData = getDataForMode(event.getLegMode());
 			modeData.countsStuck[index]++;
 		}
 	}
 
+	@Override
 	public void reset(final int iter) {
 		this.iteration = iter;
-		this.allModesData = new ModeData(nofBins + 1);
+		this.allModesData = new ModeData(this.nofBins + 1);
 		this.data.clear();
 	}
 
@@ -144,7 +148,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 */
 	public void write(final PrintStream stream) {
 		stream.print("time\ttime\tdepartures_all\tarrivals_all\tstuck_all\ten-route_all");
-		for (TransportMode legMode : this.data.keySet()) {
+		for (String legMode : this.data.keySet()) {
 			stream.print("\tdepartures_" + legMode + "\tarrivals_" + legMode + "\tstuck_" + legMode + "\ten-route_" + legMode);
 		}
 		stream.print("\n");
@@ -182,7 +186,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * @return a graphic showing the number of departures, arrivals and vehicles
 	 * en route for all legs with the specified transportation mode
 	 */
-	public JFreeChart getGraphic(final TransportMode legMode) {
+	public JFreeChart getGraphic(final String legMode) {
 		return getGraphic(this.data.get(legMode), legMode.toString());
 	}
 
@@ -246,7 +250,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	/**
 	 * @return Set of all transportation modes data is available for
 	 */
-	public Set<TransportMode> getLegModes() {
+	public Set<String> getLegModes() {
 		return this.data.keySet();
 	}
 
@@ -254,7 +258,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * @param legMode transport mode
 	 * @return number of departures per time-bin, for all legs with the specified mode
 	 */
-	public int[] getDepartures(final TransportMode legMode) {
+	public int[] getDepartures(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
 			return new int[0];
@@ -266,7 +270,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * @param legMode transport mode
 	 * @return number of all arrivals per time-bin, for all legs with the specified mode
 	 */
-	public int[] getArrivals(final TransportMode legMode) {
+	public int[] getArrivals(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
 			return new int[0];
@@ -310,9 +314,9 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * @param filename
 	 * @param legMode
 	 *
-	 * @see #getGraphic(TransportMode)
+	 * @see #getGraphic(String)
 	 */
-	public void writeGraphic(final String filename, final TransportMode legMode) {
+	public void writeGraphic(final String filename, final String legMode) {
 		try {
 			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(legMode), 1024, 768);
 		} catch (IOException e) {
@@ -330,10 +334,10 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		return bin;
 	}
 
-	private ModeData getDataForMode(TransportMode legMode) {
+	private ModeData getDataForMode(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
-			modeData = new ModeData(nofBins + 1); // +1 for all times out of our range
+			modeData = new ModeData(this.nofBins + 1); // +1 for all times out of our range
 			this.data.put(legMode, modeData);
 		}
 		return modeData;

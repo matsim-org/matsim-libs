@@ -7,7 +7,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.network.LinkImpl;
@@ -130,8 +129,8 @@ public class Main {
 				for (TransitLine transitLine : transitSchedule.getTransitLines().values()){
 					for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 						System.out.println(transitRoute.getId());
-						if (transitRoute.getTransportMode().equals(TransportMode.train)) trains++;
-						if (transitRoute.getTransportMode().equals(TransportMode.tram)) trams++;
+						if (transitRoute.getTransportMode().equals("train")) trains++;
+						if (transitRoute.getTransportMode().equals("tram")) trams++;
 					}
 				}
 				System.out.println("trains: " + trains +  "   trams: "  + trams);

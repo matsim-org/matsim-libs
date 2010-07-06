@@ -98,9 +98,8 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 
 				double dist = bl.getRoute().getDistance() / 1000.0;
 				// if (bl.getDepartureTime() < 86400)
-				TransportMode mode = bl.getMode();
-				switch (mode) {
-				case car:
+				String mode = bl.getMode();
+				if (TransportMode.car.equals(mode)) {
 					carDist += dist;
 					carDayDist += dist;
 					switch (at) {
@@ -145,8 +144,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 						break;
 					}
 					carLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				case pt:
+				} else if (TransportMode.pt.equals(mode)) {
 					ptDist += dist;
 					ptDayDist += dist;
 					switch (at) {
@@ -191,8 +189,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 						break;
 					}
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				case walk:
+				} else if (TransportMode.walk.equals(mode)) {
 					dist = CoordUtils.calcDistance(this.network.getLinks().get(
 							((PlanImpl) plan).getPreviousActivity(bl)
 									.getLinkId()).getCoord(), this.network
@@ -243,8 +240,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 						break;
 					}
 					wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				case bike:
+				} else if (TransportMode.bike.equals(mode)) {
 					dist = CoordUtils.calcDistance(this.network.getLinks().get(
 							((PlanImpl) plan).getPreviousActivity(bl)
 									.getLinkId()).getCoord(), this.network
@@ -295,8 +291,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 						break;
 					}
 					bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
-				default:
+				} else {
 					dist = CoordUtils.calcDistance(this.network.getLinks().get(
 							((PlanImpl) plan).getPreviousActivity(bl)
 									.getLinkId()).getCoord(), this.network
@@ -347,7 +342,6 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 						break;
 					}
 					othersLegDistanceCounts[Math.min(100, (int) dist)]++;
-					break;
 				}
 				dayDist += dist;
 			}

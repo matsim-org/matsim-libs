@@ -152,6 +152,7 @@ public class DailyEnRouteTime extends DailyAnalysis {
 		}
 	}
 
+	@Override
 	public void run(final Plan p) {
 		PlanImpl plan = (PlanImpl) p;
 		double dayTime = 0.0;
@@ -171,9 +172,8 @@ public class DailyEnRouteTime extends DailyAnalysis {
 					time = 0;
 				// if (bl.getDepartureTime() < 86400) {
 				dayTime += time;
-				TransportMode mode = bl.getMode();
-				switch (mode) {
-				case car:
+				String mode = bl.getMode();
+				if (TransportMode.car.equals(mode)) {
 					carTime += time;
 					carDayTime += time;
 					switch (legIntent) {
@@ -197,8 +197,7 @@ public class DailyEnRouteTime extends DailyAnalysis {
 						break;
 					}
 					carLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					break;
-				case pt:
+				} else if (TransportMode.pt.equals(mode)) {
 					ptTime += time;
 					ptDayTime += time;
 					switch (legIntent) {
@@ -222,8 +221,7 @@ public class DailyEnRouteTime extends DailyAnalysis {
 						break;
 					}
 					ptLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					break;
-				case walk:
+				} else if (TransportMode.walk.equals(mode)) {
 					wlkTime += time;
 					wlkDayTime += time;
 					switch (legIntent) {
@@ -247,8 +245,7 @@ public class DailyEnRouteTime extends DailyAnalysis {
 						break;
 					}
 					wlkLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					break;
-				case bike:
+				} else if (TransportMode.bike.equals(mode)) {
 					bikeTime += time;
 					bikeDayTime += time;
 					switch (legIntent) {
@@ -272,8 +269,7 @@ public class DailyEnRouteTime extends DailyAnalysis {
 						break;
 					}
 					bikeLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					break;
-				default:
+				} else {
 					othersTime += time;
 					othersDayTime += time;
 					switch (legIntent) {
@@ -297,7 +293,6 @@ public class DailyEnRouteTime extends DailyAnalysis {
 						break;
 					}
 					othersLegTimeCounts[Math.min(100, (int) time / 2)]++;
-					break;
 				}
 			}
 		for (int i = 0; i <= Math.min(100, (int) dayTime); i++)

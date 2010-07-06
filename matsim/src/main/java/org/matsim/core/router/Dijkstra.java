@@ -26,7 +26,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -120,7 +119,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 
 	private final PreProcessDijkstra preProcessData;
 
-	private TransportMode[] modeRestriction = null;
+	private String[] modeRestriction = null;
 
 	/**
 	 * Default constructor.
@@ -171,14 +170,12 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.router.IntermodalLeastCostPathCalculator#setModeRestriction(java.util.Set)
-	 */
-	public void setModeRestriction(final Set<TransportMode> modeRestriction) {
+	@Override
+	public void setModeRestriction(final Set<String> modeRestriction) {
 		if (modeRestriction == null) {
 			this.modeRestriction = null;
 		} else {
-			this.modeRestriction = modeRestriction.toArray(new TransportMode[modeRestriction.size()]);
+			this.modeRestriction = modeRestriction.toArray(new String[modeRestriction.size()]);
 		}
 	}
 
@@ -195,6 +192,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
 	 *      org.matsim.core.network.Node, double)
 	 */
+	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 
 		double arrivalTime = 0;
@@ -361,7 +359,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		if (this.modeRestriction == null) {
 			return true;
 		}
-		for (TransportMode mode : this.modeRestriction) {
+		for (String mode : this.modeRestriction) {
 			if (link.getAllowedModes().contains(mode)) {
 				return true;
 			}

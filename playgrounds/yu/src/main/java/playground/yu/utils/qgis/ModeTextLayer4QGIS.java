@@ -47,15 +47,16 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 		writer.writeln("mode");
 	}
 
+	@Override
 	public void run(Plan plan) {
 		Coord homeLoc = ((PlanImpl) plan).getFirstActivity().getCoord();
 		String mode = "";
 		if (PlanModeJudger.useCar(plan)) {
-			mode = TransportMode.car.name();
+			mode = TransportMode.car;
 		} else if (PlanModeJudger.usePt(plan)) {
-			mode = TransportMode.pt.name();
+			mode = TransportMode.pt;
 		} else if (PlanModeJudger.useWalk(plan)) {
-			mode = TransportMode.walk.name();
+			mode = TransportMode.walk;
 		}
 		writer.writeln(homeLoc.getX() + "\t" + homeLoc.getY() + "\t" + mode);
 	}

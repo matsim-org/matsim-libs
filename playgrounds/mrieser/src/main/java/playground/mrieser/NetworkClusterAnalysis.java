@@ -23,8 +23,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +61,7 @@ public class NetworkClusterAnalysis {
 	 *
 	 * @param modes
 	 */
-	public List<Map<Id, Link>> run(final Set<TransportMode> modes) {
+	public List<Map<Id, Link>> run(final Set<String> modes) {
 		final Map<Id, Link> visitedLinks = new HashMap<Id, Link>((int) (this.network.getLinks().size() * 1.5));
 
 		final List<Map<Id, Link>> clusters = new ArrayList<Map<Id, Link>>();
@@ -95,7 +95,7 @@ public class NetworkClusterAnalysis {
 	 * @param modes the set of modes that are allowed to
 	 * @return cluster of links <pre>startLink</pre> is part of
 	 */
-	private Map<Id, Link> findCluster(final Link startLink, final Set<TransportMode> modes) {
+	private Map<Id, Link> findCluster(final Link startLink, final Set<String> modes) {
 
 		TreeMap<Id, Link> clusterLinks = new TreeMap<Id, Link>();
 
@@ -193,7 +193,10 @@ public class NetworkClusterAnalysis {
 		Scenario sc = new ScenarioImpl();
 		new MatsimNetworkReader(sc).readFile(networkFile);
 
-		List<Map<Id, Link>> clusters = new NetworkClusterAnalysis(sc.getNetwork()).run(EnumSet.of(TransportMode.car));
+		Set<String> modes = new HashSet<String>();
+		modes.add(TransportMode.car);
+
+		List<Map<Id, Link>> clusters = new NetworkClusterAnalysis(sc.getNetwork()).run(modes);
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outDir + "/clusters_car.txt");
 			int idx = 1;
@@ -208,7 +211,10 @@ public class NetworkClusterAnalysis {
 			e.printStackTrace();
 		}
 
-		clusters = new NetworkClusterAnalysis(sc.getNetwork()).run(EnumSet.of(TransportMode.walk, TransportMode.bike));
+		modes = new HashSet<String>();
+		modes.add(TransportMode.walk);
+		modes.add(TransportMode.bike);
+		clusters = new NetworkClusterAnalysis(sc.getNetwork()).run(modes);
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outDir + "/clusters_walkBike.txt");
 			int idx = 1;

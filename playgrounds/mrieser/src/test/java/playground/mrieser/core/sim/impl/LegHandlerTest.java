@@ -66,7 +66,7 @@ public class LegHandlerTest {
 		Assert.assertEquals(transitHandler, legHandler.getDepartureHandler(TransportMode.pt));
 		Assert.assertEquals(otherHandler, legHandler.getDepartureHandler(TransportMode.walk));
 		Assert.assertEquals(otherHandler, legHandler.getDepartureHandler(TransportMode.bike));
-		Assert.assertNull(legHandler.getDepartureHandler(TransportMode.train));
+		Assert.assertNull(legHandler.getDepartureHandler("train"));
 	}
 
 	@Test

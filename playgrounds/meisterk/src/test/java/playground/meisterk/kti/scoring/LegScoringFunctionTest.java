@@ -94,7 +94,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		ActivityImpl work = new ActivityImpl("work", new IdImpl("2"));
 		work.setCoord(new CoordImpl(1150.0, 1150.0));
 
-		LegImpl testLeg = new LegImpl(TransportMode.undefined);
+		LegImpl testLeg = new LegImpl("undefined");
 
 		testPlan.addActivity(home);
 		testPlan.addLeg(testLeg);
@@ -139,7 +139,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		this.runATest(TransportMode.walk, null, null, -50.0);
 	}
 
-	private void runATest(final TransportMode mode, final String travelCard, final String routeDescription, final double expectedScore) {
+	private void runATest(final String mode, final String travelCard, final String routeDescription, final double expectedScore) {
 
 		if (travelCard != null) {
 			this.testPerson.addTravelcard(travelCard);

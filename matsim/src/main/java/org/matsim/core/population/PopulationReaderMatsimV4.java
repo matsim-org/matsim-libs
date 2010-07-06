@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
@@ -197,6 +196,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	 *
 	 * @param filename The name of the file to parse.
 	 */
+	@Override
 	public void readFile(final String filename) {
 		try {
 			parse(filename);
@@ -370,7 +370,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		if (mode.equals("undef")) {
 			mode = "undefined";
 		}
-		this.currleg = this.currplan.createAndAddLeg(TransportMode.valueOf(mode));
+		this.currleg = this.currplan.createAndAddLeg(mode.intern());
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
 		this.currleg.setArrivalTime(Time.parseTime(atts.getValue("arr_time")));

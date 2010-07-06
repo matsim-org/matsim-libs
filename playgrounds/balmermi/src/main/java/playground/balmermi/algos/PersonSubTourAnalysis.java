@@ -83,12 +83,12 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 
 		// get the subtour mode
 		int idx = -1;
-		TransportMode mode = ((LegImpl)plan.getPlanElements().get(start+1)).getMode();
+		String mode = ((LegImpl)plan.getPlanElements().get(start+1)).getMode();
 		if (mode.equals(TransportMode.walk)) { idx = WALK; }
 		else if (mode.equals(TransportMode.bike)) { idx = BIKE; }
 		else if (mode.equals(TransportMode.car)) { idx = CAR; }
 		else if (mode.equals(TransportMode.pt)) { idx = PT; }
-		else if (mode.equals(TransportMode.undefined)) { idx = UNDEF; }
+		else if (mode.equals("undefined")) { idx = UNDEF; }
 		else { Gbl.errorMsg("pid=" + plan.getPerson().getId() + ": mode=" + mode + " unknown!"); }
 
 		// calculate the SubTour distance (in 1 km time bins)
@@ -179,6 +179,7 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 		this.run(plan);
 	}
 
+	@Override
 	public void run(Plan plan) {
 //		System.out.println("----------------------------------------");
 //		System.out.println("pid=" + plan.getPerson().getId() + ":");

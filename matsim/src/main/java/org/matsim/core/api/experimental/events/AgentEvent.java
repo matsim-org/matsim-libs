@@ -21,12 +21,11 @@
 package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 
 public interface AgentEvent extends PersonEvent {
 
 	public Id getLinkId();
-	
-	public TransportMode getLegMode();
+
+	public String getLegMode();
 
 }

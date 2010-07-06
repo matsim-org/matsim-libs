@@ -21,7 +21,6 @@ package playground.mrieser.core.sim.impl;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -39,7 +38,7 @@ import playground.mrieser.core.sim.api.SimKeepAlive;
 public class LegHandler implements PlanElementHandler, SimKeepAlive {
 
 	private final NewSimEngine simEngine;
-	private final ConcurrentHashMap<TransportMode, DepartureHandler> departureHandlers = new ConcurrentHashMap<TransportMode, DepartureHandler>();
+	private final ConcurrentHashMap<String, DepartureHandler> departureHandlers = new ConcurrentHashMap<String, DepartureHandler>();
 	private int onRoute = 0;
 
 	public LegHandler(final NewSimEngine simEngine) {
@@ -102,15 +101,15 @@ public class LegHandler implements PlanElementHandler, SimKeepAlive {
 		em.processEvent(em.getFactory().createAgentArrivalEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), nextActivity.getLinkId(), leg.getMode()));
 	}
 
-	public DepartureHandler setDepartureHandler(final TransportMode mode, final DepartureHandler handler) {
+	public DepartureHandler setDepartureHandler(final String mode, final DepartureHandler handler) {
 		return this.departureHandlers.put(mode, handler);
 	}
 
-	public DepartureHandler removeDepartureHandler(final TransportMode mode) {
+	public DepartureHandler removeDepartureHandler(final String mode) {
 		return this.departureHandlers.remove(mode);
 	}
 
-	/*package*/ DepartureHandler getDepartureHandler(final TransportMode mode) {
+	/*package*/ DepartureHandler getDepartureHandler(final String mode) {
 		return this.departureHandlers.get(mode);
 	}
 

@@ -21,7 +21,7 @@
 package org.matsim.pt.utils;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,7 +69,7 @@ public class CreatePseudoNetwork {
 	private long linkIdCounter = 0;
 	private long nodeIdCounter = 0;
 
-	private final Set<TransportMode> transitModes = EnumSet.of(TransportMode.pt);
+	private final Set<String> transitModes = Collections.singleton(TransportMode.pt);
 
 	public CreatePseudoNetwork(final TransitSchedule schedule, final Network network, final String networkIdPrefix) {
 		this.schedule = schedule;

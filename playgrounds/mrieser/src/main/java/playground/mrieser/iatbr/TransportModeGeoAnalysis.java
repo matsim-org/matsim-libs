@@ -31,6 +31,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -91,16 +92,13 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
-				switch (leg.getMode()) {
-					case car:
-						hasCarLeg = true;
-						break;
-					case pt:
-						hasTransitLeg = true;
-						break;
-					case walk:
-						hasWalkLeg = true;
-						break;
+				String mode = leg.getMode();
+				if (TransportMode.car.equals(mode)) {
+					hasCarLeg = true;
+				} else if (TransportMode.pt.equals(mode)) {
+					hasTransitLeg = true;
+				} else if (TransportMode.walk.equals(mode)) {
+					hasWalkLeg = true;
 				}
 			}
 		}

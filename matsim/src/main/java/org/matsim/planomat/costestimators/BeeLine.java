@@ -21,7 +21,6 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.LegImpl;
@@ -61,7 +60,7 @@ public class BeeLine implements LegTravelTimeEstimator {
 
 	@Override
 	public LegImpl getNewLeg(
-			TransportMode mode,
+			String mode,
 			Activity actOrigin,
 			Activity actDestination,
 			int legPlanElementIndex,

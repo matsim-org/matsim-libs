@@ -21,7 +21,7 @@ package playground.balmermi.teleatlas;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -174,8 +174,8 @@ public class TeleatlasConverter45v101 {
 
 			double length = nwElement.length.doubleValue();
 
-			Set<TransportMode> modesFT = getModesFT(nwElement);
-			Set<TransportMode> modesTF = getModesTF(nwElement);
+			Set<String> modesFT = getModesFT(nwElement);
+			Set<String> modesTF = getModesTF(nwElement);
 
 			double freespeed = getFreespeed(nwElement);
 			double nOfLanes = getNOfLanes(nwElement);
@@ -217,8 +217,11 @@ public class TeleatlasConverter45v101 {
 		}
 	}
 
-	private Set<TransportMode> getModesFT(final NwElement nwElement) {
-		Set<TransportMode> modes = EnumSet.of(TransportMode.car, TransportMode.walk, TransportMode.bike);
+	private Set<String> getModesFT(final NwElement nwElement) {
+		Set<String> modes = new HashSet<String>();
+		modes.add(TransportMode.car);
+		modes.add(TransportMode.walk);
+		modes.add(TransportMode.bike);
 
 		if ((OneWay.CLOSED.equals(nwElement.oneway) || OneWay.OPEN_TF.equals(nwElement.oneway))) {
 			modes.remove(TransportMode.car);
@@ -246,8 +249,11 @@ public class TeleatlasConverter45v101 {
 		return modes;
 	}
 
-	private Set<TransportMode> getModesTF(final NwElement nwElement) {
-		Set<TransportMode> modes = EnumSet.of(TransportMode.car, TransportMode.walk, TransportMode.bike);
+	private Set<String> getModesTF(final NwElement nwElement) {
+		Set<String> modes = new HashSet<String>();
+		modes.add(TransportMode.car);
+		modes.add(TransportMode.walk);
+		modes.add(TransportMode.bike);
 
 		if ((OneWay.CLOSED.equals(nwElement.oneway) || OneWay.OPEN_FT.equals(nwElement.oneway))) {
 			modes.remove(TransportMode.car);
@@ -439,7 +445,7 @@ public class TeleatlasConverter45v101 {
 		data = null;
 		reader = null;
 		new NetworkWriter(scenario.getNetwork()).write(outputDir.toString()+"/network.xml");
-		new NetworkWriteAsTable(outputDir.toString()).run((NetworkLayer) scenario.getNetwork());
+		new NetworkWriteAsTable(outputDir.toString()).run(scenario.getNetwork());
 
 		log.info("clean network...");
 		new NetworkCleaner().run(scenario.getNetwork());
@@ -448,7 +454,7 @@ public class TeleatlasConverter45v101 {
 		outputDir = new File(outdir+"/cleaned");
 		outputDir.mkdir();
 		new NetworkWriter(scenario.getNetwork()).write(outputDir.toString()+"/network.xml");
-		new NetworkWriteAsTable(outputDir.toString()).run((NetworkLayer) scenario.getNetwork());
+		new NetworkWriteAsTable(outputDir.toString()).run(scenario.getNetwork());
 
 		log.info("fix double links...");
 		new NetworkDoubleLinks("d").run((NetworkLayer)scenario.getNetwork());
@@ -457,7 +463,7 @@ public class TeleatlasConverter45v101 {
 		outputDir = new File(outdir+"/final");
 		outputDir.mkdir();
 		new NetworkWriter(scenario.getNetwork()).write(outputDir.toString()+"/network.xml");
-		new NetworkWriteAsTable(outputDir.toString()).run((NetworkLayer) scenario.getNetwork());
+		new NetworkWriteAsTable(outputDir.toString()).run(scenario.getNetwork());
 
 		log.info("done.");
 

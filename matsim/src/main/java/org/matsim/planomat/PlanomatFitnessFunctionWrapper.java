@@ -22,7 +22,6 @@ package org.matsim.planomat;
 
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.planomat.Planomat.StepThroughPlanAction;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -43,7 +42,7 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 	 * which is not intended by JGAP.
 	 */
 	public static final double NO_FITNESS_VALUE = Double.NEGATIVE_INFINITY;
-	
+
 	@Override
 	public double getFitnessValue(IChromosome a_subject) {
 	    return evaluate(a_subject);
@@ -54,14 +53,14 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 	private transient final Planomat planomat;
 	private transient final Plan plan;
 	private transient final PlanAnalyzeSubtours planAnalyzeSubtours;
-	private transient final TransportMode[] possibleModes;
+	private transient final String[] possibleModes;
 	private transient final LegTravelTimeEstimator legTravelTimeEstimator;
 
 	public PlanomatFitnessFunctionWrapper(
-			Planomat planomat, 
-			Plan plan, 
-			PlanAnalyzeSubtours planAnalyzeSubtours, 
-			TransportMode[] possibleModes, 
+			Planomat planomat,
+			Plan plan,
+			PlanAnalyzeSubtours planAnalyzeSubtours,
+			String[] possibleModes,
 			LegTravelTimeEstimator legTravelTimeEstimator) {
 		super();
 		this.planomat = planomat;
@@ -69,18 +68,18 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 		this.planAnalyzeSubtours = planAnalyzeSubtours;
 		this.possibleModes = possibleModes;
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
-		
+
 	}
 
 	@Override
 	protected double evaluate(final IChromosome a_subject) {
 
 		double planScore = this.planomat.stepThroughPlan(
-				StepThroughPlanAction.EVALUATE, 
-				a_subject, 
-				this.plan, 
-				this.planAnalyzeSubtours, 
-				this.legTravelTimeEstimator, 
+				StepThroughPlanAction.EVALUATE,
+				a_subject,
+				this.plan,
+				this.planAnalyzeSubtours,
+				this.legTravelTimeEstimator,
 				this.possibleModes);
 
 		return planScore;

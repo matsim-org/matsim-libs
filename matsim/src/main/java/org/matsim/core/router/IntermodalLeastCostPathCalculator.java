@@ -16,6 +16,6 @@ public interface IntermodalLeastCostPathCalculator extends LeastCostPathCalculat
 	 *
 	 * @see Link#setAllowedModes(Set)
 	 */
-	public void setModeRestriction(final Set<TransportMode> modeRestriction);
+	public void setModeRestriction(final Set<String> modeRestriction);
 
 }

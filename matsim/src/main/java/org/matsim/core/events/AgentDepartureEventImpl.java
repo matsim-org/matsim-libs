@@ -21,14 +21,13 @@
 package org.matsim.core.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 
 public class AgentDepartureEventImpl extends AgentEventImpl implements AgentDepartureEvent {
 
 	public static final String EVENT_TYPE = "departure";
 
-	public AgentDepartureEventImpl(final double time, final Id agentId, final Id linkId, final TransportMode legMode) {
+	public AgentDepartureEventImpl(final double time, final Id agentId, final Id linkId, final String legMode) {
 		super(time, agentId, linkId, legMode);
 	}
 

@@ -475,7 +475,7 @@ public class BlnPlansGenerator {
 			switch (Integer.parseInt(tripData[48])) {
 			case 0:
 				// "keine Angabe"
-				leg = new LegImpl(TransportMode.undefined);
+				leg = new LegImpl("undefined");
 				this.modalSplit[0]++;
 				break;
 			case 1:
@@ -513,7 +513,7 @@ public class BlnPlansGenerator {
 				break;
 			case 7:
 				// "sonstiges"
-				leg = new LegImpl(TransportMode.undefined);
+				leg = new LegImpl("undefined");
 				this.modalSplit[7]++;
 				break;
 			default:

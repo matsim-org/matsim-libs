@@ -24,7 +24,6 @@ import java.io.PrintStream;
 
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.util.ResizableDoubleArray;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -50,12 +49,13 @@ public class PopulationLegDistanceDistribution extends AbstractClassifiedFrequen
 		this.run(person.getSelectedPlan());
 	}
 
+	@Override
 	public void run(Plan plan) {
 
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
-				TransportMode mode = leg.getMode();
+				String mode = leg.getMode();
 
 				Frequency frequency = null;
 				ResizableDoubleArray rawData = null;

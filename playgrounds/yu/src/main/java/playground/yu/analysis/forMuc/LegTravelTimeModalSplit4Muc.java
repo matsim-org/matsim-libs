@@ -70,32 +70,25 @@ public class LegTravelTimeModalSplit4Muc extends LegTravelTimeModalSplit
 
 			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
 					.getSelectedPlan();
-			TransportMode mode = PlanModeJudger.getMode(selectedplan);
-			switch (mode) {
-			case car:
+			String mode = PlanModeJudger.getMode(selectedplan);
+			if (TransportMode.car.equals(mode)) {
 				this.carTravelTimes[binIdx] += travelTime;
 				this.carArrCount[binIdx]++;
-				break;
-			case pt:
+			} else if (TransportMode.pt.equals(mode)) {
 				this.ptTravelTimes[binIdx] += travelTime;
 				this.ptArrCount[binIdx]++;
-				break;
-			case walk:
+			} else if (TransportMode.walk.equals(mode)) {
 				wlkTravelTimes[binIdx] += travelTime;
 				wlkArrCount[binIdx]++;
-				break;
-			case bike:
+			} else if (TransportMode.bike.equals(mode)) {
 				bikeTravelTimes[binIdx] += travelTime;
 				bikeArrCount[binIdx]++;
-				break;
-			case ride:
+			} else if (TransportMode.ride.equals(mode)) {
 				rideTravelTimes[binIdx] += travelTime;
 				rideArrCount[binIdx]++;
-				break;
-			default:
+			} else {
 				this.othersTravelTimes[binIdx] += travelTime;
 				this.othersArrCount[binIdx]++;
-				break;
 			}
 		}
 	}

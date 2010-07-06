@@ -387,7 +387,7 @@ public class PTActWriter {
 		return ptAct;
 	}
 
-	private LegImpl newPTLeg(final TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
+	private LegImpl newPTLeg(final String mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
 		NetworkRoute legRoute = new LinkNetworkRouteImpl(null, null);
 
 		if (mode!=TransportMode.walk){

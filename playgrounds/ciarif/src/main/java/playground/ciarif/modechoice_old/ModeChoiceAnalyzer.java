@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -40,18 +39,18 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
  *
  */
 public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
-	
-	TreeMap<TransportMode, Integer> modeStatistics =
-		new TreeMap<TransportMode, Integer>();
-	
+
+	TreeMap<String, Integer> modeStatistics =
+		new TreeMap<String, Integer>();
+
 	public ModeChoiceAnalyzer() {
 		super();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.matsim.demandmodeling.plans.algorithms.PersonAlgorithm#run(org.matsim.demandmodeling.plans.Person)
 	 */
@@ -61,9 +60,9 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
-				TransportMode mode = leg.getMode();
+				String mode = leg.getMode();
 				int modeCount = 0;
-				
+
 				if (modeStatistics.containsKey(mode)) {
 					modeCount = modeStatistics.get(mode);
 				}
@@ -72,21 +71,21 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 			}
 		}
 	}
-	
+
 	public void printInformation() {
-		Iterator<Map.Entry<TransportMode, Integer>> modeIt = modeStatistics.entrySet().iterator();
+		Iterator<Map.Entry<String, Integer>> modeIt = modeStatistics.entrySet().iterator();
 		while (modeIt.hasNext()) {
 			Map.Entry entry = modeIt.next();
 			System.out.println("There are " + entry.getValue() + " modes of "
 					+ " type " + entry.getKey());
 		}
 	}
-	
+
 	public void writeStatistics(String filename) {
 		BufferedWriter out;
 		try {
 			out = new BufferedWriter(new FileWriter(filename));
-			Iterator<Map.Entry<TransportMode, Integer>> modeIt = modeStatistics.entrySet().iterator();
+			Iterator<Map.Entry<String, Integer>> modeIt = modeStatistics.entrySet().iterator();
 			while (modeIt.hasNext()) {
 				Map.Entry entry = modeIt.next();
 				out.write(entry.getKey() + ";" + entry.getValue() + "\n");
@@ -99,4 +98,3 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 	}
 }
 
-	

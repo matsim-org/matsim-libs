@@ -21,7 +21,8 @@
 package org.matsim.core.router;
 
 import java.io.IOException;
-import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -47,11 +48,11 @@ import org.xml.sax.SAXException;
  * @author mrieser
  */
 public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase {
-	
+
 	protected abstract LeastCostPathCalculator getLeastCostPathCalculator(final Network network);
 
 	private static final String MODE_RESTRICTION_NOT_SUPPORTED = "Router algo does not support mode restrictions. ";
-	
+
 	public void testCalcLeastCostPath_Normal() throws SAXException, ParserConfigurationException, IOException {
 		Config config = loadConfig(null);
 		Scenario scenario = new ScenarioImpl(config);
@@ -79,15 +80,15 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).parse("test/scenarios/equil/network.xml");
 		Node node12 = network.getNodes().get(new IdImpl("12"));
-		
+
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node12, 8.0*3600);
-		
+
 		assertEquals("number of nodes wrong.", 1, path.nodes.size());
 		assertEquals("number of links wrong.", 0, path.links.size());
 		assertEquals(network.getNodes().get(new IdImpl("12")), path.nodes.get(0));
 	}
-	
+
 	/**
 	 * Tests route finding with a mode restriction of exactly one mode.
 	 */
@@ -98,18 +99,18 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
 
-			d.setModeRestriction(EnumSet.of(TransportMode.car));
+			d.setModeRestriction(createHashSet(TransportMode.car));
 			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[1], 6.0*3600.0);
 			assertEquals("wrong number of links.", 2, p.links.size());
 
-			d.setModeRestriction(EnumSet.of(TransportMode.bus));
+			d.setModeRestriction(createHashSet("bus"));
 			p = d.calcLeastCostPath(f.nodes[4], f.nodes[6], 6.0*3600.0);
 			assertEquals("wrong number of links.", 3, p.links.size());
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
 		}
 	}
-	
+
 	/**
 	 * Tests route finding with a mode restriction of exactly one mode,
 	 * looking for impossible routes within that mode.
@@ -120,19 +121,19 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
 		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
-			
-			d.setModeRestriction(EnumSet.of(TransportMode.car));
+
+			d.setModeRestriction(createHashSet(TransportMode.car));
 			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[7], 6.0*3600.0);
 			assertNull("no path should be possible", p);
 
-			d.setModeRestriction(EnumSet.of(TransportMode.bus));
+			d.setModeRestriction(createHashSet("bus"));
 			p = d.calcLeastCostPath(f.nodes[0], f.nodes[6], 6.0*3600.0);
 			assertNull("no path should be possible", p);
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
 		}
 	}
-	
+
 	/**
 	 * Tests route finding with a mode restriction of two modes,
 	 * where both modes are required to reach the target.
@@ -143,8 +144,8 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
 		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
-			
-			d.setModeRestriction(EnumSet.of(TransportMode.car, TransportMode.bus));
+
+			d.setModeRestriction(createHashSet(TransportMode.car, "bus"));
 			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[2], 6.0*3600.0);
 			assertNotNull("path should be possible", p);
 			assertEquals("wrong number of links", 2, p.links.size());
@@ -152,7 +153,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
 		}
 	}
-	
+
 	/**
 	 * Tests route finding with a mode restriction to no modes,
 	 * resulting in never-satisfiable route-request.
@@ -163,15 +164,15 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
 		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
-			
-			d.setModeRestriction(EnumSet.noneOf(TransportMode.class));
+
+			d.setModeRestriction(new HashSet<String>());
 			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[1], 6.0*3600.0);
 			assertNull("no path should be possible", p);
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
 		}
 	}
-	
+
 	/**
 	 * Tests route finding with mode restrictions disabled, effectively
 	 * allowing all modes.
@@ -182,7 +183,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
 		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
-			
+
 			d.setModeRestriction(null);
 			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[1], 6.0*3600.0);
 			assertNotNull("path should be possible", p);
@@ -191,7 +192,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
 		}
 	}
-	
+
 	/**
 	 * Tests route finding with a mode restriction, where the first possible
 	 * link has a wrong allowed mode. Tests the (possible) special case of handling
@@ -203,15 +204,15 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
 		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
-			
-			d.setModeRestriction(EnumSet.of(TransportMode.bus));
+
+			d.setModeRestriction(createHashSet("bus"));
 			Path p = d.calcLeastCostPath(f.nodes[1], f.nodes[6], 6.0*3600.0);
 			assertNull("no path should be possible", p);
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
 		}
 	}
-	
+
 	/**
 	 * Tests route finding with a mode restriction, where the last possible
 	 * link has a wrong allowed mode. Tests the (possible) special case of
@@ -223,8 +224,8 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
 		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
-			
-			d.setModeRestriction(EnumSet.of(TransportMode.car));
+
+			d.setModeRestriction(createHashSet("car"));
 			Path p = d.calcLeastCostPath(f.nodes[1], f.nodes[6], 6.0*3600.0);
 			assertNull("no path should be possible", p);
 		} else {
@@ -244,18 +245,18 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
 		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
-			
-			d.setModeRestriction(EnumSet.of(TransportMode.bus));
+
+			d.setModeRestriction(createHashSet("bus"));
 			Path p = d.calcLeastCostPath(f.nodes[1], f.nodes[2], 6.0*3600.0);
 			assertNull("no path should be possible", p);
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
 		}
 	}
-	
+
 	/**
 	 * Tests route finding with a mode restriction, ending in a dead end.
-	 * Some optimizations try to recognize dead ends in the network and 
+	 * Some optimizations try to recognize dead ends in the network and
 	 * handle them specially, so let's try they work as expected.
 	 */
 	public void testCalcLeastCostPath_MultiModeNetwork_OneMode_DeadEndLink() {
@@ -264,24 +265,24 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(f.network);
 		if (routerAlgo instanceof IntermodalLeastCostPathCalculator) {
 			Dijkstra d = (Dijkstra) routerAlgo;
-			
-			d.setModeRestriction(EnumSet.of(TransportMode.car));
+
+			d.setModeRestriction(createHashSet(TransportMode.car));
 			Path p = d.calcLeastCostPath(f.nodes[4], f.nodes[3], 6.0*3600.0);
 			assertNotNull("path should be possible for car.", p);
 
-			d.setModeRestriction(EnumSet.of(TransportMode.bus));
+			d.setModeRestriction(createHashSet("bus"));
 			p = d.calcLeastCostPath(f.nodes[4], f.nodes[3], 6.0*3600.0);
 			assertNull("no path should be possible for bus.", p);
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Provides a simple, multi-modal network for tests.
-	 * 
+	 *
 	 * <pre>
 	 *         cb            c            b
 	 *   (4)----9---->(5)---10---->(6)---11---->(7)      availableModes = car:
@@ -289,14 +290,14 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 	 *    |         /  |  \         |         /
 	 *    |        /   |   \        |        /            availableModes = bus:
 	 *    |       /    |    \       |      /               links: 0, 6, 7, 8, 9, 11   (b)
-	 *   3-c   4-c    5-c    6-b   7-b   8-b         
+	 *   3-c   4-c    5-c    6-b   7-b   8-b
 	 *    |   /        |        \   |   /                 node 3 is bus-only, node 5 is car-only
 	 *    |  /         |         \  |  /
 	 *    | /          |          \ | /                   all links:
 	 *    |/    b      v     c     v|/    c                 length = 1000m, capacity = 3600.0veh/h
 	 *   (0)----0---->(1)----1---->(2)----2---->(3)         freespeed = 100m/s (=10s travel time)
 	 * </pre>
-	 * 
+	 *
 	 * Some important characteristics of that network:
 	 * <ul>
 	 * <li>Node 7 can only be reached by bus, node 3 only by car</li>
@@ -337,9 +338,13 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			this.links[9] = network.createAndAddLink(new IdImpl(9), this.nodes[4], this.nodes[5], 1000.0, 100.0, 3600.0, 1.0);
 			this.links[10] = network.createAndAddLink(new IdImpl(10), this.nodes[5], this.nodes[6], 1000.0, 100.0, 3600.0, 1.0);
 			this.links[11] = network.createAndAddLink(new IdImpl(11), this.nodes[6], this.nodes[7], 1000.0, 100.0, 3600.0, 1.0);
-			EnumSet<TransportMode> carOnly = EnumSet.of(TransportMode.car);
-			EnumSet<TransportMode> busOnly = EnumSet.of(TransportMode.bus);
-			EnumSet<TransportMode> carNBus = EnumSet.of(TransportMode.car, TransportMode.bus);
+			Set<String> carOnly = new HashSet<String>();
+			carOnly.add(TransportMode.car);
+			Set<String> busOnly = new HashSet<String>();
+			busOnly.add("bus");
+			Set<String> carNBus = new HashSet<String>();
+			carNBus.add(TransportMode.car);
+			carNBus.add("bus");
 			this.links[0].setAllowedModes(busOnly);
 			this.links[1].setAllowedModes(carOnly);
 			this.links[2].setAllowedModes(carOnly);
@@ -354,5 +359,13 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			this.links[11].setAllowedModes(busOnly);
 		}
 	}
-	
+
+	public static final Set<String> createHashSet(String... modes) {
+		Set<String> set = new HashSet<String>();
+		for (String m : modes) {
+			set.add(m);
+		}
+		return set;
+	}
+
 }

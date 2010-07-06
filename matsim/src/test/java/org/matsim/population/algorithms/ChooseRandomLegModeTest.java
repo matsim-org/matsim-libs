@@ -54,13 +54,13 @@ import org.matsim.world.Layer;
  * @author mrieser
  */
 public class ChooseRandomLegModeTest extends MatsimTestCase {
-	
+
 	private static final String CONFIGFILE = "test/scenarios/equil/config.xml";
 	private static final Collection<String> activityChainStrings = Arrays.asList(
-			"1 2 1", 
-			"1 2 20 1", 
-			"1 2 1 2 1", 
-			"1 2 1 3 1", 
+			"1 2 1",
+			"1 2 20 1",
+			"1 2 1 2 1",
+			"1 2 1 3 1",
 			"1 2 2 1",
 			"1 2 2 2 2 2 2 2 1",
 			"1 2 3 2 1",
@@ -75,7 +75,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 			"1 2 3 4 3 1");
 
 	public void testRandomChoice() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -83,7 +83,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		boolean foundCarMode = false;
 		boolean foundPtMode = false;
 		boolean foundWalkMode = false;
-		TransportMode previousMode = leg.getMode();
+		String previousMode = leg.getMode();
 		for (int i = 0; i < 5; i++) {
 			algo.run(plan);
 			assertNotSame("leg mode must have changed.", previousMode, leg.getMode());
@@ -104,14 +104,14 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	}
 
 	public void testHandleEmptyPlan() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
 
 	public void testHandlePlanWithoutLeg() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		algo.run(plan);
@@ -122,7 +122,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	 * Test that all the legs have the same, changed mode
 	 */
 	public void testMultipleLegs() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt}, MatsimRandom.getRandom());
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt}, MatsimRandom.getRandom());
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		plan.createAndAddLeg(TransportMode.car);
@@ -136,7 +136,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		assertEquals("unexpected leg mode in leg 2.", TransportMode.pt, ((Leg) plan.getPlanElements().get(3)).getMode());
 		assertEquals("unexpected leg mode in leg 3.", TransportMode.pt, ((Leg) plan.getPlanElements().get(5)).getMode());
 	}
-	
+
 	public void testSubTourMutationNetworkBased() {
 		Config config = loadConfig(CONFIGFILE);
 		Scenario scenario = new ScenarioImpl(config);
@@ -147,7 +147,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		this.testSubTourMutationToCar((NetworkLayer) network, tripStructureAnalysisLayer);
 		this.testSubTourMutationToPt((NetworkLayer) network, tripStructureAnalysisLayer);
 	}
-	
+
 	public void testSubTourMutationFacilitiesBased() {
 		Config config = loadConfig(CONFIGFILE);
 		ScenarioImpl scenario = new ScenarioImpl(config);
@@ -158,7 +158,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		this.testSubTourMutationToCar(facilities, tripStructureAnalysisLayer);
 		this.testSubTourMutationToPt(facilities, tripStructureAnalysisLayer);
 	}
-	
+
 	public void testCarDoesntTeleportFromHome() {
 		Config config = loadConfig(CONFIGFILE);
 		Scenario scenario = new ScenarioImpl(config);
@@ -168,11 +168,11 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		testCarDoesntTeleport((NetworkLayer) network, config.planomat(), TransportMode.car, TransportMode.pt);
 		testCarDoesntTeleport((NetworkLayer) network, config.planomat(), TransportMode.pt, TransportMode.car);
 	}
-	
+
 	public void testSubTourMutationToCar(Layer layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
-		TransportMode expectedMode = TransportMode.car;
-		TransportMode originalMode = TransportMode.pt;
-		ChooseRandomLegMode testee = new ChooseRandomLegMode(new TransportMode[] {expectedMode, originalMode}, MatsimRandom.getRandom());
+		String expectedMode = TransportMode.car;
+		String originalMode = TransportMode.pt;
+		ChooseRandomLegMode testee = new ChooseRandomLegMode(new String[] {expectedMode, originalMode}, MatsimRandom.getRandom());
 		testee.setChangeOnlyOneSubtour(true);
 		testee.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
@@ -186,11 +186,11 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		}
 
 	}
-	
+
 	public void testSubTourMutationToPt(Layer layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
-		TransportMode expectedMode = TransportMode.pt;
-		TransportMode originalMode = TransportMode.car;
-		ChooseRandomLegMode testee = new ChooseRandomLegMode(new TransportMode[] {expectedMode, originalMode}, MatsimRandom.getRandom());
+		String expectedMode = TransportMode.pt;
+		String originalMode = TransportMode.car;
+		ChooseRandomLegMode testee = new ChooseRandomLegMode(new String[] {expectedMode, originalMode}, MatsimRandom.getRandom());
 		testee.setChangeOnlyOneSubtour(true);
 		testee.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
@@ -204,9 +204,9 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		}
 
 	}
-	
-	public void testCarDoesntTeleport(Layer layer, PlanomatConfigGroup planomatConfigGroup, TransportMode originalMode, TransportMode otherMode) {
-		ChooseRandomLegMode testee = new ChooseRandomLegMode(new TransportMode[] {originalMode, otherMode}, MatsimRandom.getRandom());
+
+	public void testCarDoesntTeleport(Layer layer, PlanomatConfigGroup planomatConfigGroup, String originalMode, String otherMode) {
+		ChooseRandomLegMode testee = new ChooseRandomLegMode(new String[] {originalMode, otherMode}, MatsimRandom.getRandom());
 		testee.setChangeOnlyOneSubtour(true);
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 		for (String activityChainString : activityChainStrings) {
@@ -232,7 +232,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	}
 
 	private void assertSubTourMutated(Plan plan, Plan originalPlan,
-			TransportMode expectedMode, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+			String expectedMode, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		planAnalyzeSubtours.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
 		planAnalyzeSubtours.run(plan);
@@ -256,7 +256,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		}
 	}
 
-	private boolean isThisSubTourMutated(Plan plan, int subTourFromIndex, int subTourToIndex, Plan originalPlan, TransportMode expectedMode) {
+	private boolean isThisSubTourMutated(Plan plan, int subTourFromIndex, int subTourToIndex, Plan originalPlan, String expectedMode) {
 		List<PlanElement> prefix = plan.getPlanElements().subList(0, subTourFromIndex);
 		List<PlanElement> subTour = plan.getPlanElements().subList(subTourFromIndex, subTourToIndex);
 		List<PlanElement> suffix = plan.getPlanElements().subList(subTourToIndex, plan.getPlanElements().size());

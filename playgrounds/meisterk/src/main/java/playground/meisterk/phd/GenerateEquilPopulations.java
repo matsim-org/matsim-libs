@@ -77,11 +77,11 @@ public class GenerateEquilPopulations {
 			
 			act = popFactory.createActivityFromLinkId("h", network.getLinks().get(new IdImpl(1)).getId());
 			plan.addActivity(act);
-			leg = popFactory.createLeg(TransportMode.undefined);
+			leg = popFactory.createLeg("undefined");
 			plan.addLeg(leg);
 			act = popFactory.createActivityFromLinkId("w", network.getLinks().get(new IdImpl(20)).getId());
 			plan.addActivity(act);
-			leg = popFactory.createLeg(TransportMode.undefined);
+			leg = popFactory.createLeg("undefined");
 			plan.addLeg(leg);
 			act = popFactory.createActivityFromLinkId("h", network.getLinks().get(new IdImpl(1)).getId());
 			plan.addActivity(act);

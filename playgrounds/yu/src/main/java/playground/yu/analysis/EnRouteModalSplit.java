@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -155,6 +156,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 
 	/* Implementation of eventhandler-Interfaces */
 
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		Id id = event.getPersonId();
 		Integer itg = legCounts.get(id);
@@ -165,11 +167,13 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 				bikeDep, this.othersDep);
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		internalHandleEvent(event, this.arr, this.carArr, this.ptArr, wlkArr,
 				bikeArr, this.othersArr);
 	}
 
+	@Override
 	public void handleEvent(final AgentStuckEvent event) {
 		internalHandleEvent(event, this.stuck, this.carStuck, null, null, null,
 				this.othersStuck);
@@ -200,27 +204,21 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		allCount[binIdx]++;
 		Integer itg = legCounts.get(ae.getPersonId());
 		if (itg != null) {
-			switch (((LegImpl) plan.getPlanElements().get(2 * itg + 1))
-					.getMode()) {
-			case car:
+			String mode = ((LegImpl) plan.getPlanElements().get(2 * itg + 1)).getMode();
+			if (TransportMode.car.equals(mode)) {
 				carCount[binIdx]++;
-				break;
-			case pt:
+			} else if (TransportMode.pt.equals(mode)) {
 				if (ptCount != null)
 					ptCount[binIdx]++;
-				break;
-			case walk:
+			} else if (TransportMode.walk.equals(mode)) {
 				if (wlkCount != null)
 					wlkCount[binIdx]++;
-				break;
-			case bike:
+			} else if (TransportMode.bike.equals(mode)) {
 				if (bikeCount != null)
 					bikeCount[binIdx]++;
-				break;
-			default:
+			} else {
 				if (othersCount != null)
 					othersCount[binIdx]++;
-				break;
 			}
 		}
 	}
@@ -360,6 +358,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		return bin;
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		for (int i = 0; i < this.dep.length; i++) {
 			this.dep[i] = 0;

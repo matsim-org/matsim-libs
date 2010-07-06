@@ -23,8 +23,8 @@ package playground.balmermi.datapuls.modules;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -53,25 +53,30 @@ public final class LinkTablesFromPopulation {
 	private final Network network;
 	private final LeastCostPathCalculator router;
 	private final Counter counter = new Counter("person #");
-	
-	private final HashMap<TransportMode, HashMap<Integer, BufferedWriter>> writers = new HashMap<TransportMode, HashMap<Integer, BufferedWriter>>();
-	private final EnumSet<TransportMode> analyzedModes = EnumSet.of(TransportMode.walk, TransportMode.bike);
-	private final HashMap<TransportMode, Double> speeds = new HashMap<TransportMode, Double>();
-	
+
+	private final HashMap<String, HashMap<Integer, BufferedWriter>> writers = new HashMap<String, HashMap<Integer, BufferedWriter>>();
+	private final HashSet<String> analyzedModes;
+	private final HashMap<String, Double> speeds = new HashMap<String, Double>();
+
 	public LinkTablesFromPopulation(final int timeBinSize,
-			final String outputDirectory, final Network network, 
+			final String outputDirectory, final Network network,
 			final LeastCostPathCalculator router, final PlansCalcRouteConfigGroup config) {
+
+		this.analyzedModes = new HashSet<String>();
+		this.analyzedModes.add(TransportMode.walk);
+		this.analyzedModes.add(TransportMode.bike);
+
 		this.timeBinSize = timeBinSize;
 		this.outputDirectory = outputDirectory;
 		this.network = network;
 		this.router = router;
-		for (TransportMode mode : analyzedModes) {
+		for (String mode : analyzedModes) {
 			this.writers.put(mode, new HashMap<Integer, BufferedWriter>());
 		}
 		this.speeds.put(TransportMode.walk, config.getWalkSpeed());
 		this.speeds.put(TransportMode.bike, config.getBikeSpeed());
 	}
-	
+
 	public void run(final Population population) throws IOException {
 		for (Person person : population.getPersons().values()) {
 			counter.incCounter();
@@ -94,10 +99,10 @@ public final class LinkTablesFromPopulation {
 			if (pe instanceof Activity) {
 				prevActivity = thisActivity;
 				thisActivity = (Activity) pe;
-				
+
 				if (prevActivity != null) {
 					if (this.analyzedModes.contains(prevLeg.getMode())) {
-						TransportMode mode = prevLeg.getMode();
+						String mode = prevLeg.getMode();
 						double time = prevActivity.getEndTime();
 						Id fromFacilityId = prevActivity.getFacilityId();
 						Id toFacilityId = thisActivity.getFacilityId();
@@ -106,7 +111,7 @@ public final class LinkTablesFromPopulation {
 						String fromActType = prevActivity.getType();
 						String toActType = thisActivity.getType();
 						double speed = this.speeds.get(mode).doubleValue();
-						
+
 						Path path = this.router.calcLeastCostPath(fromNode, toNode, time);
 						for (Link link : path.links) {
 							writeLine(mode, time, link.getId(), personId, fromActType, fromFacilityId, toActType, toFacilityId);
@@ -117,7 +122,7 @@ public final class LinkTablesFromPopulation {
 			}
 		}
 	}
-	
+
 	private void closeAllFiles() {
 		for (HashMap<Integer, BufferedWriter> writersByMode : this.writers.values()) {
 			for (BufferedWriter writer : writersByMode.values()) {
@@ -130,12 +135,12 @@ public final class LinkTablesFromPopulation {
 		}
 	}
 
-	private BufferedWriter getWriter(final TransportMode mode, final double time) {
+	private BufferedWriter getWriter(final String mode, final double time) {
 		int timeBin = ((int) time) / timeBinSize;
 		if (time > 24*3600*2) { return null; }
 		BufferedWriter writer = this.writers.get(mode).get(Integer.valueOf(timeBin));
 		if (writer == null) {
-			String filename = "/linkAnalysis_"+mode.toString()+"_"+(timeBin*this.timeBinSize)+"-"+((timeBin+1)*this.timeBinSize)+".txt.gz";
+			String filename = "/linkAnalysis_"+mode+"_"+(timeBin*this.timeBinSize)+"-"+((timeBin+1)*this.timeBinSize)+".txt.gz";
 			try {
 				writer = IOUtils.getBufferedWriter(this.outputDirectory + filename);
 				writer.write("lid\tpid\tfromActType\tfromActFid\ttoActType\ttoActFid\n");
@@ -148,10 +153,10 @@ public final class LinkTablesFromPopulation {
 		}
 		return writer;
 	}
-	
-	private void writeLine(final TransportMode mode, final double time, 
+
+	private void writeLine(final String mode, final double time,
 			final Id linkId, final Id personId,
-			final String fromActType, final Id fromFacilityId, 
+			final String fromActType, final Id fromFacilityId,
 			final String toActType, final Id toFacilityId) throws IOException {
 		BufferedWriter writer = getWriter(mode, time);
 		if (writer != null) {

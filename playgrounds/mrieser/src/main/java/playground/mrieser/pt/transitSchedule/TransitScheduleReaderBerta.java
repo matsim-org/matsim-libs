@@ -36,7 +36,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -264,7 +263,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 			timeOffset += profilpunkt.wartezeit;
 		}
 		Id routeId = getTransitRouteId(route, fahrzeitprofil);
-		TransitRoute transitRoute = this.builder.createTransitRoute(routeId, null, stops, TransportMode.bus); // TODO find correct transport mode
+		TransitRoute transitRoute = this.builder.createTransitRoute(routeId, null, stops, "bus"); // TODO find correct transport mode
 		transitRoute.setDescription("Linie " + this.tmpLinie.publicId);
 		return transitRoute;
 	}

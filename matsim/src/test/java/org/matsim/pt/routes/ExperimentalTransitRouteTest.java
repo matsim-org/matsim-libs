@@ -24,7 +24,6 @@ import java.util.Collections;
 
 import junit.framework.TestCase;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -60,7 +59,7 @@ public class ExperimentalTransitRouteTest extends TestCase {
 		stop1.setLinkId(link1.getId());
 		stop2.setLinkId(link2.getId());
 		TransitLine line = builder.createTransitLine(new IdImpl(5));
-		TransitRoute tRoute = builder.createTransitRoute(new IdImpl(6), null, Collections.<TransitRouteStop>emptyList(), TransportMode.bus);
+		TransitRoute tRoute = builder.createTransitRoute(new IdImpl(6), null, Collections.<TransitRouteStop>emptyList(), "bus");
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(stop1, line, tRoute, stop2);
 		assertEquals(stop1.getId(), route.getAccessStopId());
 		assertEquals(line.getId(), route.getLineId());

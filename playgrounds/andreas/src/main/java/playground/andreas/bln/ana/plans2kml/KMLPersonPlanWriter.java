@@ -247,7 +247,7 @@ public class KMLPersonPlanWriter {
 						linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
 					}
 
-					} else if (leg.getMode() == TransportMode.walk || leg.getMode() == TransportMode.bike || leg.getMode() == TransportMode.undefined) {
+					} else if (leg.getMode() == TransportMode.walk || leg.getMode() == TransportMode.bike || leg.getMode() == "undefined") {
 
 						if (iterator.hasNext()) {
 

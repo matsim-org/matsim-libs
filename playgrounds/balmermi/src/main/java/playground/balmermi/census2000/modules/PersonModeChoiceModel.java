@@ -125,12 +125,12 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 
 		// getting the chosen mode
 		int modechoice = model.calcModeChoice();
-		TransportMode mode = null;
+		String mode = null;
 		if (modechoice == 0) { mode = TransportMode.walk; }
 		else if (modechoice == 1) { mode = TransportMode.bike; }
 		else if (modechoice == 2) { mode = TransportMode.car; }
 		else if (modechoice == 3) { mode = TransportMode.pt; }
-		else if (modechoice == 4) { mode = TransportMode.undefined; }
+		else if (modechoice == 4) { mode = "undefined"; }
 		else { Gbl.errorMsg("Mode choice returns undefined value!"); }
 
 		// setting mode to plan
@@ -142,6 +142,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		}
 	}
 
+	@Override
 	public void run(Plan plan) {
 	}
 }

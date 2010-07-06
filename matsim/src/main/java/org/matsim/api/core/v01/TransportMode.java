@@ -19,13 +19,26 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.api.core.v01;
 
 /**
- * Enumeration of transport modes known to MATSim.
+ * Enumeration of frequently used modes of transportation in MATSim.
+ *
+ * @author mrieser
  */
-public enum TransportMode {
-	miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, transit_walk, other, undefined
+public final class TransportMode {
+
+	public static final String car = "car";
+	public static final String ride = "ride";
+	public static final String bike = "bike";
+	public static final String pt = "pt";
+	public static final String walk = "walk";
+	public static final String transit_walk = "transit_walk";
+
+	private TransportMode() {
+		// prevent creating instances of this class
+	}
+
 }
