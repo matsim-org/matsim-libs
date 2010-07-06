@@ -113,7 +113,7 @@ LegTravelTimeEstimator {
 			Adler32 adler32 = new Adler32();
 			adler32.update(this.origin.getId().toString().getBytes());
 			adler32.update(this.destination.getId().toString().getBytes());
-			adler32.update(this.mode.toString().getBytes());
+			adler32.update(this.mode.getBytes());
 			adler32.update((int) this.departureTime);
 			this.hash = (int) adler32.getValue();
 		}

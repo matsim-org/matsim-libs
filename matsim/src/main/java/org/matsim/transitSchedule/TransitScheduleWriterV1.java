@@ -111,7 +111,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 		}
 
 		this.writeStartTag(Constants.TRANSPORT_MODE, null);
-		this.writeContent(route.getTransportMode().toString(), false);
+		this.writeContent(route.getTransportMode(), false);
 		this.writeEndTag(Constants.TRANSPORT_MODE);
 
 		this.writeRouteProfile(route.getStops());

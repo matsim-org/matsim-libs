@@ -62,7 +62,7 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 		if (this.outputGraph) {
 			this.histogram.writeGraphic(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "legHistogram_all.png"));
 			for (String legMode : this.histogram.getLegModes()) {
-				this.histogram.writeGraphic(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "legHistogram_" + legMode.toString() + ".png"), legMode);
+				this.histogram.writeGraphic(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);
 			}
 		}
 

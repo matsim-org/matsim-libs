@@ -38,7 +38,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -187,7 +186,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * en route for all legs with the specified transportation mode
 	 */
 	public JFreeChart getGraphic(final String legMode) {
-		return getGraphic(this.data.get(legMode), legMode.toString());
+		return getGraphic(this.data.get(legMode), legMode);
 	}
 
 	private JFreeChart getGraphic(final ModeData modeData, final String modeName) {
@@ -282,7 +281,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * @param legMode transport mode
 	 * @return number of vehicles that got stuck in a time-bin, for all legs with the specified mode
 	 */
-	public int[] getStuck(final TransportMode legMode) {
+	public int[] getStuck(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
 			return new int[0];

@@ -43,7 +43,7 @@ public class SubChain {
 
 	public void defineMode(final String mode) {
 		if (this.mode == null) {
-			this.mode = mode.toString();
+			this.mode = mode;
 			return;
 		}
 		if (this.mode.equals("mixed")) {

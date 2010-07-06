@@ -104,7 +104,7 @@ public class LegImpl implements Leg {
 
 	@Override
 	public final String toString() {
-		return "[mode=" + this.getMode().toString()  + "]" +
+		return "[mode=" + this.getMode() + "]" +
 				"[depTime=" + Time.writeTime(this.getDepartureTime()) + "]" +
 				"[travTime=" + Time.writeTime(this.getTravelTime()) + "]" +
 				"[arrTime=" + Time.writeTime(this.getArrivalTime()) + "]" +

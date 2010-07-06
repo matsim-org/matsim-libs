@@ -143,7 +143,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 				if (counter > 0) {
 					buffer.append(',');
 				}
-				buffer.append(mode.toString());
+				buffer.append(mode);
 				counter++;
 			}
 			out.write(" modes=\"" + buffer.toString() + "\"");

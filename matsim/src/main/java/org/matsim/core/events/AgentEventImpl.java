@@ -44,7 +44,7 @@ public abstract class AgentEventImpl extends PersonEventImpl implements AgentEve
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_LINK, (this.linkId == null ? null : this.linkId.toString()));
 		if (this.legMode != null) {
-			attr.put(ATTRIBUTE_LEGMODE, this.legMode.toString());
+			attr.put(ATTRIBUTE_LEGMODE, this.legMode);
 		}
 		return attr;
 	}

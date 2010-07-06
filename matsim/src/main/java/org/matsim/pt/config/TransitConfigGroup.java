@@ -91,7 +91,7 @@ public class TransitConfigGroup extends Module {
 				if (!isFirst) {
 					str.append(',');
 				}
-				str.append(mode.toString());
+				str.append(mode);
 				isFirst = false;
 			}
 			return str.toString();
