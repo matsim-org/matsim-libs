@@ -92,13 +92,7 @@ public class RunMatsim2Urbansim {
 		MyPlansProcessor mpp = new MyPlansProcessor(s, zones);
 		mpp.processPlans();
 		mpp.writeOdMatrixToDbf(sb.getDbfOutputFile());
-		
-		// Read the link statistics;
-		String linkStatsFilename = root + studyAreaName + "/" + version + "/linkstats.txt.gz";
-		MyLinkStatsReader mlsr = new MyLinkStatsReader(linkStatsFilename, hours);
-		mlsr.readLinkStatsTravelTime(hours);
-		Map<Id,Double> tt = mlsr.getTravelTimeMap();
-		
+				
 		log.info("Process complete.");
 	}
 	

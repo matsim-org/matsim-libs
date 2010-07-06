@@ -55,12 +55,13 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 import cern.colt.matrix.ObjectMatrix2D;
+import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.impl.DenseObjectMatrix2D;
 
 public class MyPlansProcessor {
-	private Logger log = Logger.getLogger(MyPlansProcessor.class);
-	private Scenario scenario;
-	private List<MyZone> zones;
+	private final Logger log = Logger.getLogger(MyPlansProcessor.class);
+	private final Scenario scenario;
+	private final List<MyZone> zones;
 	private Map<Id, Integer> mapZoneIdToListEntry;
 	private Map<Integer, Id> mapListEntryToZoneId;
 	private DenseObjectMatrix2D odMatrix;
@@ -159,6 +160,7 @@ public class MyPlansProcessor {
 			
 		}
 		log.info("   agents: " + counter + " (Done)");
+		
 	}
 	
 	private Integer getLastActivity(Plan plan, int index){
@@ -195,8 +197,23 @@ public class MyPlansProcessor {
 		return scenario;
 	}
 
-	public DenseObjectMatrix2D getOdMatrix() {
-		return odMatrix;
+	public DenseDoubleMatrix2D getOdMatrix() {
+		DenseDoubleMatrix2D result = new DenseDoubleMatrix2D(odMatrix.rows(), odMatrix.columns());
+		int count = 0;
+		for(int row = 0; row < odMatrix.rows(); row++){
+			for(int col = 0; col < odMatrix.columns(); col++){
+				if(odMatrix.get(row, col) != null){
+					Double d = getAvgOdTravelTime(row, col);
+					result.set(row, col, d);
+					count++;
+				} else{
+					result.set(row, col, Double.POSITIVE_INFINITY);
+				}
+			}
+		}
+		double density = (((double) count) / ((double) odMatrix.rows()*odMatrix.columns()))*100;
+		log.info(String.format("OD travel time matrix returned. Density: %3.2f%% (%d nonzeros)", density, count));
+		return result;
 	}
 
 	public List<MyZone> getZones() {
@@ -218,8 +235,7 @@ public class MyPlansProcessor {
 	}
 
 	public void writeOdMatrixToDbf(String filename) {
-		log.info("Writing OD matrix travel time to " + filename);
-		
+		log.info("Writing OD travel time matrix to " + filename);
 
 		Field oId = new Field("from_zone_id", Type.NUMBER, 20);
 		Field dId = new Field("to_zone_id", Type.NUMBER, 20);

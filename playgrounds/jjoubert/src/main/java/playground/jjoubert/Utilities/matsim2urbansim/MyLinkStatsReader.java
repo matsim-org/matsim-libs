@@ -29,32 +29,40 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.trafficmonitoring.TravelTimeData;
+import org.matsim.core.trafficmonitoring.TravelTimeDataArray;
 import org.matsim.core.utils.io.IOUtils;
 
 public class MyLinkStatsReader {
 	private final Logger log = Logger.getLogger(MyLinkStatsReader.class);
 	private File file;
-	private Map<Id, Double> travelTimes;
 	
-	public MyLinkStatsReader(String filename, String hours) {
+	public MyLinkStatsReader(String filename) {
 		File f = new File(filename);
 		if(!f.exists()){
 			throw new RuntimeException("The link stats file " + f.getAbsolutePath() + " does not exist");
 		}
 		this.file = f;
-		travelTimes = new TreeMap<Id, Double>();
 	}
 	
-	public void readLinkStatsTravelTime(final String hour){
-		log.info("Reading link statistics from " + this.file.getAbsolutePath());
+	/**
+	 * Reads the average travel time from the LinkStats file.
+	 * @param hour for which the travel time is read.
+	 * @return
+	 */
+	public Map<Id, Double> readSingleHour(final String hour){
+		log.info("Reading link statistics for hour " + hour + " from " + this.file.getAbsolutePath());
+		
+		Map<Id,Double> travelTimes = new TreeMap<Id, Double>();
 		Integer index = null;
 		BufferedReader input;
 		int linkCounter = 0;
 		int linkMultiplier = 1;
 		try {
 			input = IOUtils.getBufferedReader(file.getAbsolutePath());
-//			input = new Scanner(new BufferedReader(new FileReader(this.file)));
 			try{
 				String[] header = input.readLine().split("\t");
 				/*
@@ -101,20 +109,77 @@ public class MyLinkStatsReader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return travelTimes;
 	}
 	
-	public Map<Id, Double> getTravelTimeMap(){
-		return this.travelTimes;
-	}
 	
-	public String toString(){
-		return "MyLinkStatsReader from " + file.getAbsolutePath();
-	}
-
-	public void buildTravelTimeDataObject() {
-		// TODO Auto-generated method stub
+	/**
+	 * Reads and processes the entire linkstats file and create new 
+	 * TravelTimeData objects, one for each link.
+	 * @param s the scenario
+	 * @param stat the summary statistic to use. Acceptable values are "min", 
+	 * 		"avg" and "max".
+	 */
+	public Map<Id, TravelTimeData> buildTravelTimeDataObject(Scenario s, String stat) {
+		log.info("Creating TravelTimeData map using " + stat + " travel times from " + file.getAbsolutePath());
 		
+		Map<Id, TravelTimeData> ttm = new TreeMap<Id, TravelTimeData>();
+		Integer index = null;
+		int linkCounter = 0;
+		int linkMultiplier = 1;
+		try {
+			BufferedReader br = IOUtils.getBufferedReader(file.getAbsolutePath());
+			try{
+				String [] header = br.readLine().split("\t");
+				boolean found = false;
+				int i = 0;
+				String string = "TRAVELTIME0-1" + stat;
+				do {
+					if(header[i].equalsIgnoreCase(string)){
+						found = true;
+						index = i;
+					} else{
+						i++;					
+					}
+				} while (found == false && i < header.length);
+				if(!found){
+					throw new RuntimeException("Could not find and index for " + s + " in " + file.getAbsolutePath());
+				}
+				String line = null;
+				while((line = br.readLine()) != null){
+					String[] values = line.split("\t");
+					Id linkId = new IdImpl(values[0]);
+					Link l = s.getNetwork().getLinks().get(linkId);
+					TravelTimeData ttd = new TravelTimeDataArray(l, 24);
+					try{
+						for(i = 0; i < 24; i++){
+							ttd.addTravelTime(i, Double.parseDouble(values[index+(i*3)]));
+						}	
+						ttm.put(l.getId(), ttd);
+					} catch (IndexOutOfBoundsException e){
+						log.warn("Could not get the travel time for link " + l.getId() + " for hour " + i);
+						e.printStackTrace();
+					}
+					
+					// Report progress.
+					if(++linkCounter == linkMultiplier){
+						log.info("   Links processed: " + linkCounter);
+						linkMultiplier *= 2;
+					}
+				}
+			} finally{
+					br.close();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return ttm;
 	}
-
+	
+	public File getFile(){
+		return this.file;
+	}
 }
 

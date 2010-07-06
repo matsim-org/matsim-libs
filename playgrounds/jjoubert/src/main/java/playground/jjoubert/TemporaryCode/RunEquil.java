@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * RunEquil.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,25 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities;
+package playground.jjoubert.TemporaryCode;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.controler.Controler;
 
+public class RunEquil {
 
-public class AllTests {
-		
-	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities");
-		
-		suite.addTestSuite(MyXmlConverterTest.class);
-		suite.addTestSuite(MyVehicleIdentifierTest.class);
-		suite.addTestSuite(MyFileSamplerTest.class);
-		suite.addTestSuite(MyLinkStatsReaderTest.class);
-		
-		suite.addTest(playground.jjoubert.Utilities.KernelDensityEstimation.AllTests.suite());
-		suite.addTest(playground.jjoubert.Utilities.matsim2urbansim.AllTests.suite());
-		
-		return suite;
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Controler c = new Controler("/Users/johanwjoubert/Desktop/Temp/Equil/config.xml");
+		c.setCreateGraphs(false);
+		c.setOverwriteFiles(true);
+		c.run();
 	}
+
 }

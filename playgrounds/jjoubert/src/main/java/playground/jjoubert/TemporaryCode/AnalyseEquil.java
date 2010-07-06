@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * AnalyseEquil.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,25 +18,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities;
+package playground.jjoubert.TemporaryCode;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.io.File;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.MatsimNetworkReader;
 
-public class AllTests {
-		
-	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities");
-		
-		suite.addTestSuite(MyXmlConverterTest.class);
-		suite.addTestSuite(MyVehicleIdentifierTest.class);
-		suite.addTestSuite(MyFileSamplerTest.class);
-		suite.addTestSuite(MyLinkStatsReaderTest.class);
-		
-		suite.addTest(playground.jjoubert.Utilities.KernelDensityEstimation.AllTests.suite());
-		suite.addTest(playground.jjoubert.Utilities.matsim2urbansim.AllTests.suite());
-		
-		return suite;
+public class AnalyseEquil {
+	private final static Logger log  = Logger.getLogger(AnalyseEquil.class);
+	
+	public static void main(String[] args) {
+		File f = new File("src/main/java/playground/jjoubert/TemporaryCode/equilNetwork.xml");
+		log.info("Network: " + f.getAbsolutePath());
+		Scenario s = new ScenarioImpl();
+		MatsimNetworkReader nr = new MatsimNetworkReader(s);
+		nr.readFile(f.getAbsolutePath());
+		double minX = Double.POSITIVE_INFINITY;
+		double maxX = Double.NEGATIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
+		double maxY = Double.NEGATIVE_INFINITY;
+		for(Node n : s.getNetwork().getNodes().values()){
+			minX = Math.min(minX, n.getCoord().getX());
+			maxX = Math.max(maxX, n.getCoord().getX());
+			minY = Math.min(minY, n.getCoord().getY());
+			maxY = Math.max(maxY, n.getCoord().getY());
+			log.info("Node: " + n.getId() + " (" + n.getCoord().getX() + "," + n.getCoord().getY() + ")");
+		}
+		log.info("Min X: " + minX);
+		log.info("Max X: " + maxX);
+		log.info("Min Y: " + minY);
+		log.info("Max Y: " + maxY);
 	}
+
 }
