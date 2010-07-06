@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -40,6 +42,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -47,8 +50,11 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.xml.sax.SAXException;
 
 import playground.dressler.Interval.EdgeIntervals;
+import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.SourceIntervals;
 import playground.dressler.Interval.VertexIntervals;
 import playground.dressler.ea_flow.BellmanFordIntervalBased;
@@ -75,6 +81,10 @@ public class MultiSourceEAF {
 
 	public static void debug(final boolean debug){
 		_debug=debug;
+	}
+	
+	public static boolean getDebug(){
+		return _debug;
 	}
 
 	public static void enableDebuggingForAllFlowRelatedClasses()
@@ -122,6 +132,8 @@ public class MultiSourceEAF {
 		return demands;
 	}
 
+	
+	
 
 	/**
 	 * generates demand from an population by placing demand 1 for every person on the node in the Persons first plan first activity edges ToNode
@@ -179,6 +191,21 @@ public class MultiSourceEAF {
 		return allnodes;
 	}
 	
+	
+	private static List<NetworkChangeEvent> readChangeEvents(final NetworkLayer network, final String filename) throws IOException{
+		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
+		try {
+			parser.parse(filename);
+		} catch (SAXException e1) {
+			e1.printStackTrace();
+		} catch (ParserConfigurationException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		return parser.getEvents();
+	}
+
 	
 	public static void readShelterFile(NetworkLayer network,final String filename,
 			final int totaldemands,HashMap<Node, Integer> demands,final boolean addshelterlinks) throws IOException{
@@ -302,8 +329,10 @@ public class MultiSourceEAF {
 		
 		Flow fluss;
 		
+		
 		List<TimeExpandedPath> result = null;
 		fluss = new Flow(settings);
+		
 		if(paths!=null) {
 			System.out.println("restoring flow");			
 			for (TimeExpandedPath path : paths) {
@@ -326,7 +355,7 @@ public class MultiSourceEAF {
 		} else {
 			routingAlgo = new BellmanFordIntervalBased(settings, fluss);
 		}
-		//TODO set back to 100
+
 		int VERBOSITY = 100;
 
 		int i;
@@ -346,9 +375,7 @@ public class MultiSourceEAF {
 		Runtime runtime = Runtime.getRuntime();		
 
 		for (i=1; i<=settings.MaxRounds; i++){
-			if(i>7000){
-				VERBOSITY=1;
-			}
+
 			//System.out.println("Iteration " + i);
 
 			Tall.newiter();
@@ -411,7 +438,6 @@ public class MultiSourceEAF {
 			//System.out.println("Returned paths");
 			//System.out.println(result);
 			
-			
 			Taugment.newiter();
 			Taugment.onoff();
 			
@@ -472,7 +498,8 @@ public class MultiSourceEAF {
 
 				for(TimeExpandedPath path : successfulPaths){
 					String tempstr2 = "";
-
+					
+					// Careful! This is not a new path!
 					int latestused = path.shiftToArrival(lasttime);
 
 					// some integrity checks
@@ -676,13 +703,15 @@ public class MultiSourceEAF {
 		String simplenetworkfile = null;
 		String shelterfile = null;
 		String flowfile = null;
+		String changeeventsfile = null;
+		double changeeventsoffset = 0; 
 		int uniformDemands = 0;
 
 		// Rounding is now done according to timestep and flowFactor!
 		int timeStep;
 		double flowFactor;
 
-		int instance = 441;
+		int instance = 48;
 		// 1 = siouxfalls, demand 500
 		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
@@ -692,6 +721,9 @@ public class MultiSourceEAF {
 		// 42 = padang, v2010, with 100% plans (no shelters yet)
 		// 43 = padang, v2010, with 100% plans, 10s steps, shelters
 		// 44 = padang, v2010, with 100% plans, 5s steps (no shelters yet)
+		// 45 = padang, v2010, with 100% plans, 1s steps (no shelters yet)
+		// 48 = padang, v2010, with 100% plans, 1s, change events, no shelters
+		// 49 = padang, v2010, with 100% plans, 10s, change events, no shelters 
 		// 421-441 same as above only Manuel
 		// 5 = probeevakuierung telefunken
 		// 1024 = xmas network
@@ -762,10 +794,21 @@ public class MultiSourceEAF {
 		} else if (instance == 44) {
 			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
-			timeStep = 5;
+			timeStep = 5; 
 			flowFactor = 1.0;
 			sinkid = "en1";
-		}else if (instance == 421) {
+		} else if (instance == 45) {
+			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
+			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
+			timeStep = 1;
+			flowFactor = 1.0;
+			sinkid = "en1";			
+		} else if (instance == 4500) {
+			// wie 45, aber als .dat-Datei
+			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_1s_no_shelters.dat";
+			timeStep = 1;
+			flowFactor = 1.0;
+		} else if (instance == 421) {
 			networkfile  = "/Users/manuel/testdata/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/Users/manuel/testdata/padang/plans/padang_plans_v20100317.xml.gz";
 			timeStep = 2;
@@ -781,9 +824,25 @@ public class MultiSourceEAF {
 		} else if (instance == 441) {
 			networkfile  = "/Users/manuel/testdata/padang/network/padang_net_evac_v20100317.xml.gz";
 			plansfile = "/Users/manuel/testdata/padang/plans/padang_plans_v20100317.xml.gz";
-			//outputplansfile = "/Users/manuel/Desktop/padang7000rerror5s.xml";
-			//flowfile = "/Users/manuel/Desktop/backpadang5s7000itorgpaths.txt";
 			timeStep = 5;
+			flowFactor = 1.0;
+			sinkid = "en1";
+		} else if (instance == 48) {
+			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
+			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
+			changeeventsfile = "/homes/combi/Projects/ADVEST/padang/network/change_events_v20100317.xml.gz";
+			changeeventsoffset = 3 * 3600; // starts at 3:00:00
+			// oder mit 5 Minuten Wellenangst:
+			// changeeventsoffset = 3 * 3600 + 300;
+			timeStep = 1;
+			flowFactor = 1.0;
+			sinkid = "en1";
+		} else if (instance == 49) {
+			networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20100317.xml.gz";
+			plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20100317.xml.gz";
+			changeeventsfile = "/homes/combi/Projects/ADVEST/padang/network/change_events_v20100317.xml.gz";
+			changeeventsoffset = 3 * 3600; // starts at 3:00:00
+			timeStep = 10;
 			flowFactor = 1.0;
 			sinkid = "en1";
 		} else if (instance == 5) {
@@ -840,8 +899,9 @@ public class MultiSourceEAF {
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/audimax.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/otto hahn straße 14.zet.dat";
 			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/probeevakuierung.zet.dat";
-			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
-
+			//simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/capsinks.dat";
+			simplenetworkfile = "/homes/combi/dressler/V/code/meine_EA/padang_v2010_3_sources.dat";
+			
 			uniformDemands = 100;
 
 
@@ -865,6 +925,7 @@ public class MultiSourceEAF {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
 		HashMap<Node, Integer> demands = null;
+		HashMap<Id, Interval> whenAvailable = null;
 		Node sink = null;
 
 		//read network
@@ -948,6 +1009,33 @@ public class MultiSourceEAF {
 			
 		}
 		
+		// read change events
+		
+		if (changeeventsfile != null) {
+			List<NetworkChangeEvent> changeEvents = null; 
+			whenAvailable = new HashMap<Id, Interval>();
+			try {
+			  changeEvents = readChangeEvents(network, changeeventsfile);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return;
+			}
+			for (NetworkChangeEvent event : changeEvents) {
+				int roundedtime = (int) Math.round(event.getStartTime() - changeeventsoffset);
+				roundedtime = roundedtime / timeStep;
+				if (roundedtime <= 0) {
+					System.out.println("Warning! ChangeEvents delete a link entirely! The link will be available at the first time step, though.");
+					roundedtime = 1; // FIXME is this necessary?
+				}
+				for (Link link : event.getLinks()) {				
+				  Interval i = new Interval(0, roundedtime);
+				  whenAvailable.put(link.getId(), i);
+				  //System.out.println(roundedtime + " " + link.getId());
+				}
+			}			
+		}
+		
+		
 		//NetworkWriter writer = new NetworkWriter(network);
 		//writer.write("/homes/combi/dressler/V/code/meine_EA/padang_v2010_mit_shelter.xml");
 		//if (true) return;
@@ -967,15 +1055,18 @@ public class MultiSourceEAF {
 		settings = new FlowCalculationSettings();
 		settings.setNetwork(network);
 		settings.setDemands(demands);
+		settings.whenAvailable = whenAvailable;
+		
 		settings.supersink = sink;
 		settings.timeStep = timeStep; // default 1
 		settings.flowFactor = flowFactor; // default 1.0
 
 		// set additional parameters
-		//settings.TimeHorizon = 2500;
-		//settings.MaxRounds = 1000;
-		//settings.checkConsistency = 100;
+		//settings.TimeHorizon = 2700;
+		//settings.MaxRounds = 150;
+		//settings.checkConsistency = 1;
 		//settings.doGarbageCollection = 10; // > 0 generally not such a good idea.
+		//settings.minTravelTime = 1;
 		settings.useSinkCapacities = false;
 		//settings.useVertexCleanup = false;
 		settings.useImplicitVertexCleanup = true;
@@ -987,12 +1078,13 @@ public class MultiSourceEAF {
 		// track unreachable vertices only works in REVERSE (with forward in between), and wastes time otherwise
 		//settings.trackUnreachableVertices = true  && (settings.searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);
 		//settings.sortPathsBeforeAugmenting = true;
-		settings.checkTouchedNodes = true;
-		//settings.keepPaths = true; // store paths at all!
+		settings.checkTouchedNodes = false;
+		settings.keepPaths = true; // store paths at all! This is sadly needed to compute costs & arrival pattern.
 		settings.unfoldPaths = true; // unfold stored paths into forward paths
 		settings.delaySinkPropagation = true; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
 		settings.quickCutOff = false; // stop as soon as the first good path is found
-		settings.mapLinksToTEP = false; // remember which path uses an edge at a given time
+		settings.mapLinksToTEP = true; // remember which path uses an edge at a given time
+		
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
 
@@ -1049,7 +1141,7 @@ public class MultiSourceEAF {
 		for (Node node : fluss.getDemands().keySet()){
 			int demand = fluss.getDemands().get(node);
 			if (demand > 0) {
-				// this can be a lot of text
+				// this can be a lot of text				
 				System.out.println("node:" + node.getId().toString()+ " demand:" + demand);
 			}
 		}
@@ -1069,5 +1161,6 @@ public class MultiSourceEAF {
 			System.out.println("done");
 		}
 	}
+
 
 }

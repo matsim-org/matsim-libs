@@ -203,28 +203,32 @@ public class Flow {
 				TreeMap<Integer,LinkedList<TimeExpandedPath>> temp = new TreeMap<Integer,LinkedList<TimeExpandedPath>>();
 				this._edgePathMap.put(edge, temp);
 			}
+			
 			int low = 0;
 			int high = settings.TimeHorizon;
-			// Intervals expects that it starts at 0, so we cannot restrict ourselves
+			
+			int availLow = low;
+			int availHigh = high;
+			// Intervals expects that they start at 0, so we cannot restrict them
 			// to just the available interval ...
 
+			Interval available;
+			if (this._settings.whenAvailable != null) {
+				available = this._settings.whenAvailable.get(edge.getId());
+				// could still be null, which means "always"
+			} else {
+				available = null;
+			}
+
+			if (available != null) {
+				availLow = Math.max(low, available.getLowBound());
+				availHigh = Math.min(high, available.getHighBound());
+			}
+
+			available = new Interval(availLow, availHigh);
+			
 			if (settings.useShadowFlow) {
 				Interval temp = new Interval(low, high);
-
-				Interval available;
-				if (this._settings.whenAvailable != null) {
-					available = this._settings.whenAvailable.get(edge);
-					// could still be null, which means "always"
-				} else {
-					available = null;
-				}
-
-				if (available != null) {
-					low = Math.max(low, available.getLowBound());
-					high = Math.min(high, available.getHighBound());
-				}
-
-				available = new Interval(low, high);
 
 				ShadowEdgeFlow edgeflow = new ShadowEdgeFlow(temp, this._settings.getLength(edge),
 						this._settings.getCapacity(edge), available);
@@ -234,26 +238,12 @@ public class Flow {
 
 				EdgeInterval temp = new EdgeInterval(low, high);
 
-				Interval available;
-				if (this._settings.whenAvailable != null) {
-					available = this._settings.whenAvailable.get(edge);
-					// could still be null, which means "always"
-				} else {
-					available = null;
-				}
-
-				if (available != null) {
-					low = Math.max(low, available.getLowBound());
-					high = Math.min(high, available.getHighBound());
-				}
-
-				available = new Interval(low, high);
-
 				EdgeIntervals edgeflow = new EdgeIntervals(temp, this._settings.getLength(edge),
 						this._settings.getCapacity(edge), available);
 
 				this._flow.put(edge, edgeflow);
 			}
+			
 		}
 
 		this._timeHorizon = settings.TimeHorizon;
@@ -366,6 +356,14 @@ public class Flow {
 
 				if(se.getForward()){
 					cap = this._settings.getCapacity(edge) - this._flow.get(edge).getFlowAt(se.getStartTime());
+					
+					// check if the edge exists
+					if (this._settings.whenAvailable != null) {
+						Interval when = this._settings.whenAvailable.get(edge.getId());
+						if (when != null && !when.contains(se.getStartTime())) {
+							cap = 0;
+						}
+					}
 				} else {
 					cap = this._flow.get(edge).getFlowAt(se.getArrivalTime());
 				}
@@ -558,15 +556,15 @@ public class Flow {
 	 * @return Amount of flow augmented
 	 */
 	public int augment(TimeExpandedPath TEP){
-	if(this._settings.mapLinksToTEP && _debug>0){
-		checkPathMap(true);
-		//mapAllPaths();
-	}
-	  int bottleneck = bottleNeckCapacity(TEP);
-	  Taug.onoff();
-	  int result= this.augment(TEP, bottleneck);
-	  Taug.onoff();
-	  return result;
+		if (this._settings.mapLinksToTEP && _debug > 0) {
+			checkPathMap(true);
+			//mapAllPaths();
+		}
+		Taug.onoff();
+		int bottleneck = bottleNeckCapacity(TEP);	  
+		int result = this.augment(TEP, bottleneck);
+		Taug.onoff();
+		return result;
 	}
 
 	/**
@@ -589,15 +587,17 @@ public class Flow {
 	  }
 
 	  if (this._storepaths) {
+		  // We create a fresh copy of the TEP for storage, just to be safe from weird side effects.
+		  TimeExpandedPath freshCopy = TimeExpandedPath.clone(TEP);
 		  if (this._unfoldpaths) {
-			  unfoldandaugment(TEP);
+			  unfoldandaugment(freshCopy);
 		  } else {
-			  dumbaugment(TEP, gamma);
-			  this._TimeExpandedPaths.addFirst(TEP);
-			  if(this._settings.mapLinksToTEP){
-				  System.out.println("normal augment called");
+			  dumbaugment(freshCopy, gamma);
+			  this._TimeExpandedPaths.addFirst(freshCopy);
+			  // do not need to map paths if we do not unfold 
+			  /*if(this._settings.mapLinksToTEP){
 				  mapPath(TEP);
-			  }
+			  }*/
 		  }
 	  } else {
 		  dumbaugment(TEP, gamma);
@@ -1312,8 +1312,15 @@ public class Flow {
 							   goodTEPs.add(myHead);
 
 							   otherHead.addTailToPath(myTail);
-							   otherHead.setFlow(augment);
-							   unfinishedTEPs.addFirst(otherHead); // process things in DFS, not BFS order. (Can bug with BFS.) 
+							   otherHead.setFlow(augment);							   
+							   //  process things in DFS, not BFS order. (Can bug with BFS.)
+							   // BIG DEBUG
+							   // only do DFS if DEBUG is set
+							   //if (_debug > 0) {
+							     unfinishedTEPs.addFirst(otherHead); // DFS, good
+							   //} else {
+								// unfinishedTEPs.addLast(otherHead); // BFS
+							   //}
 
 							   // adjust the flow on the edges and the flow on the (still) stored TEP
 							   dumbaugment(otherTEP, -augment);
@@ -2065,18 +2072,19 @@ public class Flow {
 	public int[] arrivals(){
 		int maxtime = 0;
 		int[] temp = new int[this._timeHorizon+1];
-		for (TimeExpandedPath TimeExpandedPath : _TimeExpandedPaths){
-			int flow = TimeExpandedPath.getFlow();
-			int time = TimeExpandedPath.getArrival();
-			if (maxtime < time){
+				
+		for (TimeExpandedPath TEP : this._TimeExpandedPaths) {			
+			int flow = TEP.getFlow();
+			int time = TEP.getArrival();
+			if (maxtime < time) {
 				maxtime = time;
 			}
-			temp[time]+=flow;
-		}
-
+			temp[time] += flow;
+		}	 
+		
 		int[] result = new int[maxtime+1];
-		for(int i=0; i<=maxtime;i++){
-			result[i]=temp[i];
+		for (int i = 0; i <= maxtime; i++) {
+			result[i] = temp[i];
 		}
 		return result;
 

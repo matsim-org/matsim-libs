@@ -504,13 +504,17 @@ public class TimeExpandedPath {
 		this._steps.addFirst(step);
 	}
 	
+	/* Creates a new, deep copy of a TimeExpandedPath 
+	 * 
+	 */
 	public static TimeExpandedPath clone(TimeExpandedPath original)
 	{
 		TimeExpandedPath copy = new TimeExpandedPath();		
 		copy.setFlow(original.getFlow());		
 		for(PathStep step : original.getPathSteps())
-		{
-			copy.append(step);
+		{	
+			// there is no real clone function for the PathSteps, but works.
+			copy.append(step.copyShifted(0)); 
 		}
 		return copy;
 	}

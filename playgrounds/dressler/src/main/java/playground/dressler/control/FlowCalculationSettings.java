@@ -24,6 +24,7 @@ package playground.dressler.control;
 //matsim imports
 import java.util.HashMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
@@ -42,6 +43,7 @@ public class FlowCalculationSettings {
 	/* default scaling parameters */
 	public int timeStep = 1;
 	public double flowFactor = 1.0;
+	public int minTravelTime = 0; //set to 1 to avoid edges with time 0 after scaling! 
 
 	/* deault timeouts */
 	public int TimeHorizon = 7654321; // should be safe
@@ -67,9 +69,10 @@ public class FlowCalculationSettings {
 
 	public boolean trackUnreachableVertices = true && (searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);; // only works in REVERSE, wastes time otherwise
 
-
+	
+	
 	/* when are links available? not included means "always" */
-	public HashMap<Link, Interval> whenAvailable = null;
+	public HashMap<Id, Interval> whenAvailable = null;
 	public Node supersink = null;
 
 	/* ---------------  private data from now on --------------- */
@@ -203,6 +206,9 @@ public class FlowCalculationSettings {
 
 			// from long to int ...
 			int newTravelTime = (int) Math.round(link.getLength() / (link.getFreespeed() * this.timeStep));
+			if (newTravelTime < this.minTravelTime) {
+				newTravelTime = minTravelTime;
+			}
 			if (newTravelTime == 0 && link.getLength() != 0d) {
 				this._roundedtozerolength++;
 			}
@@ -269,8 +275,9 @@ public class FlowCalculationSettings {
 		System.out.println("Total demand sources: " + this._totaldemandsources + " | sinks: " + this._totaldemandsinks);
 		System.out.println("Time Horizon: " + this.TimeHorizon);
 		System.out.println("Timestep: " + this.timeStep);
-		System.out.println("FlowFactor: " + this.flowFactor);
+		System.out.println("FlowFactor: " + this.flowFactor);		
 		System.out.println("Max Rounds: " + this.MaxRounds);
+		System.out.println("Min Travel Time : " + this.minTravelTime);
 		System.out.println("Edges rounded to zero length: " + this._roundedtozerolength);
 		System.out.println("Edges rounded to zero capacity: " + this._roundedtozerocapacity);
 
@@ -824,10 +831,19 @@ public class FlowCalculationSettings {
         System.out.println("BOUNDS");
 
         for (Link link : this._network.getLinks().values()) {
+        	Interval when = null;
+        	if (this.whenAvailable != null) {
+        		when = this.whenAvailable.get(link.getId()); 
+        	}
         	for (int t = 0; t < this.TimeHorizon; t++) {
         		String tmp = NameEdge(link, t, newNodeNames);
-        		if (tmp != null)
-        		  System.out.println(" 0 <= " + tmp + " <= " + this.getCapacity(link));
+        		if (tmp != null) {
+        			if (when == null || (when.getLowBound() <= t && t < when.getHighBound())) {        			          		 
+        				System.out.println(" 0 <= " + tmp + " <= " + this.getCapacity(link));
+        			} else { // link not available
+        				System.out.println(" 0 <= " + tmp + " <= 0");
+        			}
+        		} 
         	}
         }
 
