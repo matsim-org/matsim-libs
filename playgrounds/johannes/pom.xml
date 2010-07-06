@@ -18,6 +18,8 @@
         <configuration>
           <excludes>
             <exclude>playground/johannes/gis/ZoneLayerSHPTest.java</exclude>
+            <exclude>playground/johannes/graph/CentralityTest.java</exclude>
+            <exclude>playground/johannes/graph/GraphAnalyzerTest.java</exclude>
           </excludes>
         </configuration>
   		</plugin>
