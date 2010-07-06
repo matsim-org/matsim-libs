@@ -4,7 +4,6 @@
 
 	<module name="global">
 		<param name="randomSeed" value="4711" />
-		<param name="outputTimeFormat" value="HH:mm:ss" />
 		<param name="coordinateSystem" value="Atlantis" />
 	</module>
 
