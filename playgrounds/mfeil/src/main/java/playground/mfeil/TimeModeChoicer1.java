@@ -708,7 +708,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		int distanceOuter = subtourDis[planAnalyzeSubtours.getSubtourIndexation()[outer/2]];
 		for (int i=0;i<this.possibleModes.length;i++){
 
-			if (this.possibleModes[i].toString().equals("walk")){
+			if (this.possibleModes[i].equals("walk")){
 				if (distanceOuter==2) {
 					continue;
 				}
@@ -736,7 +736,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				int distanceInner = subtourDis[planAnalyzeSubtours.getSubtourIndexation()[(inner/2)-1]];
 				for (int j=0;j<this.possibleModes.length;j++){
 
-					if (this.possibleModes[j].toString().equals("walk")){
+					if (this.possibleModes[j].equals("walk")){
 						if (distanceInner==2) {
 							continue;
 						}
@@ -815,7 +815,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		for (int i=0; i<searchSpace;i++){
 			boolean tour=false;
 			for (int k=0;k<subtourDistances.size();k++){
-				if (this.possibleModes[subtourDistances.get(k)[1]].toString().equals("walk")){
+				if (this.possibleModes[subtourDistances.get(k)[1]].equals("walk")){
 					if (subtourDistances.get(k)[2]==2){
 						tour=true;
 						break;

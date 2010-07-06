@@ -171,7 +171,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			ActivityImpl next_act = (ActivityImpl)acts_legs.get(i+1);
 
 			// get row (mode type)
-			String trip_mode = leg.getMode().toString();
+			String trip_mode = leg.getMode();
 			int trip_row = -1;
 			if (WALK.equals(trip_mode)) { trip_row = 0; }
 			else if (BIKE.equals(trip_mode)) { trip_row = 1; }
@@ -291,6 +291,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		System.out.println("----------------------------------------");
 	}
 
+	@Override
 	public void run(Plan plan) {
 	}
 }

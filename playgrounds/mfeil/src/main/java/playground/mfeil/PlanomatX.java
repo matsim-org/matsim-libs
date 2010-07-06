@@ -135,6 +135,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	// run() method
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run (Plan plan){
 
 		//////////////////////////////////////////////////////////////////////
@@ -1006,10 +1007,10 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			ArrayList<String> acts1 = new ArrayList<String> ();
 			ArrayList<String> acts2 = new ArrayList<String> ();
 			for (int i = 0;i<plan1.getPlanElements().size();i=i+2){
-				acts1.add(((ActivityImpl)(plan1.getPlanElements().get(i))).getType().toString());
+				acts1.add(((ActivityImpl)(plan1.getPlanElements().get(i))).getType());
 			}
 			for (int i = 0;i<plan2.getPlanElements().size();i=i+2){
-				acts2.add(((ActivityImpl)(plan2.getPlanElements().get(i))).getType().toString());
+				acts2.add(((ActivityImpl)(plan2.getPlanElements().get(i))).getType());
 			}
 
 			return (acts1.equals(acts2));
@@ -1024,7 +1025,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		else {
 			boolean warning = true;
 			for (int i = 0; i<plan1.getPlanElements().size();i=i+2){
-				if (!((ActivityImpl)(plan1.getPlanElements().get(i))).getType().toString().equals(((ActivityImpl)(plan2.getPlanElements().get(i))).getType().toString())){
+				if (!((ActivityImpl)(plan1.getPlanElements().get(i))).getType().equals(((ActivityImpl)(plan2.getPlanElements().get(i))).getType())){
 					warning = false;
 					break;
 				}
@@ -1039,10 +1040,10 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		ArrayList<String> acts1 = new ArrayList<String> ();
 		ArrayList<String> acts2 = new ArrayList<String> ();
 		for (int i = 0;i<plan1.getPlanElements().size();i=i+2){
-			acts1.add(((ActivityImpl)(plan1.getPlanElements().get(i))).getType().toString());
+			acts1.add(((ActivityImpl)(plan1.getPlanElements().get(i))).getType());
 		}
 		for (int i = 0;i<plan2.getPlanElements().size();i=i+2){
-			acts2.add(((ActivityImpl)(plan2.getPlanElements().get(i))).getType().toString());
+			acts2.add(((ActivityImpl)(plan2.getPlanElements().get(i))).getType());
 		}
 		return (acts1.equals(acts2));
 	}
@@ -1063,7 +1064,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				insertion[0]=true;
 				return insertion;
 			}
-			if (actTypes.get(actToBeAdded[position]).equals(((ActivityImpl)(basePlan.getPlanElements().get(position*2-2))).getType().toString()) || // ensures that no duplicate activity chains are created
+			if (actTypes.get(actToBeAdded[position]).equals(((ActivityImpl)(basePlan.getPlanElements().get(position*2-2))).getType()) || // ensures that no duplicate activity chains are created
 					(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home") && !this.checkForHomeSequenceInserting(basePlan, position*2)) ||
 					(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("education_kindergarten") && !checkForKindergarten(basePlan))){
 				if (actToBeAdded[position]+1>=actTypes.size()){

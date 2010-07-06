@@ -168,13 +168,12 @@ public class CompareSelectedPlansTable {
 
 				String mode0 = PlanModeJudger.getMode(person.getSelectedPlan());
 				String tp0 = ((PlanModeJudger.useCar(person.getSelectedPlan()) || PlanModeJudger
-						.usePt(person.getSelectedPlan())) ? mode0 : "-")
-						.toString();
+						.usePt(person.getSelectedPlan())) ? mode0 : "-");
 				out.write(tp0 + ";");
 				String mode1 = PlanModeJudger.getMode(person_comp.getSelectedPlan());
 				String tp1 = ((PlanModeJudger.useCar(person_comp
 						.getSelectedPlan()) || PlanModeJudger.usePt(person_comp
-						.getSelectedPlan())) ? mode1 : "-").toString();
+						.getSelectedPlan())) ? mode1 : "-");
 				out.write(tp1 + ";");
 				out.write(tp0 + "->" + tp1 + ";");
 
@@ -190,8 +189,7 @@ public class CompareSelectedPlansTable {
 
 				int n0 = CompareSelectedPlansTable.getNumberOfTrips(person);
 				out.write(n0 + ";");
-				int n1 = CompareSelectedPlansTable
-						.getNumberOfTrips(person_comp);
+				int n1 = CompareSelectedPlansTable.getNumberOfTrips(person_comp);
 				out.write(n1 + ";");
 				out.write(Integer.toString(n1 - n0));
 

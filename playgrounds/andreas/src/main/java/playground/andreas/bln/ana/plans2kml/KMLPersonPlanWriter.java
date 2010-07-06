@@ -195,7 +195,7 @@ public class KMLPersonPlanWriter {
 
 					FolderType routeLinksFolder = this.kmlObjectFactory.createFolderType();
 					double dist = (leg.getRoute() instanceof NetworkRoute ? RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network) : Double.NaN);
-					routeLinksFolder.setName(leg.getMode().toString() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + dist);
+					routeLinksFolder.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + dist);
 
 					if(tempLinkList.size() != 0){
 						routeLinksFolder.setDescription("see attached route");

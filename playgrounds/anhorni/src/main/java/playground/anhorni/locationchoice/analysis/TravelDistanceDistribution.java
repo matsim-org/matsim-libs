@@ -46,10 +46,12 @@ public class TravelDistanceDistribution implements StartupListener, IterationEnd
 	private DistanceBins shopDistanceBins;
 	private DistanceBins leisureDistanceBins;
 
+	@Override
 	public void notifyStartup(final StartupEvent event) {
 		this.population = event.getControler().getPopulation();
 	}
 
+	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 
 		shopDistanceBins = new DistanceBins(1000.0, 100.0 * 1000.0, "car");
@@ -64,7 +66,7 @@ public class TravelDistanceDistribution implements StartupListener, IterationEnd
 					Leg leg = (Leg) actslegs.get(j);
 					Activity act = (Activity)actslegs.get(j+1);
 
-					if (!leg.getMode().toString().equals("car")) {
+					if (!leg.getMode().equals("car")) {
 						continue;
 					}
 
@@ -85,6 +87,7 @@ public class TravelDistanceDistribution implements StartupListener, IterationEnd
 		this.leisureDistanceBins.plotDistribution(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "leisureDistanceDistributions"), "");
 	}
 
+	@Override
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
 	}
 }

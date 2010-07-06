@@ -24,6 +24,7 @@ public class CarPoolingListener implements IterationEndsListener {
 	private String outputTripsFile = new String();
 	private Integer tripsAnalysisIter= null;
 
+	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
 		this.controler = event.getControler();
@@ -54,7 +55,7 @@ public class CarPoolingListener implements IterationEndsListener {
 					if (act.getType().equals("home") && ((PlanImpl) plan).getNextLeg(act)!= null) {
 						Leg homeWorkLeg = ((PlanImpl) plan).getNextLeg(act);
 						Activity workAct = ((PlanImpl) plan).getNextActivity(homeWorkLeg);
-						if (homeWorkLeg.getMode().toString().equals("car") && workAct.getType().contains("work")) {
+						if (homeWorkLeg.getMode().equals("car") && workAct.getType().contains("work")) {
 							tripNumber = tripNumber+1;
 							WorkTrip wt = new WorkTrip (tripNumber,p.getId(), act.getCoord(),workAct.getCoord(),homeWorkLeg, true);
 							this.workTrips.addTrip(wt);
@@ -64,7 +65,7 @@ public class CarPoolingListener implements IterationEndsListener {
 					if (act.getType().contains("work") && ((PlanImpl) plan).getNextLeg(act)!=null) {
 						Leg workHomeLeg = ((PlanImpl) plan).getNextLeg(act);
 						Activity homeAct = ((PlanImpl) plan).getNextActivity(workHomeLeg);
-						if (workHomeLeg.getMode().toString().equals("car") && homeAct.getType().equals("home")) {
+						if (workHomeLeg.getMode().equals("car") && homeAct.getType().equals("home")) {
 							tripNumber = tripNumber+1;
 							WorkTrip wt = new WorkTrip (tripNumber, p.getId(), act.getCoord(),homeAct.getCoord(),workHomeLeg, false);
 							this.workTrips.addTrip(wt);

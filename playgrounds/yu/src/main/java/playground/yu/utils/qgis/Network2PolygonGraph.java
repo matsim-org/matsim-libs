@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Network2PolygonGraph extends X2GraphImpl {
 	protected Set<Link> links2paint = null;
@@ -113,8 +113,7 @@ public class Network2PolygonGraph extends X2GraphImpl {
 			o[6] = (((LinkImpl) link).getType() != null) ? Integer
 					.parseInt(((LinkImpl) link).getType()) : 0;
 			o[7] = link.getFreespeed();
-			o[8] = link.getAllowedModes() != null ? link.getAllowedModes()
-					.toString() : TransportMode.car.toString();
+			o[8] = link.getAllowedModes() != null ? link.getAllowedModes().toString() : TransportMode.car;
 			for (int i = 0; i < parameters.size(); i++) {
 				o[i + 9] = parameters.get(i).get(link.getId());
 			}

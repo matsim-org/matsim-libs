@@ -170,7 +170,7 @@ public class LegHisto implements AgentDepartureEventHandler,
 		Collections.sort(modes);
 
 		for (String mode : modes) {
-			String modeName = mode.toString();
+			String modeName = mode;
 			ModeData modeData = data.get(mode);
 			chartA.addSeries(modeName, xs, modeData.countsArr);
 			chartD.addSeries(modeName, xs, modeData.countsDep);

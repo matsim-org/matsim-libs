@@ -47,10 +47,12 @@ public class CalcLegDistances implements AgentDepartureEventHandler, AgentArriva
 		this.population = population;
 	}
 
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 	}
 
+	@Override
 	public void reset(int iteration) {
 		this.sumTripDistancesByModeAndActType.clear();
 		this.sumTripsByModeAndActType.clear();
@@ -64,7 +66,7 @@ public class CalcLegDistances implements AgentDepartureEventHandler, AgentArriva
 			this.agentArrivalCounts.put(agentId, Integer.valueOf(1 + count.intValue()));
 		}
 	}
-	
+
 	private Activity getAgentsNextActivity(Plan plan) {
 		int count = this.agentArrivalCounts.get(plan.getPerson().getId()).intValue();
 		// assuming strict order Activity, Leg, Activity, Leg, Activity
@@ -78,60 +80,61 @@ public class CalcLegDistances implements AgentDepartureEventHandler, AgentArriva
 		// count is the number of the current Leg, starting at 1
 		return (Activity) plan.getPlanElements().get(count*2 - 2);
 	}
-	
+
+	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		increaseAgentArrivalCount(event.getPersonId());
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		Person agent = this.population.getPersons().get(event.getPersonId());
-			
+
 		if (depTime != null && agent != null) {
 			Plan plan = agent.getSelectedPlan();
 			Activity nextAct = getAgentsNextActivity(plan);
 			double travDistance = ((CoordImpl)getAgentsPreviousActivity(plan).getCoord()).calcDistance(
 					nextAct.getCoord());
-			
+
 			String actType;
 
 			actType = nextAct.getType();
-			
+
 			// leisure_xxx
 			if (actType.startsWith("leisure")) actType = "leisure";
 			// work_sector3, ...
 			if (actType.startsWith("work")) actType = "work";
-			
+
 			if (actType.startsWith("education")) actType = "education";
-			
-			String key = event.getLegMode().toString() + "_" + actType;
-			
+
+			String key = event.getLegMode() + "_" + actType;
+
 			if (actType.equals("shop_grocery") || actType.equals("shop_nongrocery")) {
 				String shopKey = event.getLegMode().toString() + "_shop";
-				
+
 				Double oldSumTripDistancesShop = this.sumTripDistancesByModeAndActType.get(shopKey);
 				if (oldSumTripDistancesShop == null) oldSumTripDistancesShop = 0.0;
 				this.sumTripDistancesByModeAndActType.put(shopKey, oldSumTripDistancesShop + travDistance);
-				
+
 				Integer oldSumTripsShop = this.sumTripsByModeAndActType.get(shopKey);
 				if (oldSumTripsShop == null) oldSumTripsShop = 0;
 				this.sumTripsByModeAndActType.put(shopKey, oldSumTripsShop + 1);
 			}
-			
+
 			Double oldSumTripDistances = this.sumTripDistancesByModeAndActType.get(key);
 			if (oldSumTripDistances == null) oldSumTripDistances = 0.0;
 			this.sumTripDistancesByModeAndActType.put(key, oldSumTripDistances + travDistance);
-			
+
 			Integer oldSumTrips = this.sumTripsByModeAndActType.get(key);
 			if (oldSumTrips == null) oldSumTrips = 0;
 			this.sumTripsByModeAndActType.put(event.getLegMode().toString() + "_" + actType, oldSumTrips + 1);
 		}
 	}
-	
+
 	public TreeMap<String, Double> getAverageTripDistancesByModeAndActType() {
 		TreeMap<String, Double> averageTripDistances = new TreeMap<String, Double>();
-		for (String key : this.sumTripDistancesByModeAndActType.keySet()) {			
+		for (String key : this.sumTripDistancesByModeAndActType.keySet()) {
 			// TODO: div by zero for small scenarios possible
 			double avg = this.sumTripDistancesByModeAndActType.get(key) / this.sumTripsByModeAndActType.get(key);
 			averageTripDistances.put(key, avg);
 		}
 		return averageTripDistances;
-	}	
+	}
 }

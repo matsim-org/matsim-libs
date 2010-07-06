@@ -107,7 +107,7 @@ public class NeoBatchPopulationImpl implements Population {
 				} else if (pe instanceof Leg) {
 					properties.clear();
 					Leg leg = (Leg) pe;
-					properties.put(NeoLegImpl.KEY_MODE, leg.getMode().toString());
+					properties.put(NeoLegImpl.KEY_MODE, leg.getMode());
 					// planNodes.add(inserter.createNode(properties));
 					long id = inserter.createNode(properties);
 					if (previous == null) {

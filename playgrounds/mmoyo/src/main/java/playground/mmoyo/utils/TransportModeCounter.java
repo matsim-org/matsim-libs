@@ -32,7 +32,7 @@ public class TransportModeCounter {
 		}
 
 		for(Map.Entry <String,List<Tuple<TransitLine, TransitRoute>>> entry: modeMap.entrySet() ){
-			System.out.println(entry.getKey().toString() + ": " + entry.getValue().size());
+			System.out.println(entry.getKey() + ": " + entry.getValue().size());
 			for (Tuple<TransitLine, TransitRoute> tuple : entry.getValue()){
 				System.out.println("   	   TransitLine:" + tuple.getFirst().getId() + " 	TransitRoute:" + tuple.getSecond().getId());
 			}

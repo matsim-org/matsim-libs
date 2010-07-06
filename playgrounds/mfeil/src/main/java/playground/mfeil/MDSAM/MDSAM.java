@@ -247,12 +247,12 @@ public class MDSAM {
 				String compare = "";
 				if (i>0 && j>0){
 					if (k==0) {
-						orig = ((ActivityImpl)(origPlan.getPlanElements().get((i-1)*2))).getType().toString();
-						compare = ((ActivityImpl)(comparePlan.getPlanElements().get((j-1)*2))).getType().toString();
+						orig = ((ActivityImpl)(origPlan.getPlanElements().get((i-1)*2))).getType();
+						compare = ((ActivityImpl)(comparePlan.getPlanElements().get((j-1)*2))).getType();
 					}
 					else if (k==1) {
-						orig = ((LegImpl)(origPlan.getPlanElements().get(i*2-1))).getMode().toString();
-						compare = ((LegImpl)(comparePlan.getPlanElements().get(j*2-1))).getMode().toString();
+						orig = ((LegImpl)(origPlan.getPlanElements().get(i*2-1))).getMode();
+						compare = ((LegImpl)(comparePlan.getPlanElements().get(j*2-1))).getMode();
 					}
 					else {
 						orig = ((ActivityImpl)(origPlan.getPlanElements().get((i-1)*2))).getLinkId().toString();

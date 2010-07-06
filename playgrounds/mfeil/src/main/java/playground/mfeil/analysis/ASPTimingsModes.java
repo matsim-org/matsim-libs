@@ -132,10 +132,10 @@ public class ASPTimingsModes extends ASPActivityChains {
 			ArrayList<String> in1 = new ArrayList<String> ();
 			ArrayList<String> out1 = new ArrayList<String> ();
 			for (int i = 1;i<in.size();i=i+2){
-				in1.add(((LegImpl)(in.get(i))).getMode().toString());
+				in1.add(((LegImpl)(in.get(i))).getMode());
 			}
 			for (int i = 1;i<out.size();i=i+2){
-				out1.add(((LegImpl)(out.get(i))).getMode().toString());
+				out1.add(((LegImpl)(out.get(i))).getMode());
 			}
 			return (in1.equals(out1));
 		}

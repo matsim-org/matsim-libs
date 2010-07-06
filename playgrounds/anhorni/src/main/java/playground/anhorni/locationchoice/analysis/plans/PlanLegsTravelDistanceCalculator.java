@@ -58,7 +58,7 @@ public class PlanLegsTravelDistanceCalculator  extends PlanLegsTravelMeasureCalc
 				if (super.actType.equals("all") || actType.startsWith(this.actType)) {
 
 					// mode
-					if ((this.mode.equals("all") || leg.getMode().toString().equals(this.mode)) &&
+					if ((this.mode.equals("all") || leg.getMode().equals(this.mode)) &&
 							!this.actType.equals("tta")) {
 
 						if (leg.getMode().toString().equals("car") && !this.crowFly) {

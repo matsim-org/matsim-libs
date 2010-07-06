@@ -30,17 +30,17 @@ import org.matsim.core.population.LegImpl;
 import playground.anhorni.locationchoice.preprocess.helper.Utils;
 
 public class PlanLegsTravelTimeCalculator  extends PlanLegsTravelMeasureCalculator {
-		
+
 	@Override
-	public List<Double> handle(final Plan plan, boolean wayThere) {		
-		super.reset();		
+	public List<Double> handle(final Plan plan, boolean wayThere) {
+		super.reset();
 		final List<?> actslegs = plan.getPlanElements();
-				
-		for (int j = 1; j < actslegs.size(); j=j+2) {			
+
+		for (int j = 1; j < actslegs.size(); j=j+2) {
 			if (actslegs.get(j) instanceof LegImpl) {
 				LegImpl leg = (LegImpl) actslegs.get(j);
 				ActivityImpl actPost = (ActivityImpl)actslegs.get(j + 1);
-				
+
 				// act type
 				// act type
 				String actType = actPost.getType();
@@ -48,17 +48,17 @@ public class PlanLegsTravelTimeCalculator  extends PlanLegsTravelMeasureCalculat
 					actType = Utils.getActType(plan, actPost);
 				}
 				if (super.actType.equals("all") || actType.startsWith(this.actType)) {
-					
+
 					// mode
-					if ((this.mode.equals("all") || leg.getMode().toString().equals(this.mode)) &&
+					if ((this.mode.equals("all") || leg.getMode().equals(this.mode)) &&
 							!this.actType.equals("tta")) {
 						super.sumLegsTravelMeasure += leg.getArrivalTime() - leg.getDepartureTime();
 						super.nbrOfLegs++;
 						super.legTravelMeasures.add(leg.getArrivalTime() - leg.getDepartureTime());
-					}	
+					}
 				}
-			}	
+			}
 		}
 		return super.legTravelMeasures;
-	}	
+	}
 }

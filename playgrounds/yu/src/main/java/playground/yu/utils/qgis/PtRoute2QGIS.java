@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -65,7 +65,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
  * @author yu
- * 
+ *
  */
 public class PtRoute2QGIS extends MATSimNet2QGIS {
 	public static class PtRoute2PolygonGraph extends X2GraphImpl {
@@ -115,7 +115,7 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 					o[0] = new MultiPolygon(new Polygon[] { pg }, this.geofac);
 					Id ptRouteId = ptRoute.getId();
 					o[1] = ptRouteId.toString();
-					o[2] = ptRoute.getTransportMode().toString();
+					o[2] = ptRoute.getTransportMode();
 					o[3] = ptRoute.getRoute().getLinkIds().toString();
 					StringBuffer stops = new StringBuffer();
 					for (TransitRouteStop stop : ptRoute.getStops())
@@ -308,6 +308,7 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 	 * @param ShapeFilename
 	 *            where the shapefile will be saved
 	 */
+	@Override
 	public void writeShapeFile(final String ShapeFilename) {
 		try {
 			ShapeFileWriter2.writeGeometries(p2g.getFeatures(), ShapeFilename);

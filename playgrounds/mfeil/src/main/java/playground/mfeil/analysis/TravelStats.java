@@ -101,6 +101,7 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 		this.outTime.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
 	}
 
+	@Override
 	public void notifyStartup(final StartupEvent event) {
 		if (this.createPNG) {
 			Controler controler = event.getControler();
@@ -115,6 +116,7 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 		}
 	}
 
+	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		double sumAvgPlanLegTravelDistanceWorst = 0.0;
 		double sumAvgPlanLegTravelDistanceBest = 0.0;
@@ -287,6 +289,7 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 		if (this.controler.getIterationNumber()>0 && this.controler.getIterationNumber()%10==0) new ASPGeneral (this.controler.getIterationNumber(), this.controler.getLastIteration(), this.controler.getControlerIO().getOutputPath(), (NetworkImpl) this.network);
 	}
 
+	@Override
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
 		try {
 			this.outDistance.close();
@@ -317,7 +320,7 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				final Leg leg = (Leg) pe;
-				if (!leg.getMode().toString().equals(TransportMode.car.toString())) {
+				if (!leg.getMode().equals(TransportMode.car)) {
 					planTravelDistance+= leg.getRoute().getDistance();
 				}
 				else if (leg.getRoute() instanceof NetworkRoute) {

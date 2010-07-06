@@ -445,7 +445,7 @@ public class AnalyzePlans {
 
 						if (!leg.getMode().equals(TransportMode.ride)) {
 							int dist = (int)Math.round(((CoordImpl)actPre.getCoord()).calcDistance(act.getCoord()));
-							distanceBins.get(leg.getMode().toString()).addVal(dist, 1.0);
+							distanceBins.get(leg.getMode()).addVal(dist, 1.0);
 						}
 					}
 				}

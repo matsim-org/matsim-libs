@@ -90,7 +90,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 //		if (mode == TransportMode.ride) { mode = TransportMode.car; }
 
 		if (!KTI_MODES.contains(mode)) {
-			throw new RuntimeException("cannot handle legmode '" + mode.toString() + "'.");
+			throw new RuntimeException("cannot handle legmode '" + mode + "'.");
 		}
 
 		double travelTime = 0.0;

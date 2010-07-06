@@ -281,7 +281,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		if ((index < 40) || (45 < index)) { Gbl.errorMsg("Person id=" + person.getId() + ": returning wrong index!"); }
 		vals[index]++;
 
-		String mode = ((LegImpl)person.getSelectedPlan().getPlanElements().get(1)).getMode().toString();
+		String mode = ((LegImpl)person.getSelectedPlan().getPlanElements().get(1)).getMode();
 		if (WALK.equals(mode)) { vals[45]++; }
 		else if (BIKE.equals(mode)) { vals[46]++; }
 		else if (CAR.equals(mode)) { vals[47]++; }
@@ -290,6 +290,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		else { Gbl.errorMsg("mode=" + mode + " not known!"); }
 	}
 
+	@Override
 	public void run(Plan plan) {
 	}
 }

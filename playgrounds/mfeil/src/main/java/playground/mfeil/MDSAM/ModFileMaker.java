@@ -1216,69 +1216,69 @@ public class ModFileMaker {
 					}*/
 					if (age.equals("yes")) {
 					//	if (act.getType().toString().equals("h")) stream.print("+ beta_age_innerHome * Age ");
-						if (act.getType().toString().equals("w")) stream.print("+ beta_age_work * Age ");
-						else if (act.getType().toString().equals("e")) stream.print(" + beta_age_education * Age ");
+						if (act.getType().equals("w")) stream.print("+ beta_age_work * Age ");
+						else if (act.getType().equals("e")) stream.print(" + beta_age_education * Age ");
 					//	else if (act.getType().toString().equals("shop")) stream.print("+ beta_age_shop * Age ");
 					//	else if (act.getType().toString().equals("leisure")) stream.print("+ beta_age_leisure * Age ");
 					}
 					if (income.equals("yes")) {
 						if (act.getType().toString().equals("h")) stream.print("+ beta_income_innerHome * Income ");
-						else if (act.getType().toString().equals("w")) stream.print("+ beta_income_work * Income ");
-						else if (act.getType().toString().equals("e")) stream.print("+ beta_income_education * Income ");
-						else if (act.getType().toString().equals("shop")) stream.print("+ beta_income_shop * Income ");
-						else if (act.getType().toString().equals("leisure")) stream.print("+ beta_income_leisure * Income ");
+						else if (act.getType().equals("w")) stream.print("+ beta_income_work * Income ");
+						else if (act.getType().equals("e")) stream.print("+ beta_income_education * Income ");
+						else if (act.getType().equals("shop")) stream.print("+ beta_income_shop * Income ");
+						else if (act.getType().equals("leisure")) stream.print("+ beta_income_leisure * Income ");
 					}
 					if (munType.equals("yes")) {
 					//	if (act.getType().toString().equals("h")) stream.print("+ beta_munType_ * MunType ");
 					//	else if (act.getType().toString().equals("w")) stream.print("+ beta_munType_act * MunType ");
 					//	else if (act.getType().toString().equals("e")) stream.print("+ beta_munType_act * MunType ");
-						if (act.getType().toString().equals("shop")) stream.print("+ beta_munType_shop_1 * MunType_1 + beta_munType_shop_2 * MunType_2 + beta_munType_shop_3 * MunType_3 + beta_munType_shop_4 * MunType_4 + beta_munType_shop_5 * MunType_5 ");
-						else if (act.getType().toString().equals("leisure")) stream.print("+ beta_munType_leisure_1 * MunType_1 + beta_munType_leisure_2 * MunType_2 + beta_munType_leisure_3 * MunType_3 + beta_munType_leisure_4 * MunType_4 + beta_munType_leisure_5 * MunType_5 ");
+						if (act.getType().equals("shop")) stream.print("+ beta_munType_shop_1 * MunType_1 + beta_munType_shop_2 * MunType_2 + beta_munType_shop_3 * MunType_3 + beta_munType_shop_4 * MunType_4 + beta_munType_shop_5 * MunType_5 ");
+						else if (act.getType().equals("leisure")) stream.print("+ beta_munType_leisure_1 * MunType_1 + beta_munType_leisure_2 * MunType_2 + beta_munType_leisure_3 * MunType_3 + beta_munType_leisure_4 * MunType_4 + beta_munType_leisure_5 * MunType_5 ");
 					}
 					if (gender.equals("yes")) stream.print(") * ");
 
 					if (beta.equals("no") && gamma.equals("no")){
-						if (act.getType().toString().equals("h")) {
+						if (act.getType().equals("h")) {
 							if (innerHome.equals("yes")) stream.print("InnerHomeUmax * one / ( one + exp( one_point_two * ( InnerHomeAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
 							else stream.print("HomeUmax * one / ( one + exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
 						}
-						else if (act.getType().toString().equals("w")) stream.print("WorkUmax * one / ( one + exp( one_point_two * ( WorkAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
-						else if (act.getType().toString().equals("e")) stream.print("EducationUmax * one / ( one + exp( one_point_two * ( EducationAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
-						else if (act.getType().toString().equals("shop")) stream.print("ShopUmax * one / ( one + exp( one_point_two * ( ShopAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
-						else if (act.getType().toString().equals("leisure")) stream.print("LeisureUmax * one / ( one + exp( one_point_two * ( LeisureAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
+						else if (act.getType().equals("w")) stream.print("WorkUmax * one / ( one + exp( one_point_two * ( WorkAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
+						else if (act.getType().equals("e")) stream.print("EducationUmax * one / ( one + exp( one_point_two * ( EducationAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
+						else if (act.getType().equals("shop")) stream.print("ShopUmax * one / ( one + exp( one_point_two * ( ShopAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
+						else if (act.getType().equals("leisure")) stream.print("LeisureUmax * one / ( one + exp( one_point_two * ( LeisureAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
 						else log.warn("Act has no valid type! ActChains position: "+i);
 					}
 					else if (beta.equals("yes") && gamma.equals("no")){
-						if (act.getType().toString().equals("h")) {
+						if (act.getType().equals("h")) {
 							if (innerHome.equals("yes")) stream.print("InnerHomeUmax * one / ( one + exp( InnerHomeBeta * ( InnerHomeAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
 							else stream.print("HomeUmax * one / ( one + exp( HomeBeta * ( HomeAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
 						}
-						else if (act.getType().toString().equals("w")) stream.print("WorkUmax * one / ( one + exp( WorkBeta * ( WorkAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
-						else if (act.getType().toString().equals("e")) stream.print("EducationUmax * one / ( one + exp( EducationBeta * ( EducationAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
-						else if (act.getType().toString().equals("shop")) stream.print("ShopUmax * one / ( one + exp( ShopBeta * ( ShopAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
-						else if (act.getType().toString().equals("leisure")) stream.print("LeisureUmax * one / ( one + exp( LeisureBeta * ( LeisureAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
+						else if (act.getType().equals("w")) stream.print("WorkUmax * one / ( one + exp( WorkBeta * ( WorkAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
+						else if (act.getType().equals("e")) stream.print("EducationUmax * one / ( one + exp( EducationBeta * ( EducationAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
+						else if (act.getType().equals("shop")) stream.print("ShopUmax * one / ( one + exp( ShopBeta * ( ShopAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
+						else if (act.getType().equals("leisure")) stream.print("LeisureUmax * one / ( one + exp( LeisureBeta * ( LeisureAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) )");
 						else log.warn("Act has no valid type! ActChains position: "+i);
 					}
 					else if (beta.equals("no") && gamma.equals("yes")){
-						if (act.getType().toString().equals("h")) {
+						if (act.getType().equals("h")) {
 							if (innerHome.equals("yes")) stream.print("InnerHomeUmax * one / ( ( one + InnerHomeGamma * exp( one_point_two * ( InnerHomeAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / InnerHomeGamma * one ) )");
 							else stream.print("HomeUmax * one / ( ( one + HomeGamma * exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / HomeGamma * one ) )");
 						}
-						else if (act.getType().toString().equals("w")) stream.print("WorkUmax * one / ( ( one + WorkGamma * exp( one_point_two * ( WorkAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / WorkGamma * one ) )");
-						else if (act.getType().toString().equals("e")) stream.print("EducationUmax * one / ( ( one + EducationGamma * exp( one_point_two * ( EducationAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / EducationGamma * one ) )");
-						else if (act.getType().toString().equals("shop")) stream.print("ShopUmax * one / ( ( one + ShopGamma * exp( one_point_two * ( ShopAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / ShopGamma * one ) )");
-						else if (act.getType().toString().equals("leisure")) stream.print("LeisureUmax * one / ( ( one + LeisureGamma * exp( one_point_two * ( LeisureAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / LeisureGamma * one ) )");
+						else if (act.getType().equals("w")) stream.print("WorkUmax * one / ( ( one + WorkGamma * exp( one_point_two * ( WorkAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / WorkGamma * one ) )");
+						else if (act.getType().equals("e")) stream.print("EducationUmax * one / ( ( one + EducationGamma * exp( one_point_two * ( EducationAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / EducationGamma * one ) )");
+						else if (act.getType().equals("shop")) stream.print("ShopUmax * one / ( ( one + ShopGamma * exp( one_point_two * ( ShopAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / ShopGamma * one ) )");
+						else if (act.getType().equals("leisure")) stream.print("LeisureUmax * one / ( ( one + LeisureGamma * exp( one_point_two * ( LeisureAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / LeisureGamma * one ) )");
 						else log.warn("Act has no valid type! ActChains position: "+i);
 					}
 					else {
-						if (act.getType().toString().equals("h")) {
+						if (act.getType().equals("h")) {
 							if (innerHome.equals("yes")) stream.print("InnerHomeUmax * one / ( ( one + InnerHomeGamma * exp( InnerHomeBeta * ( InnerHomeAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / InnerHomeGamma * one ) )");
 							else stream.print("HomeUmax * one / ( ( one + HomeGamma * exp( HomeBeta * ( HomeAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / HomeGamma * one ) )");
 						}
-						else if (act.getType().toString().equals("w")) stream.print("WorkUmax * one / ( ( one + WorkGamma * exp( WorkBeta * ( WorkAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / WorkGamma * one ) )");
-						else if (act.getType().toString().equals("e")) stream.print("EducationUmax * one / ( ( one + EducationGamma * exp( EducationBeta * ( EducationAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / EducationGamma * one ) )");
-						else if (act.getType().toString().equals("shop")) stream.print("ShopUmax * one / ( ( one + ShopGamma * exp( ShopBeta * ( ShopAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / ShopGamma * one ) )");
-						else if (act.getType().toString().equals("leisure")) stream.print("LeisureUmax * one / ( ( one + LeisureGamma * exp( LeisureBeta * ( LeisureAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / LeisureGamma * one ) )");
+						else if (act.getType().equals("w")) stream.print("WorkUmax * one / ( ( one + WorkGamma * exp( WorkBeta * ( WorkAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / WorkGamma * one ) )");
+						else if (act.getType().equals("e")) stream.print("EducationUmax * one / ( ( one + EducationGamma * exp( EducationBeta * ( EducationAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / EducationGamma * one ) )");
+						else if (act.getType().equals("shop")) stream.print("ShopUmax * one / ( ( one + ShopGamma * exp( ShopBeta * ( ShopAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / ShopGamma * one ) )");
+						else if (act.getType().equals("leisure")) stream.print("LeisureUmax * one / ( ( one + LeisureGamma * exp( LeisureBeta * ( LeisureAlpha * one - x"+(i+1)+"_"+(j+1)+" ) ) ) ^ ( one / LeisureGamma * one ) )");
 						else log.warn("Act has no valid type! ActChains position: "+i);
 					}
 				}

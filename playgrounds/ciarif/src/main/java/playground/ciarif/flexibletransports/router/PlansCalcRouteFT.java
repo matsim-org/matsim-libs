@@ -62,7 +62,7 @@ public class PlansCalcRouteFT extends PlansCalcRoute{
 		String mode = leg.getMode();
 
 		if (!FT_MODES.contains(mode)) {
-			throw new RuntimeException("cannot handle legmode '" + mode.toString() + "'.");
+			throw new RuntimeException("cannot handle legmode '" + mode + "'.");
 		}
 
 		double travelTime = 0.0;
