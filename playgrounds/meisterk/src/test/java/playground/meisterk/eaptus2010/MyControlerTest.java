@@ -63,8 +63,8 @@ public class MyControlerTest extends MatsimTestCase {
 					double movingAverage = Double.parseDouble(tokens[2]);
 					assertEquals(iterationLineCounter, iterationNumber);
 					if (iterationLineCounter == 10) {
-						assertEquals(0.006313131313131313, changeQuote, MatsimTestCase.EPSILON);
-						assertEquals(0.0079729152092876, movingAverage, MatsimTestCase.EPSILON);
+						assertEquals(0.017056222362602652, changeQuote, MatsimTestCase.EPSILON);
+						assertEquals(0.017419189249582957, movingAverage, MatsimTestCase.EPSILON);
 					}
 
 					iterationLineCounter++;
