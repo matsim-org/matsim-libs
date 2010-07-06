@@ -561,7 +561,9 @@ WARN_LOGFILE           =
 
 INPUT                  = org/matsim/api \
                          org/matsim/core \
-                         org/matsim/ptproject \
+                         org/matsim/run \
+                         org/matsim/ptproject/qsim \
+                         org/matsim/vis \
                          org/matsim/pt
 
 # This tag can be used to specify the character encoding of the source files 
@@ -605,7 +607,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories 
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = 
+EXCLUDE_PATTERNS       = */jdeqsim/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names 
 # (namespaces, classes, functions, etc.) that should be excluded from the 
@@ -649,7 +651,7 @@ IMAGE_PATH             =
 # to standard output.  If FILTER_PATTERNS is specified, this tag will be 
 # ignored.
 
-INPUT_FILTER           = ../../../../playgrounds/kai/src/main/java/playground/kai/other/myfilter.sh
+INPUT_FILTER           = /Users/nagel/eclipse/playgrounds/kai/src/main/java/playground/kai/other/myfilter.sh
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern 
 # basis.  Doxygen will compare the file name with each pattern and apply the 
