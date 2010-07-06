@@ -34,6 +34,7 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.network.LinkImpl;
@@ -52,10 +53,16 @@ import org.matsim.vis.snapshots.writers.VisData;
  * @author mrieser
  */
 public class QLinkImpl implements QLinkInternalI {
-
+	
+	// static variables (no problem with memory)
 	final private static Logger log = Logger.getLogger(QLinkImpl.class);
-
 	private static int spaceCapWarningCount = 0;
+	private static final boolean HOLES = false ;
+	private static int congDensWarnCnt = 0;
+
+	// dynamic variables (problem with memory)
+	private final LinkedList<Hole> holes = new LinkedList<Hole>() ;
+
 
 	/**
 	 * All vehicles from parkingList move to the waitingList as soon as their time
@@ -106,20 +113,20 @@ public class QLinkImpl implements QLinkInternalI {
 	/**
 	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
 	 */
-	private double simulatedFlowCapacity; // previously called timeCap
+	private double flowCapacityPerTimeStep; // previously called timeCap
 
-	/*package*/ double inverseSimulatedFlowCapacity; // optimization, cache 1.0 / simulatedFlowCapacity
+	/*package*/ double inverseSimulatedFlowCapacityCache; // optimization, cache 1.0 / simulatedFlowCapacity
 
 	private int bufferStorageCapacity; // optimization, cache Math.ceil(simulatedFlowCap)
 
-	private double flowCapFraction; // optimization, cache simulatedFlowCap - (int)simulatedFlowCap
+	private double flowCapFractionCache; // optimization, cache simulatedFlowCap - (int)simulatedFlowCap
 
 	/**
-	 * The (flow) capacity available in one time step to move vehicles into the
+	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
 	 * buffer. This value is updated each time step by a call to
 	 * {@link #updateBufferCapacity(double)}.
 	 */
-	private double bufferCap = 0.0;
+	private double remainingBufferCap = 0.0;
 
 	/**
 	 * Stores the accumulated fractional parts of the flow capacity. See also
@@ -128,7 +135,7 @@ public class QLinkImpl implements QLinkInternalI {
 	private double buffercap_accumulate = 1.0;
 
 	private final TransitQLaneFeature transitQueueLaneFeature = new TransitQLaneFeature(this);
-
+	private double remainingInputFlowCap;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -169,6 +176,9 @@ public class QLinkImpl implements QLinkInternalI {
 		this.getQSimEngine().getQSim().getEventsManager().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getPerson().getId(),
 						this.getLink().getId()));
+		if ( HOLES ) {
+			holes.poll();
+		}
 	}
 
 	/**
@@ -266,9 +276,13 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 	private void updateBufferCapacity() {
-		this.bufferCap = this.simulatedFlowCapacity;
+		this.remainingBufferCap = this.flowCapacityPerTimeStep;
+		if ( HOLES ) {
+			this.remainingInputFlowCap = Math.ceil( 2.*this.flowCapacityPerTimeStep ); // make sure this is at least one
+//			log.warn( " inputFlowCap: " + this.inputFlowCap ) ;
+		}
 		if (this.buffercap_accumulate < 1.0) {
-			this.buffercap_accumulate += this.flowCapFraction;
+			this.buffercap_accumulate += this.flowCapFractionCache;
 		}
 	}
 
@@ -302,6 +316,11 @@ public class QLinkImpl implements QLinkInternalI {
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
 					this.usedStorageCapacity -= veh.getSizeInEquivalents();
+					if ( HOLES ) {
+						Hole hole = new Hole() ;
+						hole.setEarliestLinkEndTime( now + this.link.getLength()*3600./15./1000. ) ;
+						holes.add( hole ) ;
+					}
 					continue;
 				}
 
@@ -314,6 +333,12 @@ public class QLinkImpl implements QLinkInternalI {
 				addToBuffer(veh, now);
 				this.vehQueue.poll();
 				this.usedStorageCapacity -= veh.getSizeInEquivalents();
+				if ( HOLES ) {
+					Hole hole = new Hole() ;
+					double offset = this.link.getLength()*3600./15./1000. ;
+					hole.setEarliestLinkEndTime( now + 0.9*offset + 0.2*Math.random()*offset ) ;
+					holes.add( hole ) ;
+				}
 			}
 		} // end while
 	}
@@ -346,7 +371,25 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 	public boolean hasSpace() {
-		return this.usedStorageCapacity < getStorageCapacity();
+		boolean storageOk = this.usedStorageCapacity < getStorageCapacity();
+		if ( !HOLES || !storageOk ) {
+			return storageOk ;
+		}
+		// at this point, storage is ok!
+		Hole hole = holes.peek();
+		if ( hole==null ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
+//			log.warn( " !hasSpace since no holes available ") ;
+			return false ;
+		}
+		if ( hole.getEarliestLinkEndTime() > this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay() ) {
+//			log.warn( " !hasSpace since all hole arrival times lie in future ") ;
+			return false ;
+		}
+//		if ( this.inputFlowCap < 1. ) {
+//			return false ;
+//		}
+		this.remainingInputFlowCap -- ;
+		return true ;
 	}
 	
 
@@ -359,20 +402,22 @@ public class QLinkImpl implements QLinkInternalI {
 	void calculateCapacities() {
 		calculateFlowCapacity(Time.UNDEFINED_TIME);
 		calculateStorageCapacity(Time.UNDEFINED_TIME);
-		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
+		this.buffercap_accumulate = (this.flowCapFractionCache == 0.0 ? 0.0 : 1.0);
 	}
 
 	private void calculateFlowCapacity(final double time) {
-		this.simulatedFlowCapacity = ((LinkImpl)this.getLink()).getFlowCapacity(time);
+		this.flowCapacityPerTimeStep = ((LinkImpl)this.getLink()).getFlowCapacity(time);
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQSimEngine().getQSim().getSimTimer().getSimTimestepSize() * this.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
-		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
-		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
+		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep 
+		   * this.getQSimEngine().getQSim().getSimTimer().getSimTimestepSize() 
+		   * this.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+		this.inverseSimulatedFlowCapacityCache = 1.0 / this.flowCapacityPerTimeStep;
+		this.flowCapFractionCache = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
 	}
 
 	private void calculateStorageCapacity(final double time) {
 		double storageCapFactor = this.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
-		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
+		this.bufferStorageCapacity = (int) Math.ceil(this.flowCapacityPerTimeStep);
 
 		double numberOfLanes = this.getLink().getNumberOfLanes(time);
 		// first guess at storageCapacity:
@@ -385,10 +430,10 @@ public class QLinkImpl implements QLinkInternalI {
 		/*
 		 * If speed on link is relatively slow, then we need MORE cells than the
 		 * above spaceCap to handle the flowCap. Example: Assume freeSpeedTravelTime
-		 * (aka freeTravelDuration) is 2 seconds. Than I need the spaceCap TWO times
+		 * (aka freeTravelDuration) is 2 seconds. Than I need the spaceCap = TWO times
 		 * the flowCap to handle the flowCap.
 		 */
-		double tempStorageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
+		double tempStorageCapacity = this.freespeedTravelTime * this.flowCapacityPerTimeStep;
 		if (this.storageCapacity < tempStorageCapacity) {
 			if (spaceCapWarningCount <= 10) {
 				log.warn("Link " + this.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
@@ -398,6 +443,43 @@ public class QLinkImpl implements QLinkInternalI {
 				spaceCapWarningCount++;
 			}
 			this.storageCapacity = tempStorageCapacity;
+		}
+		
+		if ( HOLES ) {
+			// number of initial holes (= max number of vehicles on link given bottleneck spillback) is, in fact, dicated
+			// by the bottleneck flow capacity, together with the fundamental diagram. :-(
+			double bnFlowCap_s = ((LinkImpl)this.link).getFlowCapacity() ;
+
+			// ( c * n_cells - cap * L ) / (L * c) = (n_cells/L - cap/c) ;
+			double congestedDensity = this.storageCapacity/this.link.getLength() - (bnFlowCap_s*3600.)/(15.*1000) ;
+			
+			// congestedDensity is in veh/m.  If this is less than something reasonable (e.g. 1veh/50m) or even negative, 
+			// then this means that the link has not enough storageCapacity (essentially not enough lanes) to transport the given 
+			// flow capacity.  Will increase the storageCapacity accordingly:
+			if ( congestedDensity < 1./50 ) {
+				if ( congDensWarnCnt < 1 ) {
+					congDensWarnCnt++ ;
+					log.warn( "link not ``wide'' enough to process flow capacity with holes.  increasing storage capacity ...") ;
+					log.warn( Gbl.ONLYONCE ) ;
+				}
+				this.storageCapacity = (1./50 + bnFlowCap_s*3600./(15.*1000)) * this.link.getLength() ; 
+				congestedDensity = this.storageCapacity/this.link.getLength() - (bnFlowCap_s*3600.)/(15.*1000) ;
+			}
+			
+			int nHoles = (int) Math.ceil( congestedDensity * this.link.getLength() ) ;
+			log.warn( 
+					" nHoles: " + nHoles 
+					+ " storCap: " + this.storageCapacity 
+					+ " len: " + this.link.getLength()
+					+ " bnFlowCap: " + bnFlowCap_s
+					+ " congDens: " + congestedDensity 
+					) ;
+			for ( int ii=0 ; ii<nHoles ; ii++ ) {
+				Hole hole = new Hole() ;
+				hole.setEarliestLinkEndTime( 0. ) ;
+				holes.add( hole ) ;
+			}
+//			System.exit(-1);
 		}
 	}
 
@@ -494,7 +576,7 @@ public class QLinkImpl implements QLinkInternalI {
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
 	public double getSimulatedFlowCapacity() {
-		return this.simulatedFlowCapacity;
+		return this.flowCapacityPerTimeStep;
 	}
 
 	public VisData getVisData() {
@@ -520,13 +602,13 @@ public class QLinkImpl implements QLinkInternalI {
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
 	private boolean hasBufferSpace() {
-		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.bufferCap >= 1.0)
+		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.remainingBufferCap >= 1.0)
 				|| (this.buffercap_accumulate >= 1.0)));
 	}
 
 	private void addToBuffer(final QVehicle veh, final double now) {
-		if (this.bufferCap >= 1.0) {
-			this.bufferCap--;
+		if (this.remainingBufferCap >= 1.0) {
+			this.remainingBufferCap--;
 		}
 		else if (this.buffercap_accumulate >= 1.0) {
 			this.buffercap_accumulate--;
@@ -591,7 +673,7 @@ public class QLinkImpl implements QLinkInternalI {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
 			snapshotInfoBuilder.addVehiclePositions(positions, time, QLinkImpl.this.link, QLinkImpl.this.buffer,
-					QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacity, QLinkImpl.this.storageCapacity,
+					QLinkImpl.this.vehQueue, QLinkImpl.this.inverseSimulatedFlowCapacityCache, QLinkImpl.this.storageCapacity,
 					QLinkImpl.this.bufferStorageCapacity, QLinkImpl.this.getLink().getLength(), QLinkImpl.this.transitQueueLaneFeature);
 
 			int cnt2 = 0 ; // a counter according to which non-moving items can be "spread out" in the visualization
@@ -607,6 +689,18 @@ public class QLinkImpl implements QLinkInternalI {
 
 			// return:
 			return positions;
+		}
+	}
+	
+	class Hole {
+		private double earliestLinkEndTime ;
+
+		double getEarliestLinkEndTime() {
+			return earliestLinkEndTime;
+		}
+
+		void setEarliestLinkEndTime(double earliestLinkEndTime) {
+			this.earliestLinkEndTime = earliestLinkEndTime;
 		}
 	}
 }
