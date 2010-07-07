@@ -132,7 +132,7 @@ public class AdaptiveController3 extends
     		this.lastSwitch = currentTime;
   		}
   	}
-  	else {
+  	else { //current state of signal group 1 is GREEN
   		if ((this.lastSwitch + this.greenTimeSg1Link4) <= currentTime){
     		this.getSignalGroupStates().put(sg1, SignalGroupState.RED);
     		this.getSignalGroupStates().put(sg2, SignalGroupState.GREEN);
