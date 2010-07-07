@@ -53,7 +53,7 @@ import org.matsim.vis.snapshots.writers.VisData;
  * @author mrieser
  */
 public class QLinkImpl implements QLinkInternalI {
-	
+
 	// static variables (no problem with memory)
 	final private static Logger log = Logger.getLogger(QLinkImpl.class);
 	private static int spaceCapWarningCount = 0;
@@ -154,6 +154,7 @@ public class QLinkImpl implements QLinkInternalI {
 		this.visdata = this.new VisDataImpl() ; // instantiating this here so we can cache some things
 	}
 
+	@Override
 	public void activateLink() {
 		if (!this.active) {
 			this.qsimEngine.activateLink(this);
@@ -168,6 +169,7 @@ public class QLinkImpl implements QLinkInternalI {
 	 * @param veh
 	 *          the vehicle
 	 */
+	@Override
 	public void addFromIntersection(final QVehicle veh) {
 		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 		activateLink();
@@ -204,6 +206,7 @@ public class QLinkImpl implements QLinkInternalI {
 		veh.setEarliestLinkExitTime(departureTime);
 	}
 
+	@Override
 	public void clearVehicles() {
 		this.parkedVehicles.clear();
 		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
@@ -233,6 +236,7 @@ public class QLinkImpl implements QLinkInternalI {
 		this.buffer.clear();
 	}
 
+	@Override
 	public void addParkedVehicle(QVehicle vehicle) {
 		this.parkedVehicles.put(vehicle.getId(), vehicle);
 		vehicle.setCurrentLink(this.link);
@@ -242,16 +246,19 @@ public class QLinkImpl implements QLinkInternalI {
 		return this.parkedVehicles.get(vehicleId);
 	}
 
+	@Override
 	public QVehicle removeParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
 
+	@Override
 	public void addDepartingVehicle(QVehicle vehicle) {
 		this.waitingList.add(vehicle);
 		vehicle.setCurrentLink(this.getLink());
 		this.activateLink();
 	}
 
+	@Override
 	public boolean moveLink(double now) {
 		boolean ret = false;
 		ret = this.moveLane(now);
@@ -366,10 +373,12 @@ public class QLinkImpl implements QLinkInternalI {
 		}
 	}
 
+	@Override
 	public boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();
 	}
 
+	@Override
 	public boolean hasSpace() {
 		boolean storageOk = this.usedStorageCapacity < getStorageCapacity();
 		if ( !HOLES || !storageOk ) {
@@ -391,8 +400,9 @@ public class QLinkImpl implements QLinkInternalI {
 		this.remainingInputFlowCap -- ;
 		return true ;
 	}
-	
 
+
+	@Override
 	public void recalcTimeVariantAttributes(double now) {
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed(now);
 		calculateFlowCapacity(now);
@@ -408,8 +418,8 @@ public class QLinkImpl implements QLinkInternalI {
 	private void calculateFlowCapacity(final double time) {
 		this.flowCapacityPerTimeStep = ((LinkImpl)this.getLink()).getFlowCapacity(time);
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep 
-		   * this.getQSimEngine().getQSim().getSimTimer().getSimTimestepSize() 
+		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep
+		   * this.getQSimEngine().getQSim().getSimTimer().getSimTimestepSize()
 		   * this.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacityCache = 1.0 / this.flowCapacityPerTimeStep;
 		this.flowCapFractionCache = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
@@ -444,7 +454,7 @@ public class QLinkImpl implements QLinkInternalI {
 			}
 			this.storageCapacity = tempStorageCapacity;
 		}
-		
+
 		if ( HOLES ) {
 			// number of initial holes (= max number of vehicles on link given bottleneck spillback) is, in fact, dicated
 			// by the bottleneck flow capacity, together with the fundamental diagram. :-(
@@ -452,9 +462,9 @@ public class QLinkImpl implements QLinkInternalI {
 
 			// ( c * n_cells - cap * L ) / (L * c) = (n_cells/L - cap/c) ;
 			double congestedDensity = this.storageCapacity/this.link.getLength() - (bnFlowCap_s*3600.)/(15.*1000) ;
-			
-			// congestedDensity is in veh/m.  If this is less than something reasonable (e.g. 1veh/50m) or even negative, 
-			// then this means that the link has not enough storageCapacity (essentially not enough lanes) to transport the given 
+
+			// congestedDensity is in veh/m.  If this is less than something reasonable (e.g. 1veh/50m) or even negative,
+			// then this means that the link has not enough storageCapacity (essentially not enough lanes) to transport the given
 			// flow capacity.  Will increase the storageCapacity accordingly:
 			if ( congestedDensity < 1./50 ) {
 				if ( congDensWarnCnt < 1 ) {
@@ -462,17 +472,17 @@ public class QLinkImpl implements QLinkInternalI {
 					log.warn( "link not ``wide'' enough to process flow capacity with holes.  increasing storage capacity ...") ;
 					log.warn( Gbl.ONLYONCE ) ;
 				}
-				this.storageCapacity = (1./50 + bnFlowCap_s*3600./(15.*1000)) * this.link.getLength() ; 
+				this.storageCapacity = (1./50 + bnFlowCap_s*3600./(15.*1000)) * this.link.getLength() ;
 				congestedDensity = this.storageCapacity/this.link.getLength() - (bnFlowCap_s*3600.)/(15.*1000) ;
 			}
-			
+
 			int nHoles = (int) Math.ceil( congestedDensity * this.link.getLength() ) ;
-			log.warn( 
-					" nHoles: " + nHoles 
-					+ " storCap: " + this.storageCapacity 
+			log.warn(
+					" nHoles: " + nHoles
+					+ " storCap: " + this.storageCapacity
 					+ " len: " + this.link.getLength()
 					+ " bnFlowCap: " + bnFlowCap_s
-					+ " congDens: " + congestedDensity 
+					+ " congDens: " + congestedDensity
 					) ;
 			for ( int ii=0 ; ii<nHoles ; ii++ ) {
 				Hole hole = new Hole() ;
@@ -484,6 +494,7 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 
+	@Override
 	public QVehicle getVehicle(Id vehicleId) {
 		QVehicle ret = getParkedVehicle(vehicleId);
 		if (ret != null) {
@@ -504,6 +515,7 @@ public class QLinkImpl implements QLinkInternalI {
 		return null;
 	}
 
+	@Override
 	public Collection<QVehicle> getAllVehicles() {
 
 		Collection<QVehicle> vehicles = this.getAllNonParkedVehicles();
@@ -536,10 +548,12 @@ public class QLinkImpl implements QLinkInternalI {
 	/**
 	 * @return the total space capacity available on that link (includes the space on lanes if available)
 	 */
+	@Override
 	public double getSpaceCap() {
 		return this.storageCapacity;
 	}
 
+	@Override
 	public QSimEngine getQSimEngine(){
 		return this.qsimEngine;
 	}
@@ -559,10 +573,12 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 
+	@Override
 	public Link getLink() {
 		return this.link;
 	}
 
+	@Override
 	public QNode getToQueueNode() {
 		return this.toQueueNode;
 	}
@@ -575,10 +591,12 @@ public class QLinkImpl implements QLinkInternalI {
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
+	@Override
 	public double getSimulatedFlowCapacity() {
 		return this.flowCapacityPerTimeStep;
 	}
 
+	@Override
 	public VisData getVisData() {
 		return this.visdata;
 	}
@@ -594,6 +612,7 @@ public class QLinkImpl implements QLinkInternalI {
 		return active;
 	}
 
+	@Override
 	public LinkedList<QVehicle> getVehQueue() {
 		return this.vehQueue;
 	}
@@ -623,6 +642,7 @@ public class QLinkImpl implements QLinkInternalI {
 		this.getToQueueNode().activateNode();
 	}
 
+	@Override
 	public QVehicle popFirstFromBuffer() {
 		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
@@ -630,7 +650,8 @@ public class QLinkImpl implements QLinkInternalI {
 		this.getQSimEngine().getQSim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
 		return veh;
 	}
-	
+
+	@Override
 	public QVehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
@@ -655,8 +676,8 @@ public class QLinkImpl implements QLinkInternalI {
   	return true;
   }
 
-	
-	
+
+
 	/**
 	 * Inner class to encapsulate visualization methods
 	 *
@@ -667,9 +688,10 @@ public class QLinkImpl implements QLinkInternalI {
 		private VisDataImpl() {
 		}
 
+		@Override
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
 			double time = QLinkImpl.this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay() ;
-			
+
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
 			snapshotInfoBuilder.addVehiclePositions(positions, time, QLinkImpl.this.link, QLinkImpl.this.buffer,
@@ -691,8 +713,8 @@ public class QLinkImpl implements QLinkInternalI {
 			return positions;
 		}
 	}
-	
-	class Hole {
+
+	static class Hole {
 		private double earliestLinkEndTime ;
 
 		double getEarliestLinkEndTime() {
