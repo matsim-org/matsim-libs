@@ -52,7 +52,7 @@ public class AdaptiveController2 extends
 
 	private final Id id1 = new IdImpl("1");
 	private final Id id2 = new IdImpl("2");
-	private final Id id4 = new IdImpl("4");
+//	private final Id id4 = new IdImpl("4");
 	private final Id id5 = new IdImpl("5");
 	private int vehOnLink5Lane1 = 0;
 	
@@ -62,7 +62,7 @@ public class AdaptiveController2 extends
 
 	private double greenTimeSg1 = calculateGreenTimeSg1();
 	
-	private double pSignal;
+//	private double pSignal;
 	
 	public AdaptiveController2(AdaptiveSignalSystemControlInfo controlInfo) {
 		super(controlInfo);
@@ -81,11 +81,11 @@ public class AdaptiveController2 extends
 	private void initParametersFromConfig(){
 		Config config = this.getSignalEngine().getQSim().getScenario().getConfig();
 	  Module m = config.getModule(DaganzoScenarioGenerator.CONFIG_MODULE);
-		String pSignalString = m.getValue(DaganzoScenarioGenerator.PSIGNAL_CONFIG_PARAMETER);
-		if (pSignalString != null) {
-			this.pSignal = Double.parseDouble(pSignalString);
-			log.info("Using pSignal: " + pSignal);
-		}
+//		String pSignalString = m.getValue(DaganzoScenarioGenerator.PSIGNAL_CONFIG_PARAMETER);
+//		if (pSignalString != null) {
+//			this.pSignal = Double.parseDouble(pSignalString);
+//			log.info("Using pSignal: " + pSignal);
+//		}
 		String splitSg1String = m.getValue(DaganzoScenarioGenerator.SPLITSG1LINK4_CONFIG_PARAMETER);
 		if (splitSg1String != null){
 			this.splitSg1 = Double.parseDouble(splitSg1String);
