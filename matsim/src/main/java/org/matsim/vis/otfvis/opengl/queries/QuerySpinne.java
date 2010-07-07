@@ -222,6 +222,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 	private static boolean tripOnly = false;
 	private static boolean nowOnly = false;
 
+	@Override
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals("leg only")) {
@@ -232,6 +233,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 	}
 
+	@Override
 	public JComponent getOptionsGUI(JComponent mother) {
 		JPanel com = new JPanel();
 		com.setSize(500, 60);
@@ -283,7 +285,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 					// handle leg
 					Leg leg = (Leg) pe;
 					// just look at car routes right now
-					if(leg.getMode() != TransportMode.car) continue;
+					if(!leg.getMode().equals(TransportMode.car)) continue;
 					for (Id id2 : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 						if(id2.equals(this.queryLinkId) ) {
 							actPersons.add(plan);

@@ -49,7 +49,7 @@ public class SubChain {
 		if (this.mode.equals("mixed")) {
 			return;
 		}
-		if (!this.mode.equals(mode.toString())) {
+		if (!this.mode.equals(mode)) {
 			this.mode = "mixed";
 		}
 	}

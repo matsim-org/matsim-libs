@@ -81,9 +81,9 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 	private boolean useUmlaeufe = false;
 
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
-	
+
 	private AbstractTransitDriverFactory abstractTransitDriverFactory = new UmlaufDriverFactory();
-	
+
 	public TransitQSimEngine(QSimI queueSimulation) {
 		this.qSim = queueSimulation;
 		this.schedule = ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule();
@@ -95,7 +95,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 		qSim.setAgentFactory(new TransitAgentFactory(qSim, this.agents));
 //		qSim.getNotTeleportedModes().add(TransportMode.pt);
 	}
-	
+
 
 	@Override
 	public QSimI getQSim() {
@@ -121,6 +121,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 	}
 
 
+	@Override
 	public void afterSim() {
 		double now = this.qSim.getSimTimer().getTimeOfDay();
 		for (Entry<TransitStopFacility, List<PassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
@@ -234,7 +235,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 
 	@Override
 	public boolean handleDeparture(double now, PersonAgent agent, Id linkId, Leg leg) {
-		if (leg.getMode() == TransportMode.pt) {
+		if (leg.getMode().equals(TransportMode.pt)) {
 			handleAgentPTDeparture(agent, linkId, leg);
 			return true ;
 		}
@@ -252,7 +253,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
 		this.stopHandlerFactory = stopHandlerFactory;
 	}
-	
+
 	public void setAbstractTransitDriverFactory(final AbstractTransitDriverFactory abstractTransitDriverFactory) {
 		this.abstractTransitDriverFactory = abstractTransitDriverFactory;
 	}

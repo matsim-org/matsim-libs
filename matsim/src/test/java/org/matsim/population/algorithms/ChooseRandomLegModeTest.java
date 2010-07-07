@@ -95,7 +95,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 			} else if (TransportMode.walk.equals(previousMode)) {
 				foundWalkMode = true;
 			} else {
-				fail("unexpected mode: " + previousMode.toString());
+				fail("unexpected mode: " + previousMode);
 			}
 		}
 		assertTrue("expected to find car-mode", foundCarMode);

@@ -52,7 +52,7 @@ public class TestsUtil {
 				if (leg1.getDepartureTime() != leg2.getDepartureTime()) {
 					return false;
 				}
-				if (leg1.getMode() != leg2.getMode()) {
+				if (!leg1.getMode().equals(leg2.getMode())) {
 					return false;
 				}
 				if (leg1.getTravelTime() != leg2.getTravelTime()) {

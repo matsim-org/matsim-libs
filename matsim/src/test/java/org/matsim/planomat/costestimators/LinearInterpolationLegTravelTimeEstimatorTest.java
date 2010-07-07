@@ -82,7 +82,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 		workActivity.setCoord(new CoordImpl(35000.0, 10000.0));
 
 		for (String mode : new String[]{TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk, TransportMode.car}) {
-			logger.info(mode.toString());
+			logger.info(mode);
 			for (String str : new String[] {
 					"06:10:00",
 					"07:00:00",

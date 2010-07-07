@@ -70,7 +70,7 @@ public class ChangeLegModeTest extends MatsimTestCase {
 		for (int i = 0; i < 10; i++) {
 			module.handlePlan(plan);
 			Integer count = counter.get(leg.getMode());
-			assertNotNull("unexpected mode: " + leg.getMode().toString(), count);
+			assertNotNull("unexpected mode: " + leg.getMode(), count);
 			counter.put(leg.getMode(), Integer.valueOf(count.intValue() + 1));
 		}
 
