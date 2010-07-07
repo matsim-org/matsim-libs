@@ -39,7 +39,6 @@ import org.matsim.run.OTFVis;
 import playground.dgrether.analysis.charts.DgTravelTimeCalculatorChart;
 import playground.dgrether.analysis.charts.utils.DgChartWriter;
 import playground.dgrether.linkanalysis.DgCountPerIterationGraph;
-import playground.dgrether.linkanalysis.InOutGraphWriter;
 import playground.dgrether.linkanalysis.TTGraphWriter;
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
 import playground.dgrether.signalsystems.DgGreenSplitPerIterationGraph;
@@ -124,19 +123,22 @@ public class DaganzoRunner {
 		c.addControlerListener(new IterationEndsListener() {
 			public void notifyIterationEnds(IterationEndsEvent e) {
 				TTGraphWriter ttWriter = new TTGraphWriter();
-				ttWriter.addTTEventHandler(handler3);
-				ttWriter.addTTEventHandler(handler4);
-				ttWriter.writeTTChart(e.getControler().getControlerIO().getIterationPath(e.getIteration()), e.getIteration());
+//				ttWriter.addTTEventHandler(handler3);
+//				ttWriter.addTTEventHandler(handler4);
+//				ttWriter.writeTTChart(e.getControler().getControlerIO().getIterationPath(e.getIteration()), e.getIteration());
 
-				InOutGraphWriter inoutWriter = new InOutGraphWriter();
-				inoutWriter.addInOutEventHandler(handler3);
-				inoutWriter.addInOutEventHandler(handler4);
-				inoutWriter.writeInOutChart(e.getControler().getControlerIO().getIterationPath(e.getIteration()), e.getIteration());
+//				InOutGraphWriter inoutWriter = new InOutGraphWriter();
+//				inoutWriter.addInOutEventHandler(handler3);
+//				inoutWriter.addInOutEventHandler(handler4);
+//				inoutWriter.writeInOutChart(e.getControler().getControlerIO().getIterationPath(e.getIteration()), e.getIteration());
 			
 				DgTravelTimeCalculatorChart ttcalcChart = new DgTravelTimeCalculatorChart((TravelTimeCalculator)e.getControler().getTravelTimeCalculator());
 				ttcalcChart.setStartTime(900.0);
 				ttcalcChart.setEndTime(3600.0 * 2.5);
 				List<Id> list = new ArrayList<Id>();
+				list.add(new IdImpl("2"));
+				ttcalcChart.addLinkId(list);
+				list = new ArrayList<Id>();
 				list.add(new IdImpl("4"));
 				ttcalcChart.addLinkId(list);
 				list = new ArrayList<Id>();

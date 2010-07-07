@@ -128,20 +128,19 @@ public class DaganzoScenarioGenerator {
 
 	private static final boolean isUseSignalSystems = true;
 
-	public static int iterations = 200;
-	private static final int iterations2 = 0;
+	public static int iterations = 30;
 	
 	private static final int agents = 5000;
 
 	private static final int ttBinSize = 1;
 
-	private final static Double pSignal = null;//0.5;
+	private final static Double pSignal = 0.0;//0.5;
 	
-	private final static Double splitSgLink4 = 0.60;
+	private final static Double splitSgLink4 = 0.80;
 	
-	private static final String controllerClass = AdaptiveController2.class.getCanonicalName();
+	private static final String controllerClass = AdaptiveController3.class.getCanonicalName();
 
-	public static final String runId = "1164";//"";
+	public static final String runId = "1168";//"";
 	
 	private static final boolean writerClusterFiles = false;
 	
@@ -166,7 +165,7 @@ public class DaganzoScenarioGenerator {
 	}
 
 	private void init() {
-		String baseString = "daganzo2_";
+		String baseString = "daganzo3_";
 		if (isAlternativeRouteEnabled) {
 			baseString += "alternativeRoute_";
 //			plansOut = PLANS2OUT;
@@ -380,7 +379,7 @@ public class DaganzoScenarioGenerator {
 
 		// configure controler
 		config.travelTimeCalculator().setTraveltimeBinSize(ttBinSize);
-		config.controler().setLastIteration(iterations + iterations2);
+		config.controler().setLastIteration(iterations);
 		config.controler().setOutputDirectory(outputDirectory);
 
 
@@ -441,7 +440,7 @@ public class DaganzoScenarioGenerator {
 		Lane link5lane1 = factory.createLane(id1);
 		link5lane1.setNumberOfRepresentedLanes(numberOfLanes);
 		link5lane1.addToLinkId(id6);
-		link5lane1.setStartsAtMeterFromLinkEnd(100.0);
+		link5lane1.setStartsAtMeterFromLinkEnd(15.0);
 		lanesForLink5.addLane(link5lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink5);
 		return lanes;

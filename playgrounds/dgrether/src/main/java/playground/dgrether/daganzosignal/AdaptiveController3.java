@@ -19,22 +19,21 @@
  * *********************************************************************** */
 package playground.dgrether.daganzosignal;
 
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.Module;
 import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.SignalGroupStateChangedEventImpl;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
 import org.matsim.signalsystems.control.SignalGroupState;
@@ -46,31 +45,63 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  * @author dgrether
  *
  */
-public class AdaptiveController extends
+public class AdaptiveController3 extends
 		AdaptiveSignalSystemControlerImpl implements LaneEnterEventHandler, 
 		LaneLeaveEventHandler, SimulationBeforeSimStepListener, SimulationInitializedListener {
 	
-	private static final Logger log = Logger.getLogger(AdaptiveController.class);
+	private static final Logger log = Logger.getLogger(AdaptiveController3.class);
 
 	private final Id id1 = new IdImpl("1");
-	private final Id id4 = new IdImpl("4");
+	private final Id id2 = new IdImpl("2");
+//	private final Id id4 = new IdImpl("4");
 	private final Id id5 = new IdImpl("5");
 	private int vehOnLink5Lane1 = 0;
+	
+	/**
+	 * Initialize split with a default, is not used if value is set in config
+	 */
+	private double splitSg1Link4 = 0.50;
+	
+	private double cycle = 100.0;
 
-	private Random random;
+	private double greenTimeSg1Link4;
+	private double greenTimeSg2Link5;
 	
-	private double pSignal;
+//	private double pSignal;
 	
-	public AdaptiveController(AdaptiveSignalSystemControlInfo controlInfo) {
+	SignalGroupDefinition sg1, sg2;
+
+	private double lastSwitch;
+	
+	public AdaptiveController3(AdaptiveSignalSystemControlInfo controlInfo) {
 		super(controlInfo);
-		this.random = MatsimRandom.getLocalInstance();
+		this.calculateGreenTimes();
+	}
+
+	private void calculateGreenTimes() {
+		this.greenTimeSg1Link4 = this.splitSg1Link4 * this.cycle;
+		this.greenTimeSg2Link5 = this.cycle - this.greenTimeSg1Link4;
 	}
 
 	@Override
 	public void setSignalEngine(SignalEngine signalEngine) {
 		super.setSignalEngine(signalEngine);
+	}
+	
+	private void initParametersFromConfig(){
 		Config config = this.getSignalEngine().getQSim().getScenario().getConfig();
-	  pSignal = Double.parseDouble(config.getModule(DaganzoScenarioGenerator.CONFIG_MODULE).getValue(DaganzoScenarioGenerator.PSIGNAL_CONFIG_PARAMETER));
+	  Module m = config.getModule(DaganzoScenarioGenerator.CONFIG_MODULE);
+//		String pSignalString = m.getValue(DaganzoScenarioGenerator.PSIGNAL_CONFIG_PARAMETER);
+//		if (pSignalString != null) {
+//			this.pSignal = Double.parseDouble(pSignalString);
+//			log.info("Using pSignal: " + pSignal);
+//		}
+		String splitSg1String = m.getValue(DaganzoScenarioGenerator.SPLITSG1LINK4_CONFIG_PARAMETER);
+		if (splitSg1String != null){
+			this.splitSg1Link4 = Double.parseDouble(splitSg1String);
+			this.calculateGreenTimes();
+			log.info("Using splitSg1Link4: " + this.splitSg1Link4 + " and thus a green time for sg1 of " + this.greenTimeSg1Link4 + " in a cycle of " + this.cycle);
+		}
 	}
 	
 
@@ -90,39 +121,35 @@ public class AdaptiveController extends
 
   @Override
   public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
-  	double rand = random.nextDouble();
-  	for (SignalGroupDefinition signalGroup : this.getSignalGroups().values()){
-      SignalGroupState oldState = this.getSignalGroupStates().get(signalGroup);
-      SignalGroupState newState = null;
-      if (signalGroup.getLinkRefId().equals(id5)){
-        if (vehOnLink5Lane1 > 0 && (rand >= pSignal)/**/) {
-          newState = SignalGroupState.GREEN;
-        }
-        else {
-          newState = SignalGroupState.RED;
-        }
-      }
-      else if (signalGroup.getLinkRefId().equals(id4)){
-        if (vehOnLink5Lane1 > 0 && (rand >= pSignal)/**/){
-          newState = SignalGroupState.RED;
-        }
-        else {
-          newState = SignalGroupState.GREEN;
-        }
-      }
-      //save the new state
-      this.getSignalGroupStates().put(signalGroup, newState);
-
-      //fire the event
-      if (!newState.equals(oldState)){
-        this.getSignalEngine().getEvents().processEvent(
-            new SignalGroupStateChangedEventImpl(e.getSimulationTime(), signalGroup.getSignalSystemDefinitionId(), 
-                signalGroup.getId(), newState));
-      }
-    }
+		SignalGroupState currentsg1state = this.getSignalGroupStates().get(this.sg1);
+  	double currentTime = e.getSimulationTime();
+		if (currentsg1state.equals(SignalGroupState.RED)) {
+  		if (this.vehOnLink5Lane1 == 0 && (this.lastSwitch + this.greenTimeSg2Link5 <= currentTime)){
+    		this.getSignalGroupStates().put(sg1, SignalGroupState.GREEN);
+    		this.getSignalGroupStates().put(sg2, SignalGroupState.RED);
+    		fireStateChanged(e.getSimulationTime(), sg1, SignalGroupState.GREEN);
+    		fireStateChanged(e.getSimulationTime(), sg2, SignalGroupState.RED);
+    		this.lastSwitch = currentTime;
+  		}
+  	}
+  	else {
+  		if ((this.lastSwitch + this.greenTimeSg1Link4) <= currentTime){
+    		this.getSignalGroupStates().put(sg1, SignalGroupState.RED);
+    		this.getSignalGroupStates().put(sg2, SignalGroupState.GREEN);
+    		fireStateChanged(e.getSimulationTime(), sg1, SignalGroupState.RED);
+    		fireStateChanged(e.getSimulationTime(), sg2, SignalGroupState.GREEN);
+    		this.lastSwitch = currentTime;
+  		}
+  	}	
   }
 
-  @Override
+  private void fireStateChanged(double simulationTime, SignalGroupDefinition sg, SignalGroupState state) {
+    this.getSignalEngine().getEvents().processEvent(
+        new SignalGroupStateChangedEventImpl(simulationTime, sg.getSignalSystemDefinitionId(), 
+            sg.getId(), state));
+	}
+
+	@Override
   public SignalGroupState getSignalGroupState(double seconds,
       SignalGroupDefinition signalGroup) {
     return this.getSignalGroupStates().get(signalGroup);
@@ -131,14 +158,14 @@ public class AdaptiveController extends
 
   @Override
   public void notifySimulationInitialized(SimulationInitializedEvent e) {
-    for (SignalGroupDefinition signalGroup : this.getSignalGroups().values()){
-      if (signalGroup.getLinkRefId().equals(id5)){
-        this.getSignalGroupStates().put(signalGroup, SignalGroupState.RED);
-      }
-      else {
-        this.getSignalGroupStates().put(signalGroup, SignalGroupState.GREEN);
-      }
-    }  
+		this.initParametersFromConfig();
+		this.sg1 = this.getSignalGroups().get(id1);
+		this.sg2 = this.getSignalGroups().get(id2);
+    this.getSignalGroupStates().put(this.sg1, SignalGroupState.GREEN);
+    this.getSignalGroupStates().put(this.sg2, SignalGroupState.RED);
+    this.lastSwitch = ((QSim)e.getQueueSimulation()).getSimTimer().getSimStartTime();
+		fireStateChanged(this.lastSwitch, sg1, SignalGroupState.GREEN);
+		fireStateChanged(this.lastSwitch, sg2, SignalGroupState.RED);
   }
 
 }
