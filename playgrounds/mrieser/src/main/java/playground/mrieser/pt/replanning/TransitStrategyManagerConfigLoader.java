@@ -35,6 +35,9 @@ public class TransitStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 
 	/**
 	 * Reads and instantiates the strategy modules specified in the config-object.
+	 * <br/><br/>
+	 * yy Could you please document the design decision why the functionality of this class was not
+	 * integrated into StrategyManagerConfigLoader?  Thanks, kai, jul'10
 	 *
 	 * @param controler the {@link Controler} that provides miscellaneous data for the replanning modules
 	 * @param config the {@link Config} object containing the configuration for the strategyManager
