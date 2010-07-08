@@ -41,7 +41,11 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		System.out.println(event.toString());
+		if (event.getLinkId()==null){ 
+			//System.out.println(event.toString());
+		}
+		
+		//System.out.println(event.toString());
 		
 		
 		

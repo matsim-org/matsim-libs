@@ -45,7 +45,7 @@ public class MainTest extends MatsimTestCase {
 		Object a=controler.getFacilities().getFacilities().get(new IdImpl("2"));
 				
 		GlobalRegistry.controler=controler;
-		
+		 
 		controler.run();
 	}
 
