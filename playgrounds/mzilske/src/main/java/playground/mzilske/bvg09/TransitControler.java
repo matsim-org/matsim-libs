@@ -101,9 +101,9 @@ public class TransitControler extends Controler {
 		Set<EventsFileFormat> formats = EnumSet.copyOf(this.config.controler().getEventsFileFormats());
 		formats.add(EventsFileFormat.xml);
 		this.config.controler().setEventsFileFormats(formats);
-		ActivityParams params = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
-		params.setTypicalDuration(120.0);
-		this.config.charyparNagelScoring().addActivityParams(params);
+		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		transitActivityParams.setTypicalDuration(120.0);
+		this.config.charyparNagelScoring().addActivityParams(transitActivityParams);
 		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 	}
 
@@ -244,7 +244,7 @@ public class TransitControler extends Controler {
 		return useOTFVis;
 	}
 
-	void setUseOTFVis(boolean useOTFVis) {
+	protected void setUseOTFVis(boolean useOTFVis) {
 		this.useOTFVis = useOTFVis;
 	}
 
