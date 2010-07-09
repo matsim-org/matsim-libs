@@ -1,13 +1,28 @@
 package playground.wrashid.parkingSearch.planLevel;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkLayer;
 
 public class ClosestParkingMatrix {
 	
+	private NetworkLayer network;
+	LinkParkingFacilityAssociation parkingAssociations;
+
 	// TODO: add constructor: numberOfParkings.
+	
+	public ClosestParkingMatrix(ActivityFacilitiesImpl facilities, NetworkLayer network) {
+		this.network=network;
+		this.parkingAssociations=new LinkParkingFacilityAssociation(facilities,network);
+	}
 	
 	
 	// TODO: getNumberOfParkings (for how many this was created).
@@ -36,13 +51,59 @@ public class ClosestParkingMatrix {
 	}
 	
 	/**
-	 * distance in meters.
+	 * maxDistance in meters.
 	 * @param linkId
-	 * @param distance
+	 * @param maxDistance
 	 */
-	public void getClosestLinks(String linkId, String distance){
+	public LinkedList<Link> getClosestLinks(Coord coord, double maxDistance){
+		Link initialLink=network.getNearestLink(coord);
+		
+		LinkedList<Link> untestedLinks=new LinkedList<Link>();
+		LinkedList<Link> resultLinks=new LinkedList<Link>();		
+		LinkedList<Link> checkedLinks=new LinkedList<Link>();
+		
+		untestedLinks.add(initialLink);
+		
+		while (untestedLinks.size()>0){
+			Link selectedLink=untestedLinks.removeFirst();
+			
+			checkedLinks.add(selectedLink);
+			
+			if (getDistance(coord,selectedLink)<=maxDistance){
+				resultLinks.add(selectedLink);
+				
+				// find out, if need to test the neighbouring links
+				
+				LinkedList<Link> neighbourLinks=new LinkedList<Link>();
+				
+				Node toNode=selectedLink.getToNode();
+				Node fromNode=selectedLink.getFromNode();
+				
+				neighbourLinks.addAll(toNode.getOutLinks().values());
+				neighbourLinks.addAll(fromNode.getInLinks().values());
+				
+				// only add link, if not already checked
+				
+				while (neighbourLinks.size()>0){
+					Link curLink=neighbourLinks.removeFirst();
+					if (!checkedLinks.contains(curLink)){
+						untestedLinks.add(curLink);
+					}
+				}
+				
+			}
+		}
+		return resultLinks;
 		
 	}
+	
+	private double getDistance(Coord coord, Link link){
+		double xDiff=coord.getX()-link.getCoord().getX();
+		double yDiff=coord.getY()-link.getCoord().getY();
+		return Math.sqrt(xDiff*xDiff + yDiff*yDiff);
+	}
+	
+	
 	
 	
 	
