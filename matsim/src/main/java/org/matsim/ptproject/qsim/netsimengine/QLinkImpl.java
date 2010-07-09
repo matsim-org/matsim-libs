@@ -35,6 +35,7 @@ import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.network.LinkImpl;
@@ -343,7 +344,7 @@ public class QLinkImpl implements QLinkInternalI {
 				if ( HOLES ) {
 					Hole hole = new Hole() ;
 					double offset = this.link.getLength()*3600./15./1000. ;
-					hole.setEarliestLinkEndTime( now + 0.9*offset + 0.2*Math.random()*offset ) ;
+					hole.setEarliestLinkEndTime( now + 0.9*offset + 0.2*MatsimRandom.getRandom().nextDouble()*offset ) ;
 					holes.add( hole ) ;
 				}
 			}
