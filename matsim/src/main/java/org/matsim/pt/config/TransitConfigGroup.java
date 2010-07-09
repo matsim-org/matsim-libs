@@ -28,7 +28,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
-import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
  * @author mrieser
@@ -62,15 +62,7 @@ public class TransitConfigGroup extends Module {
 		} else if (VEHICLES_FILE.equals(paramName)) {
 				setVehiclesFile(value);
 		} else if (TRANSIT_MODES.equals(paramName)) {
-			String[] parts = StringUtils.explode(value, ',');
-			Set<String> tModes = new LinkedHashSet<String>();
-			for (String part : parts) {
-				String trimmed = part.trim();
-				if (trimmed.length() > 0) {
-					tModes.add(trimmed.intern());
-				}
-			}
-			this.transitModes = Collections.unmodifiableSet(tModes);
+			this.transitModes = Collections.unmodifiableSet(CollectionUtils.stringToSet(value));
 		} else {
 			throw new IllegalArgumentException(paramName);
 		}
