@@ -32,8 +32,20 @@ public class ClosestParkingMatrix {
 		
 		Id facilityLinkId=targetFacility.getLinkId();
 		Link link=network.getLinks().get(facilityLinkId);
-		//link.get
+		
 	}
+	
+	/**
+	 * distance in meters.
+	 * @param linkId
+	 * @param distance
+	 */
+	public void getClosestLinks(String linkId, String distance){
+		
+	}
+	
+	
+	
 	
 	
 	

@@ -14,10 +14,12 @@ import org.matsim.core.network.NetworkLayer;
 
 public class LinkFacilityAssociation {
 
-	private HashMap<Id,ArrayList<ActivityFacilityImpl>> linkFacilityMapping=new HashMap<Id, ArrayList<ActivityFacilityImpl>>();
-	private NetworkImpl network;
+	protected HashMap<Id,ArrayList<ActivityFacilityImpl>> linkFacilityMapping=new HashMap<Id, ArrayList<ActivityFacilityImpl>>();
+	protected NetworkImpl network;
 	 
-	
+	protected LinkFacilityAssociation(){
+		
+	}
 	
 	public LinkFacilityAssociation(Controler controler) {
 		ActivityFacilitiesImpl facilities=(ActivityFacilitiesImpl) controler.getFacilities();
@@ -58,7 +60,7 @@ public class LinkFacilityAssociation {
 	 * need also to takle the case, if facility not assigned
 	 * @return
 	 */
-	private Id getClosestLink(ActivityFacilityImpl facility){
+	protected Id getClosestLink(ActivityFacilityImpl facility){
 		if (facility.getLinkId()==null){
 			return network.getNearestLink(facility.getCoord()).getId();
 		} else {
@@ -72,7 +74,7 @@ public class LinkFacilityAssociation {
 	 * Make sure, that in the HashMap an entry exists for the given linkId
 	 * @param linkId
 	 */
-	private void assureHashMapInitializedForLink(Id linkId) {
+	protected void assureHashMapInitializedForLink(Id linkId) {
 		if (!linkFacilityMapping.containsKey(linkId)){
 			linkFacilityMapping.put(linkId, new ArrayList<ActivityFacilityImpl>());
 		}
