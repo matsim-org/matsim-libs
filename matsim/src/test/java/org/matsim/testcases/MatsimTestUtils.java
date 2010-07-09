@@ -138,8 +138,8 @@ public class MatsimTestUtils extends TestWatchman {
 	 * @return path to the input directory for this test
 	 */
 	public String getPackageInputDirectory() {
-		String classDirectory = getClassInputDirectory();
 		if (this.packageInputDirectory == null) {
+			String classDirectory = getClassInputDirectory();
 			this.packageInputDirectory = classDirectory.substring(0, classDirectory.lastIndexOf("/") + 1);
 		}
 		return this.packageInputDirectory;
