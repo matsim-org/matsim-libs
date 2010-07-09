@@ -25,7 +25,6 @@
 	</scm>
 	<build>
 		<defaultGoal>compiler:compile</defaultGoal>
-
 		<resources>
 			<resource>
 				<directory>./</directory>
@@ -58,6 +57,7 @@
 					<target>1.6</target>
 					<showWarnings>false</showWarnings>
 					<showDeprecation>false</showDeprecation>
+					<encoding>UTF-8</encoding>
 					<!-- configure initial and maximal memory for compiling -->
 					<fork>true</fork>
 					<meminitial>128m</meminitial>

@@ -19,13 +19,17 @@
  * *********************************************************************** */
 package org.matsim.core.utils.io;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -193,6 +197,66 @@ public class IOUtilsTest {
 			log.info("catched expected exception: " + e.getMessage());
 		}
 		Assert.assertFalse(dir.exists());
+	}
+
+	@Test
+	public void testGetBufferedReader_encodingMacRoman() throws IOException {
+		String filename = this.utils.getClassInputDirectory() + "textsample_MacRoman.txt";
+		BufferedReader reader = IOUtils.getBufferedReader(filename, Charset.forName("MacRoman"));
+		String line = reader.readLine();
+		Assert.assertNotNull(line);
+		Assert.assertEquals("äöüÉç", line);
+	}
+
+	@Test
+	public void testGetBufferedReader_encodingIsoLatin1() throws IOException {
+		String filename = this.utils.getClassInputDirectory() + "textsample_IsoLatin1.txt";
+		BufferedReader reader = IOUtils.getBufferedReader(filename, Charset.forName("ISO-8859-1"));
+		String line = reader.readLine();
+		Assert.assertNotNull(line);
+		Assert.assertEquals("äöüÉç", line);
+	}
+
+	@Test
+	public void testGetBufferedReader_encodingUTF8() throws IOException {
+		String filename = this.utils.getClassInputDirectory() + "textsample_UTF8.txt";
+		BufferedReader reader = IOUtils.getBufferedReader(filename);
+		String line = reader.readLine();
+		Assert.assertNotNull(line);
+		Assert.assertEquals("äöüÉç", line);
+	}
+
+	@Test
+	public void testGetBufferedWriter_encodingMacRoman() throws IOException {
+		String filename = this.utils.getOutputDirectory() + "textsample_MacRoman.txt";
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename, Charset.forName("MacRoman"));
+		writer.write("äöüÉç");
+		writer.close();
+		long crc1 = CRCChecksum.getCRCFromFile(this.utils.getClassInputDirectory() + "textsample_MacRoman.txt");
+		long crc2 = CRCChecksum.getCRCFromFile(filename);
+		Assert.assertEquals("File was not written with encoding MacRoman.", crc1, crc2);
+	}
+
+	@Test
+	public void testGetBufferedWriter_encodingIsoLatin1() throws IOException {
+		String filename = this.utils.getOutputDirectory() + "textsample_IsoLatin1.txt";
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename, Charset.forName("ISO-8859-1"));
+		writer.write("äöüÉç");
+		writer.close();
+		long crc1 = CRCChecksum.getCRCFromFile(this.utils.getClassInputDirectory() + "textsample_IsoLatin1.txt");
+		long crc2 = CRCChecksum.getCRCFromFile(filename);
+		Assert.assertEquals("File was not written with encoding IsoLatin1.", crc1, crc2);
+	}
+
+	@Test
+	public void testGetBufferedWriter_encodingUTF8() throws IOException {
+		String filename = this.utils.getOutputDirectory() + "textsample_UTF8.txt";
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+		writer.write("äöüÉç");
+		writer.close();
+		long crc1 = CRCChecksum.getCRCFromFile(this.utils.getClassInputDirectory() + "textsample_UTF8.txt");
+		long crc2 = CRCChecksum.getCRCFromFile(filename);
+		Assert.assertEquals("File was not written with encoding UTF8.", crc1, crc2);
 	}
 
 }
