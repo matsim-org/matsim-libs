@@ -30,7 +30,7 @@ public class ClosestParkingMatrix {
 	/**
 	 *  create an object, which maintains the 'numberOfParkings' closest parkings to a link.
 	 */
-	public void getClosestParking(String link){
+	public void getClosestParkings(String link){
 		
 	}
 	
@@ -49,6 +49,20 @@ public class ClosestParkingMatrix {
 		Link link=network.getLinks().get(facilityLinkId);
 		
 	}
+	
+	
+	public ArrayList<ActivityFacilityImpl> getClosestParkings(Coord coord, double maxDistance){
+		LinkedList<Link> links = getClosestLinks(coord, maxDistance);
+		ArrayList<ActivityFacilityImpl> resultFacilities=new ArrayList<ActivityFacilityImpl>();
+		
+		for (int i=0;i<links.size();i++){
+			resultFacilities.addAll(parkingAssociations.getFacilities(links.get(i).getId()));
+		}
+		
+		return resultFacilities;
+	}
+	
+	
 	
 	/**
 	 * maxDistance in meters.
