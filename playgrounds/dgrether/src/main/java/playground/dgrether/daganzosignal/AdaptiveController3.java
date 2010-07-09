@@ -60,7 +60,7 @@ public class AdaptiveController3 extends
 	/**
 	 * Initialize split with a default, is not used if value is set in config
 	 */
-	private double splitSg1Link4 = 0.50;
+	private double splitSg1Link4 = 0.7; // this is what the direct link obtains
 	
 	private double cycle = 100.0;
 
@@ -96,12 +96,14 @@ public class AdaptiveController3 extends
 //			this.pSignal = Double.parseDouble(pSignalString);
 //			log.info("Using pSignal: " + pSignal);
 //		}
-		String splitSg1String = m.getValue(DaganzoScenarioGenerator.SPLITSG1LINK4_CONFIG_PARAMETER);
-		if (splitSg1String != null){
-			this.splitSg1Link4 = Double.parseDouble(splitSg1String);
-			this.calculateGreenTimes();
-			log.info("Using splitSg1Link4: " + this.splitSg1Link4 + " and thus a green time for sg1 of " + this.greenTimeSg1Link4 + " in a cycle of " + this.cycle);
-		}
+
+//	  String splitSg1String = m.getValue(DaganzoScenarioGenerator.SPLITSG1LINK4_CONFIG_PARAMETER);
+//		if (splitSg1String != null){
+//			this.splitSg1Link4 = Double.parseDouble(splitSg1String);
+//			this.calculateGreenTimes();
+//			log.info("Using splitSg1Link4: " + this.splitSg1Link4 + " and thus a green time for sg1 of " + this.greenTimeSg1Link4 + " in a cycle of " + this.cycle);
+//		}
+	  
 	}
 	
 
@@ -119,29 +121,63 @@ public class AdaptiveController3 extends
 	public void reset(int iteration) {
 	}
 
-  @Override
-  public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+	@Override
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
 		SignalGroupState currentsg1state = this.getSignalGroupStates().get(this.sg1);
-  	double currentTime = e.getSimulationTime();
-		if (currentsg1state.equals(SignalGroupState.RED)) {
-  		if (this.vehOnLink5Lane1 == 0 && (this.lastSwitch + this.greenTimeSg2Link5 <= currentTime)){
-    		this.getSignalGroupStates().put(sg1, SignalGroupState.GREEN);
-    		this.getSignalGroupStates().put(sg2, SignalGroupState.RED);
-    		fireStateChanged(e.getSimulationTime(), sg1, SignalGroupState.GREEN);
-    		fireStateChanged(e.getSimulationTime(), sg2, SignalGroupState.RED);
-    		this.lastSwitch = currentTime;
-  		}
-  	}
-  	else { //current state of signal group 1 is GREEN
-  		if ((this.lastSwitch + this.greenTimeSg1Link4) <= currentTime){
-    		this.getSignalGroupStates().put(sg1, SignalGroupState.RED);
-    		this.getSignalGroupStates().put(sg2, SignalGroupState.GREEN);
-    		fireStateChanged(e.getSimulationTime(), sg1, SignalGroupState.RED);
-    		fireStateChanged(e.getSimulationTime(), sg2, SignalGroupState.GREEN);
-    		this.lastSwitch = currentTime;
-  		}
-  	}	
-  }
+		double currentTime = e.getSimulationTime();
+		
+		double phase = currentTime % this.cycle ;
+		
+		if ( ( phase < 0.1*this.cycle || this.vehOnLink5Lane1 > 0) /* && !( phase > 0.9*this.cycle ) */ ) {
+
+			// switch direct route to red:
+			this.getSignalGroupStates().put(sg1, SignalGroupState.RED);
+			this.getSignalGroupStates().put(sg2, SignalGroupState.GREEN);
+			fireStateChanged(e.getSimulationTime(), sg1, SignalGroupState.RED);
+			fireStateChanged(e.getSimulationTime(), sg2, SignalGroupState.GREEN);
+//			this.lastSwitch = currentTime;
+			
+		} else {
+
+			// switch direct route to green:
+			this.getSignalGroupStates().put(sg1, SignalGroupState.GREEN);
+			this.getSignalGroupStates().put(sg2, SignalGroupState.RED);
+			fireStateChanged(e.getSimulationTime(), sg1, SignalGroupState.GREEN);
+			fireStateChanged(e.getSimulationTime(), sg2, SignalGroupState.RED);
+//			this.lastSwitch = currentTime;
+
+		}
+
+		//		else { //current state of signal group 1 is GREEN
+//			if ((this.lastSwitch + this.greenTimeSg1Link4) <= currentTime){
+//
+//			}
+//		}	
+
+		//		if (currentsg1state.equals(SignalGroupState.RED)) {
+//			if (this.vehOnLink5Lane1 == 0 && (this.lastSwitch + this.greenTimeSg2Link5 <= currentTime)){
+//
+//				// switch direct route to green:
+//				this.getSignalGroupStates().put(sg1, SignalGroupState.GREEN);
+//				this.getSignalGroupStates().put(sg2, SignalGroupState.RED);
+//				fireStateChanged(e.getSimulationTime(), sg1, SignalGroupState.GREEN);
+//				fireStateChanged(e.getSimulationTime(), sg2, SignalGroupState.RED);
+//				this.lastSwitch = currentTime;
+//
+//			}
+//		}
+//		else { //current state of signal group 1 is GREEN
+//			if ((this.lastSwitch + this.greenTimeSg1Link4) <= currentTime){
+//
+//				// switch direct route to red:
+//				this.getSignalGroupStates().put(sg1, SignalGroupState.RED);
+//				this.getSignalGroupStates().put(sg2, SignalGroupState.GREEN);
+//				fireStateChanged(e.getSimulationTime(), sg1, SignalGroupState.RED);
+//				fireStateChanged(e.getSimulationTime(), sg2, SignalGroupState.GREEN);
+//				this.lastSwitch = currentTime;
+//			}
+//		}	
+	}
 
   private void fireStateChanged(double simulationTime, SignalGroupDefinition sg, SignalGroupState state) {
     this.getSignalEngine().getEvents().processEvent(

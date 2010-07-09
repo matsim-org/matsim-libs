@@ -122,44 +122,48 @@ public class DaganzoRunner {
 		//write some output after each iteration
 		c.addControlerListener(new IterationEndsListener() {
 			public void notifyIterationEnds(IterationEndsEvent e) {
-				TTGraphWriter ttWriter = new TTGraphWriter();
-//				ttWriter.addTTEventHandler(handler3);
-//				ttWriter.addTTEventHandler(handler4);
-//				ttWriter.writeTTChart(e.getControler().getControlerIO().getIterationPath(e.getIteration()), e.getIteration());
 
-//				InOutGraphWriter inoutWriter = new InOutGraphWriter();
-//				inoutWriter.addInOutEventHandler(handler3);
-//				inoutWriter.addInOutEventHandler(handler4);
-//				inoutWriter.writeInOutChart(e.getControler().getControlerIO().getIterationPath(e.getIteration()), e.getIteration());
-			
-				DgTravelTimeCalculatorChart ttcalcChart = new DgTravelTimeCalculatorChart((TravelTimeCalculator)e.getControler().getTravelTimeCalculator());
-				ttcalcChart.setStartTime(900.0);
-				ttcalcChart.setEndTime(3600.0 * 2.5);
-				List<Id> list = new ArrayList<Id>();
-				list.add(new IdImpl("2"));
-				ttcalcChart.addLinkId(list);
-				list = new ArrayList<Id>();
-				list.add(new IdImpl("4"));
-				ttcalcChart.addLinkId(list);
-				list = new ArrayList<Id>();
-				list.add(new IdImpl("3"));
-				list.add(new IdImpl("5"));
-				ttcalcChart.addLinkId(list);
-				DgChartWriter.writeChart(e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "ttcalculator"), 
-				    ttcalcChart.createChart());
-				
 				greenSplitPerIterationGraph.addIterationData(signalGreenSplitHandler, e.getIteration());
+
+				if ( e.getIteration() % 10 == 0 ) {
+					TTGraphWriter ttWriter = new TTGraphWriter();
+					//				ttWriter.addTTEventHandler(handler3);
+					//				ttWriter.addTTEventHandler(handler4);
+					//				ttWriter.writeTTChart(e.getControler().getControlerIO().getIterationPath(e.getIteration()), e.getIteration());
+
+					//				InOutGraphWriter inoutWriter = new InOutGraphWriter();
+					//				inoutWriter.addInOutEventHandler(handler3);
+					//				inoutWriter.addInOutEventHandler(handler4);
+					//				inoutWriter.writeInOutChart(e.getControler().getControlerIO().getIterationPath(e.getIteration()), e.getIteration());
+
+					DgTravelTimeCalculatorChart ttcalcChart = new DgTravelTimeCalculatorChart((TravelTimeCalculator)e.getControler().getTravelTimeCalculator());
+					ttcalcChart.setStartTime(900.0);
+					ttcalcChart.setEndTime(3600.0 * 2.5);
+					List<Id> list = new ArrayList<Id>();
+					list.add(new IdImpl("2"));
+					ttcalcChart.addLinkId(list);
+					list = new ArrayList<Id>();
+					list.add(new IdImpl("4"));
+					ttcalcChart.addLinkId(list);
+					list = new ArrayList<Id>();
+					list.add(new IdImpl("3"));
+					list.add(new IdImpl("5"));
+					ttcalcChart.addLinkId(list);
+					DgChartWriter.writeChart(e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "ttcalculator"), 
+							ttcalcChart.createChart());
+
+				}
 			}
 		});
   	//write some output at shutdown
 		c.addControlerListener(new ShutdownListener() {
-			public void notifyShutdown(ShutdownEvent event) {
-				DgCountPerIterationGraph chart = new DgCountPerIterationGraph(event.getControler().getConfig().controler());
+			public void notifyShutdown(ShutdownEvent e) {
+				DgCountPerIterationGraph chart = new DgCountPerIterationGraph(e.getControler().getConfig().controler());
 				chart.addCountEventHandler(handler3);
 				chart.addCountEventHandler(handler4);
-				DgChartWriter.writeChart(event.getControler().getControlerIO().getOutputFilename("countPerIteration"), chart.createChart());
-			
-				DgChartWriter.writeChart(event.getControler().getControlerIO().getOutputFilename("greensplit"), greenSplitPerIterationGraph.createChart());
+				DgChartWriter.writeChart(e.getControler().getControlerIO().getOutputFilename("countPerIteration"), chart.createChart());
+
+				DgChartWriter.writeChart(e.getControler().getControlerIO().getOutputFilename("greensplit"), greenSplitPerIterationGraph.createChart());
 			}
 		});
 	}
