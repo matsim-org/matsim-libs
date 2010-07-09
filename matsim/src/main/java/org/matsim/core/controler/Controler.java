@@ -409,8 +409,11 @@ public class Controler {
 			resetRandomNumbers();
 			runMobSim();
 			this.stopwatch.endOperation("mobsim");
+			log.info(marker + "ITERATION " + this.iteration + " fires after mobsim event");
 			this.controlerListenerManager.fireControlerAfterMobsimEvent(this.iteration);
+			log.info(marker + "ITERATION " + this.iteration + " fires scoring event");
 			this.controlerListenerManager.fireControlerScoringEvent(this.iteration);
+			log.info(marker + "ITERATION " + this.iteration + " fires iteration end event");
 			this.controlerListenerManager.fireControlerIterationEndsEvent(this.iteration);
 			this.stopwatch.endOperation("iteration");
 			this.stopwatch.write(this.controlerIO.getOutputFilename("stopwatch.txt"));
