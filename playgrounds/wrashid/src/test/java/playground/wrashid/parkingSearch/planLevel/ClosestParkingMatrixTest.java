@@ -49,8 +49,21 @@ public class ClosestParkingMatrixTest extends MatsimTestCase {
 		assertEquals("19", resultFacilities.get(0).getId().toString());
 		assertEquals("1", resultFacilities.get(1).getId().toString());
 		assertEquals(2, resultFacilities.size());
+		
+		
+		resultFacilities=cpm.getClosestParkings(new CoordImpl(0.0, 0.0), 2,2);
+		assertEquals("19", resultFacilities.get(0).getId().toString());
+		assertEquals("1", resultFacilities.get(1).getId().toString());
+		assertEquals(2, resultFacilities.size());
+		
+		// con't here (following tests not running).
+		
+//		resultFacilities=cpm.getClosestParkings(new CoordImpl(0.0, 0.0), 4,0);
+//		assertEquals("19", resultFacilities.get(0).getId().toString());
+//		assertEquals("1", resultFacilities.get(1).getId().toString());
+//		assertEquals(2, resultFacilities.size());
+		
 	}
-	
 	
 	
 	
