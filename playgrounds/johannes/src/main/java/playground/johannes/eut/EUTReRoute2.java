@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
@@ -27,6 +27,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -34,18 +38,18 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  */
 public class EUTReRoute2 extends AbstractMultithreadedModule {
-	
+
 //	private static final int rho = 0;
-	
+
 	private final ArrowPrattRiskAversionI utilFunction;
-	
+
 	private EUTRouterAnalyzer analyzer;
-	
+
 	private Network network;
-	
+
 	private TwoStateTTKnowledge provider;
-	
-	
+
+
 	public EUTReRoute2(Network network, TwoStateTTKnowledge provider, double rho) {
 		super(1);
 		utilFunction = new CARAFunction(rho);
@@ -60,12 +64,17 @@ public class EUTReRoute2 extends AbstractMultithreadedModule {
 	public void setRouterAnalyzer(EUTRouterAnalyzer analyzer) {
 		this.analyzer = analyzer;
 	}
-	
+
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		EUTRouter2 router = new EUTRouter2(network, provider, utilFunction);
 		router.setAnalyzer(analyzer);
-		return new PlanAlgorithmDecorator(new PlansCalcRoute(network, router, router));
+		return new PlanAlgorithmDecorator(new PlansCalcRoute(null, network, null, null, new LeastCostPathCalculatorFactory() {
+			@Override
+			public LeastCostPathCalculator createPathCalculator(Network network2, TravelCost travelCosts, TravelTime travelTimes) {
+				return new EUTRouter2(network, provider, utilFunction);
+			}
+		}));
 	}
 
 //	@Override
@@ -77,15 +86,16 @@ public class EUTReRoute2 extends AbstractMultithreadedModule {
 	private class PlanAlgorithmDecorator implements PlanAlgorithm {
 
 		private PlanAlgorithm algo;
-		
+
 		public PlanAlgorithmDecorator(PlanAlgorithm algo) {
 			this.algo = algo;
 		}
-		
+
+		@Override
 		public void run(Plan plan) {
 			analyzer.setNextPerson(plan.getPerson());
 			algo.run(plan);
 		}
-		
+
 	}
 }

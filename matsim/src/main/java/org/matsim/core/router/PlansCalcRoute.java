@@ -130,22 +130,6 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 
-	/**
-	 * @param router The routing algorithm to be used for finding routes on the network with actual travel times.
-	 * @param routerFreeflow The routing algorithm to be used for finding routes in the empty network, with freeflow travel times.
-	 * @deprecated use one of the other constructors of this class
-	 */
-	@Deprecated
-	public PlansCalcRoute(final Network network, final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) {
-		super();
-		this.network = network;
-		this.routeAlgo = router;
-		this.routeAlgoPtFreeflow = routerFreeflow;
-		this.costCalculator = null;
-		this.routeFactory = (NetworkFactoryImpl) network.getFactory();
-		log.warn(NO_CONFIGGROUP_SET_WARNING);
-	}
-
 	public final LeastCostPathCalculator getLeastCostPathCalculator(){
 		return this.routeAlgo;
 	}
@@ -177,7 +161,6 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	protected void handlePlan(Person person, final Plan plan) {
 		double now = 0;
 		if (costCalculator != null) {
-			// this is null only when the deprecated constructor is used. Remove when that is done with.
 			costCalculator.setPerson(person);
 		}
 
