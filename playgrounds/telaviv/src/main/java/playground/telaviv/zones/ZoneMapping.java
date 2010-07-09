@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -40,6 +41,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
@@ -102,8 +106,21 @@ public class ZoneMapping {
 	 */
 	public static void main(String[] args) 
 	{
-		try {
-			new ZoneMapping();
+		new ZoneMapping();
+	}
+	
+	public ZoneMapping() {
+		
+		try
+		{
+			this.scenario = new ScenarioImpl();
+			new MatsimNetworkReader(scenario).readFile(networkFile);
+			CoordinateTransformation coordinateTransformation = new IdentityTransformation();
+			
+//			new MatsimNetworkReader(scenario).readFile("../../matsim/mysimulations/telaviv/network/network.xml");
+//			CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84");	
+			
+			this.createMapping(coordinateTransformation);
 		} catch (IOException e) { 
 			e.printStackTrace();
 		} catch (FactoryException e) {
@@ -113,14 +130,29 @@ public class ZoneMapping {
 		}
 	}
 	
-	public ZoneMapping() throws IOException, FactoryException, TransformException {
+	/*
+	 * The Zones Shape file uses WGS84 Coordinates but the MATSim network uses ITM Coordinates.
+	 * Therefore we have to transform the Coordinates.
+	 */
+	public ZoneMapping(Scenario scenario, CoordinateTransformation coordinateTransformation)
+	{
+		this.scenario = scenario;
+		
+		try
+		{		
+			this.createMapping(coordinateTransformation);
+		} catch (IOException e) { 
+			e.printStackTrace();
+		} catch (FactoryException e) {
+			e.printStackTrace();
+		} catch (TransformException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void createMapping(CoordinateTransformation coordinateTransformation) throws IOException, FactoryException, TransformException {
 		factory = new GeometryFactory();
 
-		/*
-		 * read network file
-		 */
-		scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario).readFile(networkFile);
 		network = scenario.getNetwork();
 
 		log.info("Loading Network ... done");
@@ -167,9 +199,17 @@ public class ZoneMapping {
 			Feature centerZone = null;
 			Feature endZone = null;
 
-			Point startPoint = factory.createPoint(new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()));
-			Point centerPoint = factory.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
-			Point endPoint = factory.createPoint(new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()));
+			Coord fromCoord = coordinateTransformation.transform(link.getFromNode().getCoord());
+			Coord linkCoord = coordinateTransformation.transform(link.getCoord());
+			Coord toCoord = coordinateTransformation.transform(link.getToNode().getCoord());
+
+			Point startPoint = factory.createPoint(new Coordinate(fromCoord.getX(), fromCoord.getY()));
+			Point centerPoint = factory.createPoint(new Coordinate(linkCoord.getX(), linkCoord.getY()));
+			Point endPoint = factory.createPoint(new Coordinate(toCoord.getX(), toCoord.getY()));
+
+//			Point startPoint = factory.createPoint(new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()));
+//			Point centerPoint = factory.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
+//			Point endPoint = factory.createPoint(new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()));
 
 			for (Feature zone : zones)
 			{
@@ -196,7 +236,7 @@ public class ZoneMapping {
 			if (startZone == endZone) linkMapping.put(link.getId(), startZone);
 			else if (startZone == centerZone) linkMapping.put(link.getId(), startZone);
 			else if (centerZone == endZone) linkMapping.put(link.getId(), endZone);
-			else linkMapping.put(link.getId(), getLinkMapping(link, 5));
+			else linkMapping.put(link.getId(), getLinkMapping(link, 5, coordinateTransformation));
 		}
 		
 		log.info("Found " + outsideLinks + " links outside the mapped area.");
@@ -208,7 +248,10 @@ public class ZoneMapping {
 		externalNodes = new TreeSet<Id>();
 		for (Node node : network.getNodes().values())
 		{
-			Point point = factory.createPoint(new Coordinate(node.getCoord().getX(), node.getCoord().getY()));
+			Coord pointCoord = coordinateTransformation.transform(node.getCoord());
+			Point point = factory.createPoint(new Coordinate(pointCoord.getX(), pointCoord.getY()));
+			
+//			Point point = factory.createPoint(new Coordinate(node.getCoord().getX(), node.getCoord().getY()));
 			
 			Feature pointZone = null;
 			for (Feature zone : zones)
@@ -305,7 +348,7 @@ public class ZoneMapping {
 	 * method is called recursively with the doubled number of sections until a
 	 * clear mapping is found.
 	 */
-	private Feature getLinkMapping(Link link, int sections) {
+	private Feature getLinkMapping(Link link, int sections, CoordinateTransformation coordinateTransformation) {
 		double fromX = link.getFromNode().getCoord().getX();
 		double fromY = link.getFromNode().getCoord().getY();
 		double toX = link.getToNode().getCoord().getX();
@@ -324,7 +367,10 @@ public class ZoneMapping {
 			double x = fromX + i * dXSection;
 			double y = fromY + i * dYSection;
 
-			Point point = factory.createPoint(new Coordinate(x, y));
+			Coord pointCoord = coordinateTransformation.transform(new CoordImpl(x, y));
+			Point point = factory.createPoint(new Coordinate(pointCoord.getX(), pointCoord.getY()));
+			
+//			Point point = factory.createPoint(new Coordinate(x, y));
 
 			for (Feature zone : zones)
 			{
@@ -367,7 +413,7 @@ public class ZoneMapping {
 		 */
 		if (unclearMapping)
 		{
-			mappedFeature = getLinkMapping(link, 2 * sections);
+			mappedFeature = getLinkMapping(link, 2 * sections, coordinateTransformation);
 		}
 
 		return mappedFeature;
@@ -388,6 +434,14 @@ public class ZoneMapping {
 		return linkMapping;
 	}
 	
+	public int getLinkTAZ(Id linkId)
+	{
+		Feature zone = linkMapping.get(linkId);
+		int TAZ = (Integer) zone.getAttribute(3);
+		
+		return TAZ;
+	}
+	
 	public Set<Id> getExternalNodes()
 	{
 		return externalNodes;
@@ -396,6 +450,11 @@ public class ZoneMapping {
 	public Emme2Zone getParsedZone(int id)
 	{
 		return parsedZones.get(id);
+	}
+	
+	public Map<Integer, Emme2Zone> getParsedZones()
+	{
+		return parsedZones;
 	}
 	
 	private static class FeatureComparator implements Comparator<Feature> {

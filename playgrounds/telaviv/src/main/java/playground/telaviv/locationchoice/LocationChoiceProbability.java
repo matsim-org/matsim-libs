@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Emme2person.java
+ * LocationChoiceProbability.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,59 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.telaviv.population;
+package playground.telaviv.locationchoice;
 
-/*
- * For a description of the data fields look at the
- * "final report" pdf, pages 2-4 and 2-8.
- */
-public class Emme2Person {
+public class LocationChoiceProbability {
 
-	int NEWID;
-	public int PERSONID;
-	double FACTOR;
-	int AGE;
-	int GENDER;
-	int STUDY;
-	int YRSTUDY;
-	int ECONBRCH;
-	int HHID;
-	int NUMVEH;
-	int GENAGE;
-	int HHSIZE;
-	int HHWORKERS;
-	int MENLICENY;
-	int WOMLICENY;
-	int HHLICENSES;
-	int HHEDU14;
-	int CODE;
-	int TAZH;
-	int WORKSTA;
-	int LICENSE;
-	int NUMCHILD;
-	public int MAINACTPRI;
-	int PRIMCTOD;
-	int TAZDPR;
-	int MAINMODPR;
-	public int INTSTOPPR;
-	int INTACTBP;
-	int INTACTAP;
-	int TAZBPR;
-	int TAZAPR;
-	int SWMODPR;
-	public int MAINACTSEC;
-	int MAINMODSE;
-	int TAZDSEC;
-	int SECCTOD;
-	public int INTSTOPSEC;
-	int TAZBSEC;
-	int TAZASEC;
-	double START_1;
-	double DUR_1_BEF;
-	double DUR_1_MAIN;
-	double DUR_1_AFT;
-	double START_2;
-	double DUR_2_BEF;
-	double DUR_2_MAIN;
-	double DUR_2_AFT;
+	public int fromZone;
+	public int toZone;
+	public double probability;
+	
 }

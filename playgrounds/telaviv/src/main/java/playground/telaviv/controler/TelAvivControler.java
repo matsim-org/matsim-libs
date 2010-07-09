@@ -22,10 +22,10 @@ package playground.telaviv.controler;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
+import playground.telaviv.replanning.LocationChoiceStrategyManagerConfigLoader;
 import playground.telaviv.replanning.TTAStrategyManager;
 
 public class TelAvivControler extends Controler {
@@ -51,12 +51,10 @@ public class TelAvivControler extends Controler {
 	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new TTAStrategyManager(this.scenarioData);
-		StrategyManagerConfigLoader.load(this, manager);
+		LocationChoiceStrategyManagerConfigLoader.load(this, manager);
 		return manager;
-	}
-	
-	
-	
+	}	
+
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");

@@ -20,7 +20,6 @@
 
 package playground.telaviv.population;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,13 +37,13 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.Desires;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
 
 import playground.telaviv.facilities.Emme2FacilitiesCreator;
 import playground.telaviv.zones.ZoneMapping;
@@ -54,6 +53,7 @@ public class Emme2PopulationCreator {
 	private static final Logger log = Logger.getLogger(Emme2PopulationCreator.class);
 
 	private String populationFile = "../../matsim/mysimulations/telaviv/population/PB1000_10.txt";
+	private String networkFile = "../../matsim/mysimulations/telaviv/network/network.xml";
 	private String facilitiesFile = "../../matsim/mysimulations/telaviv/facilities/facilities.xml";
 	private String outFile = "../../matsim/mysimulations/telaviv/population/internal_plans_10.xml.gz";
 
@@ -81,12 +81,12 @@ public class Emme2PopulationCreator {
 	public Emme2PopulationCreator(Scenario scenario)
 	{
 		this.scenario = scenario;
-
+		log.info("Read Network File...");
+		new MatsimNetworkReader(scenario).readFile(networkFile);
+		log.info("done.");
+		
 		log.info("Creating zone mapping...");
-		try { zoneMapping = new ZoneMapping(); }
-		catch (IOException e) { e.printStackTrace(); }
-		catch (FactoryException e) { e.printStackTrace(); }
-		catch (TransformException e) { e.printStackTrace(); }
+		zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84")); 
 		log.info("done.");
 
 		log.info("Creating FacilitiesCreator...");

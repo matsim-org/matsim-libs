@@ -46,9 +46,9 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.telaviv.zones.Emme2Zone;
 import playground.telaviv.zones.ZoneMapping;
@@ -57,6 +57,7 @@ public class Emme2FacilitiesCreator {
 
 	private static final Logger log = Logger.getLogger(Emme2FacilitiesCreator.class);
 
+	private static String networkFile = "../../matsim/mysimulations/telaviv/network/network.xml";
 	private String facilitiesFile = "../../matsim/mysimulations/telaviv/facilities/facilities.xml";
 	private String f2lFile = "../../matsim/mysimulations/telaviv/facilities/f2l.txt";
 		
@@ -72,7 +73,9 @@ public class Emme2FacilitiesCreator {
 	
 	public static void main(String[] args)
 	{
-		Emme2FacilitiesCreator facilitiesCreator = new Emme2FacilitiesCreator(new ScenarioImpl());
+		Scenario scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario).readFile(networkFile);
+		Emme2FacilitiesCreator facilitiesCreator = new Emme2FacilitiesCreator(scenario);
 		
 		facilitiesCreator.createInternalFacilities();
 		facilitiesCreator.createExternalFacilities();
@@ -82,17 +85,9 @@ public class Emme2FacilitiesCreator {
 	
 	public Emme2FacilitiesCreator(Scenario scenario)
 	{
-		try {
-			this.scenario = scenario;
-			
-			zoneMapping = new ZoneMapping();			
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (FactoryException e) {
-			e.printStackTrace();
-		} catch (TransformException e) {
-			e.printStackTrace();
-		}
+		this.scenario = scenario;
+		
+		zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
 	}
 	
 	public Emme2FacilitiesCreator(Scenario scenario, ZoneMapping zoneMapping)
