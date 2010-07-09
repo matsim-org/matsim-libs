@@ -15,7 +15,7 @@
 						<leadsTo>
 								<toLink refId="1" />
 						</leadsTo>
-						<representedLanes number="2.0" />
+						<representedLanes number="2.5" />
 						<startsAt meterFromLinkEnd="60.0" />
 						<alignment>2</alignment>
 				</lane>
