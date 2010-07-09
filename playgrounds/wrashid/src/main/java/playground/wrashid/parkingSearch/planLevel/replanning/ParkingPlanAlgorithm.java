@@ -25,10 +25,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -54,8 +57,15 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 	}
 	
 	
-	
+	/**
+	 * - replace all parkings with facility Id="36" to parkings with facility Id="2"
+	 * 
+	 * @param plan
+	 */
 	private void replaceParking(final Plan plan){
+		System.out.println(plan.getPerson().getId());
+		
+		
 		ActivityImpl newParkingActivity=new ActivityImpl("parking",new CoordImpl(0, 1500));
 		newParkingActivity.setFacilityId(new IdImpl("2"));
 		newParkingActivity.setDuration(60);
@@ -97,13 +107,25 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		
 		NetworkFactoryImpl nfi=controler.getNetwork().getFactory();
 		
+		
+		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), new DijkstraFactory());
+		
+		//dijkstraRouter.handleLeg(plan.getPerson(), plan.getPlanElements().get(index) , fromAct, toAct, depTime)
+		
+		// need to ch
+		
+		
 		// cont here!!!!
 		// see class PlansCalcRoute, zeilen 254
 		// make a method, which does it...
 		
 		
 		// TODO: change parking of all people!!
-	} 
+	}
+	
+	private void assignNewRoute(final Plan plan, int leg){
+		
+	}
 	
 
 }

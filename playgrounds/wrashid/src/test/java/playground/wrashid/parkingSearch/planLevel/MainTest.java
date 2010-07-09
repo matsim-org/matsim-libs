@@ -43,10 +43,11 @@ public class MainTest extends MatsimTestCase {
 		// build structure for parking ranking.
 		// (needed for the above task: build structure for mapping from links to facilities)
 		Object a=controler.getFacilities().getFacilities().get(new IdImpl("2"));
-				
+		
 		GlobalRegistry.controler=controler;
 		 
 		controler.run();
 	}
+	
 
 }
