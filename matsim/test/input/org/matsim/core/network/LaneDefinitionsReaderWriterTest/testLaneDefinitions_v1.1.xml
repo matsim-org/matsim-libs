@@ -8,7 +8,7 @@
         </lane>
         <lane id="5">
             <toLink refId="1"/>
-            <representedLanes number="2"/>
+            <representedLanes number="2.5"/>
             <length meter="60.0"/>
         </lane>
     </lanesToLinkAssignment>

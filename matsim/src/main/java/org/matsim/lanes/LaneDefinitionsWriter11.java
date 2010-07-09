@@ -105,8 +105,7 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter {
 				}
 
 				XMLLaneType.XMLRepresentedLanes lanes = new XMLLaneType.XMLRepresentedLanes();
-				log.warn("Using the laneDefinitions_v1.1.xsd data format not allows to store the number of represented lanes of a lane as double value. Potential double values are converted to integer. Please make sure that this is correct for your data or use LaneDefinitionsWriter20");
-				lanes.setNumber(Integer.valueOf((int)bl.getNumberOfRepresentedLanes()));
+				lanes.setNumber(bl.getNumberOfRepresentedLanes());
 				xmllane.setRepresentedLanes(lanes);
 
 				XMLLaneType.XMLLength length = new XMLLaneType.XMLLength();
