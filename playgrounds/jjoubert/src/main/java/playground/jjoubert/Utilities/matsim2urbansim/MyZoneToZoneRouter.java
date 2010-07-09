@@ -61,7 +61,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
-import cern.colt.matrix.impl.DenseObjectMatrix2D;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -75,6 +74,7 @@ public class MyZoneToZoneRouter {
 	private Map<Id, Integer> mapZoneIdToListEntry;
 	private Map<Integer, Id> mapListEntryToZoneId;
 	private Dijkstra router;
+	private DenseDoubleMatrix2D odMatrix;
 	
 	public MyZoneToZoneRouter(final Scenario scenario, final List<MyZone> zones) {
 		this.scenario = scenario;
@@ -110,16 +110,21 @@ public class MyZoneToZoneRouter {
 		log.info("Zone to zone router prepared.");
 	}
 	
-	public DenseDoubleMatrix2D processZones(DenseDoubleMatrix2D matrix, Map<Id,Double> linkstats){
+	public boolean processZones(DenseDoubleMatrix2D matrix, Map<Id,Double> linkstats){
 		log.info("Processing zone-to-zone travel times.");
+		this.odMatrix = matrix;
 		GeometryFactory gf = new GeometryFactory();
 		NetworkImpl ni = (NetworkImpl) scenario.getNetwork();
-		for(int row = 0; row < matrix.rows(); row++){
-			for(int col = 0; col < matrix.columns(); col++){
-				if(matrix.get(row, col) == Double.POSITIVE_INFINITY){
+		int total = odMatrix.rows()*odMatrix.columns();
+		int counter = 0;
+		int multiplier = 1;
+		for(int row = 0; row < odMatrix.rows(); row++){
+			for(int col = 0; col < odMatrix.columns(); col++){
+				if(odMatrix.get(row, col) == Double.POSITIVE_INFINITY){
 					if(row == col){
-						/*
-						 *  TODO Process diagonals;
+						/*=====================================================
+						 *  Process diagonals
+						 *-----------------------------------------------------
 						 *  Current I use the travel time of a link if EITHER 
 						 *  its fromNode OR its toNode reside in the zone. 
 						 */
@@ -144,18 +149,20 @@ public class MyZoneToZoneRouter {
 							}
 							if(fromIn || toIn){
 								count++;
-								double ttFreespeed = l.getFreespeed(21600);
 								double ttLinkstats = linkstats.get(l.getId());
 								tt += ttLinkstats;
 							}
 						}
 						if(count != 0){
-							matrix.set(row, col, tt / ((double) count) );
+							odMatrix.set(row, col, tt / ((double) count) );
 						} else{
 							log.error("Could not find any links within zone " + zone.getId());
 						}
 					} else{
-						// TODO Process nondiagonals;
+						/*=====================================================
+						 * Process nondiagonals;
+						 *----------------------------------------------------- 
+						 */
 						
 						Point fp = zones.get(row).getCentroid();
 						Coord fc = new CoordImpl(fp.getX(), fp.getY());
@@ -166,39 +173,49 @@ public class MyZoneToZoneRouter {
 						Node tn = ni.getNearestNode(tc); 
 						Path p = router.calcLeastCostPath(fn, tn, 21600);
 						if(p != null){
-							matrix.set(row, col, p.travelTime);
+							odMatrix.set(row, col, p.travelTime);
 						} else{
 							log.warn("Could not set travel time from zone " + zones.get(row).getId() + " to zone " + zones.get(col).getId());
 						}
 					}
 				}
+				// Report progress.
+				if(++counter == multiplier){
+					double percentage = (((double) counter) / ((double) total))*100;
+					log.info(String.format("   matrix entries completed: %d (%3.2f%%)", counter, percentage));
+					multiplier *= 2;
+				}
 			}
 		}
+		log.info(String.format("   matrix entries completed: %d (Done)", counter));
+
 		// There should now be NO more null-entries.
 		boolean empties = false;
-		for(int row = 0; row < matrix.rows(); row++){
-			for(int col = 0; col < matrix.columns(); col++){
-				if(matrix.get(row, row) == Double.POSITIVE_INFINITY){
+		for(int row = 0; row < odMatrix.rows(); row++){
+			for(int col = 0; col < odMatrix.columns(); col++){
+				if(odMatrix.get(row, row) == Double.POSITIVE_INFINITY){
 					log.warn("Empty travel time from zone " + zones.get(row).getId() + " to zone " + zones.get(col).getId());
 					empties = true;
 				}
 			}
 		}
-		if(!empties){
-			// Write DBF to file.
-			
+		if(empties){
+			log.info("Completed zone-to-zone processing... UNsuccesful.");
+		} else{
+			log.info("Completed zone-to-zone processing... SUCCESSFUL.");
 		}
-		log.info("Completed zone-to-zone processing.");
-		return matrix;
+		return empties;
 	}
 	
 	public void writeOdMatrixToDbf(String filename, DenseDoubleMatrix2D odMatrix) {
 		log.info("Writing OD matrix travel time to " + filename);
-		
 
-		Field oId = new Field("from_zone_id", Type.NUMBER, 20);
-		Field dId = new Field("to_zone_id", Type.NUMBER, 20);
-		Field carTT = new Field("am_single_vehicle_to_work_travel_time", Type.FLOAT, 4);
+		Field oId = new Field("fromZone", Type.NUMBER, 20);
+		Field dId = new Field("toZone", Type.NUMBER, 20);
+		Field carTT = new Field("ttCar", Type.FLOAT, 4);
+//		Field oId = new Field("from_zone_id", Type.NUMBER, 20);
+//		Field dId = new Field("to_zone_id", Type.NUMBER, 20);
+//		Field carTT = new Field("am_single_vehicle_to_work_travel_time", Type.FLOAT, 4);
 		List<Field> listOfFields = new ArrayList<Field>();
 		listOfFields.add(oId); listOfFields.add(dId); listOfFields.add(carTT);
 		Map<String, Value> map = new HashMap<String, Value>();
@@ -262,9 +279,10 @@ public class MyZoneToZoneRouter {
 		}
 		return travelTime;
 	}
-
-
-
+	
+	public DenseDoubleMatrix2D getOdMatrix(){
+		return this.odMatrix;
+	}
 
 	public Object getRouter() {
 		return this.router;

@@ -33,8 +33,16 @@ public class M2UStringbuilder {
 		this.percentage = percentage;
 	}
 
+	public String getTransportZoneShapefile(){
+		return root + "Shapefiles/" + studyArea + "/" + studyArea + "_TZ_UTM.shp";
+	}
+
+	public String getSubPlaceShapefile(){
+		return root + "Shapefiles/" + studyArea + "/" + studyArea + "_SP_UTM.shp";
+	}
+
 	public String getShapefile(){
-		return root + "Shapefiles/" + studyArea + "/" + "TransportZone_UTM.shp";
+		return root + "Shapefiles/" + studyArea + "/" + studyArea + "_UTM.shp";
 	}
 
 	public String getFullNetworkFilename() {
@@ -65,9 +73,16 @@ public class M2UStringbuilder {
 	}
 
 	public String getDbfOutputFile() {
-		return root + studyArea + "/" + version + "/TravelTimeDbf.dbf";
+		return root + studyArea + "/" + version + "/TravelTimeDbf_" + percentage + ".dbf";
+	}
+	
+	public String getIterationEventsFile(String iteration){
+		return root + studyArea + "/" + version + "/" + iteration + ".events_" + percentage + ".txt.gz";
 	}
 
+	public String getIterationLinkstatsFile(String iteration){
+		return root + studyArea + "/" + version + "/" + iteration + ".linkstats_" + percentage + ".txt";
+	}
 
 }
 

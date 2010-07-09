@@ -33,6 +33,7 @@ public class AllTests {
 		suite.addTestSuite(MyZoneReaderTest.class);
 		suite.addTestSuite(MyPlansProcessorTest.class);
 		suite.addTestSuite(MyZoneToZoneRouterTest.class);
+		suite.addTestSuite(MyCdfMapperTest.class);
 		
 		return suite;
 	}

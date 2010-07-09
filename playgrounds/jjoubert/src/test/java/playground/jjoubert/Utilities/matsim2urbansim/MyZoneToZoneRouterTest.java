@@ -50,26 +50,29 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 		MyZoneToZoneRouter mzzr = new MyZoneToZoneRouter(scenario, zones);
 		assertNull("Router should be null.", mzzr.getRouter());
 		
-		mzzr.prepareTravelTimeData(inputFolder + "/10.events.txt.gz");
+		mzzr.prepareTravelTimeData(inputFolder + "/50.events.txt.gz");
 		assertNotNull("Router should exist.", mzzr.getRouter());
 		assertEquals("Router should be of type Dijkstra.", Dijkstra.class, mzzr.getRouter().getClass());
 	}
 	
-	public void testFindZoneToZoneTravelTime(){
+	public void testProcessZones(){
 		setupNetwork();
 		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
 		pr.readFile(inputFolder + "/output_plans.xml.gz");
 		
 		MyPlansProcessor mpp = new MyPlansProcessor(scenario, zones);
 		mpp.processPlans();
-		mpp.writeOdMatrixToDbf("/Users/johanwjoubert/Desktop/Temp/Equil/Dbf.dbf");
+//		mpp.writeOdMatrixToDbf("/Users/johanwjoubert/Desktop/Temp/Equil/Dbf.dbf");
 		DenseDoubleMatrix2D matrix = mpp.getOdMatrix();
 		
 		MyZoneToZoneRouter mzzr = new MyZoneToZoneRouter(scenario, zones);
 		mzzr.prepareTravelTimeData(inputFolder + "/50.events.txt.gz");
 		MyLinkStatsReader mlsr = new MyLinkStatsReader(inputFolder + "/50.linkstats.txt");
-		DenseDoubleMatrix2D od = mzzr.processZones(matrix, mlsr.readSingleHour("6-7"));
+		boolean empties = mzzr.processZones(matrix, mlsr.readSingleHour("6-7"));
+		DenseDoubleMatrix2D od = mzzr.getOdMatrix(); 
+		mzzr.writeOdMatrixToDbf(getOutputDirectory() + "dbfCar.dbf", od);
 //		mzzr.writeOdMatrixToDbf("/Users/johanwjoubert/Desktop/Temp/Equil/DbfFinal.dbf", od);
+		assertFalse("Final travel time matrix has empty entries.", empties);
 		assertEquals("Wrong intrazonal travel time for zone 1.", 435, Math.round(od.get(0, 0)));
 		assertEquals("Wrong intrazonal travel time for zone 2.", 270, Math.round(od.get(1, 1)));
 		assertEquals("Wrong intrazonal travel time for zone 3.", 270, Math.round(od.get(2, 2)));
