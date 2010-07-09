@@ -16,6 +16,8 @@ API-Changes:
 
 - ScenarioImpl.getPopulation() returns Population instead of PopulationImpl (r11288)
 - A bunch of classes no longer implement or extend Serializable, mostly for Network and Population data structure (r11637, r11638, r11650 - r11653, r11655)
+- remove no longer supported config parameters (r11975)
+- Use String instead of enum TransportMode for specifying modes of transportation (r11985, r11987)
 
 
 Bug-Fixes:
