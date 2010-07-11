@@ -128,7 +128,9 @@ public class AdaptiveController3 extends
 		
 		double phase = currentTime % this.cycle ;
 		
-		if ( ( phase < 0.1*this.cycle || this.vehOnLink5Lane1 > 0) /* && !( phase > 0.9*this.cycle ) */ ) {
+		if ( currentTime < 1410 || phase < 0.1*this.cycle 
+				|| ( this.vehOnLink5Lane1 > 0 && phase < 0.9*this.cycle ) 
+				) {
 
 			// switch direct route to red:
 			this.getSignalGroupStates().put(sg1, SignalGroupState.RED);

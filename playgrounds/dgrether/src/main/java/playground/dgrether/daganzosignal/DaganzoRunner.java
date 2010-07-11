@@ -125,7 +125,7 @@ public class DaganzoRunner {
 
 				greenSplitPerIterationGraph.addIterationData(signalGreenSplitHandler, e.getIteration());
 
-				if ( e.getIteration() % 10 == 0 ) {
+//				if ( e.getIteration() % 10 == 0 ) {
 					TTGraphWriter ttWriter = new TTGraphWriter();
 					//				ttWriter.addTTEventHandler(handler3);
 					//				ttWriter.addTTEventHandler(handler4);
@@ -152,7 +152,7 @@ public class DaganzoRunner {
 					DgChartWriter.writeChart(e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "ttcalculator"), 
 							ttcalcChart.createChart());
 
-				}
+//				}
 			}
 		});
   	//write some output at shutdown
