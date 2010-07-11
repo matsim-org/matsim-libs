@@ -105,6 +105,12 @@ public class ClosestParkingMatrix {
 		ArrayList<ActivityFacilityImpl> resultFacilities = new ArrayList<ActivityFacilityImpl>();
 
 		for (int i = 0; i < links.size(); i++) {
+			if (parkingAssociations.getFacilities(links.get(i).getId())==null){
+				System.out.println(links.get(i).getId());
+				System.out.println(parkingAssociations.getFacilities(links.get(i).getId()));
+				System.exit(0);
+			}
+			
 			resultFacilities.addAll(parkingAssociations.getFacilities(links.get(i).getId()));
 		}
 

@@ -14,76 +14,84 @@ import org.matsim.core.network.NetworkLayer;
 
 public class LinkFacilityAssociation {
 
-	protected HashMap<Id,ArrayList<ActivityFacilityImpl>> linkFacilityMapping=new HashMap<Id, ArrayList<ActivityFacilityImpl>>();
+	protected HashMap<Id, ArrayList<ActivityFacilityImpl>> linkFacilityMapping = new HashMap<Id, ArrayList<ActivityFacilityImpl>>();
 	protected NetworkImpl network;
-	 
-	protected LinkFacilityAssociation(){
-		
+
+	protected LinkFacilityAssociation() {
+
 	}
-	
+
 	public LinkFacilityAssociation(Controler controler) {
-		ActivityFacilitiesImpl facilities=(ActivityFacilitiesImpl) controler.getFacilities();
-		
-		this.network=controler.getNetwork();
-		
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) controler.getFacilities();
+
+		this.network = controler.getNetwork();
+
 		init(facilities);
 	}
-	
+
 	public LinkFacilityAssociation(ActivityFacilitiesImpl facilities, NetworkLayer network) {
-		this.network=network;
+		this.network = network;
 		init(facilities);
 	}
-	
-	private void init(ActivityFacilitiesImpl facilities){
-		for (ActivityFacilityImpl facility: facilities.getFacilities().values()){
+
+	private void init(ActivityFacilitiesImpl facilities) {
+		for (ActivityFacilityImpl facility : facilities.getFacilities().values()) {
 			addFacilityToHashMap(facility);
 		}
 	}
-	
-	
+
 	/**
 	 * put the facility into the arrayList for the appropriate link.
+	 * 
 	 * @param facility
 	 */
 	private void addFacilityToHashMap(ActivityFacilityImpl facility) {
-		Id facilityLink=getClosestLink(facility);
-		
+		Id facilityLink = getClosestLink(facility);
+
 		assureHashMapInitializedForLink(facilityLink);
-		
-		ArrayList<ActivityFacilityImpl> list=linkFacilityMapping.get(facilityLink);
-		
-		// implicit assumption: a facility will only get added once for the same link
-		list.add(facility);		
+
+		ArrayList<ActivityFacilityImpl> list = linkFacilityMapping.get(facilityLink);
+
+		// implicit assumption: a facility will only get added once for the same
+		// link
+		list.add(facility);
 	}
 
 	/**
 	 * need also to takle the case, if facility not assigned
+	 * 
 	 * @return
 	 */
-	protected Id getClosestLink(ActivityFacilityImpl facility){
-		if (facility.getLinkId()==null){
+	protected Id getClosestLink(ActivityFacilityImpl facility) {
+		if (facility.getLinkId() == null) {
 			return network.getNearestLink(facility.getCoord()).getId();
 		} else {
 			return facility.getLinkId();
 		}
 	}
-	
-	
 
 	/**
 	 * Make sure, that in the HashMap an entry exists for the given linkId
+	 * 
 	 * @param linkId
 	 */
 	protected void assureHashMapInitializedForLink(Id linkId) {
-		if (!linkFacilityMapping.containsKey(linkId)){
+		if (!linkFacilityMapping.containsKey(linkId)) {
 			linkFacilityMapping.put(linkId, new ArrayList<ActivityFacilityImpl>());
 		}
 	}
 
-	public ArrayList<ActivityFacilityImpl> getFacilities(Id linkId){
-		return linkFacilityMapping.get(linkId);
+	/**
+	 * - post-cont: will never return null.
+	 * @param linkId
+	 * @return
+	 */
+	public ArrayList<ActivityFacilityImpl> getFacilities(Id linkId) {
+		ArrayList<ActivityFacilityImpl> result = linkFacilityMapping.get(linkId);
+		if (result == null) {
+			result = new ArrayList<ActivityFacilityImpl>();
+		}
+		return result;
 	}
-	
-	
-	
+
 }
