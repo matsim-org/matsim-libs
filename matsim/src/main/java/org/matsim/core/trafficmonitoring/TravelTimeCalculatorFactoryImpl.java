@@ -48,7 +48,7 @@ public class TravelTimeCalculatorFactoryImpl implements TravelTimeCalculatorFact
 			calculator.setTravelTimeAggregator(new OptimisticTravelTimeAggregator(calculator.numSlots, calculator.timeSlice));
 		} else if ("experimental_LastMile".equals(group.getTravelTimeAggregatorType())) {
 			calculator.setTravelTimeAggregator(new PessimisticTravelTimeAggregator(calculator.numSlots, calculator.timeSlice));
-			log.warn("Using experimental TravelTimeAggregator! \nIf this was not intendet please remove the travelTimeAggregator entry in the controler section in your config.xml!");
+			log.warn("Using experimental TravelTimeAggregator! \nIf this was not intended please remove the travelTimeAggregator entry in the controler section in your config.xml!");
 		} else {
 			throw new RuntimeException(group.getTravelTimeAggregatorType() + " is unknown!");
 		}
