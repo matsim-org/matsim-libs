@@ -93,12 +93,11 @@ import org.matsim.vis.snapshots.writers.VisData;
  * ----------------
  * </pre>
  *
- *agent
  * Queue Model Link implementation with the following properties:
  * <ul>
  *   <li>The queue behavior itself is simulated by one or more instances of QueueLane</li>
  *   <li>Each QueueLink has at least one QueueLane. All QueueVehicles added to the QueueLink
- *   are placed on this always existing instance.
+ *   are placed on this instance.
  *    </li>
  *   <li>All QueueLane instances which are connected to the ToQueueNode are
  *   held in the attribute toNodeQueueLanes</li>
@@ -168,8 +167,8 @@ public class QLinkLanesImpl implements QLinkInternalI {
 		this.toNodeQueueLanes = new ArrayList<QLane>();
 		this.createLanes(laneMap);
 	}
-	
-	
+
+
 	/**
 	 * Initialize the QueueLink with more than one QueueLane
 	 * @param map
@@ -178,23 +177,23 @@ public class QLinkLanesImpl implements QLinkInternalI {
 		List<Lane> sortedLanes =  new ArrayList<Lane>(map.values());
 		Collections.sort(sortedLanes, new LaneMeterFromLinkEndComparator());
 		Collections.reverse(sortedLanes);
-		
+
 		List<QLane> laneList = new LinkedList<QLane>();
 		Lane firstLane = sortedLanes.remove(0);
 		if (firstLane.getStartsAtMeterFromLinkEnd() != this.link.getLength()) {
 			throw new IllegalStateException("First Lane Id " + firstLane.getId() + " on Link Id " + this.link.getId() + 
-					"isn't starting at the beginning of the link!");
+			"isn't starting at the beginning of the link!");
 		}
 		this.originalLane = new QLane(this, firstLane, true);
 		laneList.add(this.originalLane);
 		Stack<QLane> laneStack = new Stack<QLane>();
-		
+
 		while (!laneList.isEmpty()){
 			QLane lastQLane = laneList.remove(0);
 			laneStack.push(lastQLane);
 			lastQLane.setFireLaneEvents(true);
 			this.queueLanes.add(lastQLane);
-			
+
 			//if existing create the subsequent lanes
 			List<Id> toLaneIds = lastQLane.getLaneData().getToLaneIds();
 			double nextMetersFromLinkEnd = 0.0;
@@ -219,7 +218,7 @@ public class QLinkLanesImpl implements QLinkInternalI {
 			}
 			lastQLane.setLaneLength(laneLength);
 		}		
-		
+
 		//fill toLinks
 		while (!laneStack.isEmpty()){
 			QLane qLane = laneStack.pop();
@@ -319,7 +318,7 @@ public class QLinkLanesImpl implements QLinkInternalI {
 		this.moveWaitToBuffer(now);
 		this.active = (ret || (!this.waitingList.isEmpty()));
 		return this.active;
-}
+	}
 
 	/**
 	 * Move as many waiting cars to the link as it is possible
@@ -335,7 +334,7 @@ public class QLinkLanesImpl implements QLinkInternalI {
 			}
 
 			this.getQSimEngine().getQSim().getEventsManager().processEvent(
-			new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
+					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
 			boolean handled = this.originalLane.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
 			if (!handled) {
 				this.originalLane.addToBuffer(veh, now);
@@ -401,7 +400,7 @@ public class QLinkLanesImpl implements QLinkInternalI {
 	public double getSpaceCap() {
 		double total = 0.0;
 		for (QLane ql : this.getQueueLanes()) {
-				total += ql.getStorageCapacity();
+			total += ql.getStorageCapacity();
 		}
 		return total;
 	}
@@ -440,8 +439,8 @@ public class QLinkLanesImpl implements QLinkInternalI {
 	}
 
 	public QSimEngine getQSimEngine(){
-    return this.qsimEngine;
-  }
+		return this.qsimEngine;
+	}
 
 	@Override
 	public void setQSimEngine(QSimEngine qsimEngine) {
@@ -463,17 +462,17 @@ public class QLinkLanesImpl implements QLinkInternalI {
 		return this.originalLane;
 	}
 
-  @Override
-  public LinkedList<QVehicle> getVehQueue() {
-    LinkedList<QVehicle> ll = this.originalLane.getVehQueue();
-    for (QLane l : this.getToNodeQueueLanes()){
-      ll.addAll(l.getVehQueue());
-    }
-    return ll;
-  }
+	@Override
+	public LinkedList<QVehicle> getVehQueue() {
+		LinkedList<QVehicle> ll = this.originalLane.getVehQueue();
+		for (QLane l : this.getToNodeQueueLanes()){
+			ll.addAll(l.getVehQueue());
+		}
+		return ll;
+	}
 
-  
-  
+
+
 	/**
 	 * Inner class to capsulate visualization methods
 	 * @author dgrether
@@ -485,18 +484,18 @@ public class QLinkLanesImpl implements QLinkInternalI {
 
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
-		  for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
-		    lane.visdata.getVehiclePositions(positions);
-		  }
-		  int cnt2 = 0;
-  		// treat vehicles from waiting list:
-		  agentSnapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkLanesImpl.this.link, cnt2,
+			for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
+				lane.visdata.getVehiclePositions(positions);
+			}
+			int cnt2 = 0;
+			// treat vehicles from waiting list:
+			agentSnapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkLanesImpl.this.link, cnt2,
 					QLinkLanesImpl.this.waitingList, null);
-		  cnt2 = QLinkLanesImpl.this.waitingList.size();
-		  agentSnapshotInfoBuilder.positionAgentsInActivities(positions, QLinkLanesImpl.this.link,
-		  		QLinkLanesImpl.this.agentsInActivities.values(), cnt2);
+			cnt2 = QLinkLanesImpl.this.waitingList.size();
+			agentSnapshotInfoBuilder.positionAgentsInActivities(positions, QLinkLanesImpl.this.link,
+					QLinkLanesImpl.this.agentsInActivities.values(), cnt2);
 
-		  return positions;
+			return positions;
 		}
 	}
 
