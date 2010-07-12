@@ -56,51 +56,14 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
 	public void run(final Plan plan) {
 
-		//if (GlobalRegistry.isTestingMode==true){
-			
-		//} else {
+		// assign new parking at the work activity and change the plan accordingly (replace the parking activity before and after the parking)
 		
 		ActivityFacilityImpl newParking = (ActivityFacilityImpl) GlobalRegistry.controler.getFacilities().getFacilities().get(new IdImpl("35"));
 
 		replaceParking(plan, 6, newParking, GlobalRegistry.controler, (NetworkLayer) GlobalRegistry.controler.getNetwork());
 		
-		
-		//}
-		
-		
-		
-		//assignClosestParking(plan);
-
-		/*
-		 * for (PlanElement pe : plan.getPlanElements()) { if (pe instanceof
-		 * Activity) { Activity activity = (Activity) pe;
-		 * activity.setEndTime(Time.parseTime("06:00:00")); return; // we only
-		 * want to change the end time of the very first activity } }
-		 */
+	
 	}
-
-	/**
-	 * 
-	 * @param plan
-	 */
-	/*
-	 * private void assignClosestParking(final Plan plan) { for (PlanElement pe
-	 * : plan.getPlanElements()) { if (pe instanceof Activity) { Activity
-	 * activity = (Activity) pe;
-	 * 
-	 * ActivityFacilityImpl activityFacility = (ActivityFacilityImpl)
-	 * GlobalRegistry.controler.getFacilities()
-	 * .getFacilities().get(activity.getFacilityId());
-	 * 
-	 * ActivityFacilityImpl newParking = ParkingRoot.getClosestParkingMatrix()
-	 * .getClosestParkings(activityFacility.getCoord(), 1, 0).get(0);
-	 * 
-	 * int activityIndex=plan.getPlanElements().indexOf(activity);
-	 * 
-	 * if (!((Activity) pe).getType().equalsIgnoreCase("parking") &&
-	 * activityIndex!=0) { replaceParking(plan, activityIndex, newParking); } }
-	 * } }
-	 */
 
 	/**
 	 * TODO: also handle case, when planElementIndexOfTargetActivity==0
@@ -116,13 +79,15 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		Activity fromAct = null;
 		Activity toAct = null;
 
+		// make new parking activity activity
+		
 		ActivityImpl newParkingActivity = new ActivityImpl("parking", newParking.getCoord());
 		newParkingActivity.setFacilityId(newParking.getId());
 		newParkingActivity.setLinkId(network.getNearestLink(newParking.getCoord()).getId());
-		// TODO: one should also be able to set this!!!!
+		// TODO: one should also be able to set this parameter from outside!!!!
 		newParkingActivity.setDuration(60);
 
-		// change the previous and next parking of the activity
+		// change the previous and next parking of the targetActivity
 
 		plan.getPlanElements().remove(planElementIndexOfTargetActivity - 2);
 		plan.getPlanElements().add(planElementIndexOfTargetActivity - 2, newParkingActivity);
@@ -130,7 +95,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		plan.getPlanElements().remove(planElementIndexOfTargetActivity + 2);
 		plan.getPlanElements().add(planElementIndexOfTargetActivity + 2, newParkingActivity);
 
-		// peform rerouting for route previous to parking
+		// peform rerouting: from previous activity to parking
 
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
@@ -143,11 +108,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		PlansCalcRoute router = getRoutingAlgorithm(controler);
 		router.handleLeg(plan.getPerson(), leg, fromAct, toAct, fromAct.getEndTime());
 
-		
-		
-		
-		// peform rerouting for route after parking (when the route is
-		// completed)
+		// peform rerouting: from parking to next activity (after completion of targetActivity)
 		
 		fromAct = (Activity) plan.getPlanElements().get(planElementIndexOfTargetActivity + 2);
 		toAct = (Activity) plan.getPlanElements().get(planElementIndexOfTargetActivity + 4);
@@ -165,99 +126,5 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		return new PlansCalcRoute(new PlansCalcRouteConfigGroup(), controler.getNetwork(),
 				controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), new DijkstraFactory());
 	}
-
-	/**
-	 * - possibly remove this. - replace all parkings with facility Id="36" to
-	 * parkings with facility Id="2"
-	 * 
-	 * @param plan
-	 */
-	private void replaceParking(final Plan plan) {
-		System.out.println(plan.getPerson().getId());
-
-		ActivityImpl newParkingActivity = new ActivityImpl("parking", new CoordImpl(0, 1500));
-		newParkingActivity.setFacilityId(new IdImpl("2"));
-		newParkingActivity.setDuration(60);
-
-		Activity activity = null;
-		int index = 0;
-
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				activity = (Activity) pe;
-				if (activity.getFacilityId().equals(new IdImpl("36")) && activity.getType().equalsIgnoreCase("parking")) {
-					index = plan.getPlanElements().indexOf(activity);
-					break;
-				}
-			}
-		}
-
-		plan.getPlanElements().remove(index);
-		plan.getPlanElements().add(index, newParkingActivity);
-
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				activity = (Activity) pe;
-				if (activity.getFacilityId().equals(new IdImpl("36")) && activity.getType().equalsIgnoreCase("parking")) {
-					index = plan.getPlanElements().indexOf(activity);
-					break;
-				}
-			}
-		}
-
-		plan.getPlanElements().remove(index);
-		plan.getPlanElements().add(index, newParkingActivity);
-
-		Controler controler = GlobalRegistry.controler;
-
-		TravelTimeDistanceCostCalculator ttdcc = new TravelTimeDistanceCostCalculator(controler.getTravelTimeCalculator(),
-				controler.getConfig().charyparNagelScoring());
-
-		LeastCostPathCalculator lcpc = controler.getLeastCostPathCalculatorFactory().createPathCalculator(controler.getNetwork(),
-				ttdcc, controler.getTravelTimeCalculator());
-
-		NetworkFactoryImpl nfi = controler.getNetwork().getFactory();
-
-		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), controler.getNetwork(),
-				controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), new DijkstraFactory());
-
-		// dijkstraRouter.handleLeg(plan.getPerson(),
-		// plan.getPlanElements().get(index) , fromAct, toAct, depTime)
-
-		// need to ch
-
-		// cont here!!!!
-		// see class PlansCalcRoute, zeilen 254
-		// make a method, which does it...
-
-		// TODO: change parking of all people!!
-	}
-
-	private void assignNewRoute(final Plan plan, int leg) {
-
-	}
-
-	// remove this code, if not needed any more..
-	// for all activities (not the first or last), assign the closest
-	// parkings
-
-	/*
-	 * for (PlanElement pe : plan.getPlanElements()) { if (pe instanceof
-	 * Activity) { Activity activity = (Activity) pe;
-	 * 
-	 * ActivityFacilityImpl activityFacility = (ActivityFacilityImpl)
-	 * sc.getActivityFacilities
-	 * ().getFacilities().get(activity.getFacilityId());
-	 * 
-	 * ActivityFacilityImpl newParking = ParkingRoot.getClosestParkingMatrix()
-	 * .getClosestParkings(activityFacility.getCoord(), 1, 0).get(0);
-	 * 
-	 * int activityIndex=plan.getPlanElements().indexOf(activity);
-	 * 
-	 * if (!((Activity) pe).getType().equalsIgnoreCase("parking") &&
-	 * activityIndex!=0 && activityIndex!=plan.getPlanElements().size()) {
-	 * ParkingPlanAlgorithm.replaceParking(plan, activityIndex, newParking); } }
-	 * }
-	 */
 
 }

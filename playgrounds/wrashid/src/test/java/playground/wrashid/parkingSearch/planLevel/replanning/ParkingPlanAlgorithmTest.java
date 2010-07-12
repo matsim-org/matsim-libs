@@ -33,11 +33,6 @@ public class ParkingPlanAlgorithmTest extends MatsimTestCase {
 
 		// init parkings
 		ParkingRoot.init(sc.getActivityFacilities(), net);
-
-		// hack: set network of controler
-		
-		//Reflection.setField(controler, "network", net);
-		
 		
 		// confirm the parking before the change (and compare it after the change)
 		
