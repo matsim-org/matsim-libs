@@ -176,8 +176,11 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		this.reset();
 
 		// check seasonTicket
+		if ( plan==null ) {
+			throw new RuntimeException(" dont' know what to do to recover ") ;
+		}
 		PersonImpl person = (PersonImpl) plan.getPerson();
-		if (person.getTravelcards()!=null){
+		if ( person!=null && person.getTravelcards()!=null){
 			if (person.getTravelcards().contains("ch-GA")) this.seasonTicket = "ch-GA";
 			else if (person.getTravelcards().contains("ch-HT")) this.seasonTicket = "ch-HT";
 			else {
