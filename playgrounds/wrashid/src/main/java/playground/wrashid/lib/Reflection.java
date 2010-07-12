@@ -6,7 +6,14 @@ import org.matsim.core.population.ActivityImpl;
 
 public class Reflection {
 
-	public static void setField(Object targetObject, String fieldName,Object newValue){
+	
+	/**
+	 * Set the value of a field within an object.
+	 * @param targetObject
+	 * @param fieldName
+	 * @param newValue
+	 */
+	public static void setField(Object targetObject, String fieldName, Object newValue){
 		Class<?> c = targetObject.getClass();
 	    try {
 			Field f = c.getDeclaredField(fieldName);

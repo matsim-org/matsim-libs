@@ -118,6 +118,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
 		ActivityImpl newParkingActivity = new ActivityImpl("parking", newParking.getCoord());
 		newParkingActivity.setFacilityId(newParking.getId());
+		newParkingActivity.setLinkId(network.getNearestLink(newParking.getCoord()).getId());
 		// TODO: one should also be able to set this!!!!
 		newParkingActivity.setDuration(60);
 
@@ -139,24 +140,23 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		fromAct = (Activity) plan.getPlanElements().get(planElementIndexOfTargetActivity - 4);
 		toAct = (Activity) plan.getPlanElements().get(planElementIndexOfTargetActivity - 2);
 
-		// a hack: set uninitialzed links
-		// setLink((ActivityImpl)fromAct,(IdImpl)
-		// network.getNearestLink(fromAct.getCoord()).getId());
-		// setLink((ActivityImpl)toAct,(IdImpl)
-		// network.getNearestLink(toAct.getCoord()).getId());
-
 		PlansCalcRoute router = getRoutingAlgorithm(controler);
 		router.handleLeg(plan.getPerson(), leg, fromAct, toAct, fromAct.getEndTime());
 
+		
+		
+		
 		// peform rerouting for route after parking (when the route is
 		// completed)
+		
+		fromAct = (Activity) plan.getPlanElements().get(planElementIndexOfTargetActivity + 2);
+		toAct = (Activity) plan.getPlanElements().get(planElementIndexOfTargetActivity + 4);
+		
+		router = getRoutingAlgorithm(controler);
+		router.handleLeg(plan.getPerson(), leg, fromAct, toAct, fromAct.getEndTime());
 
 	}
 
-	// was a hack...
-	// private static void setLink(ActivityImpl activity, IdImpl linkId){
-	// Reflection.setField(activity, "linkId", linkId);
-	// }
 
 	private static PlansCalcRoute getRoutingAlgorithm(Controler controler) {
 		TravelTimeDistanceCostCalculator ttdcc = new TravelTimeDistanceCostCalculator(controler.getTravelTimeCalculator(),
