@@ -675,7 +675,7 @@ public class QLane implements QBufferItem {
     	AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLane.this.queueLink.getQSimEngine().getAgentSnapshotInfoBuilder();
     	//the offset of this lane
     	double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLane().getStartsAtMeterFromLinkEnd();// QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
-      agentSnapshotInfoBuilder.addVehiclePositionsAsQueue(positions, time, QLane.this.queueLink.getLink(), QLane.this.buffer, QLane.this.vehQueue,
+      agentSnapshotInfoBuilder.addVehiclePositions(positions, time, QLane.this.queueLink.getLink(), QLane.this.buffer, QLane.this.vehQueue,
       		QLane.this.inverseSimulatedFlowCapacity, QLane.this.storageCapacity,
       		QLane.this.bufferStorageCapacity, QLane.this.length, offset, QLane.this.visualizerLane*3, QLane.this.transitQueueLaneFeature);
 

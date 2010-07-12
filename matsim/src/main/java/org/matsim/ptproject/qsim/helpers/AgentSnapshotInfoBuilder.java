@@ -54,9 +54,12 @@ public class AgentSnapshotInfoBuilder {
 	public AgentSnapshotInfoBuilder(QSimConfigGroup configGroup, double cellSize){
 		this.storageCapacityFactor = configGroup.getStorageCapFactor();
 		this.cellSize = cellSize;
-		snapshotStyle = configGroup.getSnapshotStyle() ;
+		this.snapshotStyle = configGroup.getSnapshotStyle() ;
 	}
 
+	/**
+	 * See overloaded method for parameter description.
+	 */
 	public void addVehiclePositions(final Collection<AgentSnapshotInfo> positions, double now, Link link,
 			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
 			double storageCapacity, int bufferStorageCapacity, double linkLength, TransitQLaneFeature transitQueueLaneFeature){
@@ -64,7 +67,23 @@ public class AgentSnapshotInfoBuilder {
 		this.addVehiclePositions(positions, now, link, buffer, vehQueue, inverseSimulatedFlowCapacity, storageCapacity, 
 				bufferStorageCapacity, linkLength, 0.0, null, transitQueueLaneFeature);
 	}	
-	
+
+	/**
+	 * Adds AgentSnapshotInfo instances to the Collection given as parameter for a queue-logic object located on a specific link. A queue-logic object
+	 * can be a QueueLinkImpl or a QueueLane instance or something else.
+	 * @param positions The Collection in that the AgentSnapshotInfo instances are inserted.
+	 * @param now The current time 
+	 * @param link parameter is only used to create PositionInfo instances not for calculations in this class
+	 * @param buffer 
+	 * @param vehQueue
+	 * @param inverseSimulatedFlowCapacity
+	 * @param storageCapacity
+	 * @param bufferStorageCapacity
+	 * @param linkLength the length of the queue-based object
+	 * @param offset The distance between the from node of the link to the beginning of the queue-logic object
+	 * @param laneNumber 
+	 * @param transitQueueLaneFeature
+	 */
 	public void addVehiclePositions(final Collection<AgentSnapshotInfo> positions, double now, Link link,
 			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
 			double storageCapacity, int bufferStorageCapacity, double linkLength, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature){
@@ -75,7 +94,7 @@ public class AgentSnapshotInfoBuilder {
 		}
 		else  if ("equiDist".equalsIgnoreCase(this.snapshotStyle)){
 			this.addVehiclePositionsEquil(positions, now, buffer, link, vehQueue, inverseSimulatedFlowCapacity, offset, 
-					laneNumber, transitQueueLaneFeature);
+					laneNumber, transitQueueLaneFeature, linkLength);
 		}
 		else {
 			log.warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
@@ -92,7 +111,7 @@ public class AgentSnapshotInfoBuilder {
 	 * @param transitQueueLaneFeature 
 	 * @param link2 
 	 */
-	public void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, double now, 
+	protected void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, double now, 
 			Link link, Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
 			double storageCapacity, int bufferStorageCapacity, double linkLength, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature) {
 
@@ -215,14 +234,15 @@ public class AgentSnapshotInfoBuilder {
 	 * @param vehQueue 
 	 * @param inverseSimulatedFlowCapacity 
 	 * @param transitQueueLaneFeature 
+	 * @param linkLength 
 	 */
 	protected void addVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions, double time, 
 			Collection<QVehicle> buffer, Link link, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
-			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature) {
+			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double linkLength) {
 		int cnt = buffer.size() + vehQueue.size();
 		if (cnt > 0) {
-			double spacing = link.getLength() / cnt;
-			double distFromFromNode = link.getLength() - spacing / 2.0;
+			double spacing = linkLength / cnt;
+			double distFromFromNode = linkLength - (spacing / 2.0);
 			double freespeed = link.getFreespeed();
 
 			// the cars in the buffer
