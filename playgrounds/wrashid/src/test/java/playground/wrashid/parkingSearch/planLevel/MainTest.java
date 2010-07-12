@@ -35,17 +35,15 @@ public class MainTest extends MatsimTestCase {
 		
 		controler.setOverwriteFiles(true);
 		
+		// add controler for initialization
+		controler.addControlerListener(new InitializeParkings());
+		
 		// add handlers (e.g. parking book keeping)
 		EventHandlerAtStartupAdder eventHandlerAdder=new EventHandlerAtStartupAdder();
 		eventHandlerAdder.addEventHandler(new ParkingBookKeeper(controler));
 		controler.addControlerListener(eventHandlerAdder);
 		
-		// build structure for parking ranking.
-		// (needed for the above task: build structure for mapping from links to facilities)
-		Object a=controler.getFacilities().getFacilities().get(new IdImpl("2"));
-		
-		GlobalRegistry.controler=controler;
-		 
+
 		controler.run();
 	}
 	

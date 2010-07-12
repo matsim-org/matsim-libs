@@ -16,10 +16,12 @@ public class LinkFacilityAssociationTest extends MatsimTestCase {
 	public static NetworkLayer loadNetwork(ScenarioImpl sc) {
 		String facilitiesPath = "test/input/playground/wrashid/parkingSearch/planLevel/chessFacilities.xml";
 		String networkFile = "test/input/playground/wrashid/parkingSearch/planLevel/network.xml";
+		String inputPlansFile = "test/input/playground/wrashid/parkingSearch/planLevel/chessPlans2.xml";
 
 		new MatsimFacilitiesReader(sc).readFile(facilitiesPath);
 
-		Population inPop = sc.getPopulation();
+		PopulationReader popReader = new MatsimPopulationReader(sc);
+		popReader.readFile(inputPlansFile);
 
 		new MatsimNetworkReader(sc).readFile(networkFile);
 
