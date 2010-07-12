@@ -43,7 +43,6 @@ public class MainTest extends MatsimTestCase {
 		eventHandlerAdder.addEventHandler(new ParkingBookKeeper(controler));
 		controler.addControlerListener(eventHandlerAdder);
 		
-
 		controler.run();
 	}
 	
