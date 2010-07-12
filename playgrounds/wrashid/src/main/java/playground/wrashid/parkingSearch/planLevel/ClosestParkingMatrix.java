@@ -2,6 +2,7 @@ package playground.wrashid.parkingSearch.planLevel;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -11,6 +12,8 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
+
+import playground.wrashid.parkingSearch.planLevel.scoring.OrderedFacility;
 
 public class ClosestParkingMatrix {
 
@@ -165,14 +168,42 @@ public class ClosestParkingMatrix {
 
 	}
 
-	private double getDistance(Coord coord, Link link) {
+	public static double getDistance(Coord coord, Link link) {
 		return getDistance(coord,link.getCoord());
 	}
 	
-	private double getDistance(Coord coordA, Coord coordB) {
+	public static double getDistance(Coord coordA, Coord coordB) {
 		double xDiff = coordA.getX() - coordB.getX();
 		double yDiff = coordA.getY() - coordB.getY();
 		return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+	}
+	
+	/**
+	 * possible refactoring: move this static method to some other class, where it would fit better...
+	 * 
+	 * attention: probably concurrency not possible, if list can be modified by different threads.
+	 * (if that is required, make a new list within the method).
+	 * This means, in the result list the facility, which is closest will be first in the queue.
+	 * @param coord
+	 * @param list
+	 * @return
+	 */
+	public static ArrayList<ActivityFacilityImpl> getOrderedListAccordingToDistanceFromCoord(Coord coord, ArrayList<ActivityFacilityImpl> list){
+		PriorityQueue<OrderedFacility> prioQueue=new PriorityQueue<OrderedFacility>();
+	
+		// sort list
+		while (list.size()>0){
+			ActivityFacilityImpl curFac=list.remove(0);
+			prioQueue.add(new OrderedFacility(curFac, getDistance(coord,curFac.getCoord())));
+		}
+		
+		// write list
+		while (prioQueue.size()>0){
+			ActivityFacilityImpl curFac=prioQueue.poll().getFacility();
+			list.add(curFac);
+		}
+		
+		return list;	
 	}
 
 }
