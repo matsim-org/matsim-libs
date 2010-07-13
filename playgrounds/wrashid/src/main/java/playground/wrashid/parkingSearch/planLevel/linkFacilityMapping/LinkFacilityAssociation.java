@@ -1,4 +1,4 @@
-package playground.wrashid.parkingSearch.planLevel;
+package playground.wrashid.parkingSearch.planLevel.linkFacilityMapping;
 
 import java.util.ArrayList;
 import java.util.HashMap;

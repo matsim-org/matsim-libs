@@ -50,7 +50,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.Reflection;
-import playground.wrashid.parkingSearch.planLevel.ParkingRoot;
+import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ParkingPlanAlgorithm implements PlanAlgorithm {
 

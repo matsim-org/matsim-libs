@@ -11,6 +11,9 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkFacilityAssociation;
+import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
+
 public class LinkFacilityAssociationTest extends MatsimTestCase {
 
 	public static NetworkLayer loadNetwork(ScenarioImpl sc) {

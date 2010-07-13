@@ -16,7 +16,7 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.Reflection;
 import playground.wrashid.parkingSearch.planLevel.LinkFacilityAssociationTest;
-import playground.wrashid.parkingSearch.planLevel.ParkingRoot;
+import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ParkingPlanAlgorithmTest extends MatsimTestCase {
 

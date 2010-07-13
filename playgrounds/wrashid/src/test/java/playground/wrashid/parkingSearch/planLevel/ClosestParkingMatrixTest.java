@@ -15,6 +15,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
+
 public class ClosestParkingMatrixTest extends MatsimTestCase {
 
 	public void testGetClosestLinks() {

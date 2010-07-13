@@ -1,4 +1,4 @@
-package playground.wrashid.parkingSearch.planLevel;
+package playground.wrashid.parkingSearch.planLevel.ranking;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -13,6 +13,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 
+import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
 import playground.wrashid.parkingSearch.planLevel.scoring.OrderedFacility;
 
 public class ClosestParkingMatrix {

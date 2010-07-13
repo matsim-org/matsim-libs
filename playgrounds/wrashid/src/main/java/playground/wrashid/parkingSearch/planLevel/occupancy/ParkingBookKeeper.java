@@ -1,4 +1,4 @@
-package playground.wrashid.parkingSearch.planLevel;
+package playground.wrashid.parkingSearch.planLevel.occupancy;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -12,10 +12,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.population.PlanImpl;
 
+
 public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private Controler controler;
-	
+	private ParkingOccupancyMaintainer parkingOccupancyMaintainer=new ParkingOccupancyMaintainer();
 
 	public ParkingBookKeeper(Controler controler){
 		this.controler=controler;

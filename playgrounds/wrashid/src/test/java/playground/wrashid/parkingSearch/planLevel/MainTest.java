@@ -25,6 +25,8 @@ import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.GlobalRegistry;
+import playground.wrashid.parkingSearch.planLevel.init.InitializeParkings;
+import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
 
 public class MainTest extends MatsimTestCase {
  
