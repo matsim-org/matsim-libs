@@ -7,7 +7,7 @@ public class DoubleValueHashMapTest extends TestCase{
 	public void testBasic(){
 		DoubleValueHashMap<Integer> dhm=new DoubleValueHashMap<Integer>();
 		
-		dhm.set(0, 5.2);
+		dhm.put(0, 5.2);
 		
 		dhm.incrementBy(0, 3.0);
 		

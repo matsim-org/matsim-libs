@@ -12,6 +12,8 @@ public class InitializeParkings implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		ParkingRoot.init((ActivityFacilitiesImpl) event.getControler().getFacilities(), (NetworkLayer) event.getControler().getNetwork());
 		
+		
+		
 		GlobalRegistry.controler=event.getControler();
 	}
 

@@ -12,61 +12,53 @@ import org.matsim.api.core.v01.Id;
  */
 public class ParkingOccupancyBins {
 
-	private int[] minOccupancy = null;
-	private int[] maxOccupancy = null;
-	private double[] averageOccupancy = null;
-	private int[] numberOfDataPointsForBin=null;
+	private int[] occupancy = null;
 
 	/**
 	 * Initialize the data structures.
 	 */
 	public ParkingOccupancyBins() {
-		minOccupancy = new int[96];
-		maxOccupancy = new int[96];
-		averageOccupancy = new double[96];
-		numberOfDataPointsForBin = new int[96];
+		occupancy = new int[96];
 
 		for (int i = 0; i < 96; i++) {
-			numberOfDataPointsForBin[i]=0;
-			averageOccupancy[i]=0;
-			minOccupancy[i] = Integer.MAX_VALUE;
-			maxOccupancy[i] = Integer.MIN_VALUE;
+			occupancy[i] = 0;
 		}
-	}
-
-	public void setParkingOccupancy(int curOccupancy, double time) {
-		int binIndex = getBinIndex(time);
-
-		if (minOccupancy[binIndex] > curOccupancy) {
-			minOccupancy[binIndex] = curOccupancy;
-		}
-
-		if (maxOccupancy[binIndex] < curOccupancy) {
-			maxOccupancy[binIndex] = curOccupancy;
-		}
-		
-		averageOccupancy[binIndex]=(numberOfDataPointsForBin[binIndex]*averageOccupancy[binIndex]+curOccupancy)/(numberOfDataPointsForBin[binIndex]+1);
-		numberOfDataPointsForBin[binIndex]++;
-	}
-
-	public int getMinOccupancy(double time) {
-		return minOccupancy[getBinIndex(time)];
-	}
-
-	public int getMaxOccupancy(double time) {
-		return maxOccupancy[getBinIndex(time)];
 	}
 	
-	public double getAverageOccupancy(double time) {
-		return averageOccupancy[getBinIndex(time)];
-	} 
+	public int getOccupancy(double time){
+		int binIndex=getBinIndex(time);
+		
+		return occupancy[binIndex];
+	}
+	
+
+	public void inrementParkingOccupancy(double startTime, double endTime){
+		int startBinIndex=getBinIndex(startTime);
+		int endBinIndex=getBinIndex(endTime);
+		
+		if (startBinIndex>endBinIndex){
+			
+			for (int i=startBinIndex;i<96;i++){
+				occupancy[i]++;
+			}
+			
+			for (int i=0;i<=endBinIndex;i++){
+				occupancy[i]++;
+			}
+			
+		} else {
+			for (int i=startBinIndex;i<=endBinIndex;i++){
+				occupancy[i]++;
+			}
+		}
+	}
 	
 
 	/**
 	 * return value is in [0,96)
 	 * 
-	 * if time is > 60*60*24 [seconds], it will be projected into next day,
-	 * e.g. time=60*60*24+1=1
+	 * if time is > 60*60*24 [seconds], it will be projected into next day, e.g.
+	 * time=60*60*24+1=1
 	 * 
 	 * @param time
 	 * @return
@@ -75,7 +67,7 @@ public class ParkingOccupancyBins {
 		double secondsInOneDay = 60 * 60 * 24;
 
 		if (time >= secondsInOneDay) {
-			time = ((time / secondsInOneDay) - (Math.floor(time / secondsInOneDay)))*secondsInOneDay;
+			time = ((time / secondsInOneDay) - (Math.floor(time / secondsInOneDay))) * secondsInOneDay;
 		}
 
 		return Math.round((float) Math.floor(time / 900.0));

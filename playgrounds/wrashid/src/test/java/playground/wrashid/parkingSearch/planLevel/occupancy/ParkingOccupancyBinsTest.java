@@ -20,13 +20,16 @@ public class ParkingOccupancyBinsTest extends TestCase {
 	public void testOccupancy(){
 		ParkingOccupancyBins pob=new ParkingOccupancyBins();
 	
-		pob.setParkingOccupancy(1, 0);
-		pob.setParkingOccupancy(10, 0);
-		pob.setParkingOccupancy(5, 0);
-	
-		assertEquals(1, pob.getMinOccupancy(0));
-		assertEquals(10, pob.getMaxOccupancy(0));
-		assertEquals(5.33, pob.getAverageOccupancy(0),0.01);
+		pob.inrementParkingOccupancy(0, 900);
+		
+		assertEquals(1, pob.getOccupancy(0));
+		assertEquals(1, pob.getOccupancy(905));
+		assertEquals(0, pob.getOccupancy(1800));
+		
+		pob.inrementParkingOccupancy(60*60*24-5, 60*60*24+5);
+		
+		assertEquals(2, pob.getOccupancy(0));
+		assertEquals(1, pob.getOccupancy(60*60*24-5));
 	}	
 	
 }

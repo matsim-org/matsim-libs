@@ -24,7 +24,7 @@ public class DoubleValueHashMap<KeyClass> {
 		return hm.get(id);
 	}
 
-	public void set(KeyClass id, Double value) {
+	public void put(KeyClass id, Double value) {
 		hm.put(id, value);
 	}
 

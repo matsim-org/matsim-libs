@@ -35,18 +35,13 @@ public class MainTest extends MatsimTestCase {
 		String configFilePath="test/input/playground/wrashid/parkingSearch/planLevel/chessConfig2.xml";
 		controler = new Controler(configFilePath);
 		
-		controler.setOverwriteFiles(true);
-		
-		// add controler for initialization
-		controler.addControlerListener(new InitializeParkings());
-		
-		// add handlers (e.g. parking book keeping)
-		EventHandlerAtStartupAdder eventHandlerAdder=new EventHandlerAtStartupAdder();
-		eventHandlerAdder.addEventHandler(new ParkingBookKeeper(controler));
-		controler.addControlerListener(eventHandlerAdder);
+		new BaseScenario(controler);
 		
 		controler.run();
 	}
+	
+	
+	
 	
 
 }
