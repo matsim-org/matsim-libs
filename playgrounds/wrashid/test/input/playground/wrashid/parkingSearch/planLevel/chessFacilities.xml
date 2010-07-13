@@ -91,7 +91,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="1" />
+			<capacity value="5" />
 		</activity>
 	</facility>
 
