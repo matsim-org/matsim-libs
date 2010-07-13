@@ -232,6 +232,9 @@ public class PlanImpl implements Plan {
 
 	@Override
 	public void setSelected(final boolean selected) {
+		if(!selected)
+			throw new IllegalArgumentException("You can't unmark a plan as selected.");
+		
 		this.getPerson().setSelectedPlan(this);
 	}
 
