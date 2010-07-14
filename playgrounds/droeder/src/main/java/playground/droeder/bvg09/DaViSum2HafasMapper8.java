@@ -55,6 +55,12 @@ public class DaViSum2HafasMapper8 extends AbstractDaVisum2HafasMapper {
 	}
 	
 	private Map<Id, Id> matchSameLength(){
+		
+		/*
+		 * check if the distance of order is correct. uses coordinates. might not be correct due to the fact that the coordinates of
+		 * visum and hafas are not always correct.
+		 */
+		
 		if((this.getDist(vStops.get(0).getStopFacility().getId(), hStops.get(0).getStopFacility().getId()) > 
 				this.getDist(vStops.get(0).getStopFacility().getId(), hStops.get(hStops.size() -1).getStopFacility().getId()))){
 			return null;
@@ -67,6 +73,11 @@ public class DaViSum2HafasMapper8 extends AbstractDaVisum2HafasMapper {
 		
 		int pre = 0;
 		
+		/*
+		 * checks if the visumstop is  prematched. if so check if the hafasstop at position i is equivalent to the prematched hafasstop.
+		 * 			adds the id to matched or returns null
+		 * if the stop is not prematched add visum and hafas from position i
+		 */
 		for(int i = 0 ; i < vStops.size(); i++){
 			vis = vStops.get(i).getStopFacility().getId();
 			haf = hStops.get(i).getStopFacility().getId();
@@ -88,14 +99,19 @@ public class DaViSum2HafasMapper8 extends AbstractDaVisum2HafasMapper {
 	
 	private Map<Id, Id> matchShorterVisum(){
 		
-		for(TransitRouteStop stop : vStops){
-			System.out.print(stop.getStopFacility().getId() + "\t");
-		}
-		System.out.println();
-		for(TransitRouteStop stop : hStops){
-			System.out.print(stop.getStopFacility().getId() + "\t");
-		}
-		System.out.println();
+		/*
+		 * not implemented yet
+		 */
+		
+		
+//		for(TransitRouteStop stop : vStops){
+//			System.out.print(stop.getStopFacility().getId() + "\t");
+//		}
+//		System.out.println();
+//		for(TransitRouteStop stop : hStops){
+//			System.out.print(stop.getStopFacility().getId() + "\t");
+//		}
+//		System.out.println();
 		
 		return null;
 	}
