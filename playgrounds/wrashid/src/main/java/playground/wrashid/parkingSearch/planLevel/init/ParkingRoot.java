@@ -1,5 +1,6 @@
 package playground.wrashid.parkingSearch.planLevel.init;
 
+import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
 
@@ -13,33 +14,51 @@ public class ParkingRoot {
 	private static ClosestParkingMatrix cpm = null;
 	private static LinkParkingFacilityAssociation lpfa = null;
 	private static ParkingCapacity pc = null;
-
-	public static void init(ActivityFacilitiesImpl facilities, NetworkLayer network) {
-		cpm = new ClosestParkingMatrix(facilities, network);
-		lpfa = new LinkParkingFacilityAssociation(facilities, network);
-		pc= new ParkingCapacity(facilities);
+	private static double parkingPriceScoreScalingFactor;
+	private static double parkingActivityDurationPenaltyScalingFactor;
+	
+	public static double getPriceScoreScalingFactor() {
+		return parkingPriceScoreScalingFactor;
 	}
 	
-	public static ClosestParkingMatrix getClosestParkingMatrix(){
+	public static double getParkingActivityDurationPenaltyScalingFactor() {
+		return parkingActivityDurationPenaltyScalingFactor;
+	}
+
+	public static void init(ActivityFacilitiesImpl facilities, NetworkLayer network, Controler controler) {
+		cpm = new ClosestParkingMatrix(facilities, network);
+		lpfa = new LinkParkingFacilityAssociation(facilities, network);
+		pc = new ParkingCapacity(facilities);
+
+		String tempStringValue = controler.getConfig().findParam("parking", "parkingPriceScoreScalingFactor");
+		checkIfNull(tempStringValue);
+		parkingPriceScoreScalingFactor = Double.parseDouble(tempStringValue);
+		
+		tempStringValue = controler.getConfig().findParam("parking", "parkingActivityDurationPenaltyScalingFactor");
+		checkIfNull(tempStringValue);
+		parkingActivityDurationPenaltyScalingFactor = Double.parseDouble(tempStringValue);
+	}
+
+	public static ClosestParkingMatrix getClosestParkingMatrix() {
 		checkIfNull(cpm);
 		return cpm;
 	}
-	
-	public static LinkParkingFacilityAssociation getLinkParkingFacilityAssociation(){
+
+	public static LinkParkingFacilityAssociation getLinkParkingFacilityAssociation() {
 		checkIfNull(lpfa);
 		return lpfa;
-	}	
+	}
 
-	public static ParkingCapacity getParkingCapacity(){
+	public static ParkingCapacity getParkingCapacity() {
 		checkIfNull(pc);
 		return pc;
 	}
-	
-	private static void checkIfNull(Object obj){
-		if (obj==null){
+
+	private static void checkIfNull(Object obj) {
+		if (obj == null) {
 			throw new Error("Please initialize the variables first.");
 		}
-		
+
 	}
-	
+
 }

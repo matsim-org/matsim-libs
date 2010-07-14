@@ -32,7 +32,7 @@ public class ParkingPlanAlgorithmTest extends MatsimTestCase {
 		Plan plan = sc.getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan();
 
 		// init parkings
-		ParkingRoot.init(sc.getActivityFacilities(), net);
+		ParkingRoot.init(sc.getActivityFacilities(), net, controler);
 		
 		// confirm the parking before the change (and compare it after the change)
 		

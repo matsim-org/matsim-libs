@@ -28,7 +28,9 @@ public class ParkingOccupancyMaintainerTest extends TestCase implements Shutdown
 		controler.run();
 	}
 
-	
+	/**
+	 * add test just before shutdown of the system.
+	 */
 	public void notifyShutdown(ShutdownEvent event) {
 		ParkingOccupancyBins pob=parkingBookKeeper.getParkingOccupancyMaintainer().getParkingOccupancyBins().get(new IdImpl(36));
 		
