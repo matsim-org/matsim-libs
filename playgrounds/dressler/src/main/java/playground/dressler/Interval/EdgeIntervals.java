@@ -310,6 +310,16 @@ public class EdgeIntervals extends Intervals<EdgeInterval> implements EdgeFlowI 
 	public int getMeasure() {
 		return this.getSize();
 	}
+
+
+	@Override
+	@Deprecated
+	public void augment(int tstart, int tstop, int gamma) {}
+
+
+	@Override
+	@Deprecated
+	public void augmentUnsafe(int tstart, int tstop, int gamma) {}
 	
 	/**
 	 * decreases the flow into an edge from time t to t+1 by f if flow remains nonnegative

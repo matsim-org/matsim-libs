@@ -179,39 +179,6 @@ public class BellmanFordIntervalBased {
 		//BellmanFordIntervalBased._warmstart = warmstart;
 	}
 	
-	/*class BFTask  {		
-		public int time;
-		public Interval ival;
-		public VirtualNode node;
-		public boolean reverse; 
-		
-		BFTask(VirtualNode node, Interval ival, boolean rev){
-			this.time = ival.getLowBound();
-			this.ival = new Interval(ival); // we don't want this to be a reference!
-			this.node = node;
-			this.reverse = rev;
-		}
-		
-		BFTask(VirtualNode node, int time, boolean rev){
-			this.time = time;
-			this.node = node; 			
-			this.ival = null;
-			this.reverse = rev;
-		}
-		
-		Boolean equals(BFTask other){
-			// this ignores ival!
-			return(this.time == other.time 
-					&& this.reverse == other.reverse
-					&& this.ival.equals(other.ival)
-					&& other.node.equals(this.node));
-		}
-		
-		@Override
-		public String toString(){
-			return node.toString() + " @ " + time +  " interval " + ival + " reverse " + reverse;
-		}
-	}*/
 	
 	// Comparator needs total order!!!
 	class TaskComparator implements Comparator<BFTask> {
@@ -328,8 +295,9 @@ public class BellmanFordIntervalBased {
 			}
 		}		
 	}	
+	                                   
 	
-	
+	//TODO handle holdover
 	/**
 	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
@@ -883,10 +851,26 @@ public class BellmanFordIntervalBased {
 				}
 			}
 		}
+		if(this._settings.useHoldover){
+			ArrayList<VertexInterval> changed = relabelHoldover(v, inter, this._settings.TimeHorizon);
+			if(changed!=null){
+				for(VertexInterval changedinterval : changed){
+					queue.add(new BFTask(new VirtualNormalNode(v, 0), changedinterval, false));
+				}
+			}
+		}
 		
 		return new Pair<TaskQueue, Interval>(queue, inter);
 	}
 	
+	private ArrayList<VertexInterval> relabelHoldover(Node v, Interval inter,
+			int timeHorizon) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
 	/** Return the (usually) largest interval around t that is unscanned but reachable
 	 * This also sets those intervals to scanned!
 	 * @param v The node where we are looking.

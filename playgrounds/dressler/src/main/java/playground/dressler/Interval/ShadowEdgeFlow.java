@@ -298,6 +298,14 @@ public class ShadowEdgeFlow implements EdgeFlowI {
 	public String toString() {
 		return "flow array:\n" + this._flow.toString() + "\n forward shadow\n" + this._forwardshadow.toString() + "\n backward shadow\n" + this._residualshadow.toString(); 
 	}
+	
+	@Override
+	@Deprecated
+	public void augment(int tstart, int tstop, int gamma) {}
 
+
+	@Override
+	@Deprecated
+	public void augmentUnsafe(int tstart, int tstop, int gamma) {}
 }
 

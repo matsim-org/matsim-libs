@@ -72,4 +72,20 @@ public interface EdgeFlowI {
 	public int getMeasure();
 	
 	public String toString();
+	
+	/**
+	 * Increases the holdover into an edge from time t to t+1 by f if capacity is obeyed
+	 * @param tstart  holover Start time
+	 * @param tstop Time when holdover stops
+	 * @param f amount of flow to augment (can be negative)
+	 */
+	public void augment(final int tstart,final int tstop, final int gamma);
+	
+	/**
+	 * Increases the holdover into an edge from time t to t+1 by f if capacity is obeyed
+	 * @param tstart  holover Start time
+	 * @param tstop Time when holdover stops
+	 * @param gamma amount of flow to augment (can be negative) 
+	 */
+	public void augmentUnsafe(final int tstart,final int tstop, final int gamma);
 }

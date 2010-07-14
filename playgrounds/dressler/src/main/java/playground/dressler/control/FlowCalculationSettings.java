@@ -66,6 +66,8 @@ public class FlowCalculationSettings {
 	public boolean useRepeatedPaths = true && !useSinkCapacities; // try to repeat paths
 	public boolean quickCutOff = false; // stop when the first path is found
 	public boolean delaySinkPropagation = false; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
+	public boolean useHoldover=false; //allow  holdover at all nodes
+	public boolean useHoldoverCapacities=false;// limit holdover on each node
 
 	public boolean trackUnreachableVertices = true && (searchAlgo == FlowCalculationSettings.SEARCHALGO_REVERSE);; // only works in REVERSE, wastes time otherwise
 
