@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.geotools.factory.FactoryRegistryException;
@@ -44,9 +45,12 @@ public class DaShapeWriter {
 	
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	
-	public static void writeLinks2Shape(String fileName, Map<Id, Link> links){
-		initLineFeatureType("links");
-		write(createLinkFeatures(links), fileName);
+	public static void writeLinks2Shape(String fileName, Map<Id, Link> links, Map<Id, SortedMap<String, String>> attributes){
+		for(SortedMap<String, String> m : attributes.values()){
+			initLineFeatureType("links", m);
+			break;
+		}
+		write(createLinkFeatures(links, attributes), fileName);
 	}
 	
 	public static void writeNodes2Shape(String fileName, Map<Id, Node> nodes){
@@ -61,9 +65,12 @@ public class DaShapeWriter {
 	 * @param schedule
 	 * @param lines2write
 	 */
-	public static void writeTransitLines2Shape(String fileName, TransitSchedule schedule, Collection<Id> lines2write){
-		initLineFeatureType("transitLines");
-		write(createRouteFeatures(schedule, lines2write), fileName);
+	public static void writeTransitLines2Shape(String fileName, TransitSchedule schedule, Collection<Id> lines2write, Map<Id, SortedMap<String, String>> attributes){
+		for(SortedMap<String, String> m : attributes.values()){
+			initLineFeatureType("transitLines", m);
+			break;
+		}
+		write(createRouteFeatures(schedule, lines2write, attributes), fileName);
 	}
 	
 	/**
@@ -79,9 +86,12 @@ public class DaShapeWriter {
 	}
 	
 	
-	public static void writePointDist2Shape (String fileName, Map<String, Tuple<Coord, Coord>> points){
-		initLineFeatureType("distance");
-		write(createPointDistanceFeatures(points), fileName);
+	public static void writePointDist2Shape (String fileName, Map<String, Tuple<Coord, Coord>> points, Map<String, SortedMap<String, String>> attributes){
+		for (SortedMap<String, String> m : attributes.values()){
+			initLineFeatureType("distance", m);
+			break;
+		}
+		write(createPointDistanceFeatures(points,attributes), fileName);
 	}
 	
 	private static void write(Collection<Feature> features, String fileName){
@@ -93,10 +103,15 @@ public class DaShapeWriter {
 		} 
 	}
 	
-	private static void initLineFeatureType(String name) {
-		AttributeType [] attribs = new AttributeType[2];
+	private static void initLineFeatureType(String name, SortedMap<String, String> attributes) {
+		AttributeType [] attribs = new AttributeType[attributes.size() + 1];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
-		attribs[1] = AttributeTypeFactory.newAttributeType("id", String.class);
+		
+		Integer count = 1;
+		for(String s : attributes.keySet()){
+			attribs[count] = AttributeTypeFactory.newAttributeType(s, String.class);
+			count++;
+		}
 		
 		try {
 			featureType = FeatureTypeBuilder.newFeatureType(attribs, name);
@@ -121,7 +136,7 @@ public class DaShapeWriter {
 		}
 	}
 	
-	private static Collection<Feature> createRouteFeatures(TransitSchedule schedule, Collection<Id> lines2write){
+	private static Collection<Feature> createRouteFeatures(TransitSchedule schedule, Collection<Id> lines2write, Map<Id, SortedMap<String, String>> attributes){
 		Collection<Feature> features = new ArrayList<Feature>();
 		Feature feature;
 		Coordinate[] coord;
@@ -135,7 +150,7 @@ public class DaShapeWriter {
 						coord[i] = MGC.coord2Coordinate(stop.getStopFacility().getCoord());
 						i++;
 					}
-					feature = getLineStringFeature(new CoordinateArraySequence(coord), line.getId().toString() + "_" + route.getId().toString() );
+					feature = getLineStringFeature(new CoordinateArraySequence(coord), attributes.get(line.getId()));
 					features.add(feature);
 				}
 			}
@@ -143,7 +158,7 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createLinkFeatures(Map<Id, Link> links) {
+	private static Collection<Feature> createLinkFeatures(Map<Id, Link> links, Map<Id, SortedMap<String, String>> attributes) {
 		Collection<Feature> features = new ArrayList<Feature>();
 		Feature feature;
 		Coordinate[] coord;
@@ -152,13 +167,13 @@ public class DaShapeWriter {
 			coord = new Coordinate[2];
 			coord[0] = MGC.coord2Coordinate(l.getFromNode().getCoord());
 			coord[1] = MGC.coord2Coordinate(l.getToNode().getCoord());
-			feature = getLineStringFeature(new CoordinateArraySequence(coord), l.getId().toString());
+			feature = getLineStringFeature(new CoordinateArraySequence(coord), attributes.get(l.getId()));
 			features.add(feature);
 		}
 		return features;
 	}
 	
-	private static Collection<Feature> createPointDistanceFeatures(Map<String, Tuple<Coord, Coord>> points){
+	private static Collection<Feature> createPointDistanceFeatures(Map<String, Tuple<Coord, Coord>> points, Map<String, SortedMap<String, String>> attributes){
 		Collection<Feature> features = new ArrayList<Feature>();
 		Feature feature;
 		Coordinate[] coord;
@@ -167,7 +182,7 @@ public class DaShapeWriter {
 			coord = new Coordinate[2];
 			coord[0] = MGC.coord2Coordinate(e.getValue().getFirst());
 			coord[1] = MGC.coord2Coordinate(e.getValue().getSecond());
-			feature = getLineStringFeature(new CoordinateArraySequence(coord), e.getKey());
+			feature = getLineStringFeature(new CoordinateArraySequence(coord), attributes.get(e.getKey()));
 			features.add(feature);
 		}
 		
@@ -198,11 +213,15 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Feature getLineStringFeature(CoordinateArraySequence c, String id) {
+	private static Feature getLineStringFeature(CoordinateArraySequence c, SortedMap<String, String> attributes) {
 		LineString s = geometryFactory.createLineString(c);
 		Object [] attribs = new Object[2];
 		attribs[0] = s;
-		attribs[1] = id;
+		Integer count = 1;
+		for(String str : attributes.values()){
+			attribs[count] = str;
+			count++;
+		}
 		
 		try {
 			return featureType.create(attribs);

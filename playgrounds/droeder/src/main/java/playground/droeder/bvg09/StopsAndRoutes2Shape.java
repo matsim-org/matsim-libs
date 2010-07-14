@@ -123,13 +123,13 @@ public class StopsAndRoutes2Shape{
 	public void run() {
 		this.preProcess();
 		
-		DaShapeWriter.writeTransitLines2Shape(HAFASROUTE2SHAPE, hSc.getTransitSchedule(), hLines);
-		DaShapeWriter.writeTransitLines2Shape(VISUMROUTE2SHAPE, vSc.getTransitSchedule(), vLines);
-		DaShapeWriter.writeRouteStops2Shape(HAFASSTOP2SHAPE, hSc.getTransitSchedule().getFacilities(), hStops);
-		DaShapeWriter.writeRouteStops2Shape(VISUMSTOP2SHAPE, vSc.getTransitSchedule().getFacilities(), vStops);
-		DaShapeWriter.writePointDist2Shape(MATCHEDSTOPS2SHAPE, preMatched);
-		DaShapeWriter.writeLinks2Shape(VISUMLINKS2SHAPE, vSc.getNetwork().getLinks());
-		DaShapeWriter.writeNodes2Shape(VISUMNODES2SHAPE, vSc.getNetwork().getNodes());
+//		DaShapeWriter.writeTransitLines2Shape(HAFASROUTE2SHAPE, hSc.getTransitSchedule(), hLines);
+//		DaShapeWriter.writeTransitLines2Shape(VISUMROUTE2SHAPE, vSc.getTransitSchedule(), vLines);
+//		DaShapeWriter.writeRouteStops2Shape(HAFASSTOP2SHAPE, hSc.getTransitSchedule().getFacilities(), hStops);
+//		DaShapeWriter.writeRouteStops2Shape(VISUMSTOP2SHAPE, vSc.getTransitSchedule().getFacilities(), vStops);
+//		DaShapeWriter.writePointDist2Shape(MATCHEDSTOPS2SHAPE, preMatched);
+//		DaShapeWriter.writeLinks2Shape(VISUMLINKS2SHAPE, vSc.getNetwork().getLinks());
+//		DaShapeWriter.writeNodes2Shape(VISUMNODES2SHAPE, vSc.getNetwork().getNodes());
 	}
 	
 	private void preProcess(){

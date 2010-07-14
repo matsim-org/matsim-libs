@@ -55,7 +55,6 @@ public class DaVisum2HafasMapper6 extends AbstractDaVisum2HafasMapper {
 			List<Integer> temp = new ArrayList<Integer>();
 			for (int h = v; h < (v + hSize - vSize + 1); h++){
 				temp.add(h);
-				log.error(v + " " + h);
 			}
 			possibleValues.put(v, temp);
 		}

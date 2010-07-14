@@ -27,9 +27,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -42,6 +42,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.SAXException;
@@ -65,8 +66,8 @@ public abstract class AbstractDaVisum2HafasMapper {
 	private String UNMATCHED = PATH + "unmatchedLines.txt";
 	private String MATCHED = PATH + "matchedRoutes.txt";
 	
-	private ScenarioImpl visumSc = new ScenarioImpl();
-	private ScenarioImpl hafasSc = new ScenarioImpl();
+	private ScenarioImpl visumSc = null;
+	private ScenarioImpl hafasSc = null;
 	
 	final Id NOTMATCHED = new IdImpl("notMatched");
 	
@@ -82,6 +83,8 @@ public abstract class AbstractDaVisum2HafasMapper {
 
 
 	public AbstractDaVisum2HafasMapper(double dist2Match){
+		this.visumSc = new ScenarioImpl();
+		this.hafasSc = new ScenarioImpl();
 		visumSc.getConfig().scenario().setUseTransit(true);
 		readSchedule(VISUM, visumSc);
 		hafasSc.getConfig().scenario().setUseTransit(true);
@@ -118,6 +121,24 @@ public abstract class AbstractDaVisum2HafasMapper {
 	public Map<Id, Map<Id, Id>> getVisRoute2Vis2HafStops(){
 		if (vRoute2vis2hafStops == null) this.run();
 		return vRoute2vis2hafStops;
+	}
+	
+	public Collection<Id> getUnmatchedLines(){
+		if(unmatched == null) this.run();
+		return unmatched;
+	}
+	
+	public TransitSchedule getVisumTransit(){
+		return visumSc.getTransitSchedule();
+	}
+	
+	public TransitSchedule getHafasTransit(){
+		return hafasSc.getTransitSchedule();
+	}
+	
+	public Map<Id, Id> getVisum2HafasRoute(){
+		if(this.vis2hafRoutes == null) this.run();
+		return vis2hafRoutes;
 	}
 	
 	private void matchLines(){
@@ -360,7 +381,7 @@ public abstract class AbstractDaVisum2HafasMapper {
 		}else if(visum.length() == 7){
 			hafas = haf.toString().substring(1, haf.toString().length()-1);
 		}
-		visum = visum.substring(0, visum.length()-2);
+		visum = visum.substring(0, visum.length()-1);
 		if(visum.equals(hafas)){
 			equal = true;
 		}
@@ -450,6 +471,8 @@ public abstract class AbstractDaVisum2HafasMapper {
 		HashMap<Id, Id> id2Id = new HashMap<Id, Id>();
 		Integer v = -1;
 		Integer h = -1;
+		
+		if(matched == null) return null;
 		
 		for(Entry<Integer, Integer> e : matched.entrySet()){
 			if(e.getKey()> v && e.getValue() > h){
