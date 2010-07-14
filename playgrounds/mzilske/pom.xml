@@ -21,10 +21,6 @@
 			<id>neo4j-public-repository</id>
 			<url>http://m2.neo4j.org </url>
 		</repository>
-		<repository>
-			<id>openstreetmap-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
-		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -68,6 +64,8 @@
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis</artifactId>
 			<version>0.32.1-SNAPSHOT</version>
+			<scope>system</scope>
+            <systemPath>${basedir}/lib/osmosis.jar</systemPath>
 		</dependency>
 	</dependencies>
 </project>
