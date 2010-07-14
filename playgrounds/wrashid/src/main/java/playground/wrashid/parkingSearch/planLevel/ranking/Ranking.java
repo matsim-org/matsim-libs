@@ -71,9 +71,34 @@ public class Ranking {
 		// as models and parameters have been estiamted for that part.
 		// =scalingFactorParking*(individual parts of parking defined as parameters for income, walking, etc. functions)
 		
-		// CAPACITY CONSTRAINTS
+		// CAPACITY CONSTRAINTS (how full is a parking).
+		// TODO: get data about constraint violations in last iteration here.
+		// TODO: in the beginning, we can just set the capacityConstraint score
+		// we could try: that the score of a parking used and the score given here are the same in the sense,
+		// that usage of full parking should give a high negative capacityConstraintScore!!!!
+		// we could use a general function, which gives a score as a function of how congested a parking is.
+		// the parkings, which are really full at the arrival time, should automatically come at the bottom of the ranking
+		// this means, that the capacity constraint is a quite heavy penalty (bigger than all the other scores together)
+		// when the parking is almost full, it gets trickier, because the parking should 
 		
-		double capacityConstraints;
+		// TODO: perhaps we should for each parking know, when it got full (time and when there was parking available again)
+		// this could help in the decision making process.  #######################################
+		// because with this I can decide, if I want to try a parking or not (estimate also travel by foot).		
+		// it is important, that people are encouraged to switch, if they would be first at a parking!!!!
+		// define: startTimeFull and endTimeFull as a list for the parkings, which get full.
+		// this could be just an additional statistics to the bins (which can also be used for decision taking).
+		//=> IMPLEMENT THIS
+		
+		
+		// only try to switch, if you are almost sure, you will get the space!!!!!
+		
+		// avoid having infinite loop (where you select the same parking as before even if you came late to the parking).
+		// => hope, that this will be avoided automatically.
+		
+		
+		// this function could be parameterized on individual level only if needed (e.g. how averse are people belonging
+		// to a certain category to full parkings)...
+		double capacityConstraintScore;
 		
 		// wip: discussion, it is difficult to get the data for some areas, but in some cities such data is available.
 		// the private parking data is a difficult part. but that can also be estimated (e.g. based on surveys).
