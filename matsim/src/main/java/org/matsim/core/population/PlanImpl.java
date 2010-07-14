@@ -256,6 +256,7 @@ public class PlanImpl implements Plan {
 	 **/
 	public void copyPlan(final Plan in) {
 		// TODO should be re-implemented making use of Cloneable
+		// Bloch ("effective Java") strongly advises _against_ the use of cloneable.  kai, jul'10
 		setScore(in.getScore());
 		if (in instanceof PlanImpl) {
 			this.setType(((PlanImpl) in).getType());
