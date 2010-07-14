@@ -57,6 +57,14 @@ public class M2UStringbuilder {
 		return root + studyArea + "/" + version + "/output_network_" + percentage + "_Emme.xml.gz";
 	}
 
+	public String getEmmePtNetworkFilename() {
+		return root + studyArea + "/" + version + "/output_network_" + percentage + "_Emme_Pt.xml.gz";
+	}
+	
+	public String getEmmeTransitLinesByLinkFilename(){
+		return root + studyArea + "/" + version + "/TransitLinesByLink.txt";
+	}
+
 	public String getPlansFile() {
 		return root + studyArea + "/" + version + "/output_plans_" + percentage + ".xml.gz";
 	}
@@ -82,6 +90,14 @@ public class M2UStringbuilder {
 
 	public String getIterationLinkstatsFile(String iteration){
 		return root + studyArea + "/" + version + "/" + iteration + ".linkstats_" + percentage + ".txt";
+	}
+
+	public String getSubPlaceTable() {
+		return root + studyArea + "/" + version + "/Input/PtSubplaceTable.csv";
+	}
+
+	public String getSubPlaceDistanceFilename() {
+		return root + studyArea + "/" + version + "/DistanceToPt.txt";
 	}
 
 }

@@ -77,6 +77,7 @@ public class MyZoneReader {
 	 * Read the shapefile. Known Id fields:
 	 * <ul>
 	 * 		<li> eThekwini transport zones - 1
+	 * 		<li> eThekwini sub-place - 2
 	 * 		<li> Gauteng GAP zones - 1
 	 * 		<li> KwazuluNatal GAP - 2
 	 * 		<li> Western Cape GAP - 2
@@ -93,7 +94,7 @@ public class MyZoneReader {
 			fs = ShapeFileReader.readDataFile( this.shapefile );
 			Collection<Object> objectArray = (ArrayList<Object>) fs.getFeatures().getAttribute(0);
 			for (Object o : objectArray) {
-				String name = String.valueOf(Math.round(Float.parseFloat(String.valueOf(((Feature) o).getAttribute( idField ))))); 
+				String name = String.valueOf(((Feature) o).getAttribute(idField));
 				Geometry shape = ((Feature) o).getDefaultGeometry();
 				if( shape instanceof MultiPolygon ){
 					mp = (MultiPolygon)shape;
