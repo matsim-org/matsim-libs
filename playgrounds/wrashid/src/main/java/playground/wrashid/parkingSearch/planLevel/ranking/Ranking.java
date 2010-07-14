@@ -115,6 +115,16 @@ public class Ranking {
 		// etc. is clear. so, we can select where to drive next.
 		// 	
 		
+		
+		// wip/TODO: eigentlich müsste man files angeben können für parkplatzpreise (tageszeit abhängig), parkplatz preferenzen der agenten,
+		// etc. => momentan einfach so machen. später beim aufräumen auslagern.
+		
+		// wip: (motivation/ what we want) es gibt viele ansätze für parkplatz suche etc. 
+		// wir problieren ein model zu machen, dass es erlaubt modelle aus umfragen zu benutzen um modell zu calbrieren und dann 
+		// ein system zur verfügung zu haben, wo man sowohl mit preis, parkplatz infrastruktur, demand, supply spielen kann um 
+		// policy makeren zu helfen. e.g. wo hätte ein parkplatz mit gewisser kapazität die beste chance, wirkung unter annahme
+		// von kosten, etc.
+		
 		return 0;
 	}
 }
