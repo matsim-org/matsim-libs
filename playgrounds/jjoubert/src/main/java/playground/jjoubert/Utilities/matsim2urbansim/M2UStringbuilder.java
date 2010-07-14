@@ -62,7 +62,7 @@ public class M2UStringbuilder {
 	}
 	
 	public String getEmmeTransitLinesByLinkFilename(){
-		return root + studyArea + "/" + version + "/TransitLinesByLink.txt";
+		return root + studyArea + "/" + version + "/Input/TransitLinesByLink.txt";
 	}
 
 	public String getPlansFile() {

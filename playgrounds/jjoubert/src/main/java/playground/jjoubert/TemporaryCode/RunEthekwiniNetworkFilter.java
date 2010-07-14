@@ -62,7 +62,10 @@ import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
+import com.vividsolutions.jts.geom.MultiPolygon;
+
 import playground.jjoubert.Utilities.MyGapReader;
+import playground.jjoubert.Utilities.MyShapefileReader;
 import playground.jjoubert.Utilities.matsim2urbansim.M2UStringbuilder;
 import playground.jjoubert.Utilities.matsim2urbansim.MyZone;
 import playground.jjoubert.Utilities.matsim2urbansim.MyZoneReader;
@@ -108,7 +111,7 @@ public class RunEthekwiniNetworkFilter {
 		PersonalizableTravelCost tc = tccf.createTravelCostCalculator(ttc, s.getConfig().charyparNagelScoring());
 		EventsManagerImpl em = new EventsManagerImpl();
 		em.addHandler(ttc);
-		new EventsReaderTXTv1(em).readFile("/Users/johanwjoubert/MATSim/workspace/MATSimData/eThekwini/2005/100.events_10.txt.gz");
+		new EventsReaderTXTv1(em).readFile(sb.getIterationEventsFile("100"));
 		Dijkstra router = new Dijkstra(s.getNetwork(),tc,ttc);
 		Set<String> ptSet = new TreeSet<String>();
 		ptSet.add(TransportMode.pt);
@@ -121,6 +124,7 @@ public class RunEthekwiniNetworkFilter {
 				String line = null;
 				int ptCounter = 0;
 				int directCounter = 0;
+				String allPt = "";
 				while((line = br.readLine()) != null){
 					String[] link = line.split("\t");
 					if(link.length > 8){
@@ -128,6 +132,7 @@ public class RunEthekwiniNetworkFilter {
 							// It is car... or free for all.
 						} else{
 							// It has public transport modes.
+							allPt += link[8];
 							ptCounter++;
 							Path p = null;
 							Node oNode = s.getNetwork().getNodes().get(new IdImpl(link[1]));
@@ -168,12 +173,13 @@ public class RunEthekwiniNetworkFilter {
 					}
 				}
 				log.info("Found " + ptCounter + " node-pairs serviced by transit (" + directCounter + " direct )");
-				
+				log.info(allPt);
 			} finally{
 				br.close();
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			throw new RuntimeException("Must have a file to be able to derive a transit network.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -183,16 +189,18 @@ public class RunEthekwiniNetworkFilter {
 		NetworkWriter nw = new NetworkWriter(sPt.getNetwork());
 		nw.writeFileV1(sb.getEmmePtNetworkFilename());
 		log.info("Network filterted and written to " + sb.getEmmePtNetworkFilename());
-		// Write to ESRI shapefile.
+		// Write to ESRI shapefile.------------------------
 //		FeatureGeneratorBuilder fgb = new FeatureGeneratorBuilderImpl(sPt.getNetwork(), "WGS84_UTM36S");
-//		Links2ESRIShape l2e = new Links2ESRIShape(sPt.getNetwork(),"/Users/johanwjoubert/Desktop/PT.shp", fgb);
+//		Links2ESRIShape l2e = new Links2ESRIShape(sPt.getNetwork(),"C:/temp/Eclipse/PT.shp", fgb);
 //		l2e.write();
-//		l2e = new Links2ESRIShape(s.getNetwork(), "/Users/johanwjoubert/Desktop/All.shp", "WGS84_UTM36S");
+//		l2e = new Links2ESRIShape(s.getNetwork(), "C:/temp/Eclipse/All.shp", "WGS84_UTM36S");
 //		l2e.write();
+		//-------------------------------------------------
 		// Read subplace shapefile.
 		MyZoneReader mzr = new MyZoneReader(sb.getSubPlaceShapefile());
 		mzr.readZones(2);
 		List<MyZone> spList = mzr.getZones();
+		
 		log.info("Read sub-place shapefile: " + spList.size() + " entries for " + studyAreaName);
 		int smallCounter = 0;
 		for(MyZone mz : spList){
@@ -263,7 +271,7 @@ public class RunEthekwiniNetworkFilter {
 		try {
 			BufferedWriter bw = IOUtils.getBufferedWriter(sb.getSubPlaceDistanceFilename());
 			try{
-				bw.write("SP_ID,Dist,Weight,W_Dist");
+				bw.write("SP_ID,Dist,Weight");
 				bw.newLine();
 				for(MyZone mz : spList){
 					Double dist = distanceMap.get(mz.getId());
@@ -274,8 +282,6 @@ public class RunEthekwiniNetworkFilter {
 						bw.write(String.valueOf(dist));
 						bw.write(",");
 						bw.write(String.valueOf(weight));
-						bw.write(",");
-						bw.write(String.valueOf(dist*weight));
 						bw.newLine();						
 					} else{
 						log.warn(String.format("Subplace %s: distance %.2f; weight %.2f", mz.getId(), dist, weight));
