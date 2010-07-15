@@ -37,15 +37,6 @@ public class ParkingOccupancyMaintainer {
 	HashMap<Id, ParkingArrivalLog> parkingArrivalLog = new HashMap<Id, ParkingArrivalLog>();
 	
 
-	public HashMap<Id, ParkingArrivalLog> getParkingArrivalLog() {
-		return parkingArrivalLog;
-	}
-
-	public void setParkingArrivalLog(HashMap<Id, ParkingArrivalLog> parkingArrivalLog) {
-		this.parkingArrivalLog = parkingArrivalLog;
-	}
-
-
 
 	// id: facilityId
 	// value: ParkingOccupancyBins
@@ -63,6 +54,13 @@ public class ParkingOccupancyMaintainer {
 		return parkingOccupancyBins;
 	}
 
+	public HashMap<Id, ParkingArrivalLog> getParkingArrivalLog() {
+		return parkingArrivalLog;
+	}
+
+	public void setParkingArrivalLog(HashMap<Id, ParkingArrivalLog> parkingArrivalLog) {
+		this.parkingArrivalLog = parkingArrivalLog;
+	}
 	
 
 	private Controler controler;

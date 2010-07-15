@@ -8,6 +8,7 @@ import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingCapacity;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyMaintainer;
+import playground.wrashid.parkingSearch.planLevel.parkingActivityDuration.ParkingActivityDuration;
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
 
 public class ParkingRoot {
@@ -18,7 +19,12 @@ public class ParkingRoot {
 	private static double parkingPriceScoreScalingFactor;
 	private static double parkingActivityDurationPenaltyScalingFactor;
 	private static ParkingOccupancyMaintainer parkingOccupancyMaintainer;
+	private static ParkingActivityDuration parkingActivityDuration;
 	
+	public static ParkingActivityDuration getParkingActivityDuration() {
+		return parkingActivityDuration;
+	}
+
 	public static double getPriceScoreScalingFactor() {
 		return parkingPriceScoreScalingFactor;
 	}
@@ -31,7 +37,8 @@ public class ParkingRoot {
 		cpm = new ClosestParkingMatrix(facilities, network);
 		lpfa = new LinkParkingFacilityAssociation(facilities, network);
 		pc = new ParkingCapacity(facilities);
-
+		parkingActivityDuration= new ParkingActivityDuration();
+		
 		String tempStringValue = controler.getConfig().findParam("parking", "parkingPriceScoreScalingFactor");
 		checkIfNull(tempStringValue);
 		parkingPriceScoreScalingFactor = Double.parseDouble(tempStringValue);
@@ -39,6 +46,8 @@ public class ParkingRoot {
 		tempStringValue = controler.getConfig().findParam("parking", "parkingActivityDurationPenaltyScalingFactor");
 		checkIfNull(tempStringValue);
 		parkingActivityDurationPenaltyScalingFactor = Double.parseDouble(tempStringValue);
+		
+		
 	}
 
 	public static ClosestParkingMatrix getClosestParkingMatrix() {

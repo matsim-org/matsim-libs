@@ -22,6 +22,7 @@ package playground.wrashid.parkingSearch.planLevel.replanning;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -62,12 +63,9 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		// identify which parking improvement could render the most gain.
 		// first avoid capacity constraint violations
 		// thereafter try improvements on the other levels.
-		
-		
-		
-		// select a parking 
-		
-		
+
+		// select a parking
+
 		// assign new parking at the work activity and change the plan
 		// accordingly (replace the parking activity before and after the
 		// parking)
@@ -75,71 +73,82 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		ActivityFacilityImpl newParking = (ActivityFacilityImpl) GlobalRegistry.controler.getFacilities().getFacilities()
 				.get(new IdImpl("35"));
 
-		replaceParking(plan, 6, newParking, GlobalRegistry.controler, (NetworkLayer) GlobalRegistry.controler.getNetwork());
+		replaceParking(plan, (ActivityImpl) plan.getPlanElements().get(6), newParking, GlobalRegistry.controler,
+				(NetworkLayer) GlobalRegistry.controler.getNetwork());
 
 	}
 
 	/**
-	 * TODO: also handle case, when planElementIndexOfTargetActivity==0
 	 * 
 	 * replace the parking for the specified activity with the new parking.
-	 * 
+	 * (the first/last activity location in the plan must be at the same faciliy).
 	 * 
 	 * @param plan
-	 * @param planElementIndex
+	 * @param targetActivity
+	 * @param newParking
+	 * @param controler
+	 * @param network
 	 */
-	public static void replaceParking(final Plan plan, int planElementIndexOfTargetActivity, ActivityFacilityImpl newParking,
+	public static void replaceParking(final Plan plan, ActivityImpl targetActivity, ActivityFacilityImpl newParking,
 			Controler controler, NetworkLayer network) {
-		Activity fromAct = null;
-		Activity toAct = null;
-
 		// make new parking activity activity
 
-		ActivityImpl newParkingActivity = new ActivityImpl("parking", newParking.getCoord());
-		newParkingActivity.setFacilityId(newParking.getId());
-		newParkingActivity.setLinkId(network.getNearestLink(newParking.getCoord()).getId());
-		// TODO: one should also be able to set this parameter from outside!!!!
-		newParkingActivity.setDuration(60);
+		ActivityImpl newParkingActivity = createNewParkingActivity(newParking, network, ParkingRoot.getParkingActivityDuration()
+				.getActivityDuration(newParking.getId(), plan.getPerson().getId()));
 
 		// change the previous and next parking of the targetActivity
 
-		plan.getPlanElements().remove(planElementIndexOfTargetActivity - 2);
-		plan.getPlanElements().add(planElementIndexOfTargetActivity - 2, newParkingActivity);
+		if (isFirstOrLastActivity(plan, targetActivity)) {
+			// for the first/last activity (usually home)
 
-		plan.getPlanElements().remove(planElementIndexOfTargetActivity + 2);
-		plan.getPlanElements().add(planElementIndexOfTargetActivity + 2, newParkingActivity);
+			ActivityImpl firstActivity = (ActivityImpl) plan.getPlanElements().get(0);
+			ActivityImpl lastActivity = (ActivityImpl) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+			
+			// if first and last activity are not at the same location, assumption made by parking is wrong.
+			if (!firstActivity.getFacilityId().toString().equalsIgnoreCase(lastActivity.getFacilityId().toString())){
+				throw new Error("first and last activity must be at the same location.");
+			}
 
-		// peform rerouting: from previous activity to parking
+			changeNextParking(plan, firstActivity, newParkingActivity);
+			changePreviousParking(plan, lastActivity, newParkingActivity);
+		} else {
+			// for activities in between
+			changePreviousParking(plan, targetActivity, newParkingActivity);
+			changeNextParking(plan, targetActivity, newParkingActivity);
+		}
 
-		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
-		leg.setDepartureTime(0.0);
-		leg.setTravelTime(0.0);
-		leg.setArrivalTime(0.0);
-
-		// fromAct = (Activity)
-		// plan.getPlanElements().get(planElementIndexOfTargetActivity - 4);
-		// toAct = (Activity)
-		// plan.getPlanElements().get(planElementIndexOfTargetActivity - 2);
+		// peform rerouting
 
 		PlansCalcRoute router = getRoutingAlgorithm(controler);
-		// router.handleLeg(plan.getPerson(), leg, fromAct, toAct,
-		// fromAct.getEndTime());
-
-		// peform rerouting: from parking to next activity (after completion of
-		// targetActivity)
-
-		// fromAct = (Activity)
-		// plan.getPlanElements().get(planElementIndexOfTargetActivity + 2);
-		// toAct = (Activity)
-		// plan.getPlanElements().get(planElementIndexOfTargetActivity + 4);
-
 		router = getRoutingAlgorithm(controler);
-
 		router.run(plan);
+	}
 
-		// router.handleLeg(plan.getPerson(), leg, fromAct, toAct,
-		// fromAct.getEndTime());
+	private static boolean isFirstOrLastActivity(final Plan plan, ActivityImpl targetActivity) {
+		List<PlanElement> pe = plan.getPlanElements();
+		return pe.indexOf(targetActivity) == 0 || pe.indexOf(targetActivity) == pe.size() - 1;
+	}
 
+	private static void changePreviousParking(final Plan plan, ActivityImpl targetActivity, ActivityImpl newParkingActivity) {
+		int planElementIndexOfTargetActivity = plan.getPlanElements().indexOf(targetActivity);
+		plan.getPlanElements().remove(planElementIndexOfTargetActivity - 2);
+		plan.getPlanElements().add(planElementIndexOfTargetActivity - 2, newParkingActivity);
+	}
+
+	private static void changeNextParking(final Plan plan, ActivityImpl targetActivity, ActivityImpl newParkingActivity) {
+		int planElementIndexOfTargetActivity = plan.getPlanElements().indexOf(targetActivity);
+		plan.getPlanElements().remove(planElementIndexOfTargetActivity + 2);
+		plan.getPlanElements().add(planElementIndexOfTargetActivity + 2, newParkingActivity);
+	}
+
+	private static ActivityImpl createNewParkingActivity(ActivityFacilityImpl newParking, NetworkLayer network,
+			double parkingActivityDuration) {
+		ActivityImpl newParkingActivity = new ActivityImpl("parking", newParking.getCoord());
+		newParkingActivity.setFacilityId(newParking.getId());
+		newParkingActivity.setLinkId(network.getNearestLink(newParking.getCoord()).getId());
+		newParkingActivity.setDuration(parkingActivityDuration);
+
+		return newParkingActivity;
 	}
 
 	private static PlansCalcRoute getRoutingAlgorithm(Controler controler) {

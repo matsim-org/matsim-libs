@@ -7,57 +7,72 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.Reflection;
+import playground.wrashid.parkingSearch.planLevel.BaseScenario;
 import playground.wrashid.parkingSearch.planLevel.LinkFacilityAssociationTest;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
+import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
 
-public class ParkingPlanAlgorithmTest extends MatsimTestCase {
+public class ParkingPlanAlgorithmTest extends MatsimTestCase implements IterationStartsListener {
+
+	ParkingBookKeeper parkingBookKeeper = null;
 
 	public void testReplaceParking() {
 		Controler controler;
-		String configFilePath="test/input/playground/wrashid/parkingSearch/planLevel/chessConfig2.xml";
+		String configFilePath = "test/input/playground/wrashid/parkingSearch/planLevel/chessConfig3.xml";
 		controler = new Controler(configFilePath);
-		
-		ScenarioImpl sc = new ScenarioImpl();
 
-		NetworkLayer net = LinkFacilityAssociationTest.loadNetwork(sc);
+		BaseScenario bs = new BaseScenario(controler);
+		parkingBookKeeper = bs.parkingBookKeeper;
 
-		Plan plan = sc.getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan();
+		controler.addControlerListener(this);
 
-		// init parkings
-		ParkingRoot.init(sc.getActivityFacilities(), net, controler);
-		
+		controler.run();
+
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		Plan plan = GlobalRegistry.controler.getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan();
+
 		// confirm the parking before the change (and compare it after the change)
-		
+
 		assertEquals("36", ((Activity) plan.getPlanElements().get(4)).getFacilityId().toString());
 		assertEquals("36", ((Activity) plan.getPlanElements().get(8)).getFacilityId().toString());
-		
+
 		// change the parking for the work activity to facility 35, instead of 36
-		
-		ActivityFacilityImpl newParking = ParkingRoot.getClosestParkingMatrix()
-				.getClosestParkings(sc.getActivityFacilities().getFacilities().get(new IdImpl("35")).getCoord(), 1, 0).get(0);
 
-//		ParkingPlanAlgorithm.replaceParking(plan, 6, newParking, controler, net);
+		ActivityFacilityImpl newParking = (ActivityFacilityImpl) GlobalRegistry.controler.getFacilities().getFacilities()
+				.get(new IdImpl("35"));
 
-		// test, if the facility has changed
+		ParkingPlanAlgorithm.replaceParking(plan, (ActivityImpl) plan.getPlanElements().get(6), newParking,
+				GlobalRegistry.controler, (NetworkLayer) GlobalRegistry.controler.getNetwork());
+
+		assertEquals("35", ((Activity) plan.getPlanElements().get(4)).getFacilityId().toString());
+		assertEquals("35", ((Activity) plan.getPlanElements().get(8)).getFacilityId().toString());
+
+		assertEquals("1", ((Activity) plan.getPlanElements().get(0)).getFacilityId().toString());
+		assertEquals("1", ((Activity) plan.getPlanElements().get(12)).getFacilityId().toString());
+
+		// change the parking for the home activity to facility 35, instead of 36
 		
-//		assertEquals("35", ((Activity) plan.getPlanElements().get(4)).getFacilityId().toString());
-//		assertEquals("35", ((Activity) plan.getPlanElements().get(8)).getFacilityId().toString());
-		
-		
-		// check, if rerouting happened properly		
-			
-		
-		
-		
-		// test if the route has been changed????
+		ParkingPlanAlgorithm.replaceParking(plan, (ActivityImpl) plan.getPlanElements().get(0), newParking,
+				GlobalRegistry.controler, (NetworkLayer) GlobalRegistry.controler.getNetwork());
+
+		assertEquals("35", ((Activity) plan.getPlanElements().get(2)).getFacilityId().toString());
+		assertEquals("35", ((Activity) plan.getPlanElements().get(10)).getFacilityId().toString());
 
 	}
 
