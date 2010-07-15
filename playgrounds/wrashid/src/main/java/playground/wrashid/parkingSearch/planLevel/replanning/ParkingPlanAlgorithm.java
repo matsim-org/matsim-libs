@@ -44,6 +44,9 @@ import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -56,13 +59,24 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
 	public void run(final Plan plan) {
 
-		// assign new parking at the work activity and change the plan accordingly (replace the parking activity before and after the parking)
+		// identify which parking improvement could render the most gain.
+		// first avoid capacity constraint violations
+		// thereafter try improvements on the other levels.
 		
-		ActivityFacilityImpl newParking = (ActivityFacilityImpl) GlobalRegistry.controler.getFacilities().getFacilities().get(new IdImpl("35"));
+		
+		
+		// select a parking 
+		
+		
+		// assign new parking at the work activity and change the plan
+		// accordingly (replace the parking activity before and after the
+		// parking)
+
+		ActivityFacilityImpl newParking = (ActivityFacilityImpl) GlobalRegistry.controler.getFacilities().getFacilities()
+				.get(new IdImpl("35"));
 
 		replaceParking(plan, 6, newParking, GlobalRegistry.controler, (NetworkLayer) GlobalRegistry.controler.getNetwork());
-		
-	
+
 	}
 
 	/**
@@ -80,7 +94,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		Activity toAct = null;
 
 		// make new parking activity activity
-		
+
 		ActivityImpl newParkingActivity = new ActivityImpl("parking", newParking.getCoord());
 		newParkingActivity.setFacilityId(newParking.getId());
 		newParkingActivity.setLinkId(network.getNearestLink(newParking.getCoord()).getId());
@@ -102,29 +116,41 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);
 
-		fromAct = (Activity) plan.getPlanElements().get(planElementIndexOfTargetActivity - 4);
-		toAct = (Activity) plan.getPlanElements().get(planElementIndexOfTargetActivity - 2);
+		// fromAct = (Activity)
+		// plan.getPlanElements().get(planElementIndexOfTargetActivity - 4);
+		// toAct = (Activity)
+		// plan.getPlanElements().get(planElementIndexOfTargetActivity - 2);
 
 		PlansCalcRoute router = getRoutingAlgorithm(controler);
-		router.handleLeg(plan.getPerson(), leg, fromAct, toAct, fromAct.getEndTime());
+		// router.handleLeg(plan.getPerson(), leg, fromAct, toAct,
+		// fromAct.getEndTime());
 
-		// peform rerouting: from parking to next activity (after completion of targetActivity)
-		
-		fromAct = (Activity) plan.getPlanElements().get(planElementIndexOfTargetActivity + 2);
-		toAct = (Activity) plan.getPlanElements().get(planElementIndexOfTargetActivity + 4);
-		
+		// peform rerouting: from parking to next activity (after completion of
+		// targetActivity)
+
+		// fromAct = (Activity)
+		// plan.getPlanElements().get(planElementIndexOfTargetActivity + 2);
+		// toAct = (Activity)
+		// plan.getPlanElements().get(planElementIndexOfTargetActivity + 4);
+
 		router = getRoutingAlgorithm(controler);
-		router.handleLeg(plan.getPerson(), leg, fromAct, toAct, fromAct.getEndTime());
+
+		router.run(plan);
+
+		// router.handleLeg(plan.getPerson(), leg, fromAct, toAct,
+		// fromAct.getEndTime());
 
 	}
 
-
 	private static PlansCalcRoute getRoutingAlgorithm(Controler controler) {
-		TravelTimeDistanceCostCalculator ttdcc = new TravelTimeDistanceCostCalculator(controler.getTravelTimeCalculator(),
+		TravelTime travelTime = controler.getTravelTimeCalculator();
+		PersonalizableTravelCost travelCost = controler.getTravelCostCalculatorFactory().createTravelCostCalculator(travelTime,
 				controler.getConfig().charyparNagelScoring());
 
-		return new PlansCalcRoute(new PlansCalcRouteConfigGroup(), controler.getNetwork(),
-				controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), new DijkstraFactory());
+		LeastCostPathCalculatorFactory leastCostFactory = controler.getLeastCostPathCalculatorFactory();
+
+		return new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(), travelCost, travelTime,
+				leastCostFactory);
 	}
 
 }

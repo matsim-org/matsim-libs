@@ -49,6 +49,13 @@ public class ParkingOccupancyMaintainerTest extends TestCase implements Shutdown
 		assertEquals(true, pcfl.isParkingFullAtTime(0));
 		
 		assertEquals(false, pcfl.isParkingFullAtTime(38000));
+		
+		
+		ParkingArrivalLog pal=parkingBookKeeper.getParkingOccupancyMaintainer().getParkingArrivalLog().get(new IdImpl(1));
+		
+		assertEquals(2, pal.getParkingArrivalInfoList().size());
+		
+		
 	}
 
 	

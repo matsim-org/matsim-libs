@@ -31,6 +31,21 @@ public class ParkingOccupancyMaintainer {
 	// id: personId
 	// value: facilityId
 	HashMap<Id, Id> currentParkingFacilityId = new HashMap<Id, Id>();
+	
+	// id: personId
+	// value: ParkingArrivalLog
+	HashMap<Id, ParkingArrivalLog> parkingArrivalLog = new HashMap<Id, ParkingArrivalLog>();
+	
+
+	public HashMap<Id, ParkingArrivalLog> getParkingArrivalLog() {
+		return parkingArrivalLog;
+	}
+
+	public void setParkingArrivalLog(HashMap<Id, ParkingArrivalLog> parkingArrivalLog) {
+		this.parkingArrivalLog = parkingArrivalLog;
+	}
+
+
 
 	// id: facilityId
 	// value: ParkingOccupancyBins
@@ -96,6 +111,13 @@ public class ParkingOccupancyMaintainer {
 			
 			parkingCapacityFullTimes.get(parkingFacilityId).logParkingFull(time);
 		}
+		
+		// log arrival time at parking
+		if (!parkingArrivalLog.containsKey(personId)){
+			parkingArrivalLog.put(personId, new ParkingArrivalLog());
+		}
+		parkingArrivalLog.get(personId).addParkingArrivalInfo(parkingFacilityId, time);
+		
 	}
 
 	public void logDepartureFromParking(ActivityEndEvent event) {
