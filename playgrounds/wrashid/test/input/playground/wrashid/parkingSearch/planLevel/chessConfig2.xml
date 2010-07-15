@@ -107,6 +107,7 @@
 		<param name="defaultParkingPriceForAllParkings" value="1.0" />
 		<!-- used for calibration: how important is parking compared to the other score parts -->
 		<param name="parkingPriceScoreScalingFactor" value="1.0" />
+		<param name="parkingActivityDurationPenaltyScalingFactor" value="1.0" />
 	</module>
 	
 	<module name="locationchoice">
