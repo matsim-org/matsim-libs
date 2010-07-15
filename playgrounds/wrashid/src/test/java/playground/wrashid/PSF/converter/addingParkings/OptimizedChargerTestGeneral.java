@@ -37,8 +37,8 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 /*
  * Just testing, that the scenario runs without errors.
  */
-/*package*/ class OptimizedChargerTestGeneral extends MatsimTestCase implements
-		ParametersPSFMutator {
+
+class OptimizedChargerTestGeneral extends MatsimTestCase implements ParametersPSFMutator {
 
 	Controler controler;
 
@@ -54,11 +54,9 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 	public void optimizedChargerTest() {
 		controler.addControlerListener(new AddEnergyScoreListener());
 
-		LogEnergyConsumption logEnergyConsumption = new LogEnergyConsumption(
-				controler);
+		LogEnergyConsumption logEnergyConsumption = new LogEnergyConsumption(controler);
 		LogParkingTimes logParkingTimes = new LogParkingTimes(controler);
-		SimulationStartupListener simulationStartupListener = new SimulationStartupListener(
-				controler);
+		SimulationStartupListener simulationStartupListener = new SimulationStartupListener(controler);
 		controler.addControlerListener(simulationStartupListener);
 
 		simulationStartupListener.addEventHandler(logEnergyConsumption);
@@ -67,14 +65,12 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 
 		controler.run();
 
-		OptimizedCharger optimizedCharger = new OptimizedCharger(
-				logEnergyConsumption.getEnergyConsumption(), logParkingTimes
-						.getParkingTimes(), Double.parseDouble(controler.getConfig().findParam("PSF", "default.maxBatteryCapacity")));
-		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger
-				.getChargingTimes();
+		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(),
+				logParkingTimes.getParkingTimes(), Double.parseDouble(controler.getConfig().findParam("PSF",
+						"default.maxBatteryCapacity")));
+		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
 
-		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(new IdImpl(
-				"66805"));
+		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(new IdImpl("66805"));
 
 		// the agent charges once at home in the evening (during off peak time),
 		// because the energy consumption
