@@ -82,6 +82,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	}
 
 	private int increaseAgentPlanElementIndex(final Id personId) {
+		// yyyy this is one occasion where a "central" plan status pointer imo would make life easier.  kai, jul'10
 		Integer index = this.agentPlanElementIndex.get(personId);
 		if (index == null) {
 			this.agentPlanElementIndex.put(personId, Integer.valueOf(1));
