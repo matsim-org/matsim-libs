@@ -80,6 +80,12 @@ public class PlanScoreForecaster4onlyTravPt {
 		this.oldSelected = (PlanImpl) oldSelected;
 	}
 
+	public PlanScoreForecaster4onlyTravPt(Plan selectedPlan, Plan oldSelected,
+			NetworkImpl net, TravelTime tt,
+			CharyparNagelScoringConfigGroup scoring, double d0, double d1) {
+
+	}
+
 	public double getPlanScore() {
 		// boolean fistActDone = false;
 		// for (PlanElement pe : this.plan.getPlanElements()) {
