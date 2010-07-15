@@ -7,6 +7,7 @@ import org.matsim.core.network.NetworkLayer;
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingCapacity;
+import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyMaintainer;
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
 
 public class ParkingRoot {
@@ -16,6 +17,7 @@ public class ParkingRoot {
 	private static ParkingCapacity pc = null;
 	private static double parkingPriceScoreScalingFactor;
 	private static double parkingActivityDurationPenaltyScalingFactor;
+	private static ParkingOccupancyMaintainer parkingOccupancyMaintainer;
 	
 	public static double getPriceScoreScalingFactor() {
 		return parkingPriceScoreScalingFactor;
@@ -59,6 +61,14 @@ public class ParkingRoot {
 			throw new Error("Please initialize the variables first.");
 		}
 
+	}
+
+	public static void setParkingOccupancyMaintainer(ParkingOccupancyMaintainer _parkingOccupancyMaintainer) {
+		parkingOccupancyMaintainer=_parkingOccupancyMaintainer;	
+	}
+	
+	public static ParkingOccupancyMaintainer getParkingOccupancyMaintainer() {
+		return parkingOccupancyMaintainer;	
 	}
 
 }

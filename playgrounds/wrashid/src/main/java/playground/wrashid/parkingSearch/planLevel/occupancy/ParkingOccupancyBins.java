@@ -2,6 +2,8 @@ package playground.wrashid.parkingSearch.planLevel.occupancy;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.wrashid.lib.GeneralLib;
+
 /**
  * 15 minute bins for the whole day (96 bins) for one single parking.
  * 
@@ -24,52 +26,46 @@ public class ParkingOccupancyBins {
 			occupancy[i] = 0;
 		}
 	}
-	
-	public int getOccupancy(double time){
-		int binIndex=getBinIndex(time);
-		
+
+	public int getOccupancy(double time) {
+		int binIndex = getBinIndex(time);
+
 		return occupancy[binIndex];
 	}
-	
 
-	public void inrementParkingOccupancy(double startTime, double endTime){
-		int startBinIndex=getBinIndex(startTime);
-		int endBinIndex=getBinIndex(endTime);
-		
-		if (startBinIndex>endBinIndex){
-			
-			for (int i=startBinIndex;i<96;i++){
+	public void inrementParkingOccupancy(double startTime, double endTime) {
+		int startBinIndex = getBinIndex(startTime);
+		int endBinIndex = getBinIndex(endTime);
+
+		if (startBinIndex > endBinIndex) {
+
+			for (int i = startBinIndex; i < 96; i++) {
 				occupancy[i]++;
 			}
-			
-			for (int i=0;i<=endBinIndex;i++){
+
+			for (int i = 0; i <= endBinIndex; i++) {
 				occupancy[i]++;
 			}
-			
+
 		} else {
-			for (int i=startBinIndex;i<=endBinIndex;i++){
+			for (int i = startBinIndex; i <= endBinIndex; i++) {
 				occupancy[i]++;
 			}
 		}
 	}
-	
 
 	/**
 	 * return value is in [0,96)
 	 * 
-	 * if time is > 60*60*24 [seconds], it will be projected into next day, e.g.
-	 * time=60*60*24+1=1
+	 * 
 	 * 
 	 * @param time
 	 * @return
 	 */
 	public int getBinIndex(double time) {
-		double secondsInOneDay = 60 * 60 * 24;
 
-		if (time >= secondsInOneDay) {
-			time = ((time / secondsInOneDay) - (Math.floor(time / secondsInOneDay))) * secondsInOneDay;
-		}
-
+		time=GeneralLib.projectTimeWithin24Hours(time);
+		
 		return Math.round((float) Math.floor(time / 900.0));
 	}
 

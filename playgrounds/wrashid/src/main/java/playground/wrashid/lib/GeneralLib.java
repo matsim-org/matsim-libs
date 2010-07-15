@@ -31,7 +31,7 @@ public class GeneralLib {
 
 	/*
 	 * Reads the population from the plans file.
-	 *
+	 * 
 	 * Note: use the other method with the same name, if this poses problems.
 	 */
 	public static Scenario readPopulation(String plansFile, String networkFile) {
@@ -74,7 +74,7 @@ public class GeneralLib {
 	}
 
 	public static ActivityFacilitiesImpl readActivityFacilities(String facilitiesFile) {
-		ScenarioImpl scenario = new ScenarioImpl(); 
+		ScenarioImpl scenario = new ScenarioImpl();
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		return facilities;
@@ -89,9 +89,9 @@ public class GeneralLib {
 
 	/**
 	 * Write out a list of Strings
-	 *
+	 * 
 	 * after each String in the list a "\n" is added.
-	 *
+	 * 
 	 * @param list
 	 * @param fileName
 	 */
@@ -115,9 +115,9 @@ public class GeneralLib {
 	/**
 	 * if headerLine=null, then add no line at top of file. "\n" is added at end
 	 * of first line by this method.
-	 *
+	 * 
 	 * matrix[numberOfRows][numberOfColumns]
-	 *
+	 * 
 	 * @param matrix
 	 * @param fileName
 	 * @param headerLine
@@ -144,8 +144,8 @@ public class GeneralLib {
 
 	/**
 	 * reads in data from a file.
-	 *
-	 *
+	 * 
+	 * 
 	 * @param numberOfRows
 	 * @param numberOfColumns
 	 * @param ignoreFirstLine
@@ -219,7 +219,7 @@ public class GeneralLib {
 
 	/**
 	 * TODO This method
-	 *
+	 * 
 	 * @param fileName
 	 * @return
 	 */
@@ -257,6 +257,7 @@ public class GeneralLib {
 
 	/**
 	 * TODO: write test.
+	 * 
 	 * @param sourceFilePath
 	 * @param targetFilePath
 	 */
@@ -284,10 +285,10 @@ public class GeneralLib {
 		copyDirectory("C:\\tmp\\abcd", "C:\\tmp\\aaab");
 	}
 
-	public static double[][] initializeMatrix(double[][] matrix){
-		for (int i=0;i<matrix.length;i++){
-			for (int j=0;j<matrix[0].length;j++){
-				matrix[i][j]=0;
+	public static double[][] initializeMatrix(double[][] matrix) {
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[0].length; j++) {
+				matrix[i][j] = 0;
 			}
 		}
 		return matrix;
@@ -295,8 +296,8 @@ public class GeneralLib {
 
 	/**
 	 * energyUsageStatistics[number of values][number of functions]
-	 *
-	 *
+	 * 
+	 * 
 	 * @param fileName
 	 * @param energyUsageStatistics
 	 * @param title
@@ -306,8 +307,8 @@ public class GeneralLib {
 	public static void writeGraphic(String fileName, double[][] energyUsageStatistics, String title, String xLabel, String yLabel) {
 		XYLineChart chart = new XYLineChart(title, xLabel, yLabel);
 
-		int numberOfXValues=energyUsageStatistics.length;
-		int numberOfFunctions=energyUsageStatistics[0].length;
+		int numberOfXValues = energyUsageStatistics.length;
+		int numberOfFunctions = energyUsageStatistics[0].length;
 
 		double[] time = new double[numberOfXValues];
 
@@ -327,24 +328,68 @@ public class GeneralLib {
 		chart.saveAsPng(fileName, 800, 600);
 	}
 
-	public static double[][] scaleMatrix(double[][] matrix, double scalingFactor){
-		int numberOfRows=matrix.length;
-		int numberOfColumns=matrix[0].length;
+	public static double[][] scaleMatrix(double[][] matrix, double scalingFactor) {
+		int numberOfRows = matrix.length;
+		int numberOfColumns = matrix[0].length;
 
-		double[][] resultMatrix=new double[numberOfRows][numberOfColumns];
+		double[][] resultMatrix = new double[numberOfRows][numberOfColumns];
 
-		for (int i=0;i<numberOfRows;i++){
-			for (int j=0;j<numberOfColumns;j++){
-				resultMatrix[i][j]=matrix[i][j]*scalingFactor;
+		for (int i = 0; i < numberOfRows; i++) {
+			for (int j = 0; j < numberOfColumns; j++) {
+				resultMatrix[i][j] = matrix[i][j] * scalingFactor;
 			}
 		}
 
 		return resultMatrix;
 	}
 
+	/**
+	 * If time is > 60*60*24 [seconds], it will be projected into next day, e.g.
+	 * time=60*60*24+1=1
+	 * 
+	 * @param time
+	 * @return
+	 */
+	public static double projectTimeWithin24Hours(double time) {
+		double secondsInOneDay = 60 * 60 * 24;
 
+		if (time < secondsInOneDay) {
+			return time;
+		} else {
+			return ((time / secondsInOneDay) - (Math.floor(time / secondsInOneDay))) * secondsInOneDay;
+		}
+	}
 
+	/**
+	 * Interval start and end are inclusive.
+	 * 
+	 * @param startIntervalTime
+	 * @param endIntervalTime
+	 * @param timeToCheck
+	 * @return
+	 */
+	public static boolean isIn24HourInterval(double startIntervalTime, double endIntervalTime, double timeToCheck) {
+		errorIfNot24HourProjectedTime(startIntervalTime);
+		errorIfNot24HourProjectedTime(endIntervalTime);
+		errorIfNot24HourProjectedTime(timeToCheck);
 
+		if (startIntervalTime < endIntervalTime && timeToCheck >= startIntervalTime && timeToCheck <= endIntervalTime) {
+			return true;
+		}
 
+		if (startIntervalTime > endIntervalTime && (timeToCheck >= startIntervalTime || timeToCheck <= endIntervalTime)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static void errorIfNot24HourProjectedTime(double time) {
+		double secondsInOneDay = 60 * 60 * 24;
+
+		if (time >= secondsInOneDay) {
+			throw new Error("time not projected within 24 hours!");
+		}
+	}
 
 }

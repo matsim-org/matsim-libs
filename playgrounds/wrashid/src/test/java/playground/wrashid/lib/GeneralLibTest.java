@@ -57,4 +57,23 @@ public class GeneralLibTest extends MatsimTestCase {
 
 		assertEquals(2.0, matrix[0][0]);
 	}
+	
+	
+	public void testProjectTimeWithin24Hours(){
+		assertEquals(10.0,GeneralLib.projectTimeWithin24Hours(10.0));
+		assertEquals(0.0,GeneralLib.projectTimeWithin24Hours(60*60*24.0));
+		assertEquals(1.0,GeneralLib.projectTimeWithin24Hours(60*60*24.0+1),0.1);
+	}
+	
+	
+	public void testIsIn24HourInterval(){
+		assertEquals(true,GeneralLib.isIn24HourInterval(0.0, 10.0, 9.0));
+		assertEquals(false,GeneralLib.isIn24HourInterval(0.0, 10.0, 11.0));
+		assertEquals(true,GeneralLib.isIn24HourInterval(0.0, 10.0, 0.0));
+		assertEquals(true,GeneralLib.isIn24HourInterval(0.0, 10.0, 10.0));
+		
+		assertEquals(false,GeneralLib.isIn24HourInterval(10.0, 3.0, 9.0));
+		assertEquals(true,GeneralLib.isIn24HourInterval(10.0, 3.0, 11.0));
+		assertEquals(true,GeneralLib.isIn24HourInterval(10.0, 3.0, 2.0));
+	}
 }

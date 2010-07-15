@@ -15,6 +15,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.population.PlanImpl;
 
+import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
+
 public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private Controler controler;
@@ -34,6 +36,8 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 	public ParkingBookKeeper(Controler controler) {
 		this.controler = controler;
 		parkingOccupancyMaintainer=new ParkingOccupancyMaintainer(controler);
+		
+		ParkingRoot.setParkingOccupancyMaintainer(parkingOccupancyMaintainer);
 	}
 
 	public void handleEvent(ActivityStartEvent event) {
