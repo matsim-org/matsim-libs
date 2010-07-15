@@ -45,6 +45,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 	protected double score;
 	private double lastTime;
 	private int index; // the current position in plan.actslegs
+	// yyyy [status pointer] weiteres Beispiel, wo ich das eigenständige Konstruieren des "status index" problematisch finde.  kai, jul'10
 	private double firstActTime;
 	private final int lastActIndex;
 
