@@ -56,8 +56,6 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
-import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationMobsim;
-import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationNetwork;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -95,7 +93,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author mrieser
  * @author dgrether
  */
-public class QueueSimulation implements IOSimulation, ObservableSimulation, CapacityInformationMobsim, VisMobsim, AcceptsFeatures, QSimI {
+public class QueueSimulation implements IOSimulation, ObservableSimulation, VisMobsim, AcceptsFeatures, QSimI {
 	// yyyy not sure if I want this public but something has to give for integration with OTFVis.  kai, may'10
 
 	private int snapshotPeriod = 0;
@@ -639,10 +637,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, Capa
 		return this.network ;
 	}
 
-	@Override
-	public CapacityInformationNetwork getCapacityInformationNetwork() {
-		return this.network ;
-	}
+//	@Override
+//	public CapacityInformationNetwork getCapacityInformationNetwork() {
+//		return this.network ;
+//	}
 
 	@Override
 	public Scenario getScenario() {

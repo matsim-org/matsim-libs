@@ -30,8 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationLink;
-import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationNetwork;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisLink;
@@ -45,7 +43,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
  * @author mrieser
  * @author dgrether
  */
- class QueueNetwork implements VisNetwork, CapacityInformationNetwork {
+ class QueueNetwork implements VisNetwork {
 	private QSimI qSim = null ; // QueueNetwork can exist without qSim, so this is not enforced.
 
 	private final Map<Id, QueueLink> queuelinks;
@@ -102,10 +100,10 @@ import org.matsim.vis.snapshots.writers.VisNode;
 		return Collections.unmodifiableMap(this.queuelinks);
 	}
 
-	@Deprecated // only used by christoph
-	public Map<Id, ? extends CapacityInformationLink> getCapacityInformationLinks() {
-		return Collections.unmodifiableMap( this.queuelinks ) ;
-	}
+//	@Deprecated // only used by christoph
+//	public Map<Id, ? extends CapacityInformationLink> getCapacityInformationLinks() {
+//		return Collections.unmodifiableMap( this.queuelinks ) ;
+//	}
 
 	/*package*/ Map<Id, QueueNode> getQueueNodes() {
 		return Collections.unmodifiableMap(this.queuenodes);

@@ -36,7 +36,6 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.core.mobsim.queuesim.interfaces.CapacityInformationLink;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -53,7 +52,7 @@ import org.matsim.vis.snapshots.writers.VisVehicle;
  * @author dgrether
  * @author mrieser
  */
-class QueueLink implements VisLink, CapacityInformationLink {
+class QueueLink implements VisLink {
 
 	final private static Logger log = Logger.getLogger(QueueLink.class);
 
@@ -537,15 +536,6 @@ class QueueLink implements VisLink, CapacityInformationLink {
 		return vehicles;
 	}
 
-	// /**
-	// * @return Returns the maximum number of vehicles that can be placed on
-	// the
-	// * link at a time.
-	// */
-	// /*package*/ double getStorageCapacity() {
-	// return this.storageCapacity;
-	// }
-
 	/**
 	 * @return the total storage capacity available on that link (includes the
 	 *         space on lanes if available) <br/>
@@ -557,8 +547,7 @@ class QueueLink implements VisLink, CapacityInformationLink {
 	@Deprecated
 	// it is preferred to either use the "Link" data, or to evaluate events.
 	// kai, may'10
-	@Override
-	public double getStorageCapacity() { // needs to remain public
+	/*package*/ double getStorageCapacity() { // for tests
 		return this.storageCapacity;
 	}
 
@@ -604,7 +593,7 @@ class QueueLink implements VisLink, CapacityInformationLink {
 	@Deprecated
 	// it is preferred to either use the "Link" data, or to evaluate events.
 	// kai, may'10
-	public double getSimulatedFlowCapacity() { // needs to remain public
+	/*package*/ double getSimulatedFlowCapacity() { // for tests
 		return this.simulatedFlowCapacity;
 	}
 
