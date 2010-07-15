@@ -22,7 +22,7 @@ public class ClosestParkingMatrixTest extends MatsimTestCase {
 	public void testGetClosestLinks() {
 		ScenarioImpl sc = new ScenarioImpl();
 
-		NetworkLayer net = LinkFacilityAssociationTest.loadNetwork(sc);
+		NetworkLayer net = BaseNonControlerScenario.loadNetwork(sc);
 
 		ClosestParkingMatrix cpm = new ClosestParkingMatrix(sc.getActivityFacilities(), net);
 
@@ -39,7 +39,7 @@ public class ClosestParkingMatrixTest extends MatsimTestCase {
 	public void testGetClosestParkings() {
 		ScenarioImpl sc = new ScenarioImpl();
 
-		NetworkLayer net = LinkFacilityAssociationTest.loadNetwork(sc);
+		NetworkLayer net = BaseNonControlerScenario.loadNetwork(sc);
 
 		ClosestParkingMatrix cpm = new ClosestParkingMatrix(sc.getActivityFacilities(), net);
 
@@ -72,7 +72,7 @@ public class ClosestParkingMatrixTest extends MatsimTestCase {
 	public void testGetOrderedListAccordingToDistanceFromCoord() {
 		ScenarioImpl sc = new ScenarioImpl();
 
-		NetworkLayer net = LinkFacilityAssociationTest.loadNetwork(sc);
+		NetworkLayer net = BaseNonControlerScenario.loadNetwork(sc);
 
 		ClosestParkingMatrix cpm = new ClosestParkingMatrix(sc.getActivityFacilities(), net);
 

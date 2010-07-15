@@ -7,11 +7,11 @@ import playground.wrashid.parkingSearch.planLevel.init.InitializeParkings;
 import playground.wrashid.parkingSearch.planLevel.occupancy.FinishParkingOccupancyMaintainer;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
 
-public class BaseScenario {
+public class BaseControlerScenario {
 	
 	public ParkingBookKeeper parkingBookKeeper;
 
-	public BaseScenario(Controler controler) {
+	public BaseControlerScenario(Controler controler) {
 		controler.setOverwriteFiles(true);
 
 		// add controler for initialization

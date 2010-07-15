@@ -6,7 +6,7 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
-import playground.wrashid.parkingSearch.planLevel.BaseScenario;
+import playground.wrashid.parkingSearch.planLevel.BaseControlerScenario;
 import playground.wrashid.parkingSearch.planLevel.init.InitializeParkings;
 
 import junit.framework.TestCase;
@@ -20,7 +20,7 @@ public class ParkingOccupancyMaintainerTest extends TestCase implements Shutdown
 		String configFilePath="test/input/playground/wrashid/parkingSearch/planLevel/chessConfig3.xml";
 		controler = new Controler(configFilePath);
 		
-		BaseScenario bs= new BaseScenario(controler);
+		BaseControlerScenario bs= new BaseControlerScenario(controler);
 		parkingBookKeeper=bs.parkingBookKeeper;
 		
 		controler.addControlerListener(this);

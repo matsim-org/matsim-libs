@@ -22,6 +22,7 @@ package playground.wrashid.parkingSearch.planLevel.replanning;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -35,6 +36,7 @@ import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -54,6 +56,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.Reflection;
+import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ParkingPlanAlgorithm implements PlanAlgorithm {
@@ -66,22 +69,62 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
 		// select a parking
 
-		// assign new parking at the work activity and change the plan
-		// accordingly (replace the parking activity before and after the
-		// parking)
+		// targetActivity for which the parking should be changed
+		ActivityImpl targetActivity = null;
 
-		ActivityFacilityImpl newParking = (ActivityFacilityImpl) GlobalRegistry.controler.getFacilities().getFacilities()
-				.get(new IdImpl("35"));
+		LinkedList<ActivityImpl> targetActivitiesWithParkingCapacityViolations = ParkingRoot.getParkingOccupancyMaintainer()
+				.getActivitiesWithParkingConstraintViolations(plan);
 
-		replaceParking(plan, (ActivityImpl) plan.getPlanElements().get(6), newParking, GlobalRegistry.controler,
-				(NetworkLayer) GlobalRegistry.controler.getNetwork());
+		if (targetActivitiesWithParkingCapacityViolations.size() != 0) {
+			// if some parking capacities were violated by current plan, change
+			// one of the parkings which
+			// violated the plan.
 
+			// just select one random parking to be changed.
+			int index = MatsimRandom.getRandom().nextInt(targetActivitiesWithParkingCapacityViolations.size());
+			targetActivity = targetActivitiesWithParkingCapacityViolations.get(index);
+		} else {
+			// if no parking capacity violation happened, then select a random
+			// parking and try to improve it.
+
+			LinkedList<ActivityImpl> parkingTargetActivities = ParkingGeneralLib.getParkingTargetActivities(plan);
+			int index = MatsimRandom.getRandom().nextInt(parkingTargetActivities.size());
+			targetActivity = parkingTargetActivities.get(index);
+		}
+
+		// for the selected target activity, now select the new parking
+		
+		// we could either just select the best parking or
+		// we can select the parkings according to probabilities (the higher the score the higher the 
+		// probabilities, we can argue, that a person does not just take the best parking but one among the best
+		// therefore we have such an uncertainty.
+		
+		// we could compare the two results(by implementing both variants).
+		
+		// first we perform a ranking of the available parkings close to the target Activity.
+		
+			// TODO: continue HERE #######################
+		
+		// then we select the parking (best or probability)
+		
+		ActivityFacilityImpl newParking=null;
+		
+			// TODO: continue HERE ####################
+		
+		
+		// replaceParking
+
+		// TODO: call the method here.
+		replaceParking(plan, targetActivity, newParking, GlobalRegistry.controler , (NetworkLayer) GlobalRegistry.controler.getNetwork());
+		
+		
+		// TODO: GENARLIZE replaceParking... (method below)
 	}
 
 	/**
 	 * 
-	 * replace the parking for the specified activity with the new parking.
-	 * (the first/last activity location in the plan must be at the same faciliy).
+	 * replace the parking for the specified activity with the new parking. (the
+	 * first/last activity location in the plan must be at the same faciliy).
 	 * 
 	 * @param plan
 	 * @param targetActivity
@@ -103,9 +146,10 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
 			ActivityImpl firstActivity = (ActivityImpl) plan.getPlanElements().get(0);
 			ActivityImpl lastActivity = (ActivityImpl) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
-			
-			// if first and last activity are not at the same location, assumption made by parking is wrong.
-			if (!firstActivity.getFacilityId().toString().equalsIgnoreCase(lastActivity.getFacilityId().toString())){
+
+			// if first and last activity are not at the same location,
+			// assumption made by parking is wrong.
+			if (!firstActivity.getFacilityId().toString().equalsIgnoreCase(lastActivity.getFacilityId().toString())) {
 				throw new Error("first and last activity must be at the same location.");
 			}
 

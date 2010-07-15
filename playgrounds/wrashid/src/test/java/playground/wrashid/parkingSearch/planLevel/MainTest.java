@@ -35,7 +35,7 @@ public class MainTest extends MatsimTestCase {
 		String configFilePath="test/input/playground/wrashid/parkingSearch/planLevel/chessConfig2.xml";
 		controler = new Controler(configFilePath);
 		
-		new BaseScenario(controler);
+		new BaseControlerScenario(controler);
 		
 		controler.run();
 	}

@@ -6,10 +6,12 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
@@ -31,12 +33,10 @@ public class ParkingOccupancyMaintainer {
 	// id: personId
 	// value: facilityId
 	HashMap<Id, Id> currentParkingFacilityId = new HashMap<Id, Id>();
-	
+
 	// id: personId
 	// value: ParkingArrivalLog
 	HashMap<Id, ParkingArrivalLog> parkingArrivalLog = new HashMap<Id, ParkingArrivalLog>();
-	
-
 
 	// id: facilityId
 	// value: ParkingOccupancyBins
@@ -45,6 +45,37 @@ public class ParkingOccupancyMaintainer {
 	// id: facilityId
 	// value: ParkingCapacityFullLogger
 	HashMap<Id, ParkingCapacityFullLogger> parkingCapacityFullTimes = new HashMap<Id, ParkingCapacityFullLogger>();
+
+	public LinkedList<ActivityImpl> getActivitiesWithParkingConstraintViolations(Plan plan) {
+		Id personId = plan.getPerson().getId();
+		LinkedList<Id> parkingFacilityIds = ParkingGeneralLib.getAllParkingFacilityIds(plan);
+		// this list is initialized with all parking target activities and later
+		// filtered
+		LinkedList<ActivityImpl> targetActivitiesWithParkingCapacityViolations = ParkingGeneralLib
+				.getParkingTargetActivities(plan);
+
+		for (int i = 0; i < parkingFacilityIds.size(); i++) {
+			Id parkingFacilityId = parkingFacilityIds.get(i);
+
+			ParkingArrivalInfo pai = parkingArrivalLog.get(personId).getParkingArrivalInfoList().get(i);
+
+			double parkingArrivalTime = pai.getArrivalTime();
+
+			// a consistency check of the system. It might be removed later (and
+			// also the pai.facilityId field) later.
+			if (!pai.getFacilityId().toString().equalsIgnoreCase(parkingFacilityId.toString())) {
+				throw new Error("the facility Ids are inconsistent");
+			}
+
+			// if no parking violation happend at the parking, remove it from
+			// the list.
+			if (!parkingCapacityFullTimes.get(parkingFacilityId).isParkingFullAtTime(parkingArrivalTime)) {
+				targetActivitiesWithParkingCapacityViolations.remove(i);
+			}
+		}
+
+		return targetActivitiesWithParkingCapacityViolations;
+	}
 
 	public HashMap<Id, ParkingCapacityFullLogger> getParkingCapacityFullTimes() {
 		return parkingCapacityFullTimes;
@@ -61,79 +92,73 @@ public class ParkingOccupancyMaintainer {
 	public void setParkingArrivalLog(HashMap<Id, ParkingArrivalLog> parkingArrivalLog) {
 		this.parkingArrivalLog = parkingArrivalLog;
 	}
-	
 
 	private Controler controler;
 
 	public ParkingOccupancyMaintainer(Controler controler) {
 		this.controler = controler;
-		
-		//initialize currentParkingOccupancy based on plans
+
+		// initialize currentParkingOccupancy based on plans
 	}
-	
-	public void performInitializationsAfterLoadingControlerData(){
-		for (Person person:controler.getPopulation().getPersons().values()){
-			Id firstParkingFacilityId=ParkingGeneralLib.getFirstParkingFacilityId(person.getSelectedPlan());
-			if (firstParkingFacilityId!=null){
+
+	public void performInitializationsAfterLoadingControlerData() {
+		for (Person person : controler.getPopulation().getPersons().values()) {
+			Id firstParkingFacilityId = ParkingGeneralLib.getFirstParkingFacilityId(person.getSelectedPlan());
+			if (firstParkingFacilityId != null) {
 				currentParkingOccupancy.increment(firstParkingFacilityId);
-			}	
+			}
 		}
 	}
-	
 
 	public void logArrivalAtParking(ActivityStartEvent event) {
 		Id personId = event.getPersonId();
 		Id parkingFacilityId = event.getFacilityId();
-		double time=GeneralLib.projectTimeWithin24Hours(event.getTime());
+		double time = GeneralLib.projectTimeWithin24Hours(event.getTime());
 		startTimeOfCurrentParking.put(personId, event.getTime());
 
-		// this code has been replaced by introduction of parkingCapacityFullTimes
+		// this code has been replaced by introduction of
+		// parkingCapacityFullTimes
 		// delete code, if still here till 15. July 2010.
 		/*
-		if (currentParkingOccupancy.get(parkingFacilityId) >= ParkingRoot.getParkingCapacity().getParkingCapacity(
-				parkingFacilityId)) {
-			capacityViolation.add(event);
-		}
-		*/
+		 * if (currentParkingOccupancy.get(parkingFacilityId) >=
+		 * ParkingRoot.getParkingCapacity().getParkingCapacity(
+		 * parkingFacilityId)) { capacityViolation.add(event); }
+		 */
 
-		currentParkingOccupancy.increment(parkingFacilityId);	
-		
+		currentParkingOccupancy.increment(parkingFacilityId);
+
 		currentParkingFacilityId.put(personId, parkingFacilityId);
-				
-		
-		// log if parking got full 
-		if (currentParkingOccupancy.get(parkingFacilityId)==ParkingRoot.getParkingCapacity().getParkingCapacity(parkingFacilityId)){
-			if (!parkingCapacityFullTimes.containsKey(parkingFacilityId)){
+
+		// log if parking got full
+		if (currentParkingOccupancy.get(parkingFacilityId) == ParkingRoot.getParkingCapacity().getParkingCapacity(
+				parkingFacilityId)) {
+			if (!parkingCapacityFullTimes.containsKey(parkingFacilityId)) {
 				parkingCapacityFullTimes.put(parkingFacilityId, new ParkingCapacityFullLogger());
 			}
-			
+
 			parkingCapacityFullTimes.get(parkingFacilityId).logParkingFull(time);
 		}
-		
+
 		// log arrival time at parking
-		if (!parkingArrivalLog.containsKey(personId)){
+		if (!parkingArrivalLog.containsKey(personId)) {
 			parkingArrivalLog.put(personId, new ParkingArrivalLog());
 		}
 		parkingArrivalLog.get(personId).addParkingArrivalInfo(parkingFacilityId, time);
-		
+
 	}
 
 	public void logDepartureFromParking(ActivityEndEvent event) {
 		Id personId = event.getPersonId();
 		Id parkingFacilityId = event.getFacilityId();
-		double time=GeneralLib.projectTimeWithin24Hours(event.getTime());
-		
+		double time = GeneralLib.projectTimeWithin24Hours(event.getTime());
+
 		currentParkingOccupancy.decrement(event.getFacilityId());
-		
+
 		if (!endTimeOfFirstParking.containsKey(personId)) {
 			// handle departure from first parking
 
 			endTimeOfFirstParking.put(personId, event.getTime());
-			
-			
-			
-			
-			
+
 		} else {
 			// handle departure
 
@@ -143,23 +168,20 @@ public class ParkingOccupancyMaintainer {
 
 			getOccupancyBins(event.getFacilityId()).inrementParkingOccupancy(startTimeOfCurrentParking.get(personId),
 					event.getTime());
-			
-			
-			
-			
+
 		}
-		
+
 		// log if parking got from full to not-full state
-		double currentParkingOcc=currentParkingOccupancy.get(parkingFacilityId);
-		double parkingCapacity=ParkingRoot.getParkingCapacity().getParkingCapacity(parkingFacilityId);
-		if (currentParkingOcc==parkingCapacity){
-			if (!parkingCapacityFullTimes.containsKey(parkingFacilityId)){
+		double currentParkingOcc = currentParkingOccupancy.get(parkingFacilityId);
+		double parkingCapacity = ParkingRoot.getParkingCapacity().getParkingCapacity(parkingFacilityId);
+		if (currentParkingOcc == parkingCapacity) {
+			if (!parkingCapacityFullTimes.containsKey(parkingFacilityId)) {
 				parkingCapacityFullTimes.put(parkingFacilityId, new ParkingCapacityFullLogger());
 			}
-			
+
 			parkingCapacityFullTimes.get(parkingFacilityId).logParkingNotFull(time);
 		}
-		
+
 	}
 
 	private ParkingOccupancyBins getOccupancyBins(Id facilityId) {
@@ -177,7 +199,7 @@ public class ParkingOccupancyMaintainer {
 	 * It is assured, that calling this method more than once does not work.
 	 */
 	public void closeAllLastParkings() {
-		// update all bins and 
+		// update all bins and
 
 		Iterator iter = endTimeOfFirstParking.keySet().iterator();
 
@@ -187,19 +209,14 @@ public class ParkingOccupancyMaintainer {
 
 			getOccupancyBins(parkingFacilityId).inrementParkingOccupancy(startTimeOfCurrentParking.get(personId),
 					endTimeOfFirstParking.get(personId));
-			
-			
-			
-			
+
 		}
-		
+
 		// close parkingCapacityFullTimes: close the first/last parking
-		for (ParkingCapacityFullLogger pcfl: parkingCapacityFullTimes.values()){
+		for (ParkingCapacityFullLogger pcfl : parkingCapacityFullTimes.values()) {
 			pcfl.closeLastParking();
 		}
-		
-		
-		
+
 	}
 
 }
