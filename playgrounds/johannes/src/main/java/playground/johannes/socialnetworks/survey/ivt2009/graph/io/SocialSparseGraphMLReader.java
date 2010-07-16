@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphML;
 import org.matsim.core.population.PersonImpl;
@@ -49,9 +50,16 @@ public class SocialSparseGraphMLReader
 	private SocialSparseGraphBuilder builder;
 
 	private Scenario scenario;
+	
+	private Population population; 
 
 	private String baseDir;
 
+	public SocialSparseGraph readGraph(String file, Population population) {
+		this.population = population;
+		return readGraph(file);
+	}
+	
 	@Override
 	public SocialSparseGraph readGraph(String file) {
 		baseDir = new File(file).getParent();
@@ -75,7 +83,7 @@ public class SocialSparseGraphMLReader
 		/*
 		 * get the person itself
 		 */
-		Person person = scenario.getPopulation().getPersons().get(id);
+		Person person = population.getPersons().get(id);
 		if (person == null)
 			throw new RuntimeException(String.format(
 					"Person for id=%1$s does not exist!", id.toString()));
@@ -91,12 +99,15 @@ public class SocialSparseGraphMLReader
 	@Override
 	protected SocialSparseGraph newGraph(Attributes attrs) {
 		String popFile = attrs.getValue(SocialGraphML.POPULATION_FILE_ATTR);
-		if (popFile == null)
+		if (popFile == null && population == null)
 			throw new RuntimeException("Population file must not be null!");
 
 		scenario = new ScenarioImpl();
-		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
-		reader.readFile(baseDir + "/" + popFile);
+		if(population == null) {
+			PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
+			reader.readFile(baseDir + "/" + popFile);
+			population = scenario.getPopulation();
+		}
 
 		builder = new SocialSparseGraphBuilder(SpatialGraphML.newCRS(attrs));
 

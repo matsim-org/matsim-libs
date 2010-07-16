@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EndTimeMutator.java
+ * RemoveNonCarPlans.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,57 +17,59 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.sim.interaction;
+package playground.johannes.socialnetworks.utils;
 
-import java.util.Random;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**
  * @author illenberger
  * 
  */
-public class EndTimeMutator {
+public class RemoveNonCarPlans {
 
-	private static final double RANGE = 900.0;
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
+		loader.loadScenario();
+		Scenario scenario = loader.getScenario();
 
-	private Random random = new Random();
+		Set<Person> rmPersons = new HashSet<Person>();
 
-	public boolean mutatePlan(Plan plan) {
-		int numActs = Math.max(0, (plan.getPlanElements().size() - 1) / 2);
-		if (numActs > 1) {
-			int idx = random.nextInt(numActs - 1);
-			idx = idx * 2;
-			Activity act = (Activity) plan.getPlanElements().get(idx);
-			if (!act.getType().contains("work") && !act.getType().contains("education")) {
-				double epsilon;
-				if (random.nextBoolean())
-					epsilon = RANGE;
-				else
-					epsilon = -RANGE;
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Set<Plan> remove = new HashSet<Plan>();
+			for (Plan plan : person.getPlans()) {
 
-				double time = act.getEndTime() + epsilon;
-
-				double minStartTime = 0;
-				if(idx > 0)
-					minStartTime = ((Activity)plan.getPlanElements().get(idx - 2)).getEndTime();
-				
-				double maxEndTime = 86400;
-				if(idx < plan.getPlanElements().size() - 1)
-					maxEndTime = ((Activity)plan.getPlanElements().get(idx + 2)).getEndTime()-1;
-				
-				double t = Math.max(time, minStartTime);
-				act.setEndTime(Math.min(t, maxEndTime));
-				
-				Leg leg = (Leg) plan.getPlanElements().get(idx + 1);
-				leg.setDepartureTime(time);
-				
-				return true;
+				if (plan.getPlanElements().size() > 1) {
+					for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
+						if (!((Leg) plan.getPlanElements().get(i)).getMode().equalsIgnoreCase("car")) {
+							remove.add(plan);
+							break;
+						}
+					}
+				}
 			}
+
+			for (Plan plan : remove)
+				person.getPlans().remove(plan);
+
+			if (person.getPlans().isEmpty())
+				rmPersons.add(person);
 		}
-		
-		return false;
+
+		for (Person person : rmPersons)
+			scenario.getPopulation().getPersons().remove(person.getId());
+
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(scenario.getConfig().getParam(
+				"plans", "outputPlansFile"));
 	}
 }

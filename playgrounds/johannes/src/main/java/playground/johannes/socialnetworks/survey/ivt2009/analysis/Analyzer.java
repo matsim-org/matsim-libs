@@ -107,7 +107,7 @@ public class Analyzer {
 		
 		output = output+"/clip/";
 		new File(output).mkdirs();
-//		analyze(graph, zones, choiceSet, output);
+		analyze(graph, zones, choiceSet, output);
 		/*
 		 * 
 		 */
@@ -116,23 +116,23 @@ public class Analyzer {
 		TObjectDoubleHashMap<SpatialVertex> values = obsAccess.values((Set<? extends SpatialVertex>) graph.getVertices(), new BeelineCostFunction(), choiceSet);
 		
 //		AttributePartition partition = new AttributePartition(new FixedSampleSizeDiscretizer(values.getValues(), 200));
-		AttributePartition partition = new AttributePartition(new LinearDiscretizer(700000));
-		TDoubleObjectHashMap<Set<SpatialVertex>> partitions = partition.partition(values);
-		TDoubleObjectIterator<Set<SpatialVertex>> it = partitions.iterator();
-		for(int i = 0; i < partitions.size(); i++) {
-			it.advance();
-			new File(output + "part." + it.key()).mkdirs();
-			ObservedDistance distance = new ObservedDistance();
-			Distribution.writeHistogram(distance.distribution(it.value()).absoluteDistributionLog2(1000), output + "part." + it.key() + "/d.txt");
-			
-			AcceptanceProbability accept = new ObservedAcceptanceProbability();
-			Distribution.writeHistogram(accept.distribution(it.value(), choiceSet).absoluteDistributionLog2(1000), output + "part." + it.key() + "/p_accept.log2.txt");
-			Distribution.writeHistogram(accept.distribution(it.value(), choiceSet).absoluteDistribution(1000), output + "part." + it.key() + "/p_accept.txt");
-			
-			EdgeCosts costs = new ObservedEdgeCosts(new GravityEdgeCostFunction(1.0, 1.0));
-			double c_mean = costs.vertexCostsSum(it.value()).mean();
-			System.out.println(it.key() + " = " + c_mean);
-		}
+//		AttributePartition partition = new AttributePartition(new LinearDiscretizer(100));
+//		TDoubleObjectHashMap<Set<SpatialVertex>> partitions = partition.partition(values);
+//		TDoubleObjectIterator<Set<SpatialVertex>> it = partitions.iterator();
+//		for(int i = 0; i < partitions.size(); i++) {
+//			it.advance();
+//			new File(output + "part." + it.key()).mkdirs();
+//			ObservedDistance distance = new ObservedDistance();
+//			Distribution.writeHistogram(distance.distribution(it.value()).absoluteDistributionLog2(1000), output + "part." + it.key() + "/d.txt");
+//			
+//			AcceptanceProbability accept = new ObservedAcceptanceProbability();
+//			Distribution.writeHistogram(accept.distribution(it.value(), choiceSet).absoluteDistributionLog2(1000), output + "part." + it.key() + "/p_accept.log2.txt");
+//			Distribution.writeHistogram(accept.distribution(it.value(), choiceSet).absoluteDistribution(1000), output + "part." + it.key() + "/p_accept.txt");
+//			
+//			EdgeCosts costs = new ObservedEdgeCosts(new GravityEdgeCostFunction(1.0, 1.0));
+//			double c_mean = costs.vertexCostsSum(it.value()).mean();
+//			System.out.println(it.key() + " = " + c_mean);
+//		}
 		
 	}
 

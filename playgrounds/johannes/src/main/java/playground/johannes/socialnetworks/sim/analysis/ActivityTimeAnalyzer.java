@@ -57,7 +57,7 @@ public class ActivityTimeAnalyzer {
 			
 			for(int i = 0; i < plan.getPlanElements().size(); i += 2) {
 				Activity act = (Activity)plan.getPlanElements().get(i);
-				if(act.getType().equalsIgnoreCase(type)) {
+				if(act.getType().contains(type)) {
 				int start = (int) discretizer.discretize(act.getStartTime());
 				int end = (int) discretizer.discretize(act.getEndTime());
 				for(int t = start; t <= end; t += 900) {
@@ -73,7 +73,8 @@ public class ActivityTimeAnalyzer {
 	
 	
 	public static void main(String args[]) throws FileNotFoundException, IOException, SAXException, ParserConfigurationException {
-		String popFile ="/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/sim/plans.out.xml";
+		String popFile ="/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/sim/output/50000.plan.xml";
+//		String popFile = "/Users/jillenberger/Work/work/socialnets/sim/plans.out.xml";
 //		String graphFile = args[3];
 //		double proba = Double.parseDouble(args[4]);
 
@@ -92,6 +93,7 @@ public class ActivityTimeAnalyzer {
 		
 		ActivityTimeAnalyzer analyzer = new ActivityTimeAnalyzer();
 		TDoubleDoubleHashMap histogram = analyzer.analyze(scenario.getPopulation(), "leisure");
-		Distribution.writeHistogram(histogram,"/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/sim/times.out.txt");
+//		Distribution.writeHistogram(histogram,"/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/sim/times.out.txt");
+		Distribution.writeHistogram(histogram,"/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/sim/output/50000.times.txt");
 	}
 }

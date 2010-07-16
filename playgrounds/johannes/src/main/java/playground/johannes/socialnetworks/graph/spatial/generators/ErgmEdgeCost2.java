@@ -80,11 +80,13 @@ public class ErgmEdgeCost2 implements GraphProbability {
 		logger.info("Done.");
 		
 		double values2[] = values.getValues();
-		double gammaMax = 1.6;
+		double gammaMax = 2.0;
 		double gammaMin = 1.0;
 		
-		
-		double delta = (gammaMax - gammaMin) / (StatUtils.max(values2) - StatUtils.min(values2)); 
+		double aMin = StatUtils.min(values2);
+		double aMax = StatUtils.max(values2);
+		double delta = (gammaMin - gammaMax) / (aMax - aMin);
+		double b = gammaMax - (delta * aMin);
 		
 		TDoubleObjectHashMap<EdgeCostFunction> tmpFunctions = new TDoubleObjectHashMap<EdgeCostFunction>();
 		Map<SpatialVertex, EdgeCostFunction> functions = new HashMap<SpatialVertex, EdgeCostFunction>();
@@ -93,7 +95,7 @@ public class ErgmEdgeCost2 implements GraphProbability {
 		DistanceCalculator calculator = new CartesianDistanceCalculator();
 		for(int i = 0; i < values.size(); i++) {
 			it.advance();
-			double gamma = discretizer.discretize(delta * it.value()) * 0.1;
+			double gamma = discretizer.discretize(delta * it.value() + b) * 0.1;
 			EdgeCostFunction func = tmpFunctions.get(gamma);
 			if(func == null) {
 				func = new GravityEdgeCostFunction(gamma, 1.0, calculator);

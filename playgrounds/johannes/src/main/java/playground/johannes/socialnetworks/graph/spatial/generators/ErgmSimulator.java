@@ -93,9 +93,9 @@ public class ErgmSimulator {
 		 * setup ergm terms.
 		 */
 		logger.info("Initializing ERGM...");
-		EdgeCostFunction costFunction = new GravityEdgeCostFunction(gamma, 1.0, new CartesianDistanceCalculator());
-//		ErgmEdgeCost edgeCost = new ErgmEdgeCost(y, costFunction, totalCost, outputDir + "/thetas.txt", theta_edge);
-		ErgmEdgeCost2 edgeCost = new ErgmEdgeCost2(y, 1.6, 60, outputDir + "/thetas.txt", theta_edge);
+		EdgeCostFunction costFunction = new GravityEdgeCostFunction(gamma, 0.0, new CartesianDistanceCalculator());
+		ErgmEdgeCost edgeCost = new ErgmEdgeCost(y, costFunction, totalCost, outputDir + "/thetas.txt", theta_edge);
+//		ErgmEdgeCost2 edgeCost = new ErgmEdgeCost2(y, 1.6, 60, outputDir + "/thetas.txt", theta_edge);
 		
 		ErgmDensity density = new ErgmDensity();
 		density.setTheta(theta_edge);

@@ -52,12 +52,14 @@ public class Accessability {
 	public TObjectDoubleHashMap<SpatialVertex> values(Set<? extends SpatialVertex> vertices, SpatialCostFunction costFunction, Set<Point> opportunities) {
 		TObjectDoubleHashMap<SpatialVertex> values = new TObjectDoubleHashMap<SpatialVertex>(vertices.size());
 		
+		double n = opportunities.size();
+		
 		for(SpatialVertex vertex : vertices) {
 			double sum = 0;
 			for(Point point : opportunities) {
 				sum += costFunction.costs(vertex.getPoint(), point);
 			}
-			values.put(vertex, sum);
+			values.put(vertex, sum/n);
 		}
 		
 		return values;

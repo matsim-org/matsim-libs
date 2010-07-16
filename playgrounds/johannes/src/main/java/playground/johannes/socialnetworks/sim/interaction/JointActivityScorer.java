@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 
@@ -34,7 +35,11 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
  */
 public class JointActivityScorer implements BasicScoring {
 
-	private final static double beta_join = 6/3600.0;
+	public static double totalJoinTime = 0;
+	
+	private final static Logger logger = Logger.getLogger(JointActivityScorer.class);
+	
+	private final static double beta_join = 100/3600.0;
 	
 	private Person person;
 	
@@ -43,6 +48,8 @@ public class JointActivityScorer implements BasicScoring {
 	private Set<Person> friends;
 	
 	private double score;
+	
+//	private static int joins;
 	
 	public JointActivityScorer(Person person, VisitorTracker tracker, Map<Person, SocialVertex> vertexMapping) {
 		this.person = person;
@@ -60,6 +67,8 @@ public class JointActivityScorer implements BasicScoring {
 		score = 0.0;
 		double time = tracker.timeOverlap(person, friends);
 		score = beta_join * time;
+		
+		totalJoinTime += time;
 	}
 
 	@Override

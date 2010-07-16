@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
@@ -73,7 +74,8 @@ public class DegreeAccessabilityTask extends ModuleAnalyzerTask<Degree> {
 			}
 			
 			try{
-				Correlations.writeToFile(Correlations.correlationMean(accessValues, kValues, 50000), String.format("%1$s/k_access.txt", getOutputDirectory()), "access", "k_mean");
+				double binsize = (StatUtils.max(accessValues) - StatUtils.min(accessValues))/20.0;
+				Correlations.writeToFile(Correlations.correlationMean(accessValues, kValues, binsize), String.format("%1$s/k_access.txt", getOutputDirectory()), "access", "k_mean");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

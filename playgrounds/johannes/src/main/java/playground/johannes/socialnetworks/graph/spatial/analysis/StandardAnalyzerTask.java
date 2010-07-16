@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphML2KML.java
+ * StandardAnalyzerTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,38 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import java.io.IOException;
+import java.util.Map;
+
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
-import org.matsim.contrib.sna.graph.spatial.io.VertexDegreeColorizer;
 
-import playground.johannes.socialnetworks.snowball2.sim.VertexSamplingCounter;
+import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 
 /**
  * @author illenberger
  *
  */
-public class GraphML2KML {
+public class StandardAnalyzerTask extends playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask {
 
+	public StandardAnalyzerTask() {
+		super();
+		addTask(new DistanceTask());
+		addTask(new AcceptanceProbabilityTask());
+	}
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		SpatialGraph graph = reader.readGraph(args[0]);
 		
-		SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
-		writer.setDrawEdges(false);
-		KMLIconVertexStyle style = new KMLIconVertexStyle(graph);
-		VertexDegreeColorizer colorizer = new VertexDegreeColorizer(graph);
-		colorizer.setLogscale(true);
-		style.setVertexColorizer(colorizer);
-		writer.setKmlVertexStyle(style);
-		writer.addKMZWriterListener(style);
-		writer.write(graph, args[1]);
+		String output = null;
+		if(args.length > 1) {
+			output = args[1];
+		}
+		
+		AnalyzerTask task = new StandardAnalyzerTask();
+		if(output != null)
+			task.setOutputDirectoy(output);
+		
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, task);
+		
+		if(output != null)
+			GraphAnalyzer.writeStats(stats, output + "/stats.txt");
+	
 	}
 
 }

@@ -83,9 +83,9 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		addTask(kRhoTask);
 		
 //		DegreeAccessabilityTask kAccessTask = new DegreeAccessabilityTask(choiceSet, new GravityCostFunction(1.6, 1.0));
-//		DegreeAccessabilityTask kAccessTask = new DegreeAccessabilityTask(choiceSet, new BeelineCostFunction());
-//		kAccessTask.setModule(new ObservedDegree());
-//		addTask(kAccessTask);
+		DegreeAccessabilityTask kAccessTask = new DegreeAccessabilityTask(choiceSet, new BeelineCostFunction());
+		kAccessTask.setModule(new ObservedDegree());
+		addTask(kAccessTask);
 		
 		AgeTask age = new AgeTask();
 		age.setModule(new ObservedAge());
@@ -104,13 +104,13 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		addTask(new SeedConnectionTask());
 		
 //		AccessabilityTask accessTask = new AccessabilityTask(new GravityCostFunction(1.6, 1.0), choiceSet);
-		AccessabilityTask accessTask = new AccessabilityTask(new BeelineCostFunction(), choiceSet);
-		accessTask.setModule(new ObservedAccessability());
-		addTask(accessTask);
-		
-		GravityGammaTask gammaTask = new GravityGammaTask();
-		gammaTask.setModule(new ObservedGravityGamma());
-		addTask(gammaTask);
+//		AccessabilityTask accessTask = new AccessabilityTask(new BeelineCostFunction(), choiceSet);
+//		accessTask.setModule(new ObservedAccessability());
+//		addTask(accessTask);
+//		
+//		GravityGammaTask gammaTask = new GravityGammaTask();
+//		gammaTask.setModule(new ObservedGravityGamma());
+//		addTask(gammaTask);
 	}
 
 }

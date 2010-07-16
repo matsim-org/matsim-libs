@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
@@ -44,11 +45,18 @@ public class StandardAnalyzerTask extends AnalyzerTaskComposite {
 	public static void main(String args[]) throws IOException {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(args[0]);
-		
-		Map<String, Double> stats = GraphAnalyzer.analyze(graph, new StandardAnalyzerTask());
-		
+		String output = null;
 		if(args.length > 1) {
-			GraphAnalyzer.writeStats(stats, args[1]);
+			output = args[1];
 		}
+		
+		AnalyzerTask task = new StandardAnalyzerTask();
+		if(output != null)
+			task.setOutputDirectoy(output);
+		
+		Map<String, Double> stats = GraphAnalyzer.analyze(graph, task);
+		
+		if(output != null)
+			GraphAnalyzer.writeStats(stats, output + "/stats.txt");
 	}
 }

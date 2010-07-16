@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 
@@ -57,7 +58,9 @@ public class InteractionHandler implements ActivityStartEventHandler, ActivityEn
 			facilities.put(event.getFacilityId(), visitors);
 		}
 
-		visitors.put(event.getPersonId(), event);
+		Event old = visitors.put(event.getPersonId(), event); 
+		if(old != null)
+			logger.warn(String.format("Overwriting start event for person %1$s, time %2$s.", event.getPersonId(), event.getTime()));
 	}
 
 	@Override
@@ -70,7 +73,7 @@ public class InteractionHandler implements ActivityStartEventHandler, ActivityEn
 		Map<Id, ActivityStartEvent> visitors = facilities.get(event.getFacilityId());
 		if (visitors != null) {
 			ActivityStartEvent startEvent = visitors.remove(event.getPersonId());
-
+			
 			if (startEvent != null) {
 				Collection<Id> targets = selector.select(startEvent.getPersonId(), visitors.keySet());
 				for (Id person : targets) {

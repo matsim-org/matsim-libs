@@ -102,16 +102,22 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 	public double timeOverlap(Person person, Set<Person> friends) {
 		Set<Visit> facilityVisits = visits.get(person.getId());
 		double sum = 0;
-		for(Visit visit : facilityVisits) {
-			Set<Visitor> facilityVisitors = visitors.get(visit.facility);
-			for(Visitor visitor : facilityVisitors) {
-				for(Person friend : friends) {
-					if(friend.getId().equals(visitor.person)) {
-						double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
-						double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
-						double delta = Math.max(0.0, end - start);
-						sum += delta;
-						break;
+		for (Visit visit : facilityVisits) {
+			if (visit.startEvent.getActType().equalsIgnoreCase("leisure")) {
+
+				Set<Visitor> facilityVisitors = visitors.get(visit.facility);
+				for (Visitor visitor : facilityVisitors) {
+					if (visitor.startEvent.getActType().equalsIgnoreCase("leisure")) {
+
+						for (Person friend : friends) {
+							if (friend.getId().equals(visitor.person)) {
+								double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
+								double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
+								double delta = Math.max(0.0, end - start);
+								sum += delta;
+								break;
+							}
+						}
 					}
 				}
 			}
