@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.TemporaryCode;
+package playground.jjoubert.Utilities.matsim2urbansim;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -31,22 +31,18 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
@@ -58,74 +54,140 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
-import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
 
-import playground.jjoubert.Utilities.MyGapReader;
-import playground.jjoubert.Utilities.MyShapefileReader;
-import playground.jjoubert.Utilities.matsim2urbansim.M2UStringbuilder;
-import playground.jjoubert.Utilities.matsim2urbansim.MyZone;
-import playground.jjoubert.Utilities.matsim2urbansim.MyZoneReader;
+public class WalkTimeEstimator {
+	private final static Logger log = Logger.getLogger(WalkTimeEstimator.class);
+	private String studyArea;
+	private Scenario sAll;
+	private Scenario sPt;
+	public M2UStringbuilder sb;
+	private List<MyZone> spList;
+	private Map<Id, Double> distanceMap;
+	private Map<Id, Double> ptMap;
 
-public class RunEthekwiniNetworkFilter {
-	private final static Logger log = Logger.getLogger(RunEthekwiniNetworkFilter.class);
-	private static String root;
-	private static String studyAreaName;
-	private static String version;
-	private static String percentage;
-	
+
 	/**
-	 * @param args
+	 * Estimates the walk time to public transport.
+	 * @param root
+	 * @param studyArea
+	 * @param version of the study area's data;
+	 * @param percentage of population sampled. 
+	 */
+	public WalkTimeEstimator(String root, String studyArea, 
+			String version, String percentage) {
+		this.studyArea = studyArea;
+		this.sb = new M2UStringbuilder(root, studyArea, version, percentage);
+	}
+	/**
+	 * Implements the walk time estimator. Should be run in various steps, with
+	 * consecutive steps being interrupted because of external interventions,
+	 * for example estimating the function to convert walking distance to 
+	 * walking time (estimation done in R).  
+	 * @param args a String-array containing:
+	 * <ol>
+	 * 	<li> the root folder;
+	 * 	<li> study area name. Currently allowed values are:
+	 * 		<ul>
+	 * 			<li> "eThekwini"
+	 * 		</ul> 
+	 * 	<li> version (year) of the study area to consider;
+	 * 	<li> the population sample size, e.g. "10" if a 10% sample was used;
+	 * 	<li> the specific step to perform in the walk-time-estimation. Allowed values are:
+	 * 		<ul>
+	 * 			"1" to create a distance and weight table for each subplace. The
+	 * 			output is used in R to estimate a function to convert walking
+	 * 			distance to walking time.
+	 * 		</ul>   
+	 * </ol>
 	 */
 	public static void main(String[] args) {
-		if(args.length != 4){
+		WalkTimeEstimator wte = null;	
+		int step = 0;
+		if(args.length != 5){
 			throw new RuntimeException("Incorrect number of arguments passed.");
 		} else{
-			root = args[0];
-			studyAreaName = args[1];
-			version = args[2];
-			percentage = args[3];
+			wte = new WalkTimeEstimator(args[0], args[1], args[2], args[3]);
+			step = Integer.parseInt(args[4]);
 		}
-		log.info("Filtering " + studyAreaName + "'s MATSim network to account for public transport.");
+		wte.getStartMessage(step);
 		
+		switch (step) {
+		case 1:
+			wte.deriveTransitNetwork();
+			wte.calculateSubplacedistances();
+			wte.writeSubplaceDistanceAndWeight();
+			break;
+
+		default:
+			break;
+		}
+		log.info("--------------------------------------------------");
+		log.info("             PROCESS COMPLETE");
+		log.info("==================================================");
+		
+	}
+
+
+	
+	public void getStartMessage(int step){
+		log.info("==================================================");
+		log.info("   Estimating walk time for " + studyArea);
+		log.info("--------------------------------------------------");
+		switch (step) {
+		case 1: // Prepare sub-place distance and weight table.
+			log.info("   Step 1: prepare distance and weight table");
+			log.info("           from subplace shapefiles.");	
+			break;
+
+		default:
+			log.warn("Could not find an appropriate action for step " + step);
+			break;
+		}
+		log.info("--------------------------------------------------");
+	}
+	
+	public void deriveTransitNetwork(){
+		log.info("Filtering " + studyArea + "'s MATSim network to account for public transport.");
 		// Read network.
-		M2UStringbuilder sb = new M2UStringbuilder(root, studyAreaName, version, "100");
-		Scenario s = new ScenarioImpl();
-		Scenario sPt = new ScenarioImpl();
-		MatsimNetworkReader nr = new MatsimNetworkReader(s);
+		sAll = new ScenarioImpl();
+		sPt = new ScenarioImpl();
+		MatsimNetworkReader nr = new MatsimNetworkReader(sAll);
 		nr.readFile(sb.getEmmeNetworkFilename());		
 		
-		/*
-		 * Process transit-lines-by-link file.
-		 * 
-		 * - Doesn't (always) work. Seems the OD node pair does not describe a 
-		 * 	 LINK, but a PATH. So I'll have to process events and get a router 
-		 *   going. 
-		 */
+		/*----------------------------------------------------------------------
+		 * Process transit-lines-by-link file. The OD node pair does not always
+		 * describe a single LINK, but a PATH. So I have to process an events 
+		 * file and get a router going. 
+		 * NOTE: I always use the 100th iteration's plans file. If this is NOT
+		 *       correct, I'll have to change this and pass the iteration number
+		 *       as an argument.
+		 *---------------------------------------------------------------------*/
+		// Set up router.
 		TravelTimeCalculatorFactory ttcf = new TravelTimeCalculatorFactoryImpl();
-		TravelTimeCalculator ttc = ttcf.createTravelTimeCalculator(s.getNetwork(), s.getConfig().travelTimeCalculator());
+		TravelTimeCalculator ttc = ttcf.createTravelTimeCalculator(sAll.getNetwork(), sAll.getConfig().travelTimeCalculator());
 		TravelCostCalculatorFactory tccf = new TravelCostCalculatorFactoryImpl();
-		PersonalizableTravelCost tc = tccf.createTravelCostCalculator(ttc, s.getConfig().charyparNagelScoring());
+		PersonalizableTravelCost tc = tccf.createTravelCostCalculator(ttc, sAll.getConfig().charyparNagelScoring());
 		EventsManagerImpl em = new EventsManagerImpl();
 		em.addHandler(ttc);
 		new EventsReaderTXTv1(em).readFile(sb.getIterationEventsFile("100"));
-		Dijkstra router = new Dijkstra(s.getNetwork(),tc,ttc);
+		Dijkstra router = new Dijkstra(sAll.getNetwork(),tc,ttc);
 		Set<String> ptSet = new TreeSet<String>();
 		ptSet.add(TransportMode.pt);
 		
+		// Process TransitLinesByLink file.
 		try {
 			BufferedReader br = IOUtils.getBufferedReader(sb.getEmmeTransitLinesByLinkFilename());
 			try{
 				@SuppressWarnings("unused")
 				String header = br.readLine();
 				String line = null;
+				int allCounter = 0;
 				int ptCounter = 0;
 				int directCounter = 0;
 				String allPt = "";
 				while((line = br.readLine()) != null){
+					allCounter++;
 					String[] link = line.split("\t");
 					if(link.length > 8){
 						if(link[8].equalsIgnoreCase("0")){
@@ -135,23 +197,21 @@ public class RunEthekwiniNetworkFilter {
 							allPt += link[8];
 							ptCounter++;
 							Path p = null;
-							Node oNode = s.getNetwork().getNodes().get(new IdImpl(link[1]));
-							Node dNode = s.getNetwork().getNodes().get(new IdImpl(link[2]));
+							Node oNode = sAll.getNetwork().getNodes().get(new IdImpl(link[1]));
+							Node dNode = sAll.getNetwork().getNodes().get(new IdImpl(link[2]));
 							if(oNode != null && dNode != null){
-								p = router.calcLeastCostPath(oNode, dNode, 21600);
+								p = router.calcLeastCostPath(oNode, dNode, 21600); // at 06:00 in the morning.
 								// Set all links in path.
 								for(Link ptLink : p.links){
 									ptLink.setAllowedModes(ptSet);
 								}
-								
 		
-								Map<Id, ? extends Link> outLinks = s.getNetwork().getNodes().get(oNode.getId()).getOutLinks();
-								Map<Id, ? extends Link> inLinks = s.getNetwork().getNodes().get(oNode.getId()).getInLinks();
+								Map<Id, ? extends Link> outLinks = sAll.getNetwork().getNodes().get(oNode.getId()).getOutLinks();
+								Map<Id, ? extends Link> inLinks = sAll.getNetwork().getNodes().get(oNode.getId()).getInLinks();
 								boolean found = false;
 								for(Link l : outLinks.values()){
 									Link aLink = l;
 									if(l.getToNode().equals(dNode)){
-										//								log.info("I found the link.");
 										Link theLink = aLink;
 										found = true;
 										directCounter++;
@@ -160,18 +220,11 @@ public class RunEthekwiniNetworkFilter {
 								if(!found){
 									log.info("No direct trip from " + oNode.getId().toString() + " to " + dNode.getId().toString());
 								}
-								//						for(Link l : inLinks.values()){
-								//							Link aLink = l;
-								//							if(l.getFromNode().getId().equals(dNode)){
-								//								log.info("I found the link.");
-								//								Link theLink = aLink;
-								//							}
-								//						}
 							}
-
 						}
 					}
 				}
+				log.info("A total of " + allCounter + " node pairs in network");
 				log.info("Found " + ptCounter + " node-pairs serviced by transit (" + directCounter + " direct )");
 				log.info(allPt);
 			} finally{
@@ -184,36 +237,23 @@ public class RunEthekwiniNetworkFilter {
 			e.printStackTrace();
 		}
 		log.info("Done reading transit-lines-by-link file. Now filter the network.");
-		TransportModeNetworkFilter nf = new TransportModeNetworkFilter(s.getNetwork());
+		TransportModeNetworkFilter nf = new TransportModeNetworkFilter(sAll.getNetwork());
 		nf.filter(sPt.getNetwork(), ptSet);
 		NetworkWriter nw = new NetworkWriter(sPt.getNetwork());
 		nw.writeFileV1(sb.getEmmePtNetworkFilename());
 		log.info("Network filterted and written to " + sb.getEmmePtNetworkFilename());
-		// Write to ESRI shapefile.------------------------
-//		FeatureGeneratorBuilder fgb = new FeatureGeneratorBuilderImpl(sPt.getNetwork(), "WGS84_UTM36S");
-//		Links2ESRIShape l2e = new Links2ESRIShape(sPt.getNetwork(),"C:/temp/Eclipse/PT.shp", fgb);
-//		l2e.write();
-//		l2e = new Links2ESRIShape(s.getNetwork(), "C:/temp/Eclipse/All.shp", "WGS84_UTM36S");
-//		l2e.write();
-		//-------------------------------------------------
+	}
+	
+	public void calculateSubplacedistances(){
 		// Read subplace shapefile.
 		MyZoneReader mzr = new MyZoneReader(sb.getSubPlaceShapefile());
-		mzr.readZones(2);
-		List<MyZone> spList = mzr.getZones();
+		mzr.readZones(sb.getSubplaceIdField());
+		spList = mzr.getZones();
+		log.info("Done reading sub-place shapefile: " + spList.size() + " entries for " + studyArea);
 		
-		log.info("Read sub-place shapefile: " + spList.size() + " entries for " + studyAreaName);
-		int smallCounter = 0;
-		for(MyZone mz : spList){
-			Double area = mz.getArea();
-			if(area < 100){
-				log.warn("Zone " + mz.getId() + " area: " + area);
-				smallCounter++;
-			}
-		}
-		log.warn("Found " + smallCounter + " zones smaller than 100 units.");
+		distanceMap = new TreeMap<Id, Double>();
+		ptMap = new TreeMap<Id, Double>();
 		
-		Map<Id, Double> distanceMap = new TreeMap<Id, Double>();
-		Map<Id, Double> ptMap = new TreeMap<Id, Double>();
 		// First read the public transport sub place table.
 		log.info("Reading sub-place table from " + sb.getSubPlaceTable());
 		int spCounter = 0;
@@ -267,7 +307,9 @@ public class RunEthekwiniNetworkFilter {
 			}
 		}
 		log.info("   sub-places calculated: " + spCounter + " (Done)");
-		
+	}
+	
+	public void writeSubplaceDistanceAndWeight(){
 		try {
 			BufferedWriter bw = IOUtils.getBufferedWriter(sb.getSubPlaceDistanceFilename());
 			try{
@@ -295,14 +337,6 @@ public class RunEthekwiniNetworkFilter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		
-		
-		
-		log.info("---------------------------------------------");
-		log.info("             PROCESS COMPLETE");
-		log.info("=============================================");
-		
 	}
-
+	
 }

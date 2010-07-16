@@ -97,7 +97,17 @@ public class M2UStringbuilder {
 	}
 
 	public String getSubPlaceDistanceFilename() {
-		return root + studyArea + "/" + version + "/DistanceToPt.txt";
+		return root + studyArea + "/" + version + "/DistanceToPt.csv";
+	}
+	
+	public Integer getSubplaceIdField(){
+		Integer result = null;
+		if(this.studyArea.equalsIgnoreCase("eThekwini")){
+			result = 2;
+		} else{
+			throw new RuntimeException("Don't have a subplace Id field for " + studyArea + " in M2UStringbuilder.");
+		}
+		return result;
 	}
 
 }
