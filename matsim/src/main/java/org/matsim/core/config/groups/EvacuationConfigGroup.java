@@ -28,7 +28,7 @@ public class EvacuationConfigGroup extends Module {
 
 	private static final long serialVersionUID = 1L;
 
-	public enum EvacuationScenario {day,night,afternoon}
+	public enum EvacuationScenario {day,night,afternoon, from_file}
 
 	public static final String GROUP_NAME = "evacuation";
 
@@ -400,7 +400,9 @@ public class EvacuationConfigGroup extends Module {
 			this.scenario = EvacuationScenario.night;
 		} else if (scenario.equals("afternoon")) {
 			this.scenario = EvacuationScenario.afternoon;
-		} else {
+		} else if (scenario.equals("from_file")) {
+			this.scenario = EvacuationScenario.from_file;
+		}else {
 			throw new RuntimeException("unkown scenario type:" + scenario);
 		}
 	}
