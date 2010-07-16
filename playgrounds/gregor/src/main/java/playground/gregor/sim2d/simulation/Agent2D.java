@@ -44,7 +44,7 @@ public class Agent2D  {
 
 	private AgentState state;
 
-	private final double disieredVelocity = 1.0 + MatsimRandom.getRandom().nextDouble()/2-0.25;
+	private final double disieredVelocity = 1 + MatsimRandom.getRandom().nextDouble()-0.25;
 //	private final double disieredVelocity = 1.34;
 	private final double weight = 1000*(90 + 40*MatsimRandom.getRandom().nextDouble()-20);
 

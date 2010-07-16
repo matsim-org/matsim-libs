@@ -59,7 +59,7 @@ public class Sim2D {
 	public Sim2D(final Network network, final Map<MultiPolygon,List<Link>> floors, final Population plans, final EventsManager events, final StaticForceField sff, final Config config){
 		this.config = config;
 //		this.endTime = this.config.simulation().getEndTime();
-		this.endTime = 10*3600+20*60;
+		this.endTime = 9*3600+30*60;
 		this.network = (NetworkLayer) network;
 		Map<MultiPolygon,NetworkLayer> f = new HashMap<MultiPolygon, NetworkLayer>();
 		for (Entry<MultiPolygon,List<Link>> e : floors.entrySet()) {
