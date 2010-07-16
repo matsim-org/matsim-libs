@@ -347,11 +347,18 @@ public class GeneralLib {
 	 * If time is > 60*60*24 [seconds], it will be projected into next day, e.g.
 	 * time=60*60*24+1=1
 	 * 
+	 * even if time is negative, it is turned into a positive time by adding
+	 * number of seconds of day into it consecutively
+	 * 
 	 * @param time
 	 * @return
 	 */
 	public static double projectTimeWithin24Hours(double time) {
 		double secondsInOneDay = 60 * 60 * 24;
+
+		while (time < 0) {
+			time += secondsInOneDay;
+		}
 
 		if (time < secondsInOneDay) {
 			return time;

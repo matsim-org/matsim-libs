@@ -9,7 +9,10 @@ import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkin
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingCapacity;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyMaintainer;
 import playground.wrashid.parkingSearch.planLevel.parkingActivityDuration.ParkingActivityDuration;
+import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
+import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
+import playground.wrashid.parkingSearch.planLevel.ranking.Ranking;
 
 public class ParkingRoot {
 
@@ -20,7 +23,12 @@ public class ParkingRoot {
 	private static double parkingActivityDurationPenaltyScalingFactor;
 	private static ParkingOccupancyMaintainer parkingOccupancyMaintainer;
 	private static ParkingActivityDuration parkingActivityDuration;
-	
+	private static Ranking ranking;
+
+	public static Ranking getRanking() {
+		return ranking;
+	}
+
 	public static ParkingActivityDuration getParkingActivityDuration() {
 		return parkingActivityDuration;
 	}
@@ -28,7 +36,7 @@ public class ParkingRoot {
 	public static double getPriceScoreScalingFactor() {
 		return parkingPriceScoreScalingFactor;
 	}
-	
+
 	public static double getParkingActivityDurationPenaltyScalingFactor() {
 		return parkingActivityDurationPenaltyScalingFactor;
 	}
@@ -37,17 +45,20 @@ public class ParkingRoot {
 		cpm = new ClosestParkingMatrix(facilities, network);
 		lpfa = new LinkParkingFacilityAssociation(facilities, network);
 		pc = new ParkingCapacity(facilities);
-		parkingActivityDuration= new ParkingActivityDuration();
-		
+		parkingActivityDuration = new ParkingActivityDuration();
+
 		String tempStringValue = controler.getConfig().findParam("parking", "parkingPriceScoreScalingFactor");
 		checkIfNull(tempStringValue);
 		parkingPriceScoreScalingFactor = Double.parseDouble(tempStringValue);
-		
+
 		tempStringValue = controler.getConfig().findParam("parking", "parkingActivityDurationPenaltyScalingFactor");
 		checkIfNull(tempStringValue);
 		parkingActivityDurationPenaltyScalingFactor = Double.parseDouble(tempStringValue);
-		
-		
+
+		// TODO: both the ParkingPriceMapping and the IncomeRelevantForParking
+		// should be read from a file
+		ranking = new Ranking(new ParkingPriceMapping1(), new IncomeRelevantForParking(), facilities);
+
 	}
 
 	public static ClosestParkingMatrix getClosestParkingMatrix() {
@@ -73,11 +84,11 @@ public class ParkingRoot {
 	}
 
 	public static void setParkingOccupancyMaintainer(ParkingOccupancyMaintainer _parkingOccupancyMaintainer) {
-		parkingOccupancyMaintainer=_parkingOccupancyMaintainer;	
+		parkingOccupancyMaintainer = _parkingOccupancyMaintainer;
 	}
-	
+
 	public static ParkingOccupancyMaintainer getParkingOccupancyMaintainer() {
-		return parkingOccupancyMaintainer;	
+		return parkingOccupancyMaintainer;
 	}
 
 }

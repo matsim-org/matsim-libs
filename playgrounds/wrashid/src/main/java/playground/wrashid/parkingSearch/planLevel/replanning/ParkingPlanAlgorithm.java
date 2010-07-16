@@ -24,6 +24,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -58,6 +59,8 @@ import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.Reflection;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
+import playground.wrashid.parkingSearch.planLevel.scoring.OrderedFacility;
+import playground.wrashid.parkingSearch.planLevel.scoring.ParkingTimeInfo;
 
 public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
@@ -67,9 +70,10 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		// first avoid capacity constraint violations
 		// thereafter try improvements on the other levels.
 
-		// select a parking
-
-		// targetActivity for which the parking should be changed
+		// ===========select targetActivity for which the parking should be
+		// changed==============
+		// first select such, for which the capacity violation happened
+		// if this is not the case select at random for improvement
 		ActivityImpl targetActivity = null;
 
 		LinkedList<ActivityImpl> targetActivitiesWithParkingCapacityViolations = ParkingRoot.getParkingOccupancyMaintainer()
@@ -92,33 +96,32 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 			targetActivity = parkingTargetActivities.get(index);
 		}
 
-		// for the selected target activity, now select the new parking
-		
-		// we could either just select the best parking or
-		// we can select the parkings according to probabilities (the higher the score the higher the 
-		// probabilities, we can argue, that a person does not just take the best parking but one among the best
-		// therefore we have such an uncertainty.
-		
-		// we could compare the two results(by implementing both variants).
-		
-		// first we perform a ranking of the available parkings close to the target Activity.
-		
-			// TODO: continue HERE #######################
-		
-		// then we select the parking (best or probability)
-		
-		ActivityFacilityImpl newParking=null;
-		
-			// TODO: continue HERE ####################
-		
-		
-		// replaceParking
+		// =========for the selected target activity, score the parkings close
+		// to the target ==========
 
-		// TODO: call the method here.
-		replaceParking(plan, targetActivity, newParking, GlobalRegistry.controler , (NetworkLayer) GlobalRegistry.controler.getNetwork());
-		
-		
-		// TODO: GENARLIZE replaceParking... (method below)
+		ArrayList<ActivityFacilityImpl> parkingSortedAccordingToScore = ParkingRoot.getRanking()
+				.getParkingsOrderedAccordingToScore(targetActivity, plan);
+		//
+
+		// ===============then we select the parking (best or
+		// probability)================
+		// we could either just select the best parking or
+		// we can select the parkings according to probabilities (the higher the
+		// score the higher the
+		// probabilities, we can argue, that a person does not just take the
+		// best parking but one among the best
+		// therefore we have such an uncertainty.
+		// we could compare the two results(by implementing both variants).
+
+		// TODO-intime: also add the probability method.
+
+		// select parking with highest score
+		ActivityFacilityImpl newParking = parkingSortedAccordingToScore.get(0);
+
+		// =============================replaceParking===============
+
+		replaceParking(plan, targetActivity, newParking, GlobalRegistry.controler,
+				(NetworkLayer) GlobalRegistry.controler.getNetwork());
 	}
 
 	/**
@@ -174,15 +177,15 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 	}
 
 	private static void changePreviousParking(final Plan plan, ActivityImpl targetActivity, ActivityImpl newParkingActivity) {
-		int planElementIndexOfTargetActivity = plan.getPlanElements().indexOf(targetActivity);
-		plan.getPlanElements().remove(planElementIndexOfTargetActivity - 2);
-		plan.getPlanElements().add(planElementIndexOfTargetActivity - 2, newParkingActivity);
+		int indexOfArrivalParkingAct = ParkingGeneralLib.getArrivalParkingActIndex(plan, targetActivity);
+		plan.getPlanElements().remove(indexOfArrivalParkingAct);
+		plan.getPlanElements().add(indexOfArrivalParkingAct, newParkingActivity);
 	}
 
 	private static void changeNextParking(final Plan plan, ActivityImpl targetActivity, ActivityImpl newParkingActivity) {
-		int planElementIndexOfTargetActivity = plan.getPlanElements().indexOf(targetActivity);
-		plan.getPlanElements().remove(planElementIndexOfTargetActivity + 2);
-		plan.getPlanElements().add(planElementIndexOfTargetActivity + 2, newParkingActivity);
+		int indexOfDepartingParkingAct = ParkingGeneralLib.getDepartureParkingActIndex(plan, targetActivity);
+		plan.getPlanElements().remove(indexOfDepartingParkingAct);
+		plan.getPlanElements().add(indexOfDepartingParkingAct, newParkingActivity);
 	}
 
 	private static ActivityImpl createNewParkingActivity(ActivityFacilityImpl newParking, NetworkLayer network,

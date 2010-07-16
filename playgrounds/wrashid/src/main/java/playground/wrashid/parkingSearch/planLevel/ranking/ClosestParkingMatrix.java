@@ -16,6 +16,13 @@ import org.matsim.core.network.NetworkLayer;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
 import playground.wrashid.parkingSearch.planLevel.scoring.OrderedFacility;
 
+/**
+ * TODO: The performance could be improved by perform caching here.
+ * 
+ * 
+ * @author rashid_waraich
+ *
+ */
 public class ClosestParkingMatrix {
 
 	private NetworkLayer network;
@@ -99,6 +106,7 @@ public class ClosestParkingMatrix {
 
 	/**
 	 * Get all parkings, which have less than maxDistance from coord
+	 * 
 	 * 
 	 * @param coord
 	 * @param maxDistance

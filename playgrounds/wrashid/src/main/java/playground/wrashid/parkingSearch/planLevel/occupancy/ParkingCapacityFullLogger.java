@@ -20,7 +20,7 @@ public class ParkingCapacityFullLogger {
 
 	ArrayList<ParkingCapacityFullItem> list;
 
-	double firstParkingEndeTime=-1.0;
+	double firstParkingEndeTime = -1.0;
 	double startTime;
 
 	public ParkingCapacityFullLogger() {
@@ -33,13 +33,13 @@ public class ParkingCapacityFullLogger {
 	}
 
 	private boolean isStartTimeUndefined() {
-		if (startTime<0){
+		if (startTime < 0) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
 	private void errorIfStartAlreadyDefined() {
 		if (startTime > 0) {
 			throw new Error("a call to logParkingFull must follow a call to logParkingNotFull");
@@ -57,24 +57,23 @@ public class ParkingCapacityFullLogger {
 	public void logParkingNotFull(double endTime) {
 		GeneralLib.errorIfNot24HourProjectedTime(endTime);
 
-		if (isStartTimeUndefined()){
+		if (isStartTimeUndefined()) {
 			// this means, that the first parking end time.
-			
-			firstParkingEndeTime=endTime;
+
+			firstParkingEndeTime = endTime;
 			return;
 		}
-		
+
 		list.add(new ParkingCapacityFullItem(startTime, endTime));
 
 		resetStartTime();
 	}
-	
-	public void closeLastParking(){
-		if (firstParkingEndeTime>0){
+
+	public void closeLastParking() {
+		if (firstParkingEndeTime > 0) {
 			list.add(new ParkingCapacityFullItem(startTime, firstParkingEndeTime));
-		}	
+		}
 	}
-	
 
 	public ArrayList<ParkingCapacityFullItem> getLog() {
 		return list;
@@ -97,6 +96,38 @@ public class ParkingCapacityFullLogger {
 		} else {
 			return true;
 		}
+	}
+
+	/**
+	 * checks, if parkings is full in specified interval
+	 * 
+	 * @param time
+	 * @param delta
+	 * @return
+	 */
+	public boolean doesParkingGetFullInInterval(double startTime, double endTime) {
+		GeneralLib.errorIfNot24HourProjectedTime(startTime);
+		GeneralLib.errorIfNot24HourProjectedTime(endTime);
+
+		if (list.isEmpty()) {
+			return false;
+		}
+
+		// check if the whole interval for checking lies in a non-full interval
+		for (int i = 0; i < list.size() - 1; i++) {
+			if (GeneralLib.isIn24HourInterval(list.get(i).getEndTime(), list.get(i + 1).getStartTime(), startTime)
+					&& GeneralLib.isIn24HourInterval(list.get(i).getEndTime(), list.get(i + 1).getStartTime(), endTime)) {
+				return false;
+			}
+		}
+		
+		// check this for the last intervall of the day
+		if (GeneralLib.isIn24HourInterval(list.get(list.size()-1).getEndTime(), list.get(0).getStartTime(), startTime)
+				&& GeneralLib.isIn24HourInterval(list.get(list.size()-1).getEndTime(), list.get(0).getStartTime(), endTime)) {
+			return false;
+		}
+		
+		return true;
 	}
 
 }
