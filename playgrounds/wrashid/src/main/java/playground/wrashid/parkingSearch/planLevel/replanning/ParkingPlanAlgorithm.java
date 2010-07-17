@@ -65,7 +65,33 @@ import playground.wrashid.parkingSearch.planLevel.scoring.ParkingTimeInfo;
 public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
 	public void run(final Plan plan) {
+		
+		// reason, that we do this: all the statistics regarding parking are based on the previous iteration
+		// if the activity chain structure of the given plan in this method and the plan of the last iteration
+		// is fundamentally different, the algorithm here will not work.
+		// TODO: put somewhere the last plan!!!
+		Plan lastIterationPlan=ParkingRoot.getParkingOccupancyMaintainer().getLastSelectedPlan().get(plan.getPerson().getId()); // load plan...
 
+		// Replace the plan elements of proposed plan
+		plan.getPlanElements().clear();
+		plan.getPlanElements().addAll(lastIterationPlan.getPlanElements());
+		
+		
+		// I think taking the same plan as in previous iteration and changing it makes most since, because the structural changes
+		// can happen, with the other strategy modules anyway!
+		
+		
+		
+		// TODO: use this lastIterationPlan instead of just plan variable in this method!!!!
+		
+		// TODO: set the pe elements of this into the plan method!!!
+		
+		
+		// TODO: alternative: if we find out, that the structure of the plan has changed fundamentally, 
+		// we do nothing for parking and else if the strcture is similar to the last one, we do something. 
+		// 
+		
+		
 		// identify which parking improvement could render the most gain.
 		// first avoid capacity constraint violations
 		// thereafter try improvements on the other levels.
@@ -118,10 +144,16 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		// select parking with highest score
 		ActivityFacilityImpl newParking = parkingSortedAccordingToScore.get(0);
 
-		// =============================replaceParking===============
-
+		// =============================replaceParking===============		
+		
+		//ParkingGeneralLib.printAllParkingFacilityIds(plan);
+		
 		replaceParking(plan, targetActivity, newParking, GlobalRegistry.controler,
 				(NetworkLayer) GlobalRegistry.controler.getNetwork());
+		
+		//ParkingGeneralLib.printAllParkingFacilityIds(plan);
+		
+				
 	}
 
 	/**

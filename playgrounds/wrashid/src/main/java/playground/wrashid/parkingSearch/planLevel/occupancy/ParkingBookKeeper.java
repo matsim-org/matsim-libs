@@ -35,9 +35,11 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 
 	public ParkingBookKeeper(Controler controler) {
 		this.controler = controler;
-		parkingOccupancyMaintainer=new ParkingOccupancyMaintainer(controler);
+		//parkingOccupancyMaintainer=new ParkingOccupancyMaintainer(controler);
 		
-		ParkingRoot.setParkingOccupancyMaintainer(parkingOccupancyMaintainer);
+		//ParkingRoot.setParkingOccupancyMaintainer(parkingOccupancyMaintainer);
+		
+		//reset(-1);
 	}
 
 	public void handleEvent(ActivityStartEvent event) {
@@ -58,8 +60,10 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
+		System.out.println();
+		parkingOccupancyMaintainer=new ParkingOccupancyMaintainer(controler);
+		ParkingRoot.setParkingOccupancyMaintainer(parkingOccupancyMaintainer);
+		parkingOccupancyMaintainer.performInitializationsAfterLoadingControlerData();
 	}
 
 	@Override

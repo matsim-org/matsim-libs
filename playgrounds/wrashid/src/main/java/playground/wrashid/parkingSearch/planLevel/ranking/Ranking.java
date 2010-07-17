@@ -38,8 +38,12 @@ public class Ranking {
 		ArrayList<ActivityFacilityImpl> resultList = new ArrayList<ActivityFacilityImpl>();
 		ArrayList<ActivityFacilityImpl> closestParkings = null;
 
+		
 		ActivityImpl arrivalParkingAct = ParkingGeneralLib.getArrivalParkingAct(plan, targetActivity);
 		ActivityImpl departureParkingAct = ParkingGeneralLib.getDepartureParkingAct(plan, targetActivity);
+		int indexOfCurrentParking=ParkingGeneralLib.getParkingArrivalIndex(plan, arrivalParkingAct);
+		double parkingArrivalTime=ParkingRoot.getParkingOccupancyMaintainer().getParkingArrivalLog().get(plan.getPerson().getId()).getParkingArrivalInfoList().get(indexOfCurrentParking).getArrivalTime();
+		
 		
 		int numberOfParkingsInSet=10;
 		
@@ -49,7 +53,7 @@ public class Ranking {
 		// check, if there is at least one parking in parking set which is free at the time of arrival (and the given delta interval)
 		// if that is not the case, enlarge the parking set.
 		double delta = 15 * 60;
-		while (someParkingFromSetIsFreeAtArrivalTime(closestParkings,arrivalParkingAct.getStartTime(),delta)){
+		while (!someParkingFromSetIsFreeAtArrivalTime(closestParkings,parkingArrivalTime,delta)){
 			numberOfParkingsInSet*=2;
 			closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(), numberOfParkingsInSet, numberOfParkingsInSet);
 		}
@@ -58,7 +62,7 @@ public class Ranking {
 		
 		for (int i = 0; i < closestParkings.size(); i++) {
 			ActivityFacilityImpl curParking = closestParkings.get(i);
-			ParkingTimeInfo parkingTimeInfo = new ParkingTimeInfo(arrivalParkingAct.getStartTime(),
+			ParkingTimeInfo parkingTimeInfo = new ParkingTimeInfo(parkingArrivalTime,
 					departureParkingAct.getEndTime());
 			double score = getScore(targetActivity.getCoord(), curParking.getId(), parkingTimeInfo, plan.getPerson().getId(),
 					arrivalParkingAct.getDuration(), departureParkingAct.getDuration());
@@ -97,7 +101,9 @@ public class Ranking {
 			// therefore this delta is set big (15 minute at the moment)
 			double startTime = GeneralLib.projectTimeWithin24Hours(arrivalTime - delta);
 			double endTime = GeneralLib.projectTimeWithin24Hours(arrivalTime + delta);
-			if (parkingCapacityFullTimes.get(parkings.get(i).getId()).doesParkingGetFullInInterval(startTime, endTime)) {
+			ParkingCapacityFullLogger parkingCapFullLogger=parkingCapacityFullTimes.get(parkings.get(i).getId());
+			// null means, that parking is free during the whole day (assumption: parking capacity greater than 0).
+			if (parkingCapFullLogger==null || parkingCapFullLogger.doesParkingGetFullInInterval(startTime, endTime) ) {
 				return true;
 			}
 		}
@@ -273,6 +279,6 @@ public class Ranking {
 		// kapazität die beste chance, wirkung unter annahme
 		// von kosten, etc.
 
-		return 0;
+		return walkingPenalty;
 	}
 }

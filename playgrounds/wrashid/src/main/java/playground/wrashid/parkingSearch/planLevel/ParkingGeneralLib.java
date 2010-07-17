@@ -65,6 +65,18 @@ public class ParkingGeneralLib {
 
 		return parkingFacilityIds;
 	}
+	
+	public static void printAllParkingFacilityIds(Plan plan) {
+		LinkedList<Id> allParkingFacilityIds=getAllParkingFacilityIds(plan);
+		
+		System.out.println(plan.getPerson().getId());
+		
+		for (int i=0;i<allParkingFacilityIds.size();i++){
+			System.out.print(allParkingFacilityIds.get(i) + " - ");
+		}
+		
+		System.out.println();
+	}
 
 	/**
 	 * get the first activity after each arrival at a parking.
@@ -171,7 +183,7 @@ public class ParkingGeneralLib {
 		int activityIndex = pe.indexOf(activity);
 		int indexOfArrivalParkingAct = -1;
 
-		for (int i = activityIndex; i < 0; i--) {
+		for (int i = activityIndex; 0<i; i--) {
 			if (pe.get(i) instanceof ActivityImpl) {
 				ActivityImpl parkingAct = (ActivityImpl) plan.getPlanElements().get(i);
 				if (parkingAct.getType().equalsIgnoreCase("parking")) {
@@ -187,5 +199,35 @@ public class ParkingGeneralLib {
 
 		return indexOfArrivalParkingAct;
 	}
+	
+	/**
+	 * TODO: add test.
+	 * If the specified arrival is the i-th arrival of the day, return i (with i starting at 0).
+	 * @param plan
+	 * @param parkingArrivalAct
+	 * @return
+	 */
+	public static int getParkingArrivalIndex(Plan plan, ActivityImpl parkingArrivalAct){
+			List<PlanElement> pe = plan.getPlanElements();
+			int parkingPlanElementIndex = pe.indexOf(parkingArrivalAct);
+			int index = -1;
+
+			for (int i = 0; i<=parkingPlanElementIndex; i++) {
+				if (pe.get(i) instanceof ActivityImpl) {
+					ActivityImpl activity = (ActivityImpl) plan.getPlanElements().get(i);
+					
+					if (activity.getType().equalsIgnoreCase("parking")) {
+						Leg leg = (Leg) plan.getPlanElements().get(i - 1);
+
+						if (leg.getMode().equalsIgnoreCase("car")) {
+							index++;
+						}
+					}
+				}
+			}
+			
+			return index;
+	}
+	
 
 }

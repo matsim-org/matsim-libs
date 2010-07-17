@@ -63,6 +63,7 @@ public class GeneralLibTest extends MatsimTestCase {
 		assertEquals(10.0,GeneralLib.projectTimeWithin24Hours(10.0));
 		assertEquals(0.0,GeneralLib.projectTimeWithin24Hours(60*60*24.0));
 		assertEquals(1.0,GeneralLib.projectTimeWithin24Hours(60*60*24.0+1),0.1);
+		assertEquals(60*60*24.0-1,GeneralLib.projectTimeWithin24Hours(-1),0.1);
 	}
 	
 	

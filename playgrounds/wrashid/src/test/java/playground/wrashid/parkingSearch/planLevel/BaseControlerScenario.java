@@ -23,7 +23,7 @@ public class BaseControlerScenario {
 		eventHandlerAdder.addEventHandler(parkingBookKeeper);
 		controler.addControlerListener(eventHandlerAdder);
 		
-		controler.addControlerListener(new FinishParkingOccupancyMaintainer(parkingBookKeeper.getParkingOccupancyMaintainer()));
+		controler.addControlerListener(new FinishParkingOccupancyMaintainer());
 		
 		
 	}

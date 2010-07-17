@@ -26,6 +26,11 @@ public class ParkingOccupancyMaintainer {
 	IntegerValueHashMap<Id> currentParkingOccupancy = new IntegerValueHashMap<Id>();
 
 	// id: personId
+	// value: Plan
+	// this last selected plan is needed during replanning
+	HashMap<Id, Plan> lastSelectedPlan = new HashMap<Id, Plan>();
+
+	// id: personId
 	// value: time
 	HashMap<Id, Double> endTimeOfFirstParking = new HashMap<Id, Double>();
 	DoubleValueHashMap<Id> startTimeOfCurrentParking = new DoubleValueHashMap<Id>();
@@ -46,6 +51,10 @@ public class ParkingOccupancyMaintainer {
 	// value: ParkingCapacityFullLogger
 	HashMap<Id, ParkingCapacityFullLogger> parkingCapacityFullTimes = new HashMap<Id, ParkingCapacityFullLogger>();
 
+	public HashMap<Id, Plan> getLastSelectedPlan() {
+		return lastSelectedPlan;
+	}
+	
 	public LinkedList<ActivityImpl> getActivitiesWithParkingConstraintViolations(Plan plan) {
 		Id personId = plan.getPerson().getId();
 		LinkedList<Id> parkingFacilityIds = ParkingGeneralLib.getAllParkingFacilityIds(plan);
@@ -54,6 +63,20 @@ public class ParkingOccupancyMaintainer {
 		LinkedList<ActivityImpl> targetActivitiesWithParkingCapacityViolations = ParkingGeneralLib
 				.getParkingTargetActivities(plan);
 
+		//System.out.println(personId);
+		
+		for (int i=0;i<parkingFacilityIds.size();i++){
+			//System.out.print(parkingFacilityIds.get(i) + " - ");
+		}
+		
+		//System.out.println();
+		
+		for (int i=0;i<parkingArrivalLog.get(personId).getParkingArrivalInfoList().size();i++){
+			//System.out.print(parkingArrivalLog.get(personId).getParkingArrivalInfoList().get(i).getFacilityId() + " - ");
+		}
+		
+		//System.out.println();
+		
 		for (int i = 0; i < parkingFacilityIds.size(); i++) {
 			Id parkingFacilityId = parkingFacilityIds.get(i);
 
@@ -61,15 +84,15 @@ public class ParkingOccupancyMaintainer {
 
 			double parkingArrivalTime = pai.getArrivalTime();
 
-			// a consistency check of the system. It might be removed later (and
-			// also the pai.facilityId field) later.
+			// a consistency check of the system. 
 			if (!pai.getFacilityId().toString().equalsIgnoreCase(parkingFacilityId.toString())) {
 				throw new Error("the facility Ids are inconsistent");
 			}
 
-			// if no parking violation happend at the parking, remove it from
+			// if no parking violation happened at the parking, remove it from
 			// the list.
-			if (!parkingCapacityFullTimes.get(parkingFacilityId).isParkingFullAtTime(parkingArrivalTime)) {
+			ParkingCapacityFullLogger pcfl=parkingCapacityFullTimes.get(parkingFacilityId);
+			if (pcfl==null || !pcfl.isParkingFullAtTime(parkingArrivalTime)) {
 				targetActivitiesWithParkingCapacityViolations.remove(i);
 			}
 		}
@@ -107,6 +130,7 @@ public class ParkingOccupancyMaintainer {
 			if (firstParkingFacilityId != null) {
 				currentParkingOccupancy.increment(firstParkingFacilityId);
 			}
+			lastSelectedPlan.put(person.getId(),person.getSelectedPlan());
 		}
 	}
 
