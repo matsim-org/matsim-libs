@@ -39,7 +39,6 @@ import playground.mrieser.core.sim.network.api.SimNetwork;
 	private final Map<Id, QueueLink> links;
 	private final Map<Id, QueueNode> nodes;
 	private QueueNode[] nodesArray = null;
-	private double flowCapFactor = 1.0;
 	private double storageCapFactor = 1.0;
 	private double effectiveCellSize = 7.5;
 	private boolean removeStuckVehicles = true;
@@ -93,14 +92,6 @@ import playground.mrieser.core.sim.network.api.SimNetwork;
 
 	/*package*/ void addNode(final QueueNode node) {
 		this.nodes.put(node.getId(), node);
-	}
-
-	public void setFlowCapFactor(final double flowCapFactor) {
-		this.flowCapFactor = flowCapFactor;
-	}
-
-	public double getFlowCapFactor() {
-		return this.flowCapFactor;
 	}
 
 	public void setStorageCapFactor(final double storageCapFactor) {

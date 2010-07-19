@@ -89,7 +89,7 @@ import playground.mrieser.core.sim.network.api.SimLink;
 		this.freespeedTravelTime = length / this.link.getFreespeed(now);
 
 		double simulatedFlowCapacity = ((LinkImpl)this.link).getFlowCapacity(now);
-		simulatedFlowCapacity = simulatedFlowCapacity * this.network.simEngine.getTimestepSize() * this.network.getFlowCapFactor();
+		simulatedFlowCapacity = simulatedFlowCapacity * this.network.simEngine.getTimestepSize();
 		this.buffer.setFlowCapacity(simulatedFlowCapacity);
 
 		double numberOfLanes = this.link.getNumberOfLanes(now);
