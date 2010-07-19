@@ -79,7 +79,7 @@ public abstract class AbstractDaVisum2HafasMapper {
 	private Map<Id, Id> vRoute2vLine = null;
 	private Collection<Id> unmatched = null;
 	
-	private final double distToMatch;
+	protected final double distToMatch;
 
 
 	public AbstractDaVisum2HafasMapper(double dist2Match){
@@ -283,7 +283,7 @@ public abstract class AbstractDaVisum2HafasMapper {
 		
 	}
 	
-	private double getAvDist(Map<Id, Id> stops){
+	protected double getAvDist(Map<Id, Id> stops){
 		double dist = 0;
 		
 		for (Entry<Id, Id> e : stops.entrySet()){

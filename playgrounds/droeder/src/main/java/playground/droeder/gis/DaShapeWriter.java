@@ -104,10 +104,10 @@ public class DaShapeWriter {
 	}
 	
 	private static void initLineFeatureType(String name, SortedMap<String, String> attributes) {
-		AttributeType [] attribs = new AttributeType[attributes.size() + 1];
+		AttributeType [] attribs = new AttributeType[attributes.size() + 2];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
-		
-		Integer count = 1;
+		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
+		Integer count = 2;
 		for(String s : attributes.keySet()){
 			attribs[count] = AttributeTypeFactory.newAttributeType(s, String.class);
 			count++;
@@ -150,7 +150,7 @@ public class DaShapeWriter {
 						coord[i] = MGC.coord2Coordinate(stop.getStopFacility().getCoord());
 						i++;
 					}
-					feature = getLineStringFeature(new CoordinateArraySequence(coord), attributes.get(line.getId()));
+					feature = getLineStringFeature(new CoordinateArraySequence(coord), line.getId().toString(), attributes.get(line.getId()));
 					features.add(feature);
 				}
 			}
@@ -167,7 +167,7 @@ public class DaShapeWriter {
 			coord = new Coordinate[2];
 			coord[0] = MGC.coord2Coordinate(l.getFromNode().getCoord());
 			coord[1] = MGC.coord2Coordinate(l.getToNode().getCoord());
-			feature = getLineStringFeature(new CoordinateArraySequence(coord), attributes.get(l.getId()));
+			feature = getLineStringFeature(new CoordinateArraySequence(coord), l.getId().toString(), attributes.get(l.getId()));
 			features.add(feature);
 		}
 		return features;
@@ -182,7 +182,7 @@ public class DaShapeWriter {
 			coord = new Coordinate[2];
 			coord[0] = MGC.coord2Coordinate(e.getValue().getFirst());
 			coord[1] = MGC.coord2Coordinate(e.getValue().getSecond());
-			feature = getLineStringFeature(new CoordinateArraySequence(coord), attributes.get(e.getKey()));
+			feature = getLineStringFeature(new CoordinateArraySequence(coord), e.getKey(), attributes.get(e.getKey()));
 			features.add(feature);
 		}
 		
@@ -213,11 +213,12 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Feature getLineStringFeature(CoordinateArraySequence c, SortedMap<String, String> attributes) {
+	private static Feature getLineStringFeature(CoordinateArraySequence c, String name, SortedMap<String, String> attributes) {
 		LineString s = geometryFactory.createLineString(c);
-		Object [] attribs = new Object[2];
+		Object [] attribs = new Object[attributes.size()+2];
 		attribs[0] = s;
-		Integer count = 1;
+		attribs[1] = name;
+		Integer count = 2;
 		for(String str : attributes.values()){
 			attribs[count] = str;
 			count++;
