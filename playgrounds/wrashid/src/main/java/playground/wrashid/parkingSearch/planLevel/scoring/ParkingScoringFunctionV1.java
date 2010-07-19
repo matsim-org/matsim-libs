@@ -18,7 +18,7 @@ public class ParkingScoringFunctionV1 extends ParkingScoringFunction {
 	}
 
 	public double getScore(ActivityImpl targetActivity, Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId,
-			double parkingArrivalDuration, double parkingDepartureDuration, Plan plan, double delta) {
+			double parkingArrivalDuration, double parkingDepartureDuration, Plan plan, double delta, boolean forRanking) {
 		// TODO: must ensure through the score, that parkings which are full at
 		// the time of arrival get a bad score.
 
@@ -179,6 +179,13 @@ public class ParkingScoringFunctionV1 extends ParkingScoringFunction {
 		// von kosten, etc.
 
 		//return walkingPenalty;
+		
+		if (!forRanking){
+			// -1.0 is just to assure, if the current car is the last car to arrive at the parking, still there is no problem
+			if (!ParkingRoot.getParkingScoringFunction().isParkingFullAtTime(parkingFacilityId,parkingTimeInfo.getStartTime()-1.0)){
+				return Double.parseDouble(parkingFacilityId.toString())/2;
+			}
+		}
 		
 		if (parkingFacilityId.toString().equalsIgnoreCase("36")){
 			System.out.println();

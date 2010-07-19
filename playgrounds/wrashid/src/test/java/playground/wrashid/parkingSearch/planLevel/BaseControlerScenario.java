@@ -9,6 +9,7 @@ import playground.wrashid.parkingSearch.planLevel.occupancy.FinishParkingOccupan
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
+import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoreListener;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunction;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunctionV1;
 
@@ -30,9 +31,9 @@ public class BaseControlerScenario {
 		
 		controler.addControlerListener(new FinishParkingOccupancyMaintainer());
 		
+		controler.addControlerListener(new ParkingScoreListener());
+		
 		ParkingRoot.setParkingScoringFunction(new ParkingScoringFunctionV1(new ParkingPriceMapping1(), new IncomeRelevantForParking(), null));
-		
-		
 	}
 
 }

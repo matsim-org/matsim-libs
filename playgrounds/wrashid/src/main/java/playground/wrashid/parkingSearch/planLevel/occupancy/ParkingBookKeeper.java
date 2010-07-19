@@ -22,9 +22,10 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 	private Controler controler;
 	private ParkingOccupancyMaintainer parkingOccupancyMaintainer;
 
+	// id: personId
 	// true: starts parking/arrival
 	// false: end parking/departure
-	HashMap<Id, Boolean> personParkingMode = new HashMap<Id, Boolean>();
+	HashMap<Id, Boolean> parkingMode = new HashMap<Id, Boolean>();
 
 	
 	
@@ -46,13 +47,13 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 		Id personId = event.getPersonId();
 
 		if (event.getActType().equalsIgnoreCase("parking")) {
-			if (!personParkingMode.containsKey(personId)) {
+			if (!parkingMode.containsKey(personId)) {
 				// init personParkingMode (first parking action in the morning
 				// is departure)
-				personParkingMode.put(personId, false);
+				parkingMode.put(personId, false);
 			}
 
-			if (personParkingMode.get(personId)==true){
+			if (parkingMode.get(personId)==true){
 				parkingOccupancyMaintainer.logArrivalAtParking(event);
 			}
 		}
@@ -75,11 +76,11 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 		Id personId = event.getPersonId();
 
 		if (event.getActType().equalsIgnoreCase("parking")) {
-			if (personParkingMode.get(personId)==false){
+			if (parkingMode.get(personId)==false){
 				parkingOccupancyMaintainer.logDepartureFromParking(event);
-				personParkingMode.put(personId, true);
+				parkingMode.put(personId, true);
 			} else {
-				personParkingMode.put(personId, false);
+				parkingMode.put(personId, false);
 			}
 		}
 	}
