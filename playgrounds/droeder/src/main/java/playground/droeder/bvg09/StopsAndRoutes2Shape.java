@@ -1,48 +1,33 @@
 package playground.droeder.bvg09;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
-import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;
 import playground.droeder.gis.DaShapeWriter;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class StopsAndRoutes2Shape{
 	
@@ -59,6 +44,8 @@ public class StopsAndRoutes2Shape{
 	Collection<Id> vStops;
 	Collection<Id> hLines;
 	Collection<Id> vLines;
+	
+	Map<Id, SortedMap<String, String>> linkAttributes;
 	
 	Map<String, Tuple<Coord, Coord>> preMatched;
 	
@@ -77,6 +64,8 @@ public class StopsAndRoutes2Shape{
 	private final String HAFASROUTE2SHAPE = PATH + "HafasRoutes2Shape.shp";
 	
 	private final String MATCHEDSTOPS2SHAPE = PATH + "MatchedStops2Shape.shp";
+
+	private final String NETWORK2SHAPE = PATH + "visumNet2shape.shp";
  	
 	public static void main(String[] args) {
 		StopsAndRoutes2Shape s2s = new StopsAndRoutes2Shape();
@@ -121,8 +110,11 @@ public class StopsAndRoutes2Shape{
 	}
 
 	public void run() {
-		this.preProcess();
+
+		preProcessLinks();
+		DaShapeWriter.writeLinks2Shape(NETWORK2SHAPE , vSc.getNetwork().getLinks(), linkAttributes);
 		
+//		this.preProcessStopsAndRoutes();
 //		DaShapeWriter.writeTransitLines2Shape(HAFASROUTE2SHAPE, hSc.getTransitSchedule(), hLines);
 //		DaShapeWriter.writeTransitLines2Shape(VISUMROUTE2SHAPE, vSc.getTransitSchedule(), vLines);
 //		DaShapeWriter.writeRouteStops2Shape(HAFASSTOP2SHAPE, hSc.getTransitSchedule().getFacilities(), hStops);
@@ -132,7 +124,7 @@ public class StopsAndRoutes2Shape{
 //		DaShapeWriter.writeNodes2Shape(VISUMNODES2SHAPE, vSc.getNetwork().getNodes());
 	}
 	
-	private void preProcess(){
+	private void preProcessStopsAndRoutes(){
 
 		hStops = new HashSet<Id>();
 		vStops = new HashSet<Id>();
@@ -170,6 +162,18 @@ public class StopsAndRoutes2Shape{
 					hSc.getTransitSchedule().getFacilities().get(e.getValue()).getCoord()));
 		}
 	
+	}
+	
+	private void preProcessLinks(){
+		this.linkAttributes = new HashMap<Id, SortedMap<String,String>>();
+		SortedMap<String, String> attribs;
+		
+		for(Link l : vSc.getNetwork().getLinks().values()){
+			attribs = new TreeMap<String, String>();
+			attribs.put("modes", l.getAllowedModes().toString());
+			linkAttributes.put(l.getId(), attribs);
+		}
+		
 	}
 	
 }

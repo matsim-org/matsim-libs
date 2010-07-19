@@ -46,10 +46,15 @@ public class DaShapeWriter {
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	
 	public static void writeLinks2Shape(String fileName, Map<Id, Link> links, Map<Id, SortedMap<String, String>> attributes){
-		for(SortedMap<String, String> m : attributes.values()){
-			initLineFeatureType("links", m);
-			break;
+		if(attributes == null){
+			initLineFeatureType("links", null);
+		}else{
+			for(SortedMap<String, String> m : attributes.values()){
+				initLineFeatureType("links", m);
+				break;
+			}
 		}
+
 		write(createLinkFeatures(links, attributes), fileName);
 	}
 	
@@ -91,6 +96,7 @@ public class DaShapeWriter {
 			initLineFeatureType("distance", m);
 			break;
 		}
+		
 		write(createPointDistanceFeatures(points,attributes), fileName);
 	}
 	
@@ -104,13 +110,22 @@ public class DaShapeWriter {
 	}
 	
 	private static void initLineFeatureType(String name, SortedMap<String, String> attributes) {
-		AttributeType [] attribs = new AttributeType[attributes.size() + 2];
+		AttributeType [] attribs;
+		if(attributes == null){
+			attribs = new AttributeType[2];
+		}else{
+			attribs = new AttributeType[attributes.size() + 2];
+		}
+		
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
 		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
 		Integer count = 2;
-		for(String s : attributes.keySet()){
-			attribs[count] = AttributeTypeFactory.newAttributeType(s, String.class);
-			count++;
+		
+		if(!(attributes == null)){
+			for(String s : attributes.keySet()){
+				attribs[count] = AttributeTypeFactory.newAttributeType(s, String.class);
+				count++;
+			}
 		}
 		
 		try {
@@ -167,7 +182,11 @@ public class DaShapeWriter {
 			coord = new Coordinate[2];
 			coord[0] = MGC.coord2Coordinate(l.getFromNode().getCoord());
 			coord[1] = MGC.coord2Coordinate(l.getToNode().getCoord());
-			feature = getLineStringFeature(new CoordinateArraySequence(coord), l.getId().toString(), attributes.get(l.getId()));
+			if(attributes == null){
+				feature = getLineStringFeature(new CoordinateArraySequence(coord), l.getId().toString(), null);
+			}else{
+				feature = getLineStringFeature(new CoordinateArraySequence(coord), l.getId().toString(), attributes.get(l.getId()));
+			}
 			features.add(feature);
 		}
 		return features;
@@ -215,13 +234,21 @@ public class DaShapeWriter {
 	
 	private static Feature getLineStringFeature(CoordinateArraySequence c, String name, SortedMap<String, String> attributes) {
 		LineString s = geometryFactory.createLineString(c);
-		Object [] attribs = new Object[attributes.size()+2];
+		Object [] attribs ;
+		if(attributes == null){
+			attribs = new Object[2];
+		}else{
+			attribs = new Object[attributes.size()+2];
+		}
 		attribs[0] = s;
 		attribs[1] = name;
 		Integer count = 2;
-		for(String str : attributes.values()){
-			attribs[count] = str;
-			count++;
+		
+		if(!(attributes == null)){
+			for(String str : attributes.values()){
+				attribs[count] = str;
+				count++;
+			}
 		}
 		
 		try {
