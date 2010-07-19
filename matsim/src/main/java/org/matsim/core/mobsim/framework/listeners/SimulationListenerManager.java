@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.framework.listeners;
 
 import javax.swing.event.EventListenerList;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEventImpl;
@@ -39,7 +40,9 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEventImpl;
  * @author dgrether
  */
 public class SimulationListenerManager<T extends Simulation> {
-	
+
+	private static final Logger log = Logger.getLogger("noname");
+
 	private final T queuesim;
 
 	private final EventListenerList listenerList = new EventListenerList();
@@ -50,10 +53,12 @@ public class SimulationListenerManager<T extends Simulation> {
 	
 	@SuppressWarnings("unchecked")
 	public void addQueueSimulationListener(final SimulationListener l) {
+		log.warn( "calling addQueueSimulationListener ") ;
 		Class[] interfaces = l.getClass().getInterfaces();
 		for (int i = 0; i < interfaces.length; i++) {
 			if (SimulationListener.class.isAssignableFrom(interfaces[i])) {
 				this.listenerList.add(interfaces[i], l);
+				log.warn( " just assigned class " + SimulationListener.class.getName() + " to interface " + interfaces[i].getName() ) ;
 			}
 		}
 	}
@@ -74,6 +79,7 @@ public class SimulationListenerManager<T extends Simulation> {
 	public void fireQueueSimulationInitializedEvent() {
 		SimulationInitializedEvent event = new SimulationInitializedEventImpl(queuesim);
 		SimulationInitializedListener[] listener = this.listenerList.getListeners(SimulationInitializedListener.class);
+		log.warn("firing simulationInitializedEvent") ;
     for (int i = 0; i < listener.length; i++) {
     	listener[i].notifySimulationInitialized(event);
     }

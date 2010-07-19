@@ -22,13 +22,19 @@ package org.matsim.ptproject.qsim.interfaces;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 
+@Deprecated // this is a good idea but I think that it can be fully emulated using 
+// the SimulationListeners and the EventsHandlers.  kai, jul'10
+public interface MobsimFeature extends SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener {
 
-public interface MobsimFeature {
+//	void afterPrepareSim();
+	// same functionality as SimulationInitializedListener.  kai, jul'10
 
-	void afterPrepareSim();
-
-	void beforeCleanupSim();
+//	void beforeCleanupSim();
+	// same functionality as SimulationBeforeCleanupListener.  kai, jul'10
 
 	/**
 	 * @deprecated as it seems this method is not used by any QSimFeature, also it is not clear what 
@@ -38,8 +44,9 @@ public interface MobsimFeature {
 	@Deprecated
 	void beforeHandleAgentArrival(PersonAgent agent);
 
-	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
-	void afterAfterSimStep(double time);
+//	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
+//	void afterAfterSimStep(double time);
+	// same functionality as AfterSimStepListener.  kai, jul'10
 
 	@Deprecated // do we need to pass the time?  to be discussed ...  kai, may'10
 	void beforeHandleUnknownLegMode(double now, PersonAgent agent, Link link);

@@ -342,9 +342,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 		prepareNetworkChangeEventsQueue();
 
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.afterPrepareSim();
-		}
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//			queueSimulationFeature.afterPrepareSim();
+//		}
 	}
 
 
@@ -352,9 +352,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 * Close any files, etc.
 	 */
 	protected void cleanupSim() {
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.beforeCleanupSim();
-		}
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//			queueSimulationFeature.beforeCleanupSim();
+//		}
 
 		this.simEngine.afterSim();
 
@@ -416,9 +416,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 			this.snapshotTime += this.snapshotPeriod;
 			doSnapshot(time);
 		}
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.afterAfterSimStep(time);
-		}
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//			queueSimulationFeature.afterAfterSimStep(time);
+//		}
 	}
 
 	private void doSnapshot(final double time) {

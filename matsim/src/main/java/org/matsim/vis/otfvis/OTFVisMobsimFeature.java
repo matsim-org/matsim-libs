@@ -24,11 +24,18 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
@@ -50,8 +57,10 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
-public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
+public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature, SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener  {
 
+	private static final Logger log = Logger.getLogger("noname");
+	
 	protected OnTheFlyServer otfServer = null;
 
 	private boolean ownServer = true;
@@ -81,7 +90,9 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 	}
 
 	@Override
-	public void afterPrepareSim() {
+//	public void afterPrepareSim() {
+	public void notifySimulationInitialized(SimulationInitializedEvent ev) {
+		log.warn("receiving simulationInitializedEvent") ;
 		if (ownServer) {
 			UUID idOne = UUID.randomUUID();
 			this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), queueSimulation.getEventsManager());
@@ -158,7 +169,8 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 	}
 
 	@Override
-	public void beforeCleanupSim() {
+//	public void beforeCleanupSim() {
+	public void notifySimulationBeforeCleanup( SimulationBeforeCleanupEvent ev ) {
 		if(ownServer) {
 			this.otfServer.cleanup();
 		}
@@ -170,11 +182,19 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 		this.visTeleportationData.remove(agent.getPerson().getId());
 	}
 
+//	@Override
+//	public void afterAfterSimStep(final double time) {
+//		this.visualizeTeleportedAgents(time);
+//		this.otfServer.updateStatus(time);
+//	}
+	
 	@Override
-	public void afterAfterSimStep(final double time) {
+	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent event) {
+		double time = event.getSimulationTime() ;
 		this.visualizeTeleportedAgents(time);
 		this.otfServer.updateStatus(time);
 	}
+
 
 	@Override
 	public void beforeHandleUnknownLegMode(double now, final PersonAgent agent, Link link) {
@@ -185,10 +205,9 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature {
 	private void visualizeTeleportedAgents(double time) {
 		if (this.doVisualizeTeleportedAgents) {
 			this.teleportationWriter.setSrc(this.visTeleportationData);
-		}
-		// yyyy is it necessary to call the following when teleported agents are not visualized?
-		for (TeleportationVisData teleportationVisData : visTeleportationData.values()) {
-			teleportationVisData.calculatePosition(time);
+			for (TeleportationVisData teleportationVisData : visTeleportationData.values()) {
+				teleportationVisData.calculatePosition(time);
+			}
 		}
 	}
 

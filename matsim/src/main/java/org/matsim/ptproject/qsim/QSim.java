@@ -322,9 +322,9 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			this.changeEventsEngine.onPrepareSim();
 		}
 
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) { // yyyy features should be replaced by listeners
-			queueSimulationFeature.afterPrepareSim();
-		}
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) { // yyyy features should be replaced by listeners
+//			queueSimulationFeature.afterPrepareSim();
+//		}
 	}
 
 	/**
@@ -339,9 +339,9 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			this.signalEngine.afterSim();
 		}
 
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) { // yyyy features should be replaced by listeners
-			queueSimulationFeature.beforeCleanupSim();
-		}
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) { // yyyy features should be replaced by listeners
+//			queueSimulationFeature.beforeCleanupSim();
+//		}
 
 		if ( this.netEngine != null ) {
 			this.netEngine.afterSim();
@@ -400,9 +400,9 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			doSnapshot(time);
 		}
 
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.afterAfterSimStep(time);
-		}
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//			queueSimulationFeature.afterAfterSimStep(time);
+//		}
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
 	}
 
@@ -661,6 +661,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	@Override
 	public void addFeature(final MobsimFeature queueSimulationFeature) {
 		this.queueSimulationFeatures.add(queueSimulationFeature);
+		this.addQueueSimulationListeners(queueSimulationFeature);
 	}
 
 
