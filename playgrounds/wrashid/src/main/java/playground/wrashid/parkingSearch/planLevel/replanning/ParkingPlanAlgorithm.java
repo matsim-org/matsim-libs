@@ -70,11 +70,17 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		// if the activity chain structure of the given plan in this method and the plan of the last iteration
 		// is fundamentally different, the algorithm here will not work.
 		// TODO: put somewhere the last plan!!!
+		
+		
+		
 		Plan lastIterationPlan=ParkingRoot.getParkingOccupancyMaintainer().getLastSelectedPlan().get(plan.getPerson().getId()); // load plan...
 
 		// Replace the plan elements of proposed plan
 		plan.getPlanElements().clear();
 		plan.getPlanElements().addAll(lastIterationPlan.getPlanElements());
+		
+		// probably it makes since for the parking replanning, only to chang the parking and not too much...
+		// 
 		
 		
 		// I think taking the same plan as in previous iteration and changing it makes most since, because the structural changes
@@ -106,6 +112,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 				.getActivitiesWithParkingConstraintViolations(plan);
 
 		if (targetActivitiesWithParkingCapacityViolations.size() != 0) {
+		//if (targetActivitiesWithParkingCapacityViolations.size() < 0) {
 			// if some parking capacities were violated by current plan, change
 			// one of the parkings which
 			// violated the plan.
@@ -189,10 +196,18 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 			}
 
 			changeNextParking(plan, firstActivity, newParkingActivity);
+			
+			newParkingActivity = createNewParkingActivity(newParking, network, ParkingRoot.getParkingActivityDuration()
+					.getActivityDuration(newParking.getId(), plan.getPerson().getId()));
+			
 			changePreviousParking(plan, lastActivity, newParkingActivity);
 		} else {
 			// for activities in between
 			changePreviousParking(plan, targetActivity, newParkingActivity);
+			
+			newParkingActivity = createNewParkingActivity(newParking, network, ParkingRoot.getParkingActivityDuration()
+					.getActivityDuration(newParking.getId(), plan.getPerson().getId()));
+			
 			changeNextParking(plan, targetActivity, newParkingActivity);
 		}
 

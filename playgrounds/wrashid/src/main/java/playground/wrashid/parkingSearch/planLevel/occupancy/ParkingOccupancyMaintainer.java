@@ -1,5 +1,6 @@
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,6 +17,8 @@ import org.matsim.core.population.ActivityImpl;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
+import playground.wrashid.lib.obj.list.ListElementMarkForRemoval;
+import playground.wrashid.lib.obj.list.Lists;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
@@ -54,7 +57,7 @@ public class ParkingOccupancyMaintainer {
 	public HashMap<Id, Plan> getLastSelectedPlan() {
 		return lastSelectedPlan;
 	}
-	
+
 	public LinkedList<ActivityImpl> getActivitiesWithParkingConstraintViolations(Plan plan) {
 		Id personId = plan.getPerson().getId();
 		LinkedList<Id> parkingFacilityIds = ParkingGeneralLib.getAllParkingFacilityIds(plan);
@@ -63,20 +66,23 @@ public class ParkingOccupancyMaintainer {
 		LinkedList<ActivityImpl> targetActivitiesWithParkingCapacityViolations = ParkingGeneralLib
 				.getParkingTargetActivities(plan);
 
-		//System.out.println(personId);
-		
-		for (int i=0;i<parkingFacilityIds.size();i++){
-			//System.out.print(parkingFacilityIds.get(i) + " - ");
+		// System.out.println(personId);
+
+		for (int i = 0; i < parkingFacilityIds.size(); i++) {
+			// System.out.print(parkingFacilityIds.get(i) + " - ");
 		}
-		
-		//System.out.println();
-		
-		for (int i=0;i<parkingArrivalLog.get(personId).getParkingArrivalInfoList().size();i++){
-			//System.out.print(parkingArrivalLog.get(personId).getParkingArrivalInfoList().get(i).getFacilityId() + " - ");
+
+		// System.out.println();
+
+		for (int i = 0; i < parkingArrivalLog.get(personId).getParkingArrivalInfoList().size(); i++) {
+			// System.out.print(parkingArrivalLog.get(personId).getParkingArrivalInfoList().get(i).getFacilityId()
+			// + " - ");
 		}
-		
-		//System.out.println();
-		
+
+		// System.out.println();
+
+		ListElementMarkForRemoval listElementToRemove = new ListElementMarkForRemoval();
+
 		for (int i = 0; i < parkingFacilityIds.size(); i++) {
 			Id parkingFacilityId = parkingFacilityIds.get(i);
 
@@ -84,18 +90,20 @@ public class ParkingOccupancyMaintainer {
 
 			double parkingArrivalTime = pai.getArrivalTime();
 
-			// a consistency check of the system. 
+			// a consistency check of the system.
 			if (!pai.getFacilityId().toString().equalsIgnoreCase(parkingFacilityId.toString())) {
 				throw new Error("the facility Ids are inconsistent");
 			}
 
 			// if no parking violation happened at the parking, remove it from
 			// the list.
-			ParkingCapacityFullLogger pcfl=parkingCapacityFullTimes.get(parkingFacilityId);
-			if (pcfl==null || !pcfl.isParkingFullAtTime(parkingArrivalTime)) {
-				targetActivitiesWithParkingCapacityViolations.remove(i);
+			ParkingCapacityFullLogger pcfl = parkingCapacityFullTimes.get(parkingFacilityId);
+			if (pcfl == null || !pcfl.isParkingFullAtTime(parkingArrivalTime)) {
+				listElementToRemove.markForRemoval(targetActivitiesWithParkingCapacityViolations.get(i));
 			}
 		}
+
+		listElementToRemove.apply(targetActivitiesWithParkingCapacityViolations);
 
 		return targetActivitiesWithParkingCapacityViolations;
 	}
@@ -130,7 +138,7 @@ public class ParkingOccupancyMaintainer {
 			if (firstParkingFacilityId != null) {
 				currentParkingOccupancy.increment(firstParkingFacilityId);
 			}
-			lastSelectedPlan.put(person.getId(),person.getSelectedPlan());
+			lastSelectedPlan.put(person.getId(), person.getSelectedPlan());
 		}
 	}
 
@@ -140,15 +148,10 @@ public class ParkingOccupancyMaintainer {
 		double time = GeneralLib.projectTimeWithin24Hours(event.getTime());
 		startTimeOfCurrentParking.put(personId, event.getTime());
 
-		// this code has been replaced by introduction of
-		// parkingCapacityFullTimes
-		// delete code, if still here till 15. July 2010.
-		/*
-		 * if (currentParkingOccupancy.get(parkingFacilityId) >=
-		 * ParkingRoot.getParkingCapacity().getParkingCapacity(
-		 * parkingFacilityId)) { capacityViolation.add(event); }
-		 */
-
+		if (parkingFacilityId.toString().equalsIgnoreCase("36")){
+			System.out.println();
+		}
+		
 		currentParkingOccupancy.increment(parkingFacilityId);
 
 		currentParkingFacilityId.put(personId, parkingFacilityId);
@@ -171,6 +174,12 @@ public class ParkingOccupancyMaintainer {
 
 	}
 
+	private void assureParkingOccupancyIsNonNegative(Id facilityId) {
+		if (currentParkingOccupancy.get(facilityId) < 0) {
+			throw new Error("parking occupancy cannot be negative");
+		}
+	}
+	
 	public void logDepartureFromParking(ActivityEndEvent event) {
 		Id personId = event.getPersonId();
 		Id parkingFacilityId = event.getFacilityId();
@@ -178,15 +187,14 @@ public class ParkingOccupancyMaintainer {
 
 		currentParkingOccupancy.decrement(event.getFacilityId());
 
+		
+		
 		if (!endTimeOfFirstParking.containsKey(personId)) {
 			// handle departure from first parking
 
 			endTimeOfFirstParking.put(personId, event.getTime());
 
 		} else {
-			// handle departure
-
-			currentParkingOccupancy.decrement(event.getFacilityId());
 
 			// update bins
 
@@ -195,10 +203,12 @@ public class ParkingOccupancyMaintainer {
 
 		}
 
+		assureParkingOccupancyIsNonNegative(event.getFacilityId());
+		
 		// log if parking got from full to not-full state
 		double currentParkingOcc = currentParkingOccupancy.get(parkingFacilityId);
 		double parkingCapacity = ParkingRoot.getParkingCapacity().getParkingCapacity(parkingFacilityId);
-		if (currentParkingOcc == parkingCapacity) {
+		if (currentParkingOcc == parkingCapacity-1) {
 			if (!parkingCapacityFullTimes.containsKey(parkingFacilityId)) {
 				parkingCapacityFullTimes.put(parkingFacilityId, new ParkingCapacityFullLogger());
 			}

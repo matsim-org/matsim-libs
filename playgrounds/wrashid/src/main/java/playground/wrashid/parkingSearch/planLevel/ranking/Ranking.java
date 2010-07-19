@@ -38,14 +38,21 @@ public class Ranking {
 		ArrayList<ActivityFacilityImpl> resultList = new ArrayList<ActivityFacilityImpl>();
 		ArrayList<ActivityFacilityImpl> closestParkings = null;
 
+		if (plan.getPerson().getId().toString().equalsIgnoreCase("3")){
+			System.out.println();
+		}
 		
 		ActivityImpl arrivalParkingAct = ParkingGeneralLib.getArrivalParkingAct(plan, targetActivity);
 		ActivityImpl departureParkingAct = ParkingGeneralLib.getDepartureParkingAct(plan, targetActivity);
 		int indexOfCurrentParking=ParkingGeneralLib.getParkingArrivalIndex(plan, arrivalParkingAct);
+		if (indexOfCurrentParking==-1){
+			System.out.println();
+		}
+		
 		double parkingArrivalTime=ParkingRoot.getParkingOccupancyMaintainer().getParkingArrivalLog().get(plan.getPerson().getId()).getParkingArrivalInfoList().get(indexOfCurrentParking).getArrivalTime();
 		
 		
-		int numberOfParkingsInSet=10;
+		int numberOfParkingsInSet=100;
 		
 		closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(), numberOfParkingsInSet, numberOfParkingsInSet);
 
@@ -64,14 +71,17 @@ public class Ranking {
 			ActivityFacilityImpl curParking = closestParkings.get(i);
 			ParkingTimeInfo parkingTimeInfo = new ParkingTimeInfo(parkingArrivalTime,
 					departureParkingAct.getEndTime());
-			double score = getScore(targetActivity.getCoord(), curParking.getId(), parkingTimeInfo, plan.getPerson().getId(),
-					arrivalParkingAct.getDuration(), departureParkingAct.getDuration());
+			double score = getScore(targetActivity, curParking.getId(), parkingTimeInfo, plan.getPerson().getId(),
+					arrivalParkingAct.getDuration(), departureParkingAct.getDuration(), plan, delta);
 			OrderedFacility orderedFacility = new OrderedFacility(curParking, score);
 			prio.add(orderedFacility);
 		}
 
+		
+		// because priority list is sorted from low to high score, we need to flip it
 		while (prio.size() > 0) {
-			resultList.add(prio.poll().getFacility());
+			ActivityFacilityImpl parkingFacility=prio.poll().getFacility();
+			resultList.add(0,parkingFacility);
 		}
 
 		return resultList;
@@ -86,9 +96,7 @@ public class Ranking {
 	 */
 	public boolean someParkingFromSetIsFreeAtArrivalTime(ArrayList<ActivityFacilityImpl> parkings, double arrivalTime,
 			double delta) {
-		HashMap<Id, ParkingCapacityFullLogger> parkingCapacityFullTimes = ParkingRoot.getParkingOccupancyMaintainer()
-				.getParkingCapacityFullTimes();
-
+	
 		for (int i = 0; i < parkings.size(); i++) {
 			// only if the parking is fully free within the given interval, it
 			// is considered free
@@ -99,17 +107,32 @@ public class Ranking {
 			// travel behaviour or event the current agent may change his
 			// departure time from home, etc.
 			// therefore this delta is set big (15 minute at the moment)
-			double startTime = GeneralLib.projectTimeWithin24Hours(arrivalTime - delta);
-			double endTime = GeneralLib.projectTimeWithin24Hours(arrivalTime + delta);
-			ParkingCapacityFullLogger parkingCapFullLogger=parkingCapacityFullTimes.get(parkings.get(i).getId());
-			// null means, that parking is free during the whole day (assumption: parking capacity greater than 0).
-			if (parkingCapFullLogger==null || parkingCapFullLogger.doesParkingGetFullInInterval(startTime, endTime) ) {
+			
+			if (isParkingNotFullDuringIntervall(parkings.get(i).getId(),arrivalTime, delta)){
 				return true;
 			}
+			
 		}
 
 		return false;
 	}
+	
+	private boolean isParkingNotFullDuringIntervall(Id parkingFacilityId, double arrivalTime, double delta){
+		HashMap<Id, ParkingCapacityFullLogger> parkingCapacityFullTimes = ParkingRoot.getParkingOccupancyMaintainer()
+		.getParkingCapacityFullTimes();
+		
+		double startTime = GeneralLib.projectTimeWithin24Hours(arrivalTime - delta);
+		double endTime = GeneralLib.projectTimeWithin24Hours(arrivalTime + delta);
+		ParkingCapacityFullLogger parkingCapFullLogger=parkingCapacityFullTimes.get(parkingFacilityId);
+		// null means, that parking is free during the whole day (assumption: parking capacity greater than 0).
+		if (parkingCapFullLogger==null || !parkingCapFullLogger.doesParkingGetFullInInterval(startTime, endTime) ) {
+			return true;
+		}
+		return false;
+	}
+	
+	
+	
 
 	public Ranking(ParkingPriceMapping parkingPriceMapping, IncomeRelevantForParking income,
 			ActivityFacilitiesImpl parkingFacilities) {
@@ -118,8 +141,8 @@ public class Ranking {
 		this.parkingFacilities = parkingFacilities;
 	}
 
-	public double getScore(Coord targetCoord, Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId,
-			double parkingArrivalDuration, double parkingDepartureDuration) {
+	public double getScore(ActivityImpl targetActivity, Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId,
+			double parkingArrivalDuration, double parkingDepartureDuration, Plan plan, double delta) {
 		// TODO: must ensure through the score, that parkings which are full at
 		// the time of arrival get a bad score.
 
@@ -165,7 +188,7 @@ public class Ranking {
 		// let the system calibrate itself, what scaling would render best
 		// results.
 		double walkingPenalty = -1.0
-				* ClosestParkingMatrix.getDistance(targetCoord, parkingFacilities.getFacilities().get(parkingFacilityId)
+				* ClosestParkingMatrix.getDistance(targetActivity.getCoord(), parkingFacilities.getFacilities().get(parkingFacilityId)
 						.getCoord());
 
 		// TODO: question: should we have one scaling factor to scaling the
@@ -279,6 +302,16 @@ public class Ranking {
 		// kapazität die beste chance, wirkung unter annahme
 		// von kosten, etc.
 
-		return walkingPenalty;
+		//return walkingPenalty;
+		
+		if (parkingFacilityId.toString().equalsIgnoreCase("36")){
+			System.out.println();
+		}
+		
+		if (!isParkingNotFullDuringIntervall(parkingFacilityId,parkingTimeInfo.getStartTime(),delta)){
+			return Double.parseDouble(parkingFacilityId.toString())/2;
+		}
+		
+		return Double.parseDouble(parkingFacilityId.toString());
 	}
 }

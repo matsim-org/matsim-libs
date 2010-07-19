@@ -50,6 +50,10 @@ public class ParkingCapacityFullLogger {
 		GeneralLib.errorIfNot24HourProjectedTime(startTime);
 
 		errorIfStartAlreadyDefined();
+		
+		if (startTime==42462.0){
+			System.out.println();
+		}
 
 		this.startTime = startTime;
 	}

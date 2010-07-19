@@ -166,7 +166,7 @@ public class ClosestParkingMatrix {
 
 				while (neighbourLinks.size() > 0) {
 					Link curLink = neighbourLinks.removeFirst();
-					if (!checkedLinks.contains(curLink)) {
+					if (!checkedLinks.contains(curLink) && !untestedLinks.contains(curLink)) {
 						untestedLinks.add(curLink);
 					}
 				}

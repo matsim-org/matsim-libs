@@ -34,6 +34,9 @@ public class ClosestParkingMatrixTest extends MatsimTestCase {
 		assertEquals("1", links.get(0).getId().toString());
 		assertEquals("91", links.get(1).getId().toString());
 		assertEquals(2, links.size());
+		
+		links = cpm.getClosestLinks(new CoordImpl(0.0, 0.0), 12800);
+		assertEquals(180, links.size());
 	}
 
 	public void testGetClosestParkings() {
@@ -66,7 +69,14 @@ public class ClosestParkingMatrixTest extends MatsimTestCase {
 		assertEquals("1", resultFacilities.get(2).getId().toString());
 		assertEquals("2", resultFacilities.get(3).getId().toString());
 		assertEquals(4, resultFacilities.size());
-
+		
+		resultFacilities = cpm.getClosestParkings(new CoordImpl(0.0, 0.0), 12800);
+		assertEquals(36, resultFacilities.size());
+		
+		
+		resultFacilities = cpm.getClosestParkings(new CoordImpl(0.0, 0.0), 100, 100);
+		assertEquals(36, resultFacilities.size());
+		
 	}
 
 	public void testGetOrderedListAccordingToDistanceFromCoord() {

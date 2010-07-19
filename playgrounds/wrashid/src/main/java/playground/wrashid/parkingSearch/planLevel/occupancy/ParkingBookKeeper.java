@@ -60,6 +60,10 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 
 	@Override
 	public void reset(int iteration) {
+		if (iteration==3){
+			System.out.println();
+		}
+		
 		System.out.println();
 		parkingOccupancyMaintainer=new ParkingOccupancyMaintainer(controler);
 		ParkingRoot.setParkingOccupancyMaintainer(parkingOccupancyMaintainer);
