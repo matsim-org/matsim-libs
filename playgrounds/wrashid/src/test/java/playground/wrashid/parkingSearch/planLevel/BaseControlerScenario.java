@@ -4,8 +4,13 @@ import org.matsim.core.controler.Controler;
 
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.parkingSearch.planLevel.init.InitializeParkings;
+import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.occupancy.FinishParkingOccupancyMaintainer;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
+import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
+import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
+import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunction;
+import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunctionV1;
 
 public class BaseControlerScenario {
 	
@@ -24,6 +29,8 @@ public class BaseControlerScenario {
 		controler.addControlerListener(eventHandlerAdder);
 		
 		controler.addControlerListener(new FinishParkingOccupancyMaintainer());
+		
+		ParkingRoot.setParkingScoringFunction(new ParkingScoringFunctionV1(new ParkingPriceMapping1(), new IncomeRelevantForParking(), null));
 		
 		
 	}

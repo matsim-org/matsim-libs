@@ -12,7 +12,7 @@ import playground.wrashid.parkingSearch.planLevel.parkingActivityDuration.Parkin
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
-import playground.wrashid.parkingSearch.planLevel.ranking.Ranking;
+import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunction;
 
 public class ParkingRoot {
 
@@ -23,10 +23,14 @@ public class ParkingRoot {
 	private static double parkingActivityDurationPenaltyScalingFactor;
 	private static ParkingOccupancyMaintainer parkingOccupancyMaintainer;
 	private static ParkingActivityDuration parkingActivityDuration;
-	private static Ranking ranking;
+	private static ParkingScoringFunction parkingScoringFunction;
 
-	public static Ranking getRanking() {
-		return ranking;
+	public static void setParkingScoringFunction(ParkingScoringFunction parkingScoringFunction) {
+		ParkingRoot.parkingScoringFunction = parkingScoringFunction;
+	}
+
+	public static ParkingScoringFunction getParkingScoringFunction() {
+		return parkingScoringFunction;
 	}
 
 	public static ParkingActivityDuration getParkingActivityDuration() {
@@ -54,11 +58,13 @@ public class ParkingRoot {
 		tempStringValue = controler.getConfig().findParam("parking", "parkingActivityDurationPenaltyScalingFactor");
 		checkIfNull(tempStringValue);
 		parkingActivityDurationPenaltyScalingFactor = Double.parseDouble(tempStringValue);
+		
+		checkIfNull(parkingScoringFunction);
+		parkingScoringFunction.setParkingFacilities(facilities);
+	}
 
-		// TODO: both the ParkingPriceMapping and the IncomeRelevantForParking
-		// should be read from a file
-		ranking = new Ranking(new ParkingPriceMapping1(), new IncomeRelevantForParking(), facilities);
-
+	public static void setRanking(ParkingScoringFunction ranking) {
+		ParkingRoot.parkingScoringFunction = ranking;
 	}
 
 	public static ClosestParkingMatrix getClosestParkingMatrix() {

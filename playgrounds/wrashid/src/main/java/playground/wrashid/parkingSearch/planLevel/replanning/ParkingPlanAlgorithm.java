@@ -132,7 +132,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		// =========for the selected target activity, score the parkings close
 		// to the target ==========
 
-		ArrayList<ActivityFacilityImpl> parkingSortedAccordingToScore = ParkingRoot.getRanking()
+		ArrayList<ActivityFacilityImpl> parkingSortedAccordingToScore = ParkingRoot.getParkingScoringFunction()
 				.getParkingsOrderedAccordingToScore(targetActivity, plan);
 		//
 
