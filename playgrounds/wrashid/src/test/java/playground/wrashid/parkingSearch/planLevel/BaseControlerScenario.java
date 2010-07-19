@@ -11,7 +11,7 @@ import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantFor
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoreListener;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunction;
-import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunctionV1;
+import playground.wrashid.parkingSearch.planLevel.scoring.ParkingDefaultScoringFunction;
 
 public class BaseControlerScenario {
 	
@@ -33,7 +33,7 @@ public class BaseControlerScenario {
 		
 		controler.addControlerListener(new ParkingScoreListener());
 		
-		ParkingRoot.setParkingScoringFunction(new ParkingScoringFunctionV1(new ParkingPriceMapping1(), new IncomeRelevantForParking(), null));
+		
 	}
 
 }

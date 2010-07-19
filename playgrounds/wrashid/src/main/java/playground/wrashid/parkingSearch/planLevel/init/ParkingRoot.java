@@ -13,6 +13,7 @@ import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantFor
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunction;
+import playground.wrashid.parkingSearch.planLevel.scoring.ParkingDefaultScoringFunction;
 
 public class ParkingRoot {
 
@@ -58,9 +59,18 @@ public class ParkingRoot {
 		tempStringValue = controler.getConfig().findParam("parking", "parkingActivityDurationPenaltyScalingFactor");
 		checkIfNull(tempStringValue);
 		parkingActivityDurationPenaltyScalingFactor = Double.parseDouble(tempStringValue);
-		
-		checkIfNull(parkingScoringFunction);
-		parkingScoringFunction.setParkingFacilities(facilities);
+
+		// set default scoring function, if no scoring function set
+		if (parkingScoringFunction == null) {
+			parkingScoringFunction = new ParkingDefaultScoringFunction(new ParkingPriceMapping1(),
+					new IncomeRelevantForParking(), facilities);
+		} else {
+			// in order to allow setting the scoring function from outside
+			// we must set the facilities at this stage
+			// they can be set null, at beginning when facilities are not yet loaded.
+			parkingScoringFunction.setParkingFacilities(facilities);
+		}
+
 	}
 
 	public static void setRanking(ParkingScoringFunction ranking) {

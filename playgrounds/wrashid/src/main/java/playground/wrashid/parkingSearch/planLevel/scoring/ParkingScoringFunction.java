@@ -24,6 +24,15 @@ public abstract class ParkingScoringFunction {
 	protected IncomeRelevantForParking incomeRelevantForParking;
 	protected ActivityFacilitiesImpl parkingFacilities;
 	double delta = 15 * 60;
+	int numberOfParkingsInSet = 10;
+	
+	public int getNumberOfParkingsInSet() {
+		return numberOfParkingsInSet;
+	}
+
+	public void setNumberOfParkingsInSet(int numberOfParkingsInSet) {
+		this.numberOfParkingsInSet = numberOfParkingsInSet;
+	}
 
 	public void setParkingFacilities(ActivityFacilitiesImpl parkingFacilities) {
 		this.parkingFacilities = parkingFacilities;
@@ -54,7 +63,7 @@ public abstract class ParkingScoringFunction {
 		double parkingArrivalTime = ParkingRoot.getParkingOccupancyMaintainer().getParkingArrivalLog()
 				.get(plan.getPerson().getId()).getParkingArrivalInfoList().get(indexOfCurrentParking).getArrivalTime();
 
-		int numberOfParkingsInSet = 100;
+		
 
 		closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),
 				numberOfParkingsInSet, numberOfParkingsInSet);

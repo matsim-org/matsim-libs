@@ -5,14 +5,15 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.ActivityImpl;
 
+import playground.wrashid.PSF.parking.ParkingInfo;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping;
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
 
-public class ParkingScoringFunctionV1 extends ParkingScoringFunction {
+public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 
-	public ParkingScoringFunctionV1(ParkingPriceMapping parkingPriceMapping, IncomeRelevantForParking income,
+	public ParkingDefaultScoringFunction(ParkingPriceMapping parkingPriceMapping, IncomeRelevantForParking income,
 			ActivityFacilitiesImpl parkingFacilities) {
 		super(parkingPriceMapping, income, parkingFacilities);
 	}
@@ -22,50 +23,10 @@ public class ParkingScoringFunctionV1 extends ParkingScoringFunction {
 		// TODO: must ensure through the score, that parkings which are full at
 		// the time of arrival get a bad score.
 
-		double parkingPriceScore = -1.0
-				* ParkingRoot.getPriceScoreScalingFactor()
-				* parkingPriceMapping.getParkingPrice(parkingFacilityId).getPrice(parkingTimeInfo.getStartTime(),
-						parkingTimeInfo.getEndTime());
-		double income = incomeRelevantForParking.getIncome(personId);
-
-		// TODO: instead of a linear impact, this could form a different
-		// function than the priceScore function (wip).
-		// TODO: this value should be given back by some other function!!!!
-		parkingPriceScore = parkingPriceScore / income;
-
-		// impact of parking and un-parking durations
-		double parkingActivityDurationPenalty = -1.0 * ParkingRoot.getParkingActivityDurationPenaltyScalingFactor()
-				* (parkingArrivalDuration + parkingDepartureDuration);
-
-		// TODO: the penalty could increase more than linear with the
-		// duration!!!! (wip).
-		// make general concept for this! => provide a function for each, which
-		// can be used!
-		// TODO: really important! => just change shape of main function to
-		// change the impact of whole system!!!!
-
-		// impact of walking between parking and destination
-
-		// TODO: allow defining general function, for which the parameter can be
-		// changed by individuals!
-		// e.g. negative quadratic function (positiv utility in beginning, which
-		// can decrease with time).
-
-		// e.g. if we have a model, that elderly or disabled people would like
-		// to walk much less, we should be able
-		// to make that factor really important by changing the function
-		// parameters.
-		// TODO: add here the aspect of the individual function!!!!!!
-		// wip: propose a function, but say that others could be used.
-		// wip: what one can do now, is to estimate a model, e.g. for walking
-		// distance and the other parts
-		// after that one can tell the system, what the actual parking occupancy
-		// in an area is and then
-		// let the system calibrate itself, what scaling would render best
-		// results.
+		
 		double walkingPenalty = -1.0
-				* ClosestParkingMatrix.getDistance(targetActivity.getCoord(), parkingFacilities.getFacilities().get(parkingFacilityId)
-						.getCoord());
+				* ClosestParkingMatrix.getDistance(targetActivity.getCoord(),
+						parkingFacilities.getFacilities().get(parkingFacilityId).getCoord());
 
 		// TODO: question: should we have one scaling factor to scaling the
 		// whole parking thing with the other scores?
@@ -178,24 +139,89 @@ public class ParkingScoringFunctionV1 extends ParkingScoringFunction {
 		// kapazität die beste chance, wirkung unter annahme
 		// von kosten, etc.
 
-		//return walkingPenalty;
-		
-		if (!forRanking){
-			// -1.0 is just to assure, if the current car is the last car to arrive at the parking, still there is no problem
-			if (!ParkingRoot.getParkingScoringFunction().isParkingFullAtTime(parkingFacilityId,parkingTimeInfo.getStartTime()-1.0)){
-				return Double.parseDouble(parkingFacilityId.toString())/2;
+		// return walkingPenalty;
+
+		if (!forRanking) {
+			// -1.0 is just to assure, if the current car is the last car to
+			// arrive at the parking, still there is no problem
+			if (!ParkingRoot.getParkingScoringFunction().isParkingFullAtTime(parkingFacilityId,
+					parkingTimeInfo.getStartTime() - 1.0)) {
+				return Double.parseDouble(parkingFacilityId.toString()) / 2;
 			}
 		}
-		
-		if (parkingFacilityId.toString().equalsIgnoreCase("36")){
+
+		if (parkingFacilityId.toString().equalsIgnoreCase("36")) {
 			System.out.println();
 		}
-		
-		if (!ParkingRoot.getParkingScoringFunction().isParkingNotFullDuringIntervall(parkingFacilityId,parkingTimeInfo.getStartTime(),delta)){
-			return Double.parseDouble(parkingFacilityId.toString())/2;
+
+		if (!ParkingRoot.getParkingScoringFunction().isParkingNotFullDuringIntervall(parkingFacilityId,
+				parkingTimeInfo.getStartTime(), delta)) {
+			return Double.parseDouble(parkingFacilityId.toString()) / 2;
 		}
+
 		
-		return Double.parseDouble(parkingFacilityId.toString());
+		
+		
+		
+		double parkingPriceScore=getParkingPriceScore(parkingFacilityId,parkingTimeInfo,personId);
+		
+		
+		
+		
+		
+		
+		// add more sums here!!!!
+		return parkingPriceScore;
+	}
+
+	private double getParkingPriceScore(Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId) {
+		double parkingPriceScore = -1.0
+				* ParkingRoot.getPriceScoreScalingFactor()
+				* parkingPriceMapping.getParkingPrice(parkingFacilityId).getPrice(parkingTimeInfo.getStartTime(),
+						parkingTimeInfo.getEndTime());
+		double income = incomeRelevantForParking.getIncome(personId);
+
+		// TODO: instead of a linear impact, this could form a different
+		// function than the priceScore function (wip).
+		// TODO: this value should be given back by some other function!!!!
+		parkingPriceScore = parkingPriceScore / income;
+
+		return parkingPriceScore;
+	}
+	
+	private double getParkingActivityDurationPenalty(double parkingArrivalDuration, double parkingDepartureDuration){
+		// impact of parking and un-parking durations
+		double parkingActivityDurationPenalty = -1.0 * ParkingRoot.getParkingActivityDurationPenaltyScalingFactor()
+				* (parkingArrivalDuration + parkingDepartureDuration);
+
+		// TODO: the penalty could increase more than linear with the
+		// duration!!!! (wip).
+		// make general concept for this! => provide a function for each, which
+		// can be used!
+		// TODO: really important! => just change shape of main function to
+		// change the impact of whole system!!!!
+
+		// impact of walking between parking and destination
+
+		// TODO: allow defining general function, for which the parameter can be
+		// changed by individuals!
+		// e.g. negative quadratic function (positiv utility in beginning, which
+		// can decrease with time).
+
+		// e.g. if we have a model, that elderly or disabled people would like
+		// to walk much less, we should be able
+		// to make that factor really important by changing the function
+		// parameters.
+		// TODO: add here the aspect of the individual function!!!!!!
+		// wip: propose a function, but say that others could be used.
+		// wip: what one can do now, is to estimate a model, e.g. for walking
+		// distance and the other parts
+		// after that one can tell the system, what the actual parking occupancy
+		// in an area is and then
+		// let the system calibrate itself, what scaling would render best
+		// results.
+		
+		return parkingActivityDurationPenalty;
 	}
 
 }

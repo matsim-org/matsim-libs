@@ -29,6 +29,9 @@ public class ParkingScoreListenerTest extends TestCase implements IterationEndsL
 
 		controler.addControlerListener(this);
 
+		
+		ParkingRoot.getParkingScoringFunction().setNumberOfParkingsInSet(100);
+		
 		controler.run();
 	}
 

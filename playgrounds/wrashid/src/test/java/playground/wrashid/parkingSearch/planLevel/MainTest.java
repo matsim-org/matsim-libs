@@ -31,7 +31,7 @@ import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunctionTestNumberOfParkings;
-import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunctionV1;
+import playground.wrashid.parkingSearch.planLevel.scoring.ParkingDefaultScoringFunction;
 
 public class MainTest extends MatsimTestCase {
  
