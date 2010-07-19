@@ -75,7 +75,7 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	public Id chooseNextLinkId() {
 		return null;
 	}
-	
+
 	@Override
 	public Id getCurrentLinkId() {
 		return null ;
@@ -85,7 +85,7 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	public Leg getCurrentLeg() {
 		return this.dummyLeg;
 	}
-	
+
 	@Override
 	public PlanElement getCurrentPlanElement() {
 		return this.dummyLeg ;
@@ -127,22 +127,19 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	public boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome) {
 		return true;
 	}
-	
+
+	@Override
 	public boolean initializeAndCheckIfAlive() {
 		return true ;
 	}
 
 	@Override
 	public void setVehicle(QVehicle veh) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public QVehicle getVehicle() {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 }
