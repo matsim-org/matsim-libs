@@ -36,7 +36,7 @@ public class CountsConfigGroup extends Module {
 	private static final String OUTPUTFORMAT = "outputformat";
 	private static final String OUTFILE = "outputCountsFile";
 	private static final String DISTANCEFILTER = "distanceFilter";
-	private static final String DISTANCEFITLERCENTERNODE = "distanceFilterCenterNode";
+	private static final String DISTANCEFILTERCENTERNODE = "distanceFilterCenterNode";
 	private static final String COUNTSINPUTFILENAME = "inputCountsFile";
 	private static final String COUNTSSCALEFACTOR = "countsScaleFactor";
 
@@ -78,7 +78,7 @@ public class CountsConfigGroup extends Module {
 				return null;
 			}
 			return getDistanceFilter().toString();
-		} else if (DISTANCEFITLERCENTERNODE.equals(key)) {
+		} else if (DISTANCEFILTERCENTERNODE.equals(key)) {
 			return getDistanceFilterCenterNode();
 		} else if (COUNTSINPUTFILENAME.equals(key)) {
 			return getCountsFileName();
@@ -101,7 +101,7 @@ public class CountsConfigGroup extends Module {
 			} else {
 				setDistanceFilter(Double.valueOf(value));
 			}
-		} else if (DISTANCEFITLERCENTERNODE.equals(key)) {
+		} else if (DISTANCEFILTERCENTERNODE.equals(key)) {
 			setDistanceFilterCenterNode(value);
 		} else if (COUNTSINPUTFILENAME.equals(key)) {
 			setCountsFileName(value.replace('\\', '/'));
@@ -118,7 +118,7 @@ public class CountsConfigGroup extends Module {
 		this.addParameterToMap(map, OUTPUTFORMAT);
 		this.addParameterToMap(map, OUTFILE);
 		this.addParameterToMap(map, DISTANCEFILTER);
-		this.addParameterToMap(map, DISTANCEFITLERCENTERNODE);
+		this.addParameterToMap(map, DISTANCEFILTERCENTERNODE);
 		this.addParameterToMap(map, COUNTSINPUTFILENAME);
 		this.addParameterToMap(map, COUNTSSCALEFACTOR);
 		return map;
