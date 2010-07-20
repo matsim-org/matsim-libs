@@ -44,6 +44,7 @@ public class FlowCalculationSettings {
 	public int timeStep = 1;
 	public double flowFactor = 1.0;
 	public int minTravelTime = 0; //set to 1 to avoid edges with time 0 after scaling! 
+	public double addTravelTime = 0.0; //this is added to the travel times before conversion!
 
 	/* deault timeouts */
 	public int TimeHorizon = 7654321; // should be safe
@@ -95,6 +96,9 @@ public class FlowCalculationSettings {
 
 	private int _roundedtozerocapacity;
 	private int _roundedtozerolength;
+	private double _roundingErrorCap;
+	private double _roundingErrorLength;
+	
 	private boolean _ready = false;
 
 
@@ -203,33 +207,55 @@ public class FlowCalculationSettings {
 
 		this._roundedtozerocapacity = 0;
 		this._roundedtozerolength = 0;
+		this._roundingErrorCap = 0d;
+		this._roundingErrorLength = 0d;
 
 		for (Link link : this._network.getLinks().values()){
 
+			double exactTravelTime = link.getLength() / link.getFreespeed();
+			
+			// 0 should stay 0, e.g. on links to the supersink
+			if (exactTravelTime > 0.01) {
+			  exactTravelTime += this.addTravelTime;		
+			}
+
 			// from long to int ...
-			int newTravelTime = (int) Math.round(link.getLength() / (link.getFreespeed() * this.timeStep));
+			int newTravelTime = (int) Math.round(exactTravelTime / this.timeStep);
 			if (newTravelTime < this.minTravelTime) {
 				newTravelTime = minTravelTime;
 			}
-			if (newTravelTime == 0 && link.getLength() != 0d) {
+			if (newTravelTime == 0 && exactTravelTime > 0.01) {
 				this._roundedtozerolength++;
+			}
+			
+			if (exactTravelTime > 0.01) {
+			  this._roundingErrorLength += Math.abs(exactTravelTime / this.timeStep - newTravelTime) / (exactTravelTime / this.timeStep);
 			}
 
 			this._lengths.put(link, newTravelTime);
 
 
-			long newcapacity = Math.round(link.getCapacity() * this.timeStep * this.flowFactor / capperiod);
+			double exactCapacity = link.getCapacity() * this.timeStep * this.flowFactor / capperiod;
+			long newcapacity = Math.round(exactCapacity);
 
 			// no one uses that much capacity for real ...
 			if (newcapacity > Integer.MAX_VALUE) {
 				newcapacity = Integer.MAX_VALUE;
+				System.out.println("Note: capping capacity at Integer.MAX_VALUE");
 			}
 
-			if (newcapacity == 0d && link.getCapacity() != 0d) {
+			if (newcapacity == 0l && link.getCapacity() != 0d) {
 				this._roundedtozerocapacity++;
+			}
+			
+			if (exactCapacity != 0d) {
+			  this._roundingErrorCap += Math.abs(exactCapacity - newcapacity) / exactCapacity;	
 			}
 			this._capacities.put(link, (int) newcapacity);
 		}
+		
+		this._roundingErrorCap /= this._network.getLinks().size();
+		this._roundingErrorLength /= this._network.getLinks().size();
 	}
 
 	private void prepareDemands() {
@@ -280,8 +306,11 @@ public class FlowCalculationSettings {
 		System.out.println("FlowFactor: " + this.flowFactor);		
 		System.out.println("Max Rounds: " + this.MaxRounds);
 		System.out.println("Min Travel Time : " + this.minTravelTime);
+		System.out.println("Added (raw) Travel Time : " + this.addTravelTime);
 		System.out.println("Edges rounded to zero length: " + this._roundedtozerolength);
+		System.out.println("Rounding error in % of old lengths: " + 100 * this._roundingErrorLength);
 		System.out.println("Edges rounded to zero capacity: " + this._roundedtozerocapacity);
+		System.out.println("Rounding error in % of old capacities: " + 100 * this._roundingErrorCap);
 
 		switch (this.searchAlgo) {
 		  case FlowCalculationSettings.SEARCHALGO_FORWARD:
@@ -714,7 +743,18 @@ public class FlowCalculationSettings {
 
         // the time-expanded arcs
         for (Link link : this._network.getLinks().values()) {
-        	for (int t = 0; t < this.TimeHorizon; t++) {
+        	Interval when = null;
+        	int low = 0;
+        	int high = this.TimeHorizon;
+        	if (this.whenAvailable != null) {
+        		when = this.whenAvailable.get(link.getId());
+        		if (when != null) {
+        			low = when.getLowBound();
+        			high = when.getHighBound();
+        		}
+        	}
+
+        	for (int t = low; t < high; t++) {
         		StringBuilder S = new StringBuilder();
         		String tmp = NameEdge(link, t, newNodeNames);
         		if (tmp != null) {
@@ -802,8 +842,20 @@ public class FlowCalculationSettings {
         	}
         } else {
         	 // the time-expanded arcs have their length as cost
+       	
             for (Link link : this._network.getLinks().values()) {
-            	for (int t = 0; t < this.TimeHorizon; t++) {
+            	Interval when = null;
+            	int low = 0;
+            	int high = this.TimeHorizon;
+            	if (this.whenAvailable != null) {
+            		when = this.whenAvailable.get(link.getId());
+            		if (when != null) {
+            			low = when.getLowBound();
+            			high = when.getHighBound();
+            		}
+            	}
+
+            	for (int t = low; t < high; t++) {
             		StringBuilder S = new StringBuilder();
             		String tmp = NameEdge(link, t, newNodeNames);
             		if (tmp != null) {
@@ -834,18 +886,19 @@ public class FlowCalculationSettings {
 
         for (Link link : this._network.getLinks().values()) {
         	Interval when = null;
+        	int low = 0;
+        	int high = this.TimeHorizon;
         	if (this.whenAvailable != null) {
-        		when = this.whenAvailable.get(link.getId()); 
+        		when = this.whenAvailable.get(link.getId());
+        		if (when != null) {
+        			low = when.getLowBound();
+        			high = when.getHighBound();
+        		}
         	}
-        	for (int t = 0; t < this.TimeHorizon; t++) {
+
+        	for (int t = low; t < high; t++) {
         		String tmp = NameEdge(link, t, newNodeNames);
-        		if (tmp != null) {
-        			if (when == null || (when.getLowBound() <= t && t < when.getHighBound())) {        			          		 
-        				System.out.println(" 0 <= " + tmp + " <= " + this.getCapacity(link));
-        			} else { // link not available
-        				System.out.println(" 0 <= " + tmp + " <= 0");
-        			}
-        		} 
+        		System.out.println(" 0 <= " + tmp + " <= " + this.getCapacity(link));        		        		
         	}
         }
 
