@@ -28,9 +28,6 @@ public class ParkingScoreListenerTest extends TestCase implements IterationEndsL
 				new IncomeRelevantForParking(), null));
 
 		controler.addControlerListener(this);
-
-		
-		ParkingRoot.getParkingScoringFunction().setNumberOfParkingsInSet(100);
 		
 		controler.run();
 	}

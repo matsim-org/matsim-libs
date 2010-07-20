@@ -25,13 +25,19 @@ public abstract class ParkingScoringFunction {
 	protected ActivityFacilitiesImpl parkingFacilities;
 	double delta = 15 * 60;
 	int numberOfParkingsInSet = 10;
-	
-	public int getNumberOfParkingsInSet() {
-		return numberOfParkingsInSet;
-	}
+	// int maxNumberOfParkingsInSet = 500;
+	int maxWalkingDistance = 5000; // im meters
 
-	public void setNumberOfParkingsInSet(int numberOfParkingsInSet) {
-		this.numberOfParkingsInSet = numberOfParkingsInSet;
+	// public int getNumberOfParkingsInSet() {
+	// return numberOfParkingsInSet;
+	// }
+
+	// public void setNumberOfParkingsInSet(int numberOfParkingsInSet) {
+	// this.numberOfParkingsInSet = numberOfParkingsInSet;
+	// }
+
+	public void setMaxWalkingDistance(int maxWalkingDistance) {
+		this.maxWalkingDistance = maxWalkingDistance;
 	}
 
 	public void setParkingFacilities(ActivityFacilitiesImpl parkingFacilities) {
@@ -50,20 +56,18 @@ public abstract class ParkingScoringFunction {
 		ArrayList<ActivityFacilityImpl> resultList = new ArrayList<ActivityFacilityImpl>();
 		ArrayList<ActivityFacilityImpl> closestParkings = null;
 
-//		if (plan.getPerson().getId().toString().equalsIgnoreCase("3")) {
-//			System.out.println();
-//		}
+		// if (plan.getPerson().getId().toString().equalsIgnoreCase("3")) {
+		// System.out.println();
+		// }
 
 		ActivityImpl arrivalParkingAct = ParkingGeneralLib.getArrivalParkingAct(plan, targetActivity);
 		int indexOfCurrentParking = ParkingGeneralLib.getParkingArrivalIndex(plan, arrivalParkingAct);
-//		if (indexOfCurrentParking == -1) {
-//			System.out.println();
-//		}
+		// if (indexOfCurrentParking == -1) {
+		// System.out.println();
+		// }
 
 		double parkingArrivalTime = ParkingRoot.getParkingOccupancyMaintainer().getParkingArrivalLog()
 				.get(plan.getPerson().getId()).getParkingArrivalInfoList().get(indexOfCurrentParking).getArrivalTime();
-
-		
 
 		closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),
 				numberOfParkingsInSet, numberOfParkingsInSet);
@@ -72,18 +76,24 @@ public abstract class ParkingScoringFunction {
 		// at the time of arrival (and the given delta interval)
 		// if that is not the case, enlarge the parking set.
 
-		while (!someParkingFromSetIsFreeAtArrivalTime(closestParkings, parkingArrivalTime, delta)) {
-			numberOfParkingsInSet *= 2;
+		if (!someParkingFromSetIsFreeAtArrivalTime(closestParkings, parkingArrivalTime, delta)) {
+			// numberOfParkingsInSet *= 2;
+			// closestParkings =
+			// ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),
+			// numberOfParkingsInSet, numberOfParkingsInSet);
+
+			// if there are no parkings in the walking distance, we have to live
+			// with it (and report that supply shortage in the analysis)
 			closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),
-					numberOfParkingsInSet, numberOfParkingsInSet);
+					maxWalkingDistance);
 		}
 
 		// score the given parkings
 
 		for (int i = 0; i < closestParkings.size(); i++) {
 			ActivityFacilityImpl curParking = closestParkings.get(i);
-			double score=getScore(targetActivity,plan,curParking.getId(),true);
-			
+			double score = getScore(targetActivity, plan, curParking.getId(), true);
+
 			OrderedFacility orderedFacility = new OrderedFacility(curParking, score);
 			prio.add(orderedFacility);
 		}
@@ -128,19 +138,19 @@ public abstract class ParkingScoringFunction {
 		return false;
 	}
 
-	public boolean isParkingFullAtTime(Id parkingFacilityId, double time){
+	public boolean isParkingFullAtTime(Id parkingFacilityId, double time) {
 		HashMap<Id, ParkingCapacityFullLogger> parkingCapacityFullTimes = ParkingRoot.getParkingOccupancyMaintainer()
-		.getParkingCapacityFullTimes();
-		
+				.getParkingCapacityFullTimes();
+
 		time = GeneralLib.projectTimeWithin24Hours(time);
 		ParkingCapacityFullLogger parkingCapFullLogger = parkingCapacityFullTimes.get(parkingFacilityId);
-		
+
 		if (parkingCapFullLogger == null || !parkingCapFullLogger.isParkingFullAtTime(time)) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	public boolean isParkingNotFullDuringIntervall(Id parkingFacilityId, double arrivalTime, double delta) {
 		HashMap<Id, ParkingCapacityFullLogger> parkingCapacityFullTimes = ParkingRoot.getParkingOccupancyMaintainer()
 				.getParkingCapacityFullTimes();
@@ -181,6 +191,7 @@ public abstract class ParkingScoringFunction {
 
 	/**
 	 * forRanking=false => only for scoring an actual parking
+	 * 
 	 * @param targetActivity
 	 * @param parkingFacilityId
 	 * @param parkingTimeInfo
@@ -193,5 +204,6 @@ public abstract class ParkingScoringFunction {
 	 * @return
 	 */
 	public abstract double getScore(ActivityImpl targetActivity, Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo,
-			Id personId, double parkingArrivalDuration, double parkingDepartureDuration, Plan plan, double delta, boolean forRanking);
+			Id personId, double parkingArrivalDuration, double parkingDepartureDuration, Plan plan, double delta,
+			boolean forRanking);
 }
