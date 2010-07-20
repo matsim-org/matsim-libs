@@ -113,6 +113,25 @@ public class GeneralLib {
 	}
 
 	/**
+	 * TODO: write test!!!!
+	 * @param matrix
+	 * @param numberOfRows
+	 * @param numberOfColumns
+	 * @return
+	 */
+	public static double[][] trimMatrix(double[][] matrix, int numberOfRows,int numberOfColumns){
+		double newMatrix[][]=new double[numberOfRows][numberOfColumns];
+	
+		for (int i=0;i<numberOfRows;i++){
+			for (int j=0;j<numberOfColumns;j++){
+				newMatrix[i][j]=matrix[i][j];
+			}
+		}
+		
+		return newMatrix;
+	}
+	
+	/**
 	 * if headerLine=null, then add no line at top of file. "\n" is added at end
 	 * of first line by this method.
 	 * 

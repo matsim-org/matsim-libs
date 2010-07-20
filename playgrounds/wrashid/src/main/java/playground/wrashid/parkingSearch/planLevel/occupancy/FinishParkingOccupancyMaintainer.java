@@ -12,13 +12,17 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		ParkingRoot.getParkingOccupancyMaintainer().closeAllLastParkings();
-		
+
 		// write also the occupancy statistics at this stage of the simulation
 
 		ParkingOccupancyAnalysisWriter poaWriter = new ParkingOccupancyAnalysisWriter(ParkingRoot.getParkingOccupancyMaintainer()
 				.getParkingOccupancyBins(), ParkingRoot.getParkingCapacity());
-		poaWriter.write(event.getControler().getControlerIO()
-				.getIterationFilename(event.getControler().getIterationNumber(), "parkingOccupancyStatistics.txt"));
-	}
+		String fileName = event.getControler().getControlerIO()
+				.getIterationFilename(event.getControler().getIterationNumber(), "parkingOccupancyStatistics.txt");
+		poaWriter.writeTxtFile(fileName);
+		fileName = event.getControler().getControlerIO()
+				.getIterationFilename(event.getControler().getIterationNumber(), "parkingOccupancyCoordinates.txt");
+		poaWriter.writeFakeKMLFile(fileName);
 
+	}
 }

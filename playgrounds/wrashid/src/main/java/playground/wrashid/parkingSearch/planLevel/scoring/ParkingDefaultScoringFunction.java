@@ -154,24 +154,29 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 			System.out.println();
 		}
 
-		if (!ParkingRoot.getParkingScoringFunction().isParkingNotFullDuringIntervall(parkingFacilityId,
-				parkingTimeInfo.getStartTime(), delta)) {
-			return Double.parseDouble(parkingFacilityId.toString()) / 2;
-		}
+	
 
 		
 		
 		
 		
 		double parkingPriceScore=getParkingPriceScore(parkingFacilityId,parkingTimeInfo,personId);
+	
+		// TODO: add more sums here!!!!
+		//return parkingPriceScore;
 		
 		
 		
-		
-		
-		
-		// add more sums here!!!!
-		return parkingPriceScore;
+		if (isParkingFull(parkingFacilityId,parkingTimeInfo)){
+			return 0;
+		} else {
+			return 1;
+		}
+	}
+	
+	private boolean isParkingFull(Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo){
+		return !ParkingRoot.getParkingScoringFunction().isParkingNotFullDuringIntervall(parkingFacilityId,
+				parkingTimeInfo.getStartTime(), delta); 
 	}
 
 	private double getParkingPriceScore(Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId) {
