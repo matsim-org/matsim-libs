@@ -20,7 +20,9 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,6 +61,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
@@ -125,7 +128,7 @@ public class MyZoneToZoneRouter {
 						/*=====================================================
 						 *  Process diagonals
 						 *-----------------------------------------------------
-						 *  Current I use the travel time of a link if EITHER 
+						 *  Currently I use the travel time of a link if EITHER 
 						 *  its fromNode OR its toNode reside in the zone. 
 						 */
 						int count = 0;
@@ -207,12 +210,64 @@ public class MyZoneToZoneRouter {
 		return empties;
 	}
 	
+	/**
+	 * Writes the private car travel time (in seconds) to a comma-separated 
+	 * flat file.
+	 * @param filename the absolute path of the file to which the output is 
+	 * 		  written.
+	 * @param odMatrix the private car travel time matrix.
+	 */
+	public void writeOdMatrixToCsv(String filename, DenseDoubleMatrix2D odMatrix){
+		log.info("Writing OD matrix travel time to " + filename);
+		int nullcounter = 0;
+		try {
+			BufferedWriter output = IOUtils.getBufferedWriter(filename);
+			try{
+				output.write("fromZone,toZone,carTime");
+				output.newLine();
+				int totalSize = (int) Math.pow(odMatrix.rows(),2);
+				int counter = 0;
+				int multiplier = 1;
+				for(int row = 0; row < odMatrix.rows(); row++){
+					for(int col = 0; col < odMatrix.columns(); col++){
+						if(odMatrix.get(row, col) != Double.POSITIVE_INFINITY){
+							output.write(mapListEntryToZoneId.get(row).toString());
+							output.write(",");
+							output.write(mapListEntryToZoneId.get(col).toString());
+							output.write(",");
+							output.write(String.valueOf(odMatrix.get(row, col)));
+							output.newLine();
+						} else{
+							nullcounter++;
+						}
+						
+						// Report progress.
+						if(++counter == multiplier){
+							double percentage = (((double) counter) / ((double) totalSize))*100;
+							log.info("   Entries written: " + counter + " (" + String.format("%3.2f%%)", percentage));
+							multiplier *= 2;
+						}
+					}
+				}
+				log.info("   Entries written: " + counter + " (Done)");
+			} finally {
+				output.close();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		double density = Math.round((1 - ((double) nullcounter) / (double)(Math.pow(odMatrix.rows(),2)))*100);
+		log.info("OD matrix written. Density: " + density + "% (" + nullcounter + " entries null)");
+	}
+	
 	public void writeOdMatrixToDbf(String filename, DenseDoubleMatrix2D odMatrix) {
 		log.info("Writing OD matrix travel time to " + filename);
 
 		Field oId = new Field("fromZone", Type.NUMBER, 20);
 		Field dId = new Field("toZone", Type.NUMBER, 20);
-		Field carTT = new Field("ttCar", Type.FLOAT, 4);
+		Field carTT = new Field("carTime", Type.FLOAT, 4);
 //		Field oId = new Field("from_zone_id", Type.NUMBER, 20);
 //		Field dId = new Field("to_zone_id", Type.NUMBER, 20);
 //		Field carTT = new Field("am_single_vehicle_to_work_travel_time", Type.FLOAT, 4);
@@ -230,8 +285,8 @@ public class MyZoneToZoneRouter {
 				for(int row = 0; row < odMatrix.rows(); row++){
 					for(int col = 0; col < odMatrix.columns(); col++){
 						if(odMatrix.get(row, col) != Double.POSITIVE_INFINITY){
-							Value o = new NumberValue(Integer.parseInt(mapListEntryToZoneId.get(row).toString()));
-							Value d = new NumberValue(Integer.parseInt(mapListEntryToZoneId.get(col).toString()));
+							Value o = new NumberValue(Math.round(Double.parseDouble(mapListEntryToZoneId.get(row).toString())));
+							Value d = new NumberValue(Math.round(Double.parseDouble(mapListEntryToZoneId.get(col).toString())));
 							Value tt = new NumberValue(odMatrix.get(row, col));
 							map.put(oId.getName(), o);
 							map.put(dId.getName(), d);
@@ -288,5 +343,13 @@ public class MyZoneToZoneRouter {
 		return this.router;
 	}
 	
-	
+	public Map<Id, Integer> getZoneToMatrixMap() {
+		return mapZoneIdToListEntry;
+	}
+
+	public Map<Integer, Id> getMatrixToZoneMap() {
+		return mapListEntryToZoneId;
+	}
+
+
 }

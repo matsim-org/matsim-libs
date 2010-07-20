@@ -50,13 +50,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 
+import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+import cern.colt.matrix.impl.DenseObjectMatrix2D;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-
-import cern.colt.matrix.ObjectMatrix2D;
-import cern.colt.matrix.impl.DenseDoubleMatrix2D;
-import cern.colt.matrix.impl.DenseObjectMatrix2D;
 
 public class MyPlansProcessor {
 	private final Logger log = Logger.getLogger(MyPlansProcessor.class);
@@ -79,6 +78,7 @@ public class MyPlansProcessor {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void processPlans(){
 		log.info("Processing plans (" + scenario.getPopulation().getPersons().size() + " agents)");
 		int counter = 0;
@@ -94,7 +94,7 @@ public class MyPlansProcessor {
 					if(l.getMode().equals(TransportMode.car)){
 						// Only process the leg if it has been executed, i.e. has a travel time.
 						if(l.getTravelTime() > 0){
-							// TODO find the origin node's zone;
+							// Find the origin node's zone;
 							Integer oIndex = null;
 							int o = getLastActivity(plan, i);
 							Activity oa = (Activity) plan.getPlanElements().get(o);
@@ -113,8 +113,11 @@ public class MyPlansProcessor {
 									ii++;
 								}
 							} while (found == false && ii < zones.size());
-							if(!found){break; }//log.error("Could not find a zone for the origin activity.");}
-							// TODO find the destination node's zone;
+							if(!found){
+								//log.error("Could not find a zone for the origin activity.");
+								break; 
+							}
+							// Find the destination node's zone;
 							Integer dIndex = null;
 							int d = getNextActivity(plan, i);
 							Activity da = (Activity) plan.getPlanElements().get(d);
@@ -133,7 +136,10 @@ public class MyPlansProcessor {
 									ii++;
 								}
 							} while (found == false && ii < zones.size());
-							if(!found){break;}//log.error("Could not find a zone for the destination activity.");}
+							if(!found){
+								//log.error("Could not find a zone for the destination activity.");
+								break;
+							}
 							
 							// Update travel
 							if(odMatrix.get(oIndex, dIndex) == null){
@@ -221,6 +227,7 @@ public class MyPlansProcessor {
 	}
 
 
+	@SuppressWarnings("unchecked")
 	public Double getAvgOdTravelTime(int i, int j) {
 		Double travelTime = null;
 		double total = 0;

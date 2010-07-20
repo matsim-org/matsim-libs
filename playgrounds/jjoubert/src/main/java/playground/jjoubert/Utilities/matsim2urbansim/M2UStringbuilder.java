@@ -20,6 +20,8 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
+import org.jfree.util.Log;
+
 public class M2UStringbuilder {
 	private String root;
 	private String studyArea;
@@ -44,17 +46,27 @@ public class M2UStringbuilder {
 	public String getShapefile(){
 		return root + "Shapefiles/" + studyArea + "/" + studyArea + "_UTM.shp";
 	}
+	
+	public String getPtNetworkFilename(){
+		String result = null;
+		if(studyArea.equalsIgnoreCase("eThekwini")){
+			result = getEmmePtNetworkFilename();
+		} else{
+			throw new RuntimeException("No public transport network selected for " + studyArea);
+		}
+		return result;
+	}
 
 	public String getFullNetworkFilename() {
-		return root + studyArea + "/" + version + "/output_networkFull.xml";
+		return root + studyArea + "/" + version + "/Input/output_networkFull.xml";
 	}
 	
 	public String getSmallNetworkFilename() {
-		return root + studyArea + "/" + version + "/output_networkSmall.xml";
+		return root + studyArea + "/" + version + "/Input/output_networkSmall.xml";
 	}
 	
 	public String getEmmeNetworkFilename() {
-		return root + studyArea + "/" + version + "/output_network_" + percentage + "_Emme.xml.gz";
+		return root + studyArea + "/" + version + "/Input/output_network_" + percentage + "_Emme.xml.gz";
 	}
 
 	public String getEmmePtNetworkFilename() {
@@ -66,7 +78,7 @@ public class M2UStringbuilder {
 	}
 
 	public String getPlansFile() {
-		return root + studyArea + "/" + version + "/output_plans_" + percentage + ".xml.gz";
+		return root + studyArea + "/" + version + "/Input/output_plans_" + percentage + ".xml.gz";
 	}
 	
 	public Integer getIdField(){
@@ -81,15 +93,23 @@ public class M2UStringbuilder {
 	}
 
 	public String getDbfOutputFile() {
-		return root + studyArea + "/" + version + "/TravelTimeDbf_" + percentage + ".dbf";
+		return root + studyArea + "/" + version + "/CarTimeDbf_" + percentage + ".dbf";
+	}
+
+	public String getCsvOutputFile() {
+		return root + studyArea + "/" + version + "/CarTimeCsv_" + percentage + ".csv";
 	}
 	
+	public String getTravelDataFilename(){
+		return root + studyArea + "/" + version + "/TravelData_" + percentage + ".csv";
+	}
+
 	public String getIterationEventsFile(String iteration){
-		return root + studyArea + "/" + version + "/" + iteration + ".events_" + percentage + ".txt.gz";
+		return root + studyArea + "/" + version + "/Input/" + iteration + ".events_" + percentage + ".txt.gz";
 	}
 
 	public String getIterationLinkstatsFile(String iteration){
-		return root + studyArea + "/" + version + "/" + iteration + ".linkstats_" + percentage + ".txt";
+		return root + studyArea + "/" + version + "/Input/" + iteration + ".linkstats_" + percentage + ".txt";
 	}
 
 	public String getSubPlaceTable() {
@@ -97,7 +117,7 @@ public class M2UStringbuilder {
 	}
 
 	public String getSubPlaceDistanceFilename() {
-		return root + studyArea + "/" + version + "/DistanceToPt.csv";
+		return root + studyArea + "/" + version + "/DistanceToPt_" + percentage + ".csv";
 	}
 	
 	public Integer getSubplaceIdField(){

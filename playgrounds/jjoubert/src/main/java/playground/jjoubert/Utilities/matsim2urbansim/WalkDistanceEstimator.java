@@ -56,8 +56,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 
-public class WalkTimeEstimator {
-	private final static Logger log = Logger.getLogger(WalkTimeEstimator.class);
+public class WalkDistanceEstimator {
+	private final static Logger log = Logger.getLogger(WalkDistanceEstimator.class);
 	private String studyArea;
 	private Scenario sAll;
 	private Scenario sPt;
@@ -68,22 +68,22 @@ public class WalkTimeEstimator {
 
 
 	/**
-	 * Estimates the walk time to public transport.
+	 * Estimates the walk distance to public transport.
 	 * @param root
 	 * @param studyArea
 	 * @param version of the study area's data;
 	 * @param percentage of population sampled. 
 	 */
-	public WalkTimeEstimator(String root, String studyArea, 
+	public WalkDistanceEstimator(String root, String studyArea, 
 			String version, String percentage) {
 		this.studyArea = studyArea;
 		this.sb = new M2UStringbuilder(root, studyArea, version, percentage);
 	}
 	/**
-	 * Implements the walk time estimator. Should be run in various steps, with
-	 * consecutive steps being interrupted because of external interventions,
-	 * for example estimating the function to convert walking distance to 
-	 * walking time (estimation done in R).  
+	 * Implements the walk distance estimator. Creates a distance and weight 
+	 * table for each subplace. The output is used in R to estimate a function 
+	 * to convert walking distance to walking time. Once estimated, the function
+	 * is implemented in {@code MyConverter}.
 	 * @param args a String-array containing:
 	 * <ol>
 	 * 	<li> the root folder;
@@ -93,61 +93,29 @@ public class WalkTimeEstimator {
 	 * 		</ul> 
 	 * 	<li> version (year) of the study area to consider;
 	 * 	<li> the population sample size, e.g. "10" if a 10% sample was used;
-	 * 	<li> the specific step to perform in the walk-time-estimation. Allowed values are:
-	 * 		<ul>
-	 * 			"1" to create a distance and weight table for each subplace. The
-	 * 			output is used in R to estimate a function to convert walking
-	 * 			distance to walking time.
-	 * 		</ul>   
 	 * </ol>
 	 */
 	public static void main(String[] args) {
-		WalkTimeEstimator wte = null;	
-		int step = 0;
-		if(args.length != 5){
+		WalkDistanceEstimator wte = null;	
+		if(args.length != 4){
 			throw new RuntimeException("Incorrect number of arguments passed.");
 		} else{
-			wte = new WalkTimeEstimator(args[0], args[1], args[2], args[3]);
-			step = Integer.parseInt(args[4]);
+			wte = new WalkDistanceEstimator(args[0], args[1], args[2], args[3]);
 		}
-		wte.getStartMessage(step);
-		
-		switch (step) {
-		case 1:
-			wte.deriveTransitNetwork();
-			wte.calculateSubplacedistances();
-			wte.writeSubplaceDistanceAndWeight();
-			break;
+		log.info("================================================================================");
+		log.info("   Estimating walk distance to public transport for " + args[1]);
+		log.info("--------------------------------------------------------------------------------");
 
-		default:
-			break;
-		}
-		log.info("--------------------------------------------------");
+		wte.deriveTransitNetworkFromEmme();
+		wte.calculateSubplacedistances();
+		wte.writeSubplaceDistanceAndWeight();
+
+		log.info("--------------------------------------------------------------------------------");
 		log.info("             PROCESS COMPLETE");
-		log.info("==================================================");
-		
-	}
-
-
-	
-	public void getStartMessage(int step){
-		log.info("==================================================");
-		log.info("   Estimating walk time for " + studyArea);
-		log.info("--------------------------------------------------");
-		switch (step) {
-		case 1: // Prepare sub-place distance and weight table.
-			log.info("   Step 1: prepare distance and weight table");
-			log.info("           from subplace shapefiles.");	
-			break;
-
-		default:
-			log.warn("Could not find an appropriate action for step " + step);
-			break;
-		}
-		log.info("--------------------------------------------------");
+		log.info("================================================================================");	
 	}
 	
-	public void deriveTransitNetwork(){
+	public void deriveTransitNetworkFromEmme(){
 		log.info("Filtering " + studyArea + "'s MATSim network to account for public transport.");
 		// Read network.
 		sAll = new ScenarioImpl();
@@ -207,12 +175,9 @@ public class WalkTimeEstimator {
 								}
 		
 								Map<Id, ? extends Link> outLinks = sAll.getNetwork().getNodes().get(oNode.getId()).getOutLinks();
-								Map<Id, ? extends Link> inLinks = sAll.getNetwork().getNodes().get(oNode.getId()).getInLinks();
 								boolean found = false;
 								for(Link l : outLinks.values()){
-									Link aLink = l;
 									if(l.getToNode().equals(dNode)){
-										Link theLink = aLink;
 										found = true;
 										directCounter++;
 									}
@@ -337,6 +302,10 @@ public class WalkTimeEstimator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public NetworkImpl getPtNetwork(){
+		return (NetworkImpl) this.sPt.getNetwork();
 	}
 	
 }
