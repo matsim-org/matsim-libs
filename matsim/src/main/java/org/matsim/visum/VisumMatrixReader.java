@@ -22,14 +22,12 @@ package org.matsim.visum;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Matrix;
-import org.matsim.world.Location;
 
 /**
  * @author mrieser
@@ -116,12 +114,11 @@ public class VisumMatrixReader {
 
 				String[] data = line.split("\t");
 				if (data.length != this.nofZones) {
-					Gbl.errorMsg("Expected " + this.nofZones + " data items, but found " + data.length +
+					throw new RuntimeException("Expected " + this.nofZones + " data items, but found " + data.length +
 					" in line " + this.lineCounter + ".");
 				}
 				for (int i = 0; i < this.nofZones; i++) {
-					this.matrix.setEntry(this.matrix.getLayer().getLocations().get(new IdImpl(this.zoneNames[this.zoneCounter])),
-							this.matrix.getLayer().getLocations().get(new IdImpl(this.zoneNames[i])), Double.parseDouble(data[i]));
+					this.matrix.setEntry(new IdImpl(this.zoneNames[this.zoneCounter]), new IdImpl(this.zoneNames[i]), Double.parseDouble(data[i]));
 				}
 				this.zoneCounter++;
 				if (this.zoneCounter == this.nofZones) {
@@ -142,7 +139,7 @@ public class VisumMatrixReader {
 
 				this.zoneNames = line.split("\t");
 				if (this.zoneNames.length != this.nofZones) {
-					Gbl.errorMsg("Line " + this.lineCounter + ": " +
+					throw new RuntimeException("Line " + this.lineCounter + ": " +
 							"The actual number of zones (" + this.zoneNames.length + ") does not " +
 							"correspond with the expected number of zones (" + this.nofZones + ")."
 					);
@@ -171,8 +168,6 @@ public class VisumMatrixReader {
 		private int lineCounter = 0;
 		private final Matrix matrix;
 
-		private final ArrayList<String> knownMissingLocations = new ArrayList<String>();
-
 		public SparseMatrixReader(final Matrix matrix) {
 			this.matrix = matrix;
 		}
@@ -193,27 +188,19 @@ public class VisumMatrixReader {
 
 				String[] data = line.trim().split("\\s+");
 				if (data.length != 3) {
-					Gbl.errorMsg("Expected 3 tokens, but found " + data.length + " in line " + this.lineCounter + "."
+					throw new RuntimeException("Expected 3 tokens, but found " + data.length + " in line " + this.lineCounter + "."
 					);
 				}
 
-				Location from = this.matrix.getLayer().getLocations().get(new IdImpl(data[0]));
-				Location to = this.matrix.getLayer().getLocations().get(new IdImpl(data[1]));
-
-				if (from == null) {
-					warnMissingLocation(data[0]);
-					return;
-				}
-				if (to == null) {
-					warnMissingLocation(data[1]);
-					return;
-				}
+				Id from = new IdImpl(data[0]);
+				Id to = new IdImpl(data[1]);
 
 				/*
 				 * There is no intrazonal traffic in VISUM.
 				 * However, when there comes a matrix entry from VISUM 
 				 * for a tuple of one and the same zone, store NaN instead of the value.
 				 * This indicates that the value has to be computed otherwise in MATSim.
+				 * TODO [MR] validate assumption if there is ALWAYS no intrazonal traffic
 				 */
 				double value = Double.NaN;
 				if (!from.equals(to)) {
@@ -242,16 +229,10 @@ public class VisumMatrixReader {
 				this.state = STATE_DATA;
 
 			} else {
-				Gbl.errorMsg("unknown internal state: " + this.state);
+				throw new RuntimeException("unknown internal state: " + this.state);
 			}
 		}
 
-		private void warnMissingLocation(final String locName) {
-			if (!this.knownMissingLocations.contains(locName)) {
-				this.knownMissingLocations.add(locName);
-				log.warn("Location " + locName + " does not exist in world.");
-			}
-		}
 	}
 
 }

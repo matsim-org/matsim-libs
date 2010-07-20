@@ -26,9 +26,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.world.Layer;
-import org.matsim.world.Location;
 
 public class Matrix {
 
@@ -37,7 +34,6 @@ public class Matrix {
 	//////////////////////////////////////////////////////////////////////
 
 	private final String id;
-	private final Layer worldLayer;
 	private String desc = null;
 
 	// double data structure. for fast access via from_location or via to_location
@@ -55,12 +51,11 @@ public class Matrix {
 	// Constructors
 	//////////////////////////////////////////////////////////////////////
 
-	protected Matrix(final String id, final Layer worldLayer, final String desc) {
-		if ((id == null) || (worldLayer == null)) {
-			throw new IllegalArgumentException("id and layer must not be null: id="+id+", worldLayer="+worldLayer);
+	protected Matrix(final String id, final String desc) {
+		if (id == null) {
+			throw new NullPointerException("id must not be null");
 		}
 		this.id = id;
-		this.worldLayer = worldLayer;
 		this.desc = desc;
 	}
 
@@ -68,42 +63,23 @@ public class Matrix {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	protected final Entry createEntry(final Id fromLocId, final Id toLocId, final double value) {
-		// get the from location
-		Location f_loc = this.worldLayer.getLocation(fromLocId);
-		if (f_loc == null) {
-			log.warn("[from_loc_id="+fromLocId+" does not exist.]");
-			return null;
-		}
-		// get the to location
-		Location t_loc = this.worldLayer.getLocation(toLocId);
-		if (t_loc == null) {
-			log.warn("[to_loc_id="+toLocId+" does not exist.]");
-			return null;
-		}
-		return createEntry(f_loc, t_loc, value);
-	}
-
-	public final Entry createEntry(final Location fromLoc, final Location toLoc, final double value) {
-
-		Id f_id = fromLoc.getId();
-		Id t_id = toLoc.getId();
+	public final Entry createEntry(final Id fromLocId, final Id toLocId, final double value) {
 
 		// create an entry
-		Entry e = new Entry(fromLoc,toLoc,value);
+		Entry e = new Entry(fromLocId, toLocId, value);
 
 		// add it to the from location data structure
-		if (!this.fromLocs.containsKey(f_id)) {
-			this.fromLocs.put(f_id,new ArrayList<Entry>());
+		if (!this.fromLocs.containsKey(fromLocId)) {
+			this.fromLocs.put(fromLocId,new ArrayList<Entry>());
 		}
-		ArrayList<Entry> fe = this.fromLocs.get(f_id);
+		ArrayList<Entry> fe = this.fromLocs.get(fromLocId);
 		fe.add(e);
 
 		// add it to the to location data structure
-		if (!this.toLocs.containsKey(t_id)) {
-			this.toLocs.put(t_id,new ArrayList<Entry>());
+		if (!this.toLocs.containsKey(toLocId)) {
+			this.toLocs.put(toLocId,new ArrayList<Entry>());
 		}
-		ArrayList<Entry> te = this.toLocs.get(t_id);
+		ArrayList<Entry> te = this.toLocs.get(toLocId);
 		te.add(e);
 
 		// show counter
@@ -121,10 +97,10 @@ public class Matrix {
 	// set/add methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Entry setEntry(final Location fromLoc, final Location toLoc, final double value) {
-		Entry e = getEntry(fromLoc, toLoc);
+	public final Entry setEntry(final Id fromLocId, final Id toLocId, final double value) {
+		Entry e = getEntry(fromLocId, toLocId);
 		if (e == null) {
-			return createEntry(fromLoc, toLoc, value);
+			return createEntry(fromLocId, toLocId, value);
 		}
 		e.setValue(value);
 		return e;
@@ -139,41 +115,40 @@ public class Matrix {
 	//////////////////////////////////////////////////////////////////////
 
 	public final void removeEntry(final Entry entry) {
-		Location from_loc = entry.getFromLocation();
-		Location to_loc = entry.getToLocation();
+		Id from_loc = entry.getFromLocation();
+		Id to_loc = entry.getToLocation();
 
-		ArrayList<Entry> from_loc_entries = this.fromLocs.get(from_loc.getId());
-		ArrayList<Entry> to_loc_entries = this.toLocs.get(to_loc.getId());
+		ArrayList<Entry> from_loc_entries = this.fromLocs.get(from_loc);
+		ArrayList<Entry> to_loc_entries = this.toLocs.get(to_loc);
 
 		if ((from_loc_entries == null) || (to_loc_entries == null)) {
-			Gbl.errorMsg("entry with from_loc_id=" + from_loc.getId() +
-			             " and to_loc_id=" + to_loc.getId() + " does not exist!" +
+			throw new RuntimeException("entry with from_loc_id=" + from_loc +
+			             " and to_loc_id=" + to_loc + " does not exist!" +
 			             " Inconsistent data strucutre!!!");
-			return;
 		}
 
 		if (!from_loc_entries.remove(entry)) {
-			Gbl.errorMsg("entry with from_loc_id=" + from_loc.getId() +
-		             " and to_loc_id=" + to_loc.getId() + " does not exist!" +
+			throw new RuntimeException("entry with from_loc_id=" + from_loc +
+		             " and to_loc_id=" + to_loc + " does not exist!" +
 		             " Inconsistent data strucutre!!!");
 		}
 		if (from_loc_entries.isEmpty()) {
-			this.fromLocs.remove(from_loc.getId());
+			this.fromLocs.remove(from_loc);
 		}
 
 		if (!to_loc_entries.remove(entry)) {
-			Gbl.errorMsg("entry with from_loc_id=" + from_loc.getId() +
-		             " and to_loc_id=" + to_loc.getId() + " does not exist!" +
+			throw new RuntimeException("entry with from_loc_id=" + from_loc +
+		             " and to_loc_id=" + to_loc + " does not exist!" +
 		             " Inconsistent data strucutre!!!");
 		}
 		if (to_loc_entries.isEmpty()) {
-			this.toLocs.remove(to_loc.getId());
+			this.toLocs.remove(to_loc);
 		}
-		System.out.println("entry " + entry.toString() + " removed.");
+		log.info("entry " + entry.toString() + " removed.");
 	}
 
-	public final void removeToLocEntries(final Location toLocation) {
-		ArrayList<Entry> to_loc_entries = this.toLocs.get(toLocation.getId());
+	public final void removeToLocEntries(final Id toLocationId) {
+		ArrayList<Entry> to_loc_entries = this.toLocs.get(toLocationId);
 		if (to_loc_entries != null) {
 			ArrayList<Entry> tmp = new ArrayList<Entry>(to_loc_entries);
 			Iterator<Entry> e_it = tmp.iterator();
@@ -184,8 +159,8 @@ public class Matrix {
 		}
 	}
 
-	public final void removeFromLocEntries(final Location fromLocation) {
-		ArrayList<Entry> from_loc_entries = this.fromLocs.get(fromLocation.getId());
+	public final void removeFromLocEntries(final Id fromLocationId) {
+		ArrayList<Entry> from_loc_entries = this.fromLocs.get(fromLocationId);
 		if (from_loc_entries != null) {
 			ArrayList<Entry> tmp = new ArrayList<Entry>(from_loc_entries);
 			Iterator<Entry> e_it = tmp.iterator();
@@ -204,10 +179,6 @@ public class Matrix {
 		return this.id;
 	}
 
-	public final Layer getLayer() {
-		return this.worldLayer;
-	}
-
 	public final String getDesc() {
 		return this.desc;
 	}
@@ -220,16 +191,12 @@ public class Matrix {
 		return this.toLocs;
 	}
 
-	public final ArrayList<Entry> getFromLocEntries(final Location fromlocation) {
-		return this.fromLocs.get(fromlocation.getId());
+	public final ArrayList<Entry> getFromLocEntries(final Id fromlocationId) {
+		return this.fromLocs.get(fromlocationId);
 	}
 
-	public final ArrayList<Entry> getToLocEntries(final Location toLocation) {
-		return this.toLocs.get(toLocation.getId());
-	}
-
-	public final Entry getEntry(final Location fromLoc, final Location toLoc) {
-		return this.getEntry(fromLoc.getId(),toLoc.getId());
+	public final ArrayList<Entry> getToLocEntries(final Id toLocationId) {
+		return this.toLocs.get(toLocationId);
 	}
 
 	public final Entry getEntry(final Id from, final Id to) {
@@ -237,7 +204,7 @@ public class Matrix {
 		if (fe == null) return null;
 		for (int i=0; i<fe.size(); i++) {
 			Entry e = fe.get(i);
-			if (e.getToLocation().getId().equals(to)) {
+			if (e.getToLocation().equals(to)) {
 				return e;
 			}
 		}
@@ -251,7 +218,6 @@ public class Matrix {
 	@Override
 	public final String toString() {
 		return "[id=" + this.id + "]" +
-				"[world_layer_type=" + this.worldLayer.getType() + "]" +
 				"[desc=" + this.desc + "]" +
 				"[nof_from_locs=" + this.fromLocs.size() + "]" +
 				"[nof_to_locs=" + this.toLocs.size() + "]";

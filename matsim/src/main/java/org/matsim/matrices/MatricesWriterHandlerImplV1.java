@@ -39,6 +39,7 @@ public class MatricesWriterHandlerImplV1 implements MatricesWriterHandler {
 	// <matrices ... > ... </matrices>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startMatrices(final Matrices matrices, final BufferedWriter out) throws IOException {
 		out.write("<matrices");
 		if (matrices.getName() != null) {
@@ -47,6 +48,7 @@ public class MatricesWriterHandlerImplV1 implements MatricesWriterHandler {
 		out.write(">\n\n");
 	}
 
+	@Override
 	public void endMatrices(final BufferedWriter out) throws IOException {
 		out.write("</matrices>\n");
 	}
@@ -55,10 +57,10 @@ public class MatricesWriterHandlerImplV1 implements MatricesWriterHandler {
 	// <matrix ... > ... </matrix>
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startMatrix(final Matrix matrix, final BufferedWriter out) throws IOException {
 		out.write("\t<matrix");
 		out.write(" id=\"" + matrix.getId() + "\"");
-		out.write(" world_layer=\"" + matrix.getLayer().getType() + "\"");
 
 		if (matrix.getDesc() != null) {
 			out.write(" desc=\"" + matrix.getDesc() + "\"");
@@ -66,6 +68,7 @@ public class MatricesWriterHandlerImplV1 implements MatricesWriterHandler {
 		out.write(">\n");
 	}
 
+	@Override
 	public void endMatrix(final BufferedWriter out) throws IOException {
 		out.write("\t</matrix>\n\n");
 	}
@@ -74,14 +77,16 @@ public class MatricesWriterHandlerImplV1 implements MatricesWriterHandler {
 	// <entry ... />
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void startEntry(final Entry entry, final BufferedWriter out) throws IOException {
 		out.write("\t\t<entry");
-		out.write(" from_id=\"" + entry.getFromLocation().getId() + "\"");
-		out.write(" to_id=\"" + entry.getToLocation().getId() + "\"");
+		out.write(" from_id=\"" + entry.getFromLocation() + "\"");
+		out.write(" to_id=\"" + entry.getToLocation() + "\"");
 		out.write(" value=\"" + entry.getValue() + "\"");
 		out.write(" />\n");
 	}
 
+	@Override
 	public void endEntry(final BufferedWriter out) throws IOException {
 	}
 
@@ -89,6 +94,7 @@ public class MatricesWriterHandlerImplV1 implements MatricesWriterHandler {
 	// <!-- ============ ... ========== -->
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void writeSeparator(final BufferedWriter out) throws IOException {
 		out.write("<!-- =================================================" +
 							"===================== -->\n\n");

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.meisterk.kti.router;
 
 import java.io.FileNotFoundException;
@@ -32,7 +51,7 @@ public class PlansCalcRouteKtiInfo {
 	}
 
 	public void prepare(final Network network) {
-		
+
 		if (!ktiConfigGroup.isUsePlansCalcRouteKti()) {
 			log.error("The kti module is missing.");
 		}
@@ -52,7 +71,7 @@ public class PlansCalcRouteKtiInfo {
 
 		log.info("Reading traveltime matrix...");
 		Matrices matrices = new Matrices();
-		this.ptTravelTimes = matrices.createMatrix("pt_traveltime", localWorld.getLayer("municipality"), null);
+		this.ptTravelTimes = matrices.createMatrix("pt_traveltime", null);
 		VisumMatrixReader reader = new VisumMatrixReader(this.ptTravelTimes);
 		reader.readFile(ktiConfigGroup.getPtTraveltimeMatrixFilename());
 		log.info("Reading traveltime matrix...done.");
@@ -85,5 +104,5 @@ public class PlansCalcRouteKtiInfo {
 	public KtiConfigGroup getKtiConfigGroup() {
 		return ktiConfigGroup;
 	}
-	
+
 }

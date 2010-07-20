@@ -90,7 +90,7 @@ public class CarSharingRouter extends GenericRouteImpl {
 
 	protected double calcInVehicleTime() {
 
-		Entry matrixEntry = this.plansCalcRouteKtiInfo.getPtTravelTimes().getEntry(this.fromMunicipality, this.toMunicipality);
+		Entry matrixEntry = this.plansCalcRouteKtiInfo.getPtTravelTimes().getEntry(this.fromMunicipality.getId(), this.toMunicipality.getId());
 		if (matrixEntry == null) {
 			throw new RuntimeException("No entry found for " + this.fromMunicipality.getId() + " --> " + this.toMunicipality.getId());
 		}

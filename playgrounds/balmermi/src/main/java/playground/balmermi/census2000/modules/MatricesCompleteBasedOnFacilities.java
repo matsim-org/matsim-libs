@@ -272,8 +272,8 @@ public class MatricesCompleteBasedOnFacilities {
 
 			if (!this.zone_fac_map.containsKey(z.getId())) {
 				System.out.println("      zone id=" + z.getId() + ": removing all WORK and EDUC entries ending at this zone:");
-				work_m.removeToLocEntries(z);
-				educ_m.removeToLocEntries(z);
+				work_m.removeToLocEntries(z.getId());
+				educ_m.removeToLocEntries(z.getId());
 			}
 			else {
 				ArrayList<ActivityFacilityImpl> facs = this.zone_fac_map.get(z.getId());
@@ -286,11 +286,11 @@ public class MatricesCompleteBasedOnFacilities {
 				}
 				if (!has_work) {
 					System.out.println("      zone id=" + z.getId() + ": removing all WORK entries ending at this zone:");
-					work_m.removeToLocEntries(z);
+					work_m.removeToLocEntries(z.getId());
 				}
 				if (!has_educ) {
 					System.out.println("      zone id=" + z.getId() + ": removing all EDUC entries ending at this zone:");
-					educ_m.removeToLocEntries(z);
+					educ_m.removeToLocEntries(z.getId());
 				}
 			}
 		}
@@ -303,13 +303,13 @@ public class MatricesCompleteBasedOnFacilities {
 			if (!work_m.getFromLocations().containsKey(z.getId())) {
 				ActivityFacilityImpl f = this.workFacQuadTree.get(z.getCoord().getX(),z.getCoord().getY());
 				Zone to_zone = this.fac_zone_map.get(f.getId());
-				work_m.setEntry(z,to_zone, 1);
+				work_m.setEntry(z.getId(),to_zone.getId(), 1);
 				System.out.println("      zone id=" + z.getId() + ": added a WORK entry to zone id=" + to_zone.getId() + " (fac id=" + f.getId() + ").");
 			}
 			if (!educ_m.getFromLocations().containsKey(z.getId())) {
 				ActivityFacilityImpl f = this.educFacQuadTree.get(z.getCoord().getX(),z.getCoord().getY());
 				Zone to_zone = this.fac_zone_map.get(f.getId());
-				educ_m.setEntry(z,to_zone, 1);
+				educ_m.setEntry(z.getId(),to_zone.getId(), 1);
 				System.out.println("      zone id=" + z.getId() + ": added a EDUC entry to zone id=" + to_zone.getId() + " (fac id=" + f.getId() + ").");
 			}
 		}

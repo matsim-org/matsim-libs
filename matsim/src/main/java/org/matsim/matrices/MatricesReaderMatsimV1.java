@@ -23,10 +23,7 @@ package org.matsim.matrices;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.world.World;
 import org.xml.sax.Attributes;
 
 /**
@@ -44,11 +41,9 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 	private final Scenario scenario;
 	private Matrices matrices;
 	private Matrix currMatrix = null;
-	private final World world;
 
-	public MatricesReaderMatsimV1(final Matrices matrices, final ScenarioImpl scenario) {
+	public MatricesReaderMatsimV1(final Matrices matrices, final Scenario scenario) {
 		this.matrices = matrices;
-		this.world = scenario.getWorld();
 		this.scenario = scenario;
 	}
 
@@ -61,7 +56,7 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 		} else if (ENTRY.equals(name)) {
 			startEntry(atts);
 		} else {
-			Gbl.errorMsg(this + "[tag=" + name + " not known or not supported]");
+			throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
 		}
 	}
 
@@ -79,8 +74,8 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startMatrix(final Attributes atts) {
-		this.currMatrix = this.matrices.createMatrix(atts.getValue("id"), 
-				world.getLayer(atts.getValue("world_layer")), atts.getValue("desc"));
+		this.currMatrix = this.matrices.createMatrix(atts.getValue("id"),
+				atts.getValue("desc"));
 	}
 
 	private void startEntry(final Attributes  atts) {

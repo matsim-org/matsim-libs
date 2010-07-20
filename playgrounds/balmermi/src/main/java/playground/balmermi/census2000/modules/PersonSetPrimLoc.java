@@ -266,7 +266,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		if (!work_list.isEmpty()) {
 			Integer p_id = Integer.valueOf(person.getId().toString());
 			Zone home_zone = this.persons.getPerson(p_id).getHousehold().getMunicipality().getZone();
-			Zone to_zone = this.getPrimActZone(this.matrices.getMatrix(WORK).getFromLocEntries(home_zone));
+			Zone to_zone = this.getPrimActZone(this.matrices.getMatrix(WORK).getFromLocEntries(home_zone.getId()));
 			ArrayList<ActivityFacilityImpl> to_facs = this.zone_work_fac_mapping.get(to_zone.getId());
 			ActivityFacilityImpl to_fac = null;
 			if (to_facs == null) {
@@ -287,7 +287,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		else if (!educ_list.isEmpty()) {
 			Integer p_id = Integer.valueOf(person.getId().toString());
 			Zone home_zone = this.persons.getPerson(p_id).getHousehold().getMunicipality().getZone();
-			Zone to_zone = this.getPrimActZone(this.matrices.getMatrix(EDUCATION).getFromLocEntries(home_zone));
+			Zone to_zone = this.getPrimActZone(this.matrices.getMatrix(EDUCATION).getFromLocEntries(home_zone.getId()));
 			ArrayList<ActivityFacilityImpl> to_facs = this.zone_educ_fac_mapping.get(to_zone.getId());
 
 			ActivityFacilityImpl to_fac = null;
@@ -312,6 +312,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(final Plan plan) {
 	}
 }

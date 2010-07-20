@@ -22,9 +22,6 @@ package org.matsim.matrices;
 
 import java.util.TreeMap;
 
-import org.matsim.core.gbl.Gbl;
-import org.matsim.world.Layer;
-
 public class Matrices {
 
 	//////////////////////////////////////////////////////////////////////
@@ -38,13 +35,13 @@ public class Matrices {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Matrix createMatrix(final String id, final Layer worldLayer, final String desc) {
+	public final Matrix createMatrix(final String id, final String desc) {
 		// check id string for uniqueness
 		if (this.matrices.containsKey(id)) {
-			Gbl.errorMsg("[id="+id+" already exists.]");
+			throw new RuntimeException("[id="+id+" already exists.]");
 		}
 		// create the matrix
-		Matrix m = new Matrix(id, worldLayer, desc);
+		Matrix m = new Matrix(id, desc);
 		this.matrices.put(id,m);
 		return m;
 	}
