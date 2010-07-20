@@ -16,6 +16,10 @@ public class ParkingOccupancyBins {
 
 	private int[] occupancy = null;
 
+	public int[] getOccupancy() {
+		return occupancy;
+	}
+
 	/**
 	 * Initialize the data structures.
 	 */

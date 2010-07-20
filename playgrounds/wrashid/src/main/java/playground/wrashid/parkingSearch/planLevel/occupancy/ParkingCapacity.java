@@ -1,5 +1,6 @@
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
@@ -15,6 +16,11 @@ public class ParkingCapacity {
 	 * id: facilityId value: capacity of the facility
 	 */
 	private HashMap<Id, Integer> facilityCapacity = new HashMap<Id, Integer>();
+	private ArrayList<ActivityFacilityImpl> parkingFacilities=new ArrayList<ActivityFacilityImpl>();
+
+	public ArrayList<ActivityFacilityImpl> getParkingFacilities() {
+		return parkingFacilities;
+	}
 
 	public ParkingCapacity(ActivityFacilitiesImpl facilities) {
 
@@ -24,6 +30,7 @@ public class ParkingCapacity {
 
 				if (activityOption.getType().equalsIgnoreCase("parking")) {
 					facilityCapacity.put(facility.getId(), (int) Math.round(Math.floor(activityOption.getCapacity())));
+					parkingFacilities.add(facility);
 				}
 
 			}
@@ -35,5 +42,11 @@ public class ParkingCapacity {
 	public int getParkingCapacity(Id facilityId) {
 		return facilityCapacity.get(facilityId);
 	}
+	
+	public int getNumberOfParkings(){
+		return facilityCapacity.size();
+	}
+	
+	 
 
 }
