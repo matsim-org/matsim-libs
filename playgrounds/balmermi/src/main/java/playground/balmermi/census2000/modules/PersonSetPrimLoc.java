@@ -209,7 +209,8 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		int r = MatsimRandom.getRandom().nextInt(dist_sum[n-1]);
 		for (int i=0; i<n; i++) {
 			if (r < dist_sum[i]) {
-				return (Zone)from_loc_entries.get(i).getToLocation();
+				throw new RuntimeException("code no longer works!");
+//				return (Zone)from_loc_entries.get(i).getToLocation(); // this returns now an Id which cannot be casted to Zone
 			}
 		}
 		Gbl.errorMsg("It should never reach this line!");

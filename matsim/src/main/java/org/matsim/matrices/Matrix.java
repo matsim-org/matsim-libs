@@ -21,7 +21,6 @@
 package org.matsim.matrices;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -51,7 +50,7 @@ public class Matrix {
 	// Constructors
 	//////////////////////////////////////////////////////////////////////
 
-	protected Matrix(final String id, final String desc) {
+	public Matrix(final String id, final String desc) {
 		if (id == null) {
 			throw new NullPointerException("id must not be null");
 		}
@@ -114,10 +113,8 @@ public class Matrix {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void removeEntry(final Entry entry) {
-		Id from_loc = entry.getFromLocation();
-		Id to_loc = entry.getToLocation();
-
+	public final void removeEntry(final Id from_loc, final Id to_loc) {
+		Entry entry = getEntry(from_loc, to_loc);
 		ArrayList<Entry> from_loc_entries = this.fromLocs.get(from_loc);
 		ArrayList<Entry> to_loc_entries = this.toLocs.get(to_loc);
 
@@ -145,30 +142,6 @@ public class Matrix {
 			this.toLocs.remove(to_loc);
 		}
 		log.info("entry " + entry.toString() + " removed.");
-	}
-
-	public final void removeToLocEntries(final Id toLocationId) {
-		ArrayList<Entry> to_loc_entries = this.toLocs.get(toLocationId);
-		if (to_loc_entries != null) {
-			ArrayList<Entry> tmp = new ArrayList<Entry>(to_loc_entries);
-			Iterator<Entry> e_it = tmp.iterator();
-			while (e_it.hasNext()) {
-				Entry e = e_it.next();
-				this.removeEntry(e);
-			}
-		}
-	}
-
-	public final void removeFromLocEntries(final Id fromLocationId) {
-		ArrayList<Entry> from_loc_entries = this.fromLocs.get(fromLocationId);
-		if (from_loc_entries != null) {
-			ArrayList<Entry> tmp = new ArrayList<Entry>(from_loc_entries);
-			Iterator<Entry> e_it = tmp.iterator();
-			while (e_it.hasNext()) {
-				Entry e = e_it.next();
-				this.removeEntry(e);
-			}
-		}
 	}
 
 	//////////////////////////////////////////////////////////////////////

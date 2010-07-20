@@ -200,7 +200,6 @@ public class VisumMatrixReader {
 				 * However, when there comes a matrix entry from VISUM 
 				 * for a tuple of one and the same zone, store NaN instead of the value.
 				 * This indicates that the value has to be computed otherwise in MATSim.
-				 * TODO [MR] validate assumption if there is ALWAYS no intrazonal traffic
 				 */
 				double value = Double.NaN;
 				if (!from.equals(to)) {
