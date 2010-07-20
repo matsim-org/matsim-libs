@@ -9,9 +9,10 @@ import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.gui.NetJComponent;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
+import org.matsim.vis.otfvis.gui.OTFSwingDrawer;
+import org.matsim.vis.otfvis.gui.OTFSwingDrawerContainer;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.QueryEntry;
 import org.matsim.vis.otfvis.gui.OTFQueryControl.IdResolver;
@@ -38,8 +39,8 @@ public final class OTFVisClient extends OTFClient {
 		this.connect.connectWriterToReader(LinkHandler.Writer.class, LinkHandler.class);
 		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		if (swing) {
-			this.connect.connectReaderToReceiver(LinkHandler.class, NetJComponent.SimpleQuadDrawer.class);
-			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  NetJComponent.AgentDrawer.class);
+			this.connect.connectReaderToReceiver(LinkHandler.class, OTFSwingDrawer.SimpleQuadDrawer.class);
+			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  OTFSwingDrawer.AgentDrawer.class);
 		} else {
 			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
 			this.connect.connectReaderToReceiver(LinkHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
@@ -50,7 +51,7 @@ public final class OTFVisClient extends OTFClient {
 
 	protected OTFClientQuad getRightDrawerComponent() throws RemoteException {
 		OTFConnectionManager connectR = this.connect.clone();
-		OTFClientQuad clientQ2 = createNewView(null, connectR, this.hostControlBar.getOTFHostControl());
+		OTFClientQuad clientQ2 = createNewView(null, connectR, this.hostControlBar.getOTFHostConnectionManager());
 		return clientQ2;
 	}
 
@@ -58,14 +59,16 @@ public final class OTFVisClient extends OTFClient {
 	protected OTFDrawer createDrawer(){
 		prepareConnectionManager();
 		try {
-			frame.getContentPane().add(new OTFTimeLine("time", hostControlBar), BorderLayout.SOUTH);
+			OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
+			frame.getContentPane().add(timeLine, BorderLayout.SOUTH);
+			hostControlBar.addDrawer("timeline", timeLine);
 			OTFDrawer mainDrawer;
 			if (swing) {
-				mainDrawer = new NetJComponent(this.getRightDrawerComponent());
+				mainDrawer = new OTFSwingDrawerContainer(this.getRightDrawerComponent(), hostControlBar);
 			} else {
-				mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent());
+				mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent(), hostControlBar);
 			}
-			if (hostControlBar.getOTFHostControl().isLiveHost()) {
+			if (hostControlBar.getOTFHostConnectionManager().isLiveHost()) {
 				final OTFQueryControl queryControl = new OTFQueryControl(hostControlBar, OTFClientControl.getInstance().getOTFVisConfig());
 				queryControl.getQueries().clear();
 				queryControl.getQueries().add(new QueryEntry("agentPlan", "show the current plan of an agent", QueryAgentPlan.class));

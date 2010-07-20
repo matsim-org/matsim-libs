@@ -25,19 +25,21 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 
 public final class OTFVisLiveServer implements OTFLiveServerRemote {
-	
+
 	private QueryServer queryServer;
-	
+
 	private final OTFAgentsListHandler.Writer agentWriter = new OTFAgentsListHandler.Writer();
 
 	private MyQuadTree quadTree;
-	
+
 	private volatile boolean synchedPlayback = true;
-	
+
+	private volatile boolean finished = false;
+
 	private TimeStep nextTimeStep;
-	
+
 	private ArrayBlockingQueue<TimeStep> timeStepBuffer = new ArrayBlockingQueue<TimeStep>(1);
-	
+
 	private final ByteBuffer byteBuffer = ByteBuffer.allocate(80000000);
 
 	private Scenario scenario;
@@ -45,14 +47,14 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	private SnapshotReceiver snapshotReceiver;
 
 	private SnapshotGenerator snapshotGenerator;
-	
+
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
-		
+
 		@Override
 		public Collection<AgentSnapshotInfo> getSnapshot() {
 			return nextTimeStep.agentPositions;
 		}
-		
+
 	}
 
 	private static class TimeStep implements Serializable {
@@ -60,11 +62,11 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 		private static final long serialVersionUID = 1L;
 
 		public Collection<AgentSnapshotInfo> agentPositions = new ArrayList<AgentSnapshotInfo>();
-		
+
 		public int time;
-		
+
 	}
-	
+
 	private class MyQuadTree extends OTFServerQuad2 {
 
 		private static final long serialVersionUID = 1L;
@@ -88,11 +90,11 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 			}
 			this.addAdditionalElement(agentWriter);
 		}
-		
+
 	}
-	
+
 	private class SnapshotReceiver implements SnapshotWriter {
-		
+
 		private TimeStep timeStep;
 
 		@Override
@@ -120,15 +122,15 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 			try {
 				timeStepBuffer.put(timeStep);
 			} catch (InterruptedException e) {
-				
+
 			}
 		}
 
 		@Override
 		public void finish() {
-			
+			finished = true;
 		}
-		
+
 	}
 
 	public OTFVisLiveServer(Scenario scenario, EventsManager eventsManager) {
@@ -142,7 +144,7 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	@Override
 	public OTFQueryRemote answerQuery(AbstractQuery query)
-			throws RemoteException {
+	throws RemoteException {
 		return queryServer.answerQuery(query);
 	}
 
@@ -206,7 +208,7 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	@Override
 	public byte[] getQuadDynStateBuffer(String id, Rect bounds)
-			throws RemoteException {
+	throws RemoteException {
 		byte[] result;
 		byteBuffer.position(0);
 		agentWriter.positions.clear();
@@ -233,22 +235,27 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	@Override
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
-		if (snapshotGenerator != null) {
-			snapshotGenerator.skipUntil(time);
-		}
-		while(nextTimeStep == null || nextTimeStep.time < time) {
-			try {
-				nextTimeStep = timeStepBuffer.take();
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
+		if (!finished) {
+			if (snapshotGenerator != null) {
+				snapshotGenerator.skipUntil(time);
 			}
+			while(nextTimeStep == null || nextTimeStep.time < time) {
+				try {
+					nextTimeStep = timeStepBuffer.take();
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			return true;
+		} else {
+			timeStepBuffer.clear();
+			return false;
 		}
-		return true;
 	}
 
 	@Override
 	public void toggleShowParking() throws RemoteException {
-		
+
 	}
 
 	public SnapshotReceiver getSnapshotReceiver() {
