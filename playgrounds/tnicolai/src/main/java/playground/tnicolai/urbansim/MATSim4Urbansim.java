@@ -87,7 +87,10 @@ public class MATSim4Urbansim {
 	private static String tempDirectory = null;
 	// flag o indicate the fist urbansim run (if always true equals "warm start")
 	private static boolean firstRun = true;
-
+	
+	// flag indicates if this is a test run
+	private static boolean isTestRun = false;
+	
 	// MATSim configuration
 	private static Config config	= null;
 	// MATSim scenario
@@ -109,6 +112,8 @@ public class MATSim4Urbansim {
 		// binding the parameter from the MATSim Config into the JaxB data structure
 		if(!unmaschalMATSimConfig()){
 			log.error("Unmarschalling failed. SHUTDOWN MATSim!");
+			if(isTestRun)
+				log.error("TestRun failed !!!");
 			System.exit(Constants.UNMARSCHALLING_FAILED);
 		}
 
@@ -176,6 +181,20 @@ public class MATSim4Urbansim {
 	}
 
 	/**
+	 * Returns an exit code for a successful test run given that
+	 * this run was an test run (test runs are indicated by the
+	 * "isTestRun" flag, stored in the MATSim configuration file).
+	 */
+	private static void printTestRunStatusSuccessful(){
+		if(isTestRun){
+			log.info("TestRun was successful...");
+			System.exit(Constants.TEST_RUN_SUCCESSFUL);
+		}
+		else
+			log.info("This is no TestRun!!!");
+	}
+	
+	/**
 	 * unmarschal (read) matsim config
 	 * @return
 	 */
@@ -224,11 +243,12 @@ public class MATSim4Urbansim {
 				samplingRate = matsimConfig.getUrbansimParameter().getSamplingRate();
 				year = matsimConfig.getUrbansimParameter().getYear().intValue();
 				tempDirectory = matsimConfig.getUrbansimParameter().getTempDirectory();
+				isTestRun = matsimConfig.getUrbansimParameter().isIsTestRun();
 
 				log.info("Network: " + networkFile);
 				log.info("Controler FirstIteration: " + firstIteration + " LastIteration: " + lastIteration );
 				log.info("PlanCalcScore Activity_Type_0: " + activityType_0 + " Activity_Type_1: " + activityType_1);
-				log.info("UrbansimParameter SamplingRate: " + samplingRate + " Year: " + year + " TempDir: " + tempDirectory);
+				log.info("UrbansimParameter SamplingRate: " + samplingRate + " Year: " + year + " TempDir: " + tempDirectory + " TestRun: " + isTestRun);
 			}
 		}
 		catch(JAXBException je){
@@ -243,7 +263,14 @@ public class MATSim4Urbansim {
 			ioe.printStackTrace();
 			return false;
 		}
+		catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
 		log.info("... finished unmarschallig");
+		// Unmaschalling finished without an exection. 
+		// This method returns an exit code for a successful test run given that this was an test run.
+		MATSim4Urbansim.printTestRunStatusSuccessful();
 		return true;
 	}
 
@@ -305,94 +332,6 @@ public class MATSim4Urbansim {
 			return true;
 		return false;
 	}
-
-//	/**
-//	 * gets the custom urbansim run parameter from the MATSim config and sets the variable fields
-//	 */
-//	private static boolean getRunParameterFromConfigfile(){
-//
-//		if(config == null)
-//			return false;
-//
-//		try{
-//			samplingRate = Double.parseDouble( config.findParam(Constants.MATSIM_CONFIG_MODULE_URBANSIM_PARAMETER, Constants.MATSIM_CONFIG_PARAMETER_SAMPLING_RATE) );
-//			year = Integer.parseInt( config.findParam(Constants.MATSIM_CONFIG_MODULE_URBANSIM_PARAMETER, Constants.MATSIM_CONFIG_PARAMETER_YEAR) );
-//			tempDirectory = config.findParam(Constants.MATSIM_CONFIG_MODULE_URBANSIM_PARAMETER, Constants.MATSIM_CONFIG_PARAMETER_TEMP_DIRECTORY);
-//		}
-//		catch(NumberFormatException nfe){
-//			nfe.printStackTrace();
-//			return false;
-//		}
-//		catch(Exception e){
-//			e.printStackTrace();
-//			return false;
-//		}
-//
-//		return true;
-//	}
-
-//	/**
-//	 * gets the program arguments and sets the variable fields
-//	 *
-//	 * @param args urbansim command prompt
-//	 */
-//	private static void getProgramArguments(String args[]){
-//		// expected input: /Users/thomas/Development/opus_home/opus_matsim/matsim_config/seattle_matsim_0.xml --year=2001 --samplingRate=0.010000
-//		StringTokenizer st;
-//		String tmp;
-//
-//		try{
-//			log.info("Detected program arguments:");
-//			for(int i = 0; i < args.length; i++){
-//				st = new StringTokenizer(args[i],"=");
-//				tmp = st.nextToken();
-//
-//				if(tmp.equalsIgnoreCase("--year")){
-//					year = Integer.parseInt( st.nextToken() );
-//					log.info("Argument " + i + ", year = " + year);
-//					continue;
-//				}
-//				else if(tmp.equalsIgnoreCase("--samplingRate")){
-//					samplingRate = Double.parseDouble( st.nextToken() );
-//					log.info("Argument " + i + ", samplingRate = " + samplingRate);
-//					continue;
-//				}
-//				else if(tmp.equalsIgnoreCase("--firstRun")){
-//					if(st.nextToken().equalsIgnoreCase("FALSE"))
-//						firstRun = false;
-//					log.info("Argument " + i + ", firstRun = " + firstRun);
-//					continue;
-//				}
-//				else if(tmp.endsWith(".xml")){
-//					matsimConfigFile = tmp;
-//					log.info("Argument " + i + ", matsimConfigFile = " + matsimConfigFile);
-//					continue;
-//				}
-//				else
-//					log.info("Argument " + i + ", " + tmp);
-//			}
-//
-//			if(firstRun){
-//				log.info("This ist MATSim RUN : 1");
-//				// reset old parameter in the MATSim properties file
-//				MATSimConfigurationManager.resetMATSimProperties();
-//			}
-//			else{
-//				log.info("This ist MATSim RUN : " + MATSimConfigurationManager.getMATSimRunCount() );
-//				// get path to the generated MATSim config from the properties file
-//				// this is needed because urbansim doesn't know about the this config file
-//				matsimConfigFile = MATSimConfigurationManager.getPathToGeneratedMATSimConfig();
-//			}
-//		}
-//		catch(NumberFormatException nfe){
-//			nfe.printStackTrace();
-//			System.exit(Constants.EXCEPTION_OCCURED);
-//		}
-//		catch(Exception e){
-//			e.printStackTrace();
-//			System.exit(Constants.EXCEPTION_OCCURED);
-//		}
-//	}
 
 	/**
 	 * getter for sampling rate

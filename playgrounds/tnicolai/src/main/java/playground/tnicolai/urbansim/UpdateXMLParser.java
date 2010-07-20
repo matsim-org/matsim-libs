@@ -75,7 +75,7 @@ public class UpdateXMLParser {
 			log.info("Running command: " + cmd );
 			Runtime.getRuntime().exec( cmd );
 			// copy generated files into destination directory
-			String source = tmpDirectory + File.separator + outputPackage.replace(".", File.separator);
+			String source = tmpDirectory + outputPackage.replace(".", File.separator);
 			log.info("Copying generated files from " + source + " to " + outputDirectory);
 			FileCopy.copyTree(source, outputDirectory);
 		}

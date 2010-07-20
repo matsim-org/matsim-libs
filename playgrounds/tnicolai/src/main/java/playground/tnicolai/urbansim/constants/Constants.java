@@ -30,9 +30,9 @@ package playground.tnicolai.urbansim.constants;
 public class Constants {
 	
 	/** important system environments */
-	public static final String OPUS_HOME = System.getenv("OPUS_HOME");
-	public static final String OPUS_DATA_PATH = System.getenv("OPUS_DATA_PATH");
-	public static final String PYTHONPATH = System.getenv("PYTHONPATH");
+	public static final String OPUS_HOME = System.getenv("OPUS_HOME");				// TODO: schould be provided by UrbanSim via the configuration file
+	public static final String OPUS_DATA_PATH = System.getenv("OPUS_DATA_PATH");	// TODO: schould be provided by UrbanSim via the configuration file
+	public static final String PYTHONPATH = System.getenv("PYTHONPATH");			// TODO: schould be provided by UrbanSim via the configuration file
 	
 	/** subdirectories in OPUS_HOME */
 	public static final String OPUS_MATSIM_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/";
@@ -69,6 +69,9 @@ public class Constants {
 	
 	/** debugging flags */
 	public static final String DEFAULT_MATSIM_CONFIG_FILE = "/Users/thomas/Development/opus_home/opus_matsim/matsim_config/seattle_matsim_0.xml";
+	/** test run */
+	public static final int TEST_RUN_SUCCESSFUL = 0;
+	public static final int TEST_RUN_FAILD = -1;
 	
 	/** MATSim properties */
 	public static final String MATSIM_PROPERTIES_FILE = "matsim.properties";
