@@ -30,7 +30,8 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
-import org.matsim.vis.otfvis.gui.NetJComponent;
+import org.matsim.vis.otfvis.gui.OTFSwingDrawer;
+import org.matsim.vis.otfvis.gui.OTFSwingDrawerContainer;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -83,22 +84,22 @@ public class OTFClientSwing extends OTFClient {
 		/**
 		 * The next two connections is triggering the swing drawing code
 		 */
-		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, NetJComponent.SimpleQuadDrawer.class);
-		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  NetJComponent.AgentDrawer.class);
-		this.connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class,  NetJComponent.AgentDrawer.class);
+		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class, OTFSwingDrawer.SimpleQuadDrawer.class);
+		this.connectionManager.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  OTFSwingDrawer.AgentDrawer.class);
+		this.connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class,  OTFSwingDrawer.AgentDrawer.class);
 
 	}
 
 	@Override
 	protected OTFDrawer createDrawer() {
 		try {
-			if(!hostControlBar.getOTFHostControl().isLiveHost()) {
-				frame.getContentPane().add(new OTFTimeLine("time", hostControlBar), BorderLayout.SOUTH);
+			if(!hostControlBar.getOTFHostConnectionManager().isLiveHost()) {
+				OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
+				frame.getContentPane().add(timeLine, BorderLayout.SOUTH);
 			} else  {
 				throw new IllegalStateException("Server in live mode!");
 			}
-			NetJComponent mainDrawer = new NetJComponent(createNewView("swing", connectionManager, hostControlBar.getOTFHostControl()));
-//			hostControlBar.finishedInitialisition();
+			OTFSwingDrawerContainer mainDrawer = new OTFSwingDrawerContainer(createNewView("swing", connectionManager, hostControlBar.getOTFHostConnectionManager()), hostControlBar);
 			return mainDrawer;
 		} catch (RemoteException e) {
 			e.printStackTrace();

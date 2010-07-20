@@ -98,16 +98,17 @@ public class OTFClientFile extends OTFClient {
 		connectR.connectReaderToReceiver(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
 		connectR.connectReceiverToLayer(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
 		//end dg dez 09
-		OTFClientQuad clientQ2 = createNewView(null, connectR, this.hostControlBar.getOTFHostControl());
+		OTFClientQuad clientQ2 = createNewView(null, connectR, this.hostControlBar.getOTFHostConnectionManager());
 		return clientQ2;
 	}
 
 	@Override
 	protected OTFDrawer createDrawer(){
 		try {
-			frame.getContentPane().add(new OTFTimeLine("time", hostControlBar), BorderLayout.SOUTH);
-			OTFDrawer mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent());
-//			hostControlBar.finishedInitialisition();
+			OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
+			frame.getContentPane().add(timeLine, BorderLayout.SOUTH);
+			hostControlBar.addDrawer("timeline", timeLine);
+			OTFDrawer mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent(), hostControlBar);
 			return mainDrawer;
 		} catch (RemoteException e) {
 			e.printStackTrace();

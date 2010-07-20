@@ -22,6 +22,7 @@ import javax.swing.event.ChangeListener;
 
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
+import org.matsim.vis.otfvis.gui.OTFHostControl;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
@@ -37,17 +38,48 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, ChangeListener {
 
 	private static final long serialVersionUID = 1L;
-	private final OTFHostControlBar hostControl;
+	
+	private class MyJSlider extends JSlider {
+	
+		private static final long serialVersionUID = 1L;
+	
+		public MyJSlider(int horizontal, int intValue, int intValue2, int time) {
+			super(horizontal,intValue, intValue2, time);
+		}
+	
+		@Override
+		synchronized public void paint(Graphics g) {
+			super.paint(g);
+			Rectangle bounds = g.getClipBounds();
+			bounds.grow(-32, 0);
+	
+			double delta = getMaximum() - getMinimum();
+			// get cached timesteps for hostctrl and draw them
+			synchronized (cachedTime) {
+				for(Integer time : cachedTime) {
+					g.setColor(Color.LIGHT_GRAY);
+					g.fillRect(bounds.x + (int)(bounds.width*((time- getMinimum())/delta)), (int)bounds.getCenterY(), 5, 5);
+				}
+			}
+		}
+	}
+
+	private final OTFHostControl hostControl;
+	
 	private JSlider times;
+	
 	Collection<Integer> cachedTime = new ArrayList<Integer>();
 
-	Hashtable<Integer, JLabel> labelTable =
-		new Hashtable<Integer, JLabel>();
+	Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 
-	public OTFTimeLine(String string, OTFHostControlBar hostControl) {
+	private int loopStart;
+
+	private int loopEnd;
+
+	public OTFTimeLine(String string, OTFHostControl hostControl) {
 		super(string);
 		this.hostControl = hostControl;
-		hostControl.addDrawer("timeline", this);
+		
 
 		addSlider();
 
@@ -66,28 +98,6 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 
 		add(button);
 		this.setVisible(true);
-	}
-
-	public class MyJSlider extends JSlider {
-		public MyJSlider(int horizontal, int intValue, int intValue2, int time) {
-			super(horizontal,intValue, intValue2, time);
-		}
-
-		@Override
-		synchronized public void paint(Graphics g) {
-			super.paint(g);
-			Rectangle bounds = g.getClipBounds();
-			bounds.grow(-32, 0);
-
-			double delta = getMaximum() - getMinimum();
-			// get cached timesteps for hostctrl and draw them
-			synchronized (cachedTime) {
-				for(Integer time : cachedTime) {
-					g.setColor(Color.LIGHT_GRAY);
-					g.fillRect(bounds.x + (int)(bounds.width*((time- getMinimum())/delta)), (int)bounds.getCenterY(), 5, 5);
-				}
-			}
-		}
 	}
 
 	void replaceLabel(String label, int newEnd) {
@@ -109,16 +119,16 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		// remove old label
 		// get actual time
 		int time = times.getValue();
-		if(e.getActionCommand().equals("setLoopStart")){
-			hostControl.setLoopBounds(time, -1);
+		if (e.getActionCommand().equals("setLoopStart")){
+			loopStart = time;
 			replaceLabel("[", time);
-		}else if(e.getActionCommand().equals("setLoopEnd")){
-			hostControl.setLoopBounds(-1, time);
+		} else if(e.getActionCommand().equals("setLoopEnd")){
+			loopEnd = time;
 			replaceLabel("]", time);
-		}else if(e.getActionCommand().equals("cancelcaching")){
+		} else if(e.getActionCommand().equals("cancelcaching")){
 			setCachedTime(-1);
 		}
-		// insert new label
+		hostControl.setLoopBounds(loopStart, loopEnd);
 	}
 
 	/** Listen to the slider. */
@@ -134,9 +144,8 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	}
 
 	public void addSlider() {
-
 		//Create the slider.
-		Collection<Double> steps = hostControl.getOTFHostControl().getTimeStepsdrawer();
+		Collection<Double> steps = hostControl.getTimeStepsdrawer();
 		if ((steps == null) || (steps.size() == 0)) {
 			times = new MyJSlider(JSlider.HORIZONTAL, 0, 0, 0);
 			return; // nothing to display
@@ -145,7 +154,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 
 		int min = dsteps[0].intValue();
 		int max = dsteps[dsteps.length-1].intValue();
-		int value = (int)hostControl.getOTFHostControl().getTime();
+		int value = hostControl.getSimTime();
 		times = new MyJSlider(JSlider.HORIZONTAL, min, max, value);
 
 		times.addChangeListener(this);

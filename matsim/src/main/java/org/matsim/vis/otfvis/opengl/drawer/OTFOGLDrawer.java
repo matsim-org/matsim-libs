@@ -25,7 +25,6 @@ import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
 import static javax.media.opengl.GL.GL_LINEAR;
 import static javax.media.opengl.GL.GL_TEXTURE_MAG_FILTER;
 import static javax.media.opengl.GL.GL_TEXTURE_MIN_FILTER;
-import static javax.media.opengl.GL.GL_VIEWPORT;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -84,6 +83,7 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.ClassCountExecutor;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
+import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.ZoomEntry;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -101,73 +101,7 @@ import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
 
-class OTFGLOverlay extends OTFGLDrawableImpl {
-	private final InputStream texture;
-	private final float relX;
-	private final float relY;
-	private final boolean opaque;
-	private final float size;
-	private Texture t = null;
 
-	OTFGLOverlay(final InputStream texture, float relX, float relY, float size, boolean opaque) {
-		this.texture = texture;
-		this.relX =relX;
-		this.relY = relY;
-		this.size = size;
-		this.opaque = opaque;
-	}
-
-	public void onDraw(GL gl) {
-		if(this.t == null) {
-			this.t = OTFOGLDrawer.createTexture(this.texture);
-		}
-		int[] viewport = new int[4];
-		gl.glGetIntegerv( GL_VIEWPORT, viewport ,0 );
-		float height = this.size*this.t.getHeight()/viewport[3];
-		float length = this.size*this.t.getWidth()/viewport[2];
-		int z = 0;
-		float startX = this.relX >= 0 ? -1.f + this.relX : 1.f -length +this.relX;
-		float startY = this.relY >= 0 ? -1.f + this.relY : 1.f -height +this.relY;
-
-		gl.glColor4d(1,1,1,1);
-
-		//push 1:1 screen matrix
-		gl.glMatrixMode( GL.GL_PROJECTION);
-		gl.glPushMatrix();
-		gl.glLoadIdentity();
-		gl.glMatrixMode( GL.GL_MODELVIEW);
-		gl.glPushMatrix();
-		gl.glLoadIdentity();
-		//drawQuad
-		if(!this.opaque) {
-			this.getGl().glEnable(GL.GL_BLEND);
-			this.getGl().glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-		}
-
-		this.t.enable();
-		this.t.bind();
-		gl.glBegin(GL.GL_QUADS);
-		gl.glTexCoord2f(0,1); gl.glVertex3f(startX, startY, z);
-		gl.glTexCoord2f(1,1); gl.glVertex3f(startX + length, startY, z);
-		gl.glTexCoord2f(1,0); gl.glVertex3f(startX + length, startY + height, z);
-		gl.glTexCoord2f(0,0); gl.glVertex3f(startX, startY + height, z);
-		gl.glEnd();
-		//restore old mode
-		this.t.disable();
-		if(!this.opaque) {
-			this.getGl().glDisable(GL.GL_BLEND);
-		}
-		gl.glMatrixMode( GL.GL_MODELVIEW);
-		gl.glPopMatrix();
-		gl.glMatrixMode( GL.GL_PROJECTION);
-		gl.glPopMatrix();
-	}
-
-	@Override
-	public void invalidate(SceneGraph graph) {
-	}
-
-}
 /**
  * OTFOGLDrawer is responsible for everything that goes on inside the OpenGL context.
  * The main functions are invalidate() and redraw(). The latter will simply redraw a given
@@ -176,7 +110,7 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
  * @author dstrippgen
  *
  */
-public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
+public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 
 	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);
 
@@ -215,6 +149,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	private int now;
 
 	private SceneGraph actGraph = null;
+
+	private OTFHostControlBar hostControlBar;
 
 	public static class StatusTextDrawer {
 
@@ -332,8 +268,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			super(caps);
 		}
 
-		public MyGLCanvas2(GLCapabilities caps, GLCapabilitiesChooser object,
-				GLContext motherContext, GraphicsDevice object2) {
+		public MyGLCanvas2(GLCapabilities caps, GLCapabilitiesChooser object, GLContext motherContext, GraphicsDevice object2) {
 			super(caps, object,motherContext, object2);
 		}
 
@@ -357,7 +292,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		return canvas;
 	}
 
-	public OTFOGLDrawer(OTFClientQuad clientQ) {
+	public OTFOGLDrawer(OTFClientQuad clientQ, OTFHostControlBar hostControlBar) {
 		this.clientQ = clientQ;
 		GLCapabilities caps = new GLCapabilities();
 		this.canvas = createGLCanvas(this, caps, motherContext);
@@ -378,8 +313,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		double linkcount = counter.getCount();
 		int size = linkTexWidth + (int)(0.5*Math.sqrt(linkcount))*2 +2;
 		linkTexWidth = size;
-		this.overlayItems.add(new OTFGLOverlay(MatsimResource.getAsInputStream("matsim_logo_blue.png"), -0.03f, 0.05f, 1.5f, false));
+		OTFGLOverlay matsimLogo = new OTFGLOverlay(MatsimResource.getAsInputStream("matsim_logo_blue.png"), -0.03f, 0.05f, 1.5f, false);
+		this.overlayItems.add(matsimLogo);
 		this.scaleBar = new OTFScaleBarDrawer();
+		this.hostControlBar = hostControlBar;
 	}
 
 	public void replaceMouseHandler(VisGUIMouseHandler newHandler) {
@@ -750,6 +687,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	
 	public void setScale(float scale){
 		this.mouseMan.scaleNetwork(scale);
+		hostControlBar.updateScaleLabel();
 	}
 
 	public Point3f getView() {

@@ -106,9 +106,9 @@ public class OTFQueryControl implements OTFQueryHandler {
 	}
 
 	synchronized public void removeQueries() {
-		if(this.hostControlBar.getOTFHostControl().isLiveHost()) {
+		if(this.hostControlBar.getOTFHostConnectionManager().isLiveHost()) {
 			try {
-				this.hostControlBar.getOTFHostControl().liveHost.removeQueries();
+				this.hostControlBar.getOTFHostConnectionManager().liveHost.removeQueries();
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}
@@ -184,8 +184,8 @@ public class OTFQueryControl implements OTFQueryHandler {
 	
 	public OTFQueryRemote doQuery(final AbstractQuery query) {
 		try {
-			if(this.hostControlBar.getOTFHostControl().isLiveHost()) {
-				return this.hostControlBar.getOTFHostControl().liveHost.answerQuery(query);
+			if(this.hostControlBar.getOTFHostConnectionManager().isLiveHost()) {
+				return this.hostControlBar.getOTFHostConnectionManager().liveHost.answerQuery(query);
 			} else {
 				return null;
 			}

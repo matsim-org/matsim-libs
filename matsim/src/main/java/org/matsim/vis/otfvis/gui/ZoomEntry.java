@@ -27,17 +27,17 @@ import javax.imageio.ImageIO;
 
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 
-public class ZoomEntry  implements Serializable{
+public class ZoomEntry  implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Point3f zoomstart;
-  private BufferedImage snap;
-  private String name;
-	
+	private BufferedImage snap;
+	private String name;
+
 	public ZoomEntry() {
-		
+
 	}
-	
+
 	public ZoomEntry(BufferedImage snap, Point3f zoomstart, String name) {
 		super();
 		this.snap = snap;
@@ -59,15 +59,17 @@ public class ZoomEntry  implements Serializable{
 		this.zoomstart = new Point3f(s.readFloat(),s.readFloat(),s.readFloat());
 		this.snap = ImageIO.read(s);
 	}
+
+	public Point3f getZoomstart() {
+		return this.zoomstart;
+	}
 	
-	 public Point3f getZoomstart() {
-	    return this.zoomstart;
-	  }
-	  public BufferedImage getSnap() {
-	    return this.snap;
-	  }
-	  public String getName() {
-	    return this.name;
-	  }
+	public BufferedImage getSnap() {
+		return this.snap;
+	}
+	
+	public String getName() {
+		return this.name;
+	}
 
 }

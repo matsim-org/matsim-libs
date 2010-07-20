@@ -26,14 +26,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.NoninvertibleTransformException;
@@ -43,10 +40,6 @@ import java.awt.geom.Point2D.Double;
 import java.rmi.RemoteException;
 
 import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.MouseInputAdapter;
 
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
@@ -84,150 +77,35 @@ abstract class OTFSwingDrawable implements OTFDrawable, OTFDataReceiver{
  *
  * @author dstrippgen
  */
-public class NetJComponent extends JComponent  implements OTFDrawer {
+public class OTFSwingDrawer extends JComponent {
 
-	public static interface NetVisResizable {
-		public void scaleNetwork(float scale);
-		public float getScale();
-		public void repaint();
-	}
-
-
-	public static class MyNetVisScrollPane extends JScrollPane implements NetVisResizable {
-
-		private float scale = 1.f;
-		private final NetJComponent networkComponent;
-		
-		public MyNetVisScrollPane(NetJComponent networkComponent) {
-			super(networkComponent);
-			this.networkComponent = networkComponent;
-		}
-		
-	    public void moveNetwork(int deltax, int deltay) {
-	        Rectangle rect = getViewport().getViewRect();
-	        rect.setLocation(rect.x + deltax, rect.y + deltay);
-	        getViewport().scrollRectToVisible(rect);
-	        getViewport().setViewPosition(rect.getLocation());
-	    }
-	    
-	    public void updateViewClipRect() {
-	        Dimension prefSize = networkComponent.getPreferredSize();
-	        Rectangle rect = getViewport().getViewRect();
-
-	        double relX = rect.getX() / prefSize.getWidth();
-	        double relY = rect.getY() / prefSize.getHeight();
-
-	        networkComponent.setViewClipCoords(relX, relY, relX
-	                + rect.getWidth() / prefSize.getWidth(), relY
-	                + rect.getHeight() / prefSize.getHeight());
-	    }
-
-		@Override
-		public void scaleNetwork(float scale){
-			this.scale = scale;
-			System.out.println("Scale " + this.scale);
-	        Dimension prefSize = networkComponent.getPreferredSize();
-	        Rectangle rect = getViewport().getViewRect();
-	        double relX = rect.getX() / prefSize.getWidth();
-	        double relY = rect.getY() / prefSize.getHeight();
-	        networkComponent.scale(scale);
-	        networkComponent.revalidate();
-	        Dimension prefSize2 = networkComponent.getPreferredSize();
-	        networkComponent.setViewClipCoords(relX, relY, relX
-	                + rect.getWidth() / prefSize2.getWidth(), relY
-	                + rect.getHeight() / prefSize2.getHeight());
-	        rect.x = (int) (relX * prefSize2.getWidth() + 0.5 * (rect.getWidth() * (prefSize2
-	                .getWidth()
-	                / prefSize.getWidth() - 1.)));
-	        rect.y = (int) (relY * prefSize2.getHeight() + 0.5 * (rect.getHeight() * (prefSize2
-	                .getHeight()
-	                / prefSize.getHeight() - 1.)));
-
-	        getViewport().setViewPosition(rect.getLocation());
-
-	        revalidate();
-	        repaint();
-		}
-		
-		@Override
-		public float getScale() {
-			return scale;
-		}
-
-		public float scaleNetwork(Rectangle destrect, float factor) {
-	        Dimension prefSize = networkComponent.getPreferredSize();
-	        Rectangle rect = getViewport().getViewRect();
-	        double relX = (destrect.getX() + rect.getX()) / prefSize.getWidth();
-	        double relY = (destrect.getY() + rect.getY()) / prefSize.getHeight();
-	        factor *=  Math.min((double) rect.width / destrect.width,
-	                        (double) rect.height / destrect.height);
-	        networkComponent.scale(factor);
-	        networkComponent.revalidate();
-	        Dimension prefSize2 = networkComponent.getPreferredSize();
-	        networkComponent.setViewClipCoords(relX, relY, relX
-	                + rect.getWidth() / prefSize2.getWidth(), relY
-	                + rect.getHeight() / prefSize2.getHeight());
-	        Point erg = new Point();
-	        erg.x = (int) (relX * prefSize2.getWidth());
-	        erg.y = (int) (relY * prefSize2.getHeight());
-	        rect.setLocation(erg.x, erg.y);
-	        getViewport().scrollRectToVisible(rect);
-	        getViewport().setViewPosition(erg);
-	        getViewport().toViewCoordinates(erg);
-	        revalidate();
-	        repaint();
-			this.scale = factor;
-			System.out.println("Scale " + this.scale);
-	        return this.scale;
-		}
-
-	}
 	private static final Color netColor = new Color(180,180,210,128);
+	
+	double scale = 1;
+	
 	private static final long serialVersionUID = 1L;
 
-	private static final double BORDER_FACTOR = 0.0;
 	private static final float linkWidth = 100;
 
 	private final int frameDefaultWidth;
 
 	private final int frameDefaultHeight;
 
-	private double viewMinX, viewMinY, viewMaxX, viewMaxY;
-
 	private final OTFClientQuad quad;
 
 	private transient SceneGraph sceneGraph;
-	private MyNetVisScrollPane networkScrollPane = null;
-
-	private transient final VizGuiHandler mouseMan;
+	
 	private OTFQueryHandler queryHandler;
+	
+	OTFHostControlBar hostControlBar;
 
-	public void setViewClipCoords( double minX, double minY, double maxX, double maxY) {
-		viewMinX  = networkClippingMinEasting() +  minX * networkClippingWidth();
-		viewMaxX  = networkClippingMinEasting() +  maxX * networkClippingWidth();
-
-		viewMinY  = networkClippingMinNorthing() + (1.-maxY) * networkClippingHeight();
-		viewMaxY  = networkClippingMinNorthing() + (1.-minY) * networkClippingHeight();
-	}
-
-	// returns something like this
-	// 0  1  2
-	// 4  5  6
-	// 8  9 10
-	//
-	// so 5 means the cord is IN the clipping region
-	public int checkViewClip(double x, double y) {
-		// check for quadrant
-		int xquart = x < viewMinX ? 0 : x > viewMaxX ? 2 : 1;
-		int yquart = y < viewMinY ? 0 : y > viewMaxY ? 2 : 1;
-		return xquart + 4* yquart;
-	}
+	private OTFSwingDrawerContainer parentDrawer;
 
 	// --------------- CONSTRUCTION ---------------
 
-	public NetJComponent(OTFClientQuad quad) {
+	public OTFSwingDrawer(OTFClientQuad quad, OTFHostControlBar hostControlBar, OTFSwingDrawerContainer parentDrawer) {
 		this.quad = quad;
-
+		this.parentDrawer = parentDrawer;
 		// calculate size of frame
 
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -239,72 +117,47 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		frameDefaultHeight = (int) Math.floor(networkClippingHeight() * factor);
 
 		scale(1);
-		setViewClipCoords(0,0,1,1);
-
-		networkScrollPane = new MyNetVisScrollPane(this);
-		VizGuiHandler handi = new VizGuiHandler();
-		networkScrollPane.addMouseMotionListener(handi);
-		networkScrollPane.addMouseListener(handi);
-		networkScrollPane.getViewport().addChangeListener(handi);
-		mouseMan = handi;
-		networkScrollPane.addMouseWheelListener(mouseMan);
+		this.hostControlBar = hostControlBar;
 	}
 
-	private void scale(double factor) {
+	void scale(double factor) {
 		if (factor > 0) {
+			this.scale = factor;
 			int scaledWidth = (int) Math.round(factor * frameDefaultWidth);
 			int scaledHeight = (int) Math.round(factor * frameDefaultHeight);
-
 			this.setPreferredSize(new Dimension(scaledWidth, scaledHeight));
 		}
-	}
-	
-	public void setScale(float factor){
-		this.networkScrollPane.scaleNetwork(factor);
 	}
 
 	// -------------------- COORDINATE TRANSFORMATION --------------------
 
-	private double networkClippingEastingBorder() {
-		return Math.max(1, BORDER_FACTOR
-				* (quad.getMaxEasting() - quad.getMinEasting()));
-	}
-
-	private double networkClippingNorthingBorder() {
-		return Math.max(1, BORDER_FACTOR
-				* (quad.getMaxNorthing() - quad.getMinNorthing()));
-	}
-
-	private double networkClippingMinEasting() {
-		return 0 - networkClippingEastingBorder();
-	}
-
 	private double networkClippingMaxEasting() {
-		return quad.getMaxEasting() -quad.getMinEasting() + networkClippingEastingBorder();
-	}
-
-	private double networkClippingMinNorthing() {
-		return 0 - networkClippingNorthingBorder();
+		return quad.getMaxEasting() -quad.getMinEasting() + 1;
 	}
 
 	private double networkClippingMaxNorthing() {
-		return quad.getMaxNorthing() - quad.getMinNorthing() + networkClippingNorthingBorder();
+		return quad.getMaxNorthing() - quad.getMinNorthing() + 1;
 	}
 
 	private double networkClippingWidth() {
-		return networkClippingMaxEasting() - networkClippingMinEasting();
+		return networkClippingMaxEasting() - (0 - 1);
 	}
 
 	private double networkClippingHeight() {
-		return networkClippingMaxNorthing() - networkClippingMinNorthing();
+		return networkClippingMaxNorthing() - (0 - 1);
 	}
 
-	private AffineTransform getBoxTransform() {
+	
+	public float getScale() {
+		return (float) scale;
+	}
+	
+	AffineTransform getBoxTransform() {
 
 		// two original extreme coordinates ...
 
-		double v1 = networkClippingMinEasting();
-		double w1 = networkClippingMinNorthing();
+		double v1 = 0 - 1;
+		double w1 = 0 - 1;
 
 		double v2 = networkClippingMaxEasting();
 		double w2 = networkClippingMaxNorthing();
@@ -335,6 +188,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	@Override
 	public void paint(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
+		parentDrawer.mouseMan.drawElements(g2);
 
 		boolean useAntiAliasing = true;
 
@@ -344,33 +198,16 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF));
 		}
 
-		AffineTransform originalTransform = g2.getTransform();
-
 		OTFSwingDrawable.g2d = g2;
 
 		g2.setStroke(new BasicStroke(Math.round(0.05 * linkWidth)));
-
-		AffineTransform linkTransform = new AffineTransform(originalTransform);
-		linkTransform.concatenate(getBoxTransform());
-		g2.setTransform(linkTransform);
-
+		g2.transform(getBoxTransform());
 		sceneGraph.draw();
-		
 		if (this.queryHandler != null) {
-			this.queryHandler.drawQueries(this);
+			this.queryHandler.drawQueries(parentDrawer);
 		}
-		
-		g2.setTransform(new AffineTransform());
-		mouseMan.drawElements(g2);
-		g2.setTransform(originalTransform);
-	}
-	
-	@Override
-	public Component getComponent() {
-		return networkScrollPane;
 	}
 
-	@Override
 	public OTFClientQuad getQuad() {
 		return quad;
 	}
@@ -378,23 +215,10 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	public  Graphics2D getG2D() {
 		return OTFSwingDrawable.g2d;
 	}
-	
-	public float getScale(){
-		return networkScrollPane.getScale();
-	}
 
-	@Override
 	public void invalidate(int time) throws RemoteException {
-		this.sceneGraph = quad.getSceneGraph(time, null, this);
-		redraw();
+		this.sceneGraph = quad.getSceneGraph(time, null, parentDrawer);
 	}
-
-	@Override
-	public void redraw() {
-		networkScrollPane.invalidate();
-		networkScrollPane.repaint();
-	}
-
 
 	/***
 	 * Drawer class for drawing simple quads
@@ -562,119 +386,15 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	}
 
 
-	/***
-	 * VizGuiHandler handles mouse input etc
-	 */
-	class VizGuiHandler extends MouseInputAdapter implements ChangeListener,MouseWheelListener {
-		public Point start = null;
-
-		public Rectangle currentRect = null;
-
-		public int button = 0;
-
-		public void drawElements(Graphics2D g2) {
-			if (currentRect != null) {
-				g2.setColor(Color.GREEN);
-				g2.drawRect(currentRect.x,
-						currentRect.y, currentRect.width, currentRect.height);
-			}
-		}
-
-		@Override
-		public void mousePressed(MouseEvent e) {
-			int x = e.getX();
-			int y = e.getY();
-			button = e.getButton();
-			start = new Point(x, y);
-			// networkComponent.repaint();
-		}
-
-		@Override
-		public void mouseDragged(MouseEvent e) {
-			if (button == 1)
-				updateSize(e);
-			else if (button == 2) {
-				int deltax = start.x - e.getX();
-				int deltay = start.y - e.getY();
-				start.x = e.getX();
-				start.y = e.getY();
-				networkScrollPane.moveNetwork(deltax, deltay);
-			}
-		}
-
-		@Override
-		public void mouseReleased(MouseEvent e) {
-			if (button == 1) {
-				updateSize(e);
-				if ((currentRect.getHeight() > 10)
-						&& (currentRect.getWidth() > 10)) {
-					float scale =  networkScrollPane.getScale();
-					/*scale = */networkScrollPane.scaleNetwork(currentRect,scale);
-				} else {
-					Point2D.Double origPoint = new Point2D.Double(e.getX(), e.getY());
-//					AffineTransform originalTransform = ((Graphics2D) (e.getComponent().getGraphics())).getTransform();
-					AffineTransform linkTransform = new AffineTransform( );
-					linkTransform.concatenate(getBoxTransform());
-					try {
-						linkTransform = linkTransform.createInverse();
-					} catch (NoninvertibleTransformException e1) {
-						throw new RuntimeException(e1);
-					}
-					Point2D.Double transformedPoint = (Point2D.Double) linkTransform.transform(origPoint, null);
-//					System.out.println(origPoint);
-//					System.out.println(transformedPoint);
-					handleClick(transformedPoint, button, e);
-					networkScrollPane.invalidate();
-					networkScrollPane.repaint();
-				}
-				currentRect = null;
-			}
-			button = 0;
-		}
-
-		void updateSize(MouseEvent e) {
-			currentRect = new Rectangle(start);
-			currentRect.add(e.getX(), e.getY());
-			networkScrollPane.invalidate();
-			networkScrollPane.repaint();
-		}
-
-		@Override
-		public void stateChanged(ChangeEvent e) {
-			networkScrollPane.updateViewClipRect();
-		}
-
-		private void pressed_ZOOM_OUT() {
-			float scale = networkScrollPane.getScale() / 1.42f;
-			if (scale > 0.02) networkScrollPane.scaleNetwork(scale);
-		}
-
-		private void pressed_ZOOM_IN() {
-			float scale = networkScrollPane.getScale() * 1.42f;
-			if ( scale < 100) networkScrollPane.scaleNetwork(scale);
-		}
-
-		@Override
-		public void mouseWheelMoved(MouseWheelEvent e) {
-			int i = e.getWheelRotation();
-			if(i>0)pressed_ZOOM_OUT();
-			else if ( i<0) pressed_ZOOM_IN();
-		}
-
-	}
-
-	@Override
 	public void clearCache() {
 		if(quad != null) quad.clearCache();
 	}
 
-	@Override
 	public void handleClick(Double point, int mouseButton, MouseEvent e) {
 		Point2D.Double origPoint = new Point2D.Double(point.x + this.quad.offsetEast, point.y + this.quad.offsetNorth);
 		if(this.queryHandler != null) this.queryHandler.handleClick(this.quad.getId(), origPoint, mouseButton);
 	}
 
-	@Override
 	public void handleClick(Rectangle currentRect, int button) {
 		Rectangle2D.Double origRect = new Rectangle2D.Double(currentRect.x + this.quad.offsetEast, currentRect.y + this.quad.offsetNorth, currentRect.width, currentRect.height);
 		if(this.queryHandler != null) this.queryHandler.handleClick(this.quad.getId(), origRect, button);

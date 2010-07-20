@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadI;
+import org.matsim.vis.otfvis.gui.MyNetVisScrollPane;
 import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
@@ -94,7 +95,7 @@ public abstract class OTFClient implements Runnable {
 		pane.validate();
 		this.hostControlBar.addDrawer(this.url, mainDrawer);
 		try {
-			mainDrawer.invalidate((int)hostControlBar.getOTFHostControl().getTime());
+			mainDrawer.invalidate((int)hostControlBar.getOTFHostConnectionManager().getTime());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -132,7 +133,7 @@ public abstract class OTFClient implements Runnable {
 	}
 
 	protected void createHostControlBar() {
-		this.hostControlBar = new OTFHostControlBar(masterHostControl, frame);
+		this.hostControlBar = new OTFHostControlBar(masterHostControl);
 		frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
 		PreferencesDialog preferencesDialog = new PreferencesDialog(frame, hostControlBar);
 		preferencesDialog.setVisConfig(OTFClientControl.getInstance().getOTFVisConfig());

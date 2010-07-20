@@ -94,15 +94,6 @@ public class OTFHostConnectionManager {
 		return liveHost != null;
 	}
 
-	public Collection<Double> getTimeStepsdrawer() {
-		try {
-			return this.host.getTimeSteps();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
 	public double getTime() {
 		try {
 			return host.getLocalTime();
