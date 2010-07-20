@@ -2,7 +2,7 @@ package playground.wrashid.parkingSearch.planLevel.trb;
 
 import org.matsim.core.controler.Controler;
 
-import playground.wrashid.parkingSearch.planLevel.BaseControlerScenario;
+import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
 
 public class Main1 {
 	public static void main(String[] args) {

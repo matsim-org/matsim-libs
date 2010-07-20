@@ -30,6 +30,7 @@ import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
+import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunctionTestNumberOfParkings;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingDefaultScoringFunction;
 

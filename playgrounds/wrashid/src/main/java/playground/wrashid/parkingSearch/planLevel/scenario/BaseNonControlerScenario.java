@@ -1,4 +1,4 @@
-package playground.wrashid.parkingSearch.planLevel;
+package playground.wrashid.parkingSearch.planLevel.scenario;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;

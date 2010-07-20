@@ -20,10 +20,10 @@ import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.Reflection;
-import playground.wrashid.parkingSearch.planLevel.BaseControlerScenario;
 import playground.wrashid.parkingSearch.planLevel.LinkFacilityAssociationTest;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
+import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
 
 public class ParkingPlanAlgorithmTest extends MatsimTestCase implements IterationStartsListener {
 

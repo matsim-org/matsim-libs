@@ -16,6 +16,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
+import playground.wrashid.parkingSearch.planLevel.scenario.BaseNonControlerScenario;
 
 public class ClosestParkingMatrixTest extends MatsimTestCase {
 

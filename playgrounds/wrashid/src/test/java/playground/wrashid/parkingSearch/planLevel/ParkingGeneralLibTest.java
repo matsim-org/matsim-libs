@@ -8,6 +8,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 
+import playground.wrashid.parkingSearch.planLevel.scenario.BaseNonControlerScenario;
+
 public class ParkingGeneralLibTest extends TestCase {
 
 	public void testGetAllParkingFacilityIds() {

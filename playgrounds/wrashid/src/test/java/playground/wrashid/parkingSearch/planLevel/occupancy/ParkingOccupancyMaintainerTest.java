@@ -6,8 +6,8 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
-import playground.wrashid.parkingSearch.planLevel.BaseControlerScenario;
 import playground.wrashid.parkingSearch.planLevel.init.InitializeParkings;
+import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
 
 import junit.framework.TestCase;
 

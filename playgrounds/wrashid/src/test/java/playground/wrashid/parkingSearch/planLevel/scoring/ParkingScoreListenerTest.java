@@ -10,10 +10,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
-import playground.wrashid.parkingSearch.planLevel.BaseControlerScenario;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
+import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
 
 public class ParkingScoreListenerTest extends TestCase implements IterationEndsListener {
 

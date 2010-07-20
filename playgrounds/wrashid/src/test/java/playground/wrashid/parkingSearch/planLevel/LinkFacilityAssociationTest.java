@@ -9,6 +9,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkFacilityAssociation;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
+import playground.wrashid.parkingSearch.planLevel.scenario.BaseNonControlerScenario;
 
 public class LinkFacilityAssociationTest extends MatsimTestCase {
 

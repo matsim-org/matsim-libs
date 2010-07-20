@@ -189,9 +189,15 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 			ActivityImpl firstActivity = (ActivityImpl) plan.getPlanElements().get(0);
 			ActivityImpl lastActivity = (ActivityImpl) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 
+			// if the plan intended to be used without facilities, the facility Id of the activities will be 
+			// missing, therefore it is set here.
+			//if (firstActivity==null || lastActivity==null || firstActivity.getFacilityId()==null || lastActivity.getFacilityId()==null){
+				//firstActivity.setFacilityId(facilityId)
+			//}
+			
 			// if first and last activity are not at the same location,
 			// assumption made by parking is wrong.
-			if (!firstActivity.getFacilityId().toString().equalsIgnoreCase(lastActivity.getFacilityId().toString())) {
+			if (!firstActivity.getLinkId().toString().equalsIgnoreCase(lastActivity.getLinkId().toString())) {
 				throw new Error("first and last activity must be at the same location.");
 			}
 

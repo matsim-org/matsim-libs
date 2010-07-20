@@ -1,4 +1,4 @@
-package playground.wrashid.parkingSearch.planLevel;
+package playground.wrashid.parkingSearch.planLevel.scenario;
 
 import org.matsim.core.controler.Controler;
 
