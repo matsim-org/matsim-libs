@@ -27,7 +27,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -44,11 +43,11 @@ public class ExpBetaPlanChanger2 implements PlanSelector {
 	static boolean betaFlag = true;
 
 	/**
-	 * stores the agents and their decicions for one iteration: 
+	 * stores the agents and their decicions for one iteration:
 	 * 1 stands for the decision of the person of changing the plan, 0 stands for not changing the plan
 	 */
-	private HashMap<Person, Double> tableOfAgentsAndDecisions = new HashMap<Person, Double>(); 
-	
+	private HashMap<Person, Double> tableOfAgentsAndDecisions = new HashMap<Person, Double>();
+
 	public Map<Person, Double> getTableOfAgentsAndDecisions() {
 		return Collections.unmodifiableMap(this.tableOfAgentsAndDecisions);
 	}
@@ -57,16 +56,17 @@ public class ExpBetaPlanChanger2 implements PlanSelector {
 	public void clearTableOfAgentsAndDecisions(){
 		tableOfAgentsAndDecisions.clear();
 	}
-	
-	
-	public ExpBetaPlanChanger2() {
-		this.beta = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "BrainExpBeta"));
+
+
+	public ExpBetaPlanChanger2(double beta) {
+		this.beta = beta;
 	}
 
 	/**
 	 * Changes to another plan with a probability proportional to exp( Delta scores ).
 	 * Need to think through if this goes to Nash Equilibrium or to SUE !!!
 	 */
+	@Override
 	public Plan selectPlan(final Person person) {
 		// current plan and random plan:
 		Plan currentPlan = person.getSelectedPlan();
@@ -89,7 +89,7 @@ public class ExpBetaPlanChanger2 implements PlanSelector {
 			 *   (1) someone would need to go through the theory to make sure that we remain within what we have said before
 			 *       (convergence to logit and proba of jump between equal options = 0.01
 			 *   (2) someone would need to test if the "traffic" results are similar
-			 */  
+			 */
 			betaFlag = false ;
 		}
 		double weight = Math.exp( 0.5 * this.beta * (otherScore - currentScore) );
@@ -98,26 +98,26 @@ public class ExpBetaPlanChanger2 implements PlanSelector {
 
 		// The change probability is
 		double changeProb = weight*0.01;
-		
-		
-		
+
+
+
 		if (MatsimRandom.getRandom().nextDouble() < 0.01*weight ) { // as of now, 0.01 is hardcoded (proba to change when both
 			                                           // scores are the same)
-			
+
 			//If the person changes the plan, assign 1 to this person
 			tableOfAgentsAndDecisions.put(person, new Double(1));
 
-			
+
 			return otherPlan;
-			
-			
+
+
 		}
-		
+
 		tableOfAgentsAndDecisions.put(person, new Double(0));
-		
+
 		return currentPlan;
 	}
 
 
-	
+
 }

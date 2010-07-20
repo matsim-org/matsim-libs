@@ -32,7 +32,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.LocationChoice;
 
 public class MyStrategyManagerConfigLoader {
-	
+
 	private static final Logger log = Logger.getLogger(MyStrategyManagerConfigLoader.class);
 
 	private static int externalCounter = 0;
@@ -130,7 +130,7 @@ public class MyStrategyManagerConfigLoader {
 		} else if (name.equals("ChangeExpBeta")) {
 			strategy = new PlanStrategy(new ExpBetaPlanChanger(config.charyparNagelScoring().getBrainExpBeta()));
 		} else if (name.equals("ChangeExpBeta2")) {
-			strategy = new PlanStrategy(new ExpBetaPlanChanger2());
+			strategy = new PlanStrategy(new ExpBetaPlanChanger2(config.charyparNagelScoring().getBrainExpBeta()));
 		} else if (name.equals("SelectRandom")) {
 			strategy = new PlanStrategy(new RandomPlanSelector());
 		} else if (name.equals("ChangeLegMode")) {
@@ -139,23 +139,6 @@ public class MyStrategyManagerConfigLoader {
 			strategy.addStrategyModule(new ReRoute(controler));
 		} else if (name.equals("SelectPathSizeLogit")) {
 			strategy = new PlanStrategy(new PathSizeLogitSelector(controler.getNetwork(), config.charyparNagelScoring()));
-//			// JH
-		} else if (name.equals("KSecLoc")){
-//			strategy = new PlanStrategy(new RandomPlanSelector());
-//			PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(network, travelCostCalc, travelTimeCalc);
-//			strategy.addStrategyModule(socialNetStrategyModule);
-			log.warn("jhackney: No replanning module available in the core for keywords KSecLoc, FSecLoc,SSecloc. The modules have moved to the playground.");
-		} else if (name.equals("FSecLoc")){
-//			strategy = new PlanStrategy(new RandomPlanSelector());
-//			PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherF(network, travelCostCalc, travelTimeCalc, facilities);
-//			strategy.addStrategyModule(socialNetStrategyModule);
-			log.warn("jhackney: No replanning module available in the core for keywords KSecLoc, FSecLoc,SSecloc. The modules have moved to the playground.");
-		} else if (name.equals("SSecLoc")){
-//			strategy = new PlanStrategy(new RandomPlanSelector());
-//			PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(network,travelCostCalc,travelTimeCalc);
-//			strategy.addStrategyModule(socialNetStrategyModule);
-			log.warn("jhackney: No replanning module available in the core for keywords KSecLoc, FSecLoc,SSecloc. The modules have moved to the playground.");
-//			// JH
 		} else if (name.equals("LocationChoice")) {
 			strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 			strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenario()).getKnowledges()));
