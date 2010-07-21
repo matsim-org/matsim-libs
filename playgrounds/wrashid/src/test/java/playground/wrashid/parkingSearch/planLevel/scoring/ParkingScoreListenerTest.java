@@ -33,7 +33,7 @@ public class ParkingScoreListenerTest extends TestCase implements IterationEndsL
 	}
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		HashMap<Id, Double> hm = ParkingScoreListener.getScoreHashMap();
+		HashMap<Id, Double> hm = ParkingScoreExecutor.getScoreHashMap();
 		assertEquals(-2.0, hm.get(new IdImpl(1)).doubleValue());
 		assertEquals(-2.0, hm.get(new IdImpl(2)).doubleValue());
 		assertEquals(-2.0, hm.get(new IdImpl(3)).doubleValue());

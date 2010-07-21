@@ -6,6 +6,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingOccupancyAnalysis;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingTimesAnalysis;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
+import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoreExecutor;
 
 public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 
@@ -30,5 +31,10 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		new ParkingWalkingTimesAnalysis(ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance())
 				.writeTxtFile(fileName);
 
+		
+		
+		
+		new ParkingScoreExecutor().performScoring(event);
+		
 	}
 }

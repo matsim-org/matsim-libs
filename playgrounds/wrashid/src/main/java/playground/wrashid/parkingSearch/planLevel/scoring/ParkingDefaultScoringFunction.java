@@ -1,12 +1,16 @@
 package playground.wrashid.parkingSearch.planLevel.scoring;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scoring.ScoringFunction;
 
 import playground.wrashid.PSF.parking.ParkingInfo;
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping;
@@ -20,13 +24,8 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 
 	public double getScore(ActivityImpl targetActivity, Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId,
 			double parkingArrivalDuration, double parkingDepartureDuration, Plan plan, double delta, boolean forRanking) {
-		// TODO: must ensure through the score, that parkings which are full at
-		// the time of arrival get a bad score.
-
 		
-		double walkingPenalty = -1.0
-				* GeneralLib.getDistance(targetActivity.getCoord(),
-						parkingFacilities.getFacilities().get(parkingFacilityId).getCoord());
+		
 
 		// TODO: question: should we have one scaling factor to scaling the
 		// whole parking thing with the other scores?
@@ -142,44 +141,92 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		// return walkingPenalty;
 
 		if (!forRanking) {
-			// -1.0 is just to assure, if the current car is the last car to
-			// arrive at the parking, still there is no problem
-			if (!ParkingRoot.getParkingScoringFunction().isParkingFullAtTime(parkingFacilityId,
-					parkingTimeInfo.getStartTime() - 1.0)) {
-				return Double.parseDouble(parkingFacilityId.toString()) / 2;
-			}
-		}
+			//TODO: remove forRanking variable...
 
-		if (parkingFacilityId.toString().equalsIgnoreCase("36")) {
-			System.out.println();
 		}
 
 	
+		// in order to get a sense for the scoring function range, it is assumed that the agent performs the first activity
+		// for almost the whole day. 
+		// then we divide this by the number of act-legs. Although we could make more checks (e.g. how many parkings are there, etc.)
+		// we just want to get a general since for the score, so that the penalty fits into the whole scoring scheme.
+		
+		ScoringFunction scoringFunction = GlobalRegistry.controler.getScoringFunctionFactory().createNewScoringFunction(plan);
+		scoringFunction.startActivity(0.0, (Activity) plan.getPlanElements().get(0));
+		scoringFunction.endActivity(23*3600);
+		double penaltyScoreNorm = -1.0*scoringFunction.getScore()/plan.getPlanElements().size();
+		scoringFunction.reset();
+		
 
+		double parkingPriceScore = getParkingPriceScore(parkingFacilityId, parkingTimeInfo, personId);
+		double parkingParkingCapacityViolationPenalty = getParkingCapacityViolationPenalty(parkingFacilityId, parkingTimeInfo, plan);
+		double parkingWalkingPenalty=getWalkingExplicitScorePart(targetActivity, personId);
+		double parkingActivityDurationPenalty=getParkingActivityDurationPenalty(parkingArrivalDuration, parkingDepartureDuration);
 		
-		
-		
-		
-		double parkingPriceScore=getParkingPriceScore(parkingFacilityId,parkingTimeInfo,personId);
-	
 		// TODO: add more sums here!!!!
-		//return parkingPriceScore;
+		double weightedScore=0;
+		weightedScore+=parkingPriceScore;
+		weightedScore+=parkingWalkingPenalty;
+		weightedScore+=parkingActivityDurationPenalty;
+		weightedScore+=6*parkingParkingCapacityViolationPenalty;
+		
+		return weightedScore*penaltyScoreNorm;
+	}
+
+	
+	private double getWalkingExplicitScorePart(ActivityImpl targetActivity, Id parkingFacilityId){
+		double zeroValueForNormalization=0;
+		double oneValueForNormalization=5000; // in meters
 		
 		
+		double walkingPenalty = -1.0
+		* GeneralLib.getDistance(targetActivity.getCoord(), parkingFacilities.getFacilities().get(parkingFacilityId)
+				.getCoord());
+		return (walkingPenalty-zeroValueForNormalization)/(oneValueForNormalization);
 		
-		if (isParkingFull(parkingFacilityId,parkingTimeInfo)){
-			return 0;
-		} else {
-			return 1;
-		}
 	}
 	
-	private boolean isParkingFull(Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo){
+	
+	
+	/**
+	 * 
+	 * @param parkingFacilityId
+	 * @param parkingTimeInfo
+	 * @param plan 
+	 * @return
+	 */
+	private double getParkingCapacityViolationPenalty(Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Plan plan) {
+		double parkingCapacityViolationPenalty=0;
+		
+		if (ParkingRoot.getParkingScoringFunction()
+				.isParkingFullAtTime(parkingFacilityId, parkingTimeInfo.getStartTime() - delta)) {
+			// if parking full before arrival => give full penalty
+			parkingCapacityViolationPenalty = 1;
+		} else if (ParkingRoot.getParkingScoringFunction()
+				.isParkingFullAtTime(parkingFacilityId, parkingTimeInfo.getStartTime() - delta/10.0) && ParkingRoot.getParkingScoringFunction().isParkingFullAtTime(parkingFacilityId,
+				parkingTimeInfo.getStartTime() + delta)) {
+			// if parking not full just before arrival but full after arrival, then still give a small penalty, because we caused the parking
+			// to get full and this might cause some problem in the future
+			parkingCapacityViolationPenalty = 0.1;
+		} else {
+			// if parking not full before and after our arrival => no problem.
+			parkingCapacityViolationPenalty = 0;
+		}
+
+		return parkingCapacityViolationPenalty;
+	}
+
+	private boolean isParkingFull(Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo) {
 		return !ParkingRoot.getParkingScoringFunction().isParkingNotFullDuringIntervall(parkingFacilityId,
-				parkingTimeInfo.getStartTime(), delta); 
+				parkingTimeInfo.getStartTime(), delta);
 	}
 
 	private double getParkingPriceScore(Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId) {
+		double lowestIncome=3000;
+		double zeroValueForNormalization=0;
+		double oneValueForNormalization=parkingPriceMapping.getParkingPrice(parkingFacilityId).getPrice(0,
+				12*3600)/lowestIncome; // in seconds
+		
 		double parkingPriceScore = -1.0
 				* ParkingRoot.getPriceScoreScalingFactor()
 				* parkingPriceMapping.getParkingPrice(parkingFacilityId).getPrice(parkingTimeInfo.getStartTime(),
@@ -191,10 +238,13 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		// TODO: this value should be given back by some other function!!!!
 		parkingPriceScore = parkingPriceScore / income;
 
-		return parkingPriceScore;
+		return (parkingPriceScore-zeroValueForNormalization)/(oneValueForNormalization);
 	}
-	
-	private double getParkingActivityDurationPenalty(double parkingArrivalDuration, double parkingDepartureDuration){
+
+	private double getParkingActivityDurationPenalty(double parkingArrivalDuration, double parkingDepartureDuration) {
+		double zeroValueForNormalization=0;
+		double oneValueForNormalization=20*60; // in seconds
+		
 		// impact of parking and un-parking durations
 		double parkingActivityDurationPenalty = -1.0 * ParkingRoot.getParkingActivityDurationPenaltyScalingFactor()
 				* (parkingArrivalDuration + parkingDepartureDuration);
@@ -225,8 +275,8 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		// in an area is and then
 		// let the system calibrate itself, what scaling would render best
 		// results.
-		
-		return parkingActivityDurationPenalty;
+
+		return (parkingActivityDurationPenalty-zeroValueForNormalization)/(oneValueForNormalization);
 	}
 
 }

@@ -66,6 +66,11 @@ public class GeneralLibTest extends MatsimTestCase {
 		assertEquals(60*60*24.0-1,GeneralLib.projectTimeWithin24Hours(-1),0.1);
 	}
 	
+	public void testGetIntervalDuration(){
+		assertEquals(10.0,GeneralLib.getIntervalDuration(0.0,10.0));
+		assertEquals(11.0,GeneralLib.getIntervalDuration(60*60*24.0-1.0,10.0));
+	}
+	
 	
 	public void testIsIn24HourInterval(){
 		assertEquals(true,GeneralLib.isIn24HourInterval(0.0, 10.0, 9.0));

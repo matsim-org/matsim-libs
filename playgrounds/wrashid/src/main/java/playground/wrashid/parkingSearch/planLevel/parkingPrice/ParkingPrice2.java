@@ -1,11 +1,11 @@
 package playground.wrashid.parkingSearch.planLevel.parkingPrice;
 
+import playground.wrashid.lib.GeneralLib;
+
 public class ParkingPrice2 extends ParkingPrice {
 
 	public double getPrice(double startParkingTime, double endParkingTime) {
-		checkPreCond_startPSmallerThanEndPTime(startParkingTime, endParkingTime);
-
-		return (endParkingTime - startParkingTime)*2.0;
+		return GeneralLib.getIntervalDuration(startParkingTime,endParkingTime * 2);
 	}
 
 }

@@ -390,6 +390,26 @@ public class GeneralLib {
 	}
 
 	/**
+	 * 24 hour check is performed (no projection required as pre-requisite).
+	 * @param startIntervalTime
+	 * @param endIntervalTime
+	 * @return
+	 */
+	public static double getIntervalDuration(double startIntervalTime, double endIntervalTime){
+		double secondsInOneDay = 60 * 60 * 24;
+		startIntervalTime=projectTimeWithin24Hours(startIntervalTime);
+		endIntervalTime=projectTimeWithin24Hours(endIntervalTime);
+		
+		
+		if (startIntervalTime<endIntervalTime){
+			return endIntervalTime-startIntervalTime;
+		} else {
+			return endIntervalTime + (secondsInOneDay - startIntervalTime);
+		}
+	
+	}
+	
+	/**
 	 * Interval start and end are inclusive.
 	 * 
 	 * @param startIntervalTime

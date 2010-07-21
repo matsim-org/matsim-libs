@@ -21,6 +21,7 @@ import playground.wrashid.lib.obj.list.ListElementMarkForRemoval;
 import playground.wrashid.lib.obj.list.Lists;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
+import playground.wrashid.parkingSearch.planLevel.scoring.ParkingTimeInfo;
 
 public class ParkingOccupancyMaintainer {
 
@@ -48,7 +49,7 @@ public class ParkingOccupancyMaintainer {
 
 	// id: personId
 	// value: ParkingArrivalLog
-	HashMap<Id, ParkingArrivalLog> parkingArrivalLog = new HashMap<Id, ParkingArrivalLog>();
+	HashMap<Id, ParkingArrivalDepartureLog> parkingArrivalDepartureLog = new HashMap<Id, ParkingArrivalDepartureLog>();
 
 	// id: facilityId
 	// value: ParkingOccupancyBins
@@ -82,7 +83,7 @@ public class ParkingOccupancyMaintainer {
 
 		// System.out.println();
 
-		for (int i = 0; i < parkingArrivalLog.get(personId).getParkingArrivalInfoList().size(); i++) {
+		for (int i = 0; i < parkingArrivalDepartureLog.get(personId).getParkingArrivalDepartureList().size(); i++) {
 			// System.out.print(parkingArrivalLog.get(personId).getParkingArrivalInfoList().get(i).getFacilityId()
 			// + " - ");
 		}
@@ -94,12 +95,12 @@ public class ParkingOccupancyMaintainer {
 		for (int i = 0; i < parkingFacilityIds.size(); i++) {
 			Id parkingFacilityId = parkingFacilityIds.get(i);
 
-			ParkingArrivalInfo pai = parkingArrivalLog.get(personId).getParkingArrivalInfoList().get(i);
+			ParkingTimeInfo pai = parkingArrivalDepartureLog.get(personId).getParkingArrivalDepartureList().get(i);
 
-			double parkingArrivalTime = pai.getArrivalTime();
+			double parkingArrivalTime = pai.getStartTime();
 
 			// a consistency check of the system.
-			if (!pai.getFacilityId().toString().equalsIgnoreCase(parkingFacilityId.toString())) {
+			if (!pai.getParkingFacilityId().toString().equalsIgnoreCase(parkingFacilityId.toString())) {
 				throw new Error("the facility Ids are inconsistent");
 			}
 
@@ -124,12 +125,12 @@ public class ParkingOccupancyMaintainer {
 		return parkingOccupancyBins;
 	}
 
-	public HashMap<Id, ParkingArrivalLog> getParkingArrivalLog() {
-		return parkingArrivalLog;
+	public HashMap<Id, ParkingArrivalDepartureLog> getParkingArrivalDepartureLog() {
+		return parkingArrivalDepartureLog;
 	}
 
-	public void setParkingArrivalLog(HashMap<Id, ParkingArrivalLog> parkingArrivalLog) {
-		this.parkingArrivalLog = parkingArrivalLog;
+	public void setParkingArrivalLog(HashMap<Id, ParkingArrivalDepartureLog> parkingArrivalLog) {
+		this.parkingArrivalDepartureLog = parkingArrivalLog;
 	}
 
 	private Controler controler;
@@ -178,12 +179,6 @@ public class ParkingOccupancyMaintainer {
 			parkingCapacityFullTimes.get(parkingFacilityId).logParkingFull(time);
 		}
 
-		// log arrival time at parking
-		if (!parkingArrivalLog.containsKey(personId)) {
-			parkingArrivalLog.put(personId, new ParkingArrivalLog());
-		}
-		parkingArrivalLog.get(personId).addParkingArrivalInfo(parkingFacilityId, time);
-
 	}
 
 	private void assureParkingOccupancyIsNonNegative(Id facilityId) {
@@ -210,7 +205,12 @@ public class ParkingOccupancyMaintainer {
 
 			getOccupancyBins(event.getFacilityId()).inrementParkingOccupancy(startTimeOfCurrentParking.get(personId),
 					event.getTime());
-
+			
+			// log arrival time at parking
+			if (!parkingArrivalDepartureLog.containsKey(personId)) {
+				parkingArrivalDepartureLog.put(personId, new ParkingArrivalDepartureLog());
+			}
+			parkingArrivalDepartureLog.get(personId).logParkingArrivalDepartureTime(parkingFacilityId, startTimeOfCurrentParking.get(personId), event.getTime());
 		}
 
 		assureParkingOccupancyIsNonNegative(event.getFacilityId());
@@ -225,6 +225,9 @@ public class ParkingOccupancyMaintainer {
 
 			parkingCapacityFullTimes.get(parkingFacilityId).logParkingNotFull(time);
 		}
+		
+		
+		
 
 	}
 
@@ -254,6 +257,7 @@ public class ParkingOccupancyMaintainer {
 			getOccupancyBins(parkingFacilityId).inrementParkingOccupancy(startTimeOfCurrentParking.get(personId),
 					endTimeOfFirstParking.get(personId));
 
+			parkingArrivalDepartureLog.get(personId).logParkingArrivalDepartureTime(parkingFacilityId, startTimeOfCurrentParking.get(personId), endTimeOfFirstParking.get(personId));
 		}
 
 		// close parkingCapacityFullTimes: close the first/last parking

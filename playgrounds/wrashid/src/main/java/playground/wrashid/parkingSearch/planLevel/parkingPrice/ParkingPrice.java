@@ -13,10 +13,6 @@ public abstract class ParkingPrice {
 	 */
 	public abstract double getPrice(double startParkingTime, double endParkingTime);
 	
-	public void checkPreCond_startPSmallerThanEndPTime(double startParkingTime, double endParkingTime){
-		if (startParkingTime < endParkingTime){
-			throw new Error("startParkingTime < endParkingTime");
-		}
-	}
+	
 	
 }

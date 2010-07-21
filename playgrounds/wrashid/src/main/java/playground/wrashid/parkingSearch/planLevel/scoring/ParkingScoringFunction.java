@@ -66,8 +66,8 @@ public abstract class ParkingScoringFunction {
 		// System.out.println();
 		// }
 
-		double parkingArrivalTime = ParkingRoot.getParkingOccupancyMaintainer().getParkingArrivalLog()
-				.get(plan.getPerson().getId()).getParkingArrivalInfoList().get(indexOfCurrentParking).getArrivalTime();
+		double parkingArrivalTime = ParkingRoot.getParkingOccupancyMaintainer().getParkingArrivalDepartureLog()
+				.get(plan.getPerson().getId()).getParkingArrivalDepartureList().get(indexOfCurrentParking).getStartTime();
 
 		closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),
 				numberOfParkingsInSet, numberOfParkingsInSet);
@@ -176,12 +176,9 @@ public abstract class ParkingScoringFunction {
 	public double getScore(ActivityImpl targetActivity, Plan plan, Id parkingFacilityId, boolean forRanking) {
 		ActivityImpl arrivalParkingAct = ParkingGeneralLib.getArrivalParkingAct(plan, targetActivity);
 		ActivityImpl departureParkingAct = ParkingGeneralLib.getDepartureParkingAct(plan, targetActivity);
-		int indexOfCurrentParking = ParkingGeneralLib.getParkingArrivalIndex(plan, arrivalParkingAct);
 
-		double parkingArrivalTime = ParkingRoot.getParkingOccupancyMaintainer().getParkingArrivalLog()
-				.get(plan.getPerson().getId()).getParkingArrivalInfoList().get(indexOfCurrentParking).getArrivalTime();
-
-		ParkingTimeInfo parkingTimeInfo = new ParkingTimeInfo(parkingArrivalTime, departureParkingAct.getEndTime());
+		ParkingTimeInfo parkingTimeInfo = ParkingGeneralLib.getParkingTimeInfo(plan, targetActivity, ParkingRoot
+				.getParkingOccupancyMaintainer().getParkingArrivalDepartureLog().get(plan.getPerson().getId()));
 
 		double score = getScore(targetActivity, parkingFacilityId, parkingTimeInfo, plan.getPerson().getId(),
 				arrivalParkingAct.getDuration(), departureParkingAct.getDuration(), plan, delta, forRanking);

@@ -12,6 +12,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingArrivalDepartureLog;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingTimeInfo;
 
 public class ParkingGeneralLib {
@@ -162,6 +163,8 @@ public class ParkingGeneralLib {
 
 		return list;
 	}
+	
+
 
 	/**
 	 * Get the ParkingTimeInfo of the parking related to the given activity
@@ -169,11 +172,19 @@ public class ParkingGeneralLib {
 	 * @param activity
 	 * @return
 	 */
-	public static ParkingTimeInfo getParkingTimeInfo(Plan plan, ActivityImpl activity) {
+	public static ParkingTimeInfo getParkingTimeInfo(Plan plan, ActivityImpl activity, ParkingArrivalDepartureLog parkingArrivalDepartureLog) {
 		ActivityImpl arrivalParkingAct = getArrivalParkingAct(plan, activity);
 		ActivityImpl departureParkingAct = getDepartureParkingAct(plan, activity);
 
-		return new ParkingTimeInfo(arrivalParkingAct.getStartTime(), departureParkingAct.getEndTime());
+		int parkingArrivalIndex=getParkingArrivalIndex(plan,arrivalParkingAct);
+		
+		ParkingTimeInfo parkingTimeInfo=parkingArrivalDepartureLog.getParkingArrivalDepartureList().get(parkingArrivalIndex);
+		
+		if (arrivalParkingAct.getFacilityId()!=parkingTimeInfo.getParkingFacilityId()){
+			throw new Error("facility Ids inconsistent");
+		}
+		
+		return parkingTimeInfo;
 	}
 
 	public static ActivityImpl getDepartureParkingAct(Plan plan, ActivityImpl activity) {

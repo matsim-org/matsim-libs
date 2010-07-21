@@ -14,7 +14,7 @@ import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingOccupancyAnalysis;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
-public class ParkingScoreListener implements AfterMobsimListener {
+public class ParkingScoreExecutor {
 
 	private static HashMap<Id, Double> scoreHashMap = new HashMap<Id, Double>();
 
@@ -22,7 +22,7 @@ public class ParkingScoreListener implements AfterMobsimListener {
 		return scoreHashMap;
 	}
 
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
+	public void performScoring(AfterMobsimEvent event) {
 		for (Person person : event.getControler().getPopulation().getPersons().values()) {
 			double score = 0.0;
 
