@@ -258,7 +258,7 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	}
 
-	public SnapshotReceiver getSnapshotReceiver() {
+	public SnapshotWriter getSnapshotReceiver() {
 		return snapshotReceiver;
 	}
 

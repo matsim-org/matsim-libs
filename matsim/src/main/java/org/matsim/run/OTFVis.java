@@ -293,16 +293,30 @@ public class OTFVis {
 	}
 
 	public static final void playNetwork(final String[] args) {
+		String filename = args[0];
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
-		EventsManagerImpl events = new EventsManagerImpl();
-		OTFVisQSim queueSimulation = new OTFVisQSim(scenario, events);
-		queueSimulation.run();
+		new MatsimNetworkReader(scenario).readFile(filename);
+		EventsManager events = new EventsManagerImpl();
+		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
+		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager(filename, server);
+		OTFVisClient client = new OTFVisClient();
+		client.setHostConnectionManager(hostConnectionManager);
+		client.setSwing(false);
+		client.run();
+		server.getSnapshotReceiver().finish();
 	}
 
 	public static final void playNetwork_Swing(final String filename) {
-		new OTFClientSwing("net:" + filename).run();
+		ScenarioImpl scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario).readFile(filename);
+		EventsManager events = new EventsManagerImpl();
+		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
+		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager(filename, server);
+		OTFVisClient client = new OTFVisClient();
+		client.setHostConnectionManager(hostConnectionManager);
+		client.setSwing(true);
+		client.run();
+		server.getSnapshotReceiver().finish();
 	}
 
 	public static final void convert(final String[] args) {
