@@ -270,25 +270,29 @@ public class MyCommercialChainAnalyser {
 		if(f.exists()){
 			try {
 				Scanner input = new Scanner(new BufferedReader(new FileReader(f)));
-				String line = input.nextLine();
-				line = input.nextLine();
-				line = input.nextLine();
-				String[] dim = line.split(",");
-				int dim1 = Integer.parseInt(dim[0]);
-				int dim2 = Integer.parseInt(dim[1]);
-				int dim3 = Integer.parseInt(dim[2]);
-				result = new SparseDoubleMatrix3D(dim1, dim2, dim3);
-				
-				line = input.nextLine();
-				line = input.nextLine();
-				while(input.hasNextLine()){
-					String [] entry = input.nextLine().split(",");
-					if(entry.length == 4){
-						result.setQuick(Integer.parseInt(entry[0]), 
-										Integer.parseInt(entry[1]), 
-										Integer.parseInt(entry[2]), 
-										Double.parseDouble(entry[3]));
-					}
+				try{
+					String line = input.nextLine();
+					line = input.nextLine();
+					line = input.nextLine();
+					String[] dim = line.split(",");
+					int dim1 = Integer.parseInt(dim[0]);
+					int dim2 = Integer.parseInt(dim[1]);
+					int dim3 = Integer.parseInt(dim[2]);
+					result = new SparseDoubleMatrix3D(dim1, dim2, dim3);
+					
+					line = input.nextLine();
+					line = input.nextLine();
+					while(input.hasNextLine()){
+						String [] entry = input.nextLine().split(",");
+						if(entry.length == 4){
+							result.setQuick(Integer.parseInt(entry[0]), 
+									Integer.parseInt(entry[1]), 
+									Integer.parseInt(entry[2]), 
+									Double.parseDouble(entry[3]));
+						}
+					}					
+				} finally{
+					input.close();
 				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();

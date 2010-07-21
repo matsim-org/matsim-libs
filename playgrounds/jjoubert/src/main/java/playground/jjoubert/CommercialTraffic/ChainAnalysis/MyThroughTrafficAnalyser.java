@@ -36,9 +36,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import playground.jjoubert.CommercialTraffic.Activity;
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.CommercialVehicle;
-
 import cern.colt.matrix.impl.DenseObjectMatrix2D;
-import cern.colt.matrix.impl.SparseObjectMatrix2D;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

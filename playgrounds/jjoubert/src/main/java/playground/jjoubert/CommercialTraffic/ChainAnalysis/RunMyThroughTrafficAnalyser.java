@@ -36,15 +36,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class RunMyThroughTrafficAnalyser {
 	private static Logger log = Logger.getLogger(RunMyThroughTrafficAnalyser.class);
-	
-	 /*=============================================================================
-	 * String value indicating where the root where job is executed. 				|
-	 * 		- Mac																	|
-	 * 		- IE-Calvin														  		|
-	 *=============================================================================*/
-//	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
-	private static String root = "/home/jwjoubert/MATSim/MATSimData/";					// IE-Calvin
-
+	private static String root = "/home/jwjoubert/MATSim/MATSimData/";
 	 /*=============================================================================
 	 * String value that must be set. Allowed study areas are:						|
 	 * 		- SouthAfrica															|
@@ -52,44 +44,50 @@ public class RunMyThroughTrafficAnalyser {
 	 * 		- KZN																	|
 	 * 		- WesternCape															|
 	 *=============================================================================*/
-	private static String studyAreaName = "Gauteng";
-
-	/*==============================================================================
-	 * The year for which the DigiCore analysis is being done. Available years are:	|
-	 * 		- 2008																	|
-	 *=============================================================================*/
-	private static int year = 2008;
-
-	 /*=============================================================================
-	 * Version of ActivityAnalysis that should be used.								|
-	 *=============================================================================*/
-	private static String version = "20091202131951";
-
-	 /*=============================================================================
-	 * Integer indicating for which minor/major threshold the KDE image should be 	|
-	 * calculated.																	|
-	 *=============================================================================*/
-	private static int threshold = 300;
-
-	 /*=============================================================================
-	 * Integer indicating for which sample the KDE image should be 	calculated.		|
-	 *=============================================================================*/
-	private static int sample = 1;
-	
-	private static double withinThreshold = 0.6;
+	private static String studyAreaName;
+	private static int year;
+	private static String version;
+	private static int threshold;
+	private static int sample;
+	private static double withinThreshold ;
 
 	/**
-	 * Should provide the number of vehicles to sample. If not provided, all
-	 * vehicle files will be processed.
-	 * @param args
+	 * Implements the <code>MyThroughTrafficAnalyser</code> class. 
+	 * @param args A number of arguments <b><i>MUST</i></b> be passed, and in 
+	 * the following order:
+	 * <ol>
+	 * 	<li> <b>root</b> absolute path of the data root;
+	 * 	<li> <b>studyArea</b> the name of the are considered, e.g. "Gauteng";
+	 * 	<li> <b>year</b> indicating what <i>DigiCore</i> data set should be used;
+	 * 	<li> <b>version</b> of the activity analysis to use;
+	 * 	<li> <b>threshold</b> of activity duration used to distinguish between 
+	 * 		 <i>minor</i> and <i>major</i> traffic, typically "300";
+	 * 	<li> <b>sample</b> indicating which (of possibly many) samples of the
+	 * 		 activity analysis to use; and
+	 * 	<li> <b>withinThreshold</b> used to distinguish between <i>within</i> 
+	 * 		 and <i>through</i> traffic, typically should be "0.6"
+	 * </ol>
+	 * An optional 8th argument may be passed indicating the number of vehicles 
+	 * for which the chain analysis must be done. If not provided, all vehicle 
+	 * files will be processed.
 	 */
 	public static void main(String[] args) {
 		int numberOfVehiclesToSample;
-		if(args.length > 0){
-			numberOfVehiclesToSample = Integer.parseInt(args[0]);
-		} else{
+		if(args.length == 8){
+			numberOfVehiclesToSample = Integer.parseInt(args[7]);
+		} else if(args.length == 7){
 			numberOfVehiclesToSample = Integer.MAX_VALUE;
+		} else{
+			throw new RuntimeException("Improper number of arguments passed");
 		}
+		root = args[0];
+		studyAreaName = args[1];
+		year = Integer.parseInt(args[2]);
+		version = args[3];
+		threshold = Integer.parseInt(args[4]);
+		sample = Integer.parseInt(args[5]);
+		withinThreshold = Double.parseDouble(args[6]);
+		
 		/*
 		 * Read study area.
 		 */
