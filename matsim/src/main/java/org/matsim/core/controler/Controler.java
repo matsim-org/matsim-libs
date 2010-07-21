@@ -86,7 +86,6 @@ import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
-import org.matsim.core.mobsim.jdeqsim.parallel.PJDEQSimulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
@@ -784,18 +783,7 @@ public class Controler {
 		 */
 		if (this.config.simulation().getExternalExe() == null) {
 			final String JDEQ_SIM = "JDEQSim";
-			final String NUMBER_OF_THREADS = "numberOfThreads";
-			String numberOfThreads = this.config.findParam(JDEQ_SIM, NUMBER_OF_THREADS);
-			int numOfThreads = 0;
-
-			if (numberOfThreads != null) {
-				numOfThreads = Integer.parseInt(numberOfThreads);
-			}
-
-			if ((this.config.getModule(JDEQ_SIM) != null) && (numOfThreads > 1)) {
-				PJDEQSimulation sim = new PJDEQSimulation(this.scenarioData, this.events,numOfThreads);
-				sim.run();
-			} else if (this.config.getModule(JDEQ_SIM) != null) {
+			if (this.config.getModule(JDEQ_SIM) != null) {
 				JDEQSimulation sim = new JDEQSimulation(this.scenarioData, this.events);
 				sim.run();
 			} else {
