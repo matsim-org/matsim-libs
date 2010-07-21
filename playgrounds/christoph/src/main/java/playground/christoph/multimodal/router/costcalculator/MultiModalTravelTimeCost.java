@@ -72,9 +72,33 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 	public double getModalLinkTravelTime(Link link, double time, String transportMode) {
 		double speed = 1.0;
 		
-		if (transportMode.equals(TransportMode.bike)) speed = group.getBikeSpeed();
-		else if (transportMode.equals(TransportMode.walk)) speed = group.getWalkSpeed();
-		else if (transportMode.equals(TransportMode.pt)) return travelTime.getLinkTravelTime(link, time);
+		if (transportMode.equals(TransportMode.bike)) {
+			/*
+			 * If the link allows bike trips, we use bike speed. 
+			 * Otherwise we check whether walk trips are allowed and return walk speed.
+			 * If neither bike nor walk is allowed on the link, the default speed of 1.0
+			 * is used.
+			 */
+			if (link.getAllowedModes().contains(TransportMode.bike)) speed = group.getBikeSpeed();
+			else if (link.getAllowedModes().contains(TransportMode.walk)) speed = group.getWalkSpeed();
+		}
+		else if (transportMode.equals(TransportMode.walk)) {
+			/*
+			 * If the link allows walk or bike trips, we use walk speed. 
+			 * If both modes are not allowed, use the default speed of 1.0 instead.
+			 */
+			if (link.getAllowedModes().contains(TransportMode.walk) || 
+				link.getAllowedModes().contains(TransportMode.bike)) speed = group.getWalkSpeed();
+		}
+		else if (transportMode.equals(TransportMode.pt)) {
+			/*
+			 * If it is a car link, we use car travel times. Else we check whether it is
+			 * a bike / walk link - if it is one, we use walk travel times.
+			 */
+			if (link.getAllowedModes().contains(TransportMode.car)) return travelTime.getLinkTravelTime(link, time);
+			else if (link.getAllowedModes().contains(TransportMode.bike) ||
+					link.getAllowedModes().contains(TransportMode.walk)) speed = group.getWalkSpeed();
+		}
 		else throw new RuntimeException("Not supported TransportMode: " + transportMode);
 		
 		return link.getLength() / speed;

@@ -34,10 +34,10 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -59,11 +59,14 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 	private IntermodalLeastCostPathCalculator bikeRouteAlgo;
 	private IntermodalLeastCostPathCalculator ptRouteAlgo;
 	
+	private LeastCostPathCalculatorFactory factory;
+		
 	public MultiModalPlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network,
 			final PersonalizableTravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		super(group, network, costCalculator, timeCalculator, factory);
 		
+		this.factory = factory;
 		initRouteAlgos(network, timeCalculator);
 	}
 
@@ -71,16 +74,29 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 
-	private void initRouteAlgos(Network network, TravelTime travelTime)
-	{	
+	private void initRouteAlgos(Network network, TravelTime travelTime) {	
+		/*
+		 * Car
+		 * Add mode restriction because now the network is multi-modal and not car-only.
+		 */
+		LeastCostPathCalculator carRouteAlgo = this.getLeastCostPathCalculator();
+		if (carRouteAlgo instanceof IntermodalLeastCostPathCalculator) {
+			Set<String> carModeRestrictions = new TreeSet<String>();
+			carModeRestrictions.add(TransportMode.car);
+			((IntermodalLeastCostPathCalculator)carRouteAlgo).setModeRestriction(carModeRestrictions);
+		}
+		
+		
 		/*
 		 * Walk
 		 */
 		MultiModalTravelTimeCost walkTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.walk);
-		walkRouteAlgo = new Dijkstra(network, walkTravelTimeCost, walkTravelTimeCost);
-		
+//		walkRouteAlgo = new Dijkstra(network, walkTravelTimeCost, walkTravelTimeCost);
+		walkRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, walkTravelTimeCost, walkTravelTimeCost);
+			
 		Set<String> walkModeRestrictions = new TreeSet<String>();
 		walkModeRestrictions.add(TransportMode.walk);
+		walkModeRestrictions.add(TransportMode.car);
 		walkRouteAlgo.setModeRestriction(walkModeRestrictions);
 		
 		
@@ -88,10 +104,17 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 		 * Bike
 		 */
 		MultiModalTravelTimeCost bikeTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.bike);
-		bikeRouteAlgo = new Dijkstra(network, bikeTravelTimeCost, bikeTravelTimeCost);
+//		bikeRouteAlgo = new Dijkstra(network, bikeTravelTimeCost, bikeTravelTimeCost);
+		bikeRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, bikeTravelTimeCost, bikeTravelTimeCost);
 		
+		/*
+		 * Besides bike mode we also allow walk mode - but then the
+		 * agent only travels with walk speed (handled in MultiModalTravelTimeCost).
+		 */
 		Set<String> bikeModeRestrictions = new TreeSet<String>();
 		bikeModeRestrictions.add(TransportMode.bike);
+		bikeModeRestrictions.add(TransportMode.walk);
+		bikeModeRestrictions.add(TransportMode.car);
 		bikeRouteAlgo.setModeRestriction(bikeModeRestrictions);
 		
 		
@@ -108,52 +131,29 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 			bufferedTravelTime.setScaleFactor(1.25);
 			ptTravelTimeCost.setTravelTime(bufferedTravelTime);
 		}
-		ptRouteAlgo = new Dijkstra(network, ptTravelTimeCost, ptTravelTimeCost);
 		
+//		ptRouteAlgo = new Dijkstra(network, ptTravelTimeCost, ptTravelTimeCost);
+		ptRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, ptTravelTimeCost, ptTravelTimeCost);
+		
+		/*
+		 * We assume PT trips are possible on every road that can be used by cars.
+		 * 
+		 * Additionally we also allow pt trips to use walk and / or bike only links.
+		 * On those links the traveltimes are quite high and we can assume that they
+		 * are only use e.g. to walk from the origin to the bus station or from the
+		 * bus station to the destination.
+		 */
 		Set<String> ptModeRestrictions = new TreeSet<String>();
-		ptModeRestrictions.add(TransportMode.pt);
+//		ptModeRestrictions.add(TransportMode.pt);
+		ptModeRestrictions.add(TransportMode.car);
+		ptModeRestrictions.add(TransportMode.bike);
+		ptModeRestrictions.add(TransportMode.walk);
 		ptRouteAlgo.setModeRestriction(ptModeRestrictions);
 	}
 	
 	@Override
 	protected double handleWalkLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		
 		return handleMultiModalLeg(leg, fromAct, toAct, depTime, walkRouteAlgo, walkRouteFactory);
-		
-//		double travTime = 0;
-//		Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
-//		Link toLink = this.network.getLinks().get(toAct.getLinkId());
-//		if (fromLink == null) throw new RuntimeException("fromLink missing.");
-//		if (toLink == null) throw new RuntimeException("toLink missing.");
-//
-//		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-//		Node endNode = toLink.getFromNode(); // the target is the start of the link
-//
-//		Path path = null;
-//		if (toLink != fromLink) {
-//			// do not drive/walk around, if we stay on the same link
-//			path = this.walkRouteAlgo.calcLeastCostPath(startNode, endNode, depTime);
-//			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-//			NetworkRoute route = (NetworkRoute) walkRouteFactory.createRoute(fromLink.getId(), toLink.getId());
-//			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
-//			route.setTravelTime((int) path.travelTime);
-//			route.setTravelCost(path.travelCost);
-//			route.setDistance(RouteUtils.calcDistance(route, this.network));
-//			leg.setRoute(route);
-//			travTime = (int) path.travelTime;
-//		} else {
-//			// create an empty route == staying on place if toLink == endLink
-//			NetworkRoute route = (NetworkRoute) walkRouteFactory.createRoute(fromLink.getId(), toLink.getId());
-//			route.setTravelTime(0);
-//			route.setDistance(0.0);
-//			leg.setRoute(route);
-//			travTime = 0;
-//		}
-//
-//		leg.setDepartureTime(depTime);
-//		leg.setTravelTime(travTime);
-//		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
-//		return travTime;
 	}
 	
 	@Override
@@ -167,7 +167,7 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 	}
 	
 	/*
-	 * Adapted from handleCarLeg - exchanged only the routeAlgo and the routeFactory.
+	 * Adapted from PlansCalcRoute.handleCarLeg(...) - exchanged only the routeAlgo and the routeFactory.
 	 */
 	private double handleMultiModalLeg(Leg leg, Activity fromAct, Activity toAct, double depTime, 
 			IntermodalLeastCostPathCalculator routeAlgo, RouteFactory routeFactory)

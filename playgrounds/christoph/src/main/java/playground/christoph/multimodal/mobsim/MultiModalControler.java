@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -41,6 +42,9 @@ import playground.christoph.multimodal.router.costcalculator.TravelTimeCalculato
 public class MultiModalControler extends Controler{
 
 	private static final Logger log = Logger.getLogger(MultiModalControler.class);
+	
+	private boolean dropNonCarRoutes = false;
+	private boolean createMultiModeNetwork = false;
 	
 	public MultiModalControler(String[] args) {
 		super(args);
@@ -68,15 +72,26 @@ public class MultiModalControler extends Controler{
 	
 	@Override
 	protected void loadData() {
+		
+		log.info("replacing RouteFactories for non car modes...");
+		super.scenarioData.getNetwork().getFactory().setRouteFactory(TransportMode.bike, new LinkNetworkRouteFactory());
+		super.scenarioData.getNetwork().getFactory().setRouteFactory(TransportMode.walk, new LinkNetworkRouteFactory());
+		super.scenarioData.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
+		log.info("done.");
+		
 		super.loadData();
 		
-		log.info("dropping existing walk and bike routes...");
-		dropNonCarRoutes();
-		log.info("done.");
+		if (dropNonCarRoutes) {
+			log.info("dropping existing walk and bike routes...");
+			dropNonCarRoutes();
+			log.info("done.");			
+		}
 		
-		log.info("creating multi modal network...");
-		createMultiModalNetwork();
-		log.info("done.");
+		if (createMultiModeNetwork) {
+			log.info("creating multi modal network...");
+			createMultiModalNetwork();
+			log.info("done.");			
+		}
 	}
 	
 	/*

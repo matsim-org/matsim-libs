@@ -20,19 +20,29 @@
 
 package playground.christoph.multimodal.router.costcalculator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
-public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator {
+public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator implements AgentDepartureEventHandler {
 
 	private Map<Id, double[]> bufferedTravelTimes;
+	private List<Id> nonCarAgents = new ArrayList<Id>();
 	
 	public TravelTimeCalculatorWithBuffer(Network network, int timeslice,
 			int maxTime, TravelTimeCalculatorConfigGroup ttconfigGroup) {
@@ -51,7 +61,7 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator {
 	 * Initially use FreeSpeedTravelTimes
 	 */
 	private void initBuffer(Network network)
-	{
+	{			
 		int timeSlice = this.getTimeSlice();
 		int numSlots = this.getNumSlots();
 		
@@ -108,7 +118,52 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator {
 	@Override
 	public void reset(int iteration) {
 		updateBufferedTravelTimes(iteration);
-
+		nonCarAgents = new ArrayList<Id>();
+		
 		super.reset(iteration);
+	}
+
+	/*
+	 * We only want to calculate traveltimes of car legs. Therefore we collect
+	 * all agents that perform non-car legs.
+	 */
+	public void handleEvent(AgentDepartureEvent event) {
+		if (!event.getLegMode().equals(TransportMode.car)) nonCarAgents.add(event.getPersonId()); 
+	}
+	
+	/*
+	 * We try to remove the agent from the nonCarAgents List (if it was a carAgent,
+	 * nothing will happen).
+	 */
+	@Override
+	public void handleEvent(final AgentArrivalEvent event) {
+		nonCarAgents.remove(event.getPersonId());
+		super.handleEvent(event);
+	}
+	
+	/*
+	 * If it is an agent with a car leg, we pass the event to the superclass.
+	 */
+	@Override
+	public void handleEvent(final LinkEnterEvent e) {
+		if (!nonCarAgents.contains(e.getPersonId())) super.handleEvent(e);
+	}
+	
+	/*
+	 * If it is an agent with a car leg, we pass the event to the superclass.
+	 */
+	@Override
+	public void handleEvent(final LinkLeaveEvent e) {
+		if (!nonCarAgents.contains(e.getPersonId())) super.handleEvent(e);
+	}
+	
+	/*
+	 * We try to remove the agent from the nonCarAgents List and pass the
+	 * event then to the superclass.
+	 */
+	@Override
+	public void handleEvent(AgentStuckEvent event) {
+		nonCarAgents.remove(event.getPersonId());
+		super.handleEvent(event);
 	}
 }
