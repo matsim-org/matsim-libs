@@ -38,6 +38,7 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.xml.sax.SAXException;
 
+import playground.johannes.socialnetworks.sim.interaction.EndTimeMutator;
 import playground.johannes.socialnetworks.statistics.Discretizer;
 import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
@@ -60,7 +61,10 @@ public class ActivityTimeAnalyzer {
 				if(act.getType().contains(type)) {
 				int start = (int) discretizer.discretize(act.getStartTime());
 				int end = (int) discretizer.discretize(act.getEndTime());
-				for(int t = start; t <= end; t += 900) {
+				if(Double.isInfinite(act.getEndTime()))
+					end = (int)discretizer.discretize(86400);
+				
+				for(int t = start; t <= end; t += 1) {
 					histogram.adjustOrPutValue(t, 1, 1);
 				}
 				}
@@ -73,7 +77,7 @@ public class ActivityTimeAnalyzer {
 	
 	
 	public static void main(String args[]) throws FileNotFoundException, IOException, SAXException, ParserConfigurationException {
-		String popFile ="/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/sim/output/50000.plan.xml";
+		String popFile ="/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/sim/output/2200000.plan.xml";
 //		String popFile = "/Users/jillenberger/Work/work/socialnets/sim/plans.out.xml";
 //		String graphFile = args[3];
 //		double proba = Double.parseDouble(args[4]);
@@ -92,8 +96,8 @@ public class ActivityTimeAnalyzer {
 		reader.readFile(popFile);
 		
 		ActivityTimeAnalyzer analyzer = new ActivityTimeAnalyzer();
-		TDoubleDoubleHashMap histogram = analyzer.analyze(scenario.getPopulation(), "leisure");
+		TDoubleDoubleHashMap histogram = analyzer.analyze(scenario.getPopulation(), "home");
 //		Distribution.writeHistogram(histogram,"/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/sim/times.out.txt");
-		Distribution.writeHistogram(histogram,"/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/sim/output/50000.times.txt");
+		Distribution.writeHistogram(histogram,"/Volumes/hertz.math.tu-berlin.de/net/ils/jillenberger/socialnets/sim/output/2200000.home.txt");
 	}
 }

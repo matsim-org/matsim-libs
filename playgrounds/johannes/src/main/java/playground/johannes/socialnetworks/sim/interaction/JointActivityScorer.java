@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 
@@ -37,7 +36,7 @@ public class JointActivityScorer implements BasicScoring {
 
 	public static double totalJoinTime = 0;
 	
-	private final static Logger logger = Logger.getLogger(JointActivityScorer.class);
+//	private final static Logger logger = Logger.getLogger(JointActivityScorer.class);
 	
 	private final static double beta_join = 100/3600.0;
 	

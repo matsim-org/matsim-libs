@@ -40,8 +40,11 @@ public class EndTimeMutator {
 		if (numActs > 1) {
 			int idx = random.nextInt(numActs - 1);
 			idx = idx * 2;
+			if(idx == 0)
+				return false;
+			
 			Activity act = (Activity) plan.getPlanElements().get(idx);
-			if (!act.getType().contains("work") && !act.getType().contains("education")) {
+			if (!act.getType().contains("work") || !act.getType().contains("education")) {
 				double epsilon;
 				if (random.nextBoolean())
 					epsilon = RANGE;

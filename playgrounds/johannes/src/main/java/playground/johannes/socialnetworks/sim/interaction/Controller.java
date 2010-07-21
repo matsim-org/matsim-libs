@@ -135,7 +135,7 @@ public class Controller {
 		
 			step();
 			
-			if(i % 50000 == 0 && i > 0) {
+			if(i % 100000 == 0 && i > 0) {
 				logger.info("Dumping plans...");
 				writer.write(String.format("%1$s/%2$s.plan.xml", outputDir, i));
 				

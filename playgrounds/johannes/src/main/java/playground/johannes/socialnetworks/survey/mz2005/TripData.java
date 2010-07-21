@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LegContainer.java
+ * TripContainer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,13 +19,44 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.mz2005;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * @author illenberger
  *
  */
-public class LegContainer {
+public class TripData {
 
-	public String id;
+	public String personId;
+	
+	public String tripId;
+	
+	public double distance;
+	
+	public double duration;
+	
+	public boolean outwardTrip;
+	
+	public int accompanists;
+	
+	public int leisureType;
+	
+	public int type;
+	
+	public int startTime;
+	
+	public int endTime;
 	
 	public int mode;
+	
+	public boolean roundTrip;
+	
+	public List<LegData> legs = new LinkedList<LegData>();
+	
+	public AggregatedMode aggrMode;
+	
+	public double[] startCoord;
+	
+	public double[] destCoord;
 }

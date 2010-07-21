@@ -30,7 +30,7 @@ public class PseudoPlan {
 
 	public List<PseudoActivity> activities = new ArrayList<PseudoActivity>();
 	
-	public List<TripContainer> trips = new ArrayList<TripContainer>();
+	public List<TripData> trips = new ArrayList<TripData>();
 	
 	public String activityChain() {
 		StringBuilder builder = new StringBuilder(activities.size() * 10);

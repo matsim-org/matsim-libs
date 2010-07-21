@@ -33,9 +33,9 @@ import java.util.Collection;
  */
 public class PseudoPlanAnalyzer {
 
-	public static TObjectIntHashMap<String> makeChainHistogram(Collection<PersonContainer> persons) {
+	public static TObjectIntHashMap<String> makeChainHistogram(Collection<PersonData> persons) {
 		TObjectIntHashMap<String> hist = new TObjectIntHashMap<String>();
-		for(PersonContainer person : persons) {
+		for(PersonData person : persons) {
 			hist.adjustOrPutValue(person.plan.activityChain(), 1, 1);
 		}
 		return hist;

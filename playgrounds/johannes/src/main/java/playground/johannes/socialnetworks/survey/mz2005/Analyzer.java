@@ -45,16 +45,16 @@ public class Analyzer {
 	public static void main(String[] args) throws IOException {
 		String basedir = "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/rawdata/";
 		String outbase = "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/analysis/";
-		TripParser parser = new TripParser();
+		DataParser parser = new DataParser();
 		System.out.println("Parsing persons...");
-		Map<String, PersonContainer> persons = parser.readPersons(basedir + "Zielpersonen.dat");
+		Map<String, PersonData> persons = parser.readPersons(basedir + "Zielpersonen.dat");
 		System.out.println("Parsing trips...");
 		parser.readTrips(basedir + "Wegeinland.dat", persons);
 		System.out.println("Parsing legs...");
 		parser.readLegs(basedir + "Etappen.dat", persons);
 
 		System.out.println("Creating pseudo plans...");
-		for(PersonContainer person : persons.values()) {
+		for(PersonData person : persons.values()) {
 			person.createPseudoPlan();
 			person.removeDoubleHomes();
 		}
@@ -64,8 +64,8 @@ public class Analyzer {
 			String output = outbase + "day" + day + "/";
 			new File(output).mkdirs();
 			
-			Collection<PersonContainer> daypersons = new LinkedList<PersonContainer>();
-			for(PersonContainer person : persons.values()) {
+			Collection<PersonData> daypersons = new LinkedList<PersonData>();
+			for(PersonData person : persons.values()) {
 				if(person.referenceDay == day) {
 					daypersons.add(person);
 				}
@@ -78,7 +78,7 @@ public class Analyzer {
 		analysis(persons.values(), outbase + "all/");
 	}
 
-	public static void analysis(Collection<PersonContainer> persons, String output) throws IOException {
+	public static void analysis(Collection<PersonData> persons, String output) throws IOException {
 		/*
 		 * Activity chains
 		 */
@@ -88,7 +88,7 @@ public class Analyzer {
 		 * Activity type frequencies
 		 */
 		Distribution acttypes = new Distribution();
-		for(PersonContainer person : persons) {
+		for(PersonData person : persons) {
 			for(PseudoActivity act : person.plan.activities) {
 				acttypes.add(act.type.ordinal());
 			}
@@ -102,7 +102,7 @@ public class Analyzer {
 			actfrequencies[i] = new Distribution();
 		Distribution leisurefrequencies = new Distribution();
 		
-		for(PersonContainer person : persons) {
+		for(PersonData person : persons) {
 			int[] counts = new int[ActivityType.values().length];
 			int leisurecounts = 0;
 			
@@ -136,7 +136,7 @@ public class Analyzer {
 		loadCurve(persons, output);
 	}
 	
-	public static void analyseActivityTiming(Collection<PersonContainer> persons, String output, AggregatedMode mode) throws FileNotFoundException, IOException {
+	public static void analyseActivityTiming(Collection<PersonData> persons, String output, AggregatedMode mode) throws FileNotFoundException, IOException {
 		Distribution[] actdurations = new Distribution[ActivityType.values().length];
 		Distribution[] actstarttimes = new Distribution[ActivityType.values().length];
 		Distribution[] distances = new Distribution[ActivityType.values().length];
@@ -146,7 +146,7 @@ public class Analyzer {
 			distances[i] = new Distribution();
 		}
 		int[] zerodurs = new int[ActivityType.values().length];
-		for(PersonContainer person : persons) {
+		for(PersonData person : persons) {
 			for(int i = 0; i < person.plan.activities.size(); i++) {
 				PseudoActivity act = person.plan.activities.get(i);
 				if(mode == null) {
@@ -189,12 +189,12 @@ public class Analyzer {
 		}
 	}
 	
-	public static void loadCurve(Collection<PersonContainer> persons, String output) throws FileNotFoundException, IOException {
+	public static void loadCurve(Collection<PersonData> persons, String output) throws FileNotFoundException, IOException {
 		TDoubleDoubleHashMap[] loadCurves = new TDoubleDoubleHashMap[ActivityType.values().length];
 		for(int i = 0; i < loadCurves.length; i++)
 			loadCurves[i] = new TDoubleDoubleHashMap();
 		
-		for(PersonContainer person : persons) {
+		for(PersonData person : persons) {
 			for(PseudoActivity act : person.plan.activities) {
 				TDoubleDoubleHashMap loadCurve = loadCurves[act.type.ordinal()];
 				for(int t = act.startTime; t < act.endTime; t++) {

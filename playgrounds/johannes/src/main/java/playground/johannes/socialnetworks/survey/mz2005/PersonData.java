@@ -29,7 +29,7 @@ import java.util.TreeSet;
  * @author illenberger
  *
  */
-public class PersonContainer {
+public class PersonData {
 
 	public String id;
 	
@@ -37,7 +37,7 @@ public class PersonContainer {
 	
 	public int referenceDay;
 	
-	public List<TripContainer> trips = new LinkedList<TripContainer>();
+	public List<TripData> trips = new LinkedList<TripData>();
 	
 	public PseudoPlan plan;
 	
@@ -45,8 +45,8 @@ public class PersonContainer {
 		/*
 		 * Sort trips to chronological order.
 		 */
-		SortedSet<TripContainer> sortedTrips = new TreeSet<TripContainer>(new Comparator<TripContainer>() {
-			public int compare(TripContainer o1, TripContainer o2) {
+		SortedSet<TripData> sortedTrips = new TreeSet<TripData>(new Comparator<TripData>() {
+			public int compare(TripData o1, TripData o2) {
 				
 				int result = o1.startTime - o2.endTime;
 				if(result == 0) {
@@ -71,7 +71,7 @@ public class PersonContainer {
 		/*
 		 * Go through all trips.
 		 */
-		for(TripContainer trip : sortedTrips) {
+		for(TripData trip : sortedTrips) {
 			/*
 			 * Set end time of previous activity.
 			 */
@@ -128,7 +128,7 @@ public class PersonContainer {
 		 */
 		PseudoActivity last = plan.activities.get(plan.activities.size() - 1);
 		if (last.type != ActivityType.home) {
-			TripContainer trip = new TripContainer();
+			TripData trip = new TripData();
 			trip.startTime = last.endTime;
 			trip.accompanists = -99;
 			trip.distance = -99;

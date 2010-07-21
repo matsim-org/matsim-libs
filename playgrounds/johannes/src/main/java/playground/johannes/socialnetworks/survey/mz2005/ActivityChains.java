@@ -40,18 +40,18 @@ public class ActivityChains {
 
 //	public static enum ActivityTypes {home, nonleisure, visit, bar, loutdoor, lindoor};
 	
-	public static List<String> extractTripChains(Collection<PersonContainer> persons) {
+	public static List<String> extractTripChains(Collection<PersonData> persons) {
 		List<String> chains = new LinkedList<String>();
 		
 		int invalidChains = 0;
 		
-		for(PersonContainer person : persons) {
+		for(PersonData person : persons) {
 			try {
 			/*
 			 * Sort the trips to chronological order.
 			 */
-			SortedSet<TripContainer> trips = new TreeSet<TripContainer>(new Comparator<TripContainer>() {
-				public int compare(TripContainer o1, TripContainer o2) {
+			SortedSet<TripData> trips = new TreeSet<TripData>(new Comparator<TripData>() {
+				public int compare(TripData o1, TripData o2) {
 					
 					int result = o1.startTime - o2.endTime;
 					if(result == 0) {
@@ -70,7 +70,7 @@ public class ActivityChains {
 			
 			chain.add(ActivityType.home);
 			
-			for(TripContainer trip : trips) {
+			for(TripData trip : trips) {
 				if(trip.outwardTrip) {
 					if(trip.type == 8) {
 						if(trip.leisureType == 1) {

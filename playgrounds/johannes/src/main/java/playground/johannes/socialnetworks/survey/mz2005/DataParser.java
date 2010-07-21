@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.math.Distribution;
 
 
@@ -37,18 +38,24 @@ import org.matsim.contrib.sna.math.Distribution;
  * @author illenberger
  * 
  */
-public class TripParser {
+public class DataParser {
 
+	private static final Logger logger = Logger.getLogger(DataParser.class);
+	
 	private static final String SEPARATOR = "\t";
 
+//	private static GoogleLocationLookup googleLookup;
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String basedir = "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/rawdata/";
-		TripParser parser = new TripParser();
-		Map<String, PersonContainer> persons = parser.readPersons(basedir + "Zielpersonen.dat");
+		String basedir = "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/rawdata/";
+		DataParser parser = new DataParser();
+		
+//		googleLookup = new GoogleLocationLookup();
+		
+		Map<String, PersonData> persons = parser.readPersons(basedir + "Zielpersonen.dat");
 		parser.readTrips(basedir + "Wegeinland.dat", persons);
 		parser.readLegs(basedir + "Etappen.dat", persons);
 		
@@ -67,10 +74,10 @@ public class TripParser {
 		Distribution modes = new Distribution();
 		Distribution roundTripModes = new Distribution();
 		
-		Collection<PersonContainer> sunday = new LinkedList<PersonContainer>();
+		Collection<PersonData> sunday = new LinkedList<PersonData>();
 		
 		TObjectIntHashMap<String> modeChains = new TObjectIntHashMap<String>();
-		for (PersonContainer pContainer : persons.values()) {
+		for (PersonData pContainer : persons.values()) {
 			referenceDays.add(pContainer.referenceDay);
 			ages.add(pContainer.age);
 			if (pContainer.referenceDay == 7) {
@@ -78,11 +85,11 @@ public class TripParser {
 			}
 			
 			int nTrips = 0;	
-			for (TripContainer container : pContainer.trips) {
+			for (TripData container : pContainer.trips) {
 				if(container.roundTrip) {
 					roundTripModes.add(container.mode);
 					StringBuilder modeChain = new StringBuilder(); 
-					for(LegContainer leg : container.legs) {
+					for(LegData leg : container.legs) {
 						modeChain.append(leg.mode);
 						modeChain.append("-");
 					}
@@ -104,32 +111,32 @@ public class TripParser {
 			}
 			numTrips.add(nTrips);
 		}
-		Distribution.writeHistogram(distances.absoluteDistribution(1.0), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/ltrip.distance.hist.txt");
-		Distribution.writeHistogram(durations.absoluteDistribution(1.0), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/ltrip.duration.hist.txt");
-		Distribution.writeHistogram(accompanists.absoluteDistribution(), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/ltrip.accompanists.hist.txt");
-		Distribution.writeHistogram(leisureTypes.absoluteDistribution(), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/ltrip.ltypes.hist.txt");
-		Distribution.writeHistogram(referenceDays.absoluteDistribution(), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/ltrip.day.hist.txt");
-		Distribution.writeHistogram(ages.absoluteDistribution(), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/ltrip.age.hist.txt");
-		Distribution.writeHistogram(numTrips.absoluteDistribution(), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/ltrip.numTrips.hist.txt");
-		Distribution.writeHistogram(tripTypes.absoluteDistribution(), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/ltrip.type.hist.txt");
-		Distribution.writeHistogram(startTimes.absoluteDistribution(60), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/ltrip.startTime.hist.txt");
-		Distribution.writeHistogram(endTimes.absoluteDistribution(60), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/ltrip.endTime.hist.txt");
-		Distribution.writeHistogram(modes.absoluteDistribution(), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/ltrip.mode.hist.txt");
-		Distribution.writeHistogram(roundTripModes.absoluteDistribution(), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/ltrip.rTripMode.hist.txt");
+		Distribution.writeHistogram(distances.absoluteDistribution(1.0), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/ltrip.distance.hist.txt");
+		Distribution.writeHistogram(durations.absoluteDistribution(1.0), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/ltrip.duration.hist.txt");
+		Distribution.writeHistogram(accompanists.absoluteDistribution(), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/ltrip.accompanists.hist.txt");
+		Distribution.writeHistogram(leisureTypes.absoluteDistribution(), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/ltrip.ltypes.hist.txt");
+		Distribution.writeHistogram(referenceDays.absoluteDistribution(), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/ltrip.day.hist.txt");
+		Distribution.writeHistogram(ages.absoluteDistribution(), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/ltrip.age.hist.txt");
+		Distribution.writeHistogram(numTrips.absoluteDistribution(), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/ltrip.numTrips.hist.txt");
+		Distribution.writeHistogram(tripTypes.absoluteDistribution(), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/ltrip.type.hist.txt");
+		Distribution.writeHistogram(startTimes.absoluteDistribution(60), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/ltrip.startTime.hist.txt");
+		Distribution.writeHistogram(endTimes.absoluteDistribution(60), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/ltrip.endTime.hist.txt");
+		Distribution.writeHistogram(modes.absoluteDistribution(), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/ltrip.mode.hist.txt");
+		Distribution.writeHistogram(roundTripModes.absoluteDistribution(), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/ltrip.rTripMode.hist.txt");
 		
 		List<String> chains = ActivityChains.extractTripChains(sunday);
 		TObjectIntHashMap<String> chainHist = ActivityChains.makeChainHistogram(chains);
-		ActivityChains.writeChainHistogram(chainHist, "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/chains.hist.txt");
+		ActivityChains.writeChainHistogram(chainHist, "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/chains.hist.txt");
 		
 		ActivityChains.removeDoubleHomes(chains);
 		chainHist = ActivityChains.makeChainHistogram(chains);
-		ActivityChains.writeChainHistogram(chainHist, "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/chains.filtered.hist.txt");
+		ActivityChains.writeChainHistogram(chainHist, "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/chains.filtered.hist.txt");
 		
-		ActivityChains.writeChainHistogram(modeChains, "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/mz2005/modechains.hist.txt");
+		ActivityChains.writeChainHistogram(modeChains, "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/modechains.hist.txt");
 	}
 
-	public Map<String, PersonContainer> readPersons(String filename) throws IOException {
-		Map<String, PersonContainer> persons = new HashMap<String, PersonContainer>();
+	public Map<String, PersonData> readPersons(String filename) throws IOException {
+		Map<String, PersonData> persons = new HashMap<String, PersonData>();
 		
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
 
@@ -144,7 +151,7 @@ public class TripParser {
 			try {
 				tokens = line.split(SEPARATOR);
 				
-				PersonContainer container = new PersonContainer();
+				PersonData container = new PersonData();
 				
 				String householdId = tokens[colNames.get("HHNR")];
 				String personId = tokens[colNames.get("ZIELPNR")]; 
@@ -158,11 +165,12 @@ public class TripParser {
 				System.out.println("Failed to parse person: " + e.getMessage());
 			}
 		}
-		System.out.println("Parsed " + persons.size() + " persons.");
+		logger.info(String.format("Parsed %1$s persons.", persons.size()));
+		
 		return persons;
 	}
 	
-	public void readTrips(String filename, Map<String, PersonContainer> persons)
+	public void readTrips(String filename, Map<String, PersonData> persons)
 			throws IOException {
 //		Map<String, TripContainer> trips = new HashMap<String, TripContainer>();
 
@@ -172,10 +180,9 @@ public class TripParser {
 
 		int totalTrips = 0;
 		int invalidTrips = 0;
-		int leisureTrips = 0;
 		int outwardTrips = 0;
 		
-		TripContainer container = null;
+		TripData container = null;
 		
 		String line = null;
 		String[] tokens = null;
@@ -184,7 +191,7 @@ public class TripParser {
 			try {
 				tokens = line.split(SEPARATOR);
 
-				container = new TripContainer();
+				container = new TripData();
 
 				String householdId = tokens[colNames.get("HHNR")];
 				String personId = tokens[colNames.get("ZIELPNR")]; 
@@ -218,25 +225,53 @@ public class TripParser {
 				
 				container.leisureType = Integer.parseInt(tokens[colNames.get("F5202")]);
 				
-				PersonContainer pContainer = persons.get(container.personId);
+//				container.startCoord = coordinates(tokens, colNames, "S");
+//				container.destCoord = coordinates(tokens, colNames, "Z");
+				
+				PersonData pContainer = persons.get(container.personId);
 				if(pContainer != null) {
 					pContainer.trips.add(container);
 				} else {
-					System.out.println(String.format("Person with id %1$s not found!", container.personId));
+					logger.warn(String.format("Person with id %1$s not found!", container.personId));
 				}
 				
 			} catch (Exception e) {
 				invalidTrips++;
-				System.err.println("Failed to parse trip: " + e.getMessage());
 			}
 		}
 		
-		System.out.println(String.format("Parsed %1$s trips, %2$s leisure trips, %3$s outward trips, %4$s invalid trips.", totalTrips, leisureTrips, outwardTrips, invalidTrips));
+		logger.info(String.format("Parsed %1$s trips, %2$s outward trips, %3$s invalid trips.", totalTrips, outwardTrips, invalidTrips));
 	}
 
-	public void readLegs(String filename, Map<String, PersonContainer> persons) throws IOException {
+//	private double[] coordinates(String tokens[], TObjectIntHashMap<String> colNames, String prefix) {
+//		StringBuilder builder = new StringBuilder();
+//		
+//		builder.append(tokens[colNames.get(prefix + "_STRA")]);
+//		builder.append(" ");
+//		builder.append(tokens[colNames.get(prefix + "_HNR")]);
+//		builder.append(" ");
+//		
+//		String plz = tokens[colNames.get(prefix + "_PLZ")];
+//		if(!plz.equalsIgnoreCase("-97")) {
+//			builder.append(plz);
+//			builder.append(" ");
+//		}
+//		
+//		builder.append(tokens[colNames.get(prefix + "_ORT")]);
+//		builder.append(" ");
+//		builder.append(tokens[colNames.get(prefix + "_LAND")]);
+//		builder.append(" ");
+//		
+//		Coord c = googleLookup.requestCoordinates(builder.toString());
+//		return new double[]{c.getX(), c.getY()};
+//	}
+	
+	public void readLegs(String filename, Map<String, PersonData> persons) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
 		TObjectIntHashMap<String> colNames = readColNames(reader);
+		
+		int total = 0;
+		int invalid = 0;
 		
 		String line = null;
 		String tokens[] = null;
@@ -244,16 +279,16 @@ public class TripParser {
 			try {
 				tokens = line.split(SEPARATOR);
 				
-				LegContainer leg = new LegContainer();
+				LegData leg = new LegData();
 				leg.id = tokens[colNames.get("ETNR")];
 				leg.mode = Integer.parseInt(tokens[colNames.get("F510")]);
 				
 				String personId = tokens[colNames.get("HHNR")] + "." + tokens[colNames.get("ZIELPNR")];
-				PersonContainer person = persons.get(personId);
+				PersonData person = persons.get(personId);
 				if(person != null) {
 					String tripId = tokens[colNames.get("WEGNR")];
-					TripContainer trip = null;
-					for(TripContainer tc : person.trips) {
+					TripData trip = null;
+					for(TripData tc : person.trips) {
 						if(tc.tripId.equals(tripId)) {
 							trip = tc;
 							break;
@@ -262,16 +297,20 @@ public class TripParser {
 					if(trip != null) {
 						trip.legs.add(leg);
 					} else {
-						System.err.println(String.format("Trip with id %1$s for person with id %2$s not found.", tripId, personId));
+						invalid++;
+//						logger.warn(String.format("Trip with id %1$s for person with id %2$s not found.", tripId, personId));
 					}
+					total++;
 				} else {
-					System.err.println(String.format("Person with id %1$s not found.", personId));
+					logger.warn(String.format("Person with id %1$s not found.", personId));
 				}
 				
 			} catch (Exception e) {
-				System.err.println("Failed to parse leg: " + e.getMessage());
+				logger.warn("Failed to parse leg: " + e.getMessage());
 			}
 		}
+		
+		logger.info(String.format("Parsed %1$s legs, %2$s invalid.", total, invalid));
 	}
 	
 	private TObjectIntHashMap<String> readColNames(BufferedReader reader) throws IOException {

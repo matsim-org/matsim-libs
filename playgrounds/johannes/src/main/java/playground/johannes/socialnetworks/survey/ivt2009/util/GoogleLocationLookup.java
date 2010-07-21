@@ -57,6 +57,35 @@ public class GoogleLocationLookup {
 	
 	private ResponseHandler handler = new ResponseHandler();
 	
+	private int interval = 100;
+	
+	public Coord requestCoordinates(String query) {
+		try {
+			Thread.sleep(interval);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		Coord c = locationToCoord(query);
+		if (getLastErrorCode() == 620) {
+			while (getLastErrorCode() == 620) {
+				if (interval > 5000) {
+					logger.warn("Lookup interval is 5 secs. Seems we reached the request limit!");
+					System.exit(-1);
+				}
+				logger.warn(String.format("Increasing lookup interval, now %1$s msecs.", interval));
+				interval += 100;
+				try {
+					Thread.sleep(interval);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				c = locationToCoord(query);
+			}
+		}
+		return c;
+	}
+	
 	public Coord locationToCoord(String location) {
 		try {
 			URLConnection connection = new URL(PROTOCOL, SERVER, QUERY + URLEncoder.encode(location, CHAR_ENCODING)).openConnection();

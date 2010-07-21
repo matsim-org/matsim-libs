@@ -24,13 +24,17 @@ import java.util.List;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
 
@@ -42,21 +46,29 @@ public class ActivitySwitcher {
 
 	private Random random = new Random();
 	
-	private List<String> forbiddenTypes;
+	private List<String> allowedTypes;
 
 	private Network network;
 	
 	private LeastCostPathCalculator router;
 	
-	public ActivitySwitcher() {
-		forbiddenTypes = new ArrayList<String>(2);
-		forbiddenTypes.add("home");
-		forbiddenTypes.add("shop");
-		forbiddenTypes.add("leisure");
+	public ActivitySwitcher(final TravelTime travelTime) {
+		allowedTypes = new ArrayList<String>(3);
+		allowedTypes.add("home");
+		allowedTypes.add("shop");
+		allowedTypes.add("leisure");
+		
+		router = new Dijkstra(network, new TravelCost() {
+			
+			@Override
+			public double getLinkTravelCost(Link link, double time) {
+				return travelTime.getLinkTravelTime(link, time);
+			}
+		}, travelTime);
 	}
 	
 	private boolean isAllowedType(String type) {
-		for(String aType : forbiddenTypes) {
+		for(String aType : allowedTypes) {
 			if(type.equalsIgnoreCase(aType))
 				return true;
 		}
@@ -89,27 +101,49 @@ public class ActivitySwitcher {
 				
 			double endTime1 = act1.getEndTime();
 			double entTime2 = act2.getEndTime();
-			
+			/*
+			 * first act
+			 */
 			plan.getPlanElements().set(idx1, act2);
 			act2.setEndTime(endTime1);
-			
-			Id link1 = ((Activity)plan.getPlanElements().get(idx1-2)).getLinkId();
-			Id link2 = act2.getLinkId();
-
-			Node node1 = network.getLinks().get(link1).getFromNode();
-			Node node2 = network.getLinks().get(link2).getToNode();
-			
-			Path path = router.calcLeastCostPath(node1, node2, ((Activity)plan.getPlanElements().get(idx1-2)).getEndTime());
-			Leg toLeg = ((Leg)plan.getPlanElements().get(idx1-1));
-			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(link1, link2);
-			route.setLinkIds(link1, NetworkUtils.getLinkIds(path.links), link2);
-			toLeg.setRoute(route);
 			/*
-			 * ... and so on...
+			 * toLeg
+			 */
+			calcRoute((Activity)plan.getPlanElements().get(idx1-2), act2, (Leg)plan.getPlanElements().get(idx1-1));
+			/*
+			 * fromLeg
+			 */
+			calcRoute(act2, (Activity)plan.getPlanElements().get(idx1+2), (Leg)plan.getPlanElements().get(idx1+1));
+			/*
+			 * second Act
 			 */
 			plan.getPlanElements().set(idx2, act1);
 			act1.setEndTime(entTime2);
+			/*
+			 * toLeg
+			 */
+			if(idx2 != idx1+2) {
+				calcRoute((Activity)plan.getPlanElements().get(idx2-2), act1, (Leg)plan.getPlanElements().get(idx2-1));
+			}
+			/*
+			 * fromLeg
+			 */
+			calcRoute(act1, (Activity)plan.getPlanElements().get(idx2+2), (Leg)plan.getPlanElements().get(idx2+1));
 		}
 		return true;
+	}
+	
+	private void calcRoute(Activity prev, Activity next, Leg leg) {
+		Id link1 = prev.getLinkId();
+		Id link2 = next.getLinkId();
+
+		Node node1 = network.getLinks().get(link1).getFromNode();
+		Node node2 = network.getLinks().get(link2).getToNode();
+		
+		Path path = router.calcLeastCostPath(node1, node2, prev.getEndTime());
+		
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(link1, link2);
+		route.setLinkIds(link1, NetworkUtils.getLinkIds(path.links), link2);
+		leg.setRoute(route);		
 	}
 }
