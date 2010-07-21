@@ -28,9 +28,9 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 
-public class MyDatasetSink implements Sink {
+public class NetworkWriterSink implements Sink {
 
-	private static Logger log = Logger.getLogger(MyDatasetSink.class);
+	private static Logger log = Logger.getLogger(NetworkWriterSink.class);
 	private Scenario scenario;
 	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	private final Network network;
@@ -39,7 +39,7 @@ public class MyDatasetSink implements Sink {
 
 
 
-	public MyDatasetSink(CoordinateTransformation transform) {
+	public NetworkWriterSink(CoordinateTransformation transform) {
 		super();
 		this.scenario = new ScenarioImpl();
 		this.network = scenario.getNetwork();
@@ -62,6 +62,10 @@ public class MyDatasetSink implements Sink {
 			final double freespeedFactor, final double laneCapacity_vehPerHour, final boolean oneway) {
 		this.highwayDefaults.put(highwayType, new OsmHighwayDefaults(lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
 	}
+	
+	public Network getNetwork() {
+		return network;
+	}
 
 	private void readLink(Way entry) {
 		List<WayNode> wayNodes = entry.getWayNodes();
@@ -80,7 +84,7 @@ public class MyDatasetSink implements Sink {
 
 
 	private void readNode(Node osmNode) {
-		CoordImpl osmCoord = new CoordImpl(osmNode.getLatitude(), osmNode.getLongitude());
+		CoordImpl osmCoord = new CoordImpl(osmNode.getLongitude(), osmNode.getLatitude());
 		Coord transformedCoord = transform.transform(osmCoord);
 		network.addNode(network.getFactory().createNode(new IdImpl(osmNode.getId()), transformedCoord));
 	}

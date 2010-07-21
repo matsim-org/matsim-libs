@@ -52,11 +52,12 @@ public class LiveMain {
 		
 		OTFVisClient client = new OTFVisClient();
 		client.setHostConnectionManager(hostConnectionManager);
-		client.setSwing(true);
+		client.setSwing(false);
 		client.run();
 		
 		System.out.println("Reading...");
 		new MatsimEventsReader(events).readFile(eventsFileName);
+		snapshotGenerator.finish();
 		
 	}
 
