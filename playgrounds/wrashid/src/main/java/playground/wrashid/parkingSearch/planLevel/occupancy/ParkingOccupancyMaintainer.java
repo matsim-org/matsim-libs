@@ -257,6 +257,9 @@ public class ParkingOccupancyMaintainer {
 			getOccupancyBins(parkingFacilityId).inrementParkingOccupancy(startTimeOfCurrentParking.get(personId),
 					endTimeOfFirstParking.get(personId));
 
+			if (!parkingArrivalDepartureLog.containsKey(personId)) {
+				parkingArrivalDepartureLog.put(personId, new ParkingArrivalDepartureLog());
+			}
 			parkingArrivalDepartureLog.get(personId).logParkingArrivalDepartureTime(parkingFacilityId, startTimeOfCurrentParking.get(personId), endTimeOfFirstParking.get(personId));
 		}
 

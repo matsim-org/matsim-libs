@@ -84,7 +84,7 @@ public class ParkingCapacityFullLogger {
 	}
 
 	public boolean isParkingFullAtTime(double time) {
-		GeneralLib.errorIfNot24HourProjectedTime(time);
+		time=GeneralLib.projectTimeWithin24Hours(time);
 
 		if (list.isEmpty()) {
 			return false;

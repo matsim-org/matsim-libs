@@ -160,7 +160,7 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 
 		double parkingPriceScore = getParkingPriceScore(parkingFacilityId, parkingTimeInfo, personId);
 		double parkingParkingCapacityViolationPenalty = getParkingCapacityViolationPenalty(parkingFacilityId, parkingTimeInfo, plan);
-		double parkingWalkingPenalty=getWalkingExplicitScorePart(targetActivity, personId);
+		double parkingWalkingPenalty=getWalkingExplicitScorePart(targetActivity, parkingFacilityId);
 		double parkingActivityDurationPenalty=getParkingActivityDurationPenalty(parkingArrivalDuration, parkingDepartureDuration);
 		
 		// TODO: add more sums here!!!!
