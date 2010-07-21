@@ -1,0 +1,17 @@
+for using this, add the following code in the controler (attention: don't commit controler, because we are referencing to code
+in playground now).
+
+
+			final String NUMBER_OF_THREADS = "numberOfThreads";
+			String numberOfThreads = this.config.findParam(JDEQ_SIM, NUMBER_OF_THREADS);
+			int numOfThreads = 0;
+
+			if (numberOfThreads != null) {
+				numOfThreads = Integer.parseInt(numberOfThreads);
+			}
+
+			if ((this.config.getModule(JDEQ_SIM) != null) && (numOfThreads > 1)) {
+				//
+				PJDEQSimulation sim = new PJDEQSimulation(this.scenarioData, this.events,numOfThreads);
+				sim.run();
+			} else if ()...
