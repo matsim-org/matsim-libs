@@ -28,9 +28,9 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 
-public class NetworkWriterSink implements Sink {
+public class NetworkSink implements Sink {
 
-	private static Logger log = Logger.getLogger(NetworkWriterSink.class);
+	private static Logger log = Logger.getLogger(NetworkSink.class);
 	private Scenario scenario;
 	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	private final Network network;
@@ -39,23 +39,11 @@ public class NetworkWriterSink implements Sink {
 
 
 
-	public NetworkWriterSink(CoordinateTransformation transform) {
+	public NetworkSink(CoordinateTransformation transform) {
 		super();
 		this.scenario = new ScenarioImpl();
 		this.network = scenario.getNetwork();
 		this.transform = transform;
-		this.setHighwayDefaults(1, "motorway",      2, 120.0/3.6, 1.0, 2000, true);
-		this.setHighwayDefaults(1, "motorway_link", 1,  80.0/3.6, 1.0, 1500, true);
-		this.setHighwayDefaults(2, "trunk",         1,  80.0/3.6, 1.0, 2000, false);
-		this.setHighwayDefaults(2, "trunk_link",    1,  50.0/3.6, 1.0, 1500, false);
-		this.setHighwayDefaults(3, "primary",       1,  80.0/3.6, 1.0, 1500, false);
-		this.setHighwayDefaults(3, "primary_link",  1,  60.0/3.6, 1.0, 1500, false);
-		this.setHighwayDefaults(4, "secondary",     1,  60.0/3.6, 1.0, 1000, false);
-		this.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  600, false);
-		this.setHighwayDefaults(6, "minor",         1,  45.0/3.6, 1.0,  600, false);
-		this.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600, false);
-		this.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  600, false);
-		this.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300, false);
 	}
 
 	public void setHighwayDefaults(final int hierarchy, final String highwayType, final double lanes, final double freespeed,

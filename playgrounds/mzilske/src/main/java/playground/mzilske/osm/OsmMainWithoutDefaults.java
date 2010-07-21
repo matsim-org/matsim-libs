@@ -16,7 +16,9 @@ import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
 import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
 import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
 
-public class OsmMain {
+import uk.co.randomjunk.osmosis.transform.v0_6.TransformTask;
+
+public class OsmMainWithoutDefaults {
 	
 	public static void main(String[] args) {
 		Map<String, Set<String>> tagKeyValues = new HashMap<String, Set<String>>();
@@ -29,26 +31,15 @@ public class OsmMain {
 		
 		SimplifyTask simplify = new SimplifyTask(IdTrackerType.BitSet);
 		
+		TransformTask tagTransform = new TransformTask("input/schweiz/tagtransform.xml", "output/tagtransform-stats.xml");
+		
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S);
 		NetworkSink sink = new NetworkSink(coordinateTransformation);
-		sink.setHighwayDefaults(1, "motorway",      2, 120.0/3.6, 1.0, 2000, true);
-		sink.setHighwayDefaults(1, "motorway_link", 1,  80.0/3.6, 1.0, 1500, true);
-		sink.setHighwayDefaults(2, "trunk",         1,  80.0/3.6, 1.0, 2000, false);
-		sink.setHighwayDefaults(2, "trunk_link",    1,  50.0/3.6, 1.0, 1500, false);
-		sink.setHighwayDefaults(3, "primary",       1,  80.0/3.6, 1.0, 1500, false);
-		sink.setHighwayDefaults(3, "primary_link",  1,  60.0/3.6, 1.0, 1500, false);
-		sink.setHighwayDefaults(4, "secondary",     1,  60.0/3.6, 1.0, 1000, false);
-		sink.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  600, false);
-		sink.setHighwayDefaults(6, "minor",         1,  45.0/3.6, 1.0,  600, false);
-		sink.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600, false);
-		sink.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  600, false);
-		sink.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300, false);
-		
-		TransitNetworkSink transitNetworkSink = new TransitNetworkSink();
 		
 		reader.setSink(tagFilter);
 		tagFilter.setSink(simplify);
-		simplify.setSink(sink);
+		simplify.setSink(tagTransform);
+		tagTransform.setSink(sink);
 
 		reader.run();
 		
