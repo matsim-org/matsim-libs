@@ -43,9 +43,7 @@ public class OsmMain {
 		sink.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600, false);
 		sink.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  600, false);
 		sink.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300, false);
-		
-		TransitNetworkSink transitNetworkSink = new TransitNetworkSink();
-		
+
 		reader.setSink(tagFilter);
 		tagFilter.setSink(simplify);
 		simplify.setSink(sink);
