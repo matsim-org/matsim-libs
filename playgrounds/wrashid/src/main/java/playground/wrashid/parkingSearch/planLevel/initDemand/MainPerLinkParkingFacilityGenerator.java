@@ -28,7 +28,7 @@ public class MainPerLinkParkingFacilityGenerator {
 		ScenarioImpl sc = new ScenarioImpl();
 
 		String networkFile = "C:\\data\\workspace\\playgrounds\\wrashid\\test\\scenarios\\berlin\\network.xml.gz";
-		String facilitiesPath = "C:\\data\\workspace\\playgrounds\\wrashid\\test\\scenarios\\berlin\\facilities.xml.gz";
+		String facilitiesPath = "C:\\data\\workspace\\playgrounds\\wrashid\\test\\scenarios\\berlin\\parkingFacilities.xml.gz";
 
 		new MatsimNetworkReader(sc).readFile(networkFile);
 		NetworkLayer net = sc.getNetwork();
@@ -38,9 +38,9 @@ public class MainPerLinkParkingFacilityGenerator {
 		int parkPlatzId = 1;
 		int totalNumberOfParkingsAdded=0;
 		for (Link link : net.getLinks().values()) {
-			// 5m long, half of the street available for parking
-			// divided by hundred, because 1 percent sample
-			int parkingCapacity = (int) Math.round(Math.ceil(link.getLength() / 2.0 / 5.0 / 100));
+			// 5m long car, half of the street available for parking
+			// don't do this change - will be done later probably
+			int parkingCapacity = (int) Math.round(Math.ceil(link.getLength() / 2.0 / 5.0));
 			totalNumberOfParkingsAdded+=parkingCapacity;
 			ActivityFacilityImpl activityFacility = activityFacilities.createFacility(new IdImpl(parkPlatzId), link.getCoord());
 			activityFacility.createActivityOption("parking").setCapacity(parkingCapacity);

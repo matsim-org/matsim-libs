@@ -10,12 +10,12 @@ import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingCapacity;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 
-public class ParkingOccupancyAnalysisWriter {
+public class ParkingOccupancyAnalysis {
 
 	private final HashMap<Id, ParkingOccupancyBins> parkingOccupancyBins;
 	private final ParkingCapacity parkingCapacity;
 
-	public ParkingOccupancyAnalysisWriter(HashMap<Id, ParkingOccupancyBins> parkingOccupancyBins, ParkingCapacity parkingCapacity) {
+	public ParkingOccupancyAnalysis(HashMap<Id, ParkingOccupancyBins> parkingOccupancyBins, ParkingCapacity parkingCapacity) {
 		super();
 		this.parkingOccupancyBins = parkingOccupancyBins;
 		this.parkingCapacity = parkingCapacity;

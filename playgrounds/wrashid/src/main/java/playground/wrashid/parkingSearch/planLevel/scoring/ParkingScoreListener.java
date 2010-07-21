@@ -11,7 +11,7 @@ import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
-import playground.wrashid.parkingSearch.planLevel.analysis.ParkingOccupancyAnalysisWriter;
+import playground.wrashid.parkingSearch.planLevel.analysis.ParkingOccupancyAnalysis;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ParkingScoreListener implements AfterMobsimListener {

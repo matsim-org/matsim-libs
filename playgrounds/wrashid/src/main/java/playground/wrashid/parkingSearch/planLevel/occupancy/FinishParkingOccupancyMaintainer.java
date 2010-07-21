@@ -3,7 +3,8 @@ package playground.wrashid.parkingSearch.planLevel.occupancy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
-import playground.wrashid.parkingSearch.planLevel.analysis.ParkingOccupancyAnalysisWriter;
+import playground.wrashid.parkingSearch.planLevel.analysis.ParkingOccupancyAnalysis;
+import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingTimesAnalysis;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
@@ -15,7 +16,7 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 
 		// write also the occupancy statistics at this stage of the simulation
 
-		ParkingOccupancyAnalysisWriter poaWriter = new ParkingOccupancyAnalysisWriter(ParkingRoot.getParkingOccupancyMaintainer()
+		ParkingOccupancyAnalysis poaWriter = new ParkingOccupancyAnalysis(ParkingRoot.getParkingOccupancyMaintainer()
 				.getParkingOccupancyBins(), ParkingRoot.getParkingCapacity());
 		String fileName = event.getControler().getControlerIO()
 				.getIterationFilename(event.getControler().getIterationNumber(), "parkingOccupancyStatistics.txt");
@@ -23,6 +24,11 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		fileName = event.getControler().getControlerIO()
 				.getIterationFilename(event.getControler().getIterationNumber(), "parkingOccupancyCoordinates.txt");
 		poaWriter.writeFakeKMLFile(fileName);
+
+		fileName = event.getControler().getControlerIO()
+				.getIterationFilename(event.getControler().getIterationNumber(), "parkingWalkingTimes.txt");
+		new ParkingWalkingTimesAnalysis(ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance())
+				.writeTxtFile(fileName);
 
 	}
 }

@@ -3,15 +3,68 @@ package playground.wrashid.parkingSearch.planLevel;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.population.ActivityImpl;
 
+import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingTimeInfo;
 
 public class ParkingGeneralLib {
+
+	
+	/**
+	 * TODO: write Test.
+	 * @param plan
+	 * @param facilities
+	 * @return
+	 */
+	public static double getParkingRelatedWalkingDistanceOfWholeDay(Plan plan, ActivityFacilities facilities) {
+		double travelDistance=0;
+
+		List<PlanElement> pe = plan.getPlanElements();
+
+		for (int i = 0; i < pe.size(); i++) {
+			if (pe.get(i) instanceof ActivityImpl) {
+				ActivityImpl parkingActivity = (ActivityImpl) pe.get(i);
+				Coord coordParking=facilities.getFacilities().get(parkingActivity.getFacilityId()).getCoord();
+				if (parkingActivity.getType().equalsIgnoreCase("parking")) {
+					Leg nextLeg = (Leg) pe.get(i + 1);
+					Leg prevLeg = (Leg) pe.get(i - 1);
+					if (nextLeg.getMode().equalsIgnoreCase("walk")) {
+						ActivityImpl nextAct = (ActivityImpl) pe.get(i+2);
+						
+						if (nextAct.getFacilityId()!=null){
+							Coord nextActFacilityCoord=facilities.getFacilities().get(nextAct.getFacilityId()).getCoord();
+							travelDistance+=GeneralLib.getDistance(coordParking, nextActFacilityCoord);
+						} else {
+							Coord nextActLinkCoord=nextAct.getCoord();
+							travelDistance+=GeneralLib.getDistance(coordParking, nextActLinkCoord);
+						}
+						
+					}
+					if (prevLeg.getMode().equalsIgnoreCase("walk")) {
+						ActivityImpl prevAct = (ActivityImpl) pe.get(i-2);
+						
+						if (prevAct.getFacilityId()!=null){
+							Coord prevActFacilityCoord=facilities.getFacilities().get(prevAct.getFacilityId()).getCoord();
+							travelDistance+=GeneralLib.getDistance(coordParking, prevActFacilityCoord);
+						} else {
+							Coord prevActLinkCoord=prevAct.getCoord();
+							travelDistance+=GeneralLib.getDistance(coordParking, prevActLinkCoord);
+						}
+					}
+
+				}
+			}
+		}
+
+		return travelDistance;
+	}
 
 	/**
 	 * reurns null, if no parking activity found else id of first parking
@@ -65,16 +118,16 @@ public class ParkingGeneralLib {
 
 		return parkingFacilityIds;
 	}
-	
+
 	public static void printAllParkingFacilityIds(Plan plan) {
-		LinkedList<Id> allParkingFacilityIds=getAllParkingFacilityIds(plan);
-		
+		LinkedList<Id> allParkingFacilityIds = getAllParkingFacilityIds(plan);
+
 		System.out.println(plan.getPerson().getId());
-		
-		for (int i=0;i<allParkingFacilityIds.size();i++){
+
+		for (int i = 0; i < allParkingFacilityIds.size(); i++) {
 			System.out.print(allParkingFacilityIds.get(i) + " - ");
 		}
-		
+
 		System.out.println();
 	}
 
@@ -109,8 +162,7 @@ public class ParkingGeneralLib {
 	}
 
 	/**
-	 * Get the ParkingTimeInfo of the parking related to the
-	 * given activity
+	 * Get the ParkingTimeInfo of the parking related to the given activity
 	 * 
 	 * @param activity
 	 * @return
@@ -183,7 +235,7 @@ public class ParkingGeneralLib {
 		int activityIndex = pe.indexOf(activity);
 		int indexOfArrivalParkingAct = -1;
 
-		for (int i = activityIndex; 0<i; i--) {
+		for (int i = activityIndex; 0 < i; i--) {
 			if (pe.get(i) instanceof ActivityImpl) {
 				ActivityImpl parkingAct = (ActivityImpl) plan.getPlanElements().get(i);
 				if (parkingAct.getType().equalsIgnoreCase("parking")) {
@@ -199,35 +251,35 @@ public class ParkingGeneralLib {
 
 		return indexOfArrivalParkingAct;
 	}
-	
+
 	/**
-	 * TODO: add test.
-	 * If the specified arrival is the i-th arrival of the day, return i (with i starting at 0).
+	 * TODO: add test. If the specified arrival is the i-th arrival of the day,
+	 * return i (with i starting at 0).
+	 * 
 	 * @param plan
 	 * @param parkingArrivalAct
 	 * @return
 	 */
-	public static int getParkingArrivalIndex(Plan plan, ActivityImpl parkingArrivalAct){
-			List<PlanElement> pe = plan.getPlanElements();
-			int parkingPlanElementIndex = pe.indexOf(parkingArrivalAct);
-			int index = -1;
+	public static int getParkingArrivalIndex(Plan plan, ActivityImpl parkingArrivalAct) {
+		List<PlanElement> pe = plan.getPlanElements();
+		int parkingPlanElementIndex = pe.indexOf(parkingArrivalAct);
+		int index = -1;
 
-			for (int i = 0; i<=parkingPlanElementIndex; i++) {
-				if (pe.get(i) instanceof ActivityImpl) {
-					ActivityImpl activity = (ActivityImpl) plan.getPlanElements().get(i);
-					
-					if (activity.getType().equalsIgnoreCase("parking")) {
-						Leg leg = (Leg) plan.getPlanElements().get(i - 1);
+		for (int i = 0; i <= parkingPlanElementIndex; i++) {
+			if (pe.get(i) instanceof ActivityImpl) {
+				ActivityImpl activity = (ActivityImpl) plan.getPlanElements().get(i);
 
-						if (leg.getMode().equalsIgnoreCase("car")) {
-							index++;
-						}
+				if (activity.getType().equalsIgnoreCase("parking")) {
+					Leg leg = (Leg) plan.getPlanElements().get(i - 1);
+
+					if (leg.getMode().equalsIgnoreCase("car")) {
+						index++;
 					}
 				}
 			}
-			
-			return index;
+		}
+
+		return index;
 	}
-	
 
 }

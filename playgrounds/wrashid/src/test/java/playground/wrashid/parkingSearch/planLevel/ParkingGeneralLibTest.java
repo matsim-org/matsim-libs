@@ -24,4 +24,16 @@ public class ParkingGeneralLibTest extends TestCase {
 		assertEquals("36", parkingFacilityIds.get(0).toString());
 		assertEquals("1", parkingFacilityIds.get(1).toString());
 	}
+	
+	public void testGetParkingRelatedWalkingDistanceOfWholeDay(){
+		ScenarioImpl sc = new ScenarioImpl();
+
+		BaseNonControlerScenario.loadNetwork(sc);
+		
+		double parkingRelatedWalkingDistance=ParkingGeneralLib.getParkingRelatedWalkingDistanceOfWholeDay(sc.getPopulation().getPersons()
+				.get(new IdImpl(1)).getSelectedPlan(),sc.getActivityFacilities());
+		
+		assertEquals(0.0, parkingRelatedWalkingDistance);
+		
+	}
 }

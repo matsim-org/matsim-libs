@@ -13,6 +13,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 
+import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
 import playground.wrashid.parkingSearch.planLevel.scoring.OrderedFacility;
 
@@ -88,7 +89,7 @@ public class ClosestParkingMatrix {
 		int maxDistanceIndex=-1;
 		
 		for (int i=0;i<list.size();i++){
-			double distance=getDistance(coord, list.get(i).getCoord());
+			double distance=GeneralLib.getDistance(coord, list.get(i).getCoord());
 			if (distance>maxDistance){
 				maxDistance=distance;
 				maxDistanceIndex=i;
@@ -149,7 +150,7 @@ public class ClosestParkingMatrix {
 
 			checkedLinks.add(selectedLink);
 
-			if (getDistance(coord, selectedLink) <= maxDistance) {
+			if (GeneralLib.getDistance(coord, selectedLink) <= maxDistance) {
 				resultLinks.add(selectedLink);
 
 				// find out, if need to test the neighbouring links
@@ -177,16 +178,6 @@ public class ClosestParkingMatrix {
 
 	}
 
-	public static double getDistance(Coord coord, Link link) {
-		return getDistance(coord,link.getCoord());
-	}
-	
-	public static double getDistance(Coord coordA, Coord coordB) {
-		double xDiff = coordA.getX() - coordB.getX();
-		double yDiff = coordA.getY() - coordB.getY();
-		return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-	}
-	
 	/**
 	 * possible refactoring: move this static method to some other class, where it would fit better...
 	 * 
@@ -203,7 +194,7 @@ public class ClosestParkingMatrix {
 		// sort list
 		while (list.size()>0){
 			ActivityFacilityImpl curFac=list.remove(0);
-			prioQueue.add(new OrderedFacility(curFac, getDistance(coord,curFac.getCoord())));
+			prioQueue.add(new OrderedFacility(curFac, GeneralLib.getDistance(coord,curFac.getCoord())));
 		}
 		
 		// write list

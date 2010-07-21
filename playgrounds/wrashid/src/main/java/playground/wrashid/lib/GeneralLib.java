@@ -11,8 +11,10 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -26,6 +28,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.charts.XYLineChart;
+
 
 public class GeneralLib {
 
@@ -416,6 +419,16 @@ public class GeneralLib {
 		if (time >= secondsInOneDay) {
 			throw new Error("time not projected within 24 hours!");
 		}
+	}
+
+	public static double getDistance(Coord coord, Link link) {
+		return GeneralLib.getDistance(coord,link.getCoord());
+	}
+
+	public static double getDistance(Coord coordA, Coord coordB) {
+		double xDiff = coordA.getX() - coordB.getX();
+		double yDiff = coordA.getY() - coordB.getY();
+		return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 	}
 
 }

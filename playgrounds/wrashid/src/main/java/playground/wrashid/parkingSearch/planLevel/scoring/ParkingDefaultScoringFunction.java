@@ -6,10 +6,10 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.PSF.parking.ParkingInfo;
+import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping;
-import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
 
 public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 
@@ -25,7 +25,7 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 
 		
 		double walkingPenalty = -1.0
-				* ClosestParkingMatrix.getDistance(targetActivity.getCoord(),
+				* GeneralLib.getDistance(targetActivity.getCoord(),
 						parkingFacilities.getFacilities().get(parkingFacilityId).getCoord());
 
 		// TODO: question: should we have one scaling factor to scaling the

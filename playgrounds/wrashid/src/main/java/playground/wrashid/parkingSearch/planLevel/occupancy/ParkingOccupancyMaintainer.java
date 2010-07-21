@@ -39,6 +39,10 @@ public class ParkingOccupancyMaintainer {
 	DoubleValueHashMap<Id> startTimeOfCurrentParking = new DoubleValueHashMap<Id>();
 
 	// id: personId
+	// value: travel distance whole day
+	HashMap<Id, Double> parkingRelatedWalkDistance = new HashMap<Id, Double>();
+
+	// id: personId
 	// value: facilityId
 	HashMap<Id, Id> currentParkingFacilityId = new HashMap<Id, Id>();
 
@@ -56,6 +60,10 @@ public class ParkingOccupancyMaintainer {
 
 	public HashMap<Id, Plan> getLastSelectedPlan() {
 		return lastSelectedPlan;
+	}
+
+	public HashMap<Id, Double> getParkingRelatedWalkDistance() {
+		return parkingRelatedWalkDistance;
 	}
 
 	public LinkedList<ActivityImpl> getActivitiesWithParkingConstraintViolations(Plan plan) {
@@ -139,6 +147,10 @@ public class ParkingOccupancyMaintainer {
 				currentParkingOccupancy.increment(firstParkingFacilityId);
 			}
 			lastSelectedPlan.put(person.getId(), person.getSelectedPlan());
+			
+			// update parkingRelatedWalkDistance
+			
+			parkingRelatedWalkDistance.put(person.getId(), ParkingGeneralLib.getParkingRelatedWalkingDistanceOfWholeDay(person.getSelectedPlan(),controler.getFacilities()));
 		}
 	}
 
@@ -148,10 +160,10 @@ public class ParkingOccupancyMaintainer {
 		double time = GeneralLib.projectTimeWithin24Hours(event.getTime());
 		startTimeOfCurrentParking.put(personId, event.getTime());
 
-		if (parkingFacilityId.toString().equalsIgnoreCase("36")){
+		if (parkingFacilityId.toString().equalsIgnoreCase("36")) {
 			System.out.println();
 		}
-		
+
 		currentParkingOccupancy.increment(parkingFacilityId);
 
 		currentParkingFacilityId.put(personId, parkingFacilityId);
@@ -179,7 +191,7 @@ public class ParkingOccupancyMaintainer {
 			throw new Error("parking occupancy cannot be negative");
 		}
 	}
-	
+
 	public void logDepartureFromParking(ActivityEndEvent event) {
 		Id personId = event.getPersonId();
 		Id parkingFacilityId = event.getFacilityId();
@@ -187,8 +199,6 @@ public class ParkingOccupancyMaintainer {
 
 		currentParkingOccupancy.decrement(event.getFacilityId());
 
-		
-		
 		if (!endTimeOfFirstParking.containsKey(personId)) {
 			// handle departure from first parking
 
@@ -204,11 +214,11 @@ public class ParkingOccupancyMaintainer {
 		}
 
 		assureParkingOccupancyIsNonNegative(event.getFacilityId());
-		
+
 		// log if parking got from full to not-full state
 		double currentParkingOcc = currentParkingOccupancy.get(parkingFacilityId);
 		double parkingCapacity = ParkingRoot.getParkingCapacity().getParkingCapacity(parkingFacilityId);
-		if (currentParkingOcc == parkingCapacity-1) {
+		if (currentParkingOcc == parkingCapacity - 1) {
 			if (!parkingCapacityFullTimes.containsKey(parkingFacilityId)) {
 				parkingCapacityFullTimes.put(parkingFacilityId, new ParkingCapacityFullLogger());
 			}
