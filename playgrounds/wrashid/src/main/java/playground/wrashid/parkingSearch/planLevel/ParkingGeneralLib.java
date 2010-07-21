@@ -18,21 +18,22 @@ public class ParkingGeneralLib {
 
 	
 	/**
-	 * TODO: write Test.
+	 * get parking related walking distance of whole day - average per leg
 	 * @param plan
 	 * @param facilities
 	 * @return
 	 */
-	public static double getParkingRelatedWalkingDistanceOfWholeDay(Plan plan, ActivityFacilities facilities) {
+	public static double getParkingRelatedWalkingDistanceOfWholeDayAveragePerLeg(Plan plan, ActivityFacilities facilities) {
 		double travelDistance=0;
+		int numberOfLegs=0;
 
 		List<PlanElement> pe = plan.getPlanElements();
 
 		for (int i = 0; i < pe.size(); i++) {
 			if (pe.get(i) instanceof ActivityImpl) {
 				ActivityImpl parkingActivity = (ActivityImpl) pe.get(i);
-				Coord coordParking=facilities.getFacilities().get(parkingActivity.getFacilityId()).getCoord();
 				if (parkingActivity.getType().equalsIgnoreCase("parking")) {
+					Coord coordParking=facilities.getFacilities().get(parkingActivity.getFacilityId()).getCoord();
 					Leg nextLeg = (Leg) pe.get(i + 1);
 					Leg prevLeg = (Leg) pe.get(i - 1);
 					if (nextLeg.getMode().equalsIgnoreCase("walk")) {
@@ -45,7 +46,7 @@ public class ParkingGeneralLib {
 							Coord nextActLinkCoord=nextAct.getCoord();
 							travelDistance+=GeneralLib.getDistance(coordParking, nextActLinkCoord);
 						}
-						
+						numberOfLegs++;
 					}
 					if (prevLeg.getMode().equalsIgnoreCase("walk")) {
 						ActivityImpl prevAct = (ActivityImpl) pe.get(i-2);
@@ -57,13 +58,14 @@ public class ParkingGeneralLib {
 							Coord prevActLinkCoord=prevAct.getCoord();
 							travelDistance+=GeneralLib.getDistance(coordParking, prevActLinkCoord);
 						}
+						numberOfLegs++;
 					}
 
 				}
 			}
 		}
 
-		return travelDistance;
+		return travelDistance/numberOfLegs;
 	}
 
 	/**

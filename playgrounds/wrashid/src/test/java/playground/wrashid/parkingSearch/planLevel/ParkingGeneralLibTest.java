@@ -30,7 +30,7 @@ public class ParkingGeneralLibTest extends TestCase {
 
 		BaseNonControlerScenario.loadNetwork(sc);
 		
-		double parkingRelatedWalkingDistance=ParkingGeneralLib.getParkingRelatedWalkingDistanceOfWholeDay(sc.getPopulation().getPersons()
+		double parkingRelatedWalkingDistance=ParkingGeneralLib.getParkingRelatedWalkingDistanceOfWholeDayAveragePerLeg(sc.getPopulation().getPersons()
 				.get(new IdImpl(1)).getSelectedPlan(),sc.getActivityFacilities());
 		
 		assertEquals(0.0, parkingRelatedWalkingDistance);

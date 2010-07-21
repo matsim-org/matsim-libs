@@ -17,7 +17,7 @@ public class ParkingWalkingTimesAnalysis {
 
 	public void writeTxtFile(String filePath) {
 		double[][] matrix = getMatrix();
-		String headerLine = "parkingFacilityId" + "\t" + "walkingDistance" + "\t";
+		String headerLine = "parkingFacilityId" + "\t" + "averageWalkingDistancePerWalkingLeg" + "\t";
 
 		GeneralLib.writeMatrix(matrix, filePath, headerLine);
 	}

@@ -150,7 +150,7 @@ public class ParkingOccupancyMaintainer {
 			
 			// update parkingRelatedWalkDistance
 			
-			parkingRelatedWalkDistance.put(person.getId(), ParkingGeneralLib.getParkingRelatedWalkingDistanceOfWholeDay(person.getSelectedPlan(),controler.getFacilities()));
+			parkingRelatedWalkDistance.put(person.getId(), ParkingGeneralLib.getParkingRelatedWalkingDistanceOfWholeDayAveragePerLeg(person.getSelectedPlan(),controler.getFacilities()));
 		}
 	}
 
