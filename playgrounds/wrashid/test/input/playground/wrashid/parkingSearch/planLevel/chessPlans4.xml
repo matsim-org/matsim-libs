@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+
+<plans name="Plans_Test1">
+
+<!-- ====================================================================== -->
+
+	<person id="1" age="30">
+		<plan>
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="00:00:00" end_time="08:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg num="0" mode="car" dep_time="08:00:00" trav_time="00:00:00" arr_time="08:00:00">
+			</leg>
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="work" facility="36" x="8500.0" y="9000.0" start_time="08:00:00" end_time="16:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg num="1" mode="car" dep_time="16:00:00" trav_time="00:00:00" arr_time="16:00:00">
+			</leg>
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="20:00:00" end_time="24:00:00" />
+		</plan>
+	</person>
+	
+	<!-- ====================================================================== -->
+
+	<!-- ====================================================================== -->
+
+	<person id="2" age="30">
+		<plan>
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="00:00:00" end_time="08:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg num="0" mode="car" dep_time="08:00:00" trav_time="00:00:00" arr_time="08:00:00">
+			</leg>
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="work" facility="36" x="8500.0" y="9000.0" start_time="08:00:00" end_time="16:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg num="1" mode="car" dep_time="16:00:00" trav_time="00:00:00" arr_time="16:00:00">
+			</leg>
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="20:00:00" end_time="24:00:00" />
+		</plan>
+	</person>
+	
+	<!-- ====================================================================== -->
+
+	<!-- ====================================================================== -->
+
+	<person id="3" age="30">
+		<plan>
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="00:00:00" end_time="08:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg num="0" mode="car" dep_time="08:00:00" trav_time="00:00:00" arr_time="08:00:00">
+			</leg>
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="work" facility="36" x="8500.0" y="9000.0" start_time="08:00:00" end_time="16:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg num="1" mode="car" dep_time="16:00:00" trav_time="00:00:00" arr_time="16:00:00">
+			</leg>
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="20:00:00" end_time="24:00:00" />
+		</plan>
+	</person>
+	
+	<!-- ====================================================================== -->
+
+	<person id="4" age="30">
+		<plan>
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="00:00:00" end_time="08:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg num="0" mode="car" dep_time="08:00:00" trav_time="00:00:00" arr_time="08:00:00">
+			</leg>
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="work" facility="36" x="8500.0" y="9000.0" start_time="08:00:00" end_time="16:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg num="1" mode="car" dep_time="16:00:00" trav_time="00:00:00" arr_time="16:00:00">
+			</leg>
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="20:00:00" end_time="24:00:00" />
+		</plan>
+	</person>
+	
+	<!-- ====================================================================== -->
+	
+		<person id="5" age="30">
+		<plan>
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="00:00:00" end_time="08:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg num="0" mode="car" dep_time="08:00:00" trav_time="00:00:00" arr_time="08:00:00">
+			</leg>
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="work" facility="36" x="8500.0" y="9000.0" start_time="08:00:00" end_time="16:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg num="1" mode="car" dep_time="16:00:00" trav_time="00:00:00" arr_time="16:00:00">
+			</leg>
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="20:00:00" end_time="24:00:00" />
+		</plan>
+	</person>
+	
+	<!-- ====================================================================== -->
+	
+		<person id="6" age="30">
+		<plan>
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="00:00:00" end_time="08:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg num="0" mode="car" dep_time="08:00:00" trav_time="00:00:00" arr_time="08:00:00">
+			</leg>
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="work" facility="36" x="8500.0" y="9000.0" start_time="08:00:00" end_time="16:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg num="1" mode="car" dep_time="16:00:00" trav_time="00:00:00" arr_time="16:00:00">
+			</leg>
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="20:00:00" end_time="24:00:00" />
+		</plan>
+	</person>
+	
+	<!-- ====================================================================== -->
+	
+		<person id="7" age="30">
+		<plan>
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="00:00:00" end_time="08:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg num="0" mode="car" dep_time="08:00:00" trav_time="00:00:00" arr_time="08:00:00">
+			</leg>
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="work" facility="36" x="8500.0" y="9000.0" start_time="08:00:00" end_time="16:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg num="1" mode="car" dep_time="16:00:00" trav_time="00:00:00" arr_time="16:00:00">
+			</leg>
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="20:00:00" end_time="24:00:00" />
+		</plan>
+	</person>
+	
+	<!-- ====================================================================== -->
+	
+	
+		<person id="8" age="30">
+		<plan>
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="00:00:00" end_time="08:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg num="0" mode="car" dep_time="08:00:00" trav_time="00:00:00" arr_time="08:00:00">
+			</leg>
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="work" facility="36" x="8500.0" y="9000.0" start_time="08:00:00" end_time="16:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg num="1" mode="car" dep_time="16:00:00" trav_time="00:00:00" arr_time="16:00:00">
+			</leg>
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="20:00:00" end_time="24:00:00" />
+		</plan>
+	</person>
+	
+	<!-- ====================================================================== -->
+		<person id="9" age="30">
+		<plan>
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="00:00:00" end_time="08:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg num="0" mode="car" dep_time="08:00:00" trav_time="00:00:00" arr_time="08:00:00">
+			</leg>
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="work" facility="36" x="8500.0" y="9000.0" start_time="08:00:00" end_time="16:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg num="1" mode="car" dep_time="16:00:00" trav_time="00:00:00" arr_time="16:00:00">
+			</leg>
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="20:00:00" end_time="24:00:00" />
+		</plan>
+	</person>
+	
+	<!-- ====================================================================== -->
+	
+	<person id="10" age="30">
+		<plan>
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="00:00:00" end_time="08:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg num="0" mode="car" dep_time="08:00:00" trav_time="00:00:00" arr_time="08:00:00">
+			</leg>
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="work" facility="36" x="8500.0" y="9000.0" start_time="08:00:00" end_time="16:00:00" />
+			
+			<leg mode="walk" />
+			
+			<act type="parking" facility="36" x="8500.0" y="9000.0" dur="00:01" />
+			
+			<leg num="1" mode="car" dep_time="16:00:00" trav_time="00:00:00" arr_time="16:00:00">
+			</leg>
+			
+			<act type="parking" facility="1" x="0.0" y="500.0" dur="00:01" />
+			
+			<leg mode="walk" />
+			
+			<act type="home" facility="1" x="0.0" y="500.0" start_time="20:00:00" end_time="24:00:00" />
+		</plan>
+	</person>
+	
+	<!-- ====================================================================== -->
+</plans>

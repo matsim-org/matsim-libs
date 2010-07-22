@@ -24,12 +24,12 @@ import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
 
-public class ParkingIntegrationTest extends MatsimTestCase {
+public class ParkingIntegrationTestMedium extends MatsimTestCase {
  
 	// just to test, that the system runs without errors.
 	public void testScenario(){   
 		Controler controler;
-		String configFilePath="test/input/playground/wrashid/parkingSearch/planLevel/chessConfig2.xml";
+		String configFilePath="test/input/playground/wrashid/parkingSearch/planLevel/chessConfig4.xml";
 		controler = new Controler(configFilePath);
 		
 		new BaseControlerScenario(controler);
