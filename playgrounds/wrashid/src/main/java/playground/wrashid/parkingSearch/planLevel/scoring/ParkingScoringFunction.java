@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.lib.GeneralLib;
@@ -26,7 +27,7 @@ public abstract class ParkingScoringFunction {
 	double delta = 15 * 60;
 	int numberOfParkingsInSet = 10;
 	// int maxNumberOfParkingsInSet = 500;
-	int maxWalkingDistance = 5000; // im meters
+	int maxWalkingDistance = 2000; // im meters
 
 	// public int getNumberOfParkingsInSet() {
 	// return numberOfParkingsInSet;
@@ -69,14 +70,19 @@ public abstract class ParkingScoringFunction {
 		double parkingArrivalTime = ParkingRoot.getParkingOccupancyMaintainer().getParkingArrivalDepartureLog()
 				.get(plan.getPerson().getId()).getParkingArrivalDepartureList().get(indexOfCurrentParking).getStartTime();
 
+//		closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),
+//				numberOfParkingsInSet, numberOfParkingsInSet);
+		
+		// only look at parkings with in 5km range
 		closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),
-				numberOfParkingsInSet, numberOfParkingsInSet);
+				maxWalkingDistance);
+		
 
 		// check, if there is at least one parking in parking set which is free
 		// at the time of arrival (and the given delta interval)
 		// if that is not the case, enlarge the parking set.
 
-		if (!someParkingFromSetIsFreeAtArrivalTime(closestParkings, parkingArrivalTime, delta)) {
+//		if (!someParkingFromSetIsFreeAtArrivalTime(closestParkings, parkingArrivalTime, delta)) {
 			// numberOfParkingsInSet *= 2;
 			// closestParkings =
 			// ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),
@@ -84,16 +90,40 @@ public abstract class ParkingScoringFunction {
 
 			// if there are no parkings in the walking distance, we have to live
 			// with it (and report that supply shortage in the analysis)
-			closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),
-					maxWalkingDistance);
-		}
+			
+			
+			
+			
+			// if still no parking found, log this violation
+			if (!someParkingFromSetIsFreeAtArrivalTime(closestParkings, parkingArrivalTime, delta)) {
+				ParkingRoot.getParkingLog().add("all parkings in area full: " + targetActivity.getCoord().toString());
+			}
+			
+//		}
 
 		// score the given parkings
 
 		for (int i = 0; i < closestParkings.size(); i++) {
 			ActivityFacilityImpl curParking = closestParkings.get(i);
 			double score = getScore(targetActivity, plan, curParking.getId(), true);
+			
+			
+			// add a very small random number to the parking score
+			// this is different per agent and therefore solves the following artifacts
+			// of discretization:
+			// if two parkings have exactly the same score, one of them will come first in the 
+			// priority queue. If for all agents the same parking comes first, we have a preference
+			// of parking, which is not due to the score. By introducing the random factor, some agents
+			// will get he one parking first in the queue than others.
+			
+			// note: this adding of a small scores has to be small compared to the score of parking
+			// therefore a multiplication with that score is needed.
+			
+			// this is probably only need for experiments with artificial test scenarios.
+			score+= MatsimRandom.getRandom().nextDouble()*score/1000;
 
+			
+			
 			OrderedFacility orderedFacility = new OrderedFacility(curParking, score);
 			prio.add(orderedFacility);
 		}

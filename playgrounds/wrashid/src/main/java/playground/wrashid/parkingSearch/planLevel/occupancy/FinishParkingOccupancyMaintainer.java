@@ -3,6 +3,7 @@ package playground.wrashid.parkingSearch.planLevel.occupancy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
+import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingOccupancyAnalysis;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingTimesAnalysis;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
@@ -31,7 +32,10 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 				.getIterationFilename(event.getControler().getIterationNumber(), "parkingWalkingTimes.txt");
 		new ParkingWalkingTimesAnalysis(ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance())
 				.writeTxtFile(fileName);
-
+		fileName = event.getControler().getControlerIO()
+		.getIterationFilename(event.getControler().getIterationNumber(), "parkingLog.txt");
+		GeneralLib.writeList(ParkingRoot.getParkingLog(),fileName);
+		
 		// perform scoring
 		new ParkingScoreExecutor().performScoring(event);
 		

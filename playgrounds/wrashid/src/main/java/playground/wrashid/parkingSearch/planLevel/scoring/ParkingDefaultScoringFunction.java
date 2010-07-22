@@ -186,7 +186,7 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 	
 	private double getWalkingExplicitScorePart(ActivityImpl targetActivity, Id parkingFacilityId){
 		double zeroValueForNormalization=0;
-		double oneValueForNormalization=5000; // in meters
+		double oneValueForNormalization=2000; // in meters
 		
 		
 		double walkingPenalty = -1.0
@@ -199,6 +199,7 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 	
 	
 	/**
+	 * For each agent, it is assessed if he violates the parking capacity based on his time of arrival.
 	 * 
 	 * @param parkingFacilityId
 	 * @param parkingTimeInfo
@@ -209,10 +210,10 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		double parkingCapacityViolationPenalty=0;
 		
 		if (ParkingRoot.getParkingScoringFunction()
-				.isParkingFullAtTime(parkingFacilityId, parkingTimeInfo.getStartTime() - delta)) {
+				.isParkingFullAtTime(parkingFacilityId, parkingTimeInfo.getStartTime() - delta/10.0)) {
 			// if parking full before arrival => give full penalty
 			parkingCapacityViolationPenalty = -1.0;
-		} else if (ParkingRoot.getParkingScoringFunction()
+		} else if (!ParkingRoot.getParkingScoringFunction()
 				.isParkingFullAtTime(parkingFacilityId, parkingTimeInfo.getStartTime() - delta/10.0) && ParkingRoot.getParkingScoringFunction().isParkingFullAtTime(parkingFacilityId,
 				parkingTimeInfo.getStartTime() + delta)) {
 			// if parking not full just before arrival but full after arrival, then still give a small penalty, because we caused the parking

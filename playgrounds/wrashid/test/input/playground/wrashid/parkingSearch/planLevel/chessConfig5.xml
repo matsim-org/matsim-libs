@@ -22,7 +22,7 @@
 	<module name="controler">
 		<param name="outputDirectory" value="output/Test5" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="100" />
+		<param name="lastIteration" value="300" />
 	</module>
 
 	<module name="simulation">

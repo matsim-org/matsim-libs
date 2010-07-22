@@ -1,5 +1,7 @@
 package playground.wrashid.parkingSearch.planLevel.init;
 
+import java.util.ArrayList;
+
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -25,6 +27,7 @@ public class ParkingRoot {
 	private static ParkingOccupancyMaintainer parkingOccupancyMaintainer;
 	private static ParkingActivityDuration parkingActivityDuration;
 	private static ParkingScoringFunction parkingScoringFunction;
+	private static ArrayList<String> parkingLog;
 
 	public static void setParkingScoringFunction(ParkingScoringFunction parkingScoringFunction) {
 		ParkingRoot.parkingScoringFunction = parkingScoringFunction;
@@ -51,6 +54,7 @@ public class ParkingRoot {
 		lpfa = new LinkParkingFacilityAssociation(facilities, network);
 		pc = new ParkingCapacity(facilities);
 		parkingActivityDuration = new ParkingActivityDuration();
+		parkingLog=new ArrayList<String>();
 
 		String tempStringValue = controler.getConfig().findParam("parking", "parkingPriceScoreScalingFactor");
 		checkIfNull(tempStringValue);
@@ -105,6 +109,10 @@ public class ParkingRoot {
 
 	public static ParkingOccupancyMaintainer getParkingOccupancyMaintainer() {
 		return parkingOccupancyMaintainer;
+	}
+
+	public static ArrayList<String> getParkingLog() {
+		return parkingLog;
 	}
 
 }
