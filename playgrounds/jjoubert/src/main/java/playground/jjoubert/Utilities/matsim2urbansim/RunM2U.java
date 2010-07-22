@@ -21,6 +21,7 @@
 package playground.jjoubert.Utilities.matsim2urbansim;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
@@ -57,11 +58,19 @@ public class RunM2U {
 			throw new RuntimeException("Incorrect number of arguments provided.");
 		}
 		
+		CarTimeEstimator cte = new CarTimeEstimator(args[0], args[1], args[2], args[3]);
+		/*
+		 * TODO Check if the output file is not maybe open.
+		 */
+		File f = new File(cte.sb.getTravelDataFilename());
+		if(f.exists() && !f.canWrite()){
+			log.warn("Can not write to " + f.getAbsolutePath());
+			throw new RuntimeException("Ensure that file is not open in another application.");
+		}
 		/*
 		 * First get the private car travel time. Once I have this, I simply 
 		 * can convert it to public transport travel times. 
 		 */
-		CarTimeEstimator cte = new CarTimeEstimator(args[0], args[1], args[2], args[3]);
 		cte.estimateCarTime(args[4], args[5], false);
 		DenseDoubleMatrix2D odMatrix = cte.getOdMatrix();
 		List<MyZone> zones = cte.getZones();
@@ -119,7 +128,7 @@ public class RunM2U {
 						double walkTo = mc.convertWalkDistanceToWalkTime(distanceToPt.get(fromId)) / 60;
 						bw.write(String.valueOf(walkTo));
 						bw.write(",");
-						double ptTime = mc.convertCarTimeToPtTime(carTime) / 60;
+						double ptTime = mc.convertCarTimeToPtTime(odMatrix.get(row, col)) / 60;
 						bw.write(String.valueOf(ptTime));
 						bw.write(",");
 						double walkFrom = mc.convertWalkDistanceToWalkTime(distanceToPt.get(toId)) / 60;

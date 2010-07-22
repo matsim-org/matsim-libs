@@ -59,7 +59,16 @@ public class MyConverter {
 		Double walkTime = null;
 		switch (studyAreaCode) {
 		case 1: // eThekwini
-			walkTime = 5.859e-01 + 1.070e-02*walkDistance -1.464e-06*Math.pow(walkDistance,2) +2.695*Math.pow(walkDistance, 3);
+			double a = 5.858772e-01;
+			double b = 1.070014e-02;
+			double c = -1.464301e-06;
+			double d = 2.694900e-09;
+			double wt = a + b*walkDistance + c*Math.pow(walkDistance,2) + d*Math.pow(walkDistance, 3);
+			/*
+			 * Since the model fitting in R was done on walking time in MINUTES,
+			 * we need to convert it back to seconds, just to be consistent.
+			 */
+			walkTime = wt*60;
 			break;
 		default:
 			break;
@@ -92,8 +101,13 @@ public class MyConverter {
 			double d =	2.04099913494E-003;
 			double e =	1.09340128891E-004;
 			double f =	2.76219195512E-004;
-			double pt = a + b*ct + c*Math.pow(ct,2) + d*Math.pow(ct, 3) + 
-					 	e*Math.pow(ct, 4) + f*Math.pow(ct, 5);
+			double pt = Math.exp(
+					a + 
+					b*Math.log(ct) + 
+					c*Math.pow(Math.log(ct), 2) + 
+					d*Math.pow(Math.log(ct), 3) +
+					e*Math.pow(Math.log(ct), 4) + 
+					f*Math.pow(Math.log(ct), 5));
 			ptTime = pt*60;
 			break;
 
