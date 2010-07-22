@@ -28,30 +28,36 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
- *
- * ParallelEvents allows parallelization for events handling.
- * Usage: First create an object of this class. Before each iteration, call initProcessing.
- * After each iteration, call finishProcessing. This has already been incorporated into
- * the Controller.
- *
+ * 
+ * ParallelEvents allows parallelization for events handling. Usage: First
+ * create an object of this class. Before each iteration, call initProcessing.
+ * After each iteration, call finishProcessing. This has already been
+ * incorporated into the Controller.
+ * 
  * Usage via config.xml:
+ * 
  * <pre>
  * <module name="parallelEventHandling">
  *  <param name="numberOfThreads" value="2" />
  * </module>
  * </pre>
- *
+ * 
  * optionally you can also specify the estimated number of events per iteration:
+ * 
  * <pre>
  *  <param name="estimatedNumberOfEvents" value="10000000" />
  * </pre>
- * (not really needed, but can make performance slightly faster in larger simulations).
+ * 
+ * (not really needed, but can make performance slightly faster in larger
+ * simulations).
+ * 
  * @see http://www.matsim.org/node/238
  * @author rashid_waraich
- *
+ * 
  */
 public class ParallelEventsManagerImpl extends EventsManagerImpl {
 
+	private boolean parallelMode = true;
 	private int numberOfThreads;
 	private EventsManagerImpl[] events = null;
 	private ProcessEventThread[] eventsProcessThread = null;
@@ -66,20 +72,20 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	// quite well for larger simulations with 10 million events
 	private int preInputBufferMaxLength = 100000;
 
-
 	/**
-	 * @param numberOfThreads -
-	 *            specify the number of threads used for the events handler
+	 * @param numberOfThreads
+	 *            - specify the number of threads used for the events handler
 	 */
 	public ParallelEventsManagerImpl(int numberOfThreads) {
 		init(numberOfThreads);
 	}
 
 	/**
-	 *
+	 * 
 	 * @param numberOfThreads
 	 * @param estimatedNumberOfEvents
-	 * Only use this constructor for larger simulations (20M+ events).
+	 *            Only use this constructor for larger simulations (20M+
+	 *            events).
 	 */
 	public ParallelEventsManagerImpl(int numberOfThreads, int estimatedNumberOfEvents) {
 		preInputBufferMaxLength = estimatedNumberOfEvents / 10;
@@ -88,11 +94,16 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 
 	@Override
 	public void processEvent(final Event event) {
-		for (int i = 0; i < eventsProcessThread.length; i++) {
-			eventsProcessThread[i].processEvent(event);
+		if (parallelMode) {
+			for (int i = 0; i < eventsProcessThread.length; i++) {
+				eventsProcessThread[i].processEvent(event);
+			}
+		} else {
+			for (int i = 0; i < eventsProcessThread.length; i++) {
+				eventsProcessThread[i].getEvents().processEvent(event);
+			}
 		}
 	}
-
 
 	@Override
 	public void addHandler(final EventHandler handler) {
@@ -102,51 +113,46 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 		}
 	}
 
-
 	@Override
 	public void resetHandlers(final int iteration) {
 		synchronized (this) {
-			for (int i=0;i<events.length;i++){
+			for (int i = 0; i < events.length; i++) {
 				events[i].resetHandlers(iteration);
 			}
 		}
 	}
 
-
 	@Override
 	public void resetCounter() {
 		synchronized (this) {
-			for (int i=0;i<events.length;i++){
+			for (int i = 0; i < events.length; i++) {
 				events[i].resetCounter();
 			}
 		}
 	}
 
-
 	@Override
 	public void removeHandler(final EventHandler handler) {
 		synchronized (this) {
-			for (int i=0;i<events.length;i++){
+			for (int i = 0; i < events.length; i++) {
 				events[i].removeHandler(handler);
 			}
 		}
 	}
 
-
 	@Override
 	public void clearHandlers() {
 		synchronized (this) {
-			for (int i=0;i<events.length;i++){
+			for (int i = 0; i < events.length; i++) {
 				events[i].clearHandlers();
 			}
 		}
 	}
 
-
 	@Override
 	public void printEventHandlers() {
 		synchronized (this) {
-			for (int i=0;i<events.length;i++){
+			for (int i = 0; i < events.length; i++) {
 				events[i].printEventHandlers();
 			}
 		}
@@ -166,6 +172,9 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	// When one simulation iteration is finish, it must call this method,
 	// so that it can communicate to the threads, that the simulation is
 	// finished and that it can await the event handler threads.
+
+	// after call to this method, all event processing is done not in parallel
+	// anymore
 	@Override
 	public void finishProcessing() {
 		for (int i = 0; i < eventsProcessThread.length; i++) {
@@ -179,16 +188,24 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 		} catch (BrokenBarrierException e) {
 			e.printStackTrace();
 		}
+
+		/*
+		 * introduction of the parallel mode variable was required, because of
+		 * the following reason: previously no event handling was possible after
+		 * the end of the simulation. e.g. adding money events in the after
+		 * mobsim controler listener would not be invoked by parallelEventHandling
+		 */
+
+		parallelMode = false;
 	}
 
 	// create event handler threads
 	// prepare for next iteration
 	@Override
-	public void initProcessing(){
+	public void initProcessing() {
 		// reset this class, so that it can be reused for the next iteration
 		for (int i = 0; i < numberOfThreads; i++) {
-			eventsProcessThread[i] = new ProcessEventThread(events[i],
-					preInputBufferMaxLength, barrier);
+			eventsProcessThread[i] = new ProcessEventThread(events[i], preInputBufferMaxLength, barrier);
 			new Thread(eventsProcessThread[i], "Events-" + i).start();
 		}
 	}

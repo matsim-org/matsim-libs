@@ -30,18 +30,17 @@ import org.matsim.core.gbl.Gbl;
 
 /**
  * The wrapper around the Events class for allowing parallelization.
- *
+ * 
  * @author rashid_waraich
  */
 public class ProcessEventThread implements Runnable {
 	ArrayList<Event> preInputBuffer = null;
 	ConcurrentListSPSC<Event> eventQueue = null;
-	EventsManager events;
+	private EventsManager events;
 	CyclicBarrier cb = null;
 	private int preInputBufferMaxLength;
 
-	public ProcessEventThread(EventsManager events, int preInputBufferMaxLength,
-			CyclicBarrier cb) {
+	public ProcessEventThread(EventsManager events, int preInputBufferMaxLength, CyclicBarrier cb) {
 		this.events = events;
 		this.preInputBufferMaxLength = preInputBufferMaxLength;
 		eventQueue = new ConcurrentListSPSC<Event>();
@@ -70,7 +69,7 @@ public class ProcessEventThread implements Runnable {
 				if (nextEvent instanceof LastEventOfIteration) {
 					break;
 				}
-				events.processEvent(nextEvent);
+				getEvents().processEvent(nextEvent);
 			}
 		}
 		// inform main thread, that processing finished
@@ -92,6 +91,10 @@ public class ProcessEventThread implements Runnable {
 		processEvent(new LastEventOfIteration(0.0));
 		eventQueue.add(preInputBuffer);
 		preInputBuffer.clear();
+	}
+
+	public EventsManager getEvents() {
+		return events;
 	}
 
 }
