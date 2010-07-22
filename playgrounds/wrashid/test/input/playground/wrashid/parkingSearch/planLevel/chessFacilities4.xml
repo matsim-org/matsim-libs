@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE facilities SYSTEM "http://www.matsim.org/files/dtd/facilities_v1.dtd">
+
+<facilities name="Facilities_Test1">
+
+<!-- on all outside boundries/links of the chess board, there are parking facilities -->
+
+<!-- ====================================================================== -->
+
+	<facility id="1" x="0.0" y="500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="2" x="0.0" y="1500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="3" x="0.0" y="2500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="4" x="0.0" y="3500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="5" x="0.0" y="4500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="6" x="0.0" y="5500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="7" x="0.0" y="6500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="8" x="0.0" y="7500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="9" x="0.0" y="8500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="5" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="10" x="9000.0" y="500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="11" x="9000.0" y="1500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="12" x="9000.0" y="2500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="13" x="9000.0" y="3500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="14" x="9000.0" y="4500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="15" x="9000.0" y="5500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="16" x="9000.0" y="6500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="17" x="9000.0" y="7500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="18" x="9000.0" y="8500.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="19" x="500.0" y="0.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="20" x="1500.0" y="0.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="21" x="2500.0" y="0.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="22" x="3500.0" y="0.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="23" x="4500.0" y="0.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="24" x="5500.0" y="0.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="25" x="6500.0" y="0.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="26" x="7500.0" y="0.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="27" x="8500.0" y="0.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="28" x="500.0" y="9000.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="29" x="1500.0" y="9000.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="30" x="2500.0" y="9000.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="31" x="3500.0" y="9000.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="32" x="4500.0" y="9000.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="33" x="5500.0" y="9000.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="34" x="6500.0" y="9000.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="35" x="7500.0" y="9000.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="36" x="8500.0" y="9000.0">
+		<activity type="home"/>
+		<activity type="work"/>
+		<activity type="parking">
+			<capacity value="2" />
+		</activity>
+	</facility>
+
+
+<!-- ====================================================================== -->
+
+	<facility id="37" x="4500.0" y="0.0">
+		<activity type="shopping"/>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="38" x="4500.0" y="2000.0">
+		<activity type="shopping"/>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="39" x="4500.0" y="4000.0">
+		<activity type="shopping"/>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="40" x="4500.0" y="6000.0">
+		<activity type="shopping"/>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="41" x="4500.0" y="8000.0">
+		<activity type="shopping"/>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="42" x="4500.0" y="1000.0">
+		<activity type="leisure"/>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="43" x="4500.0" y="3000.0">
+		<activity type="leisure"/>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="44" x="4500.0" y="5000.0">
+		<activity type="leisure"/>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="45" x="4500.0" y="7000.0">
+		<activity type="leisure"/>
+	</facility>
+
+<!-- ====================================================================== -->
+
+	<facility id="46" x="4500.0" y="9000.0">
+		<activity type="leisure"/>
+	</facility>
+
+<!-- ====================================================================== -->
+</facilities>
+
