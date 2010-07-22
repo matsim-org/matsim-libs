@@ -145,7 +145,7 @@ public abstract class ParkingScoringFunction {
 		time = GeneralLib.projectTimeWithin24Hours(time);
 		ParkingCapacityFullLogger parkingCapFullLogger = parkingCapacityFullTimes.get(parkingFacilityId);
 
-		if (parkingCapFullLogger == null || !parkingCapFullLogger.isParkingFullAtTime(time)) {
+		if (parkingCapFullLogger != null && parkingCapFullLogger.isParkingFullAtTime(time)) {
 			return true;
 		}
 		return false;

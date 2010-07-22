@@ -151,11 +151,20 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		// then we divide this by the number of act-legs. Although we could make more checks (e.g. how many parkings are there, etc.)
 		// we just want to get a general since for the score, so that the penalty fits into the whole scoring scheme.
 		
-		ScoringFunction scoringFunction = GlobalRegistry.controler.getScoringFunctionFactory().createNewScoringFunction(plan);
-		scoringFunction.startActivity(0.0, (Activity) plan.getPlanElements().get(0));
-		scoringFunction.endActivity(23*3600);
-		double penaltyScoreNorm = -1.0*scoringFunction.getScore()/plan.getPlanElements().size();
-		scoringFunction.reset();
+//		ScoringFunction scoringFunction = GlobalRegistry.controler.getScoringFunctionFactory().createNewScoringFunction(plan);
+//		scoringFunction.startActivity(0.0, (Activity) plan.getPlanElements().get(0));
+//		scoringFunction.endActivity(23*3600);
+//		scoringFunction.finish();
+		double penaltyScoreNorm=50;
+//		Plan lastSelectedPlan=ParkingRoot.getParkingOccupancyMaintainer().getLastSelectedPlan().get(personId);
+//		if (lastSelectedPlan.getScore()==null){
+//			// during first iteration, when it is not initialized
+//			penaltyScoreNorm = 20;
+//		}else {
+//			penaltyScoreNorm = lastSelectedPlan.getScore() /plan.getPlanElements().size();
+//		}
+		
+		
 		
 
 		double parkingPriceScore = getParkingPriceScore(parkingFacilityId, parkingTimeInfo, personId);
@@ -169,6 +178,7 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		weightedScore+=parkingWalkingPenalty;
 		weightedScore+=parkingActivityDurationPenalty;
 		weightedScore+=6*parkingParkingCapacityViolationPenalty;
+		weightedScore/=9.0; // for normailization
 		
 		return weightedScore*penaltyScoreNorm;
 	}
@@ -201,13 +211,13 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		if (ParkingRoot.getParkingScoringFunction()
 				.isParkingFullAtTime(parkingFacilityId, parkingTimeInfo.getStartTime() - delta)) {
 			// if parking full before arrival => give full penalty
-			parkingCapacityViolationPenalty = 1;
+			parkingCapacityViolationPenalty = -1.0;
 		} else if (ParkingRoot.getParkingScoringFunction()
 				.isParkingFullAtTime(parkingFacilityId, parkingTimeInfo.getStartTime() - delta/10.0) && ParkingRoot.getParkingScoringFunction().isParkingFullAtTime(parkingFacilityId,
 				parkingTimeInfo.getStartTime() + delta)) {
 			// if parking not full just before arrival but full after arrival, then still give a small penalty, because we caused the parking
 			// to get full and this might cause some problem in the future
-			parkingCapacityViolationPenalty = 0.1;
+			parkingCapacityViolationPenalty = -0.1;
 		} else {
 			// if parking not full before and after our arrival => no problem.
 			parkingCapacityViolationPenalty = 0;

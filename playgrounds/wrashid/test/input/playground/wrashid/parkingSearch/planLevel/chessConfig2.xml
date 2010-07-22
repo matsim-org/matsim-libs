@@ -115,4 +115,8 @@
 		<param name="maxRecursions" value="20"/>
 	</module>
 
+	<module name="parallelEventHandling">
+    <param name="numberOfThreads" value="1" />
+	</module>
+
 </config>

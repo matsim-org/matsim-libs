@@ -40,7 +40,7 @@ public class MainPerLinkParkingFacilityGenerator {
 		for (Link link : net.getLinks().values()) {
 			// 5m long car, half of the street available for parking
 			// don't do this change - will be done later probably
-			int parkingCapacity = (int) Math.round(Math.ceil(link.getLength() / 2.0 / 5.0));
+			int parkingCapacity = (int) Math.round(Math.ceil(link.getLength() / 2.0 / 5.0/100.0/2));
 			totalNumberOfParkingsAdded+=parkingCapacity;
 			ActivityFacilityImpl activityFacility = activityFacilities.createFacility(new IdImpl(parkPlatzId), link.getCoord());
 			activityFacility.createActivityOption("parking").setCapacity(parkingCapacity);

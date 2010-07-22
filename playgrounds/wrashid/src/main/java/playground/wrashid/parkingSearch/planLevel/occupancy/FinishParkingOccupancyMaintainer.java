@@ -13,9 +13,10 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 	private ParkingOccupancyMaintainer parkingOccupancyMaintainer;
 
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		// close handler processing
 		ParkingRoot.getParkingOccupancyMaintainer().closeAllLastParkings();
 
-		// write also the occupancy statistics at this stage of the simulation
+		// write occupancy statistics
 
 		ParkingOccupancyAnalysis poaWriter = new ParkingOccupancyAnalysis(ParkingRoot.getParkingOccupancyMaintainer()
 				.getParkingOccupancyBins(), ParkingRoot.getParkingCapacity());
@@ -31,9 +32,7 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		new ParkingWalkingTimesAnalysis(ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance())
 				.writeTxtFile(fileName);
 
-		
-		
-		
+		// perform scoring
 		new ParkingScoreExecutor().performScoring(event);
 		
 	}

@@ -19,23 +19,14 @@ package playground.wrashid.parkingSearch.planLevel;
  *                                                                         *
  * *********************************************************************** */
 
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.lib.EventHandlerAtStartupAdder;
-import playground.wrashid.lib.GlobalRegistry;
-import playground.wrashid.parkingSearch.planLevel.init.InitializeParkings;
-import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
-import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
-import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
-import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
-import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunctionTestNumberOfParkings;
-import playground.wrashid.parkingSearch.planLevel.scoring.ParkingDefaultScoringFunction;
 
-public class MainTest extends MatsimTestCase {
+public class ParkingIntegrationTest extends MatsimTestCase {
  
+	// just to test, that the system runs without errors.
 	public void testScenario(){   
 		Controler controler;
 		String configFilePath="test/input/playground/wrashid/parkingSearch/planLevel/chessConfig2.xml";
