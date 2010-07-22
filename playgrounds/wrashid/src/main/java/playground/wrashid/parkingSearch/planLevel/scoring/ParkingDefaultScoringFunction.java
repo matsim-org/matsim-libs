@@ -155,13 +155,13 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 //		scoringFunction.startActivity(0.0, (Activity) plan.getPlanElements().get(0));
 //		scoringFunction.endActivity(23*3600);
 //		scoringFunction.finish();
-		double penaltyScoreNorm=1000;
+		double penaltyScoreNorm=30;
 //		Plan lastSelectedPlan=ParkingRoot.getParkingOccupancyMaintainer().getLastSelectedPlan().get(personId);
 //		if (lastSelectedPlan.getScore()==null){
 //			// during first iteration, when it is not initialized
-//			penaltyScoreNorm = 20;
+//			penaltyScoreNorm = 1000;
 //		}else {
-//			penaltyScoreNorm = lastSelectedPlan.getScore() /plan.getPlanElements().size();
+//			penaltyScoreNorm = 4* lastSelectedPlan.getScore() /plan.getPlanElements().size();
 //		}
 		
 		
@@ -177,8 +177,8 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		weightedScore+=parkingPriceScore;
 		weightedScore+=2*parkingWalkingPenalty;
 		weightedScore+=parkingActivityDurationPenalty;
-		weightedScore+=6*parkingParkingCapacityViolationPenalty;
-		weightedScore/=10.0; // for normailization
+		weightedScore+=30*parkingParkingCapacityViolationPenalty;
+		weightedScore/=35.0; // for normailization
 		
 		return weightedScore*penaltyScoreNorm;
 	}

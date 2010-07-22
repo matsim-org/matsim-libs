@@ -18,6 +18,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 
+import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
 
 public class PlanGeneratorWithParkingActivities {
@@ -129,14 +130,7 @@ public class PlanGeneratorWithParkingActivities {
 	}
 
 	public void writePlans(String outputPlansFile) {
-		PopulationWriter popWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		popWriter.writeStartPlans(outputPlansFile);
-
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			popWriter.writePerson(person);
-		}
-
-		popWriter.writeEndPlans();
+		GeneralLib.writePersons(scenario.getPopulation().getPersons().values(), outputPlansFile,network);
 	}
 
 }

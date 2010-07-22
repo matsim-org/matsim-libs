@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.StringTokenizer;
 
 import org.matsim.api.core.v01.Coord;
@@ -16,8 +17,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -25,10 +26,12 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.charts.XYLineChart;
-
+import org.matsim.core.population.PopulationWriter;
 
 public class GeneralLib {
 
@@ -117,23 +120,24 @@ public class GeneralLib {
 
 	/**
 	 * TODO: write test!!!!
+	 * 
 	 * @param matrix
 	 * @param numberOfRows
 	 * @param numberOfColumns
 	 * @return
 	 */
-	public static double[][] trimMatrix(double[][] matrix, int numberOfRows,int numberOfColumns){
-		double newMatrix[][]=new double[numberOfRows][numberOfColumns];
-	
-		for (int i=0;i<numberOfRows;i++){
-			for (int j=0;j<numberOfColumns;j++){
-				newMatrix[i][j]=matrix[i][j];
+	public static double[][] trimMatrix(double[][] matrix, int numberOfRows, int numberOfColumns) {
+		double newMatrix[][] = new double[numberOfRows][numberOfColumns];
+
+		for (int i = 0; i < numberOfRows; i++) {
+			for (int j = 0; j < numberOfColumns; j++) {
+				newMatrix[i][j] = matrix[i][j];
 			}
 		}
-		
+
 		return newMatrix;
 	}
-	
+
 	/**
 	 * if headerLine=null, then add no line at top of file. "\n" is added at end
 	 * of first line by this method.
@@ -391,24 +395,24 @@ public class GeneralLib {
 
 	/**
 	 * 24 hour check is performed (no projection required as pre-requisite).
+	 * 
 	 * @param startIntervalTime
 	 * @param endIntervalTime
 	 * @return
 	 */
-	public static double getIntervalDuration(double startIntervalTime, double endIntervalTime){
+	public static double getIntervalDuration(double startIntervalTime, double endIntervalTime) {
 		double secondsInOneDay = 60 * 60 * 24;
-		startIntervalTime=projectTimeWithin24Hours(startIntervalTime);
-		endIntervalTime=projectTimeWithin24Hours(endIntervalTime);
-		
-		
-		if (startIntervalTime<endIntervalTime){
-			return endIntervalTime-startIntervalTime;
+		startIntervalTime = projectTimeWithin24Hours(startIntervalTime);
+		endIntervalTime = projectTimeWithin24Hours(endIntervalTime);
+
+		if (startIntervalTime < endIntervalTime) {
+			return endIntervalTime - startIntervalTime;
 		} else {
 			return endIntervalTime + (secondsInOneDay - startIntervalTime);
 		}
-	
+
 	}
-	
+
 	/**
 	 * Interval start and end are inclusive.
 	 * 
@@ -442,7 +446,7 @@ public class GeneralLib {
 	}
 
 	public static double getDistance(Coord coord, Link link) {
-		return GeneralLib.getDistance(coord,link.getCoord());
+		return GeneralLib.getDistance(coord, link.getCoord());
 	}
 
 	public static double getDistance(Coord coordA, Coord coordB) {
@@ -451,4 +455,32 @@ public class GeneralLib {
 		return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 	}
 
+	/**
+	 * TODO: write test.
+	 * 
+	 * @param persons
+	 * @param outputPlansFileName
+	 * @param network
+	 */
+	public static void writePersons(Collection<? extends Person> persons, String outputPlansFileName, NetworkLayer network) {
+		PopulationWriter popWriter = new PopulationWriter(new PopulationImpl(null), network);
+		popWriter.writeStartPlans(outputPlansFileName);
+
+		for (Person person : persons) {
+			popWriter.writePerson(person);
+		}
+
+		popWriter.writeEndPlans();
+	}
+
+	/**
+	 * copy the attributes of the given person object to a new person object.
+	 * @param person
+	 * @return
+	 */
+	public static Person copyPerson(Person person) {
+		Person copyPerson=new PersonImpl(person.getId());
+		copyPerson.addPlan(person.getSelectedPlan());
+		return copyPerson;
+	}
 }
