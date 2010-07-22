@@ -92,7 +92,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		String shapefile = folder.getParent() + "/zones.shp";
 		MyZoneReader mzr = new MyZoneReader(shapefile);
 		mzr.readZones(1);
-		zones = (List<MyZone>) mzr.getZones();
+		zones = (List<MyZone>) mzr.getZoneList();
 		
 		// Set up scenario.
 		scenario = new ScenarioImpl();

@@ -24,11 +24,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -44,7 +47,8 @@ public class MyZoneReader {
 
 	private final Logger log = Logger.getLogger(MyZoneReader.class);
 	private String shapefile;
-	private List<MyZone> zones;
+	private List<MyZone> zoneList;
+	private Map<Id, MyZone> zoneMap;
 	private QuadTree<SAZone> quadTree;
 
 	private double xMin = Double.POSITIVE_INFINITY;
@@ -78,6 +82,7 @@ public class MyZoneReader {
 	 * <ul>
 	 * 		<li> eThekwini transport zones - 1
 	 * 		<li> eThekwini sub-place - 2
+	 * 		<li> eThekwini parcel - 1
 	 * 		<li> Gauteng GAP zones - 1
 	 * 		<li> KwazuluNatal GAP - 2
 	 * 		<li> Western Cape GAP - 2
@@ -87,7 +92,8 @@ public class MyZoneReader {
 	@SuppressWarnings("unchecked")
 	public void readZones (int idField){
 		log.info("Reading shapefile " + this.shapefile);		
-		this.zones = new ArrayList<MyZone>();
+		this.zoneList = new ArrayList<MyZone>();
+		this.zoneMap = new HashMap<Id, MyZone>();
 		FeatureSource fs = null;
 		MultiPolygon mp = null;
 		try {	
@@ -113,7 +119,8 @@ public class MyZoneReader {
 						}
 					}
 					MyZone newZone = new MyZone(polygonArray, mp.getFactory(), new IdImpl(name));
-					zones.add(newZone);
+					zoneList.add(newZone);
+					zoneMap.put(newZone.getId(), newZone);
 
 					/*
 					 * Determine the extent of the QuadTree.
@@ -155,8 +162,12 @@ public class MyZoneReader {
 		return quadTree;
 	}
 	
-	public List<MyZone> getZones(){
-		return this.zones;
+	public List<MyZone> getZoneList(){
+		return this.zoneList;
+	}
+	
+	public Map<Id,MyZone> getZoneMap(){
+		return this.zoneMap;
 	}
 
 	public String getShapefileName() {

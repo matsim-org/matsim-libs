@@ -129,7 +129,7 @@ public class CarTimeEstimator {
 		// 1a. Read the transportation zones. 
 		MyZoneReader r = new MyZoneReader(sb.getTransportZoneShapefile());
 		r.readZones(sb.getIdField());
-		zones = r.getZones();
+		zones = r.getZoneList();
 		// 1b. Create new scenario.
 		Scenario s = new ScenarioImpl();
 		// 1c. Read the network.

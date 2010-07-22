@@ -213,7 +213,7 @@ public class WalkDistanceEstimator {
 		// Read subplace shapefile.
 		MyZoneReader mzr = new MyZoneReader(sb.getSubPlaceShapefile());
 		mzr.readZones(sb.getSubplaceIdField());
-		spList = mzr.getZones();
+		spList = mzr.getZoneList();
 		log.info("Done reading sub-place shapefile: " + spList.size() + " entries for " + studyArea);
 		
 		distanceMap = new TreeMap<Id, Double>();

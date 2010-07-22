@@ -52,8 +52,8 @@ public class MyZoneReaderTest extends MatsimTestCase{
 		String shapefile = folder.getParent() + "/zones.shp";
 		MyZoneReader mzr = new MyZoneReader(shapefile);
 		mzr.readZones(1);
-		assertEquals("Wrong return type.", ArrayList.class, mzr.getZones().getClass());
-		List<MyZone> zones = (List<MyZone>) mzr.getZones();
+		assertEquals("Wrong return type.", ArrayList.class, mzr.getZoneList().getClass());
+		List<MyZone> zones = (List<MyZone>) mzr.getZoneList();
 		assertEquals("Wrong number of objects.", 4, zones.size());
 		MyZone z = zones.get(0);
 		assertEquals("Wrong Id for first zone.", "0", z.getId().toString());
