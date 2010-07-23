@@ -3,7 +3,9 @@ package playground.mmoyo.Validators;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
@@ -14,6 +16,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.transitSchedule.api.TransitRouteStop;
 
 import playground.mmoyo.PTRouter.LogicFactory;
 import playground.mmoyo.PTRouter.MyDijkstra;
@@ -22,13 +25,12 @@ import playground.mmoyo.PTRouter.MyDijkstra;
  * Identifies isolated TransitRoutes
  */
 public class TransitRouteValidator {
-
 	private NetworkLayer logicNetwork;
 	private TransitSchedule transitSchedule;
-
+	private static final Logger log = Logger.getLogger(TransitRouteValidator.class);
+	
 	public TransitRouteValidator(TransitSchedule transitSchedule){
-		this.logicNetwork =	new LogicFactory(transitSchedule).getLogicNet();
-		getIsolatedPTLines();
+		this.transitSchedule = transitSchedule;
 	}
 
 	public void getIsolatedPTLines(){
@@ -36,6 +38,7 @@ public class TransitRouteValidator {
 		int isolated=0;
 		int comparisons=0;
 		PseudoTimeCost pseudoTimeCost = new PseudoTimeCost();
+		this.logicNetwork =	new LogicFactory(this.transitSchedule).getLogicNet();
 		LeastCostPathCalculator expressDijkstra = new MyDijkstra(logicNetwork, pseudoTimeCost, pseudoTimeCost);
 
 		List<Id[]> ptLineIdList = new ArrayList<Id[]>();
@@ -83,12 +86,38 @@ public class TransitRouteValidator {
 		public double getLinkTravelCost(final Link link, final double time) {
 			return 1.0;
 		}
-
+		
 		public double getLinkTravelTime(final Link link, final double time) {
 			return 1.0;
 		}
 	}
 
+	public void findRepetedStops(){
+		final String ERROR_LOG = " the stop already exist in transit route ";		
+		for (TransitLine line : this.transitSchedule.getTransitLines().values()){
+			for (TransitRoute route :line.getRoutes().values()){
+				List<Id> stopIdList = new ArrayList<Id>();
+				log.info(route.getId());
+				for (TransitRouteStop stop:  route.getStops()){
+					if (stopIdList.contains(stop.getStopFacility().getId())){
+						log.error(stop.getStopFacility().getId() + ERROR_LOG +  route.getId() );
+					}
+					stopIdList.add(stop.getStopFacility().getId());
+				}
+			}
+		}
+	}
 
+	public static void main(String[] args) {
+		String config = null;
 
+		if (args.length==1){
+			config = args[0];
+		}else{
+			config= "../playgrounds/mmoyo/output/trRoutVis/config.xml";
+		}
+		ScenarioImpl scenarioImpl = new playground.mmoyo.utils.TransScenarioLoader().loadScenario(config);
+		new TransitRouteValidator(scenarioImpl.getTransitSchedule()).findRepetedStops();
+	}
+	
 }

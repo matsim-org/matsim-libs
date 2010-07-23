@@ -22,7 +22,6 @@ package playground.mmoyo.ptRouterAdapted;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 
