@@ -49,7 +49,6 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonAgent;
@@ -510,7 +509,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	@Override
 	public void scheduleActivityEnd(final PersonDriverAgent agent) {
 		this.activityEndsList.add(agent);
-		int planElementIndex = agent.getPerson().getSelectedPlan().getPlanElements().indexOf(agent.getCurrentPlanElement()) ; // yyyy Aaaarrrrgggghhh
+//		int planElementIndex = agent.getPerson().getSelectedPlan().getPlanElements().indexOf(agent.getCurrentPlanElement()) ; // yyyy Aaaarrrrgggghhh
 //		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 //			queueSimulationFeature.afterActivityBegins(agent);
 //		}
@@ -564,8 +563,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 			QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 			if (vehicle == null) {
 				// try to fix it somehow
-				if (this.teleportVehicles && (agent instanceof DriverAgent)) {
-					vehicle = ((DriverAgent) agent).getVehicle();
+				if (this.teleportVehicles) {
+					vehicle = agent.getVehicle();
 					if (vehicle.getCurrentLink() != null) {
 						if (this.cntTeleportVehicle < 9) {
 							this.cntTeleportVehicle++;
