@@ -42,7 +42,6 @@ public class MyNetVisScrollPane extends JScrollPane {
 		p.translate(- viewRect.width / 2, - viewRect.height / 2); // center 
 		getViewport().setViewPosition(p);
 		revalidate();
-		this.otfSwingDrawer.hostControlBar.updateScaleLabel();
 	}
 
 	public double scaleNetwork(Rectangle destrect, float factor) {

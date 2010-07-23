@@ -275,7 +275,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		if (e.getSource() == this.agentSizeSlider) {
 			this.visConfig.setAgentSize(this.agentSizeSlider.getValue());
 			if (this.host != null)
-				this.host.invalidateDrawers();
+				this.host.getOTFHostControl().invalidateDrawers();
 		 } else if (e.getSource() == this.linkWidthSlider) {
 			 this.visConfig.setLinkWidth(this.linkWidthSlider.getValue());
 			 if (this.host != null){
@@ -310,7 +310,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				if (c != null) {
 					this.visConfig.setBackgroundColor(c);
 					if (this.host != null) {
-						this.host.invalidateDrawers();
+						this.host.getOTFHostControl().invalidateDrawers();
 					}
 				}
 			}
@@ -320,7 +320,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				if (c != null) {
 					this.visConfig.setNetworkColor(c);
 					if (this.host != null) {
-						this.host.invalidateDrawers();
+						this.host.getOTFHostControl().invalidateDrawers();
 					}
 				}
 			}

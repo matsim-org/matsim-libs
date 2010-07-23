@@ -37,7 +37,7 @@ import org.matsim.vis.otfvis.data.OTFClientQuad;
  *
  */
 public interface OTFDrawer {
-	public void invalidate(int time) throws RemoteException;
+	public void invalidate() throws RemoteException;
 	public void redraw();
 	public void handleClick(Point2D.Double point, int mouseButton, MouseEvent e);
 	public OTFClientQuad getQuad();

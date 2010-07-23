@@ -1,6 +1,5 @@
 package org.matsim.vis.otfvis.opengl.gui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -8,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 
@@ -23,7 +21,6 @@ import javax.swing.event.ChangeListener;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.gui.OTFHostControl;
-import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 
@@ -39,36 +36,25 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 
 	private static final long serialVersionUID = 1L;
 	
-	private class MyJSlider extends JSlider {
+	private class TimestepSlider extends JSlider {
 	
 		private static final long serialVersionUID = 1L;
 	
-		public MyJSlider(int horizontal, int intValue, int intValue2, int time) {
-			super(horizontal,intValue, intValue2, time);
+		public TimestepSlider() {
+			super(hostControl.getSimTimeModel());
 		}
 	
 		@Override
-		synchronized public void paint(Graphics g) {
+		public void paint(Graphics g) {
 			super.paint(g);
 			Rectangle bounds = g.getClipBounds();
 			bounds.grow(-32, 0);
-	
-			double delta = getMaximum() - getMinimum();
-			// get cached timesteps for hostctrl and draw them
-			synchronized (cachedTime) {
-				for(Integer time : cachedTime) {
-					g.setColor(Color.LIGHT_GRAY);
-					g.fillRect(bounds.x + (int)(bounds.width*((time- getMinimum())/delta)), (int)bounds.getCenterY(), 5, 5);
-				}
-			}
 		}
 	}
 
 	private final OTFHostControl hostControl;
 	
-	private JSlider times;
-	
-	Collection<Integer> cachedTime = new ArrayList<Integer>();
+	private JSlider timestepSlider;
 
 	Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 
@@ -79,10 +65,51 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	public OTFTimeLine(String string, OTFHostControl hostControl) {
 		super(string);
 		this.hostControl = hostControl;
-		
-
 		addSlider();
+		addLoopButtons();
+		this.setVisible(true);
+	}
 
+	private void addSlider() {
+		//Create the slider.
+		Collection<Double> steps = hostControl.getTimeStepsdrawer();
+		if ((steps == null) || (steps.size() == 0)) {
+			timestepSlider = new TimestepSlider();
+			return; // nothing to display
+		}
+		
+		int min = hostControl.getSimTimeModel().getMinimum();
+		int max = hostControl.getSimTimeModel().getMaximum();
+		timestepSlider = new TimestepSlider();
+	
+		timestepSlider.getModel().addChangeListener(this);
+		timestepSlider.setMajorTickSpacing((min-max)/10);
+		timestepSlider.setPaintTicks(true);
+	
+		//Create the label table.
+		//PENDING: could use images, but we don't have any good ones.
+		Double[] dsteps = steps.toArray(new Double[steps.size()]);
+		labelTable.put(Integer.valueOf( min ),
+				new JLabel(Time.writeTime(dsteps[0], Time.TIMEFORMAT_HHMM)));
+		//new JLabel(createImageIcon("images/stop.gif")) );
+		labelTable.put(Integer.valueOf( max ),
+				new JLabel(Time.writeTime(dsteps[dsteps.length-1], Time.TIMEFORMAT_HHMM)) );
+		//new JLabel(createImageIcon("images/fast.gif")) );
+	
+		int n = dsteps.length/10 + 1;
+	
+		for(int i= n; i< dsteps.length-1; i+=n) {
+			labelTable.put(Integer.valueOf( dsteps[i].intValue() ),
+					new JLabel(Time.writeTime(dsteps[i], Time.TIMEFORMAT_HHMM)) );
+		}
+		timestepSlider.setLabelTable(labelTable);
+	
+		timestepSlider.setPaintLabels(true);
+		timestepSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
+		add(timestepSlider);
+	}
+
+	private void addLoopButtons() {
 		JButton button = new JButton();
 		button.setText("[");
 		button.setActionCommand("setLoopStart");
@@ -95,9 +122,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		button.setActionCommand("setLoopEnd");
 		button.addActionListener(this);
 		button.setToolTipText("Sets the loop end time");
-
 		add(button);
-		this.setVisible(true);
 	}
 
 	void replaceLabel(String label, int newEnd) {
@@ -109,24 +134,19 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 			}
 		}
 		labelTable.put(Integer.valueOf(newEnd), new JLabel(label));
-		times.setLabelTable(labelTable);
-
-		times.repaint();
+		timestepSlider.setLabelTable(labelTable);
+		timestepSlider.repaint();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// remove old label
-		// get actual time
-		int time = times.getValue();
+		int time = timestepSlider.getValue();
 		if (e.getActionCommand().equals("setLoopStart")){
 			loopStart = time;
 			replaceLabel("[", time);
-		} else if(e.getActionCommand().equals("setLoopEnd")){
+		} else if (e.getActionCommand().equals("setLoopEnd")){
 			loopEnd = time;
 			replaceLabel("]", time);
-		} else if(e.getActionCommand().equals("cancelcaching")){
-			setCachedTime(-1);
 		}
 		hostControl.setLoopBounds(loopStart, loopEnd);
 	}
@@ -134,53 +154,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	/** Listen to the slider. */
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		JSlider source = (JSlider)e.getSource();
-		if (!source.getValueIsAdjusting()) {
-			int newTime_s = source.getValue();
-			hostControl.setNEWTime(newTime_s);
-		} else {
-			hostControl.stopMovie();
-		}
-	}
-
-	public void addSlider() {
-		//Create the slider.
-		Collection<Double> steps = hostControl.getTimeStepsdrawer();
-		if ((steps == null) || (steps.size() == 0)) {
-			times = new MyJSlider(JSlider.HORIZONTAL, 0, 0, 0);
-			return; // nothing to display
-		}
-		Double[] dsteps = steps.toArray(new Double[steps.size()]);
-
-		int min = dsteps[0].intValue();
-		int max = dsteps[dsteps.length-1].intValue();
-		int value = hostControl.getSimTime();
-		times = new MyJSlider(JSlider.HORIZONTAL, min, max, value);
-
-		times.addChangeListener(this);
-		times.setMajorTickSpacing((min-max)/10);
-		times.setPaintTicks(true);
-
-		//Create the label table.
-		//PENDING: could use images, but we don't have any good ones.
-		labelTable.put(Integer.valueOf( min ),
-				new JLabel(Time.writeTime(dsteps[0], Time.TIMEFORMAT_HHMM)));
-		//new JLabel(createImageIcon("images/stop.gif")) );
-		labelTable.put(Integer.valueOf( max ),
-				new JLabel(Time.writeTime(dsteps[dsteps.length-1], Time.TIMEFORMAT_HHMM)) );
-		//new JLabel(createImageIcon("images/fast.gif")) );
-
-		int n = dsteps.length/10 + 1;
-
-		for(int i= n; i< dsteps.length-1; i+=n) {
-			labelTable.put(Integer.valueOf( dsteps[i].intValue() ),
-					new JLabel(Time.writeTime(dsteps[i], Time.TIMEFORMAT_HHMM)) );
-		}
-		times.setLabelTable(labelTable);
-
-		times.setPaintLabels(true);
-		times.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
-		add(times);
+		hostControl.setNEWTime();
 	}
 
 	@Override
@@ -206,46 +180,8 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	}
 
 	@Override
-	public void invalidate(int time) throws RemoteException {
-		if(time >= 0) times.setValue(time);
-		else {
-			synchronized (cachedTime) {
-				cachedTime.add(-time);
-				times.repaint();
-			}
-		}
-	}
-
-	private JButton cancelCaching = null;
-	public boolean isCancelCaching = false;
-	synchronized public void setCachedTime(int time) {
-		if(time == -1){
-			cachedTime.clear();
-			if(cancelCaching != null) {
-				isCancelCaching = true;
-				remove(cancelCaching);
-				this.doLayout();
-				invalidate();
-				setVisible(true);
-				cancelCaching = null;
-			}
-		} else {
-			if(cancelCaching == null) {
-				cancelCaching = new JButton();
-				cancelCaching.setText("Cancel");
-				cancelCaching.setActionCommand("cancelcaching");
-				cancelCaching.addActionListener(this);
-				cancelCaching.setToolTipText("Cancel the preloading of timesteps");
-
-				add(cancelCaching);
-				validate();
-				this.setVisible(true);
-			}
-			synchronized (cachedTime) {
-				cachedTime.add(time);
-				times.repaint();
-			}
-		}
+	public void invalidate() {
+		
 	}
 
 	@Override

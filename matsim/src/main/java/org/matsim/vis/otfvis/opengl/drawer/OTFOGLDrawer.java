@@ -477,7 +477,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		this.mouseMan.init(this.gl);
 
 		AgentDrawer.agentpng = createTexture(MatsimResource.getAsInputStream("icon18.png"));
-//		AgentDrawer.carjpg = createTexture(MatsimResource.getAsInputStream("car.png"));
+		//		AgentDrawer.carjpg = createTexture(MatsimResource.getAsInputStream("car.png"));
 		AgentDrawer.wavejpg = createTexture(MatsimResource.getAsInputStream("square.png"));
 		AgentDrawer.pedpng = createTexture(MatsimResource.getAsInputStream("ped.png"));
 
@@ -634,35 +634,25 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		this.canvas.repaint();
 	}
 
-	/***
-	 * invalidate, gets the actual correct data from the host, to display the given rect
-	 * This method is used in most cases
-	 * @throws RemoteException
-	 */
-	public void invalidate(int time) throws RemoteException {
-		if(time != -1) {
+	public void invalidate() {
+		int time = this.hostControlBar.getOTFHostControl().getSimTime();
+		if (time != -1) {
 			this.now = time;
 			this.lastTime = Time.writeTime(time, ':');
 		}
-
-		// do something like
-		// getTimeStep from somewhere
-		// check: is there a cached version for timestep
-		// use chached version, else get the real one
-
-		{
-			synchronized (this.blockRefresh) {
-
-				QuadTree.Rect rect = this.mouseMan.getBounds();
-				synchronized (newItems) {
+		synchronized (this.blockRefresh) {
+			QuadTree.Rect rect = this.mouseMan.getBounds();
+			synchronized (newItems) {
+				try {
 					this.actGraph  = this.clientQ.getSceneGraph(time, rect, this);
-				}
+				} catch (RemoteException e) {
+					throw new RuntimeException(e);					}
 			}
 		}
-		// Todo put drawing to displyLists here and in
-		// display(gl) we only display the two lists
-
-		if(this.queryHandler != null) this.queryHandler.updateQueries();
+		if (this.queryHandler != null) {
+			this.queryHandler.updateQueries();
+		}
+		hostControlBar.updateScaleLabel();
 		redraw();
 	}
 
@@ -680,11 +670,11 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	public OTFClientQuad getQuad() {
 		return this.clientQ;
 	}
-	
+
 	public float getScale(){
 		return this.mouseMan.getScale();
 	}
-	
+
 	public void setScale(float scale){
 		this.mouseMan.scaleNetwork(scale);
 		hostControlBar.updateScaleLabel();
@@ -705,7 +695,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	static public Texture createTexture(String filename) {
 		Texture t = null;
 		if (filename.startsWith("./res/")){
-		  filename = filename.substring(6);
+			filename = filename.substring(6);
 		}
 		try {
 			t = TextureIO.newTexture(MatsimResource.getAsInputStream(filename),

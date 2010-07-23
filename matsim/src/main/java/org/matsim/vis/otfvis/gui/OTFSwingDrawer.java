@@ -22,7 +22,6 @@ package org.matsim.vis.otfvis.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -47,7 +46,6 @@ import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gui.ValueColorizer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -216,8 +214,12 @@ public class OTFSwingDrawer extends JComponent {
 		return OTFSwingDrawable.g2d;
 	}
 
-	public void invalidate(int time) throws RemoteException {
-		this.sceneGraph = quad.getSceneGraph(time, null, parentDrawer);
+	public void invalidate() {
+		try {
+			this.sceneGraph = quad.getSceneGraph(hostControlBar.getOTFHostControl().getSimTime(), null, parentDrawer);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/***

@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D.Double;
-import java.rmi.RemoteException;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -66,8 +65,8 @@ public class OTFSwingDrawerContainer extends JPanel implements OTFDrawer {
 		delegate.handleClick(currentRect, button);
 	}
 
-	public void invalidate(int time) throws RemoteException {
-		delegate.invalidate(time);
+	public void invalidate() {
+		delegate.invalidate();
 		redraw();
 	}
 
@@ -82,6 +81,7 @@ public class OTFSwingDrawerContainer extends JPanel implements OTFDrawer {
 
 	public void setScale(float scale) {
 		this.networkScrollPane.scaleNetwork(scale);
+		this.delegate.hostControlBar.updateScaleLabel();
 	}
 
 	@Override

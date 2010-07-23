@@ -5,9 +5,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.swing.BoundedRangeModel;
+import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisControlerListener;
+import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 
@@ -19,7 +25,7 @@ public class OTFHostControl {
 
 	private final List <OTFHostConnectionManager> hostControls = new ArrayList<OTFHostConnectionManager>();
 
-	private int simTime = 0;
+	private BoundedRangeModel simTime;
 
 	private int loopStart = 0;
 
@@ -33,7 +39,28 @@ public class OTFHostControl {
 
 	public OTFHostControl(OTFHostConnectionManager masterHostConnectionManager, OTFHostControlBar hostControlBar) {
 		this.masterHostConnectionManager = masterHostConnectionManager;
+		this.hostControls.add(masterHostConnectionManager);
 		this.hostControlBar = hostControlBar;
+		Collection<Double> steps = getTimeStepsdrawer();
+		if (steps != null) {
+			// Movie mode with timesteps
+			Double[] dsteps = steps.toArray(new Double[steps.size()]);		
+			int min = dsteps[0].intValue();
+			int max = dsteps[dsteps.length-1].intValue();
+			simTime = new DefaultBoundedRangeModel(min, 0 /* extent */, min, max);
+		} else {
+			// Live mode without timesteps
+			simTime = new DefaultBoundedRangeModel(0 /* value */, 0 /* extent */, 0 /* value */, Integer.MAX_VALUE /* max */);
+		}
+		
+		simTime.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				invalidateDrawers();
+			}
+			
+		});
 	}
 
 	public void toStart() {
@@ -41,7 +68,7 @@ public class OTFHostControl {
 		if(isLive()) {
 			cancel();
 			requestTimeStep(0, OTFServerRemote.TimePreference.LATER);
-			simTime = 0;
+			simTime.setValue(0);
 		} else {
 			requestTimeStep(loopStart, OTFServerRemote.TimePreference.LATER);
 			log.debug("To start...");
@@ -65,14 +92,9 @@ public class OTFHostControl {
 
 	/**
 	 * Called when user clicks on the time line displayed when playing movies.
-	 *
-	 * @param newTime_s
 	 */
-	public void setNEWTime(int newTime_s) {
-		if (newTime_s != getSimTime()) {
-			stopMovie();
-			gotoTime(newTime_s, null);
-		}
+	public void setNEWTime() {
+		gotoTime(getSimTime(), null);
 	}
 
 
@@ -92,7 +114,7 @@ public class OTFHostControl {
 
 	void fetchTimeAndStatus() {
 		try {
-			simTime = this.masterHostConnectionManager.getOTFServer().getLocalTime();
+			simTime.setValue(this.masterHostConnectionManager.getOTFServer().getLocalTime());
 			if(controllerStatus != OTFVisControlerListener.NOCONTROL){
 				controllerStatus = ((OTFLiveServerRemote) this.masterHostConnectionManager.getOTFServer()).getControllerStatus();
 			}
@@ -104,7 +126,7 @@ public class OTFHostControl {
 	boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime) {
 		try {
 			if (requestNewTime(newTime, prefTime)) {
-				simTime = masterHostConnectionManager.getOTFServer().getLocalTime();
+				simTime.setValue(masterHostConnectionManager.getOTFServer().getLocalTime());
 				for(OTFHostConnectionManager slave : hostControls) {
 					if (!slave.equals(this.masterHostConnectionManager))
 						slave.getOTFServer().requestNewTime(newTime, prefTime);
@@ -121,7 +143,8 @@ public class OTFHostControl {
 
 	boolean requestNewTime(int newTime, OTFServerRemote.TimePreference prefTime) {
 		try {
-			return masterHostConnectionManager.getOTFServer().requestNewTime(newTime, prefTime);
+			boolean requestNewTime = masterHostConnectionManager.getOTFServer().requestNewTime(newTime, prefTime);
+			return requestNewTime;
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -132,11 +155,15 @@ public class OTFHostControl {
 	}
 
 	public int getSimTime() {
-		return simTime;
+		return simTime.getValue();
 	}
 
+	public BoundedRangeModel getSimTimeModel() {
+		return simTime;
+	}
+	
 	void setSimTime(int simTime) {
-		this.simTime = simTime;
+		this.simTime.setValue(simTime);
 	}
 
 	int getControllerStatus() {
@@ -178,7 +205,7 @@ public class OTFHostControl {
 		}
 	}
 
-	void pressPauseOnServer() {
+	private void pressPauseOnServer() {
 		try {
 			((OTFLiveServerRemote) masterHostConnectionManager.getOTFServer()).pause();
 		} catch (RemoteException e) {
@@ -211,6 +238,18 @@ public class OTFHostControl {
 			loopEnd = max;
 		}
 	}
+	
+	public void invalidateDrawers() {
+		try {
+			for (OTFHostConnectionManager slave : hostControls) {
+				for (OTFDrawer handler : slave.getDrawer().values()) {
+					handler.invalidate();
+				}
+			}
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
 
 	class MovieTimer extends Thread {
 
@@ -236,16 +275,15 @@ public class OTFHostControl {
 						requestNewTime(loopStart, OTFServerRemote.TimePreference.LATER);
 					}
 					actTime = getSimTime();
-					simTime = masterHostConnectionManager.getOTFServer().getLocalTime();
+					simTime.setValue(masterHostConnectionManager.getOTFServer().getLocalTime());
 					for (OTFHostConnectionManager slave : hostControls) {
 						if (!slave.equals(masterHostConnectionManager)) {
-							slave.getOTFServer().requestNewTime(simTime, OTFServerRemote.TimePreference.LATER);
+							slave.getOTFServer().requestNewTime(simTime.getValue(), OTFServerRemote.TimePreference.LATER);
 						}
 					}
 					hostControlBar.updateTimeLabel();
-					if (simTime != actTime) {
+					if (simTime.getValue() != actTime) {
 						hostControlBar.repaint();
-						hostControlBar.invalidateDrawers();
 					}
 				} catch (RemoteException e) {
 					throw new RuntimeException(e);

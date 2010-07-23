@@ -147,18 +147,6 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		this.masterHostConnectionManager.getDrawer().put(id, handler);
 	}
 
-	public void invalidateDrawers() {
-		try {
-			for (OTFHostConnectionManager slave : hostConnectionManagers) {
-				for (OTFDrawer handler : slave.getDrawer().values()) {
-					handler.invalidate(hostControl.getSimTime());
-				}
-			}
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public void redrawDrawers() {
 		for(OTFHostConnectionManager slave : hostConnectionManagers) {
 			for (OTFDrawer handler : slave.getDrawer().values()) {
@@ -169,9 +157,6 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 
 	private boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime) {
 		boolean result = hostControl.requestTimeStep(newTime, prefTime);
-		if (result) {
-			invalidateDrawers();
-		}
 		return result;
 	}
 

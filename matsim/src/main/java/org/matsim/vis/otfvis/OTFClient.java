@@ -95,7 +95,7 @@ public abstract class OTFClient implements Runnable {
 		pane.validate();
 		this.hostControlBar.addDrawer(this.url, mainDrawer);
 		try {
-			mainDrawer.invalidate((int)hostControlBar.getOTFHostConnectionManager().getTime());
+			mainDrawer.invalidate();
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -180,7 +180,7 @@ public abstract class OTFClient implements Runnable {
 				OTFVisConfigGroup visConfig = save.chooseAndReadSettingsFile();
 				OTFClientControl.getInstance().setOTFVisConfig(visConfig);
 				try {
-					OTFClientControl.getInstance().getMainOTFDrawer().invalidate(-1);
+					OTFClientControl.getInstance().getMainOTFDrawer().invalidate();
 				} catch (RemoteException e1) {
 					e1.printStackTrace();
 				}

@@ -68,29 +68,32 @@ import com.sun.opengl.util.texture.TextureCoords;
  * @author dstrippgen
  *
  */
-public class VisGUIMouseHandler extends MouseInputAdapter
-implements MouseWheelListener{
+public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelListener {
 	private Point3f cameraStart = new Point3f(30000f, 3000f, 1500f);
 	private Point3f cameraTarget = new Point3f(30000f, 3000f, 0f);
-	double[] modelview = new double[16];
-	double[] projection = new double[16];
-	int[] viewport = new int[4];
-	//private GL gl = null;
+	private double[] modelview = new double[16];
+	private double[] projection = new double[16];
+	private int[] viewport = new int[4];
 	private QuadTree.Rect viewBounds = null;
 
-
 	private Camera camera = new Camera();
-	//private Animator cameraAnimator;
-	//private Point2D.Float clickPoint = null;
 
 	private double aspectRatio = 1;
-	public Point start = null;
+	private Point start = null;
 
-	public Rectangle currentRect = null;
-	public float scale = 1.f;
+	private Rectangle currentRect = null;
+	private float scale = 1.f;
 
 	private int button = 0;
 	private final OTFDrawer clickHandler;
+
+	private Rectangle2D.Float bounds = null;
+	private float minZoom;
+	private float maxZoom;
+
+	private Texture marker = null;
+
+	private float alpha = 1.0f;
 
 	public VisGUIMouseHandler(OTFDrawer clickHandler) {
 		this.clickHandler = clickHandler;
@@ -108,17 +111,16 @@ implements MouseWheelListener{
 
 	private void invalidateHandler() {
 		try {
-			clickHandler.invalidate(-1);
+			clickHandler.invalidate();
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 	}
 
-	void scrollCamera(Point3f start, Point3f end, String prop){
+	void scrollCamera(Point3f start, Point3f end, String prop) {
 		KeyValues<Point3f> values = KeyValues.create(new EvaluatorPoint3f(),
 				start, end);
 
-		//KeyTimes times = new KeyTimes(0f, 1f);
 		KeyFrames frames = new KeyFrames(values);
 		PropertySetter ps = new PropertySetter(camera, prop, frames);
 		Animator cameraAnimator = new Animator(2000, ps);
@@ -140,7 +142,7 @@ implements MouseWheelListener{
 		camera.setTarget(cameraTarget);
 	}
 
-	public void scrollToNewPos(Point3f cameraEnd){
+	private void scrollToNewPos(Point3f cameraEnd){
 		Point3f targetEnd = new Point3f(cameraEnd.getX(), cameraEnd.getY(),0);
 		scrollCamera(cameraStart, cameraEnd, "location");
 		scrollCamera(cameraTarget, targetEnd, "target");
@@ -162,15 +164,15 @@ implements MouseWheelListener{
 		int mbutton = e.getButton();
 		String function = "";
 		switch (mbutton) {
-			case 1:
-				function = OTFClientControl.getInstance().getOTFVisConfig().getLeftMouseFunc();
-				break;
-			case 2:
-				function = OTFClientControl.getInstance().getOTFVisConfig().getMiddleMouseFunc();
-				break;
-			case 3:
-				function = OTFClientControl.getInstance().getOTFVisConfig().getRightMouseFunc();
-				break;
+		case 1:
+			function = OTFClientControl.getInstance().getOTFVisConfig().getLeftMouseFunc();
+			break;
+		case 2:
+			function = OTFClientControl.getInstance().getOTFVisConfig().getMiddleMouseFunc();
+			break;
+		case 3:
+			function = OTFClientControl.getInstance().getOTFVisConfig().getRightMouseFunc();
+			break;
 		}
 		if(function.equals("Zoom")) button = 1;
 		else if (function.equals("Pan")) button = 2;
@@ -178,8 +180,6 @@ implements MouseWheelListener{
 		else if (function.equals("Select")) button = 4;
 		else button = 0;
 		start = new Point(x, y);
-		//		Point3f pp = getOGLPos(x, y);
-		//		clickPoint = new Point2D.Float(pp.getX(),pp.getY());
 		alpha = 1.0f;
 		currentRect = null;
 	}
@@ -209,7 +209,6 @@ implements MouseWheelListener{
 				int deltax = Math.abs(start.x - e.getX());
 				int deltay = Math.abs(start.y - e.getY());
 				double ratio =( (start.y - e.getY()) > 0 ? 1:0) + Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
-				//System.out.println(ratio);
 				Point3f newPos = new Point3f((float)currentRect.getCenterX(),(float)currentRect.getCenterY(),(float)(cameraStart.getZ()*ratio));
 				if (button == 1) {
 					scrollToNewPos(newPos);
@@ -222,13 +221,9 @@ implements MouseWheelListener{
 					currentRect = null;
 					setAlpha(0);
 				}
-				//InfoText.showText("Zoom", newPos.getX(),newPos.getY(),newPos.getZ());
-				// Cube fader
-				//currentRect = null;
 			}
 		} else {
 			Point3f newcameraStart = getOGLPos(start.x, start.y);
-			//setToNewPos(newcameraStart);
 			Point2D.Double point = new Point2D.Double(newcameraStart.getX(), newcameraStart.getY());
 			clickHandler.handleClick(point, button, e);
 			currentRect = null;
@@ -236,7 +231,7 @@ implements MouseWheelListener{
 		button = 0;
 	}
 
-	void updateSize(MouseEvent e) {
+	private void updateSize(MouseEvent e) {
 		Point3f newRectStart = getOGLPos(start.x, start.y);
 		Point3f newRectEnd = getOGLPos(e.getX(), e.getY());
 		currentRect = new Rectangle(new Point((int)newRectStart.getX(), (int)newRectStart.getY()));
@@ -246,23 +241,16 @@ implements MouseWheelListener{
 	}
 
 	@Override
-  public void mouseWheelMoved(MouseWheelEvent e) {
+	public void mouseWheelMoved(MouseWheelEvent e) {
 		float delta = -0.1f*e.getWheelRotation();
 		scaleNetworkRelative(1.f -delta);
-		//InfoText.showText("Scale");
 	}
-
-	private float alpha = 1.0f;
-	public float getAlpha() {return alpha;}
 
 	public void setAlpha(float a){
 		alpha = a;
 		// This only redraws GUI Elements, no need to invalidate(), just redraw()
 		if (clickHandler != null) clickHandler.redraw();
 	}
-
-	Texture marker = null;
-
 
 	/**
 	 * Renders the given texture so that it is centered within the given
@@ -274,22 +262,10 @@ implements MouseWheelListener{
 		float ty1 = tc.top();
 		float tx2 = tc.right();
 		float ty2 = tc.bottom();
-
-		//	        int imgw = t.getImageWidth();
-		//	        int imgh = t.getImageHeight();
-		//	        if (imgw > imgh) {
-		//	            h *= ((float)imgh) / imgw;
-		//	        } else {
-		//	            w *= ((float)imgw) / imgh;
-		//	        }
-		//	        float w2 = w/2f;
-		//	        float h2 = h/2f;
-
 		float z = 20f;
 		t.enable();
 		t.bind();
 
-		//System.out.println("b:" + button);
 		if (button==4) gl.glColor4f(0.8f, 0.2f, 0.2f, alpha);
 		else gl.glColor4f(alpha, alpha, alpha, alpha);
 
@@ -303,13 +279,13 @@ implements MouseWheelListener{
 
 	}
 
-	public void updateBounds() {
+	private void updateBounds() {
 		Point3f p1 = getOGLPos(viewport[0], viewport[1]);
 		Point3f p2 = getOGLPos(viewport[0]+viewport[2], viewport[1]+viewport[3]);
 		viewBounds =  new QuadTree.Rect(p1.x, p1.y, p2.x, p2.y);
 	}
 
-	public void updateMatrices(GL gl) {
+	private void updateMatrices(GL gl) {
 		// update matrices for mouse position calculation
 		gl.glGetDoublev( GL_MODELVIEW_MATRIX, modelview,0);
 		gl.glGetDoublev( GL_PROJECTION_MATRIX, projection,0);
@@ -349,7 +325,7 @@ implements MouseWheelListener{
 	}
 
 
-	public void scaleNetworkRelative(float scale) {
+	private void scaleNetworkRelative(float scale) {
 		this.scale *= scale;
 		double zPos = (cameraStart.getZ()*(scale));
 		if (zPos < minZoom) zPos = minZoom;
@@ -379,19 +355,15 @@ implements MouseWheelListener{
 
 		winX = x;
 		winY = viewport[3] - y;
-		//gl.glReadPixels( x, (int)(winY), 1, 1,gl.GL_DEPTH_COMPONENT, gl.GL_FLOAT, DoubleBuffer.wrap(z_pos) );
 		z_pos[0]=1;
 
 		GLU glu = new GLU();
 		obj_pos[2]=0; // Check view relative z-koord of layer zero == visnet layer
 		glu.gluProject( obj_pos[0], obj_pos[1],obj_pos[2], modelview,0, projection,0, viewport,0, w_pos,0);
-		//		glu.gluUnProject( winX, winY, winZ, DoubleBuffer.wrap(modelview), DoubleBuffer.wrap(projection), IntBuffer.wrap(viewport), DoubleBuffer.wrap(obj_pos));
 		glu.gluUnProject( winX, winY, w_pos[2], modelview,0, projection,0, viewport,0, obj_pos,0);
 
 		posX = (float)obj_pos[0] - camera.getTargetOffset().x;
 		posY = (float)obj_pos[1] - camera.getTargetOffset().y;
-		//posZ = (float)obj_pos[2];
-		// maintain z-pos == zoom level
 		return new Point3f(posX, posY, cameraStart.getZ());
 	}
 
@@ -406,7 +378,6 @@ implements MouseWheelListener{
 	}
 
 	public void init(GL gl) {
-		//this.gl = gl;
 		initCamera();
 	}
 
@@ -414,9 +385,6 @@ implements MouseWheelListener{
 		this.aspectRatio = aspectRatio;
 	}
 
-	Rectangle2D.Float bounds = null;
-	private float minZoom;
-	private float maxZoom;
 	public void setBounds(float minEasting, float minNorthing, float maxEasting, float maxNorthing, float minZoom) {
 		this.minZoom = minZoom;
 		this.maxZoom = 1.5f * Math.max(maxNorthing- minNorthing, (maxEasting-minEasting));
@@ -434,4 +402,5 @@ implements MouseWheelListener{
 	public Point3f getView() {
 		return cameraStart;
 	}
+
 }
