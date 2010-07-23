@@ -61,6 +61,7 @@ public class TTGraphWriter {
 	  }
 		int numberTimeSteps = (int)(lastTimeStep - firstTimeStep);
 
+		//write chart data
 		for (TTInOutflowEventHandler handler : this.ttmapList){
 			if (handler.getTravelTimesMap().isEmpty())
 				continue;
