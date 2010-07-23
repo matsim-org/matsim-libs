@@ -99,6 +99,8 @@ public class DgOTFVisReplayLastIteration {
       config.getQSimConfigGroup().setStuckTime(config.simulation().getStuckTime());
       config.getQSimConfigGroup().setSnapshotStyle(config.simulation().getSnapshotStyle());
     }
+    //disable snapshot writing as the snapshot should not be overwritten
+    config.getQSimConfigGroup().setSnapshotPeriod(0.0);
     
     ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
     Scenario sc = loader.loadScenario();
