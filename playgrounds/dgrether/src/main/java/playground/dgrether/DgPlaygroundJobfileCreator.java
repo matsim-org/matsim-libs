@@ -35,8 +35,8 @@ public class DgPlaygroundJobfileCreator {
 	
 	private final static String[] template = {
 			"#!/bin/bash --login",
-			"#$ -l h_rt=259200",
-			"#$ -N matsim-0.1.0 ",
+			"#$ -l h_rt=259200", // 72 h runtime
+			"#$ -N matsim-0.2.0 ",
 			"#$ -o 1055.log",
 			"#$ -j y",
 			"#$ -m be",
@@ -56,9 +56,11 @@ public class DgPlaygroundJobfileCreator {
 	
 	private static final String command = "java -Djava.awt.headless=true";
 	
-	private static final String memory = "-Xmx16000M";
+	private static final String memory = "-Xmx15000M";
 	
-	private static final String classPath = "-cp ./matsim/playgroundDgretherDaganzo2/dgrether-0.2.0-SNAPSHOT.jar:./matsim/playgroundDgretherDaganzo2/dgrether-0.2.0-SNAPSHOT-jar-with-dependencies.jar";
+	private static final String jarDir = "./matsim/playgroundDgretherDaganzo6/";
+	
+	private static final String classPath = "-cp " + jarDir + "dgrether-0.2.0-SNAPSHOT.jar:" + jarDir + "dgrether-0.2.0-SNAPSHOT-jar-with-dependencies.jar";
 	
 //	private static final String mainClass = "org.matsim.run.Controler";
 	private static final String mainClass = "playground.dgrether.daganzosignal.DaganzoRunner";
