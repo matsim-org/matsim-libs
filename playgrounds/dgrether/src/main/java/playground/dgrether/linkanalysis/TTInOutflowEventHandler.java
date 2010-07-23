@@ -29,7 +29,6 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 
 public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 	
@@ -81,7 +80,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 				getInflowMap().put(event.getTime(), in);
 			}
 			//traveltime
-			this.enterEvents.put(new IdImpl(event.getPersonId().toString()), event);
+			this.enterEvents.put(event.getPersonId(), event);
 		}
 	}
 	
@@ -98,7 +97,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 				getOutflowMap().put(event.getTime(), out);
 			}
 			//travel time
-			LinkEnterEvent enterEvent = this.enterEvents.get(new IdImpl(event.getPersonId().toString()));
+			LinkEnterEvent enterEvent = this.enterEvents.get(event.getPersonId());
 			double tt = event.getTime() - enterEvent.getTime();
 //			log.error("Travel time on link " + event.getLinkId() + " " + tt);
 			Double ttravel = getTravelTimesMap().get(enterEvent.getTime());
@@ -115,6 +114,15 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	}
 
 	public void reset(int iteration) {
+		//reset again to avoid errors in case iterationEnds() isn't called
+		this.count = 0;
+		this.enterEvents.clear();
+		this.getInflowMap().clear();
+		this.getOutflowMap().clear();
+		this.getTravelTimesMap().clear();
+	}
+
+	public void iterationsEnds(int iteration) {
 		this.countPerItertation.put(Integer.valueOf(iteration), Integer.valueOf(this.count));
 		this.count = 0;
 		this.enterEvents.clear();
@@ -122,6 +130,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 		this.getOutflowMap().clear();
 		this.getTravelTimesMap().clear();
 	}
+
 	
 	public Id getLinkId() {
 		return this.linkIdIn;
@@ -142,4 +151,6 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	public SortedMap<Double, Double> getTravelTimesMap() {
 		return travelTimes;
 	}
+
+
 }
