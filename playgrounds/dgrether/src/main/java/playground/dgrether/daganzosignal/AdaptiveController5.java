@@ -45,11 +45,11 @@ import org.matsim.signalsystems.systems.SignalGroupDefinition;
  * @author dgrether
  *
  */
-public class AdaptiveController3 extends
+public class AdaptiveController5 extends
 		AdaptiveSignalSystemControlerImpl implements LaneEnterEventHandler, 
 		LaneLeaveEventHandler, SimulationBeforeSimStepListener, SimulationInitializedListener {
 	
-	private static final Logger log = Logger.getLogger(AdaptiveController3.class);
+	private static final Logger log = Logger.getLogger(AdaptiveController5.class);
 
 	private final Id id1 = new IdImpl("1");
 	private final Id id2 = new IdImpl("2");
@@ -75,7 +75,7 @@ public class AdaptiveController3 extends
 
 	private double initialRedNormalRoute = 1500;
 	
-	public AdaptiveController3(AdaptiveSignalSystemControlInfo controlInfo) {
+	public AdaptiveController5(AdaptiveSignalSystemControlInfo controlInfo) {
 		super(controlInfo);
 		this.calculateGreenTimes();
 	}
@@ -133,7 +133,7 @@ public class AdaptiveController3 extends
 		double phase = currentTime % this.cycle ;
 		
 		if ( currentTime < initialRedNormalRoute  || phase < 0.1*this.cycle 
-				|| ( this.vehOnLink5Lane1 > 2 && phase < 0.9*this.cycle ) 
+				|| ( this.vehOnLink5Lane1 > 0 && phase < 0.9*this.cycle ) 
 				) {
 
 			// switch direct route to red:
