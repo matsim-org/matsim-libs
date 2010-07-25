@@ -21,6 +21,7 @@
 package playground.mfeil;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -48,6 +49,7 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.core.population.PopulationWriter;
 
 import playground.mfeil.FilesForTests.Initializer;
 import playground.mfeil.FilesForTests.JohScoringTestFunctionFactory;
@@ -87,16 +89,10 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		new MatsimFacilitiesReader(this.scenario_input).readFile(this.initializer.getControler().getConfig().facilities().getInputFile());
 		new MatsimPopulationReader(this.scenario_input).readFile(this.initializer.getControler().getConfig().plans().getInputFile());
 
-		/*ScenarioLoader loader = new ScenarioLoader(this.initializer.getControler().getConfig());
-		loader.loadScenario();
-		this.scenario_input = loader.getScenario();
-		*/
-
 		// no events are used, hence an empty road network
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario_input.getNetwork(), 900);
 
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario_input.getNetwork(), this.initializer.getControler().getConfig().travelTimeCalculator());
-		// Using charyparNagelScoring is okay since only travel values which are identical with JohScoring
 		PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.initializer.getControler().getConfig().charyparNagelScoring());
 
 		this.router = new PlansCalcRoute(this.initializer.getControler().getConfig().plansCalcRoute(), this.scenario_input.getNetwork(), linkTravelCostEstimator, linkTravelTimeEstimator);
@@ -116,7 +112,12 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 
 
 	public void testRun (){
-
+		/*
+		log.info("Writing reference plan...");
+		this.testee.run(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+		new PopulationWriter(this.scenario_input.getPopulation(), this.scenario_input.getNetwork()).write("D:/Documents and Settings/Matthias Feil/Desktop/test_plans.xml");
+		log.info("done.");
+*/
 		log.info("Running TMC testRun...");
 
 		PlanImpl newPlan = new PlanImpl (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
@@ -143,21 +144,17 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		this.testee.run(newPlan);
 
 		// Import expected output plan into population
-		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"TMC_expected_output.xml");
+		new MatsimPopulationReader(this.scenario_input).readFile("mfeil/"+this.getPackageInputDirectory()+"TMC_expected_output.xml");
 
 		// Compare the two plans; <1 because of double rounding errors
 		for (int i=0;i<newPlan.getPlanElements().size();i++){
 			if (i%2==0){
-//				assertEquals(Math.floor(((ActivityImpl)(newPlan.getPlanElements().get(i))).getStartTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getStartTime()));
-				// I commented out the last assertion since it has been failing the tests for a long time.   kai, jul'10
-//				assertEquals(Math.floor(((ActivityImpl)(newPlan.getPlanElements().get(i))).getEndTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getEndTime()));
-				// I commented out the last assertion since it has been failing the tests for a long time.   kai, jul'10
+				assertEquals(Math.floor(((ActivityImpl)(newPlan.getPlanElements().get(i))).getStartTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getStartTime()));
+				assertEquals(Math.floor(((ActivityImpl)(newPlan.getPlanElements().get(i))).getEndTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getEndTime()));
 			}
 			else {
-//				assertEquals(Math.floor(((LegImpl)(newPlan.getPlanElements().get(i))).getDepartureTime()), Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getDepartureTime()));
-				// I commented out the last assertion since it has been failing the tests for a long time.   kai, jul'10
-//				assertEquals(Math.floor(((LegImpl)(newPlan.getPlanElements().get(i))).getArrivalTime()),  Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getArrivalTime()));
-				// I commented out the last assertion since it has been failing the tests for a long time.   kai, jul'10
+				assertEquals(Math.floor(((LegImpl)(newPlan.getPlanElements().get(i))).getDepartureTime()), Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getDepartureTime()));
+				assertEquals(Math.floor(((LegImpl)(newPlan.getPlanElements().get(i))).getArrivalTime()),  Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getArrivalTime()));
 			}
 		}
 		log.info("... done.");
