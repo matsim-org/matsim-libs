@@ -5,7 +5,7 @@
 	<module name="global">
 		<param name="randomSeed" value="4711" />
 		<param name="coordinateSystem" value="Atlantis" />
-		<param name="numberOfThreads" value="2" />
+		<param name="numberOfThreads" value="1" />
 	</module>
 
 	<module name="network">
