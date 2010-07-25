@@ -20,18 +20,18 @@
 
 package playground.mfeil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.testcases.MatsimTestCase;
-
 import playground.mfeil.FilesForTests.Initializer;
 import playground.mfeil.MDSAM.ActivityTypeFinder;
 
@@ -42,8 +42,6 @@ public class PlanomatXTest extends MatsimTestCase{
 	private static final Logger log = Logger.getLogger(PlanomatXTest.class);
 	private Initializer initializer;
 	final String TEST_PERSON_ID = "1";
-	private PlansCalcRoute router;
-	//private LegTravelTimeEstimator estimator;
 	private PlanomatX testee;
 	private ScenarioImpl scenario_input;
 
@@ -71,41 +69,110 @@ public class PlanomatXTest extends MatsimTestCase{
 	public void testRun (){
 		log.info("Running PlX testRun...");
 
-		/*
-		log.info("Writing reference plan...");
-		this.testee.run(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
-		new PopulationWriter(this.scenario_input.getPopulation()).writeFile("D:/Documents and Settings/Matthias Feil/Desktop/test_plans.xml");
-		log.info("done.");
-
-		PlanImpl plan = new PlanImpl (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
-		plan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
-
-		this.testee.run(plan);
-
-		// Import expected output plan into population
-		this.scenario_input.getPopulation().getPersons().clear();
-		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"PLX_expected_output.xml");
-
-		// Compare the two plans; <1 because of double rounding errors
-		for (int i=0;i<plan.getPlanElements().size();i++){
-			if (i%2==0){
-	//			System.out.println("start: "+((ActivityImpl)(plan.getPlanElements().get(i))).getStartTime());
-	//			System.out.println("end: "+((ActivityImpl)(plan.getPlanElements().get(i))).getEndTime());
-				assertEquals(Math.floor(((ActivityImpl)(plan.getPlanElements().get(i))).getStartTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getStartTime()));
-				assertEquals(Math.floor(((ActivityImpl)(plan.getPlanElements().get(i))).getEndTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getEndTime()));
-			}
-			else {
-				assertEquals(Math.floor(((LegImpl)(plan.getPlanElements().get(i))).getDepartureTime()), Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getDepartureTime()));
-				assertEquals(Math.floor(((LegImpl)(plan.getPlanElements().get(i))).getArrivalTime()),  Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getArrivalTime()));
+		PlanomatXPlan plan1 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		plan1.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+		PlanomatXPlan plan2 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		plan2.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+		PlanomatXPlan plan3 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		plan3.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+		PlanomatXPlan plan4 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		plan4.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+		PlanomatXPlan plan5 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		plan5.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+		PlanomatXPlan plan6 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		plan6.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+		PlanomatXPlan plan7 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		plan7.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+		PlanomatXPlan plan8 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		plan8.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+		PlanomatXPlan plan9 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		plan9.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+		PlanomatXPlan plan10 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		plan10.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+				
+		PlanomatXPlan [] neighbourhood = {plan1,plan2,plan3,plan4,plan5,plan6,plan7,plan8,plan9,plan10};
+		int [][] infoOnNeighbourhood = new int [10][3];
+		ArrayList<ActivityOptionImpl> primActs = new ArrayList<ActivityOptionImpl>();
+		primActs.add(new ActivityOptionImpl("home", this.scenario_input.getActivityFacilities().getFacilities().get(new IdImpl(1))));
+		primActs.add(new ActivityOptionImpl("work", this.scenario_input.getActivityFacilities().getFacilities().get(new IdImpl(10))));
+		List<String> actTypes = new ArrayList<String>();
+		actTypes.add("home");
+		actTypes.add("work");
+		actTypes.add("shopping");
+		actTypes.add("leisure");
+		
+		/* Test of standard neighbourhood creation*/
+		this.testee.createNeighbourhood(neighbourhood, infoOnNeighbourhood, actTypes, primActs);
+		
+		ArrayList<String[]> output= new ArrayList<String[]>();
+		output.add(new String[]{"shopping","work",""});
+		output.add(new String[]{"work","shopping",""});
+		output.add(new String[]{"leisure","work","shopping"});
+		output.add(new String[]{"work","leisure","shopping"});
+		output.add(new String[]{"work","shopping","leisure"});
+		output.add(new String[]{"work","",""});
+		output.add(new String[]{"work","shopping",""});
+		output.add(new String[]{"work","shopping",""});
+		output.add(new String[]{"work","work",""});
+		output.add(new String[]{"work","leisure",""});
+		for (int i=0;i<neighbourhood.length;i++){
+			for (int j=2;j<neighbourhood[i].getPlanElements().size()-2;j+=2){
+				assertEquals(((ActivityImpl)(neighbourhood[i].getPlanElements().get(j))).getType(),output.get(i)[j/2-1]);
 			}
 		}
-		log.info("... done.");*/
+		
+		/* Test of short plans neighbourhood creation*/
+		PlanomatXPlan pla1 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		pla1.copyPlan(neighbourhood[5]);
+		PlanomatXPlan pla2 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		pla2.copyPlan(neighbourhood[5]);
+		PlanomatXPlan pla3 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		pla3.copyPlan(neighbourhood[5]);
+		PlanomatXPlan pla4 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		pla4.copyPlan(neighbourhood[5]);
+		PlanomatXPlan pla5 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		pla5.copyPlan(neighbourhood[5]);
+		PlanomatXPlan pla6 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		pla6.copyPlan(neighbourhood[5]);
+		PlanomatXPlan pla7 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		pla7.copyPlan(neighbourhood[5]);
+		PlanomatXPlan pla8 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		pla8.copyPlan(neighbourhood[5]);
+		PlanomatXPlan pla9 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		pla9.copyPlan(neighbourhood[5]);
+		PlanomatXPlan pla10 = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
+		pla10.copyPlan(neighbourhood[5]);
+			
+		neighbourhood[0]=pla1;
+		neighbourhood[1]=pla2;
+		neighbourhood[2]=pla3;
+		neighbourhood[3]=pla4;
+		neighbourhood[4]=pla5;
+		neighbourhood[5]=pla6;
+		neighbourhood[6]=pla7;
+		neighbourhood[7]=pla8;
+		neighbourhood[8]=pla9;
+		neighbourhood[9]=pla10;
+		
+		this.testee.createNeighbourhood(neighbourhood, infoOnNeighbourhood, actTypes, primActs);
+		
+		output= new ArrayList<String[]>();
+		output.add(new String[]{"work"});
+		output.add(new String[]{"work"});
+		output.add(new String[]{"leisure","work"});
+		output.add(new String[]{"work","shopping"});
+		output.add(new String[]{"work","work"});
+		output.add(new String[]{"work"});
+		output.add(new String[]{"work"});
+		output.add(new String[]{"work"});
+		output.add(new String[]{"work"});
+		output.add(new String[]{"work"});
+		for (int i=0;i<neighbourhood.length;i++){
+			for (int j=2;j<neighbourhood[i].getPlanElements().size()-2;j+=2){
+				assertEquals(((ActivityImpl)(neighbourhood[i].getPlanElements().get(j))).getType(),output.get(i)[j/2-1]);
+			}
+		}
+		
+		log.info("done.");
 	}
-
-	public void testCreateNeighbourhood (){
-
-	}
-	//(PlanomatXPlan [] neighbourhood, int[][]infoOnNeighbourhood, List<String> actTypes, ArrayList<ActivityOption> primActs) {
-
-
 }
