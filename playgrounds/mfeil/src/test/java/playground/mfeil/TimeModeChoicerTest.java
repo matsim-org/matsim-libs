@@ -206,7 +206,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 
 		// Import expected output plan into population
 		this.scenario_input.getPopulation().getPersons().clear();
-		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"TMC_expected_output.xml");
+		new MatsimPopulationReader(this.scenario_input).readFile("mfeil/"+this.getPackageInputDirectory()+"TMC_expected_output.xml");
 
 		// Import expected output plan into population
 		PlanomatXPlan newPlan = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPerson());
@@ -297,7 +297,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 
 		// Import expected output plan into population
 		this.scenario_input.getPopulation().getPersons().clear();
-		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"TMC_expected_output.xml");
+		new MatsimPopulationReader(this.scenario_input).readFile("mfeil/"+this.getPackageInputDirectory()+"TMC_expected_output.xml");
 
 		// Import expected output plan into population
 		PlanomatXPlan newPlan = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPerson());
