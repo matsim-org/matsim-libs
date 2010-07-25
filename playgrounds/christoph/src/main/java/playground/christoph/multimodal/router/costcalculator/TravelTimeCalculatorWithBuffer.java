@@ -20,9 +20,9 @@
 
 package playground.christoph.multimodal.router.costcalculator;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,7 +42,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator implements AgentDepartureEventHandler {
 
 	private Map<Id, double[]> bufferedTravelTimes;
-	private List<Id> nonCarAgents = new ArrayList<Id>();
+	private Set<Id> nonCarAgents = new HashSet<Id>();
 	
 	public TravelTimeCalculatorWithBuffer(Network network, int timeslice,
 			int maxTime, TravelTimeCalculatorConfigGroup ttconfigGroup) {
@@ -118,7 +118,7 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 	@Override
 	public void reset(int iteration) {
 		updateBufferedTravelTimes(iteration);
-		nonCarAgents = new ArrayList<Id>();
+		nonCarAgents = new HashSet<Id>();
 		
 		super.reset(iteration);
 	}

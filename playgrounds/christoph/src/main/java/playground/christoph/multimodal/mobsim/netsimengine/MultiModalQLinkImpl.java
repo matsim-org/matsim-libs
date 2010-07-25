@@ -27,7 +27,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
@@ -52,17 +51,22 @@ public class MultiModalQLinkImpl extends QLinkImpl {
 	protected PlansCalcRouteConfigGroup configGroup;
 	protected MultiModalTravelTime multiModalTravelTime;
 	
+	/*
+	 * Is set to "true" if the QLink and/or the MultiModalQLink has active Agents.
+	 */
+	protected boolean isActive = false;
+	
 	protected Queue<Tuple<Double, PersonAgent>> agents = new PriorityQueue<Tuple<Double, PersonAgent>>(30, new TravelTimeComparator());
 	protected Queue<PersonAgent> waitingAfterActivityAgents = new LinkedList<PersonAgent>();
 	protected Queue<PersonAgent> waitingToLeaveAgents = new LinkedList<PersonAgent>();
+//	protected Set<PersonAgent> waitingAfterActivityAgents = new HashSet<PersonAgent>();
+//	protected Set<PersonAgent> waitingToLeaveAgents = new TreeSet<PersonAgent>(new PersonAgentComparator());
 	
 	public MultiModalQLinkImpl(Link link2, QSimEngine engine, QNode toNode, MultiModalTravelTime multiModalTravelTime) {
 		super(link2, engine, toNode);
-			
-		Module module = engine.getQSim().getScenario().getConfig().getModule("planscalcroute");
-		
-		if (module != null) configGroup = (PlansCalcRouteConfigGroup) module;
-		else configGroup =  new PlansCalcRouteConfigGroup();
+				
+		configGroup = engine.getQSim().getScenario().getConfig().plansCalcRoute();
+		if (configGroup == null) configGroup = new PlansCalcRouteConfigGroup(); 
 		
 		this.multiModalTravelTime = multiModalTravelTime;
 	}
@@ -80,6 +84,7 @@ public class MultiModalQLinkImpl extends QLinkImpl {
 	 */
 	public void addAgentFromIntersection(PersonAgent personAgent, double now) {
 		this.activateLink();
+		
 		this.addAgent(personAgent, now);
 
 		this.getQSimEngine().getQSim().getEventsManager().processEvent(
@@ -117,6 +122,8 @@ public class MultiModalQLinkImpl extends QLinkImpl {
 		boolean ret = super.moveLink(now);		
 		boolean ret2 = moveAgents(now);
 		
+//		qLinkIsActive = ret;
+		
 		moveWaitingAfterActivityAgents();
 		/*
 		 * super: active, this: inactive -> active
@@ -124,17 +131,28 @@ public class MultiModalQLinkImpl extends QLinkImpl {
 		 * super: inactive, this: inactive -> inactive
 		 * super: active, this: active -> active
 		 */
-		return (ret || ret2);
+		isActive = (ret || ret2);
+		return isActive;
+	}
+	
+	@Override
+	public void activateLink() {
+		/*
+		 *  If the QLink and/or the MultiModalQLink is already active
+		 *  we do not do anything.
+		 */
+		if (isActive) return;
+		
+		else super.activateLink();
 	}
 	
 	/*
-	 * Returns true, if the Link has to be still active. 
+	 * Returns true, if the Link has to be still active.
 	 */
 	private boolean moveAgents(double now) {
 		Tuple<Double, PersonAgent> tuple = null;
 		
-		while ((tuple = agents.peek()) != null)
-		{
+		while ((tuple = agents.peek()) != null) {
 			/*
 			 * If the PersonAgent cannot depart now:
 			 * At least still one Agent is still walking/cycling/... on the Link, therefore
@@ -159,7 +177,7 @@ public class MultiModalQLinkImpl extends QLinkImpl {
 			 * The PersonAgent can leave, therefore we move him to the waitingToLeave Queue.
 			 */	
 			else {
-				waitingToLeaveAgents.add(tuple.getSecond());				
+				waitingToLeaveAgents.add(tuple.getSecond());
 			}
 		}
 				
@@ -179,12 +197,13 @@ public class MultiModalQLinkImpl extends QLinkImpl {
 	
 	public PersonAgent getNextWaitingAgent(double now) {
 		PersonAgent personAgent = waitingToLeaveAgents.poll();
+//		PersonAgent personAgent = ((TreeSet<PersonAgent>)waitingToLeaveAgents).pollFirst();
 		if (personAgent != null) {
 			this.getQSimEngine().getQSim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, personAgent.getPerson().getId(), this.getLink().getId()));			
 		}
 		return personAgent;
 	}
-	
+		
 	@Override
 	public void clearVehicles() {
 		super.clearVehicles();
@@ -201,7 +220,12 @@ public class MultiModalQLinkImpl extends QLinkImpl {
 		this.agents.clear();
 	}
 	
-	
+//	private static class PersonAgentComparator implements Comparator<PersonAgent> {
+//		@Override
+//		public int compare(PersonAgent a1, PersonAgent a2) {
+//			return a1.getPerson().getId().compareTo(a2.getPerson().getId());
+//		}
+//	}
 	
 	private static class TravelTimeComparator implements Comparator<Tuple<Double, PersonAgent>>, Serializable {
 		private static final long serialVersionUID = 1L;
