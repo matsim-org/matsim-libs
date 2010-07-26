@@ -21,21 +21,27 @@
 package playground.jjoubert.Utilities.matsim2urbansim.controler;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.Module;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 
 public class Controler_eThekwini_Census {
 	private static int numberOfIterations;
 	private static boolean overwrite;
+	private static int numberOfThreadsReplanning;
+	private static int numberOfThreadsQSim;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if(args.length != 2){
-			throw new IllegalArgumentException("Need number of iterations and logical overwrite argument");
+		if(args.length != 4){
+			throw new IllegalArgumentException("Incorrect number of arguments passed");
 		} else{
 			numberOfIterations = Integer.parseInt(args[0]);
 			overwrite = Boolean.parseBoolean(args[1]);
+			numberOfThreadsReplanning = Integer.parseInt(args[2]);
+			numberOfThreadsQSim = Integer.parseInt(args[3]);
 		}
 		/*
 		 * Set up basic config.
@@ -49,11 +55,18 @@ public class Controler_eThekwini_Census {
 		config.controler().setLastIteration(numberOfIterations);
 		config.network().setInputFile("./input/output_network_100_Emme.xml.gz");
 		config.plans().setInputFile("./input/Generated_plans_100.xml.gz");
+		config.global().setNumberOfThreads(numberOfThreadsReplanning);
+
+		/*
+		 * Add the multi-thread queue simulation.
+		 */
+		config.getQSimConfigGroup().setNumberOfThreads(numberOfThreadsQSim);
 
 		Controler c = new Controler(config);
 		c.setCreateGraphs(true);
 		c.setWriteEventsInterval(20);
 		c.setOverwriteFiles(overwrite);
+		
 		c.run();
 	}
 

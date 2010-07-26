@@ -22,6 +22,8 @@ package playground.jjoubert.Utilities.matsim2urbansim.controler;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.Module;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
@@ -35,7 +37,9 @@ public class MyBasicConfig {
 		// Global.
 		config.global().setCoordinateSystem("WGS84");
 		config.global().setRandomSeed(1234);
-		config.global().setNumberOfThreads(4);
+		config.global().setNumberOfThreads(2);
+		
+		
 
 		// Network.
 		config.network().setInputFile("./input/output_network_100_Emme.xml.gz");
@@ -94,6 +98,12 @@ public class MyBasicConfig {
 		config.strategy().addStrategySettings(s2);
 		//---------------------------------------------------------------------
 
+		// Parallel QSim
+		QSimConfigGroup qsim = new QSimConfigGroup();
+		qsim.setNumberOfThreads(2);
+		qsim.setSnapshotFormat("googleearth");
+		qsim.setSnapshotPeriod(900);
+		config.setQSimConfigGroup(qsim);
 	}
 	
 	public Config getConfig(){
