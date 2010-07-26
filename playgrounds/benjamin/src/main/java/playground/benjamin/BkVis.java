@@ -34,7 +34,7 @@ public class BkVis {
 
 //===========================================================================================================		
 //		Für den mvi-modus:
-			String otffile = "../playgrounds/benjamin/test/input/playground/benjamin/BkRouterTest/network.xml";
+//			String otffile = "../playgrounds/benjamin/test/input/playground/benjamin/BkRouterTest/network.xml";
 //			String otffile = "../matsim/output/singleIteration/ITERS/it.0/0.otfvis.mvi";
 //			String otffile = BkPaths.RUNSSVN + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
 //			String otffile = BkPaths.RUNSSVN + "run950/it.1000/950.1000.events.mvi";
@@ -63,7 +63,7 @@ public class BkVis {
 //		3. in "simulation" noch "evacuationTime" und "timeout" auskommentieren!
 		
 //		String otffile = "../matsim/examples/tutorial/singleIteration.xml";
-//		String otffile = BkPaths.RUNSSVN + "run749/TestOTFVis_interactive/749.output_config.xml";
+		String otffile = BkPaths.RUNSSVN + "run749/TestOTFVis_interactive/749.output_config.xml";
 //		String otffile = "../detailedEval/pop/140k-synthetische-personen/config-for-visualisation.xml";
 //		String otffile = BkPaths.RUNSSVN + "run950/950.output_config.xml";
 

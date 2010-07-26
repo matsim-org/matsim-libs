@@ -72,6 +72,7 @@ public class FreightDemandCreatorMunich {
 	Population filteredPlans = null;
 	String outputFile = "../../detailedEval/pop/gueterVerkehr/freightDemandBavaria.xml";
 	
+	
 	public static void main(String[] args) throws IOException {
 		FreightDemandCreatorMunich fdc = new FreightDemandCreatorMunich();
 		fdc.run(args);
@@ -103,20 +104,22 @@ public class FreightDemandCreatorMunich {
 			//checking if at least one node (or link) from a person's plan is in Bavaria
 			for (Id bavariaId : nodesInBavaria) {
 				if (nodesFromNodes.contains(bavariaId)){
-					//adding filtered plans to a new, empty population
+					//check if population already contains person
 					if(filteredPlans.getPersons().keySet().contains(person.getId())){
 						//do nothing
 					}
 					else{
+						//add person
 						filteredPlans.addPerson(person);
 					}
 				} 
 				else if (nodesFromLinks.contains(bavariaId)){
-					//adding these people only if they are not yet in population
+					//check if population already contains person
 					if(filteredPlans.getPersons().keySet().contains(person.getId())){
 						//do nothing
 					}
 					else{
+						//add person
 						filteredPlans.addPerson(person);
 					}
 				}
