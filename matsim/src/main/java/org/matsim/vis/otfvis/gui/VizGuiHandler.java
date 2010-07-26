@@ -31,6 +31,7 @@ class VizGuiHandler extends MouseInputAdapter implements MouseWheelListener {
 	}
 
 	public Point start = null;
+	private int button = 0;
 
 	public Rectangle currentRect = new Rectangle();;
 
@@ -50,7 +51,9 @@ class VizGuiHandler extends MouseInputAdapter implements MouseWheelListener {
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if (e.getButton() == 1) {
+		// It seems like the MouseEvent-Button is always 0 on Windows in the mouseDragged Event
+		// so the button is stored in a variable when it is pressed
+		if (button == 1) {
 			currentRect.setFrameFromDiagonal(start, e.getPoint());
 			otfSwingDrawer.repaint();
 		}
@@ -103,6 +106,7 @@ class VizGuiHandler extends MouseInputAdapter implements MouseWheelListener {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		start = e.getPoint();
+		button = e.getButton();
 	}
 
 }
@@ -113,6 +117,7 @@ class DragToScrollListener extends MouseAdapter {
 	private MyNetVisScrollPane myNetVisScrollPane;
 
 	private Point start;
+	private int button = 0;
 
 	public DragToScrollListener(MyNetVisScrollPane myNetVisScrollPane) {
 		this.myNetVisScrollPane = myNetVisScrollPane;
@@ -121,11 +126,14 @@ class DragToScrollListener extends MouseAdapter {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		start = e.getLocationOnScreen();
+		button = e.getButton();
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if (e.getButton() == 2) {
+		// It seems like the MouseEvent-Button is always 0 on Windows in the mouseDragged Event
+		// so the button is stored in a variable when it is pressed
+		if (button == 2) {
 			double deltax = start.x - e.getLocationOnScreen().getX();
 			double deltay = start.y - e.getLocationOnScreen().getY();
 			start = e.getLocationOnScreen();
