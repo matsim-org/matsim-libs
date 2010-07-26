@@ -254,17 +254,11 @@ public class SimulationConfigGroup extends Module {
 		return this.timeOut;
 	}
 
-	/** See "getComments()" for options.
-	 *
-	 */
+	/** See {@link #getComments()} for options. */
 	public void setSnapshotStyle(final String style) {
 		this.snapshotStyle = style.intern();
-		if (!"equil".equals(this.snapshotStyle) && !"equiDist".equals(this.snapshotStyle) && !"queue".equals(this.snapshotStyle)) {
+		if (!"equiDist".equals(this.snapshotStyle) && !"queue".equals(this.snapshotStyle)) {
 			Logger.getLogger(this.getClass()).warn("The snapshotStyle \"" + style + "\" is not one of the known ones (queue, equiDist).");
-		}
-		if (style.equals("equil")) {
-			Logger.getLogger(this.getClass()).info("Please use 'equiDist' instead of 'equil' for snapshotFormat.");
-			this.snapshotStyle = "equiDist";
 		}
 	}
 
