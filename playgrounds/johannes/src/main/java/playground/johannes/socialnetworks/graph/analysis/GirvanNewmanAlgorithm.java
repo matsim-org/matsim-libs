@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
-import gnu.trove.TObjectIntIterator;
+import gnu.trove.TObjectLongIterator;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -76,7 +76,7 @@ public class GirvanNewmanAlgorithm {
 
 			double maxBC = 0;
 			Edge maxBCEdge = null;
-			TObjectIntIterator<Edge> it = c.edgeBetweenness().iterator();
+			TObjectLongIterator<Edge> it = c.edgeBetweenness().iterator();
 			for(int i = 0; i < c.edgeBetweenness().size(); i++) {
 				it.advance();
 				if(it.value() > maxBC) {

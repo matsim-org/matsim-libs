@@ -28,6 +28,7 @@ import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 import playground.johannes.socialnetworks.statistics.Discretizer;
@@ -43,7 +44,7 @@ public class AcceptanceProbability {
 
 	private Discretizer discretizer = new LinearDiscretizer(1000);
 	
-	private DistanceCalculator distanceCalculator = new OrthodromicDistanceCalculator();
+	private DistanceCalculator distanceCalculator = new CartesianDistanceCalculator();// OrthodromicDistanceCalculator();
 	
 	public void setDistanceCalculator(DistanceCalculator calculator) {
 		this.distanceCalculator = calculator;

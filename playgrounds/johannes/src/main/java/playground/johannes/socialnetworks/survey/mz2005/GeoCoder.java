@@ -27,6 +27,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleLocationLookup;
@@ -37,7 +38,9 @@ import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleLocationLook
  */
 public class GeoCoder {
 
-	private static GoogleLocationLookup googleLookup = new GoogleLocationLookup();
+	private static final Logger logger = Logger.getLogger(GeoCoder.class);
+	
+	private static final GoogleLocationLookup googleLookup = new GoogleLocationLookup();
 	
 	/**
 	 * @param args
@@ -76,6 +79,9 @@ public class GeoCoder {
 		/*
 		 * parse file
 		 */
+		logger.info("Starting geo coding...");
+		int lineCount = 0;
+		int invalid = 0;
 		while((line = reader.readLine()) != null) {
 			String[] tokens = line.split("\t");
 			/*
@@ -97,8 +103,8 @@ public class GeoCoder {
 				builder.append("\t");
 
 			} else {
-				for(int i = 0; i < 4; i++)
-					builder.append("\t");
+				builder.append("\t");
+				builder.append("\t");
 			}
 			
 			
@@ -107,14 +113,23 @@ public class GeoCoder {
 				builder.append("\t");
 				builder.append(String.valueOf(dest[1]));
 			} else {
-				for(int i = 0; i < 3; i++)
-					builder.append("\t");
+				builder.append("\t");
 			}
 			
 			writer.write(builder.toString());
 			writer.newLine();
+			writer.flush();
+			
+			lineCount++;
+			if(start == null || dest == null)
+				invalid++;
+			
+			if(lineCount % 100 == 0)
+				logger.info(String.format("Parsed %1$s lines. %2$s addresses not found.", lineCount, invalid));
 		}
 		writer.close();
+		
+		logger.info("Done.");
 	}
 
 	private static double[] coordinates(String tokens[], TObjectIntHashMap<String> colNames, String prefix) {
@@ -136,10 +151,19 @@ public class GeoCoder {
 		builder.append(tokens[colNames.get(prefix + "_LAND")]);
 		builder.append(" ");
 		
-		Coord c = googleLookup.requestCoordinates(builder.toString());
-		if(c == null)
-			return null;
+		String query = builder.toString().trim();
+		Coord c;
 		
-		return new double[]{c.getX(), c.getY()};
+		if(query.isEmpty())
+			c = null;
+		else
+			c = googleLookup.requestCoordinates(builder.toString());
+		
+		if(c == null) {
+			logger.warn(String.format("No results for query \"%1$s\".", query));
+			return null;
+		} else {
+			return new double[]{c.getX(), c.getY()};
+		}
 	}
 }

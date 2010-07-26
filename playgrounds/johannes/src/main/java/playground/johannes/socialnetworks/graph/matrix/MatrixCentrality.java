@@ -20,8 +20,8 @@
 package playground.johannes.socialnetworks.graph.matrix;
 
 import gnu.trove.TIntArrayList;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntIterator;
+import gnu.trove.TIntLongHashMap;
+import gnu.trove.TIntLongIterator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,9 +46,9 @@ public class MatrixCentrality {
 
 	private double[] vertexCloseness;
 
-	private int[] vertexBetweenness;
+	private long[] vertexBetweenness;
 
-	private TIntIntHashMap[] edgeBetweenness;
+	private TIntLongHashMap[] edgeBetweenness;
 
 	private double meanVertexCloseness;
 
@@ -104,7 +104,7 @@ public class MatrixCentrality {
 	 * 
 	 * @return an array with values for vertex betweenness.
 	 */
-	public int[] getVertexBetweenness() {
+	public long[] getVertexBetweenness() {
 		return vertexBetweenness;
 	}
 
@@ -114,7 +114,7 @@ public class MatrixCentrality {
 	 * 
 	 * @return a matrix with values for edge betweenness.
 	 */
-	public TIntIntHashMap[] getEdgeBetweenness() {
+	public TIntLongHashMap[] getEdgeBetweenness() {
 		return edgeBetweenness;
 	}
 
@@ -173,8 +173,8 @@ public class MatrixCentrality {
 		int n = y.getVertexCount();
 		vertexCloseness = new double[n];
 		Arrays.fill(vertexCloseness, Double.POSITIVE_INFINITY);
-		vertexBetweenness = new int[n];
-		edgeBetweenness = new TIntIntHashMap[n];
+		vertexBetweenness = new long[n];
+		edgeBetweenness = new TIntLongHashMap[n];
 		diameter = 0;
 		radius = Integer.MAX_VALUE;
 		/*
@@ -188,7 +188,6 @@ public class MatrixCentrality {
 		int i_start = 0;
 		int i_stop = size;
 		for (int i = 0; i < numThreads - 1; i++) {
-			// threads.add(new CentralityThread(y, vertices));
 			threads.add(new CentralityThread(y, i_start, i_stop, dijkstraFactory));
 			i_start = i_stop;
 			i_stop += size;
@@ -215,8 +214,6 @@ public class MatrixCentrality {
 		 */
 		for (CentralityThread thread : threads) {
 			for (int i = 0; i < n; i++) {
-				// if(!Double.isInfinite(thread.vertexCloseness[i]))
-				// vertexCloseness[i] = thread.vertexCloseness[i];
 				/*
 				 * if this thread did not calculate the closeness of i it
 				 * returns infinity
@@ -230,7 +227,7 @@ public class MatrixCentrality {
 				 * merge edge betweenness values
 				 */
 				if (thread.edgeBetweenness[i] != null) {
-					TIntIntIterator it = thread.edgeBetweenness[i].iterator();
+					TIntLongIterator it = thread.edgeBetweenness[i].iterator();
 					for (int j = 0; j < thread.edgeBetweenness[i].size(); j++) {
 						it.advance();
 						/*
@@ -238,11 +235,11 @@ public class MatrixCentrality {
 						 * for both edges
 						 */
 						if (edgeBetweenness[i] == null)
-							edgeBetweenness[i] = new TIntIntHashMap();
+							edgeBetweenness[i] = new TIntLongHashMap();
 						edgeBetweenness[i].adjustOrPutValue(it.key(), it.value(), it.value());
 
 						if (edgeBetweenness[it.key()] == null)
-							edgeBetweenness[it.key()] = new TIntIntHashMap();
+							edgeBetweenness[it.key()] = new TIntLongHashMap();
 						edgeBetweenness[it.key()].adjustOrPutValue(i, it.value(), it.value());
 					}
 				}
@@ -257,16 +254,16 @@ public class MatrixCentrality {
 		 * calculate mean values
 		 */
 		meanVertexCloseness = StatUtils.mean(vertexCloseness);
-		int sum = 0;
+		long sum = 0;
 		for (int i = 0; i < y.getVertexCount(); i++)
 			sum += vertexBetweenness[i];
 		meanVertexBetweenness = sum / (double) y.getVertexCount();
 
 		sum = 0;
-		int count = 0;
+		double count = 0;
 		for (int i = 0; i < n; i++) {
 			if (edgeBetweenness[i] != null) {
-				TIntIntIterator it = edgeBetweenness[i].iterator();
+				TIntLongIterator it = edgeBetweenness[i].iterator();
 				for (int k = 0; k < edgeBetweenness[i].size(); k++) {
 					it.advance();
 					sum += it.value();
@@ -274,21 +271,20 @@ public class MatrixCentrality {
 				}
 			}
 		}
-		meanEdgeBetweenness = sum / (double) count;
+		meanEdgeBetweenness = sum / count;
 	}
 
 	private static class CentralityThread extends Thread {
 
 		private Dijkstra dijkstra;
 
-		// private Queue<Integer> vertices;
 		private int i_start;
 
 		private int i_stop;
 
-		private TIntIntHashMap[] edgeBetweenness;
+		private TIntLongHashMap[] edgeBetweenness;
 
-		private int vertexBetweenness[];
+		private long vertexBetweenness[];
 
 		private double vertexCloseness[];
 
@@ -299,8 +295,6 @@ public class MatrixCentrality {
 		private int diameter;
 
 		private int radius;
-
-//		private DijkstraFactory dijkstraFactory;
 		
 		private final Logger logger = Logger.getLogger(CentralityThread.class);
 
@@ -326,19 +320,15 @@ public class MatrixCentrality {
 			/*
 			 * initialize the betweenness arrays with zero
 			 */
-			vertexBetweenness = new int[n];
-			edgeBetweenness = new TIntIntHashMap[n];
+			vertexBetweenness = new long[n];
+			edgeBetweenness = new TIntLongHashMap[n];
 			/*
 			 * time measuring
 			 */
 			long dkTime = 0;
 			long cTime = 0;
 
-			// Integer i_obj;
-			// while((i_obj = vertices.poll()) != null) {
 			for (int i = i_start; i < i_stop; i++) {
-
-				// int i = i_obj.intValue();
 				/*
 				 * run the Dijkstra to all nodes
 				 */
@@ -369,8 +359,6 @@ public class MatrixCentrality {
 					 * extract all paths
 					 */
 					int[][] matrix = new int[pathLength][pathCount];
-//					System.out.println("len: " + pathLength);
-//					System.out.println("count: " + pathCount);
 					pathExtractor.run(dijkstra.getSpanningTree(), matrix, j);
 					/*
 					 * increase betweenness values for each passed vertex and
@@ -387,7 +375,7 @@ public class MatrixCentrality {
 							vertexBetweenness[vertex]++;
 
 							if (edgeBetweenness[prevVertex] == null) {
-								edgeBetweenness[prevVertex] = new TIntIntHashMap();
+								edgeBetweenness[prevVertex] = new TIntLongHashMap();
 							}
 							edgeBetweenness[prevVertex].adjustOrPutValue(vertex, 1, 1);
 
@@ -400,10 +388,6 @@ public class MatrixCentrality {
 					}
 				}
 
-				// if(reachable.size() == 0)
-				// vertexCloseness[i] = 0;
-				// else
-				// vertexCloseness[i] = pathLengthSum/(double)reachable.size();
 				if (reachable.size() > 0)
 					vertexCloseness[i] = pathLengthSum / (double) reachable.size();
 
