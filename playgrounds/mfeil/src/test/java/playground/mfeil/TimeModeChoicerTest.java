@@ -21,7 +21,6 @@
 package playground.mfeil;
 
 import java.util.ArrayList;
-
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -49,7 +48,6 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.core.population.PopulationWriter;
 
 import playground.mfeil.FilesForTests.Initializer;
 import playground.mfeil.FilesForTests.JohScoringTestFunctionFactory;
@@ -144,7 +142,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		this.testee.run(newPlan);
 
 		// Import expected output plan into population
-		new MatsimPopulationReader(this.scenario_input).readFile("mfeil/"+this.getPackageInputDirectory()+"TMC_expected_output.xml");
+		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"TMC_expected_output.xml");
 
 		// Compare the two plans; <1 because of double rounding errors
 		for (int i=0;i<newPlan.getPlanElements().size();i++){
@@ -203,7 +201,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 
 		// Import expected output plan into population
 		this.scenario_input.getPopulation().getPersons().clear();
-		new MatsimPopulationReader(this.scenario_input).readFile("mfeil/"+this.getPackageInputDirectory()+"TMC_expected_output.xml");
+		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"TMC_expected_output.xml");
 
 		// Import expected output plan into population
 		PlanomatXPlan newPlan = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPerson());
@@ -294,7 +292,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 
 		// Import expected output plan into population
 		this.scenario_input.getPopulation().getPersons().clear();
-		new MatsimPopulationReader(this.scenario_input).readFile("mfeil/"+this.getPackageInputDirectory()+"TMC_expected_output.xml");
+		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"TMC_expected_output.xml");
 
 		// Import expected output plan into population
 		PlanomatXPlan newPlan = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPerson());
