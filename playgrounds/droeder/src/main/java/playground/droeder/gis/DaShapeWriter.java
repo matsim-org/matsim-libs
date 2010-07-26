@@ -3,6 +3,7 @@ package playground.droeder.gis;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -98,6 +99,20 @@ public class DaShapeWriter {
 		}
 		
 		write(createPointDistanceFeatures(points,attributes), fileName);
+	}
+	
+	public static void writeDefaultLineString2Shape(String fileName, String name,  Map<String, SortedMap<Integer, Coord>> lineStrings, Map<String, SortedMap<String, String>> attributes){
+		
+		if(attributes == null){
+			initLineFeatureType(name, null);
+		}else{
+			for (SortedMap<String, String> m : attributes.values()){
+				initLineFeatureType(name, m);
+				break;
+			}
+		}
+		
+		write(createDefaultLineStringFeature(lineStrings, attributes), fileName);
 	}
 	
 	private static void write(Collection<Feature> features, String fileName){
@@ -229,6 +244,36 @@ public class DaShapeWriter {
 			feature = getPointFeature(n.getCoord(), n.getId().toString());
 			features.add(feature);
 		}
+		return features;
+	}
+	
+	private static Collection<Feature> createDefaultLineStringFeature(Map<String, SortedMap<Integer, Coord>> lineStrings,	Map<String, SortedMap<String, String>> attributes) {
+		Collection<Feature> features = new ArrayList<Feature>();
+		Feature feature;
+		Coordinate[] coord;
+		
+		for(Entry<String, SortedMap<Integer, Coord>> points : lineStrings.entrySet()){
+			if (points.getValue().size()<2){
+				log.error("not enough points for a lineString. Need at least 2 points!");
+			}else{
+				int i = 0;
+				coord = new Coordinate[points.getValue().size()];
+				for(Coord p : points.getValue().values()){
+					coord[i] = MGC.coord2Coordinate(p);
+					i++;
+				}
+				if(attributes == null){
+					feature = getLineStringFeature(new CoordinateArraySequence(coord), points.getKey(), null);
+				}else{
+					feature = getLineStringFeature(new CoordinateArraySequence(coord), points.getKey(), attributes.get(points.getKey()));
+				}
+				features.add(feature);
+				
+			}
+			
+		}
+		
+		
 		return features;
 	}
 	
