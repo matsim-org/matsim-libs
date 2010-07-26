@@ -22,8 +22,8 @@ package org.matsim.core.config.groups;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -81,7 +81,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private double marginalUtlOfDistanceWalk = 0.0;
 	private double waiting = -0.0;
 
-	private final HashMap<String, ActivityParams> activityTypes = new HashMap<String, ActivityParams>();
+	private final HashMap<String, ActivityParams> activityTypes = new LinkedHashMap<String, ActivityParams>();
 	private final HashMap<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
 
 	@Override
@@ -217,16 +217,18 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, Double.toString(this.getMarginalUtlOfDistanceCar()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_PT, Double.toString(this.getMarginalUtlOfDistancePt()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, Double.toString(this.getMarginalUtlOfDistanceWalk()));
-		for(Entry<String, ActivityParams> entry : this.activityTypesByNumber.entrySet()) {
-			String key = entry.getKey();
-			map.put(ACTIVITY_TYPE + key, getValue(ACTIVITY_TYPE + key));
-			map.put(ACTIVITY_PRIORITY + key, getValue(ACTIVITY_PRIORITY + key));
-			map.put(ACTIVITY_TYPICAL_DURATION + key, getValue(ACTIVITY_TYPICAL_DURATION + key));
-			map.put(ACTIVITY_MINIMAL_DURATION + key, getValue(ACTIVITY_MINIMAL_DURATION + key));
-			map.put(ACTIVITY_OPENING_TIME + key, getValue(ACTIVITY_OPENING_TIME + key));
-			map.put(ACTIVITY_LATEST_START_TIME + key, getValue(ACTIVITY_LATEST_START_TIME + key));
-			map.put(ACTIVITY_EARLIEST_END_TIME + key, getValue(ACTIVITY_EARLIEST_END_TIME + key));
-			map.put(ACTIVITY_CLOSING_TIME + key, getValue(ACTIVITY_CLOSING_TIME + key));
+		int index = 0;
+		for(ActivityParams params : this.activityTypes.values()) {
+			String key = Integer.toString(index);
+			index++;
+			map.put(ACTIVITY_TYPE + key, params.type);
+			map.put(ACTIVITY_PRIORITY + key, Double.toString(params.priority));
+			map.put(ACTIVITY_TYPICAL_DURATION + key, Time.writeTime(params.typicalDuration));
+			map.put(ACTIVITY_MINIMAL_DURATION + key, Time.writeTime(params.minimalDuration));
+			map.put(ACTIVITY_OPENING_TIME + key, Time.writeTime(params.openingTime));
+			map.put(ACTIVITY_LATEST_START_TIME + key, Time.writeTime(params.latestStartTime));
+			map.put(ACTIVITY_EARLIEST_END_TIME + key, Time.writeTime(params.earliestEndTime));
+			map.put(ACTIVITY_CLOSING_TIME + key, Time.writeTime(params.closingTime));
 		}
 		return map;
 	}
