@@ -16,10 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import bibtex.dom.BibtexFile;
-import bibtex.expansions.CrossReferenceExpander;
-import bibtex.expansions.ExpansionException;
-import bibtex.expansions.MacroReferenceExpander;
-import bibtex.expansions.PersonListExpander;
 import bibtex.parser.BibtexParser;
 
 /**
@@ -64,7 +60,8 @@ public final class Main {
 						aKey=keys[1].substring(2, keys[1].length()-1);
 					}
 					if (fillIn.get(aKey)!=null) {
-						bw1.write("crossref = "+fillIn.get(aKey)+",");
+						bw1.write(fillIn.get(aKey));
+//						System.out.println(fillIn.get(aKey));
 					}
 					else bw1.write(aLine);
 				}  
@@ -90,7 +87,7 @@ public final class Main {
 						aKey=keys[1].substring(2, keys[1].length()-1);
 					}
 					if (fillIn.get(aKey)!=null) {
-						bw2.write("crossref = "+fillIn.get(aKey)+",");
+						bw2.write(fillIn.get(aKey));
 					}
 					else bw2.write(aLine);
 				}  
@@ -111,7 +108,7 @@ public final class Main {
 			printNonFatalExceptions(parser.getExceptions());
 		}
 
-		System.err.println("\n\nGenerating output ...");
+		System.err.println("\n\nDone!");
 
 	}
 
