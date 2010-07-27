@@ -961,7 +961,7 @@ public class ModFileMaker {
 		}
 		if (similarity.equals("yes")){
 			stream.println("beta_sim \t0  \t-10000  \t1000  \t0");
-	//		stream.println("lambda_sim \t1  \t-50  \t50  \t0");
+			stream.println("lambda_sim \t1  \t-50  \t50  \t0");
 		}
 
 		stream.println();
@@ -1163,13 +1163,13 @@ public class ModFileMaker {
 					}
 				}
 			}
-			if (similarity.equals("yes")){
+		/*	if (similarity.equals("yes")){
 				if (started) stream.print(" + beta_sim * x"+(i+1)+"_sim");
 				else {
 					stream.print("beta_sim * x"+(i+1)+"_sim");
 					started = true;
 				}
-			}
+			}*/
 			if (!started) stream.print("$NONE");
 			stream.println();
 		}
@@ -1610,9 +1610,9 @@ public class ModFileMaker {
 			}
 
 			// box cox formulation of similarity attribute
-		/*	if (similarity.equals("yes")){
+			if (similarity.equals("yes")){
 				stream.print(" + beta_sim * ( ( x"+(i+1)+"_sim ^ lambda_sim - one ) / lambda_sim * one )");
-			}*/
+			}
 
 			stream.println();
 		}

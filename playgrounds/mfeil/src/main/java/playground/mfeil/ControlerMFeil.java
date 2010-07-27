@@ -51,7 +51,6 @@ import playground.mfeil.MDSAM.PlansEvaluator;
 import playground.mfeil.MDSAM.PlansVariatorInitializer;
 import playground.mfeil.attributes.AgentsAttributesAdder;
 import playground.mfeil.analysis.TravelStats;
-import playground.mfeil.analysis.ASPGeneral;
 
 
 /**

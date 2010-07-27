@@ -22,6 +22,7 @@ package playground.mfeil;
 
 
 import java.io.File;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -45,6 +46,7 @@ import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mfeil.MDSAM.ActivityTypeFinder;
 
@@ -74,7 +76,7 @@ public class RecyclingModule implements PlanStrategyModule{
 	private final ActivityTypeFinder 				finder;
 
 	private final int iterationsFirstTime, iterationsFurtherTimes, noOfAssignmentAgents, noOfSoftCoefficients;
-	private final DistanceCoefficients 				coefficients;
+	protected final DistanceCoefficients 				coefficients;
 	private ArrayList<double[]> 					tabuList;
 	private final String primActsDistance, homeLocationDistance, municipality, sex, age, license, car_avail, employed;
 	private final ArrayList<String> 				softCoef;
@@ -83,29 +85,28 @@ public class RecyclingModule implements PlanStrategyModule{
 	private static final Logger 					log = Logger.getLogger(RecyclingModule.class);
 
 
-	public RecyclingModule (ControlerMFeil controler, ActivityTypeFinder finder) {
+	public RecyclingModule (Controler controler, ActivityTypeFinder finder) {
 
 		this.controler=controler;
 		this.knowledges 			= controler.getScenario().getKnowledges();
 		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler, this.knowledges);
-	//	this.locator 				= new LMwCSCustomized(controler.getNetwork(), controler, this.knowledges);
 		this.scorer 				= new PlanScorer (controler.getScoringFunctionFactory());
 		this.network 				= controler.getNetwork();
 		this.init(network);
 		this.tDepDelayCalc 			= new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 		this.nonassignedAgents 		= new LinkedList<String>();
-		this.noOfSchedulingAgents	= 100;
-		this.noOfAssignmentAgents	= 500;
+		this.noOfSchedulingAgents	= 5;
+		this.noOfAssignmentAgents	= 10;
 		this.finder					= finder;
 		this.iterationsFirstTime 	= 20;
 		this.iterationsFurtherTimes = 5;
 		this.primActsDistance 		= "yes";
 		this.homeLocationDistance 	= "yes";
 		this.municipality			= "no";
-		this.sex 					= "yes";
+		this.sex 					= "no";
 		this.age 					= "yes";
-		this.license 				= "yes";
+		this.license 				= "no";
 		this.car_avail 				= "no";
 		this.employed 				= "no";
 		this.softCoef 				= this.detectSoftCoefficients();
@@ -173,11 +174,19 @@ public class RecyclingModule implements PlanStrategyModule{
 		schedulingModule.finishReplanning();
 
 		/* Fill Optimized Agents object */
+		if (this.controler.getIterationNumber()== null) {
+			log.warn("This if-loop to be run only for test case! Check code if run during operational simulation!");
+			list[0].clear();
+			list[0].add(this.controler.getPopulation().getPersons().get(new IdImpl(1)).getSelectedPlan());
+			list[0].add(this.controler.getPopulation().getPersons().get(new IdImpl(2)).getSelectedPlan());
+			list[0].add(this.controler.getPopulation().getPersons().get(new IdImpl(3)).getSelectedPlan());
+			list[0].add(this.controler.getPopulation().getPersons().get(new IdImpl(4)).getSelectedPlan());
+			list[0].add(this.controler.getPopulation().getPersons().get(new IdImpl(5)).getSelectedPlan());
+		}
 		agents = new OptimizedAgents (list[0], this.knowledges);
 
 		/* Detect optimal coefficients metric */
-	//	Statistics.prt=false;
-		if (this.controler.getIterationNumber()%10==1	&&	this.noOfSoftCoefficients>1) {
+		if ((this.controler.getIterationNumber()== null || this.controler.getIterationNumber()%10==1)	&&	this.noOfSoftCoefficients>1) {
 			Statistics.prt=false;
 			this.detectCoefficients();
 			Statistics.prt=true;
@@ -188,8 +197,7 @@ public class RecyclingModule implements PlanStrategyModule{
 			this.calculate();
 			if (!this.nonassignedAgents.isEmpty()) this.rescheduleNonassigedAgents();
 		}
-	//	Statistics.prt=true;
-
+	
 		/* Print statistics of individual optimization */
 		assignment.println("Iteration "+this.controler.getIterationNumber());
 		assignment.println("Individual optimization");
@@ -208,20 +216,10 @@ public class RecyclingModule implements PlanStrategyModule{
 
 		/* Assign remaining agents */
 		assignmentModule.prepareReplanning();
-	/*	if (this.list1Pointer.size()>0){
-			int pointer = 0;
-			for (int i=this.noOfAssignmentAgents;i<list[1].size();i++){
-				if (i!=this.list1Pointer.get(pointer)){
-					assignmentModule.handlePlan(list[1].get(i));
-				}
-				else pointer=java.lang.Math.min(pointer+1, this.list1Pointer.size()-1);
-			}
+		for (int i=this.noOfAssignmentAgents;i<list[1].size();i++){
+			assignmentModule.handlePlan(list[1].get(i));
 		}
-		else {*/
-			for (int i=this.noOfAssignmentAgents;i<list[1].size();i++){
-				assignmentModule.handlePlan(list[1].get(i));
-			}
-		//}
+		
 		assignmentModule.finishReplanning();
 
 		/* Individually optimize all agents that couldn't be assigned */
@@ -326,7 +324,7 @@ public class RecyclingModule implements PlanStrategyModule{
 
 		/* Further iterations */
 		int iter;
-		if (this.controler.getIterationNumber()==1) iter=this.iterationsFirstTime;
+		if (this.controler.getIterationNumber()== null || this.controler.getIterationNumber()==1) iter=this.iterationsFirstTime;
 		else iter=this.iterationsFurtherTimes;
 		for (int i=1;i<iter+1;i++){
 			log.info("Metric detection: iteration "+i);
@@ -435,7 +433,6 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.assignmentModule.prepareReplanning();
 		for (int j=0;j<java.lang.Math.min(this.noOfAssignmentAgents, list[1].size());j++){
 			assignmentModule.handlePlan(list[1].get(j));
-		//	log.info("Calculating agent "+list[1].get(j).getPerson().getId());
 		}
 		assignmentModule.finishReplanning();
 		for (int j=0;j<java.lang.Math.min(this.noOfAssignmentAgents, list[1].size());j++){
@@ -462,7 +459,6 @@ public class RecyclingModule implements PlanStrategyModule{
 		java.util.Collections.sort(this.list1Pointer);
 		for (int x=list1Pointer.size()-1;x>=0;x--){
 			this.list[0].add(this.list[1].get(list1Pointer.get(x)));
-			//this.list[1].remove(list1Pointer.get(x));
 			this.agents.addAgent((this.list[0].get(this.list[0].size()-1)));
 
 		}
@@ -566,8 +562,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		double[] tabu = new double[coefMatrix.length];
 		for (int y=0;y<coefMatrix.length;y++){
 			double aux = coefMatrix[y];
-		//	log.info("aux = "+aux);
-			tabu[y] = aux;
+		tabu[y] = aux;
 		}
 		this.tabuList.add(tabu);
 	}

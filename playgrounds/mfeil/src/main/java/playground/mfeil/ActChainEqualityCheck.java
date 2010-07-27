@@ -29,7 +29,7 @@ import org.matsim.core.population.LegImpl;
 
 
 /**
- * Simple class that check whether two activity chains are identical. Returns true if so, and false otherwise. *
+ * Simple class to check whether two activity chains are identical. Returns true if so, and false otherwise. *
  * @author mfeil *
  */
 

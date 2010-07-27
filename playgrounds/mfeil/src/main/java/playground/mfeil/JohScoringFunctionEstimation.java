@@ -228,7 +228,6 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			}
 		}
 		else {
-		//	log.warn("No license information for person "+person.getId()+". " +
 		//	"Setting license to default \"no\".");
 			this.license=0;
 		}
@@ -397,9 +396,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().startsWith(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType().substring(0, 1))) gamma = 1;
 			double interScore = Math.max(0, factorOfLateArrival * (1 + beta_female_act * this.female + params.getBetaAge() * this.age + repeat * gamma) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(Math.abs(duration)/3600))),1/params.getGamma()))));
 			tmpScore -= interScore;
-			log.warn("In duration<0 loop - this must not happen! (Person "+plan.getPerson().getId()+" at act position "+this.index+" with duration "+duration+" and utility "+interScore);
-
-	//		tmpScore -= 100;
+		//	log.warn("In duration<0 loop - this must not happen! (Person "+plan.getPerson().getId()+" at act position "+this.index+" with duration "+duration+" and utility "+interScore);
 		}
 
 		// disutility if stopping too early

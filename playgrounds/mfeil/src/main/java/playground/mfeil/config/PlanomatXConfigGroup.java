@@ -52,7 +52,7 @@ public class PlanomatXConfigGroup extends Module {
 	private static String weight_inc_number = "0.5";
 	private static String timer = "TimeModeChoicer";
 	private static String final_timer = "none";
-	private static String lc_mode = "fullLC";
+	private static String lc_mode = "reducedLC";
 	private static String lc_set_size = "5";
 	private static String act_types = "customized";
 

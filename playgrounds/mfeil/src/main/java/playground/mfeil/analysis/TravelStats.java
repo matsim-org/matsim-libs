@@ -286,7 +286,7 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 			}
 		}
 
-		if (this.controler.getIterationNumber()>0 && this.controler.getIterationNumber()%10==0) new ASPGeneral (this.controler.getIterationNumber(), this.controler.getLastIteration(), this.controler.getControlerIO().getOutputPath(), (NetworkImpl) this.network);
+	//	if (this.controler.getIterationNumber()>0 && this.controler.getIterationNumber()%10==0) new ASPGeneral (this.controler.getIterationNumber(), this.controler.getLastIteration(), this.controler.getControlerIO().getOutputPath(), (NetworkImpl) this.network);
 	}
 
 	@Override

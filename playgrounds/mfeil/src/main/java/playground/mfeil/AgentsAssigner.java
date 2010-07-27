@@ -125,7 +125,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 
 	@Override
 	public void run (Plan plan){
-
+		
 		OptimizedAgents agents = this.module.getOptimizedAgents();
 
 		double distance = Double.MAX_VALUE;

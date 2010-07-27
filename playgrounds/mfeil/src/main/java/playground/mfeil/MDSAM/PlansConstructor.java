@@ -98,9 +98,9 @@ public class PlansConstructor implements PlanStrategyModule{
 
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
-		String version = "0997b";
-		this.inputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml"; // sonst "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
-		this.outputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mzASb.xml.gz";
+		String version = "Mohit1";
+		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
+		this.outputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans"+version+".xml.gz";
 		this.outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans"+version+".dat";
 		this.attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 		this.outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model"+version+".mod";
@@ -185,11 +185,11 @@ public class PlansConstructor implements PlanStrategyModule{
 		//	this.reducePersonsIntelligently();
 
 	// Needs to always run
-	//	this.linkRouteOrigPlans(); // sonst standard
+		this.linkRouteOrigPlans(); // sonst standard
 
 	// Type of enlarging plans set
 		//	this.enlargePlansSet();
-		//this.enlargePlansSetWithRandomSelection("PlanomatX"); //sonst standard
+		this.enlargePlansSetWithRandomSelection("PlanomatX"); //sonst standard
 		this.routeAlternativePlans();
 
 	// Needs to always run
@@ -455,7 +455,6 @@ public class PlansConstructor implements PlanStrategyModule{
 
 				// Add all plans with activity chains different to the one of person's current plan
 				if (!acCheck.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
-				//if (!acCheck.checkEqualActChainsModes(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
 					PlanImpl plan = new PlanImpl (person);
 
 					for (int j=0;j<this.actChains.get(i).size();j++){
@@ -482,19 +481,6 @@ public class PlansConstructor implements PlanStrategyModule{
 					((ActivityImpl) plan.getLastActivity()).setCoord(((PlanImpl) person.getSelectedPlan()).getLastActivity().getCoord());
 
 					this.linker.run(plan);
-
-					/* Analysis of subtours and random allocation of modes to subtours
-					PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
-					planAnalyzeSubtours.run(plan);
-					for (int j=0;j<planAnalyzeSubtours.getNumSubtours();j++){
-						TransportMode[]	modes = TimeModeChoicerConfigGroup.getPossibleModes();
-						TransportMode mode = modes[(int)(MatsimRandom.getRandom().nextDouble()*modes.length)];
-						for (int k=1;k<plan.getPlanElements().size();k+=2){
-							if (planAnalyzeSubtours.getSubtourIndexation()[(k-1)/2]==j){
-								((LegImpl)plan.getPlanElements().get(k)).setMode(mode);
-							}
-						}
-					}*/
 
 					for (int j=1;j<plan.getPlanElements().size();j++){
 						if (j%2==1){
