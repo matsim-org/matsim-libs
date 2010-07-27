@@ -64,7 +64,7 @@ public final class Main {
 						aKey=keys[1].substring(2, keys[1].length()-1);
 					}
 					if (fillIn.get(aKey)!=null) {
-						bw1.write("crossref = "+fillIn.get(aKey));
+						bw1.write("crossref = "+fillIn.get(aKey)+",");
 					}
 					else bw1.write(aLine);
 				}  
@@ -90,7 +90,7 @@ public final class Main {
 						aKey=keys[1].substring(2, keys[1].length()-1);
 					}
 					if (fillIn.get(aKey)!=null) {
-						bw2.write("crossref = "+fillIn.get(aKey));
+						bw2.write("crossref = "+fillIn.get(aKey)+",");
 					}
 					else bw2.write(aLine);
 				}  
