@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -21,6 +23,7 @@ import uk.co.randomjunk.osmosis.transform.v0_6.TransformTask;
 public class OsmMainWithoutDefaults {
 	
 	public static void main(String[] args) {
+		Scenario scenario = new ScenarioImpl();
 		Map<String, Set<String>> tagKeyValues = new HashMap<String, Set<String>>();
 		tagKeyValues.put("highway", new HashSet<String>(Arrays.asList("motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary","minor","unclassified","residential","living_street")));
 		String filename = "inputs/schweiz/zurich.osm";
@@ -34,7 +37,7 @@ public class OsmMainWithoutDefaults {
 		TransformTask tagTransform = new TransformTask("input/schweiz/tagtransform.xml", "output/tagtransform-stats.xml");
 		
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S);
-		NetworkSink sink = new NetworkSink(coordinateTransformation);
+		NetworkSink sink = new NetworkSink(scenario.getNetwork(), coordinateTransformation);
 		
 		reader.setSink(tagFilter);
 		tagFilter.setSink(simplify);
@@ -43,7 +46,7 @@ public class OsmMainWithoutDefaults {
 
 		reader.run();
 		
-		new NetworkWriter(sink.getNetwork()).write("output/wurst.xml");
+		new NetworkWriter(scenario.getNetwork()).write("output/wurst.xml");
 	}
 
 }
