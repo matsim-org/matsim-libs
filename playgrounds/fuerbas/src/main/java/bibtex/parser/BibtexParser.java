@@ -136,7 +136,7 @@ public final class BibtexParser {
             bibtexFile.addEntry(bibtexFile.makeMacroDefinition(stringName, value));
             //
 //            System.out.println("STRINGVALUE: "+value.toString());
-            fillIn.put(stringName, value.toString());
+            fillIn.put(stringName, value.toString());				// Funktioniert noch nicht einwandfrei!!!
             //
         } else if (entryType.equals("preamble")) {
             BibtexAbstractValue value = parseValue();
@@ -184,7 +184,10 @@ public final class BibtexParser {
             String bE2 = entry.toString();
             String type = "@"+entry.getEntryType();
             bE2 = bE2.replaceAll(type, "");
+            bE2 = bE2.replaceFirst(bibkey, "");
+            bE2 = bE2.substring(3, bE2.length()-2);
 //            System.out.println("BIBKEY ENTRY 2:"+bE2);
+//            System.out.println(bE2);
             fillIn.put(bibkey, bE2);
 //            System.out.println("BIBKEY ENTRY2: "+fillIn.get(bibkey));
             //
