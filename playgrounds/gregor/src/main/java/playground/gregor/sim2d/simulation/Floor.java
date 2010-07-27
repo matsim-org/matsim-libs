@@ -46,7 +46,7 @@ public class Floor {
 	private final Map<Agent2D,Force> agentForceMapping = new HashMap<Agent2D, Force>();
 	private final StaticForceField staticForceField;
 	
-	private List<double[]> forceInfos;
+//	private List<double[]> forceInfos;
 	
 	//needed to generated "finish lines"
 	@Deprecated
@@ -147,8 +147,8 @@ public class Floor {
 
 	private void updateForces() {
 
-		//DEBUG
-		this.forceInfos = new ArrayList<double[]>();
+//		//DEBUG
+//		this.forceInfos = new ArrayList<double[]>();
 
 
 		for (Agent2D agent : this.agents) {		
@@ -178,17 +178,17 @@ public class Floor {
 				validateForce(agent,force);
 			}
 
-			//DEBUG
-			double [] tmp1 = {agent.getPosition().x,agent.getPosition().y,force.getFx(), force.getFy(),0.f};
-			this.forceInfos.add(tmp1);
-			double [] tmp2 = {agent.getPosition().x,agent.getPosition().y,force.interactionX, force.interactionY,1.f};
-			this.forceInfos.add(tmp2);
-			double [] tmp3 = {agent.getPosition().x,agent.getPosition().y,force.envX, force.envY,2.f};
-			this.forceInfos.add(tmp3);
-			double [] tmp4 = {agent.getPosition().x,agent.getPosition().y,force.driveX, force.driveY,3.f};
-			this.forceInfos.add(tmp4);
-			double [] tmp5 = {agent.getPosition().x,agent.getPosition().y,force.pathX, force.pathY,4.f};
-			this.forceInfos.add(tmp5);
+//			//DEBUG
+//			double [] tmp1 = {agent.getPosition().x,agent.getPosition().y,force.getFx(), force.getFy(),0.f};
+//			this.forceInfos.add(tmp1);
+//			double [] tmp2 = {agent.getPosition().x,agent.getPosition().y,force.interactionX, force.interactionY,1.f};
+//			this.forceInfos.add(tmp2);
+//			double [] tmp3 = {agent.getPosition().x,agent.getPosition().y,force.envX, force.envY,2.f};
+//			this.forceInfos.add(tmp3);
+//			double [] tmp4 = {agent.getPosition().x,agent.getPosition().y,force.driveX, force.driveY,3.f};
+//			this.forceInfos.add(tmp4);
+//			double [] tmp5 = {agent.getPosition().x,agent.getPosition().y,force.pathX, force.pathY,4.f};
+//			this.forceInfos.add(tmp5);
 		}
 	}
 
@@ -396,10 +396,10 @@ public class Floor {
 
 
 
-	//DEBUG
-	public List<double[]> getForceInfos() {
-		return this.forceInfos ;
-	}
+//	//DEBUG
+//	public List<double[]> getForceInfos() {
+//		return this.forceInfos ;
+//	}
 
 	public double getAgentVelocity(Agent2D agent) {
 		Force force = this.agentForceMapping.get(agent);

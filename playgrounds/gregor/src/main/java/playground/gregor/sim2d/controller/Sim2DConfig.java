@@ -5,7 +5,7 @@ package playground.gregor.sim2d.controller;
 public class Sim2DConfig {
 
 	public static double STATIC_FORCE_RESOLUTION = 0.05;
-	public static final double TIME_STEP_SIZE = 0.1;
+	public static final double TIME_STEP_SIZE = 0.5;
 	
 	public static final double Bpath = 0.5;
 	public static final double Bp = 1.5;
