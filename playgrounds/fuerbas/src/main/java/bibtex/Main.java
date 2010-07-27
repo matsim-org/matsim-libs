@@ -27,7 +27,7 @@ import bibtex.parser.BibtexParser;
  * 
  * args[2] und args[3] : Output Filepath
  * 
- * @author henkel modified by fuerbas
+ * @author fuerbas
  */
 public final class Main {
  
