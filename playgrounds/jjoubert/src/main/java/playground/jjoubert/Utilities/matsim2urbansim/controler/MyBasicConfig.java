@@ -89,15 +89,21 @@ public class MyBasicConfig {
 		//---------------------------------------------------------------------
 		StrategySettings s1 = new StrategySettings(new IdImpl("1"));
 		s1.setModuleName("SelectExpBeta");
-		s1.setProbability(0.85);
+		s1.setProbability(0.80);
 		config.strategy().addStrategySettings(s1);
 		//---------------------------------------------------------------------
 		StrategySettings s2 = new StrategySettings(new IdImpl("2"));
 		s2.setModuleName("ReRoute");
-		s2.setProbability(0.15);
+		s2.setProbability(0.10);
 		config.strategy().addStrategySettings(s2);
 		//---------------------------------------------------------------------
+		StrategySettings s3 = new StrategySettings(new IdImpl("3"));
+		s3.setModuleName("TimeAllocationMutator");
+		s3.setProbability(0.10);
+		config.strategy().addStrategySettings(s3);
+		//---------------------------------------------------------------------
 
+		
 		// Parallel QSim
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setNumberOfThreads(2);
