@@ -117,11 +117,9 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		log.info("done.");
 */
 		log.info("Running TMC testRun...");
-
+		// Import plan of person 1, copy and delete original population
 		PlanImpl newPlan = new PlanImpl (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
-
-		// Import plan of person 1, copy and delete original population
 		this.scenario_input.getPopulation().getPersons().clear();
 
 		// Process plan
