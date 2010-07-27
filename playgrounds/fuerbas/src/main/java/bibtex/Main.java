@@ -11,7 +11,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,8 +59,9 @@ public final class Main {
 						aKey=keys[1].substring(2, keys[1].length()-1);
 					}
 					if (fillIn.get(aKey)!=null) {
-						bw1.write(fillIn.get(aKey));
-						System.out.println(fillIn.get(aKey));
+						String str = replaceTitleField(fillIn.get(aKey));
+						bw1.write(str);
+						System.out.println(str);
 					}
 					else bw1.write(aLine);
 				}  
@@ -87,8 +87,9 @@ public final class Main {
 						aKey=keys[1].substring(2, keys[1].length()-1);
 					}
 					if (fillIn.get(aKey)!=null) {
-						bw2.write(fillIn.get(aKey));
-						System.out.println(fillIn.get(aKey));
+						String str = replaceTitleField(fillIn.get(aKey));
+						bw2.write(str);
+						System.out.println(str);
 
 					}
 					else bw2.write(aLine);
@@ -114,6 +115,13 @@ public final class Main {
 
 	}
 
+	private static String replaceTitleField(String str) {
+		/*
+		 * just replace "title" with "booktitle", which results in tiltle->booktitle and booktitle->bookbooktitle
+		 */
+		return str.replace("title", "booktitle");
+	}
+	
 	private static void printNonFatalExceptions(Exception[] exceptions) {
 		if (exceptions.length > 0) {
 			System.err.println("Non-fatal exceptions: ");
