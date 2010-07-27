@@ -61,7 +61,7 @@ public final class Main {
 					}
 					if (fillIn.get(aKey)!=null) {
 						bw1.write(fillIn.get(aKey));
-//						System.out.println(fillIn.get(aKey));
+						System.out.println(fillIn.get(aKey));
 					}
 					else bw1.write(aLine);
 				}  
@@ -88,6 +88,8 @@ public final class Main {
 					}
 					if (fillIn.get(aKey)!=null) {
 						bw2.write(fillIn.get(aKey));
+						System.out.println(fillIn.get(aKey));
+
 					}
 					else bw2.write(aLine);
 				}  
