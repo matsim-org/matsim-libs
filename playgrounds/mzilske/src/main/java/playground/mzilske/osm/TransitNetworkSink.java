@@ -7,7 +7,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -28,7 +27,6 @@ import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.Relation;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
-import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 import org.openstreetmap.osmosis.core.domain.v0_6.TagCollectionImpl;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 import org.openstreetmap.osmosis.core.filter.common.IdTracker;
@@ -184,29 +182,6 @@ public class TransitNetworkSink implements Sink {
 			TransitLine line = transitSchedule.getFactory().createTransitLine(new IdImpl(ref + "-" + relation.getId()));
 			LinkedList<TransitRouteStop> stopsH = new LinkedList<TransitRouteStop>();
 			LinkedList<TransitRouteStop> stopsR = new LinkedList<TransitRouteStop>();
-
-			for (RelationMember relationMember : relation.getMembers()) {
-				if (relationMember.getMemberType().equals(EntityType.Node)) {
-					if (allNodesTracker.get(relationMember.getMemberId())) {
-						System.out.println(relationMember.getMemberId());
-						Node node = nodeReader.get(relationMember.getMemberId()).getEntity();
-						Coord coordinate = new CoordImpl(node.getLongitude(), node.getLatitude());
-						TransitStopFacility facility = transitSchedule.getFactory().createTransitStopFacility(new IdImpl(node.getId()), coordinate, false);
-						String role = relationMember.getMemberRole();
-						if (role.startsWith("stop")) {
-							stopsH.addLast(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
-							stopsR.addFirst(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
-						} else if (role.startsWith("forward:stop")) {
-							stopsH.addLast(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
-						} else if (role.startsWith("backward:stop")) {
-							stopsR.addFirst(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
-						}
-					} else {
-						System.out.println("Missing node: " + relationMember.getMemberId());
-					}
-				}
-			}
-			
 			Stitcher stitcher = new Stitcher(network);
 			
 			for (RelationMember relationMember : relation.getMembers()) {
@@ -227,8 +202,38 @@ public class TransitNetworkSink implements Sink {
 				} 
 			}
 			
-			LinkedList<Id> linkIdsH = stitcher.getForwardRoute();
-			LinkedList<Id> linkIdsR = stitcher.getBackwardRoute();
+			for (RelationMember relationMember : relation.getMembers()) {
+				if (relationMember.getMemberType().equals(EntityType.Node)) {
+					if (allNodesTracker.get(relationMember.getMemberId())) {
+						System.out.println(relationMember.getMemberId());
+						Node node = nodeReader.get(relationMember.getMemberId()).getEntity();
+						Coord coordinate = new CoordImpl(node.getLongitude(), node.getLatitude());
+						TransitStopFacility facility = transitSchedule.getFactory().createTransitStopFacility(new IdImpl(node.getId()), coordinate, false);
+						String role = relationMember.getMemberRole();
+						if (role.startsWith("stop")) {
+							stopsH.addLast(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
+							stopsR.addFirst(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
+							stitcher.addForwardStop(node);
+							stitcher.addBackwardStop(node);
+						} else if (role.startsWith("forward:stop")) {
+							stopsH.addLast(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
+							stitcher.addForwardStop(node);
+						} else if (role.startsWith("backward:stop")) {
+							stopsR.addFirst(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
+							stitcher.addBackwardStop(node);
+						} else {
+							System.out.println("Unknown role: " + role);
+						}
+					} else {
+						System.out.println("Missing node: " + relationMember.getMemberId());
+					}
+				}
+			}
+			
+			
+			
+			List<Id> linkIdsH = stitcher.getForwardRoute();
+			List<Id> linkIdsR = stitcher.getBackwardRoute();
 			
 			if (linkIdsH.size() >= 2) {
 				NetworkRoute networkRouteH = createNetworkRoute(linkIdsH);
@@ -249,7 +254,8 @@ public class TransitNetworkSink implements Sink {
 		wayReader.release();
 	}
 
-	private NetworkRoute createNetworkRoute(LinkedList<Id> linkIds) {
+	private NetworkRoute createNetworkRoute(List<Id> plinkIds) {
+		LinkedList<Id> linkIds = new LinkedList<Id>(plinkIds);
 		NetworkRoute networkRouteH = (NetworkRoute) ((NetworkFactoryImpl) network.getFactory()).createRoute(TransportMode.car, linkIds.getFirst(), linkIds.getLast());
 		Id first = linkIds.removeFirst();
 		Id last = linkIds.removeLast();

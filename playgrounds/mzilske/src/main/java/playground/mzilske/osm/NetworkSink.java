@@ -69,7 +69,9 @@ public class NetworkSink implements SinkSource {
 	private void readNode(Node osmNode) {
 		CoordImpl osmCoord = new CoordImpl(osmNode.getLongitude(), osmNode.getLatitude());
 		Coord transformedCoord = transform.transform(osmCoord);
-		network.addNode(network.getFactory().createNode(new IdImpl(osmNode.getId()), transformedCoord));
+		org.matsim.api.core.v01.network.Node node = network.getFactory().createNode(new IdImpl(osmNode.getId()), transformedCoord);
+		network.addNode(node);
+		osmNode.getTags().add(new Tag("matsim:node-id", node.getId().toString()));
 	}
 
 
