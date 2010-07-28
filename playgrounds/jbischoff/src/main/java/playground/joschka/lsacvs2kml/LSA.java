@@ -6,7 +6,7 @@ public class LSA {
 	private String LongName;
 	private double xcord;
 	private double ycord;
-	
+	public LSA(){}
 	public LSA(String sn,String ln,double x,double y)
 	{
 		ShortName=sn;
