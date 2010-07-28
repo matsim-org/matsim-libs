@@ -1,7 +1,7 @@
 package org.matsim.core.config.groups;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
@@ -219,13 +219,13 @@ public class PlanomatConfigGroup extends Module {
 		return Integer.parseInt(this.getParams().get(PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getParameterName()));
 	}
 
-	private HashSet<String> cachedPossibleModes = null;
+	private TreeSet<String> cachedPossibleModes = null;
 
 	public Set<String> getPossibleModes() {
 
 		if (this.cachedPossibleModes == null) {
 
-			this.cachedPossibleModes = new HashSet<String>();
+			this.cachedPossibleModes = new TreeSet<String>();
 
 			if (!super.getParams().get(PlanomatConfigParameter.POSSIBLE_MODES.getParameterName()).equals(PlanomatConfigParameter.POSSIBLE_MODES.getDefaultValue())) {
 				String[] possibleModesStringArray = super.getParams().get(PlanomatConfigParameter.POSSIBLE_MODES.getParameterName()).split(",");

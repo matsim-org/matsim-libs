@@ -20,6 +20,8 @@
 
 package org.matsim.planomat;
 
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
@@ -209,10 +211,10 @@ public class PlanomatTest extends MatsimTestCase {
 		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
 		Planomat testee = new Planomat(null, null, planomatConfigGroup, null, this.scenario.getNetwork());
 
-		String[] possibleModes = testee.getPossibleModes(testPlan);
+		TreeSet<String> possibleModes = testee.getPossibleModes(testPlan);
 
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
-		if (possibleModes.length > 0) {
+		if (possibleModes.size() > 0) {
 			planAnalyzeSubtours = new PlanAnalyzeSubtours();
 			planAnalyzeSubtours.run(testPlan);
 		}

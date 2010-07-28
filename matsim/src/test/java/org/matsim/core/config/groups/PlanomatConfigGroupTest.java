@@ -59,9 +59,11 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		PlanomatConfigGroup expectedConfig = super.loadConfig(this.getInputDirectory() + "config.xml").planomat();
 
 		assertEquals( 10, expectedConfig.getPopSize() );
-		assertEquals( 2, expectedConfig.getPossibleModes().toArray().length );
-		assertEquals( TransportMode.car, expectedConfig.getPossibleModes().toArray()[0] );
-		assertEquals( TransportMode.pt, expectedConfig.getPossibleModes().toArray()[1] );
+		assertEquals( 4, expectedConfig.getPossibleModes().toArray().length );
+		assertEquals( TransportMode.bike, expectedConfig.getPossibleModes().toArray()[0] );
+		assertEquals( TransportMode.car, expectedConfig.getPossibleModes().toArray()[1] );
+		assertEquals( TransportMode.pt, expectedConfig.getPossibleModes().toArray()[2] );
+		assertEquals( TransportMode.walk, expectedConfig.getPossibleModes().toArray()[3] );
 		assertEquals( PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible, expectedConfig.getSimLegInterpretation() );
 		assertEquals( PlanomatConfigGroup.RoutingCapability.linearInterpolation, expectedConfig.getRoutingCapability() );
 		assertEquals( 1000, expectedConfig.getJgapMaxGenerations() );

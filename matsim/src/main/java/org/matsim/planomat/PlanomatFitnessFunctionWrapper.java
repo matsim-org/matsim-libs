@@ -20,6 +20,8 @@
 
 package org.matsim.planomat;
 
+import java.util.TreeSet;
+
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.matsim.api.core.v01.population.Plan;
@@ -53,14 +55,14 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 	private transient final Planomat planomat;
 	private transient final Plan plan;
 	private transient final PlanAnalyzeSubtours planAnalyzeSubtours;
-	private transient final String[] possibleModes;
+	private transient final TreeSet<String> possibleModes;
 	private transient final LegTravelTimeEstimator legTravelTimeEstimator;
 
 	public PlanomatFitnessFunctionWrapper(
 			Planomat planomat,
 			Plan plan,
 			PlanAnalyzeSubtours planAnalyzeSubtours,
-			String[] possibleModes,
+			TreeSet<String> possibleModes,
 			LegTravelTimeEstimator legTravelTimeEstimator) {
 		super();
 		this.planomat = planomat;

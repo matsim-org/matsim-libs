@@ -22,6 +22,7 @@ package org.matsim.planomat;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.TreeSet;
 
 import org.jgap.BaseGeneticOperator;
 import org.jgap.impl.BestChromosomesSelector;
@@ -94,10 +95,10 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
 		Planomat testee = new Planomat(null, null, planomatConfigGroup, null, this.scenario.getNetwork());
 
-		String[] possibleModes = testee.getPossibleModes(testPlan);
+		TreeSet<String> possibleModes = testee.getPossibleModes(testPlan);
 
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
-		if (possibleModes.length > 0) {
+		if (possibleModes.size() > 0) {
 			planAnalyzeSubtours = new PlanAnalyzeSubtours();
 			planAnalyzeSubtours.setTripStructureAnalysisLayer(scenario.getConfig().planomat().getTripStructureAnalysisLayer());
 			planAnalyzeSubtours.run(testPlan);

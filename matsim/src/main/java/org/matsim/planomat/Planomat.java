@@ -20,9 +20,9 @@
 
 package org.matsim.planomat;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.jgap.Genotype;
@@ -119,10 +119,10 @@ public class Planomat implements PlanAlgorithm {
 
 		// perform subtour analysis only if mode choice on subtour basis is optimized
 		// (if only times are optimized, subtour analysis is not necessary)
-		String[] possibleModes = this.getPossibleModes(plan);
+		TreeSet<String> possibleModes = this.getPossibleModes(plan);
 
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
-		if (possibleModes.length > 0) {
+		if (possibleModes.size() > 0) {
 			if (this.doLogging) {
 				logger.info("Running subtour analysis...");
 			}
@@ -175,21 +175,16 @@ public class Planomat implements PlanAlgorithm {
 		plan.setScore(null);
 	}
 
-	/**
-	 * TODO refactor all "possibleModes" operations to Set rather than arrays
-	 * @param plan
-	 * @return
-	 */
-	protected String[] getPossibleModes(final Plan plan) {
+	protected TreeSet<String> getPossibleModes(final Plan plan) {
 
 		// remove car option for agents that have no car available
-		HashSet<String> possibleModes = new HashSet<String>(this.planomatConfigGroup.getPossibleModes());
+		TreeSet<String> possibleModes = new TreeSet<String>(this.planomatConfigGroup.getPossibleModes());
 
 		String carAvail = ((PersonImpl) plan.getPerson()).getCarAvail();
 		if ("never".equals(carAvail)) {
 			possibleModes.remove(TransportMode.car);
 		}
-		return possibleModes.toArray(new String[possibleModes.size()]);
+		return possibleModes;
 	}
 
 	private IChromosome evolveAndReturnFittest(final Genotype population) {
@@ -206,7 +201,7 @@ public class Planomat implements PlanAlgorithm {
 			final Plan plan,
 			final PlanAnalyzeSubtours planAnalyzeSubtours,
 			final LegTravelTimeEstimator legTravelTimeEstimator,
-			final String[] possibleModes) {
+			final TreeSet<String> possibleModes) {
 
 		// TODO comment this
 		double positionInTimeInterval = 0.5;
@@ -275,7 +270,7 @@ public class Planomat implements PlanAlgorithm {
 				// set mode
 				int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[geneIndex - 1];
 				int modeIndex = ((IntegerGene) individual.getGene(1 + numLegs + subtourIndex)).intValue();
-				desiredMode = possibleModes[modeIndex];
+				desiredMode = (String) possibleModes.toArray()[modeIndex];
 			} // otherwise leave modes untouched
 
 			LegImpl newLeg = legTravelTimeEstimator.getNewLeg(

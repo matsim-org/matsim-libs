@@ -20,6 +20,8 @@
 
 package org.matsim.planomat;
 
+import java.util.TreeSet;
+
 import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
 import org.jgap.Gene;
@@ -48,7 +50,7 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			PlanAnalyzeSubtours planAnalyzeSubtours,
 			long seed,
 			int numTimeIntervals,
-			String[] possibleModes,
+			TreeSet<String> possibleModes,
 			PlanomatConfigGroup planomatConfigGroup) {
 
 		// JGAP Configuration object is initialized without an id. This means there can be only one configuration object per thread, which is what we want.
@@ -114,7 +116,7 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			}
 			// one integer gene for the mode of each subtour
 			for (int ii=0; ii < numSubtours; ii++) {
-				sampleGenes[1 + numActs + ii] = new IntegerGene(this, 0, possibleModes.length - 1);
+				sampleGenes[1 + numActs + ii] = new IntegerGene(this, 0, possibleModes.size() - 1);
 			}
 
 			IChromosome sampleChromosome = null;
