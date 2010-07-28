@@ -34,8 +34,14 @@ import org.matsim.visum.VisumNetwork.StopPoint;
 import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;
+/**
+ * doesn't work yet. need to be checked
+ * 
+ * @author droeder
+ *
+ */
 
-
+@Deprecated
 public class DaVisumHafasScheduleMerger {
 
 	private static Logger log = Logger.getLogger(DaVisumHafasScheduleMerger.class);

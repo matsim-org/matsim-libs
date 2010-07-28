@@ -103,8 +103,8 @@ public abstract class AbstractDaVisum2HafasMapper {
 		this.preMatchStops();
 		this.matchLines();
 		this.analyseResults();
-		this.unmatched2txt();
-		this.matched2txt();
+//		this.unmatched2txt();
+//		this.matched2txt();
 
 	}
 	
@@ -202,6 +202,31 @@ public abstract class AbstractDaVisum2HafasMapper {
 	protected abstract Map<Id, Id> tryToMatchRoute(TransitRoute visRoute, TransitRoute hafRoute);
 	
 	private void analyseResults(){
+		
+//		int routes = 0;
+//		for(TransitLine line : visumSc.getTransitSchedule().getTransitLines().values()){
+//			routes += line.getRoutes().size();
+//		}
+//		log.info("###visum-scenario### lines:"+ visumSc.getTransitSchedule().getTransitLines().size() + 
+//				" routes:" + routes + " stops:" + visumSc.getTransitSchedule().getFacilities().size());
+//		
+//		routes = 0;
+//		for(TransitLine line : hafasSc.getTransitSchedule().getTransitLines().values()){
+//			routes += line.getRoutes().size();
+//		}
+//		log.info("###hafas-scenario### lines:"+ hafasSc.getTransitSchedule().getTransitLines().size() + 
+//				" routes:" + routes + " stops:" + hafasSc.getTransitSchedule().getFacilities().size());
+//		
+//		int h = 0, v = 0, l = 0;
+//		for(Entry<Id, Id> e : vis2HafLines.entrySet()){
+//			v += visumSc.getTransitSchedule().getTransitLines().get(e.getKey()).getRoutes().size();
+//			h += hafasSc.getTransitSchedule().getTransitLines().get(e.getValue()).getRoutes().size();
+//			l++;
+////			if(visumSc.getTransitSchedule().getTransitLines().containsKey(e.getKey()) && hafasSc.getTransitSchedule().getTransitLines().containsKey(e.getValue())){
+////			}
+//		}
+//		log.info("lines in both scenarios:" + l + " Routes v:" + v + " h:" + h);
+		
 		Map<Id, Id> temp;
 		int all = 0;
 		int part = 0;
@@ -460,7 +485,7 @@ public abstract class AbstractDaVisum2HafasMapper {
 	}
 	
 	/**
-	 *  transforms matched positions to Id pairs and check if the order of stops is possible
+	 *  transforms matched positions of stops to Id-pairs and check if the order of stops is possible
 	 *  returns null if not
 	 * @param matched
 	 * @param vis
@@ -491,14 +516,6 @@ public abstract class AbstractDaVisum2HafasMapper {
 		}
 	}
 	
-	private void test(){
-		
-		Id v = new IdImpl("792020");
-		Id h = new IdImpl("9079202");
-		System.out.println(this.checkFacsById(v, h));
-		System.out.println(this.getDist(v, h));
-		System.out.println(preVisum2HafasMap.size());
-		System.out.println(preVisum2HafasMap.get(v));
-
-	}
+	
+	
 }

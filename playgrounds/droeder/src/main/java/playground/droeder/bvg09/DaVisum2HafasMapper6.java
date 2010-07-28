@@ -86,19 +86,19 @@ public class DaVisum2HafasMapper6 extends AbstractDaVisum2HafasMapper {
 					for (Integer i : e.getValue()){
 						
 						// get new solution from old
-						System.out.println(l.size());
+//						System.out.println(l.size());
 						if(l.size() == e.getKey() && l.get(l.size()-1) < i){
 							List<Integer> s = new ArrayList<Integer>(l);
 							s.add(i);
 							double score = scoreSolution(s);
-							log.error(score);
+//							log.error(score);
 							if(score < 5000){
 								solutions.put(count, s);
 								count++;
-								for(Integer ii : s){
-									System.out.print(ii + "\t");
-								}
-								System.out.println();
+//								for(Integer ii : s){
+//									System.out.print(ii + "\t");
+//								}
+//								System.out.println();
 							}
 						}
 					}

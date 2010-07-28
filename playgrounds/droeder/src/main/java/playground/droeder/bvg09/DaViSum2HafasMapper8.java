@@ -111,10 +111,10 @@ public class DaViSum2HafasMapper8 extends AbstractDaVisum2HafasMapper {
 	}
 	
 	private Map<Id, Id> matchShorterVisum(){
-		
 		/*
 		 * not implemented yet
 		 */
+		
 		for(TransitRouteStop stop : vStops){
 			System.out.print(stop.getStopFacility().getId() + "\t");
 		}
