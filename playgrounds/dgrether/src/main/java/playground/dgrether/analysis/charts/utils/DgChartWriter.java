@@ -71,30 +71,50 @@ public class DgChartWriter {
 				if (xy.getDomainAxis() != null){
 					xAxisLabel = xy.getDomainAxis().getLabel();
 				}
-				String header = xAxisLabel + "\t " + yAxisLabel;
+				String header = "#" + xAxisLabel + "\t " + yAxisLabel;
 				writer.write(header);
 				writer.newLine();
+			//write the header
+				writer.write("#");
 				for (int i = 0; i < xy.getDatasetCount(); i++){
 					XYDataset xyds = xy.getDataset(i);
-					for (int seriesIndex = 0; seriesIndex < xyds.getSeriesCount(); seriesIndex ++) {
-						writer.newLine();
-						writer.write("Series" + xyds.getSeriesKey(seriesIndex).toString());
-						writer.newLine();
-						int items = xyds.getItemCount(seriesIndex);
-						for (int itemsIndex = 0; itemsIndex < items; itemsIndex++){
-							Number xValue = xyds.getX(seriesIndex, itemsIndex);
-							Number yValue = xyds.getY(seriesIndex, itemsIndex);
-							writer.write(xValue.toString());
-							writer.write("\t");
-							writer.write(yValue.toString());
-							writer.newLine();
+					int seriesIndex = 0;
+					int maxItems = 0;
+					int seriesCount = xyds.getSeriesCount();
+					while (seriesIndex <  seriesCount){
+						writer.write("Series " + xyds.getSeriesKey(seriesIndex).toString());
+						if (seriesIndex < seriesCount - 1){
+							writer.write("\t \t");
 						}
+						if (xyds.getItemCount(seriesIndex) > maxItems){
+							maxItems = xyds.getItemCount(seriesIndex);
+						}
+						seriesIndex++;
+					}
+					writer.newLine();
+					
+					//write the data
+					Number xValue, yValue = null;
+					for (int itemsIndex = 0; itemsIndex < maxItems; itemsIndex++){
+						for (int seriesIdx = 0; seriesIdx < seriesCount; seriesIdx ++) {
+							xValue = xyds.getX(seriesIdx, itemsIndex);
+							yValue = xyds.getY(seriesIdx, itemsIndex);
+							if (xValue != null && yValue != null){
+								writer.write(xValue.toString());
+								writer.write("\t");
+								writer.write(yValue.toString());
+								if (seriesIdx < seriesCount - 1){
+									writer.write("\t");
+								}
+							}
+						}
+						writer.newLine();
 					}
 				}
 			} catch(ClassCastException e){ //else instanceof CategoryPlot
 				log.info("caught class cast exception, trying to write CategoryPlot");
 				CategoryPlot cp = chart.getCategoryPlot();
-				String header = "CategoryRowKey \t CategoryColumnKey \t CategoryRowIndex \t CategoryColumnIndex \t Value";
+				String header = "# CategoryRowKey \t CategoryColumnKey \t CategoryRowIndex \t CategoryColumnIndex \t Value";
 				writer.write(header);
 				writer.newLine();
 				for (int i = 0; i < cp.getDatasetCount(); i++) {
