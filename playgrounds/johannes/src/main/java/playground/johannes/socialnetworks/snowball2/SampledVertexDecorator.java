@@ -83,6 +83,7 @@ public class SampledVertexDecorator<V extends Vertex> extends VertexDecorator<V>
 		return (List<? extends SampledVertexDecorator<V>>) super.getNeighbours();
 	}
 
+	@Deprecated
 	@Override
 	public SampledVertexDecorator<V> getSeed() {
 		return seed;

@@ -203,6 +203,10 @@ public class GraphBuilder {
 		}
 	}
 	
+	private void setSeedVertices(SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> proj) {
+		
+	}
+	
 	private class ErrorLogger {
 		
 		private int noEgoCoords;

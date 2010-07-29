@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
-import gnu.trove.TIntLongIterator;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.TIntDoubleIterator;
+import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectLongHashMap;
 
 import org.matsim.contrib.sna.graph.Edge;
@@ -60,14 +60,14 @@ public class Centrality {
 		return distr;
 	}
 	
-	public TObjectLongHashMap<Edge> edgeBetweenness() {
-		TObjectLongHashMap<Edge> edgeBetweenness = new TObjectLongHashMap<Edge>();
+	public TObjectDoubleHashMap<Edge> edgeBetweenness() {
+		TObjectDoubleHashMap<Edge> edgeBetweenness = new TObjectDoubleHashMap<Edge>();
 		
 		for(int i = 0; i < y.getVertexCount(); i++) {
 			Vertex v1 = y.getVertex(i);
 			
 			if(mCentrality.getEdgeBetweenness()[i] != null) {
-				TIntLongIterator it = mCentrality.getEdgeBetweenness()[i].iterator();
+				TIntDoubleIterator it = mCentrality.getEdgeBetweenness()[i].iterator();
 				for(int k = 0; k < mCentrality.getEdgeBetweenness()[i].size(); k++) {
 					it.advance();
 					Vertex v2 = y.getVertex(it.key());

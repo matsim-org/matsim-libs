@@ -20,8 +20,8 @@
 package playground.johannes.socialnetworks.graph.matrix;
 
 import gnu.trove.TIntArrayList;
-import gnu.trove.TIntLongHashMap;
-import gnu.trove.TIntLongIterator;
+import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.TIntDoubleIterator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,9 +46,9 @@ public class MatrixCentrality {
 
 	private double[] vertexCloseness;
 
-	private long[] vertexBetweenness;
+	private double[] vertexBetweenness;
 
-	private TIntLongHashMap[] edgeBetweenness;
+	private TIntDoubleHashMap[] edgeBetweenness;
 
 	private double meanVertexCloseness;
 
@@ -104,7 +104,7 @@ public class MatrixCentrality {
 	 * 
 	 * @return an array with values for vertex betweenness.
 	 */
-	public long[] getVertexBetweenness() {
+	public double[] getVertexBetweenness() {
 		return vertexBetweenness;
 	}
 
@@ -114,7 +114,7 @@ public class MatrixCentrality {
 	 * 
 	 * @return a matrix with values for edge betweenness.
 	 */
-	public TIntLongHashMap[] getEdgeBetweenness() {
+	public TIntDoubleHashMap[] getEdgeBetweenness() {
 		return edgeBetweenness;
 	}
 
@@ -173,8 +173,8 @@ public class MatrixCentrality {
 		int n = y.getVertexCount();
 		vertexCloseness = new double[n];
 		Arrays.fill(vertexCloseness, Double.POSITIVE_INFINITY);
-		vertexBetweenness = new long[n];
-		edgeBetweenness = new TIntLongHashMap[n];
+		vertexBetweenness = new double[n];
+		edgeBetweenness = new TIntDoubleHashMap[n];
 		diameter = 0;
 		radius = Integer.MAX_VALUE;
 		/*
@@ -227,7 +227,7 @@ public class MatrixCentrality {
 				 * merge edge betweenness values
 				 */
 				if (thread.edgeBetweenness[i] != null) {
-					TIntLongIterator it = thread.edgeBetweenness[i].iterator();
+					TIntDoubleIterator it = thread.edgeBetweenness[i].iterator();
 					for (int j = 0; j < thread.edgeBetweenness[i].size(); j++) {
 						it.advance();
 						/*
@@ -235,11 +235,11 @@ public class MatrixCentrality {
 						 * for both edges
 						 */
 						if (edgeBetweenness[i] == null)
-							edgeBetweenness[i] = new TIntLongHashMap();
+							edgeBetweenness[i] = new TIntDoubleHashMap();
 						edgeBetweenness[i].adjustOrPutValue(it.key(), it.value(), it.value());
 
 						if (edgeBetweenness[it.key()] == null)
-							edgeBetweenness[it.key()] = new TIntLongHashMap();
+							edgeBetweenness[it.key()] = new TIntDoubleHashMap();
 						edgeBetweenness[it.key()].adjustOrPutValue(i, it.value(), it.value());
 					}
 				}
@@ -254,7 +254,7 @@ public class MatrixCentrality {
 		 * calculate mean values
 		 */
 		meanVertexCloseness = StatUtils.mean(vertexCloseness);
-		long sum = 0;
+		double sum = 0;
 		for (int i = 0; i < y.getVertexCount(); i++)
 			sum += vertexBetweenness[i];
 		meanVertexBetweenness = sum / (double) y.getVertexCount();
@@ -263,7 +263,7 @@ public class MatrixCentrality {
 		double count = 0;
 		for (int i = 0; i < n; i++) {
 			if (edgeBetweenness[i] != null) {
-				TIntLongIterator it = edgeBetweenness[i].iterator();
+				TIntDoubleIterator it = edgeBetweenness[i].iterator();
 				for (int k = 0; k < edgeBetweenness[i].size(); k++) {
 					it.advance();
 					sum += it.value();
@@ -282,9 +282,9 @@ public class MatrixCentrality {
 
 		private int i_stop;
 
-		private TIntLongHashMap[] edgeBetweenness;
+		private TIntDoubleHashMap[] edgeBetweenness;
 
-		private long vertexBetweenness[];
+		private double vertexBetweenness[];
 
 		private double vertexCloseness[];
 
@@ -320,8 +320,8 @@ public class MatrixCentrality {
 			/*
 			 * initialize the betweenness arrays with zero
 			 */
-			vertexBetweenness = new long[n];
-			edgeBetweenness = new TIntLongHashMap[n];
+			vertexBetweenness = new double[n];
+			edgeBetweenness = new TIntDoubleHashMap[n];
 			/*
 			 * time measuring
 			 */
@@ -375,9 +375,9 @@ public class MatrixCentrality {
 							vertexBetweenness[vertex]++;
 
 							if (edgeBetweenness[prevVertex] == null) {
-								edgeBetweenness[prevVertex] = new TIntLongHashMap();
+								edgeBetweenness[prevVertex] = new TIntDoubleHashMap();
 							}
-							edgeBetweenness[prevVertex].adjustOrPutValue(vertex, 1, 1);
+							edgeBetweenness[prevVertex].adjustOrPutValue(vertex, 1.0, 1.0);
 
 							prevVertex = vertex;
 						}
