@@ -154,6 +154,7 @@ public class ChangeProbStats implements StartupListener, IterationEndsListener, 
 				}
 			}
 			this.out.write(System.getProperty("line.separator"));
+			this.out.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

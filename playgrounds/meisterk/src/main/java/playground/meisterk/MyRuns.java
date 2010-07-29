@@ -91,7 +91,8 @@ public class MyRuns {
 		/**
 		 * Generate initial ivtch demand for ivtch-changed-wu-flama. Used for semester project of Elias Aptus.
 		 */
-		MOVE_DEMAND_TO_NETWORK("moveInitDemandToDifferentNetwork");
+		MOVE_DEMAND_TO_NETWORK("moveInitDemandToDifferentNetwork"),
+		SUE_STUDY("sueStudy");
 
 		private final String name;
 
@@ -132,7 +133,7 @@ public class MyRuns {
 		logger.info("Running " + desiredRunName + "...");
 		String[] methodArgs = Arrays.copyOfRange(args, 1, args.length);
 		if (desiredRunName.equals(Run.EAPTUS_2010.getName())) {
-			myRuns.eaptus2010(methodArgs);
+			myRuns.eaptus2010ForPhDThesis(methodArgs);
 		} else if (desiredRunName.equals(Run.MOVE_DEMAND_TO_NETWORK.getName())) {
 			myRuns.moveInitDemandToDifferentNetwork(methodArgs);
 		}
@@ -140,12 +141,18 @@ public class MyRuns {
 
 	}
 
-	void eaptus2010(final String[] args) {
+	void eaptus2010ForPhDThesis(final String[] args) {
 
-		MyControler myControler = new MyControler(args);
-		myControler.setCreateGraphs(false);
-		myControler.setOverwriteFiles(true);
-		myControler.run();
+		final double[] VARY_LEARNING_RATE = new double[]{1.0, 0.1};
+		
+		for (double learningRate : VARY_LEARNING_RATE) {
+			MyControler myControler = new MyControler(args);
+			myControler.setCreateGraphs(false);
+			
+			myControler.getConfig().charyparNagelScoring().setLearningRate(learningRate);
+			myControler.getConfig().controler().setOutputDirectory("output/eaptus2010ForPhDThesis/equil/learningRate_" + Double.toString(learningRate));
+			myControler.run();
+		}
 
 	}
 
