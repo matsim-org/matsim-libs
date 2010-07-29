@@ -16,8 +16,8 @@ public class KonvMain {
 	 */
 	public static void main(String[] args) throws IOException {
 		
-		File input = new File ("/home/sfuerbas/workspace/Konverter/src/root/testliste");
-		File output = new File("/home/sfuerbas/workspace/Konverter/src/root/ausgangtest");
+		File input = new File ("/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/rawdata/Wegeinland.dat");
+		File output = new File("/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/rawdata/Wegeinland.conv.dat");
 		
 		FileReader reader = new FileReader(input);
 		

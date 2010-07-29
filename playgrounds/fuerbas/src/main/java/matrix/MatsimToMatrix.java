@@ -1,6 +1,6 @@
 package matrix;
 
-import gnu.trove.TIntLongHashMap;
+import gnu.trove.TIntDoubleHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -8,13 +8,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -97,9 +95,9 @@ public class MatsimToMatrix {
 	MatrixCent.run(y);
 	System.out.println("MATRIX CENT RUN CPLT "+Runtime.getRuntime().freeMemory());
 	
-	TIntLongHashMap[] betweenness = MatrixCent.getEdgeBetweenness();
+	TIntDoubleHashMap[] betweenness = MatrixCent.getEdgeBetweenness();
 
-	Long betwFromTo;	
+	double betwFromTo;	
 	
 	for (Link link : linkList) {
 
