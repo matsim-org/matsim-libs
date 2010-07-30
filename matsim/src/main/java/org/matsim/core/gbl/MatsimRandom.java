@@ -62,7 +62,7 @@ public abstract class MatsimRandom {
 	/** Returns an instance of a random number generator, which can be used
 	 * locally, e.g. in threads.
 	 *
-	 * @return pseudo random number generated.
+	 * @return pseudo random number generator
 	 */
 	public static Random getLocalInstance() {
 		internalCounter++;
