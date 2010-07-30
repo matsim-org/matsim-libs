@@ -59,7 +59,7 @@ public class BkControlerIncome extends BkControler {
 		this.scenarioData.getConfig().global().setNumberOfThreads(1);
 		this.personHouseholdMapping = new PersonHouseholdMapping(this.getScenario().getHouseholds());
 		
-/*		Setting the needed scoring function.
+		/*		Setting the needed scoring function.
 		Remark: parameters must be set in several classes and independently for scoring and router!*/
 		ScoringFunctionFactory scoringFactory = new IncomeScoringFunctionFactory(this.getScenario().getConfig(), personHouseholdMapping, this.getNetwork());
 		

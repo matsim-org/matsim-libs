@@ -22,6 +22,8 @@ package playground.benjamin.old;
 import org.matsim.core.controler.Controler;
 import org.matsim.run.OTFVis;
 
+import playground.benjamin.BkPaths;
+
 public class MyMain {
 
 //	/**
@@ -49,12 +51,10 @@ public class MyMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		Controler c = new Controler("examples/equil/config.xml");
-//		org.matsim.run.Controler.main(new String[] {"examples/tutorial/singleIteration.xml"});
-		String equilExampleConfig = "examples/equil/configOTF.xml";
-		
-//		String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteNoModeTest/config.xml";
-		String oneRouteNoModeTest = "../bkick/oneRouteNoModeTest/configOldUtlFctn.xml";
+
+//		String equilExampleConfig = "examples/equil/configOTF.xml";
+		String oneRouteNoModeTest = BkPaths.SHAREDSVN + "studies/bkick/oneRouteNoModeTest/config.xml";
+
 
 
 //		String config = equilExampleConfig;
@@ -69,8 +69,6 @@ public class MyMain {
 		
 //		String out = c.getConfig().controler().getOutputDirectory() + "/ITERS/it."+lastIteration+"/Snapshot";
 		String out = c.getConfig().controler().getOutputDirectory() + "/ITERS/it."+lastIteration+"/"+lastIteration+".otfvis.mvi";
-		
-		String[] visargs = {out};
 		
 		OTFVis.main(new String[] {out});	
 	}

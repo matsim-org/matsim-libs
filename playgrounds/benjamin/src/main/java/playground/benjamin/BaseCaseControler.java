@@ -34,7 +34,7 @@ public class BaseCaseControler {
 
 
 	public static void main(String[] args) {
-		String config = "../bkick/routerTest/configRouterTest.xml";
+		String config = "../../shared-svn/studies/bkick/routerTest/configRouterTest.xml";
 		Controler controler = new Controler(config);
 		controler.run();
 	}
