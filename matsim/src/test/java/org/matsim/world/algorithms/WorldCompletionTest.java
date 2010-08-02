@@ -100,7 +100,7 @@ public class WorldCompletionTest extends MatsimTestCase {
 		log.info("running testCompletion()...");
 
 		HashSet<String> excludingLinkTypes = new HashSet<String>();
-		
+
 		log.info("  reading world xml file... ");
 		ScenarioImpl scenario = new ScenarioImpl(this.config);
 		World world = scenario.getWorld();
@@ -119,32 +119,32 @@ public class WorldCompletionTest extends MatsimTestCase {
 
 		log.info("  running WorldBottom2TopCompletion module without excludingLinkTypes... ");
 		excludingLinkTypes.clear();
-		new WorldConnectLocations(excludingLinkTypes).run(world);
+		new WorldConnectLocations(excludingLinkTypes, this.config).run(world);
 		log.info("    done.");
-		
+
 		log.info("  running WorldBottom2TopCompletion module with excludingLinkTypes=[1]... ");
 		excludingLinkTypes.clear();
 		excludingLinkTypes.add("1");
-		new WorldConnectLocations(excludingLinkTypes).run(world);
+		new WorldConnectLocations(excludingLinkTypes, this.config).run(world);
 		log.info("    done.");
-		
+
 		log.info("  running WorldBottom2TopCompletion module with excludingLinkTypes=[2]... ");
 		excludingLinkTypes.clear();
 		excludingLinkTypes.add("2");
-		new WorldConnectLocations(excludingLinkTypes).run(world);
+		new WorldConnectLocations(excludingLinkTypes, this.config).run(world);
 		log.info("    done.");
-		
+
 		log.info("  running WorldBottom2TopCompletion module with excludingLinkTypes=[1,2]... ");
 		excludingLinkTypes.clear();
 		excludingLinkTypes.add("1");
 		excludingLinkTypes.add("2");
-		new WorldConnectLocations(excludingLinkTypes).run(world);
+		new WorldConnectLocations(excludingLinkTypes, this.config).run(world);
 		log.info("    done.");
-		
+
 		log.info("  running WorldBottom2TopCompletion module with excludingLinkTypes=[3]... ");
 		excludingLinkTypes.clear();
 		excludingLinkTypes.add("3");
-		new WorldConnectLocations(excludingLinkTypes).run(world);
+		new WorldConnectLocations(excludingLinkTypes, this.config).run(world);
 		log.info("    done.");
 
 		TriangleScenario.writeWorld(world);

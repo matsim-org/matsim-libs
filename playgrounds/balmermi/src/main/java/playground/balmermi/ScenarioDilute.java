@@ -103,7 +103,7 @@ public class ScenarioDilute {
 		exTxpes.add("4-4130-1"); // ferry
 		exTxpes.add("4-4130-2"); // train
 		exTxpes.add("7-4130-1"); // ferry
-		sc.getWorld().complete(exTxpes);
+		sc.getWorld().complete(exTxpes, config);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 

@@ -115,12 +115,13 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 	private final Logger log = Logger.getLogger(SNControllerListener2.class);
 	private Knowledges knowledges;
 
+	@Override
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
 		this.snConfig = (SocNetConfigGroup) this.controler.getConfig().getModule(SocNetConfigGroup.GROUP_NAME);
 		this.knowledges = (controler.getScenario()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
-		new WorldConnectLocations().run(controler.getScenario().getWorld());
+		new WorldConnectLocations(this.controler.getConfig()).run(controler.getScenario().getWorld());
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 		initializeKnowledge();
@@ -131,6 +132,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		snsetup();
 	}
 
+	@Override
 	public void notifyScoring(final ScoringEvent event){
 
 		this.log.info("scoring");
@@ -204,6 +206,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		//} old bracket position only updated scores each replanning_interval!!!!!
 	}
 
+	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 
 		this.log.info("finishIteration ... "+event.getIteration());
@@ -266,6 +269,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 	 *
 	 * See {@link org.matsim.controler.Controler#doIterations()}
 	 */
+	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 
 		this.teo.clearTimeWindowMap();

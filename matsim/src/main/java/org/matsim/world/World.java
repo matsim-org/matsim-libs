@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.world.algorithms.WorldConnectLocations;
@@ -59,12 +60,12 @@ public class World {
 	//////////////////////////////////////////////////////////////////////
 
 	@Deprecated
-	public final void complete() {
-		complete(new HashSet<String>());
+	public final void complete(final Config config) {
+		complete(new HashSet<String>(), config);
 	}
 
 	@Deprecated
-	public final void complete(Set<String> excludingLinkTypes) {
+	public final void complete(Set<String> excludingLinkTypes, final Config config) {
 		// 1. remove rules and mappings containing network and/or facility layers
 		Layer f_layer = this.layers.get(ActivityFacilitiesImpl.LAYER_TYPE);
 		Layer n_layer = this.layers.get(NetworkLayer.LAYER_TYPE);
@@ -135,7 +136,7 @@ public class World {
 			}
 		}
 		// 5. connect the locations from neighbor layers
-		new WorldConnectLocations(excludingLinkTypes).run(this);
+		new WorldConnectLocations(excludingLinkTypes, config).run(this);
 	}
 
 	//////////////////////////////////////////////////////////////////////

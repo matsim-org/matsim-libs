@@ -136,12 +136,13 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		this.controler=controler;
 	}
 
+	@Override
 	public void notifyStartup(final StartupEvent event) {
 //		this.controler = event.getControler();
 		this.snConfig = (SocNetConfigGroup) event.getControler().getConfig().getModule(SocNetConfigGroup.GROUP_NAME);
 		this.knowledges = (controler.getScenario()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
-		new WorldConnectLocations().run(event.getControler().getScenario().getWorld());
+		new WorldConnectLocations(this.controler.getConfig()).run(event.getControler().getScenario().getWorld());
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 
@@ -179,6 +180,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 
 	}
 
+	@Override
 	public void notifyScoring(final ScoringEvent event){
 
 		this.log.info("scoring");
@@ -261,6 +263,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		}
 	}
 
+	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 
 		this.log.info("finishIteration ... "+event.getIteration());
@@ -318,6 +321,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 
 	}
 
+	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 /**
  * Clears the spatial social interaction tables (time overlap, or time windows) AFTER

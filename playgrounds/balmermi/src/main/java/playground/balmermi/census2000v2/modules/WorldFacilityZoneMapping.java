@@ -23,6 +23,7 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -45,15 +46,17 @@ public class WorldFacilityZoneMapping {
 	private final static Logger log = Logger.getLogger(WorldFacilityZoneMapping.class);
 
 	private final Households households;
+	private final Config config;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public WorldFacilityZoneMapping(Households households) {
+	public WorldFacilityZoneMapping(Households households, Config config) {
 		super();
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.households = households;
+		this.config = config;
 		log.info("    done.");
 	}
 
@@ -68,7 +71,7 @@ public class WorldFacilityZoneMapping {
 	public void run(World world) {
 		log.info("    running " + this.getClass().getName() + " module...");
 
-		world.complete();
+		world.complete(config);
 
 		if (world.getLayers().size() != 2) { Gbl.errorMsg("World must contian 2 layers!"); }
 		ActivityFacilitiesImpl fs = (ActivityFacilitiesImpl)world.getBottomLayer();

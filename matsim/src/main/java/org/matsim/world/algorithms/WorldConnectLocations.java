@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -68,6 +69,7 @@ public class WorldConnectLocations {
 	private final static Logger log = Logger.getLogger(WorldConnectLocations.class);
 
 	private final Set<String> excludingLinkTypes;
+	private final Config config;
 
 	public final static String CONFIG_F2L = "f2l";
 	public final static String CONFIG_F2L_INPUTF2LFile = "inputF2LFile";
@@ -77,12 +79,13 @@ public class WorldConnectLocations {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public WorldConnectLocations() {
-		this(new HashSet<String>());
+	public WorldConnectLocations(final Config config) {
+		this(new HashSet<String>(), config);
 	}
 
-	public WorldConnectLocations(final Set<String> excludingLinkTypes) {
+	public WorldConnectLocations(final Set<String> excludingLinkTypes, final Config config) {
 		this.excludingLinkTypes = excludingLinkTypes;
+		this.config = config;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -245,8 +248,8 @@ public class WorldConnectLocations {
 		}
 		log.info("    done.");
 
-		if (Gbl.getConfig() != null) {
-			String outputF2LFile = Gbl.getConfig().findParam(CONFIG_F2L,CONFIG_F2L_OUTPUTF2LFile);
+		if (this.config != null) {
+			String outputF2LFile = this.config.findParam(CONFIG_F2L,CONFIG_F2L_OUTPUTF2LFile);
 			if (outputF2LFile != null) {
 				outputF2LFile = outputF2LFile.replace('\\', '/');
 				writeF2LFile(facilities,outputF2LFile);

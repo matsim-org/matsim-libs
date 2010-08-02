@@ -86,7 +86,7 @@ public class IIDMAssign2Network {
 		System.out.println("  reading the network xml file...");
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		world.complete();
+		world.complete(null);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ public class IIDMAssign2Network {
 		excludingLinkTypes.add("90"); excludingLinkTypes.add("91"); excludingLinkTypes.add("92"); excludingLinkTypes.add("93");
 		excludingLinkTypes.add("94"); excludingLinkTypes.add("95"); excludingLinkTypes.add("96"); excludingLinkTypes.add("97");
 		excludingLinkTypes.add("98"); excludingLinkTypes.add("99");
-		new WorldConnectLocations(excludingLinkTypes).run(world);
+		new WorldConnectLocations(excludingLinkTypes, config).run(world);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

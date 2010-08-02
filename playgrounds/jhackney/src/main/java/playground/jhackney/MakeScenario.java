@@ -90,7 +90,7 @@ public class MakeScenario {
 
 		//////////////////////////////////////////////////////////////////////
 		System.out.println("  Completing World ... ");
-		new WorldConnectLocations().run(scenario.getWorld());
+		new WorldConnectLocations(config).run(scenario.getWorld());
 		System.out.println("  done.");
 		//////////////////////////////////////////////////////////////////////
 

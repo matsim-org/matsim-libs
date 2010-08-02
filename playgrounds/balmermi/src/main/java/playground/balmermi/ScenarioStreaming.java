@@ -128,7 +128,7 @@ public class ScenarioStreaming {
 //		exTxpes.add("90"); exTxpes.add("91"); exTxpes.add("92"); exTxpes.add("93");
 //		exTxpes.add("94"); exTxpes.add("95"); exTxpes.add("96"); exTxpes.add("97");
 //		exTxpes.add("98"); exTxpes.add("99");
-		sc.getWorld().complete(exTxpes);
+		sc.getWorld().complete(exTxpes, sc.getConfig());
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 

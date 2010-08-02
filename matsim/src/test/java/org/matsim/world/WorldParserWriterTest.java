@@ -54,7 +54,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 	private final void runModules(final World world) {
 		System.out.println("  running world modules... ");
-		new WorldConnectLocations().run(world);
+		new WorldConnectLocations(this.config).run(world);
 		System.out.println("  done.");
 	}
 

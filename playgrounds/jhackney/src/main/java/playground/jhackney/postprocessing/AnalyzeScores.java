@@ -71,7 +71,7 @@ public class AnalyzeScores {
 		World world = ScenarioConfig.readWorld();
 		facilities = ScenarioConfig.readFacilities();
 		network =ScenarioConfig.readNetwork();
-		new WorldConnectLocations().run(world);
+		new WorldConnectLocations(config).run(world);
 		int iplans=500;
 		int isoc=500;
 		knowledges = new KnowledgesImpl();

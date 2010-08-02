@@ -74,7 +74,7 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (WORLD.equals(name)) {
-			this.world.complete();
+			this.world.complete(this.scenario.getConfig());
 			this.world = null;
 		} else if (LAYER.equals(name)) {
 			this.currLayer = null;

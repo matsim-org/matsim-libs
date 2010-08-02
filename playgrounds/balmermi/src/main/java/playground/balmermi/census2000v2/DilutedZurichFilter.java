@@ -86,19 +86,19 @@ public class DilutedZurichFilter {
 		log.info("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-		world.complete();
+		world.complete(config);
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		world.complete();
+		world.complete(config);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  running world modules... ");
-		new WorldConnectLocations().run(world);
+		new WorldConnectLocations(config).run(world);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

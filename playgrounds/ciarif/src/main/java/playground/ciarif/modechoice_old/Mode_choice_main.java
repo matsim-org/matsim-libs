@@ -73,7 +73,7 @@ public class Mode_choice_main {
 		System.out.println();
 
 		System.out.println("  running world algorithms... ");
-		new WorldConnectLocations().run(world);
+		new WorldConnectLocations(config).run(world);
 		System.out.println("  done.");
 
 		System.out.println();

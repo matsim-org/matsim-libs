@@ -47,7 +47,7 @@ public class FacilitiesCreation {
 		System.out.println("MATSim-DB: create Facilites based on census2000 data.");
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  extracting input directory... ");
@@ -66,7 +66,7 @@ public class FacilitiesCreation {
 		System.out.println("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-		scenario.getWorld().complete();
+		scenario.getWorld().complete(config);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ public class FacilitiesCreation {
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		System.out.println("  writing facilities xml file... ");
 		FacilitiesWriter fac_writer = new FacilitiesWriter(facilities);
 		fac_writer.write(config.facilities().getOutputFile());

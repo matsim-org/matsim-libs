@@ -107,7 +107,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		Scenario scenario = new ScenarioImpl(this.config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
-		world.complete();
+		world.complete(this.config);
 		log.info("  done.");
 
 		this.runModules((NetworkLayer) network, world);
@@ -133,13 +133,13 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(this.config.world().getInputFile());
-		world.complete();
+		world.complete(this.config);
 		log.info("  done.");
 
 		log.info("  reading network xml file as a layer of the world... ");
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
-		world.complete();
+		world.complete(this.config);
 		log.info("  done.");
 
 		this.runModules(network, world);
@@ -165,7 +165,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("  reading network xml file as a layer of the world... ");
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
-		world.complete();
+		world.complete(this.config);
 		log.info("  done.");
 
 		this.runModules(network, world);
@@ -173,7 +173,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(this.config.world().getInputFile());
-		world.complete();
+		world.complete(this.config);
 		log.info("  done.");
 
 		TriangleScenario.writeConfig(this.config);

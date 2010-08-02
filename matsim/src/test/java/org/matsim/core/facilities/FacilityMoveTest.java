@@ -37,14 +37,14 @@ public class FacilityMoveTest extends MatsimTestCase {
 	//////////////////////////////////////////////////////////////////////
 
 	private static final Id ZONE_ID = new IdImpl("zone");
-	
+
 	private static final Coord[] COORDS = {
 		new CoordImpl(1.0,1.0), new CoordImpl(0.5,1.0), new CoordImpl(0.5,0.5),
 		new CoordImpl(0.0,0.0), new CoordImpl(-0.5,-0.5)
 	};
 	private static final String[] F_UP_ZONEID = { "z", "z", "z", "z00", null };
 	private static final String[] F_DOWN_LINKID = { "l0011", "l0211", "l0211", "l0011", "l0011" };
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
@@ -59,13 +59,13 @@ public class FacilityMoveTest extends MatsimTestCase {
 		zones.createZone(new IdImpl("z"),"1.0","1.0","0.5","0.5","1.5","1.5","1","z");
 		return world;
 	}
-	
+
 	private final ActivityFacilitiesImpl buildFacilities(World world) {
 		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
 		facilities.createFacility(new IdImpl("f11"), new CoordImpl(1, 1));
 		return facilities;
 	}
-	
+
 	private final NetworkLayer buildNetwork(World world) {
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		Node n00 = network.createAndAddNode(new IdImpl("n00"), new CoordImpl("0.0","0.0"));
@@ -79,7 +79,7 @@ public class FacilityMoveTest extends MatsimTestCase {
 		network.createAndAddLink(new IdImpl("l2211"),n22,n11,2,1,2000,1);
 		return network;
 	}
-	
+
 	private final void validate(World world, int i) {
 		ActivityFacilityImpl f = (ActivityFacilityImpl)world.getLayer(ActivityFacilitiesImpl.LAYER_TYPE).getLocations().values().iterator().next();
 		if (world.getLayer(ZONE_ID) != null) {
@@ -87,21 +87,21 @@ public class FacilityMoveTest extends MatsimTestCase {
 			else { assertEquals(F_UP_ZONEID[i],f.getUpMapping().values().iterator().next().getId().toString()); }
 		}
 		else { assertEquals(0,f.getUpMapping().size()); }
-		
+
 		if (world.getLayer(NetworkLayer.LAYER_TYPE) != null) { assertEquals(F_DOWN_LINKID[i],f.getLinkId().toString()); }
 		else { assertEquals(0,f.getDownMapping().size()); }
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// tests
 	//////////////////////////////////////////////////////////////////////
 
 	public void testMoveFacility1() {
 		System.out.println("running testMoveFacility1()...");
-		
+
 		World world = new World();
 		ActivityFacilitiesImpl facilities = buildFacilities(world);
-		world.complete();
+		world.complete(null);
 
 		ActivityFacilityImpl f = facilities.getFacilities().values().iterator().next();
 		for (int i=0; i<COORDS.length; i++) {
@@ -116,11 +116,11 @@ public class FacilityMoveTest extends MatsimTestCase {
 
 	public void testMoveFacility2() {
 		System.out.println("running testMoveFacility2()...");
-		
+
 		World world = buildWorld();
 		ActivityFacilitiesImpl facilities = buildFacilities(world);
-		world.complete();
-		
+		world.complete(null);
+
 		ActivityFacilityImpl f = facilities.getFacilities().values().iterator().next();
 		for (int i=0; i<COORDS.length; i++) {
 			f.moveTo(COORDS[i]);
@@ -134,12 +134,12 @@ public class FacilityMoveTest extends MatsimTestCase {
 
 	public void testMoveFacility3() {
 		System.out.println("running testMoveFacility3()...");
-		
+
 		World world = new World();
 		ActivityFacilitiesImpl facilities = buildFacilities(world);
 		buildNetwork(world);
-		world.complete();
-		
+		world.complete(null);
+
 		ActivityFacilityImpl f = facilities.getFacilities().values().iterator().next();
 		for (int i=0; i<COORDS.length; i++) {
 			f.moveTo(COORDS[i]);
@@ -153,12 +153,12 @@ public class FacilityMoveTest extends MatsimTestCase {
 
 	public void testMoveFacility4() {
 		System.out.println("running testMoveFacility4()...");
-		
+
 		World world = buildWorld();
 		ActivityFacilitiesImpl facilities = buildFacilities(world);
 		buildNetwork(world);
-		world.complete();
-		
+		world.complete(null);
+
 		ActivityFacilityImpl f = facilities.getFacilities().values().iterator().next();
 		for (int i=0; i<COORDS.length; i++) {
 			f.moveTo(COORDS[i]);

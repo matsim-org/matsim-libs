@@ -72,7 +72,7 @@ public class EgoNetMakeActivitySpaces {
 
 		//read in facilities knowledge
 		new InitializeKnowledge(plans, facilities,  knowledges, network, snConfig);
-		new WorldConnectLocations().run(world);
+		new WorldConnectLocations(config).run(world);
 		//////////////////////////////////////////////////////////////////////
 
 //		// ch.cut.640000.200000.740000.310000.xml

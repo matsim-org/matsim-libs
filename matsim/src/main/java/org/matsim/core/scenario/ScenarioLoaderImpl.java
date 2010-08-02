@@ -270,7 +270,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 				throw new RuntimeException(e);
 			}
 			if (this.getScenario().getWorld() != null) {
-				this.getScenario().getWorld().complete();
+				this.getScenario().getWorld().complete(config);
 			}
 		}
 		else {

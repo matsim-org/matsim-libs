@@ -53,7 +53,7 @@ public class CreateKMZFromOutput {
 		World world = Scenario.readWorld();
 		ActivityFacilities facilities = Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
-		new WorldConnectLocations().run(world);
+		new WorldConnectLocations(config).run(world);
 
 
 //		Write out the KML for the EgoNet of a chosen agent

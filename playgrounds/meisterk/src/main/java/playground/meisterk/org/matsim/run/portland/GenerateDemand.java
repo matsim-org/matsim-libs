@@ -63,7 +63,7 @@ public class GenerateDemand {
 		//facilities_reader.setValidating(false);
 		facilities_reader.readFile(config.facilities().getInputFile());
 		facilityLayer.printFacilitiesCount();
-		world.complete();
+		world.complete(null);
 		System.out.println("Reading facilities...done.");
 
 		System.out.println("Setting up plans objects...");

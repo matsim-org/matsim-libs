@@ -128,11 +128,12 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		this.controler=controler;
 	}
 
+	@Override
 	public void notifyStartup(final StartupEvent event) {
 		this.snConfig = (SocNetConfigGroup) event.getControler().getConfig().getModule(SocNetConfigGroup.GROUP_NAME);
 		this.knowledges = (controler.getScenario()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
-		new WorldConnectLocations().run(controler.getScenario().getWorld());
+		new WorldConnectLocations(this.controler.getConfig()).run(controler.getScenario().getWorld());
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 		initializeKnowledge();
@@ -167,6 +168,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges, this.controler.getNetwork(), this.snConfig);
 	}
 
+	@Override
 	public void notifyScoring(final ScoringEvent event){
 
 		this.log.info("scoring");
@@ -244,6 +246,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 //		}//old bracket position: run social scoring only on social iterations (are plans re-scored?)
 	}
 
+	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 
 		this.log.info("finishIteration ... "+event.getIteration());
@@ -300,6 +303,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 
 	}
 
+	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		/**
 		 * Clears the spatial social interaction tables (time overlap, or time windows) AFTER

@@ -122,7 +122,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("  reading network xml file... ");
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
-		world.complete();
+		world.complete(config);
 		log.info("  done.");
 
 		log.info("\n");

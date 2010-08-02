@@ -117,8 +117,8 @@ public class PlanModifications {
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
 
-		world.complete();
-		new WorldConnectLocations().run(world);
+		world.complete(scenario.getConfig());
+		new WorldConnectLocations(scenario.getConfig()).run(world);
 		log.info("world checking done.");
 
 

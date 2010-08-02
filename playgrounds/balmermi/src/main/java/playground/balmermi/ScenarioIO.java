@@ -115,7 +115,7 @@ public class ScenarioIO {
 //		exTxpes.add("94"); exTxpes.add("95"); exTxpes.add("96"); exTxpes.add("97");
 //		exTxpes.add("98"); exTxpes.add("99");
 
-		sc.getWorld().complete(exTxpes);
+		sc.getWorld().complete(exTxpes, config);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 

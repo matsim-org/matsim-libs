@@ -244,6 +244,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 	}
 
 
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		String id = event.getPersonId().toString();
 		if (id.contains("guide")) {
@@ -259,6 +260,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 	}
 
 
+	@Override
 	public void reset(final int iteration) {
 		// TODO Auto-generated method stub
 
@@ -280,7 +282,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 		log.info("loading network from " + config.network().getInputFile());
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		world.complete();
+		world.complete(config);
 		log.info("done.");
 
 //		log.info("loading shape file from " + district_shape_file);

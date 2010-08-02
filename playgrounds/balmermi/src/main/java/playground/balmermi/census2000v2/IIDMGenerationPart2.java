@@ -90,7 +90,7 @@ public class IIDMGenerationPart2 {
 		log.info("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-		world.complete();
+		world.complete(null);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

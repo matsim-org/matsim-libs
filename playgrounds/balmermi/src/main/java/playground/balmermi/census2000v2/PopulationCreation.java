@@ -80,7 +80,7 @@ public class PopulationCreation {
 		System.out.println("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-		world.complete();
+		world.complete(scenario.getConfig());
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ public class PopulationCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running world modules... ");
-		new WorldFacilityZoneMapping(households).run(world);
+		new WorldFacilityZoneMapping(households, config).run(world);
 		new WorldWriteFacilityZoneMapping(outdir+"/output_f2z_mapping.txt").run(world);
 		System.out.println("  done.");
 

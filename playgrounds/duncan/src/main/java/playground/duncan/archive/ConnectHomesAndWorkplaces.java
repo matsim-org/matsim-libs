@@ -74,7 +74,7 @@ public class ConnectHomesAndWorkplaces {
 			final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 			worldReader.readFile(this.config.world().getInputFile());
 		}
-		world.complete();
+		world.complete(config);
 
 		MatsimFacilitiesReader fr = new MatsimFacilitiesReader(scenario) ;
 		fr.readFile( this.config.facilities().getInputFile() ) ;

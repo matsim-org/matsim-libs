@@ -77,8 +77,8 @@ public class PlanRemoveUnselected {
 		log.info("facilities reading done");
 
 		World world = scenario.getWorld();
-		world.complete();
-		new WorldConnectLocations().run(world);
+		world.complete(scenario.getConfig());
+		new WorldConnectLocations(scenario.getConfig()).run(world);
 		log.info("world checking done.");
 
 

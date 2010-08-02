@@ -78,7 +78,7 @@ public class AnalyzeTimeCorrelations {
 		World world = Scenario.readWorld();
 		facilities= Scenario.readFacilities();
 		network =Scenario.readNetwork();
-		new WorldConnectLocations().run(world);
+		new WorldConnectLocations(config).run(world);
 
 		int iplan=500;
 		int isoc=0;

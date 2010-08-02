@@ -122,15 +122,9 @@ public abstract class Gbl {
 
 	@Deprecated
 	public static final void reset() {
-		log.info("Gbl.reset() -- reset config, world");
+		log.info("Gbl.reset() -- reset config");
 		Gbl.config = null;
 		MatsimRandom.reset();
-
-//		SimulationTimer.resetStatic(1.);
-		// The org.matsim tests work correctly without this line.  The number of failures/errors in the playground
-		// test does not increase without this line.  As a next step, this object will be made non-static.  kai, may'10
-		// I had to include the line again, as the tests only worked in some order, but not all. marcel, may'10
-		// Trying again to remove it.  kai, jun'10
 	}
 
 	public static final void printMemoryUsage() {

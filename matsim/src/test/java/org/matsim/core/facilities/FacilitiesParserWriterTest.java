@@ -92,7 +92,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl(this.config);
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
-		world.complete();
+		world.complete(this.config);
 		System.out.println("  done.");
 
 		this.runModules(facilities, world);
@@ -118,7 +118,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
-		world.complete();
+		world.complete(this.config);
 		System.out.println("  done.");
 
 		this.runModules(facilities, world);
@@ -143,13 +143,13 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		final World world = scenario.getWorld();
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(this.config.world().getInputFile());
-		world.complete();
+		world.complete(this.config);
 		System.out.println("  done.");
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
-		world.complete();
+		world.complete(this.config);
 		System.out.println("  done.");
 
 		this.runModules(facilities, world);
@@ -175,7 +175,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
-		world.complete();
+		world.complete(this.config);
 		System.out.println("  done.");
 
 		this.runModules(facilities, world);
@@ -183,7 +183,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
 		worldReader.readFile(this.config.world().getInputFile());
-		world.complete();
+		world.complete(this.config);
 		System.out.println("  done.");
 
 		TriangleScenario.writeConfig(this.config);
