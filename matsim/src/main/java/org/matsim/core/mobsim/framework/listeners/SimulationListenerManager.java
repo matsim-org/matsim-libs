@@ -20,6 +20,9 @@
 
 package org.matsim.core.mobsim.framework.listeners;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.swing.event.EventListenerList;
 
 import org.apache.log4j.Logger;
@@ -50,25 +53,39 @@ public class SimulationListenerManager<T extends Simulation> {
 	public SimulationListenerManager(T qsim){
 		this.queuesim = qsim;
 	}
-	
+		
 	@SuppressWarnings("unchecked")
 	public void addQueueSimulationListener(final SimulationListener l) {
 		log.warn( "calling addQueueSimulationListener ") ;
-		Class[] interfaces = l.getClass().getInterfaces();
-		for (int i = 0; i < interfaces.length; i++) {
-			if (SimulationListener.class.isAssignableFrom(interfaces[i])) {
-				this.listenerList.add(interfaces[i], l);
-				log.warn( " just assigned class " + SimulationListener.class.getName() + " to interface " + interfaces[i].getName() ) ;
+		Set<Class> interfaces = new HashSet<Class>();
+		Class<?> test = l.getClass();
+		while (test != Object.class) {
+			for (Class<?> theInterface : test.getInterfaces()) {
+				interfaces.add(theInterface);
+			}
+			test = test.getSuperclass();
+		}
+		for (Class interfaceClass : interfaces) {
+			if (SimulationListener.class.isAssignableFrom(interfaceClass)) {
+				this.listenerList.add(interfaceClass, l);
+				log.warn( " just assigned class " + SimulationListener.class.getName() + " to interface " + interfaceClass.getName() ) ;
 			}
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	public void removeQueueSimulationListener(final SimulationListener l) {
-		Class[] interfaces = l.getClass().getInterfaces();
-		for (int i = 0; i < interfaces.length; i++) {
-			if (SimulationListener.class.isAssignableFrom(interfaces[i])) {
-				this.listenerList.remove(interfaces[i], l);
+		Set<Class> interfaces = new HashSet<Class>();
+		Class<?> test = l.getClass();
+		while (test != Object.class) {
+			for (Class<?> theInterface : test.getInterfaces()) {
+				interfaces.add(theInterface);					
+			}
+			test = test.getSuperclass();
+		}
+		for (Class interfaceClass : interfaces) {
+			if (SimulationListener.class.isAssignableFrom(interfaceClass)) {
+				this.listenerList.remove(interfaceClass, l);
 			}
 		}
 	}
