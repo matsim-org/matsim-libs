@@ -51,8 +51,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
@@ -248,16 +248,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	/**I think that this class is used nowhere except that some static fields are used from somewhere else.
 	 * (But, as usual, it might be needed in some old mvi files.)  Kai, jan'10
 	 */
-	public static class AgentDrawer
-	{
+	public static class AgentDrawer {
 		public static  Texture  agentpng = null;
-
-		//for backward compatibility only
-		@Deprecated
-		public static  Texture  wavejpg = null;
-		//for backward compatibility only
-		@Deprecated
-		public static  Texture  pedpng = null;
 	}
 
 	private static class MyGLCanvas2 extends GLCanvas {
@@ -477,15 +469,13 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		this.mouseMan.init(this.gl);
 
 		AgentDrawer.agentpng = createTexture(MatsimResource.getAsInputStream("icon18.png"));
-		//		AgentDrawer.carjpg = createTexture(MatsimResource.getAsInputStream("car.png"));
-		AgentDrawer.wavejpg = createTexture(MatsimResource.getAsInputStream("square.png"));
-		AgentDrawer.pedpng = createTexture(MatsimResource.getAsInputStream("ped.png"));
 
 		this.netDisplList = this.gl.glGenLists(1);
 
 		drawNetList();
 	}
 
+	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
 		GL gl = drawable.getGL();
@@ -516,6 +506,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 			buttons.add(i, b);
 			b.setActionCommand(Integer.toString(i));
 			b.addActionListener( new ActionListener() {
+				@Override
 				public void actionPerformed( ActionEvent e ) {
 					int num = Integer.parseInt(e.getActionCommand());
 					OTFOGLDrawer.this.lastZoom = zooms.get(num);
@@ -528,6 +519,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		JPanel pane = new JPanel();
 		JButton bb = new JButton("Cancel");
 		bb.addActionListener( new ActionListener() {
+			@Override
 			public void actionPerformed( ActionEvent e ) {
 				OTFOGLDrawer.this.lastZoom = null;
 				OTFOGLDrawer.this.zoomD.setVisible(false);
@@ -553,6 +545,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 			final JDialog d = new JDialog((JFrame)null,"Name for this zoom", true);
 			JTextField field = new JTextField(20);
 			ActionListener al =  new ActionListener() {
+				@Override
 				public void actionPerformed( ActionEvent e ) {
 					d.setVisible(false);
 				} };
@@ -569,6 +562,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 
 	}
 
+	@Override
 	public void handleClick(final Point2D.Double point, int mouseButton, MouseEvent e) {
 		if(mouseButton == 4 ){
 			this.current = null;
@@ -580,18 +574,21 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 			popmen.addSeparator();
 			popmen.add( new AbstractAction("Store Zoom") {
 				private static final long serialVersionUID = 1L;
+				@Override
 				public void actionPerformed( ActionEvent e ) {
 					storeZoom(false, "");
 				}
 			} );
 			popmen.add( new AbstractAction("Store inital Zoom") {
 				private static final long serialVersionUID = 1L;
+				@Override
 				public void actionPerformed( ActionEvent e ) {
 					storeZoom(false, "*Initial*");
 				}
 			} );
 			popmen.add( new AbstractAction("Store named Zoom...") {
 				private static final long serialVersionUID = 1L;
+				@Override
 				public void actionPerformed( ActionEvent e ) {
 					storeZoom(true, "");
 				}
@@ -599,6 +596,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 			popmen.addSeparator();
 			popmen.add( new AbstractAction("Load Zoom...") {
 				private static final long serialVersionUID = 1L;
+				@Override
 				public void actionPerformed( ActionEvent e ) {
 					showZoomDialog();
 					if(OTFOGLDrawer.this.lastZoom != null) OTFOGLDrawer.this.mouseMan.setToNewPos(OTFOGLDrawer.this.lastZoom.getZoomstart());
@@ -606,6 +604,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 			} );
 			popmen.add( new AbstractAction("Delete last Zoom") {
 				private static final long serialVersionUID = 1L;
+				@Override
 				public void actionPerformed( ActionEvent e ) {
 					if(OTFOGLDrawer.this.lastZoom != null) {
 						OTFClientControl.getInstance().getOTFVisConfig().deleteZoom(OTFOGLDrawer.this.lastZoom);
@@ -620,6 +619,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		if(this.queryHandler != null) this.queryHandler.handleClick(this.clientQ.getId(),origPoint, mouseButton);
 	}
 
+	@Override
 	public void handleClick(Rectangle currentRect, int button) {
 		Rectangle2D.Double origRect = new Rectangle2D.Double(currentRect.x + this.clientQ.offsetEast, currentRect.y + this.clientQ.offsetNorth, currentRect.width, currentRect.height);
 		if(this.queryHandler != null) this.queryHandler.handleClick(this.clientQ.getId(),origRect, button);
@@ -630,10 +630,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	 * useful for zooming, or overlaying GUI items
 	 * if the displayed Rect is moved or enlarged, we need to call invalidate, to get the correct data from the host
 	 */
+	@Override
 	public void redraw() {
 		this.canvas.repaint();
 	}
 
+	@Override
 	public void invalidate() {
 		int time = this.hostControlBar.getOTFHostControl().getSimTime();
 		if (time != -1) {
@@ -659,27 +661,33 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	/**
 	 * @return the canvas
 	 */
+	@Override
 	public Component getComponent() {
 		return this.canvas;
 	}
 
+	@Override
 	public GL getGL() {
 		return this.gl;
 	}
 
+	@Override
 	public OTFClientQuad getQuad() {
 		return this.clientQ;
 	}
 
+	@Override
 	public float getScale(){
 		return this.mouseMan.getScale();
 	}
 
+	@Override
 	public void setScale(float scale){
 		this.mouseMan.scaleNetwork(scale);
 		hostControlBar.updateScaleLabel();
 	}
 
+	@Override
 	public Point3f getView() {
 		return this.mouseMan.getView();
 	}
@@ -730,6 +738,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		if (this.clientQ != null) this.clientQ.clearCache();
 	}
 
+	@Override
 	public void setQueryHandler(OTFQueryHandler queryHandler) {
 		if(queryHandler != null) this.queryHandler = queryHandler;
 	}

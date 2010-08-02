@@ -41,7 +41,6 @@ import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.AgentDrawer;
-import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.RandomColorizer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
@@ -144,11 +143,11 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 			setTexture();
 
-			//texture = null; 
+			//texture = null;
 			// setting the texture to null means that agents are painted using (software-rendered?) squares.  I have made speed
 			// tests and found on my computer (mac powerbook, with "slow" graphics settings) no difference at all between "null"
 			// and a jpg.  So no reason to not use a jpg/png.  kai, apr'10
-			
+
 			if (this.texture != null) {
 				this.texture.enable();
 				gl.glEnable(GL.GL_TEXTURE_2D);
@@ -220,6 +219,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	}
 
 	public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver {
+		@Override
 		@Deprecated
 		public void setAgent(char[] id, float startX, float startY, int state, int userdefined, float color) {
 			if ( agentPointDrawerSetAgentCnt < 1 ) {
@@ -232,7 +232,8 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, new Color(0.0f, 0.7f, 1.0f), true);
 			}
 		}
-		
+
+		@Override
 		public void setAgent( AgentSnapshotInfo agInfo ) {
 			char[] id = agInfo.getId().toString().toCharArray();
 			if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
@@ -246,7 +247,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			} else {
 				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.YELLOW, true);
 			}
-			
+
 			// version for bvg demo (obviously, this should be made switchable, but ...).  kai, apr'10
 //			if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
 //				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.DARK_GRAY, true);
@@ -265,7 +266,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 //					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.GREEN, true);
 //				} else if ( idstr.contains("line_U")) {
 //					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.BLUE, true);
-//				} else { 
+//				} else {
 //					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
 //				}
 //			} else {
@@ -316,17 +317,11 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 	private final AgentArrayDrawer drawer = new AgentArrayDrawer();
 	private final AgentPointDrawer pointdrawer = this.new AgentPointDrawer();
-	private final AgentPadangTimeDrawer timedrawer = this.new AgentPadangTimeDrawer();
-	private final AgentPadangRegionDrawer regiondrawer = this.new AgentPadangRegionDrawer();
 	private final AgentPointDrawerByID pointIDdrawer = this.new AgentPointDrawerByID();
 
 	@Override
 	public void draw() {
 		this.drawer.draw();
-
-		this.regiondrawer.drawAll();
-		this.timedrawer.drawAll();
-
 	}
 
 	@Override
@@ -339,9 +334,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 	@Override
 	public OTFDataReceiver newInstance(Class<? extends OTFDataReceiver> clazz) throws InstantiationException, IllegalAccessException {
-		if (clazz == AgentPadangTimeDrawer.class) return this.timedrawer;
-		else if (clazz == AgentPadangRegionDrawer.class) return this.regiondrawer;
-		else if (clazz == AgentPointDrawerByID.class) return this.pointIDdrawer;
+		if (clazz == AgentPointDrawerByID.class) return this.pointIDdrawer;
 		else return this.pointdrawer;
 	}
 
@@ -361,70 +354,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			return new Point2D.Double(x,y);
 		}
 		return null;
-
-	}
-
-	// #################################################################
-	// #################################################################
-	// below here is for backwards compatibility only
-
-	//for backward compatibility only
-	@Deprecated
-	// for Padang time-based agents
-	/*package*/ final static RandomColorizer colorizer2 = new RandomColorizer(257);
-
-	//for backward compatibility only
-	@Deprecated
-	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer3 = new OTFOGLDrawer.FastColorizer(
-			new double[] { 0.0, 30., 120., 255. ,256.}, new Color[] {	Color.GREEN, Color.YELLOW, Color.RED, Color.RED, Color.BLUE});
-
-	//for backward compatibility only
-	@Deprecated
-	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer4 = new OTFOGLDrawer.FastColorizer(
-			 new double[] { 0.0, 20.,255.}, new Color[] {	new Color(0,255,128,0), Color.CYAN, Color.BLUE});
-
-	//for backward compatibility only
-	@Deprecated
-	public class AgentPadangDrawer  extends AgentPointDrawer {
-
-		public final AgentArrayDrawer drawerWave = new AgentArrayDrawer(){
-			@Override
-			protected void setAgentSize(){getGl().glPointSize(10);}
-			@Override
-			protected void setTexture(){this.texture = null;}
-		};
-
-		public final AgentArrayDrawer drawerEvacuees = new AgentArrayDrawer(){
-			@Override
-			protected void setTexture(){this.texture = AgentDrawer.pedpng;}
-		};
-
-		public void drawAll() {
-			this.drawerWave.draw();
-			this.drawerEvacuees.draw();
-		}
-	}
-
-	//for backward compatibility only
-	@Deprecated
-	public class AgentPadangRegionDrawer extends AgentPadangDrawer {
-
-		@Override
-		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			if (user !=-1) this.drawerEvacuees.addAgent(id, startX, startY, colorizer2.getColor(user), false);
-			else this.drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
-		}
-	}
-
-	//for backward compatibility only
-	@Deprecated
-	public class AgentPadangTimeDrawer extends AgentPadangDrawer {
-
-		@Override
-		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			if (user != -1) this.drawerEvacuees.addAgent(id, startX, startY, colorizer3.getColor(state),false);
-			else this.drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
-		}
 	}
 
 
