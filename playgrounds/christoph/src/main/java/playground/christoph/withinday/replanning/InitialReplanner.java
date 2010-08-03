@@ -24,58 +24,37 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
-
-import playground.christoph.router.util.KnowledgeTools;
+import org.matsim.core.mobsim.framework.PersonAgent;
 
 /*
  * The InitialReplanner can be used when the Simulations is initialized but
  * has not started yet.
  */
 
-public class InitialReplanner extends WithinDayInitialReplanner{
+public class InitialReplanner extends WithinDayInitialReplanner {
 		
 	private static final Logger log = Logger.getLogger(InitialReplanner.class);
-
-	private KnowledgeTools knowledgeTools = new KnowledgeTools();
-	private boolean removeKnowledge = true;
 	
-	public InitialReplanner(Id id, Scenario scenario)
-	{
+	public InitialReplanner(Id id, Scenario scenario) {
 		super(id, scenario);
 	}
 	
-	public void setRemoveKnowledge(boolean removeKnowledge)
-	{
-		this.removeKnowledge = removeKnowledge;
-	}
-	
-	public boolean doReplanning(PersonDriverAgent driverAgent)
-	{	
+	public boolean doReplanning(PersonAgent personAgent) {	
 		// If we don't have a valid Replanner.
 		if (this.planAlgorithm == null) return false;
 		
 		// If we don't have a valid WithinDayPersonAgent
-		if (driverAgent == null) return false;
+		if (personAgent == null) return false;
 		
-		Person person = driverAgent.getPerson();
+		Person person = personAgent.getPerson();
 		
 		planAlgorithm.run(person.getSelectedPlan());
-
-		// If flag is set, remove Knowledge after doing the replanning.
-		if (removeKnowledge)
-		{
-			knowledgeTools.removeKnowledge(person);
-			knowledgeTools.removeSubNetwork(person);
-		}
 		
 		return true;
 	}
 	
-	public InitialReplanner clone()
-	{
+	public InitialReplanner clone() {
 		InitialReplanner clone = new InitialReplanner(this.id, this.scenario);
-		clone.setRemoveKnowledge(this.removeKnowledge);
 		
 		super.cloneBasicData(clone);
 		

@@ -29,8 +29,7 @@ import org.matsim.api.core.v01.Scenario;
  */
 public abstract class WithinDayDuringLegReplanner extends WithinDayReplanner {
 
-	public WithinDayDuringLegReplanner(Id id, Scenario scenario)
-	{
+	public WithinDayDuringLegReplanner(Id id, Scenario scenario) {
 		super(id, scenario);
 	}
 	

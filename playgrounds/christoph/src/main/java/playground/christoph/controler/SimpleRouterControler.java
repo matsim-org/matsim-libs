@@ -30,25 +30,24 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QVehicle;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.router.CompassRoute;
-import playground.christoph.router.CloneablePlansCalcRoute;
 import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomDijkstraRoute;
 import playground.christoph.router.RandomRoute;
@@ -60,11 +59,13 @@ import playground.christoph.withinday.mobsim.InitialReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
+import playground.christoph.withinday.mobsim.WithinDayQSim;
 import playground.christoph.withinday.replanning.InitialReplanner;
 import playground.christoph.withinday.replanning.ReplanningIdGenerator;
 import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
 import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImpl;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
+import playground.christoph.withinday.replanning.modules.ReplanningModule;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
 
 /**
@@ -156,23 +157,20 @@ public class SimpleRouterControler extends Controler {
 	protected ReplanningManager replanningManager = new ReplanningManager();
 	protected KnowledgeWithinDayQSim sim;
 
-	public SimpleRouterControler(String[] args)
-	{
+	public SimpleRouterControler(String[] args) {
 		super(args);
 
 		setConstructorParameters();
 	}
 
 	// only for Batch Runs
-	public SimpleRouterControler(Config config)
-	{
+	public SimpleRouterControler(Config config) {
 		super(config);
 
 		setConstructorParameters();
 	}
 
-	private void setConstructorParameters()
-	{
+	private void setConstructorParameters() {
 		/*
 		 * Use MyLinkImpl. They can carry some additional Information like their
 		 * TravelTime or VehicleCount.
@@ -190,44 +188,45 @@ public class SimpleRouterControler extends Controler {
 	 */
 	protected void initReplanningRouter() {
 		
+		AbstractMultithreadedModule router;
+		
 		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 		
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
 		RandomRoute randomRoute = new RandomRoute(this.network);
-		CloneablePlansCalcRoute randomRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, randomRoute, null, new SimpleRouterFactory());
+		router = new ReplanningModule(config, network, randomRoute, null, new SimpleRouterFactory()); 
 		this.randomReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.randomReplanner.setReplanner(randomRouter);
+		this.randomReplanner.setAbstractMultithreadedModule(router);
 		this.randomReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomReplanner);
 
 		TabuRoute tabuRoute = new TabuRoute(this.network);
-		CloneablePlansCalcRoute tabuRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, tabuRoute, null, new SimpleRouterFactory());
+		router = new ReplanningModule(config, network, tabuRoute, null, new SimpleRouterFactory());
 		this.tabuReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.tabuReplanner.setReplanner(tabuRouter);
+		this.tabuReplanner.setAbstractMultithreadedModule(router);
 		this.tabuReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.tabuReplanner);
 
 		CompassRoute compassRoute = new CompassRoute(this.network);
-		CloneablePlansCalcRoute compassRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, compassRoute, null, new SimpleRouterFactory());
+		router = new ReplanningModule(config, network, compassRoute, null, new SimpleRouterFactory());
 		this.compassReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.compassReplanner.setReplanner(compassRouter);
+		this.compassReplanner.setAbstractMultithreadedModule(router);
 		this.compassReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.compassReplanner);
 
-		RandomCompassRoute randomCompassRoute = new RandomCompassRoute(this.network); 
-		CloneablePlansCalcRoute randomCompassRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, randomCompassRoute, null, new SimpleRouterFactory());
+		RandomCompassRoute randomCompassRoute = new RandomCompassRoute(this.network);
+		router = new ReplanningModule(config, network, randomCompassRoute, null, new SimpleRouterFactory());
 		this.randomCompassReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.randomCompassReplanner.setReplanner(randomCompassRouter);
+		this.randomCompassReplanner.setAbstractMultithreadedModule(router);
 		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomCompassReplanner);
 
-		
 		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, dijkstraTravelCost, dijkstraTravelTime);
 		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
-		CloneablePlansCalcRoute randomDijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, randomDijkstraRoute, null, new SimpleRouterFactory());
+		router = new ReplanningModule(config, network, randomDijkstraRoute, null, new SimpleRouterFactory());
 		this.randomDijkstraReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.randomDijkstraReplanner.setReplanner(randomDijkstraRouter);
+		this.randomDijkstraReplanner.setAbstractMultithreadedModule(router);
 		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomDijkstraReplanner);
 	}
@@ -235,18 +234,15 @@ public class SimpleRouterControler extends Controler {
 	/*
 	 * Hands over the ArrayList to the ParallelReplannerModules
 	 */
-	protected void initParallelReplanningModules()
-	{	
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
-		this.parallelInitialReplanner.setRemoveKnowledge(true);
+	protected void initParallelReplanningModules() {	
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, this);
 		
 		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
 		replanningManager.setInitialReplanningModule(initialReplanningModule);
 	}
 	
 	@Override
-	protected void runMobSim() 
-	{
+	protected void runMobSim() {
 		sim = new KnowledgeWithinDayQSim(this.scenarioData, this.events);
 //		sim.addQueueSimulationListeners(replanningManager);
 		sim.addQueueSimulationListeners(foqsl);
@@ -261,8 +257,7 @@ public class SimpleRouterControler extends Controler {
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
 		
 		
-		if (useKnowledge)
-		{
+		if (useKnowledge) {
 			log.info("Set Knowledge Storage Type");
 			setKnowledgeStorageHandler();			
 		}
@@ -280,8 +275,7 @@ public class SimpleRouterControler extends Controler {
 	 * How to store the known Nodes of the Agents?
 	 * Currently we store them in a Database.
 	 */
-	private void setKnowledgeStorageHandler()
-	{		
+	private void setKnowledgeStorageHandler() {		
 		for(Person person : population.getPersons().values())
 		{			
 			Map<String, Object> customAttributes = person.getCustomAttributes();
@@ -307,7 +301,7 @@ public class SimpleRouterControler extends Controler {
 		return manager;
 	}
 	
-	public static class ReplanningFlagInitializer implements SimulationInitializedListener{
+	public static class ReplanningFlagInitializer implements SimulationInitializedListener<QSimI> {
 
 		protected SimpleRouterControler simpleRouterControler;
 		protected Map<Id, WithinDayPersonAgent> withinDayPersonAgents;
@@ -317,14 +311,12 @@ public class SimpleRouterControler extends Controler {
 		protected int actEndReplanningCounter = 0;
 		protected int leaveLinkReplanningCounter = 0;
 		
-		public ReplanningFlagInitializer(SimpleRouterControler controler)
-		{
+		public ReplanningFlagInitializer(SimpleRouterControler controler) {
 			this.simpleRouterControler = controler;
 		}
 		
 		@Override
-		public void notifySimulationInitialized(SimulationInitializedEvent e)
-		{
+		public void notifySimulationInitialized(SimulationInitializedEvent<QSimI> e) {
 			collectAgents((QSim)e.getQueueSimulation());
 			setReplanningFlags();
 		}
@@ -335,10 +327,8 @@ public class SimpleRouterControler extends Controler {
 		 * At the moment: Replanning Modules are assigned hard coded. Later: Modules
 		 * are assigned based on probabilities from config files.
 		 */
-		protected void setReplanningFlags() 
-		{
-			for (WithinDayPersonAgent withinDayPersonAgent : this.withinDayPersonAgents.values())
-			{
+		protected void setReplanningFlags() {
+			for (WithinDayPersonAgent withinDayPersonAgent : this.withinDayPersonAgents.values()) {
 				double probability;
 				Random random = MatsimRandom.getLocalInstance();
 				probability = random.nextDouble();
@@ -362,43 +352,37 @@ public class SimpleRouterControler extends Controler {
 
 				
 				// Random Router
-				if (pRandomRouterLow <= probability && probability < pRandomRouterHigh)
-				{
+				if (pRandomRouterLow <= probability && probability < pRandomRouterHigh) {
 					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.randomReplanner);
 					initialReplanningCounter++;
 					simpleRouterControler.randomRouterCounter++;
 				}
 				// Tabu Router
-				else if (pTabuRouterLow <= probability && probability < pTabuRouterHigh)
-				{
+				else if (pTabuRouterLow <= probability && probability < pTabuRouterHigh) {
 					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.tabuReplanner);
 					initialReplanningCounter++;
 					simpleRouterControler.tabuRouterCounter++;
 				}
 				// Compass Router
-				else if (pCompassRouterLow <= probability && probability < pCompassRouterHigh)
-				{
+				else if (pCompassRouterLow <= probability && probability < pCompassRouterHigh) {
 					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.compassReplanner);
 					initialReplanningCounter++;
 					simpleRouterControler.compassRouterCounter++;
 				}
 				// Random Compass Router
-				else if (pRandomCompassRouterLow <= probability && probability < pRandomCompassRouterHigh)
-				{
+				else if (pRandomCompassRouterLow <= probability && probability < pRandomCompassRouterHigh) {
 					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.randomCompassReplanner);
 					initialReplanningCounter++;
 					simpleRouterControler.randomCompassRouterCounter++;
 				}
 				// Random Dijkstra Router
-				else if (pRandomDijkstraRouterLow <= probability && probability <= pRandomDijkstraRouterHigh)
-				{
+				else if (pRandomDijkstraRouterLow <= probability && probability <= pRandomDijkstraRouterHigh) {
 					withinDayPersonAgent.addWithinDayReplanner(simpleRouterControler.randomDijkstraReplanner);
 					initialReplanningCounter++;
 					simpleRouterControler.randomDijkstraRouterCounter++;
 				}
 				// No Router
-				else
-				{
+				else {
 					noReplanningCounter++;
 				}
 
@@ -425,17 +409,11 @@ public class SimpleRouterControler extends Controler {
 			log.info(initialReplanningCounter + " persons replan their plans initially (" + initialReplanningCounter / numPersons * 100.0 + "%)");
 		}
 				
-		protected void collectAgents(QSim sim)
-		{
+		protected void collectAgents(QSim sim) {
 			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
 			
-			for (QLinkInternalI qLink : sim.getQNetwork().getLinks().values())
-			{
-				for (QVehicle qVehicle : qLink.getAllVehicles())
-				{
-					WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) qVehicle.getDriver();
-					this.withinDayPersonAgents.put(withinDayPersonAgent.getPerson().getId(), withinDayPersonAgent);
-				}
+			for (PersonAgent personAgent : ((WithinDayQSim) sim).getPersonAgents().values()) {
+				withinDayPersonAgents.put(personAgent.getPerson().getId(), (WithinDayPersonAgent) personAgent);
 			}
 		}
 		
@@ -460,16 +438,13 @@ public class SimpleRouterControler extends Controler {
 		System.exit(0);
 	}
 
-	public static class FreeSpeedTravelTime implements TravelTime, Cloneable
-	{
-
-		public double getLinkTravelTime(Link link, double time)
-		{
+	public static class FreeSpeedTravelTime implements TravelTime, Cloneable {
+		
+		public double getLinkTravelTime(Link link, double time) {
 			return link.getFreespeed(time);
 		}
 		
-		public FreeSpeedTravelTime clone()
-		{
+		public FreeSpeedTravelTime clone() {
 			return new FreeSpeedTravelTime();
 		}
 	}

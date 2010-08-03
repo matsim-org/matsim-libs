@@ -27,8 +27,8 @@ public class EditRoutes {
 	 * Activities. By doing so the PlanAlgorithm will only
 	 * change the Route of that Leg.
 	 */
-	public boolean replanFutureLegRoute(Plan plan, Leg leg, PlanAlgorithm planAlgorithm)
-	{
+	public boolean replanFutureLegRoute(Plan plan, Leg leg, PlanAlgorithm planAlgorithm) {
+		
 		if (plan == null) return false;
 		if (leg == null) return false;
 		if (planAlgorithm == null) return false; 
@@ -42,31 +42,24 @@ public class EditRoutes {
 		
 		Route oldRoute = leg.getRoute();
 		
-		if (oldRoute != null)
-		{
+		if (oldRoute != null) {
 			// Update the startLinkId if it has changed.
-			if (!fromActivity.getLinkId().equals(oldRoute.getStartLinkId()))
-			{
-				if (oldRoute instanceof RouteWRefs)
-				{
+			if (!fromActivity.getLinkId().equals(oldRoute.getStartLinkId())) {
+				if (oldRoute instanceof RouteWRefs) {
 					((RouteWRefs) oldRoute).setStartLinkId(fromActivity.getLinkId());
 				}
-				else
-				{
+				else {
 					logger.warn("Could not update the StartLinkId of the Route! Route was not replanned!");
 					return false;
 				}
 			}
 			
 			// Update the endLinkId if it has changed.
-			if (!toActivity.getLinkId().equals(oldRoute.getEndLinkId()))
-			{
-				if (oldRoute instanceof RouteWRefs)
-				{
+			if (!toActivity.getLinkId().equals(oldRoute.getEndLinkId())) {
+				if (oldRoute instanceof RouteWRefs) {
 					((RouteWRefs) oldRoute).setEndLinkId(toActivity.getLinkId());
 				}
-				else
-				{
+				else {
 					logger.warn("Could not update the EndLinkId of the Route! Route was not replanned!");
 					return false;
 				}
@@ -85,19 +78,15 @@ public class EditRoutes {
 		
 		Route newRoute = leg.getRoute();
 
-		if (oldRoute != null)
-		{
+		if (oldRoute != null) {
 			// If the Route Object was replaced...
-			if (oldRoute != newRoute)
-			{
-				if (oldRoute instanceof NetworkRoute)
-				{
+			if (oldRoute != newRoute) {
+				if (oldRoute instanceof NetworkRoute) {
 					List<Id> linkIds = ((NetworkRoute) newRoute).getLinkIds();
 					((NetworkRoute) oldRoute).setLinkIds(newRoute.getStartLinkId(), linkIds, newRoute.getEndLinkId());
 					leg.setRoute(oldRoute);
 				}
-				else
-				{
+				else {
 					logger.warn("A new Route Object was created. The Route data could not be copied to the old Route. Cached Referenced to the old Route may cause Problems!");
 				}			
 			}		
@@ -119,8 +108,7 @@ public class EditRoutes {
 	 * The currentNodeIndex has to Point to the next Node
 	 * (which is the endNode of the current Link)
 	 */
-	public boolean replanCurrentLegRoute(Plan plan, Leg leg, int currentNodeIndex, PlanAlgorithm planAlgorithm, Network network, double time)
-	{
+	public boolean replanCurrentLegRoute(Plan plan, Leg leg, int currentNodeIndex, PlanAlgorithm planAlgorithm, Network network, double time) {
 		if (plan == null) return false;
 		if (leg == null) return false;
 		if (planAlgorithm == null) return false; 
@@ -136,21 +124,21 @@ public class EditRoutes {
 		
 		// Get the Id of the current Link.
 		Id currentLinkId = null;
-		if (currentNodeIndex == 1)
-		{
+		if (currentNodeIndex == 1) {
 			currentLinkId = oldRoute.getStartLinkId();
 		}
-		else
-		{
-			if (oldRoute instanceof NetworkRoute)
-			{
+		else {
+			if (oldRoute instanceof NetworkRoute) {
 				List<Id> ids = ((NetworkRoute) oldRoute).getLinkIds();
-//				if (ids.size() <= currentNodeIndex - 1) currentLinkId = oldRoute.getEndLinkId();
-//				else currentLinkId = ids.get(currentNodeIndex - 1);
-				currentLinkId = ids.get(currentNodeIndex - 2);
+
+				// If the current Link is the last Link we don't have to replan
+				// our Route.
+				if (ids.size() <= currentNodeIndex - 2) {
+					return true;			
+				}
+				else currentLinkId = ids.get(currentNodeIndex - 2);
 			}
-			else
-			{
+			else {
 				logger.warn("Could not retrieve the LinkIds of the current Route. Route is not replanned!");
 				return false;
 			}
@@ -168,14 +156,12 @@ public class EditRoutes {
 		List<Id> linkIds = new ArrayList<Id>();
 		
 		// Get those Links which have already been passed.
-		if (oldRoute instanceof NetworkRoute)
-		{
+		if (oldRoute instanceof NetworkRoute) {
 			List<Id> oldLinkIds = ((NetworkRoute) oldRoute).getLinkIds();
 			//TODO use correct index...
 			linkIds.addAll(oldLinkIds.subList(0, currentNodeIndex - 1));
 		}
-		else
-		{
+		else {
 			logger.warn("Could not retrieve the LinkIds of the current Route. Route is not replanned!");
 			return false;
 		}
@@ -201,23 +187,29 @@ public class EditRoutes {
 		Route newRoute = newLeg.getRoute();
 		
 		// Merge old and new Route.
-		if (newRoute instanceof NetworkRoute)
-		{
+		if (newRoute instanceof NetworkRoute) {
+			/*
+			 * Edit cdobler 25.5.2010
+			 * If the new leg ends at the current Link, we have to
+			 * remove that linkId from the linkIds List - it is stored
+			 * in the endLinkId field of the route.
+			 */
+			if (linkIds.size() > 0 && linkIds.get(linkIds.size() - 1).equals(newRoute.getEndLinkId())) {
+				linkIds.remove(linkIds.size() - 1);
+			}
+			
 			linkIds.addAll(((NetworkRoute) newRoute).getLinkIds());
 		}
-		else
-		{
+		else {
 			logger.warn("The Route data could not be copied to the old Route. Old Route will be used!");
 			return false;
 		}
 		
 		// Overwrite old Route
-		if (oldRoute instanceof NetworkRoute)
-		{
+		if (oldRoute instanceof NetworkRoute) {
 			((NetworkRoute) oldRoute).setLinkIds(oldRoute.getStartLinkId(), linkIds, toActivity.getLinkId());
 		}
-		else
-		{
+		else {
 			logger.warn("The new Route data could not be copied to the old Route. Old Route will be used!");
 			return false;
 		}	

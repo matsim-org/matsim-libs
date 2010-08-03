@@ -62,46 +62,37 @@ public class CloneablePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	}
 		
 	@Override
-	public CloneablePlansCalcRoute clone()
-	{
+	public CloneablePlansCalcRoute clone() {
+		
 		PersonalizableTravelCost travelCostClone = null;
-		if (costCalculator instanceof Cloneable)
-		{
-			try
-			{
+		if (costCalculator instanceof Cloneable) {
+			try {
 				Method method;
 				method = costCalculator.getClass().getMethod("clone", new Class[]{});
 				travelCostClone = costCalculator.getClass().cast(method.invoke(costCalculator, new Object[]{}));
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				Gbl.errorMsg(e);
 			} 
 		}
+		
 		// not cloneable or an Exception occurred
-		if (travelCostClone == null)
-		{
+		if (travelCostClone == null) {
 			travelCostClone = costCalculator;
 			log.warn("Could not clone the Travel Cost Calculator - use reference to the existing Calculator and hope the best...");
 		}
 		
 		TravelTime travelTimeClone = null;
-		if (timeCalculator instanceof Cloneable)
-		{
-			try
-			{
+		if (timeCalculator instanceof Cloneable) {
+			try {
 				Method method;
 				method = timeCalculator.getClass().getMethod("clone", new Class[]{});
 				travelTimeClone = timeCalculator.getClass().cast(method.invoke(timeCalculator, new Object[]{}));
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				Gbl.errorMsg(e);
 			} 
 		}
 		// not cloneable or an Exception occurred
-		if (travelTimeClone == null)
-		{
+		if (travelTimeClone == null) {
 			travelTimeClone = timeCalculator;
 			log.warn("Could not clone the Travel Time Calculator - use reference to the existing Calculator and hope the best...");
 		}

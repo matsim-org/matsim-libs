@@ -25,6 +25,7 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 /*
  * This Class implements a QueueSimulationBeforeSimStepListener.
@@ -33,7 +34,7 @@ import org.matsim.core.utils.misc.Time;
  * whether a WithinDayReplanning of the Agents Plans should
  * be done and / or is necessary.
  */
-public class ReplanningManager implements SimulationBeforeSimStepListener, SimulationInitializedListener{
+public class ReplanningManager implements SimulationBeforeSimStepListener<QSimI>, SimulationInitializedListener<QSimI> {
 
 	protected boolean initialReplanning = false;
 	protected boolean actEndReplanning = false;
@@ -43,8 +44,7 @@ public class ReplanningManager implements SimulationBeforeSimStepListener, Simul
 	protected DuringActivityReplanningModule actEndReplanningModule;
 	protected DuringLegReplanningModule leaveLinkReplanningModule;
 	
-	public ReplanningManager()
-	{
+	public ReplanningManager() {
 	}
 	
 	/*
@@ -52,117 +52,93 @@ public class ReplanningManager implements SimulationBeforeSimStepListener, Simul
 	 * Replanning Modules are not null, the replanning will be
 	 * activated automatically!
 	 */
-	public ReplanningManager(InitialReplanningModule initialReplanningModule, DuringActivityReplanningModule actEndReplanningModule, DuringLegReplanningModule leaveLinkReplanningModule)
-	{
-		if (initialReplanningModule != null)
-		{
+	public ReplanningManager(InitialReplanningModule initialReplanningModule, DuringActivityReplanningModule actEndReplanningModule, DuringLegReplanningModule leaveLinkReplanningModule) {
+		if (initialReplanningModule != null) {
 			this.initialReplanningModule = initialReplanningModule;
 			initialReplanning = true;
-		}
-		else
-		{
+		} 
+		else {
 			initialReplanning = false;
 		}
 		
-		if (actEndReplanningModule != null)
-		{
+		if (actEndReplanningModule != null) {
 			this.actEndReplanningModule = actEndReplanningModule;
 			actEndReplanning = true;
 		}
-		else
-		{
+		else {
 			actEndReplanning = false;
 		}
 		
-		if (leaveLinkReplanningModule != null)
-		{
+		if (leaveLinkReplanningModule != null) {
 			this.leaveLinkReplanningModule = leaveLinkReplanningModule;
 			leaveLinkReplanning = true;
 		}
-		else
-		{
+		else {
 			leaveLinkReplanning = false;
 		}
 	}
 	
-	public void doInitialReplanning(boolean value)
-	{
+	public void doInitialReplanning(boolean value) {
 		initialReplanning = value;
 	}
 	
-	public boolean isInitialReplanning()
-	{
+	public boolean isInitialReplanning() {
 		return initialReplanning;
 	}
 	
-	public void setInitialReplanningModule(InitialReplanningModule module)
-	{
+	public void setInitialReplanningModule(InitialReplanningModule module) {
 		this.initialReplanningModule = module;	
 	}
 	
-	public InitialReplanningModule getInitialReplanningModule()
-	{
+	public InitialReplanningModule getInitialReplanningModule() {
 		return this.initialReplanningModule;
 	}
 	
-	public void doActEndReplanning(boolean value)
-	{
+	public void doActEndReplanning(boolean value) {
 		actEndReplanning = value;
 	}
 	
-	public boolean isActEndReplanning()
-	{
+	public boolean isActEndReplanning() {
 		return actEndReplanning;
 	}
 	
-	public void setActEndReplanningModule(DuringActivityReplanningModule module)
-	{
+	public void setActEndReplanningModule(DuringActivityReplanningModule module) {
 		this.actEndReplanningModule = module;	
 	}
 	
-	public DuringActivityReplanningModule getActEndReplanningModule()
-	{
+	public DuringActivityReplanningModule getActEndReplanningModule() {
 		return this.actEndReplanningModule;
 	}
 	
-	public void doLeaveLinkReplanning(boolean value)
-	{
+	public void doLeaveLinkReplanning(boolean value) {
 		leaveLinkReplanning = value;
 	}
 	
-	public boolean isLeaveLinkReplanning()
-	{
+	public boolean isLeaveLinkReplanning() {
 		return leaveLinkReplanning;
 	}
 	
-	public void setLeaveLinkReplanningModule(DuringLegReplanningModule module)
-	{
+	public void setLeaveLinkReplanningModule(DuringLegReplanningModule module) {
 		this.leaveLinkReplanningModule = module;
 	}
 	
-	public DuringLegReplanningModule getLeaveLinkReplanningModule()
-	{
+	public DuringLegReplanningModule getLeaveLinkReplanningModule() {
 		return this.leaveLinkReplanningModule;
 	}
 	
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e)
-	{
-		if (isInitialReplanning())
-		{
+	public void notifySimulationInitialized(SimulationInitializedEvent<QSimI> e) {
+		if (isInitialReplanning()) {
 			initialReplanningModule.doReplanning(Time.UNDEFINED_TIME);
 		}
 	}
 	
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e)
-	{
-		if (isActEndReplanning())
-		{
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent<QSimI> e) {
+		if (isActEndReplanning()) {
 			actEndReplanningModule.doReplanning(e.getSimulationTime());
 		}
 		
-		if (isLeaveLinkReplanning())
-		{
+		if (isLeaveLinkReplanning()) {
 			leaveLinkReplanningModule.doReplanning(e.getSimulationTime());
 		}	
 	}

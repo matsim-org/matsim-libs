@@ -27,8 +27,7 @@ public class ReplanningIdGenerator {
 	
 	private static int idCount = 0;
 	
-	public static Id getNextId()
-	{
+	public static Id getNextId() {
 		Id id = new IdImpl(idCount);
 		idCount++;
 		

@@ -26,15 +26,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 
-import playground.christoph.events.ExtendedAgentReplanEventImpl;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
+import playground.christoph.withinday.utils.EditRoutes;
 
 /*
  * The NextLegReplanner can be used while an Agent is performing an Activity. The
@@ -42,13 +40,12 @@ import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
  * the Agent's Plan.
  */
 
-public class NextLegReplanner extends WithinDayDuringActivityReplanner{
+public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		
 	private static final Logger log = Logger.getLogger(NextLegReplanner.class);
 	private EventsManager events;
 
-	public NextLegReplanner(Id id, Scenario scenario, EventsManager events)
-	{
+	public NextLegReplanner(Id id, Scenario scenario, EventsManager events) {
 		super(id, scenario);
 		this.events = events;
 	}
@@ -71,19 +68,18 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 	 * of such a functionality would be a problem due to the structure of MATSim...
 	 */
 	@Override
-	public boolean doReplanning(PersonDriverAgent driverAgent)
-	{	
+	public boolean doReplanning(PersonAgent personAgent) {		
 		// If we don't have a valid Replanner.
 		if (this.planAlgorithm == null) return false;
 		
 		// If we don't have a valid WithinDayPersonAgent
-		if (driverAgent == null) return false;
+		if (personAgent == null) return false;
 		
 		WithinDayPersonAgent withinDayPersonAgent = null;
-		if (!(driverAgent instanceof WithinDayPersonAgent)) return false;
+		if (!(personAgent instanceof WithinDayPersonAgent)) return false;
 		else
 		{
-			withinDayPersonAgent = (WithinDayPersonAgent) driverAgent;
+			withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
 		}
 		
 		PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
@@ -92,105 +88,28 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner{
 		// If we don't have a selected plan
 		if (selectedPlan == null) return false;
 		
-		Activity currentActivity;
-		Leg nextLeg;
-		Activity nextActivity;
-		
-		currentActivity = withinDayPersonAgent.getCurrentActivity();
+		Activity currentActivity = withinDayPersonAgent.getCurrentActivity();
 		
 		// If we don't have a current Activity
 		if (currentActivity == null) return false;
 		
-		nextLeg = selectedPlan.getNextLeg(currentActivity);
-		
-		if (nextLeg == null) return false;
-	
-		nextActivity = selectedPlan.getNextActivity(nextLeg);
-		
-		
-		/*
-		 * By default we replan the leg after the current Activity, but there are
-		 * some exclusions.
-		 * 
-		 * If the next Activity takes place at the same Link we don't have to 
-		 * replan the next leg.
-		 * BUT: if the next Activity has a duration of 0 seconds we have to replan
-		 * the leg after that Activity.
-		 */
-		while (nextLeg.getRoute().getStartLinkId().equals(nextLeg.getRoute().getEndLinkId()))
-		{
-			/*
-			 *  If the next Activity has a duration > 0 we don't have to replan
-			 *  the leg after that Activity now - it will be scheduled later.
-			 */
-			if (nextActivity.getEndTime() > time)
-			{	
-				return true;
-			}
-
-			nextLeg = selectedPlan.getNextLeg(nextActivity);
-			if (nextLeg == null)
-			{
-				return true;
-			}
-			nextActivity = selectedPlan.getNextActivity(nextLeg);
-		}
-		
-		
+		Leg nextLeg = selectedPlan.getNextLeg(currentActivity);
+//		Activity nextActivity = selectedPlan.getNextActivity(nextLeg);	
+				
 		// If it is not a car Leg we don't replan it.
-		if (!nextLeg.getMode().equals(TransportMode.car)) return false;
+//		if (!nextLeg.getMode().equals(TransportMode.car)) return false;
 		
-		// Replace the EndTime with the current time - do we really need this?
-//		fromAct.setEndTime(time);
-		
-		// Create new Plan and select it.
-		// This Plan contains only the just ended and the next Activity.
-		// -> That's the only Part of the Route that we want to replan.
-		PlanImpl newPlan = new PlanImpl(person);
-		person.addPlan(newPlan);
-		person.setSelectedPlan(newPlan);
-		
-		// Here we are at the moment.
-		newPlan.addActivity(currentActivity);
-		
-		Route originalRoute = nextLeg.getRoute();
-			
-		// Current Route between fromAct and toAct - this Route shall be replanned.
-		newPlan.addLeg(nextLeg);
-		
-		// We still want to go there...
-		newPlan.addActivity(nextActivity);
-							
-		// By doing the replanning the "betweenLeg" is replanned, so the changes are
-		// included in the previously selected plan, too!
-		planAlgorithm.run(newPlan);
-		
-		// reactivate previously selected, replanned plan
-		person.setSelectedPlan(selectedPlan);
-		
-		// remove previously added new Plan
-		person.removePlan(newPlan);
-		
-		Route alternativeRoute = nextLeg.getRoute();
+		// new Route for next Leg
+		new EditRoutes().replanFutureLegRoute(selectedPlan, nextLeg, planAlgorithm);
 
-		// set VehicleId in original Route as well as in the alternative Route
-		((NetworkRoute)originalRoute).setVehicleId(withinDayPersonAgent.getVehicle().getId());
-		((NetworkRoute)alternativeRoute).setVehicleId(withinDayPersonAgent.getVehicle().getId());
-		
-//		if (alternativeRoute.getDistance() != originalRoute.getDistance())
-//		{
-//			log.info("Changed Route length! Id:" + person.getId() + " " + alternativeRoute.getDistance() + " vs. " + originalRoute.getDistance());
-//		}
-		
 //		// create ReplanningEvent
-//		this.events.processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRoute)alternativeRoute, (NetworkRoute)originalRoute));
+//		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRouteWRefs)alternativeRoute, (NetworkRouteWRefs)originalRoute));
 				
 		return true;
 	}
 	
 	@Override
-	public NextLegReplanner clone()
-	{
+	public NextLegReplanner clone() {
 		NextLegReplanner clone = new NextLegReplanner(this.id, this.scenario, this.events);
 		
 		super.cloneBasicData(clone);

@@ -20,29 +20,17 @@
 
 package playground.christoph.withinday.replanning;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
-import playground.christoph.events.ExtendedAgentReplanEventImpl;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
+import playground.christoph.withinday.utils.EditRoutes;
 
 /*
  * The CurrentLegReplanner can be used while an Agent travels from
@@ -60,14 +48,13 @@ import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
  * Links that already have been passed by the Person.
  */
 
-public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
+public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 
 	private EventsManager events;
 
 	private static final Logger log = Logger.getLogger(CurrentLegReplanner.class);
 
-	public CurrentLegReplanner(Id id, Scenario scenario, EventsManager events)
-	{
+	public CurrentLegReplanner(Id id, Scenario scenario, EventsManager events) {
 		super(id, scenario);
 		this.events = events;
 	}
@@ -81,19 +68,18 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 	 * - merge already passed parts of the current Route with the new created Route
 	 */
 	@Override
-	public boolean doReplanning(PersonDriverAgent driverAgent)
-	{
+	public boolean doReplanning(PersonAgent personAgent) {
+		
 		// If we don't have a valid Replanner.
 		if (this.planAlgorithm == null) return false;
 
 		// If we don't have a valid WithinDayPersonAgent
-		if (driverAgent == null) return false;
+		if (personAgent == null) return false;
 
 		WithinDayPersonAgent withinDayPersonAgent = null;
-		if (!(driverAgent instanceof WithinDayPersonAgent)) return false;
-		else
-		{
-			withinDayPersonAgent = (WithinDayPersonAgent) driverAgent;
+		if (!(personAgent instanceof WithinDayPersonAgent)) return false;
+		else {
+			withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
 		}
 
 		PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
@@ -102,102 +88,29 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner{
 		// If we don't have a selected plan
 		if (selectedPlan == null) return false;
 
-		Leg currentLeg = driverAgent.getCurrentLeg();
-		Activity nextActivity = selectedPlan.getNextActivity(currentLeg);
+		Leg currentLeg = personAgent.getCurrentLeg();
 
 		// If it is not a car Leg we don't replan it.
-		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
+//		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
 
-		/*
-		 * Get the index and the currently next Node on the route.
-		 * Entries with a lower index have already been visited!
-		 */
-		int currentNodeIndex = withinDayPersonAgent.getCurrentNodeIndex();
-		NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
+		// new Route for current Leg
+		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, withinDayPersonAgent.getCurrentNodeIndex(), planAlgorithm, scenario.getNetwork(), time);
 
-		QVehicle vehicle = withinDayPersonAgent.getVehicle();
-
-		/*
-		 * If the Vehicle is already on the destination Link we don't need any
-		 * further Replanning.
-		 */
-		if (vehicle.getCurrentLink().getId().equals(route.getEndLinkId())) return true;
-
-		// set VehicleId - seems that it currently null?
-		route.setVehicleId(vehicle.getId());
-
-		// create dummy data for the "new" activities
-		String type = "w";
-		// This would be the "correct" Type - but it is slower and is not necessary
-		//String type = this.plan.getPreviousActivity(leg).getType();
-
-		ActivityImpl newFromAct = new ActivityImpl(type, vehicle.getCurrentLink().getToNode().getCoord(), vehicle.getCurrentLink().getId());
-
-		newFromAct.setStartTime(time);
-		newFromAct.setEndTime(time);
-
-		LinkNetworkRouteImpl subRoute = new LinkNetworkRouteImpl(vehicle.getCurrentLink().getId(), route.getEndLinkId());
-
-		// put the new route in a new leg
-		Leg newLeg = new LegImpl(currentLeg.getMode());
-		newLeg.setDepartureTime(currentLeg.getDepartureTime());
-		newLeg.setTravelTime(currentLeg.getTravelTime());
-		newLeg.setRoute(subRoute);
-
-		// create new plan and select it
-		PlanImpl newPlan = new PlanImpl(person);
-
-		// here we are at the moment
-		newPlan.addActivity(newFromAct);
-
-		// Route from the current position to the next destination.
-		newPlan.addLeg(newLeg);
-
-		// next Activity
-		newPlan.addActivity(nextActivity);
-
-		this.planAlgorithm.run(newPlan);
-
-		// get new calculated Route
-		NetworkRoute newRoute = (NetworkRoute) newLeg.getRoute();
-
-		// use VehicleId from existing Route
-		newRoute.setVehicleId(vehicle.getId());
-
-		// get Nodes from the current Route
-		List<Node> nodesBuffer = RouteUtils.getNodes(route, this.scenario.getNetwork());
-
-		// remove Nodes after the current Position in the Route
-		nodesBuffer.subList(currentNodeIndex - 1, nodesBuffer.size()).clear();
-
-		// Merge already driven parts of the Route with the new routed parts.
-		nodesBuffer.addAll(RouteUtils.getNodes(newRoute, this.scenario.getNetwork()));
-
-		// Update Route by replacing the Nodes.
-		route.setLinkIds(route.getStartLinkId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(nodesBuffer)), route.getEndLinkId());
-
-		// Update Distance
-		double distance = 0.0;
-		for (Id id : route.getLinkIds())
-		{
-			distance = distance + this.scenario.getNetwork().getLinks().get(id).getLength();
-		}
-		distance = distance + this.scenario.getNetwork().getLinks().get(route.getEndLinkId()).getLength();
-		route.setDistance(distance);
-
-		// finally reset the cached next Link of the PersonAgent - it may have changed!
+//		// Finally reset the cached next Link of the PersonAgent - it may have changed!
 //		withinDayPersonAgent.resetCachedNextLink();
+
+		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayPersonAgent.resetCaches();
 		
-//		// create ReplanningEvent		
-//		this.events.processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));
+//		// create ReplanningEvent
+//		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));
 
 		return true;
 	}
 
+
 	@Override
-	public CurrentLegReplanner clone()
-	{
+	public CurrentLegReplanner clone() {
 		CurrentLegReplanner clone = new CurrentLegReplanner(this.id, this.scenario, this.events);
 
 		super.cloneBasicData(clone);

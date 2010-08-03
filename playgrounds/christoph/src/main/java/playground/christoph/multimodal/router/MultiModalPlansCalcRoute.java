@@ -54,10 +54,12 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 	private RouteFactory walkRouteFactory = new LinkNetworkRouteFactory();
 	private RouteFactory bikeRouteFactory = new LinkNetworkRouteFactory();
 	private RouteFactory ptRouteFactory = new LinkNetworkRouteFactory();
+	private RouteFactory rideRouteFactory = new LinkNetworkRouteFactory();
 	
 	private IntermodalLeastCostPathCalculator walkRouteAlgo;
 	private IntermodalLeastCostPathCalculator bikeRouteAlgo;
 	private IntermodalLeastCostPathCalculator ptRouteAlgo;
+	private IntermodalLeastCostPathCalculator rideRouteAlgo;
 	
 	private LeastCostPathCalculatorFactory factory;
 		
@@ -91,7 +93,6 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 		 * Walk
 		 */
 		MultiModalTravelTimeCost walkTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.walk);
-//		walkRouteAlgo = new Dijkstra(network, walkTravelTimeCost, walkTravelTimeCost);
 		walkRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, walkTravelTimeCost, walkTravelTimeCost);
 			
 		Set<String> walkModeRestrictions = new TreeSet<String>();
@@ -104,7 +105,6 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 		 * Bike
 		 */
 		MultiModalTravelTimeCost bikeTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.bike);
-//		bikeRouteAlgo = new Dijkstra(network, bikeTravelTimeCost, bikeTravelTimeCost);
 		bikeRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, bikeTravelTimeCost, bikeTravelTimeCost);
 		
 		/*
@@ -132,7 +132,6 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 			ptTravelTimeCost.setTravelTime(bufferedTravelTime);
 		}
 		
-//		ptRouteAlgo = new Dijkstra(network, ptTravelTimeCost, ptTravelTimeCost);
 		ptRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, ptTravelTimeCost, ptTravelTimeCost);
 		
 		/*
@@ -149,6 +148,28 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 		ptModeRestrictions.add(TransportMode.bike);
 		ptModeRestrictions.add(TransportMode.walk);
 		ptRouteAlgo.setModeRestriction(ptModeRestrictions);
+		
+		
+		/*
+		 * Ride
+		 * If possible, we use "real" TravelTimes from previous iterations - if not,
+		 * freeSpeedTravelTimes are used.
+		 */
+		MultiModalTravelTimeCost rideTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.ride);
+		if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
+			BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
+			bufferedTravelTime.setScaleFactor(1.0);
+			rideTravelTimeCost.setTravelTime(bufferedTravelTime);
+		}
+		
+		rideRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, ptTravelTimeCost, ptTravelTimeCost);
+		
+		/*
+		 * We assume ride trips are possible on every road that can be used by cars.
+		 */
+		Set<String> rideModeRestrictions = new TreeSet<String>();
+		rideModeRestrictions.add(TransportMode.car);
+		rideRouteAlgo.setModeRestriction(rideModeRestrictions);
 	}
 	
 	@Override
@@ -164,6 +185,11 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 	@Override
 	protected double handlePtLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		return handleMultiModalLeg(leg, fromAct, toAct, depTime, ptRouteAlgo, ptRouteFactory);
+	}
+	
+	@Override
+	protected double handleRideLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+		return handleMultiModalLeg(leg, fromAct, toAct, depTime, rideRouteAlgo, rideRouteFactory);
 	}
 	
 	/*

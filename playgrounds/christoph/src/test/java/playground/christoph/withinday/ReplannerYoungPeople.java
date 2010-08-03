@@ -2,12 +2,10 @@ package playground.christoph.withinday;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -30,19 +28,19 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 	}
 
 	@Override
-	public boolean doReplanning(PersonDriverAgent driverAgent) {
+	public boolean doReplanning(PersonAgent personAgent) {
 		
 		// If we don't have a valid Replanner.
 		if (this.planAlgorithm == null) return false;
 
 		// If we don't have a valid WithinDayPersonAgent
-		if (driverAgent == null) return false;
+		if (personAgent == null) return false;
 
 		WithinDayPersonAgent withinDayPersonAgent = null;
-		if (!(driverAgent instanceof WithinDayPersonAgent)) return false;
+		if (!(personAgent instanceof WithinDayPersonAgent)) return false;
 		else
 		{
-			withinDayPersonAgent = (WithinDayPersonAgent) driverAgent;
+			withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
 		}
 
 		PersonImpl person = (PersonImpl)withinDayPersonAgent.getPerson();
@@ -51,7 +49,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		// If we don't have a selected plan
 		if (selectedPlan == null) return false;
 
-		Leg currentLeg = driverAgent.getCurrentLeg();
+		Leg currentLeg = personAgent.getCurrentLeg();
 		Activity nextActivity = selectedPlan.getNextActivity(currentLeg);
 
 		// If it is not a car Leg we don't replan it.
@@ -67,7 +65,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		 *  Replan Routes
 		 */
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, ((WithinDayPersonAgent)driverAgent).getCurrentNodeIndex(), planAlgorithm, scenario.getNetwork(), time);
+		new EditRoutes().replanCurrentLegRoute(selectedPlan, currentLeg, withinDayPersonAgent.getCurrentNodeIndex(), planAlgorithm, scenario.getNetwork(), time);
 		
 		// new Route for next Leg
 		Leg homeLeg = selectedPlan.getNextLeg(newWorkAct);

@@ -22,7 +22,7 @@ package playground.christoph.withinday.mobsim;
 
 import java.util.List;
 
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 
 import playground.christoph.withinday.replanning.ReplanningTask;
 import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
@@ -30,26 +30,20 @@ import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 
-public class DuringLegReplanningModule extends WithinDayReplanningModule{
+public class DuringLegReplanningModule extends WithinDayReplanningModule {
 		
-	public DuringLegReplanningModule(ParallelDuringLegReplanner parallelDuringLegReplanner)
-	{
+	public DuringLegReplanningModule(ParallelDuringLegReplanner parallelDuringLegReplanner) {
 		this.parallelReplanner = parallelDuringLegReplanner;
 	}
 	
-	public void doReplanning(double time)
-	{
-		for (WithinDayReplanner replanner : this.parallelReplanner.getWithinDayReplanners())
-		{
-			if(replanner instanceof WithinDayDuringLegReplanner)
-			{
+	public void doReplanning(double time) {
+		for (WithinDayReplanner replanner : this.parallelReplanner.getWithinDayReplanners()) {
+			if(replanner instanceof WithinDayDuringLegReplanner) {
 				List<AgentsToReplanIdentifier> identifiers = replanner.getAgentsToReplanIdentifers();
 				
-				for (AgentsToReplanIdentifier identifier : identifiers)
-				{
-					for (PersonDriverAgent driverAgent : identifier.getAgentsToReplan(time, replanner))
-					{
-						ReplanningTask replanningTask = new ReplanningTask(driverAgent, replanner.getId());
+				for (AgentsToReplanIdentifier identifier : identifiers) {
+					for (PersonAgent personAgent : identifier.getAgentsToReplan(time, replanner)) {
+						ReplanningTask replanningTask = new ReplanningTask(personAgent, replanner.getId());
 						this.parallelReplanner.addReplanningTask(replanningTask);
 					}
 				}

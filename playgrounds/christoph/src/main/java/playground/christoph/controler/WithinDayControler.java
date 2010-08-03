@@ -28,22 +28,21 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QVehicle;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
-import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
-import playground.christoph.replanning.TravelTimeCollector;
-import playground.christoph.router.CloneablePlansCalcRoute;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
@@ -53,10 +52,13 @@ import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
 import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSimFactory;
 import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
+import playground.christoph.withinday.mobsim.WithinDayQSim;
+import playground.christoph.withinday.network.WithinDayLinkFactoryImpl;
 import playground.christoph.withinday.replanning.CurrentLegReplanner;
 import playground.christoph.withinday.replanning.InitialReplanner;
 import playground.christoph.withinday.replanning.NextLegReplanner;
 import playground.christoph.withinday.replanning.ReplanningIdGenerator;
+import playground.christoph.withinday.replanning.TravelTimeCollector;
 import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
 import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
 import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
@@ -66,6 +68,7 @@ import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifier
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
+import playground.christoph.withinday.replanning.modules.ReplanningModule;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
@@ -96,7 +99,7 @@ public class WithinDayControler extends Controler {
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 2;
+	protected int numReplanningThreads = 6;
 
 	protected TravelTime travelTime;
 	
@@ -116,29 +119,27 @@ public class WithinDayControler extends Controler {
 
 	private static final Logger log = Logger.getLogger(WithinDayControler.class);
 
-	public WithinDayControler(String[] args)
-	{
+	public WithinDayControler(String[] args) {
 		super(args);
 
 		setConstructorParameters();
 	}
 
 	// only for Batch Runs
-	public WithinDayControler(Config config)
-	{
+	public WithinDayControler(Config config) {
 		super(config);
 
 		setConstructorParameters();
 	}
 
-	private void setConstructorParameters()
-	{
+	private void setConstructorParameters() {
 		/*
 		 * Use MyLinkImpl. They can carry some additional Information like their
 		 * TravelTime or VehicleCount.
 		 * This is needed to be able to use a LinkVehiclesCounter.
 		 */
-		this.getNetwork().getFactory().setLinkFactory(new MyLinkFactoryImpl());
+//		this.getNetwork().getFactory().setLinkFactory(new MyLinkFactoryImpl());
+		this.getNetwork().getFactory().setLinkFactory(new WithinDayLinkFactoryImpl());
 
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
@@ -151,6 +152,7 @@ public class WithinDayControler extends Controler {
 	protected void initReplanningRouter() {
 		
 		travelTime = new TravelTimeCollector(network);
+		foqsl.addQueueSimulationInitializedListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
@@ -159,24 +161,25 @@ public class WithinDayControler extends Controler {
 		
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 
-//		KnowledgePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime, new FastDijkstraFactory());
-		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
-			
+//		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
+		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring())); 
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory); 
+		
 		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.initialReplanner.setReplanner(dijkstraRouter);
+		this.initialReplanner.setAbstractMultithreadedModule(router);
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
 		
-		this.duringActivityIdentifier = new ActivityEndIdentifier(this.sim);
+		this.duringActivityIdentifier = new ActivityEndIdentifier(this);
 		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData, this.events);
-		this.duringActivityReplanner.setReplanner(dijkstraRouter);
+		this.duringActivityReplanner.setAbstractMultithreadedModule(router);
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 		
-		this.duringLegIdentifier = new LeaveLinkIdentifier(this.sim);
+		this.duringLegIdentifier = new LeaveLinkIdentifier(this);
 		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData, this.getEvents());
-		this.duringLegReplanner.setReplanner(dijkstraRouter);
+		this.duringLegReplanner.setAbstractMultithreadedModule(router);
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
 	}
@@ -184,11 +187,10 @@ public class WithinDayControler extends Controler {
 	/*
 	 * Initializes the ParallelReplannerModules
 	 */
-	protected void initParallelReplanningModules()
-	{		
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
-		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
-		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
+	protected void initParallelReplanningModules() {		
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, this);
+		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, this);
+		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads, this);
 	}
 	
 	/*
@@ -197,27 +199,19 @@ public class WithinDayControler extends Controler {
 	 *
 	 * The full initialization of them is done later (we don't have all necessary Objects yet).
 	 */
-	protected void createHandlersAndListeners()
-	{
+	protected void createHandlersAndListeners() {
 		replanningManager = new ReplanningManager();
 	}
 
 	@Override
-	protected void runMobSim()
-	{	
+	protected void runMobSim() {	
 		createHandlersAndListeners();
 		
-//		sim = new KnowledgeWithinDayQSim(this.scenarioData, this.events, new KnowledgeWithinDayQSimFactory());
 		sim = new KnowledgeWithinDayQSimFactory().createMobsim(this.scenarioData, this.events);
 	
 		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
 		foqsl.addQueueSimulationInitializedListener(rfi);
-				
-//		if (this.events instanceof WithinDayParallelEventsManagerImpl)
-//		{
-//			foqsl.addQueueSimulationAfterSimStepListener((WithinDayParallelEventsManagerImpl)this.events);			
-//		}
-
+		
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		 * ensure that they are started in the needed order.
@@ -255,7 +249,7 @@ public class WithinDayControler extends Controler {
 	}
 
 
-	public static class ReplanningFlagInitializer implements SimulationInitializedListener{
+	public static class ReplanningFlagInitializer implements SimulationInitializedListener<QSimI> {
 
 		protected WithinDayControler withinDayControler;
 		protected Map<Id, WithinDayPersonAgent> withinDayPersonAgents;
@@ -265,21 +259,17 @@ public class WithinDayControler extends Controler {
 		protected int actEndReplanningCounter = 0;
 		protected int leaveLinkReplanningCounter = 0;
 		
-		public ReplanningFlagInitializer(WithinDayControler controler)
-		{
+		public ReplanningFlagInitializer(WithinDayControler controler) {
 			this.withinDayControler = controler;
 		}
 		
 		@Override
-		public void notifySimulationInitialized(SimulationInitializedEvent e)
-		{
-			collectAgents((QSim)e.getQueueSimulation());
+		public void notifySimulationInitialized(SimulationInitializedEvent<QSimI> e) {
+			collectAgents(e.getQueueSimulation());
 			setReplanningFlags();
-			
 		}
 		
-		protected void setReplanningFlags()
-		{
+		protected void setReplanningFlags() {
 			noReplanningCounter = 0;
 			initialReplanningCounter = 0;
 			actEndReplanningCounter = 0;
@@ -287,15 +277,13 @@ public class WithinDayControler extends Controler {
 
 			Random random = MatsimRandom.getLocalInstance();
 			
-			for (WithinDayPersonAgent withinDayPersonAgent : this.withinDayPersonAgents.values())
-			{
+			for (WithinDayPersonAgent withinDayPersonAgent : this.withinDayPersonAgents.values()) {
 				double probability;
 				boolean noReplanning = true;
 
 				probability = random.nextDouble();
 				if (probability > withinDayControler.pInitialReplanning) ;
-				else
-				{
+				else {
 					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.initialReplanner);
 					noReplanning = false;
 					initialReplanningCounter++;
@@ -303,9 +291,8 @@ public class WithinDayControler extends Controler {
 
 				// No Replanning
 				probability = random.nextDouble();
-				if (probability > withinDayControler.pActEndReplanning) ;
-				else
-				{
+				if (probability > withinDayControler.pActEndReplanning);
+				else {
 					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.duringActivityReplanner);
 					noReplanning = false;
 					actEndReplanningCounter++;
@@ -314,8 +301,7 @@ public class WithinDayControler extends Controler {
 				// No Replanning
 				probability = random.nextDouble();
 				if (probability > withinDayControler.pLeaveLinkReplanning) ;
-				else
-				{
+				else {
 					withinDayPersonAgent.addWithinDayReplanner(withinDayControler.duringLegReplanner);
 					noReplanning = false;
 					leaveLinkReplanningCounter++;
@@ -346,20 +332,13 @@ public class WithinDayControler extends Controler {
 			log.info(leaveLinkReplanningCounter + " persons replan their plans at each node (" + leaveLinkReplanningCounter / numPersons * 100.0 + "%)");
 		}
 		
-		protected void collectAgents(QSim sim)
-		{
+		protected void collectAgents(QSimI sim) {
 			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
 			
-			for (QLinkInternalI queueLink : sim.getQNetwork().getLinks().values())
-			{
-				for (QVehicle queueVehicle : queueLink.getAllVehicles())
-				{
-					WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) queueVehicle.getDriver();
-					this.withinDayPersonAgents.put(withinDayPersonAgent.getPerson().getId(), withinDayPersonAgent);
-				}
+			for (PersonAgent personAgent : ((WithinDayQSim) sim).getPersonAgents().values()) {
+				withinDayPersonAgents.put(personAgent.getPerson().getId(), (WithinDayPersonAgent) personAgent);
 			}
 		}
-		
 	}
 	
 	/*
@@ -384,14 +363,12 @@ public class WithinDayControler extends Controler {
 	public static class FreeSpeedTravelTime implements TravelTime, Cloneable
 	{
 
-		public double getLinkTravelTime(Link link, double time)
-		{
+		public double getLinkTravelTime(Link link, double time) {
 			return link.getFreespeed(time);
 		}
 		
 		@Override
-		public FreeSpeedTravelTime clone()
-		{
+		public FreeSpeedTravelTime clone() {
 			return new FreeSpeedTravelTime();
 		}
 	}

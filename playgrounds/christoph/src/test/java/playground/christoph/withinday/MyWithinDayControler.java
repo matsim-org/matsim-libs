@@ -3,8 +3,12 @@ package playground.christoph.withinday;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.controler.WithinDayControler;
@@ -21,6 +25,7 @@ import playground.christoph.withinday.replanning.WithinDayInitialReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
+import playground.christoph.withinday.replanning.modules.ReplanningModule;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
@@ -72,28 +77,26 @@ public class MyWithinDayControler extends Controler {
 
 		// use dijkstra for replanning (routing)
 		travelTime=this.getTravelTimeCalculator();
-		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
-
-
-
-
+//		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory()); 
+		
 //		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 //		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
 //		this.initialReplanner.setReplanner(dijkstraRouter);
 //		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 //		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
-//
+
 
 		// use replanning during activity
 		this.duringActivityIdentifier = new OldPeopleIdentifier(this.sim);
 		this.duringActivityReplanner = new ReplannerOldPeople(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.duringActivityReplanner.setReplanner(dijkstraRouter);
+		this.duringActivityReplanner.setAbstractMultithreadedModule(router);
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 
 		this.duringLegIdentifier = new YoungPeopleIdentifier(this.sim);
 		this.duringLegReplanner = new ReplannerYoungPeople(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.duringLegReplanner.setReplanner(dijkstraRouter);
+		this.duringLegReplanner.setAbstractMultithreadedModule(router);
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
 	}
@@ -103,9 +106,9 @@ public class MyWithinDayControler extends Controler {
 	 */
 	protected void initParallelReplanningModules()
 	{
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
-		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
-		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, this);
+		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, this);
+		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads, this);
 	}
 
 	/*

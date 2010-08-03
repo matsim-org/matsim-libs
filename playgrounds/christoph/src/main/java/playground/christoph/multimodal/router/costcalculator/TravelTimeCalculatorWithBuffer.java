@@ -60,8 +60,7 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 	/*
 	 * Initially use FreeSpeedTravelTimes
 	 */
-	private void initBuffer(Network network)
-	{			
+	private void initBuffer(Network network) {			
 		int timeSlice = this.getTimeSlice();
 		int numSlots = this.getNumSlots();
 		
@@ -85,13 +84,11 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 	private void updateBufferedTravelTimes(int iteration) {
 		if (iteration == 0) return;	// before the first Iteration -> nothing to do
 		
-		for (Entry<Id, double[]> entry : bufferedTravelTimes.entrySet())
-		{			
+		for (Entry<Id, double[]> entry : bufferedTravelTimes.entrySet()) {			
 			double[] travelTimeArray = entry.getValue();
 
 			int time = 0;
-			for (int i = 0; i < this.getNumSlots(); i++)
-			{
+			for (int i = 0; i < this.getNumSlots(); i++) {
 				travelTimeArray[i] = this.getLinkTravelTime(entry.getKey(), time);
 				time = time + this.getTimeSlice();
 			}

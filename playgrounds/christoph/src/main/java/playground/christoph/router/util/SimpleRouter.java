@@ -36,7 +36,7 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
  * By implementing the PersonalizableTravelCost interface the PlansCalcRoute
  * class hands over the currently handled person by using the setPerson method. 
  */
-public abstract class SimpleRouter implements LeastCostPathCalculator, PersonalizableTravelCost, Cloneable{
+public abstract class SimpleRouter implements LeastCostPathCalculator, PersonalizableTravelCost, Cloneable {
 	
 	protected KnowledgeTools knowledgeTools;
 	protected Network network;
@@ -45,8 +45,7 @@ public abstract class SimpleRouter implements LeastCostPathCalculator, Personali
 	protected TabuSelector tabuSelector;
 	protected Person person;
 	
-	public SimpleRouter(Network network) 
-	{
+	public SimpleRouter(Network network) {
 		this.network = network;
 		this.knowledgeTools = new KnowledgeTools();
 		this.random = MatsimRandom.getLocalInstance();
@@ -54,8 +53,7 @@ public abstract class SimpleRouter implements LeastCostPathCalculator, Personali
 		this.tabuSelector = new TabuSelector();
 	}
 	
-	public void setPerson(Person person)
-	{
+	public void setPerson(Person person) {
 		this.person = person;
 	}
 
@@ -63,8 +61,7 @@ public abstract class SimpleRouter implements LeastCostPathCalculator, Personali
 	 * A typical simple Router like a Random Router ignores
 	 * the link travel costs so by default we set them to 0.
 	 */
-	public double getLinkTravelCost(Link link, double time)
-	{
+	public double getLinkTravelCost(Link link, double time) {
 		return 0;
 	}
 }

@@ -27,23 +27,23 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.QPersonAgent;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
-import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 
-public class WithinDayPersonAgent extends QPersonAgent{
+public class WithinDayPersonAgent extends QPersonAgent {
 
 	private static final Logger log = Logger.getLogger(WithinDayPersonAgent.class);
 
 	private List<WithinDayReplanner> withinDayReplanner = new ArrayList<WithinDayReplanner>();
+	private WithinDayQSim simulation;
 	
-	public WithinDayPersonAgent(final PersonImpl p, final QSimI simulation)
-	{
+	public WithinDayPersonAgent(Person p, QSimI simulation) {
 		super(p, simulation);
+		this.simulation = (WithinDayQSim) simulation;
 	}
 
 	/*
@@ -54,18 +54,42 @@ public class WithinDayPersonAgent extends QPersonAgent{
 	 * because it can be called from the Replanning Module and isn't done for
 	 * every Agent even it is not necessary.
 	 */
-	public void resetCachedNextLink()
-	{
+	public void resetCachedNextLink() {
 		super.cachedNextLinkId = null;
 	}
 
+	
+	public void rescheduleCurrentActivity(double now) {
+		this.simulation.rescheduleActivityEnd(now, this);
+		
+//		resetActivityDepartureTime(time);
+//
+//		simulation.getActivityEndsList().remove(this);
+//		
+//		/*
+//		 * Check whether it is the last Activity. If true,
+//		 * only remove it from the ActvityEndsList and decrease
+//		 * the living counter.
+//		 * Otherwise reschedule the Activity by adding it again
+//		 * to the ActivityEndsList.
+//		 */
+//		Activity currentActivity = getCurrentActivity();
+//		List<PlanElement> planElements = this.getPerson().getSelectedPlan().getPlanElements();
+//		if (planElements.size() - 1 == planElements.indexOf(currentActivity)) {
+//			// this is the last activity
+//			simulation.getAgentCounter().decLiving();			
+//		}
+//		else {
+//			simulation.getActivityEndsList().add(this);
+//		}
+	}
+		
 	/*
 	 * Returns the currently performed Activity or the
 	 * Activity that will be performed after the current
 	 * Leg. 
 	 */
-	public Activity getCurrentActivity()
-	{
+	public Activity getCurrentActivity() {
 		Activity currentActivity = null;
 		
 		// The Person is currently at an Activity and is going to leave it.
@@ -75,40 +99,33 @@ public class WithinDayPersonAgent extends QPersonAgent{
 		Leg currentLeg = this.getCurrentLeg();
 		
 		// first Activity - there is no previous Leg
-		if (currentLeg == null)
-		{
+		if (currentLeg == null) {
 			currentActivity = (Activity)planElements.get(0);
 		}
-		else
-		{
+		else {
 			int index = planElements.indexOf(currentLeg);
 			// If the Leg is part of the Person's Plan
-			if (index >= 0)
-			{
+			if (index >= 0) {
 				currentActivity = (Activity)planElements.get(index + 1);
 			}
 		}
 		
-		if (currentActivity == null)
-		{
+		if (currentActivity == null) {
 			log.error("Could not find Activity!");
 		}
 		
 		return currentActivity;
 	}
 	
-	public boolean addWithinDayReplanner(WithinDayReplanner replanner)
-	{
+	public boolean addWithinDayReplanner(WithinDayReplanner replanner) {
 		return this.withinDayReplanner.add(replanner);
 	}
 	
-	public boolean removeWithinDayReplanner(WithinDayReplanner replanner)
-	{
+	public boolean removeWithinDayReplanner(WithinDayReplanner replanner) {
 		return this.withinDayReplanner.remove(replanner);
 	}
 	
-	public List<WithinDayReplanner> getWithinDayReplanners()
-	{
+	public List<WithinDayReplanner> getWithinDayReplanners() {
 		return Collections.unmodifiableList(withinDayReplanner);
 	}
 }

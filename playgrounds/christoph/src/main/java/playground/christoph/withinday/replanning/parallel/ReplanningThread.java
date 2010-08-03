@@ -29,22 +29,28 @@ import java.util.concurrent.CyclicBarrier;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.utils.misc.Counter;
+import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 
 import playground.christoph.withinday.replanning.ReplanningTask;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 
 /*
  * Typical Replanner Implementations should be able to use this 
- * Class method without any Changes.
- * Override the doReplanning() Method to implement the Replanning functionality.
+ * Class method without any changes.
+ * Override the doReplanning() method to implement the replanning functionality.
  */
 public abstract class ReplanningThread extends Thread{
 
 	private final static Logger log = Logger.getLogger(ReplanningThread.class);
 	
+	protected Counter counter;
 	protected double time = 0.0;
+	protected AgentCounterI agentCounter;
 	protected boolean simulationRunning = true;
+	
+	
 	
 	/*
 	 *  The original WithinDayReplanners are initialized and assigned
@@ -60,37 +66,35 @@ public abstract class ReplanningThread extends Thread{
 	protected CyclicBarrier timeStepStartBarrier;
 	protected CyclicBarrier timeStepEndBarrier;
 	
-	public ReplanningThread()
-	{
+	public ReplanningThread(String counterText) {
+		counter = new Counter(counterText);
 	}
 	
-	public void setTime(double time)
-	{
+	public void setTime(double time) {
 		this.time = time;
 	}
 	
-	public void setSimulationRunning(boolean simulationRunning)
-	{
+	public void setAgentCounter(AgentCounterI agentCounter) {
+		this.agentCounter = agentCounter;
+	}
+	
+	public void setSimulationRunning(boolean simulationRunning) {
 		this.simulationRunning = simulationRunning;
 	}
 	
-	public void setCyclicTimeStepStartBarrier(CyclicBarrier barrier)
-	{
+	public void setCyclicTimeStepStartBarrier(CyclicBarrier barrier) {
 		this.timeStepStartBarrier = barrier;
 	}
 	
-	public void setCyclicTimeStepEndBarrier(CyclicBarrier barrier)
-	{
+	public void setCyclicTimeStepEndBarrier(CyclicBarrier barrier) {
 		this.timeStepEndBarrier = barrier;
 	}
 
-	public void addReplanningTask(ReplanningTask replanningTask)
-	{			
+	public void addReplanningTask(ReplanningTask replanningTask) {			
 		replanningTasks.add(replanningTask);
 	}
 	
-	public void addWithinDayReplanner(WithinDayReplanner withinDayReplanner)
-	{
+	public void addWithinDayReplanner(WithinDayReplanner withinDayReplanner) {
 		this.withinDayReplanners.put(withinDayReplanner.getId(), withinDayReplanner);
 	}
 	
@@ -98,37 +102,41 @@ public abstract class ReplanningThread extends Thread{
 	 * Typical Replanner Implementations should be able to use 
 	 * this method without any Changes.
 	 */
-	protected void doReplanning()
-	{
+	protected void doReplanning() {
 		ReplanningTask replanningTask;
-		while((replanningTask = replanningTasks.poll()) != null)
-		{
+		while((replanningTask = replanningTasks.poll()) != null) {
 			Id id = replanningTask.getWithinDayReplannerId();
-			PersonDriverAgent driverAgent = replanningTask.getAgentToReplan();
+			PersonAgent personAgent = replanningTask.getAgentToReplan();
 			
-			if (id == null)
-			{
+			if (id == null) {
 				log.error("WithinDayReplanner Id is null!");
 				return;
 			}
 			
-			if (driverAgent == null)
-			{
-				log.error("DriverAgent is null!");
+			if (personAgent == null) {
+				log.error("PersonAgent is null!");
 				return;
 			}
 			
 			WithinDayReplanner withinDayReplanner = this.withinDayReplanners.get(id);
-			
-			if (withinDayReplanner != null)
-			{
-				withinDayReplanner.setTime(time);
-				boolean replanningSuccessful = withinDayReplanner.doReplanning(driverAgent);
+
+			if (withinDayReplanner != null) {
+				/*
+				 * Check whether the current Agent should be replanned based on the 
+				 * replanning probability. If not, continue with the next one.
+				 */
+				if (!withinDayReplanner.replanAgent()) continue;
 				
-				if (!replanningSuccessful) log.error("Replanning was not successful!");
+				withinDayReplanner.setAgentCounter(agentCounter);
+				withinDayReplanner.setTime(time);
+				boolean replanningSuccessful = withinDayReplanner.doReplanning(personAgent);
+				
+				if (!replanningSuccessful) {
+					log.error("Replanning was not successful!");
+				}
+				else counter.incCounter();
 			}
-			else
-			{
+			else {
 				log.error("WithinDayReplanner is null!");
 			}
 
@@ -136,12 +144,9 @@ public abstract class ReplanningThread extends Thread{
 	}
 	
 	@Override
-	public void run()
-	{
-		while (simulationRunning)
-		{
-			try
-			{
+	public void run() {
+		while (simulationRunning) {
+			try {
 				/*
 				 * The End of the Replanning is synchronized with 
 				 * the TimeStepEndBarrier. If all Threads reach this Barrier
@@ -156,13 +161,9 @@ public abstract class ReplanningThread extends Thread{
 				timeStepStartBarrier.await();
 
 				doReplanning();
-			}
-			catch (InterruptedException e)
-			{
+			} catch (InterruptedException e) {
 				Gbl.errorMsg(e);
-			}
-            catch (BrokenBarrierException e)
-            {
+			} catch (BrokenBarrierException e) {
             	Gbl.errorMsg(e);
             }
 

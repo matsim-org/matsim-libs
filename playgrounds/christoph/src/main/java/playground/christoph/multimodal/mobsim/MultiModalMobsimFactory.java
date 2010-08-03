@@ -38,11 +38,13 @@ import playground.christoph.multimodal.router.costcalculator.BufferedTravelTime;
 import playground.christoph.multimodal.router.costcalculator.MultiModalTravelTimeCost;
 import playground.christoph.multimodal.router.costcalculator.TravelTimeCalculatorWithBuffer;
 
-public class MultiModalMobsimFactory implements MobsimFactory{
+public class MultiModalMobsimFactory implements MobsimFactory {
 
 	private static final Logger log = Logger.getLogger(MultiModalMobsimFactory.class);
 	
-	private TravelTime travelTime;
+	protected TravelTime travelTime;
+	protected MobsimFactory mobSimFactory = new QSimFactory();
+	protected MobsimFactory parallelMobSimFactory = new ParallelQSimFactory();
 	
 	/*
 	 * The TravelTimeCalculator which is used by the Controler to reschedule the Plans. 
@@ -50,7 +52,7 @@ public class MultiModalMobsimFactory implements MobsimFactory{
 	public MultiModalMobsimFactory(TravelTime travelTime) {
 		this.travelTime = travelTime;
 	}
-	 
+	
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
 		
@@ -65,10 +67,10 @@ public class MultiModalMobsimFactory implements MobsimFactory{
 		 * the existing SimFactories.
 		 */
 		if (numOfThreads > 1) {
-			sim = new ParallelQSimFactory().createMobsim(sc, eventsManager);
+			sim = parallelMobSimFactory.createMobsim(sc, eventsManager);
 		}
 		else {
-			sim = new QSimFactory().createMobsim(sc, eventsManager);
+			sim = mobSimFactory.createMobsim(sc, eventsManager);
 		}
 		
 		/*

@@ -25,10 +25,10 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.ptproject.qsim.QSim;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
@@ -36,36 +36,28 @@ import playground.christoph.withinday.replanning.identifiers.interfaces.DuringAc
 
 public class ActivityEndIdentifier extends DuringActivityIdentifier{
 	
-	protected QSim qSim;
 	protected ActivityReplanningMap activityReplanningMap;
 	
-	public ActivityEndIdentifier(QSim qSim)
-	{
-		this.qSim = qSim;
-		this.activityReplanningMap = new ActivityReplanningMap(qSim);
+	public ActivityEndIdentifier(Controler controler) {
+		this.activityReplanningMap = new ActivityReplanningMap(controler);
 	}
 	
 	// Only for Cloning.
-	private ActivityEndIdentifier(QSim qSim, ActivityReplanningMap activityReplanningMap)
-	{
-		this.qSim = qSim;
+	private ActivityEndIdentifier(ActivityReplanningMap activityReplanningMap) {
 		this.activityReplanningMap = activityReplanningMap;
 	}
 	
-	public List<PersonDriverAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner)
-	{
-		List<PersonDriverAgent> agentsToReplan = activityReplanningMap.getReplanningDriverAgents(time);
+	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
+		List<PersonAgent> agentsToReplan = activityReplanningMap.getReplanningDriverAgents(time);
 
-		Iterator<PersonDriverAgent> iter = agentsToReplan.iterator();
-		while(iter.hasNext())
-		{
+		Iterator<PersonAgent> iter = agentsToReplan.iterator();
+		while(iter.hasNext()) {
 			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) iter.next();
 			
 			/*
 			 * Remove the Agent from the list, if the replanning flag is not set.
 			 */
-			if (!withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner))
-			{
+			if (!withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner)) {
 				iter.remove();
 				continue;
 			}
@@ -81,8 +73,7 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier{
 			PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan(); 
 			
 			// If we don't have a selected plan
-			if (selectedPlan == null)
-			{
+			if (selectedPlan == null) {
 				iter.remove();
 				continue;
 			}
@@ -94,15 +85,13 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier{
 			currentActivity = withinDayPersonAgent.getCurrentActivity();
 			
 			// If we don't have a current Activity
-			if (currentActivity == null)
-			{
+			if (currentActivity == null) {
 				iter.remove();
 				continue;
 			}
 			
 			nextLeg = selectedPlan.getNextLeg(currentActivity);
-			if (nextLeg == null)
-			{
+			if (nextLeg == null) {
 				iter.remove();
 				continue;
 			}
@@ -119,21 +108,18 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier{
 			 * the leg after that Activity.
 			 */
 			boolean removeAgent = false;
-			while (nextLeg.getRoute().getStartLinkId().equals(nextLeg.getRoute().getEndLinkId()))
-			{
+			while (nextLeg.getRoute().getStartLinkId().equals(nextLeg.getRoute().getEndLinkId())) {
 				/*
 				 *  If the next Activity has a duration > 0 we don't have to replan
 				 *  the leg after that Activity now - it will be scheduled later.
 				 */
-				if (nextActivity.getEndTime() > time)
-				{	
+				if (nextActivity.getEndTime() > time) {	
 					removeAgent = true;
 					break;
 				}				
 			
 				nextLeg = selectedPlan.getNextLeg(nextActivity);
-				if (nextLeg == null)
-				{
+				if (nextLeg == null) {
 					removeAgent = true;
 					break;
 				}
@@ -143,8 +129,7 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier{
 			/*
 			 * If no "next" leg to replan has been found - remove Agent from list.
 			 */
-			if (removeAgent)
-			{
+			if (removeAgent) {
 				iter.remove();
 				continue;
 			}
@@ -153,13 +138,12 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier{
 		return agentsToReplan;
 	}
 
-	public ActivityEndIdentifier clone()
-	{
+	public ActivityEndIdentifier clone() {
 		/*
 		 *  We don't want to clone the ActivityReplanningMap. Instead we
 		 *  reuse the existing one.
 		 */
-		ActivityEndIdentifier clone = new ActivityEndIdentifier(this.qSim, this.activityReplanningMap);
+		ActivityEndIdentifier clone = new ActivityEndIdentifier(this.activityReplanningMap);
 		
 		super.cloneBasicData(clone);
 		

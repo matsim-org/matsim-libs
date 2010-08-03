@@ -27,7 +27,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 
-public class MultiModalTravelTimeCost implements MultiModalTravelTime, PersonalizableTravelCost{
+public class MultiModalTravelTimeCost implements MultiModalTravelTime, PersonalizableTravelCost {
 
 	private TravelTime travelTime;
 	private PlansCalcRouteConfigGroup group;
@@ -47,6 +47,7 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 		if (transportMode.equals(TransportMode.bike)) speed = group.getBikeSpeed();
 		else if (transportMode.equals(TransportMode.walk)) speed = group.getWalkSpeed();
 		else if (transportMode.equals(TransportMode.pt)) ;	// nothing to do here
+		else if (transportMode.equals(TransportMode.ride)) ; // nothing to do here
 		else throw new RuntimeException("Not supported TransportMode: " + transportMode);
 		
 		/*
@@ -91,6 +92,15 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 				link.getAllowedModes().contains(TransportMode.bike)) speed = group.getWalkSpeed();
 		}
 		else if (transportMode.equals(TransportMode.pt)) {
+			/*
+			 * If it is a car link, we use car travel times. Else we check whether it is
+			 * a bike / walk link - if it is one, we use walk travel times.
+			 */
+			if (link.getAllowedModes().contains(TransportMode.car)) return travelTime.getLinkTravelTime(link, time);
+			else if (link.getAllowedModes().contains(TransportMode.bike) ||
+					link.getAllowedModes().contains(TransportMode.walk)) speed = group.getWalkSpeed();
+		}
+		else if (transportMode.equals(TransportMode.ride)) {
 			/*
 			 * If it is a car link, we use car travel times. Else we check whether it is
 			 * a bike / walk link - if it is one, we use walk travel times.

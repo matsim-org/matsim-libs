@@ -61,15 +61,15 @@ public class BatchRun {
 	
 	
 	// Default Config
-	protected static String configFileName = "config.xml";
-	protected static String configFilePath = "test/scenarios/berlin";	
-	protected static String outbase = "output/scenarios/berlin";
-	protected static String inbase = "test/scenarios/berlin";
-	
-//	protected static String outbase = "mysimulations/kt-zurich/output";
-//	protected static String inbase = "mysimulations/kt-zurich/input";
-//	protected static String configFilePath = "mysimulations/kt-zurich";
 //	protected static String configFileName = "config.xml";
+//	protected static String configFilePath = "../../matsim/test/scenarios/berlin";	
+//	protected static String outbase = "../../matsim/output/scenarios/berlin";
+//	protected static String inbase = "../../matsim/test/scenarios/berlin";
+	
+	protected static String outbase = "../../matsim/mysimulations/kt-zurich/output";
+	protected static String inbase = "../../matsim/mysimulations/kt-zurich/input";
+	protected static String configFilePath = "../../matsim/mysimulations/kt-zurich";
+	protected static String configFileName = "config.xml";
 	
 //	protected static String configFilePath = "mysimulations/zurich-cut";
 //	protected static String configFileName = "config.xml";
@@ -95,8 +95,9 @@ public class BatchRun {
 		BatchRun batchRun = new BatchRun();
 		//batchRun.runBatchRunRandomCompass();
 		//batchRun.runBatchRunCompass();
-		//batchRun.runBatchRunWithinDay();
-		batchRun.runBatchRunDoE();
+		batchRun.runBatchRunWithinDay();
+//		batchRun.runBatchRunWithinDayKnowledge();
+//		batchRun.runBatchRunDoE();
 		
 		System.exit(0);
 	}
@@ -170,27 +171,55 @@ public class BatchRun {
 	{
 		for (int i = 0; i < knowledgeFactors.length; i++)
 		{
-//			for (int j = 0; j < tbuffers.length; j++)
-			{
-				//outputDirectory = outbase + "/WithinDayRouter" + "_Knowledge" + knowledgeFactors[i] + "_Tbuffer" + tbuffers[j];
-				//outputDirectory = outbase + "/ActEndReplanningRouter" + "_Knowledge" + knowledgeFactors[i];
-				outputDirectory = outbase + "/LeaveLinkReplanningRouter" + "_Knowledge" + knowledgeFactors[i];
-				inputDirectory = inbase;
+//			outputDirectory = outbase + "/output_act_end_full";
+			outputDirectory = outbase + "/output_leave_link_full";
+//			outputDirectory = outbase + "/output_total_full";
+			inputDirectory = inbase;
+		
+			outputDirectory = outputDirectory.replace("/", separator);
+			inputDirectory = inputDirectory.replace("/", separator);
 			
-				outputDirectory = outputDirectory.replace("/", separator);
-				inputDirectory = inputDirectory.replace("/", separator);
-				
-				Gbl.reset();
+			Gbl.reset();
+		
+			Config config = readConfigFile();
 			
-				Config config = readConfigFile();
-				
-				updateConfigData(config, knowledgeFactors[i]);
-				
-				WithinDayControler controler = new WithinDayControler(config);			
-				controler.setOverwriteFiles(true);
-				controler.run();
-				controler = null;
-			}
+			updateConfigData(config, knowledgeFactors[i]);
+			
+			WithinDayControler controler = new WithinDayControler(config);			
+			controler.setOverwriteFiles(true);
+			controler.pInitialReplanning = 0.0;
+			controler.pActEndReplanning = 0.0;
+			controler.pLeaveLinkReplanning = 1.0;
+			controler.run();
+			controler = null;
+		}
+	}
+	
+	protected void runBatchRunWithinDayKnowledge()
+	{
+		for (int i = 0; i < knowledgeFactors.length; i++)
+		{
+			outputDirectory = outbase + "/output_act_end_" + knowledgeFactors[i];
+//			outputDirectory = outbase + "/output_leave_link_" + knowledgeFactors[i];
+			inputDirectory = inbase;
+					
+			outputDirectory = outputDirectory.replace("/", separator);
+			inputDirectory = inputDirectory.replace("/", separator);
+						
+			Gbl.reset();
+					
+			Config config = readConfigFile();
+						
+			updateConfigData(config, knowledgeFactors[i]);
+						
+			WithinDayKnowledgeControler controler = new WithinDayKnowledgeControler(config);
+			controler.tableName = "BatchTable" + knowledgeFactors[i].replace('.', '_');
+			controler.setOverwriteFiles(true);
+			controler.pInitialReplanning = 0.0;
+			controler.pActEndReplanning = 1.0;
+			controler.pLeaveLinkReplanning = 0.0;
+			controler.run();
+			controler = null;
 		}
 	}
 	
@@ -299,12 +328,13 @@ public class BatchRun {
 		config.getModule("facilities").addParam("inputFacilitiesFile", inputDirectory + "/facilities.xml.gz");
 		config.getModule("facilities").addParam("outputFacilitiesFile", outputDirectory + "/output_facilities.xml.gz");
 
-		config.getModule("matrices").addParam("inputMatricesFile", inputDirectory + "/matrices.xml");
-		config.getModule("matrices").addParam("outputMatricesFile", outputDirectory + "/output_matrices.xml");
+//		config.getModule("matrices").addParam("inputMatricesFile", inputDirectory + "/matrices.xml");
+//		config.getModule("matrices").addParam("outputMatricesFile", outputDirectory + "/output_matrices.xml");
 
 		config.getModule("network").addParam("inputNetworkFile", inputDirectory + "/network.xml");
 		config.getModule("network").addParam("outputNetworkFile", outputDirectory + "/output_network.xml");
 
+//		config.getModule("plans").addParam("inputPlansFile", inputDirectory + "/plans_hwh_1pct.xml.gz");
 		config.getModule("plans").addParam("inputPlansFile", inputDirectory + "/plans.xml.gz");
 		config.getModule("plans").addParam("outputPlansFile", outputDirectory + "/output_plans.xml.gz");
 

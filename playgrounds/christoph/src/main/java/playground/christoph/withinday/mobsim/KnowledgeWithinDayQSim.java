@@ -36,7 +36,7 @@ import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandle
  * should be separated somewhen but at the moment this seems
  * to be difficult so they remain here for now...
  */
-public class KnowledgeWithinDayQSim extends WithinDayQSim{
+public class KnowledgeWithinDayQSim extends WithinDayQSim {
 
 	private final static Logger log = Logger.getLogger(KnowledgeWithinDayQSim.class);
 	

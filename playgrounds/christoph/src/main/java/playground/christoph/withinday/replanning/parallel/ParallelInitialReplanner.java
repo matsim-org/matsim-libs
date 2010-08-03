@@ -21,34 +21,24 @@
 package playground.christoph.withinday.replanning.parallel;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
-
-import playground.christoph.withinday.replanning.InitialReplanner;
-import playground.christoph.withinday.replanning.ReplanningTask;
-import playground.christoph.withinday.replanning.WithinDayReplanner;
+import org.matsim.core.controler.Controler;
 
 public class ParallelInitialReplanner extends ParallelReplanner {
 	
 	private final static Logger log = Logger.getLogger(ParallelInitialReplanner.class);
 	
-	protected boolean removeKnowledge = false;
-	
-	public ParallelInitialReplanner(int numOfThreads)
-	{
-		super(numOfThreads);
+	public ParallelInitialReplanner(int numOfThreads, Controler controler) {
+		super(numOfThreads, controler);
 		this.init();
 	}
 	
 	@Override
-	protected void init()
-	{
+	protected void init() {
 		replanningThreads = new InternalReplanningThread[numOfThreads];
 
 		// Do initial Setup of the Threads
-		for (int i = 0; i < numOfThreads; i++)
-		{
-			ReplanningThread replanningThread = new InternalReplanningThread();
+		for (int i = 0; i < numOfThreads; i++) {
+			ReplanningThread replanningThread = new InternalReplanningThread("ParallelInitialReplanner Thread" + i + " replanned plans: ");
 			replanningThread.setName("ParallelInitialReplanner" + i);
 			replanningThreads[i] = replanningThread;
 		}
@@ -56,67 +46,15 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 		// Do all other Initialization Operations in the super Class.
 		super.init();
 	}
-	
-	public void setRemoveKnowledge(boolean value)
-	{
-		removeKnowledge = value;
-	}
-		
+
 	/*
 	 * The thread class that really handles the persons.
 	 */
-	private static class InternalReplanningThread extends ReplanningThread 
-	{			
-		public void setRemoveKnowledge(boolean value)
-		{
-			((InitialReplanner)this.withinDayReplanner).setRemoveKnowledge(value);
-		}
+	private static class InternalReplanningThread extends ReplanningThread {			
 		
-		/*
-		 * We only override the method because we want to show log messages!
-		 */
-		@Override
-		protected void doReplanning()
-		{
-			int numRuns = 0;
-			
-			ReplanningTask replanningTask;
-			while((replanningTask = replanningTasks.poll()) != null)
-			{
-				Id id = replanningTask.getWithinDayReplannerId();
-				PersonDriverAgent driverAgent = replanningTask.getAgentToReplan();
-				
-				if (id == null)
-				{
-					log.error("WithinDayReplanner Id is null!");
-					return;
-				}
-				
-				if (driverAgent == null)
-				{
-					log.error("DriverAgent is null!");
-					return;
-				}
-				
-				WithinDayReplanner withinDayReplanner = this.withinDayReplanners.get(id);
-				
-				if (withinDayReplanner != null)
-				{
-					withinDayReplanner.setTime(time);
-					boolean replanningSuccessful = withinDayReplanner.doReplanning(driverAgent);
-					
-					if (!replanningSuccessful) log.error("Replanning was not successful!");
-					else numRuns++;
-				}
-				else
-				{
-					log.error("WithinDayReplanner is null!");
-				}
-				
-				if (numRuns % 500 == 0) log.info("created new Plan for " + numRuns + " persons in thread " + Thread.currentThread().getName());
-			}
+		public InternalReplanningThread(String counterText) {
+			super(counterText);
 		}
-		
-	}	// InternalReplanningThread
+	}
 	
 }

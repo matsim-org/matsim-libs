@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.christoph.router.util;
 
+import java.lang.reflect.Method;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -38,73 +40,30 @@ import org.matsim.core.router.util.TravelTime;
  * a handled person to the SimpleRouter.
  * 
  */
-public class SimpleRouterFactory implements LeastCostPathCalculatorFactory{
+public class SimpleRouterFactory implements LeastCostPathCalculatorFactory {
 
 	private static final Logger log = Logger.getLogger(SimpleRouterFactory.class);
-	
-//	private LeastCostPathCalculator calculator;
-	
-	public SimpleRouterFactory()
-	{
+		
+	public SimpleRouterFactory() {
 	}
-	
-//	public SimpleRouterFactory(LeastCostPathCalculator calculator)
-//	{
-//		this.calculator = calculator;
-//	}
-	
-	public LeastCostPathCalculator createPathCalculator(Network network, TravelCost travelCosts, TravelTime travelTimes)
-	{
-		if (travelCosts instanceof SimpleRouter)
-		{
-			return ((LeastCostPathCalculator)travelCosts);
+		
+	public LeastCostPathCalculator createPathCalculator(Network network, TravelCost travelCosts, TravelTime travelTimes) {
+		if (travelCosts instanceof SimpleRouter) {
+			
+			SimpleRouter simpleRouter = (SimpleRouter) travelCosts;
+			if (simpleRouter instanceof Cloneable) {
+				try {
+					Method method;
+					method = simpleRouter.getClass().getMethod("clone", new Class[]{});
+					LeastCostPathCalculator clone = simpleRouter.getClass().cast(method.invoke(simpleRouter, new Object[]{}));
+					return clone;
+				} catch (Exception e) {
+					return ((LeastCostPathCalculator) travelCosts);
+				} 
+			}
+			else return ((LeastCostPathCalculator) travelCosts);
 		}
 		else return null;
-		/*
-		 * We don't clone travelCosts and travelTimes Objects - they should already
-		 * be clones created by ClonablePlansCalcRoute! 
-		 */
-//		LeastCostPathCalculator calculatorClone = null;
-//		if (calculator instanceof Cloneable)
-//		{
-//			try
-//			{
-//				Method method;
-//				method = calculator.getClass().getMethod("clone", new Class[]{});
-//				calculatorClone = calculator.getClass().cast(method.invoke(calculator, new Object[]{}));
-//				return calculatorClone;
-//			}
-//			catch (Exception e)
-//			{
-//				Gbl.errorMsg(e);
-//			} 
-//		}
-//		/*
-//		 *  Not cloneable or an Exception occured when trying to Clone
-//		 *  Now try to create a new Calculator Object with an empty Constructor
-//		 */
-//		if (calculatorClone == null)
-//		{
-//			try
-//			{
-//				calculatorClone = this.calculator.getClass().newInstance();
-//				return calculatorClone;
-//			} 
-//			catch (Exception e) 
-//			{
-//				Gbl.errorMsg(e);
-//			}
-//		}
-//		/*
-//		 * We tried everything but we can't get a new Calculator Object
-//		 * so we finally use the existing one.
-//		 */
-//		if (calculatorClone == null)
-//		{
-//			calculatorClone = calculator;
-//			log.warn("Could not clone the Least Cost Path Calculator - use reference to the existing Calculator and hope the best...");		
-//		}
-//		return calculator;
 	}
 
 }

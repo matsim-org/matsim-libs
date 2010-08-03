@@ -21,6 +21,7 @@
 package playground.christoph.withinday.replanning.parallel;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.controler.Controler;
 
 import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
 
@@ -33,22 +34,19 @@ public class ParallelDuringActivityReplanner extends ParallelReplanner {
 	
 	private final static Logger log = Logger.getLogger(ParallelDuringActivityReplanner.class);
 	
-	public ParallelDuringActivityReplanner(int numOfThreads)
-	{
-		super(numOfThreads);
+	public ParallelDuringActivityReplanner(int numOfThreads, Controler controler) {
+		super(numOfThreads, controler);
 		this.init();
 	}
 	
 	@Override
-	protected void init()
-	{	
+	protected void init() {	
 		replanningThreads = new InternalReplanningThread[numOfThreads];
 
 		// Do initial Setup of the Threads
-		for (int i = 0; i < numOfThreads; i++)
-		{
-			ReplanningThread replanningThread = new InternalReplanningThread();
-			replanningThread.setName("ParallelDuringActivityReplanner" + i);
+		for (int i = 0; i < numOfThreads; i++) {
+			ReplanningThread replanningThread = new InternalReplanningThread("ParallelDuringActivityReplanner Thread" + i + " replanned plans: ");
+			replanningThread.setName("" + i);
 			replanningThreads[i] = replanningThread;
 		}
 
@@ -59,11 +57,10 @@ public class ParallelDuringActivityReplanner extends ParallelReplanner {
 	/*
 	 * The thread class that really handles the replanning.
 	 */
-	private static class InternalReplanningThread extends ReplanningThread
-	{		
-		public InternalReplanningThread()
-		{
-			super();
+	private static class InternalReplanningThread extends ReplanningThread {		
+		
+		public InternalReplanningThread(String counterText) {
+			super(counterText);
 		}
 				
 	}	// ReplannerThread

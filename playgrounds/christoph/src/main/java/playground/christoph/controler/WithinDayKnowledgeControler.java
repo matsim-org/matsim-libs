@@ -25,21 +25,23 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
-import playground.christoph.replanning.TravelTimeCollector;
-import playground.christoph.router.CloneablePlansCalcRoute;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.router.costcalculators.SubNetworkDijkstraTravelCostWrapper;
-import playground.christoph.router.util.SubNetworkDijkstraFactory;
 import playground.christoph.withinday.replanning.CurrentLegReplanner;
 import playground.christoph.withinday.replanning.InitialReplanner;
 import playground.christoph.withinday.replanning.NextLegReplanner;
 import playground.christoph.withinday.replanning.ReplanningIdGenerator;
+import playground.christoph.withinday.replanning.TravelTimeCollector;
 import playground.christoph.withinday.replanning.identifiers.ActivityEndIdentifier;
 import playground.christoph.withinday.replanning.identifiers.InitialIdentifierImpl;
 import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifier;
+import playground.christoph.withinday.replanning.modules.ReplanningModule;
 
 /**
  * This Controler should give an Example what is needed to run
@@ -129,26 +131,26 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 		SubNetworkDijkstraTravelCostWrapper subNetworkDijkstraTravelCostWrapper = new SubNetworkDijkstraTravelCostWrapper(travelCost);
 		
-		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
-				subNetworkDijkstraTravelCostWrapper, travelTime, new SubNetworkDijkstraFactory());		
+//		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
+//				subNetworkDijkstraTravelCostWrapper, travelTime, new SubNetworkDijkstraFactory());		
+		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring())); 
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, subNetworkDijkstraTravelCostWrapper, travelTime, factory); 
 		
 		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		// If we do initial Replanning we don't want to remove the knowledge afterwards!
-		((InitialReplanner)this.initialReplanner).setRemoveKnowledge(false);
-		this.initialReplanner.setReplanner(dijkstraRouter);
+		this.initialReplanner.setAbstractMultithreadedModule(router);
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
-		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
-				
-		this.duringActivityIdentifier = new ActivityEndIdentifier(this.sim);
+		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);	
+		
+		this.duringActivityIdentifier = new ActivityEndIdentifier(this);
 		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData, this.events);
-		this.duringActivityReplanner.setReplanner(dijkstraRouter);
+		this.duringActivityReplanner.setAbstractMultithreadedModule(router);
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 		
-		this.duringLegIdentifier = new LeaveLinkIdentifier(this.sim);
+		this.duringLegIdentifier = new LeaveLinkIdentifier(this);
 		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData, this.events);
-		this.duringLegReplanner.setReplanner(dijkstraRouter);
+		this.duringLegReplanner.setAbstractMultithreadedModule(router);
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
 	}

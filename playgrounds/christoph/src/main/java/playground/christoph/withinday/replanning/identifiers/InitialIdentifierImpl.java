@@ -23,47 +23,36 @@ package playground.christoph.withinday.replanning.identifiers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.interfaces.QVehicle;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.core.mobsim.framework.PersonAgent;
 
-import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
+import playground.christoph.withinday.mobsim.WithinDayQSim;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
-public class InitialIdentifierImpl extends InitialIdentifier{
+public class InitialIdentifierImpl extends InitialIdentifier {
 
-	protected KnowledgeWithinDayQSim simulation;
+	protected WithinDayQSim simulation;
 		
-	public InitialIdentifierImpl(KnowledgeWithinDayQSim simulation)
-	{
+	public InitialIdentifierImpl(WithinDayQSim simulation) {
 		this.simulation = simulation;
 	}
 		
-	public List<PersonDriverAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner)
-	{
-		List<PersonDriverAgent> agentsToReplan = new ArrayList<PersonDriverAgent>();
+	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
+		List<PersonAgent> agentsToReplan = new ArrayList<PersonAgent>();
 		
-		for (QLinkInternalI qLink : simulation.getQNetwork().getLinks().values())
-		{
-			for (QVehicle vehicle : qLink.getAllVehicles())
-			{
-				PersonDriverAgent driverAgent = vehicle.getDriver();
-				
-				WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) driverAgent;
-				if (withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner))
-				{
-					agentsToReplan.add(driverAgent);
-				}
+		for (PersonAgent personAgent : this.simulation.getPersonAgents().values()) {
+			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
+			
+			if (withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner)) {
+				agentsToReplan.add(personAgent);
 			}
 		}
 		
 		return agentsToReplan;
 	}
 
-	public InitialIdentifierImpl clone()
-	{
+	public InitialIdentifierImpl clone() {
 		InitialIdentifierImpl clone = new InitialIdentifierImpl(this.simulation);
 		
 		super.cloneBasicData(clone);

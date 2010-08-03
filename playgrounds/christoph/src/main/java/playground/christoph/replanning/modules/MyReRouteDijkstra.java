@@ -58,8 +58,7 @@ public class MyReRouteDijkstra extends ReRouteDijkstra {
 	 * replanning.
 	 */
 	@Override
-	public PlanAlgorithm getPlanAlgoInstance()
-	{
+	public PlanAlgorithm getPlanAlgoInstance() {
 		return new CloneablePlansCalcRoute(this.configGroup, this.network, this.costCalculator, this.timeCalculator, new CloningDijkstraFactory());
 	}
 }

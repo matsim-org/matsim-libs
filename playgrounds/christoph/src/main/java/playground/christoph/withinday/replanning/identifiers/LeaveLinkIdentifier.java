@@ -23,56 +23,46 @@ package playground.christoph.withinday.replanning.identifiers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.PersonAgent;
 
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
-public class LeaveLinkIdentifier extends DuringLegIdentifier{
+public class LeaveLinkIdentifier extends DuringLegIdentifier {
 
-	protected QSim qSim;
 	protected LinkReplanningMap linkReplanningMap;
 	
-	public LeaveLinkIdentifier(QSim qSim)
-	{
-		this.qSim = qSim;
-		linkReplanningMap = new LinkReplanningMap(qSim);
+	public LeaveLinkIdentifier(Controler controler) {
+		linkReplanningMap = new LinkReplanningMap(controler);
 	}
 	
 	// Only for Cloning.
-	private LeaveLinkIdentifier(QSim qSim, LinkReplanningMap linkReplanningMap)
-	{
-		this.qSim = qSim;
+	public LeaveLinkIdentifier(LinkReplanningMap linkReplanningMap) {
 		this.linkReplanningMap = linkReplanningMap;
 	}
 	
-	public List<PersonDriverAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner)
-	{
-		List<QVehicle> vehiclesToReplanLeaveLink = linkReplanningMap.getReplanningVehicles(time);
-		List<PersonDriverAgent> agentsToReplan = new ArrayList<PersonDriverAgent>(); 
+	public List<PersonAgent> getAgentsToReplan(double time, WithinDayReplanner withinDayReplanner) {
+		List<PersonAgent> agentsToReplanLeaveLink = linkReplanningMap.getReplanningAgents(time);
+		List<PersonAgent> agentsToReplan = new ArrayList<PersonAgent>(); 
 
-		for (QVehicle qVehicle : vehiclesToReplanLeaveLink)
-		{
-			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) qVehicle.getDriver();
-			if (withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner))
-			{
-				agentsToReplan.add(qVehicle.getDriver());
+		for (PersonAgent personAgent : agentsToReplanLeaveLink) {
+			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
+			if (withinDayPersonAgent.getWithinDayReplanners().contains(withinDayReplanner)) {
+				agentsToReplan.add(withinDayPersonAgent);
 			}
 		}
-		
+
 		return agentsToReplan;
 	}
 
-	public LeaveLinkIdentifier clone()
-	{
+	public LeaveLinkIdentifier clone() {
 		/*
 		 *  We don't want to clone the linkReplanningMap. Instead we
 		 *  reuse the existing one.
 		 */
-		LeaveLinkIdentifier clone = new LeaveLinkIdentifier(this.qSim, this.linkReplanningMap);
+		LeaveLinkIdentifier clone = new LeaveLinkIdentifier(this.linkReplanningMap);
 		
 		super.cloneBasicData(clone);
 		
