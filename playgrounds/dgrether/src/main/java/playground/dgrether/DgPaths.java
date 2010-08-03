@@ -64,4 +64,9 @@ public interface DgPaths {
 	final String CLUSTERSVN = CLUSTERBASE;
 	
 	final String CLUSTER_MATSIM_OUTPUT = CLUSTERBASE + "matsimOutput/";
+	
+	final String BERLIN_SCENARIO = SHAREDSVN + "studies/countries/de/berlin-bvg09/";
+	
+	final String BERLIN_NET = BERLIN_SCENARIO  + "net/miv_big/m44_344_big.xml.gz";
+	
 }

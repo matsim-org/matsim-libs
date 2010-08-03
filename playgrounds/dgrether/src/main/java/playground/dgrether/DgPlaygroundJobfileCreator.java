@@ -43,7 +43,7 @@ public class DgPlaygroundJobfileCreator {
 			"#$ -M grether@vsp.tu-berlin.de",
 			"#$ -cwd",
 			"#$ -l cluster7",
-			"# -l mem_free=16G use for min 16 G memory on cluster",
+			"# -l mem_free=16G",
 			"date",
 			"hostname",
 			"echo \"default java version:\"",
