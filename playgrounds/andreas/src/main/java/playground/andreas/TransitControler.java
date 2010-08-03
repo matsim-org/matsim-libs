@@ -74,6 +74,7 @@ public class TransitControler extends Controler {
 	private final TransitConfigGroup transitConfig;
 
 	private boolean useOTFVis = true;
+	private boolean useHeadwayControler = false;
 
 	public TransitControler(final String[] args) {
 		super(args);
@@ -149,10 +150,12 @@ public class TransitControler extends Controler {
 		}
 		sim.setUseUmlaeufe(true);
 		sim.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-		sim.setTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
 		
-//		this.events.addHandler(new LogOutputEventHandler());		
-		this.events.addHandler(new FixedHeadwayControler(sim));			
+		if(useHeadwayControler){
+			sim.setTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
+			this.events.addHandler(new FixedHeadwayControler(sim));		
+		}		
+//		this.events.addHandler(new LogOutputEventHandler());	
 		
 		if (sim instanceof IOSimulation){
 			((IOSimulation)sim).setControlerIO(this.getControlerIO());
