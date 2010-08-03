@@ -80,6 +80,8 @@ public class PhDControlerTest extends MatsimTestCase {
 	
 	public void testPlanomatOnly() {
 
+		this.config.planomat().setJgapMaxGenerations(10);
+		
 		this.config.plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarOnly/expected_plans.xml.gz");
 
 		this.config.strategy().addParam("ModuleProbability_1", "0.9");
@@ -97,6 +99,8 @@ public class PhDControlerTest extends MatsimTestCase {
 	
 	public void testPlanomatRouter() {
 		
+		this.config.planomat().setJgapMaxGenerations(10);
+
 		this.config.plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarOnly/expected_plans.xml.gz");
 
 		this.config.strategy().addParam("ModuleProbability_1", "0.8");
@@ -118,6 +122,7 @@ public class PhDControlerTest extends MatsimTestCase {
 	public void testPlanomatRouterCarPt() {
 
 		this.config.planomat().setPossibleModes("car,pt");
+		this.config.planomat().setJgapMaxGenerations(10);
 		
 		this.config.plansCalcRoute().setPtSpeedFactor(1.5);
 		
@@ -136,6 +141,47 @@ public class PhDControlerTest extends MatsimTestCase {
 		expectedPlanScores.put(new IdImpl(947), 103.45836480987339);
 
 		this.runATest(expectedPlanScores);
+	}
+	
+	public void testPlanomatRouterSamplingOnly() {
+
+		this.config.planomat().setJgapMaxGenerations(0);
+		
+		this.config.plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarOnly/expected_plans.xml.gz");
+
+		this.config.strategy().addParam("ModuleProbability_1", "0.8");
+		this.config.strategy().addParam("Module_2", "Planomat");
+		this.config.strategy().addParam("ModuleProbability_2", "0.1");
+		this.config.strategy().addParam("Module_3", "ReRoute");
+		this.config.strategy().addParam("ModuleProbability_3", "0.1");
+
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 94.57548202998221);
+		expectedPlanScores.put(new IdImpl(1072), 90.78104651406623);
+		expectedPlanScores.put(new IdImpl(947), 104.09682058923968);
+
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testPlanomatRouterManyGenerations() {
+
+		this.config.plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarOnly/expected_plans.xml.gz");
+
+		this.config.strategy().addParam("ModuleProbability_1", "0.8");
+		this.config.strategy().addParam("Module_2", "Planomat");
+		this.config.strategy().addParam("ModuleProbability_2", "0.1");
+		this.config.strategy().addParam("Module_3", "ReRoute");
+		this.config.strategy().addParam("ModuleProbability_3", "0.1");
+
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 94.39603769844027);
+		expectedPlanScores.put(new IdImpl(1072), 94.90568335701548);
+		expectedPlanScores.put(new IdImpl(947), 106.10466621258328);
+		this.runATest(expectedPlanScores);
+
 	}
 	
 	public void xtestImprovePtTravelTime() {

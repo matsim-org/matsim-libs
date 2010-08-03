@@ -2,6 +2,8 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
 <config>
 
+	<!-- see test source code for other parameters -->
+
 	<module name="global">
 		<param name="numberOfThreads" value="0" />
 	</module>
@@ -46,18 +48,17 @@
 	</module>
 
 	<module name="planomat">
-		<param name="jgapMaxGenerations" value="10" />
 		<param name="tripStructureAnalysisLayer" value="link" />
 	</module>
 
 	<module name="plans">
-		<!-- see test source code for other parameters -->
 	</module>
 
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="3" /> <!-- 0 means unlimited -->
 		<param name="Module_1" value="SelectExpBeta" />
-		<!-- see test source code for other parameters -->
 	</module>
+
+	<!-- see test source code for other parameters -->
 
 </config>
