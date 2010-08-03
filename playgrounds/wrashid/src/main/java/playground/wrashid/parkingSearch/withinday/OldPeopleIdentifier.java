@@ -3,9 +3,9 @@ package playground.wrashid.parkingSearch.withinday;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.ptproject.qsim.QSim;
 
 import playground.christoph.withinday.mobsim.WithinDayQSim;
 import playground.christoph.withinday.replanning.WithinDayReplanner;
@@ -23,10 +23,10 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 	}
 
 	@Override
-	public List<PersonDriverAgent> getAgentsToReplan(double time,
+	public List<PersonAgent> getAgentsToReplan(double time,
 			WithinDayReplanner withinDayReplanner) {
 
-		ArrayList<PersonDriverAgent> list = new ArrayList<PersonDriverAgent>();
+		ArrayList<PersonAgent> list = new ArrayList<PersonAgent>();
 
 		// don't handle the agent, if time != 12 o'clock
 		if (time != 12 * 3600) {

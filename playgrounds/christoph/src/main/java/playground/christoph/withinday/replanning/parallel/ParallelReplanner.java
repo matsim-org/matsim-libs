@@ -31,6 +31,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 import playground.christoph.withinday.replanning.ReplanningTask;
@@ -60,6 +61,11 @@ public abstract class ParallelReplanner implements SimulationInitializedListener
 		this.setNumberOfThreads(numOfThreads);
 		controler.getQueueSimulationListener().add(this);		
 	}
+	
+	public ParallelReplanner(int numOfThreads, List<SimulationListener> list) {
+		this.setNumberOfThreads(numOfThreads);
+		list.add(this);
+	}	
 	
 	protected void init() {		
 		this.timeStepStartBarrier = new CyclicBarrier(numOfThreads + 1);

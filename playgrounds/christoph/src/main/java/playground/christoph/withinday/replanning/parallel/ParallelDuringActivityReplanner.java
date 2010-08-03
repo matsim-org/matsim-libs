@@ -20,8 +20,11 @@
 
 package playground.christoph.withinday.replanning.parallel;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 
 import playground.christoph.withinday.replanning.WithinDayDuringActivityReplanner;
 
@@ -36,6 +39,11 @@ public class ParallelDuringActivityReplanner extends ParallelReplanner {
 	
 	public ParallelDuringActivityReplanner(int numOfThreads, Controler controler) {
 		super(numOfThreads, controler);
+		this.init();
+	}
+	
+	public ParallelDuringActivityReplanner(int numOfThreads, List<SimulationListener> list) {
+		super(numOfThreads, list);
 		this.init();
 	}
 	

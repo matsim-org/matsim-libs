@@ -37,6 +37,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.controler.Controler;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.core.mobsim.framework.PersonAgent;
@@ -85,11 +86,25 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
 		controler.getQueueSimulationListener().add(this);
 		
+		init();
+	}
+	
+	public ActivityReplanningMap(QSim qSim) {
+		//Add LinkReplanningMap to the QueueSimulation's EventsManager
+		qSim.getEventsManager().addHandler(this);
+		
+		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
+		qSim.addQueueSimulationListeners(this);
+		
+		init();
+	}
+	
+	private void init() {
 		this.personAgentMapping = new TreeMap<Id, PersonAgent>();
 		this.replanningSet = new TreeSet<Id>();
 		this.startingAgents = new TreeSet<Id>();
 	}
-		
+	
 	/*
 	 * When the simulation starts the agents are all performing an activity.
 	 * There is no activity start event so we have to collect by hand by

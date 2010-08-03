@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.QSimEngineFactory;
 import org.matsim.ptproject.qsim.netsimengine.DefaultQSimEngineFactory;
@@ -107,6 +108,16 @@ public class WithinDayQSim extends QSim {
 			this.getActivityEndsList().add(withinDayPersonAgent);
 		}
 		
+	}
+	
+	@Override
+	public void setAgentFactory(AgentFactory factory) {
+		throw new RuntimeException("Please use a WithinDayAgentFactory!");
+	}
+	
+	public void setAgentFactory(WithinDayAgentFactory factory) {
+		this.agentFactory = factory;
+		super.setAgentFactory(factory);
 	}
 	
 	public Map<Id, PersonAgent> getPersonAgents() {

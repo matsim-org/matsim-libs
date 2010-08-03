@@ -1,5 +1,6 @@
 package playground.mzilske.teach;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -14,14 +15,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.ptproject.qsim.AgentFactory;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.ptproject.qsim.helpers.QPersonAgent;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis2.OTFVisClient;
@@ -30,10 +29,14 @@ import org.matsim.vis.otfvis2.OTFVisLiveServer;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
 import playground.christoph.withinday.mobsim.ReplanningManager;
+import playground.christoph.withinday.mobsim.WithinDayAgentFactory;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
+import playground.christoph.withinday.mobsim.WithinDayQSim;
+import playground.christoph.withinday.mobsim.WithinDayQSimFactory;
 import playground.christoph.withinday.replanning.ReplanningIdGenerator;
 import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
 import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifier;
+import playground.christoph.withinday.replanning.identifiers.LinkReplanningMap;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 
 public class EquilVisWithinday implements Runnable {
@@ -49,16 +52,15 @@ public class EquilVisWithinday implements Runnable {
 		@Override
 		public WithinDayDuringLegReplanner clone() {
 			MyWithinDayDuringLegReplanner clone = new MyWithinDayDuringLegReplanner(id, scenario);
-			clone.setReplanner(planAlgorithm);
 			return clone;
 		}
 
 		@Override
-		public boolean doReplanning(PersonDriverAgent driverAgent) {
+		public boolean doReplanning(PersonAgent driverAgent) {
 			Id personId = new IdImpl("98");
 			if (personId.equals(driverAgent.getPerson().getId())) {
 				List<Id> route = ((LinkNetworkRoute) driverAgent.getCurrentLeg().getRoute()).getLinkIds();
-				Id id = driverAgent.getCurrentLinkId();
+				Id id = ((PersonDriverAgent)driverAgent).getCurrentLinkId();
 				if (new IdImpl("6").equals(id)) {
 					stellAb(driverAgent);
 					((QPersonAgent) driverAgent).resetCaches();
@@ -67,8 +69,8 @@ public class EquilVisWithinday implements Runnable {
 			return true;
 		}
 
-		private void stellAb(PersonDriverAgent driverAgent) {
-			Id currentLinkId = driverAgent.getCurrentLinkId();
+		private void stellAb(PersonAgent driverAgent) {
+			Id currentLinkId = ((PersonDriverAgent)driverAgent).getCurrentLinkId();
 			PlanImpl plan = (PlanImpl) driverAgent.getPerson().getSelectedPlan();
 			Leg currentLeg = driverAgent.getCurrentLeg();
 			Route route = currentLeg.getRoute();
@@ -108,25 +110,26 @@ public class EquilVisWithinday implements Runnable {
 		
 		final WithinDayDuringLegReplanner duringLegReplanner = new MyWithinDayDuringLegReplanner(ReplanningIdGenerator.getNextId(), scenario);
 
-
-		// WithinDayQSim queueSimulation = (WithinDayQSim) new WithinDayQSim(scenario, events);
 		
-		QSim queueSimulation = (QSim) new QSimFactory().createMobsim(scenario, events);
+		WithinDayQSim queueSimulation = new WithinDayQSimFactory().createMobsim(scenario, events);
+//		QSim queueSimulation = (QSim) new QSimFactory().createMobsim(scenario, events);
 		
 		queueSimulation.addSnapshotWriter(server.getSnapshotReceiver());
-		queueSimulation.setAgentFactory(new AgentFactory(queueSimulation) {
+		queueSimulation.setAgentFactory(new WithinDayAgentFactory(queueSimulation) {
 
 			@Override
 			public QPersonAgent createPersonAgent(Person p) {
-				WithinDayPersonAgent agent = new WithinDayPersonAgent((PersonImpl) p, this.simulation);
+				WithinDayPersonAgent agent = (WithinDayPersonAgent) super.createPersonAgent(p);
 				agent.addWithinDayReplanner(duringLegReplanner);
 				return agent;
 			}
 			
 		});
 		
+		List<SimulationListener> listeners = new ArrayList<SimulationListener>();
 		ReplanningManager replanningManager = new ReplanningManager();
-		ParallelDuringLegReplanner parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(1);
+		ParallelDuringLegReplanner parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(1, listeners);
+		for (SimulationListener listener : listeners) queueSimulation.addQueueSimulationListeners(listener);
 		
 		FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
 		
@@ -137,8 +140,8 @@ public class EquilVisWithinday implements Runnable {
 
 		
 		
-		
-		LeaveLinkIdentifier leaveLinkIdentifier = new LeaveLinkIdentifier(queueSimulation);
+		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(queueSimulation);
+		LeaveLinkIdentifier leaveLinkIdentifier = new LeaveLinkIdentifier(linkReplanningMap);
 		duringLegReplanner.addAgentsToReplanIdentifier(leaveLinkIdentifier);
 		parallelLeaveLinkReplanner.addWithinDayReplanner(duringLegReplanner);
 

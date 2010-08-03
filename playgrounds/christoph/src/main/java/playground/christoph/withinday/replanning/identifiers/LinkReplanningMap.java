@@ -41,6 +41,7 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.Controler;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
@@ -95,8 +96,23 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
 		controler.getQueueSimulationListener().add(this);
 		
+		init();
+	}
+	
+	public LinkReplanningMap(QSim qSim) {
+		//Add LinkReplanningMap to the QueueSimulation's EventsManager
+		qSim.getEventsManager().addHandler(this);
+		
+		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
+		qSim.addQueueSimulationListeners(this);
+		
+		init();
+	}
+	
+	private void init() {
 		this.replanningMap = new HashMap<Id, Tuple<Id, Double>>();
 	}
+	
 	
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent<QSimI> e) {

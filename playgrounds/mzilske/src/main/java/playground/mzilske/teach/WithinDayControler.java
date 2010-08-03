@@ -27,11 +27,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
@@ -40,8 +41,6 @@ import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
-import playground.christoph.replanning.TravelTimeCollector;
-import playground.christoph.router.CloneablePlansCalcRoute;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 import playground.christoph.withinday.mobsim.DuringLegReplanningModule;
@@ -51,9 +50,11 @@ import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.replanning.CurrentLegReplanner;
 import playground.christoph.withinday.replanning.ReplanningIdGenerator;
+import playground.christoph.withinday.replanning.TravelTimeCollector;
 import playground.christoph.withinday.replanning.WithinDayDuringLegReplanner;
 import playground.christoph.withinday.replanning.identifiers.LeaveLinkIdentifier;
 import playground.christoph.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import playground.christoph.withinday.replanning.modules.ReplanningModule;
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 
 /**
@@ -125,7 +126,7 @@ public class WithinDayControler extends Controler {
 		sim.addQueueSimulationListeners(foqsl);
 
 		log.info("Initialize Parallel Replanning Modules");
-		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
+		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads, this);
 		
 		log.info("Initialize Replanning Routers");
 		travelTime = new TravelTimeCollector(network);
@@ -133,10 +134,10 @@ public class WithinDayControler extends Controler {
 		foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
-		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
-		this.duringLegIdentifier = new LeaveLinkIdentifier(this.sim);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, new DijkstraFactory());
+		this.duringLegIdentifier = new LeaveLinkIdentifier(this);
 		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData, this.getEvents());
-		this.duringLegReplanner.setReplanner(dijkstraRouter);
+		this.duringLegReplanner.setAbstractMultithreadedModule(router);
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
 
