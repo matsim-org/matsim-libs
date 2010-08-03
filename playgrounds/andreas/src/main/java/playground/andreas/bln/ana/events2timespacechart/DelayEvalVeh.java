@@ -30,6 +30,22 @@ public class DelayEvalVeh {
 	
 	private LinkedList<DelayHandler> handler = new LinkedList<DelayHandler>();
 	
+	public static void main(String[] args) {
+//		DelayEvalVeh delayEval = new DelayEvalVeh("E:/_out/veh/");
+		DelayEvalVeh delayEval = new DelayEvalVeh("E:/_out/veh/", "d:/Berlin/BVG/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/stopareamap.txt");
+//		delayEval.readNetwork("d:/Berlin/BVG/berlin-bvg09/pt/nullfall_BB_5x/network.xml.gz");
+//		delayEval.readTransitSchedule("d:/Berlin/BVG/berlin-bvg09/pt/nullfall_BB_5x/transitSchedule_long.xml.gz");
+		delayEval.readNetwork("d:/Berlin/intervalltakt/simulation/network.xml");
+		delayEval.readTransitSchedule("d:/Berlin/intervalltakt/simulation/transitSchedule.xml");
+		delayEval.addTransitLine("M44  ");	
+		
+		
+//		delayEval.addTransitLine("B-M44");
+//		delayEval.addTransitLine("T-M 5");
+//		delayEval.addTransitLine("S-5");
+		delayEval.readEvents("E:/_out/veh/0.events.xml.gz");
+	}
+	
 	public DelayEvalVeh(String outputDir) {
 		this.outputDir = outputDir;
 		this.stopIDNameMap = null;		
@@ -94,15 +110,6 @@ public class DelayEvalVeh {
 		}
 	}
 
-	public static void main(String[] args) {
-//		DelayEvalVeh delayEval = new DelayEvalVeh("E:/_out/veh/");
-		DelayEvalVeh delayEval = new DelayEvalVeh("E:/_out/veh/", "d:/Berlin/BVG/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/stopareamap.txt");
-		delayEval.readNetwork("d:/Berlin/BVG/berlin-bvg09/pt/m4_demand/network_kl.xml");
-		delayEval.readTransitSchedule("d:/Berlin/BVG/berlin-bvg09/pt/m4_demand/transitSchedule_kl.xml");
-		
-		delayEval.addTransitLine("M44  ");
-		delayEval.addTransitLine("344  ");
-		delayEval.readEvents("E:/_out/veh/0.events.xml.gz");
-	}
+
 
 }
