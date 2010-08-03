@@ -83,8 +83,7 @@ public class QPersonAgent implements PersonDriverAgent {
 	 * If the Leg has not changed, calling this method has no effect
 	 * on the Results of the Simulation!
 	 */
-	public void resetCaches()
-	{
+	public void resetCaches() {
 		this.cachedNextLinkId = null;
 		this.cachedRouteLinkIds = null;
 		this.destinationLinkId = null;
@@ -94,8 +93,7 @@ public class QPersonAgent implements PersonDriverAgent {
 		 * we update the Reference to the currentLeg Object.
 		 */
 		PlanElement currentPlanElement = this.getPlanElements().get(this.currentPlanElementIndex);
-		if (currentPlanElement instanceof Leg)
-		{
+		if (currentPlanElement instanceof Leg) {
 			this.setCurrentLeg((Leg) currentPlanElement);
 		}
 
@@ -259,41 +257,46 @@ public class QPersonAgent implements PersonDriverAgent {
 		if ((act.getDuration() == Time.UNDEFINED_TIME) && (act.getEndTime() == Time.UNDEFINED_TIME)) {
 			setDepartureTime(Double.POSITIVE_INFINITY);
 		} else {
-
-			double departure = 0;
-
-//			if (this.simulation.isUseActivityDurations()) {
-			if ( this.simulation.getScenario().getConfig().vspExperimental().isUseActivityDurations() ) {
-				/* The person leaves the activity either 'actDur' later or
-				 * when the end is defined of the activity, whatever comes first. */
-				if (act.getDuration() == Time.UNDEFINED_TIME) {
-					departure = act.getEndTime();
-				} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
-					departure = now + act.getDuration();
-				} else {
-					departure = Math.min(act.getEndTime(), now + act.getDuration());
-				}
-			}
-			else {
-				if (act.getEndTime() != Time.UNDEFINED_TIME) {
-					departure = act.getEndTime() ;
-				}
-				else {
-					throw new IllegalStateException("Can not use activity end time as new departure time as it is not set for person: " + this.getPerson().getId());
-				}
-			}
-
-
-
-			if (departure < now) {
-				// we cannot depart before we arrived, thus change the time so the timestamp in events will be right
-				departure = now;
-				// actually, we will depart in (now+1) because we already missed the departing in this time step
-			}
-			setDepartureTime(departure);
+			calculateDepatureTime(now, act);
 		}
 	}
 
+	/**
+	 * If this method is called to update a changed ActivityEndTime please
+	 * ensure, that the ActivityEndsList in the {@link QSim} is also updated.
+	 */
+	final public void calculateDepatureTime(double now, ActivityImpl act) {
+		double departure = 0;
+
+//		if (this.simulation.isUseActivityDurations()) {
+		if ( this.simulation.getScenario().getConfig().vspExperimental().isUseActivityDurations() ) {
+			/* The person leaves the activity either 'actDur' later or
+			 * when the end is defined of the activity, whatever comes first. */
+			if (act.getDuration() == Time.UNDEFINED_TIME) {
+				departure = act.getEndTime();
+			} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
+				departure = now + act.getDuration();
+			} else {
+				departure = Math.min(act.getEndTime(), now + act.getDuration());
+			}
+		}
+		else {
+			if (act.getEndTime() != Time.UNDEFINED_TIME) {
+				departure = act.getEndTime() ;
+			}
+			else {
+				throw new IllegalStateException("Can not use activity end time as new departure time as it is not set for person: " + this.getPerson().getId());
+			}
+		}
+
+		if (departure < now) {
+			// we cannot depart before we arrived, thus change the time so the timestamp in events will be right
+			departure = now;
+			// actually, we will depart in (now+1) because we already missed the departing in this time step
+		}
+		setDepartureTime(departure);
+	}
+		
 	public void moveOverNode() {
 		this.currentLinkId = this.cachedNextLinkId;
 		this.currentLinkIdIndex++;
