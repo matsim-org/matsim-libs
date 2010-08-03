@@ -39,6 +39,8 @@ import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 
+import playground.dgrether.DgPaths;
+
 /**
  * @author dgrether
  *
@@ -103,13 +105,14 @@ public class KmlNetworkVisualizer {
 
 
 	public static void main(final String[] args) {
-		if (args.length != 2) {
+		if (false && args.length != 2) {
 			printHelp();
 		}
 		else {
-			Network net = loadNetwork("../../cvsRep/vsp-cvs/studies/berlin-wip/network/wip_net.xml");
+			//			Network net = loadNetwork("../../cvsRep/vsp-cvs/studies/berlin-wip/network/wip_net.xml");
+			Network net = loadNetwork(DgPaths.BERLIN_NET);
 //			new KmlNetworkVisualizer("./examples/equil/network.xml", "./output/equil.kmz");
-			new KmlNetworkVisualizer(net).write("./output/wipNet.kmz");
+			new KmlNetworkVisualizer(net).write(DgPaths.BERLIN_SCENARIO + "net/miv_big/m44_344_big.kmz");
 
 		}
 	}

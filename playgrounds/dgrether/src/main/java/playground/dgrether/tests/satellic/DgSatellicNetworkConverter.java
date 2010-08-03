@@ -47,9 +47,9 @@ public class DgSatellicNetworkConverter {
 	private static final Logger log = Logger.getLogger(DgSatellicNetworkConverter.class);
 	
 	public static void main(String[] args) {
-		String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab.xml";
+		String net = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_cleaned.xml.gz";
 //		String netOut = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab.shp";
-		String netOut = "/home/dgrether/Desktop/prognoseNetz/network_ab.shp";
+		String netOut = "/home/dgrether/Desktop/prognoseNetz/network_cleaned.shp";
 
 		Scenario sc = new ScenarioImpl();
 		MatsimNetworkReader reader = new MatsimNetworkReader(sc);
