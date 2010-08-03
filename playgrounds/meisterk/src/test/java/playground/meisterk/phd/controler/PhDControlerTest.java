@@ -22,8 +22,11 @@ package playground.meisterk.phd.controler;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
@@ -38,8 +41,32 @@ import org.matsim.testcases.MatsimTestCase;
 public class PhDControlerTest extends MatsimTestCase {
 
 	public static final int TEST_ITERATION = 10;
+	private static final Logger log = Logger.getLogger(PhDControlerTest.class);
+
+	private Config config;
 	
+	@Override
+	protected void setUp() throws Exception {
+
+		super.setUp();
+		
+		String configFilename = this.getClassInputDirectory() + "config.xml";
+		
+		this.config = new Config();
+		this.config.addCoreModules();
+		new MatsimConfigReader(this.config).readFile(configFilename);
+		
+	}
+
 	public void testTAMRouter() {
+
+		this.config.plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateAll6AM/expected_plans.xml.gz");
+		
+		this.config.strategy().addParam("ModuleProbability_1", "0.8");
+		this.config.strategy().addParam("Module_2", "TimeAllocationMutator");
+		this.config.strategy().addParam("ModuleProbability_2", "0.1");
+		this.config.strategy().addParam("Module_3", "ReRoute");
+		this.config.strategy().addParam("ModuleProbability_3", "0.1");
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), 102.3995485156362);
@@ -53,6 +80,12 @@ public class PhDControlerTest extends MatsimTestCase {
 	
 	public void testPlanomatOnly() {
 
+		this.config.plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarOnly/expected_plans.xml.gz");
+
+		this.config.strategy().addParam("ModuleProbability_1", "0.9");
+		this.config.strategy().addParam("Module_2", "Planomat");
+		this.config.strategy().addParam("ModuleProbability_2", "0.1");
+		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), 99.02855025439848);
 		expectedPlanScores.put(new IdImpl(1033), -22.11377578357179);
@@ -63,6 +96,14 @@ public class PhDControlerTest extends MatsimTestCase {
 	}
 	
 	public void testPlanomatRouter() {
+		
+		this.config.plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarOnly/expected_plans.xml.gz");
+
+		this.config.strategy().addParam("ModuleProbability_1", "0.8");
+		this.config.strategy().addParam("Module_2", "Planomat");
+		this.config.strategy().addParam("ModuleProbability_2", "0.1");
+		this.config.strategy().addParam("Module_3", "ReRoute");
+		this.config.strategy().addParam("ModuleProbability_3", "0.1");
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
@@ -76,6 +117,18 @@ public class PhDControlerTest extends MatsimTestCase {
 	
 	public void testPlanomatRouterCarPt() {
 
+		this.config.planomat().setPossibleModes("car,pt");
+		
+		this.config.plansCalcRoute().setPtSpeedFactor(1.5);
+		
+		this.config.plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarPt/expected_plans.xml.gz");
+
+		this.config.strategy().addParam("ModuleProbability_1", "0.9");
+		this.config.strategy().addParam("Module_2", "Planomat");
+		this.config.strategy().addParam("ModuleProbability_2", "0.1");
+		this.config.strategy().addParam("Module_3", "ReRoute");
+		this.config.strategy().addParam("ModuleProbability_3", "0.1");
+		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
 		expectedPlanScores.put(new IdImpl(1033), 106.53017916647772);
@@ -111,7 +164,7 @@ public class PhDControlerTest extends MatsimTestCase {
 	
 	private void runATest(HashMap<Id,Double> expectedPlanScores) {
 		
-		Controler testee = new PhDControler(new String[]{this.getInputDirectory() + "config.xml"});
+		Controler testee = new PhDControler(this.config);
 		testee.getConfig().controler().setOutputDirectory(this.getOutputDirectory());
 
 		testee.addControlerListener(new ScoreChecker(expectedPlanScores));
