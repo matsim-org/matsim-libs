@@ -142,7 +142,7 @@ class VehEventFilter implements VehicleDepartsAtFacilityEventHandler, VehicleArr
 
 	public void addVehToEvaluate(Id veh) {
 		try {
-			this.writerMap.put(veh, new BufferedWriter(new FileWriter(new File(this.outputDir + veh.toString()))));
+			this.writerMap.put(veh, new BufferedWriter(new FileWriter(new File(this.outputDir + veh.toString() + "_events.txt"))));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		

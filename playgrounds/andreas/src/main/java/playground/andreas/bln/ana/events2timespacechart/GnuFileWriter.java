@@ -37,14 +37,14 @@ public class GnuFileWriter {
 			this.writer.write("set xdata time"); this.writer.newLine();
 			this.writer.write("set timefmt \"%H:%M:%S\""); this.writer.newLine();
 
-			this.writer.write("set xtics rotate \"00:00:00\", 1800, \"30:00:00\""); this.writer.newLine();
+			this.writer.write("set xtics rotate \"00:00:00\", 300, \"30:00:00\""); this.writer.newLine();
 			this.writer.write("set xrange [\"08:00:00\" :  \"10:00:00\"]"); this.writer.newLine();
 
 			this.writer.write(writeYTics(stopIdDistanceMap, stopIdNameMap)); this.writer.newLine();
 
 			this.writer.write("set key off"); this.writer.newLine();
-			this.writer.write("set xlabel \"Zeit [HH:MM:SS]\" 0, 0"); this.writer.newLine();
-			this.writer.write("set ylabel \"Haltestelle [ ]\" 0, 0"); this.writer.newLine();
+			this.writer.write("set xlabel \"Time [HH:MM:SS]\" 0, 0"); this.writer.newLine();
+			this.writer.write("set ylabel \"Stop [ ]\" 0, 0"); this.writer.newLine();
 
 			this.writer.write("set style line 1  linetype 1 linecolor rgb \"blue\"  linewidth 2.000 pointtype 1 pointsize default"); this.writer.newLine();
 			this.writer.write("set style line 2  linetype 1 linecolor rgb \"red\"  linewidth 2.000 pointtype 2 pointsize default"); this.writer.newLine();
@@ -79,7 +79,7 @@ public class GnuFileWriter {
 			if(stopIdNameMap == null){
 				buffer.append(entry.getKey().toString().split("\\.")[0]);
 			}else{
-				buffer.append(stopIdNameMap.get(new IdImpl(entry.getKey().toString().split("\\.")[0])).trim());
+				buffer.append(stopIdNameMap.get(new IdImpl(entry.getKey().toString().split("\\.")[0])).toString().trim());
 			}
 			buffer.append("\" ");
 			buffer.append(entry.getValue());
