@@ -42,6 +42,7 @@ public class PlanomatXConfigGroup extends Module {
 	private static final String LC_MODE = "lc_mode";
 	private static final String LC_SET_SIZE = "lc_set_size";
 	private static final String ACT_TYPES = "act_types";
+	private static final String TMC_MAX_ITERATIONS = "TMC_maxIterations";
 
 	//default values
 	// TODO all "static" to be removed later, only bypassing solution
@@ -55,6 +56,7 @@ public class PlanomatXConfigGroup extends Module {
 	private static String lc_mode = "reducedLC";
 	private static String lc_set_size = "5";
 	private static String act_types = "customized";
+	private static String TMC_maxIterations = "5";
 
 	private final static Logger log = Logger.getLogger(PlanomatXConfigGroup.class);
 
@@ -94,6 +96,9 @@ public class PlanomatXConfigGroup extends Module {
 		}
 		if (ACT_TYPES.equals(key)) {
 			return getActTypes();
+		}
+		if (TMC_MAX_ITERATIONS.equals(key)) {
+			return getTMCmaxIterations();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -190,6 +195,14 @@ public class PlanomatXConfigGroup extends Module {
 				log.warn(value+" is no valid ACT_TYPES parameter. \"All\" activity types will be used instead.");
 			}
 
+		} else if (TMC_MAX_ITERATIONS.equals(key)) {
+			if (Integer.parseInt(value)<1) {
+				log.warn("Parameter TMC_MAX_ITERATIONS has been set to "+value+" but must be equal to or greater than 1. The default value of 5 will be used instead.");
+			}
+			else {
+				setTMCmaxIterations(value);
+			}
+
 		} else throw new IllegalArgumentException(key);
 	}
 
@@ -206,6 +219,7 @@ public class PlanomatXConfigGroup extends Module {
 		this.addParameterToMap(map, LC_MODE);
 		this.addParameterToMap(map, LC_SET_SIZE);
 		this.addParameterToMap(map, ACT_TYPES);
+		this.addParameterToMap(map, TMC_MAX_ITERATIONS);
 		return map;
 	}
 
@@ -269,5 +283,11 @@ public class PlanomatXConfigGroup extends Module {
 	}
 	public void setActTypes(final String size) {
 		this.act_types = size;
+	}
+	public static String getTMCmaxIterations() {
+		return TMC_maxIterations;
+	}
+	public void setTMCmaxIterations(final String no) {
+		this.TMC_maxIterations = no;
 	}
 }

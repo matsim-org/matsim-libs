@@ -59,55 +59,59 @@ import playground.mfeil.config.TimeModeChoicerConfigGroup;
  * Standard version as of 21/06/2009.
  */
 
-public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAlgorithm {
+public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlgorithm {
 
-	protected final int						MAX_ITERATIONS, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
-	protected final double					OFFSET;
-	protected final Map<String, Double>		minimumTime;
-	protected final Map<String, Double>		introTime;
-	protected final PlansCalcRoute		 	router;
-	protected final PlanScorer 				scorer;
-	protected LegTravelTimeEstimator		estimator;
-	protected final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
-	protected final PlanomatConfigGroup 	config;
-	protected static final Logger 			log = Logger.getLogger(TimeModeChoicer1.class);
-	protected final double					maxWalkingDistance;
-	protected final String					modeChoice;
-	protected final String[]			possibleModes;
-	protected List<LinkNetworkRouteImpl> 	routes;
-	private final Network 					network;
-	protected PrintStream 					stream;
-	boolean 								printing = false;
-	protected ControlerIO 					controlerIO;
+	protected final int								MAX_ITERATIONS, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
+	protected final double							OFFSET;
+	protected final Map<String, Double>				minimumTime;
+	protected final PlansCalcRoute		 			router;
+	protected final PlanScorer 						scorer;
+	protected LegTravelTimeEstimator				estimator;
+	protected final LegTravelTimeEstimatorFactory 	legTravelTimeEstimatorFactory;
+	protected final PlanomatConfigGroup 			config;
+	protected static final Logger 					log = Logger.getLogger(TimeModeChoicer.class);
+	protected final double							maxWalkingDistance;
+	protected final String							modeChoice;
+	protected final String[]						possibleModes;
+	protected List<LinkNetworkRouteImpl> 			routes;
+	private final Network 							network;
+	protected PrintStream 							stream;
+	boolean 										printing = false;
+	protected ControlerIO 							controlerIO;
 
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public TimeModeChoicer1 (Controler controler, LegTravelTimeEstimatorFactory estimatorFactory, PlanScorer scorer){
+	// constructor for PlanomatX (LegTravelTimeEstimatorFactory already initialized)
+	public TimeModeChoicer (Controler controler, LegTravelTimeEstimatorFactory estimatorFactory, PlanScorer scorer, Integer maxIterations){
 
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer 				= scorer;
 		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
-		this.MAX_ITERATIONS 		= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());
+		if (maxIterations!=null){
+			this.MAX_ITERATIONS 	= maxIterations;
+		}
+		else {
+			this.MAX_ITERATIONS 	= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());
+		}
 		this.STOP_CRITERION			= Integer.parseInt(TimeModeChoicerConfigGroup.getStopCriterion());
 		this.minimumTime			= new TreeMap<String, Double>();
-		this.minimumTime.put("home", 3600.0);
-		this.minimumTime.put("work", 3600.0);
-		this.minimumTime.put("shopping", 1800.0);
-		this.minimumTime.put("leisure", 3600.0);
-		this.minimumTime.put("education_higher", 3600.0);
-		this.minimumTime.put("education_kindergarten", 3600.0);
-		this.minimumTime.put("education_other", 3600.0);
-		this.minimumTime.put("education_primary", 3600.0);
-		this.minimumTime.put("education_secondary", 3600.0);
-		this.minimumTime.put("shop", 1800.0);
-		this.minimumTime.put("work_sector2", 3600.0);
-		this.minimumTime.put("work_sector3", 3600.0);
-		this.minimumTime.put("tta", 3600.0);
-		this.minimumTime.put("w", 3600.0);
-		this.minimumTime.put("h", 3600.0);
-		this.introTime				= this.minimumTime;
+		this.minimumTime.put("home", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeHome()));
+		this.minimumTime.put("work", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeWork()));
+		this.minimumTime.put("shopping", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeShopping()));
+		this.minimumTime.put("leisure", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeLeisure()));
+		this.minimumTime.put("education_higher", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("education_kindergarten", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("education_other", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("education_primary", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("education_secondary", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("shop", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeShopping()));
+		this.minimumTime.put("work_sector2", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeWork()));
+		this.minimumTime.put("work_sector3", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeWork()));
+		this.minimumTime.put("tta", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeHome())); //take standard home duration
+		this.minimumTime.put("w", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeWork()));
+		this.minimumTime.put("h", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeHome()));
 		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(TimeModeChoicerConfigGroup.getNeighbourhoodSize());
 		this.maxWalkingDistance		= Double.parseDouble(TimeModeChoicerConfigGroup.getMaximumWalkingDistance());
 		this.possibleModes			= TimeModeChoicerConfigGroup.getPossibleModes();
@@ -120,7 +124,8 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.config					= controler.getConfig().planomat();
 	}
 
-	public TimeModeChoicer1 (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc){
+	// self-standing constructor (legTravelTimeEstimatorFactory not initialized yet)
+	public TimeModeChoicer (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc){
 
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
@@ -131,22 +136,21 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.MAX_ITERATIONS 		= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());
 		this.STOP_CRITERION			= Integer.parseInt(TimeModeChoicerConfigGroup.getStopCriterion());
 		this.minimumTime			= new TreeMap<String, Double>();
-		this.minimumTime.put("home", 7200.0);
-		this.minimumTime.put("work", 3600.0);
-		this.minimumTime.put("shopping", 3600.0);
-		this.minimumTime.put("leisure", 3600.0);
-		this.minimumTime.put("education_higher", 3600.0);
-		this.minimumTime.put("education_kindergarten", 3600.0);
-		this.minimumTime.put("education_other", 3600.0);
-		this.minimumTime.put("education_primary", 3600.0);
-		this.minimumTime.put("education_secondary", 3600.0);
-		this.minimumTime.put("shop", 3600.0);
-		this.minimumTime.put("work_sector2", 3600.0);
-		this.minimumTime.put("work_sector3", 3600.0);
-		this.minimumTime.put("tta", 3600.0);
-		this.minimumTime.put("w", 3600.0);
-		this.minimumTime.put("h", 7200.0);
-		this.introTime				= this.minimumTime;
+		this.minimumTime.put("home", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeHome()));
+		this.minimumTime.put("work", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeWork()));
+		this.minimumTime.put("shopping", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeShopping()));
+		this.minimumTime.put("leisure", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeLeisure()));
+		this.minimumTime.put("education_higher", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("education_kindergarten", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("education_other", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("education_primary", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("education_secondary", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("shop", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeShopping()));
+		this.minimumTime.put("work_sector2", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeWork()));
+		this.minimumTime.put("work_sector3", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeWork()));
+		this.minimumTime.put("tta", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeHome()));//take standard home duration
+		this.minimumTime.put("w", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeWork()));
+		this.minimumTime.put("h", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeHome()));
 		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(TimeModeChoicerConfigGroup.getNeighbourhoodSize());
 		this.maxWalkingDistance		= Double.parseDouble(TimeModeChoicerConfigGroup.getMaximumWalkingDistance());
 		this.possibleModes			= TimeModeChoicerConfigGroup.getPossibleModes();
@@ -154,13 +158,11 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.routes					= null;
 		this.network        = controler.getNetwork();
 
-		//meisterk
 		this.config 				= controler.getConfig().planomat();
-	//	this.legTravelTimeEstimatorFactory = null;
 	}
 
 	// Constructor for test case
-	public TimeModeChoicer1 (LegTravelTimeEstimatorFactory estimatorFactory, LegTravelTimeEstimator	estimator, PlanScorer scorer, PlansCalcRoute router, Network network, PlanomatConfigGroup config){
+	public TimeModeChoicer (LegTravelTimeEstimatorFactory estimatorFactory, LegTravelTimeEstimator	estimator, PlanScorer scorer, PlansCalcRoute router, Network network, PlanomatConfigGroup config){
 
 		this.router 				= router;
 		this.scorer 				= scorer;
@@ -168,22 +170,21 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.MAX_ITERATIONS 		= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());
 		this.STOP_CRITERION			= Integer.parseInt(TimeModeChoicerConfigGroup.getStopCriterion());
 		this.minimumTime			= new TreeMap<String, Double>();
-		this.minimumTime.put("home", 7200.0);
-		this.minimumTime.put("work", 3600.0);
-		this.minimumTime.put("shopping", 3600.0);
-		this.minimumTime.put("leisure", 3600.0);
-		this.minimumTime.put("education_higher", 3600.0);
-		this.minimumTime.put("education_kindergarten", 3600.0);
-		this.minimumTime.put("education_other", 3600.0);
-		this.minimumTime.put("education_primary", 3600.0);
-		this.minimumTime.put("education_secondary", 3600.0);
-		this.minimumTime.put("shop", 3600.0);
-		this.minimumTime.put("work_sector2", 3600.0);
-		this.minimumTime.put("work_sector3", 3600.0);
-		this.minimumTime.put("tta", 3600.0);
-		this.minimumTime.put("w", 3600.0);
-		this.minimumTime.put("h", 7200.0);
-		this.introTime				= this.minimumTime;
+		this.minimumTime.put("home", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeHome()));
+		this.minimumTime.put("work", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeWork()));
+		this.minimumTime.put("shopping", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeShopping()));
+		this.minimumTime.put("leisure", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeLeisure()));
+		this.minimumTime.put("education_higher", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("education_kindergarten", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("education_other", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("education_primary", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("education_secondary", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeEducation()));
+		this.minimumTime.put("shop", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeShopping()));
+		this.minimumTime.put("work_sector2", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeWork()));
+		this.minimumTime.put("work_sector3", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeWork()));
+		this.minimumTime.put("tta", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeHome()));//take standard home duration
+		this.minimumTime.put("w", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeWork()));
+		this.minimumTime.put("h", Double.parseDouble(TimeModeChoicerConfigGroup.getMintimeHome()));
 		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(TimeModeChoicerConfigGroup.getNeighbourhoodSize());
 		this.maxWalkingDistance		= Double.parseDouble(TimeModeChoicerConfigGroup.getMaximumWalkingDistance());
 		this.possibleModes			= TimeModeChoicerConfigGroup.getPossibleModes();
@@ -205,10 +206,6 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 
 	@Override
 	public void run (Plan basePlan){
-
-	//	if (basePlan.getPerson().getId().toString().equals("1062251") ||
-	//			basePlan.getPerson().getId().toString().equals("4773280")) this.printing = true;
-	//	else this.printing = false;
 
 		if (printing){
 			String outputfile = this.controlerIO.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+basePlan.getPerson().getId()+".xls");
@@ -301,19 +298,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				}
 				move = this.cleanSchedule(this.minimumTime.get(((ActivityImpl)plan.getPlanElements().get(0)).getType()), plan);
 				if (move!=0.0){
-					// TODO Check whether allowed?
 					basePlan.setScore(-100000.0);	// Like this, PlanomatX will see that the solution is no proper solution
-				//	log.info("No valid initial solution found for person "+plan.getPerson().getId()+"!");
-				/*	for (int i=0;i<plan.getPlanElements().size();i++){
-						if (i%2==0){
-							ActivityImpl act = ((ActivityImpl) (plan.getPlanElements().get(i)));
-							log.info("act "+i+" = "+act.getType()+", "+act.getStartTime()+", "+act.calculateDuration()+", "+act.getEndTime());
-						}
-						else{
-							LegImpl leg = ((LegImpl) (plan.getPlanElements().get(i)));
-							log.info("leg "+i+" = "+leg.getMode()+", "+leg.getRoute().getDistance()+", "+leg.getDepartureTime()+", "+leg.getTravelTime()+", "+leg.getArrivalTime());
-						}
-					}*/
 					return;
 				}
 			}
@@ -325,10 +310,6 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		}
 
 		plan.setScore(this.scorer.getScore(plan));
-
-		/* Old copying
-		PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
-		plan.copyPlan(basePlan); */
 
 		/* Initializing */
 		int neighbourhood_size = 0;
@@ -461,7 +442,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			}
 		}
 		this.cleanRoutes(basePlan);
-
+		log.info(currentIteration);
 	}
 
 

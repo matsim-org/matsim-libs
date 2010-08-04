@@ -63,7 +63,7 @@ import playground.mfeil.config.PlanomatXConfigGroup;
 
 public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm {
 
-	protected int							NEIGHBOURHOOD_SIZE, MAX_ITERATIONS, LC_SET_SIZE; // is not private final for PlanomatXTest
+	protected int							NEIGHBOURHOOD_SIZE, MAX_ITERATIONS, LC_SET_SIZE; // is not private final because of PlanomatXTest
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
 	private final double 					WEIGHT_INC_NUMBER;
 	private final String					LC_MODE;
@@ -74,13 +74,13 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	private static final Logger 			log = Logger.getLogger(PlanomatX.class);
 	private final String					finalOpt;
 	private final ActivityTypeFinder 		finder;
-	private final double					LC_minimum_time = 1.0;
-
+	private final double					LC_MINIMUM_TIME = 1.0;
+	private final int 						TMC_maxIterations;
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final Knowledges knowledges;
 	private final Network network;
 	private		 ControlerIO				controlerIO;
-	private boolean 						printing = true;
+	private boolean 						printing = false;
 	private PrintStream 					stream;
 
 
@@ -110,7 +110,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		this.finalOpt				= PlanomatXConfigGroup.getFinalTimer();
 
 		if (PlanomatXConfigGroup.getTimer().equals("TimeModeChoicer")){
-			this.timer				= new TimeModeChoicer1(controler, this.legTravelTimeEstimatorFactory, this.scorer);
+			this.timer				= new TimeModeChoicer(controler, this.legTravelTimeEstimatorFactory, this.scorer, Integer.parseInt(PlanomatXConfigGroup.getTMCmaxIterations()));
 		}
 		else if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
 			this.timer				= new Planomat (this.legTravelTimeEstimatorFactory, controler.getScoringFunctionFactory(), controler.getConfig().planomat(), this.router, controler.getNetwork());
@@ -118,7 +118,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		else this.timer				= new TimeOptimizer(controler, this.legTravelTimeEstimatorFactory, this.scorer);
 
 		if (this.finalOpt.equals("TimeModeChoicer")){
-			this.finalTimer			= new TimeModeChoicer1(controler, this.legTravelTimeEstimatorFactory, this.scorer);
+			this.finalTimer			= new TimeModeChoicer(controler, this.legTravelTimeEstimatorFactory, this.scorer, Integer.parseInt(PlanomatXConfigGroup.getTMCmaxIterations()));
 		}
 		else if (this.finalOpt.equals("Planomat")){
 			this.finalTimer			= new Planomat(this.legTravelTimeEstimatorFactory, controler.getScoringFunctionFactory(), controler.getConfig().planomat(), this.router, controler.getNetwork());
@@ -128,6 +128,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		this.locator				= locator;
 
 		this.knowledges = (controler.getScenario()).getKnowledges();
+		this.TMC_maxIterations 		= Integer.parseInt(PlanomatXConfigGroup.getTMCmaxIterations());
 	}
 
 
@@ -1118,9 +1119,9 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		ManageSubchains manager = new ManageSubchains();
 		if (second-first==1){	// one long subchain
 			/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
-			if (((LegImpl)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(this.LC_minimum_time);
-			if (((LegImpl)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(first*2+1)).setTravelTime(this.LC_minimum_time);
-			if (((LegImpl)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(second*2+1)).setTravelTime(this.LC_minimum_time);
+			if (((LegImpl)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(this.LC_MINIMUM_TIME);
+			if (((LegImpl)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(first*2+1)).setTravelTime(this.LC_MINIMUM_TIME);
+			if (((LegImpl)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(second*2+1)).setTravelTime(this.LC_MINIMUM_TIME);
 			manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first-1)*2), (LegImpl)plan.getPlanElements().get((first-1)*2+1));
 			manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(first*2), (LegImpl)plan.getPlanElements().get(first*2+1));
 			manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(second*2), (LegImpl)plan.getPlanElements().get(second*2+1));
@@ -1129,16 +1130,16 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		else{					// two short subchains
 			if (first!=-1){
 				/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
-				if (((LegImpl)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(this.LC_minimum_time);
-				if (((LegImpl)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(first*2+1)).setTravelTime(this.LC_minimum_time);
+				if (((LegImpl)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(this.LC_MINIMUM_TIME);
+				if (((LegImpl)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(first*2+1)).setTravelTime(this.LC_MINIMUM_TIME);
 				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first-1)*2), (LegImpl)plan.getPlanElements().get((first-1)*2+1));
 				manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(first*2), (LegImpl)plan.getPlanElements().get(first*2+1));
 				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first+1)*2), null);
 				}
 			if (second!=-1){
 				/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
-				if (((LegImpl)plan.getPlanElements().get((second-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((second-1)*2+1)).setTravelTime(this.LC_minimum_time);
-				if (((LegImpl)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(second*2+1)).setTravelTime(this.LC_minimum_time);
+				if (((LegImpl)plan.getPlanElements().get((second-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((second-1)*2+1)).setTravelTime(this.LC_MINIMUM_TIME);
+				if (((LegImpl)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(second*2+1)).setTravelTime(this.LC_MINIMUM_TIME);
 				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((second-1)*2), (LegImpl)plan.getPlanElements().get((second-1)*2+1));
 				manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(second*2), (LegImpl)plan.getPlanElements().get(second*2+1));
 				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((second+1)*2), null);

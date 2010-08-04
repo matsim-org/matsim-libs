@@ -49,7 +49,7 @@ public class TmcInitialiser extends AbstractMultithreadedModule{
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {		
 
-		PlanAlgorithm timeOptAlgorithm = new TimeModeChoicer1 (this.controler, this.tDepDelayCalc);
+		PlanAlgorithm timeOptAlgorithm = new TimeModeChoicer (this.controler, this.tDepDelayCalc);
 		return timeOptAlgorithm;
 	}
 }

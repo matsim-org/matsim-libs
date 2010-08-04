@@ -38,21 +38,29 @@ public class TimeModeChoicerConfigGroup extends Module {
 	private static final String MAX_ITERATIONS = "max_iterations";
 	private static final String STOP_CRITERION = "stop_criterion";
 	private static final String OFFSET = "offset";
-	private static final String MINIMUM_TIME = "minimum_time";
 	private static final String MAXIMUM_WALKING_DISTANCE = "maximum_walking_distance";
 	private static final String MODE_CHOICE = "mode_choice";
+	private static final String MINTIME_HOME = "mintime_home";
+	private static final String MINTIME_WORK = "mintime_work";
+	private static final String MINTIME_SHOPPING = "mintime_shopping";
+	private static final String MINTIME_LEISURE = "mintime_leisure";
+	private static final String MINTIME_EDUCATION = "mintime_education";
 
 
 	//default values
 	// TODO all "static" to be removed later, only bypassing solution
 	private static String possible_modes = "car,pt,bike,walk";
 	private static String neighbourhood_size = "10";
-	private static String max_iterations = "5";
+	private static String max_iterations = "30";
 	private static String stop_criterion = "5";
 	private static String offset = "1800";
-	private static String minimum_time = "3600";
 	private static String maximum_walking_distance = "2000";
 	private static String mode_choice = "standard";
+	private static String mintime_home = "3600";
+	private static String mintime_work = "3600";
+	private static String mintime_shopping = "1800";
+	private static String mintime_leisure = "3600";
+	private static String mintime_education = "3600";
 
 
 	private final static Logger log = Logger.getLogger(TimeModeChoicerConfigGroup.class);
@@ -79,13 +87,25 @@ public class TimeModeChoicerConfigGroup extends Module {
 		if (OFFSET.equals(key)) {
 			return getOffset();
 		}
-		if (MINIMUM_TIME.equals(key)) {
-			return getMinimumTime();
-		}
 		if (MAXIMUM_WALKING_DISTANCE.equals(key)) {
 			return getModeChoice();
 		}
 		if (MODE_CHOICE.equals(key)) {
+			return getMaximumWalkingDistance();
+		}
+		if (MINTIME_HOME.equals(key)) {
+			return getMaximumWalkingDistance();
+		}
+		if (MINTIME_WORK.equals(key)) {
+			return getMaximumWalkingDistance();
+		}
+		if (MINTIME_SHOPPING.equals(key)) {
+			return getMaximumWalkingDistance();
+		}
+		if (MINTIME_LEISURE.equals(key)) {
+			return getMaximumWalkingDistance();
+		}
+		if (MINTIME_EDUCATION.equals(key)) {
 			return getMaximumWalkingDistance();
 		}
 		throw new IllegalArgumentException(key);
@@ -132,14 +152,6 @@ public class TimeModeChoicerConfigGroup extends Module {
 				setOffset(value);
 			}
 
-		} else if (MINIMUM_TIME.equals(key)) {
-			if ((Double.parseDouble(value)) < 1) {
-				log.warn("Parameter MINIMUM_TIME has been set to "+value+"sec but must be equal to or greater than 1sec. The default value of 3600sec (=1hour) will be used instead.");
-			}
-			else {
-				setMinimumTime(value);
-			}
-
 		} else if (MAXIMUM_WALKING_DISTANCE.equals(key)) {
 			if (Double.parseDouble(value) < 1) {
 				log.warn("Parameter MAXIMUM_WALKING_DISTANCE has been set to "+value+"m but must be equal to or greater than 1m. Default TimeModeChoicer will be used instead.");
@@ -155,6 +167,41 @@ public class TimeModeChoicerConfigGroup extends Module {
 			else {
 				log.warn(value+" is no valid MODE_CHOICE. Standard mode choice will be used instead.");
 			}
+		} else if (MINTIME_HOME.equals(key)) {
+			if (Double.parseDouble(value) < 1) {
+				log.warn("Parameter MINTIME_HOME has been set to "+value+" seconds but must be equal to or greater than 1 second. Default value of 3600 seconds will be used instead.");
+			}
+			else {
+				setMintimeHome(value);
+			}
+		} else if (MINTIME_WORK.equals(key)) {
+			if (Double.parseDouble(value) < 1) {
+				log.warn("Parameter MINTIME_WORK has been set to "+value+" seconds but must be equal to or greater than 1 second. Default value of 3600 seconds will be used instead.");
+			}
+			else {
+				setMintimeHome(value);
+			}
+		} else if (MINTIME_SHOPPING.equals(key)) {
+			if (Double.parseDouble(value) < 1) {
+				log.warn("Parameter MINTIME_SHOPPING has been set to "+value+" seconds but must be equal to or greater than 1 second. Default value of 1800 seconds will be used instead.");
+			}
+			else {
+				setMintimeHome(value);
+			}
+		} else if (MINTIME_LEISURE.equals(key)) {
+			if (Double.parseDouble(value) < 1) {
+				log.warn("Parameter MINTIME_LEISURE has been set to "+value+" seconds but must be equal to or greater than 1 second. Default value of 3600 seconds will be used instead.");
+			}
+			else {
+				setMintimeHome(value);
+			}
+		} else if (MINTIME_EDUCATION.equals(key)) {
+			if (Double.parseDouble(value) < 1) {
+				log.warn("Parameter MINTIME_EDUCATION has been set to "+value+" seconds but must be equal to or greater than 1 second. Default value of 3600 seconds will be used instead.");
+			}
+			else {
+				setMintimeHome(value);
+			}
 		} else throw new IllegalArgumentException(key);
 	}
 
@@ -165,9 +212,13 @@ public class TimeModeChoicerConfigGroup extends Module {
 		this.addParameterToMap(map, MAX_ITERATIONS);
 		this.addParameterToMap(map, STOP_CRITERION);
 		this.addParameterToMap(map, OFFSET);
-		this.addParameterToMap(map, MINIMUM_TIME);
 		this.addParameterToMap(map, MAXIMUM_WALKING_DISTANCE);
 		this.addParameterToMap(map, MODE_CHOICE);
+		this.addParameterToMap(map, MINTIME_HOME);
+		this.addParameterToMap(map, MINTIME_WORK);
+		this.addParameterToMap(map, MINTIME_SHOPPING);
+		this.addParameterToMap(map, MINTIME_LEISURE);
+		this.addParameterToMap(map, MINTIME_EDUCATION);
 		return map;
 	}
 
@@ -214,12 +265,6 @@ public class TimeModeChoicerConfigGroup extends Module {
 	public void setOffset(final String weight) {
 		this.offset = weight;
 	}
-	public static String getMinimumTime() {
-		return minimum_time;
-	}
-	public void setMinimumTime(final String weight) {
-		this.minimum_time = weight;
-	}
 	public static String getMaximumWalkingDistance() {
 		return maximum_walking_distance;
 	}
@@ -231,5 +276,35 @@ public class TimeModeChoicerConfigGroup extends Module {
 	}
 	public void setModeChoice(final String finalTimer) {
 		this.mode_choice = finalTimer;
+	}
+	public static String getMintimeHome() {
+		return mintime_home;
+	}
+	public void setMintimeHome(final String time) {
+		this.mintime_home = time;
+	}
+	public static String getMintimeWork() {
+		return mintime_work;
+	}
+	public void setMintimeWork(final String time) {
+		this.mode_choice = time;
+	}
+	public static String getMintimeShopping() {
+		return mintime_shopping;
+	}
+	public void setMintimeShopping(final String time) {
+		this.mode_choice = time;
+	}
+	public static String getMintimeLeisure() {
+		return mintime_leisure;
+	}
+	public void setMintimeLeisure(final String time) {
+		this.mode_choice = time;
+	}
+	public static String getMintimeEducation() {
+		return mintime_education;
+	}
+	public void setMintimeEducation(final String time) {
+		this.mode_choice = time;
 	}
 }

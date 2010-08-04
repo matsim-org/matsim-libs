@@ -41,7 +41,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * However includes initial clean-up of the schedule.
  */
 
-public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm { 
+public class TimeOptimizer extends TimeModeChoicer implements PlanAlgorithm { 
 	
 	protected int						MAX_ITERATIONS, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
 	protected int						OFFSET;
@@ -54,7 +54,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	
 	public TimeOptimizer (Controler controler, LegTravelTimeEstimatorFactory estimatorFactory, PlanScorer scorer){
 		
-		super(controler, estimatorFactory, scorer);
+		super(controler, estimatorFactory, scorer, null);
 		
 		this.OFFSET					= 1800;
 		this.MAX_ITERATIONS 		= 30;

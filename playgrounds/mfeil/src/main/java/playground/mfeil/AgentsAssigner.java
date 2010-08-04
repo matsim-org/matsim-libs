@@ -90,7 +90,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.network				= controler.getNetwork();
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
-		this.timer					= new TimeModeChoicer2(controler, legTravelTimeEstimatorFactory, scorer);
+		this.timer					= new TimeModeChoicer(controler, legTravelTimeEstimatorFactory, scorer, null);
 		this.locator 				= locator;
 		this.finder					= finder;
 		this.module					= recyclingModule;
