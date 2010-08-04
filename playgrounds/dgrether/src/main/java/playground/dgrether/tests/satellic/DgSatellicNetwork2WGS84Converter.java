@@ -37,6 +37,7 @@ import org.matsim.utils.gis.matsim2esri.network.WidthCalculator;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.visualization.KmlNetworkVisualizer;
+import playground.gregor.gis.coordinatetransform.ApproximatelyCoordianteTransformation;
 
 
 public class DgSatellicNetwork2WGS84Converter {
@@ -47,7 +48,7 @@ public class DgSatellicNetwork2WGS84Converter {
 		String netbase = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_cleaned";
 		String net = netbase + ".xml.gz";
 		String f = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/coordinateTransformationLookupTable.csv";
-//		ApproximatelyCoordianteTransformation transform = new ApproximatelyCoordianteTransformation(f);
+		ApproximatelyCoordianteTransformation transform = new ApproximatelyCoordianteTransformation(f);
 
 		String netOut = netbase + "_wgs84.xml.gz";
 
@@ -57,7 +58,7 @@ public class DgSatellicNetwork2WGS84Converter {
 
 		Coord c = null;
 		for (Node n : sc.getNetwork().getNodes().values()){
-//			c = transform.getTransformed(n.getCoord());
+			c = transform.getTransformed(n.getCoord());
 			n.getCoord().setXY(c.getX(), c.getY());
 		}
 		
