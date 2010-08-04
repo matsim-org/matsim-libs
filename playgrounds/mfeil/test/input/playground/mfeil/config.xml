@@ -9,15 +9,15 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/scenarios/chessboard/network.xml" />
+		<param name="inputNetworkFile" value="../matsim/test/scenarios/chessboard/network.xml" />
 	</module>
 
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="test/scenarios/chessboard/facilities.xml" />
+		<param name="inputFacilitiesFile" value="../matsim/test/scenarios/chessboard/facilities.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/scenarios/chessboard/plans.xml" />
+		<param name="inputPlansFile" value="../matsim/test/scenarios/chessboard/plans.xml" />
 	</module>
 
 	<module name="controler">

@@ -5,7 +5,7 @@
 	<module name="global">
 		<param name="randomSeed" value="4711" />
 		<param name="coordinateSystem" value="Atlantis" />
-		<param name="numberOfThreads" value="1" />
+		<param name="numberOfThreads" value="2" />
 	</module>
 
 	<module name="network">
@@ -103,7 +103,7 @@
 		<param name="Module_3" value="BestScore" />
 		
 		<param name="ModuleProbability_4" value="0.0" />
-		<param name="Module_4" value="Clustering" />
+		<param name="Module_4" value="Recycling" />
 		
 		<param name="ModuleProbability_5" value="0.0" />
 		<param name="Module_5" value="Planomat" />
