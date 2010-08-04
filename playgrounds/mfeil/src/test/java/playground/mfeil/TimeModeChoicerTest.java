@@ -61,7 +61,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 	final String TEST_PERSON_ID = "1";
 	private PlansCalcRoute router;
 	private LegTravelTimeEstimator estimator;
-	private TimeModeChoicer1 testee;
+	private TimeModeChoicer testee;
 	private ScenarioImpl scenario_input;
 
 	@Override
@@ -104,7 +104,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 				this.router,
 				this.scenario_input.getNetwork());
 
-		this.testee = new TimeModeChoicer1 (legTravelTimeEstimatorFactory, this.estimator, new PlanScorer(new JohScoringTestFunctionFactory()), this.router, this.scenario_input.getNetwork(), this.scenario_input.getConfig().planomat());
+		this.testee = new TimeModeChoicer (legTravelTimeEstimatorFactory, this.estimator, new PlanScorer(new JohScoringTestFunctionFactory()), this.router, this.scenario_input.getNetwork(), this.scenario_input.getConfig().planomat());
 	}
 
 
