@@ -29,7 +29,7 @@ import org.matsim.vis.otfvis.OTFVisQSim;
 
 public class FourWaysVis {
 
-	public static final String TESTINPUTDIR = "../matsim/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
+	public static final String TESTINPUTDIR = "../../matsim/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
 	
 	/**
 	 * @param args
