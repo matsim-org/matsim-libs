@@ -49,7 +49,7 @@ public class AdaptiveController4 extends
 		AdaptiveSignalSystemControlerImpl implements LaneEnterEventHandler, 
 		LaneLeaveEventHandler, SimulationBeforeSimStepListener, SimulationInitializedListener {
 	
-	private static final Logger log = Logger.getLogger(AdaptiveController3.class);
+	private static final Logger log = Logger.getLogger(AdaptiveController4.class);
 
 	private final Id id1 = new IdImpl("1");
 	private final Id id2 = new IdImpl("2");
