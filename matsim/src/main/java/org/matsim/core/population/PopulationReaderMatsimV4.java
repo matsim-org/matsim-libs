@@ -226,7 +226,12 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.currperson.setAge(age);
 		this.currperson.setLicence(atts.getValue("license"));
 		this.currperson.setCarAvail(atts.getValue("car_avail"));
-		this.currperson.setEmployed(atts.getValue("employed"));
+		String employed = atts.getValue("employed");
+		if (employed == null) {
+			this.currperson.setEmployed(null);
+		} else {
+			this.currperson.setEmployed("yes".equals(employed));
+		}
 	}
 
 	private void startTravelcard(final Attributes atts) {

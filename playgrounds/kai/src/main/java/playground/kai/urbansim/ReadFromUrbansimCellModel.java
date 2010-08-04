@@ -63,6 +63,7 @@ import playground.kai.urbansim.ids.LocationIdFactory;
 public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 	private static final Logger log = Logger.getLogger(ReadFromUrbansimCellModel.class);
 
+	@Override
 	public void readFacilities(ActivityFacilitiesImpl facilities) {
 		log.fatal("does not work; see javadoc of class.  Aborting ..." + this) ;
 		System.exit(-1) ;
@@ -166,9 +167,9 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 					Utils.makeHomePlan(plan, homeCoord) ;
 
 					if ( ii<nWorkers ) {
-						person.setEmployed("yes") ;
+						person.setEmployed(Boolean.TRUE);
 					} else {
-						person.setEmployed("no") ;
+						person.setEmployed(Boolean.FALSE);
 					}
 				}
 				line = reader.readLine(); // next line
@@ -181,6 +182,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 		}
 	}
 
+	@Override
 	public void readZones(ActivityFacilitiesImpl zones, Layer parcels) {
 		log.fatal("not implemented; aborting ...") ;
 		System.exit(-1);

@@ -183,9 +183,9 @@ public class ReadFromUrbansimParcelModel {
 
 				int idx = idxFromKey.get("parcel_id_work") ;
 				if ( parts[idx].equals("-1") ) {
-					newPerson.setEmployed("no") ;
+					newPerson.setEmployed(Boolean.FALSE);
 				} else {
-					newPerson.setEmployed("yes") ;
+					newPerson.setEmployed(Boolean.TRUE);
 					Id workParcelId = new IdImpl( parts[idx] ) ;
 					Location jobLocation = facilities.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {

@@ -73,7 +73,7 @@ public class PlansCreateFromNetwork {
 			double rd = MatsimRandom.getRandom().nextDouble();
 			String license = "no";
 			String car_avail = "never";
-			String employed = "no";
+			boolean employed = false;
 			int age = -1;
 			if (rd < 0.05) {
 				age = MatsimRandom.getRandom().nextInt(7);
@@ -82,7 +82,7 @@ public class PlansCreateFromNetwork {
 			} else if (rd < 0.4) {
 				age = 18 + MatsimRandom.getRandom().nextInt(10);
 				if (MatsimRandom.getRandom().nextDouble() < 0.7) {
-					employed = "yes";
+					employed = true;
 				}
 				if (MatsimRandom.getRandom().nextDouble() < 0.5) {
 					license = "yes";
@@ -93,7 +93,7 @@ public class PlansCreateFromNetwork {
 			} else if (rd < 0.9) {
 				age = 28 + MatsimRandom.getRandom().nextInt(37);
 				if (MatsimRandom.getRandom().nextDouble() < 0.6) {
-					employed = "yes";
+					employed = true;
 				}
 				if (MatsimRandom.getRandom().nextDouble() < 0.7) {
 					license = "yes";

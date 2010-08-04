@@ -179,7 +179,7 @@ public class CreateSelectedPlansTables {
 				out.write(person.getAge()+"\t");
 				out.write(person.getLicense()+"\t");
 				out.write(person.getCarAvail()+"\t");
-				out.write(person.getEmployed()+"\t");
+				out.write((person.isEmployed() ? "yes" : "no")+"\t");
 
 
 				if (((PlanImpl) person.getSelectedPlan()).getFirstActivity().getType().substring(0,1).equals("h")) {

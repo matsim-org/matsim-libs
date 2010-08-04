@@ -261,9 +261,8 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		else if (ALWAYS.equals(person.getCarAvail())) { vals[13]++; }
 		else { Gbl.errorMsg("Person id=" + person.getId() + ": Attribute 'car_avail' is wrong!"); }
 
-		if (YES.equals(person.getEmployed())) { vals[14]++; }
-		else if (NO.equals(person.getEmployed())) { vals[15]++; }
-		else { Gbl.errorMsg("Person id=" + person.getId() + ": Attribute 'employed' is wrong!"); }
+		if (person.isEmployed()) { vals[14]++; }
+		else { vals[15]++; }
 
 		if (!person.getTravelcards().isEmpty()) { vals[16]++; }
 		else { vals[17]++; }

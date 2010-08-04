@@ -433,7 +433,7 @@ public class PlansCreateFromCensus2000 {
 
 		p.setAge(Integer.parseInt(entries[CAtts.I_ALTJ]));
 		if (entries[CAtts.I_GESL].equals("1")) { p.setSex("m"); } else { p.setSex("f"); }
-		if (this.isEmployed(Integer.parseInt(entries[CAtts.I_AMS]))) { p.setEmployed("yes"); } else { p.setEmployed("no"); }
+		if (this.isEmployed(Integer.parseInt(entries[CAtts.I_AMS]))) { p.setEmployed(Boolean.TRUE); } else { p.setEmployed(Boolean.FALSE); }
 
 		this.chooseWorkFacility(p,entries[CAtts.I_AGDE],entries[CAtts.I_PBER],municipalityLayer);
 

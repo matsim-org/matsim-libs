@@ -115,7 +115,7 @@ public class BlnPlansGenerator {
 
 			// filter unemployed persons and data without entry
 			if (Integer.parseInt(data[12]) != 6 && Integer.parseInt(data[12]) != 0){
-				person.setEmployed("yes");
+				person.setEmployed(Boolean.TRUE);
 			}
 
 			// person.setHousehold(hh)(new IdImpl(data[1]));

@@ -229,9 +229,9 @@ public class PlansCreateFromDataPuls2010 {
 				else { throw new RuntimeException("line "+line_cnt+": gender is not 1 nor 2."); }
 
 				int jobClass = Integer.parseInt(entries[6].trim());
-				String employed = null;
-				if ((jobClass==1) || (jobClass==2)) { employed = "yes"; }
-				else if ((jobClass==3) || (jobClass==4) || (jobClass==5)) { employed = "no"; }
+				Boolean employed = null;
+				if ((jobClass==1) || (jobClass==2)) { employed = Boolean.TRUE; }
+				else if ((jobClass==3) || (jobClass==4) || (jobClass==5)) { employed = Boolean.FALSE; }
 				else { throw new RuntimeException("line "+line_cnt+": jobClass="+jobClass+" not known!"); }
 
 				Id fid = new IdImpl(entries[1].trim());

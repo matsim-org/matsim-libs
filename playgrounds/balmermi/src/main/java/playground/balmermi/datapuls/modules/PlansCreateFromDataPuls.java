@@ -264,7 +264,7 @@ public class PlansCreateFromDataPuls {
 	private final void mapDemand(PersonImpl dPerson, KnowledgeImpl dKnowledge, PersonImpl cPerson, KnowledgeImpl cKnowledge) {
 		// demographics
 		dPerson.setCarAvail(cPerson.getCarAvail());
-		dPerson.setEmployed(cPerson.getEmployed());
+		dPerson.setEmployed(cPerson.isEmployed());
 		dPerson.setLicence(cPerson.getLicense());
 		// travel cards
 		if (cPerson.getTravelcards() != null) {

@@ -112,7 +112,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			if (person.getCarAvail().equals(ALWAYS)) { this.caravail_groups[0][0]++; }
 			else if (person.getCarAvail().equals(SOMETIMES)) { this.caravail_groups[0][1]++; }
 			else { this.caravail_groups[0][2]++; }
-			if (person.getEmployed().equals(YES)) { this.employed_groups[0]++; }
+			if (person.isEmployed()) { this.employed_groups[0]++; }
 		}
 		else if (person.getAge() < 7) {
 			age_groups[1]++;
@@ -120,7 +120,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			if (person.getCarAvail().equals(ALWAYS)) { this.caravail_groups[1][0]++; }
 			else if (person.getCarAvail().equals(SOMETIMES)) { this.caravail_groups[1][1]++; }
 			else { this.caravail_groups[1][2]++; }
-			if (person.getEmployed().equals(YES)) { this.employed_groups[1]++; }
+			if (person.isEmployed()) { this.employed_groups[1]++; }
 		}
 		else if (person.getAge() < 66) {
 			age_groups[2]++;
@@ -128,7 +128,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			if (person.getCarAvail().equals(ALWAYS)) { this.caravail_groups[2][0]++; }
 			else if (person.getCarAvail().equals(SOMETIMES)) { this.caravail_groups[2][1]++; }
 			else { this.caravail_groups[2][2]++; }
-			if (person.getEmployed().equals(YES)) { this.employed_groups[2]++; }
+			if (person.isEmployed()) { this.employed_groups[2]++; }
 		}
 		else if (person.getAge() < 1000) {
 			age_groups[3]++;
@@ -136,7 +136,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			if (person.getCarAvail().equals(ALWAYS)) { this.caravail_groups[3][0]++; }
 			else if (person.getCarAvail().equals(SOMETIMES)) { this.caravail_groups[3][1]++; }
 			else { this.caravail_groups[3][2]++; }
-			if (person.getEmployed().equals(YES)) { this.employed_groups[3]++; }
+			if (person.isEmployed()) { this.employed_groups[3]++; }
 		}
 		else {
 			age_groups[4]++;
@@ -144,7 +144,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			if (person.getCarAvail().equals(ALWAYS)) { this.caravail_groups[4][0]++; }
 			else if (person.getCarAvail().equals(SOMETIMES)) { this.caravail_groups[4][1]++; }
 			else { this.caravail_groups[4][2]++; }
-			if (person.getEmployed().equals(YES)) { this.employed_groups[4]++; }
+			if (person.isEmployed()) { this.employed_groups[4]++; }
 		}
 
 		for (int i=0; i<person.getPlans().size(); i++) {

@@ -53,7 +53,7 @@ public class StripPersonPlan extends NewPopulation {
 
 		person.setAge(Integer.MIN_VALUE);
 		person.setCarAvail(null);
-		person.setEmployed(null);
+		person.setEmployed((Boolean) null);
 		person.setLicence(null);
 		person.setSex(null);
 

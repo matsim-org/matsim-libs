@@ -42,12 +42,14 @@ public class TicketAlgo extends AbstractPersonAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-  
+
 	@Override
 	public void run(Person pp) {
 		PersonImpl person = (PersonImpl) pp;
 		double rd3 = MatsimRandom.getRandom().nextDouble();
-		if (person.getEmployed() == "no") {
+		if (person.isEmployed() == null) {
+			; // what happens if it is "null"?
+		} else if (!person.isEmployed()) {
 			if (person.getCarAvail() == "always") {
 				if (rd3 < 0.1) {
 					person.addTravelcard("HT");
@@ -79,7 +81,7 @@ public class TicketAlgo extends AbstractPersonAlgorithm {
 				Gbl.errorMsg("do not know car avail = " + person.getCarAvail());
 			}
 		}
-		else if (person.getEmployed() == "yes") {
+		else if (person.isEmployed()) {
 			if (person.getCarAvail() == "always") {
 				if (rd3 < 0.1) {
 					person.addTravelcard("HT");
@@ -104,9 +106,6 @@ public class TicketAlgo extends AbstractPersonAlgorithm {
 			else {
 				Gbl.errorMsg("do not know car avail = " + person.getCarAvail());
 			}
-		}
-		else {
-			; // what happens if it is "null"?
 		}
 	}
 }

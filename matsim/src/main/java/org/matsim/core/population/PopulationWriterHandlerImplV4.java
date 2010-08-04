@@ -103,9 +103,9 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 				out.write(person.getCarAvail());
 				out.write("\"");
 			}
-			if (person.getEmployed() != null) {
+			if (person.isEmployed() != null) {
 				out.write(" employed=\"");
-				out.write(person.getEmployed());
+				out.write((person.isEmployed() ? "yes" : "no"));
 				out.write("\"");
 			}
 		}

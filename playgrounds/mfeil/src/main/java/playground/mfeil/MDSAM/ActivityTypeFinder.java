@@ -71,6 +71,7 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 		log.info("Searching available activity types done.");
 	}
 
+	@Override
 	public void run(ActivityFacility facility){
 		Collection<? extends ActivityOption> facActTypes = facility.getActivityOptions().values();
 		for (Iterator<? extends ActivityOption> iterator = facActTypes.iterator();iterator.hasNext();){
@@ -112,7 +113,7 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 				if (!agentKnActTypes.contains("education_primary"))agentCuActTypes.remove("education_primary");
 				if (!agentKnActTypes.contains("education_secondary"))agentCuActTypes.remove("education_secondary");
 				if (!agentKnActTypes.contains("education_higher"))agentCuActTypes.remove("education_higher");
-				if ((((PersonImpl) agent).getEmployed()!=null) && !(((PersonImpl) agent).isEmployed())){
+				if ((((PersonImpl) agent).isEmployed()!=null) && !(((PersonImpl) agent).isEmployed())){
 					if (!agentKnActTypes.contains("work_sector2"))agentCuActTypes.remove("work_sector2");
 					else log.warn("Person "+((PersonImpl)agent).getId()+" is unemployed but has a work type in his knowledge!");
 					if (!agentKnActTypes.contains("work_sector3"))agentCuActTypes.remove("work_sector3");

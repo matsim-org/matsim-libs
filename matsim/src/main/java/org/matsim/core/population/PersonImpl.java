@@ -47,7 +47,7 @@ public class PersonImpl implements Person {
 	private int age = Integer.MIN_VALUE;
 	private String hasLicense;
 	private String carAvail;
-	private String isEmployed;
+	private Boolean isEmployed = false;
 
 	private TreeSet<String> travelcards = null;
 	protected Desires desires = null;
@@ -60,10 +60,12 @@ public class PersonImpl implements Person {
 		this.id = id;
 	}
 
+	@Override
 	public final Plan getSelectedPlan() {
 		return this.selectedPlan;
 	}
 
+	@Override
 	public boolean addPlan(final Plan plan) {
 		plan.setPerson(this);
 		// Make sure there is a selected plan if there is at least one plan
@@ -172,10 +174,12 @@ public class PersonImpl implements Person {
 		return newPlan;
 	}
 
+	@Override
 	public Id getId() {
 		return this.id;
 	}
 
+	@Override
 	public void setId(final Id id) {
 		this.id = id;
 	}
@@ -201,10 +205,7 @@ public class PersonImpl implements Person {
 	}
 
 	public final Boolean isEmployed() {
-		if (this.isEmployed == null) {
-			return null;
-		}
-		return ("yes".equals(this.isEmployed)) || ("true".equals(this.isEmployed));
+		return this.isEmployed;
 	}
 
 	public void setAge(final int age) {
@@ -226,16 +227,9 @@ public class PersonImpl implements Person {
 		this.carAvail = (carAvail == null) ? null : carAvail.intern();
 	}
 
-	public final void setEmployed(final String employed) {
-		this.isEmployed = (employed == null) ? null : employed.intern();
-		// yyyy: maybe I am getting this wrong, but it seems to me that this is a bit weird:
-		// - it accepts a String, implying that you can put in whatever you want
-		// - it also writes it without problems in the population writer
-		// - however, when reading it back in it complains that it wants "yes" or "no"
-		// Maybe use a "boolean" instead of a "String"?  kai, nov08
+	public final void setEmployed(final Boolean employed) {
+		this.isEmployed = employed;
 	}
-
-
 
 	public final Desires createDesires(final String desc) {
 		if (this.desires == null) {
@@ -277,7 +271,7 @@ public class PersonImpl implements Person {
 		b.append("[age=").append(this.getAge()).append("]");
 		b.append("[license=").append(this.getLicense()).append("]");
 		b.append("[car_avail=").append(this.getCarAvail()).append("]");
-		b.append("[employed=").append(this.getEmployed()).append("]");
+		b.append("[employed=").append((isEmployed() ? "yes" : "no")).append("]");
 		b.append("[travelcards=").append(this.getTravelcards() == null ? "null" : this.getTravelcards().size()).append("]");
 		b.append("[nof_plans=").append(this.getPlans() == null ? "null" : this.getPlans().size()).append("]");
 	  return b.toString();
@@ -291,23 +285,13 @@ public class PersonImpl implements Person {
 		return result;
 	}
 
-	/**
-	 * @return "yes" if the person has a job
-	 * @deprecated use {@link #isEmployed()}
-	 */
-	@Deprecated
-	public String getEmployed() {
-		if (isEmployed() == null) {
-			return null;
-		}
-		return (isEmployed() ? "yes" : "no");
-	}
-
+	@Override
 	public List<Plan> getPlans() {
 		return this.plans;
 	}
 
 
+	@Override
 	public Map<String, Object> getCustomAttributes() {
 		if (this.customizableDelegate == null) {
 			this.customizableDelegate = new CustomizableImpl();

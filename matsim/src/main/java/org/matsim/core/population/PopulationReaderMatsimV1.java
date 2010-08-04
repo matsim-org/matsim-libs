@@ -165,7 +165,12 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 		this.currperson.setAge(Integer.parseInt(atts.getValue("age")));
 		this.currperson.setLicence(atts.getValue("license"));
 		this.currperson.setCarAvail(atts.getValue("car_avail"));
-		this.currperson.setEmployed(atts.getValue("employed"));
+		String employed = atts.getValue("employed");
+		if (employed == null) {
+			this.currperson.setEmployed(null);
+		} else {
+			this.currperson.setEmployed("yes".equals(employed));
+		}
 	}
 
 	private void startPlan(final Attributes atts) {

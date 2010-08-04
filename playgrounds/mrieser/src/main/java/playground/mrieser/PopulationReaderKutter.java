@@ -136,12 +136,12 @@ public class PopulationReaderKutter implements PopulationReader {
 				"always", "sometimes", "never", "never", "always", "sometimes", "never", "never", /* 61-68 */
 				"always", "sometimes", "never", "never" /* 69-72 */
 				};
-		private final String[] pgEmployed = {null, "no", "no", "no", "no", "no", "no", "no", "no", "no", "no", "no", "no", /* 0, 1-12 */
-				"yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes", "no", "no", "no", "no", "no", "no", "no", "no", /* 13-28 */
-				"yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes", /* 29-44 */
-				"yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes", /* 45-52 */
-				"no", "no", "no", "no", "no", "no", "no", "no", "no", "no", "no", "no", /* 53-64 */
-				"no", "no", "no", "no", "no", "no", "no", "no" /* 65-72 */
+		private final Boolean[] pgEmployed = {null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, /* 0, 1-12 */
+				Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, /* 13-28 */
+				Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, /* 29-44 */
+				Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, /* 45-52 */
+				Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, /* 53-64 */
+				Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE /* 65-72 */
 				};
 		private final int[] pgMinAge = {0, 0, 0, 0, 0,  5,  5,  5,  5, 12, 12, 12, 12, /* 0, 1-12 */
 				18, 18, 16, 16, 18, 18, 16, 16, 18, 18, 18, 18, 18, 18, 18, 18, /* 13-28 */
