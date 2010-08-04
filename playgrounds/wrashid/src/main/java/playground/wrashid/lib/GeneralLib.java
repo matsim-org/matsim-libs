@@ -13,6 +13,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.StringTokenizer;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import junit.framework.Assert;
+
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
@@ -24,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -31,17 +36,23 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.charts.XYLineChart;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
+import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.vis.kml.KMZWriter;
+import org.xml.sax.SAXException;
 
 public class GeneralLib {
 
@@ -93,6 +104,10 @@ public class GeneralLib {
 		sl.loadScenario();
 
 		return sc.getNetwork();
+	}
+	
+	public static void writeNetwork(Network network, String outputNetworkFileName){
+		new NetworkWriter(network).write(outputNetworkFileName);
 	}
 	
 
@@ -514,7 +529,7 @@ public class GeneralLib {
 	}
 	
 	
-	public static void writeNetworkToKmz(String networkFile, String outputKmzFileName) throws IOException {
+	public static void convertMATSimNetworkToKmz(String networkFile, String outputKmzFileName) throws IOException {
 		Network network = readNetwork(networkFile);
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
@@ -525,7 +540,7 @@ public class GeneralLib {
 		mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
 		
 		//KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network, new AtlantisToWGS84(), kmzWriter, mainDoc);
-		KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network,new GeotoolsTransformation(TransformationFactory.CH1903_LV03_GT, TransformationFactory.WGS84), kmzWriter, mainDoc);
+		KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network,new CH1903LV03toWGS84(), kmzWriter, mainDoc);
 		
 		
 		mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(kmlNetworkWriter.getNetworkFolder()));
@@ -533,4 +548,19 @@ public class GeneralLib {
 		kmzWriter.writeMainKml(mainKml);
 		kmzWriter.close();
 	}
+	
+	public static Network convertOsmNetworkToMATSimNetwork(String osmNetworkFile) throws SAXException, ParserConfigurationException, IOException{
+		Scenario sc = new ScenarioImpl();
+		Network net = sc.getNetwork();
+
+		CoordinateTransformation ct = new WGS84toCH1903LV03();
+
+		OsmNetworkReader reader = new OsmNetworkReader(net,ct);
+		reader.setKeepPaths(true);
+		reader.parse(osmNetworkFile);
+
+		new NetworkCleaner().run(net);
+		return net;
+	}
+	
 }
