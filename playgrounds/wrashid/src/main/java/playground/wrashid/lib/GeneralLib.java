@@ -5,12 +5,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.StringTokenizer;
+
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.ObjectFactory;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -23,6 +28,7 @@ import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -31,7 +37,11 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.charts.XYLineChart;
+import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
+import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.vis.kml.KMZWriter;
 
 public class GeneralLib {
 
@@ -501,5 +511,26 @@ public class GeneralLib {
 		Person copyPerson=new PersonImpl(person.getId());
 		copyPerson.addPlan(person.getSelectedPlan());
 		return copyPerson;
+	}
+	
+	
+	public static void writeNetworkToKmz(String networkFile, String outputKmzFileName) throws IOException {
+		Network network = readNetwork(networkFile);
+
+		ObjectFactory kmlObjectFactory = new ObjectFactory();
+		KMZWriter kmzWriter = new KMZWriter(outputKmzFileName);
+		
+		KmlType mainKml = kmlObjectFactory.createKmlType();
+		DocumentType mainDoc = kmlObjectFactory.createDocumentType();
+		mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
+		
+		//KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network, new AtlantisToWGS84(), kmzWriter, mainDoc);
+		KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network,new GeotoolsTransformation(TransformationFactory.CH1903_LV03_GT, TransformationFactory.WGS84), kmzWriter, mainDoc);
+		
+		
+		mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(kmlNetworkWriter.getNetworkFolder()));
+		
+		kmzWriter.writeMainKml(mainKml);
+		kmzWriter.close();
 	}
 }
