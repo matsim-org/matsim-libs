@@ -55,7 +55,7 @@ public class TimeModeChoicerConfigGroup extends Module {
 	private static String stop_criterion = "5";
 	private static String offset = "1800";
 	private static String maximum_walking_distance = "2000";
-	private static String mode_choice = "standard";
+	private static String mode_choice = "none";
 	private static String mintime_home = "3600";
 	private static String mintime_work = "3600";
 	private static String mintime_shopping = "1800";
@@ -161,7 +161,7 @@ public class TimeModeChoicerConfigGroup extends Module {
 			}
 
 		} else if (MODE_CHOICE.equals(key)) {
-			if (value.equals("standard") || value.equals("extended_1") || value.equals("extended_2") || value.equals("extended_3")) {
+			if (value.equals("standard") || value.equals("extended_1") || value.equals("extended_2") || value.equals("extended_3") || value.equals("none")) {
 				setModeChoice(value);
 			}
 			else {

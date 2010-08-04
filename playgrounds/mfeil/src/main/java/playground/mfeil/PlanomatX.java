@@ -104,30 +104,24 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		this.WEIGHT_CHANGE_NUMBER 	= Double.parseDouble(PlanomatXConfigGroup.getWeightChangeNumber());
 		this.WEIGHT_INC_NUMBER		= Double.parseDouble(PlanomatXConfigGroup.getWeightIncNumber());
 		this.MAX_ITERATIONS			= Integer.parseInt(PlanomatXConfigGroup.getMaxIterations());
-		/* reducedLC=only modified secondary acts will be located; fullLC=all secondary acts of the plan will be located*/
 		this.LC_MODE				= PlanomatXConfigGroup.getLCMode();
 		this.LC_SET_SIZE			= Integer.parseInt(PlanomatXConfigGroup.getLCSetSize());
 		this.finalOpt				= PlanomatXConfigGroup.getFinalTimer();
 
-		if (PlanomatXConfigGroup.getTimer().equals("TimeModeChoicer")){
+		if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
+			this.timer				= new Planomat (this.legTravelTimeEstimatorFactory, controler.getScoringFunctionFactory(), controler.getConfig().planomat(), this.router, controler.getNetwork());
+		} 
+		else {
 			this.timer				= new TimeModeChoicer(controler, this.legTravelTimeEstimatorFactory, this.scorer, Integer.parseInt(PlanomatXConfigGroup.getTMCmaxIterations()));
 		}
-		else if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
-			this.timer				= new Planomat (this.legTravelTimeEstimatorFactory, controler.getScoringFunctionFactory(), controler.getConfig().planomat(), this.router, controler.getNetwork());
-		}
-		else this.timer				= new TimeOptimizer(controler, this.legTravelTimeEstimatorFactory, this.scorer);
-
-		if (this.finalOpt.equals("TimeModeChoicer")){
-			this.finalTimer			= new TimeModeChoicer(controler, this.legTravelTimeEstimatorFactory, this.scorer, Integer.parseInt(PlanomatXConfigGroup.getTMCmaxIterations()));
-		}
-		else if (this.finalOpt.equals("Planomat")){
+		
+		if (this.finalOpt.equals("Planomat")){
 			this.finalTimer			= new Planomat(this.legTravelTimeEstimatorFactory, controler.getScoringFunctionFactory(), controler.getConfig().planomat(), this.router, controler.getNetwork());
 		}
-		else this.finalTimer		= new TimeOptimizerWIGIC(controler, this.legTravelTimeEstimatorFactory, this.scorer);
-
+		else this.finalTimer		= new TimeModeChoicer(controler, this.legTravelTimeEstimatorFactory, this.scorer, Integer.parseInt(PlanomatXConfigGroup.getTMCmaxIterations()));
+		
 		this.locator				= locator;
-
-		this.knowledges = (controler.getScenario()).getKnowledges();
+		this.knowledges 			= (controler.getScenario()).getKnowledges();
 		this.TMC_maxIterations 		= Integer.parseInt(PlanomatXConfigGroup.getTMCmaxIterations());
 	}
 
@@ -368,13 +362,12 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		java.util.Collections.sort(tabuList);
 		List<PlanElement> al = plan.getPlanElements();
 
-
-		// TODO must be removed before putting into core!
 		plan.setScore(tabuList.get(tabuList.size()-1).getScore());
 
 
 		if (this.printing) this.stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
 
+		// option to go over plan once again to achieve excellent optimization result. Normally not needed.
 		if (!this.finalOpt.equals("none")){
 			this.finalTimer.run(tabuList.get(tabuList.size()-1));
 			tabuList.get(tabuList.size()-1).setScore(this.scorer.getScore(tabuList.get(tabuList.size()-1)));
@@ -460,7 +453,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				infoOnNeighbourhood[neighbourPos] = this.changeType(neighbourhood[neighbourPos], typePosition, actsToBeChanged, actTypes, primActs);
 			}
 		}
-		else {								// reduced neighbourhood definition for short plans
+		else {									// reduced neighbourhood definition for short plans
 			int neighbourPos;
 			int [] numberPosition = {1};		// "number of cycles"
 			int [] actsToBeAdded = new int [2];
@@ -614,9 +607,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				if (this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(2), primActs)		&&
 						!(this.checkForSamePrimary(basePlan, 1))) return (new int[]{1,0,0});
 				else {
-					/*this.removeAct(1, basePlan);
-					positions[3]++;*/
-
+					
 					// NEW (24th Oct 2009 MF): When removing act from plan with 3 acts, reduce to 24h of "home"
 					this.removeAct(1, basePlan);
 					this.removeAct(0, basePlan);
@@ -814,7 +805,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			else {
 				boolean warningTabu = false;
 				for (int i = 0; i<tabuList.size();i++){		//compare each neighbourhood solution with all tabu solutions
-					if (checkForEquality(tabuList.get(tabuList.size()-1-i), neighbourhood[x])){ //TODO Check whether enough to start from .size()-2-i?
+					if (checkForEquality(tabuList.get(tabuList.size()-1-i), neighbourhood[x])){ 
 						warningTabu = true;
 						break;
 					}
@@ -1046,7 +1037,6 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	}
 
 
-	// NEW NEW NEW NEW NEW NEW NEW NEW NEW
 	/* Checks whether an act is primary*/
 	public boolean checkPrimary (ActivityImpl act, ArrayList<ActivityOptionImpl> primActs){
 

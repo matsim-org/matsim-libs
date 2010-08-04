@@ -48,7 +48,6 @@ import org.matsim.locationchoice.LocationChoice;
 import playground.mfeil.MDSAM.ActivityTypeFinder;
 import playground.mfeil.MDSAM.PlansConstructor;
 import playground.mfeil.MDSAM.PlansEvaluator;
-import playground.mfeil.MDSAM.PlansVariatorInitializer;
 import playground.mfeil.attributes.AgentsAttributesAdder;
 import playground.mfeil.analysis.TravelStats;
 
@@ -130,11 +129,6 @@ public class ControlerMFeil extends Controler {
 				PlanStrategyModule planomatStrategyModule = new PlanomatModule(this, this.getEvents(), this.getNetwork(), this.getScoringFunctionFactory(), this.createTravelCostCalculator(), this.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
 			}
-			else if (classname.equals("TimeOptimizer")) {
-				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule timeOptStrategyModule = new TimeOptimizerInitialiser(this);
-				strategy.addStrategyModule(timeOptStrategyModule);
-			}
 			else if (classname.equals("Recycling")) {
 				ActivityTypeFinder finder = new ActivityTypeFinder (this);
 				finder.run(this.getFacilities());
@@ -154,17 +148,10 @@ public class ControlerMFeil extends Controler {
 	    	strategy.addStrategyModule(new ReRoute(this));
 				strategy.addStrategyModule(new TimeAllocationMutator(config));
 			}
-
-			else if (classname.equals("PlansVariator")) {
-		    	strategy = new PlanStrategy(new KeepSelected());
-				strategy.addStrategyModule(new PlansVariatorInitializer(this));
-			}
-
 			else if (classname.equals("PlansConstructor")) {
 		    	strategy = new PlanStrategy(new KeepSelected());
 				strategy.addStrategyModule(new PlansConstructor(this));
 			}
-
 			else if (classname.equals("PlansEvaluator")) {
 		    	strategy = new PlanStrategy(new KeepSelected());
 				strategy.addStrategyModule(new PlansEvaluator(this));

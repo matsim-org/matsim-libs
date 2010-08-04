@@ -241,30 +241,30 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 		plan.copyPlan(basePlan);
 
 		/*Set all leg modes to car*/
-		for (int z=1;z<plan.getPlanElements().size();z+=2){
-			((LegImpl)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
-		}
-		this.router.run(plan);
+		if (!this.modeChoice.equals("none")){
+			for (int z=1;z<plan.getPlanElements().size();z+=2){
+				((LegImpl)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
+			}
+			this.router.run(plan);
 
-		/* Memorize the initial car routes.
-		 * Do this in any case as the car routes are required in the setTimes() method. */
-		ArrayList <LinkNetworkRouteImpl> routes = new ArrayList<LinkNetworkRouteImpl>();
-		for (int i=1;i<plan.getPlanElements().size();i=i+2){
-			Route oldRoute = ((LegImpl)(plan.getPlanElements().get(i))).getRoute();
-			LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
-		/*	List<Id> l = new ArrayList<Id>();
-			for (int j=0;j<((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++){
-				l.add(((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().get(j));
-			}*/
-			List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
-			r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
-			r.setDistance(oldRoute.getDistance());
-			routes.add(r);
+			/* Memorize the initial car routes.
+			 * Do this in any case as the car routes are required in the setTimes() method. */
+			ArrayList <LinkNetworkRouteImpl> routes = new ArrayList<LinkNetworkRouteImpl>();
+			for (int i=1;i<plan.getPlanElements().size();i=i+2){
+				Route oldRoute = ((LegImpl)(plan.getPlanElements().get(i))).getRoute();
+				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
+			/*	List<Id> l = new ArrayList<Id>();
+				for (int j=0;j<((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++){
+					l.add(((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().get(j));
+				}*/
+				List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
+				r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
+				r.setDistance(oldRoute.getDistance());
+				routes.add(r);
+			}
+			this.routes = routes;
 		}
-		this.routes = routes;
 
-		// meisterk
-		//for (int z=1;z<plan.getPlanElements().size();z+=2) System.out.println("initial leg "+plan.getActLegIndex(plan.getPlanElements().get(z)));
 		this.estimator = this.legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				plan,
 				this.config.getSimLegInterpretation(),
@@ -432,13 +432,14 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 				((LegImpl)al.get(i)).setArrivalTime(time);
 				((LegImpl)al.get(i)).setMode(((LegImpl)(bestSolution.get(i))).getMode());
 
-				Route oldRoute = ((LegImpl)(bestSolution.get(i))).getRoute();
-				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
-				List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
-				r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
-				r.setDistance(oldRoute.getDistance());
-				((LegImpl)al.get(i)).setRoute(r);
-
+				if (!this.modeChoice.equals("none")){
+					Route oldRoute = ((LegImpl)(bestSolution.get(i))).getRoute();
+					LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLinkId(), oldRoute.getEndLinkId());
+					List<Id> l = ((NetworkRoute) oldRoute).getLinkIds();
+					r.setLinkIds(oldRoute.getStartLinkId(), l, oldRoute.getEndLinkId());
+					r.setDistance(oldRoute.getDistance());
+					((LegImpl)al.get(i)).setRoute(r);
+				}
 			}
 		}
 		this.cleanRoutes(basePlan);
@@ -901,7 +902,7 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 					(ActivityImpl)(plan.getPlanElements().get(i+1)),
 					(LegImpl)(plan.getPlanElements().get(i)),
 					false);
-			if (((LegImpl)(plan.getPlanElements().get(i))).getMode()!=TransportMode.car){
+			if (((LegImpl)(plan.getPlanElements().get(i))).getMode()!=TransportMode.car && !this.modeChoice.equals("none")){
 				((LegImpl)(plan.getPlanElements().get(i))).setRoute(this.routes.get((i/2)));
 			}
 			((LegImpl)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
@@ -1035,7 +1036,7 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 					(ActivityImpl)(actslegs.get(i+1)),
 					(LegImpl)(actslegs.get(i)),
 					false);
-			if (((LegImpl)(actslegs.get(i))).getMode()!=TransportMode.car){
+			if (((LegImpl)(actslegs.get(i))).getMode()!=TransportMode.car && !this.modeChoice.equals("none")){
 				((LegImpl)(actslegs.get(i))).setRoute(this.routes.get((i-1)/2));
 			}
 
@@ -1062,7 +1063,7 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 					(ActivityImpl)(actslegs.get(i+1)),
 					(LegImpl)(actslegs.get(i)),
 					false);
-			if (((LegImpl)(actslegs.get(i))).getMode()!=TransportMode.car){
+			if (((LegImpl)(actslegs.get(i))).getMode()!=TransportMode.car && !this.modeChoice.equals("none")){
 				((LegImpl)(actslegs.get(i))).setRoute(this.routes.get((i-1)/2));
 			}
 
@@ -1095,7 +1096,7 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 								(ActivityImpl)(actslegs.get(i+3)),
 								(LegImpl)(actslegs.get(i+2)),
 								false);
-						if (((LegImpl)(actslegs.get(i+2))).getMode()!=TransportMode.car){
+						if (((LegImpl)(actslegs.get(i+2))).getMode()!=TransportMode.car && !this.modeChoice.equals("none")){
 							((LegImpl)(actslegs.get(i+2))).setRoute(this.routes.get((i+1)/2));
 						}
 						((LegImpl)(actslegs.get(i+2))).setArrivalTime(now+travelTime);
@@ -1129,7 +1130,7 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 						(ActivityImpl)(actslegs.get(i+1)),
 						(LegImpl)(actslegs.get(i)),
 						false);
-				if (((LegImpl)(actslegs.get(i))).getMode()!=TransportMode.car){
+				if (((LegImpl)(actslegs.get(i))).getMode()!=TransportMode.car && !this.modeChoice.equals("none")){
 					((LegImpl)(actslegs.get(i))).setRoute(this.routes.get((i-1)/2));
 				}
 				((LegImpl)(actslegs.get(i))).setArrivalTime(now+travelTime);
@@ -1152,7 +1153,7 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 								(ActivityImpl)(actslegs.get(i+3)),
 								(LegImpl)(actslegs.get(i+2)),
 								false);
-						if (((LegImpl)(actslegs.get(i+2))).getMode()!=TransportMode.car){
+						if (((LegImpl)(actslegs.get(i+2))).getMode()!=TransportMode.car && !this.modeChoice.equals("none")){
 							((LegImpl)(actslegs.get(i+2))).setRoute(this.routes.get((i+1)/2));
 						}
 						((LegImpl)(actslegs.get(i+2))).setArrivalTime(now+travelTime);
