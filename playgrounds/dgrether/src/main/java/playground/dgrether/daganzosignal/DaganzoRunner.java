@@ -64,9 +64,9 @@ public class DaganzoRunner {
 	public void runScenario(final String configFile){
 		String conf = null;
 		if (configFile == null) {
-//			conf = DaganzoScenarioGenerator.DAGANZOBASEDIR + "dgconfig.xml";
-			DaganzoScenarioGenerator scgen = new DaganzoScenarioGenerator();
-			conf = scgen.configOut;
+			conf = DaganzoScenarioGenerator.DAGANZOBASEDIR + "dgconfig.xml";
+//			DaganzoScenarioGenerator scgen = new DaganzoScenarioGenerator();
+//			conf = scgen.configOut;
 		}
 		else {
 			conf = configFile;
@@ -74,10 +74,10 @@ public class DaganzoRunner {
 		ScenarioLoader scenarioLoader = new ScenarioLoaderImpl(conf);
 		ScenarioImpl scenario = (ScenarioImpl) scenarioLoader.loadScenario();
 		
-		if (scenario.getConfig().signalSystems().getSignalSystemConfigFile() == null){
-			DaganzoScenarioGenerator scgenerator = new DaganzoScenarioGenerator();
-			scgenerator.createSignalSystemsConfig(scenario);
-		}
+//		if (scenario.getConfig().signalSystems().getSignalSystemConfigFile() == null){
+//			DaganzoScenarioGenerator scgenerator = new DaganzoScenarioGenerator();
+//			scgenerator.createSignalSystemsConfig(scenario);
+//		}
 		
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
@@ -152,7 +152,7 @@ public class DaganzoRunner {
 		c.addControlerListener(new ShutdownListener() {
 			public void notifyShutdown(ShutdownEvent e) {
 				DgCountPerIterationGraph chart = new DgCountPerIterationGraph(e.getControler().getConfig().controler());
-				chart.addCountEventHandler(handler3);
+				chart.addCountEventHandler(handler3, "count on link 3 & 5");
 				chart.addCountEventHandler(handler4);
 				DgChartWriter.writeChart(e.getControler().getControlerIO().getOutputFilename("countPerIteration"), chart.createChart());
 

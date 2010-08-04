@@ -56,7 +56,11 @@ public class DgCountPerIterationGraph {
 	}
 	
 	public void addCountEventHandler(TTInOutflowEventHandler h) {
-		XYSeries series = new XYSeries("count on link " + h.getLinkId(), false, true);
+		this.addCountEventHandler(h, "count on link " + h.getLinkId());
+	}
+	
+	public void addCountEventHandler(TTInOutflowEventHandler h, String seriesTitle){
+		XYSeries series = new XYSeries(seriesTitle, false, true);
 		for (Integer i : h.getCountPerIteration().keySet()){
 			series.add(i, h.getCountPerIteration().get(i));
 		}
