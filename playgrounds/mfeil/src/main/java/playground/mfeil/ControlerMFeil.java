@@ -132,7 +132,7 @@ public class ControlerMFeil extends Controler {
 			}
 			else if (classname.equals("TimeOptimizer")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule timeOptStrategyModule = new TimeOptInitialiser(this);
+				PlanStrategyModule timeOptStrategyModule = new TimeOptimizerInitialiser(this);
 				strategy.addStrategyModule(timeOptStrategyModule);
 			}
 			else if (classname.equals("Recycling")) {
@@ -145,7 +145,7 @@ public class ControlerMFeil extends Controler {
 
 			else if (classname.equals("TimeModeChoicer")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule module = new TmcInitialiser(this);
+				PlanStrategyModule module = new TimeModeChoicerInitialiser(this);
 				strategy.addStrategyModule(module);
 			}
 			else if (classname.equals("LocationChoice")) {

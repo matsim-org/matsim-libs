@@ -20,6 +20,7 @@
 package playground.mfeil;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -30,26 +31,33 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * Initialiser for TimeOptimizer module.
  */
 
-public class TmcInitialiser extends AbstractMultithreadedModule{
+public class TimeOptimizerInitialiser extends AbstractMultithreadedModule{
 	
 	private final Controler							controler;
 	private final DepartureDelayAverageCalculator 	tDepDelayCalc;
+	private final NetworkImpl 						network;
 
 	
-	public TmcInitialiser (Controler controler) {
+	public TimeOptimizerInitialiser (Controler controler) {
 		super(controler.getConfig().global());
-		this.controler = controler;		
-		this.tDepDelayCalc = new DepartureDelayAverageCalculator(
-				controler.getNetwork(),
-				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
+		this.network = controler.getNetwork();
+		this.init(network);
+		this.controler = controler;
+		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network, controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
+	}
+	
+	private void init(final NetworkImpl network) {
+		this.network.connect();
 	}
 
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {		
 
-		PlanAlgorithm timeOptAlgorithm = new TimeModeChoicer (this.controler, this.tDepDelayCalc);
+		//PlanAlgorithm timeOptAlgorithm = new TimeOptimizerPerformanceT (this.controler, this.estimator, this.scorer, this.factory);
+		PlanAlgorithm timeOptAlgorithm = new TimeOptimizer (this.controler, this.tDepDelayCalc);
+
 		return timeOptAlgorithm;
 	}
 }

@@ -29,7 +29,7 @@ public class TimeOptimizerConfigGroup extends Module {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String GROUP_NAME = "planomatX";
+	public static final String GROUP_NAME = "TimeOptimizer";
 
 	/* Name of parameters */
 	private static final String NEIGHBOURHOOD_SIZE = "neighbourhood_size";
@@ -41,7 +41,7 @@ public class TimeOptimizerConfigGroup extends Module {
 	//default values
 	// TODO all "static" to be removed later, only bypassing solution
 	private static String neighbourhood_size = "10";
-	private static String max_iterations = "0";
+	private static String max_iterations = "30";
 	private static String stop_criterion = "5";
 	private static String offset = "900";
 

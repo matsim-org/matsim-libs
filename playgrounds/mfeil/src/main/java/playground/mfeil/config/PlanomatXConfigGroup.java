@@ -29,7 +29,7 @@ public class PlanomatXConfigGroup extends Module {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String GROUP_NAME = "planomatX";
+	public static final String GROUP_NAME = "PlanomatX";
 
 	/* Name of parameters */
 	private static final String NEIGHBOURHOOD_SIZE = "neighbourhood_size";

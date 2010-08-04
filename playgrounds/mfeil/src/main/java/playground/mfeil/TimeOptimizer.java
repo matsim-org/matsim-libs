@@ -107,7 +107,6 @@ public class TimeOptimizer extends TimeModeChoicer implements PlanAlgorithm {
 				}
 				move = this.cleanSchedule(this.minimumTime.get(((ActivityImpl)basePlan.getPlanElements().get(0)).getType()), basePlan);
 				if (move!=0.0){
-					// TODO Check whether allowed?
 					basePlan.setScore(-100000.0);	// Like this, PlanomatX will see that the solution is no proper solution
 					log.warn("No valid initial solution found for person "+basePlan.getPerson().getId()+"!");
 					return;
@@ -125,10 +124,8 @@ public class TimeOptimizer extends TimeModeChoicer implements PlanAlgorithm {
 	}
 		
 	protected void processPlan (PlanImpl basePlan){
-		// TODO Check whether allowed?
 		basePlan.setScore(this.scorer.getScore(basePlan));	
 		
-		/* TODO: just as long as PlanomatXPlan exists. Needs then to be removed!!! */
 		PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
 		plan.copyPlan(basePlan);
 		
@@ -147,28 +144,6 @@ public class TimeOptimizer extends TimeModeChoicer implements PlanAlgorithm {
 		int currentIteration							= 1;
 		int lastImprovement 							= 0;
 		
-		/*
-		String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
-		Counter.timeOptCounter++;
-		PrintStream stream;
-		try {
-			stream = new PrintStream (new File(outputfile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		stream.print(plan.getScore()+"\t");
-		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-		Act act = (Act)plan.getActsLegs().get(z);
-			stream.print(act.getType()+"\t");
-		}
-		stream.println();
-		stream.print("\t");
-		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-			stream.print(((Act)(plan.getActsLegs()).get(z)).getDuration()+"\t");
-		}
-		stream.println();
-		*/
 		
 		/* Copy the plan into all fields of the array neighbourhood */
 		for (int i = 0; i < initialNeighbourhood.length; i++){
@@ -201,8 +176,6 @@ public class TimeOptimizer extends TimeModeChoicer implements PlanAlgorithm {
 		/* Do Tabu Search iterations */
 		for (currentIteration = 2; currentIteration<=MAX_ITERATIONS;currentIteration++){
 			
-	//		stream.println("Iteration "+currentIteration);
-			
 			this.createNeighbourhood((PlanomatXPlan)plan, neighbourhood, score, moves, position);
 			pointer = this.findBestSolution (neighbourhood, score, moves, position);
 			
@@ -230,7 +203,6 @@ public class TimeOptimizer extends TimeModeChoicer implements PlanAlgorithm {
 		
 		
 		/* Update the plan with the final solution */ 		
-	//	stream.println("Selected solution\t"+bestScore);
 		List<? extends PlanElement> al = basePlan.getPlanElements();
 		basePlan.setScore(bestScore);
 		
@@ -424,13 +396,7 @@ public class TimeOptimizer extends TimeModeChoicer implements PlanAlgorithm {
 		double travelTime;
 		for (int i=1;i<=plan.getPlanElements().size()-2;i=i+2){
 			((LegImpl)(plan.getPlanElements().get(i))).setDepartureTime(now);
-//			statement was replaced by the one below
-//			travelTime = this.estimator.getInterpolation(
-//					plan.getPerson().getId(), 
-//					now, (ActivityImpl)(plan.getPlanElements().get(i-1)), 
-//					(ActivityImpl)(plan.getPlanElements().get(i+1)), 
-//					(LegImpl)(plan.getPlanElements().get(i))
-//					);
+
 			travelTime = this.estimator.getLegTravelTimeEstimation(
 					plan.getPerson().getId(), 
 					now, (ActivityImpl)(plan.getPlanElements().get(i-1)), 
@@ -483,16 +449,10 @@ public class TimeOptimizer extends TimeModeChoicer implements PlanAlgorithm {
 		double now = ((LegImpl)(actslegs.get(start+1))).getDepartureTime();
 		int position = 0;	// indicates whether time setting has reached parameter "stop"
 		
-		/* if start < outer (mode choice) */
+		// if start < outer (mode choice) 
 		for (int i=start+1;i<=outer-1;i=i+2){
 			((LegImpl)(actslegs.get(i))).setDepartureTime(now);
-//			statement was replaced by the one below
-//			travelTime = this.estimator.getInterpolation(
-//					plan.getPerson().getId(), 
-//					now, 
-//					(ActivityImpl)(actslegs.get(i-1)), 
-//					(ActivityImpl)(actslegs.get(i+1)), 
-//					(LegImpl)(actslegs.get(i)));
+
 			travelTime = this.estimator.getLegTravelTimeEstimation(
 					plan.getPerson().getId(), 
 					now, 
@@ -505,7 +465,7 @@ public class TimeOptimizer extends TimeModeChoicer implements PlanAlgorithm {
 			now = java.lang.Math.max(now+travelTime+this.minimumTime.get(((ActivityImpl)(actslegs.get(i+1))).getType()), ((ActivityImpl)(actslegs.get(i+1))).getEndTime());
 		}
 		
-		/* standard process */
+		// standard process 
 		for (int i=outer+1;i<=inner-1;i=i+2){
 			if (i==outer+1) {
 				if (outer!=0) {
@@ -514,14 +474,7 @@ public class TimeOptimizer extends TimeModeChoicer implements PlanAlgorithm {
 				else now +=offset;
 			}
 			((LegImpl)(actslegs.get(i))).setDepartureTime(now);
-//			statement was replaced by the one below
-//			travelTime = this.estimator.getInterpolation(
-//					plan.getPerson().getId(), 
-//					now, 
-//					(ActivityImpl)(actslegs.get(i-1)), 
-//					(ActivityImpl)(actslegs.get(i+1)), 
-//					(LegImpl)(actslegs.get(i))
-//					);
+
 			travelTime = this.estimator.getLegTravelTimeEstimation(
 					plan.getPerson().getId(), 
 					now, 
@@ -579,7 +532,7 @@ public class TimeOptimizer extends TimeModeChoicer implements PlanAlgorithm {
 			}
 		}
 		
-		/* if position < stop (mode choice) */
+		// if position < stop (mode choice) 
 		if (position < stop){
 			now = ((LegImpl)(actslegs.get(position+1))).getDepartureTime();
 			for (int i=position+1;i<=stop-1;i=i+2){
@@ -643,7 +596,7 @@ public class TimeOptimizer extends TimeModeChoicer implements PlanAlgorithm {
 		}
 		
 		
-		/* Scoring */
+		// Scoring 
 		plan.setActsLegs(actslegs);
 		return scorer.getScore(plan);
 	}

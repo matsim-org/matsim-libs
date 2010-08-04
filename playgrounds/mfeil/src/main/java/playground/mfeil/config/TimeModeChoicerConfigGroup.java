@@ -30,7 +30,7 @@ public class TimeModeChoicerConfigGroup extends Module {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String GROUP_NAME = "planomatX";
+	public static final String GROUP_NAME = "TimeModeChoicer";
 
 	/* Name of parameters */
 	private static final String POSSIBLE_MODES = "possible_modes";
