@@ -52,7 +52,7 @@ public class GeneralLib {
 
 		return scenario;
 	}
-
+	
 	/*
 	 * Reads the population from the plans file.
 	 */
@@ -69,6 +69,22 @@ public class GeneralLib {
 
 		return sc.getPopulation();
 	}
+	
+	/*
+	 * Reads the network from the network file.
+	 */
+	public static NetworkLayer readNetwork(String networkFile) {
+		ScenarioImpl sc = new ScenarioImpl();
+
+		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
+
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
+
+		sl.loadScenario();
+
+		return sc.getNetwork();
+	}
+	
 
 	/*
 	 * Write the population to the specified file.
@@ -86,6 +102,9 @@ public class GeneralLib {
 		return facilities;
 	}
 
+	
+	
+	
 	/*
 	 * Write the facilities to the specified file.
 	 */

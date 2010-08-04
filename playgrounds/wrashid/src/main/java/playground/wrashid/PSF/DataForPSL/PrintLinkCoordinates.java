@@ -17,19 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PHEV.Triangle;
+package playground.wrashid.PSF.DataForPSL;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+
+import playground.wrashid.lib.GeneralLib;
 
 public class PrintLinkCoordinates {
 
 	public static void main(String[] args) throws Exception {
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
-		sl.loadNetwork();
+		NetworkLayer network = GeneralLib.readNetwork("C:/data/workspace/playgrounds/mzilske/inputs/schweiz/zurich-switzerland.xml.gz");
 
 		System.out.println("linkId\tx\ty");
-		for (Link link : sl.getScenario().getNetwork().getLinks().values()){
+		for (Link link : network.getLinks().values()){
 			System.out.println(link.getId().toString() +"\t"+ getXCoordinate(link) +"\t"+  getYCoordinate(link));
 		}
 
