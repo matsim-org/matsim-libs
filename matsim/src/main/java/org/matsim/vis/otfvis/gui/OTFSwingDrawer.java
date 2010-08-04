@@ -226,6 +226,7 @@ public class OTFSwingDrawer extends JComponent {
 	 * Drawer class for drawing simple quads
 	 */
 	public static class SimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQuadReceiver{
+		private final boolean drawStreetsAsLines = false;
 		protected final Point2D.Float[] quad = new Point2D.Float[4];
 		protected String id = "noId";
 		private float oldResizer = 1;
@@ -265,22 +266,26 @@ public class OTFSwingDrawer extends JComponent {
 
 		@Override
 		public void onDraw(Graphics2D display) {
-			Polygon poly = new Polygon();
-			
-			float resizer = (float) ((2*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth())/(1*linkWidth) + 0.5);
-			quad[2].x = resizer/this.oldResizer * (quad[2].x - quad[0].x) + quad[0].x;
-			quad[2].y = resizer/this.oldResizer * (quad[2].y - quad[0].y) + quad[0].y;
-			quad[3].x = resizer/this.oldResizer * (quad[3].x - quad[1].x) + quad[1].x;
-			quad[3].y = resizer/this.oldResizer * (quad[3].y - quad[1].y) + quad[1].y;
-			this.oldResizer=resizer;
-			
-			poly.addPoint((int)(quad[0].x), (int)(quad[0].y));
-			poly.addPoint((int)(quad[1].x), (int)(quad[1].y));
-			poly.addPoint((int)(quad[3].x), (int)(quad[3].y));
-			poly.addPoint((int)(quad[2].x), (int)(quad[2].y));
-			display.setColor(netColor);
-			display.fill(poly);
-			
+			if (drawStreetsAsLines){
+				display.setColor(Color.black);
+				display.drawLine((int)quad[0].x, (int)quad[0].y, (int)quad[1].x, (int)quad[1].y);
+			} else {
+				Polygon poly = new Polygon();
+				float resizer = (float) ((2*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth())/(1*linkWidth) + 0.5);
+				quad[2].x = resizer/this.oldResizer * (quad[2].x - quad[0].x) + quad[0].x;
+				quad[2].y = resizer/this.oldResizer * (quad[2].y - quad[0].y) + quad[0].y;
+				quad[3].x = resizer/this.oldResizer * (quad[3].x - quad[1].x) + quad[1].x;
+				quad[3].y = resizer/this.oldResizer * (quad[3].y - quad[1].y) + quad[1].y;
+				this.oldResizer=resizer;
+				
+				poly.addPoint((int)(quad[0].x), (int)(quad[0].y));
+				poly.addPoint((int)(quad[1].x), (int)(quad[1].y));
+				poly.addPoint((int)(quad[3].x), (int)(quad[3].y));
+				poly.addPoint((int)(quad[2].x), (int)(quad[2].y));
+				display.setColor(netColor);
+				display.fill(poly);
+			}
+
 			
 			// Show LinkIds
 			if (OTFClientControl.getInstance().getOTFVisConfig().drawLinkIds()){
