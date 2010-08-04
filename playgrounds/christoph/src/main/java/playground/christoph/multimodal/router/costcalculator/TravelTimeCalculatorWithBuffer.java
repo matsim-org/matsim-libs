@@ -20,12 +20,14 @@
 
 package playground.christoph.multimodal.router.costcalculator;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -33,14 +35,21 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
+import playground.christoph.multimodal.mobsim.MultiModalControler;
+
 public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator implements AgentDepartureEventHandler {
 
+	private static final Logger log = Logger.getLogger(MultiModalControler.class);
+	
 	private Map<Id, double[]> bufferedTravelTimes;
 	private Set<Id> nonCarAgents = new HashSet<Id>();
 	
@@ -50,13 +59,39 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 		
 		initBuffer(network);
 	}
-
+	
 	public TravelTimeCalculatorWithBuffer(Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		super(network, ttconfigGroup);
 		
 		initBuffer(network);
 	}
+	
+	/*
+	 * Initialize TravelTimes by using an EventsFile from a
+	 * previous run.
+	 */
+	public void initTravelTimes(String eventsFile) {
+				
+		if (eventsFile == null || !new File(eventsFile).exists()) {
+			log.warn("No valid EventsFile - using free speed travel times instead.");
+			return;
+		} else if (!eventsFile.toLowerCase().endsWith("xml.gz") && !eventsFile.toLowerCase().endsWith(".xml")) {
+			log.warn("EventsFile has to be in xml Format - .txt EventsFiles do not contain the TransportMode of a Leg.");
+			return;
+		}
 		
+		// We use a new EventsManager where we only register the TravelTimeCalculator.
+		EventsManager eventsManager = new EventsManagerImpl();
+		eventsManager.addHandler(this);
+		
+		log.info("Processing events file to get initial travel times...");
+		EventsReaderTXTv1 reader = new EventsReaderTXTv1(eventsManager);
+		reader.readFile(eventsFile);
+		
+		eventsManager.removeHandler(this);
+		eventsManager = null;
+	}
+	
 	/*
 	 * Initially use FreeSpeedTravelTimes
 	 */

@@ -162,7 +162,7 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 			rideTravelTimeCost.setTravelTime(bufferedTravelTime);
 		}
 		
-		rideRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, ptTravelTimeCost, ptTravelTimeCost);
+		rideRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, rideTravelTimeCost, rideTravelTimeCost);
 		
 		/*
 		 * We assume ride trips are possible on every road that can be used by cars.

@@ -128,6 +128,12 @@ public class EvacuationControler extends MultiModalControler {
 	 */
 	protected int numReplanningThreads = 6;
 
+	/*
+	 * The EventsFile which is used to get the initial TravelTimes for the
+	 * TravelTimeCalculator.
+	 */
+	protected String initialEventsFile = "../../matsim/mysimulations/multimodal/input_10pct_zrhCutC/events_initial_traveltimes.txt.gz";
+	
 	protected TravelTime travelTime;
 	
 	protected ParallelInitialReplanner parallelInitialReplanner;
@@ -201,6 +207,8 @@ public class EvacuationControler extends MultiModalControler {
 		// iterative
 		if (doIterations) {
 			travelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) this.getTravelTimeCalculator());
+			
+			((TravelTimeCalculatorWithBuffer) this.getTravelTimeCalculator()).initTravelTimes(initialEventsFile);
 		}
 		// within day
 		else {	

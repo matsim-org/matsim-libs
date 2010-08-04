@@ -42,6 +42,7 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 
 		if (leg.getMode().equals(TransportMode.walk) || 
 			leg.getMode().equals(TransportMode.bike) ||
+			leg.getMode().equals(TransportMode.ride) ||
 			leg.getMode().equals(TransportMode.pt)) {
 			if ( personAgent instanceof PersonDriverAgent ) {
 				handleMultiModalDeparture(now, (PersonDriverAgent)personAgent, linkId, leg);
@@ -54,8 +55,8 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 		return false;
 	}
 	
-	private void handleMultiModalDeparture(double now, PersonDriverAgent personAgent, Id linkId, Leg leg)
-	{
+	private void handleMultiModalDeparture(double now, PersonDriverAgent personAgent, Id linkId, Leg leg) {
+		
 		Route route = leg.getRoute();
 		MultiModalQLinkImpl qLink = (MultiModalQLinkImpl) qSim.getQNetwork().getQLink(linkId);
 		

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.ActivityImpl;
@@ -69,7 +70,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		
 		// If we don't have a current Activity.
 		if (currentActivity == null) return false;
-		
+				
 		/*
 		 * If the agent is already at the end of his scheduled plan then
 		 * the simulation counter has been decreased by one. We re-enable the
@@ -79,10 +80,14 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		
 		// Set the end time of the current activity to the current time.
 		currentActivity.setEndTime(this.time);
+
+		// get the index of the currently performed activity in the selected plan
+		int currentActivityIndex = selectedPlan.getActLegIndex(currentActivity);
+
+		// identify the TransportMode for the rescueLeg
+		String transportMode = identifyTransportMode(currentActivityIndex, selectedPlan);
 		
 		// Remove all legs and activities after the current activity.
-		int currentActivityIndex = selectedPlan.getActLegIndex(currentActivity);
-		
 		while (selectedPlan.getPlanElements().size() - 1 > currentActivityIndex) {
 			selectedPlan.removeActivity(selectedPlan.getPlanElements().size() - 1);
 		}
@@ -101,7 +106,8 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		((ActivityImpl)rescueActivity).setCoord(rescueCoord);
 		
 		// by default we use a car...
-		Leg legToRescue = factory.createLeg(TransportMode.car);
+//		Leg legToRescue = factory.createLeg(TransportMode.car);
+		Leg legToRescue = factory.createLeg(transportMode);
 			
 		// add new activity
 		selectedPlan.insertLegAct(selectedPlan.getActLegIndex(currentActivity) + 1, legToRescue, rescueActivity);
@@ -118,6 +124,44 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		return true;
 	}
 
+	/*
+	 * By default we try to use a car. We can do this, if the previous or the next 
+	 * Leg are performed with a car.
+	 * The order is as following:
+	 * car is preferred to ride is preferred to pt is preferred to bike if preferred to walk 
+	 */
+	private String identifyTransportMode(int currentActivityIndex, Plan selectedPlan) {
+		
+		boolean hasCar = false;
+		boolean hasBike = false;
+		boolean hasPt = false;
+		boolean hasRide = false;
+		
+		if (currentActivityIndex > 0) {
+			Leg previousLeg = (Leg) selectedPlan.getPlanElements().get(currentActivityIndex - 1);
+			String transportMode = previousLeg.getMode();
+			if (transportMode.equals(TransportMode.car)) hasCar = true;
+			else if (transportMode.equals(TransportMode.bike)) hasBike = true;
+			else if (transportMode.equals(TransportMode.pt)) hasPt = true;
+			else if (transportMode.equals(TransportMode.ride)) hasRide = true;
+		}
+		
+		if (currentActivityIndex + 1 < selectedPlan.getPlanElements().size()) {
+			Leg nextLeg = (Leg) selectedPlan.getPlanElements().get(currentActivityIndex + 1);
+			String transportMode = nextLeg.getMode();
+			if (transportMode.equals(TransportMode.car)) hasCar = true;
+			else if (transportMode.equals(TransportMode.bike)) hasBike = true;
+			else if (transportMode.equals(TransportMode.pt)) hasPt = true;
+			else if (transportMode.equals(TransportMode.ride)) hasRide = true;
+		}
+		
+		if (hasCar) return TransportMode.car;
+		else if (hasRide) return TransportMode.ride;
+		else if (hasPt) return TransportMode.pt;
+		else if (hasBike) return TransportMode.bike;
+		else return TransportMode.walk;
+	}
+	
 	@Override
 	public EndActivityAndEvacuateReplanner clone() {
 		EndActivityAndEvacuateReplanner clone = new EndActivityAndEvacuateReplanner(this.id, this.scenario);
