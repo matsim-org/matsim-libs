@@ -184,8 +184,191 @@ public class PhDControlerTest extends MatsimTestCase {
 
 	}
 	
-	public void xtestImprovePtTravelTime() {
-		fail("Not yet implemented.");
+	private void configurePtCostVariation(double ptSpeedFactor, double travelingPt) {
+
+		this.config.planomat().setPossibleModes("car,pt");
+		this.config.planomat().setJgapMaxGenerations(10);
+		
+		this.config.plansCalcRoute().setPtSpeedFactor(ptSpeedFactor);
+		this.config.charyparNagelScoring().setTravelingPt(travelingPt);
+		
+		this.config.plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarPt/expected_plans.xml.gz");
+
+		this.config.strategy().addParam("ModuleProbability_1", "0.8");
+		this.config.strategy().addParam("Module_2", "Planomat");
+		this.config.strategy().addParam("ModuleProbability_2", "0.1");
+		this.config.strategy().addParam("Module_3", "ReRoute");
+		this.config.strategy().addParam("ModuleProbability_3", "0.1");
+
+	}
+	
+	public void testPtSpeedFactor10() {
+
+		this.configurePtCostVariation(1.0, this.config.charyparNagelScoring().getTravelingPt());
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 106.83535858516643);
+		expectedPlanScores.put(new IdImpl(1072), 79.86540409434511);
+		expectedPlanScores.put(new IdImpl(947), 105.42101834952176);
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testPtSpeedFactor11() {
+
+		this.configurePtCostVariation(1.1, this.config.charyparNagelScoring().getTravelingPt());
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 104.19682933444355);
+		expectedPlanScores.put(new IdImpl(1072), 105.0695479783633);
+		expectedPlanScores.put(new IdImpl(947), 107.13014696303627);
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testPtSpeedFactor12() {
+
+		this.configurePtCostVariation(1.2, this.config.charyparNagelScoring().getTravelingPt());
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 103.3233776257545);
+		expectedPlanScores.put(new IdImpl(1072), 105.04246369984388);
+		expectedPlanScores.put(new IdImpl(947), 92.624537992099);
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testPtSpeedFactor13() {
+
+		this.configurePtCostVariation(1.3, this.config.charyparNagelScoring().getTravelingPt());
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 87.57753546446183);
+		expectedPlanScores.put(new IdImpl(1072), 104.26443813631997);
+		expectedPlanScores.put(new IdImpl(947), 104.63519690371794);
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testPtSpeedFactor14() {
+
+		this.configurePtCostVariation(1.4, this.config.charyparNagelScoring().getTravelingPt());
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 83.03024603384561);
+		expectedPlanScores.put(new IdImpl(1072), 105.0423906792287);
+		expectedPlanScores.put(new IdImpl(947), 107.69313072553115);
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testPtSpeedFactor15() {
+
+		this.configurePtCostVariation(1.5, this.config.charyparNagelScoring().getTravelingPt());
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 106.47184583314439);
+		expectedPlanScores.put(new IdImpl(1072), null);
+		expectedPlanScores.put(new IdImpl(947), 105.37741325732861);
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testTravelingPt0() {
+		
+		this.configurePtCostVariation(1.5, 0.0);
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 111.35534110589401);
+		expectedPlanScores.put(new IdImpl(1072), 108.37254712986397);
+		expectedPlanScores.put(new IdImpl(947), 108.68190268803976);
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testTravelingPtMinus1() {
+		
+		this.configurePtCostVariation(1.5, -1.0);
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 109.79505713065271);
+		expectedPlanScores.put(new IdImpl(1072), 106.76339898557961);
+		expectedPlanScores.put(new IdImpl(947), 107.151875323949);
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testTravelingPtMinus2() {
+		
+		this.configurePtCostVariation(1.5, -2.0);
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 98.92828146624726);
+		expectedPlanScores.put(new IdImpl(1072), 105.66601296327353);
+		expectedPlanScores.put(new IdImpl(947), 105.85294455886937);
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testTravelingPtMinus3() {
+		
+		this.configurePtCostVariation(1.5, -3.0);
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 106.60587176607606);
+		expectedPlanScores.put(new IdImpl(1072), 104.26367086471274);
+		expectedPlanScores.put(new IdImpl(947), 105.44081926265083);
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testTravelingPtMinus4() {
+		
+		this.configurePtCostVariation(1.5, -4.0);
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 106.59517916647772);
+		expectedPlanScores.put(new IdImpl(1072), 103.92248197107142);
+		expectedPlanScores.put(new IdImpl(947), 105.4108236832208);
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testTravelingPtMinus5() {
+		
+		this.configurePtCostVariation(1.5, -5.0);
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 94.69320800929532);
+		expectedPlanScores.put(new IdImpl(1072), 101.4853713320467);
+		expectedPlanScores.put(new IdImpl(947), 101.75631976839345);
+		this.runATest(expectedPlanScores);
+
+	}
+	
+	public void testTravelingPtMinus6() {
+		
+		this.configurePtCostVariation(1.5, -6.0);
+		
+		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
+		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
+		expectedPlanScores.put(new IdImpl(1033), 106.47184583314439);
+		expectedPlanScores.put(new IdImpl(1072), null);
+		expectedPlanScores.put(new IdImpl(947), 105.37741325732861101);
+		this.runATest(expectedPlanScores);
+
 	}
 	
 	public void xtestUpgradeRouteToHighway() {
@@ -193,14 +376,6 @@ public class PhDControlerTest extends MatsimTestCase {
 	}
 	
 	public void xtestIntroduceTollOnHighway() {
-		fail("Not yet implemented.");
-	}
-	
-	public void xtestRealWorldFeatures() {
-		fail("Not yet implemented.");
-	}
-	
-	public void xtestVaryLeisureOpeningTimes() {
 		fail("Not yet implemented.");
 	}
 	
