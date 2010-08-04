@@ -47,7 +47,6 @@ import org.matsim.locationchoice.LocationChoice;
 
 import playground.mfeil.MDSAM.ActivityTypeFinder;
 import playground.mfeil.MDSAM.PlansConstructor;
-import playground.mfeil.MDSAM.PlansEvaluator;
 import playground.mfeil.attributes.AgentsAttributesAdder;
 import playground.mfeil.analysis.TravelStats;
 
@@ -136,7 +135,6 @@ public class ControlerMFeil extends Controler {
 				PlanStrategyModule module = new RecyclingModule(this, finder);
 				strategy.addStrategyModule(module);
 			}
-
 			else if (classname.equals("TimeModeChoicer")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PlanStrategyModule module = new TimeModeChoicerInitialiser(this);
@@ -152,11 +150,7 @@ public class ControlerMFeil extends Controler {
 		    	strategy = new PlanStrategy(new KeepSelected());
 				strategy.addStrategyModule(new PlansConstructor(this));
 			}
-			else if (classname.equals("PlansEvaluator")) {
-		    	strategy = new PlanStrategy(new KeepSelected());
-				strategy.addStrategyModule(new PlansEvaluator(this));
-			}
-
+		
 			manager.addStrategy(strategy, rate);
 		}
 

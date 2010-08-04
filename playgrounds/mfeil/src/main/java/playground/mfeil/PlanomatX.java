@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -52,6 +51,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mfeil.MDSAM.ActivityTypeFinder;
 import playground.mfeil.config.PlanomatXConfigGroup;
+import playground.mfeil.config.TimeModeChoicerConfigGroup;
 
 
 
@@ -75,11 +75,9 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	private final String					finalOpt;
 	private final ActivityTypeFinder 		finder;
 	private final double					LC_MINIMUM_TIME = 1.0;
-	private final int 						TMC_maxIterations;
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
-	private final Knowledges knowledges;
-	private final Network network;
-	private		 ControlerIO				controlerIO;
+	private final Knowledges 				knowledges;
+	private	ControlerIO						controlerIO;
 	private boolean 						printing = false;
 	private PrintStream 					stream;
 
@@ -92,7 +90,6 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	public PlanomatX (Controler controler, LocationMutatorwChoiceSet locator, DepartureDelayAverageCalculator tDepDelayCalc, ActivityTypeFinder finder){
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
-		this.network = controler.getNetwork();
 		this.controlerIO			= controler.getControlerIO();
 		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
 
@@ -122,7 +119,6 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		
 		this.locator				= locator;
 		this.knowledges 			= (controler.getScenario()).getKnowledges();
-		this.TMC_maxIterations 		= Integer.parseInt(PlanomatXConfigGroup.getTMCmaxIterations());
 	}
 
 
@@ -191,7 +187,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			}
 		}
 		this.locator.run(plan);
-		if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
+		if (PlanomatXConfigGroup.getTimer().equals("Planomat") || (PlanomatXConfigGroup.getTimer().equals("TimeModeChoicer") && TimeModeChoicerConfigGroup.getModeChoice().equals("none"))){
 			for (int z=1;z<plan.getPlanElements().size();z+=2){
 				((LegImpl)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
 			}
@@ -220,7 +216,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			}
 
 			/* Routing*/
-			if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
+			if (PlanomatXConfigGroup.getTimer().equals("Planomat") || (PlanomatXConfigGroup.getTimer().equals("TimeModeChoicer") && TimeModeChoicerConfigGroup.getModeChoice().equals("none"))){
 				for (int z=1;z<plan.getPlanElements().size();z+=2){
 					((LegImpl)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
 				}
