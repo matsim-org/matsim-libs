@@ -151,8 +151,7 @@ public class DaganzoScenarioGenerator {
 
 	public static final String runId = "1190";//"";
 	
-	private static final boolean writerClusterFiles = true;
-
+	private static final boolean writerClusterFiles = false;
 	
 	private boolean doOtfOutput = true;
 	
