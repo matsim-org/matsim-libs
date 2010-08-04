@@ -529,8 +529,8 @@ public class GeneralLib {
 	}
 	
 	
-	public static void convertMATSimNetworkToKmz(String networkFile, String outputKmzFileName) throws IOException {
-		Network network = readNetwork(networkFile);
+	public static void convertMATSimNetworkToKmz(String matsimNetworkFileName, String outputKmzFileName) throws IOException {
+		Network network = readNetwork(matsimNetworkFileName);
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
 		KMZWriter kmzWriter = new KMZWriter(outputKmzFileName);
