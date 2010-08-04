@@ -540,8 +540,8 @@ public class GeneralLib {
 		mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
 		
 		//KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network, new AtlantisToWGS84(), kmzWriter, mainDoc);
-		KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network,new CH1903LV03toWGS84(), kmzWriter, mainDoc);
-		
+		//KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network,new CH1903LV03toWGS84(), kmzWriter, mainDoc);
+		KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network,TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S, TransformationFactory.WGS84), kmzWriter, mainDoc);
 		
 		mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(kmlNetworkWriter.getNetworkFolder()));
 		
