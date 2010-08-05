@@ -37,57 +37,7 @@
 	</module>
 	
 
-	<module name="planCalcScore">
-		<param name="learningRate" value="1.0" />
-		<param name="BrainExpBeta" value="2.0" />
 
-		<param name="lateArrival" value="-18" />
-		<param name="earlyDeparture" value="-0" />
-		<param name="performing" value="+6" />
-		<param name="traveling" value="-6" />
-		<param name="waiting" value="-0" />
-		
-		<param name="activityType_0"            value="home" /> <!-- home -->
-		<param name="activityPriority_0"        value="1" />
-		<param name="activityTypicalDuration_0" value="12:00:00" />
-		<param name="activityMinimalDuration_0" value="08:00:00" />
-	
-		<param name="activityType_1"            value="work" /> <!-- work -->
-		<param name="activityPriority_1"        value="1" />
-		<param name="activityTypicalDuration_1" value="08:00:00" />
-		<param name="activityMinimalDuration_1" value="06:00:00" />
-		<param name="activityOpeningTime_1"     value="08:00:00" />
-		<param name="activityLatestStartTime_1" value="10:00:00" />
-		<param name="activityEarliestEndTime_1" value="14:00:00" />
-		<param name="activityClosingTime_1"     value="20:00:00" />
-		
-		<param name="activityType_2"            value="leisure" /> <!-- leisure -->
-		<param name="activityPriority_2"        value="1" />
-		<param name="activityTypicalDuration_2" value="03:00:00" />
-		<param name="activityMinimalDuration_2" value="02:00:00" />
-		<param name="activityOpeningTime_2"     value="16:00:00" />
-		<param name="activityLatestStartTime_2" value="" />
-		<param name="activityEarliestEndTime_2" value="" />
-		<param name="activityClosingTime_2"     value="23:00:00" />
-				
-		<param name="activityType_3"            value="shopping" /> <!-- shopping -->
-		<param name="activityPriority_3"        value="1" />
-		<param name="activityTypicalDuration_3" value="02:00:00" />
-		<param name="activityMinimalDuration_3" value="01:00:00" />
-		<param name="activityOpeningTime_3"     value="08:00:00" />
-		<param name="activityLatestStartTime_3" value="" />
-		<param name="activityEarliestEndTime_3" value="" />
-		<param name="activityClosingTime_3"     value="18:00:00" />
-		
-		<param name="activityType_4"            value="shopping_test" /> <!-- shopping -->
-		<param name="activityPriority_4"        value="1" />
-		<param name="activityTypicalDuration_4" value="02:00:00" />
-		<param name="activityMinimalDuration_4" value="01:00:00" />
-		<param name="activityOpeningTime_4"     value="10:00:00" />
-		<param name="activityLatestStartTime_4" value="" />
-		<param name="activityEarliestEndTime_4" value="" />
-		<param name="activityClosingTime_4"     value="18:00:00" />
-	</module>
 
 	
 	<module name="strategy">
