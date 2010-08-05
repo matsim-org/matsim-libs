@@ -161,7 +161,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		List<String> actTypes							= this.finder.getActTypes(plan.getPerson());
 
 		if (this.printing){
-			String outputfile = this.controlerIO.getOutputFilename(plan.getPerson().getId()+"_detailed_log.xls");
+			String outputfile = this.controlerIO.getOutputFilename(plan.getPerson().getId()+"_"+Counter.counter+"_detailed_log.xls");
 			Counter.counter++;
 			try {
 				this.stream = new PrintStream (new File(outputfile));

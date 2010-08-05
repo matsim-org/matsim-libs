@@ -61,11 +61,10 @@ import playground.mfeil.MDSAM.ActivityTypeFinder;
 public class RecyclingModule implements PlanStrategyModule{
 
 	private  ArrayList<Plan> []						list;
-	private final AbstractMultithreadedModule 		schedulingModule;
-	private final AbstractMultithreadedModule		assignmentModule;
+	private final AbstractMultithreadedModule 		schedulingModule,
+													assignmentModule;
 	private final LocationMutatorwChoiceSet 		locator;
 	private final PlanScorer						scorer;
-	private final int								noOfSchedulingAgents;
 	private final Controler							controler;
 	private OptimizedAgents 						agents;
 	private LinkedList<String>						nonassignedAgents;
@@ -74,13 +73,23 @@ public class RecyclingModule implements PlanStrategyModule{
 	public static PrintStream 						assignment;
 	private final Knowledges 						knowledges;
 	private final ActivityTypeFinder 				finder;
-
-	private final int iterationsFirstTime, iterationsFurtherTimes, noOfAssignmentAgents, noOfSoftCoefficients;
-	protected final DistanceCoefficients 				coefficients;
+	private final int 								iterationsFirstTime, 
+													iterationsFurtherTimes, 
+													noOfIndividualAgents, 
+													noOfRecycledAgents, 
+													noOfSoftCoefficients;
+	protected final DistanceCoefficients 			coefficients;
 	private ArrayList<double[]> 					tabuList;
-	private final String primActsDistance, homeLocationDistance, municipality, sex, age, license, car_avail, employed;
-	private final ArrayList<String> 				softCoef;
-	private final ArrayList<String> 				allCoef;
+	private final String 							primActsDistance, 
+													homeLocationDistance, 
+													municipality, 
+													gender, 
+													age, 
+													license, 
+													car_avail, 
+													employed;
+	private final ArrayList<String> 				softCoef,
+													allCoef;
 	private ArrayList<Integer> 						list1Pointer;
 	private static final Logger 					log = Logger.getLogger(RecyclingModule.class);
 
@@ -96,15 +105,15 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.tDepDelayCalc 			= new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 		this.nonassignedAgents 		= new LinkedList<String>();
-		this.noOfSchedulingAgents	= 5;
-		this.noOfAssignmentAgents	= 10;
+		this.noOfIndividualAgents	= 5;
+		this.noOfRecycledAgents		= 10;
 		this.finder					= finder;
 		this.iterationsFirstTime 	= 20;
 		this.iterationsFurtherTimes = 5;
 		this.primActsDistance 		= "yes";
 		this.homeLocationDistance 	= "yes";
 		this.municipality			= "no";
-		this.sex 					= "no";
+		this.gender 				= "no";
 		this.age 					= "yes";
 		this.license 				= "no";
 		this.car_avail 				= "no";
@@ -165,7 +174,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		Statistics.noMunicipalityAssignment=false;
 
 		/* Individual optimization of agents */
-		for (int i=0;i<this.noOfSchedulingAgents;i++) {
+		for (int i=0;i<this.noOfIndividualAgents;i++) {
 			int pos = (int)(MatsimRandom.getRandom().nextDouble()*this.list[1].size());
 			list[0].add(list[1].get(pos));
 			schedulingModule.handlePlan(list[1].get(pos));
@@ -207,7 +216,7 @@ public class RecyclingModule implements PlanStrategyModule{
 				assignment.print(((ActivityImpl)(list[0].get(i).getPlanElements().get(j))).getType()+"\t");
 			}
 			assignment.println();
-			if (i==this.noOfSchedulingAgents-1) {
+			if (i==this.noOfIndividualAgents-1) {
 				assignment.println();
 				assignment.println("Individual optimization of non-assigend agents in metric detection phase");
 			}
@@ -216,7 +225,7 @@ public class RecyclingModule implements PlanStrategyModule{
 
 		/* Assign remaining agents */
 		assignmentModule.prepareReplanning();
-		for (int i=this.noOfAssignmentAgents;i<list[1].size();i++){
+		for (int i=this.noOfRecycledAgents;i<list[1].size();i++){
 			assignmentModule.handlePlan(list[1].get(i));
 		}
 		
@@ -431,11 +440,11 @@ public class RecyclingModule implements PlanStrategyModule{
 	private double calculate (){
 		double score = 0;
 		this.assignmentModule.prepareReplanning();
-		for (int j=0;j<java.lang.Math.min(this.noOfAssignmentAgents, list[1].size());j++){
+		for (int j=0;j<java.lang.Math.min(this.noOfRecycledAgents, list[1].size());j++){
 			assignmentModule.handlePlan(list[1].get(j));
 		}
 		assignmentModule.finishReplanning();
-		for (int j=0;j<java.lang.Math.min(this.noOfAssignmentAgents, list[1].size());j++){
+		for (int j=0;j<java.lang.Math.min(this.noOfRecycledAgents, list[1].size());j++){
 			score += this.list[1].get(j).getScore().doubleValue();
 		}
 		return score;
@@ -506,7 +515,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		if (this.municipality.equals("yes")) {
 			allCoef.add("municipality");
 		}
-		if (this.sex.equals("yes")) {
+		if (this.gender.equals("yes")) {
 			allCoef.add("sex");
 		}
 		if (this.age.equals("yes")) {
