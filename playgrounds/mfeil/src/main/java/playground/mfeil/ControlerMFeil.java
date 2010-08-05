@@ -53,7 +53,8 @@ import playground.mfeil.analysis.TravelStats;
 
 /**
  * @author Matthias Feil
- * Adjusting the Controler in order to call the PlanomatX. Replaces also the StrategyManagerConfigLoader.
+ * Adjusting Controler in order to call PlanomatX, TimeModeChoicer and ScheduleRecycling. 
+ * Replaces also StrategyManagerConfigLoader.
  */
 public class ControlerMFeil extends Controler {
 	
@@ -74,26 +75,9 @@ public class ControlerMFeil extends Controler {
 	@Override
 	protected void loadData() {
 		super.loadData();
-//		if (!this.scenarioLoaded) {
-//			this.loader = new ScenarioLoaderImpl(this.scenarioData);
-//			this.loader.loadScenario();
-//			this.network = loadNetwork();
-//			this.population = loadPopulation();
-//			this.scenarioLoaded = true;
-
-			// loading income data!
-			new AgentsAttributesAdder().loadIncomeData(this.scenarioData);
-
-//			if (this.getScenario().getWorld() != null) {
-//				new WorldCheck().run(this.getScenario().getWorld());
-//			}
-//		}
+		new AgentsAttributesAdder().loadIncomeData(this.scenarioData);
 	}
 
-
-		/*
-		 * @return A fully initialized StrategyManager for the plans replanning.
-		 */
 
 	@Override
 	protected StrategyManager loadStrategyManager() {
@@ -111,7 +95,6 @@ public class ControlerMFeil extends Controler {
 
 			if (classname.equals("PlanomatX")) {
 				ActivityTypeFinder finder = new ActivityTypeFinder (this);
-				//finder.run(this.getFacilities());
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PlanStrategyModule planomatXStrategyModule = new PlanomatXInitialiser(this, finder);
 				strategy.addStrategyModule(planomatXStrategyModule);
@@ -160,9 +143,8 @@ public class ControlerMFeil extends Controler {
 
 	@Override
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		//return new PlanomatXScoringFunctionFactory(this.getConfig().charyparNagelScoring());
 		//return new JohScoringFunctionFactory();
-		return new JohScoringFunctionEstimationFactory(this.network);
+		return new EstimatedJohScoringFunctionFactory(this.network);
 	}
 	
 	@Override

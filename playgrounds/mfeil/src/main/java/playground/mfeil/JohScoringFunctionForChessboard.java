@@ -41,12 +41,12 @@ import org.matsim.core.utils.misc.Time;
  *  Measuring and Predicting Adaptation in Multidimensional Activity-Travel Patterns,<br>
  *  Bouwstenen 79, Eindhoven University Press, Eindhoven.</p>
  * </blockquote>
- *
+ * Holds parameters as used for chessboard scenario
  *
  * @author mfeil
  */
 
-public class JohScoringFunction implements ScoringFunction {
+public class JohScoringFunctionForChessboard implements ScoringFunction {
 
 	protected final Person person;
 	protected final Plan plan;
@@ -73,49 +73,47 @@ public class JohScoringFunction implements ScoringFunction {
 	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
 	private static boolean scoreActs = true;
 
-	private static final Logger log = Logger.getLogger(JohScoringFunction.class);
+	private static final Logger log = Logger.getLogger(JohScoringFunctionForChessboard.class);
 	
 	private static final TreeMap<String, JohActUtilityParameters> utilParams = new TreeMap<String, JohActUtilityParameters>();
-	private static double marginalUtilityOfWaiting = -6; //war -6
-	private static double marginalUtilityOfLateArrival = -18; //war -18
-	private static double marginalUtilityOfEarlyDeparture = -0; // war -0
-	private static double marginalUtilityOfTraveling = -6; // war fuer alle -6
+	private static double marginalUtilityOfWaiting = -6; 
+	private static double marginalUtilityOfLateArrival = -18; 
+	private static double marginalUtilityOfEarlyDeparture = -0; 
+	private static double marginalUtilityOfTraveling = -6; 
 	private static double marginalUtilityOfTravelingPT = -6; 
 	private static double marginalUtilityOfTravelingWalk = -6;
-	private static double marginalUtilityOfDistance = 0; // war 0
-	
-	//private static double repeat = 0.332;
+	private static double marginalUtilityOfDistance = 0; 
 	
 	private static final double uMin_home = 0;
 	private static final double uMin_work = 0;
 	private static final double uMin_shopping = 0;
 	private static final double uMin_leisure = 0;
-	private static final double uMax_home = 60; //60
-	private static final double uMax_work= 55;  //55
-	private static final double uMax_shopping = 12; //12
-	private static final double uMax_leisure = 35;  //35
-	private static final double alpha_home = 6;//6
-	private static final double alpha_work = 4;//4
-	private static final double alpha_shopping = 1;//1
-	private static final double alpha_leisure = 2;//2
-	private static final double beta_home = 1.2;//1.2
+	private static final double uMax_home = 60; 
+	private static final double uMax_work= 55;  
+	private static final double uMax_shopping = 12;
+	private static final double uMax_leisure = 35; 
+	private static final double alpha_home = 6;
+	private static final double alpha_work = 4;
+	private static final double alpha_shopping = 1;
+	private static final double alpha_leisure = 2;
+	private static final double beta_home = 1.2;
 	private static final double beta_work = 1.2;
 	private static final double beta_shopping = 1.2;
 	private static final double beta_leisure = 1.2;
-	private static final double gamma_home = 1;//1
+	private static final double gamma_home = 1;
 	private static final double gamma_work = 1;
 	private static final double gamma_shopping = 1;
 	private static final double gamma_leisure = 1;
 	
 	private static final double uMin_education = 0;
-	private static final double uMax_education = 40;//40
-	private static final double alpha_education = 3;//3
+	private static final double uMax_education = 40;
+	private static final double alpha_education = 3;
 	private static final double beta_education = 1.2;
 	private static final double gamma_education = 1;
 	
 	
 	
-	public JohScoringFunction(final Plan plan) {
+	public JohScoringFunctionForChessboard(final Plan plan) {
 		init();
 		this.reset();
 
@@ -191,35 +189,6 @@ public class JohScoringFunction implements ScoringFunction {
 
 		double tmpScore = 0.0;
 
-		/* Calculate the times the agent actually performs the
-		 * activity.  The facility must be open for the agent to
-		 * perform the activity.  If it's closed, but the agent is
-		 * there, the agent must wait instead of performing the
-		 * activity (until it opens).
-		 *
-		 *                                             Interval during which
-		 * Relationship between times:                 activity is performed:
-		 *
-		 *      O________C A~~D  ( 0 <= C <= A <= D )   D...D (not performed)
-		 * A~~D O________C       ( A <= D <= O <= C )   D...D (not performed)
-		 *      O__A+++++C~~D    ( O <= A <= C <= D )   A...C
-		 *      O__A++D__C       ( O <= A <= D <= C )   A...D
-		 *   A~~O++++++++C~~D    ( A <= O <= C <= D )   O...C
-		 *   A~~O+++++D__C       ( A <= O <= D <= C )   O...D
-		 *
-		 * Legend:
-		 *  A = arrivalTime    (when agent gets to the facility)
-		 *  D = departureTime  (when agent leaves the facility)
-		 *  O = openingTime    (when facility opens)
-		 *  C = closingTime    (when facility closes)
-		 *  + = agent performs activity
-		 *  ~ = agent waits (agent at facility, but not performing activity)
-		 *  _ = facility open, but agent not there
-		 *
-		 * assume O <= C
-		 * assume A <= D
-		 */
-
 		double[] openingInterval = this.getOpeningInterval(act);
 		double openingTime = openingInterval[0];
 		double closingTime = openingInterval[1];
@@ -255,15 +224,11 @@ public class JohScoringFunction implements ScoringFunction {
 
 		// utility of performing an action
 		if (duration > 0) {
-			/*int gamma = 0;
-			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
-			*/double utilPerf = /*(1 - repeat * gamma) * */(params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma())));
+			double utilPerf = /*(1 - repeat * gamma) * */(params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma())));
 			double utilWait = marginalUtilityOfWaiting / 3600 * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else if (duration<0){
 			tmpScore += 2*marginalUtilityOfLateArrival / 3600 *Math.abs(duration);
-			//tmpScore += -100000; // Negative durations results in refusal of plan
-
 		}
 
 		// disutility if stopping too early
@@ -290,9 +255,6 @@ public class JohScoringFunction implements ScoringFunction {
 		double openingTime = params.getOpeningTime();
 		double closingTime = params.getClosingTime();
 
-		// openInterval has two values
-		// openInterval[0] will be the opening time
-		// openInterval[1] will be the closing time
 		double[] openInterval = new double[]{openingTime, closingTime};
 
 		return openInterval;
@@ -317,11 +279,6 @@ public class JohScoringFunction implements ScoringFunction {
 		return tmpScore;
 	}
 	
-	/*
-	private static double getStuckPenalty() {
-		return abortedPlanScore;
-	}
-	 */
 	
 	/**
 	 * reads all activity utility values from the config-file
@@ -466,7 +423,7 @@ public class JohScoringFunction implements ScoringFunction {
 
 		if (this.index == 0) {
 			this.firstActTime = time;
-		} /*else*/ if (this.index == this.lastActIndex) {
+		} if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
 			if (lastActType.equals(((ActivityImpl) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type

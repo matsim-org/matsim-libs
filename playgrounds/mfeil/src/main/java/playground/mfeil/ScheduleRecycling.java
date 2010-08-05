@@ -55,7 +55,8 @@ import playground.mfeil.config.ScheduleRecyclingConfigGroup;
 
 /**
  * @author Matthias Feil
- * Includes also the optimization of the distance coefficients
+ * Schedule recycling re-uses plans of individually optimized agents for other non-optimized agents.
+ * See dissertation Matthias Feil "Choosing the Daily Schedule: Expanding Activity-Based travel demand modelling".
  */
 
 

@@ -31,7 +31,7 @@ import org.matsim.knowledges.Knowledges;
  * @author Matthias Feil
  * This class provides access to all agents that have been optimized during an iteration.
  * Attributes (such as number or type of primary activities, distance between primary activities
- * and others) may be calculated and provided to other classes, mainly the AgentsAssigner.
+ * and others) may be calculated and provided to other classes, mainly AgentsAssigner.
  */
 
 public class OptimizedAgents {

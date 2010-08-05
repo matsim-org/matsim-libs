@@ -25,14 +25,14 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
- * A factory to create {@link JohScoringFunction}s.
+ * A factory to create {@link JohScoringFunctionForChessboard}s.
  *
  * @author mfeil
  */
-public class JohScoringFunctionFactory implements ScoringFunctionFactory {
+public class JohScoringFunctionForChessboardFactory implements ScoringFunctionFactory {
 	
 	public ScoringFunction createNewScoringFunction(final Plan plan) {
-		return new JohScoringFunction(plan);
+		return new JohScoringFunctionForChessboard(plan);
 	}
 
 }

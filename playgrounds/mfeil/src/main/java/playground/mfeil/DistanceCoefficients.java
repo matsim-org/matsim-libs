@@ -2,6 +2,12 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 
+
+/**
+ * Stores and makes available distance coefficients for Schedule Recycling
+ * @author Matthias Feil
+ *
+ */
 public class DistanceCoefficients {
 	
 	private double [] softCoef;

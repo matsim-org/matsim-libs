@@ -33,7 +33,7 @@ import playground.mfeil.MDSAM.ActivityTypeFinder;
 
 /**
  * @author Matthias Feil
- * Replacing the PlanomatOptimizeTimes class to initialise the PlanomatX module.
+ * Initiating PlanomatX.
  */
 
 public class PlanomatXInitialiser extends AbstractMultithreadedModule{
@@ -80,10 +80,4 @@ public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 		planomatXAlgorithm = new PlanomatX (this.controler, this.locator, this.tDepDelayCalc, this.finder);
 		return planomatXAlgorithm;
 	}
-	
-	// TODO The list of valid act types across all agents must be implemented here.
-	/*private ArrayList<Activity> findActTypes (){
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE,null);
-		return new ArrayList<Activity>();
-	}*/
 }

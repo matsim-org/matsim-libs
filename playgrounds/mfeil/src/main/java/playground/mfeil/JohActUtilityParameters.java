@@ -21,7 +21,7 @@
 package playground.mfeil;
 
 /**
- * 	For Joh's utility function
+ * 	Joh's utility function parameters
  *  @author Matthias Feil
  */
 
@@ -41,7 +41,6 @@ public class JohActUtilityParameters {
 
 	public JohActUtilityParameters(final String type, final double uMin,
 			final double uMax, final double alpha, final double beta, final double gamma) {
-		//super();
 		this.type = type;
 		this.uMin = uMin;
 		this.uMax = uMax;

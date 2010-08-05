@@ -21,7 +21,7 @@
 package playground.mfeil;
 
 /**
- * 	For Joh's utility function
+ * 	Joh's utility function parameters, adding age
  *  @author Matthias Feil
  */
 

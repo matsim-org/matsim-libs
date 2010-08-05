@@ -27,7 +27,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author Matthias Feil
- * Initialiser for TimeOptimizer module.
+ * Initiating TimeModeChoicer.
  */
 
 public class TimeModeChoicerInitialiser extends AbstractMultithreadedModule{

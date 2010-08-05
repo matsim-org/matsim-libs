@@ -35,7 +35,7 @@ import playground.mfeil.MDSAM.ActivityTypeFinder;
 
 /**
  * @author Matthias Feil
- * Initializes the agentsAssigner.
+ * Initializes AgentsAssigner.
  */
 
 public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule {
@@ -44,11 +44,10 @@ public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule {
 	protected final Controler							controler;
 	protected final LocationMutatorwChoiceSet 			locator;
 	protected final PlanScorer 							scorer;
-	protected final ScheduleRecycling						module;
+	protected final ScheduleRecycling					module;
 	protected LinkedList<String>						nonassignedAgents;
 	protected final DepartureDelayAverageCalculator 	tDepDelayCalc;
-	private final ActivityTypeFinder 					finder;
-	
+	private final ActivityTypeFinder 					finder;	
 	private final DistanceCoefficients 					distanceCoefficients;
 
 		

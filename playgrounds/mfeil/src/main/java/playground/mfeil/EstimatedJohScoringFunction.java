@@ -47,12 +47,12 @@ import playground.mfeil.attributes.AgentsAttributesAdder;
  *  Measuring and Predicting Adaptation in Multidimensional Activity-Travel Patterns,<br>
  *  Bouwstenen 79, Eindhoven University Press, Eindhoven.</p>
  * </blockquote>
- *
+ * Holds parameters as estimated and calibrated by mfeil.
  *
  * @author mfeil
  */
 
-public class JohScoringFunctionEstimation implements ScoringFunction {
+public class EstimatedJohScoringFunction implements ScoringFunction {
 
 	protected final Person person;
 	protected final Plan plan;
@@ -60,7 +60,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 	protected double score;
 	private double lastTime;
-	private int index; // the current position in plan.actslegs
+	private int index; 
 	private double firstActTime;
 	private final int lastActIndex;
 
@@ -85,7 +85,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
 	private static boolean scoreActs = true;
 
-	private static final Logger log = Logger.getLogger(JohScoringFunctionEstimation.class);
+	private static final Logger log = Logger.getLogger(EstimatedJohScoringFunction.class);
 	private static boolean parametersLogged = false;
 
 	private static final TreeMap<String, JohActUtilityParametersExtended> utilParams = new TreeMap<String, JohActUtilityParametersExtended>();
@@ -169,7 +169,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 
 
-	public JohScoringFunctionEstimation(final Plan plan, final Network network) {
+	public EstimatedJohScoringFunction(final Plan plan, final Network network) {
 		this.network = network;
 
 		init();
@@ -327,35 +327,6 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 		double tmpScore = 0.0;
 
-		/* Calculate the times the agent actually performs the
-		 * activity.  The facility must be open for the agent to
-		 * perform the activity.  If it's closed, but the agent is
-		 * there, the agent must wait instead of performing the
-		 * activity (until it opens).
-		 *
-		 *                                             Interval during which
-		 * Relationship between times:                 activity is performed:
-		 *
-		 *      O________C A~~D  ( 0 <= C <= A <= D )   D...D (not performed)
-		 * A~~D O________C       ( A <= D <= O <= C )   D...D (not performed)
-		 *      O__A+++++C~~D    ( O <= A <= C <= D )   A...C
-		 *      O__A++D__C       ( O <= A <= D <= C )   A...D
-		 *   A~~O++++++++C~~D    ( A <= O <= C <= D )   O...C
-		 *   A~~O+++++D__C       ( A <= O <= D <= C )   O...D
-		 *
-		 * Legend:
-		 *  A = arrivalTime    (when agent gets to the facility)
-		 *  D = departureTime  (when agent leaves the facility)
-		 *  O = openingTime    (when facility opens)
-		 *  C = closingTime    (when facility closes)
-		 *  + = agent performs activity
-		 *  ~ = agent waits (agent at facility, but not performing activity)
-		 *  _ = facility open, but agent not there
-		 *
-		 * assume O <= C
-		 * assume A <= D
-		 */
-
 		double[] openingInterval = this.getOpeningInterval(act);
 		double openingTime = openingInterval[0];
 		double closingTime = openingInterval[1];
@@ -396,7 +367,6 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().startsWith(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType().substring(0, 1))) gamma = 1;
 			double interScore = Math.max(0, factorOfLateArrival * (1 + beta_female_act * this.female + params.getBetaAge() * this.age + repeat * gamma) * (params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(Math.abs(duration)/3600))),1/params.getGamma()))));
 			tmpScore -= interScore;
-		//	log.warn("In duration<0 loop - this must not happen! (Person "+plan.getPerson().getId()+" at act position "+this.index+" with duration "+duration+" and utility "+interScore);
 		}
 
 		// disutility if stopping too early
@@ -489,8 +459,6 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		actParams = new JohActUtilityParametersExtended("work", uMin_work, uMax_work, alpha_work, beta_work, gamma_work, beta_age_work);
 		actParams.setOpeningTime(7*3600);
 		actParams.setClosingTime(18*3600);
-	//	actParams.setLatestStartTime(10*3600);
-	//	actParams.setEarliestEndTime(15*3600);
 		utilParams.put(type, actParams);
 
 		type = "shopping";
@@ -506,45 +474,34 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		utilParams.put(type, actParams);
 
 
-		//TODO @ mfeil: bad programming style, I know...
 		type = "education_higher";
 		actParams = new JohActUtilityParametersExtended("education_higher", uMin_education, uMax_education, alpha_education, beta_education, gamma_education, beta_age_education);
 		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(16*3600);
-	//	actParams.setLatestStartTime(9*3600);
-	//	actParams.setEarliestEndTime(12*3600);
 		utilParams.put(type, actParams);
 
 		type = "education_kindergarten";
 		actParams = new JohActUtilityParametersExtended("education_kindergarten", uMin_education, uMax_education, alpha_education, beta_education, gamma_education, beta_age_education);
 		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(16*3600);
-	//	actParams.setLatestStartTime(9*3600);
-	//	actParams.setEarliestEndTime(12*3600);
 		utilParams.put(type, actParams);
 
 		type = "education_other";
 		actParams = new JohActUtilityParametersExtended("education_other", uMin_education, uMax_education, alpha_education, beta_education, gamma_education, beta_age_education);
 		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(16*3600);
-	//	actParams.setLatestStartTime(9*3600);
-	//	actParams.setEarliestEndTime(12*3600);
 		utilParams.put(type, actParams);
 
 		type = "education_primary";
 		actParams = new JohActUtilityParametersExtended("education_primary", uMin_education, uMax_education, alpha_education, beta_education, gamma_education, beta_age_education);
 		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(16*3600);
-	//	actParams.setLatestStartTime(9*3600);
-	//	actParams.setEarliestEndTime(12*3600);
 		utilParams.put(type, actParams);
 
 		type = "education_secondary";
 		actParams = new JohActUtilityParametersExtended("education_secondary", uMin_education, uMax_education, alpha_education, beta_education, gamma_education, beta_age_education);
 		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(16*3600);
-	//	actParams.setLatestStartTime(9*3600);
-	//	actParams.setEarliestEndTime(12*3600);
 		utilParams.put(type, actParams);
 
 		type = "shop";
@@ -557,16 +514,12 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		actParams = new JohActUtilityParametersExtended("work_sector2", uMin_work, uMax_work, alpha_work, beta_work, gamma_work, beta_age_work);
 		actParams.setOpeningTime(7*3600);
 		actParams.setClosingTime(18*3600);
-	//	actParams.setLatestStartTime(10*3600);
-	//	actParams.setEarliestEndTime(15*3600);
 		utilParams.put(type, actParams);
 
 		type = "work_sector3";
 		actParams = new JohActUtilityParametersExtended("work_sector3", uMin_work, uMax_work, alpha_work, beta_work, gamma_work, beta_age_work);
 		actParams.setOpeningTime(7*3600);
 		actParams.setClosingTime(18*3600);
-	//	actParams.setLatestStartTime(10*3600);
-	//	actParams.setEarliestEndTime(15*3600);
 		utilParams.put(type, actParams);
 
 		type = "tta";
@@ -579,8 +532,6 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		actParams = new JohActUtilityParametersExtended("w", uMin_work, uMax_work, alpha_work, beta_work, gamma_work, beta_age_work);
 		actParams.setOpeningTime(7*3600);
 		actParams.setClosingTime(18*3600);
-	//	actParams.setLatestStartTime(10*3600);
-	//	actParams.setEarliestEndTime(15*3600);
 		utilParams.put(type, actParams);
 
 		type = "h";
@@ -603,8 +554,6 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		actParams = new JohActUtilityParametersExtended("e", uMin_education, uMax_education, alpha_education, beta_education, gamma_education, beta_age_education);
 		actParams.setOpeningTime(8*3600);
 		actParams.setClosingTime(16*3600);
-	//	actParams.setLatestStartTime(9*3600);
-	//	actParams.setEarliestEndTime(12*3600);
 		utilParams.put(type, actParams);
 
 
@@ -615,7 +564,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 		if (this.index == 0) {
 			this.firstActTime = time;
-		} /*else*/ if (this.index == this.lastActIndex) {
+		} if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
 			if (lastActType.equals(((ActivityImpl) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type

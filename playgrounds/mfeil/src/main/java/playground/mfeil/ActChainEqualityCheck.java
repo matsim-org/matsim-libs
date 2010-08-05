@@ -29,12 +29,14 @@ import org.matsim.core.population.LegImpl;
 
 
 /**
- * Simple class to check whether two activity chains are identical. Returns true if so, and false otherwise. *
+ * Simple class to check equality of attributes of two activity chains. 
+ * Returns true if so, and false otherwise. *
  * @author mfeil *
  */
 
 public class ActChainEqualityCheck {
 
+	// Check only act chain
 	public boolean checkEqualActChains (List<PlanElement> ac1, List<PlanElement> ac2){
 
 		if (ac1.size()!=ac2.size()){
@@ -54,6 +56,7 @@ public class ActChainEqualityCheck {
 		}
 	}
 
+	// Check act chain and leg modes
 	public boolean checkEqualActChainsModes (List<PlanElement> ac1, List<PlanElement> ac2){
 
 		if (ac1.size()!=ac2.size()){
@@ -75,10 +78,11 @@ public class ActChainEqualityCheck {
 		}
 	}
 
-		public boolean checkEqualActChainsModesAccumulated (List<PlanElement> ac1, List<PlanElement> ac2){
+	// Check unordered list of act types and leg modes
+	public boolean checkEqualActChainsModesAccumulated (List<PlanElement> ac1, List<PlanElement> ac2){
 
 		if (ac1.size()!=ac2.size()){
-
+		
 			return false;
 		}
 		else{

@@ -54,8 +54,8 @@ import playground.mfeil.MDSAM.ActivityTypeFinder;
 
 /**
  * @author Matthias Feil
- * Parallel PlanAlgorithm to assign the non-optimized agents to an optimized agent
- * (= non-optimized agent copies the plan of the most similar optimized agent).
+ * Parallel PlanAlgorithm to link non-optimized agents to an optimized agent
+ * (= non-optimized agent copies act chain of most similar optimized agent).
  */
 
 public class AgentsAssigner implements PlanAlgorithm{
@@ -70,7 +70,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected final LocationMutatorwChoiceSet 	locator;
 	protected final PlansCalcRoute				router;
 	protected final Network						network;
-	protected final ScheduleRecycling				module;
+	protected final ScheduleRecycling			module;
 	protected LinkedList<String>				nonassignedAgents;
 	protected Knowledges 						knowledges;
 	private final ActivityTypeFinder 			finder;
@@ -79,7 +79,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	private static final double					LC_minimum_time_AA = 300.0;
 
 	private final DistanceCoefficients coefficients;
-	private String primActsDistance, homeLocation, municipality, age, sex, license, car_avail, employed;
+	private String primActsDistance, homeLocation, municipality, age, gender, license, car_avail, employed;
 
 
 	public AgentsAssigner (Controler controler, DepartureDelayAverageCalculator 	tDepDelayCalc,
@@ -101,7 +101,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.primActsDistance	="no";
 		this.homeLocation		="no";
 		this.age				="no";
-		this.sex				="no";
+		this.gender				="no";
 		this.license			="no";
 		this.car_avail			="no";
 		this.employed			="no";
@@ -110,7 +110,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			if (this.coefficients.getNamesOfCoef().get(i).equals("homeLocation")) this.homeLocation="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("municipality")) this.municipality="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("age")) this.age="yes";
-			if (this.coefficients.getNamesOfCoef().get(i).equals("sex")) this.sex="yes";
+			if (this.coefficients.getNamesOfCoef().get(i).equals("sex")) this.gender="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("license")) this.license="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("car_avail")) this.car_avail="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("employed")) this.employed="yes";
@@ -177,7 +177,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			// Further hard constraints
 
 			// Gender
-			if (this.sex=="yes"){
+			if (this.gender=="yes"){
 				try{
 					if (!((PersonImpl) plan.getPerson()).getSex().equals(((PersonImpl) agents.getAgentPerson(j)).getSex())) continue optimizedAgentsLoop;
 				}
@@ -249,23 +249,13 @@ public class AgentsAssigner implements PlanAlgorithm{
 				else Statistics.noMunicipalityAssignment = true;
 			}
 
-			// TODO @mfeil: exception handling missing
 			if (this.age=="yes"){
 				distanceAgent+= this.coefficients.getSingleCoef("age")* java.lang.Math.abs(((PersonImpl)(plan.getPerson())).getAge()-((PersonImpl)(agents.getAgentPerson(j))).getAge());
 			}
 
 			if (distanceAgent<distance){
-				/*if (Statistics.prt==true){
-					if (agents.filling[j]>0){
-						assignedAgent=j;
-						distance = distanceAgent;
-						agents.filling[j]--;
-					}
-				}
-				else {*/
-					assignedAgent=j;
-					distance = distanceAgent;
-				//}
+				assignedAgent=j;
+				distance = distanceAgent;
 			}
 		}
 		if (distance==Double.MAX_VALUE){
@@ -274,11 +264,6 @@ public class AgentsAssigner implements PlanAlgorithm{
 			return;
 		}
 		this.writePlan(agents.getAgentPlan(assignedAgent), plan);
-	//	do {
-	//		this.locator.handlePlan(plan);
-	//		this.timer.run(plan);  // includes to write the new score to the plan
-	//		counterLCTimings++;
-	//	} while (plan.getScore()==-100000 && counterLCTimings <= AgentsAssigner.trialsLCTimings);
 
 		ArrayList<PlanImpl> setOfLCplans = new ArrayList<PlanImpl>();
 		double bestDis = Double.MAX_VALUE;
@@ -300,7 +285,6 @@ public class AgentsAssigner implements PlanAlgorithm{
 			}
 			setOfLCplans.add(LCplan);
 		}
-	//	log.info("beste Distanz fuer Person "+plan.getPerson().getId()+" = "+bestDis+", von Person "+agents.getAgentPlan(assignedAgent).getPerson().getId());
 		plan.getPlanElements().clear();
 		for (int y=0;y<setOfLCplans.get(pointerToBestDis).getPlanElements().size();y++){
 			if (y%2==0) plan.addActivity(((ActivityImpl)(setOfLCplans.get(pointerToBestDis).getPlanElements().get(y))));
@@ -328,7 +312,6 @@ public class AgentsAssigner implements PlanAlgorithm{
 				prt.add(((ActivityImpl)(plan.getPlanElements().get(y))).getType());
 			}
 			Statistics.list.add(prt);
-		//	log.info("added person "+plan.getPerson().getId()+" to Statistics.");
 		}
 	}
 
@@ -354,10 +337,6 @@ public class AgentsAssigner implements PlanAlgorithm{
 				}
 			}
 		}
-	//	for (int i=1;i<bestPlan.getPlanElements().size()-1;i+=2){
-	//		((LegImpl)(bestPlan.getPlanElements().get(i))).setTravelTime(1);
-	//	}
-
 		if(bestPlan.getPlanElements().size()!=1 && al.size()>bestPlan.getPlanElements().size()){
 			int i;
 			for (i = 2; i<bestPlan.getPlanElements().size()-2;i++){
@@ -400,12 +379,6 @@ public class AgentsAssigner implements PlanAlgorithm{
 			al.add(i, bestPlan.getPlanElements().get(i));
 			}
 		}
-		/*
-		// adjust first home duration if al.size()!=1
-		if (al.size()>1){
-			((ActivityImpl)al.get(0)).setEndTime(6*3600);
-			((ActivityImpl)al.get(0)).setDuration(6*3600);
-		}*/
 
 		// adjust first home duration if al.size()!=1: if start time later than 18h move it to midday. Plans get endless, otherwise
 		if (al.size()>1 && ((ActivityImpl)(al.get(0))).getEndTime()>18*3600){
@@ -415,7 +388,6 @@ public class AgentsAssigner implements PlanAlgorithm{
 
 		// adjust travel time budget for location choice:
 		// travel times need to be translated back to car travel time since LC is based on car travel time
-		// not translating results in too long distances traveled and a bias of the schedule recycling (compared to PlanomatX)
 		for (int i = 1;i<al.size();i+=2) {
 			LegImpl leg = ((LegImpl)(al.get(i)));
 

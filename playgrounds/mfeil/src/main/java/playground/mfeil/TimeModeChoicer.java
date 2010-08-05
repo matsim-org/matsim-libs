@@ -55,8 +55,8 @@ import playground.mfeil.config.TimeModeChoicerConfigGroup;
 
 /**
  * @author Matthias Feil
- * Class that optimizes the mode choices and activity timings of a plan.
- * Standard version as of 21/06/2009.
+ * Class optimizing mode choices and activity timings of a plan.
+ * See dissertation Matthias Feil "Choosing the Daily Schedule: Expanding Activity-Based travel demand modelling".
  */
 
 public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlgorithm {
@@ -208,8 +208,8 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 	public void run (Plan basePlan){
 
 		if (printing){
-			String outputfile = this.controlerIO.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+basePlan.getPerson().getId()+".xls");
-			Counter.timeOptCounter++;
+			String outputfile = this.controlerIO.getOutputFilename("Timer_log"+Counter.TmcCounter+"_"+basePlan.getPerson().getId()+".xls");
+			Counter.TmcCounter++;
 			try {
 				stream = new PrintStream (new File(outputfile));
 			} catch (FileNotFoundException e) {
@@ -480,7 +480,6 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 		int fieldLength = neighbourhood.length/3;
 
 			for (int outer=java.lang.Math.max(position[0]-(fieldLength/2)*2,0);outer<position[0];outer+=2){
-		//		log.info("cN 1: outer = "+outer+", position[0] = "+position[0]);
 				score[pos]=this.decreaseTime(plan, neighbourhood[pos], outer, position[0], planAnalyzeSubtours, subtourDis);
 				moves [pos][0]=position[0];
 				moves [pos][1]=outer;
@@ -490,7 +489,6 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 			OuterLoop1:
 				for (int outer=position[0];outer<neighbourhood[0].size()-2;outer+=2){
 					for (int inner=outer+2;inner<neighbourhood[0].size();inner+=2){
-		//				log.info("cN 2: outer = "+outer+", inner = "+inner);
 						score[pos]=this.increaseTime(plan, neighbourhood[pos], outer, inner, planAnalyzeSubtours, subtourDis);
 						moves [pos][0]=outer;
 						moves [pos][1]=inner;
@@ -503,7 +501,6 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 			for (int outer=java.lang.Math.max(position[1]-(fieldLength/2)*2,0);outer<position[1];outer+=2){
 
 				if (outer!=position[0]){
-		//			log.info("cN 3: outer = "+outer+", position[1] = "+position[1]);
 					score[pos]=this.increaseTime(plan, neighbourhood[pos], outer, position[1], planAnalyzeSubtours, subtourDis);
 					moves [pos][0]=outer;
 					moves [pos][1]=position[1];
@@ -514,7 +511,6 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 			OuterLoop2:
 				for (int outer=position[1];outer<neighbourhood[0].size()-2;outer+=2){
 					for (int inner=outer+2;inner<neighbourhood[0].size();inner+=2){
-		//				log.info("cN 4: outer = "+outer+", inner = "+inner);
 						score[pos]=this.decreaseTime(plan, neighbourhood[pos], outer, inner, planAnalyzeSubtours, subtourDis);
 						moves [pos][0]=inner;
 						moves [pos][1]=outer;
@@ -531,7 +527,6 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 
 						if (outer!=position[0]	&&	inner!=position[1]){
 							if (position[0]<position[1]){
-		//						log.info("cN 5: outer = "+outer+", inner = "+inner);
 								score[pos]=this.increaseTime(plan, neighbourhood[pos], outer, inner, planAnalyzeSubtours, subtourDis);
 								moves [pos][0]=outer;
 								moves [pos][1]=inner;
@@ -539,7 +534,6 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 								if (pos>neighbourhood.length-1) break OuterLoop3;
 							}
 							else if (inner!=position[0]	||	outer!=position[1]){
-		//						log.info("cN 6: outer = "+outer+", inner = "+inner);
 								score[pos]=this.increaseTime(plan, neighbourhood[pos], outer, inner, planAnalyzeSubtours, subtourDis);
 								moves [pos][0]=outer;
 								moves [pos][1]=inner;
@@ -550,7 +544,6 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 
 						if (inner!=position[0]	&&	outer!=position[1]){
 							if (position[0]>position[1]){
-		//						log.info("cN 7: outer = "+outer+", inner = "+inner);
 								score[pos]=this.decreaseTime(plan, neighbourhood[pos], outer, inner, planAnalyzeSubtours, subtourDis);
 								moves [pos][0]=inner;
 								moves [pos][1]=outer;
@@ -558,7 +551,6 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 								if (pos>neighbourhood.length-1) break OuterLoop3;
 							}
 							else if (outer!=position[0]	||	inner!=position[1]){
-		//						log.info("cN 8: outer = "+outer+", inner = "+inner);
 								score[pos]=this.decreaseTime(plan, neighbourhood[pos], outer, inner, planAnalyzeSubtours, subtourDis);
 								moves [pos][0]=inner;
 								moves [pos][1]=outer;
@@ -584,17 +576,14 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 					return this.chooseMode(plan, actslegs, this.OFFSET, outer, inner, planAnalyzeSubtours, subtourDis);
 				}
 				else {
-	//				log.info("increase Time 1");
 					return this.setTimes(plan, actslegs, this.OFFSET, outer, inner, outer, inner);
 				}
 			}
 			else {
-	//			log.info("increase Time 1");
 				return this.setTimes(plan, actslegs, this.OFFSET, outer, inner, outer, inner);
 			}
 		}
 		else {
-	//		log.info("increase Time swap");
 			return this.swapDurations (plan, actslegs, outer, inner, planAnalyzeSubtours, subtourDis);
 		}
 	}
@@ -619,28 +608,23 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 				}
 				else {
 					if (!checkFinalAct) {
-	//					log.info("decrease Time 1");
 						return this.setTimes(plan, actslegs, (-1)*this.OFFSET, outer, inner, outer, inner);
 					}
 					else {
-	//					log.info("decrease Time 2");
 						return this.setTimes(plan, actslegs, (-1)*this.OFFSET, outer, inner, outer, actslegs.size()-1);
 					}
 				}
 			}
 			else {
 				if (!checkFinalAct) {
-	//				log.info("decrease Time 3");
 					return this.setTimes(plan, actslegs, (-1)*this.OFFSET, outer, inner, outer, inner);
 				}
 				else {
-	//				log.info("decrease Time 4");
 					return this.setTimes(plan, actslegs, (-1)*this.OFFSET, outer, inner, outer, actslegs.size()-1);
 				}
 			}
 		}
 		else {
-	//		log.info("decrease Time swap");
 			return this.swapDurations(plan, actslegs, outer, inner, planAnalyzeSubtours, subtourDis);
 		}
 	}
@@ -655,22 +639,18 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 			}
 			else {
 				if (outer==0 	&&	swaptime<0) {
-	//				log.info("swap Time 1");
 					return this.setTimes(plan, actslegs, swaptime, outer, inner, outer, actslegs.size()-1); // check that first/last act does not turn below minimum time
 				}
 				else {
-	//				log.info("swap Time 2");
 					return this.setTimes(plan, actslegs, swaptime, outer, inner, outer, inner);
 				}
 			}
 		}
 		else {
 			if (outer==0 	&&	swaptime<0) {
-	//			log.info("swap Time 3");
 				return this.setTimes(plan, actslegs, swaptime, outer, inner, outer, actslegs.size()-1); // check that first/last act does not turn below minimum time
 			}
 			else {
-	//			log.info("swap Time 4");
 				return this.setTimes(plan, actslegs, swaptime, outer, inner, outer, inner);
 			}
 		}

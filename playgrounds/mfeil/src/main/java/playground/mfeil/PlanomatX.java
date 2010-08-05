@@ -58,7 +58,8 @@ import playground.mfeil.config.TimeModeChoicerConfigGroup;
 
 /**
  * @author Matthias Feil
- * New standard version as of 22.12.2008. Like PlanomatX17 but also covering plans with only 1 or 2 activities.
+ * PlanomatX comprehensively optimizes plans, i.e. including activity chain, mode, route and location choices,
+ * and activity timings. See dissertation Matthias Feil "Choosing the Daily Schedule: Expanding Activity-Based travel demand modelling".
  */
 
 public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm {
@@ -161,8 +162,8 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		List<String> actTypes							= this.finder.getActTypes(plan.getPerson());
 
 		if (this.printing){
-			String outputfile = this.controlerIO.getOutputFilename(plan.getPerson().getId()+"_"+Counter.counter+"_detailed_log.xls");
-			Counter.counter++;
+			String outputfile = this.controlerIO.getOutputFilename(plan.getPerson().getId()+"_"+Counter.PlxCounter+"_detailed_log.xls");
+			Counter.PlxCounter++;
 			try {
 				this.stream = new PrintStream (new File(outputfile));
 			} catch (FileNotFoundException e) {
@@ -510,7 +511,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 					!(this.checkForSamePrimary(basePlan, 1))) return (new int[]{1,0,0});
 			else {
 				
-				// NEW (24th Oct 2009 MF): When removing act from plan with 3 acts, reduce to 24h of "home"
+				// When removing act from plan with 3 acts, reduce to 24h of "home"
 				this.removeAct(1, basePlan);
 				this.removeAct(0, basePlan);
 				((ActivityImpl)(basePlan.getPlanElements().get(0))).setDuration(86400);
@@ -604,7 +605,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 						!(this.checkForSamePrimary(basePlan, 1))) return (new int[]{1,0,0});
 				else {
 					
-					// NEW (24th Oct 2009 MF): When removing act from plan with 3 acts, reduce to 24h of "home"
+					// When removing act from plan with 3 acts, reduce to 24h of "home"
 					this.removeAct(1, basePlan);
 					this.removeAct(0, basePlan);
 					((ActivityImpl)(basePlan.getPlanElements().get(0))).setDuration(86400);
@@ -695,7 +696,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			((ActivityImpl)actslegs.get(0)).setDuration(12*3600);
 			((ActivityImpl)actslegs.get(0)).setEndTime(12*3600);
 
-			// NEW (24th Oct 2009 MF) Plan should have either one or three acts
+			// Plan should have either one or three acts
 			// First add a second home act, allow for 1h of travelling
 			ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get((0))));
 			actHelp.setDuration(11*3600);
@@ -748,7 +749,6 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	public int[] changeType (PlanomatXPlan basePlan, int [] position, int[]actsToBeChanged,
 			List<String> actTypes, ArrayList<ActivityOptionImpl> primActs){
 
-		// NEW NEW NEW NEW NEW NEW NEW NEW NE
 		OuterLoop:
 		while (position[1]<=(actTypes.size()-1)*(((basePlan.getPlanElements().size()/2))-1)){
 			if (position[0]>basePlan.getPlanElements().size()/2-1) position[0] = 1;

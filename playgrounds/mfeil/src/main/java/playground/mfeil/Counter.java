@@ -21,9 +21,9 @@ package playground.mfeil;
 
 /**
  * @author Matthias Feil
- * Required to differentiate the log files created from PlanomatX
+ * Required to differentiate log files created by PlanomatX and TimeModeChoicer
  */
 public class Counter {
-	static int counter = 1;
-	static int timeOptCounter = 1;
+	static int PlxCounter = 1;
+	static int TmcCounter = 1;
 }

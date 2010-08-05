@@ -28,7 +28,7 @@ import org.matsim.core.population.PlanImpl;
 
 /**
  * @author Matthias Feil
- * Extends the standard Plan object to enable sorting of arrays or lists of Plans after their scores.
+ * Extends standard Plan object to enable sorting lists of Plans following their scores.
  * Use 
  * java.util.Arrays.sort (nameOfArray[]) 
  * or
@@ -43,13 +43,6 @@ public class PlanomatXPlan extends PlanImpl implements Comparable<PlanomatXPlan>
 	
 	public final int compareTo(PlanomatXPlan p){
 		return this.getScore().compareTo(p.getScore());
-//		if (this.getScoreAsPrimitiveType() == p.getScoreAsPrimitiveType()) {
-//			return 0;
-//		}
-//		else if (this.getScoreAsPrimitiveType() - p.getScoreAsPrimitiveType() > 0.0){
-//			return 1;
-//		}
-//		else return -1;
 	}
 	
 	public void setActsLegs (List<? extends PlanElement> actslegs){
@@ -57,34 +50,4 @@ public class PlanomatXPlan extends PlanImpl implements Comparable<PlanomatXPlan>
 		planElements.clear();
 		planElements.addAll(actslegs);
 	}
-	/*
-	public void copyTimes (ArrayList<Object> in){
-		try {
-			Act a = (Act)this.actsLegs.get(0);
-			Act a0 = (Act)in.get(0);
-			a.setDuration(a0.getDuration());
-			a.setStartTime(a0.getStartTime());
-			a.setEndTime(a0.getEndTime());
-			
-			for (int i=1; i<in.size()-1; i+=2) {
-				Leg lx = (Leg)this.actsLegs.get(i);
-				Leg lx0 = (Leg)in.get(i);
-				lx.setTravelTime(lx0.getTravelTime());
-				lx.setDepartureTime(lx0.getDepartureTime());
-				lx.setArrivalTime(lx0.getArrivalTime());
-				
-				Act ax = (Act)this.actsLegs.get(i+1);
-				Act ax0 = (Act)in.get(i+1);
-				ax.setDuration(ax0.getDuration());
-				ax.setStartTime(ax0.getStartTime());
-				ax.setEndTime(ax0.getEndTime());
-			}
-		} catch (Exception e) {
-			// copying a plan is fairly basic. if an exception occurs here, something
-			// must be definitively wrong -- exit with an error
-			Gbl.errorMsg(e);
-		}
-		
-	}
-	*/
 }

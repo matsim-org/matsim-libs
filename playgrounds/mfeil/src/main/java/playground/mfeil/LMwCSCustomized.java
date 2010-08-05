@@ -32,10 +32,14 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 
+
+/**
+ * Extension of Horni's location choice: Removes origin and destination facilities from choice set
+ * to avoid 0m trips. 
+ * @author Matthias Feil
+ *
+ */
 public class LMwCSCustomized extends LocationMutatorwChoiceSet {
-
-//	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
-
 
 	public LMwCSCustomized(final Network network, Controler controler, Knowledges kn) {
 		super(network, controler, kn);
@@ -49,15 +53,13 @@ public class LMwCSCustomized extends LocationMutatorwChoiceSet {
 		for (ActivityFacility fac: choiceSet){
 			if (fac.getCoord().equals(startCoord)) {
 				choiceSet.remove(fac);
-//				log.info("Removed fac "+fac.getId()+" at link "+fac.getLinkId()+" from choice set with start coord "+startCoord.getX()+"/"+startCoord.getY());
 				break;
 			}
 		}
 		for (ActivityFacility fac: choiceSet){
 			if (fac.getCoord().equals(endCoord)) {
 				choiceSet.remove(fac);
-//				log.info("Removed fac "+fac.getId()+" at link "+fac.getLinkId()+" from choice set with start coord "+endCoord.getX()+"/"+endCoord.getY());
-				break;
+			break;
 			}
 		}
 
@@ -69,7 +71,6 @@ public class LMwCSCustomized extends LocationMutatorwChoiceSet {
        		act.setCoord(facility.getCoord());
        		return true;
 		}
-		// else ...
 		return false;
 	}
 }
