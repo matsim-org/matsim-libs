@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -123,7 +122,7 @@ public class GenerateEquilPopulations {
 	
 	protected void generateAll6AMInitialDemand(ScenarioImpl scenario) {
 
-		Population pop = scenario.getPopulation();
+		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 		PopulationFactory popFactory = pop.getFactory();
 
 		Network network = scenario.getNetwork();
@@ -132,7 +131,9 @@ public class GenerateEquilPopulations {
 		Leg leg = null;
 		for (int ii=0; ii < NUM_AGENTS; ii++) {
 			
-			Person person = popFactory.createPerson(new IdImpl(ii));
+			PersonImpl person = (PersonImpl) popFactory.createPerson(new IdImpl(ii));
+			person.setEmployed(null);
+
 			pop.addPerson(person);
 			
 			Plan plan = popFactory.createPlan();
