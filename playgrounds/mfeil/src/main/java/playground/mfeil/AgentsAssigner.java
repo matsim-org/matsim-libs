@@ -49,7 +49,6 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.mfeil.attributes.ActivityTypeFinder;
 
 
 /**

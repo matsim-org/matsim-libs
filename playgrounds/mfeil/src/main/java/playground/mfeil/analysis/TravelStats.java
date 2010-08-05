@@ -201,10 +201,10 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 		log.info("-- average of the average leg distance (worst plans only): " + (sumAvgPlanLegTravelDistanceWorst / nofLegTravelWorst));
 		log.info("-- average of the average leg distance (all plans): " + (sumAvgPlanLegTravelDistanceAll / nofLegTravelAvg));
 		log.info("-- average of the average leg distance (best plans only): " + (sumAvgPlanLegTravelDistanceBest / nofLegTravelBest));
-		log.info("-- average of the average leg travel time (executed plans only): " + (sumAvgPlanLegTravelTimeExecuted / nofLegTravelExecuted));
-		log.info("-- average of the average leg travel time (worst plans only): " + (sumAvgPlanLegTravelTimeWorst / nofLegTravelWorst));
-		log.info("-- average of the average leg travel time (all plans): " + (sumAvgPlanLegTravelTimeAll / nofLegTravelAvg));
-		log.info("-- average of the average leg travel time (best plans only): " + (sumAvgPlanLegTravelTimeBest / nofLegTravelBest));
+	//	log.info("-- average of the average leg travel time (executed plans only): " + (sumAvgPlanLegTravelTimeExecuted / nofLegTravelExecuted));
+	//	log.info("-- average of the average leg travel time (worst plans only): " + (sumAvgPlanLegTravelTimeWorst / nofLegTravelWorst));
+	//	log.info("-- average of the average leg travel time (all plans): " + (sumAvgPlanLegTravelTimeAll / nofLegTravelAvg));
+	//	log.info("-- average of the average leg travel time (best plans only): " + (sumAvgPlanLegTravelTimeBest / nofLegTravelBest));
 
 		try {
 			this.outDistance.write(event.getIteration() + "\t" + (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelExecuted) + "\t" +
@@ -278,14 +278,14 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 				System.arraycopy(this.historyTime[INDEX_EXECUTED], 0, values, 0, index + 1);
 				chart.addSeries("executed plan", iterations, values);
 				chart.addMatsimLogo();
-				chart.saveAsPng(event.getControler().getControlerIO().getOutputFilename("traveltimestats.png"), 800, 600);
+		//		chart.saveAsPng(event.getControler().getControlerIO().getOutputFilename("traveltimestats.png"), 800, 600);
 			}
 			if (index == this.historyTime[0].length) {
 				// we cannot store more information, so disable the graph feature.
 				this.historyTime = null;
 			}
 		}
-
+	// activate this line if you want to compare results with Microcensus
 	//	if (this.controler.getIterationNumber()>0 && this.controler.getIterationNumber()%10==0) new ASPGeneral (this.controler.getIterationNumber(), this.controler.getLastIteration(), this.controler.getControlerIO().getOutputPath(), (NetworkImpl) this.network);
 	}
 

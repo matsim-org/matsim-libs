@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil.attributes;
+package playground.mfeil;
 
 
 import java.util.ArrayList;

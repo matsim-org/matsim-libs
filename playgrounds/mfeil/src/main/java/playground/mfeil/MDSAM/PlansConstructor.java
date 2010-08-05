@@ -63,10 +63,10 @@ import org.matsim.locationchoice.constrained.ManageSubchains;
 import org.matsim.locationchoice.constrained.SubChain;
 import org.matsim.population.algorithms.XY2Links;
 
-import playground.mfeil.ActChainEqualityCheck;
+import playground.mfeil.AgentsAttributesAdder;
 import playground.mfeil.analysis.ASPActivityChainsModes;
 import playground.mfeil.analysis.ASPActivityChainsModesAccumulated;
-import playground.mfeil.attributes.AgentsAttributesAdder;
+import playground.mfeil.analysis.ActChainEqualityCheck;
 
 
 

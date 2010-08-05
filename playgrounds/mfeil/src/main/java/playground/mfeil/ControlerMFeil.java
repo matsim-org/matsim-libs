@@ -46,8 +46,8 @@ import org.matsim.counts.Counts;
 import org.matsim.locationchoice.LocationChoice;
 
 import playground.mfeil.MDSAM.PlansConstructor;
-import playground.mfeil.attributes.ActivityTypeFinder;
-import playground.mfeil.attributes.AgentsAttributesAdder;
+import playground.mfeil.ActivityTypeFinder;
+import playground.mfeil.AgentsAttributesAdder;
 import playground.mfeil.analysis.TravelStats;
 
 

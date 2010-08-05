@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil.attributes;
+package playground.mfeil;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -36,6 +36,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.api.core.v01.ScenarioImpl;
+
+import playground.mfeil.attributes.AgentsHighestEducationAdder;
 
 
 

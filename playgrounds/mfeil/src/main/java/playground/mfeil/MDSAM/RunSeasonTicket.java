@@ -34,7 +34,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 
-import playground.mfeil.attributes.AgentsAttributesAdder;
+import playground.mfeil.AgentsAttributesAdder;
 
 public class RunSeasonTicket {
 

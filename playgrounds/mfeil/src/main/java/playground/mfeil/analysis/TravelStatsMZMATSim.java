@@ -40,7 +40,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRoute;
-import playground.mfeil.attributes.AgentsAttributesAdder;
+
+import playground.mfeil.AgentsAttributesAdder;
 
 
 

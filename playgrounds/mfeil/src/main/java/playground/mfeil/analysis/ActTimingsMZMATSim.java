@@ -37,7 +37,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.misc.Time;
 
-import playground.mfeil.attributes.AgentsAttributesAdder;
+import playground.mfeil.AgentsAttributesAdder;
 
 
 

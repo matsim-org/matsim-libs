@@ -27,7 +27,6 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.mfeil.attributes.ActivityTypeFinder;
 
 
 

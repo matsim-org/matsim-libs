@@ -38,7 +38,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 
-import playground.mfeil.attributes.AgentsAttributesAdder;
 
 /**
  * New scoring function following Joh's dissertation:

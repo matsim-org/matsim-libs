@@ -39,7 +39,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.knowledges.Knowledges;
 
-import playground.mfeil.ActChainEqualityCheck;
 
 
 /**
