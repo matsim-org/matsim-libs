@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil.analysis;
+package playground.mfeil.miscellanous;
 
 import java.io.*;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelChartsComparison.java
+ * AnalysisActivityTimings.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil.analysis;
+package playground.mfeil.miscellanous;
 
 import java.io.*;
 import org.matsim.core.utils.charts.*;
@@ -28,22 +28,16 @@ import java.util.StringTokenizer;
 
 
 /**
- * Simple class to read an Excel file with several data sources and 
- * to draw a chart from this the data.
+ * Simple class to read an Excel file and 
+ * to draw a MATSim chart from this the data.
  *
  * @author mfeil
  */
-public class ScoreChartsComparison {	
+public class TravelCharts {	
 	
 	double [] xaxis = new double [101];
-	double [] best1 = new double [xaxis.length];
-	double [] exec1 = new double [xaxis.length];
-	double [] ave1 = new double [xaxis.length];
-	double [] worst1 = new double [xaxis.length];
-	double [] best2 = new double [xaxis.length];
-	double [] exec2 = new double [xaxis.length];
-	double [] ave2 = new double [xaxis.length];
-	double [] worst2 = new double [xaxis.length];
+	double [] distanceserie = new double [xaxis.length];
+	double [] timeserie = new double [xaxis.length];
 
 	public void readData(String path) {
 
@@ -54,8 +48,7 @@ public class ScoreChartsComparison {
 			String line = null;
 			StringTokenizer tokenizer = null;
 			line = br.readLine(); // do not parse first line which just
-			line = br.readLine(); // contains column headers
-			
+									// contains column headers
 			line = br.readLine();
 			String token = null;
 			int index=0;
@@ -67,28 +60,10 @@ public class ScoreChartsComparison {
 				this.xaxis[index]= Double.parseDouble(token);
 				
 				token = tokenizer.nextToken();
-				this.exec1[index]= Double.parseDouble(token);
+				this.distanceserie[index]= Double.parseDouble(token);
 				
 				token = tokenizer.nextToken();
-				this.worst1[index]= Double.parseDouble(token);
-
-				token = tokenizer.nextToken();
-				this.ave1[index]= Double.parseDouble(token);
-
-				token = tokenizer.nextToken();
-				this.best1[index]= Double.parseDouble(token);
-
-				token = tokenizer.nextToken();
-				this.exec2[index]= Double.parseDouble(token);
-
-				token = tokenizer.nextToken();
-				this.worst2[index]= Double.parseDouble(token);
-
-				token = tokenizer.nextToken();
-				this.ave2[index]= Double.parseDouble(token);
-
-				token = tokenizer.nextToken();
-				this.best2[index]= Double.parseDouble(token);
+				this.timeserie[index]= Double.parseDouble(token);
 
 				line = br.readLine();
 				index++;
@@ -102,28 +77,19 @@ public class ScoreChartsComparison {
 	
 	public static void main(final String [] args) {
 		
-		ScoreChartsComparison msc = new ScoreChartsComparison();
+		TravelCharts msc = new TravelCharts();
 		
-		msc.readData("./plans/scorestats.txt");
+		msc.readData("./plans/tripdur.txt");
 		for (int i=0; i<msc.xaxis.length;i++){
 			//System.out.println(streetData.get(i));
-			System.out.println(msc.xaxis[i]+"; "+msc.best1[i]);
+			System.out.println(msc.xaxis[i]+"; "+msc.distanceserie[i]);
 		}
 		
-		XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");
-		
-		chart.addSeries("Base test: avg. best score", msc.xaxis, msc.best2);
-		//chart.addSeries(/*"PlanomatX: avg. worst score"*/"", msc.xaxis, msc.exec1);
-		chart.addSeries("PlanomatX: avg. best score", msc.xaxis, msc.best1);
-		//chart.addSeries(/*"PlanomatX: avg. of plans' average score"*/"", msc.xaxis, msc.exec1);
-		chart.addSeries("Base test: avg. executed score", msc.xaxis, msc.exec2);
-		chart.addSeries("PlanomatX: avg. executed score", msc.xaxis, msc.exec1);
-		//chart.addSeries("Base test: avg. worst score", msc.xaxis, msc.worst2);
-		//chart.addSeries("Base test: avg. best score", msc.xaxis, msc.best2);
-		//chart.addSeries("Base test: avg. of plans' average score", msc.xaxis, msc.ave2);
-		//chart.addSeries("Base test: avg. executed score", msc.xaxis, msc.exec2);
+		XYLineChart chart = new XYLineChart("Travel Statistics", "iteration", "distance in meters / time in seconds");
+		chart.addSeries("average executed trip travel distance", msc.xaxis, msc.distanceserie);
+		chart.addSeries("average executed trip travel time", msc.xaxis, msc.timeserie);
 		chart.addMatsimLogo();
-		chart.saveAsPng("./plans/scorestats.png", 800, 600);
+		chart.saveAsPng("./plans/travelstats.png", 800, 600);
 		
 	}
 

@@ -42,7 +42,7 @@ import playground.mfeil.AgentsAttributesAdder;
 
 
 /**
- * Reads an plans file and summarizes average activity durations
+ * Reads a plans file and summarizes average activity durations
  *
  * @author mfeil
  */
