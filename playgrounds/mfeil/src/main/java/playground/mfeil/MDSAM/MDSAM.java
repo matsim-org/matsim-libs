@@ -262,19 +262,16 @@ public class MDSAM {
 				// if identity possible, always to prefer. Note that, according to Joh, the identity moves is disregarded in the
 				// similarity sum although the position-sensitive MDSAM allocates a weight to identity moves.
 				if (i>0 && j>0 && table[k][i-1][j-1]>=table[k][i][j]-GW && orig.equals(compare)){
-					//System.out.println("Identity.");
 					i--;
 					j--;
 				}
 				// check insertion {1,x}, rounding due to java inexactness
 				else if (j>0 &&	Math.abs(table[k][i][j-1]-(table[k][i][j]-GW))<0.001 && osetContains(oset,dimensions,k,1,j)){
-					//System.out.println("Insertion.");
 					goLeft = false;
 					j--;
 				}
 				// check deletion {2,x}
 				else if (i>0 &&	Math.abs(table[k][i-1][j]-(table[k][i][j]-GW))<0.001 && osetContains(oset,dimensions,k,2,i)){
-					//System.out.println("Deletion.");
 					goLeft = true;
 					i--;
 				}
@@ -286,7 +283,6 @@ public class MDSAM {
 					dimensions.add(l);
 					j--;
 					goLeft = false;
-					//System.out.println("New insertion.");
 				}
 				// go new path (deletion) in zick zack
 				else if (!goLeft && i>0 && Math.abs(table[k][i-1][j]-(table[k][i][j]-GW))<0.001){
@@ -296,7 +292,6 @@ public class MDSAM {
 					dimensions.add(l);
 					i--;
 					goLeft = true;
-					//System.out.println("New deletion.");
 				}
 				// go new path (insertion)
 				else if (j>0 && Math.abs(table[k][i][j-1]-(table[k][i][j]-GW))<0.001) {
@@ -305,7 +300,6 @@ public class MDSAM {
 					l.add(k);
 					dimensions.add(l);
 					j--;
-					//System.out.println("New insertion.");
 				}
 				// go new path (deletion)
 				else if (Math.abs(table[k][i-1][j]-(table[k][i][j]-GW))<0.001){
@@ -314,7 +308,6 @@ public class MDSAM {
 					l.add(k);
 					dimensions.add(l);
 					i--;
-					//System.out.println("New deletion.");
 				}
 				else log.warn("Cannot find my way at i = "+i+" and j = "+j+" for person "+origPlan.getPerson().getId());
 			}

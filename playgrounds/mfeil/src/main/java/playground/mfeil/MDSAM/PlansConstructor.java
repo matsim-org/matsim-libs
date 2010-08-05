@@ -1400,75 +1400,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.close();
 		log.info("done.");
 	}
-	/*
-	private int writeAccumulatedPlanIntoFile (PrintStream stream, List<PlanElement> planToBeWritten, List<PlanElement> referencePlan, double travelCostPt){
 
-		if (planToBeWritten.size()!=referencePlan.size()){
-			log.warn("Plans do not have same size; planToBeWritten: "+planToBeWritten+", referencePlan: "+referencePlan);
-		}
-
-		int counter=0;
-
-		// Plan has only one act
-		if (planToBeWritten.size()==1) {
-			stream.print(24+"\t");
-			counter++;
-		}
-		else {
-			// First and last home act
-			stream.print((((ActivityImpl)(planToBeWritten.get(0))).getEndTime()+86400-((ActivityImpl)(planToBeWritten.get(planToBeWritten.size()-1))).getStartTime())/3600+"\t");
-			counter++;
-			LinkedList<Integer> takenPositions = new LinkedList<Integer>();
-			for (int i=1;i<referencePlan.size()-1;i++){
-				if (i%2==0){ // Activities
-					boolean found = false;
-					for (int j=2;j<planToBeWritten.size()-2;j+=2){
-						if (((ActivityImpl)(referencePlan.get(i))).getType().equals(((ActivityImpl)(planToBeWritten.get(j))).getType()) &&
-								!takenPositions.contains(j)){
-							stream.print(((ActivityImpl)(planToBeWritten.get(j))).calculateDuration()/3600+"\t");
-							counter++;
-							takenPositions.add(j);
-							found = true;
-							break;
-						}
-					}
-					if (!found) log.warn("Activity "+referencePlan.get(i)+" could not be found!");
-				}
-				else { // Legs
-					if ((!((LegImpl)(referencePlan.get(i))).getMode().equals(TransportMode.bike)) || this.bikeIn.equals("yes")){
-						boolean found = false;
-						for (int j=1;j<planToBeWritten.size()-1;j+=2){
-							if (((LegImpl)(referencePlan.get(i))).getMode().equals(((LegImpl)(planToBeWritten.get(j))).getMode()) &&
-									!takenPositions.contains(j)){
-								stream.print(((LegImpl)(planToBeWritten.get(j))).getTravelTime()/3600+"\t");
-								counter++;
-								takenPositions.add(j);
-								if (this.travelCost.equals("yes")){
-									if (((LegImpl)(planToBeWritten.get(j))).getMode().equals(TransportMode.car)){
-										stream.print((((LegImpl)(planToBeWritten.get(j))).getRoute().getDistance()/1000*this.travelCostCar)+"\t");
-										counter++;
-									}
-									else if (((LegImpl)(planToBeWritten.get(j))).getMode().equals(TransportMode.pt)){
-										stream.print((((LegImpl)(planToBeWritten.get(j))).getRoute().getDistance()/1000*travelCostPt)+"\t");
-										counter++;
-									}
-								}
-								if (this.incomeBoxCox.equals("yes") || this.travelDistance.equals("yes")){
-									stream.print((((LegImpl)(planToBeWritten.get(j))).getRoute().getDistance()/1000)+"\t");
-									counter++;
-								}
-								found = true;
-								break;
-							}
-						}
-						if (!found) log.warn("Leg "+referencePlan.get(i)+" could not be found!");
-					}
-				}
-			}
-		}
-		return counter;
-	}
-	*/
 
 
 	private int writeAccumulatedPlanIntoFileAccumulated (PrintStream stream, List<PlanElement> planToBeWritten, List<PlanElement> referencePlan, double travelCostPt){
