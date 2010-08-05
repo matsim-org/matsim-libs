@@ -64,13 +64,11 @@ public class PSSControler {
 		// if result folder not empty, stop the execution.
 		File resultsDirectory = new File(resultDirectory);
 		if (resultsDirectory.list().length > 0) {
-			System.out.println("The result directory is not empty.");
-			System.exit(0);
+			throw new Error("The result directory is not empty.");
 		}
 
 		if (!new File(outputPSSPath + "\\hubPriceInfo.txt").exists()) {
-			System.out.println("The initial price file is not in " + outputPSSPath);
-			System.exit(0);
+			throw new Error("The initial price file is not in " + outputPSSPath);
 		}
 
 		// copy the initial prices to the result directory.

@@ -14,6 +14,8 @@ next:
 2.) copy initial prices to: a:\data\PSS\output\hubPriceInfo.txt (for input of MATSim) 
 and a:\data\PSS\input\initialNodePriceInfo.txt (for input to PSS).
 
+(example files (for hubPriceInfo.txt, initialNodePriceInfo.txt) you find in folder /wrashid/test/input/playground/wrashid/PSF/res/)
+
 
 Notes:
 ======
