@@ -48,7 +48,7 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.mfeil.MDSAM.ActivityTypeFinder;
+import playground.mfeil.attributes.ActivityTypeFinder;
 import playground.mfeil.config.ScheduleRecyclingConfigGroup;
 
 

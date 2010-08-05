@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityOptionFinder.java
+ * ActivityTypeFinder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil.MDSAM;
+package playground.mfeil.attributes;
 
 
 import java.util.ArrayList;
