@@ -29,6 +29,8 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
  *
  * @author aneumann, Yu
  *
+ * * TODO: delete class, after the classes extending this class are removed.
+ *
  */
 public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	protected PopulationWriter popWriter;

@@ -18,6 +18,7 @@ import org.matsim.core.population.PopulationReader;
  * removes non miv plans from input file...
  *  (facilities needed for some plans files...)
  *   => probably can just remove things related to faclities and it should work (or look at earlier revision)
+ *    * TODO: refactor class and move class to "lib.tools.plan" (implementation of interface "New Population" not required.
  */
 
 public class KeepOnlyMIVPlans extends NewPopulation {
