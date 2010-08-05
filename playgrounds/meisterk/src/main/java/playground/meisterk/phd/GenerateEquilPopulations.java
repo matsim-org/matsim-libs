@@ -34,6 +34,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
@@ -59,7 +61,7 @@ public class GenerateEquilPopulations {
 
 	protected void generateRandomInitialDemand(ScenarioImpl scenario) {
 		
-		Population pop = scenario.getPopulation();
+		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 		PopulationFactory popFactory = pop.getFactory();
 
 		Network network = scenario.getNetwork();
@@ -68,7 +70,9 @@ public class GenerateEquilPopulations {
 		Leg leg = null;
 		for (int ii=0; ii < NUM_AGENTS; ii++) {
 			
-			Person person = popFactory.createPerson(new IdImpl(ii));
+			PersonImpl person = (PersonImpl) popFactory.createPerson(new IdImpl(ii));
+			person.setEmployed(null);
+			
 			pop.addPerson(person);
 			
 			Plan plan = popFactory.createPlan();
