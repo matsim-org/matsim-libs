@@ -87,7 +87,6 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		new MatsimFacilitiesReader(this.scenario_input).readFile(this.initializer.getControler().getConfig().facilities().getInputFile());
 		new MatsimPopulationReader(this.scenario_input).readFile(this.initializer.getControler().getConfig().plans().getInputFile());
 
-		// no events are used, hence an empty road network
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario_input.getNetwork(), 900);
 
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario_input.getNetwork(), this.initializer.getControler().getConfig().travelTimeCalculator());

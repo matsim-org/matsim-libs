@@ -56,7 +56,6 @@ public class PlanomatXTest extends MatsimTestCase{
 
 		this.scenario_input = this.initializer.getControler().getScenario();
 
-		// no events are used, hence an empty road network
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario_input.getNetwork(), 900);
 
 		LocationMutatorwChoiceSet locator = new LocationMutatorwChoiceSet (this.scenario_input.getNetwork(), this.initializer.getControler(), this.initializer.getControler().getScenario().getKnowledges());

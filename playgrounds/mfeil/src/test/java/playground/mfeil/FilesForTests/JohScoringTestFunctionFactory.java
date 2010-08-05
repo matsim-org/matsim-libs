@@ -24,10 +24,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.mfeil.JohScoringFunction;
+import playground.mfeil.JohScoringFunctionForChessboard;
 
 /**
- * A factory to create {@link JohScoringFunction}s.
+ * A factory to create {@link JohScoringFunctionForChessboard}s.
  *
  * @author mfeil
  */
