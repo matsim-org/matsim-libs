@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RecyclingModule1.java
+ * ScheduleRecycling.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -49,6 +49,7 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mfeil.MDSAM.ActivityTypeFinder;
+import playground.mfeil.config.ScheduleRecyclingConfigGroup;
 
 
 
@@ -58,7 +59,7 @@ import playground.mfeil.MDSAM.ActivityTypeFinder;
  */
 
 
-public class RecyclingModule implements PlanStrategyModule{
+public class ScheduleRecycling implements PlanStrategyModule{
 
 	private  ArrayList<Plan> []						list;
 	private final AbstractMultithreadedModule 		schedulingModule,
@@ -91,10 +92,10 @@ public class RecyclingModule implements PlanStrategyModule{
 	private final ArrayList<String> 				softCoef,
 													allCoef;
 	private ArrayList<Integer> 						list1Pointer;
-	private static final Logger 					log = Logger.getLogger(RecyclingModule.class);
+	private static final Logger 					log = Logger.getLogger(ScheduleRecycling.class);
 
 
-	public RecyclingModule (Controler controler, ActivityTypeFinder finder) {
+	public ScheduleRecycling (Controler controler, ActivityTypeFinder finder) {
 
 		this.controler=controler;
 		this.knowledges 			= controler.getScenario().getKnowledges();
@@ -105,19 +106,19 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.tDepDelayCalc 			= new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 		this.nonassignedAgents 		= new LinkedList<String>();
-		this.noOfIndividualAgents	= 5;
-		this.noOfRecycledAgents		= 10;
+		this.noOfIndividualAgents	= Integer.parseInt(ScheduleRecyclingConfigGroup.getNoOfIndividualAgents());
+		this.noOfRecycledAgents		= Integer.parseInt(ScheduleRecyclingConfigGroup.getNoOfRecycledAgents());
 		this.finder					= finder;
-		this.iterationsFirstTime 	= 20;
-		this.iterationsFurtherTimes = 5;
-		this.primActsDistance 		= "yes";
-		this.homeLocationDistance 	= "yes";
-		this.municipality			= "no";
-		this.gender 				= "no";
-		this.age 					= "yes";
-		this.license 				= "no";
-		this.car_avail 				= "no";
-		this.employed 				= "no";
+		this.iterationsFirstTime 	= Integer.parseInt(ScheduleRecyclingConfigGroup.getIterationsFirstTime());
+		this.iterationsFurtherTimes = Integer.parseInt(ScheduleRecyclingConfigGroup.getIterationsFurtherTimes());
+		this.primActsDistance 		= ScheduleRecyclingConfigGroup.getPrimActsDistance();
+		this.homeLocationDistance 	= ScheduleRecyclingConfigGroup.getHomeLocationDistance();
+		this.municipality			= ScheduleRecyclingConfigGroup.getMunicipalityType();
+		this.gender 				= ScheduleRecyclingConfigGroup.getGender();
+		this.age 					= ScheduleRecyclingConfigGroup.getAge();
+		this.license 				= ScheduleRecyclingConfigGroup.getLicenseOwnership();
+		this.car_avail 				= ScheduleRecyclingConfigGroup.getCarAvailability();
+		this.employed 				= ScheduleRecyclingConfigGroup.getEmployment();
 		this.softCoef 				= this.detectSoftCoefficients();
 		this.allCoef 				= this.detectAllCoefficients();
 		this.noOfSoftCoefficients	= this.softCoef.size();
@@ -139,8 +140,8 @@ public class RecyclingModule implements PlanStrategyModule{
 			e.printStackTrace();
 			return;
 		}
-		RecyclingModule.assignment = new PrintStream (fileOverview);
-		RecyclingModule.assignment.println("Agent\tScore\tPlan\n");
+		ScheduleRecycling.assignment = new PrintStream (fileOverview);
+		ScheduleRecycling.assignment.println("Agent\tScore\tPlan\n");
 	}
 
 	private void init(final NetworkImpl network) {

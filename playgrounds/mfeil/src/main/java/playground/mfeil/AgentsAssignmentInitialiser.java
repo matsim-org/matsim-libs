@@ -44,7 +44,7 @@ public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule {
 	protected final Controler							controler;
 	protected final LocationMutatorwChoiceSet 			locator;
 	protected final PlanScorer 							scorer;
-	protected final RecyclingModule						module;
+	protected final ScheduleRecycling						module;
 	protected LinkedList<String>						nonassignedAgents;
 	protected final DepartureDelayAverageCalculator 	tDepDelayCalc;
 	private final ActivityTypeFinder 					finder;
@@ -57,7 +57,7 @@ public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule {
 			final LocationMutatorwChoiceSet locator,
 			final PlanScorer scorer,
 			final ActivityTypeFinder finder,
-			final RecyclingModule module, 
+			final ScheduleRecycling module, 
 			final DistanceCoefficients distanceCoefficients,
 			LinkedList<String> nonassignedAgents) {
 		super(controler.getConfig().global());

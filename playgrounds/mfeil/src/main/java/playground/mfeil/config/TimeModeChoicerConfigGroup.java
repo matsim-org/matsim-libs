@@ -55,7 +55,7 @@ public class TimeModeChoicerConfigGroup extends Module {
 	private static String stop_criterion = "5";
 	private static String offset = "1800";
 	private static String maximum_walking_distance = "2000";
-	private static String mode_choice = "none";
+	private static String mode_choice = "standard";
 	private static String mintime_home = "3600";
 	private static String mintime_work = "3600";
 	private static String mintime_shopping = "1800";

@@ -132,7 +132,7 @@ public class ControlerMFeil extends Controler {
 				ActivityTypeFinder finder = new ActivityTypeFinder (this);
 				finder.run(this.getFacilities());
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule module = new RecyclingModule(this, finder);
+				PlanStrategyModule module = new ScheduleRecycling(this, finder);
 				strategy.addStrategyModule(module);
 			}
 			else if (classname.equals("TimeModeChoicer")) {

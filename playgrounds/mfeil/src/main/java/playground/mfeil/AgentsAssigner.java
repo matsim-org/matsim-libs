@@ -70,7 +70,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected final LocationMutatorwChoiceSet 	locator;
 	protected final PlansCalcRoute				router;
 	protected final Network						network;
-	protected final RecyclingModule				module;
+	protected final ScheduleRecycling				module;
 	protected LinkedList<String>				nonassignedAgents;
 	protected Knowledges 						knowledges;
 	private final ActivityTypeFinder 			finder;
@@ -83,7 +83,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 
 
 	public AgentsAssigner (Controler controler, DepartureDelayAverageCalculator 	tDepDelayCalc,
-			LocationMutatorwChoiceSet locator, PlanScorer scorer, ActivityTypeFinder finder, RecyclingModule recyclingModule,
+			LocationMutatorwChoiceSet locator, PlanScorer scorer, ActivityTypeFinder finder, ScheduleRecycling recyclingModule,
 			DistanceCoefficients coefficients, LinkedList<String> nonassignedAgents){
 
 		this.controler				= controler;
