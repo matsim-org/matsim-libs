@@ -74,6 +74,15 @@ public class GeneralLib {
 		return scenario;
 	}
 	
+	/**
+	 * Sometimes the plans contain information related to the network and can therefore not be used with a different network.
+	 * This method removes such information.
+	 * @return
+	 */
+	public static void removeNetworkInformationFromPlans(Population population){
+		// TODO: remove method, if no implementation provided till 10. aug 2010
+	}
+	
 	/*
 	 * Reads the population from the plans file.
 	 */
