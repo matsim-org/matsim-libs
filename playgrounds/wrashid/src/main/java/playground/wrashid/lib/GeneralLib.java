@@ -11,6 +11,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -124,28 +126,6 @@ public class GeneralLib {
 		MatsimWriter populationWriter = new PopulationWriter(population, network);
 
 		populationWriter.write(plansFile);
-	}
-	
-	/**
-	 * Sometimes the plans contain information related to the network and can therefore not be used with a different network.
-	 * This method removes such information.
-	 */
-	public static void removeNetworkInformationFromPlans(Population population){
-		for (Person person:population.getPersons().values()){
-			for (Plan plan:person.getPlans()){
-				for (PlanElement pe:plan.getPlanElements()){
-					if (pe instanceof Activity){
-						ActivityImpl activity=(ActivityImpl) pe;
-						activity.setLinkId(null);
-						//activity.setFacilityId(null);
-					}
-					if (pe instanceof Leg){
-						LegImpl leg=(LegImpl) pe;
-						leg.setRoute(null);
-					}
-				}
-			}
-		}
 	}
 
 	public static ActivityFacilitiesImpl readActivityFacilities(String facilitiesFile) {
@@ -590,5 +570,5 @@ public class GeneralLib {
 		new NetworkCleaner().run(net);
 		return net;
 	}
-	
+		
 }
