@@ -26,7 +26,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.api.internal.MatsimWriter;
@@ -37,6 +41,8 @@ import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -74,19 +80,10 @@ public class GeneralLib {
 		return scenario;
 	}
 	
-	/**
-	 * Sometimes the plans contain information related to the network and can therefore not be used with a different network.
-	 * This method removes such information.
-	 * @return
-	 */
-	public static void removeNetworkInformationFromPlans(Population population){
-		// TODO: remove method, if no implementation provided till 10. aug 2010
-	}
-	
 	/*
 	 * Reads the population from the plans file.
 	 */
-	public static Population readPopulation(String plansFile, String networkFile, String facilititiesPath) {
+	public static Scenario readPopulation(String plansFile, String networkFile, String facilititiesPath) {
 		ScenarioImpl sc = new ScenarioImpl();
 
 		sc.getConfig().setParam("plans", "inputPlansFile", plansFile);
@@ -97,7 +94,7 @@ public class GeneralLib {
 
 		sl.loadScenario();
 
-		return sc.getPopulation();
+		return sc;
 	}
 	
 	/*
@@ -127,6 +124,28 @@ public class GeneralLib {
 		MatsimWriter populationWriter = new PopulationWriter(population, network);
 
 		populationWriter.write(plansFile);
+	}
+	
+	/**
+	 * Sometimes the plans contain information related to the network and can therefore not be used with a different network.
+	 * This method removes such information.
+	 */
+	public static void removeNetworkInformationFromPlans(Population population){
+		for (Person person:population.getPersons().values()){
+			for (Plan plan:person.getPlans()){
+				for (PlanElement pe:plan.getPlanElements()){
+					if (pe instanceof Activity){
+						ActivityImpl activity=(ActivityImpl) pe;
+						activity.setLinkId(null);
+						//activity.setFacilityId(null);
+					}
+					if (pe instanceof Leg){
+						LegImpl leg=(LegImpl) pe;
+						leg.setRoute(null);
+					}
+				}
+			}
+		}
 	}
 
 	public static ActivityFacilitiesImpl readActivityFacilities(String facilitiesFile) {
