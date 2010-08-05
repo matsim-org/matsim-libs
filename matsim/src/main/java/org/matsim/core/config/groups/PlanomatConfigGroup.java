@@ -1,5 +1,6 @@
 package org.matsim.core.config.groups;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -219,25 +220,29 @@ public class PlanomatConfigGroup extends Module {
 		return Integer.parseInt(this.getParams().get(PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getParameterName()));
 	}
 
+	/**
+	 * set representation of the possible modes
+	 */
 	private TreeSet<String> cachedPossibleModes = null;
 
 	public Set<String> getPossibleModes() {
 
-		if (this.cachedPossibleModes == null) {
+		// the lazy initialization of this.cachedPossibleModes has to be synchronized because several planomat may share access to the only instance of PlanomatConfigGroup
+		synchronized (this) {
+			if (this.cachedPossibleModes == null) {
 
-			this.cachedPossibleModes = new TreeSet<String>();
+				this.cachedPossibleModes = new TreeSet<String>();
 
-			if (!super.getParams().get(PlanomatConfigParameter.POSSIBLE_MODES.getParameterName()).equals(PlanomatConfigParameter.POSSIBLE_MODES.getDefaultValue())) {
-				String[] possibleModesStringArray = super.getParams().get(PlanomatConfigParameter.POSSIBLE_MODES.getParameterName()).split(",");
-				for (int ii=0; ii < possibleModesStringArray.length; ii++) {
-					this.cachedPossibleModes.add(possibleModesStringArray[ii].intern());
+				if (!super.getParams().get(PlanomatConfigParameter.POSSIBLE_MODES.getParameterName()).equals(PlanomatConfigParameter.POSSIBLE_MODES.getDefaultValue())) {
+					String[] possibleModesStringArray = super.getParams().get(PlanomatConfigParameter.POSSIBLE_MODES.getParameterName()).split(",");
+					for (int ii = 0; ii < possibleModesStringArray.length; ii++) {
+						this.cachedPossibleModes.add(possibleModesStringArray[ii].intern());
+					}
 				}
+
 			}
-
 		}
-
-		return this.cachedPossibleModes;
-//		return Collections.unmodifiableSet(this.cachedPossibleModes);
+		return Collections.unmodifiableSet(this.cachedPossibleModes);
 
 	}
 
