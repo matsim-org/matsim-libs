@@ -93,17 +93,17 @@
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 		
-		<param name="ModuleProbability_1" value="0.1" />
+		<param name="ModuleProbability_1" value="0.0" />
 		<param name="Module_1" value="PlanomatX" />
 		
-		<param name="ModuleProbability_2" value="0.0" />
-		<param name="Module_2" value="TimeOptimizer" />
+		<param name="ModuleProbability_2" value="0.9" />
+		<param name="Module_2" value="BestScore" />
 		
-		<param name="ModuleProbability_3" value="0.9" />
-		<param name="Module_3" value="BestScore" />
+		<param name="ModuleProbability_3" value="0.1" />
+		<param name="Module_3" value="Recycling" />
 		
 		<param name="ModuleProbability_4" value="0.0" />
-		<param name="Module_4" value="Recycling" />
+		<param name="Module_4" value="LocationChoice" />
 		
 		<param name="ModuleProbability_5" value="0.0" />
 		<param name="Module_5" value="Planomat" />
@@ -113,12 +113,6 @@
 		
 		<param name="ModuleProbability_7" value="0.0" />
 		<param name="Module_7" value="ReRoute" />
-		
-		<param name="ModuleProbability_8" value="0.0" />
-		<param name="Module_8" value="LocationChoice" />
-		
-		<param name="ModuleProbability_9" value="0.0" />
-		<param name="Module_9" value="PlansVariator" />
 
 	</module>
 	
@@ -133,9 +127,10 @@
 		<param name="jgapmaxGenerations" value="100"/>
 	</module>
 	
-	<!--<module name="parallelEventHandling">-->
-  	<!--	<param name="numberOfThreads" value="1" />-->
-	<!--</module>-->
-	
+	<module name="planscalcroute" >
+		<param name="bikeSpeed" value="2.7777777777777777" />
+		<param name="ptSpeedFactor" value="1.8" />
+		<param name="walkSpeed" value="0.75" />
+	</module>
 
 </config>

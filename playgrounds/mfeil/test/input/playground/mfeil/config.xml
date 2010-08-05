@@ -86,6 +86,12 @@
 		<param name="activityClosingTime_4"     value="18:00:00" />
 	</module>
 
+	<module name="planscalcroute" >
+		<param name="bikeSpeed" value="2.7777777777777777" />
+		<param name="ptSpeedFactor" value="1.8" />
+		<param name="walkSpeed" value="0.75" />
+	</module>
+
 	
 
 </config>
