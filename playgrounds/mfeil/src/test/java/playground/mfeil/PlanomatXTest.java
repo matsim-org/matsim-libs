@@ -33,7 +33,7 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.testcases.MatsimTestCase;
 import playground.mfeil.FilesForTests.Initializer;
-import playground.mfeil.MDSAM.ActivityTypeFinder;
+import playground.mfeil.attributes.ActivityTypeFinder;
 
 
 

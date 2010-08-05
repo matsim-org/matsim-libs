@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.population.Person;
 
 
 import playground.mfeil.FilesForTests.Initializer;
-import playground.mfeil.MDSAM.ActivityTypeFinder;
+import playground.mfeil.attributes.ActivityTypeFinder;
 
 public class ScheduleRecyclingTest extends MatsimTestCase{
 	
