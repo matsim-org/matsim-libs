@@ -299,7 +299,7 @@ public class SocialNetwork {
 
 //			makeSocialContact( person1, person2, -1);
 			if(makeSocialContactNotify(person1, person2, 0, "random")==2){
-			log.info("new link made dist "+distance+" "+pdist);
+//			log.info("new link made dist "+distance+" "+pdist);
 			i++;
 			}
 		}
