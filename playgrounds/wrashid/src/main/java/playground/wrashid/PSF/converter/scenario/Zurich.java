@@ -15,6 +15,9 @@ public class Zurich {
 		String inputPlansPath = "a:/data/matsim/input/runRW1003/plans-1pml-miv-dilzh30km-unmapped.xml.gz";
 		String inputFacilitiesPath="a:/data/matsim/input/runRW1003/facilities.zrhCutC.xml.gz";
 		
+		String outputPlansPath="a:/data/matsim/input/runRW1003/plans-1pml-miv-dilzh30km-unmapped-withParkArrAndDepActs.xml.gz";
+		String outputFacilitiesPath="a:/data/matsim/input/runRW1003/facilities.zrhCutC-withParkingArrAndDep.xml.gz";
+		
 		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(inputPlansPath, inputNetworkPath, inputFacilitiesPath);
 
 		// generate parking facilities
@@ -23,7 +26,9 @@ public class Zurich {
 		// generate plans with parking
 		AddParkingsToPlans.generatePlanWithParkingActs(scenario);
 		
-		
-	
+		// write output files
+		GeneralLib.writePopulation(scenario.getPopulation(), scenario.getNetwork(), outputPlansPath);
+		GeneralLib.writeActivityFacilities(scenario.getActivityFacilities(), outputFacilitiesPath);
 	}
+	
 }

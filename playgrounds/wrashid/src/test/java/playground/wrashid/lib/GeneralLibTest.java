@@ -9,11 +9,11 @@ public class GeneralLibTest extends MatsimTestCase {
 
 
 	public void testReadWritePopulation(){
-		Scenario scenario = GeneralLib.readPopulation("test/scenarios/equil/plans2.xml","test/scenarios/equil/network.xml" );
+		Scenario scenario = GeneralLib.readScenario("test/scenarios/equil/plans2.xml","test/scenarios/equil/network.xml" );
 
 		GeneralLib.writePopulation(scenario.getPopulation(), scenario.getNetwork(), getOutputDirectory() + "plans2.xml");
 
-		scenario = GeneralLib.readPopulation(getOutputDirectory() + "plans2.xml","test/scenarios/equil/network.xml" );
+		scenario = GeneralLib.readScenario(getOutputDirectory() + "plans2.xml","test/scenarios/equil/network.xml" );
 
 		assertEquals(2, scenario.getPopulation().getPersons().size());
 	}

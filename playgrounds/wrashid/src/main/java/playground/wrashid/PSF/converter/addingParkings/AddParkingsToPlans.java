@@ -16,6 +16,9 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 
 /**
  * add parking to plans (leg + activities)
+ * TODO: This is not consistent with the new parking model (where there is just one type of activity: parking...)
+ * => change that!!!
+ * => change also required in PSF, where the activity types are used.
  */
 public class AddParkingsToPlans {
 
