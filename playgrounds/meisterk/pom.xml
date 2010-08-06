@@ -21,4 +21,16 @@
 			<version>2.0</version>
 		</dependency>
   </dependencies>
+  	<build>
+		<plugins>
+			<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <forkMode>once</forkMode>
+          <argLine>-Xmx400m -Djava.awt.headless=true</argLine>
+        </configuration>
+      </plugin>
+		</plugins>
+	</build>
 </project>
