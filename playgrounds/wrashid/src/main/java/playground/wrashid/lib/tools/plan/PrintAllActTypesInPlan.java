@@ -21,7 +21,7 @@ public class PrintAllActTypesInPlan {
 		String inputNetworkFile="V:/data/cvs/ivt/studies/switzerland/networks/ivtch/network.xml";
 		String inputFacilities="V:/data/cvs/ivt/studies/switzerland/facilities/facilities.xml.gz";
 		
-		Scenario scenario= GeneralLib.readPopulation(inputPlansFile, inputNetworkFile, inputFacilities);
+		Scenario scenario= GeneralLib.readScenario(inputPlansFile, inputNetworkFile, inputFacilities);
 		
 		printAllActTypes(scenario.getPopulation());
 	}

@@ -69,7 +69,7 @@ public class GeneralLib {
 	 * 
 	 * Note: use the other method with the same name, if this poses problems.
 	 */
-	public static Scenario readPopulation(String plansFile, String networkFile) {
+	public static Scenario readScenario(String plansFile, String networkFile) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Population population = scenario.getPopulation();
 
@@ -85,7 +85,7 @@ public class GeneralLib {
 	/*
 	 * Reads the population from the plans file.
 	 */
-	public static Scenario readPopulation(String plansFile, String networkFile, String facilititiesPath) {
+	public static Scenario readScenario(String plansFile, String networkFile, String facilititiesPath) {
 		ScenarioImpl sc = new ScenarioImpl();
 
 		sc.getConfig().setParam("plans", "inputPlansFile", plansFile);

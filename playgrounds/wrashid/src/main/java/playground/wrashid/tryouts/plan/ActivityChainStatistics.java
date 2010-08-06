@@ -19,7 +19,7 @@ import org.matsim.core.population.PopulationReader;
 
 /*
  * just reads an input plans file and produces an output on the console of activity chains and their occurance in percentage.
- * TODO: refactor class and move class to "lib.tools.plan" (implementation of interface "New Population" not required.
+ * TODO: ###########################  refactor class and move class to "lib.tools.plan" (implementation of interface "New Population" not required.
  */
 
 public class ActivityChainStatistics extends NewPopulation {

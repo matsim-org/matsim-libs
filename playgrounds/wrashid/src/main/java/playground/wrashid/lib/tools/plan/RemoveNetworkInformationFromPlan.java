@@ -24,7 +24,7 @@ public class RemoveNetworkInformationFromPlan {
 		
 		String outputPlansFile="v:/data/v-temp/plans-new.xml.gz";		
 		
-		Scenario scenario= GeneralLib.readPopulation(inputPlansFile, inputNetworkFile,inputFacilities);
+		Scenario scenario= GeneralLib.readScenario(inputPlansFile, inputNetworkFile,inputFacilities);
 		
 		removeNetworkInformationFromPlans(scenario.getPopulation());
 

@@ -27,7 +27,7 @@ public class PlanCloner {
 		
 		// start program
 		
-		Scenario scenario= GeneralLib.readPopulation(inputPlansFile, inputNetworkFile);
+		Scenario scenario= GeneralLib.readScenario(inputPlansFile, inputNetworkFile);
 		
 		Person selectedPersonForCloning=scenario.getPopulation().getPersons().get(new IdImpl(idOfPersonForCloning));
 		
