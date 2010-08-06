@@ -46,6 +46,7 @@ import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 
@@ -80,7 +81,7 @@ public class FacilityDrawer {
 						out.putDouble(facility.getCoord().getY() - OTFServerQuad2.offsetNorth);
 					} else {
 						ByteBufferUtils.putString(out, facility.getLinkId().toString());
-						AgentSnapshotInfo ps = new PositionInfo(facility.getId(),link) ;
+						AgentSnapshotInfo ps = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(facility.getId(), link) ;
 						out.putDouble( ps.getEasting() - OTFServerQuad2.offsetEast ) ;
 						out.putDouble( ps.getNorthing() - OTFServerQuad2.offsetNorth ) ;
 					}

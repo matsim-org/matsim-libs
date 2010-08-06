@@ -33,6 +33,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
@@ -279,7 +280,7 @@ public class AgentSnapshotInfoBuilder {
 		distanceOnLink += offset;
 		int cnt = 0 ;
 		for (PersonAgent passenger : peopleInVehicle) {
-			AgentSnapshotInfo passengerPosition = new PositionInfo(passenger.getPerson().getId(), link, distanceOnLink, lane, cnt );
+			AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getPerson().getId(), link, distanceOnLink, lane, cnt);
 			passengerPosition.setColorValueBetweenZeroAndOne(speed);
 			if (passenger.getPerson().getId().toString().startsWith("pt")) {
 				passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
@@ -298,7 +299,7 @@ public class AgentSnapshotInfoBuilder {
 			Collection<PersonAgent> agentsInActivities,  int cnt2) {
 		int c = cnt2;
 		for (PersonAgent pa : agentsInActivities) {
-			PositionInfo agInfo = new PositionInfo( pa.getPerson().getId(), link, c) ;
+			AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(pa.getPerson().getId(), link, c) ;
 			agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
 			positions.add(agInfo) ;
 			c++ ;
@@ -319,8 +320,7 @@ public class AgentSnapshotInfoBuilder {
 			Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
 			boolean first = true;
 			for (PersonAgent passenger : peopleInVehicle) {
-				AgentSnapshotInfo passengerPosition = new PositionInfo(passenger.getPerson().getId(), link,
-						cnt2); // for the time being, same position as facilities
+				AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getPerson().getId(), link, cnt2); // for the time being, same position as facilities
 				if (passenger.getPerson().getId().toString().startsWith("pt")) {
 					passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
 				}

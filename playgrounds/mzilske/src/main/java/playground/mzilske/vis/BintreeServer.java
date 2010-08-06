@@ -23,6 +23,7 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis2.LinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
@@ -114,7 +115,7 @@ public final class BintreeServer implements OTFServerRemote {
 				Id personId = trajectory.personId;
 				double easting = trajectory.x + (time - trajectory.startTime) * trajectory.dx;
 				double northing = trajectory.y + (time - trajectory.startTime) * trajectory.dy; 
-				PositionInfo agentPositionInfo = new PositionInfo(personId, easting, northing, 0.0d, 0.0d);
+				AgentSnapshotInfo agentPositionInfo = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(personId, easting, northing, 0.0d, 0.0d);
 				agentPositionInfo.setAgentState(AgentState.PERSON_DRIVING_CAR);
 				timeStep.agentPositions.add(agentPositionInfo);
 			}

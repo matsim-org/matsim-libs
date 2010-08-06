@@ -33,8 +33,9 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 /**
  * Converts a TRANSIMS vehicle file into a google earth file.
@@ -222,8 +223,8 @@ public class Veh2Kml {
 						String speed = result[6];
 						String elevation = result[13];
 						String azimuth = result[14];
-						PositionInfo position = new PositionInfo(new IdImpl(agent), easting, northing,
-								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+						AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(new IdImpl(agent), easting, northing, Double.parseDouble(elevation), Double.parseDouble(azimuth),
+								Double.parseDouble(speed), AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 						addVehicle(Double.parseDouble(time), position);
 					}
 				}
@@ -236,7 +237,7 @@ public class Veh2Kml {
 		finish();
 	}
 
-	private void addVehicle(final double time, final PositionInfo position) {
+	private void addVehicle(final double time, final AgentSnapshotInfo position) {
 		if (MatsimRandom.getRandom().nextDouble() >= this.percentage) return;
 		this.cntPositions++;
 

@@ -17,6 +17,7 @@ import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
@@ -142,7 +143,7 @@ public class TransitQLaneFeature {
 				Collection<PersonAgent> peopleInVehicle = getPassengers(veh);
 				boolean first = true;
 				for (PersonAgent passenger : peopleInVehicle) {
-					AgentSnapshotInfo passengerPosition = new PositionInfo( passenger.getPerson().getId(), queueLane.getLink(), cnt2 ); // for the time being, same position as facilities
+					AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getPerson().getId(), queueLane.getLink(), cnt2); // for the time being, same position as facilities
 					if ( passenger.getPerson().getId().toString().startsWith("pt")) {
 						passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
 					} else if (first) {

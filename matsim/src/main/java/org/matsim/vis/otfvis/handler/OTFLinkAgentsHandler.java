@@ -36,6 +36,7 @@ import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
@@ -131,8 +132,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		float colorValue = in.getFloat();
 		int state = in.getInt();
 
-		AgentSnapshotInfo agInfo = new PositionInfo(new IdImpl(id), x, y, 0.,
-				0.);
+		AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(new IdImpl(id), x, y, 0., 0.);
 		agInfo.setColorValueBetweenZeroAndOne(colorValue);
 		agInfo.setUserDefined(userdefined);
 		agInfo.setAgentState(AgentState.values()[state]);

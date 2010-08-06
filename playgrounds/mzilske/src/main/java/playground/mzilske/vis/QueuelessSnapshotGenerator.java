@@ -40,6 +40,8 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
@@ -123,7 +125,7 @@ public class QueuelessSnapshotGenerator implements AgentDepartureEventHandler, A
 			if (i % snapshotPeriod == 0) {
 				double easting = x + (i - agent.startTime) * dx;
 				double northing = y + (i - agent.startTime) * dy; 
-				PositionInfo agentPositionInfo = new PositionInfo(personId, easting, northing, 0.0d, 0.0d);
+				AgentSnapshotInfo agentPositionInfo = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(personId, easting, northing, 0.0d, 0.0d);
 				agentPositionInfo.setAgentState(AgentState.PERSON_DRIVING_CAR);
 				agentPositionInfo.setColorValueBetweenZeroAndOne(speedRatio);
 				doSnapshot(i, agentPositionInfo);
@@ -144,7 +146,7 @@ public class QueuelessSnapshotGenerator implements AgentDepartureEventHandler, A
 		this.eventAgents.clear();
 	}
 
-	private void doSnapshot(int time, PositionInfo agentPositionInfo) {
+	private void doSnapshot(int time, AgentSnapshotInfo agentPositionInfo) {
 		for (SnapshotWriter writer : this.snapshotWriters) {
 			writer.beginSnapshot(time);
 			writer.addAgent(agentPositionInfo);

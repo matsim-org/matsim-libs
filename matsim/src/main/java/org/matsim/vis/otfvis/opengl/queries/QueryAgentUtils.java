@@ -14,7 +14,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
 public class QueryAgentUtils {
 
@@ -42,7 +43,7 @@ public class QueryAgentUtils {
 				if (coord == null) {
 					assert (net != null);
 					Link link = net.getLinks().get(act.getLinkId());
-					PositionInfo pi = new PositionInfo(agentId, link);
+					AgentSnapshotInfo pi = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(agentId, link);
 					coord = new CoordImpl(pi.getEasting(), pi.getNorthing());
 				}
 				setCoord(pos++, coord, col, result);

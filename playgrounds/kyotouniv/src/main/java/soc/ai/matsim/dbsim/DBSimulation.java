@@ -64,7 +64,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 
@@ -378,10 +378,10 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 
 	private void doSnapshot(final double time) {
 		if (!this.snapshotWriters.isEmpty()) {
-			Collection<PositionInfo> positions = this.network.getVehiclePositions();
+			Collection<AgentSnapshotInfo> positions = this.network.getVehiclePositions();
 			for (SnapshotWriter writer : this.snapshotWriters) {
 				writer.beginSnapshot(time);
-				for (PositionInfo position : positions) {
+				for (AgentSnapshotInfo position : positions) {
 					writer.addAgent(position);
 				}
 				writer.endSnapshot();

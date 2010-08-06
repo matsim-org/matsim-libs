@@ -30,10 +30,11 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
 /**
- * This provides a position for the visualizer. Since the QueueSimulation has no physics these coordinates
- * are meant for the visualizer and not necessary meaningful in engineering terms.
  * A helper class to store information about agents (id, position, speed), mainly used to create
- * {@link SnapshotWriter snapshots}.
+ * {@link SnapshotWriter snapshots}.  It also provides a way to convert graph coordinates (linkId, offset) into
+ * Euclidean coordinates.  Also does some additional coordinate shifting (e.g. to the "right") to improve visualization.
+ * In contrast to earlier versions of this comment, it does _not_ define a physical position of particles in the queue model;
+ * that functionality needs to be provided elsewhere.
  *
  * @author mrieser, knagel
  */
@@ -91,7 +92,7 @@ public class PositionInfo implements AgentSnapshotInfo {
 
 	private int user = 0;
 
-	public PositionInfo( final Id agentId, final Link link ) {
+	PositionInfo( final Id agentId, final Link link ) {
 		this( agentId, link, 0 ) ;
 	}
 	
@@ -102,14 +103,14 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 * @param cnt used to calculate offset from link to place items side-by-side rather than on top of each other. Use 0 if you
 	 *            don't know.
 	 */
-	public PositionInfo( final Id agentId, final Link link, int cnt ) {
+	PositionInfo( final Id agentId, final Link link, int cnt ) {
 		this( agentId, link, 0.9*link.getLength(), 10+2*cnt, 0., AgentState.PERSON_AT_ACTIVITY) ;
 	}
 
 	/**
 	 * Use when you have something moving on a link.
 	 */
-	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane ) {
+	PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane ) {
 		this( agentId, link, distanceOnLink, lane, 0 ) ;
 	}
 
@@ -118,13 +119,13 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 * 
 	 * @param cnt is used to "count" persons in a vehicle to possibly offset them to the side.  Not supported without code modification. kai, apr'10
 	 */
-	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final int cnt ) {
+	PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final int cnt ) {
 		this.agentId = agentId;
 		this.linkId = link.getId();
 		this.calculatePosition(link, 1.0, distanceOnLink, lane + 2*cnt );
 	}
 
-	public PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth ) {
+	PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth ) {
 		this.agentId = driverId;
 		this.linkId = null;
 		this.easting = easting;
@@ -144,8 +145,8 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 * @param speed The speed the agent is traveling with.
 	 * @param vehicleState The state of the vehicle (Parking,Driving)
 	 */
-	@Deprecated // in my view, use shorter constructors.  kai, jan'10
-	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState vehicleState ) {
+	@Deprecated // in my view, use shorter constructors.  kai, jan'10 
+	PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState vehicleState ) {
 		this.agentId = agentId;
 		this.linkId = link.getId();
 		this.calculatePosition(link, 1.0, distanceOnLink, lane);
@@ -164,15 +165,15 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 * @param speed The speed the agent is traveling with.
 	 * @param agentState The state of the vehicle (Parking,Driving)
 	 */
-	@Deprecated // (1) try to use shorter constructors.  (2) I don't think it makes sense to hand linkScale as a method into positionInfo; it should come frome somewhere else. kai, apr'10
-	public PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState agentState) {
+	@Deprecated // (1) try to use shorter constructors.  (2) I don't think it makes sense to hand linkScale as a method into positionInfo; it should come frome somewhere else. kai, apr'10 
+	PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final AgentState agentState) {
 		this( linkScale, agentId, link, distanceOnLink, lane ) ;
 		this.speed = speed;
 		this.agentState = agentState;
 	}
 
 	@Deprecated //  I don't think it makes sense to hand linkScale as a method into positionInfo; it should come from somewhere else. kai, apr'10
-	public PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane ) {
+	private PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane ) {
 		this.agentId = agentId;
 		this.linkId = link.getId();
 		this.calculatePosition(link, linkScale, distanceOnLink, lane);
@@ -190,7 +191,7 @@ public class PositionInfo implements AgentSnapshotInfo {
 	 * @param vehicleState The state of the vehicle (Parking, Driving)
 	 */
 	@Deprecated // please try to use the shorter constructors.  kai, apr'10
-	public PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final AgentState vehicleState) {
+	protected PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final AgentState vehicleState) {
 		this( driverId, easting, northing, elevation, azimuth ) ;
 		this.speed = speed;
 		this.agentState = vehicleState;

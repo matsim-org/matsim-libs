@@ -21,9 +21,7 @@ package soc.ai.matsim.dbsim;
 
 import java.util.Collection;
 
-import soc.ai.matsim.dbsim.DBSimLink.AgentOnLink;
-
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 /**
  * Interface for methods to provide a visualizer with data.
  * @author dgrether
@@ -45,8 +43,8 @@ public interface VisData {
 	 */
 	public double getDisplayableTimeCapValue(double now);
 
-	public Collection<PositionInfo> getVehiclePositions(
-			final Collection<PositionInfo> positions);
+	public Collection<AgentSnapshotInfo> getVehiclePositions(
+			final Collection<AgentSnapshotInfo> positions);
 
 /* I don't think these two methods should be part of the interface!
  * Only getVehiclePositions() should be in the interface, how the

@@ -66,7 +66,8 @@ import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
 import com.sun.opengl.util.BufferUtil;
 
@@ -393,7 +394,7 @@ public final class QueryAgentPlan extends AbstractQuery {
 				if (coord == null) {
 					assert (net != null);
 					Link link = net.getLinks().get(act.getLinkId());
-					PositionInfo pi = new PositionInfo(agentId, link);
+					AgentSnapshotInfo pi = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(agentId, link);
 					coord = new CoordImpl(pi.getEasting(), pi.getNorthing());
 				}
 				setCoord(pos++, coord, col, result);

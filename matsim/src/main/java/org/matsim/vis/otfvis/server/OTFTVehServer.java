@@ -45,6 +45,7 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisNetwork;
@@ -118,8 +119,7 @@ public class OTFTVehServer implements OTFServerRemote {
 
 					lineFound = true;
 					this.time = Double.parseDouble(time);
-					this.readVehicle = new PositionInfo(new IdImpl(agent), easting, northing,
-							Double.parseDouble(elevation), Double.parseDouble(azimuth) ) ;
+					this.readVehicle = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(new IdImpl(agent), easting, northing, Double.parseDouble(elevation), Double.parseDouble(azimuth)) ;
 					this.readVehicle.setColorValueBetweenZeroAndOne( Double.parseDouble(speed) ) ;
 					this.readVehicle.setAgentState( AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR ) ;
 					this.readVehicle.setType( Integer.parseInt(result[7]) ) ;

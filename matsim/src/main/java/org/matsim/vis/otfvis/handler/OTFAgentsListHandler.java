@@ -38,6 +38,7 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
@@ -59,15 +60,17 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 	protected List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
 	
-	public static class ExtendedPositionInfo extends PositionInfo {
-
-		private ExtendedPositionInfo(Id driverId, double easting, double northing, double elevation, double azimuth, double speed, AgentState vehicleState, int type, int userdata) {
-			super(driverId, easting, northing, elevation, azimuth, speed, vehicleState);
-			this.setType(type);
-			this.setUserDefined(userdata);
-		}
-
-	}
+//	public static class ExtendedPositionInfo extends PositionInfo {
+//
+//		private ExtendedPositionInfo(Id driverId, double easting, double northing, double elevation, double azimuth, double speed, AgentState vehicleState, int type, int userdata) {
+//			super(driverId, easting, northing, elevation, azimuth, speed, vehicleState);
+//			this.setType(type);
+//			this.setUserDefined(userdata);
+//		}
+//
+//	}
+//
+// no longer needed.  kai, aug'10
 
 	static public class Writer extends OTFDataWriter<Void> {
 //		private Writer() {
@@ -128,7 +131,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			int int1 = in.getInt() ;
 			int int2 = in.getInt() ;
 			float float1 = in.getFloat() ;
-			AgentSnapshotInfo agInfo = new PositionInfo( new IdImpl(id), x, y, 0., 0. ) ;
+			AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(new IdImpl(id), x, y, 0., 0.) ;
 			agInfo.setAgentState( al[int1] ) ;
 			agInfo.setUserDefined( int2 ) ;
 			agInfo.setColorValueBetweenZeroAndOne( float1 ) ;

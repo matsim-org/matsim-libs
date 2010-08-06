@@ -47,7 +47,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.PositionInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 
 public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
@@ -158,10 +159,10 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	private void doSnapshot(final double time) {
 		if (time >= skipUntil) {
 			if (!this.snapshotWriters.isEmpty()) {
-				Collection<PositionInfo> positions = getVehiclePositions(time);
+				Collection<AgentSnapshotInfo> positions = getVehiclePositions(time);
 				for (SnapshotWriter writer : this.snapshotWriters) {
 					writer.beginSnapshot(time);
-					for (PositionInfo position : positions) {
+					for (AgentSnapshotInfo position : positions) {
 						writer.addAgent(position);
 					}
 					writer.endSnapshot();
@@ -170,8 +171,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		}
 	}
 
-	private Collection<PositionInfo> getVehiclePositions(final double time) {
-		Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
+	private Collection<AgentSnapshotInfo> getVehiclePositions(final double time) {
+		Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 		if ("queue".equals(this.snapshotStyle)) {
 			for (EventLink link : this.linkList) {
 				link.getVehiclePositionsQueue(positions, time);
@@ -283,7 +284,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		 * @param positions A collection where the calculated positions can be stored.
 		 * @param time The current timestep
 		 */
-		private void getVehiclePositionsQueue(final Collection<PositionInfo> positions, final double time) {
+		private void getVehiclePositionsQueue(final Collection<AgentSnapshotInfo> positions, final double time) {
 			double queueEnd = this.link.getLength(); // the length of the queue jammed vehicles build at the end of the link
 			double vehLen = Math.min(	// the length of a vehicle in visualization
 					this.euklideanDist / this.spaceCap, // all vehicles must have place on the link
@@ -298,9 +299,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed(time);
 				agent.speed = speed;
 
-				PositionInfo position = new PositionInfo(agent.id,
-						this.link, queueEnd/* + NetworkLayer.CELL_LENGTH*/,
-						lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(agent.id, this.link, queueEnd/* + NetworkLayer.CELL_LENGTH*/, lane, speed,
+						AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 				positions.add(position);
 				queueEnd -= vehLen;
 			}
@@ -333,9 +333,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed(time);
 				agent.speed = speed;
 				int lane = 1 + (agent.intId % NetworkUtils.getNumberOfLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME, this.link));
-				PositionInfo position = new PositionInfo(agent.id,
-						this.link, distanceOnLink/* + NetworkLayer.CELL_LENGTH*/,
-						lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(agent.id, this.link, distanceOnLink/* + NetworkLayer.CELL_LENGTH*/, lane, speed,
+						AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 				positions.add(position);
 				lastDistance = distanceOnLink;
 			}
@@ -345,8 +344,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			 * to the coordinates of the from node */
 			int lane = NetworkUtils.getNumberOfLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME, this.link) + 1; // place them next to the link
 			for (EventAgent agent : this.waitingQueue) {
-				PositionInfo position = new PositionInfo(agent.id,
-						this.link, this.effectiveCellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
+				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(agent.id, this.link, this.effectiveCellSize, lane, 0.0,
+						AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
 				positions.add(position);
 			}
 
@@ -355,8 +354,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			 * to the coordinates of the from node */
 			lane = NetworkUtils.getNumberOfLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME, this.link) + 2; // place them next to the link
 			for (EventAgent agent : this.parkingQueue) {
-				PositionInfo position = new PositionInfo(agent.id,
-						this.link, this.effectiveCellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
+				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(agent.id, this.link, this.effectiveCellSize, lane, 0.0,
+						AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
 				positions.add(position);
 			}
 		}
@@ -369,7 +368,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		 * @param positions A collection where the calculated positions can be stored.
 		 * @param time The current timestep
 		 */
-		private void getVehiclePositionsEquil(final Collection<PositionInfo> positions, final double time) {
+		private void getVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions, final double time) {
 			int bufferSize = this.buffer.size();
 			int drivingQueueSize = this.drivingQueue.size();
 			int waitingQueueSize = this.waitingQueue.size();
@@ -392,7 +391,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 						} else {
 							agent.speed = freespeed;
 						}
-						PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+						AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(agent.id, this.link, distFromFromNode, agent.lane,
+								agent.speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 						positions.add(position);
 						distFromFromNode -= cellSize;
 					}
@@ -406,7 +406,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 						} else {
 							agent.speed = freespeed;
 						}
-						PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+						AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(agent.id, this.link, distFromFromNode, agent.lane,
+								agent.speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 						positions.add(position);
 						distFromFromNode -= cellSize;
 					}
@@ -421,7 +422,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 					for (EventAgent agent : this.waitingQueue) {
 						agent.lane = lane;
 						agent.speed = 0.0;
-						PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
+						AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(agent.id, this.link, distFromFromNode, agent.lane,
+								agent.speed, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
 						positions.add(position);
 						distFromFromNode -= cellSize;
 					}
@@ -436,7 +438,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 					for (EventAgent agent : this.parkingQueue) {
 						agent.lane = lane;
 						agent.speed = 0.0;
-						PositionInfo position = new PositionInfo(agent.id, this.link, distFromFromNode, agent.lane, agent.speed, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
+						AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(agent.id, this.link, distFromFromNode, agent.lane,
+								agent.speed, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
 						positions.add(position);
 						distFromFromNode -= cellSize;
 					}
