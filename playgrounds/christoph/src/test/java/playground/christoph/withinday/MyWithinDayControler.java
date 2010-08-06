@@ -1,14 +1,29 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.christoph.withinday;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.controler.WithinDayControler;
@@ -32,14 +47,22 @@ import playground.christoph.withinday.replanning.parallel.ParallelInitialReplann
 
 public class MyWithinDayControler extends Controler {
 
-
-
 	public MyWithinDayControler(String configFileName) {
 		super(configFileName);
 	}
 
-	public static void start(String configFilePath){
+	public MyWithinDayControler(Config config) {
+		super(config);
+	}
+
+	public static void start(String configFilePath) {
 		final MyWithinDayControler controler = new MyWithinDayControler(configFilePath);
+		controler.setOverwriteFiles(true);
+		controler.run();
+	}
+
+	public static void start(Config config) {
+		final MyWithinDayControler controler = new MyWithinDayControler(config);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
@@ -78,8 +101,8 @@ public class MyWithinDayControler extends Controler {
 		// use dijkstra for replanning (routing)
 		travelTime=this.getTravelTimeCalculator();
 //		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory()); 
-		
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
+
 //		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 //		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
 //		this.initialReplanner.setReplanner(dijkstraRouter);
