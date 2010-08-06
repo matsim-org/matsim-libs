@@ -12,10 +12,10 @@ import playground.wrashid.lib.GeneralLib;
 public class Zurich {
 	public static void main(String[] args) {
 		String inputNetworkPath="a:/data/matsim/input/runRW1003/network-osm-ch.xml.gz";
-		String inputPlansPath = "a:/data/matsim/input/runRW1003/plans-1pml-miv-dilzh30km-unmapped.xml.gz";
+		String inputPlansPath = "a:/data/matsim/input/runRW1003/plans-1pml-miv-dilzh30km-osm-mapped.xml.gz";
 		String inputFacilitiesPath="a:/data/matsim/input/runRW1003/facilities.zrhCutC.xml.gz";
 		
-		String outputPlansPath="a:/data/matsim/input/runRW1003/plans-1pml-miv-dilzh30km-unmapped-withParkArrAndDepActs.xml.gz";
+		String outputPlansPath="a:/data/matsim/input/runRW1003/plans-1pml-miv-dilzh30km-osm-mapped-withParkArrAndDepActs.xml.gz";
 		String outputFacilitiesPath="a:/data/matsim/input/runRW1003/facilities.zrhCutC-withParkingArrAndDep.xml.gz";
 		
 		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(inputPlansPath, inputNetworkPath, inputFacilitiesPath);

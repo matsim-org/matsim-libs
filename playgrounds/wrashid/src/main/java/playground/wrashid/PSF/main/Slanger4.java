@@ -20,7 +20,7 @@ public class Slanger4 implements ParametersPSFMutator {
 	public static void main(String[] args) {
 		// for running on "slanger4"
 		
-		PSSControler pssControler=new PSSControler("a:\\data\\matsim\\input\\runRW1002\\config.xml", null);
+		PSSControler pssControler=new PSSControler("a:\\data\\matsim\\input\\runRW1003\\config.xml", null);
 		
 		pssControler.runMATSimPSSIterations(2);
 		/*
