@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 
@@ -38,6 +37,43 @@ import org.matsim.core.network.NodeImpl;
  */
 public class MergeNetworks {
 
+	/**
+	 * Merges two networks into one, by copying all nodes and links from the addNetworks to the baseNetwork.
+	 *
+	 * @param baseNetwork
+	 * @param addNetwork
+	 */
+	public static void merge(final Network baseNetwork, final String addPrefix, final Network addNetwork) {
+		double capacityFactor = baseNetwork.getCapacityPeriod() / addNetwork.getCapacityPeriod();
+		NetworkFactory factory = baseNetwork.getFactory();
+		for (Node node : addNetwork.getNodes().values()) {
+			NodeImpl node2 = (NodeImpl) factory.createNode(new IdImpl(addPrefix + node.getId().toString()), node.getCoord());
+			baseNetwork.addNode(node2);
+		}
+		for (Link link : addNetwork.getLinks().values()) {
+			Id fromNodeId = new IdImpl(addPrefix + link.getFromNode().getId().toString());
+			Id toNodeId = new IdImpl(addPrefix + link.getToNode().getId().toString());
+			Link link2 = factory.createLink(new IdImpl(addPrefix + link.getId().toString()),
+					fromNodeId, toNodeId);
+			link2.setAllowedModes(link.getAllowedModes());
+			link2.setCapacity(link.getCapacity() * capacityFactor);
+			link2.setFreespeed(link.getFreespeed());
+			link2.setLength(link.getLength());
+			link2.setNumberOfLanes(link.getNumberOfLanes());
+			baseNetwork.addLink(link2);
+		}
+	}
+
+	/**
+	 * Merges two networks into one, by copying all nodes and links from the two
+	 * given networks to a third one.
+	 *
+	 * @param networkA
+	 * @param prefixA
+	 * @param networkB
+	 * @param prefixB
+	 * @param mergedNetwork
+	 */
 	public static void merge(final Network networkA, final String prefixA, final Network networkB, final String prefixB, final NetworkImpl mergedNetwork) {
 		double capacityFactor = mergedNetwork.getCapacityPeriod() / networkA.getCapacityPeriod();
 		NetworkFactory factory = mergedNetwork.getFactory();
@@ -55,7 +91,7 @@ public class MergeNetworks {
 			link2.setFreespeed(link.getFreespeed());
 			link2.setLength(link.getLength());
 			link2.setNumberOfLanes(link.getNumberOfLanes());
-			mergedNetwork.getLinks().put(link2.getId(), (LinkImpl) link2);
+			mergedNetwork.getLinks().put(link2.getId(), link2);
 			mergedNetwork.getNodes().get(fromNodeId).addOutLink(link2);
 			mergedNetwork.getNodes().get(toNodeId).addInLink(link2);
 		}
@@ -74,7 +110,7 @@ public class MergeNetworks {
 			link2.setFreespeed(link.getFreespeed());
 			link2.setLength(link.getLength());
 			link2.setNumberOfLanes(link.getNumberOfLanes());
-			mergedNetwork.getLinks().put(link2.getId(), (LinkImpl) link2);
+			mergedNetwork.getLinks().put(link2.getId(), link2);
 			mergedNetwork.getNodes().get(fromNodeId).addOutLink(link2);
 			mergedNetwork.getNodes().get(toNodeId).addInLink(link2);
 		}
