@@ -23,6 +23,7 @@ package org.matsim.visum;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
@@ -142,7 +143,7 @@ public class VisumNetworkReader {
 	}
 
 	public void read(final String filename) throws FileNotFoundException, IOException {
-		BufferedReader reader = IOUtils.getBufferedReader(filename);
+		BufferedReader reader = IOUtils.getBufferedReader(filename, Charset.forName("ISO-8859-1"));
 
 		try {
 			String line = reader.readLine();
