@@ -14,6 +14,7 @@
 			<includes>
 				<include>examples/equil/**</include>
 				<include>examples/tutorial/**</include>
+				<include>libs/**</include>
 			</includes>
 		</fileSet>
 		
@@ -37,7 +38,15 @@
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
+			<source>README.txt</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
 			<source>${project.build.directory}/${project.build.finalName}.jar</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
+			<source>${project.build.directory}/${project.build.finalName}-sources.jar</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
 	</files>
