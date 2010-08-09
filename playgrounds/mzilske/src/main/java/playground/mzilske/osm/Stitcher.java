@@ -100,6 +100,10 @@ public class Stitcher {
 		while (i.hasNext()) {
 			Node next = network.getNodes().get(i.next());
 			Path leastCostPath = router.calcLeastCostPath(previous, next, 0);
+			if (leastCostPath == null) {
+				System.out.println("No route.");
+				return Collections.emptyList();
+			}
 			for (Link link : leastCostPath.links) {
 				links.add(link.getId());
 			}

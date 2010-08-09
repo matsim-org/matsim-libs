@@ -215,10 +215,10 @@ public class TransitNetworkSink implements Sink {
 							stopsR.addFirst(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
 							stitcher.addForwardStop(node);
 							stitcher.addBackwardStop(node);
-						} else if (role.startsWith("forward:stop")) {
+						} else if (role.startsWith("forward")) {
 							stopsH.addLast(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
 							stitcher.addForwardStop(node);
-						} else if (role.startsWith("backward:stop")) {
+						} else if (role.startsWith("backward")) {
 							stopsR.addFirst(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
 							stitcher.addBackwardStop(node);
 						} else {

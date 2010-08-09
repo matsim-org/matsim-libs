@@ -139,14 +139,24 @@ public class NetworkSink implements SinkSource {
 		long fromNodeNumber = fromNode.getNodeId();
 		long toNodeNumber = toNode.getNodeId();
 		if (!onewayReverse) {
-			Link l = network.createAndAddLink(new IdImpl(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber)), network.getNodes().get(new IdImpl(fromNodeNumber)), network.getNodes().get(new IdImpl(toNodeNumber)), length, freespeed, capacity, nofLanes);
-			((LinkImpl) l).setOrigId(origId);
-			tagWayForward(way, l);
+			IdImpl id = new IdImpl(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber));
+			if (!network.getLinks().containsKey(id)) {
+				Link l = network.createAndAddLink(id, network.getNodes().get(new IdImpl(fromNodeNumber)), network.getNodes().get(new IdImpl(toNodeNumber)), length, freespeed, capacity, nofLanes);
+				((LinkImpl) l).setOrigId(origId);
+				tagWayForward(way, l);
+			} else {
+				log.warn("Duplicate link: " + id);
+			}
 		}
 		if (!oneway) {
-			Link l = network.createAndAddLink(new IdImpl(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber)+"_R"), network.getNodes().get(new IdImpl(toNodeNumber)), network.getNodes().get(new IdImpl(fromNodeNumber)), length, freespeed, capacity, nofLanes);
-			((LinkImpl) l).setOrigId(origId);
-			tagWayBackward(way, l);
+			IdImpl id = new IdImpl(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber)+"_R");
+			if (!network.getLinks().containsKey(id)) {
+				Link l = network.createAndAddLink(id, network.getNodes().get(new IdImpl(toNodeNumber)), network.getNodes().get(new IdImpl(fromNodeNumber)), length, freespeed, capacity, nofLanes);
+				((LinkImpl) l).setOrigId(origId);
+				tagWayBackward(way, l);
+			} else {
+				log.warn("Duplicate link: " + id);
+			}
 		}
 	}
 

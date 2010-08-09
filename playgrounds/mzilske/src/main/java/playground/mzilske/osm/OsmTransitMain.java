@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.transitSchedule.api.TransitScheduleWriter;
@@ -25,6 +26,8 @@ public class OsmTransitMain {
 		scenario.getConfig().scenario().setUseTransit(true);
 		String filename = "inputs/schweiz/zurich.osm";
 		FastXmlReader reader = new FastXmlReader(new File(filename ), true, CompressionMethod.None);		
+		
+		// TransformTask transform = new TransformTask("inputs/schweiz/zurich-transit-transform.xml", "output/stats.xml");
 		
 		Map<String, Set<String>> tagKeyValues = new HashMap<String, Set<String>>();
 		tagKeyValues.put("route", new HashSet<String>(Arrays.asList("tram", "train", "bus")));
@@ -52,10 +55,12 @@ public class OsmTransitMain {
 		
 		
 		reader.setSink(transitFilter);
+		// transform.setSink(transitFilter);
 		transitFilter.setSink(usedFilter);
 		usedFilter.setSink(networkGenerator);
 		networkGenerator.setSink(transitNetworkSink);
 		reader.run();
+		new NetworkWriter(scenario.getNetwork()).write("output/transit-network.xml");
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("output/transit.xml");
 	}
 
