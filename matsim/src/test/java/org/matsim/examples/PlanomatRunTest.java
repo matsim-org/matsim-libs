@@ -20,10 +20,16 @@
 
 package org.matsim.examples;
 
-import org.apache.log4j.Logger;
+import java.util.HashMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.planomat.utils.SelectedPlansScoreTest;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatRunTest extends MatsimTestCase {
@@ -46,29 +52,31 @@ public class PlanomatRunTest extends MatsimTestCase {
 		this.runControlerTest(this.config);
 	}
 
-	/**
-	 * TODO this test always fails for an unknown reason.
-	 * checksums of actual test results are not stable even in repeated runs of this test on one machine
-	 */
 	public void testMainCarPt() {
-//		this.runControlerTest(this.config); // commented this out because I don't really like non-deterministic tests. kai, aug09
+		this.runControlerTest(this.config);
 	}
 
 	private void runControlerTest(final Config config) {
 
-		final Logger logger = Logger.getLogger(PlanomatRunTest.class);
+		String plansInputFile = config.plans().getInputFile();
 
-		config.controler().setOutputDirectory(this.getOutputDirectory());
+		HashMap<Id,Double> expectedScores = new HashMap<Id,Double>();
+
+		Scenario expectedScenario = new ScenarioImpl(config);
+		expectedScenario.getConfig().plans().setInputFile(this.getInputDirectory() + "plans.xml.gz");
+		new ScenarioLoaderImpl(expectedScenario).loadScenario();
+		for (Person person : expectedScenario.getPopulation().getPersons().values()) {
+			expectedScores.put(person.getId(), person.getSelectedPlan().getScore());
+		}
+
+		config.plans().setInputFile(plansInputFile);
+
 		Controler testee = new Controler(config);
+		testee.addControlerListener(new SelectedPlansScoreTest(expectedScores, 10));
 		testee.setCreateGraphs(false);
 		testee.setWriteEventsInterval(0);
 		testee.run();
-
-		// actual test: compare checksums of the files
-		final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + "plans.xml.gz");
-		final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + "output_plans.xml.gz");
-		logger.info("Actual checksum: " + Long.toString(actualChecksum));
-		assertEquals("different plans files.", expectedChecksum, actualChecksum);
-	}
-
+		
+	}	
+	
 }

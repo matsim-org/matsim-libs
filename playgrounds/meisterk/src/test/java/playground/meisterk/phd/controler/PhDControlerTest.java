@@ -28,8 +28,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.planomat.utils.SelectedPlansScoreTest;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -58,6 +57,12 @@ public class PhDControlerTest extends MatsimTestCase {
 		
 	}
 
+	@Override
+	protected void tearDown() throws Exception {
+		this.config = null;
+		super.tearDown();
+	}
+
 	public void testTAMRouter() {
 
 		this.config.plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateAll6AM/expected_plans.xml.gz");
@@ -69,10 +74,10 @@ public class PhDControlerTest extends MatsimTestCase {
 		this.config.strategy().addParam("ModuleProbability_3", "0.1");
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
-		expectedPlanScores.put(new IdImpl(1012), 102.3995485156362);
-		expectedPlanScores.put(new IdImpl(1033), 92.3175207822995);
-		expectedPlanScores.put(new IdImpl(1072), 107.02180374798185);
-		expectedPlanScores.put(new IdImpl(947), 102.39001983518614);
+		expectedPlanScores.put(new IdImpl(1012), 102.4771507401222);
+		expectedPlanScores.put(new IdImpl(1033), 96.53444472767572);
+		expectedPlanScores.put(new IdImpl(1072), 107.02180374798186);
+		expectedPlanScores.put(new IdImpl(947), 102.3916865018528);
 
 		this.runATest(expectedPlanScores);
 		
@@ -89,10 +94,10 @@ public class PhDControlerTest extends MatsimTestCase {
 		this.config.strategy().addParam("ModuleProbability_2", "0.1");
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
-		expectedPlanScores.put(new IdImpl(1012), 99.02855025439848);
-		expectedPlanScores.put(new IdImpl(1033), -22.11377578357179);
-		expectedPlanScores.put(new IdImpl(1072), 104.98460992294699);
-		expectedPlanScores.put(new IdImpl(947), 103.71560343846069);
+		expectedPlanScores.put(new IdImpl(1012), 94.6779217996309);
+		expectedPlanScores.put(new IdImpl(1033), -22.113775783571782);
+		expectedPlanScores.put(new IdImpl(1072), 104.22794325628031);
+		expectedPlanScores.put(new IdImpl(947), 98.97406416124487);
 
 		this.runATest(expectedPlanScores);
 	}
@@ -136,9 +141,9 @@ public class PhDControlerTest extends MatsimTestCase {
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
-		expectedPlanScores.put(new IdImpl(1033), 106.53017916647772);
-		expectedPlanScores.put(new IdImpl(1072), null);
-		expectedPlanScores.put(new IdImpl(947), 103.45836480987339);
+		expectedPlanScores.put(new IdImpl(1033), 106.82511071811835);
+		expectedPlanScores.put(new IdImpl(1072), 105.00036493948923);
+		expectedPlanScores.put(new IdImpl(947), 103.22669814320673);
 
 		this.runATest(expectedPlanScores);
 	}
@@ -177,7 +182,7 @@ public class PhDControlerTest extends MatsimTestCase {
 
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
-		expectedPlanScores.put(new IdImpl(1033), 94.39603769844027);
+		expectedPlanScores.put(new IdImpl(1033), 94.37270436510693);
 		expectedPlanScores.put(new IdImpl(1072), 94.90568335701548);
 		expectedPlanScores.put(new IdImpl(947), 106.10466621258328);
 		this.runATest(expectedPlanScores);
@@ -223,7 +228,7 @@ public class PhDControlerTest extends MatsimTestCase {
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
 		expectedPlanScores.put(new IdImpl(1033), 104.19682933444355);
 		expectedPlanScores.put(new IdImpl(1072), 105.0695479783633);
-		expectedPlanScores.put(new IdImpl(947), 107.13014696303627);
+		expectedPlanScores.put(new IdImpl(947), 106.87181362970294);
 		this.runATest(expectedPlanScores);
 
 	}
@@ -234,9 +239,9 @@ public class PhDControlerTest extends MatsimTestCase {
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
-		expectedPlanScores.put(new IdImpl(1033), 103.3233776257545);
+		expectedPlanScores.put(new IdImpl(1033), 103.24504429242117);
 		expectedPlanScores.put(new IdImpl(1072), 105.04246369984388);
-		expectedPlanScores.put(new IdImpl(947), 92.624537992099);
+		expectedPlanScores.put(new IdImpl(947), 92.61820451723383);
 		this.runATest(expectedPlanScores);
 
 	}
@@ -247,7 +252,7 @@ public class PhDControlerTest extends MatsimTestCase {
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
-		expectedPlanScores.put(new IdImpl(1033), 87.57753546446183);
+		expectedPlanScores.put(new IdImpl(1033), 87.5842021311285);
 		expectedPlanScores.put(new IdImpl(1072), 104.26443813631997);
 		expectedPlanScores.put(new IdImpl(947), 104.63519690371794);
 		this.runATest(expectedPlanScores);
@@ -273,9 +278,9 @@ public class PhDControlerTest extends MatsimTestCase {
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
-		expectedPlanScores.put(new IdImpl(1033), 106.47184583314439);
-		expectedPlanScores.put(new IdImpl(1072), null);
-		expectedPlanScores.put(new IdImpl(947), 105.37741325732861);
+		expectedPlanScores.put(new IdImpl(1033), 106.82179507900221);
+		expectedPlanScores.put(new IdImpl(1072), 101.55431613167895);
+		expectedPlanScores.put(new IdImpl(947), 105.34074659066195);
 		this.runATest(expectedPlanScores);
 
 	}
@@ -312,9 +317,9 @@ public class PhDControlerTest extends MatsimTestCase {
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
-		expectedPlanScores.put(new IdImpl(1033), 98.92828146624726);
+		expectedPlanScores.put(new IdImpl(1033), 98.92661479958059);
 		expectedPlanScores.put(new IdImpl(1072), 105.66601296327353);
-		expectedPlanScores.put(new IdImpl(947), 105.85294455886937);
+		expectedPlanScores.put(new IdImpl(947), 105.85740228220659);
 		this.runATest(expectedPlanScores);
 
 	}
@@ -325,9 +330,9 @@ public class PhDControlerTest extends MatsimTestCase {
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
-		expectedPlanScores.put(new IdImpl(1033), 106.60587176607606);
+		expectedPlanScores.put(new IdImpl(1033), 106.6342050994094);
 		expectedPlanScores.put(new IdImpl(1072), 104.26367086471274);
-		expectedPlanScores.put(new IdImpl(947), 105.44081926265083);
+		expectedPlanScores.put(new IdImpl(947), 105.4358076390397);
 		this.runATest(expectedPlanScores);
 
 	}
@@ -338,9 +343,9 @@ public class PhDControlerTest extends MatsimTestCase {
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
-		expectedPlanScores.put(new IdImpl(1033), 106.59517916647772);
+		expectedPlanScores.put(new IdImpl(1033), 106.43684583314439);
 		expectedPlanScores.put(new IdImpl(1072), 103.92248197107142);
-		expectedPlanScores.put(new IdImpl(947), 105.4108236832208);
+		expectedPlanScores.put(new IdImpl(947), 105.38574659066195);
 		this.runATest(expectedPlanScores);
 
 	}
@@ -364,9 +369,9 @@ public class PhDControlerTest extends MatsimTestCase {
 		
 		HashMap<Id, Double> expectedPlanScores = new HashMap<Id, Double>();
 		expectedPlanScores.put(new IdImpl(1012), -203.22393647708262);
-		expectedPlanScores.put(new IdImpl(1033), 106.47184583314439);
-		expectedPlanScores.put(new IdImpl(1072), null);
-		expectedPlanScores.put(new IdImpl(947), 105.37741325732861101);
+		expectedPlanScores.put(new IdImpl(1033), 106.82179507900221);
+		expectedPlanScores.put(new IdImpl(1072), 101.55431613167895);
+		expectedPlanScores.put(new IdImpl(947), 105.34074659066195);
 		this.runATest(expectedPlanScores);
 
 	}
@@ -388,47 +393,12 @@ public class PhDControlerTest extends MatsimTestCase {
 		Controler testee = new PhDControler(this.config);
 		testee.getConfig().controler().setOutputDirectory(this.getOutputDirectory());
 
-		testee.addControlerListener(new ScoreChecker(expectedPlanScores));
+		testee.addControlerListener(new SelectedPlansScoreTest(expectedPlanScores, PhDControlerTest.TEST_ITERATION));
 		
 		testee.setCreateGraphs(false);
 		testee.setWriteEventsInterval(0);
 		testee.run();
 		
 	}
-	
-	private class ScoreChecker implements BeforeMobsimListener {
-
-		private final HashMap<Id,Double> expectedPlanScores;
-		
-		public ScoreChecker(HashMap<Id, Double> expectedPlanScores) {
-			super();
-			this.expectedPlanScores = expectedPlanScores;
-		}
-
-		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-
-			int iterationNumber = event.getIteration();
-			if (iterationNumber == PhDControlerTest.TEST_ITERATION) {
-				
-				for (Id personId : this.expectedPlanScores.keySet()) {
-					Double expectedScore = this.expectedPlanScores.get(personId);
-					Double actualScore = event.getControler().getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
-					if (expectedScore == null) {
-						assertNull(actualScore);
-					} else {
-						assertEquals(
-								"Unexpected score for selected plan of agent with id " + personId.toString() + ".", 
-								expectedScore, 
-								actualScore, 
-								MatsimTestCase.EPSILON);
-					}
-				}
-				
-			}
-			
-		}
-
-	}
-
 
 }

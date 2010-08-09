@@ -173,7 +173,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 				this.ktiConfigGroup);
 		double actualLegScore = testee.calcLegScore(Time.parseTime("06:00:00"), Time.parseTime("06:30:00"), testLeg);
 
-		assertEquals(expectedScore, actualLegScore, 1e-6);
+		assertEquals(expectedScore, actualLegScore, MatsimTestCase.EPSILON);
 
 	}
 
