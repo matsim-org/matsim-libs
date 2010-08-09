@@ -85,6 +85,8 @@ public class MATSim4Urbansim {
 	private static double samplingRate = -0.01;
 	// points to the directory where urbansim and MATSim exchange data
 	private static String tempDirectory = null;
+	// points to the OPUS_HOME directory
+	private static String opusHomeDirectory = null;
 	// flag o indicate the fist urbansim run (if always true equals "warm start")
 	private static boolean firstRun = true;
 	
@@ -211,7 +213,7 @@ public class MATSim4Urbansim {
 			// crate a schema factory ...
 			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
 			// ... and initialize it with an xsd (xsd lies in the urbansim project)
-			File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" );
+			File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); // TODO: make it configurable
 			if(!file2XSD.exists()){
 				log.error(file2XSD.getCanonicalPath() + " does not exsist!!!");
 				return false;
@@ -243,12 +245,18 @@ public class MATSim4Urbansim {
 				samplingRate = matsimConfig.getUrbansimParameter().getSamplingRate();
 				year = matsimConfig.getUrbansimParameter().getYear().intValue();
 				tempDirectory = matsimConfig.getUrbansimParameter().getTempDirectory();
+				opusHomeDirectory = matsimConfig.getUrbansimParameter().getOpusHOME();
 				isTestRun = matsimConfig.getUrbansimParameter().isIsTestRun();
 
 				log.info("Network: " + networkFile);
 				log.info("Controler FirstIteration: " + firstIteration + " LastIteration: " + lastIteration );
 				log.info("PlanCalcScore Activity_Type_0: " + activityType_0 + " Activity_Type_1: " + activityType_1);
-				log.info("UrbansimParameter SamplingRate: " + samplingRate + " Year: " + year + " TempDir: " + tempDirectory + " TestRun: " + isTestRun);
+				log.info("UrbansimParameter SamplingRate: " + samplingRate + " Year: " + year + " TempDir: " + tempDirectory + " OPUS_HOME: " + opusHomeDirectory + " TestRun: " + isTestRun);
+				
+				// update opus home path if needed
+				if(! Constants.OPUS_HOME.equalsIgnoreCase(opusHomeDirectory))
+					Constants.updateOpusHomeSubdirectories(opusHomeDirectory);
+				
 			}
 		}
 		catch(JAXBException je){

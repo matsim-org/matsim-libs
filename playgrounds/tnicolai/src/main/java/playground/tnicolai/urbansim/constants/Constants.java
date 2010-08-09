@@ -30,15 +30,23 @@ package playground.tnicolai.urbansim.constants;
 public class Constants {
 	
 	/** important system environments */
-	public static final String OPUS_HOME = System.getenv("OPUS_HOME");				// TODO: schould be provided by UrbanSim via the configuration file
-	public static final String OPUS_DATA_PATH = System.getenv("OPUS_DATA_PATH");	// TODO: schould be provided by UrbanSim via the configuration file
-	public static final String PYTHONPATH = System.getenv("PYTHONPATH");			// TODO: schould be provided by UrbanSim via the configuration file
+	public static String OPUS_HOME = System.getenv("OPUS_HOME");			// TODO: schould be provided by UrbanSim via the configuration file
+	public static String OPUS_DATA_PATH = System.getenv("OPUS_DATA_PATH");	// TODO: schould be provided by UrbanSim via the configuration file
+	public static String PYTHONPATH = System.getenv("PYTHONPATH");			// TODO: schould be provided by UrbanSim via the configuration file
 	
 	/** subdirectories in OPUS_HOME */
-	public static final String OPUS_MATSIM_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/";
-	public static final String MATSIM_CONFIG_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/matsim_config/";
-	public static final String OPUS_MATSIM_OUTPUT_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/output/";
-	public static final String OPUS_MATSIM_TEMPORARY_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/tmp/";
+	public static String OPUS_MATSIM_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/";
+	public static String MATSIM_CONFIG_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/matsim_config/";
+	public static String OPUS_MATSIM_OUTPUT_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/output/";
+	public static String OPUS_MATSIM_TEMPORARY_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/tmp/";
+	
+	public static void updateOpusHomeSubdirectories(String opusHome){
+		OPUS_HOME = opusHome;
+		OPUS_MATSIM_DIRECTORY = opusHome+'/'+"opus_matsim/";
+		MATSIM_CONFIG_DIRECTORY = opusHome+'/'+"opus_matsim/matsim_config/";
+		OPUS_MATSIM_OUTPUT_DIRECTORY = opusHome+'/'+"opus_matsim/output/";
+		OPUS_MATSIM_TEMPORARY_DIRECTORY = opusHome+'/'+"opus_matsim/tmp/";
+	}
 	
 	/** subdirectories in MATSim */
 	public static final String MATSIM_WORKING_DIRECTORY = System.getProperty("user.dir");
