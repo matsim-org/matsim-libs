@@ -71,8 +71,6 @@ class VizGuiHandler extends MouseInputAdapter implements MouseWheelListener {
 				throw new RuntimeException(e1);
 			}
 			Point2D.Double transformedPoint = (Point2D.Double) linkTransform.transform(origPoint, null);
-			System.out.println(origPoint);
-			System.out.println(transformedPoint);
 			this.otfSwingDrawer.handleClick(transformedPoint, e.getButton(), e);
 			scrollPane.invalidate();
 			scrollPane.repaint();
