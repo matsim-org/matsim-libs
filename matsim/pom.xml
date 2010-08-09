@@ -61,6 +61,25 @@
 		</testResources>
 		<plugins>
 			<plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>1.0-beta-4</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <doCheck>false</doCheck>
+          <doUpdate>false</doUpdate>
+          <revisionOnScmFailure>unknown</revisionOnScmFailure>
+          <timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+        </configuration>
+      </plugin>
+			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.6</source>
@@ -201,24 +220,6 @@
 				<pluginManagement>
 					<plugins>
 						<plugin>
-							<groupId>org.codehaus.mojo</groupId>
-							<artifactId>buildnumber-maven-plugin</artifactId>
-							<version>1.0-beta-4</version>
-							<executions>
-								<execution>
-									<phase>validate</phase>
-									<goals>
-										<goal>create</goal>
-									</goals>
-								</execution>
-							</executions>
-							<configuration>
-								<doCheck>false</doCheck>
-								<doUpdate>false</doUpdate>
-								<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
-							</configuration>
-						</plugin>
-						<plugin>
 							<artifactId>maven-jar-plugin</artifactId>
 							<configuration>
 								<archive>
@@ -239,24 +240,6 @@
 			<build>
 				<pluginManagement>
 					<plugins>
-						<plugin>
-							<groupId>org.codehaus.mojo</groupId>
-							<artifactId>buildnumber-maven-plugin</artifactId>
-							<version>1.0-beta-4</version>
-							<executions>
-								<execution>
-									<phase>validate</phase>
-									<goals>
-										<goal>create</goal>
-									</goals>
-								</execution>
-							</executions>
-							<configuration>
-								<doCheck>false</doCheck>
-								<doUpdate>false</doUpdate>
-								<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
-							</configuration>
-						</plugin>
 						<plugin>
 							<artifactId>maven-jar-plugin</artifactId>
 							<configuration>
@@ -340,10 +323,10 @@
 			<version>2.3.5</version>
 		</dependency>
 		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt2-epsg-hsql</artifactId>
-			<version>2.3.5</version>
-		</dependency>
+	    	<groupId>org.geotools</groupId>
+    		<artifactId>gt2-epsg-hsql</artifactId>
+    		<version>2.3.5</version>
+    	</dependency>
 		<dependency>
 			<groupId>jfree</groupId>
 			<artifactId>jfreechart</artifactId>
