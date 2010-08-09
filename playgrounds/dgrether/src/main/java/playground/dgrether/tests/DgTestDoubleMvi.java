@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.tests;
 
-import org.matsim.vis.otfvis.OTFDoubleMVI;
-
 import playground.dgrether.DgPaths;
 
 
@@ -37,7 +35,8 @@ public class DgTestDoubleMvi {
 		String file1 = DgPaths.RUNBASE + "run749/it.100/749.100.Zurich.otfvis.mvi";
 		String file2 = DgPaths.RUNBASE + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
 		String[] a = {file1, file2};
-		OTFDoubleMVI.main(a);
+//		OTFDoubleMVI.main(a);
+		throw new UnsupportedOperationException("did not compile on 9/aug/2010, so I commented it out.  kai") ;
 	}
 
 }
