@@ -37,6 +37,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -51,6 +53,7 @@ public final class LinkTablesFromPopulation {
 	private final int timeBinSize;
 	private final String outputDirectory;
 	private final Network network;
+	private final ActivityFacilities facilities;
 	private final LeastCostPathCalculator router;
 	private final Counter counter = new Counter("person #");
 
@@ -60,6 +63,7 @@ public final class LinkTablesFromPopulation {
 
 	public LinkTablesFromPopulation(final int timeBinSize,
 			final String outputDirectory, final Network network,
+			final ActivityFacilities facilities,
 			final LeastCostPathCalculator router, final PlansCalcRouteConfigGroup config) {
 
 		this.analyzedModes = new HashSet<String>();
@@ -69,6 +73,7 @@ public final class LinkTablesFromPopulation {
 		this.timeBinSize = timeBinSize;
 		this.outputDirectory = outputDirectory;
 		this.network = network;
+		this.facilities = facilities;
 		this.router = router;
 		for (String mode : analyzedModes) {
 			this.writers.put(mode, new HashMap<Integer, BufferedWriter>());
@@ -106,8 +111,12 @@ public final class LinkTablesFromPopulation {
 						double time = prevActivity.getEndTime();
 						Id fromFacilityId = prevActivity.getFacilityId();
 						Id toFacilityId = thisActivity.getFacilityId();
-						Node fromNode = network.getLinks().get(prevActivity.getLinkId()).getToNode();
-						Node toNode = network.getLinks().get(thisActivity.getLinkId()).getFromNode();
+						ActivityFacility fromF = facilities.getFacilities().get(fromFacilityId);
+						ActivityFacility toF = facilities.getFacilities().get(toFacilityId);
+						Node fromNode = network.getLinks().get(fromF.getLinkId()).getToNode();
+//						Node fromNode = network.getLinks().get(prevActivity.getLinkId()).getToNode();
+						Node toNode = network.getLinks().get(toF.getLinkId()).getFromNode();
+//						Node toNode = network.getLinks().get(toF.getLinkId()).getFromNode();
 						String fromActType = prevActivity.getType();
 						String toActType = thisActivity.getType();
 						double speed = this.speeds.get(mode).doubleValue();

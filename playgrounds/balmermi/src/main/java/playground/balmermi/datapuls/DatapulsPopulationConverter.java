@@ -57,7 +57,7 @@ public class DatapulsPopulationConverter {
 		new PopulationWriteTable(((ScenarioImpl) scenario).getActivityFacilities()).run(scenario.getPopulation(),outdir);
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(scenario.getNetwork(), timeCostCalculator);
-		LinkTablesFromPopulation planAlgo = new LinkTablesFromPopulation(timeBinSize, outdir, scenario.getNetwork(), factory.createPathCalculator(scenario.getNetwork(), timeCostCalculator, timeCostCalculator), scenario.getConfig().plansCalcRoute());
+		LinkTablesFromPopulation planAlgo = new LinkTablesFromPopulation(timeBinSize, outdir, scenario.getNetwork(), ((ScenarioImpl)scenario).getActivityFacilities(), factory.createPathCalculator(scenario.getNetwork(), timeCostCalculator, timeCostCalculator), scenario.getConfig().plansCalcRoute());
 		log.info("processing plans...");
 		try {
 			planAlgo.run(scenario.getPopulation());

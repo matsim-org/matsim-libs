@@ -61,24 +61,34 @@ public class DatapulsConverter {
 		log.info("=> "+outdir);
 		log.info("done.");
 		
+		log.info("gathering case ");
+		int casetype = Integer.parseInt(args[3]);
+		log.info("=> "+casetype);
+		log.info("done.");
+		
 		log.info("loading scenario...");
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		((ScenarioImpl)scenario).getWorld().complete(scenario.getConfig());
 		log.info("done.");
-
-		new FacilitiesWriteTables().run(((ScenarioImpl) scenario).getActivityFacilities(),outdir);
-		new PopulationWriteTable(((ScenarioImpl) scenario).getActivityFacilities()).run(scenario.getPopulation(),outdir);
-
-		EventsManagerImpl events = new EventsManagerImpl();
 		
-		LinkTablesEventHandler handler = new LinkTablesEventHandler(timeBinSize,outdir,scenario.getPopulation());
-		
-		events.addHandler(handler);
-		
-		MatsimEventsReader eventsReader = new MatsimEventsReader(events);
-		eventsReader.readFile(scenario.getConfig().events().getInputFile());
+		if (casetype == 0) {
+			new FacilitiesWriteTables().run(((ScenarioImpl) scenario).getActivityFacilities(),outdir);
+			new PopulationWriteTable(((ScenarioImpl) scenario).getActivityFacilities()).run(scenario.getPopulation(),outdir);
 
-		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
-		AStarLandmarksFactory factory = new AStarLandmarksFactory(scenario.getNetwork(), timeCostCalculator);
-		new LinkTablesFromPopulation(timeBinSize, outdir, scenario.getNetwork(), factory.createPathCalculator(scenario.getNetwork(), timeCostCalculator, timeCostCalculator), scenario.getConfig().plansCalcRoute()).run(scenario.getPopulation());
+			EventsManagerImpl events = new EventsManagerImpl();
+			
+			LinkTablesEventHandler handler = new LinkTablesEventHandler(timeBinSize,outdir,scenario.getPopulation());
+			
+			events.addHandler(handler);
+			
+			MatsimEventsReader eventsReader = new MatsimEventsReader(events);
+			eventsReader.readFile(scenario.getConfig().events().getInputFile());
+		}
+		else {
+//			FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
+			FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(0.0,0.0,-1.0);
+			AStarLandmarksFactory factory = new AStarLandmarksFactory(scenario.getNetwork(), timeCostCalculator);
+			new LinkTablesFromPopulation(timeBinSize, outdir, scenario.getNetwork(), ((ScenarioImpl)scenario).getActivityFacilities(), factory.createPathCalculator(scenario.getNetwork(), timeCostCalculator, timeCostCalculator), scenario.getConfig().plansCalcRoute()).run(scenario.getPopulation());
+		}
 	}
 }
