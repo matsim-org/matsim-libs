@@ -46,15 +46,12 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFClientFile;
-import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFClientSwing;
-import org.matsim.vis.otfvis.OTFDoubleMVI;
 import org.matsim.vis.otfvis.OTFVisQSim;
-import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
-import org.matsim.vis.otfvis2.OTFVisLiveServer;
 import org.matsim.vis.otfvis2.OTFVisClient;
+import org.matsim.vis.otfvis2.OTFVisLiveServer;
 import org.matsim.vis.snapshots.writers.VisMobsim;
 
 /**
@@ -125,9 +122,7 @@ public class OTFVis {
 			arg0l = args2[0].toLowerCase(Locale.ROOT);
 		}
 
-		if (arg0l.endsWith(".veh.gz") || arg0l.endsWith(".veh")) {
-			playVEH(args2);
-		} else if (arg0l.endsWith(".mvi")) {
+		if (arg0l.endsWith(".mvi")) {
 			if (args2.length > 1) {
 				String arg1l = args2[1].toLowerCase(Locale.ROOT);
 				if (arg1l.endsWith(".mvi")) {
@@ -208,42 +203,16 @@ public class OTFVis {
 	}
 
 	public static void playDoubleMVI(final String file1, final String file2) {
-		new OTFDoubleMVI(file1, file2).run();
+		throw new RuntimeException("The double movie mode is no more.");
 	}
 
 	public static void playMVI_Swing(String file) {
 		new OTFClientSwing("file:" + file).run();
 	}
 
-	/* @deprecated this currently does not work; may be fixed if needed.  kai, jan'10 */
-	@Deprecated // this currently does not work; may be fixed if needed.  kai, jan'10
-	public static final void playVEH(final String[] args) {
-		log.error("this currently does not work; may be fixed if needed.  kai, jan'10" );
-		log.error("At least OTFTVeh2MVI is now working again.  kai, may'10" ) ;
-		System.exit(-1) ;
-		// we should have the network as second argument
-		String vehFileName = args[0];
-		if (args.length < 2) {
-			printUsage();
-			return;
-		}
-		if (args[1].toLowerCase(Locale.ROOT).endsWith(".xml") || args[1].toLowerCase(Locale.ROOT).endsWith(".xml.gz")) {
-			String netFileName = args[1];
-//  seeing that Gbl.getConfig() is nowhere used anymore in org.matsim.vis.otfvis, I assume
-//  it should now work without the following lines. marcel/6apr2010
-//			if (Gbl.getConfig() == null) {
-//				Gbl.createConfig(null); // is this really required?
-//			}
-//			Gbl.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-			OTFClientLive client = new OTFClientLive("tveh:"+vehFileName + "@" + netFileName, new DefaultConnectionManagerFactory().createConnectionManager());
-			client.run();
-		}
-	}
-
 	public static final void playConfig(final String configFilename){
 		playConfig(new String[]{configFilename});
 	}
-	
 
 	public static final void playConfig_Swing(String configFileName) {		
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(configFileName);

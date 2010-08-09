@@ -52,14 +52,14 @@ public class OTFHostControl {
 			// Live mode without timesteps
 			simTime = new DefaultBoundedRangeModel(0 /* value */, 0 /* extent */, 0 /* value */, Integer.MAX_VALUE /* max */);
 		}
-		
+
 		simTime.addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				invalidateDrawers();
 			}
-			
+
 		});
 	}
 
@@ -161,7 +161,7 @@ public class OTFHostControl {
 	public BoundedRangeModel getSimTimeModel() {
 		return simTime;
 	}
-	
+
 	void setSimTime(int simTime) {
 		this.simTime.setValue(simTime);
 	}
@@ -238,16 +238,12 @@ public class OTFHostControl {
 			loopEnd = max;
 		}
 	}
-	
+
 	public void invalidateDrawers() {
-		try {
-			for (OTFHostConnectionManager slave : hostControls) {
-				for (OTFDrawer handler : slave.getDrawer().values()) {
-					handler.invalidate();
-				}
+		for (OTFHostConnectionManager slave : hostControls) {
+			for (OTFDrawer handler : slave.getDrawer().values()) {
+				handler.redraw();
 			}
-		} catch (RemoteException e) {
-			e.printStackTrace();
 		}
 	}
 

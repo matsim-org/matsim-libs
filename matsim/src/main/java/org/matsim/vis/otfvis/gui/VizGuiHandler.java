@@ -125,6 +125,7 @@ class DragToScrollListener extends MouseAdapter {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		System.out.println("pressed");
 		start = e.getLocationOnScreen();
 		button = e.getButton();
 	}

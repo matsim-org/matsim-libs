@@ -24,7 +24,6 @@ import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.rmi.RemoteException;
 
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 
@@ -37,14 +36,23 @@ import org.matsim.vis.otfvis.data.OTFClientQuad;
  *
  */
 public interface OTFDrawer {
-	public void invalidate() throws RemoteException;
+	
 	public void redraw();
+	
 	public void handleClick(Point2D.Double point, int mouseButton, MouseEvent e);
+	
 	public OTFClientQuad getQuad();
+	
 	public Component getComponent();
+	
 	public void clearCache();
+	
 	public void handleClick(Rectangle currentRect, int button);
+	
 	public void setQueryHandler(OTFQueryHandler queryHandler);
+	
 	public void setScale(float scale);
+	
 	public float getScale();
+	
 }

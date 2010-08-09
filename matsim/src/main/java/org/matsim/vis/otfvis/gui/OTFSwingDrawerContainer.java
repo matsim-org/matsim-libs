@@ -65,14 +65,8 @@ public class OTFSwingDrawerContainer extends JPanel implements OTFDrawer {
 		delegate.handleClick(currentRect, button);
 	}
 
-	public void invalidate() {
-		super.invalidate();
-		networkScrollPane.invalidate();
-	}
-
 	public void redraw() {
-		networkScrollPane.invalidate();
-		networkScrollPane.repaint();
+		delegate.repaint();
 	}
 
 	public void setQueryHandler(OTFQueryHandler queryHandler) {

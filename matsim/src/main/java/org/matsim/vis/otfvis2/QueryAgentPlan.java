@@ -56,6 +56,7 @@ import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.gui.OTFSwingDrawer;
+import org.matsim.vis.otfvis.gui.OTFSwingDrawerContainer;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
@@ -164,15 +165,15 @@ public final class QueryAgentPlan extends AbstractQuery {
 		public void draw(OTFDrawer drawer) {
 			if (drawer instanceof OTFOGLDrawer) {
 				drawWithGLDrawer((OTFOGLDrawer) drawer);
-			} else if (drawer instanceof OTFSwingDrawer){
-				drawWithNetJComponent((OTFSwingDrawer)drawer);
+			} else if (drawer instanceof OTFSwingDrawerContainer) {
+				drawWithNetJComponent((OTFSwingDrawerContainer) drawer);
 			} else {
 				log.error("cannot draw query cause no OTFOGLDrawer is used!");
 			}
 		}
 
-		protected void drawWithNetJComponent(OTFSwingDrawer drawer) {
-			Graphics2D g2d = (Graphics2D)drawer.getG2D();
+		protected void drawWithNetJComponent(OTFSwingDrawerContainer drawer) {
+			Graphics2D g2d = OTFSwingDrawer.g2d;
 			float lineWidth = this.getLineWidth(); 
 			for (MyInfoText act: this.acts){
 				// Transform the act-koordinates

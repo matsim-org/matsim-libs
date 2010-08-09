@@ -54,11 +54,10 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
  * @author david
  */
 abstract class OTFSwingDrawable implements OTFDrawable, OTFDataReceiver{
-	static Graphics2D g2d = null;
 
 	@Override
 	public final void draw() {
-		onDraw(g2d);
+		onDraw(OTFSwingDrawer.g2d);
 	}
 
 	abstract public void onDraw(Graphics2D g2d);
@@ -76,6 +75,8 @@ abstract class OTFSwingDrawable implements OTFDrawable, OTFDataReceiver{
  * @author dstrippgen
  */
 public class OTFSwingDrawer extends JComponent {
+	
+	public static Graphics2D g2d = null;
 
 	private static final Color netColor = new Color(180,180,210,128);
 	
@@ -91,8 +92,6 @@ public class OTFSwingDrawer extends JComponent {
 
 	private final OTFClientQuad quad;
 
-	private transient SceneGraph sceneGraph;
-	
 	private OTFQueryHandler queryHandler;
 	
 	OTFHostControlBar hostControlBar;
@@ -181,8 +180,6 @@ public class OTFSwingDrawer extends JComponent {
 		return new AffineTransform(m00, 0.0, 0.0, m11, m02, m12);
 	}
 
-	// -------------------- PAINTING --------------------
-
 	@Override
 	public void paint(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
@@ -196,10 +193,11 @@ public class OTFSwingDrawer extends JComponent {
 			g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF));
 		}
 
-		OTFSwingDrawable.g2d = g2;
+		OTFSwingDrawer.g2d = g2;
 
 		g2.setStroke(new BasicStroke(Math.round(0.05 * linkWidth)));
 		g2.transform(getBoxTransform());
+		SceneGraph sceneGraph = quad.getSceneGraph(hostControlBar.getOTFHostControl().getSimTime(), null, parentDrawer);
 		sceneGraph.draw();
 		if (this.queryHandler != null) {
 			this.queryHandler.drawQueries(parentDrawer);
@@ -208,18 +206,6 @@ public class OTFSwingDrawer extends JComponent {
 
 	public OTFClientQuad getQuad() {
 		return quad;
-	}
-	
-	public  Graphics2D getG2D() {
-		return OTFSwingDrawable.g2d;
-	}
-
-	public void invalidate() {
-		try {
-			this.sceneGraph = quad.getSceneGraph(hostControlBar.getOTFHostControl().getSimTime(), null, parentDrawer);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	/***

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
@@ -35,7 +36,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 public final class LinkHandler extends OTFDataReader {
 
 	public static final double LINK_SCALE  = 1.00; 
-	
+
 	protected OTFDataQuadReceiver quadReceiver = null;
 
 	public OTFDataQuadReceiver getQuadReceiver() {
@@ -48,12 +49,15 @@ public final class LinkHandler extends OTFDataReader {
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
-		//subtract minEasting/Northing somehow!
+			//subtract minEasting/Northing somehow!
+			String id = this.src.getId().toString();
+			ByteBufferUtils.putString(out, id);
+
 			Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast, 
 					this.src.getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 			Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
 					this.src.getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-			
+
 			out.putFloat((float) linkStart.x); 
 			out.putFloat((float) linkStart.y);
 			out.putFloat((float) linkEnd.x); 
@@ -62,18 +66,20 @@ public final class LinkHandler extends OTFDataReader {
 
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
-			
+
 		}
 
 	}
 
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		
+
 	}
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
+		String id = ByteBufferUtils.getString(in);
+		this.quadReceiver.setId(id.toCharArray());
 		this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat());
 	}
 
@@ -88,6 +94,6 @@ public final class LinkHandler extends OTFDataReader {
 	public void invalidate(SceneGraph graph) {
 		this.quadReceiver.invalidate(graph);
 	}
-	
+
 }
 

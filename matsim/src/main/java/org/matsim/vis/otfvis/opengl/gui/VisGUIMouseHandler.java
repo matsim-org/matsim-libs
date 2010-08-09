@@ -110,11 +110,7 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 	}
 
 	private void invalidateHandler() {
-		try {
-			clickHandler.invalidate();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		clickHandler.redraw();
 	}
 
 	void scrollCamera(Point3f start, Point3f end, String prop) {

@@ -51,8 +51,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Map.Entry;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
@@ -625,18 +625,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		if(this.queryHandler != null) this.queryHandler.handleClick(this.clientQ.getId(),origRect, button);
 	}
 
-	/***
-	 * redraw refreshes the displayed graphic i.e. it draws the same items as last time something was drawn
-	 * useful for zooming, or overlaying GUI items
-	 * if the displayed Rect is moved or enlarged, we need to call invalidate, to get the correct data from the host
-	 */
 	@Override
 	public void redraw() {
-		this.canvas.repaint();
-	}
-
-	@Override
-	public void invalidate() {
 		int time = this.hostControlBar.getOTFHostControl().getSimTime();
 		if (time != -1) {
 			this.now = time;
@@ -645,17 +635,14 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		synchronized (this.blockRefresh) {
 			QuadTree.Rect rect = this.mouseMan.getBounds();
 			synchronized (newItems) {
-				try {
-					this.actGraph  = this.clientQ.getSceneGraph(time, rect, this);
-				} catch (RemoteException e) {
-					throw new RuntimeException(e);					}
+				this.actGraph  = this.clientQ.getSceneGraph(time, rect, this);
 			}
 		}
 		if (this.queryHandler != null) {
 			this.queryHandler.updateQueries();
 		}
 		hostControlBar.updateScaleLabel();
-		redraw();
+		this.canvas.repaint();
 	}
 
 	/**

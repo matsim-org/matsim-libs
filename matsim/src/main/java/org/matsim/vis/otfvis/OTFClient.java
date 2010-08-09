@@ -53,7 +53,7 @@ import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
  */
 public abstract class OTFClient implements Runnable {
 
-  private static final Logger log = Logger.getLogger(OTFClient.class);
+	private static final Logger log = Logger.getLogger(OTFClient.class);
 
 	protected String url;
 
@@ -93,11 +93,7 @@ public abstract class OTFClient implements Runnable {
 		pane.setRightComponent(this.createDrawerPanel(this.url, mainDrawer));
 		pane.validate();
 		this.hostControlBar.addDrawer(this.url, mainDrawer);
-		try {
-			mainDrawer.invalidate();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		mainDrawer.redraw();
 		frame.setVisible(true);
 
 		log.info("OTFVis finished init");
@@ -108,12 +104,12 @@ public abstract class OTFClient implements Runnable {
 	}
 
 	protected JPanel createDrawerPanel(String url, OTFDrawer drawer){
-	    JPanel panel = new JPanel(new BorderLayout());
-	    JLabel label = new JLabel();
-	    label.setText(url);
-	    panel.add(drawer.getComponent(), BorderLayout.CENTER);
-	    panel.add(label, BorderLayout.NORTH);
-	    return panel;
+		JPanel panel = new JPanel(new BorderLayout());
+		JLabel label = new JLabel();
+		label.setText(url);
+		panel.add(drawer.getComponent(), BorderLayout.CENTER);
+		panel.add(label, BorderLayout.NORTH);
+		return panel;
 	}
 
 	public OTFClientQuad createNewView(String id, OTFConnectionManager connect, OTFHostConnectionManager hostControl) throws RemoteException {
@@ -181,11 +177,7 @@ public abstract class OTFClient implements Runnable {
 			public void actionPerformed(final ActionEvent e) {
 				OTFVisConfigGroup visConfig = save.chooseAndReadSettingsFile();
 				OTFClientControl.getInstance().setOTFVisConfig(visConfig);
-				try {
-					OTFClientControl.getInstance().getMainOTFDrawer().invalidate();
-				} catch (RemoteException e1) {
-					e1.printStackTrace();
-				}
+				OTFClientControl.getInstance().getMainOTFDrawer().redraw();
 			}
 		};
 		fileMenu.add(openAction);

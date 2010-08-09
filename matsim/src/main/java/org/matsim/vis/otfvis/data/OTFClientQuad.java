@@ -171,92 +171,96 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		this.cachedTimes.clear();
 	}
 
-	public synchronized SceneGraph getSceneGraphNoCache(final int time, Rect rect, final OTFDrawer drawer) throws RemoteException {
-		List<Rect> rects = new LinkedList<Rect>();
-		/*
-		 * This hack ensures that vehicles on links are drawn even if their center is not visible
-		 */
-		if (OTFClientControl.getInstance().getOTFVisConfig().isScaleQuadTreeRect()){
-		  rect = rect.scale(5.0, 5.0);
-		}
-
-		SceneGraph cachedResult = this.cachedTimes.get(time);
-		if(cachedResult != null) {
-			Rect cachedRect = cachedResult.getRect();
-			if((cachedRect == null) || cachedRect.containsOrEquals(rect)) return cachedResult;
-
-			Rect intersec = rect.intersection(cachedRect);
-			if(intersec == null) {
-				// we need to get the whole rect
-				cachedResult = null;
-			} else {
-				// As we can only store ONE rect with our cached Drawing, we cannot simply
-				// add the new portion to the old rect but have to use a rect where both
-				// old and new rect fit into aka the union of both
-				rect = rect.union(cachedRect);
-				// Check the four possible rects, that need filling, possible rect follow this scheme
-				//   1133333344
-				//   11iiiiii44
-				//   11iiiiii44
-				//   1122222244
-				double r1w = cachedRect.minX - rect.minX;
-				double r2h = cachedRect.minY - rect.minY;
-				double r3h = rect.maxY -cachedRect.maxY;
-				double r4w = rect.maxX -cachedRect.maxX;
-				if (r1w > 0) rects.add(new Rect(rect.minX,rect.minY,cachedRect.minX,rect.maxY));
-				if (r4w > 0) rects.add(new Rect(cachedRect.maxX,rect.minY, rect.maxX,rect.maxY));
-				if (r2h > 0) rects.add(new Rect(cachedRect.minX,rect.minY,cachedRect.maxX,cachedRect.minY));
-				if (r3h > 0) rects.add(new Rect(cachedRect.minX,cachedRect.maxY,cachedRect.maxX,rect.maxY));
+	public synchronized SceneGraph getSceneGraphNoCache(final int time, Rect rect, final OTFDrawer drawer) {
+		try {
+			List<Rect> rects = new LinkedList<Rect>();
+			/*
+			 * This hack ensures that vehicles on links are drawn even if their center is not visible
+			 */
+			if (OTFClientControl.getInstance().getOTFVisConfig().isScaleQuadTreeRect()){
+				rect = rect.scale(5.0, 5.0);
 			}
-		}
 
-		// otherwise this Scenegraph is not useful, so we create a new one
-		if(this.host.isLive() == false) {
-			rect = null;
-			cachedResult = null;
-		}
+			SceneGraph cachedResult = this.cachedTimes.get(time);
+			if(cachedResult != null) {
+				Rect cachedRect = cachedResult.getRect();
+				if((cachedRect == null) || cachedRect.containsOrEquals(rect)) return cachedResult;
 
-		SceneGraph result;
-		if ( cachedResult == null) {
-			SceneGraph result1 = new SceneGraph(rect, time, this.connect, drawer);
-			QuadTree.Rect bound2 = this.host.isLive() ? rect : this.top.getBounds();
-			byte[] bbyte;
-			bbyte = this.host.getQuadDynStateBuffer(this.id, bound2);
-			ByteBuffer in = ByteBuffer.wrap(bbyte);
-			this.execute(bound2, new ReadDataExecutor(in, false, result1));
-			for(OTFDataReader element : this.additionalElements) {
-				try {
-					element.readDynData(in,result1);
-				} catch (IOException e) {
-					e.printStackTrace();
+				Rect intersec = rect.intersection(cachedRect);
+				if(intersec == null) {
+					// we need to get the whole rect
+					cachedResult = null;
+				} else {
+					// As we can only store ONE rect with our cached Drawing, we cannot simply
+					// add the new portion to the old rect but have to use a rect where both
+					// old and new rect fit into aka the union of both
+					rect = rect.union(cachedRect);
+					// Check the four possible rects, that need filling, possible rect follow this scheme
+					//   1133333344
+					//   11iiiiii44
+					//   11iiiiii44
+					//   1122222244
+					double r1w = cachedRect.minX - rect.minX;
+					double r2h = cachedRect.minY - rect.minY;
+					double r3h = rect.maxY -cachedRect.maxY;
+					double r4w = rect.maxX -cachedRect.maxX;
+					if (r1w > 0) rects.add(new Rect(rect.minX,rect.minY,cachedRect.minX,rect.maxY));
+					if (r4w > 0) rects.add(new Rect(cachedRect.maxX,rect.minY, rect.maxX,rect.maxY));
+					if (r2h > 0) rects.add(new Rect(cachedRect.minX,rect.minY,cachedRect.maxX,cachedRect.minY));
+					if (r3h > 0) rects.add(new Rect(cachedRect.minX,cachedRect.maxY,cachedRect.maxX,rect.maxY));
 				}
 			}
-			// fill with elements
-			invalidate(rect, result1);
-			result = result1;
-		} else {
-			result = cachedResult;
-			result.setRect(rect);
-			for(Rect rectPart : rects) {
-				QuadTree.Rect bound2 = this.host.isLive() ? rectPart : this.top.getBounds();
+
+			// otherwise this Scenegraph is not useful, so we create a new one
+			if(this.host.isLive() == false) {
+				rect = null;
+				cachedResult = null;
+			}
+
+			SceneGraph result;
+			if ( cachedResult == null) {
+				SceneGraph result1 = new SceneGraph(rect, time, this.connect, drawer);
+				QuadTree.Rect bound2 = this.host.isLive() ? rect : this.top.getBounds();
 				byte[] bbyte;
 				bbyte = this.host.getQuadDynStateBuffer(this.id, bound2);
 				ByteBuffer in = ByteBuffer.wrap(bbyte);
-				this.execute(bound2, new ReadDataExecutor(in, false, result));
+				this.execute(bound2, new ReadDataExecutor(in, false, result1));
+				for(OTFDataReader element : this.additionalElements) {
+					try {
+						element.readDynData(in,result1);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 				// fill with elements
-				invalidate(rectPart, result);
+				invalidate(rect, result1);
+				result = result1;
+			} else {
+				result = cachedResult;
+				result.setRect(rect);
+				for(Rect rectPart : rects) {
+					QuadTree.Rect bound2 = this.host.isLive() ? rectPart : this.top.getBounds();
+					byte[] bbyte;
+					bbyte = this.host.getQuadDynStateBuffer(this.id, bound2);
+					ByteBuffer in = ByteBuffer.wrap(bbyte);
+					this.execute(bound2, new ReadDataExecutor(in, false, result));
+					// fill with elements
+					invalidate(rectPart, result);
+				}
 			}
-		}
 
-		result.finish();
+			result.finish();
 
-		if (OTFClientControl.getInstance().getOTFVisConfig().isCachingAllowed()) {
-		  this.cachedTimes.put(time, result);
+			if (OTFClientControl.getInstance().getOTFVisConfig().isCachingAllowed()) {
+				this.cachedTimes.put(time, result);
+			}
+			return result;
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
 		}
-		return result;
 	}
 
-	public synchronized SceneGraph getSceneGraph(final int time, final Rect rect, final OTFDrawer drawer) throws RemoteException {
+	public synchronized SceneGraph getSceneGraph(final int time, final Rect rect, final OTFDrawer drawer) {
 		if ((time == -1) && (this.lastGraph != null)) return this.lastGraph;
 		this.lastGraph = getSceneGraphNoCache(time, rect, drawer);
 		return this.lastGraph;
