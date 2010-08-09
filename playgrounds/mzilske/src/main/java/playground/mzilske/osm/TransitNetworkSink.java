@@ -12,6 +12,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -65,9 +66,12 @@ public class TransitNetworkSink implements Sink {
 
 	private TransitSchedule transitSchedule;
 
-	public TransitNetworkSink(Network network, TransitSchedule transitSchedule, IdTrackerType idTrackerType) {
+	private CoordinateTransformation coordinateTransformation;
+
+	public TransitNetworkSink(Network network, TransitSchedule transitSchedule, CoordinateTransformation coordinateTransformation, IdTrackerType idTrackerType) {
 		this.network = network;
 		this.transitSchedule = transitSchedule;
+		this.coordinateTransformation = coordinateTransformation;
 		stopNodes = IdTrackerFactory.createInstance(idTrackerType);
 		routeWays = IdTrackerFactory.createInstance(idTrackerType);
 		allWaysTracker = IdTrackerFactory.createInstance(idTrackerType);
@@ -207,8 +211,11 @@ public class TransitNetworkSink implements Sink {
 					if (allNodesTracker.get(relationMember.getMemberId())) {
 						System.out.println(relationMember.getMemberId());
 						Node node = nodeReader.get(relationMember.getMemberId()).getEntity();
-						Coord coordinate = new CoordImpl(node.getLongitude(), node.getLatitude());
+						Coord coordinate = coordinateTransformation.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
 						TransitStopFacility facility = transitSchedule.getFactory().createTransitStopFacility(new IdImpl(node.getId()), coordinate, false);
+						if (!transitSchedule.getFacilities().containsKey(facility.getId())) {
+							transitSchedule.addStopFacility(facility);
+						}
 						String role = relationMember.getMemberRole();
 						if (role.startsWith("stop")) {
 							stopsH.addLast(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
