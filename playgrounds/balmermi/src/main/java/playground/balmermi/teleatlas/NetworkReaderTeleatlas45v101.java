@@ -38,6 +38,8 @@ import playground.balmermi.teleatlas.NwElement.NetTwoClass;
 import playground.balmermi.teleatlas.NwElement.NwFeatureType;
 import playground.balmermi.teleatlas.NwElement.OneWay;
 import playground.balmermi.teleatlas.NwElement.PrivateRoad;
+import playground.balmermi.teleatlas.NwElement.Ramp;
+import playground.balmermi.teleatlas.NwElement.SlipRoad;
 import playground.balmermi.teleatlas.NwElement.SpeedCategory;
 
 /**
@@ -252,6 +254,28 @@ public class NetworkReaderTeleatlas45v101 {
 	 * </ul>
 	 */
 	private static final String NW_SPEEDCAT_NAME = "SPEEDCAT";
+
+	/**
+	 * Ramp Category attribute of network shape file
+	 * <ul>
+	 * <li><code>0</code>: No Exit/Entrance Ramp - Default</li>
+	 * <li><code>1</code>: Exit</li>
+	 * <li><code>2</code>: Entrance</li>
+	 * </ul>
+	 */
+	private static final String RAMP_NAME = "RAMP";
+
+	/**
+	 * Slip Road Category attribute of network shape file
+	 * <ul>
+	 * <li><code>0</code>: No Slip Road (default)</li>
+	 * <li><code>1</code>: Parallel Road</li>
+	 * <li><code>2</code>: Slip Road of a Grade Separated Crossing</li>
+	 * <li><code>3</code>: Slip Road of a Crossing at Grade</li>
+	 * <li><code>18</code>: Major / Minor Slip Road</li>
+	 * </ul>
+	 */
+	private static final String SLIPRD_NAME = "SLIPRD";
 
 //	private static final String RR_ID_NAME = "ID";
 //	private static final String RR_FJNCTID_NAME = "F_JNCTID";
@@ -550,6 +574,38 @@ public class NetworkReaderTeleatlas45v101 {
 		}
 		return PrivateRoad.SPECIAL_RESTRICTION;
 	}
+	
+	private final static Ramp extractRamp(final Feature f) {
+		int r = Integer.parseInt(f.getAttribute(RAMP_NAME).toString());
+		switch (r) {
+		case 0:
+			return Ramp.NO_RAMP;
+		case 1:
+			return Ramp.EXIT;
+		case 2:
+			return Ramp.ENTRANCE;
+		default:
+			throw new IllegalArgumentException("At feature id '"+f.getID()+"': "+RAMP_NAME+"="+r+" not allowed.");
+		}
+	}
+
+	private final static SlipRoad extractSlipRoad(final Feature f) {
+		int sr = Integer.parseInt(f.getAttribute(SLIPRD_NAME).toString());
+		switch (sr) {
+		case 0:
+			return SlipRoad.NO_SLIPROAD;
+		case 1:
+			return SlipRoad.PARALLEL_ROAD;
+		case 2:
+			return SlipRoad.SLIP_ROAD_OF_GRADE_SEP_CROSSING;
+		case 3:
+			return SlipRoad.SLIP_ROAD_OF_CROSSING_AT_GRADE;
+		case 18:
+			return SlipRoad.MAJOR_MINOR_SLIPROAD;
+		default:
+			throw new IllegalArgumentException("At feature id '"+f.getID()+"': "+SLIPRD_NAME+"="+sr+" not allowed.");
+		}
+	}
 
 //////////////////////////////////////////////////////////////////////
 // parse methods
@@ -616,6 +672,8 @@ public final void parseNw(final String nwShpFileName) throws IOException, Runtim
 		e.nOfLanes = extractNumberOfLanes(f);
 		e.fow = extractFormOfWay(f);
 		e.privat = extractPrivateRoad(f);
+		e.ramp = extractRamp(f);
+		e.slipRoad = extractSlipRoad(f);
 
 		if (map.containsKey(e.id)) { throw new RuntimeException("id="+e.id+" already exists."); }
 		map.put(e.id,e);

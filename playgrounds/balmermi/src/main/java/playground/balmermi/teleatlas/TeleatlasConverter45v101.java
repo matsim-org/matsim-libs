@@ -174,8 +174,10 @@ public class TeleatlasConverter45v101 {
 
 			double length = nwElement.length.doubleValue();
 
-			Set<String> modesFT = getModesFT(nwElement);
-			Set<String> modesTF = getModesTF(nwElement);
+//			Set<String> modesFT = getModesFT(nwElement);
+//			Set<String> modesTF = getModesTF(nwElement);
+			Set<String> modesFT = getModesFTv2(nwElement);
+			Set<String> modesTF = getModesTFv2(nwElement);
 
 			double freespeed = getFreespeed(nwElement);
 			double nOfLanes = getNOfLanes(nwElement);
@@ -278,6 +280,59 @@ public class TeleatlasConverter45v101 {
 			modes.remove(TransportMode.bike);
 		}
 
+		return modes;
+	}
+
+	private Set<String> getModesFTv2(final NwElement nwElement) {
+		Set<String> modes = new HashSet<String>();
+		modes.add(TransportMode.car);
+
+		if ((OneWay.CLOSED.equals(nwElement.oneway) || OneWay.OPEN_TF.equals(nwElement.oneway))) {
+			modes.remove(TransportMode.car);
+		}
+
+		if (NwElement.FormOfWay.PEDESTRIAN_ZONE.equals(nwElement.fow) || NwElement.FormOfWay.WALKWAY.equals(nwElement.fow)) {
+			modes.remove(TransportMode.car);
+		}
+
+//		FRC <> 0 AND Ramp = 0 AND SLIPRD = 0 AND FOW <> 20 AND FOW <> -1 AND FRC <> -1 AND Freeway <> 1
+		if ((!NwElement.FunctionalRoadClass.MOTORWAY.equals(nwElement.frc)) &&
+		    (NwElement.Ramp.NO_RAMP.equals(nwElement.ramp)) &&
+		    (NwElement.SlipRoad.NO_SLIPROAD.equals(nwElement.slipRoad)) &&
+		    (!NwElement.FormOfWay.AUTHORITIES.equals(nwElement.fow)) &&
+		    (!NwElement.FormOfWay.UNDEFINED.equals(nwElement.fow)) &&
+		    (!NwElement.FunctionalRoadClass.UNDEFINED.equals(nwElement.frc)) &&
+		    (!NwElement.Freeway.FREEWAY.equals(nwElement.freeway))) {
+			modes.add(TransportMode.walk);
+			modes.add(TransportMode.bike);
+		}
+
+		return modes;
+	}
+
+	private Set<String> getModesTFv2(final NwElement nwElement) {
+		Set<String> modes = new HashSet<String>();
+		modes.add(TransportMode.car);
+
+		if ((OneWay.CLOSED.equals(nwElement.oneway) || OneWay.OPEN_FT.equals(nwElement.oneway))) {
+			modes.remove(TransportMode.car);
+		}
+
+		if (NwElement.FormOfWay.PEDESTRIAN_ZONE.equals(nwElement.fow) || NwElement.FormOfWay.WALKWAY.equals(nwElement.fow)) {
+			modes.remove(TransportMode.car);
+		}
+
+//		FRC <> 0 AND Ramp = 0 AND SLIPRD = 0 AND FOW <> 20 AND FOW <> -1 AND FRC <> -1 AND Freeway <> 1
+		if ((!NwElement.FunctionalRoadClass.MOTORWAY.equals(nwElement.frc)) &&
+		    (NwElement.Ramp.NO_RAMP.equals(nwElement.ramp)) &&
+		    (NwElement.SlipRoad.NO_SLIPROAD.equals(nwElement.slipRoad)) &&
+		    (!NwElement.FormOfWay.AUTHORITIES.equals(nwElement.fow)) &&
+		    (!NwElement.FormOfWay.UNDEFINED.equals(nwElement.fow)) &&
+		    (!NwElement.FunctionalRoadClass.UNDEFINED.equals(nwElement.frc)) &&
+		    (!NwElement.Freeway.FREEWAY.equals(nwElement.freeway))) {
+			modes.add(TransportMode.walk);
+			modes.add(TransportMode.bike);
+		}
 		return modes;
 	}
 

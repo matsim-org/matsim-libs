@@ -78,6 +78,17 @@ public class NwElement {
 	public OneWay oneway;
 
 	public Integer nOfLanes;
+	
+	public static enum Ramp {
+		NO_RAMP, EXIT, ENTRANCE
+	}
+	public Ramp ramp;
+	
+	public static enum SlipRoad {
+		NO_SLIPROAD, PARALLEL_ROAD, SLIP_ROAD_OF_GRADE_SEP_CROSSING,
+		SLIP_ROAD_OF_CROSSING_AT_GRADE, MAJOR_MINOR_SLIPROAD
+	}
+	public SlipRoad slipRoad;
 
 	public static enum SpeedCategory {
 		GT130, R101_130, R91_100, R71_90, R51_70, R31_50, R11_30, LT11, OTHER
@@ -107,6 +118,8 @@ public class NwElement {
 		str.append("privat=").append(privat).append(';');
 		str.append("oneway=").append(oneway).append(';');
 		str.append("nOfLanes=").append(nOfLanes).append(';');
+		str.append("ramp=").append(ramp).append(';');
+		str.append("slipRoad=").append(slipRoad).append(';');
 		str.append("speedCat=").append(speedCat).append(';');
 		return str.toString();
 	}

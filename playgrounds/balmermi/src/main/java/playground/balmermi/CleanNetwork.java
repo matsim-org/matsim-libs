@@ -53,7 +53,8 @@ public class CleanNetwork {
 		NetworkLayer subNet = new NetworkLayer();
 
 		Set<String> modes = new HashSet<String>();
-		modes.add(TransportMode.car);
+		modes.add(TransportMode.walk);
+		modes.add(TransportMode.bike);
 
 		new TransportModeNetworkFilter(network).filter(subNet, modes);
 //		new NetworkAdaptLength().run(network);
