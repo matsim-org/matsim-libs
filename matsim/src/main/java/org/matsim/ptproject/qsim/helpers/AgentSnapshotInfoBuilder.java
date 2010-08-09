@@ -33,22 +33,21 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
 /**
  * A builder for AgentSnapshotInfo objects that can be used by links with queue logic
  * @author dgrether
  */
 public class AgentSnapshotInfoBuilder {
-	
+
 	private static final Logger log = Logger.getLogger(AgentSnapshotInfoBuilder.class);
-	
-	private final double storageCapacityFactor; 
-	
-	private final double cellSize; 
-	
+
+	private final double storageCapacityFactor;
+
+	private final double cellSize;
+
 	private final String snapshotStyle;
 
 
@@ -62,46 +61,46 @@ public class AgentSnapshotInfoBuilder {
 	 * See overloaded method for parameter description.
 	 */
 	public void addVehiclePositions(final Collection<AgentSnapshotInfo> positions, double now, Link link,
-			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
+			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,
 			double storageCapacity, int bufferStorageCapacity, double linkLength, TransitQLaneFeature transitQueueLaneFeature){
-		
-		this.addVehiclePositions(positions, now, link, buffer, vehQueue, inverseSimulatedFlowCapacity, storageCapacity, 
+
+		this.addVehiclePositions(positions, now, link, buffer, vehQueue, inverseSimulatedFlowCapacity, storageCapacity,
 				bufferStorageCapacity, linkLength, 0.0, null, transitQueueLaneFeature);
-	}	
+	}
 
 	/**
 	 * Adds AgentSnapshotInfo instances to the Collection given as parameter for a queue-logic object located on a specific link. A queue-logic object
 	 * can be a QueueLinkImpl or a QueueLane instance or something else.
 	 * @param positions The Collection in that the AgentSnapshotInfo instances are inserted.
-	 * @param now The current time 
+	 * @param now The current time
 	 * @param link parameter is only used to create PositionInfo instances not for calculations in this class
-	 * @param buffer 
+	 * @param buffer
 	 * @param vehQueue
 	 * @param inverseSimulatedFlowCapacity
 	 * @param storageCapacity
 	 * @param bufferStorageCapacity
 	 * @param linkLength the length of the queue-based object
 	 * @param offset The distance between the from node of the link to the beginning of the queue-logic object
-	 * @param laneNumber 
+	 * @param laneNumber
 	 * @param transitQueueLaneFeature
 	 */
 	public void addVehiclePositions(final Collection<AgentSnapshotInfo> positions, double now, Link link,
-			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
+			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,
 			double storageCapacity, int bufferStorageCapacity, double linkLength, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature){
-			
+
 		if ("queue".equalsIgnoreCase(this.snapshotStyle)){
-			this.addVehiclePositionsAsQueue(positions, now, link, buffer, vehQueue, inverseSimulatedFlowCapacity, 
+			this.addVehiclePositionsAsQueue(positions, now, link, buffer, vehQueue, inverseSimulatedFlowCapacity,
 					storageCapacity, bufferStorageCapacity, linkLength, offset, laneNumber, transitQueueLaneFeature);
 		}
 		else  if ("equiDist".equalsIgnoreCase(this.snapshotStyle)){
-			this.addVehiclePositionsEquil(positions, now, buffer, link, vehQueue, inverseSimulatedFlowCapacity, offset, 
+			this.addVehiclePositionsEquil(positions, now, buffer, link, vehQueue, inverseSimulatedFlowCapacity, offset,
 					laneNumber, transitQueueLaneFeature, linkLength);
 		}
 		else {
 			log.warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
 		}
 	}
-	
+
 	/**
 	 * Calculates the positions of all vehicles on this link according to the queue-logic: Vehicles are placed on the link
 	 * according to the ratio between the free-travel time and the time the vehicles are already on the link. If they could have
@@ -109,17 +108,17 @@ public class AgentSnapshotInfoBuilder {
 	 *
 	 * @param positions
 	 *            A collection where the calculated positions can be stored.
-	 * @param transitQueueLaneFeature 
-	 * @param link2 
+	 * @param transitQueueLaneFeature
+	 * @param link2
 	 */
-	protected void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, double now, 
-			Link link, Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
+	protected void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
+			Link link, Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,
 			double storageCapacity, int bufferStorageCapacity, double linkLength, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature) {
 
 		double currentQueueEnd = linkLength; // queue end initialized at end of link
 		float vehSpacingAsQueueCache = (float) calculateQueueVehicleSpacing(linkLength, storageCapacity, bufferStorageCapacity);
 		// treat vehicles from buffer:
-		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, now, currentQueueEnd, link, vehSpacingAsQueueCache, 
+		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, now, currentQueueEnd, link, vehSpacingAsQueueCache,
 				buffer, inverseSimulatedFlowCapacity, offset, laneNumber, transitQueueLaneFeature);
 
 		// treat other driving vehicles:
@@ -129,24 +128,24 @@ public class AgentSnapshotInfoBuilder {
 		// yyyy waiting list, transit stops, persons at activity, etc. all do not depend on "queue" vs "equil"
 		// and should thus not be treated in this method. kai, apr'10
 	}
-	
+
 	private double calculateQueueVehicleSpacing(double linkLength, double storageCapacity, double bufferStorageCapacity) {
 		double vehLen = Math.min( // the length of a vehicle in visualization
 				linkLength / (storageCapacity + bufferStorageCapacity), // all vehicles must have place on the link
 				this.cellSize / this.storageCapacityFactor); // a vehicle should not be larger than it's actual size. yyyy why is that an issue? kai, apr'10
 		return vehLen;
 	}
-	
+
 	/**
 	 * place other driving cars according the following rule: - calculate the time how long the vehicle is on the link already -
 	 * calculate the position where the vehicle should be if it could drive with freespeed - if the position is already within
 	 * the congestion queue, add it to the queue with slow speed - if the position is not within the queue, just place the car
 	 * with free speed at that place
-	 * @param inverseSimulatedFlowCapacity 
-	 * @param vehQueue 
+	 * @param inverseSimulatedFlowCapacity
+	 * @param vehQueue
 	 */
 	private void positionOtherDrivingVehiclesAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
-			double queueEnd, Link link, double vehSpacing, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
+			double queueEnd, Link link, double vehSpacing, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,
 			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double linkLength)
 	{
 		double lastDistance = Double.POSITIVE_INFINITY;
@@ -184,7 +183,7 @@ public class AgentSnapshotInfoBuilder {
 			lastDistance = distanceOnLink;
 		}
 	}
-	
+
 	private int calculateLane(QVehicle veh, int numberOfLanes){
 		int tmpLane;
 		try {
@@ -195,13 +194,13 @@ public class AgentSnapshotInfoBuilder {
 		int lane = 1 + (tmpLane % numberOfLanes);
 		return lane;
 	}
-	
+
 	/**
 	 *  put all cars in the buffer one after the other
-	 * @param buffer 
+	 * @param buffer
 	 */
 	private double positionVehiclesFromBufferAsQueue(final Collection<AgentSnapshotInfo> positions, double now,
-			double queueEnd, Link link, double vehSpacing, Collection<QVehicle> buffer, double inverseSimulatedFlowCapacity, 
+			double queueEnd, Link link, double vehSpacing, Collection<QVehicle> buffer, double inverseSimulatedFlowCapacity,
 			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature)
 	{
 		for (QVehicle veh : buffer) {
@@ -221,7 +220,7 @@ public class AgentSnapshotInfoBuilder {
 		return queueEnd;
 	}
 
-	
+
 	/**
 	 * Calculates the positions of all vehicles on this link so that there is always the same distance between following cars. A
 	 * single vehicle will be placed at the middle (0.5) of the link, two cars will be placed at positions 0.25 and 0.75, three
@@ -229,16 +228,16 @@ public class AgentSnapshotInfoBuilder {
 	 *
 	 * @param positions
 	 *            A collection where the calculated positions can be stored.
-	 * @param time 
-	 * @param buffer 
-	 * @param link 
-	 * @param vehQueue 
-	 * @param inverseSimulatedFlowCapacity 
-	 * @param transitQueueLaneFeature 
-	 * @param linkLength 
+	 * @param time
+	 * @param buffer
+	 * @param link
+	 * @param vehQueue
+	 * @param inverseSimulatedFlowCapacity
+	 * @param transitQueueLaneFeature
+	 * @param linkLength
 	 */
-	protected void addVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions, double time, 
-			Collection<QVehicle> buffer, Link link, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity, 
+	protected void addVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions, double time,
+			Collection<QVehicle> buffer, Link link, Collection<QVehicle> vehQueue, double inverseSimulatedFlowCapacity,
 			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, double linkLength) {
 		int cnt = buffer.size() + vehQueue.size();
 		if (cnt > 0) {
@@ -273,7 +272,7 @@ public class AgentSnapshotInfoBuilder {
 			}
 		}
 	}
-	
+
 	private void createAndAddSnapshotInfoForPeopleInMovingVehicle(Collection<AgentSnapshotInfo> positions,
 			Collection<PersonAgent> peopleInVehicle, double distanceOnLink, Link link, int lane, double speed, double offset)
 	{
@@ -293,7 +292,7 @@ public class AgentSnapshotInfoBuilder {
 			cnt++ ;
 		}
 	}
-	
+
 
 	public int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
 			Collection<PersonAgent> agentsInActivities,  int cnt2) {
@@ -307,7 +306,7 @@ public class AgentSnapshotInfoBuilder {
 		return c;
 	}
 
-	
+
 	/**
 	 * Put the vehicles from the waiting list in positions. Their actual position doesn't matter, PositionInfo provides a
 	 * constructor for handling this situation.
@@ -338,9 +337,9 @@ public class AgentSnapshotInfoBuilder {
 
 	/**
 	 * Returns all the people sitting in this vehicle.
-	 * 
+	 *
 	 * @param vehicle
-	 * @param transitQueueLaneFeature 
+	 * @param transitQueueLaneFeature
 	 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
 	 */
 	private Collection<PersonAgent> getPeopleInVehicle(QVehicle vehicle, TransitQLaneFeature transitQueueLaneFeature) {

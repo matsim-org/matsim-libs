@@ -39,7 +39,6 @@ import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 
@@ -47,9 +46,9 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * This is a standalone executable to convert T.veh.gz files to .mvi files.
  *
  * @author dstrippgen
- * 
+ *
  * @deprecated When I found this in may'10, it did not work.  I made it operational again by replacing the QSim
- * by the QueueSimulation, but it seems that it is currently unmaintained.  Thus --> deprecated (i.e. use with 
+ * by the QueueSimulation, but it seems that it is currently unmaintained.  Thus --> deprecated (i.e. use with
  * even greater care than usual).  kai, may'10
  */
 @Deprecated
@@ -157,7 +156,7 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 
 
 	public static void main(String[] args) {
-		
+
 //		String netFileName = "../studies/schweiz/2network/ch.xml";
 //		String vehFileName = "../runs/run168/run168.it210.T.veh";
 //		String netFileName = "../../tmp/studies/ivtch/network.xml";
@@ -168,17 +167,17 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 //		String vehFileName = "./output/colorizedT.veh.txt.gz";
 		String vehFileName = "../../tmp/studies/padang/run301.it100.colorized.T.veh.gz";
 		String outFileName = "./output/testrun301.mvi";
-		
+
 		netFileName = "./output/net.xml" ;
 		vehFileName = "./output/T.veh" ;
 		outFileName = "./output/out.mvi" ;
-		
+
 		if ( args.length == 3 ) {
 			vehFileName = args[0] ;
 			netFileName = args[1] ;
 			outFileName = args[2] ;
 		}
-		
+
 		int intervall_s = 1;
 
 		Gbl.createConfig(null);

@@ -47,25 +47,23 @@ import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshots.writers.PositionInfo;
-
 
 public class FacilityDrawer {
 	private static final Logger log = Logger.getLogger(FacilityDrawer.class);
-	
+
 	public static class DataWriter_v1_0 extends OTFDataWriter<Void> {
 
 		private static final long serialVersionUID = 1L;
 		private final transient TransitSchedule schedule;
 		private final transient TransitStopAgentTracker agentTracker;
 		private final transient Network network ;
-		
+
 		public DataWriter_v1_0(final Network network, final TransitSchedule schedule, final TransitStopAgentTracker agentTracker) {
 			this.network = network ;
 			this.schedule = schedule;
 			this.agentTracker = agentTracker;
 		}
-		
+
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
 			out.putInt(this.schedule.getFacilities().size());
@@ -100,13 +98,13 @@ public class FacilityDrawer {
 				out.putInt(this.agentTracker.getAgentsAtStop(facility).size());
 			}
 		}
-		
+
 	}
-	
+
 	public static class DataReader_v1_0 extends OTFDataReader {
 
 		private DataDrawer drawer = null;
-		
+
 		@Override
 		public void connect(OTFDataReceiver receiver) {
 			if (receiver instanceof DataDrawer) {
@@ -146,17 +144,18 @@ public class FacilityDrawer {
 				stop.setnOfPeople(in.getInt());
 			}
 		}
-		
+
 	}
 
 	public static class DataDrawer extends OTFGLDrawableImpl {
 
 		/*package*/ final List<VisBusStop> stops = new LinkedList<VisBusStop>();
-		
+
+		@Override
 		public void onDraw(GL gl) {
 			if (OTFClientControl.getInstance().getOTFVisConfig().drawTransitFacilities()) {
 				for (VisBusStop stop : this.stops) {
-					DrawingUtils.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);			
+					DrawingUtils.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);
 				}
 				initTexts();
 			}
@@ -172,7 +171,7 @@ public class FacilityDrawer {
 		}
 
 	}
-	
+
 	private static class VisBusStop {
 		public double x = 0.0;
 		public double y = 0.0;
@@ -180,7 +179,7 @@ public class FacilityDrawer {
 		public String linkId;
 		private int nOfPeople = 0;
 		private InfoText stopText;
-		
+
 		public void setnOfPeople(int nOfPeople) {
 			int oldnOfPeople = this.nOfPeople;
 			this.nOfPeople = nOfPeople;
@@ -188,7 +187,7 @@ public class FacilityDrawer {
 				updateText();
 			}
 		}
-		
+
 		private void updateText() {
 			stopText.setText(buildText());
 		}
@@ -196,11 +195,11 @@ public class FacilityDrawer {
 		private String buildText() {
 			return id + ": " + getnOfPeople();
 		}
-		
+
 		private int getnOfPeople() {
 			return nOfPeople;
 		}
-		
+
 	}
-	
+
 }

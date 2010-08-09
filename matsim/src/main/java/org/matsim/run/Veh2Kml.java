@@ -35,7 +35,6 @@ import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 /**
  * Converts a TRANSIMS vehicle file into a google earth file.

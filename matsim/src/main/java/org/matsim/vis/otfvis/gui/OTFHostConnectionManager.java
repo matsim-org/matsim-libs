@@ -21,7 +21,6 @@ package org.matsim.vis.otfvis.gui;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +48,7 @@ public class OTFHostConnectionManager {
 	private final Map <String,OTFClientQuad> quads = new HashMap<String,OTFClientQuad>();
 
 	private final Map <String,OTFDrawer> drawer = new HashMap<String,OTFDrawer>();
-	
+
 	public OTFHostConnectionManager(String address, OTFServerRemote server) {
 		setAddressAndServer(address, server);
 	}
@@ -69,7 +68,7 @@ public class OTFHostConnectionManager {
 	public OTFServerRemote getOTFServer(){
 		return this.host;
 	}
-	
+
 	private void openAddress(final String address) throws RemoteException, InterruptedException, NotBoundException {
 		OTFServerRemote createdHost = new OTFHostConnectionBuilder().createRemoteServerConnection(address);
 		setAddressAndServer(address, createdHost);

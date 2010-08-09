@@ -36,10 +36,9 @@ import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshots.writers.PositionInfo;
-import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshots.writers.VisLink;
 
 /**
  * OTFLinkAgentsHandler transfers basic agent data as well as the default data
@@ -124,7 +123,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	public void readAgent(ByteBuffer in, SceneGraph graph) {
 		// yyyy there is a very similar method in OTFAgentsListHandler.  with a more robust format, they should be united.  kai, apr'10
 		// yyyyyy another writer potentially connected to this reader is in OTFQueueSimLinkAgentsWriter
-		
+
 		String id = ByteBufferUtils.getString(in);
 		float x = in.getFloat();
 		float y = in.getFloat();

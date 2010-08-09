@@ -26,7 +26,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -257,6 +256,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		}
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		String command = event.getActionCommand();
 		if (TO_START.equals(command)) {
@@ -300,6 +300,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 
 	}
 
+	@Override
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox) e.getItemSelectable();
 		if (source.getText().equals(TOGGLE_SYNCH)) {

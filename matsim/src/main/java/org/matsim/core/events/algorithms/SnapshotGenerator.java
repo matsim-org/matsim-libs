@@ -48,7 +48,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 
 public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
@@ -87,36 +86,43 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		return this.snapshotWriters.remove(writer);
 	}
 
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).departure(getEventAgent(event));
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).arrival(getEventAgent(event));
 	}
 
+	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(event));
 	}
 
+	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(event));
 	}
 
+	@Override
 	public void handleEvent(final AgentWait2LinkEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).wait2link(getEventAgent(event));
 	}
 
+	@Override
 	public void handleEvent(final AgentStuckEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).stuck(getEventAgent(event));
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		this.eventLinks.clear();
 		for (Link link : this.network.getLinks().values()) {
@@ -192,13 +198,13 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			writer.finish();
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Allow this SnapshotGenerator to skip all snapshots up to, but not including, a give timestep.
 	 * This is especially useful for interactive settings where a user may fast-forward.
-	 * Snapshot generation is one of the most expensive parts of mobility simulations, so this saves a lot of time. 
-	 * 
+	 * Snapshot generation is one of the most expensive parts of mobility simulations, so this saves a lot of time.
+	 *
 	 * @param when The earliest timestep at which the caller will be interested in snapshots again.
 	 */
 	public void skipUntil(final double when) {
@@ -461,6 +467,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 			this.intId = id.hashCode();
 		}
 
+		@Override
 		public int compareTo(final EventAgent o) {
 			return this.id.compareTo(o.id);
 		}

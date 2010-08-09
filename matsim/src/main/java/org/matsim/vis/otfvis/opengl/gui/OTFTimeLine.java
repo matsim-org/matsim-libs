@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.vis.otfvis.opengl.gui;
 
 import java.awt.Component;
@@ -6,7 +25,6 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Hashtable;
 
@@ -35,15 +53,15 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, ChangeListener {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private class TimestepSlider extends JSlider {
-	
+
 		private static final long serialVersionUID = 1L;
-	
+
 		public TimestepSlider() {
 			super(hostControl.getSimTimeModel());
 		}
-	
+
 		@Override
 		public void paint(Graphics g) {
 			super.paint(g);
@@ -53,7 +71,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	}
 
 	private final OTFHostControl hostControl;
-	
+
 	private JSlider timestepSlider;
 
 	Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
@@ -77,15 +95,15 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 			timestepSlider = new TimestepSlider();
 			return; // nothing to display
 		}
-		
+
 		int min = hostControl.getSimTimeModel().getMinimum();
 		int max = hostControl.getSimTimeModel().getMaximum();
 		timestepSlider = new TimestepSlider();
-	
+
 		timestepSlider.getModel().addChangeListener(this);
 		timestepSlider.setMajorTickSpacing((min-max)/10);
 		timestepSlider.setPaintTicks(true);
-	
+
 		//Create the label table.
 		//PENDING: could use images, but we don't have any good ones.
 		Double[] dsteps = steps.toArray(new Double[steps.size()]);
@@ -95,15 +113,15 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		labelTable.put(Integer.valueOf( max ),
 				new JLabel(Time.writeTime(dsteps[dsteps.length-1], Time.TIMEFORMAT_HHMM)) );
 		//new JLabel(createImageIcon("images/fast.gif")) );
-	
+
 		int n = dsteps.length/10 + 1;
-	
+
 		for(int i= n; i< dsteps.length-1; i+=n) {
 			labelTable.put(Integer.valueOf( dsteps[i].intValue() ),
 					new JLabel(Time.writeTime(dsteps[i], Time.TIMEFORMAT_HHMM)) );
 		}
 		timestepSlider.setLabelTable(labelTable);
-	
+
 		timestepSlider.setPaintLabels(true);
 		timestepSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
 		add(timestepSlider);
@@ -181,7 +199,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 
 	@Override
 	public void invalidate() {
-		
+
 	}
 
 	@Override
@@ -203,7 +221,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	public void setScale(float scale) {
 		// Empty because .. well, because this method implements OTFDrawer although it shouldn't.
 	}
-	
-	
-	
+
+
+
 }

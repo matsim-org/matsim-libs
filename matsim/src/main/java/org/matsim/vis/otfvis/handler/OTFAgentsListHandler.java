@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.OTFClientControl;
@@ -38,14 +37,13 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
 /**
- * OTFAgentsListHandler is responsible for the IO of the 
+ * OTFAgentsListHandler is responsible for the IO of the
  * agent's data in case of a mvi file converted from an events-file.
- * 
+ *
  * @author david
  *
  */
@@ -59,7 +57,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	protected Class agentReceiverClass = null;
 
 	protected List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
-	
+
 //	public static class ExtendedPositionInfo extends PositionInfo {
 //
 //		private ExtendedPositionInfo(Id driverId, double easting, double northing, double elevation, double azimuth, double speed, AgentState vehicleState, int type, int userdata) {
@@ -79,11 +77,11 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		// This class is only instantiated in OTFNetworkServer, OTFTVehServer, OTFEvent2MVI, and OTFTVeh2MVI.  The latter three imply that this class is
 		// needed/used in situations where no quad tree can be constructed from the available data.  I don't know why it is used in OTFNetworkServer,
 		// and think it should be removed from there.  kai, apr'10
-		
+
 		private static final long serialVersionUID = -6368752578878835954L;
 
 		public transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-		
+
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
@@ -106,8 +104,8 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			ByteBufferUtils.putString(out, id);
 			out.putFloat((float)(agInfo.getEasting() - OTFServerQuad2.offsetEast));
 			out.putFloat((float)(agInfo.getNorthing()- OTFServerQuad2.offsetNorth));
-			out.putInt((int)agInfo.getAgentState().ordinal() ) ;
-			out.putInt((int)agInfo.getUserDefined());
+			out.putInt(agInfo.getAgentState().ordinal() ) ;
+			out.putInt(agInfo.getUserDefined());
 			out.putFloat((float)agInfo.getColorValueBetweenZeroAndOne());
 		}
 
@@ -118,7 +116,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		// there is a very similar method in OTFLinkAgentsHandler.  with a more robust format, they should be united.  kai, apr'10
 
 
-		if ( OTFClientControl.getInstance().getOTFVisConfig().getFileVersion()<=1 
+		if ( OTFClientControl.getInstance().getOTFVisConfig().getFileVersion()<=1
 				&& OTFClientControl.getInstance().getOTFVisConfig().getFileMinorVersion()<=6 ) {
 			// this needs to stay in spite of the fact that "writeAgent" does not seem to support it ...
 			// ... since the byte stream can come from a file.
@@ -143,7 +141,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
-			} 
+			}
 		}
 
  	}
@@ -224,7 +222,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			}
-			
+
 	 	}
 	}
 

@@ -34,7 +34,6 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -43,7 +42,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.VisData;
 import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.VisVehicle;
@@ -141,7 +139,7 @@ class QueueLink implements VisLink {
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
-	 * 
+	 *
 	 * @param link2
 	 * @param queueNetwork
 	 * @param toNode
@@ -176,7 +174,7 @@ class QueueLink implements VisLink {
 	/**
 	 * Adds a vehicle to the link, called by
 	 * {@link QueueNode#moveVehicleOverNode(QVehicle, QueueLink, double)}.
-	 * 
+	 *
 	 * @param veh
 	 *            the vehicle
 	 */
@@ -196,7 +194,7 @@ class QueueLink implements VisLink {
 
 	/**
 	 * Adds a vehicle to the lane.
-	 * 
+	 *
 	 * @param veh
 	 * @param now
 	 *            the current time
@@ -307,7 +305,7 @@ class QueueLink implements VisLink {
 
 	/**
 	 * called from framework, do everything related to link movement here
-	 * 
+	 *
 	 * @param now
 	 *            current time step
 	 * @return
@@ -335,7 +333,7 @@ class QueueLink implements VisLink {
 	 * Move vehicles from link to buffer, according to buffer capacity and
 	 * departure time of vehicle. Also removes vehicles from lane if the vehicle
 	 * arrived at its destination.
-	 * 
+	 *
 	 * @param now
 	 *            The current time.
 	 */
@@ -375,7 +373,7 @@ class QueueLink implements VisLink {
 
 	/**
 	 * Move as many waiting cars to the link as it is possible
-	 * 
+	 *
 	 * @param now
 	 *            the current time
 	 */
@@ -440,8 +438,7 @@ class QueueLink implements VisLink {
 	}
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = Gbl.getConfig().simulation()
-				.getStorageCapFactor();
+		double storageCapFactor = this.queueNetwork.getQSim().getScenario().getConfig().simulation().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math
 				.ceil(this.simulatedFlowCapacity);
 
@@ -504,6 +501,7 @@ class QueueLink implements VisLink {
 		return null;
 	}
 
+	@Override
 	public Collection<VisVehicle> getAllVehicles() {
 
 		Collection<VisVehicle> vehicles = this.getAllNonParkedVehicles();
@@ -559,7 +557,7 @@ class QueueLink implements VisLink {
 	/**
 	 * One should think about the need for this method because it is only called
 	 * by one testcase
-	 * 
+	 *
 	 * @return
 	 */
 	int vehOnLinkCount() {
@@ -584,12 +582,12 @@ class QueueLink implements VisLink {
 	 * This method returns the normalized capacity of the link, i.e. the
 	 * capacity of vehicles per second. It is considering the capacity reduction
 	 * factors set in the config and the simulation's tick time.
-	 * 
+	 *
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime. <br/>
 	 *         I don't understand. Is it vehicles per second, or vehicles per
 	 *         simticktime? kai, may'10
-	 * 
+	 *
 	 */
 	@Deprecated
 	// it is preferred to either use the "Link" data, or to evaluate events.
@@ -598,6 +596,7 @@ class QueueLink implements VisLink {
 		return this.simulatedFlowCapacity;
 	}
 
+	@Override
 	public VisData getVisData() { // needs to remain public (makes sense, but
 									// should become interface method)
 		return this.visdata;
@@ -665,12 +664,13 @@ class QueueLink implements VisLink {
 
 	/**
 	 * Inner class to capsulate visualization methods
-	 * 
+	 *
 	 * @author dgrether
-	 * 
+	 *
 	 */
 	class VisDataImpl implements VisData {
 
+		@Override
 		public Collection<AgentSnapshotInfo> getVehiclePositions(
 				final Collection<AgentSnapshotInfo> positions) {
 			String snapshotStyle = simEngine.getConfig().simulation()
@@ -695,7 +695,7 @@ class QueueLink implements VisLink {
 		 * will be placed at the middle (0.5) of the link, two cars will be
 		 * placed at positions 0.25 and 0.75, three cars at positions 0.16,
 		 * 0.50, 0.83, and so on.
-		 * 
+		 *
 		 * @param positions
 		 *            A collection where the calculated positions can be stored.
 		 */
@@ -751,7 +751,7 @@ class QueueLink implements VisLink {
 		 * already on the link. If they could have left the link already (based
 		 * on the time), the vehicles start to build a traffic-jam (queue) at
 		 * the end of the link.
-		 * 
+		 *
 		 * @param positions
 		 *            A collection where the calculated positions can be stored.
 		 */

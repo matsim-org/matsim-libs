@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadI;
-import org.matsim.vis.otfvis.gui.MyNetVisScrollPane;
 import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
@@ -71,9 +70,9 @@ public abstract class OTFClient implements Runnable {
 	public OTFClient(String url) {
 		this.url = url;
 	}
-	
+
 	protected OTFClient() {
-		
+
 	}
 
 	@Override
@@ -100,7 +99,7 @@ public abstract class OTFClient implements Runnable {
 			e.printStackTrace();
 		}
 		frame.setVisible(true);
-		
+
 		log.info("OTFVis finished init");
 	}
 
@@ -151,6 +150,7 @@ public abstract class OTFClient implements Runnable {
 				putValue(Action.MNEMONIC_KEY, 0);
 			}
 
+			@Override
 			public void actionPerformed(final ActionEvent e) {
 				PreferencesDialog preferencesDialog = new PreferencesDialog(frame, hostControlBar);
 				preferencesDialog.setVisConfig(OTFClientControl.getInstance().getOTFVisConfig());
@@ -164,6 +164,7 @@ public abstract class OTFClient implements Runnable {
 				putValue(Action.MNEMONIC_KEY, 1);
 			}
 
+			@Override
 			public void actionPerformed(final ActionEvent e) {
 				save.saveSettingsAs(OTFClientControl.getInstance().getOTFVisConfig());
 			}
@@ -176,6 +177,7 @@ public abstract class OTFClient implements Runnable {
 				putValue(Action.MNEMONIC_KEY, 1);
 			}
 
+			@Override
 			public void actionPerformed(final ActionEvent e) {
 				OTFVisConfigGroup visConfig = save.chooseAndReadSettingsFile();
 				OTFClientControl.getInstance().setOTFVisConfig(visConfig);
@@ -189,6 +191,7 @@ public abstract class OTFClient implements Runnable {
 		fileMenu.add(openAction);
 
 		Action exitAction = new AbstractAction("Quit") {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				frame.endProgram(0);
 			}
