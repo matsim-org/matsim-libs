@@ -25,7 +25,7 @@ import org.matsim.run.OTFVis;
 /**
  * @author florian ostermann
  */
-public class T2_LiveVis {
+public class T0_LiveVis {
 	
 	private static String config = "./test/input/org/matsim/vis/otfvis/checklists/config-qsim.xml";
 	

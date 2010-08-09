@@ -49,9 +49,10 @@ public class PositionInfoTest extends MatsimTestCase {
 
 		// place the vehicle at one quarter of the link
 		AgentSnapshotInfo posInfo = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(new IdImpl(1), link1, 250, 0, 10, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
-		assertEquals(260.6066017177982, posInfo.getEasting(), epsilon);
-		assertEquals(239.3933982822018, posInfo.getNorthing(), epsilon);
+		assertEquals(265.0, posInfo.getEasting(), epsilon);
+		assertEquals(235.0, posInfo.getNorthing(), epsilon);
 		// These numbers became a little weird when I moved vehicles away from the center of a link. Kai, Dec/08
+		// These numbers changed again when I mad the orthogonal offset adaptive.  kai, aug/10
 	}
 
 	/**
@@ -69,9 +70,10 @@ public class PositionInfoTest extends MatsimTestCase {
 
 		// place the vehicle at one quarter of the link
 		AgentSnapshotInfo posInfo = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(new IdImpl(1), link1, 500, 0, 10, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
-		assertEquals(260.6066017177982, posInfo.getEasting(), epsilon);
-		assertEquals(239.3933982822018, posInfo.getNorthing(), epsilon);
+		assertEquals(257.5, posInfo.getEasting(), epsilon);
+		assertEquals(242.5, posInfo.getNorthing(), epsilon);
 		// These numbers became a little weird when I moved vehicles away from the center of a link. Kai, Dec/08
+		// These numbers changed again when I mad the orthogonal offset adaptive.  kai, aug/10
 	}
 
 }

@@ -25,7 +25,7 @@ import org.matsim.core.controler.Controler;
 /**
  * @author florian ostermann
  */
-public class T0_StartControler {
+public class T2_StartControler {
 	
 	private static String config = "./test/input/org/matsim/vis/otfvis/checklists/config.xml";
 	private static String config2 = "./test/input/org/matsim/vis/otfvis/checklists/config-qsim.xml";

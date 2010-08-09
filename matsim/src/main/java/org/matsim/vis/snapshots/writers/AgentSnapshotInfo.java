@@ -21,15 +21,17 @@ package org.matsim.vis.snapshots.writers;
 
 import java.io.Serializable;
 
-import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.Id;
 
-public interface AgentSnapshotInfo extends Identifiable, Serializable {
+public interface AgentSnapshotInfo /* extends Serializable */ {
 
 	// !!! WARNING: The enum list can only be extended.  Making it shorter or changing the sequence of existing elements
 	// will break the otfvis binary channel, meaning that *.mvi files generated until then will become weird. kai, jan'10
 	public enum AgentState { PERSON_AT_ACTIVITY, PERSON_DRIVING_CAR, PERSON_OTHER_MODE, TRANSIT_DRIVER }
 	// !!! WARNING: See comment above this enum.
 
+	Id getId() ;
+	
 	double getEasting();
 
 	double getNorthing();

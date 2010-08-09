@@ -25,10 +25,14 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 import com.vividsolutions.jts.geom.LineSegment;
 
-public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo {
+public class PositionInfo 
+//extends org.matsim.vis.snapshots.writers.PositionInfo
+implements AgentSnapshotInfo
+{
 
 
 
@@ -61,7 +65,7 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 
 	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed,
 			final AgentState vehicleState, final String visualizerData) {
-		super(agentId, 0, 0, 0, 0, 0, PositionInfo.AgentState.PERSON_DRIVING_CAR);
+//		super(agentId, 0, 0, 0, 0, 0, PositionInfo.AgentState.PERSON_DRIVING_CAR);
 		this.agentId = agentId;
 		this.link = link;
 		final TreeMap<Double,LineSegment> lsMap = lsTree.getTreeMap(link.getId().toString());
@@ -198,6 +202,42 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 
 	public static void setLANE_WIDTH(double lANE_WIDTH) {
 		LANE_WIDTH = lANE_WIDTH;
+	}
+
+	@Override
+	public int getType() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public int getUserDefined() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public void setAgentState(AgentState state) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public void setColorValueBetweenZeroAndOne(double tmp) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public void setType(int tmp) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public void setUserDefined(int tmp) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
 	}
 
 }

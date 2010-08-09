@@ -28,6 +28,9 @@
 	
 		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		<param name = "snapshotFormat"	value = "otfvis"/> <!-- googleearth, transims, otfvis -->
+
+		<param name="snapshotStyle" value="queue" />
+
 	</module>
 	
 	<module name="otfvis" >
