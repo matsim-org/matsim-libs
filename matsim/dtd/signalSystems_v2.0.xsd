@@ -33,36 +33,20 @@
 		<xs:element name="signalSystems">
 				<xs:complexType>
 						<xs:sequence>
-								<xs:element name="signalSystemDefinition" type="signalSystemDefinitionType"
+								<xs:element name="signalSystem" type="signalSystemType"
 										minOccurs="0" maxOccurs="unbounded" />
 						</xs:sequence>
 				</xs:complexType>
 		</xs:element>
 
-		<xs:complexType name="signalSystemDefinitionType">
+		<xs:complexType name="signalSystemType">
 				<xs:complexContent>
 						<xs:extension base="matsimObjectType">
 								<xs:sequence>
-										<xs:element name="defaultCycleTime" type="matsimTimeAttributeType" minOccurs="0"
-												maxOccurs="1">
-												<xs:annotation>
-														<xs:documentation>The default duration of one cycle, iff cycles are used for control.
-																In German "Umlaufzeit"</xs:documentation>
-												</xs:annotation>
-										</xs:element>
 										<xs:element name="signals" minOccurs="1" maxOccurs="1">
 												<xs:complexType>
 														<xs:sequence>
-																<xs:element name="signalDefinition" type="signalDefinitionType"
-																		minOccurs="1" maxOccurs="unbounded" />
-														</xs:sequence>
-												</xs:complexType>
-										</xs:element>
-										
-										<xs:element name="signalGroups" minOccurs="1" maxOccurs="1">
-												<xs:complexType>
-														<xs:sequence>
-																<xs:element name="signalGroupDefinition" type="signalGroupDefinitionType"
+																<xs:element name="signal" type="signalType"
 																		minOccurs="1" maxOccurs="unbounded" />
 														</xs:sequence>
 												</xs:complexType>
@@ -72,7 +56,7 @@
 				</xs:complexContent>
 		</xs:complexType>
 
-		<xs:complexType name="signalDefinitionType">
+		<xs:complexType name="signalType">
 				<xs:complexContent>
 						<xs:extension base="matsimObjectType">
 								<xs:sequence>
@@ -104,15 +88,4 @@
 						</xs:extension>
 				</xs:complexContent>
 		</xs:complexType>
-
-		<xs:complexType name="signalGroupDefinitionType">
-				<xs:complexContent>
-						<xs:extension base="matsimObjectType">
-								<xs:sequence>
-								  <xs:element name="signal" type="idRefType" minOccurs="1" maxOccurs="unbounded"/>
-								</xs:sequence>
-						</xs:extension>
-				</xs:complexContent>
-		</xs:complexType>
-
 </xs:schema>
