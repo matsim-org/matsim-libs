@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.wrashid.lib.GeneralLib;
 
@@ -35,14 +37,17 @@ public class BasicPointVisualizer {
 	}
 
 	private void addPlaceMark(Coord coord, ArrayList<String> fileContents, String label) {
+		CoordinateTransformation ct = new CH1903LV03toWGS84();
+		Coord transformedCoord=ct.transform(coord);
+		
 		fileContents.add("<Placemark>");
 		fileContents.add("<name>");
 		fileContents.add(label);
 		fileContents.add("</name>");
 		
-		fileContents.add("<coordinates>");
-		fileContents.add(coord.getX()+","+coord.getY());
-		fileContents.add("</coordinates>");
+		fileContents.add("<Point><coordinates>");
+		fileContents.add(transformedCoord.getX()+","+transformedCoord.getY());
+		fileContents.add("</coordinates></Point>");
 		
 		fileContents.add("</Placemark>");
 	}
