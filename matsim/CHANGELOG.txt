@@ -7,7 +7,8 @@ Release version 0.x.x
 
 Features:
 
-- org.matsim.run.OTFVis now supports Swing-GUI (-swing) and Double-MVI (r11281)
+- org.matsim.run.OTFVis now supports Swing-GUI (-swing) 
+- org.matsim.run.OTFVis now supports Double-MVI (r11281), and removed again (r12288)
 - Swing-OTFVis can now show Link-Ids (r11300) and different link-widths (r11366)
 - NetVis is no longer available (r11317ff)
 
