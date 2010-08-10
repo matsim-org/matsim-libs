@@ -171,7 +171,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		this.cachedTimes.clear();
 	}
 
-	public synchronized SceneGraph getSceneGraphNoCache(final int time, Rect rect, final OTFDrawer drawer) {
+	private SceneGraph getSceneGraphNoCache(final int time, Rect rect, final OTFDrawer drawer) {
 		try {
 			List<Rect> rects = new LinkedList<Rect>();
 			/*
@@ -275,10 +275,6 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		for(OTFDataReader element : this.additionalElements) {
 			element.invalidate(result);
 		}
-	}
-
-	synchronized public void invalidateAll(final SceneGraph result) {
-		invalidate(null, result);
 	}
 
 	@Override
