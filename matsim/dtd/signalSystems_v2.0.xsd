@@ -72,7 +72,7 @@
 												</xs:complexType>
 										</xs:element>
 										
-										<xs:element name="turningMoveRestrictions" minOccurs="0" maxOccurs="unbounded">
+										<xs:element name="turningMoveRestrictions" minOccurs="0" maxOccurs="1">
 												<xs:annotation>
 														<xs:documentation>
 														</xs:documentation>
