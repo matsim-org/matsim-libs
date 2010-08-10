@@ -110,7 +110,6 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 				assertEquals("Wrong returned travel time for mode \"" + mode + "\".", 0.0, travelTime);
 				assertEquals("Wrong leg departure time for mode \"" + mode + "\".", departureTime, leg.getDepartureTime());
 				assertEquals("Wrong leg travel time for mode \"" + mode + "\".", 0.0, leg.getTravelTime());
-				assertEquals("Wrong leg arrival time for mode \"" + mode + "\".", departureTime, leg.getArrivalTime());
 				assertEquals("Wrong distance for mode \"" + mode + "\".", 0.0, leg.getRoute().getDistance());
 			} catch (RuntimeException e) {
 				System.out.println(e.toString());

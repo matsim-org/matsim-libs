@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -42,7 +41,7 @@ import org.matsim.world.MappedLocation;
 
 
 /**
- * Modifications of the roting module for the KTI project.
+ * Modifications of the routing module for the KTI project.
  *
  * @author mrieser
  * @author meisterk
@@ -107,7 +106,6 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			leg.setRoute(route);
 			leg.setDepartureTime(depTime);
 			leg.setTravelTime(travelTime);
-			((LegImpl) leg).setArrivalTime(depTime + travelTime);  // yy will not survive alternative implementation of Leg.  kai, apr'10
 		} else {
 			if (mode.equals(TransportMode.pt)) {
 				travelTime = handleSwissPtLeg(fromAct, leg, toAct, depTime);
@@ -159,7 +157,6 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travelTime);
-		((LegImpl) leg) .setArrivalTime(depTime + travelTime); // yy will cause problems with alternative implementation of Leg.  kai, apr'10
 
 		return travelTime;
 	}
