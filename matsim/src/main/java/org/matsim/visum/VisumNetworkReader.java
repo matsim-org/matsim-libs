@@ -66,6 +66,8 @@ public class VisumNetworkReader {
 	private final String[] TABLE_TIMEPROFILE = {"$TIMEPROFILE:", "$FAHRZEITPROFIL:"};
 	private final String[] TABLE_TIMEPROFILEITEM = {"$TIMEPROFILEITEM:", "$FAHRZEITPROFILELEMENT:"};
 	private final String[] TABLE_VEHJOURNEY = {"$VEHJOURNEY:", "$FZGFAHRT:"};
+//	private final String[] TABLE_VEHJOURNEYITEM = {"$VEHJOURNEYITEM:", "$FZGFAHRTELEMENT:"};
+	private final String[] TABLE_VEHJOURNEYSECTION = {"$VEHJOURNEYSECTION:", "$FZGFAHRTABSCHNITT:"};
 	private final String[] TABLE_VEHUNIT = {"$VEHUNIT:", "$FZGEINHEIT:"};
 	private final String[] TABLE_VEHCOMB = {"$VEHCOMB:", "$FZGKOMB:"};
 	private final String[] TABLE_VEHUNITTOVEHCOMB = {"$VEHUNITTOVEHCOMB:", "$FZGEINHEITZUFZGKOMB:"};
@@ -126,6 +128,9 @@ public class VisumNetworkReader {
 	private final String[] ATTRIBUTE_D_DEP = {"DEP", "ABFAHRT"};
 	private final String[] ATTRIBUTE_D_DCODE = GENERAL_DCODE;
 
+	private final String[] ATTRIBUTE_VJS_VEHJOURNEYNO = {"VEHJOURNEYNO", "FZGFAHRTNR"}; // vehicle journey section
+	private final String[] ATTRIBUTE_VJS_VEHCOMBNO = {"VEHCOMBNO", "FZGKOMBNR"};
+
 	private final String[] ATTRIBUTE_VEHUNIT_ID = GENERAL_NO;
 	private final String[] ATTRIBUTE_VEHUNIT_CODE = {"CODE", "CODE"};
 	private final String[] ATTRIBUTE_VEHUNIT_SEATCAP = {"SEATCAP", "SITZPL"};
@@ -175,6 +180,8 @@ public class VisumNetworkReader {
 					readTimeProfileItems(line, reader);
 				} else if (line.startsWith(this.TABLE_VEHJOURNEY[this.language])) {
 					readDepartures(line, reader);
+				} else if (line.startsWith(this.TABLE_VEHJOURNEYSECTION[this.language])) {
+					readDepartureSections(line, reader);
 				} else if (line.startsWith(this.TABLE_VEHUNIT[this.language])) {
 					readVehicleUnits(line, reader);
 				} else if (line.startsWith(this.TABLE_VEHCOMB[this.language])) {
@@ -400,7 +407,7 @@ public class VisumNetworkReader {
 		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_VEHJOURNEY[this.language].length()), ';');
 		final int idxLineRouteName = getAttributeIndex(this.ATTRIBUTE_D_LRNAME[this.language], attributes);
 		final int idxLineName = getAttributeIndex(this.ATTRIBUTE_D_LNAME[this.language], attributes);
-		final int idxIndex = getAttributeIndex(this.ATTRIBUTE_D_ID[this.language], attributes);
+		final int idxNo = getAttributeIndex(this.ATTRIBUTE_D_ID[this.language], attributes);
 		final int idxTRI = getAttributeIndex(this.ATTRIBUTE_D_TPNAME[this.language], attributes);
 		final int idxDep = getAttributeIndex(this.ATTRIBUTE_D_DEP[this.language], attributes);
 		final int idxDCode = getAttributeIndex(this.ATTRIBUTE_D_DCODE[this.language], attributes);
@@ -409,8 +416,26 @@ public class VisumNetworkReader {
 		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 
-			VisumNetwork.Departure d = new VisumNetwork.Departure(parts[idxLineName],parts[idxLineRouteName],parts[idxIndex],parts[idxTRI],parts[idxDep],new IdImpl(parts[idxDCode]));
+			VisumNetwork.Departure d = new VisumNetwork.Departure(parts[idxLineName],parts[idxLineRouteName],parts[idxNo],parts[idxTRI],parts[idxDep],new IdImpl(parts[idxDCode]));
 			this.network.addDeparture(d);
+			// proceed to next line
+			line = reader.readLine();
+		}
+	}
+
+	private void readDepartureSections(final String tableAttributes, final BufferedReader reader) throws IOException {
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_VEHJOURNEYSECTION[this.language].length()), ';');
+		final int idxVehicleJourneyNo = getAttributeIndex(this.ATTRIBUTE_VJS_VEHJOURNEYNO[this.language], attributes);
+		final int idxVehCombinationNo = getAttributeIndex(this.ATTRIBUTE_VJS_VEHCOMBNO[this.language], attributes);
+
+		String line = reader.readLine();
+		while (line != null && line.length() > 0) {
+			final String[] parts = StringUtils.explode(line, ';');
+
+			String vehJourneyNo = parts[idxVehicleJourneyNo];
+			String vehCombNo = parts[idxVehCombinationNo];
+			VisumNetwork.Departure d = this.network.departuresByNo.get(vehJourneyNo);
+			d.vehCombinationNo = vehCombNo;
 			// proceed to next line
 			line = reader.readLine();
 		}

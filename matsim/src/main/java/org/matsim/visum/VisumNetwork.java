@@ -44,16 +44,17 @@ public class VisumNetwork {
 	public final Map<String, TimeProfile> timeProfiles = new TreeMap<String, TimeProfile>();
 	public final Map<String, TimeProfileItem> timeProfileItems = new LinkedHashMap<String, TimeProfileItem>();
 	public final Map<String, Departure> departures = new TreeMap<String, Departure>();
+	public final Map<String, Departure> departuresByNo = new TreeMap<String, Departure>();
 	public final Map<String, VehicleUnit> vehicleUnits = new HashMap<String, VehicleUnit>();
 	public final Map<String, VehicleCombination> vehicleCombinations = new HashMap<String, VehicleCombination>();
-	
+
 	public void addEdgeType(final EdgeType edgeType) {
 		EdgeType oldEdgeType = edgeTypes.put(edgeType.id, edgeType);
 		if (oldEdgeType != null) {
 			throw new IllegalArgumentException("Duplicate edge type.");
 		}
 	}
-	
+
 	public void addStop(final Stop stop) {
 		Stop oldStop = this.stops.put(stop.id, stop);
 		if (oldStop != null) {
@@ -64,7 +65,7 @@ public class VisumNetwork {
 		}
 
 	}
-	
+
 	public void addStopArea(final StopArea stopAr) {
 		StopArea oldStopAr = this.stopAreas.put(stopAr.id, stopAr);
 		if (oldStopAr != null) {
@@ -144,6 +145,7 @@ public class VisumNetwork {
 			this.departures.put(oldD.lineName+"/"+ oldD.lineRouteName +"/"+ oldD.index, oldD);
 			throw new IllegalArgumentException("There is already a departure with the same id.");
 		}
+		this.departuresByNo.put(d.index, d);
 	}
 
 	public void addVehicleUnit(final VehicleUnit vehUnit) {
@@ -177,9 +179,9 @@ public class VisumNetwork {
 			this.kapIV = kapIV;
 			this.v0IV = v0IV;
 		}
-		
+
 	}
-	
+
 	public static class Stop {
 		public final Id id;
 		public final String name;
@@ -297,6 +299,7 @@ public class VisumNetwork {
 			this.lRIIndex = lRIIndex;
 		}
 	}
+
 	public static class Departure {
 		public final String lineName;
 		public final String lineRouteName;
@@ -304,8 +307,7 @@ public class VisumNetwork {
 		public final String TRI;
 		public final String dep;
 		public final Id DCode;
-
-
+		public String vehCombinationNo = null;
 
 		public Departure(final String lineName, final String lineRouteName, final String index, final String TRI, final String dep,final Id DCode) {
 			this.lineName = lineName;
@@ -314,7 +316,6 @@ public class VisumNetwork {
 			this.TRI = TRI;
 			this.dep = dep;
 			this.DCode=DCode;
-
 		}
 	}
 

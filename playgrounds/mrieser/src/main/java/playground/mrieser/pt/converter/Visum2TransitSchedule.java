@@ -104,44 +104,54 @@ public class Visum2TransitSchedule {
 			TransitLine tLine = builder.createTransitLine(line.id);
 
 			for (VisumNetwork.TimeProfile timeProfile : this.visum.timeProfiles.values()){
-				VisumNetwork.VehicleCombination vehCombination = this.visum.vehicleCombinations.get(timeProfile.vehCombNr);
-				if (vehCombination == null) {
-					vehCombination = this.visum.vehicleCombinations.get(line.vehCombNo);
+				VisumNetwork.VehicleCombination defaultVehCombination = this.visum.vehicleCombinations.get(timeProfile.vehCombNr);
+				if (defaultVehCombination == null) {
+					defaultVehCombination = this.visum.vehicleCombinations.get(line.vehCombNo);
 				}
-				if (vehCombination == null) {
-					log.error("Could not find vehicle combination with id=" + timeProfile.vehCombNr + " used in line " + line.id.toString() + ". Some TimeProfile may not be converted.");
-				} else {
-					VehicleType vehType = this.vehicles.getVehicleTypes().get(new IdImpl(vehCombination.id));
-					// convert line routes
-					if (timeProfile.lineName.equals(line.id)) {
-						List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-						//  convert route profile
-						for (VisumNetwork.TimeProfileItem tpi : this.visum.timeProfileItems.values()){
-							if (tpi.lineName.equals(line.id.toString()) && tpi.lineRouteName.equals(timeProfile.lineRouteName.toString()) && tpi.timeProfileName.equals(timeProfile.index.toString()) && tpi.DCode.equals(timeProfile.DCode.toString())){
-								TransitRouteStop s = builder.createTransitRouteStop(stopFacilities.get(this.visum.lineRouteItems.get(line.id.toString() +"/"+ timeProfile.lineRouteName.toString()+"/"+ tpi.lRIIndex.toString()+"/"+tpi.DCode).stopPointNo),Time.parseTime(tpi.arr),Time.parseTime(tpi.dep));
-								stops.add(s);
+				VehicleType defaultVehType = null;
+				if (defaultVehCombination != null) {
+					defaultVehType = this.vehicles.getVehicleTypes().get(new IdImpl(defaultVehCombination.id));
+				}
+				// convert line routes
+				if (timeProfile.lineName.equals(line.id)) {
+					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+					//  convert route profile
+					for (VisumNetwork.TimeProfileItem tpi : this.visum.timeProfileItems.values()){
+						if (tpi.lineName.equals(line.id.toString()) && tpi.lineRouteName.equals(timeProfile.lineRouteName.toString()) && tpi.timeProfileName.equals(timeProfile.index.toString()) && tpi.DCode.equals(timeProfile.DCode.toString())){
+							TransitRouteStop s = builder.createTransitRouteStop(stopFacilities.get(this.visum.lineRouteItems.get(line.id.toString() +"/"+ timeProfile.lineRouteName.toString()+"/"+ tpi.lRIIndex.toString()+"/"+tpi.DCode).stopPointNo),Time.parseTime(tpi.arr),Time.parseTime(tpi.dep));
+							stops.add(s);
+						}
+					}
+					String mode = this.transportModes.get(line.tCode);
+					if (mode == null) {
+						log.error("Could not find TransportMode for " + line.tCode + ", more info: " + line.id);
+					}
+					TransitRoute tRoute = builder.createTransitRoute(new IdImpl(timeProfile.lineName.toString()+"."+timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+"."+timeProfile.DCode.toString()),null,stops,mode);
+					//  convert departures
+					for (VisumNetwork.Departure d : this.visum.departures.values()){
+						if (d.lineName.equals(line.id.toString()) && d.lineRouteName.equals(timeProfile.lineRouteName.toString()) && d.TRI.equals(timeProfile.index.toString())) {
+							Departure departure = builder.createDeparture(new IdImpl(d.index), Time.parseTime(d.dep));
+							VehicleType vehType = defaultVehType;
+							if (d.vehCombinationNo != null) {
+								vehType = this.vehicles.getVehicleTypes().get(new IdImpl(d.vehCombinationNo));
+								if (vehType == null) {
+									vehType = defaultVehType;
+								}
 							}
-						}
-						String mode = this.transportModes.get(line.tCode);
-						if (mode == null) {
-							log.error("Could not find TransportMode for " + line.tCode + ", more info: " + line.id);
-						}
-						TransitRoute tRoute = builder.createTransitRoute(new IdImpl(timeProfile.lineName.toString()+"."+timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+"."+timeProfile.DCode.toString()),null,stops,mode);
-						//  convert departures
-						for (VisumNetwork.Departure d : this.visum.departures.values()){
-							if (d.lineName.equals(line.id.toString()) && d.lineRouteName.equals(timeProfile.lineRouteName.toString()) && d.TRI.equals(timeProfile.index.toString())) {
-								Departure departure = builder.createDeparture(new IdImpl(d.index), Time.parseTime(d.dep));
+							if (vehType == null) {
+								log.error("Could not find any vehicle combination for deparutre " + d.index + " used in line " + line.id.toString() + ".");
+							} else {
 								Vehicle veh = vb.createVehicle(new IdImpl("tr_" + vehId++), vehType);
 								this.vehicles.getVehicles().put(veh.getId(), veh);
 								departure.setVehicleId(veh.getId());
 								tRoute.addDeparture(departure);
 							}
 						}
-						if (tRoute.getDepartures().size() > 0) {
-							tLine.addRoute(tRoute);
-						} else {
-							log.warn("The route " + tRoute.getId() + " was not added to the line " + tLine.getId() + " because it does not contain any departures.");
-						}
+					}
+					if (tRoute.getDepartures().size() > 0) {
+						tLine.addRoute(tRoute);
+					} else {
+						log.warn("The route " + tRoute.getId() + " was not added to the line " + tLine.getId() + " because it does not contain any departures.");
 					}
 				}
 			}
