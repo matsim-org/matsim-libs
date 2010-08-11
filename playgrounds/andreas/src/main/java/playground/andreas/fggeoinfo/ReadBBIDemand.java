@@ -49,14 +49,14 @@ public class ReadBBIDemand implements TabularFileHandler{
 		private String description;
 		private int numberOfAgents;
 		private Coord location;
+		private double shareTXL;
 		
-		public DemandBox(String street, String description, int numberOfAgents, double xCoord, double yCoord) {
+		public DemandBox(String street, String description, int numberOfAgents, double xCoord, double yCoord, double shareTXL) {
 			this.street = street;
 			this.description = description;
 			this.numberOfAgents = numberOfAgents;
 			this.location = new CoordImpl(xCoord, yCoord);
-			
-
+			this.shareTXL = shareTXL;
 		}
 		
 		public String getNameBySourceAndDescription(){
@@ -70,6 +70,10 @@ public class ReadBBIDemand implements TabularFileHandler{
 		public int numberOfPassengers(){
 			return this.numberOfAgents;
 		}
+
+		public double getShareTXL() {
+			return this.shareTXL;
+		}
 	}
 
 	@Override
@@ -82,7 +86,7 @@ public class ReadBBIDemand implements TabularFileHandler{
 			}
 			log.info("Ignoring: " + tempBuffer);
 		} else {
-			this.demandList.add(new DemandBox(row[0], row[1], Integer.parseInt(row[2]), Double.parseDouble(row[3]), Double.parseDouble(row[4])));			
+			this.demandList.add(new DemandBox(row[0], row[1], Integer.parseInt(row[2]), Double.parseDouble(row[3]), Double.parseDouble(row[4]), Double.parseDouble(row[5])));			
 		}
 		
 	}

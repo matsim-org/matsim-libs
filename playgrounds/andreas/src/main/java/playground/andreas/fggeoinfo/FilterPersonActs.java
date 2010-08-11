@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -67,6 +68,7 @@ public class FilterPersonActs extends NewPopulation {
 						this.actSXF.put(act.getType(), new Integer(this.actSXF.get(act.getType()).intValue() + 1 ));
 					}					
 					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
+					person.setId(new IdImpl(person.getId().toString() + "_SXF-BBI"));
 				}
 				
 				if(checkIsTXL(act)){
@@ -76,6 +78,7 @@ public class FilterPersonActs extends NewPopulation {
 						this.actTXL.put(act.getType(), new Integer(this.actTXL.get(act.getType()).intValue() + 1 ));
 					}
 					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
+					person.setId(new IdImpl(person.getId().toString() + "_TXL-BBI"));
 				}
 			}
 		}
@@ -122,7 +125,7 @@ public class FilterPersonActs extends NewPopulation {
 		String inputDir = "d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20100809_verwendet\\";
 
 		String networkFile = inputDir + "network_modified_20100806_added_BBI_AS_cl.xml.gz";
-		String inPlansFile = "d:\\Berlin\\BVG\\berlin-bvg09\\pop\\baseplan_900s.xml.gz";
+		String inPlansFile = "d:\\Berlin\\berlin-sharedsvn\\plans\\baseplan_900s.xml.gz";
 		String outPlansFile = inputDir + "baseplan_900s_movedToBBI.xml.gz";
 
 		NetworkLayer net = sc.getNetwork();

@@ -55,10 +55,10 @@ public class MergePopulations extends NewPopulation {
 		String inputDir = "d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20100809_verwendet\\";
 
 		String networkFile = inputDir + "network_modified_20100806_added_BBI_AS_cl.xml.gz";
-//		String inPlansFile = "d:\\Berlin\\BVG\\berlin-bvg09\\pop\\baseplan_900s.xml.gz";
-		String inPlansFile = inputDir + "baseplan_900s_movedToBBI.xml.gz";
-		String additionalPlansFile = inputDir + "pop_generated.xml";
-		String outPlansFile = inputDir + "pop_merged.xml.gz";
+		String inPlansFile = "d:\\Berlin\\BVG\\berlin-bvg09\\pop\\baseplan_900s.xml.gz";
+//		String inPlansFile = inputDir + "baseplan_1x_900s_movedToBBI.xml.gz";
+		String additionalPlansFile = inputDir + "pop_1x_generated_TXL_SXF.xml";
+		String outPlansFile = inputDir + "pop_1x_merged_TXL_SXF.xml.gz";
 
 		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(networkFile);

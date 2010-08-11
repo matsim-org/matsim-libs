@@ -26,6 +26,10 @@ public class BBIextraDemand {
 	private static final Logger log = Logger.getLogger(BBIextraDemand.class);
 	
 	Coord coordBBI = new CoordImpl(4604545.48760, 5805194.68221);
+	Coord coordTXL = new CoordImpl(4588068.19422, 5824668.31998);
+	Coord coordSXF = new CoordImpl(4603377.91673, 5807538.81303);
+	
+	double fraction = 0.02;
 	
 	List<DemandBox> demandList;
 	List<Person> personList = new ArrayList<Person>();
@@ -35,8 +39,12 @@ public class BBIextraDemand {
 		
 		BBIextraDemand bbi = new BBIextraDemand();
 		bbi.initialize();
-		bbi.createAgents();
-		bbi.writePopulation("d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20100809_verwendet\\pop_generated.xml.gz");
+		
+		bbi.createAgents(false);
+		bbi.writePopulation("d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20100809_verwendet\\pop_generated_TXL_SXF.xml.gz");
+		
+		bbi.createAgents(true);
+		bbi.writePopulation("d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20100809_verwendet\\pop_generated_BBI_only.xml.gz");
 				
 	}
 
@@ -50,27 +58,81 @@ public class BBIextraDemand {
 		}		
 	}
 
-	private void createAgents() {
-		for (DemandBox demandBox : this.demandList) {
+	private void createAgents(boolean onlyBBI) {
+		
+		this.personList = new ArrayList<Person>(); 
+		
+		if(onlyBBI){
 			
-			for (int i = 0; i < demandBox.numberOfPassengers(); i++) {
-				
-				PersonImpl person =  new PersonImpl(new IdImpl("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i+1)));
-	
-				PlanImpl plan = new PlanImpl();
-				ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
-				act.setEndTime(getStartTime() * 3600 + Math.random() * 3600);
-				plan.addActivity(act);
-				
-				plan.addLeg(new LegImpl(TransportMode.car));
-				
-				plan.addActivity(new ActivityImpl("leisure", this.coordBBI));
-	
-				person.addPlan(plan);
-				
-				this.personList.add(person);
-			}	
+			log.info("Creating agents heading for BBI only.");
 			
+			for (DemandBox demandBox : this.demandList) {
+
+				// create agents heading for BBI
+				for (int i = 1; i < demandBox.numberOfPassengers() * this.fraction; i++) {
+
+					PersonImpl person =  new PersonImpl(new IdImpl("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i)));
+
+					PlanImpl plan = new PlanImpl();
+					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
+					act.setEndTime(getStartTime() * 3600 + Math.random() * 3600);
+					plan.addActivity(act);
+
+					plan.addLeg(new LegImpl(TransportMode.car));
+
+					plan.addActivity(new ActivityImpl("leisure", this.coordBBI));
+
+					person.addPlan(plan);
+
+					this.personList.add(person);
+				}	
+
+			}
+		} else {
+			
+			log.info("Creating agents heading for TXL and SXF.");
+			
+			for (DemandBox demandBox : this.demandList) {
+
+				// create agents heading for TXL
+				for (int i = 1; i < demandBox.numberOfPassengers() * this.fraction * demandBox.getShareTXL(); i++) {
+
+					PersonImpl person =  new PersonImpl(new IdImpl("TXL_" + demandBox.getNameBySourceAndDescription() + "_" + (i)));
+
+					PlanImpl plan = new PlanImpl();
+					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
+					act.setEndTime(getStartTime() * 3600 + Math.random() * 3600);
+					plan.addActivity(act);
+
+					plan.addLeg(new LegImpl(TransportMode.car));
+
+					plan.addActivity(new ActivityImpl("leisure", this.coordTXL));
+
+					person.addPlan(plan);
+
+					this.personList.add(person);
+				}
+				
+				// create agents heading for SXF
+				for (int i = 1; i < demandBox.numberOfPassengers() * this.fraction * (1 - demandBox.getShareTXL()); i++) {
+
+					PersonImpl person =  new PersonImpl(new IdImpl("SXF_" + demandBox.getNameBySourceAndDescription() + "_" + (i)));
+
+					PlanImpl plan = new PlanImpl();
+					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
+					act.setEndTime(getStartTime() * 3600 + Math.random() * 3600);
+					plan.addActivity(act);
+
+					plan.addLeg(new LegImpl(TransportMode.car));
+
+					plan.addActivity(new ActivityImpl("leisure", this.coordSXF));
+
+					person.addPlan(plan);
+
+					this.personList.add(person);
+				}			
+
+			}
 		}
 		
 		log.info("Created: " + this.personList.size() + " agents");		
