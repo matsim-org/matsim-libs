@@ -50,26 +50,26 @@ public class AnalyzePlansActivities {
 	 * 0: path to plans file
 	 * 1: path to network file
 	 * 2: path to facilities file
+	 * 3: outpath
 	 */
 	public static void main(final String[] args) {
-		
 		log.info("Analyzig plans ...");
-		Gbl.startMeasurement();
-		
+				
 		String plansFile = args[0];
 		String networkFile = args[1];
 		String facilitiesFile = args[2];
-		String outputFile = args[3];
+		String outpath = args[3];
 		
 		final AnalyzePlansActivities analyzer = new AnalyzePlansActivities();
 		analyzer.init(plansFile, networkFile, facilitiesFile);
-		analyzer.run(plansFile, outputFile);
+		analyzer.run(plansFile, outpath);
 		
-		Gbl.printElapsedTime();
+		log.info("Finished analyzig plans ...");
+		
 	}
 
-	public void run(String plansFile, String outputFile) {
-		this.analyze(outputFile, plansFile);	
+	public void run(String plansFile, String outpath) {
+		this.analyze(outpath, plansFile);	
 	}
 
 	private void init(String plansFile, String networkFile, String facilitiesFile) {
@@ -80,7 +80,7 @@ public class AnalyzePlansActivities {
 		log.info("reading the network ...");
 		new MatsimNetworkReader(this.scenario).readFile(networkFile);
 
-		log.info("  reading file " + plansFile);
+		log.info("reading the plans file " + plansFile);
 		final PopulationReader plansReader = new MatsimPopulationReader(this.scenario);
 		plansReader.readFile(plansFile);
 	}
@@ -91,6 +91,9 @@ public class AnalyzePlansActivities {
 		try {
 			final BufferedWriter out = IOUtils.getBufferedWriter(outpath + "plan_activities.txt");
 
+			int numberOfPersons = 0;
+			int numberOfActs = 0;
+			
 			int numberOfShoppingActs = 0;
 			int numberOfLeisureActs = 0;
 			int numberOfWorkActs = 0;
@@ -111,6 +114,9 @@ public class AnalyzePlansActivities {
 
 			Iterator<? extends Person> person_it = this.plans.getPersons().values().iterator();
 			while (person_it.hasNext()) {
+				
+				numberOfPersons++;
+				
 				Person person = person_it.next();
 				Plan selectedPlan = person.getSelectedPlan();
 				
@@ -128,6 +134,9 @@ public class AnalyzePlansActivities {
 				final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j=j+2) {
 					final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+					
+					numberOfActs++;
+					
 					if (act.getType().startsWith("shop")) {
 						numberOfShoppingActs++;
 						
@@ -182,6 +191,9 @@ public class AnalyzePlansActivities {
 				if (education && leisure) {numberOfPersonsEducationAndLeisure++;}
 			}	
 			out.write("Plans file: " + plansFile +"\n");
+			
+			out.write("numberOfPersons: \t" + numberOfPersons + "\n");
+			out.write("numberOfActs: \t" + numberOfActs + "\n");
 			
 			out.write("numberOfPersonsInclWorking: \t" + numberOfPersonsInclWorking + "\n");
 			out.write("numberOfPersonsInclEducation: \t" + numberOfPersonsInclEducation + "\n");
