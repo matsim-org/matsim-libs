@@ -111,6 +111,8 @@ public class AnalyzePlansActivities {
 			int numberOfPersonsLeisureOnly = 0;
 			int numberOfPersonsShopOnly = 0;
 			int numberOfPersonsHomeOnly = 0;
+			
+			int numberOfPersonsShopAndLeisureOnly = 0;
 
 			Iterator<? extends Person> person_it = this.plans.getPersons().values().iterator();
 			while (person_it.hasNext()) {
@@ -129,7 +131,7 @@ public class AnalyzePlansActivities {
 				boolean work = false;
 				boolean education = false;
 				boolean leisure = false;
-				//boolean shop = false;				
+				boolean shop = false;				
 
 				final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j=j+2) {
@@ -140,6 +142,8 @@ public class AnalyzePlansActivities {
 					if (act.getType().startsWith("shop")) {
 						numberOfShoppingActs++;
 						
+						shop = true;
+						
 						workOnly = false;
 						educationOnly = false;
 						leisureOnly = false;
@@ -147,6 +151,8 @@ public class AnalyzePlansActivities {
 					}
 					else if (act.getType().startsWith("leisure")) {
 						numberOfLeisureActs++;
+						
+						leisure = true;
 						
 						workOnly = false;
 						educationOnly = false;
@@ -156,6 +162,8 @@ public class AnalyzePlansActivities {
 					else if (act.getType().startsWith("work")) {
 						numberOfWorkActs++;
 						
+						work = true;
+						
 						leisureOnly = false;
 						educationOnly = false;
 						shopOnly = false;
@@ -164,6 +172,8 @@ public class AnalyzePlansActivities {
 					else if (act.getType().startsWith("education")) {
 						numberOfEducationActs++;
 						
+						education = true;
+						
 						workOnly = false;
 						leisureOnly = false;
 						shopOnly = false;
@@ -171,11 +181,6 @@ public class AnalyzePlansActivities {
 					}
 					else if (act.getType().startsWith("home")) {
 						numberOfHomeActs++;
-						
-						workOnly = false;
-						educationOnly = false;
-						leisureOnly = false;
-						shopOnly = false;
 					}
 				}
 				if (workOnly) {	numberOfPersonsWorkOnly++;}
@@ -183,6 +188,8 @@ public class AnalyzePlansActivities {
 				if (leisureOnly) {numberOfPersonsLeisureOnly++;}
 				if (shopOnly) {numberOfPersonsShopOnly++;}
 				if (homeOnly) {numberOfPersonsHomeOnly++;}
+				
+				if (shop && leisure &&!work && !education) {numberOfPersonsShopAndLeisureOnly++;}
 				
 				if (work) {numberOfPersonsInclWorking++;}
 				if (education) {numberOfPersonsInclEducation++;}
@@ -206,6 +213,8 @@ public class AnalyzePlansActivities {
 			
 			out.write("numberOfPersonsWorkAndLeisure: \t" + numberOfPersonsWorkAndLeisure + "\n");
 			out.write("numberOfPersonsEducationAndLeisure: \t" + numberOfPersonsEducationAndLeisure + "\n");
+			
+			out.write("numberOfPersonsShopAndLeisureOnly: \t" + numberOfPersonsShopAndLeisureOnly + "\n");
 			
 			out.flush();
 			out.close();
