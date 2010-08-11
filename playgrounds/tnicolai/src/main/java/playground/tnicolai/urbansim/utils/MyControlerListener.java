@@ -17,7 +17,6 @@ import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.toronto.ttimematrix.SpanningTree;
 
@@ -50,7 +49,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		st.setDepartureTime(dpTime);
 
 		try {
-			String travelDataPath = Constants.OPUS_HOME + MATSim4Urbansim.getTempDirectory() + "travel_data.csv";
+			String travelDataPath = Constants.OPUS_HOME + MATSimConfigObject.getTempDirectory() + "travel_data.csv";
 
 			BufferedWriter writer = IOUtils.getBufferedWriter( travelDataPath );
 

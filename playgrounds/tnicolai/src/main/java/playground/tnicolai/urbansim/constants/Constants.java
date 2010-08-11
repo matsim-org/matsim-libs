@@ -31,8 +31,7 @@ public class Constants {
 	
 	/** important system environments */
 	public static String OPUS_HOME = System.getenv("OPUS_HOME");			// TODO: schould be provided by UrbanSim via the configuration file
-	public static String OPUS_DATA_PATH = System.getenv("OPUS_DATA_PATH");	// TODO: schould be provided by UrbanSim via the configuration file
-	public static String PYTHONPATH = System.getenv("PYTHONPATH");			// TODO: schould be provided by UrbanSim via the configuration file
+//	public static String PYTHONPATH = System.getenv("PYTHONPATH");			// TODO: schould be provided by UrbanSim via the configuration file
 	
 	/** subdirectories in OPUS_HOME */
 	public static String OPUS_MATSIM_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/";
@@ -40,12 +39,20 @@ public class Constants {
 	public static String OPUS_MATSIM_OUTPUT_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/output/";
 	public static String OPUS_MATSIM_TEMPORARY_DIRECTORY = System.getenv("OPUS_HOME")+'/'+"opus_matsim/tmp/";
 	
-	public static void updateOpusHomeSubdirectories(String opusHome){
+	/**
+	 * applay a new root path for the OPUS_HOME directory
+	 * @param opusHome path to the new OPUS_HOME Directory
+	 */
+	public static void setOpusHomeDirectory(String opusHome){
+		
+		if(!opusHome.endsWith("/"))
+			opusHome += "/";
+		
 		OPUS_HOME = opusHome;
-		OPUS_MATSIM_DIRECTORY = opusHome+'/'+"opus_matsim/";
-		MATSIM_CONFIG_DIRECTORY = opusHome+'/'+"opus_matsim/matsim_config/";
-		OPUS_MATSIM_OUTPUT_DIRECTORY = opusHome+'/'+"opus_matsim/output/";
-		OPUS_MATSIM_TEMPORARY_DIRECTORY = opusHome+'/'+"opus_matsim/tmp/";
+		OPUS_MATSIM_DIRECTORY = opusHome+"opus_matsim/";
+		MATSIM_CONFIG_DIRECTORY = opusHome+"opus_matsim/matsim_config/";
+		OPUS_MATSIM_OUTPUT_DIRECTORY = opusHome+"opus_matsim/output/";
+		OPUS_MATSIM_TEMPORARY_DIRECTORY = opusHome+"opus_matsim/tmp/";
 	}
 	
 	/** subdirectories in MATSim */
@@ -67,6 +74,8 @@ public class Constants {
 	
 	/** parameter for computing urbansim data */
 	public static final String TAB_SEPERATOR = "[\t\n]+";
+	public static final String TAB = "\t";
+	public static final String NEW_LINE	= "\r\n";
 	public static final String PARCEL_ID = "parcel_id";
 	public static final String X_COORDINATE = "x_coord_sp";
 	public static final String Y_COORDINATE = "y_coord_sp";

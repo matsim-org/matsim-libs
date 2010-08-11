@@ -78,6 +78,8 @@ public class UpdateXMLParser {
 			String source = tmpDirectory + outputPackage.replace(".", File.separator);
 			log.info("Copying generated files from " + source + " to " + outputDirectory);
 			FileCopy.copyTree(source, outputDirectory);
+//			File tempDir = new File(source);
+//			tempDir.delete();
 		}
 		catch (IOException e) {
 			log.error("Error occoured executing command: " + cmd );
@@ -122,7 +124,13 @@ public class UpdateXMLParser {
 		if(xsdLocation == null){
 			log.info("XSD location not given...");
 			// set default location
-			xsdLocation = Constants.PYTHONPATH + "/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd";
+			if( System.getenv("PYTHONPATH") == null){
+				log.error("Enviornment variable 'PYTHONPATH' not found!");
+				log.equals("Please add the 'PYTHONPATH' (the path to your UrbanSim source directory) to your enviornment variables");
+				log.equals("or add '--xsdLocation' (providing the path to the xsd file) parameter calling UpdateXMLParser.");
+				System.exit(-1);
+			}
+			xsdLocation = System.getenv("PYTHONPATH")+ "/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd";
 			log.info("Set default location to: " + xsdLocation);
 		}
 		if(outputDirectory == null){

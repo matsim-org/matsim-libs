@@ -72,8 +72,14 @@ public class FileCopy {
 	        // copy every source file into destination path
 	        for(File f : fileNames) { 
 	        	String fullName = f.getCanonicalPath(); 
-	            int pos = fullName.indexOf(sourceDir);           
-	            String subName = fullName.substring(pos + sourceDir.length()+1); 
+	            int pos = fullName.indexOf(sourceDir);    
+	            
+	            String subName = null;
+	            if(sourceDir.endsWith("/")) 
+	            	subName = fullName.substring(pos + sourceDir.length());
+	            else 
+	            	subName = fullName.substring(pos + sourceDir.length()+1); 
+	            
 	            String targetName = targetRootName + subName;
 	            target = new File(targetName); 
 	            if(f.isDirectory()) { 

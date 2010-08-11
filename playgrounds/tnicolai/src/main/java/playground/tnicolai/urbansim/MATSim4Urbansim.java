@@ -39,22 +39,17 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.xml.sax.SAXException;
 
 import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.utils.IdFactory;
+import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.MyControlerListener;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
@@ -67,64 +62,39 @@ public class MATSim4Urbansim {
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4Urbansim.class);
 
-	// MATSim configuration file
+	// Stores location of MATSim configuration file
 	private static String matsimConfigFile = null;
-	// pointer to network file location
-	private static String networkFile = null;
-	// number of first iteration of this run
-	private static int firstIteration = -1;
-	// number of last iteration of this run
-	private static int lastIteration = -1;
-	// identifier activityType_0
-	private static String activityType_0 = null;
-	// identifier activityType_1
-	private static String activityType_1 = null;
-	// year of this run
-	private static int year = -1;
-	// denotes the sample rate on which MATSim runs. 0.01 means 1%
-	private static double samplingRate = -0.01;
-	// points to the directory where urbansim and MATSim exchange data
-	private static String tempDirectory = null;
-	// points to the OPUS_HOME directory
-	private static String opusHomeDirectory = null;
-	// flag o indicate the fist urbansim run (if always true equals "warm start")
-	private static boolean firstRun = true;
-	
-	// flag indicates if this is a test run
-	private static boolean isTestRun = false;
-	
 	// MATSim configuration
 	private static Config config	= null;
 	// MATSim scenario
 	private static ScenarioImpl scenario = null;
 
 	/**
-	 *
+	 * Entry point
 	 * @param args urbansim command prompt
 	 */
-	public static void main(String args[]){
+	public static int main(String args[]){
 
 		log.info("Starting MATSim from Urbansim");
 
-		// test the path to matsim config xml
-		if( args==null || args[0].length() <= 0 || !isValidConfigPath( args[0] ) ){
-			log.error("Missing path to the MATSim configuration file or path isn't valid. SHUTDOWN MATSim!");
-			System.exit(Constants.NOT_VALID_PATH);
-		}
-		// binding the parameter from the MATSim Config into the JaxB data structure
-		if(!unmaschalMATSimConfig()){
-			log.error("Unmarschalling failed. SHUTDOWN MATSim!");
-			if(isTestRun)
-				log.error("TestRun failed !!!");
-			System.exit(Constants.UNMARSCHALLING_FAILED);
+		// checks if args parameter contains a valid path
+		isValidPath(args);
+		// loading and initializing MATSim config
+		prepareRun();
+		// checking for if this is only a test run
+		// a test run only validates the xml config file by initializing the xml config via the xsd.
+		if(MATSimConfigObject.isTestRun()){
+			log.info("TestRun was successful...");
+			return Constants.TEST_RUN_SUCCESSFUL;
 		}
 
-		// create config object
-		createAndInitializeConfigObject();
+		// init scenario and config object
+		scenario = MATSimConfigObject.getScenario();
+		config = MATSimConfigObject.getConfig();
 
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
-		NetworkLayer network = scenario.getNetwork() ;
+		NetworkLayer network = scenario.getNetwork();
 
 		log.info("") ;
 		log.info("Cleaning network ...");
@@ -133,7 +103,7 @@ public class MATSim4Urbansim {
 		log.info("") ;
 
 		// get the data from urbansim (parcels and persons)
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year );
+		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( MATSimConfigObject.getYear() );
 
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
@@ -160,7 +130,7 @@ public class MATSim4Urbansim {
 
 		Population newPopulation = new ScenarioImpl().getPopulation();
 		// read urbansim persons.  Generates hwh acts as side effect
-		readFromUrbansim.readPersons( oldPopulation, newPopulation, facilities, network, samplingRate ) ;
+		readFromUrbansim.readPersons( oldPopulation, newPopulation, facilities, network, MATSimConfigObject.getSampeRate() ) ;
 		oldPopulation=null ;
 		System.gc() ;
 
@@ -180,20 +150,37 @@ public class MATSim4Urbansim {
 
 		// run the iterations, including the post-processing:
 		controler.run() ;
+		
+		return 0;
 	}
-
+	
 	/**
-	 * Returns an exit code for a successful test run given that
-	 * this run was an test run (test runs are indicated by the
-	 * "isTestRun" flag, stored in the MATSim configuration file).
+	 * verifying if args argument contains a vaild path. 
+	 * @param args
 	 */
-	private static void printTestRunStatusSuccessful(){
-		if(isTestRun){
-			log.info("TestRun was successful...");
-			System.exit(Constants.TEST_RUN_SUCCESSFUL);
+	private static void isValidPath(String args[]){
+		// test the path to matsim config xml
+		if( args==null || args[0].length() <= 0 || !pathExsits( args[0] ) ){
+			log.error(args[0] + " is not a valid path. SHUTDOWN MATSim!");
+			System.exit(Constants.NOT_VALID_PATH);
 		}
-		else
-			log.info("This is no TestRun!!!");
+	}
+	
+	/**
+	 * loading, validating and initializing MATSim config.
+	 */
+	private static void prepareRun(){
+		// binding the parameter from the MATSim Config into the JaxB data structure
+		if(!unmaschalMATSimConfig()){
+			if(MATSimConfigObject.isTestRun()){
+				log.error("TestRun failed !!!");
+				System.exit(Constants.TEST_RUN_FAILD);
+			}
+			else{
+				log.error("Unmarschalling failed. SHUTDOWN MATSim!");
+				System.exit(Constants.UNMARSCHALLING_FAILED);
+			}
+		}
 	}
 	
 	/**
@@ -206,7 +193,6 @@ public class MATSim4Urbansim {
 		log.info("...");
 		try{
 			JAXBContext jaxbContext = JAXBContext.newInstance(playground.tnicolai.urbansim.com.matsim.config.ObjectFactory.class);
-
 			// create an unmaschaller (write xml file)
 			Unmarshaller unmarschaller = jaxbContext.createUnmarshaller();
 
@@ -215,48 +201,34 @@ public class MATSim4Urbansim {
 			// ... and initialize it with an xsd (xsd lies in the urbansim project)
 			File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); // TODO: make it configurable
 			if(!file2XSD.exists()){
-				log.error(file2XSD.getCanonicalPath() + " does not exsist!!!");
+				log.error(file2XSD.getCanonicalPath() + " not found!!!");
 				return false;
 			}
-			log.info("Using folowing xsd schema: " + file2XSD.getCanonicalPath());
-			Schema schema = schemaFactory.newSchema(file2XSD);	// set schema for validation
-
+			log.info("Using following xsd schema: " + file2XSD.getCanonicalPath());
+			// create a schema object via the given xsd to validate the MATSim xml config.
+			Schema schema = schemaFactory.newSchema(file2XSD);
+			// set the schema for validation while reading/importing the MATSim xml config.
 			unmarschaller.setSchema(schema);
-
+			
 			File inputFile = new File( MATSim4Urbansim.matsimConfigFile );
 			if(!inputFile.exists())
-				log.error(inputFile.getCanonicalPath() + " does not exsist!!!");
-
+				log.error(inputFile.getCanonicalPath() + " not found!!!");
+			// contains the content of the MATSim config.
 			Object object = unmarschaller.unmarshal(inputFile);
-
+			
+			// Java representation of the schema file.
 			ConfigType matsimConfig;
-
+			
+			// The structure of both objects must match.
 			if(object.getClass() == ConfigType.class)
 				matsimConfig = (ConfigType) object;
 			else
 				matsimConfig = (( JAXBElement<ConfigType>) object).getValue();
-
+			
+			// creatin MASim config object that contains the values from the xml config file.
 			if(matsimConfig != null){
-				networkFile = matsimConfig.getNetwork().getInputFile();
-				firstIteration = matsimConfig.getControler().getFirstIteration().intValue();
-				lastIteration = matsimConfig.getControler().getLastIteration().intValue();
-				activityType_0 = matsimConfig.getPlanCalcScore().getActivityType0();
-				activityType_1 = matsimConfig.getPlanCalcScore().getActivityType1();
-				samplingRate = matsimConfig.getUrbansimParameter().getSamplingRate();
-				year = matsimConfig.getUrbansimParameter().getYear().intValue();
-				tempDirectory = matsimConfig.getUrbansimParameter().getTempDirectory();
-				opusHomeDirectory = matsimConfig.getUrbansimParameter().getOpusHOME();
-				isTestRun = matsimConfig.getUrbansimParameter().isIsTestRun();
-
-				log.info("Network: " + networkFile);
-				log.info("Controler FirstIteration: " + firstIteration + " LastIteration: " + lastIteration );
-				log.info("PlanCalcScore Activity_Type_0: " + activityType_0 + " Activity_Type_1: " + activityType_1);
-				log.info("UrbansimParameter SamplingRate: " + samplingRate + " Year: " + year + " TempDir: " + tempDirectory + " OPUS_HOME: " + opusHomeDirectory + " TestRun: " + isTestRun);
-				
-				// update opus home path if needed
-				if(! Constants.OPUS_HOME.equalsIgnoreCase(opusHomeDirectory))
-					Constants.updateOpusHomeSubdirectories(opusHomeDirectory);
-				
+				log.info("Creating new MATSim config object to store the values from the xml configuration.");
+				MATSimConfigObject.initMATSimConfigObject(matsimConfig);
 			}
 		}
 		catch(JAXBException je){
@@ -276,95 +248,21 @@ public class MATSim4Urbansim {
 			return false;
 		}
 		log.info("... finished unmarschallig");
-		// Unmaschalling finished without an exection. 
-		// This method returns an exit code for a successful test run given that this was an test run.
-		MATSim4Urbansim.printTestRunStatusSuccessful();
 		return true;
 	}
 
 	/**
-	 * creates a MATSim config object with the parameter from the JaxB data structure
+	 * Checks a given path if it exists
+	 * @param arg path
+	 * @return true if the given file exists
 	 */
-	private static void createAndInitializeConfigObject(){
-		
-		scenario = new ScenarioImpl();
-		MATSim4Urbansim.config = scenario.getConfig();
-
-		NetworkConfigGroup networkCG = (NetworkConfigGroup) MATSim4Urbansim.config.getModule(NetworkConfigGroup.GROUP_NAME);
-		ControlerConfigGroup controlerCG = (ControlerConfigGroup) MATSim4Urbansim.config.getModule(ControlerConfigGroup.GROUP_NAME);
-		
-		// set values
-		networkCG.setInputFile( MATSim4Urbansim.networkFile );	// network
-		log.info("Set network to config...");
-		
-		controlerCG.setFirstIteration( MATSim4Urbansim.firstIteration );	// controller (first, last iteration)
-		controlerCG.setLastIteration( MATSim4Urbansim.lastIteration);
-		log.info("Set controler to config...");
-		
-		ActivityParams actType0 = new ActivityParams(MATSim4Urbansim.activityType_0);
-		actType0.setTypicalDuration(12*60*60);
-		ActivityParams actType1 = new ActivityParams(MATSim4Urbansim.activityType_1);
-		actType1.setTypicalDuration(8*60*60);
-		MATSim4Urbansim.config.charyparNagelScoring().addActivityParams( actType0 ); // planCalcScore
-		MATSim4Urbansim.config.charyparNagelScoring().addActivityParams( actType1 );
-		log.info("Set planCalcScore to config...");
-		
-		// configure strategies for replanning
-		MATSim4Urbansim.config.strategy().setMaxAgentPlanMemorySize(4);
-		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
-		selectExp.setModuleName("ReRoute_Dijkstra");
-		selectExp.setProbability(1.0);
-		MATSim4Urbansim.config.strategy().addStrategySettings(selectExp);
-		log.info("Set strategy to config...");
-		
-		// init loader
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadScenario();
-		
-		// old version
-//		ScenarioLoaderImpl loader = new ScenarioLoaderImpl("/Users/thomas/Development/workspace/OPUS_MATSim_Config_Test/xmls/MATSim4UrbansimOldConfig.xml");
-//		loader.loadScenario();
-//		ScenarioImpl scenario = loader.getScenario();
-//		config = scenario.getConfig();
-	}
-
-	/**
-	 *
-	 * @param arg
-	 * @return
-	 */
-	private static boolean isValidConfigPath(String args){
+	private static boolean pathExsits(String args){
 		matsimConfigFile = args.trim();
 
 		if( (new File(matsimConfigFile)).exists() )
 			return true;
 		return false;
 	}
-
-	/**
-	 * getter for sampling rate
-	 * @return
-	 */
-	public static double getSamplingRate(){
-		return MATSim4Urbansim.samplingRate;
-	}
-
-	/**
-	 * getter for year
-	 * @return
-	 */
-	public static int getYear(){
-		return MATSim4Urbansim.year;
-	}
-
-	/**
-	 * getter for temp directory
-	 * @return
-	 */
-	public static String getTempDirectory(){
-		return MATSim4Urbansim.tempDirectory;
-	}
-
 }
 
 
