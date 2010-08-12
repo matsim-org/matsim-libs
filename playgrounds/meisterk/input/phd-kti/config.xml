@@ -2,7 +2,7 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[	
 		<!ENTITY INBASE  "/data/matsim/switzerland/ivt/studies">
-		<!ENTITY OUTBASE "/data/matsim/meisterk/output/phd-kti">
+		<!ENTITY OUTBASE "output">
 	]
 >
 <config>
