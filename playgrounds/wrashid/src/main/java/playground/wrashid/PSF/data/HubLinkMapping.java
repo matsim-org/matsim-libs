@@ -100,5 +100,9 @@ public class HubLinkMapping {
 		return linkHubMapping.get(linkId).intValue();
 	}
 	
+	public static void main(String[] args) {
+		new HubLinkMapping("A:/data/matsim/input/runRW1003/hubLinkMapping.txt",819);
+	}
+	
 }     
  
