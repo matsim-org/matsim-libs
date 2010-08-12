@@ -62,6 +62,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
 
+import playground.wrashid.lib.obj.StringMatrix;
 import playground.wrashid.lib.obj.list.Lists;
 
 public class GeneralLib {
@@ -582,6 +583,40 @@ public class GeneralLib {
 
 		new NetworkCleaner().run(net);
 		return net;
+	}
+	
+	//TODO: there are some classes (e.g. playground.wrashid.PSF.data.HubLinkMapping and HubPriceInfo, which could
+	// be refactored by calling this method.
+	public static StringMatrix readStringMatrix(String fileName){
+		StringMatrix matrix=new StringMatrix();
+		
+		try {
+			
+			FileReader fr = new FileReader(fileName);
+			
+			BufferedReader br = new BufferedReader(fr);
+			String line;
+			StringTokenizer tokenizer;
+			line = br.readLine();
+			while (line != null) {
+				LinkedList<String> row=new LinkedList<String>();
+				
+				tokenizer = new StringTokenizer(line);
+				
+				while (tokenizer.hasMoreTokens()){
+					row.add(tokenizer.nextToken());
+				}
+				
+				matrix.addRow(row);
+				
+				line = br.readLine();
+			}
+		} catch (Exception e){
+			throw new Error("Error reading the file");
+		}		
+				
+		
+		return matrix;
 	}
 		
 }
