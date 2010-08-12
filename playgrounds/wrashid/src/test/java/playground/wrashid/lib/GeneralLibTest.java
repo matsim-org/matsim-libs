@@ -1,9 +1,12 @@
 package playground.wrashid.lib;
 
+import org.jgap.Gene;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
+
+import playground.wrashid.lib.obj.StringMatrix;
 
 public class GeneralLibTest extends MatsimTestCase {
 
@@ -87,5 +90,13 @@ public class GeneralLibTest extends MatsimTestCase {
 		assertEquals(false,GeneralLib.isIn24HourInterval(10.0, 3.0, 9.0));
 		assertEquals(true,GeneralLib.isIn24HourInterval(10.0, 3.0, 11.0));
 		assertEquals(true,GeneralLib.isIn24HourInterval(10.0, 3.0, 2.0));
+	}
+	
+	public void testReadStringMatrix(){
+		StringMatrix matrix=GeneralLib.readStringMatrix("test/input/playground/wrashid/PSF/data/hubPriceInfo.txt");
+		
+		assertEquals(96, matrix.getNumberOfRows());
+		assertEquals(4, matrix.getNumberOfColumnsInRow(0));
+		assertEquals(80.0, matrix.getDouble(0, 0),0.1);
 	}
 }
