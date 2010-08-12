@@ -26,6 +26,7 @@ package playground.tnicolai.urbansim;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -49,6 +50,7 @@ import org.xml.sax.SAXException;
 
 import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.urbansim.matsimTest.MATSim4UrbanSimTest;
 import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.MyControlerListener;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
@@ -199,7 +201,9 @@ public class MATSim4Urbansim {
 			// crate a schema factory ...
 			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
 			// ... and initialize it with an xsd (xsd lies in the urbansim project)
-			File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); // TODO: make it configurable
+			// TODO: upload to matsim.org
+			File file2XSD = new File( getCurrentPath() +"xsd/MATSim4UrbanSimConfigSchema.xsd" );
+			// File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
 			if(!file2XSD.exists()){
 				log.error(file2XSD.getCanonicalPath() + " not found!!!");
 				return false;
@@ -262,6 +266,20 @@ public class MATSim4Urbansim {
 		if( (new File(matsimConfigFile)).exists() )
 			return true;
 		return false;
+	}
+	
+	/**
+	 * returns the path of the current directory
+	 * @return
+	 */
+	private static String getCurrentPath(){
+		try{
+			URL dirUrl = MATSim4Urbansim.class.getResource("./"); // get my directory
+			return dirUrl.getFile();
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
 
