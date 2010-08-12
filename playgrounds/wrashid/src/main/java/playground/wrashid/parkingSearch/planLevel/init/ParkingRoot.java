@@ -8,6 +8,7 @@ import org.matsim.core.network.NetworkLayer;
 
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
+import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceMeanAndStandardDeviationGraph;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingCapacity;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyMaintainer;
@@ -30,6 +31,11 @@ public class ParkingRoot {
 	private static ParkingScoringFunction parkingScoringFunction;
 	private static ArrayList<String> parkingLog;
 	private static BasicPointVisualizer mapDebugTrace;
+	private static ParkingWalkingDistanceMeanAndStandardDeviationGraph parkingWalkingDistanceGraph;
+
+	public static ParkingWalkingDistanceMeanAndStandardDeviationGraph getParkingWalkingDistanceGraph() {
+		return parkingWalkingDistanceGraph;
+	}
 
 	public static BasicPointVisualizer getMapDebugTrace() {
 		return mapDebugTrace;
@@ -65,6 +71,7 @@ public class ParkingRoot {
 	}
 
 	public static void init(ActivityFacilitiesImpl facilities, NetworkLayer network, Controler controler) {
+		parkingWalkingDistanceGraph=new ParkingWalkingDistanceMeanAndStandardDeviationGraph();
 		mapDebugTrace=new BasicPointVisualizer();
 		cpm = new ClosestParkingMatrix(facilities, network);
 		lpfa = new LinkParkingFacilityAssociation(facilities, network);

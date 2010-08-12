@@ -101,7 +101,7 @@ public abstract class ParkingScoringFunction {
 				
 
 				ParkingRoot.getMapDebugTrace().addPointCoordinate(targetActivity.getCoord(), "targetActivity", Color.RED);
-				ParkingRoot.writeMapDebugTraceToCurrentIterationDirectory();
+				//ParkingRoot.writeMapDebugTraceToCurrentIterationDirectory();
 			}
 			
 			// assure, that there are at least some parkings in the selection set (especially avoid by this, that

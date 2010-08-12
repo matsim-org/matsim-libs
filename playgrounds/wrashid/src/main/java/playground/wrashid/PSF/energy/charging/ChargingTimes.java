@@ -233,7 +233,7 @@ public class ChargingTimes {
 
 	
 	public static void writeEnergyConsumptionGraphic(String fileName, double[][] energyUsageStatistics, String title) {
-		GeneralLib.writeGraphic(fileName, GeneralLib.scaleMatrix(energyUsageStatistics, 1.0/3600000) ,title, "Time of Day [s]","Energy Consumption [kWh]");
+		GeneralLib.writeHubGraphic(fileName, GeneralLib.scaleMatrix(energyUsageStatistics, 1.0/3600000) ,title, "Time of Day [s]","Energy Consumption [kWh]");
 	}
 
 	// write out data (energy usage at each hub)

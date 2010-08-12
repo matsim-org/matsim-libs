@@ -101,7 +101,7 @@ public class BatteryStatistics {
 	
 	
 	public static void writeGridConnectedPower(String fileName, double[][] gridConnectedPower) {
-		GeneralLib.writeGraphic(fileName, GeneralLib.scaleMatrix(gridConnectedPower, 1.0/1000) ,"Power Available From Connected Vehicles", "Time of Day [s]","Power [kW]");
+		GeneralLib.writeHubGraphic(fileName, GeneralLib.scaleMatrix(gridConnectedPower, 1.0/1000) ,"Power Available From Connected Vehicles", "Time of Day [s]","Power [kW]");
 	}
 	
 	public static void writeGridConnectedPowerData(String fileName, double[][] gridConnectedPower) {
@@ -109,7 +109,7 @@ public class BatteryStatistics {
 	}
 	
 	public static void writeGridConnectedEnergy(String fileName, double[][] gridConnectedPower) {
-		GeneralLib.writeGraphic(fileName, GeneralLib.scaleMatrix(gridConnectedPower, 1.0/1000/3600) ,"Energy Available From Connected Vehicles", "Time of Day [s]","Energy [kWh]");
+		GeneralLib.writeHubGraphic(fileName, GeneralLib.scaleMatrix(gridConnectedPower, 1.0/1000/3600) ,"Energy Available From Connected Vehicles", "Time of Day [s]","Energy [kWh]");
 	}
 	
 	public static void writeGridConnectedEnergyData(String fileName, double[][] gridConnectedPower) {

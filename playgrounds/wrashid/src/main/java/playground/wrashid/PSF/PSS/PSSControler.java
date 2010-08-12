@@ -145,8 +145,8 @@ public class PSSControler {
 		double[][] hubPricePeaks = GeneralLib.readMatrix(numberOfTimeBins, ParametersPSF.getNumberOfHubs(), false,
 				hubPricePeaksFileName + ".txt");
 
-		GeneralLib.writeGraphic(hubPriceInfoFileName + ".png", hubPriceInfo, "Hub Energy Prices", "Time of Day [s]", "Price [CHF]");
-		GeneralLib.writeGraphic(hubPricePeaksFileName + ".png", hubPricePeaks, "Hub Energy Prices (only Peak)", "Time of Day [s]",
+		GeneralLib.writeHubGraphic(hubPriceInfoFileName + ".png", hubPriceInfo, "Hub Energy Prices", "Time of Day [s]", "Price [CHF]");
+		GeneralLib.writeHubGraphic(hubPricePeaksFileName + ".png", hubPricePeaks, "Hub Energy Prices (only Peak)", "Time of Day [s]",
 				"Price [CHF]");
 	}
 

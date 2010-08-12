@@ -377,16 +377,15 @@ public class GeneralLib {
 	 * 
 	 * 
 	 * @param fileName
-	 * @param energyUsageStatistics
+	 * @param matrix
 	 * @param title
 	 * @param xLabel
 	 * @param yLabel
 	 */
-	public static void writeGraphic(String fileName, double[][] energyUsageStatistics, String title, String xLabel, String yLabel) {
-		XYLineChart chart = new XYLineChart(title, xLabel, yLabel);
-
-		int numberOfXValues = energyUsageStatistics.length;
-		int numberOfFunctions = energyUsageStatistics[0].length;
+	public static void writeHubGraphic(String fileName, double[][] matrix, String title, String xLabel, String yLabel) {
+		int numberOfXValues = matrix.length;
+		int numberOfFunctions = matrix[0].length;
+		String[] seriesLabels= new String[numberOfFunctions];
 
 		double[] time = new double[numberOfXValues];
 
@@ -395,16 +394,30 @@ public class GeneralLib {
 		}
 
 		for (int i = 0; i < numberOfFunctions; i++) {
-			double[] hubConcumption = new double[numberOfXValues];
+			seriesLabels[i]= "hub-" + i;
+		}
+
+		writeGraphic(fileName, matrix, title, xLabel, yLabel, seriesLabels, time);
+	}
+	
+	public static void writeGraphic(String fileName, double[][] matrix, String title, String xLabel, String yLabel, String[] seriesLabels, double[] xValues){
+		XYLineChart chart = new XYLineChart(title, xLabel, yLabel);
+
+		int numberOfXValues = matrix.length;
+		int numberOfFunctions = matrix[0].length;
+
+		for (int i = 0; i < numberOfFunctions; i++) {
+			double[] series = new double[numberOfXValues];
 			for (int j = 0; j < numberOfXValues; j++) {
-				hubConcumption[j] = energyUsageStatistics[j][i];
+				series[j] = matrix[j][i];
 			}
-			chart.addSeries("hub-" + i, time, hubConcumption);
+			chart.addSeries(seriesLabels[i], xValues, series);
 		}
 
 		// chart.addMatsimLogo();
 		chart.saveAsPng(fileName, 800, 600);
 	}
+	
 
 	public static double[][] scaleMatrix(double[][] matrix, double scalingFactor) {
 		int numberOfRows = matrix.length;
