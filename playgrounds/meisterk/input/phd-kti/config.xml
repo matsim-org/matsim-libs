@@ -131,6 +131,8 @@
 	</module>
 
 	<module name="planCalcScore">
+		<param name="learningRate" value="1.0"/>
+	
 		<param name="earlyDeparture" value="-180.0" />
 		<param name="waiting" value="0.0" />
 		
