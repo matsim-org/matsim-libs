@@ -30,7 +30,15 @@ public class LinkParkingFacilityAssociation extends LinkFacilityAssociation {
 		ArrayList<ActivityFacilityImpl> list=linkFacilityMapping.get(facilityLink);
 		
 		if (facility.getActivityOptions().containsKey("parking")){
+			if (list.contains(facility)){
+				throw new Error("!!!!!!!!!!!!!!");
+			}
+			
 			list.add(facility);
+			
+			
+			
+			
 			// DEBUG INFO: display parking facilities
 			if (GeneralLib.getDistance(new CoordImpl(4528426.090831845,5822407.437950259), network.getLinks().get(facilityLink).getCoord())<5000){
 				ParkingRoot.getMapDebugTrace().addPointCoordinate(network.getLinks().get(facilityLink).getCoord(), facilityLink.toString(), Color.GREEN);

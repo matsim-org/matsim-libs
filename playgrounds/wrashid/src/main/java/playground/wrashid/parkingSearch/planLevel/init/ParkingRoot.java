@@ -1,7 +1,9 @@
 package playground.wrashid.parkingSearch.planLevel.init;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -32,6 +34,8 @@ public class ParkingRoot {
 	private static ArrayList<String> parkingLog;
 	private static BasicPointVisualizer mapDebugTrace;
 	private static ParkingWalkingDistanceMeanAndStandardDeviationGraph parkingWalkingDistanceGraph;
+	private static HashMap<Id, Double> parkingWalkingDistanceOfPreviousIteration=null;
+
 
 	public static ParkingWalkingDistanceMeanAndStandardDeviationGraph getParkingWalkingDistanceGraph() {
 		return parkingWalkingDistanceGraph;
@@ -138,6 +142,15 @@ public class ParkingRoot {
 
 	public static ArrayList<String> getParkingLog() {
 		return parkingLog;
+	}
+
+	public static void setParkingWalkingDistanceOfPreviousIteration(
+			HashMap<Id, Double> parkingWalkingDistanceOfPreviousIteration) {
+		ParkingRoot.parkingWalkingDistanceOfPreviousIteration = parkingWalkingDistanceOfPreviousIteration;
+	}
+
+	public static HashMap<Id, Double> getParkingWalkingDistanceOfPreviousIteration() {
+		return parkingWalkingDistanceOfPreviousIteration;
 	}
 
 }

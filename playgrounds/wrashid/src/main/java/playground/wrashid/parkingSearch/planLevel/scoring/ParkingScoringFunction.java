@@ -96,18 +96,24 @@ public abstract class ParkingScoringFunction {
 			
 			
 			// if still no parking is free, log the violation
-			if (!someParkingFromSetIsFreeAtArrivalTime(closestParkings, parkingArrivalTime, delta)) {
-				ParkingRoot.getParkingLog().add("all parkings in area full: " + targetActivity.getCoord().toString());
+			//if (!someParkingFromSetIsFreeAtArrivalTime(closestParkings, parkingArrivalTime, delta)) {
+			//	ParkingRoot.getParkingLog().add("all parkings in area full: " + targetActivity.getCoord().toString());
 				
 
-				ParkingRoot.getMapDebugTrace().addPointCoordinate(targetActivity.getCoord(), "targetActivity", Color.RED);
+			//	ParkingRoot.getMapDebugTrace().addPointCoordinate(targetActivity.getCoord(), "targetActivity", Color.RED);
 				//ParkingRoot.writeMapDebugTraceToCurrentIterationDirectory();
-			}
+			//}
 			
 			// assure, that there are at least some parkings in the selection set (especially avoid by this, that
 			// the selection within the maxDistance radius gives back 0 parkings
 			int minimumNumberOfParkings=3;
 			if (closestParkings.size()<minimumNumberOfParkings) {			
+				closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),minimumNumberOfParkings,minimumNumberOfParkings);
+			}
+			
+			// if there is no parking, in the set which is free, extend the set also
+			while (!someParkingFromSetIsFreeAtArrivalTime(closestParkings, parkingArrivalTime, delta)) {
+				minimumNumberOfParkings*=2;
 				closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),minimumNumberOfParkings,minimumNumberOfParkings);
 			}
 			

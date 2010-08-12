@@ -39,6 +39,7 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		GeneralLib.writeList(ParkingRoot.getParkingLog(),fileName);
 		
 		writeWalkingDistanceStatisticsGraph();
+		updateparkingWalkingTimeOfPreviousIteration();
 		
 		//ParkingRoot.writeMapDebugTraceToCurrentIterationDirectory();
 		//ParkingRoot.resetMapDebugTrace();
@@ -53,6 +54,10 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		ParkingRoot.getParkingWalkingDistanceGraph().updateStatisticsForIteration(controler.getIterationNumber(), ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance());
 		String fileName = GlobalRegistry.controler.getControlerIO().getOutputFilename("walkingDistance.png");
 		ParkingRoot.getParkingWalkingDistanceGraph().writeGraphic(fileName);
+	}
+	
+	private void updateparkingWalkingTimeOfPreviousIteration(){
+		ParkingRoot.setParkingWalkingDistanceOfPreviousIteration(ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance());
 	}
 	
 }
