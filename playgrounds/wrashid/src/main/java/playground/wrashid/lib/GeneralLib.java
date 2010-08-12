@@ -62,6 +62,8 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
 
+import playground.wrashid.lib.obj.list.Lists;
+
 public class GeneralLib {
 
 	/*
@@ -158,11 +160,9 @@ public class GeneralLib {
 			FileOutputStream fos = new FileOutputStream(fileName);
 			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos);
 
-			for (int i = 0; i < list.size(); i++) {
-				outputStreamWriter.write(list.get(i));
-				outputStreamWriter.write("\n");
-			}
-
+			char[] charArray=Lists.getCharsOfAllArrayItemsWithNewLineCharacterInbetween(list);
+			outputStreamWriter.write(charArray);			
+			
 			outputStreamWriter.flush();
 			outputStreamWriter.close();
 		} catch (Exception e) {

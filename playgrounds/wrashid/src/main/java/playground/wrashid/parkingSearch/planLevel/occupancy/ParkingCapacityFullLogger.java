@@ -51,10 +51,6 @@ public class ParkingCapacityFullLogger {
 
 		errorIfStartAlreadyDefined();
 		
-		if (startTime==42462.0){
-			System.out.println();
-		}
-
 		this.startTime = startTime;
 	}
 

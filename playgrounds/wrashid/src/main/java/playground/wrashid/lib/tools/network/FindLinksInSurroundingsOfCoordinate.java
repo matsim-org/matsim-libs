@@ -10,6 +10,7 @@ import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
+import playground.wrashid.lib.tools.kml.Color;
 
 
 /**
@@ -31,7 +32,7 @@ public class FindLinksInSurroundingsOfCoordinate {
 		
 		for (Link link:network.getLinks().values()){
 			if (GeneralLib.getDistance(coordInFocus, link.getCoord())<maxDistanceInMeters){
-				basicPointVisualizer.addPointCoordinate(link.getCoord(), link.getId().toString());
+				basicPointVisualizer.addPointCoordinate(link.getCoord(), link.getId().toString(),Color.GREEN);
 			}
 		}
 		

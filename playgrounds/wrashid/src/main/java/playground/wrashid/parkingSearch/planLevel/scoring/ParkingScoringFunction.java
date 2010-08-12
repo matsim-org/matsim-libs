@@ -13,6 +13,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.tools.kml.Color;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingCapacityFullLogger;
@@ -73,7 +74,7 @@ public abstract class ParkingScoringFunction {
 //		closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),
 //				numberOfParkingsInSet, numberOfParkingsInSet);
 		
-		// only look at parkings with in 5km range
+		// only look at parkings with in maxWalkingDistance
 		closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),
 				maxWalkingDistance);
 		
@@ -94,9 +95,20 @@ public abstract class ParkingScoringFunction {
 			
 			
 			
-			// if still no parking found, log this violation
+			// if still no parking is free, log the violation
 			if (!someParkingFromSetIsFreeAtArrivalTime(closestParkings, parkingArrivalTime, delta)) {
 				ParkingRoot.getParkingLog().add("all parkings in area full: " + targetActivity.getCoord().toString());
+				
+
+				ParkingRoot.getMapDebugTrace().addPointCoordinate(targetActivity.getCoord(), "targetActivity", Color.RED);
+				ParkingRoot.writeMapDebugTraceToCurrentIterationDirectory();
+			}
+			
+			// assure, that there are at least some parkings in the selection set (especially avoid by this, that
+			// the selection within the maxDistance radius gives back 0 parkings
+			int minimumNumberOfParkings=3;
+			if (closestParkings.size()<minimumNumberOfParkings) {			
+				closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),minimumNumberOfParkings,minimumNumberOfParkings);
 			}
 			
 //		}

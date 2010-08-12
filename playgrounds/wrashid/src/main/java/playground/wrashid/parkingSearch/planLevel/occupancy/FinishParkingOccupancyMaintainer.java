@@ -36,6 +36,9 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		.getIterationFilename(event.getControler().getIterationNumber(), "parkingLog.txt");
 		GeneralLib.writeList(ParkingRoot.getParkingLog(),fileName);
 		
+		//ParkingRoot.writeMapDebugTraceToCurrentIterationDirectory();
+		//ParkingRoot.resetMapDebugTrace();
+		
 		// perform scoring
 		new ParkingScoreExecutor().performScoring(event);
 		

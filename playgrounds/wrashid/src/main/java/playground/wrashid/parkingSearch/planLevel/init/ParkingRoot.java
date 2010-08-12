@@ -7,6 +7,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.wrashid.lib.GlobalRegistry;
+import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingCapacity;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyMaintainer;
@@ -28,6 +29,20 @@ public class ParkingRoot {
 	private static ParkingActivityDuration parkingActivityDuration;
 	private static ParkingScoringFunction parkingScoringFunction;
 	private static ArrayList<String> parkingLog;
+	private static BasicPointVisualizer mapDebugTrace;
+
+	public static BasicPointVisualizer getMapDebugTrace() {
+		return mapDebugTrace;
+	}
+	
+	public static void resetMapDebugTrace(){
+		mapDebugTrace=new BasicPointVisualizer();
+	}
+	
+	public static void writeMapDebugTraceToCurrentIterationDirectory(){
+		String fileName = GlobalRegistry.controler.getControlerIO().getOutputFilename("mapDebugTrace.kml");
+		ParkingRoot.getMapDebugTrace().write(fileName);
+	}
 
 	public static void setParkingScoringFunction(ParkingScoringFunction parkingScoringFunction) {
 		ParkingRoot.parkingScoringFunction = parkingScoringFunction;
@@ -50,6 +65,7 @@ public class ParkingRoot {
 	}
 
 	public static void init(ActivityFacilitiesImpl facilities, NetworkLayer network, Controler controler) {
+		mapDebugTrace=new BasicPointVisualizer();
 		cpm = new ClosestParkingMatrix(facilities, network);
 		lpfa = new LinkParkingFacilityAssociation(facilities, network);
 		pc = new ParkingCapacity(facilities);
@@ -74,6 +90,8 @@ public class ParkingRoot {
 			// they can be set null, at beginning when facilities are not yet loaded.
 			parkingScoringFunction.setParkingFacilities(facilities);
 		}
+		
+		
 
 	}
 

@@ -160,11 +160,6 @@ public class ParkingOccupancyMaintainer {
 		Id parkingFacilityId = event.getFacilityId();
 		double time = GeneralLib.projectTimeWithin24Hours(event.getTime());
 		startTimeOfCurrentParking.put(personId, event.getTime());
-
-		if (parkingFacilityId.toString().equalsIgnoreCase("36")) {
-			System.out.println();
-		}
-
 		currentParkingOccupancy.increment(parkingFacilityId);
 
 		currentParkingFacilityId.put(personId, parkingFacilityId);

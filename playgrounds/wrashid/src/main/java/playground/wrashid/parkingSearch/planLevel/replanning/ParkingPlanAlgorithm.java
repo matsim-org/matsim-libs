@@ -149,6 +149,9 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		// TODO-intime: also add the probability method.
 
 		// select parking with highest score
+		//if (parkingSortedAccordingToScore.size()==0){
+			//System.out.println();
+		//}
 		ActivityFacilityImpl newParking = parkingSortedAccordingToScore.get(0);
 
 		// =============================replaceParking===============		
