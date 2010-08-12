@@ -29,7 +29,6 @@ import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
  */
 public class KTIControler extends Controler {
 
-	protected static final String SVN_INFO_FILE_NAME = "svninfo.txt";
 	protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
 	protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
