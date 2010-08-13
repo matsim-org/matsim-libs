@@ -15,10 +15,13 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 
+import playground.andreas.bln.ana.acts2kml.KMLActsWriter;
 import playground.andreas.bln.pop.NewPopulation;
 
 /**
@@ -43,6 +46,9 @@ public class FilterPersonActs extends NewPopulation {
 	private int planswritten = 0;
 	private int personshandled = 0;
 	private int nAct = 0;
+	
+	private boolean kmlOutputEnabled = false;
+	private KMLActsWriter kmlWriter = new KMLActsWriter();
 
 	public FilterPersonActs(Network network, Population plans, String filename) {
 		super(network, plans, filename);
@@ -58,15 +64,18 @@ public class FilterPersonActs extends NewPopulation {
 		Plan plan = person.getSelectedPlan();
 		
 		for (PlanElement plan_element : plan.getPlanElements()) {
-			if (plan_element instanceof Activity){
+			if (plan_element instanceof ActivityImpl){
 				this.nAct++;
-				Activity act = (Activity) plan_element;
+				ActivityImpl act = (ActivityImpl) plan_element;
 				if(checkIsSXF(act)){
 					if(this.actSXF.get(act.getType()) == null){
 						this.actSXF.put(act.getType(), new Integer(1));
 					} else {
 						this.actSXF.put(act.getType(), new Integer(this.actSXF.get(act.getType()).intValue() + 1 ));
-					}					
+					}
+					if(this.kmlOutputEnabled){
+						this.kmlWriter.addActivity(new ActivityImpl(act));
+					}
 					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
 					person.setId(new IdImpl(person.getId().toString() + "_SXF-BBI"));
 				}
@@ -76,6 +85,9 @@ public class FilterPersonActs extends NewPopulation {
 						this.actTXL.put(act.getType(), new Integer(1));
 					} else {
 						this.actTXL.put(act.getType(), new Integer(this.actTXL.get(act.getType()).intValue() + 1 ));
+					}
+					if(this.kmlOutputEnabled){
+						this.kmlWriter.addActivity(new ActivityImpl(act));
 					}
 					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
 					person.setId(new IdImpl(person.getId().toString() + "_TXL-BBI"));
@@ -92,7 +104,7 @@ public class FilterPersonActs extends NewPopulation {
 //		}
 
 	}
-	
+
 	private boolean checkIsSXF(Activity act){
 		boolean isSXF = true;
 		
@@ -136,6 +148,7 @@ public class FilterPersonActs extends NewPopulation {
 		popReader.readFile(inPlansFile);
 
 		FilterPersonActs dp = new FilterPersonActs(net, inPop, outPlansFile);
+		dp.enableKMLOutput("filteredActsTXLSXF.kmz", "E:\\temp");
 		dp.run(inPop);
 		System.out.println(dp.personshandled + " persons handled; " + dp.planswritten + " plans written to file");
 		
@@ -149,7 +162,19 @@ public class FilterPersonActs extends NewPopulation {
 			System.out.println(entry.getKey() + " " + entry.getValue());
 		}
 		dp.writeEndPlans();
+		dp.writeKML();
 
 		Gbl.printElapsedTime();
+	}
+
+	private void enableKMLOutput(String name, String dir) {
+		this.kmlOutputEnabled = true;
+		this.kmlWriter.setCoordinateTransformation(new GK4toWGS84());
+		this.kmlWriter.setKmzFileName(name);
+		this.kmlWriter.setOutputDirectory(dir);
+	}
+	
+	private void writeKML(){
+		this.kmlWriter.writeFile();
 	}
 }
