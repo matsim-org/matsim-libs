@@ -226,24 +226,27 @@ public class KMLPersonPlanWriter {
 
 						AbstractFeatureType abstractFeature;
 
-						if(((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("===R")){
-							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createDBNetworkLinkStyle());
-						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("===S")){
-							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createSBAHNNetworkLinkStyle());
-						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("----M")){
-							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createMetroBusTramNetworkLinkStyle());
-						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("BVU----")){
-							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createSubWayNetworkLinkStyle());
-						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("BVT----")){
-							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createTramNetworkLinkStyle());
-						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("BVB----")){
-							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createBusNetworkLinkStyle());
+						if(leg.getRoute() != null){
+							if(((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("===R")){
+								abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createDBNetworkLinkStyle());
+							} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("===S")){
+								abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createSBAHNNetworkLinkStyle());
+							} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("----M")){
+								abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createMetroBusTramNetworkLinkStyle());
+							} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("BVU----")){
+								abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createSubWayNetworkLinkStyle());
+							} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("BVT----")){
+								abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createTramNetworkLinkStyle());
+							} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("BVB----")){
+								abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createBusNetworkLinkStyle());
+							} else {
+								abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createDefaultNetworkLinkStyle());
+								abstractFeature.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
+							}
 						} else {
 							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createDefaultNetworkLinkStyle());
 						}
-
-
-						abstractFeature.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
+						
 						linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
 					}
 

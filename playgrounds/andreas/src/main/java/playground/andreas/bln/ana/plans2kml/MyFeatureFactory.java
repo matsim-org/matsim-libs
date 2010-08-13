@@ -61,7 +61,9 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		folder.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + dist);
 
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
-		p.setName(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
+		if(leg.getRoute() != null){
+			p.setName(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
+		}
 
 		Coord centerCoord = this.coordTransform.transform((new CoordImpl(from.getX() + (to.getX() - from.getX())/2, from.getY() + (to.getY() - from.getY())/2)));
 
@@ -72,15 +74,19 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		line.getCoordinates().add(Double.toString(toCoord.getX()) + "," + Double.toString(toCoord.getY()) + ",0.0");
 		p.setAbstractGeometryGroup(this.kmlObjectFactory.createLineString(line));
 		p.setStyleUrl(networkStyle.getId());
-		p.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
+		if(leg.getRoute() != null){
+			p.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
+		}
 
 		PlacemarkType pointPlacemark = this.kmlObjectFactory.createPlacemarkType();
 		PointType point = this.kmlObjectFactory.createPointType();
 		point.getCoordinates().add(Double.toString(centerCoord.getX()) + "," + Double.toString(centerCoord.getY()) + ",0.0");
 		pointPlacemark.setAbstractGeometryGroup(this.kmlObjectFactory.createPoint(point));
 		pointPlacemark.setStyleUrl(networkStyle.getId());
-		pointPlacemark.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
-
+		if(leg.getRoute() != null){
+			pointPlacemark.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
+		}
+			
 		folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(pointPlacemark));
 		folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(p));
 
@@ -123,10 +129,12 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		double dist = (leg.getRoute() instanceof NetworkRoute ? RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network) : Double.NaN);
 		p.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + dist);
 
-		if(((GenericRouteImpl) leg.getRoute()).getRouteDescription().equalsIgnoreCase("")){
-			p.setDescription("sorry no route, made a beeline to the destination");
-		} else {
-			p.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
+		if(leg.getRoute() != null){
+			if(((GenericRouteImpl) leg.getRoute()).getRouteDescription().equalsIgnoreCase("")){
+				p.setDescription("sorry no route, made a beeline to the destination");
+			} else {
+				p.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
+			}
 		}
 
 		Coord fromCoord = this.coordTransform.transform(from);
