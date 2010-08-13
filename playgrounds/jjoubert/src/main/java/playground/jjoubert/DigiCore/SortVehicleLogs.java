@@ -30,11 +30,8 @@ public class SortVehicleLogs {
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
 //	final static String ROOT = "~/";												// IVT-Sim0
 //	final static String ROOT = "~/data/DigiCore/";									// Satawal
-	final static String ROOT = "/home/jwjoubert/MATSim/MATSimData/DigiCore/2009/";	// IE-Calvin
+//	final static String ROOT = "/home/jwjoubert/MATSim/MATSimData/DigiCore/2009/";	// IE-Calvin and IE-Hobbes
 	
-	// Derived string values
-	final static String SOURCEFOLDER = ROOT + "Vehicles/";
-	final static String DESTFOLDER = ROOT + "SortedVehicles/";
 	// Other variables and parameters
 	final static String DELIMITER = ","; // this could be "," or "\t"
 
@@ -44,17 +41,23 @@ public class SortVehicleLogs {
 	 * @param args
 	 */
 	public static void main (String args[] ){
+		if(args.length != 1){
+			throw new RuntimeException("Must provide path where there `Vehicles' folder can be found.");
+		}
+		String root = args[0];
+		String sourceFolder = root + "Vehicles/";
+		String destFolder = root + "SortedVehicles/";
 		log.info("=============================================================");
 		log.info("  Sorting DigiCore vehicle files after they've been split.");
 		log.info("-------------------------------------------------------------");
 		
-		File outFolder = new File(DESTFOLDER);
+		File outFolder = new File(destFolder);
 		boolean checkDirectory = outFolder.mkdir();
 		if(!checkDirectory){
 			throw new RuntimeException("Could nor create " + outFolder.toString() + ", or it already exists. Delete and then rerun.");
 		}
 		
-		File files = new File(SOURCEFOLDER);
+		File files = new File(sourceFolder);
 		File vehicleFiles[] = files.listFiles();
 		int numFiles = vehicleFiles.length;
 		
@@ -76,7 +79,7 @@ public class SortVehicleLogs {
 						}
 						
 						try {
-							writeSortedArray(DESTFOLDER, theFile, sortedArray, true);
+							writeSortedArray(destFolder, theFile, sortedArray, true);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
