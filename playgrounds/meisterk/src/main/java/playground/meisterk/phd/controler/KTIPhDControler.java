@@ -21,9 +21,12 @@
 package playground.meisterk.phd.controler;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
 
 import playground.meisterk.kti.controler.KTIControler;
 import playground.meisterk.phd.config.PopulationConvergenceConfigGroup;
+import playground.meisterk.phd.replanning.PhDStrategyManager;
 
 public class KTIPhDControler extends KTIControler {
 
@@ -38,6 +41,13 @@ public class KTIPhDControler extends KTIControler {
 	protected void loadControlerListeners() {
 		super.loadControlerListeners();
 		this.addControlerListener(new PersonTreatmentRecorder(this.populationConvergenceConfigGroup));
+	}
+	
+	@Override
+	protected StrategyManager loadStrategyManager() {
+		PhDStrategyManager manager = new PhDStrategyManager();
+		StrategyManagerConfigLoader.load(this, manager);
+		return manager;
 	}
 
 	/**
