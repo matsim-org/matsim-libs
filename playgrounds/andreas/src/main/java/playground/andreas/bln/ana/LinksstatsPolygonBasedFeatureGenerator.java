@@ -40,7 +40,7 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		this.geofac = new GeometryFactory();
 		initFeatureType();
 
-		this.compareResultMap = EvaluateLinkstats.compareLinkstatFiles("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\763.1000.linkstats.txt", "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\762.1000.linkstats.txt");
+		this.compareResultMap = EvaluateLinkstats.compareLinkstatFiles("e:\\temp\\771.1000.linkstats.txt", "e:\\temp\\772.1000.linkstats.txt");
 	}
 
 	private void initFeatureType() {

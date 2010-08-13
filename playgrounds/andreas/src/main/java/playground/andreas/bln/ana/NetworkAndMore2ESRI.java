@@ -44,11 +44,11 @@ public class NetworkAndMore2ESRI extends Links2ESRIShape{
 		String outputFileP = null ;
 
 		if ( args.length == 0 ) {
-			netfile = "./bb_5_A100_16_17_18_v_scaled_simple.xml.gz";
+			netfile = "d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20100809_verwendet\\network_modified_20100806_added_BBI_AS_cl.xml.gz";
 //		String netfile = "./test/scenarios/berlin/network.xml.gz";
 
-			outputFileLs = "./networkLs.shp";
-			outputFileP = "./networkP.shp";
+			outputFileLs = "e:\\temp\\qgis\\networkLs.shp";
+			outputFileP = "e:\\temp\\qgis\\networkP.shp";
 		} else if ( args.length == 3 ) {
 			netfile = args[0] ;
 			outputFileLs = args[1] ;
