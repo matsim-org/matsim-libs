@@ -1,4 +1,4 @@
-package playground.wrashid.PSF.data;
+package playground.wrashid.PSF.data.hubCoordinates;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -16,7 +16,7 @@ public class VisualizeHubLocations {
 		
 		for (int i=0;i<matrix.getNumberOfRows();i++){
 			Coord coord=new CoordImpl(matrix.getDouble(i, 1), matrix.getDouble(i, 2));
-			visualizer.addPointCoordinate(coord, Long.toString(Math.round(matrix.getDouble(i, 0))), Color.RED);
+			visualizer.addPointCoordinate(coord, Long.toString(matrix.convertDoubleToInteger(i, 0)), Color.RED);
 		}
 		
 		visualizer.write("A:/data/ewz daten/GIS_coordinates_of_managers.kml");
