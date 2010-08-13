@@ -27,11 +27,11 @@ public class HistogramMaker {
 	
 	private static final Logger logger = Logger.getLogger(HistogramMaker.class);
 
-	private static final String outputDir = "/Users/jillenberger/Work/work/socialnets/data/schweiz/network/";
+	private static final String outputDir = "/home/sfuerbas/workspace/Schweiz/";
 	
-	private static final String netFile = "/Users/jillenberger/Work/work/socialnets/data/schweiz/network/switzerland_matsim_cl_simple.xml";
+	private static final String netFile = "/home/sfuerbas/workspace/Schweiz/switzerland_matsim_cl_simple.xml.gz";
 	
-	private static final String bcFile = "/Users/jillenberger/Work/work/socialnets/data/schweiz/network/BetweennessSchweiz.txt";
+	private static final String bcFile = "/home/sfuerbas/workspace/Schweiz/BetweennessSchweiz";
 	
 	/**
 	 * @param args
@@ -89,7 +89,7 @@ public class HistogramMaker {
 			long value = Long.parseLong(line);
 			if(value < 0) {
 				logger.warn("Value < 0!");
-				System.exit(-1);
+//				System.exit(-1);
 			}
 			values.put(link, value);
 		}
