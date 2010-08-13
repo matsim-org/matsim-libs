@@ -66,10 +66,10 @@ public class NetworkScaler {
 		
         for (Entry<Id, Link> entry : linkDeletion.entrySet()) {        
 //            System.out.println(linkDeletion.get(entry.getKey()));
-            network.removeLink(entry.getKey());	//tut leider nicht das, was ich will
+            network.removeLink(entry.getKey());	//tut leider nicht das, was ich will, nämlich den link löschen. gibt es dafür eine methode?
         }
 		
-		new NetworkCleaner().run(new String[] {args[0], args[0]});
+		new NetworkCleaner().run(new String[] {args[0], args[2]});
 
 		
 
