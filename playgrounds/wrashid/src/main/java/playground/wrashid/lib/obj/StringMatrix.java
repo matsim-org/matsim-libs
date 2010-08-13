@@ -27,6 +27,10 @@ public class StringMatrix {
 		return new Integer(getString(row,column));
 	}
 	
+	public int convertDoubleToInteger(int row, int column){
+		return (int) Math.round(getDouble(row, column));
+	}
+	
 	public void addRow(LinkedList<String> row){
 		matrix.add(row);
 	}
