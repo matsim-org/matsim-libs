@@ -132,8 +132,14 @@ public class HubPriceInfo {
 	}
 
 	public static void main(String[] args) {
-		HubPriceInfo hubPriceInfo = new HubPriceInfo(18000, 75600, 9, 18);
-		hubPriceInfo.printFakeHubs(4);
+		// create hubs
+		// attention: if there is too much output, you won't be able to copy it from the console directly.
+		// therefore redirect that output to a file and copy it from there!
+//		HubPriceInfo hubPriceInfo = new HubPriceInfo(18000, 75600, 9, 18);
+//		hubPriceInfo.printFakeHubs(819);
+		
+		// read hubs
+		new HubPriceInfo("A:/data/matsim/input/runRW1003/hubPriceInfo.txt",819);
 	}
 
 }
