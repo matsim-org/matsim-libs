@@ -133,8 +133,6 @@ import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountControlerListener;
-import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
-import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.replanning.TransitStrategyManagerConfigLoader;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -861,14 +859,7 @@ public class Controler {
 				JDEQSimulation sim = new JDEQSimulation(this.scenarioData, this.events);
 				sim.run();
 			} else {
-				Simulation simulation;
-				if (this.config.scenario().isUseTransit()) {
-					simulation = new TransitQSimulation(this.scenarioData, this.events);
-					((TransitQSimulation) simulation).getQSimTransitEngine().setUseUmlaeufe(true);
-					((TransitQSimulation) simulation).getQSimTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-				} else {
-					simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
-				}
+				Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
 				if (simulation instanceof IOSimulation){
 					((IOSimulation)simulation).setControlerIO(this.getControlerIO());
 					((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
