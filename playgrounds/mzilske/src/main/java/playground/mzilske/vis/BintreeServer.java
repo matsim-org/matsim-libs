@@ -24,7 +24,6 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis2.LinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 import playground.mzilske.vis.BintreeGenerator.Trajectory;
@@ -196,7 +195,9 @@ public final class BintreeServer implements OTFServerRemote {
 
 	@Override
 	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException {
-		return new OTFVisConfigGroup();
+		OTFVisConfigGroup otfVisConfigGroup = new OTFVisConfigGroup();
+		otfVisConfigGroup.setCachingAllowed(false);
+		return otfVisConfigGroup;
 	}
 
 	public void close() {

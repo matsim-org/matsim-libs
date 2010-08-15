@@ -118,7 +118,7 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature, Sim
 								((ScenarioImpl) queueSimulation.getScenario())
 										.getTransitSchedule(),
 								((TransitQSimulation) queueSimulation)
-										.getAgentTracker()));
+										.getQSimTransitEngine().getAgentTracker()));
 				this.connectionManager.connectWriterToReader(
 						FacilityDrawer.DataWriter_v1_0.class,
 						FacilityDrawer.DataReader_v1_0.class);

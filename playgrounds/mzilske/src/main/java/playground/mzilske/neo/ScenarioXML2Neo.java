@@ -2,8 +2,6 @@ package playground.mzilske.neo;
 
 import java.io.File;
 
-import org.matsim.core.network.MatsimNetworkReader;
-
 import playground.mzilske.vis.DirectoryUtils;
 
 public class ScenarioXML2Neo {

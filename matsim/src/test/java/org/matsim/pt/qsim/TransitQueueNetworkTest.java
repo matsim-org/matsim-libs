@@ -1035,7 +1035,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			this.simEngine = qsim.getQSimEngine();
 //			this.simEngine = new TestSimEngine(qsim);
 			this.simEngine.onPrepareSim();
-			TransitStopAgentTracker tracker = qsim.getAgentTracker();
+			TransitStopAgentTracker tracker = qsim.getQSimTransitEngine().getAgentTracker();
 			tracker.addAgentToStop(new FakeAgent(null, null), stop1); // just add some agent so the transit vehicle has to stop
 			if (stop2 != null) {
 				tracker.addAgentToStop(new FakeAgent(null, null), stop2); // just add some agent so the transit vehicle has to stop

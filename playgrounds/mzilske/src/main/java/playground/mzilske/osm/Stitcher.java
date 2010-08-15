@@ -31,6 +31,11 @@ public class Stitcher {
 
 	private LinkedList<Id> backwardStops = new LinkedList<Id>();
 	
+	private LinkedList<Id> forwardStopLinks = new LinkedList<Id>();
+
+	private LinkedList<Id> backwardStopLinks = new LinkedList<Id>();
+	
+	
 	public Stitcher(Network network) {
 		this.network = network;
 	}
@@ -85,10 +90,18 @@ public class Stitcher {
 	}
 
 	public List<Id> getForwardRoute() {
-		return route(forwardStops);
+		return route(forwardStops, forwardStopLinks);
 	}
 	
-	private List<Id> route(List<Id> stopNodes) {
+	public List<Id> getForwardStopLinks() {
+		return forwardStopLinks;
+	}
+	
+	public List<Id> getBackwardStopLinks() {
+		return backwardStopLinks;
+	}
+	
+	private List<Id> route(List<Id> stopNodes, List<Id> outStopLinks) {
 		if (stopNodes.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -107,13 +120,21 @@ public class Stitcher {
 			for (Link link : leastCostPath.links) {
 				links.add(link.getId());
 			}
+			Link linkForStop;
+			if (leastCostPath.links.isEmpty()) {
+				linkForStop = null;
+				outStopLinks.add(null);
+			} else {
+				linkForStop = leastCostPath.links.get(leastCostPath.links.size()-1);
+				outStopLinks.add(linkForStop.getId());
+			}
 			previous = next;
 		}
 		return links;
 	}
 
 	public List<Id> getBackwardRoute() {
-		return route(backwardStops);
+		return route(backwardStops, backwardStopLinks);
 	}
 	
 	private void addForwardLinks(Way way) {

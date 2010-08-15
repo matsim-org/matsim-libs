@@ -51,6 +51,7 @@ import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.pt.qsim.TransitQSimulation;
+import org.matsim.pt.replanning.TransitStrategyManagerConfigLoader;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
@@ -60,7 +61,6 @@ import org.xml.sax.SAXException;
 
 import playground.andreas.fixedHeadway.FixedHeadwayControler;
 import playground.andreas.fixedHeadway.FixedHeadwayCycleUmlaufDriverFactory;
-import playground.mrieser.pt.replanning.TransitStrategyManagerConfigLoader;
 
 /**
  * @author mrieser
@@ -148,11 +148,11 @@ public class TransitControler extends Controler {
 			otfVisQSimFeature.setVisualizeTeleportedAgents(sim.getScenario().getConfig().otfVis().isShowTeleportedAgents());
 			sim.addFeature(otfVisQSimFeature);
 		}
-		sim.setUseUmlaeufe(true);
-		sim.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+		sim.getQSimTransitEngine().setUseUmlaeufe(true);
+		sim.getQSimTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 		
 		if(useHeadwayControler){
-			sim.setTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
+			sim.getQSimTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
 			this.events.addHandler(new FixedHeadwayControler(sim));		
 		}		
 //		this.events.addHandler(new LogOutputEventHandler());	

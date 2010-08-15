@@ -51,6 +51,7 @@ import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.pt.qsim.TransitQSimulation;
+import org.matsim.pt.replanning.TransitStrategyManagerConfigLoader;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
@@ -58,7 +59,6 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.xml.sax.SAXException;
 
-import playground.mrieser.pt.replanning.TransitStrategyManagerConfigLoader;
 
 /**
  * @author mrieser
@@ -145,8 +145,8 @@ public class TransitControler extends Controler {
 			otfVisQSimFeature.setVisualizeTeleportedAgents(sim.getScenario().getConfig().otfVis().isShowTeleportedAgents());
 			sim.addFeature(otfVisQSimFeature);
 		}
-		sim.setUseUmlaeufe(true);
-		sim.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+		sim.getQSimTransitEngine().setUseUmlaeufe(true);
+		sim.getQSimTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 		
 //		this.events.addHandler(new LogOutputEventHandler());
 		

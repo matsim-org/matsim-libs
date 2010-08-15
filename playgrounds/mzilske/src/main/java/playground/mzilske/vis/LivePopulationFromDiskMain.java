@@ -10,8 +10,8 @@ import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
-import org.matsim.vis.otfvis2.OTFVisLiveServer;
 import org.matsim.vis.otfvis2.OTFVisClient;
+import org.matsim.vis.otfvis2.OTFVisLiveServer;
 
 public class LivePopulationFromDiskMain {
 	

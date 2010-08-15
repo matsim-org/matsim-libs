@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;

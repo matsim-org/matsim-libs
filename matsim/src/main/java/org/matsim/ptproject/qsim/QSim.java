@@ -141,7 +141,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	private ControlerIO controlerIO;
 	private QSimSnapshotWriterManager snapshotManager = new QSimSnapshotWriterManager();
 
-	protected TransitQSimEngine transitEngine;
+	private TransitQSimEngine transitEngine;
 
 	private AgentCounterI agentCounter;
 
@@ -721,5 +721,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
+	public TransitQSimEngine getQSimTransitEngine() {
+		return transitEngine;
+	}
 
 }

@@ -1,5 +1,7 @@
 package playground.mzilske.osm;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +9,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -184,8 +187,8 @@ public class TransitNetworkSink implements Sink {
 			String networkOperator = tags.get("network");
 			System.out.println(networkOperator + " // " + ref + " // " + operator + " // " + name);
 			TransitLine line = transitSchedule.getFactory().createTransitLine(new IdImpl(ref + "-" + relation.getId()));
-			LinkedList<TransitRouteStop> stopsH = new LinkedList<TransitRouteStop>();
-			LinkedList<TransitRouteStop> stopsR = new LinkedList<TransitRouteStop>();
+			LinkedList<Node> stopsH = new LinkedList<Node>();
+			LinkedList<Node> stopsR = new LinkedList<Node>();
 			Stitcher stitcher = new Stitcher(network);
 			
 			for (RelationMember relationMember : relation.getMembers()) {
@@ -212,21 +215,17 @@ public class TransitNetworkSink implements Sink {
 						System.out.println(relationMember.getMemberId());
 						Node node = nodeReader.get(relationMember.getMemberId()).getEntity();
 						Coord coordinate = coordinateTransformation.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
-						TransitStopFacility facility = transitSchedule.getFactory().createTransitStopFacility(new IdImpl(node.getId()), coordinate, false);
-						if (!transitSchedule.getFacilities().containsKey(facility.getId())) {
-							transitSchedule.addStopFacility(facility);
-						}
 						String role = relationMember.getMemberRole();
 						if (role.startsWith("stop")) {
-							stopsH.addLast(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
-							stopsR.addFirst(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
+							stopsH.addLast(node);
+							stopsR.addFirst(node);
 							stitcher.addForwardStop(node);
 							stitcher.addBackwardStop(node);
 						} else if (role.startsWith("forward")) {
-							stopsH.addLast(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
+							stopsH.addLast(node);
 							stitcher.addForwardStop(node);
 						} else if (role.startsWith("backward")) {
-							stopsR.addFirst(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
+							stopsR.addFirst(node);
 							stitcher.addBackwardStop(node);
 						} else {
 							System.out.println("Unknown role: " + role);
@@ -244,21 +243,63 @@ public class TransitNetworkSink implements Sink {
 			
 			if (linkIdsH.size() >= 2) {
 				NetworkRoute networkRouteH = createNetworkRoute(linkIdsH);
-				TransitRoute routeH = transitSchedule.getFactory().createTransitRoute(new IdImpl("H"), networkRouteH, stopsH, TransportMode.pt);
+				List<Id> stopLinkIdsH = stitcher.getForwardStopLinks();
+				assert (stopLinkIdsH.size() == stopsH.size() - 1);
+				List<TransitRouteStop> stops = enterStopLinkIds(stopsH, stopLinkIdsH, line.getId() + "H", network.getLinks().get(linkIdsH.get(0)).getFromNode());
+				TransitRoute routeH = transitSchedule.getFactory().createTransitRoute(new IdImpl("H"), networkRouteH, stops, TransportMode.pt);
 				line.addRoute(routeH);
 			}
 
 			if (linkIdsR.size() >= 2) {
 				NetworkRoute networkRouteR = createNetworkRoute(linkIdsR);
-				TransitRoute routeR = transitSchedule.getFactory().createTransitRoute(new IdImpl("R"), networkRouteR, stopsR, TransportMode.pt);
+				List<Id> stopLinkIdsR = stitcher.getBackwardStopLinks();
+				assert (stopLinkIdsR.size() == stopsR.size() - 1);
+				List<TransitRouteStop> stops = enterStopLinkIds(stopsR, stopLinkIdsR, line.getId() + "R", network.getLinks().get(linkIdsR.get(0)).getFromNode());
+				TransitRoute routeR = transitSchedule.getFactory().createTransitRoute(new IdImpl("R"), networkRouteR, stops, TransportMode.pt);
 				line.addRoute(routeR);
 			}
 
 			transitSchedule.addTransitLine(line);
+			
 		}
 		transitLineIterator.release();
 		nodeReader.release();
 		wayReader.release();
+	}
+
+	private List<TransitRouteStop> enterStopLinkIds(List<Node> stopNodes, List<Id> stopLinkIdsH, String routeRef, org.matsim.api.core.v01.network.Node node) {
+		System.out.println(stopNodes.size() + "__" + stopLinkIdsH.size());
+		int stopNo = 0;
+		List<TransitRouteStop> transitRouteStops = new ArrayList<TransitRouteStop>();
+		Iterator<Id> i = stopLinkIdsH.iterator();
+		Iterator<Node> j = stopNodes.iterator();
+		Node firstStopNode = j.next();
+		Coord firstCoordinate = coordinateTransformation.transform(new CoordImpl(firstStopNode.getLongitude(), firstStopNode.getLatitude()));
+		Link entryLink = network.getFactory().createLink(new IdImpl(routeRef + "_ENTRY"), node.getId(), node.getId());
+		network.addLink(entryLink);
+		TransitStopFacility firstFacility = transitSchedule.getFactory().createTransitStopFacility(createTransitStopId(routeRef, stopNo), firstCoordinate, false);
+		stopNo++;
+		transitRouteStops.add(transitSchedule.getFactory().createTransitRouteStop(firstFacility, 0, 0));
+		Id linkId = entryLink.getId();
+		firstFacility.setLinkId(linkId);
+		while(i.hasNext()) {
+			Id nextLinkId = i.next();
+			if (nextLinkId != null) {
+				linkId = nextLinkId;
+			}
+			Node stopNode = j.next();
+			Coord coordinate = coordinateTransformation.transform(new CoordImpl(stopNode.getLongitude(), stopNode.getLatitude()));
+			TransitStopFacility facility = transitSchedule.getFactory().createTransitStopFacility(createTransitStopId(routeRef, stopNo), coordinate, false);
+			stopNo++;
+			transitSchedule.addStopFacility(facility);
+			transitRouteStops.add(transitSchedule.getFactory().createTransitRouteStop(facility, 0, 0));
+			facility.setLinkId(linkId);
+		}
+		return transitRouteStops;
+	}
+
+	private IdImpl createTransitStopId(String ref, int stopNo) {
+		return new IdImpl(ref + "_" + stopNo);
 	}
 
 	private NetworkRoute createNetworkRoute(List<Id> plinkIds) {

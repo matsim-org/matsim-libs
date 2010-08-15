@@ -42,13 +42,13 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.qsim.TransitQSimulation;
+import org.matsim.pt.replanning.TransitStrategyManagerConfigLoader;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
 
-import playground.mrieser.pt.replanning.TransitStrategyManagerConfigLoader;
 
 /**
  * @author mrieser

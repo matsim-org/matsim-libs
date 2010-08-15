@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.pt.replanning;
+package org.matsim.pt.replanning;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;

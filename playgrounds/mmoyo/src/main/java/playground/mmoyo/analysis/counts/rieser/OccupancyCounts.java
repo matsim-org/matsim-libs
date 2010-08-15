@@ -35,7 +35,7 @@ public class OccupancyCounts {
 	public static void play(final ScenarioImpl scenario, final EventsManager events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		final TransitQSimulation sim = new TransitQSimulation(scenario, (EventsManagerImpl) events);
-		sim.setUseUmlaeufe(true);
+		sim.getQSimTransitEngine().setUseUmlaeufe(true);
 		sim.run();
 	}
 

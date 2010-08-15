@@ -27,9 +27,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
@@ -46,14 +50,17 @@ import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.Module;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
@@ -121,13 +128,26 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.PtConstants;
+import org.matsim.pt.ReconstructingUmlaufBuilder;
+import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.pt.counts.OccupancyAnalyzer;
+import org.matsim.pt.counts.PtCountControlerListener;
+import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
+import org.matsim.pt.qsim.TransitQSimulation;
+import org.matsim.pt.replanning.TransitStrategyManagerConfigLoader;
+import org.matsim.pt.router.PlansCalcTransitRoute;
+import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.ptproject.qsim.ParallelQSimFactory;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.signalsystems.SignalSystemConfigurationsWriter11;
 import org.matsim.signalsystems.SignalSystemsWriter11;
+import org.matsim.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.world.WorldWriter;
+import org.xml.sax.SAXException;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -150,9 +170,10 @@ public class Controler {
 	public static final String FILENAME_LANES = "output_lanes.xml.gz";
 	public static final String FILENAME_SIGNALSYSTEMS = "output_signalsystems.xml.gz";
 	public static final String FILENAME_SIGNALSYSTEMS_CONFIG = "output_signalsystem_configuration.xml.gz";
-  public static final String FILENAME_CONFIG = "output_config.xml.gz";
+	public static final String FILENAME_CONFIG = "output_config.xml.gz";
 
-
+	private final static String COUNTS_MODULE_NAME = "ptCounts";
+	
 	private enum ControlerState {
 		Init, Running, Shutdown, Finished
 	}
@@ -237,8 +258,9 @@ public class Controler {
 	private TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 	private ControlerIO controlerIO;
 
-  private MobsimFactory mobsimFactory = new QueueSimulationFactory();
+	private MobsimFactory mobsimFactory = new QueueSimulationFactory();
 
+	private TransitConfigGroup transitConfig;
 
 	/** initializes Log4J */
 	static {
@@ -285,8 +307,6 @@ public class Controler {
 
 	public Controler(final ScenarioImpl scenario) {
 		this(null, null, null, scenario);
-		this.network = this.scenarioData.getNetwork();
-		this.population = this.scenarioData.getPopulation();
 	}
 
 	private Controler(final String configFileName, final String dtdFileName, final Config config, final ScenarioImpl scenario) {
@@ -317,12 +337,15 @@ public class Controler {
 				this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			}
 			this.scenarioData = new ScenarioImpl(this.config);
-			this.network = this.scenarioData.getNetwork();
-			this.population = this.scenarioData.getPopulation();
 		}
-
+		this.network = this.scenarioData.getNetwork();
+		this.population = this.scenarioData.getPopulation();
 		Gbl.setConfig(this.config);
 		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
+
+		if (this.config.scenario().isUseTransit()) {
+			setupTransitConfig();
+		}
 	}
 
 	/**
@@ -348,6 +371,30 @@ public class Controler {
 		setUp();
 		loadCoreListeners();
 		loadControlerListeners();
+	}
+
+	private final void setupTransitConfig() {
+		this.transitConfig = new TransitConfigGroup();
+		if (this.config.getModule(TransitConfigGroup.GROUP_NAME) == null) {
+			this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
+		} else {
+			// this would not be necessary if TransitConfigGroup is part of core config
+			Module oldModule = this.config.getModule(TransitConfigGroup.GROUP_NAME);
+			this.config.removeModule(TransitConfigGroup.GROUP_NAME);
+			this.transitConfig.addParam("transitScheduleFile", oldModule.getValue("transitScheduleFile"));
+			this.transitConfig.addParam("vehiclesFile", oldModule.getValue("vehiclesFile"));
+			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
+		}
+		if (!this.config.scenario().isUseVehicles()) {
+			log.warn("Your are using Transit but not Vehicles. This most likely won't work.");
+		}
+		Set<EventsFileFormat> formats = EnumSet.copyOf(this.config.controler().getEventsFileFormats());
+		formats.add(EventsFileFormat.xml);
+		this.config.controler().setEventsFileFormats(formats);
+		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		transitActivityParams.setTypicalDuration(120.0);
+		this.config.charyparNagelScoring().addActivityParams(transitActivityParams);
+		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 	}
 
 	/**
@@ -449,20 +496,20 @@ public class Controler {
 				new NetworkChangeEventsWriter().write(this.controlerIO.getOutputFilename("output_change_events.xml.gz"), this.network.getNetworkChangeEvents());
 			}
 			if (this.config.scenario().isUseHouseholds()){
-			  try {
-          new HouseholdsWriterV10(this.scenarioData.getHouseholds()).writeFile(this.controlerIO.getOutputFilename(FILENAME_HOUSEHOLDS));
-        } catch (FileNotFoundException e) {
-          e.printStackTrace();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
+				try {
+					new HouseholdsWriterV10(this.scenarioData.getHouseholds()).writeFile(this.controlerIO.getOutputFilename(FILENAME_HOUSEHOLDS));
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			if (this.config.scenario().isUseLanes()){
-			  new LaneDefinitionsWriter20(this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
+				new LaneDefinitionsWriter20(this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
 			}
 			if (this.config.scenario().isUseSignalSystems()){
-			  new SignalSystemsWriter11(this.scenarioData.getSignalSystems()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS));
-			  new SignalSystemConfigurationsWriter11(this.scenarioData.getSignalSystemConfigurations()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS_CONFIG));
+				new SignalSystemsWriter11(this.scenarioData.getSignalSystems()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS));
+				new SignalSystemConfigurationsWriter11(this.scenarioData.getSignalSystemConfigurations()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS_CONFIG));
 			}
 
 			if (unexpected) {
@@ -583,12 +630,12 @@ public class Controler {
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
 		}
-    if (this.config.controler().getRunId() != null) {
-    	this.controlerIO =  new ControlerIO(outputPath, this.scenarioData.createId(this.config.controler().getRunId()));
-    }
-    else {
-    	this.controlerIO =  new ControlerIO(outputPath);
-    }
+		if (this.config.controler().getRunId() != null) {
+			this.controlerIO =  new ControlerIO(outputPath, this.scenarioData.createId(this.config.controler().getRunId()));
+		}
+		else {
+			this.controlerIO =  new ControlerIO(outputPath);
+		}
 
 		// make the tmp directory
 		File outputDir = new File(outputPath);
@@ -608,8 +655,8 @@ public class Controler {
 					// files!
 					throw new RuntimeException(
 							"The output directory "
-									+ outputPath
-									+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
+							+ outputPath
+							+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
 				}
 			}
 		} else {
@@ -648,9 +695,15 @@ public class Controler {
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
 	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(this, manager);
-		return manager;
+		if (this.config.scenario().isUseTransit()) {
+			StrategyManager manager = new StrategyManager();
+			StrategyManagerConfigLoader.load(this, manager);
+			return manager;
+		} else {
+			StrategyManager manager = new StrategyManager();
+			TransitStrategyManagerConfigLoader.load(this, this.config, manager);
+			return manager;
+		}
 	}
 
 	/**
@@ -691,7 +744,7 @@ public class Controler {
 
 		// load road pricing, if requested
 		if (this.config.scenario().isUseRoadpricing()) {
-		  this.roadPricing = new RoadPricing();
+			this.roadPricing = new RoadPricing();
 			this.addCoreControlerListener(this.roadPricing);
 		}
 
@@ -737,6 +790,27 @@ public class Controler {
 			this.addControlerListener(ccl);
 			this.counts = ccl.getCounts();
 		}
+
+		if (this.config.scenario().isUseTransit()) {
+			addTransitControlerListener();
+			if (config.getModule(COUNTS_MODULE_NAME) != null) {
+				addPtCountControlerListener();
+			}
+		}
+	}
+
+	private void addPtCountControlerListener() {
+		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
+		log.info("Using counts.");
+		OccupancyAnalyzerListener oal = new OccupancyAnalyzerListener(occupancyAnalyzer);
+		addControlerListener(oal);
+		addControlerListener(new PtCountControlerListener(config, occupancyAnalyzer));
+		setCreateGraphs(false);
+	}
+
+	private void addTransitControlerListener() {
+		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
+		addControlerListener(cl);
 	}
 
 	/**
@@ -787,16 +861,23 @@ public class Controler {
 				JDEQSimulation sim = new JDEQSimulation(this.scenarioData, this.events);
 				sim.run();
 			} else {
-			  Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
-			  if (simulation instanceof IOSimulation){
-			    ((IOSimulation)simulation).setControlerIO(this.getControlerIO());
-			    ((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
-			  }
-			  if (simulation instanceof ObservableSimulation){
-          for (SimulationListener l : this.getQueueSimulationListener()) {
-            ((ObservableSimulation)simulation).addQueueSimulationListeners(l);
-          }
-			  }
+				Simulation simulation;
+				if (this.config.scenario().isUseTransit()) {
+					simulation = new TransitQSimulation(this.scenarioData, this.events);
+					((TransitQSimulation) simulation).getQSimTransitEngine().setUseUmlaeufe(true);
+					((TransitQSimulation) simulation).getQSimTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+				} else {
+					simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
+				}
+				if (simulation instanceof IOSimulation){
+					((IOSimulation)simulation).setControlerIO(this.getControlerIO());
+					((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
+				}
+				if (simulation instanceof ObservableSimulation){
+					for (SimulationListener l : this.getQueueSimulationListener()) {
+						((ObservableSimulation)simulation).addQueueSimulationListeners(l);
+					}
+				}
 				simulation.run();
 			}
 		} else {
@@ -1002,9 +1083,13 @@ public class Controler {
 				&& (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scenarioData.getRoadPricingScheme().getType()))) {
 			return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
 					.getLeastCostPathCalculatorFactory(), this.scenarioData.getRoadPricingScheme());
+		} else if (this.config.scenario().isUseTransit()) {
+			return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
+					this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.transitConfig);
+		} else {
+			return new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
+					.getLeastCostPathCalculatorFactory());
 		}
-		return new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
-				.getLeastCostPathCalculatorFactory());
 	}
 
 	/*
@@ -1092,7 +1177,7 @@ public class Controler {
 	 * Controler as simple as possible.
 	 */
 	protected static class CoreControlerListener implements StartupListener, BeforeMobsimListener, AfterMobsimListener,
-			ShutdownListener {
+	ShutdownListener {
 
 		private final List<EventWriter> eventWriters = new LinkedList<EventWriter>();
 
@@ -1101,22 +1186,22 @@ public class Controler {
 		}
 
 		@Override
-    public void notifyStartup(StartupEvent event) {
-		  Config c = event.getControler().getScenario().getConfig();
-		  QSimConfigGroup conf = (QSimConfigGroup) c.getModule(QSimConfigGroup.GROUP_NAME);
-		  if (conf != null){
-		    if (conf.getNumberOfThreads() > 1){
-		      event.getControler().setMobsimFactory(new ParallelQSimFactory());
-		    }
-		    else {
-		      event.getControler().setMobsimFactory(new QSimFactory());
-		    }
-		  }
-		  else if (c.getModule("JDEQSim") == null) {
-		    log.warn("There might be no configuration for a mobility simulation in the config. The Controler " +
-		        " uses the default QueueSimulation that might not have all features implemented.");
-		  }
-    }
+		public void notifyStartup(StartupEvent event) {
+			Config c = event.getControler().getScenario().getConfig();
+			QSimConfigGroup conf = (QSimConfigGroup) c.getModule(QSimConfigGroup.GROUP_NAME);
+			if (conf != null){
+				if (conf.getNumberOfThreads() > 1){
+					event.getControler().setMobsimFactory(new ParallelQSimFactory());
+				}
+				else {
+					event.getControler().setMobsimFactory(new QSimFactory());
+				}
+			}
+			else if (c.getModule("JDEQSim") == null) {
+				log.warn("There might be no configuration for a mobility simulation in the config. The Controler " +
+				" uses the default QueueSimulation that might not have all features implemented.");
+			}
+		}
 
 		public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 			Controler controler = event.getControler();
@@ -1187,6 +1272,76 @@ public class Controler {
 		}
 	}
 
+	public static class TransitControlerListener implements StartupListener {
+
+		private final TransitConfigGroup config;
+
+		public TransitControlerListener(final TransitConfigGroup config) {
+			this.config = config;
+		}
+
+		public void notifyStartup(final StartupEvent event) {
+			if (this.config.getTransitScheduleFile() != null) {
+				try {
+					new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork()).readFile(this.config.getTransitScheduleFile());
+				} catch (SAXException e) {
+					throw new RuntimeException("could not read transit schedule.", e);
+				} catch (ParserConfigurationException e) {
+					throw new RuntimeException("could not read transit schedule.", e);
+				} catch (IOException e) {
+					throw new RuntimeException("could not read transit schedule.", e);
+				}
+			}
+			if (this.config.getVehiclesFile() != null) {
+				try {
+					new VehicleReaderV1(event.getControler().getScenario().getVehicles()).parse(this.config.getVehiclesFile());
+				} catch (SAXException e) {
+					throw new RuntimeException("could not read vehicles.", e);
+				} catch (ParserConfigurationException e) {
+					throw new RuntimeException("could not read vehicles.", e);
+				} catch (IOException e) {
+					throw new RuntimeException("could not read vehicles.", e);
+				}
+			}
+			ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(
+					event.getControler().getScenario().getNetwork(), event
+					.getControler().getScenario()
+					.getTransitSchedule().getTransitLines().values(),
+					event.getControler().getScenario().getVehicles(),
+					event.getControler().getScenario().getConfig().charyparNagelScoring());
+			reconstructingUmlaufBuilder.build();
+		}
+
+	}
+
+	public static class OccupancyAnalyzerListener implements
+	BeforeMobsimListener, AfterMobsimListener {
+
+		private OccupancyAnalyzer occupancyAnalyzer;
+
+		public OccupancyAnalyzerListener(OccupancyAnalyzer occupancyAnalyzer) {
+			this.occupancyAnalyzer = occupancyAnalyzer;
+		}
+
+		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+			int iter = event.getIteration();
+			if (iter % 10 == 0&& iter > event.getControler().getFirstIteration()) {
+				occupancyAnalyzer.reset(iter);
+				event.getControler().getEvents().addHandler(occupancyAnalyzer);
+			}
+		}
+
+		public void notifyAfterMobsim(AfterMobsimEvent event) {
+			int it = event.getIteration();
+			if (it % 10 == 0 && it > event.getControler().getFirstIteration()) {
+				event.getControler().getEvents().removeHandler(occupancyAnalyzer);
+				occupancyAnalyzer.write(event.getControler().getControlerIO()
+						.getIterationFilename(it, "occupancyAnalysis.txt"));
+			}
+		}
+
+	}
+
 	/*
 	 * ===================================================================
 	 * main
@@ -1246,12 +1401,12 @@ public class Controler {
 		return this.iteration;
 	}
 
-  public MobsimFactory getMobsimFactory() {
-    return this.mobsimFactory;
-  }
+	public MobsimFactory getMobsimFactory() {
+		return this.mobsimFactory;
+	}
 
-  public void setMobsimFactory(MobsimFactory mobsimFactory) {
-    this.mobsimFactory = mobsimFactory;
-  }
+	public void setMobsimFactory(MobsimFactory mobsimFactory) {
+		this.mobsimFactory = mobsimFactory;
+	}
 
 }
