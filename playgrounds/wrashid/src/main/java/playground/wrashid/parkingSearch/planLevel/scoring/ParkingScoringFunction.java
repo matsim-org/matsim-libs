@@ -119,6 +119,8 @@ public abstract class ParkingScoringFunction {
 			
 //		}
 
+			double highestScore=Double.MIN_NORMAL;
+			
 		// score the given parkings
 
 		for (int i = 0; i < closestParkings.size(); i++) {
@@ -144,6 +146,10 @@ public abstract class ParkingScoringFunction {
 			
 			OrderedFacility orderedFacility = new OrderedFacility(curParking, score);
 			prio.add(orderedFacility);
+			
+			
+			highestScore=Math.max(highestScore, score);
+			
 		}
 
 		// because priority list is sorted from low to high score, we need to
@@ -153,6 +159,8 @@ public abstract class ParkingScoringFunction {
 			resultList.add(0, parkingFacility);
 		}
 
+		//System.out.println(highestScore);
+		
 		return resultList;
 	}
 

@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -155,7 +156,7 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 //		scoringFunction.startActivity(0.0, (Activity) plan.getPlanElements().get(0));
 //		scoringFunction.endActivity(23*3600);
 //		scoringFunction.finish();
-		double penaltyScoreNorm=30;
+		double penaltyScoreNorm=5;
 //		Plan lastSelectedPlan=ParkingRoot.getParkingOccupancyMaintainer().getLastSelectedPlan().get(personId);
 //		if (lastSelectedPlan.getScore()==null){
 //			// during first iteration, when it is not initialized
@@ -177,8 +178,23 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		weightedScore+=parkingPriceScore;
 		weightedScore+=2*parkingWalkingPenalty;
 		weightedScore+=parkingActivityDurationPenalty;
-		weightedScore+=30*parkingParkingCapacityViolationPenalty;
-		weightedScore/=35.0; // for normailization
+		weightedScore+=50*parkingParkingCapacityViolationPenalty;
+		weightedScore/=54.0; // for normailization
+	
+		
+		// this is extremly important for reduing the number of parking slot violations, because:
+		// for the same target if there is no individualization of the parameters for the agents, all see the 
+		// same score map for the parkings. Therefore there is lots of oszilation.
+		// - even if this parameter is chosen extremly small, still there are only few violations.
+		// - an agent, which would have a better score at a place, because he could reach that place first, will
+		// still get a chance to do that later.
+		// - pakrings, which have similar scores get selected at random!!! (e.g. within range of 10%)
+		
+		int iterationNumber=GlobalRegistry.controler.getIterationNumber();
+		int startingPhaseIterations=5;
+		if (iterationNumber<startingPhaseIterations){
+			//weightedScore=weightedScore*MatsimRandom.getRandom().nextDouble()*(1-(iterationNumber)/(startingPhaseIterations+1));
+		}
 		
 		return weightedScore*penaltyScoreNorm;
 	}
