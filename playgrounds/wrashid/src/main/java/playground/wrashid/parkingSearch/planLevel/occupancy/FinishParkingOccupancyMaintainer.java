@@ -29,6 +29,8 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		fileName = event.getControler().getControlerIO()
 				.getIterationFilename(event.getControler().getIterationNumber(), "parkingOccupancyCoordinates.txt");
 		poaWriter.writeFakeKMLFile(fileName);
+		
+		writeOccupancyViolationStatisticsGrpah(poaWriter);
 
 		fileName = event.getControler().getControlerIO()
 				.getIterationFilename(event.getControler().getIterationNumber(), "parkingWalkingTimes.txt");
@@ -49,6 +51,16 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		
 	}
 	
+	private void writeOccupancyViolationStatisticsGrpah(
+			ParkingOccupancyAnalysis poaWriter) {
+		
+		Controler controler=GlobalRegistry.controler;
+		ParkingOccupancyAnalysis.updateStatisticsForIteration(controler.getIterationNumber(), poaWriter);
+		String fileName = GlobalRegistry.controler.getControlerIO().getOutputFilename("occupancyViolations.png");
+		ParkingOccupancyAnalysis.writeStatisticsGraph(fileName);
+		
+	}
+
 	private void writeWalkingDistanceStatisticsGraph(){
 		Controler controler=GlobalRegistry.controler;
 		ParkingRoot.getParkingWalkingDistanceGraph().updateStatisticsForIteration(controler.getIterationNumber(), ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance());
