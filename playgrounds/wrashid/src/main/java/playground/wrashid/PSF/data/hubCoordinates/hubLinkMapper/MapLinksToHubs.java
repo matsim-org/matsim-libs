@@ -1,6 +1,7 @@
 package playground.wrashid.PSF.data.hubCoordinates.hubLinkMapper;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -9,12 +10,16 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.obj.HashMapInverter;
+import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.lib.obj.StringMatrix;
 
 public class MapLinksToHubs {
 	public static void main(String[] args) {
 		// key: linkId, value: hub number
 		HashMap<Id,Integer> linkHubMapping=new HashMap<Id,Integer>();
+		// key: hub number, value: linkIds
+		LinkedListValueHashMap<Integer,LinkedList<Id>> hubLinkMapping=new LinkedListValueHashMap<Integer,LinkedList<Id>>();
 		StringMatrix matrix=GeneralLib.readStringMatrix("A:/data/ewz daten/GIS_coordinates_of_managers.txt");
 		NetworkLayer network=GeneralLib.readNetwork("A:/data/matsim/input/runRW1003/network-osm-ch.xml.gz");
 		
@@ -32,8 +37,13 @@ public class MapLinksToHubs {
 			}
 		}
 		
+		hubLinkMapping=initHubLinkMapping(linkHubMapping);
 		
-		printAllLinkHubMappingsToConsole();
+		printAllLinkHubMappingsToConsole(hubLinkMapping);
+	}
+	
+	private static LinkedListValueHashMap<Integer,LinkedList<Id>> initHubLinkMapping(HashMap<Id,Integer> linkHubMapping){
+		return new HashMapInverter(linkHubMapping).getLinkedListValueHashMap();
 	}
 	
 	private static int getNumberOfHubs(StringMatrix matrix){
@@ -47,8 +57,22 @@ public class MapLinksToHubs {
 		return numberOfHubs;
 	}
 
-	private static void printAllLinkHubMappingsToConsole() {
-		// CONTINUE Here.
-		
+	private static void printAllLinkHubMappingsToConsole(LinkedListValueHashMap<Integer,LinkedList<Id>> hubLinkMapping) {
+		for (int i=0;i<hubLinkMapping.getNumberOfEntriesInLongestList();i++){
+			// assumption, that ids of hubs start with 1!!!
+			for (int j=1;i<=hubLinkMapping.size();j++){
+				if (i<hubLinkMapping.get(j).size()){
+					System.out.print(hubLinkMapping.get(j).get(i));
+				} else {
+					System.out.print(-1.0);
+				}
+				
+				if (j!=hubLinkMapping.size()){
+					System.out.print("\t");
+				}
+				
+			}
+			System.out.println("\n");
+		}
 	}
 }
