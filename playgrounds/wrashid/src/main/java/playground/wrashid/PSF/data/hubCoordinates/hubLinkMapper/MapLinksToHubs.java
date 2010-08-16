@@ -14,6 +14,8 @@ import playground.wrashid.lib.obj.HashMapInverter;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.lib.obj.StringMatrix;
 
+// TODO: I could it make faster by introducing hierarchical mapping 
+// OR: just let it run for a very long time...
 public class MapLinksToHubs {
 	public static void main(String[] args) {
 		// key: linkId, value: hub number
@@ -27,6 +29,7 @@ public class MapLinksToHubs {
 		
 		// this is a N^2/expensive operation: browse through all network links for each "HubSubManagers"
 	
+		int numberOfLinksProcessedStatistics=0;
 		for (Link link:network.getLinks().values()){
 			for (int i=0;i<matrix.getNumberOfRows();i++){
 				Coord coordinateOfCurrentHubSubManager=new CoordImpl(matrix.getDouble(i, 1),matrix.getDouble(i, 2));
@@ -34,6 +37,10 @@ public class MapLinksToHubs {
 				if (GeneralLib.getDistance(link.getCoord(), coordinateOfCurrentHubSubManager)<averageHubSubManagers){
 					linkHubMapping.put(link.getId(), matrix.convertDoubleToInteger(i, 0));
 				}
+			}
+			numberOfLinksProcessedStatistics++;
+			if (numberOfLinksProcessedStatistics % 1000==0){
+				System.out.println("number of links processed:" + numberOfLinksProcessedStatistics);
 			}
 		}
 		
