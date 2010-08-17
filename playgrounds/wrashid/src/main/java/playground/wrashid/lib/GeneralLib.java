@@ -47,6 +47,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -540,14 +541,19 @@ public class GeneralLib {
 	}
 
 	/**
-	 * copy the attributes of the given person object to a new person object.
+	 * copy the person and the selected plan of the person
 	 * @param person
 	 * @return
 	 */
 	public static Person copyPerson(Person person) {
-		Person copyPerson=new PersonImpl(person.getId());
-		copyPerson.addPlan(person.getSelectedPlan());
-		return copyPerson;
+		PersonImpl newPerson=new PersonImpl(person.getId());
+		PlanImpl newPlan=new PlanImpl();
+		newPlan.copyPlan(person.getSelectedPlan());
+		newPlan.setPerson(newPerson);
+		newPerson.addPlan(newPlan);
+		newPerson.setSelectedPlan(newPlan);
+		newPerson.removeUnselectedPlans();
+		return newPerson;
 	}
 	
 	

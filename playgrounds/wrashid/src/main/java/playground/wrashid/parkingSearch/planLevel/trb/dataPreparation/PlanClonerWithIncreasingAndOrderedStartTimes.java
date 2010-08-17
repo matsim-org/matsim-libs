@@ -1,6 +1,7 @@
 package playground.wrashid.parkingSearch.planLevel.trb.dataPreparation;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -22,7 +23,7 @@ public class PlanClonerWithIncreasingAndOrderedStartTimes {
 		// input parameters
 		String inputPlansFile="C:/data/workspace/playgrounds/wrashid/test/input/playground/wrashid/parkingSearch/planLevel/chessPlans2.xml";
 		String inputNetworkFile="C:/data/workspace/playgrounds/wrashid/test/scenarios/chessboard/network.xml";
-		String outputPlansFile="C:/data/workspace/playgrounds/wrashid/test/input/playground/wrashid/parkingSearch/planLevel/chessPlan6.xml";
+		String outputPlansFile="C:/data/workspace/playgrounds/wrashid/test/input/playground/wrashid/parkingSearch/planLevel/chessPlans6.xml";
 		int numberOfClones=100;	
 		String idOfPersonForCloning="1";
 		
@@ -37,10 +38,10 @@ public class PlanClonerWithIncreasingAndOrderedStartTimes {
 		for (int i=1;i<=numberOfClones;i++){
 			Person person=GeneralLib.copyPerson(selectedPersonForCloning);
 			person.setId(new IdImpl(i));
-			Leg firstLeg=((Leg)person.getSelectedPlan().getPlanElements().get(1));
-			double depTime=firstLeg.getDepartureTime();
+			Activity firstActivity=((Activity)person.getSelectedPlan().getPlanElements().get(0));
+			double endTime=firstActivity.getEndTime();
 			// the departure time of the agents is ordered in increasing order
-			firstLeg.setDepartureTime(depTime+i);
+			firstActivity.setEndTime(endTime+i);
 			
 			scenario.getPopulation().addPerson(person);
 		}
