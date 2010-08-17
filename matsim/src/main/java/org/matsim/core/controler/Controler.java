@@ -695,11 +695,11 @@ public class Controler {
 	protected StrategyManager loadStrategyManager() {
 		if (this.config.scenario().isUseTransit()) {
 			StrategyManager manager = new StrategyManager();
-			StrategyManagerConfigLoader.load(this, manager);
+			TransitStrategyManagerConfigLoader.load(this, this.config, manager);
 			return manager;
 		} else {
 			StrategyManager manager = new StrategyManager();
-			TransitStrategyManagerConfigLoader.load(this, this.config, manager);
+			StrategyManagerConfigLoader.load(this, manager);
 			return manager;
 		}
 	}
