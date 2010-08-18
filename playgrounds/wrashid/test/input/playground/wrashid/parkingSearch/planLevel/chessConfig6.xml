@@ -90,20 +90,6 @@
 		<param name="ModuleProbability_1" value="0.08" />
 		<param name="Module_1" value="playground.wrashid.parkingSearch.planLevel.replanning.ParkingPlanStrategy" />
 
-
-<!-- The following modules are turned off to test only the parking module deterministically. -->
-		
-		<param name="ModuleProbability_2" value="0.0085" />
-		<param name="Module_2" value="SelectExpBeta" />
-	
-		<param name="ModuleProbability_3" value="0.001" />
-		<param name="Module_3" value="ReRoute" />
-
-		<param name="ModuleProbability_4" value="0.001" />
-		<param name="Module_4" value="TimeAllocationMutator" />
-		
-		<param name="ModuleProbability_5" value="0.008" />
-		<param name="Module_5" value="BestScore" />
 	</module>
 	
 	<module name="parking">
