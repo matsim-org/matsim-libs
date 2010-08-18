@@ -58,19 +58,19 @@ public class Counts2Plans {
 		counts2plans.access = Counts2Plans.readCountsFile("d:/Berlin/BVG/berlin-bvg09/counts/pt/counts_boarding_M44_344.xml");
 		counts2plans.egress = Counts2Plans.readCountsFile("d:/Berlin/BVG/berlin-bvg09/counts/pt/counts_alighting_M44_344.xml");
 
-		counts2plans.transitSchedule = Counts2Plans.readTransitSchedule("d:/Berlin/BVG/berlin-bvg09/pt/m4_demand/transitSchedule.xml", "d:/Berlin/BVG/berlin-bvg09/pt/m4_demand/network.xml");
+		counts2plans.transitSchedule = Counts2Plans.readTransitSchedule("d:/Berlin/intervalltakt/simulation/transitSchedule.xml", "d:/Berlin/intervalltakt/simulation/network.xml");
 
 //		counts2plans.addLine("344  ");
 
 		counts2plans.addM44_H();
 		counts2plans.addM44_R();
-		counts2plans.add344_H();
-		counts2plans.add344_R();
+//		counts2plans.add344_H();
+//		counts2plans.add344_R();
 
 		counts2plans.createPlans();
 		counts2plans.printLog();
 		counts2plans.addTouristGroup(100, Time.parseTime("08:30:00"), new IdImpl("812030.1"), new IdImpl("806520.1"));
-		counts2plans.createPopulation("E:/_out/plans.xml.gz");
+		counts2plans.createPopulation("d:/Berlin/intervalltakt/simulation/plans_neu.xml.gz");
 
 		Counts2Plans.log.info("Finished");
 
