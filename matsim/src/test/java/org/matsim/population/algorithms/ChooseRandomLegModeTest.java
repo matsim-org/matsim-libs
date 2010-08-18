@@ -20,59 +20,18 @@
 
 package org.matsim.population.algorithms;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.Layer;
 
 /**
  * @author mrieser
  */
 public class ChooseRandomLegModeTest extends MatsimTestCase {
-
-	private static final String CONFIGFILE = "test/scenarios/equil/config.xml";
-	private static final Collection<String> activityChainStrings = Arrays.asList(
-			"1 2 1",
-			"1 2 20 1",
-			"1 2 1 2 1",
-			"1 2 1 3 1",
-			"1 2 2 1",
-			"1 2 2 2 2 2 2 2 1",
-			"1 2 3 2 1",
-			"1 2 3 4 3 2 1",
-			"1 2 14 2 14 2 1",
-			"1 2 14 14 2 14 2 1",
-			"1 2 3 4 3 2 5 4 5 1",
-			"1 2 3 2 3 2 1 2 1",
-			"1 1 1 1 1 2 1",
-			"1 2 1 1",
-			"1 2 2 3 2 2 2 1 4 1",
-			"1 2 3 4 3 1");
 
 	public void testRandomChoice() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
@@ -137,148 +96,5 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		assertEquals("unexpected leg mode in leg 3.", TransportMode.pt, ((Leg) plan.getPlanElements().get(5)).getMode());
 	}
 
-	public void testSubTourMutationNetworkBased() {
-		Config config = loadConfig(CONFIGFILE);
-		Scenario scenario = new ScenarioImpl(config);
-		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		TripStructureAnalysisLayerOption tripStructureAnalysisLayer = PlanomatConfigGroup.TripStructureAnalysisLayerOption.link;
-		config.planomat().setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
-		this.testSubTourMutationToCar((NetworkLayer) network, tripStructureAnalysisLayer);
-		this.testSubTourMutationToPt((NetworkLayer) network, tripStructureAnalysisLayer);
-	}
-
-	public void testSubTourMutationFacilitiesBased() {
-		Config config = loadConfig(CONFIGFILE);
-		ScenarioImpl scenario = new ScenarioImpl(config);
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-		TripStructureAnalysisLayerOption tripStructureAnalysisLayer = PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility;
-		config.planomat().setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
-		this.testSubTourMutationToCar(facilities, tripStructureAnalysisLayer);
-		this.testSubTourMutationToPt(facilities, tripStructureAnalysisLayer);
-	}
-
-	public void testCarDoesntTeleportFromHome() {
-		Config config = loadConfig(CONFIGFILE);
-		Scenario scenario = new ScenarioImpl(config);
-		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
-		testCarDoesntTeleport((NetworkLayer) network, config.planomat(), TransportMode.car, TransportMode.pt);
-		testCarDoesntTeleport((NetworkLayer) network, config.planomat(), TransportMode.pt, TransportMode.car);
-	}
-
-	public void testSubTourMutationToCar(Layer layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
-		String expectedMode = TransportMode.car;
-		String originalMode = TransportMode.pt;
-		ChooseRandomLegMode testee = new ChooseRandomLegMode(new String[] {expectedMode, originalMode}, MatsimRandom.getRandom());
-		testee.setChangeOnlyOneSubtour(true);
-		testee.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
-		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = TestsUtil.createPlan(layer, person, originalMode, activityChainString, tripStructureAnalysisLayer);
-			PlanImpl originalPlan = new PlanImpl(person);
-			originalPlan.copyPlan(plan);
-			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
-			testee.run(plan);
-			assertSubTourMutated(plan, originalPlan, expectedMode, tripStructureAnalysisLayer);
-		}
-
-	}
-
-	public void testSubTourMutationToPt(Layer layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
-		String expectedMode = TransportMode.pt;
-		String originalMode = TransportMode.car;
-		ChooseRandomLegMode testee = new ChooseRandomLegMode(new String[] {expectedMode, originalMode}, MatsimRandom.getRandom());
-		testee.setChangeOnlyOneSubtour(true);
-		testee.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
-		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = TestsUtil.createPlan(layer, person, originalMode, activityChainString, tripStructureAnalysisLayer);
-			PlanImpl originalPlan = new PlanImpl(person);
-			originalPlan.copyPlan(plan);
-			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
-			testee.run(plan);
-			assertSubTourMutated(plan, originalPlan, expectedMode, tripStructureAnalysisLayer);
-		}
-
-	}
-
-	public void testCarDoesntTeleport(Layer layer, PlanomatConfigGroup planomatConfigGroup, String originalMode, String otherMode) {
-		ChooseRandomLegMode testee = new ChooseRandomLegMode(new String[] {originalMode, otherMode}, MatsimRandom.getRandom());
-		testee.setChangeOnlyOneSubtour(true);
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
-		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = TestsUtil.createPlan(layer, person, originalMode, activityChainString, TripStructureAnalysisLayerOption.facility);
-			testee.run(plan);
-			Iterator<PlanElement> i = plan.getPlanElements().iterator();
-			Activity firstActivity = (Activity) i.next();
-			Id firstLocation = firstActivity.getLinkId();
-			Id carLocation = firstLocation;
-			Id currentLocation = firstLocation;
-			while (i.hasNext()) {
-				Leg nextLeg = (Leg) i.next();
-				Activity nextActivity = (Activity) i.next();
-				Id nextLocation = nextActivity.getLinkId();
-				if (nextLeg.getMode() == TransportMode.car) {
-					assertEquals(currentLocation, carLocation);
-					carLocation = nextLocation;
-				}
-				currentLocation = nextLocation;
-			}
-			assertEquals(firstLocation, carLocation);
-		}
-	}
-
-	private void assertSubTourMutated(Plan plan, Plan originalPlan,
-			String expectedMode, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
-		planAnalyzeSubtours.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
-		planAnalyzeSubtours.run(plan);
-		Integer mutatedSubTourIndex = null;
-		int numSubtours = planAnalyzeSubtours.getNumSubtours();
-		if (numSubtours == 0) {
-			return;
-		} else {
-			for (int subTourIndex = 0; subTourIndex < numSubtours; subTourIndex++) {
-				int subTourFromIndex = planAnalyzeSubtours
-						.getFromIndexOfSubtours().get(subTourIndex);
-				int subTourToIndex = planAnalyzeSubtours.getToIndexOfSubtours()
-						.get(subTourIndex);
-				if (isThisSubTourMutated(plan, subTourFromIndex,
-						subTourToIndex, originalPlan, expectedMode)) {
-					mutatedSubTourIndex = subTourToIndex;
-				}
-			}
-			assertNotNull("Couldn't find a mutated subtour.",
-					mutatedSubTourIndex);
-		}
-	}
-
-	private boolean isThisSubTourMutated(Plan plan, int subTourFromIndex, int subTourToIndex, Plan originalPlan, String expectedMode) {
-		List<PlanElement> prefix = plan.getPlanElements().subList(0, subTourFromIndex);
-		List<PlanElement> subTour = plan.getPlanElements().subList(subTourFromIndex, subTourToIndex);
-		List<PlanElement> suffix = plan.getPlanElements().subList(subTourToIndex, plan.getPlanElements().size());
-		List<PlanElement> originalPrefix = originalPlan.getPlanElements().subList(0, subTourFromIndex);
-		List<PlanElement> originalSubTour = originalPlan.getPlanElements().subList(subTourFromIndex, subTourToIndex);
-		List<PlanElement> originalSuffix = originalPlan.getPlanElements().subList(subTourToIndex, originalPlan.getPlanElements().size());
-		if (!TestsUtil.equals(originalPrefix, prefix)) {
-			return false;
-		}
-		if (!TestsUtil.equals(originalSuffix, suffix)) {
-			return false;
-		}
-		for (PlanElement planElement : originalSubTour) {
-			if (planElement instanceof Leg) {
-				Leg leg = (Leg) planElement;
-				leg.setMode(expectedMode);
-			}
-		}
-		if (!TestsUtil.equals(originalSubTour, subTour)) {
-			return false;
-		}
-		return true;
-	}
 
 }
