@@ -14,6 +14,8 @@ import playground.wrashid.lib.GeneralLib;
 
 public class ParametersPSF {
 
+	private static Controler matsimControler;
+	
 	private static final Logger log = Logger.getLogger(ParametersPSF.class);
 	private static EventsManager events=null;
 
@@ -77,6 +79,13 @@ public class ParametersPSF {
 	// joules
 	private static String main_baseLoadPath = "main.baseLoadPath";
 	private static double[][] mainBaseLoad = null;
+	
+	// when this is set, unmapped links are added automatically when loading the mapping
+	// the number of hubs in the config needs to add one hub number manually
+	// the price file needs to have one additional column (at the beginning).
+	private static final String main_initUnmappedLinks="main.initUnmappedLinks";
+	private static Boolean mainInitUnmappedLinks=null;
+	
 
 	// earliest charging: charge at the earliest time you can during the day, if
 	// the same price is
@@ -89,6 +98,10 @@ public class ParametersPSF {
 	// the grid, how long they will stay at some place and the grid decides,
 	// when they should charge to
 	// avoid peaks
+
+	public static Boolean getMainInitUnmappedLinks() {
+		return mainInitUnmappedLinks;
+	}
 
 	public static final String MODERATE_CHARGING = "moderateCharging";
 	public static final String EARLIEST_CHARGING = "earliestCharging";
@@ -209,6 +222,8 @@ public class ParametersPSF {
 	}
 
 	public static void readConfigParamters(Controler controler) {
+		setMatsimControler(controler);
+		
 		// reset simulation parameters
 		reset();
 		
@@ -221,6 +236,14 @@ public class ParametersPSF {
 			errorReadingParameter(default_maxBatteryCapacity);
 		}
 
+		// the loading of this variable must happen before loading of the hub link mapping
+		tempStringValue = controler.getConfig().findParam(PSFModule, main_initUnmappedLinks);
+		if (tempStringValue != null) {
+			mainInitUnmappedLinks = new Boolean(tempStringValue);
+		} else {
+			mainInitUnmappedLinks=null;
+		}
+		
 		tempStringValue = controler.getConfig().findParam(PSFModule, default_chargingPowerAtParking);
 		if (tempStringValue != null) {
 			defaultChargingPowerAtParking = Double.parseDouble(tempStringValue);
@@ -481,6 +504,14 @@ public class ParametersPSF {
 					.getTestingPeakHourElectricityPrice());
 		}
 
+	}
+
+	public static void setMatsimControler(Controler matsimControler) {
+		ParametersPSF.matsimControler = matsimControler;
+	}
+
+	public static Controler getMatsimControler() {
+		return matsimControler;
 	}
 
 }

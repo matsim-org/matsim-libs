@@ -1,0 +1,17 @@
+quick fix done: 
+class FacilityChargingPrice: "two slots with the same starting time => some thing is wrong..."
+class ChargingLog: "A car cannot charge using the same starting time twice..."
+
+even with this !!!HACK!!!, the program exits with the folloowing error:
+xception in thread "main" java.lang.ArrayIndexOutOfBoundsException: 96
+	at playground.wrashid.PSF.parking.ParkingTimes.wasParkedAtHub(ParkingTimes.java:86)
+	at playground.wrashid.PSF.V2G.BatteryStatistics.getGridConnectedPower(BatteryStatistics.java:85)
+	at playground.wrashid.PSF.energy.charging.optimizedCharging.OptimizedCharger.outputOptimizationData(OptimizedCharger.java:120)
+	at playground.wrashid.PSF.energy.AfterSimulationListener.notifyAfterMobsim(AfterSimulationListener.java:48)
+	at org.matsim.core.controler.ControlerListenerManager.fireControlerAfterMobsimEvent(ControlerListenerManager.java:237)
+	at org.matsim.core.controler.Controler.doIterations(Controler.java:412)
+	at org.matsim.core.controler.Controler.run(Controler.java:335)
+	at playground.wrashid.PSF.PSS.PSSControler.runMATSimIterations(PSSControler.java:207)
+	at playground.wrashid.PSF.PSS.PSSControler.runMATSimPSSIterations(PSSControler.java:78)
+	at playground.wrashid.PSF.main.Slanger4.main(Slanger4.java:25)
+2010-08-18 13:02:57,134  WARN Controler:430 S H U T D O W N   ---   received unexpected shutdown request.

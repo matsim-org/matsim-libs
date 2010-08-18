@@ -29,7 +29,9 @@ public class HubPriceInfo {
 	public HubPriceInfo(String fileName, int numberOfHubs) {
 
 		this.numberOfHubs = numberOfHubs;
-
+		
+		//System.out.println(fileName);
+		
 		hubPrice = GeneralLib.readMatrix(numberOfTimeBins,numberOfHubs,false,fileName);
 		// need to invert the matrix, because hubPrice expects the hub number as the first dimension and
 		// the time as the second dimension.
@@ -135,11 +137,11 @@ public class HubPriceInfo {
 		// create hubs
 		// attention: if there is too much output, you won't be able to copy it from the console directly.
 		// therefore redirect that output to a file and copy it from there!
-//		HubPriceInfo hubPriceInfo = new HubPriceInfo(18000, 75600, 9, 18);
-//		hubPriceInfo.printFakeHubs(819);
+		//HubPriceInfo hubPriceInfo = new HubPriceInfo(18000, 75600, 9, 18);
+		//hubPriceInfo.printFakeHubs(820);
 		
 		// read hubs
-		new HubPriceInfo("A:/data/matsim/input/runRW1003/hubPriceInfo.txt",819);
+		new HubPriceInfo("A:/data/matsim/input/runRW1003/hubPriceInfo.txt",820);
 	}
 
 }

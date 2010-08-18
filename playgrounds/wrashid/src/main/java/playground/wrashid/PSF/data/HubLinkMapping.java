@@ -5,8 +5,11 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+import org.matsim.api.core.v01.network.Link;
+
 import playground.wrashid.PHEV.parking.data.Facility;
 import playground.wrashid.PHEV.parking.data.StreetParkingData;
+import playground.wrashid.PSF.ParametersPSF;
 
 /**
  * File format (for example see test case data).
@@ -29,7 +32,24 @@ public class HubLinkMapping {
 	HashMap<String,Integer> linkHubMapping=new HashMap<String,Integer>();
 	private int numberOfHubs;
 
+	private void handleUnmappedLinksStart(){
+		if (ParametersPSF.getMainInitUnmappedLinks()!=null && ParametersPSF.getMainInitUnmappedLinks()){
+			this.numberOfHubs--;
+		}
+	}
 	
+	private void handleUnmappedLinksEnd(){
+		if (ParametersPSF.getMainInitUnmappedLinks()!=null && ParametersPSF.getMainInitUnmappedLinks()){
+			// add unmapped links in "last column"
+			for (Link link:ParametersPSF.getMatsimControler().getNetwork().getLinks().values()){
+				String linkStringId=link.getId().toString();
+				if (!linkHubMapping.containsKey(linkStringId)){
+					linkHubMapping.put(linkStringId, this.numberOfHubs);
+				}
+			}
+			this.numberOfHubs++;
+		}
+	}
 	
 
 	/**
@@ -38,6 +58,8 @@ public class HubLinkMapping {
 	 */
 	public HubLinkMapping(String fileName, int numberOfHubs){
 		this.numberOfHubs = numberOfHubs;
+		
+		handleUnmappedLinksStart();
 		
 		try {
 		
@@ -52,7 +74,7 @@ public class HubLinkMapping {
 		while (line != null) {
 			tokenizer = new StringTokenizer(line);
 			
-			for (int i=0;i<numberOfHubs;i++){
+			for (int i=0;i<this.numberOfHubs;i++){
 				token = tokenizer.nextToken();
 				linkId= (int) Double.parseDouble(token);
 				linkHubMapping.put(Integer.toString(linkId), i);
@@ -76,6 +98,8 @@ public class HubLinkMapping {
 		
 		// remove link id with number -1
 		linkHubMapping.remove("-1");
+		
+		handleUnmappedLinksEnd();
 	}
 
 
