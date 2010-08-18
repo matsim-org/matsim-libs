@@ -807,7 +807,7 @@ public class Controler {
 	}
 
 	private void addTransitControlerListener() {
-		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
+		TransitControlerListener cl = new TransitControlerListener();
 		addControlerListener(cl);
 	}
 
@@ -1263,18 +1263,12 @@ public class Controler {
 		}
 	}
 
-	public static class TransitControlerListener implements StartupListener {
-
-		private final TransitConfigGroup config;
-
-		public TransitControlerListener(final TransitConfigGroup config) {
-			this.config = config;
-		}
+	public class TransitControlerListener implements StartupListener {
 
 		public void notifyStartup(final StartupEvent event) {
-			if (this.config.getTransitScheduleFile() != null) {
+			if (Controler.this.transitConfig.getTransitScheduleFile() != null) {
 				try {
-					new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork()).readFile(this.config.getTransitScheduleFile());
+					new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork()).readFile(Controler.this.transitConfig.getTransitScheduleFile());
 				} catch (SAXException e) {
 					throw new RuntimeException("could not read transit schedule.", e);
 				} catch (ParserConfigurationException e) {
@@ -1283,9 +1277,9 @@ public class Controler {
 					throw new RuntimeException("could not read transit schedule.", e);
 				}
 			}
-			if (this.config.getVehiclesFile() != null) {
+			if (Controler.this.transitConfig.getVehiclesFile() != null) {
 				try {
-					new VehicleReaderV1(event.getControler().getScenario().getVehicles()).parse(this.config.getVehiclesFile());
+					new VehicleReaderV1(event.getControler().getScenario().getVehicles()).parse(Controler.this.transitConfig.getVehiclesFile());
 				} catch (SAXException e) {
 					throw new RuntimeException("could not read vehicles.", e);
 				} catch (ParserConfigurationException e) {
