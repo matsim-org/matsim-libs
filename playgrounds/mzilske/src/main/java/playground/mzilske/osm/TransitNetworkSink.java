@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,6 +45,8 @@ import org.openstreetmap.osmosis.core.store.SingleClassObjectSerializationFactor
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 
 public class TransitNetworkSink implements Sink {
+	
+	static final Logger log = Logger.getLogger(TransitNetworkSink.class);
 
 	private SimpleObjectStore<NodeContainer> allNodes;
 
@@ -115,14 +118,14 @@ public class TransitNetworkSink implements Sink {
 				// debug
 				count++;
 				if (count % 50000 == 0)
-					System.out.println(count + " nodes processed so far");
+					log.info(count + " nodes processed so far");
 			}
 
 			@Override
 			public void process(RelationContainer relationContainer) {
 				Relation relation = relationContainer.getEntity();
 				Map<String, String> tags = new TagCollectionImpl(relation.getTags()).buildMap();
-				if ("route".equals(tags.get("type")) && "bus".equals(tags.get("route"))) {
+				if ("route".equals(tags.get("type"))){// && "bus".equals(tags.get("route"))) {
 					transitLines.add(relationContainer);
 				}
 			}
@@ -178,15 +181,25 @@ public class TransitNetworkSink implements Sink {
 
 		IndexedObjectStoreReader<NodeContainer> nodeReader = stopNodeStore.createReader();
 		IndexedObjectStoreReader<WayContainer> wayReader = routeSegmentStore.createReader();
+		log.info("Processing transit lines...");
 		while (transitLineIterator.hasNext()) {
 			Relation relation = transitLineIterator.next().getEntity();
 			Map<String, String> tags = new TagCollectionImpl(relation.getTags()).buildMap();
+			String route = tags.get("route");
 			String ref = tags.get("ref");
+			if(ref != null){
+				ref = ref.replace('"', ' ').trim();
+				ref = ref.replace('&', ' ').trim();
+			}
 			String operator = tags.get("operator");
 			String name = tags.get("name");
+			if(name != null){
+				name = name.replace('"', ' ').trim();
+				name = name.replace('&', ' ').trim();
+			}
 			String networkOperator = tags.get("network");
-			System.out.println(networkOperator + " // " + ref + " // " + operator + " // " + name);
-			TransitLine line = transitSchedule.getFactory().createTransitLine(new IdImpl(ref + "-" + relation.getId()));
+//			System.out.println(networkOperator + " // " + route + " // " + ref + " // " + operator + " // " + name);
+			TransitLine line = transitSchedule.getFactory().createTransitLine(new IdImpl(operator + "-" + route + "-" + ref + "-" + name + "-" + relation.getId()));
 			LinkedList<Node> stopsH = new LinkedList<Node>();
 			LinkedList<Node> stopsR = new LinkedList<Node>();
 			Stitcher stitcher = new Stitcher(network);
@@ -204,7 +217,7 @@ public class TransitNetworkSink implements Sink {
 							stitcher.addBackward(way);
 						}
 					} else {
-						System.out.println("Missing way: " + relationMember.getMemberId());
+						log.info("--- Missing way: " + relationMember.getMemberId());
 					}
 				} 
 			}
@@ -212,7 +225,7 @@ public class TransitNetworkSink implements Sink {
 			for (RelationMember relationMember : relation.getMembers()) {
 				if (relationMember.getMemberType().equals(EntityType.Node)) {
 					if (allNodesTracker.get(relationMember.getMemberId())) {
-						System.out.println(relationMember.getMemberId());
+//						System.out.println(relationMember.getMemberId());
 						Node node = nodeReader.get(relationMember.getMemberId()).getEntity();
 						Coord coordinate = coordinateTransformation.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
 						String role = relationMember.getMemberRole();
@@ -228,10 +241,10 @@ public class TransitNetworkSink implements Sink {
 							stopsR.addFirst(node);
 							stitcher.addBackwardStop(node);
 						} else {
-							System.out.println("Unknown role: " + role);
+							log.info("--- Unknown role: " + role);
 						}
 					} else {
-						System.out.println("Missing node: " + relationMember.getMemberId());
+						log.info("--- Missing node: " + relationMember.getMemberId());
 					}
 				}
 			}
@@ -281,6 +294,7 @@ public class TransitNetworkSink implements Sink {
 		Link entryLink = network.getFactory().createLink(new IdImpl(routeRef + "_ENTRY"), node.getId(), node.getId());
 		network.addLink(entryLink);
 		TransitStopFacility firstFacility = transitSchedule.getFactory().createTransitStopFacility(createTransitStopId(routeRef, stopNo), firstCoordinate, false);
+		transitSchedule.addStopFacility(firstFacility);
 		stopNo++;
 		double time = 0;
 		transitRouteStops.add(transitSchedule.getFactory().createTransitRouteStop(firstFacility, time, time));
