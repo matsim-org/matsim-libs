@@ -9,6 +9,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.wrashid.lib.GlobalRegistry;
+import playground.wrashid.lib.obj.plan.PersonGroups;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceMeanAndStandardDeviationGraph;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
@@ -35,6 +36,7 @@ public class ParkingRoot {
 	private static BasicPointVisualizer mapDebugTrace;
 	private static ParkingWalkingDistanceMeanAndStandardDeviationGraph parkingWalkingDistanceGraph;
 	private static HashMap<Id, Double> parkingWalkingDistanceOfPreviousIteration=null;
+	private static PersonGroups personGroupsForStatistics=null;
 
 
 	public static ParkingWalkingDistanceMeanAndStandardDeviationGraph getParkingWalkingDistanceGraph() {
@@ -151,6 +153,15 @@ public class ParkingRoot {
 
 	public static HashMap<Id, Double> getParkingWalkingDistanceOfPreviousIteration() {
 		return parkingWalkingDistanceOfPreviousIteration;
+	}
+
+	public static void setPersonGroupsForStatistics(
+			PersonGroups personGroupsForStatistics) {
+		ParkingRoot.personGroupsForStatistics = personGroupsForStatistics;
+	}
+
+	public static PersonGroups getPersonGroupsForStatistics() {
+		return personGroupsForStatistics;
 	}
 
 }

@@ -41,7 +41,7 @@ public class PlanClonerWithIncreasingAndOrderedStartTimes {
 			Activity firstActivity=((Activity)person.getSelectedPlan().getPlanElements().get(0));
 			double endTime=firstActivity.getEndTime();
 			// the departure time of the agents is ordered in increasing order
-			firstActivity.setEndTime(endTime+i);
+			firstActivity.setEndTime(endTime+i*60);
 			
 			scenario.getPopulation().addPerson(person);
 		}
