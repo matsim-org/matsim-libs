@@ -43,6 +43,12 @@ import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario
  * 
  * - we can for clarity show in the beginning with only two groups and later with 3 groups.
  * 
+ * - add parking type experiments (during parking selection we need to be able to say, what type of parking we require 
+ * for an activity, e.g. electrical parking) => electric vehicles as a group will have longer trips if less parkings
+ * of that type available (this should be a good example to show that the concept works).
+ * 
+ * - why is parking score still so negative (even for the vehicles arriving first????????????????)
+ * 
  * @author wrashid
  * 
  */
