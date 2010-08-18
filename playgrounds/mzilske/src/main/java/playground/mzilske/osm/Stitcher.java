@@ -35,6 +35,9 @@ public class Stitcher {
 
 	private LinkedList<Id> backwardStopLinks = new LinkedList<Id>();
 	
+	private List<Double> forwardTravelTimes = new LinkedList<Double>();
+
+	private List<Double> backwardTravelTimes = new LinkedList<Double>();
 	
 	public Stitcher(Network network) {
 		this.network = network;
@@ -90,7 +93,7 @@ public class Stitcher {
 	}
 
 	public List<Id> getForwardRoute() {
-		return route(forwardStops, forwardStopLinks);
+		return route(forwardStops, forwardStopLinks, forwardTravelTimes);
 	}
 	
 	public List<Id> getForwardStopLinks() {
@@ -101,7 +104,7 @@ public class Stitcher {
 		return backwardStopLinks;
 	}
 	
-	private List<Id> route(List<Id> stopNodes, List<Id> outStopLinks) {
+	private List<Id> route(List<Id> stopNodes, List<Id> outStopLinks, List<Double> outTravelTimes) {
 		if (stopNodes.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -121,12 +124,17 @@ public class Stitcher {
 				links.add(link.getId());
 			}
 			Link linkForStop;
+			double travelTime;
 			if (leastCostPath.links.isEmpty()) {
 				linkForStop = null;
+				travelTime = 0;
 				outStopLinks.add(null);
+				outTravelTimes.add(travelTime);
 			} else {
 				linkForStop = leastCostPath.links.get(leastCostPath.links.size()-1);
+				travelTime = leastCostPath.travelTime;
 				outStopLinks.add(linkForStop.getId());
+				outTravelTimes.add(travelTime);
 			}
 			previous = next;
 		}
@@ -134,7 +142,7 @@ public class Stitcher {
 	}
 
 	public List<Id> getBackwardRoute() {
-		return route(backwardStops, backwardStopLinks);
+		return route(backwardStops, backwardStopLinks, backwardTravelTimes);
 	}
 	
 	private void addForwardLinks(Way way) {
@@ -173,6 +181,14 @@ public class Stitcher {
 		if (!networkForThisRoute.getNodes().containsKey(fromNode.getId())) {
 			networkForThisRoute.addNode(networkForThisRoute.getFactory().createNode(fromNode.getId(), fromNode.getCoord()));
 		}
+	}
+
+	public List<Double> getForwardTravelTimes() {
+		return forwardTravelTimes;
+	}
+
+	public List<Double> getBackwardTravelTimes() {
+		return backwardTravelTimes;
 	}
 
 }
