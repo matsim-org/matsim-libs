@@ -20,11 +20,10 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -102,13 +101,13 @@ public class NetworkCalcTopoType implements NetworkRunnable {
 		return i.intValue();
 	}
 
-	private List<Node> getIncidentNodes(final Node node) {
-		List<Node> nodes = new ArrayList<Node>();
+	private HashMap<Id, Node> getIncidentNodes(final Node node) {
+		HashMap<Id, Node> nodes = new HashMap<Id, Node>();
 		for (Link link : node.getInLinks().values()) {
-			nodes.add(link.getFromNode());
+			nodes.put(link.getFromNode().getId(), link.getFromNode());
 		}
 		for (Link link : node.getOutLinks().values()) {
-			nodes.add(link.getToNode());
+			nodes.put(link.getToNode().getId(), link.getToNode());
 		}
 		return nodes;
 	}
