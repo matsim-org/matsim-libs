@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
+import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
@@ -72,6 +74,37 @@ public class PersonGroups {
 		if (labelPersonMapping.get(groupLabel)==null){
 			throw new Error("there is no such groupLabel defined");
 		}
+	}
+	
+	public void generateIterationGrafic(String xLabel, String yLabel, String title, String attributeNameWithoutIterationNumber, String fileName){
+		int numberOfXValues = GlobalRegistry.controler.getIterationNumber() + 1;
+		int numberOfFunctions = this.getNumberOfGroups();
+		double[] xValues = new double[numberOfXValues];
+		String[] seriesLabels = new String[numberOfFunctions];
+
+		int k = 0;
+		for (String groupLabel : this.getGroupLabels()) {
+			seriesLabels[k] = groupLabel;
+			k++;
+		}
+
+		double[][] matrix = new double[numberOfXValues][numberOfFunctions];
+
+		for (int i = 0; i < numberOfXValues; i++) {
+
+			String attribute = attributeNameWithoutIterationNumber + i;
+			for (int j = 0; j < numberOfFunctions; j++) {
+				String groupName = seriesLabels[j];
+				matrix[i][j] = (Double) this.getAttributeValueForGroup(
+						groupName, attribute)
+						/ this.getGroupSize(groupName);
+			}
+
+			xValues[i] = i;
+		}
+
+		GeneralLib.writeGraphic(fileName, matrix, title, xLabel, yLabel,
+				seriesLabels, xValues);
 	}
 	
 }

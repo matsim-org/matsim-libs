@@ -1,11 +1,15 @@
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
+import java.util.HashMap;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.GlobalRegistry;
+import playground.wrashid.lib.obj.plan.PersonGroups;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingOccupancyAnalysis;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingTimesAnalysis;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
@@ -41,6 +45,7 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		GeneralLib.writeList(ParkingRoot.getParkingLog(),fileName);
 		
 		writeWalkingDistanceStatisticsGraph();
+		generatePersonGroupsWalkingDistanceGraph();
 		updateparkingWalkingTimeOfPreviousIteration();
 		
 		//ParkingRoot.writeMapDebugTraceToCurrentIterationDirectory();
@@ -51,6 +56,36 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		
 	}
 	
+	private void generatePersonGroupsWalkingDistanceGraph() {
+		
+		PersonGroups personGroups = ParkingRoot.getPersonGroupsForStatistics();
+		
+		if (personGroups==null){
+			return;
+		}
+		
+		
+		HashMap<Id, Double> parkingRelatedWalkDistance = ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance();
+		
+		for (Id personId:parkingRelatedWalkDistance.keySet()){
+			int iterationNumber=GlobalRegistry.controler.getIterationNumber();
+			String attribute=PersonGroupWalkingDistanceGraphGenerator.iterationWalkingDistanceSum+iterationNumber;
+			
+			Double sumOfWalkingDistance = (Double) personGroups.getAttributeValueForGroupToWhichThePersonBelongs(personId, attribute);
+			
+			if (sumOfWalkingDistance==null){
+				sumOfWalkingDistance=0.0;
+			}
+			
+			sumOfWalkingDistance+=parkingRelatedWalkDistance.get(personId);
+			
+			personGroups.setAttributeValueForGroupToWhichThePersonBelongs(personId, attribute, sumOfWalkingDistance);
+			
+		}
+		
+		PersonGroupWalkingDistanceGraphGenerator.generateGraphic(ParkingRoot.getPersonGroupsForStatistics(), GlobalRegistry.controler.getControlerIO().getOutputFilename("personGroupsWalkingDistance.png"));
+	}
+
 	private void writeOccupancyViolationStatisticsGrpah(
 			ParkingOccupancyAnalysis poaWriter) {
 		

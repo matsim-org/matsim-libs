@@ -56,7 +56,7 @@ public class ParkingScoreExecutor {
 
 	private void printParkingScoreGraphForPersonGroups() {
 		if (ParkingRoot.getPersonGroupsForStatistics() != null) {
-			PersonGroupParkingScoreGraphicProducer.generateGraphic(ParkingRoot
+			PersonGroupParkingScoreGraphicGenerator.generateGraphic(ParkingRoot
 					.getPersonGroupsForStatistics(),
 					GlobalRegistry.controler.getControlerIO()
 							.getOutputFilename("personGroupsParkingScore.png"));
@@ -69,7 +69,7 @@ public class ParkingScoreExecutor {
 			PersonGroups personGroupsStatistics = ParkingRoot
 					.getPersonGroupsForStatistics();
 			int iterationNumber = GlobalRegistry.controler.getIterationNumber();
-			String attribute = PersonGroupParkingScoreGraphicProducer.iterationScoreSum + iterationNumber;
+			String attribute = PersonGroupParkingScoreGraphicGenerator.iterationScoreSum + iterationNumber;
 			Double currentSum = (Double) personGroupsStatistics
 					.getAttributeValueForGroupToWhichThePersonBelongs(personId,
 							attribute);
