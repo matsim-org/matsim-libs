@@ -1,5 +1,6 @@
 package playground.wrashid.lib.obj.plan;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -81,13 +82,15 @@ public class PersonGroups {
 		int numberOfFunctions = this.getNumberOfGroups();
 		double[] xValues = new double[numberOfXValues];
 		String[] seriesLabels = new String[numberOfFunctions];
-
+		
 		int k = 0;
 		for (String groupLabel : this.getGroupLabels()) {
 			seriesLabels[k] = groupLabel;
 			k++;
 		}
 
+		Arrays.sort(seriesLabels);
+		
 		double[][] matrix = new double[numberOfXValues][numberOfFunctions];
 
 		for (int i = 0; i < numberOfXValues; i++) {

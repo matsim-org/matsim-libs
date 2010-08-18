@@ -3,6 +3,7 @@ package playground.wrashid.parkingSearch.planLevel.scoring;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -224,6 +225,10 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 	 */
 	private double getParkingCapacityViolationPenalty(Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Plan plan) {
 		double parkingCapacityViolationPenalty=0;
+		
+		if (plan.getPerson().getId().toString().equalsIgnoreCase("5")){
+			System.out.println();
+		}
 		
 		if (ParkingRoot.getParkingScoringFunction()
 				.isParkingFullAtTime(parkingFacilityId, parkingTimeInfo.getStartTime() - delta/10.0)) {

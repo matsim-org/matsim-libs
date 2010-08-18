@@ -418,6 +418,42 @@ public class GeneralLib {
 
 		// chart.addMatsimLogo();
 		chart.saveAsPng(fileName, 800, 600);
+		
+		printGraphicDataToConsole(fileName, matrix, title, xLabel, yLabel, seriesLabels, xValues);
+	}
+	
+	public static void printGraphicDataToConsole(String fileName, double[][] matrix, String title, String xLabel, String yLabel, String[] seriesLabels, double[] xValues){
+		int numberOfXValues = matrix.length;
+		int numberOfFunctions = matrix[0].length;
+		
+		System.out.println("===================================================");
+		
+		System.out.println("title:" + title);
+		System.out.println("xLabel:" + xLabel);
+		System.out.println("yLabel:" + yLabel);
+		
+		System.out.println("----------------------------------------------------");
+		
+		System.out.print("xValues");
+		
+		for (int i=0;i<numberOfFunctions;i++){
+			System.out.print("\t"+seriesLabels[i]);
+		}
+		
+		System.out.print("\n");
+		System.out.println("----------------------------------------------------");
+		
+		for (int i = 0; i < numberOfXValues; i++) {
+			System.out.print(xValues[i]);
+			
+			for (int j = 0; j < numberOfFunctions; j++) {
+				System.out.print("\t"+matrix[i][j]);
+			}
+			System.out.print("\n");
+		}
+		
+		
+		System.out.println("==================================================");
 	}
 	
 
