@@ -34,6 +34,15 @@ import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario
  * - compare scenarios with 100000 agents and increase parking capacities =>
  * find out, in how many iterations the system finds a proper solution.
  * 
+ * 
+ * - reason, why there is so much change in the average travel distance: too much of replanning done
+ *  and only parking replanning turned on.
+ *  
+ * - one can see, that the advantage of arriving early (and therefore an advantage regarding the capacity
+ * constraint can be established almost immediatly (within the first 5 iterations).
+ * 
+ * - we can for clarity show in the beginning with only two groups and later with 3 groups.
+ * 
  * @author wrashid
  * 
  */
@@ -53,9 +62,9 @@ public class MainConfig6 {
 	private static void initPersonGroupsForStatistics() {
 		PersonGroups personGroupsForStatistics = new PersonGroups();
 
-		for (int i = 0; i <= 98; i++) {
+		for (int i = 0; i <= 99; i++) {
 			personGroupsForStatistics.addPersonToGroup(
-					"Group-" + Integer.toString(i / 33 + 1), new IdImpl(i));
+					"Group-" + Integer.toString(i / 50 + 1), new IdImpl(i));
 		}
 
 		ParkingRoot.setPersonGroupsForStatistics(personGroupsForStatistics);

@@ -419,7 +419,10 @@ public class GeneralLib {
 		// chart.addMatsimLogo();
 		chart.saveAsPng(fileName, 800, 600);
 		
-		printGraphicDataToConsole(fileName, matrix, title, xLabel, yLabel, seriesLabels, xValues);
+		
+		if (GlobalRegistry.doPrintGraficDataToConsole){
+			printGraphicDataToConsole(fileName, matrix, title, xLabel, yLabel, seriesLabels, xValues);
+		}
 	}
 	
 	public static void printGraphicDataToConsole(String fileName, double[][] matrix, String title, String xLabel, String yLabel, String[] seriesLabels, double[] xValues){
