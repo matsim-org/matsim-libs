@@ -14,7 +14,7 @@ public class PersonGroupParkingScoreGraphicGenerator {
 		String yLabel = "utility score";
 		String title="Average Person Group Parking Utilities";
 		
-		personGroups.generateIterationGrafic(xLabel, yLabel, title, iterationScoreSum, fileName);
+		personGroups.generateIterationAverageGraph(xLabel, yLabel, title, iterationScoreSum, fileName);
 		
 	}
 	

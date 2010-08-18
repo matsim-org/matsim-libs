@@ -76,7 +76,7 @@ public class PersonGroups {
 		}
 	}
 	
-	public void generateIterationGrafic(String xLabel, String yLabel, String title, String attributeNameWithoutIterationNumber, String fileName){
+	public void generateIterationAverageGraph(String xLabel, String yLabel, String title, String attributeNameWithoutIterationNumber, String fileName){
 		int numberOfXValues = GlobalRegistry.controler.getIterationNumber() + 1;
 		int numberOfFunctions = this.getNumberOfGroups();
 		double[] xValues = new double[numberOfXValues];

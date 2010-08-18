@@ -14,6 +14,6 @@ public class PersonGroupWalkingDistanceGraphGenerator {
 		String xLabel = "Iteration";
 		String yLabel = "walking distance [m]";
 		String title = "Average Person Group Walking Distance";
-		personGroups.generateIterationGrafic(xLabel, yLabel, title, iterationWalkingDistanceSum, fileName);
+		personGroups.generateIterationAverageGraph(xLabel, yLabel, title, iterationWalkingDistanceSum, fileName);
 	}
 }

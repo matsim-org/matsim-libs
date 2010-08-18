@@ -3,7 +3,7 @@ package playground.wrashid.lib.obj;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-
+// TODO: write tests.
 public class LinkedListValueHashMap<KeyClass,ValueClass> {
 
 	HashMap<KeyClass, LinkedList<ValueClass>> hashMap=new HashMap<KeyClass, LinkedList<ValueClass>>();
