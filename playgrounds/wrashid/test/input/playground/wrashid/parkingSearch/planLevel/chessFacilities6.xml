@@ -11,7 +11,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -21,7 +21,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -31,7 +31,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -41,7 +41,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -51,7 +51,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -61,7 +61,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -71,7 +71,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -81,7 +81,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -101,7 +101,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -111,7 +111,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -121,7 +121,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -131,7 +131,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -141,7 +141,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -151,7 +151,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -161,7 +161,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -171,7 +171,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -181,7 +181,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -191,7 +191,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -201,7 +201,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -211,7 +211,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -221,7 +221,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -231,7 +231,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -241,7 +241,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -251,7 +251,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -261,7 +261,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -271,7 +271,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -281,7 +281,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -291,7 +291,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -301,7 +301,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -311,7 +311,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -321,7 +321,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -331,7 +331,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -341,7 +341,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -351,7 +351,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
@@ -361,7 +361,7 @@
 		<activity type="home"/>
 		<activity type="work"/>
 		<activity type="parking">
-			<capacity value="10" />
+			<capacity value="20" />
 		</activity>
 	</facility>
 
