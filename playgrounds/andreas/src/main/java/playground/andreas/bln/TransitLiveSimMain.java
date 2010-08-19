@@ -21,25 +21,12 @@ import org.xml.sax.SAXException;
 public class TransitLiveSimMain {
 	
 	public static void main(String[] args) {
+		
+		String inputDir = "e:/_out/otflivetest/";
 
-//		 String fileName = "../../run749/749.output_network.xml.gz";
-//		 String eventsFileName = "../../run749/it.1000/749.1000.events.txt.gz";
-//		
-		String networkFileName = "../../matsim/output/example5/output_network.xml.gz";
-		String eventsFileName = "../../matsim/output/example5/ITERS/it.10/10.events.xml.gz";
-		String populationFileName = "../../matsim/output/example5/wurst.xml";
-		
-//		String networkFileName = "../../network-ivtch/ivtch-osm.xml";
-//		String eventsFileName = "../../run657/it.1000/1000.events.txt.gz";
-//		String populationFileName = "../../run657/it.1000/1000.plans.xml.gz";
-		
-//		String networkFileName = "output/brandenburg/output_network.xml.gz";
-//		String eventsFileName = "output/brandenburg/ITERS/it.10/10.events.txt.gz";
-//		String populationFileName = "output/brandenburg/output_plans.xml.gz";
-		
 		double snapshotPeriod = 60;
 		SimulationConfigGroup simulationConfigGroup = new SimulationConfigGroup();
-		String configFilename = "e:\\_out\\test\\config.xml";
+		String configFilename = inputDir + "config.xml";
 		Config config = new Config();
 		config.addCoreModules();
 		new MatsimConfigReader(config).readFile(configFilename);
@@ -49,8 +36,8 @@ public class TransitLiveSimMain {
 		scenario = (ScenarioImpl) new ScenarioLoaderImpl(scenario).loadScenario();
 		
         try {
-			new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).readFile("e:\\_out\\test\\transitSchedule.xml");
-			new VehicleReaderV1(scenario.getVehicles()).parse("e:\\_out\\test\\vehicles.xml");
+			new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).readFile(inputDir + "transitSchedule.xml");
+			new VehicleReaderV1(scenario.getVehicles()).parse(inputDir + "vehicles.xml");
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
