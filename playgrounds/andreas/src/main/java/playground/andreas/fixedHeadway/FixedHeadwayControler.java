@@ -9,7 +9,7 @@ import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.qsim.TransitQSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
@@ -17,12 +17,12 @@ public class FixedHeadwayControler implements VehicleDepartsAtFacilityEventHandl
 	
 	private final static Logger log = Logger.getLogger(FixedHeadwayControler.class);
 	
-	private TransitQSimulation qSim;
+	private QSim qSim;
 	
 	HashMap<Id, FixedHeadwayCycleUmlaufDriver> umlaufDriver;	
 	HashMap<Id, FixedHeadwayCycleUmlaufDriver> stopId2LastDriverPassedMap = new HashMap<Id, FixedHeadwayCycleUmlaufDriver>();	
 
-	public FixedHeadwayControler(TransitQSimulation qSim) {
+	public FixedHeadwayControler(QSim qSim) {
 		super();
 		this.qSim = qSim;
 //		for (PersonAgent personAgent : ptAgents) {
