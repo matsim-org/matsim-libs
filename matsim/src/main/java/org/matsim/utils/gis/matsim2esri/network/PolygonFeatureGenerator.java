@@ -82,7 +82,6 @@ public class PolygonFeatureGenerator implements FeatureGenerator{
 	@Override
 	public Feature getFeature(final Link link) {
 		double width = this.widthCalculator.getWidth(link);
-		width += 0;
 
 		Coordinate from = MGC.coord2Coordinate(link.getFromNode().getCoord());
 		Coordinate to = MGC.coord2Coordinate(link.getToNode().getCoord());
@@ -104,10 +103,12 @@ public class PolygonFeatureGenerator implements FeatureGenerator{
 			}
 		}
 		if (theta < 0.0) theta += TWO_PI;
-		double xfrom2 = from.x + Math.cos(theta) * 0  + Math.sin(theta) * width;
-		double yfrom2 = from.y + Math.sin(theta) * 0 - Math.cos(theta) * width;
-		double xto2 = from.x + Math.cos(theta) *  length + Math.sin(theta) * width;
-		double yto2 = from.y + Math.sin(theta) * length - Math.cos(theta) * width;
+		double sinTheta = Math.sin(theta);
+		double cosTheta = Math.cos(theta);
+		double xfrom2 = from.x + sinTheta * width;
+		double yfrom2 = from.y - cosTheta * width;
+		double xto2 = from.x + cosTheta * length + sinTheta * width;
+		double yto2 = from.y + sinTheta * length - cosTheta * width;
 		Coordinate from2 = new Coordinate(xfrom2,yfrom2);
 		Coordinate to2 = new Coordinate(xto2,yto2);
 
