@@ -23,8 +23,8 @@ public class PlanClonerWithIncreasingAndOrderedStartTimes {
 		// input parameters
 		String inputPlansFile="C:/data/workspace/playgrounds/wrashid/test/input/playground/wrashid/parkingSearch/planLevel/chessPlans2.xml";
 		String inputNetworkFile="C:/data/workspace/playgrounds/wrashid/test/scenarios/chessboard/network.xml";
-		String outputPlansFile="C:/data/workspace/playgrounds/wrashid/test/input/playground/wrashid/parkingSearch/planLevel/chessPlans6.xml";
-		int numberOfClones=100;	
+		String outputPlansFile="H:/data/experiments/STRC2010/input/plans8.xml.gz";
+		int numberOfClones=1000;	
 		String idOfPersonForCloning="1";
 		
 		// start program
