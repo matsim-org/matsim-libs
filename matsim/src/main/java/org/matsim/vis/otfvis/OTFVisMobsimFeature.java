@@ -42,7 +42,6 @@ import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.qsim.TransitQSimulation;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.MobsimFeature;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
@@ -112,13 +111,13 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature, Sim
 						OTFTeleportAgentsLayer.class);
 
 			}
-			if (queueSimulation instanceof QSim) {
+			if (queueSimulation instanceof TransitQSimulation) {
 				this.otfServer
 						.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
 								queueSimulation.getVisNetwork().getNetwork(),
 								((ScenarioImpl) queueSimulation.getScenario())
 										.getTransitSchedule(),
-								((QSim) queueSimulation)
+								((TransitQSimulation) queueSimulation)
 										.getQSimTransitEngine().getAgentTracker()));
 				this.connectionManager.connectWriterToReader(
 						FacilityDrawer.DataWriter_v1_0.class,
