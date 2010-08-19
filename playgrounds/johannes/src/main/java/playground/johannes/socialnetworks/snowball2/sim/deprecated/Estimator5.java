@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
@@ -29,13 +29,15 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
+import playground.johannes.socialnetworks.snowball2.sim.ProbabilityEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 import playground.johannes.socialnetworks.statistics.Histogram;
 
 /**
  * @author illenberger
  *
  */
-public class Estimator5 implements BiasedDistribution {
+public class Estimator5 implements ProbabilityEstimator {
 
 	private SampleStats stats;
 	
@@ -111,7 +113,7 @@ public class Estimator5 implements BiasedDistribution {
 		}
 	}
 	
-	@Override
+
 	public double getWeight(SampledVertex vertex) {
 		// TODO Auto-generated method stub
 		return 0;

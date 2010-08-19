@@ -59,7 +59,7 @@ public class VertexSamplingCounter implements SamplerListener {
 	
 	private int[] nsim = new int[maxIters];
 	
-	private BiasedDistribution estimator;
+	private ProbabilityEstimator estimator;
 	
 	private static final int maxIters = 40;
 	

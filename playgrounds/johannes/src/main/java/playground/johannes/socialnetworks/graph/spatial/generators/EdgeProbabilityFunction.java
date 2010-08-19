@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PopulationEstimator.java
+ * EdgeProbabilityFunction.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,14 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.graph.spatial.generators;
 
 /**
  * @author illenberger
  *
  */
-public interface PopulationEstimator {
+public interface EdgeProbabilityFunction {
 
-	public double mean(double[] values, double[] weights);
+	public double probability(int i, int j);
 	
 }

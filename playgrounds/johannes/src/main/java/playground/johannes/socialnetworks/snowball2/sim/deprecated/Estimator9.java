@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Estimator2.java
+ * Estimator9.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntDoubleHashMap;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TIntObjectIterator;
+import gnu.trove.TIntIntHashMap;
 
-import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+
+import playground.johannes.socialnetworks.snowball2.sim.ProbabilityEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
 /**
  * @author illenberger
  *
  */
-public class Estimator2 implements BiasedDistribution {
-	
-	private TIntDoubleHashMap kMap;
+public class Estimator9 implements ProbabilityEstimator {
+
+	private TIntIntHashMap numNeighbors;
 	
 	private SampleStats stats;
 	
+	private double C;
+	
 	private final int N;
 	
-	public Estimator2(int N) {
+	public Estimator9(int N) {
 		this.N = N;
 	}
 	
@@ -56,22 +57,13 @@ public class Estimator2 implements BiasedDistribution {
 			int n = stats.getAccumulatedNumSampled(it - 1);
 			return 1 - Math.pow(1 - n/(double)N, k);
 		} else {
-			double k_neighbor = kMap.get(k);
-			double p_neighbor = 1 - Math.pow(1 - stats.getAccumulatedNumSampled(it - 2)/(double)N, k_neighbor);
-			
-			double p_k = 1 - Math.pow(1 - p_neighbor, k);
-			
-			double p = 1;
-			if(vertex.getIterationSampled() == it)
-				p = stats.getNumSampled(it)/(double)stats.getNumDetected(it - 1);
-			
-			return p * p_k;
+			double p_w = C * numNeighbors.get(k) / (double)N;
+			return 1 - Math.pow(1 - p_w, k);
 		}
 	}
 
-	@Override
+	
 	public double getWeight(SampledVertex vertex) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -79,34 +71,25 @@ public class Estimator2 implements BiasedDistribution {
 	public void update(SampledGraph graph) {
 		stats = new SampleStats(graph);
 		
-		TIntObjectHashMap<TIntArrayList> tmp = new TIntObjectHashMap<TIntArrayList>();
-
+		numNeighbors = new TIntIntHashMap();
 		for(Vertex vertex : graph.getVertices()) {
-			if(((SampledVertex)vertex).isSampled()) {
-				int k = vertex.getNeighbours().size();
-				TIntArrayList values = tmp.get(k);
-				if(values == null) {
-					values = new TIntArrayList();
-					tmp.put(k, values);
-				}
+			if(((SampledVertex)vertex).isSampled() && ((SampledVertex)vertex).getIterationSampled() < stats.getMaxIteration()) {
 				for(Vertex neighbor : vertex.getNeighbours()) {
-					if(((SampledVertex)neighbor).isSampled()) {
-						values.add(neighbor.getNeighbours().size());
+					if(((SampledVertex)neighbor).isSampled()) {// && ((SampledVertex)neighbor).getIterationSampled() < stats.getMaxIteration()) {
+						numNeighbors.adjustOrPutValue(neighbor.getNeighbours().size(), 1, 1);
 					}
 				}
 			}
 		}
-
-		kMap = new TIntDoubleHashMap();
-		TIntObjectIterator<TIntArrayList> it = tmp.iterator();
-		for(int i = 0; i < tmp.size(); i++) {
-			it.advance();
-			TIntArrayList list = it.value();
-			double[] dList = new double[list.size()];
-			for(int k = 0; k < list.size(); k++)
-				dList[k] = list.get(k);
-			kMap.put(it.key(), StatUtils.geometricMean(dList));
+		
+		double sum = 0;
+		for(Vertex vertex : graph.getVertices()) {
+			if(((SampledVertex)vertex).isSampled() && ((SampledVertex)vertex).getIterationSampled() < stats.getMaxIteration()) {
+				sum += numNeighbors.get(vertex.getNeighbours().size());
+			}
 		}
+		
+		C = Math.pow(stats.getAccumulatedNumSampled(stats.getMaxIteration() - 1), 2) / sum;
 	}
 
 }

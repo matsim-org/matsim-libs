@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.mz2005;
 
+import geo.google.datamodel.GeoCoordinate;
 import gnu.trove.TObjectIntHashMap;
 
 import java.io.BufferedReader;
@@ -29,8 +30,10 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleLocationLookup;
+import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
+import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleLocationLookup.RequestLimitException;
 
 /**
  * @author illenberger
@@ -40,7 +43,9 @@ public class GeoCoder {
 
 	private static final Logger logger = Logger.getLogger(GeoCoder.class);
 	
-	private static final GoogleLocationLookup googleLookup = new GoogleLocationLookup();
+//	private static final GoogleLocationLookup googleLookup = new GoogleLocationLookup();
+	
+	private static final GoogleGeoCoder googleLookup = new GoogleGeoCoder();
 	
 	/**
 	 * @param args
@@ -51,10 +56,10 @@ public class GeoCoder {
 		/*
 		 * read header
 		 */
-		String line = reader.readLine();
+		String header = reader.readLine();
 		TObjectIntHashMap<String> colIndices = new TObjectIntHashMap<String>();
 		int idx = 0;
-		for(String token : line.split("\t")) {
+		for(String token : header.split("\t")) {
 			colIndices.put(token, idx);
 			idx++;
 		}
@@ -63,8 +68,8 @@ public class GeoCoder {
 		 */
 		BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
 		
-		StringBuilder builder = new StringBuilder(line.length() + 50);
-		builder.append(line);
+		StringBuilder builder = new StringBuilder(header.length() + 50);
+		builder.append(header);
 		builder.append("\t");
 		builder.append("x_start");
 		builder.append("\t");
@@ -82,13 +87,16 @@ public class GeoCoder {
 		logger.info("Starting geo coding...");
 		int lineCount = 0;
 		int invalid = 0;
+		String line;
 		while((line = reader.readLine()) != null) {
 			String[] tokens = line.split("\t");
 			/*
 			 * get coordinates
 			 */
+			try {
 			double[] start = coordinates(tokens, colIndices, "S");
 			double[] dest = coordinates(tokens, colIndices, "Z");
+			
 			/*
 			 * write new line
 			 */
@@ -124,8 +132,26 @@ public class GeoCoder {
 			if(start == null || dest == null)
 				invalid++;
 			
-			if(lineCount % 100 == 0)
+			if(lineCount % 20 == 0)
 				logger.info(String.format("Parsed %1$s lines. %2$s addresses not found.", lineCount, invalid));
+			} catch (RequestLimitException e) {
+				e.printStackTrace();
+				
+				writer.close();
+				
+				BufferedWriter remainingWriter = new BufferedWriter(new FileWriter(args[1] + ".remaining"));
+				remainingWriter.write(header);
+				remainingWriter.newLine();
+				
+				remainingWriter.write(line);
+				remainingWriter.newLine();
+				while((line = reader.readLine()) != null) {
+					remainingWriter.write(line);
+					remainingWriter.newLine();
+				}
+				logger.info("Writing remaining file done.");
+				System.exit(0);
+			}
 		}
 		writer.close();
 		
@@ -152,12 +178,15 @@ public class GeoCoder {
 		builder.append(" ");
 		
 		String query = builder.toString().trim();
-		Coord c;
+		Coord c = null;
 		
 		if(query.isEmpty())
 			c = null;
-		else
-			c = googleLookup.requestCoordinates(builder.toString());
+		else {
+			GeoCoordinate coord = googleLookup.requestCoordinate(builder.toString());
+			if(coord != null)
+				c = new CoordImpl(coord.getLatitude(), coord.getLongitude());
+		}
 		
 		if(c == null) {
 			logger.warn(String.format("No results for query \"%1$s\".", query));

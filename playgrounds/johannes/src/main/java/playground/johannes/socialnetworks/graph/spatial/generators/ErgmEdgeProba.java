@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Estimator8.java
+ * ErgmEdgeProba.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,62 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.graph.spatial.generators;
 
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+
+import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public class Estimator8 implements BiasedDistribution {
+public class ErgmEdgeProba extends ErgmTerm {
 
-	private final int N;
-	
-	private SampleStats stats;
-	
-	public Estimator8(int N) {
-		this.N = N;
-	}
-	
-	@Override
-	public double getProbability(SampledVertex vertex) {
-		int it = stats.getMaxIteration();
-		int k = vertex.getNeighbours().size();
-		
-		if(it == 0) {
-			return stats.getAccumulatedNumSampled(it)/(double)N;
-		} else if(it == 1) {
-			int n = stats.getAccumulatedNumSampled(it - 1);
-			return 1 - Math.pow(1 - n/(double)N, k);
-		} else {
-			double prod = 1;
-			for(int i = 0; i < vertex.getNeighbours().size(); i++) {
-				SampledVertex neighbour = (SampledVertex) vertex.getNeighbours().get(i);
-				double q = 0;
-				if(neighbour.isSampled()) {
-					q = 1 - Math.pow(1 - stats.getAccumulatedNumSampled(it - 2)/(double)N, neighbour.getNeighbours().size());
-				} else {
-					q = stats.getAccumulatedNumSampled(it - 1)/(double)N;
-				}
-				prod *= 1 - q;
-			}
-			
-			return 1 - prod;
-		}
+	private final EdgeProbabilityFunction probaFunction;
+
+	public ErgmEdgeProba(EdgeProbabilityFunction function) {
+		probaFunction = function;
 	}
 
 	@Override
-	public double getWeight(SampledVertex vertex) {
-		// TODO Auto-generated method stub
-		return 0;
+	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+		double p = probaFunction.probability(i, j);
+
+		return (1 - p) / p;
 	}
-
-	@Override
-	public void update(SampledGraph graph) {
-		stats = new SampleStats(graph);
-
-	}
-
 }

@@ -39,7 +39,7 @@ import playground.johannes.socialnetworks.statistics.FixedSampleSizeDiscretizer;
  * @author illenberger
  *
  */
-public class Estimator11 implements BiasedDistribution {
+public class Estimator11 implements ProbabilityEstimator {
 
 	private SampleStats stats;
 
@@ -198,11 +198,6 @@ public class Estimator11 implements BiasedDistribution {
 //		int bin = (int) Math.floor(Math.log(k)/Math.log(2.0));
 //		return Math.max(bin, 0);
 		return (int) discretizer.discretize(k);
-	}
-
-	@Override
-	public double getWeight(SampledVertex vertex) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override

@@ -43,6 +43,8 @@ import playground.johannes.socialnetworks.snowball2.analysis.EstimatedTransitivi
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedTransitivity;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
+import playground.johannes.socialnetworks.snowball2.sim.deprecated.HTEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.deprecated.PopulationEstimator;
 
 /**
  * @author illenberger
@@ -91,12 +93,16 @@ public class Loader {
 		final int N = graph.getVertices().size();
 		final int M = graph.getEdges().size();
 		Map<String, EstimatorSet> estimators = new HashMap<String, EstimatorSet>();
-		Set<BiasedDistribution> estimatorSet = new HashSet<BiasedDistribution>();
+		Set<ProbabilityEstimator> estimatorSet = new HashSet<ProbabilityEstimator>();
 		
-//		BiasedDistribution estim1 = new Estimator1(N);
-//		estimatorSet.add(estim1);
-//		estimators.put("estim1a", new EstimatorSet(estim1, null, null));
-//		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
+		ProbabilityEstimator estim1 = new Estimator1(N);
+		ProbabilityEstimator estim1Norm = new NormalizedEstimator(estim1, N);
+		estimatorSet.add(estim1);
+		estimatorSet.add(estim1Norm);
+		estimators.put("estim1a", new EstimatorSet(estim1, null, null));
+		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
+		estimators.put("estim1c", new EstimatorSet(estim1Norm, null, null));
+		estimators.put("estim1d", new EstimatorSet(estim1Norm, new HTEstimator(N), new HTEstimator(M)));
 		
 //		BiasedDistribution estim2 = new Estimator2(N);
 //		estimatorSet.add(estim2);
@@ -143,10 +149,10 @@ public class Loader {
 //		estimators.put("estim10a", new EstimatorSet(estim10, null, null));
 //		estimators.put("estim10b", new EstimatorSet(estim10, new HTEstimator(N), new HTEstimator(M)));
 		
-		BiasedDistribution estim11 = new Estimator11(N);
-		estimatorSet.add(estim11);
-		estimators.put("estim11a", new EstimatorSet(estim11, null, null));
-		estimators.put("estim11b", new EstimatorSet(estim11, new HTEstimator(N), new HTEstimator(M)));
+//		BiasedDistribution estim11 = new Estimator11(N);
+//		estimatorSet.add(estim11);
+//		estimators.put("estim11a", new EstimatorSet(estim11, null, null));
+//		estimators.put("estim11b", new EstimatorSet(estim11, new HTEstimator(N), new HTEstimator(M)));
 		/*
 		 * Load analyzers.
 		 */
@@ -231,7 +237,7 @@ public class Loader {
 		for(Entry<String, EstimatorSet> entry : estimators.entrySet()) {
 			tasks = new AnalyzerTaskComposite();
 			
-			BiasedDistribution biasdDistr = entry.getValue().distribution;
+			ProbabilityEstimator biasdDistr = entry.getValue().distribution;
 			PopulationEstimator estimator = entry.getValue().vertexEstimator;
 			PopulationEstimator edgeEstimator = entry.getValue().edgeEstimator;
 			
@@ -255,13 +261,13 @@ public class Loader {
 	
 	private static class EstimatorSet {
 		
-		private BiasedDistribution distribution;
+		private ProbabilityEstimator distribution;
 		
 		private PopulationEstimator vertexEstimator;
 		
 		private PopulationEstimator edgeEstimator;
 		
-		public EstimatorSet(BiasedDistribution distribution, PopulationEstimator vertexEstimator, PopulationEstimator edgeEstimator) {
+		public EstimatorSet(ProbabilityEstimator distribution, PopulationEstimator vertexEstimator, PopulationEstimator edgeEstimator) {
 			this.distribution = distribution;
 			this.vertexEstimator = vertexEstimator;
 			this.edgeEstimator = edgeEstimator;

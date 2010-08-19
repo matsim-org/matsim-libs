@@ -23,6 +23,7 @@ import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
+import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -50,6 +51,17 @@ public class Age {
 		}
 		
 		return distr;
+	}
+	
+	public TObjectDoubleHashMap<SocialVertex> values(Set<? extends SocialVertex> vertices) {
+		TObjectDoubleHashMap<SocialVertex> values = new TObjectDoubleHashMap<SocialVertex>();
+		for(SocialVertex vertex : vertices) {
+			int age = vertex.getPerson().getAge();
+			if(age > -1)
+				values.put(vertex, age);
+		}
+		
+		return values;
 	}
 	
 	public TDoubleDoubleHashMap correlation(Set<? extends SocialVertex> vertices) {

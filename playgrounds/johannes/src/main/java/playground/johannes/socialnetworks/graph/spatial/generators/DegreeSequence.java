@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IterationSampleAnalyzer.java
+ * DegreeSequence.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,48 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.graph.spatial.generators;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.Map;
-
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger
  *
  */
-public class IterationSampleAnalyzer extends SampleAnalyzer {
+public class DegreeSequence implements EdgeProbabilityFunction {
 
-	private int lastIteration;
-
-	public IterationSampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<ProbabilityEstimator> estimators, String output) {
-		super(tasks, estimators, output);
-		lastIteration = 0;
-	}
+	private final int N;
 	
-	@Override
-	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
-		return true;
-	}
-
-	@Override
-	public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
-		if(sampler.getIteration() > lastIteration) {
-			File file = makeDirectories(String.format("%1$s/it.%2$s", getRootDirectory(), lastIteration));
-			analyse(sampler.getSampledGraph(), file.getAbsolutePath());
-			lastIteration = sampler.getIteration();
-		}
+	private final int[] kSequence;
+	
+	public DegreeSequence(AdjacencyMatrix<?> y) {
+		N = y.getVertexCount();
 		
-		return true;
-	}
-
-	@Override
-	public void endSampling(Sampler<?, ?, ?> sampler) {
+		kSequence = new int[N];
+		for(int i = 0; i < N; i++)
+			kSequence[i] = y.getNeighborCount(i);
 	}
 	
+	@Override
+	public double probability(int i, int j) {
+		return kSequence[i]/(double)N;
+	}
 
 }

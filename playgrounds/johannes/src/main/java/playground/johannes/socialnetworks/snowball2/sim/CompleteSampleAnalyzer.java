@@ -36,7 +36,7 @@ public class CompleteSampleAnalyzer extends SampleAnalyzer {
 
 //	private int numVertex;
 	
-	public CompleteSampleAnalyzer(Graph graph, Map<String, AnalyzerTask> tasks, Collection<BiasedDistribution> estimators, String output) {
+	public CompleteSampleAnalyzer(Graph graph, Map<String, AnalyzerTask> tasks, Collection<ProbabilityEstimator> estimators, String output) {
 		super(tasks, estimators, output);
 //		numVertex = graph.getVertices().size();
 	}

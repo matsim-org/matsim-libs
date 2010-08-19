@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnowballEstimator.java
+ * Estimator8.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,72 +17,65 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
+import playground.johannes.socialnetworks.snowball2.sim.ProbabilityEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
+
 /**
- * Estimates the inclusion probability of a vertex based on its degree and the
- * number of sampled vertices. <br>
- * p_i = 1 - (1 - (n^{(it - 1)} / N))^{k_i}
- * 
  * @author illenberger
- * 
+ *
  */
-public class Estimator1 implements ProbabilityEstimator {
+public class Estimator8 implements ProbabilityEstimator {
 
 	private final int N;
-
+	
 	private SampleStats stats;
-
-	/**
-	 * Creates a new estimator.
-	 * 
-	 * @param N
-	 *            the total population of vertices.
-	 */
-	public Estimator1(int N) {
+	
+	public Estimator8(int N) {
 		this.N = N;
 	}
-
-	/**
-	 * @see {@link ProbabilityEstimator#update(SampledGraph)}
-	 */
-	public void update(SampledGraph graph) {
-		stats = new SampleStats(graph);
-	}
-
-	/**
-	 * Estimates the inclusion probability of a vertex based on its degree and
-	 * the number of vertices sampled.
-	 * 
-	 * @param vertex
-	 *            a sampled vertex
-	 */
+	
+	@Override
 	public double getProbability(SampledVertex vertex) {
 		int it = stats.getMaxIteration();
+		int k = vertex.getNeighbours().size();
 		
-		if (it == 0)
-			/*
-			 * In the 0th iteration we have random sampling.
-			 */
-			return stats.getNumSampled(0) / (double) N;
-		
-		else {
+		if(it == 0) {
+			return stats.getAccumulatedNumSampled(it)/(double)N;
+		} else if(it == 1) {
 			int n = stats.getAccumulatedNumSampled(it - 1);
-			/*
-			 * inclusion probability
-			 */
-			double p_k = 1 - Math.pow(1 - n / (double) N, vertex.getNeighbours().size());
-			/*
-			 * response rate
-			 */
-			double p = 1;
-			if (vertex.getIterationSampled() == it)
-				p = stats.getNumSampled(it) / ((double) stats.getNumDetected(it - 1) * stats.getResonseRate());
+			return 1 - Math.pow(1 - n/(double)N, k);
+		} else {
+			double prod = 1;
+			for(int i = 0; i < vertex.getNeighbours().size(); i++) {
+				SampledVertex neighbour = (SampledVertex) vertex.getNeighbours().get(i);
+				double q = 0;
+				if(neighbour.isSampled()) {
+					q = 1 - Math.pow(1 - stats.getAccumulatedNumSampled(it - 2)/(double)N, neighbour.getNeighbours().size());
+				} else {
+					q = stats.getAccumulatedNumSampled(it - 1)/(double)N;
+				}
+				prod *= 1 - q;
+			}
 			
-			return p * p_k;
+			return 1 - prod;
 		}
 	}
+
+	
+	public double getWeight(SampledVertex vertex) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void update(SampledGraph graph) {
+		stats = new SampleStats(graph);
+
+	}
+
 }

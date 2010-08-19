@@ -59,7 +59,7 @@ public class GoogleLocationLookup {
 	
 	private int interval = 100;
 	
-	public Coord requestCoordinates(String query) {
+	public Coord requestCoordinates(String query) throws RequestLimitException {
 		try {
 			Thread.sleep(interval);
 		} catch (InterruptedException e1) {
@@ -70,8 +70,9 @@ public class GoogleLocationLookup {
 		if (getLastErrorCode() == 620) {
 			while (getLastErrorCode() == 620) {
 				if (interval > 5000) {
-					logger.warn("Lookup interval is 5 secs. Seems we reached the request limit!");
-					System.exit(-1);
+					throw new RequestLimitException("Lookup interval is 5 secs. Seems we reached the request limit!");
+//					logger.warn("Lookup interval is 5 secs. Seems we reached the request limit!");
+//					System.exit(-1);
 				}
 				logger.warn(String.format("Increasing lookup interval, now %1$s msecs.", interval));
 				interval += 100;
@@ -185,6 +186,26 @@ public class GoogleLocationLookup {
 			if(buffer != null)
 				buffer.append(ch, start, length);
 		}
+	}
+	
+	public static final class RequestLimitException extends RuntimeException {
+
+		/**
+		 * 
+		 */
+		public RequestLimitException() {
+			super();
+			// TODO Auto-generated constructor stub
+		}
+
+		/**
+		 * @param message
+		 */
+		public RequestLimitException(String message) {
+			super(message);
+			// TODO Auto-generated constructor stub
+		}
+		
 	}
 	
 	public static void main(String args[]) throws UnsupportedEncodingException {

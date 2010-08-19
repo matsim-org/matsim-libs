@@ -39,7 +39,7 @@ public class IntervalSampleAnalyzer extends SampleAnalyzer {
 //	
 //	private boolean dump;
 	
-	public IntervalSampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<BiasedDistribution> estimators, String output) {
+	public IntervalSampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<ProbabilityEstimator> estimators, String output) {
 		super(tasks, estimators, output);
 //		this.base = interval;
 	}

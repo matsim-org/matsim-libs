@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Estimator.java
+ * HTEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,24 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger
- *
+ * @deprecated
  */
-public interface BiasedDistribution {
+public class HTEstimator implements PopulationEstimator {
 
-	public void update(SampledGraph graph);
+	private final int N;
 	
-	public double getProbability(SampledVertex vertex);
+	public HTEstimator(int N) {
+		this.N = N;
+	}
 	
-	/**
-	 * @deprecated
-	 * 
-	 */
-	public double getWeight(SampledVertex vertex);
+	@Override
+	public double mean(double[] values, double[] weights) {
+		double sum = 0;
+		for(int i = 0; i < values.length; i++) {
+			sum += values[i] * weights[i];
+		}
+		return sum/(double)N;
+	}
+
 }

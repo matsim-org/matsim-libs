@@ -21,7 +21,7 @@ package playground.johannes.socialnetworks.statistics;
 
 import org.matsim.contrib.sna.math.Distribution;
 
-import playground.johannes.socialnetworks.snowball2.sim.PopulationEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.deprecated.PopulationEstimator;
 
 /**
  * @author illenberger

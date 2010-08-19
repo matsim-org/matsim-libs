@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityLoadCurve.java
+ * LegDistanceAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,12 +21,9 @@ package playground.johannes.socialnetworks.sim.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,63 +31,51 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.xml.sax.SAXException;
 
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
-
 /**
  * @author illenberger
- *
+ * 
  */
-public class ActivityLoadCurve {
+public class LegDistanceAnalyzer {
 
-	private Discretizer discretizer = new LinearDiscretizer(3600);
-	
-	public Map<String, TDoubleDoubleHashMap> makeLoadCurve(Set<Plan> plans) {
+	public static Map<String, TDoubleDoubleHashMap> analyze(Population population) {
 		Map<String, TDoubleDoubleHashMap> map = new HashMap<String, TDoubleDoubleHashMap>();
 
-		for (Plan plan : plans) {
-			if(plan.getPlanElements().size() > 0) {
-				for(int i = 0; i < plan.getPlanElements().size(); i+=2) {
-					Activity element = (Activity) plan.getPlanElements().get(i);
-					String type = element.getType().substring(0, 1);
-					
-					double start = 0;
-					if(!Double.isNaN(element.getStartTime()) && !Double.isInfinite(element.getStartTime()))
-						start = discretizer.discretize(element.getStartTime());
-					
-					double end = 24;
-					if(!Double.isNaN(element.getEndTime()) && !Double.isInfinite(element.getEndTime()))
-						end = discretizer.discretize((element).getEndTime());
+		for (Person person : population.getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			if (plan.getPlanElements().size() > 1) {
+				for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
+					Route route = ((Leg) plan.getPlanElements().get(i)).getRoute();
+					if (route != null) {
+//						double dist = route.getDistance();
+						double dist = route.getTravelTime();
+						String type = ((Activity) plan.getPlanElements().get(i + 1)).getType();//.substring(0, 1);
 
-					start = Math.min(start, end);
-					
-					TDoubleDoubleHashMap hist = map.get(type);
-					if (hist == null) {
-						hist = new TDoubleDoubleHashMap();
-						map.put(type, hist);
+						TDoubleDoubleHashMap hist = map.get(type);
+						if (hist == null) {
+							hist = new TDoubleDoubleHashMap();
+							map.put(type, hist);
+						}
+
+						hist.adjustOrPutValue(Math.ceil(dist / 300.0)*5, 1, 1);
 					}
-
-					
-					
-					for (int t = (int)start; t <= end; t++) {
-						hist.adjustOrPutValue(t, 1, 1);
-					}
-
 				}
 			}
 		}
-
+		
 		return map;
 	}
 	
-	public static void main(String args[]) throws FileNotFoundException, IOException, SAXException, ParserConfigurationException {
+	public static void main(String args[]) throws SAXException, ParserConfigurationException, IOException {
 		Scenario scenario = new ScenarioImpl();
 //		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
 //		netReader.parse("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml");
@@ -98,19 +83,13 @@ public class ActivityLoadCurve {
 //		reader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/plans/plans_miv_zrh30km_transitincl_10pct.xml");
 		reader.readFile("/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/rawdata/plans.xml");
 		
-		Set<Plan> plans = new HashSet<Plan>();
-		for(Person person : scenario.getPopulation().getPersons().values()) {
-//			if(Math.random() < 0.1)
-				plans.add(person.getSelectedPlan());
-		}
-		
-		ActivityLoadCurve loadCurve = new ActivityLoadCurve();
-		Map<String, TDoubleDoubleHashMap> map = loadCurve.makeLoadCurve(plans);
+		Population population = scenario.getPopulation();
+		Map<String , TDoubleDoubleHashMap> map = analyze(population);
 		
 		Distribution distr = new Distribution();
 		for(Entry<String, TDoubleDoubleHashMap> entry : map.entrySet()) {
 			
-			Distribution.writeHistogram(distr.normalizedDistribution(entry.getValue()), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/analysis/compareWithSim/actload/" + entry.getKey() + ".ref.txt");
+			Distribution.writeHistogram(distr.normalizedDistribution(entry.getValue()), "/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/analysis/" + entry.getKey() + ".tt.ref.txt");
 		}
 	}
 }

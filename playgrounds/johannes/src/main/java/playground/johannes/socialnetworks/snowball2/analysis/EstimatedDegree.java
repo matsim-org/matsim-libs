@@ -32,8 +32,8 @@ import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
-import playground.johannes.socialnetworks.snowball2.sim.BiasedDistribution;
-import playground.johannes.socialnetworks.snowball2.sim.PopulationEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.ProbabilityEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.deprecated.PopulationEstimator;
 import playground.johannes.socialnetworks.statistics.EstimatedDistribution;
 
 /**
@@ -42,13 +42,13 @@ import playground.johannes.socialnetworks.statistics.EstimatedDistribution;
  */
 public class EstimatedDegree extends Degree {
 
-	private BiasedDistribution biasedDistribution;
+	private ProbabilityEstimator biasedDistribution;
 	
 	private PopulationEstimator vertexEstimator;
 	
 	private PopulationEstimator edgeEstimator;
 	
-	public EstimatedDegree(BiasedDistribution estimator, PopulationEstimator vertexEstimator, PopulationEstimator edgeEstimator) {
+	public EstimatedDegree(ProbabilityEstimator estimator, PopulationEstimator vertexEstimator, PopulationEstimator edgeEstimator) {
 		this.biasedDistribution = estimator;
 		this.vertexEstimator = vertexEstimator;
 		this.edgeEstimator = edgeEstimator;

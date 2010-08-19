@@ -52,7 +52,7 @@ public class ConnectionSampleAnalyzer extends SampleAnalyzer {
 	
 	private Components components;
 		
-	public ConnectionSampleAnalyzer(int numSeeds, Map<String, AnalyzerTask> tasks, Collection<BiasedDistribution> estimators, String rootDirectory) {
+	public ConnectionSampleAnalyzer(int numSeeds, Map<String, AnalyzerTask> tasks, Collection<ProbabilityEstimator> estimators, String rootDirectory) {
 		super(tasks, estimators, rootDirectory);
 		matrix = new boolean[numSeeds][numSeeds];
 		try {

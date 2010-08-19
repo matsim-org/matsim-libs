@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IterationSampleAnalyzer.java
+ * PopulationEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,48 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.Map;
-
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
+package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
 /**
  * @author illenberger
- *
+ * @deprecated
  */
-public class IterationSampleAnalyzer extends SampleAnalyzer {
+public interface PopulationEstimator {
 
-	private int lastIteration;
-
-	public IterationSampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<ProbabilityEstimator> estimators, String output) {
-		super(tasks, estimators, output);
-		lastIteration = 0;
-	}
+	public double mean(double[] values, double[] weights);
 	
-	@Override
-	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
-		return true;
-	}
-
-	@Override
-	public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
-		if(sampler.getIteration() > lastIteration) {
-			File file = makeDirectories(String.format("%1$s/it.%2$s", getRootDirectory(), lastIteration));
-			analyse(sampler.getSampledGraph(), file.getAbsolutePath());
-			lastIteration = sampler.getIteration();
-		}
-		
-		return true;
-	}
-
-	@Override
-	public void endSampling(Sampler<?, ?, ?> sampler) {
-	}
-	
-
 }

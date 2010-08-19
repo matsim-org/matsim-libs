@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Estimator9.java
+ * SnowballEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,76 +17,71 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
-import gnu.trove.TIntIntHashMap;
+import gnu.trove.TObjectDoubleHashMap;
 
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
+import playground.johannes.socialnetworks.snowball2.sim.ProbabilityEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
+
 /**
  * @author illenberger
  *
  */
-public class Estimator9 implements BiasedDistribution {
+public class Estimator10 implements ProbabilityEstimator {
 
-	private TIntIntHashMap numNeighbors;
+	private final int N;
 	
 	private SampleStats stats;
 	
-	private double C;
+	private TObjectDoubleHashMap<SampledVertex> probas;
 	
-	private final int N;
+	private double c;
 	
-	public Estimator9(int N) {
+	public Estimator10(int N) {
 		this.N = N;
 	}
 	
-	@Override
-	public double getProbability(SampledVertex vertex) {
-		int it = stats.getMaxIteration();
-		int k = vertex.getNeighbours().size();
-		
-		if(it == 0) {
-			return stats.getAccumulatedNumSampled(it)/(double)N;
-		} else if(it == 1) {
-			int n = stats.getAccumulatedNumSampled(it - 1);
-			return 1 - Math.pow(1 - n/(double)N, k);
-		} else {
-			double p_w = C * numNeighbors.get(k) / (double)N;
-			return 1 - Math.pow(1 - p_w, k);
-		}
-	}
-
-	@Override
-	public double getWeight(SampledVertex vertex) {
-		return 0;
-	}
-
-	@Override
 	public void update(SampledGraph graph) {
 		stats = new SampleStats(graph);
+		probas = new TObjectDoubleHashMap<SampledVertex>();
 		
-		numNeighbors = new TIntIntHashMap();
+		double p_sum = 0;
 		for(Vertex vertex : graph.getVertices()) {
-			if(((SampledVertex)vertex).isSampled() && ((SampledVertex)vertex).getIterationSampled() < stats.getMaxIteration()) {
-				for(Vertex neighbor : vertex.getNeighbours()) {
-					if(((SampledVertex)neighbor).isSampled()) {// && ((SampledVertex)neighbor).getIterationSampled() < stats.getMaxIteration()) {
-						numNeighbors.adjustOrPutValue(neighbor.getNeighbours().size(), 1, 1);
-					}
-				}
+			SampledVertex v = (SampledVertex)vertex;
+			if(v.isSampled()) {
+				double p = getProbabilityIntern(v);
+				probas.put(v, p);
+				p_sum += 1/p;
 			}
 		}
 		
-		double sum = 0;
-		for(Vertex vertex : graph.getVertices()) {
-			if(((SampledVertex)vertex).isSampled() && ((SampledVertex)vertex).getIterationSampled() < stats.getMaxIteration()) {
-				sum += numNeighbors.get(vertex.getNeighbours().size());
-			}
+		c = N/p_sum;
+	}
+	
+	public double getProbabilityIntern(SampledVertex vertex) {
+		int it = stats.getMaxIteration();
+		if(it == 0)
+			return stats.getNumSampled(0)/(double)N;
+		else {
+			int n = stats.getAccumulatedNumSampled(it - 1);
+			double p_k = 1 - Math.pow(1 - n/(double)N, vertex.getNeighbours().size());
+			double p = 1;
+//			if(vertex.getIterationSampled() == it)
+//				p = stats.getNumSampled(it)/((double)stats.getNumDetected(it - 1) * stats.getResonseRate());
+			return p * p_k;
 		}
-		
-		C = Math.pow(stats.getAccumulatedNumSampled(stats.getMaxIteration() - 1), 2) / sum;
 	}
 
+	/* (non-Javadoc)
+	 * @see playground.johannes.socialnetworks.snowball2.sim.BiasedDistribution#getProbability(org.matsim.contrib.sna.snowball.SampledVertex)
+	 */
+	@Override
+	public double getProbability(SampledVertex vertex) {
+		return probas.get(vertex);
+	}
 }

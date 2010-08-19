@@ -20,12 +20,14 @@
 package playground.johannes.socialnetworks.survey.mz2005;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
@@ -33,11 +35,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -60,6 +64,7 @@ public class PopulationGenerator {
 		 * create the first home activity
 		 */
 		ActivityImpl act = new ActivityImpl(ActivityType.home.name(), new CoordImpl(0, 0));
+		act.setStartTime(0);
 		act.setCoord(null);
 		plan.addActivity(act);
 		/*
@@ -77,7 +82,20 @@ public class PopulationGenerator {
 			 * create leg
 			 */
 			LegImpl leg = new LegImpl(trip.aggrMode.name());
+//			leg.setTravelTime(trip.duration * 60);
 			plan.addLeg(leg);
+			/*
+			 * create route
+			 */
+			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(null, null);
+			if(trip.distance != -99)
+				route.setDistance(trip.distance * 1000);
+			
+			if(trip.duration != -99)
+				route.setTravelTime(trip.duration * 60);
+			
+			route.setLinkIds(new IdImpl(0), new ArrayList<Id>(0), new IdImpl(0));
+			leg.setRoute(route);
 			/*
 			 * create next activity
 			 */
@@ -152,8 +170,10 @@ public class PopulationGenerator {
 						return result;
 				}
 			});
-			Person p = generator.createPerson(pContainer.trips);
-			pop.addPerson(p);
+				if (pContainer.referenceDay < 6) {
+					Person p = generator.createPerson(pContainer.trips);
+					pop.addPerson(p);
+				}
 			}
 		}
 		

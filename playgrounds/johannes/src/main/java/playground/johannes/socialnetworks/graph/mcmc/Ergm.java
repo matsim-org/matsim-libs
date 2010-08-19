@@ -54,8 +54,8 @@ public class Ergm extends Composite<GraphProbability> implements GraphProbabilit
 		for(int k = 0; k < components.size(); k++)
 			prod *= components.get(k).difference(y, i, j, y_ij);
 		
-		if(Double.isInfinite(prod))
-			throw new IllegalArgumentException("H(y) must not be infinity!");
+//		if(Double.isInfinite(prod))
+//			throw new IllegalArgumentException("H(y) must not be infinity!");
 		if(Double.isNaN(prod))
 			throw new IllegalArgumentException("H(y) must not be NaN!");
 		

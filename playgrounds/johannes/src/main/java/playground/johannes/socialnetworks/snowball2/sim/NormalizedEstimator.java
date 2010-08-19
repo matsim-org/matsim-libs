@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnowballEstimator.java
+ * NormalizedEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,71 +19,69 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
+ * This estimator normalizes the estimates from a delegate estimator such that
+ * <code>\sum_i{1/p_i} = N</code>.
+ * 
  * @author illenberger
- *
+ * 
  */
-public class Estimator10 implements BiasedDistribution {
+public class NormalizedEstimator implements ProbabilityEstimator {
 
-	private final int N;
-	
-	private SampleStats stats;
-	
-	private TObjectDoubleHashMap<SampledVertex> probas;
-	
-	private double c;
-	
-	public Estimator10(int N) {
+	private ProbabilityEstimator delegate;
+
+	private final double N;
+
+	private double konst;
+
+	/**
+	 * Creates a new estimator.
+	 * 
+	 * @param delegate
+	 *            a delegate estimator
+	 * @param N
+	 *            the size of the total population of vertices
+	 */
+	public NormalizedEstimator(ProbabilityEstimator delegate, int N) {
+		this.delegate = delegate;
 		this.N = N;
 	}
-	
-	public void update(SampledGraph graph) {
-		stats = new SampleStats(graph);
-		probas = new TObjectDoubleHashMap<SampledVertex>();
-		
-		double p_sum = 0;
-		for(Vertex vertex : graph.getVertices()) {
-			SampledVertex v = (SampledVertex)vertex;
-			if(v.isSampled()) {
-				double p = getProbabilityIntern(v);
-				probas.put(v, p);
-				p_sum += 1/p;
-			}
-		}
-		
-		c = N/p_sum;
-	}
-	
-	public double getProbabilityIntern(SampledVertex vertex) {
-		int it = stats.getMaxIteration();
-		if(it == 0)
-			return stats.getNumSampled(0)/(double)N;
-		else {
-			int n = stats.getAccumulatedNumSampled(it - 1);
-			double p_k = 1 - Math.pow(1 - n/(double)N, vertex.getNeighbours().size());
-			double p = 1;
-//			if(vertex.getIterationSampled() == it)
-//				p = stats.getNumSampled(it)/((double)stats.getNumDetected(it - 1) * stats.getResonseRate());
-			return p * p_k;
-		}
-	}
-	
-	@Override
-	public double getWeight(SampledVertex vertex) {
-		return 1 / getProbability(vertex) * c;
-	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.socialnetworks.snowball2.sim.BiasedDistribution#getProbability(org.matsim.contrib.sna.snowball.SampledVertex)
+	/**
+	 * Returns the estimate of the delegate estimator multiplied with
+	 * <code>\sum_i{1/p_i} / N</code>.
+	 * 
+	 * @param vertex
+	 *            a sampled vertex
+	 * @return the estimate of the delegate estimator multiplied with
+	 *         <code>\sum_i{1/p_i} / N</code>.
 	 */
 	@Override
 	public double getProbability(SampledVertex vertex) {
-		return probas.get(vertex);
+		return konst * delegate.getProbability(vertex);
 	}
+
+	/**
+	 * Updates the delegate estaimtor and calculates the normalization constant.
+	 * 
+	 * @param graph
+	 *            a sampled graph
+	 */
+	@Override
+	public void update(SampledGraph graph) {
+		delegate.update(graph);
+
+		double sum = 0;
+		for (SampledVertex vertex : graph.getVertices()) {
+			if (vertex.isSampled()) {
+				sum += 1 / delegate.getProbability(vertex);
+			}
+		}
+
+		konst = sum / (double) N;
+	}
+
 }

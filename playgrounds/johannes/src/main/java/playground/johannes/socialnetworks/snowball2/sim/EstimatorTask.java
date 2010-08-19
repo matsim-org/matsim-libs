@@ -20,6 +20,8 @@
 package playground.johannes.socialnetworks.snowball2.sim;
 
 import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.TIntDoubleIterator;
+import gnu.trove.TIntIntHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -39,30 +41,34 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
  */
 public class EstimatorTask extends AnalyzerTask {
 
-	private final BiasedDistribution estimator;
+	private final ProbabilityEstimator estimator;
 	
-	public EstimatorTask(BiasedDistribution estimator) {
+	public EstimatorTask(ProbabilityEstimator estimator) {
 		this.estimator = estimator;
 	}
 	
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
-		TIntDoubleHashMap probas = new TIntDoubleHashMap();
-		
-		double p_sum = 0;
-		int n = 0;
+		TIntDoubleHashMap probas = new TIntDoubleHashMap(graph.getVertices().size());
+		TIntIntHashMap counts = new TIntIntHashMap(graph.getVertices().size());
+				
 		for(Vertex vertex : graph.getVertices()) {
 			if(((SampledVertex)vertex).isSampled()) {
 				int k = vertex.getNeighbours().size();
 				double p = estimator.getProbability((SampledVertex) vertex);
-				probas.put(k, p);
-				p_sum += 1/p;
-				n++;
-//				p_sum += estimator.getWeight((SampledVertex) vertex);
+
+				probas.adjustOrPutValue(k, p, p);
+				counts.adjustOrPutValue(k, 1, 1);
 			}
 		}
-		System.out.println("Const = " + 36458.0/p_sum);
-		writeValues(probas, "proba");	
+
+		TIntDoubleIterator it = probas.iterator();
+		for(int i = 0; i < probas.size(); i++) {
+			it.advance();
+			it.setValue(it.value() / counts.get(it.key()));
+		}
+		
+		writeValues(probas, "proba");
 	}
 
 	private void writeValues(TIntDoubleHashMap values, String valName) {

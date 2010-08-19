@@ -31,8 +31,8 @@ import org.matsim.contrib.sna.graph.analysis.Transitivity;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
-import playground.johannes.socialnetworks.snowball2.sim.BiasedDistribution;
-import playground.johannes.socialnetworks.snowball2.sim.PopulationEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.ProbabilityEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.deprecated.PopulationEstimator;
 import playground.johannes.socialnetworks.statistics.EstimatedDistribution;
 
 /**
@@ -41,7 +41,7 @@ import playground.johannes.socialnetworks.statistics.EstimatedDistribution;
  */
 public class EstimatedTransitivity extends Transitivity {
 
-	private final BiasedDistribution biasedDistribution;
+	private final ProbabilityEstimator biasedDistribution;
 	
 	private final PopulationEstimator estimator;
 	
@@ -51,7 +51,7 @@ public class EstimatedTransitivity extends Transitivity {
 	
 	private static TObjectDoubleHashMap<SampledVertex> cachedValues;
 	
-	public EstimatedTransitivity(BiasedDistribution biasedDistr, PopulationEstimator estimator) {
+	public EstimatedTransitivity(ProbabilityEstimator biasedDistr, PopulationEstimator estimator) {
 		this.biasedDistribution = biasedDistr;
 		this.estimator = estimator;
 	}

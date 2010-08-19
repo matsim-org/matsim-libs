@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Estimator4.java
+ * Estimator2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,22 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.TIntObjectHashMap;
+import gnu.trove.TIntObjectIterator;
+
+import org.apache.commons.math.stat.StatUtils;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+
+import playground.johannes.socialnetworks.snowball2.sim.ProbabilityEstimator;
+import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
 /**
  * @author illenberger
  *
  */
-public class Estimator4 implements BiasedDistribution {
-
-	private final int N;
+public class Estimator2 implements ProbabilityEstimator {
+	
+	private TIntDoubleHashMap kMap;
 	
 	private SampleStats stats;
 	
-	public Estimator4(int N) {
+	private final int N;
+	
+	public Estimator2(int N) {
 		this.N = N;
 	}
 	
@@ -47,50 +59,53 @@ public class Estimator4 implements BiasedDistribution {
 			int n = stats.getAccumulatedNumSampled(it - 1);
 			return 1 - Math.pow(1 - n/(double)N, k);
 		} else {
-			double prod = 1;
-			for(int i = 0; i <= it; i++)
-				prod *= (1 - getIterationProbability(vertex, i));
+			double k_neighbor = kMap.get(k);
+			double p_neighbor = 1 - Math.pow(1 - stats.getAccumulatedNumSampled(it - 2)/(double)N, k_neighbor);
 			
-			double p_k = 1 - prod;
+			double p_k = 1 - Math.pow(1 - p_neighbor, k);
 			
 			double p = 1;
 			if(vertex.getIterationSampled() == it)
 				p = stats.getNumSampled(it)/(double)stats.getNumDetected(it - 1);
 			
-			return p * p_k; 
+			return p * p_k;
 		}
 	}
 
-	private double getIterationProbability(SampledVertex vertex, int it) {
-		if(it == 0) {
-			return stats.getAccumulatedNumSampled(it)/(double)N;
-		} else if(it == 1) {
-			int n = stats.getAccumulatedNumSampled(it - 1);
-			return 1 - Math.pow(1 - n/(double)N, vertex.getNeighbours().size());
-		} else {
-			int n_i = stats.getNumSampled(it - 1);
-			int N_i = N - (stats.getAccumulatedNumSampled(it - 2) + stats.getNumSampled(it));
-			
-			return 1 - Math.pow(1 - n_i/(double)N_i, vertex.getNeighbours().size());
-		}
-		
-	}
-	/* (non-Javadoc)
-	 * @see playground.johannes.socialnetworks.snowball2.sim.BiasedDistribution#getWeight(org.matsim.contrib.sna.snowball.SampledVertex)
-	 */
-	@Override
-	public double getWeight(SampledVertex vertex) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.socialnetworks.snowball2.sim.BiasedDistribution#update(org.matsim.contrib.sna.snowball.SampledGraph)
-	 */
+
 	@Override
 	public void update(SampledGraph graph) {
 		stats = new SampleStats(graph);
+		
+		TIntObjectHashMap<TIntArrayList> tmp = new TIntObjectHashMap<TIntArrayList>();
 
+		for(Vertex vertex : graph.getVertices()) {
+			if(((SampledVertex)vertex).isSampled()) {
+				int k = vertex.getNeighbours().size();
+				TIntArrayList values = tmp.get(k);
+				if(values == null) {
+					values = new TIntArrayList();
+					tmp.put(k, values);
+				}
+				for(Vertex neighbor : vertex.getNeighbours()) {
+					if(((SampledVertex)neighbor).isSampled()) {
+						values.add(neighbor.getNeighbours().size());
+					}
+				}
+			}
+		}
+
+		kMap = new TIntDoubleHashMap();
+		TIntObjectIterator<TIntArrayList> it = tmp.iterator();
+		for(int i = 0; i < tmp.size(); i++) {
+			it.advance();
+			TIntArrayList list = it.value();
+			double[] dList = new double[list.size()];
+			for(int k = 0; k < list.size(); k++)
+				dList[k] = list.get(k);
+			kMap.put(it.key(), StatUtils.geometricMean(dList));
+		}
 	}
 
 }

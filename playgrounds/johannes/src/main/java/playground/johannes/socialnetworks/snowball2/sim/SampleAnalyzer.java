@@ -40,11 +40,11 @@ public abstract class SampleAnalyzer implements SamplerListener {
 
 	private Map<String, AnalyzerTask> tasks;
 	
-	private Collection<BiasedDistribution> estimators;
+	private Collection<ProbabilityEstimator> estimators;
 	
 	private String rootDirectory;
 	
-	public SampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<BiasedDistribution> estimators, String rootDirectory) {
+	public SampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<ProbabilityEstimator> estimators, String rootDirectory) {
 		this.tasks = tasks;
 		this.rootDirectory = rootDirectory;
 		this.estimators = estimators;
@@ -57,7 +57,7 @@ public abstract class SampleAnalyzer implements SamplerListener {
 	protected void analyse(SampledGraphProjection<?, ?, ?> graph, String output) {
 		try {
 			Logger.getRootLogger().setLevel(Level.WARN);
-			for(BiasedDistribution estimator : estimators) {
+			for(ProbabilityEstimator estimator : estimators) {
 				estimator.update(graph);
 			}
 			for(Entry<String, AnalyzerTask> task : tasks.entrySet()) {

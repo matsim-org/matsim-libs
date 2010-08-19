@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HTEstimator.java
+ * Estimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,25 +19,33 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
-/**
- * @author illenberger
- *
- */
-public class HTEstimator implements PopulationEstimator {
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
-	private final int N;
-	
-	public HTEstimator(int N) {
-		this.N = N;
-	}
-	
-	@Override
-	public double mean(double[] values, double[] weights) {
-		double sum = 0;
-		for(int i = 0; i < values.length; i++) {
-			sum += values[i] * weights[i];
-		}
-		return sum/(double)N;
-	}
+/**
+ * A ProbabilityEstimator estimates the inclusion probability of a vertex in a
+ * snowball sample.
+ * 
+ * @author illenberger
+ * 
+ */
+public interface ProbabilityEstimator {
+
+	/**
+	 * Notifies the estimator that the sample has changed.
+	 * 
+	 * @param graph
+	 *            the sampled snwoball graph
+	 */
+	public void update(SampledGraph graph);
+
+	/**
+	 * Returns the inclusion probability of a vertex in the snowball sample.
+	 * 
+	 * @param vertex
+	 *            a sampled vertex
+	 * @return the inclusion probability of a vertex in the snowball sample.
+	 */
+	public double getProbability(SampledVertex vertex);
 
 }
