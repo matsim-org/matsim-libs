@@ -19,10 +19,27 @@ import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
 import org.openstreetmap.osmosis.core.xml.v0_6.XmlWriter;
 
 public class OsmPrepare {
+	
+	private final String infFile;
+	private final String outFile;
+	
+	private final String[] streetFilter;
+	private final String[] transitFilter;
+	
+	public OsmPrepare(String infFile, String outFile, String[] streetFilter, String[] transitFilter){
+		this.infFile = infFile;
+		this.outFile = outFile;
+		this.streetFilter = streetFilter;
+		this.transitFilter = transitFilter;
+	}
 
 	public static void main(String[] args) {
-		String filename = "inputs/schweiz/zurich.osm";
-		String targetFilename = "inputs/schweiz/zurich-filtered.osm";
+		new OsmPrepare("e:/_out/osm/berlinbrandenburg.osm", "e:/_out/osm/berlinbrandenburg_filtered_small.osm", new String[]{"motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary"}, new String[]{"tram", "train", "bus"}).prepareOsm();		
+	}
+	
+	public void prepareOsm(){
+		String filename = this.infFile;
+		String targetFilename = this.outFile;
 		
 		FastXmlReader reader = new FastXmlReader(new File(filename), true, CompressionMethod.None);		
 		UsedNodeFilter usedNodeFilter = new UsedNodeFilter(IdTrackerType.BitSet);
@@ -30,11 +47,9 @@ public class OsmPrepare {
 		
 		FastXmlReader reader2 = new FastXmlReader(new File(filename), true, CompressionMethod.None);		
 		EntityProgressLogger logger2= new EntityProgressLogger(10);
-		
-		
-		TagFilter streetFilter = createStreetFilter();
-		
-		TagFilter transitFilter = createTransitFilter();
+				
+		TagFilter streetTagFilter = createStreetFilter(this.streetFilter);		
+		TagFilter transitTagFilter = createTransitFilter(this.transitFilter);
 		UsedNodeAndWayFilter usedFilter = new UsedNodeAndWayFilter(IdTrackerType.BitSet);
 		
 		EntityMerger entityMerger = new EntityMerger(ConflictResolutionMethod.LatestSource, 20);
@@ -42,11 +57,11 @@ public class OsmPrepare {
 		XmlWriter writer = new XmlWriter(new File(targetFilename), CompressionMethod.None);
 		
 		reader.setSink(logger);
-		logger.setSink(streetFilter);
-		streetFilter.setSink(usedNodeFilter);
+		logger.setSink(streetTagFilter);
+		streetTagFilter.setSink(usedNodeFilter);
 		reader2.setSink(logger2);
-		logger2.setSink(transitFilter);
-		transitFilter.setSink(usedFilter);
+		logger2.setSink(transitTagFilter);
+		transitTagFilter.setSink(usedFilter);
 		usedNodeFilter.setSink(entityMerger.getSink(0));
 		usedFilter.setSink(entityMerger.getSink(1));
 		entityMerger.setSink(writer);
@@ -68,17 +83,17 @@ public class OsmPrepare {
 		
 	}
 
-	private static TagFilter createStreetFilter() {
+	private static TagFilter createStreetFilter(String[] filter) {
 		Map<String, Set<String>> tagKeyValues = new HashMap<String, Set<String>>();
-		tagKeyValues.put("highway", new HashSet<String>(Arrays.asList("motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary","minor","unclassified","residential","living_street")));
+		tagKeyValues.put("highway", new HashSet<String>(Arrays.asList(filter)));
 		Set<String> tagKeys = Collections.emptySet();
 		TagFilter tagFilter = new TagFilter("accept-way", tagKeys, tagKeyValues);
 		return tagFilter;
 	}
 
-	private static TagFilter createTransitFilter() {
+	private static TagFilter createTransitFilter(String[] filter) {
 		Map<String, Set<String>> tagKeyValues = new HashMap<String, Set<String>>();
-		tagKeyValues.put("route", new HashSet<String>(Arrays.asList("tram", "train", "bus")));
+		tagKeyValues.put("route", new HashSet<String>(Arrays.asList(filter))); 
 		Set<String> tagKeys = Collections.emptySet();
 		TagFilter transitFilter = new TagFilter("accept-relation", tagKeys, tagKeyValues);
 		return transitFilter;

@@ -66,12 +66,22 @@ public class PTNetworkSimplifier {
 
 	private static final Logger log = Logger.getLogger(PTNetworkSimplifier.class);
 	private boolean mergeLinkStats = false;
-	private Set<Integer> nodeTopoToMerge = new TreeSet<Integer>();
 	private TransitSchedule transitSchedule;
 	private TreeSet<String> linksNeededByTransitSchedule = null;
 	private Network network;
 	
+	private String netInFile;
+	private String scheduleInFile;
+	private String netOutFile;
+	private String scheduleOutFile;
+	private Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
 	
+	public PTNetworkSimplifier(String netInFile, String scheduleInFile, String netOutFile, String scheduleOutFile){
+		this.netInFile = netInFile;
+		this.scheduleInFile = scheduleInFile;
+		this.netOutFile = netOutFile;
+		this.scheduleOutFile = scheduleOutFile;
+	}	
 
 	public void run(final Network net, final TransitSchedule tranSched) {
 		
@@ -82,7 +92,7 @@ public class PTNetworkSimplifier {
 		TransitScheduleCleaner.removeStopsNotUsed(this.transitSchedule);
 		this.network = TransitScheduleCleaner.tagTransitLinksInNetwork(this.transitSchedule, this.network);
 		
-		if(this.nodeTopoToMerge.size() == 0){
+		if(this.nodeTypesToMerge.size() == 0){
 			Gbl.errorMsg("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
 		}
 
@@ -112,7 +122,7 @@ public class PTNetworkSimplifier {
 				continue;
 			}
 
-			if(this.nodeTopoToMerge.contains(Integer.valueOf(nodeTopo.getTopoType(node)))){
+			if(this.nodeTypesToMerge.contains(Integer.valueOf(nodeTopo.getTopoType(node)))){
 
 				List<Link> iLinks = new ArrayList<Link> (node.getInLinks().values());
 
@@ -218,8 +228,8 @@ public class PTNetworkSimplifier {
 
 		}
 
-		org.matsim.core.network.algorithms.NetworkCleaner nc = new org.matsim.core.network.algorithms.NetworkCleaner();
-		nc.run(this.network);
+//		org.matsim.core.network.algorithms.NetworkCleaner nc = new org.matsim.core.network.algorithms.NetworkCleaner();
+//		nc.run(this.network);
 
 		nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(this.network);
@@ -239,7 +249,6 @@ public class PTNetworkSimplifier {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				
 				if(transitRoute.getRoute().getLinkIds().contains(inLink.getId()) || transitRoute.getRoute().getLinkIds().contains(inLink.getId())){
-
 
 					LinkedList<Id> routeLinkIds = new LinkedList<Id>();
 					routeLinkIds.add(transitRoute.getRoute().getStartLinkId());
@@ -266,16 +275,12 @@ public class PTNetworkSimplifier {
 			}
 		}
 		
-		
-		
-		
 		// second perform
 		
 		for (TransitLine transitLine : this.transitSchedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				
 				if(transitRoute.getRoute().getLinkIds().contains(inLink.getId()) || transitRoute.getRoute().getLinkIds().contains(inLink.getId())){
-
 
 					LinkedList<Id> routeLinkIds = new LinkedList<Id>();
 					routeLinkIds.add(transitRoute.getRoute().getStartLinkId());
@@ -289,7 +294,6 @@ public class PTNetworkSimplifier {
 						routeLinkIds.remove(inLink.getId());
 						routeLinkIds.remove(outLink.getId());
 					}
-
 
 					NetworkRoute newRoute = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(routeLinkIds.getFirst(), routeLinkIds.getLast());
 					Id startLink = routeLinkIds.pollFirst();
@@ -328,7 +332,7 @@ public class PTNetworkSimplifier {
 	 * @see NetworkCalcTopoType NetworkCalcTopoType for a list of available classifications.
 	 */
 	public void setNodesToMerge(Set<Integer> nodeTypesToMerge){
-		this.nodeTopoToMerge.addAll(nodeTypesToMerge);
+		this.nodeTypesToMerge.addAll(nodeTypesToMerge);
 	}
 
 	/**
@@ -361,33 +365,32 @@ public class PTNetworkSimplifier {
 		return bothLinksHaveSameLinkStats;
 	}
 	
-
 	public static void main(String[] args) {
-		
-		String networkFile = "e:/_out/osm/transit-network_bb_small.xml";
-		String transitScheduleFile = "e:/_out/osm/osm_transitSchedule_profil_small.xml";
-		String outNetworkFile = "e:/_out/osm/transit-network_bb_small_simplified_merged.xml";
-		String outTransitScheduleFile = "e:/_out/osm/osm_transitSchedule_profil_small_merged.xml";
-		
+		PTNetworkSimplifier simplifier = new PTNetworkSimplifier("e:/_out/osm/transit-network_bb_subway.xml", "e:/_out/osm/osm_transitSchedule_subway.xml", "e:/_out/osm/transit-network_bb_subway_simplified_merged.xml", "e:/_out/osm/osm_transitSchedule_subway_merged.xml");
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
 		nodeTypesToMerge.add(new Integer(4));
 		nodeTypesToMerge.add(new Integer(5));
+		simplifier.setNodesToMerge(nodeTypesToMerge);
+		simplifier.setMergeLinkStats(false);
+		simplifier.simplifyPTNetwork();
+	}
+	
+	public void simplifyPTNetwork(){
 
 		Scenario scenario = new ScenarioImpl();
-		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFile);
-		
-			
+		this.network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.netInFile);
+					
 		ScenarioImpl osmScenario = new ScenarioImpl();
 		Config osmConfig = osmScenario.getConfig();		
 		osmConfig.scenario().setUseTransit(true);
 		osmConfig.scenario().setUseVehicles(true);
-		osmConfig.network().setInputFile(networkFile);		
+		osmConfig.network().setInputFile(this.netInFile);		
 		ScenarioLoaderImpl osmLoader = new ScenarioLoaderImpl(osmScenario);
 		osmLoader.loadScenario();
 	
 		try {
-			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork()).readFile(transitScheduleFile);
+			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork()).readFile(this.scheduleInFile);
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -398,19 +401,13 @@ public class PTNetworkSimplifier {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
-		
 
-		PTNetworkSimplifier nsimply = new PTNetworkSimplifier();
-		nsimply.setNodesToMerge(nodeTypesToMerge);
-		nsimply.setMergeLinkStats(false);
-		nsimply.run(network, osmScenario.getTransitSchedule());
-
-		log.info("fertig");
-		nsimply.run(network, osmScenario.getTransitSchedule());
+		run(this.network, osmScenario.getTransitSchedule());
+		TransitScheduleCleaner.removeRoutesAndStopsOfLinesWithMissingLinksInNetwork(osmScenario.getTransitSchedule(), this.network);
 		
-		new NetworkWriter(network).write(outNetworkFile);
+		new NetworkWriter(this.network).write(this.netOutFile);
 		try {
-			new TransitScheduleWriter(osmScenario.getTransitSchedule()).writeFile(outTransitScheduleFile);
+			new TransitScheduleWriter(osmScenario.getTransitSchedule()).writeFile(this.scheduleOutFile);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
