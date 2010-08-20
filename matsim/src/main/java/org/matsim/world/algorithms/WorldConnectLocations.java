@@ -38,7 +38,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -229,8 +228,8 @@ public class WorldConnectLocations {
 		log.info("    done.");
 
 		Set<Id> remainingFacilities = new HashSet<Id>(facilities.getFacilities().keySet());
-		if (Gbl.getConfig() != null) {
-			String inputF2LFile = Gbl.getConfig().findParam(CONFIG_F2L,CONFIG_F2L_INPUTF2LFile);
+		if (this.config != null) {
+			String inputF2LFile = this.config.findParam(CONFIG_F2L,CONFIG_F2L_INPUTF2LFile);
 			if (inputF2LFile != null) {
 				inputF2LFile = inputF2LFile.replace('\\', '/');
 				connect(facilities,network,world,inputF2LFile,remainingFacilities);
