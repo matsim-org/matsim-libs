@@ -12,6 +12,10 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 
+import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
+import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
+import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingAttribute;
+
 public class LinkFacilityAssociation {
 
 	protected HashMap<Id, ArrayList<ActivityFacilityImpl>> linkFacilityMapping = new HashMap<Id, ArrayList<ActivityFacilityImpl>>();
@@ -93,5 +97,28 @@ public class LinkFacilityAssociation {
 		}
 		return result;
 	}
+	
+	/**
+	 * - post-cont: will never return null.
+	 * @param linkId
+	 * @return
+	 */
+	public ArrayList<ActivityFacilityImpl> getFacilitiesHavingParkingAttribute(Id linkId, ParkingAttribute parkingAttribute) {
+		ArrayList<ActivityFacilityImpl> result = linkFacilityMapping.get(linkId);
+		if (result == null) {
+			result = new ArrayList<ActivityFacilityImpl>();
+		} else if (parkingAttribute!=null) {
+			for (int i=0;i<result.size();i++){
+				Id facilityId=result.get(i).getId();
+				ArrayList<ActivityFacilityImpl> filteredResult=new ArrayList<ActivityFacilityImpl>();
+				if (ParkingGeneralLib.containsParkingAttribute(ParkingRoot.getParkingFacilityAttributes().getParkingFacilityAttributes(facilityId), parkingAttribute)){
+					filteredResult.add(result.get(i));
+				}
+			}
+		}
+		return result;
+	}
+	
+	
 
 }

@@ -15,6 +15,7 @@ import org.matsim.core.network.NetworkLayer;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
+import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingAttribute;
 import playground.wrashid.parkingSearch.planLevel.scoring.OrderedFacility;
 
 /**
@@ -22,7 +23,7 @@ import playground.wrashid.parkingSearch.planLevel.scoring.OrderedFacility;
  * 
  * 
  * @author rashid_waraich
- *
+ * 
  */
 public class ClosestParkingMatrix {
 
@@ -46,64 +47,36 @@ public class ClosestParkingMatrix {
 	 * @param maxNumberOfParkings
 	 */
 	public ArrayList<ActivityFacilityImpl> getClosestParkings(Coord coord, int minNumberOfParkings, int maxNumberOfParkings) {
-		// increment distance by to until a parking is found
-		ArrayList<ActivityFacilityImpl> list=null;
+
+		return getClosestParkings(coord, minNumberOfParkings, maxNumberOfParkings, null);
+
 		
-		double maxDistance=100;
-		list=getClosestParkings(coord,maxDistance);
-		
-		int maxTimeSetExtention=10;
-		
-		// try to find more parkings only 'maxTimeSetExtention' times
-		for (int i=0;i<maxTimeSetExtention;i++){
-			if (list.size()>=minNumberOfParkings){
-				// enough parkings found
-				break;
-			} else {
-				// need to find more parkings
-				maxDistance*=2;
-				list=getClosestParkings(coord,maxDistance);
-			}
-		}
-		
-		// just return the result, if no trimming if result required
-		if (maxNumberOfParkings==0 || list.size()<=maxNumberOfParkings){
-			return list;
-		} else {
-			// trim the facility set: discard parkings most far away from the given coord
-			while (list.size()>maxNumberOfParkings){
-				list=removeMostFarAwayFacility(coord,list);
-			}
-			return list;
-		}
 	}
-	
+
 	/**
 	 * Removes the facility, which is most far away from coord (from the list)
+	 * 
 	 * @param coord
 	 * @param list
 	 * @return
 	 */
-	private ArrayList<ActivityFacilityImpl> removeMostFarAwayFacility(Coord coord, ArrayList<ActivityFacilityImpl> list){
-		double maxDistance=Double.MIN_VALUE;
-		int maxDistanceIndex=-1;
-		
-		for (int i=0;i<list.size();i++){
-			double distance=GeneralLib.getDistance(coord, list.get(i).getCoord());
-			if (distance>maxDistance){
-				maxDistance=distance;
-				maxDistanceIndex=i;
+	private ArrayList<ActivityFacilityImpl> removeMostFarAwayFacility(Coord coord, ArrayList<ActivityFacilityImpl> list) {
+		double maxDistance = Double.MIN_VALUE;
+		int maxDistanceIndex = -1;
+
+		for (int i = 0; i < list.size(); i++) {
+			double distance = GeneralLib.getDistance(coord, list.get(i).getCoord());
+			if (distance > maxDistance) {
+				maxDistance = distance;
+				maxDistanceIndex = i;
 			}
 		}
-		
+
 		// remove the parking, which is most far away from the list
 		list.remove(maxDistanceIndex);
-		
+
 		return list;
 	}
-	
-	
-	
 
 	/**
 	 * Get all parkings, which have less than maxDistance from coord
@@ -114,20 +87,7 @@ public class ClosestParkingMatrix {
 	 * @return
 	 */
 	public ArrayList<ActivityFacilityImpl> getClosestParkings(Coord coord, double maxDistance) {
-		LinkedList<Link> links = getClosestLinks(coord, maxDistance);
-		ArrayList<ActivityFacilityImpl> resultFacilities = new ArrayList<ActivityFacilityImpl>();
-
-		for (int i = 0; i < links.size(); i++) {
-			if (parkingAssociations.getFacilities(links.get(i).getId())==null){
-				System.out.println(links.get(i).getId());
-				System.out.println(parkingAssociations.getFacilities(links.get(i).getId()));
-				System.exit(0);
-			}
-			
-			resultFacilities.addAll(parkingAssociations.getFacilities(links.get(i).getId()));
-		}
-
-		return resultFacilities;
+		return getClosestParkings(coord, maxDistance, null);		
 	}
 
 	/**
@@ -179,31 +139,82 @@ public class ClosestParkingMatrix {
 	}
 
 	/**
-	 * possible refactoring: move this static method to some other class, where it would fit better...
+	 * possible refactoring: move this static method to some other class, where
+	 * it would fit better...
 	 * 
-	 * attention: probably concurrency not possible, if list can be modified by different threads.
-	 * (if that is required, make a new list within the method).
-	 * This means, in the result list the facility, which is closest will be first in the queue.
+	 * attention: probably concurrency not possible, if list can be modified by
+	 * different threads. (if that is required, make a new list within the
+	 * method). This means, in the result list the facility, which is closest
+	 * will be first in the queue.
+	 * 
 	 * @param coord
 	 * @param list
 	 * @return
 	 */
-	public static ArrayList<ActivityFacilityImpl> getOrderedListAccordingToDistanceFromCoord(Coord coord, ArrayList<ActivityFacilityImpl> list){
-		PriorityQueue<OrderedFacility> prioQueue=new PriorityQueue<OrderedFacility>();
-	
+	public static ArrayList<ActivityFacilityImpl> getOrderedListAccordingToDistanceFromCoord(Coord coord,
+			ArrayList<ActivityFacilityImpl> list) {
+		PriorityQueue<OrderedFacility> prioQueue = new PriorityQueue<OrderedFacility>();
+
 		// sort list
-		while (list.size()>0){
-			ActivityFacilityImpl curFac=list.remove(0);
-			prioQueue.add(new OrderedFacility(curFac, GeneralLib.getDistance(coord,curFac.getCoord())));
+		while (list.size() > 0) {
+			ActivityFacilityImpl curFac = list.remove(0);
+			prioQueue.add(new OrderedFacility(curFac, GeneralLib.getDistance(coord, curFac.getCoord())));
 		}
-		
+
 		// write list
-		while (prioQueue.size()>0){
-			ActivityFacilityImpl curFac=prioQueue.poll().getFacility();
+		while (prioQueue.size() > 0) {
+			ActivityFacilityImpl curFac = prioQueue.poll().getFacility();
 			list.add(curFac);
 		}
+
+		return list;
+	}
+
+	public ArrayList<ActivityFacilityImpl> getClosestParkings(Coord coord, double maxDistance, ParkingAttribute personParkingAttribute) {
+		// TODO Auto-generated method stub
+		LinkedList<Link> links = getClosestLinks(coord, maxDistance);
+		ArrayList<ActivityFacilityImpl> resultFacilities = new ArrayList<ActivityFacilityImpl>();
+
+		for (int i = 0; i < links.size(); i++) {
+			resultFacilities.addAll(parkingAssociations.getFacilitiesHavingParkingAttribute(links.get(i).getId(),personParkingAttribute));
+		}
+
+		return resultFacilities;
+	}
+
+	public ArrayList<ActivityFacilityImpl> getClosestParkings(Coord coord, int minNumberOfParkings, int maxNumberOfParkings, ParkingAttribute personParkingAttribute) {
+		// increment distance by to until a parking is found
+		ArrayList<ActivityFacilityImpl> list = null;
+
+		double maxDistance = 100;
+		list = getClosestParkings(coord, maxDistance, personParkingAttribute);
+
+		int maxTimeSetExtention = 10;
+
+		// try to find more parkings only 'maxTimeSetExtention' times
+		for (int i = 0; i < maxTimeSetExtention; i++) {
+			if (list.size() >= minNumberOfParkings) {
+				// enough parkings found
+				break;
+			} else {
+				// need to find more parkings
+				maxDistance *= 2;
+				list = getClosestParkings(coord, maxDistance);
+			}
+		}
+
+		// just return the result, if no trimming if result required
+		if (maxNumberOfParkings == 0 || list.size() <= maxNumberOfParkings) {
+			return list;
+		} else {
+			// trim the facility set: discard parkings most far away from the
+			// given coord
+			while (list.size() > maxNumberOfParkings) {
+				list = removeMostFarAwayFacility(coord, list);
+			}
+			return list;
+		}
 		
-		return list;	
 	}
 
 }

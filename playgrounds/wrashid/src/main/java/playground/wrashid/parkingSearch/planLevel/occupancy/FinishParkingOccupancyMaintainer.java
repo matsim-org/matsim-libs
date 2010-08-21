@@ -77,7 +77,7 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 				sumOfWalkingDistance=0.0;
 			}
 			
-			sumOfWalkingDistance+=parkingRelatedWalkDistance.get(personId)*ParkingRoot.getParkingDistanceScalingFactorForOutput();
+			sumOfWalkingDistance+=parkingRelatedWalkDistance.get(personId)*ParkingRoot.getParkingWalkingDistanceScalingFactorForOutput();
 			
 			personGroups.setAttributeValueForGroupToWhichThePersonBelongs(personId, attribute, sumOfWalkingDistance);
 			

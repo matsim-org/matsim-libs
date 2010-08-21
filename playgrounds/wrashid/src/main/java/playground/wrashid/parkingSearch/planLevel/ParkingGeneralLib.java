@@ -13,6 +13,7 @@ import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingArrivalDepartureLog;
+import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingAttribute;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingTimeInfo;
 
 public class ParkingGeneralLib {
@@ -295,4 +296,13 @@ public class ParkingGeneralLib {
 		return index;
 	}
 
+	public static boolean containsParkingAttribute(LinkedList<ParkingAttribute> parkingFacilityAttributeList, ParkingAttribute parkingAttribute){
+		for (ParkingAttribute parkingAttrbiuteInList:parkingFacilityAttributeList){
+			if (parkingAttrbiuteInList==parkingAttribute){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 }

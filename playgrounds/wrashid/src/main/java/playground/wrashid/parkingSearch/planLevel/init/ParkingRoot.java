@@ -18,6 +18,10 @@ import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyMain
 import playground.wrashid.parkingSearch.planLevel.parkingActivityDuration.ParkingActivityDuration;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
+import playground.wrashid.parkingSearch.planLevel.parkingType.DefaultParkingFacilityAttributPersonPreferences;
+import playground.wrashid.parkingSearch.planLevel.parkingType.DefaultParkingFacilityAttributes;
+import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingFacilityAttributPersonPreferences;
+import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingFacilityAttributes;
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunction;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingDefaultScoringFunction;
@@ -37,7 +41,9 @@ public class ParkingRoot {
 	private static ParkingWalkingDistanceMeanAndStandardDeviationGraph parkingWalkingDistanceGraph;
 	private static HashMap<Id, Double> parkingWalkingDistanceOfPreviousIteration=null;
 	private static PersonGroups personGroupsForStatistics=null;
-	private static double parkingDistanceScalingFactorForOutput=0.1;
+	private static Double parkingWalkingDistanceScalingFactorForOutput;
+	private static ParkingFacilityAttributes parkingFacilityAttributes=null;
+	private static ParkingFacilityAttributPersonPreferences parkingFacilityAttributPersonPreferences=null;
 
 	public static ParkingWalkingDistanceMeanAndStandardDeviationGraph getParkingWalkingDistanceGraph() {
 		return parkingWalkingDistanceGraph;
@@ -83,11 +89,14 @@ public class ParkingRoot {
 		lpfa = new LinkParkingFacilityAssociation(facilities, network);
 		pc = new ParkingCapacity(facilities);
 		
-		if (getParkingActivityDuration()==null){
-			// initialize parking activity duration, if already not done at this stage
+		if (notInitializedOrNull(parkingActivityDuration)){
 			setParkingActivityDuration(new ParkingActivityDuration());
 		}
 		
+		parkingWalkingDistanceScalingFactorForOutput=GlobalRegistry.readDoubleFromConfig("parking", "parkingWalkingDistanceScalingFactorForOutput");
+		if (notInitializedOrNull(parkingWalkingDistanceScalingFactorForOutput)){
+			parkingWalkingDistanceScalingFactorForOutput=1.0;
+		}
 		
 		parkingLog=new ArrayList<String>();
 
@@ -110,8 +119,20 @@ public class ParkingRoot {
 			parkingScoringFunction.setParkingFacilities(facilities);
 		}
 		
+		if (notInitializedOrNull(getParkingFacilityAttributes())){
+			setParkingFacilityAttributes(new DefaultParkingFacilityAttributes());
+		}
 		
-
+		if (notInitializedOrNull(getParkingFacilityAttributPersonPreferences())){
+			setParkingFacilityAttributPersonPreferences(new DefaultParkingFacilityAttributPersonPreferences());
+		}
+	}
+	
+	private static boolean notInitializedOrNull(Object obj){
+		if (obj==null){
+			return true;
+		}
+		return false;
 	}
 
 	public static void setRanking(ParkingScoringFunction ranking) {
@@ -175,8 +196,23 @@ public class ParkingRoot {
 		ParkingRoot.parkingActivityDuration = parkingActivityDuration;
 	}
 	
-	public static double getParkingDistanceScalingFactorForOutput(){
-		return parkingDistanceScalingFactorForOutput;
+	public static double getParkingWalkingDistanceScalingFactorForOutput(){
+		return parkingWalkingDistanceScalingFactorForOutput;
 	}
 
+	public static void setParkingFacilityAttributes(ParkingFacilityAttributes parkingFacilityAttributes) {
+		ParkingRoot.parkingFacilityAttributes = parkingFacilityAttributes;
+	}
+
+	public static ParkingFacilityAttributes getParkingFacilityAttributes() {
+		return parkingFacilityAttributes;
+	}
+
+	public static void setParkingFacilityAttributPersonPreferences(ParkingFacilityAttributPersonPreferences parkingFacilityAttributPersonPreferences) {
+		ParkingRoot.parkingFacilityAttributPersonPreferences = parkingFacilityAttributPersonPreferences;
+	}
+
+	public static ParkingFacilityAttributPersonPreferences getParkingFacilityAttributPersonPreferences() {
+		return parkingFacilityAttributPersonPreferences;
+	}
 }

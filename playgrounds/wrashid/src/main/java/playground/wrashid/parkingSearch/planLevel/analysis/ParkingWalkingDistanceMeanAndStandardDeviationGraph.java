@@ -70,7 +70,7 @@ public class ParkingWalkingDistanceMeanAndStandardDeviationGraph {
 		
 		double[][] matrix=new double[numberOfXValues][numberOfFunctions];
 		
-		double parkingDistanceScalingFactor=ParkingRoot.getParkingDistanceScalingFactorForOutput();
+		double parkingDistanceScalingFactor=ParkingRoot.getParkingWalkingDistanceScalingFactorForOutput();
 		
 		for (int i=0;i<numberOfXValues;i++){
 			matrix[i][0]=statisticalValues.get(i).mean*parkingDistanceScalingFactor;

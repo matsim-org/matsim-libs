@@ -19,6 +19,7 @@ import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingCapacityFullLogger;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping;
+import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingAttribute;
 
 public abstract class ParkingScoringFunction {
 
@@ -57,6 +58,7 @@ public abstract class ParkingScoringFunction {
 		PriorityQueue<OrderedFacility> prio = new PriorityQueue<OrderedFacility>();
 		ArrayList<ActivityFacilityImpl> resultList = new ArrayList<ActivityFacilityImpl>();
 		ArrayList<ActivityFacilityImpl> closestParkings = null;
+		ParkingAttribute personParkingAttribute=ParkingRoot.getParkingFacilityAttributPersonPreferences().getParkingFacilityAttributPreferencesOfPersonForActivity(plan.getPerson().getId(), targetActivity);
 
 		// if (plan.getPerson().getId().toString().equalsIgnoreCase("3")) {
 		// System.out.println();
@@ -76,7 +78,7 @@ public abstract class ParkingScoringFunction {
 		
 		// only look at parkings with in maxWalkingDistance
 		closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),
-				maxWalkingDistance);
+				maxWalkingDistance, personParkingAttribute);
 		
 
 		// check, if there is at least one parking in parking set which is free
@@ -108,7 +110,7 @@ public abstract class ParkingScoringFunction {
 			// the selection within the maxDistance radius gives back 0 parkings
 			int minimumNumberOfParkings=3;
 			if (closestParkings.size()<minimumNumberOfParkings) {			
-				closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),minimumNumberOfParkings,minimumNumberOfParkings);
+				closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),minimumNumberOfParkings,minimumNumberOfParkings, personParkingAttribute);
 			}
 			
 			// if there is no parking, in the set which is free, extend the set also
@@ -118,7 +120,7 @@ public abstract class ParkingScoringFunction {
 			
 			while (!someParkingFromSetIsFreeAtArrivalTime(closestParkings, parkingArrivalTime, delta)) {
 				minimumNumberOfParkings*=2;
-				closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),minimumNumberOfParkings,minimumNumberOfParkings);
+				closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),minimumNumberOfParkings,minimumNumberOfParkings,  personParkingAttribute);
 			}
 			
 //		}

@@ -30,7 +30,7 @@ public class ParkingWalkingDistanceAnalysis {
 		int i=0;
 		for (Id personId:parkingWalkingDistance.keySet()) {
 			matrix[i][0] = Integer.parseInt(personId.toString());
-			matrix[i][1] = parkingWalkingDistance.get(personId)*ParkingRoot.getParkingDistanceScalingFactorForOutput();
+			matrix[i][1] = parkingWalkingDistance.get(personId)*ParkingRoot.getParkingWalkingDistanceScalingFactorForOutput();
 			i++;
 		}
 		
