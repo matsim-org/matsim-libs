@@ -28,7 +28,7 @@ public abstract class ParkingScoringFunction {
 	double delta = 15 * 60;
 	int numberOfParkingsInSet = 10;
 	// int maxNumberOfParkingsInSet = 500;
-	int maxWalkingDistance = 2000; // im meters
+	public int maxWalkingDistance = 10000; // im meters
 
 	// public int getNumberOfParkingsInSet() {
 	// return numberOfParkingsInSet;
@@ -112,6 +112,10 @@ public abstract class ParkingScoringFunction {
 			}
 			
 			// if there is no parking, in the set which is free, extend the set also
+			// §§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§?????
+			// TODO: this loop might never end, if the scenario has too few parkings
+			// TODO: find out, what happens, if the scenario does not contain the specified number of parkings to call getClosestParkings
+			
 			while (!someParkingFromSetIsFreeAtArrivalTime(closestParkings, parkingArrivalTime, delta)) {
 				minimumNumberOfParkings*=2;
 				closestParkings = ParkingRoot.getClosestParkingMatrix().getClosestParkings(targetActivity.getCoord(),minimumNumberOfParkings,minimumNumberOfParkings);
@@ -227,6 +231,10 @@ public abstract class ParkingScoringFunction {
 		this.parkingPriceMapping = parkingPriceMapping;
 		this.incomeRelevantForParking = income;
 		this.parkingFacilities = parkingFacilities;
+	}
+	
+	public ParkingScoringFunction(){
+		
 	}
 
 	public double getScore(ActivityImpl targetActivity, Plan plan, Id parkingFacilityId, boolean forRanking) {

@@ -11,7 +11,7 @@ import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.obj.plan.PersonGroups;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingOccupancyAnalysis;
-import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingTimesAnalysis;
+import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceAnalysis;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoreExecutor;
 
@@ -38,7 +38,7 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 
 		fileName = event.getControler().getControlerIO()
 				.getIterationFilename(event.getControler().getIterationNumber(), "parkingWalkingTimes.txt");
-		new ParkingWalkingTimesAnalysis(ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance())
+		new ParkingWalkingDistanceAnalysis(ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance())
 				.writeTxtFile(fileName);
 		fileName = event.getControler().getControlerIO()
 		.getIterationFilename(event.getControler().getIterationNumber(), "parkingLog.txt");
@@ -77,7 +77,7 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 				sumOfWalkingDistance=0.0;
 			}
 			
-			sumOfWalkingDistance+=parkingRelatedWalkDistance.get(personId);
+			sumOfWalkingDistance+=parkingRelatedWalkDistance.get(personId)*ParkingRoot.getParkingDistanceScalingFactorForOutput();
 			
 			personGroups.setAttributeValueForGroupToWhichThePersonBelongs(personId, attribute, sumOfWalkingDistance);
 			

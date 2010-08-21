@@ -5,14 +5,15 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
-public class ParkingWalkingTimesAnalysis {
+public class ParkingWalkingDistanceAnalysis {
 
-	private final HashMap<Id, Double> parkingWalkingTime;
+	private final HashMap<Id, Double> parkingWalkingDistance;
 
-	public ParkingWalkingTimesAnalysis(HashMap<Id, Double> parkingWalkingTime) {
+	public ParkingWalkingDistanceAnalysis(HashMap<Id, Double> parkingWalkingTime) {
 		super();
-		this.parkingWalkingTime = parkingWalkingTime;
+		this.parkingWalkingDistance = parkingWalkingTime;
 	}
 
 	public void writeTxtFile(String filePath) {
@@ -23,13 +24,13 @@ public class ParkingWalkingTimesAnalysis {
 	}
 
 	private double[][] getMatrix() {
-		int numberOfPersonsUsingCar=parkingWalkingTime.size();
+		int numberOfPersonsUsingCar=parkingWalkingDistance.size();
 		double[][] matrix = new double[numberOfPersonsUsingCar][2];
 		
 		int i=0;
-		for (Id personId:parkingWalkingTime.keySet()) {
+		for (Id personId:parkingWalkingDistance.keySet()) {
 			matrix[i][0] = Integer.parseInt(personId.toString());
-			matrix[i][1] = parkingWalkingTime.get(personId);
+			matrix[i][1] = parkingWalkingDistance.get(personId)*ParkingRoot.getParkingDistanceScalingFactorForOutput();
 			i++;
 		}
 		

@@ -23,6 +23,11 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 			ActivityFacilitiesImpl parkingFacilities) {
 		super(parkingPriceMapping, income, parkingFacilities);
 	}
+	
+	public ParkingDefaultScoringFunction(ParkingPriceMapping parkingPriceMapping, IncomeRelevantForParking income) {
+		this.parkingPriceMapping=parkingPriceMapping;
+		this.incomeRelevantForParking=income;
+	}
 
 	public double getScore(ActivityImpl targetActivity, Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId,
 			double parkingArrivalDuration, double parkingDepartureDuration, Plan plan, double delta, boolean forRanking) {
@@ -177,10 +182,10 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		// TODO: add more sums here!!!!
 		double weightedScore=0;
 		weightedScore+=parkingPriceScore;
-		weightedScore+=2*parkingWalkingPenalty;
+		weightedScore+=parkingWalkingPenalty;
 		weightedScore+=parkingActivityDurationPenalty;
-		weightedScore+=50*parkingParkingCapacityViolationPenalty;
-		weightedScore/=54.0; // for normailization
+		weightedScore+=10*parkingParkingCapacityViolationPenalty;
+		weightedScore/=13.0; // for normailization
 	
 		
 		// this is extremly important for reduing the number of parking slot violations, because:
@@ -203,7 +208,7 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 	
 	private double getWalkingExplicitScorePart(ActivityImpl targetActivity, Id parkingFacilityId){
 		double zeroValueForNormalization=0;
-		double oneValueForNormalization=2000; // in meters
+		double oneValueForNormalization=maxWalkingDistance; // in meters
 		
 		
 		double walkingPenalty = -1.0

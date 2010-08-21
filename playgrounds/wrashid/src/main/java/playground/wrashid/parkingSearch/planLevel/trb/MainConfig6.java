@@ -4,32 +4,24 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
 
+import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.obj.plan.PersonGroups;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
 
 /**
- * This experiment clearly shows, that if we form three groups, the walking
- * distance and score of the groups are different. - and ordered as we would
- * expect.
  * 
- * - point out, why there is a rise in walking distance in the beginning. -
- * point out, why difference between waling distance of group1-group2 is larger
- * than group2-group3 (because the number of parkings increases with bigger
- * radius, that difference is not that important anymore.
- * 
- * 
- * - change the number of parkings and see, what happens (in general the walking
- * distance should decrease).
- * 
- * - change the access time of the closest facilities to home and work => their
- * attractivness should decrease (resulting in longer walking times).
+ * - 
  * 
  * - increase the price of the closest parking: have different groups with
  * different incomes (they should be picket at random, to solve the bias of
  * having an arrival advantage - e.g. select the agents with even ids). -
  * => the agents with higher income should have shorter walking distances.
- * - 
+ * - => create a Run27 for that, in which both the income of the agents and the price of some parkings is set
+ * => show walking distance of groups (high, low income) and compare also the Besetzung der parkplaetze compared 
+ *    to szenario, where the price of all parkings is equal.
+ *    
+ *    
  * 
  * - compare scenarios with 100000 agents and increase parking capacities =>
  * find out, in how many iterations the system finds a proper solution.
@@ -61,6 +53,7 @@ public class MainConfig6 {
 		new BaseControlerScenario(controler);
 
 		initPersonGroupsForStatistics();
+		GlobalRegistry.doPrintGraficDataToConsole=true;
 
 		controler.run();
 	}

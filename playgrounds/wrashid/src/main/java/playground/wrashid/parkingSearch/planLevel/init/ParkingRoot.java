@@ -37,7 +37,7 @@ public class ParkingRoot {
 	private static ParkingWalkingDistanceMeanAndStandardDeviationGraph parkingWalkingDistanceGraph;
 	private static HashMap<Id, Double> parkingWalkingDistanceOfPreviousIteration=null;
 	private static PersonGroups personGroupsForStatistics=null;
-
+	private static double parkingDistanceScalingFactorForOutput=0.1;
 
 	public static ParkingWalkingDistanceMeanAndStandardDeviationGraph getParkingWalkingDistanceGraph() {
 		return parkingWalkingDistanceGraph;
@@ -82,7 +82,13 @@ public class ParkingRoot {
 		cpm = new ClosestParkingMatrix(facilities, network);
 		lpfa = new LinkParkingFacilityAssociation(facilities, network);
 		pc = new ParkingCapacity(facilities);
-		parkingActivityDuration = new ParkingActivityDuration();
+		
+		if (getParkingActivityDuration()==null){
+			// initialize parking activity duration, if already not done at this stage
+			setParkingActivityDuration(new ParkingActivityDuration());
+		}
+		
+		
 		parkingLog=new ArrayList<String>();
 
 		String tempStringValue = controler.getConfig().findParam("parking", "parkingPriceScoreScalingFactor");
@@ -162,6 +168,15 @@ public class ParkingRoot {
 
 	public static PersonGroups getPersonGroupsForStatistics() {
 		return personGroupsForStatistics;
+	}
+
+	public static void setParkingActivityDuration(
+			ParkingActivityDuration parkingActivityDuration) {
+		ParkingRoot.parkingActivityDuration = parkingActivityDuration;
+	}
+	
+	public static double getParkingDistanceScalingFactorForOutput(){
+		return parkingDistanceScalingFactorForOutput;
 	}
 
 }

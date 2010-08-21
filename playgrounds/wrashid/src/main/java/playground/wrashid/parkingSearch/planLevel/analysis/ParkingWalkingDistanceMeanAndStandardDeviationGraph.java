@@ -70,12 +70,14 @@ public class ParkingWalkingDistanceMeanAndStandardDeviationGraph {
 		
 		double[][] matrix=new double[numberOfXValues][numberOfFunctions];
 		
+		double parkingDistanceScalingFactor=ParkingRoot.getParkingDistanceScalingFactorForOutput();
+		
 		for (int i=0;i<numberOfXValues;i++){
-			matrix[i][0]=statisticalValues.get(i).mean;
-			matrix[i][1]=statisticalValues.get(i).mean+statisticalValues.get(i).standardDeviation;
-			matrix[i][2]=statisticalValues.get(i).mean-statisticalValues.get(i).standardDeviation;
-			matrix[i][3]=statisticalValues.get(i).averageIncreaseInParkingWalkingDistance;
-			matrix[i][4]=statisticalValues.get(i).averageDecreaseInParkingWalkingDistance;
+			matrix[i][0]=statisticalValues.get(i).mean*parkingDistanceScalingFactor;
+			matrix[i][1]=(statisticalValues.get(i).mean+statisticalValues.get(i).standardDeviation)*parkingDistanceScalingFactor;
+			matrix[i][2]=(statisticalValues.get(i).mean-statisticalValues.get(i).standardDeviation)*parkingDistanceScalingFactor;
+			matrix[i][3]=statisticalValues.get(i).averageIncreaseInParkingWalkingDistance*parkingDistanceScalingFactor;
+			matrix[i][4]=statisticalValues.get(i).averageDecreaseInParkingWalkingDistance*parkingDistanceScalingFactor;
 			xValues[i]=i;
 		}
 
