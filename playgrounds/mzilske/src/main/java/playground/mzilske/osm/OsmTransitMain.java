@@ -10,7 +10,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.transitSchedule.api.TransitScheduleWriter;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
 import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
-import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
 
 public class OsmTransitMain {
 	
@@ -29,19 +28,19 @@ public class OsmTransitMain {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		new OsmTransitMain("e:/_out/osm/berlinbrandenburg_filtered_subway.osm", TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, "e:/_out/osm/transit-network_bb_subway.xml", "e:/_out/osm/osm_transitSchedule_subway.xml").convertOsm2Matsim();
+		new OsmTransitMain("/Users/michaelzilske/Desktop/wurst/neu.osm", TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, "e:/_out/osm/transit-network_bb_subway.xml", "e:/_out/osm/osm_transitSchedule_subway.xml").convertOsm2Matsim();
 	}
 	
 	public void convertOsm2Matsim(){
 		
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
-		String filename = this.inFile;
-		FastXmlReader reader = new FastXmlReader(new File(filename ), true, CompressionMethod.None);		
+		JOSMTolerantFastXMLReader reader = new JOSMTolerantFastXMLReader(new File(inFile), false, CompressionMethod.None);		
+
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(this.fromCoordSystem, this.toCoordSystem);
 		NetworkSink networkGenerator = new NetworkSink(scenario.getNetwork(), coordinateTransformation);
 		
-// Anmerkung trunk, primary und secondary sollten in Bln als ein Typ behandelt werden
+		// Anmerkung trunk, primary und secondary sollten in Bln als ein Typ behandelt werden
 		
 		// Autobahn
 		networkGenerator.setHighwayDefaults(1, "motorway",      2,  100.0/3.6, 1.2, 2000, true); // 70
@@ -68,22 +67,6 @@ public class OsmTransitMain {
 		// Spielstrassen
 		networkGenerator.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300, false);
 		
-		
-//		networkGenerator.setHighwayDefaults(1, "motorway",      2, 100.0/3.6, 1.2, 2000, true);
-//		networkGenerator.setHighwayDefaults(1, "motorway_link", 1,  60.0/3.6, 1.2, 1500, true);
-//		
-//		networkGenerator.setHighwayDefaults(2, "trunk",         2,  50.0/3.6, 0.5, 1000, false);
-//		networkGenerator.setHighwayDefaults(2, "trunk_link",    1,  50.0/3.6, 0.5, 1000, false);
-//		
-//		networkGenerator.setHighwayDefaults(3, "primary",       1,  50.0/3.6, 0.5, 1000, false);
-//		networkGenerator.setHighwayDefaults(3, "primary_link",  1,  50.0/3.6, 0.5, 1000, false);
-//		
-//		networkGenerator.setHighwayDefaults(4, "secondary",     1,  60.0/3.6, 1.0, 1000, false);
-//		networkGenerator.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  600, false);
-//		networkGenerator.setHighwayDefaults(6, "minor",         1,  45.0/3.6, 1.0,  600, false);
-//		networkGenerator.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600, false);
-//		networkGenerator.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  600, false);
-//		networkGenerator.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300, false);
 		TransitNetworkSink transitNetworkSink = new TransitNetworkSink(scenario.getNetwork(), scenario.getTransitSchedule(), coordinateTransformation, IdTrackerType.BitSet);
 		reader.setSink(networkGenerator);
 		networkGenerator.setSink(transitNetworkSink);
