@@ -281,6 +281,10 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 	private double getParkingActivityDurationPenalty(double parkingArrivalDuration, double parkingDepartureDuration) {
 		double zeroValueForNormalization=0;
 
+		if (parkingArrivalDuration>100){
+			System.out.println();
+		}
+		
 		
 		// impact of parking and un-parking durations
 		double parkingActivityDurationPenalty = -1.0 * ParkingRoot.getParkingActivityDurationPenaltyScalingFactor()

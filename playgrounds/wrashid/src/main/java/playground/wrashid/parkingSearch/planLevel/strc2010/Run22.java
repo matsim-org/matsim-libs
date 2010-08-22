@@ -36,7 +36,7 @@ public class Run22 extends ParkingActivityDuration {
 	// TODO: need to do some experimentation on this
 	public double getActivityDuration(Id parkingFacilityId, Id personId){
 		if (Run27.isPartOfParkingSetCloseToHomeWithin4500Meters(parkingFacilityId) || Run27.isPartOfParkingSetCloseToWorkWithin4500Meters(parkingFacilityId)){
-			return ParkingDefaultScoringFunction.oneValueForNormalizationInSeconds*2;
+			return ParkingDefaultScoringFunction.oneValueForNormalizationInSeconds*10000;
 		}
 		
 		return 60;
