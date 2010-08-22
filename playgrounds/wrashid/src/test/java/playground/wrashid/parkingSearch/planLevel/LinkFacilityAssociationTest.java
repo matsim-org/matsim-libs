@@ -1,5 +1,8 @@
 package playground.wrashid.parkingSearch.planLevel;
 
+import java.util.LinkedList;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -7,8 +10,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkFacilityAssociation;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
+import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingAttribute;
+import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingFacilityAttributes;
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseNonControlerScenario;
 
 public class LinkFacilityAssociationTest extends MatsimTestCase {
@@ -29,6 +35,22 @@ public class LinkFacilityAssociationTest extends MatsimTestCase {
 		// afterwards for verification
 		assertEquals("42", lfa.getFacilities(new IdImpl("50")).get(0).getId().toString());
 		assertEquals(1, lfa.getFacilities(new IdImpl("50")).size());
+		
+		// save state of static variable
+		ParkingFacilityAttributes tempParkingFacilityAttributes = ParkingRoot.getParkingFacilityAttributes();
+		
+		ParkingRoot.setParkingFacilityAttributes(new ParkingFacilityAttributes() {
+			public LinkedList<ParkingAttribute> getParkingFacilityAttributes(Id facilityId) {
+				LinkedList<ParkingAttribute> result=new LinkedList<ParkingAttribute>();
+				result.add(ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG);
+				return result;
+			}
+		});
+		
+		assertEquals(1, lfa.getFacilitiesHavingParkingAttribute(new IdImpl("50"), ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG).size());
+		
+		// reset static variable
+		ParkingRoot.setParkingFacilityAttributes(tempParkingFacilityAttributes);
 	}
 
 	public void testParkingFacility() {
