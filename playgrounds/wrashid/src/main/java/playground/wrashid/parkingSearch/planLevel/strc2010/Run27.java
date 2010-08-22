@@ -6,6 +6,7 @@ import org.matsim.core.controler.Controler;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.GlobalRegistry;
+import playground.wrashid.lib.RunLib;
 import playground.wrashid.lib.obj.plan.PersonGroups;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
@@ -19,11 +20,9 @@ import playground.wrashid.parkingSearch.planLevel.scoring.ParkingDefaultScoringF
 public class Run27  extends IncomeRelevantForParking implements ParkingPriceMapping {
 
 	public static void main(String[] args) {
-		Controler controler;
-		String configFilePath = "H:/data/experiments/STRC2010/input/config27.xml";
-		controler = new Controler(configFilePath);
-
-		new BaseControlerScenario(controler);
+		int runNumber = RunLib.getRunNumber(new Object() {
+		}.getClass().getEnclosingClass());
+		Controler controler = RunSeries.getControler(runNumber);
 
 		ParkingRoot.setParkingScoringFunction(new ParkingDefaultScoringFunction(new Run27(), new Run27()));
 		

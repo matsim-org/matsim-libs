@@ -8,6 +8,7 @@ public class GlobalRegistry {
 	public static boolean isTestingMode = false;
 
 	public static boolean doPrintGraficDataToConsole = false;
+	public static int runNumber;
 
 	public static Double readDoubleFromConfig(String moduleName, String paramName) {
 		String doubleValue = null;

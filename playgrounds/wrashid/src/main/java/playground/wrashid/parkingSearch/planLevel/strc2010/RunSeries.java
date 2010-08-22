@@ -1,0 +1,54 @@
+package playground.wrashid.parkingSearch.planLevel.strc2010;
+
+import java.io.File;
+
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+
+import playground.wrashid.lib.GlobalRegistry;
+import playground.wrashid.lib.Reflection;
+import playground.wrashid.lib.RunLib;
+import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenarioOneLiner;
+
+public class RunSeries {
+	public static String inputBasePath="H:/data/experiments/STRC2010/input/";
+	public static String outputBasePath="H:/data/experiments/STRC2010/output/";
+	public static String configBaseName="config";
+	
+	
+	public static String getConfigName(int runNumber){
+		return inputBasePath+configBaseName+runNumber+".xml";
+	}
+	
+	public static String getOutputFolderFullPath(int runNumber){
+		return outputBasePath+"run"+runNumber+"/";
+	}
+	
+	public static Controler getControler(int runNumber){
+		GlobalRegistry.runNumber=runNumber;
+		GlobalRegistry.doPrintGraficDataToConsole=true;
+		Controler controler= BaseControlerScenarioOneLiner.getControler(getConfigName(runNumber));
+		addOutputFolderPathToControler(controler);
+		return controler;
+	}
+	
+	private static void addOutputFolderPathToControler(Controler controler){
+		String outputFolder=getOutputFolderFullPath(GlobalRegistry.runNumber);
+		new File(outputFolder).mkdir();
+		String iterationFoler=getOutputFolderFullPath(GlobalRegistry.runNumber)+"ITERS/";
+		new File(iterationFoler).mkdir();
+		
+		controler.addControlerListener(new StartupListener() {
+			
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				Controler controler= event.getControler();
+				ControlerIO controlerIO=new ControlerIO(RunSeries.getOutputFolderFullPath(GlobalRegistry.runNumber));
+				Reflection.setField(controler, "controlerIO", controlerIO);
+			}
+		});
+	}
+	
+}

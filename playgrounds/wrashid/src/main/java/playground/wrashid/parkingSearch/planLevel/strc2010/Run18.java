@@ -8,6 +8,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.lib.GlobalRegistry;
+import playground.wrashid.lib.RunLib;
 import playground.wrashid.lib.obj.plan.PersonGroups;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingAttribute;
@@ -19,11 +20,9 @@ import playground.wrashid.parkingSearch.planLevel.scoring.ParkingDefaultScoringF
 public class Run18 {
 
 	public static void main(String[] args) {
-		Controler controler;
-		String configFilePath = "H:/data/experiments/STRC2010/input/config18.xml";
-		controler = new Controler(configFilePath);
-
-		new BaseControlerScenario(controler);
+		int runNumber = RunLib.getRunNumber(new Object() {
+		}.getClass().getEnclosingClass());
+		Controler controler = RunSeries.getControler(runNumber);
 
 		ParkingRoot.setParkingFacilityAttributes(getParkingFacilityAttributes());
 		ParkingRoot.setParkingFacilityAttributPersonPreferences(getParkingFacilityAttributPersonPreferences());

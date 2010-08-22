@@ -6,6 +6,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
 
 import playground.wrashid.lib.GlobalRegistry;
+import playground.wrashid.lib.RunLib;
 import playground.wrashid.lib.obj.plan.PersonGroups;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingActivityDuration.ParkingActivityDuration;
@@ -19,11 +20,9 @@ import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario
  */
 public class Run22 extends ParkingActivityDuration {
 	public static void main(String[] args) {
-		Controler controler;
-		String configFilePath = "H:/data/experiments/STRC2010/input/config22.xml";
-		controler = new Controler(configFilePath);
-
-		new BaseControlerScenario(controler);
+		int runNumber = RunLib.getRunNumber(new Object() {
+		}.getClass().getEnclosingClass());
+		Controler controler = RunSeries.getControler(runNumber);
 
 		ParkingRoot.setParkingActivityDuration(new Run22());
 		GlobalRegistry.doPrintGraficDataToConsole=true;

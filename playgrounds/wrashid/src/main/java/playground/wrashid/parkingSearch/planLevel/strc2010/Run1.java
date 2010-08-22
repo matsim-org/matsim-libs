@@ -5,6 +5,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
 
 import playground.wrashid.lib.GlobalRegistry;
+import playground.wrashid.lib.RunLib;
 import playground.wrashid.lib.obj.plan.PersonGroups;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
@@ -15,10 +16,10 @@ import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario
  * @author wrashid
  * 
  */
-public class Run1 {
+public class Run1 extends SecurityManager {
 	public static void main(String[] args) {
-		new BaseControlerScenarioOneLiner("H:/data/experiments/STRC2010/input/config1.xml").run();
-		GlobalRegistry.doPrintGraficDataToConsole=true;
+		int runNumber=RunLib.getRunNumber(new Object() { }.getClass().getEnclosingClass());
+		RunSeries.getControler(runNumber).run();
 	}
-
+	
 }

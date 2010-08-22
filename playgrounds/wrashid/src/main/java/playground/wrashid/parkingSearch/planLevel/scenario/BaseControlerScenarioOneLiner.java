@@ -5,19 +5,14 @@ import org.matsim.core.controler.Controler;
 
 public class BaseControlerScenarioOneLiner {
 
-	private final String configPath;
-
-	public BaseControlerScenarioOneLiner(String configPath) {
-		this.configPath = configPath;
-	}
-	
-	public void run(){
+	public static Controler getControler(String configPath) {
 		Controler controler;
 		controler = new Controler(configPath);
-
+		
+		
 		new BaseControlerScenario(controler);
-
-		controler.run();
+		
+		return controler;
 	}
 	
 }
