@@ -15,7 +15,7 @@ public class ParkingOccupancyAnalysis {
 
 	private final HashMap<Id, ParkingOccupancyBins> parkingOccupancyBins;
 	private final ParkingCapacity parkingCapacity;
-	private static LinkedList<Double> numberOfParkingViolationSlotsInIteration = new LinkedList<Double>();
+	private static LinkedList<Double> numberOfParkingViolationSlotsInIteration;
 
 	public ParkingOccupancyAnalysis(
 			HashMap<Id, ParkingOccupancyBins> parkingOccupancyBins,
@@ -27,8 +27,14 @@ public class ParkingOccupancyAnalysis {
 
 	public static void updateStatisticsForIteration(int iterationNumber,
 			ParkingOccupancyAnalysis poaWriter) {
+		
+		if (iterationNumber==0){
+			// initialize static variable
+			numberOfParkingViolationSlotsInIteration = new LinkedList<Double>();
+		}
+		
 		if (numberOfParkingViolationSlotsInIteration.size() != iterationNumber) {
-			throw new Error();
+			throw new Error(numberOfParkingViolationSlotsInIteration.size() + "!=" + iterationNumber);
 		}
 
 		double[][] matrix=poaWriter.getMatrix();
