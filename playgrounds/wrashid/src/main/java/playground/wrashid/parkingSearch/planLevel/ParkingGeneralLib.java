@@ -182,7 +182,7 @@ public class ParkingGeneralLib {
 		ParkingTimeInfo parkingTimeInfo=parkingArrivalDepartureLog.getParkingArrivalDepartureList().get(parkingArrivalIndex);
 		
 		if (arrivalParkingAct.getFacilityId()!=parkingTimeInfo.getParkingFacilityId()){
-			throw new Error("facility Ids inconsistent");
+			throw new Error("facility Ids inconsistent:" + arrivalParkingAct.getFacilityId()+"!="+parkingTimeInfo.getParkingFacilityId());
 		}
 		
 		return parkingTimeInfo;
