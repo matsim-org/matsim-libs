@@ -261,8 +261,9 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 	private double getParkingPriceScore(Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId) {
 		double lowestIncome=3000;
 		double zeroValueForNormalization=0;
-		double oneValueForNormalization=parkingPriceMapping.getParkingPrice(parkingFacilityId).getPrice(0,
-				12*3600)/lowestIncome; // in seconds
+		//TODO: make thie following normalization better!!!!
+		double defaultParkingPriceForOneDay=24*3600;
+		double oneValueForNormalization=defaultParkingPriceForOneDay/lowestIncome; // in seconds
 		
 		double parkingPriceScore = -1.0
 				* ParkingRoot.getPriceScoreScalingFactor()
