@@ -49,6 +49,9 @@ public class RunSeries {
 				String outputFolder=getOutputFolderFullPath(GlobalRegistry.runNumber);
 				Controler controler= event.getControler();
 				ControlerIO controlerIO=new ControlerIO(outputFolder);
+				
+				//TODO: write tests for this, which fail when the variable or method names change (and as such can be easily adapted).
+				
 				Reflection.setField(controler, "controlerIO", controlerIO);
 				
 				Reflection.setField(controler.getConfig().controler(), "outputDirectory", outputFolder);
