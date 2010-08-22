@@ -49,7 +49,7 @@ public class Run27  extends IncomeRelevantForParking implements ParkingPriceMapp
 	public ParkingPrice getExpensiveParking(){
 		return new ParkingPrice() {
 			public double getPrice(double startParkingTime, double endParkingTime) {
-				return 2*getCheapParking().getPrice(startParkingTime, endParkingTime);
+				return 10*getCheapParking().getPrice(startParkingTime, endParkingTime);
 			}
 		};
 	}
@@ -57,7 +57,7 @@ public class Run27  extends IncomeRelevantForParking implements ParkingPriceMapp
 	public double getIncome(Id personId){
 		int personIdInt=Integer.parseInt(personId.toString());
 		if (personIdInt %2==0){
-			return 10000;
+			return 50000;
 		} else {
 			return 5000;
 		}
