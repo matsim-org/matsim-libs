@@ -19,6 +19,8 @@ import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMappi
 
 public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 
+	public static double oneValueForNormalizationInSeconds=20*60;
+	
 	public ParkingDefaultScoringFunction(ParkingPriceMapping parkingPriceMapping, IncomeRelevantForParking income,
 			ActivityFacilitiesImpl parkingFacilities) {
 		super(parkingPriceMapping, income, parkingFacilities);
@@ -231,9 +233,7 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 	private double getParkingCapacityViolationPenalty(Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Plan plan) {
 		double parkingCapacityViolationPenalty=0;
 		
-		if (plan.getPerson().getId().toString().equalsIgnoreCase("5")){
-			System.out.println();
-		}
+		
 		
 		if (ParkingRoot.getParkingScoringFunction()
 				.isParkingFullAtTime(parkingFacilityId, parkingTimeInfo.getStartTime() - delta/10.0)) {
@@ -280,7 +280,7 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 
 	private double getParkingActivityDurationPenalty(double parkingArrivalDuration, double parkingDepartureDuration) {
 		double zeroValueForNormalization=0;
-		double oneValueForNormalization=20*60; // in seconds
+
 		
 		// impact of parking and un-parking durations
 		double parkingActivityDurationPenalty = -1.0 * ParkingRoot.getParkingActivityDurationPenaltyScalingFactor()
@@ -313,7 +313,7 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		// let the system calibrate itself, what scaling would render best
 		// results.
 
-		return (parkingActivityDurationPenalty-zeroValueForNormalization)/(oneValueForNormalization);
+		return (parkingActivityDurationPenalty-zeroValueForNormalization)/(oneValueForNormalizationInSeconds);
 	}
 
 }

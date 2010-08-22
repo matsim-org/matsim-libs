@@ -12,6 +12,7 @@ import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingActivityDuration.ParkingActivityDuration;
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenarioOneLiner;
+import playground.wrashid.parkingSearch.planLevel.scoring.ParkingDefaultScoringFunction;
 
 /**
  * 
@@ -32,9 +33,10 @@ public class Run22 extends ParkingActivityDuration {
 		
 	}
 	
-	public double getActivityDuration(Id parkingFacility, Id personId){
-		if (parkingFacility.toString().equalsIgnoreCase("1")){
-			// programm this rightly!!!
+	// TODO: need to do some experimentation on this
+	public double getActivityDuration(Id parkingFacilityId, Id personId){
+		if (Run27.isPartOfParkingSetCloseToHomeWithin4500Meters(parkingFacilityId) || Run27.isPartOfParkingSetCloseToWorkWithin4500Meters(parkingFacilityId)){
+			return ParkingDefaultScoringFunction.oneValueForNormalizationInSeconds*2;
 		}
 		
 		return 60;

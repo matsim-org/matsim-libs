@@ -15,6 +15,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.population.PlanImpl;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEndEventHandler {
@@ -45,7 +46,7 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 
 	public void handleEvent(ActivityStartEvent event) {
 		Id personId = event.getPersonId();
-
+		
 		if (event.getActType().equalsIgnoreCase("parking")) {
 			if (!parkingMode.containsKey(personId)) {
 				// init personParkingMode (first parking action in the morning
@@ -61,6 +62,8 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 
 	@Override
 	public void reset(int iteration) {
+		DebugLib.startDebuggingInIteration(iteration);
+		
 		
 		parkingOccupancyMaintainer=new ParkingOccupancyMaintainer(controler);
 		ParkingRoot.setParkingOccupancyMaintainer(parkingOccupancyMaintainer);

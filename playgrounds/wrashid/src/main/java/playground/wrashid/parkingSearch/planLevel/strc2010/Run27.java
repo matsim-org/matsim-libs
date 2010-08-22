@@ -63,7 +63,7 @@ public class Run27  extends IncomeRelevantForParking implements ParkingPriceMapp
 		}
 	}
 	
-	public boolean isPartOfParkingSetCloseToHomeWithin4500Meters(Id facilityId){
+	public static boolean isPartOfParkingSetCloseToHomeWithin4500Meters(Id facilityId){
 		int facilityIdInt=Integer.parseInt(facilityId.toString());
 		if (facilityIdInt>=1 && facilityIdInt<=5){
 			return true;
@@ -74,7 +74,7 @@ public class Run27  extends IncomeRelevantForParking implements ParkingPriceMapp
 		return false;
 	}
 	
-	public boolean isPartOfParkingSetCloseToWorkWithin4500Meters(Id facilityId){
+	public static boolean isPartOfParkingSetCloseToWorkWithin4500Meters(Id facilityId){
 		int facilityIdInt=Integer.parseInt(facilityId.toString());
 		if (facilityIdInt>=15 && facilityIdInt<=18){
 			return true;

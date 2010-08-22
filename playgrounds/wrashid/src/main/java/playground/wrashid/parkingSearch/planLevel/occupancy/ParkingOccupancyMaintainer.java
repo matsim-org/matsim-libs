@@ -14,6 +14,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
@@ -186,6 +187,10 @@ public class ParkingOccupancyMaintainer {
 		Id personId = event.getPersonId();
 		Id parkingFacilityId = event.getFacilityId();
 		double time = GeneralLib.projectTimeWithin24Hours(event.getTime());
+		
+		if (parkingFacilityId==null){
+			System.out.println();
+		}
 
 		currentParkingOccupancy.decrement(event.getFacilityId());
 
@@ -249,6 +254,10 @@ public class ParkingOccupancyMaintainer {
 			Id personId = (Id) iter.next();
 			Id parkingFacilityId = currentParkingFacilityId.get(personId);
 
+			if (parkingFacilityId==null){
+				System.out.println();
+			}
+			
 			getOccupancyBins(parkingFacilityId).inrementParkingOccupancy(startTimeOfCurrentParking.get(personId),
 					endTimeOfFirstParking.get(personId));
 

@@ -13,7 +13,7 @@ public class ParkingActivityDuration {
 	 * @param personId
 	 * @return
 	 */
-	public double getActivityDuration(Id parkingFacility, Id personId){
+	public double getActivityDuration(Id parkingFacilityId, Id personId){
 		return 60;
 	}
 	
