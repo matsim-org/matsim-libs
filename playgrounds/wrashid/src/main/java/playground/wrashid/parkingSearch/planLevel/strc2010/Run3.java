@@ -30,9 +30,9 @@ public class Run3 {
 	private static void initPersonGroupsForStatistics() {
 		PersonGroups personGroupsForStatistics = new PersonGroups();
 
-		for (int i = 0; i <= 999; i++) {
+		for (int i = 0; i <= 99; i++) {
 			personGroupsForStatistics.addPersonToGroup(
-					"Group-" + Integer.toString(i / 333 + 1), new IdImpl(i));
+					"Group-" + Integer.toString(i / 33 + 1), new IdImpl(i));
 		}
 
 		ParkingRoot.setPersonGroupsForStatistics(personGroupsForStatistics);
