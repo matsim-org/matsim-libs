@@ -54,8 +54,8 @@ public class Run18 {
 				
 				int facilityIdInt=new Integer(facilityId.toString());
 				
-				if (facilityIdInt%5==0){
-					if (facilityIdInt%10==0){
+				if (facilityIdInt%2==0){
+					if (facilityIdInt%3==0){
 						// 10%: only electric parking
 						result.add(ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG);
 					} else {
@@ -64,6 +64,7 @@ public class Run18 {
 						result.add(ParkingAttribute.DUMMY_DEFAULT_PARKING);
 					}
 				} else {
+					// if does not work, introduce 1/3 strategie here.
 					// 90%: only dummy parking
 					result.add(ParkingAttribute.DUMMY_DEFAULT_PARKING);
 				}
@@ -75,7 +76,7 @@ public class Run18 {
 	
 	private static boolean belongsToElectricVehilcleOwnerGroup(Id personId){
 		int personIdInt=new Integer(personId.toString());
-		if (personIdInt%10==0){
+		if (personIdInt%5==0){
 			return true;
 		}
 		return false;
