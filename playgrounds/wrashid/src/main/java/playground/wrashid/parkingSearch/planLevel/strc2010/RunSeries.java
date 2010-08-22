@@ -6,6 +6,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.utils.io.CollectLogMessagesAppender;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.Reflection;
@@ -44,9 +46,18 @@ public class RunSeries {
 			
 			@Override
 			public void notifyStartup(StartupEvent event) {
+				String outputFolder=getOutputFolderFullPath(GlobalRegistry.runNumber);
 				Controler controler= event.getControler();
-				ControlerIO controlerIO=new ControlerIO(RunSeries.getOutputFolderFullPath(GlobalRegistry.runNumber));
+				ControlerIO controlerIO=new ControlerIO(outputFolder);
 				Reflection.setField(controler, "controlerIO", controlerIO);
+				
+				Reflection.setField(controler.getConfig().controler(), "outputDirectory", outputFolder);
+				
+				Reflection.setField(controler, "collectLogMessagesAppender", new CollectLogMessagesAppender());
+				
+				Reflection.callMethod(new IOUtils(), "closeOutputDirLogging", null);
+				
+				Reflection.callMethod(controler, "initLogging", null);
 			}
 		});
 	}
