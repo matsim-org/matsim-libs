@@ -68,7 +68,7 @@ public class Run18 {
 					result.add(ParkingAttribute.DUMMY_DEFAULT_PARKING);
 				}
 				
-				return null;
+				return result;
 			}
 		};
 	}
