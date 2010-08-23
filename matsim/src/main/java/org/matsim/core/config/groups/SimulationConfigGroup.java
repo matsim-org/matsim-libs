@@ -151,6 +151,8 @@ public class SimulationConfigGroup extends Module {
 		Map<String,String> map = super.getComments();
 		map.put(SNAPSHOT_STYLE,"snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link)");
 		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible.") ;
+		map.put(REMOVE_STUCK_VEHICLES, QSimConfigGroup.REMOVE_STUCK_VEHICLES_STRING ) ;
+		map.put(STUCK_TIME, QSimConfigGroup.STUCK_TIME_STRING ) ;
 		return map ;
 	}
 

@@ -137,6 +137,12 @@ public class QSimConfigGroup extends Module {
 		map.put(NUMBER_OF_THREADS, getValue(NUMBER_OF_THREADS));
 		return map;
 	}
+	
+	// measure so that comments remain consistent between Simulation and QSim.  kai, aug'10
+	/* package */ static String REMOVE_STUCK_VEHICLES_STRING=
+		"Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice.";
+	/* package */ static String STUCK_TIME_STRING=
+		"time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move." ;
 
 	@Override
 	public final Map<String, String> getComments() {
@@ -144,6 +150,8 @@ public class QSimConfigGroup extends Module {
 		map.put(SNAPSHOT_STYLE,"snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link)");
 		map.put(NUMBER_OF_THREADS, "Use number of threads > 1 for parallel version using the specified number of threads");
 		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible.") ;
+		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING ) ;
+		map.put(STUCK_TIME, STUCK_TIME_STRING ) ;
 		return map ;
 	}
 	/* direct access */
