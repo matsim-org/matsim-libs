@@ -54,20 +54,25 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
-import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
 import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
+import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
 import org.matsim.run.XY2Links;
 import org.xml.sax.SAXException;
 
 import playground.meisterk.eaptus2010.MyControler;
+import playground.meisterk.kti.config.KtiConfigGroup;
+import playground.meisterk.kti.router.KtiPtRoute;
+import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
@@ -84,6 +89,7 @@ public class MyRuns {
 	//////////////////////////////////////////////////////////////////////
 
 	private enum Run {
+		KTI_PT_ROUTES_PERFORMANCE_TEST("ktiPtRoutesPerformanceTest"),
 		/**
 		 * Re-generate equilibration results of semester project of Elias Aptus.
 		 */
@@ -136,11 +142,52 @@ public class MyRuns {
 			myRuns.eaptus2010ForPhDThesis(methodArgs);
 		} else if (desiredRunName.equals(Run.MOVE_DEMAND_TO_NETWORK.getName())) {
 			myRuns.moveInitDemandToDifferentNetwork(methodArgs);
+		} else if (desiredRunName.equals(Run.KTI_PT_ROUTES_PERFORMANCE_TEST.getName())) {
+			myRuns.ktiPtRoutesPerformanceTest(methodArgs);
 		}
 		logger.info("Running " + desiredRunName + "...done.");
 
 	}
 
+	void ktiPtRoutesPerformanceTest(final String[] args) {
+		
+		ScenarioImpl scenario = new ScenarioImpl();
+		Config config = scenario.getConfig();
+		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
+		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
+		MatsimConfigReader reader = new MatsimConfigReader(config);
+		reader.readFile(args[0]);
+
+		NetworkLayer network = scenario.getNetwork();
+		
+		NodeImpl node = null;
+		
+		node = new NodeImpl(new IdImpl(1));
+		node.setCoord(new CoordImpl(-824635.0, -799519.0));
+		network.addNode(node);
+		
+		node = new NodeImpl(new IdImpl(2));
+		node.setCoord(new CoordImpl(2732681.5, 2625289.25));
+		network.addNode(node);
+		
+		PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);
+		plansCalcRouteKtiInfo.prepare(network);
+
+		int skip = 1;
+		int max = 100000;
+		for (int i = 0; i < max; i++) {
+			String expectedRouteDescription = "kti=300614=6616=456.78=4258=8500301";
+			KtiPtRoute testee = new KtiPtRoute(null, null, plansCalcRouteKtiInfo);
+			testee.setRouteDescription(null, expectedRouteDescription, null);
+			if (i == skip) {
+				logger.info("Constructed " + i + " KtiPtRoute objects with processing route descriptions.");
+				skip += max / 10;
+			}
+		}
+		logger.info("Constructed " + max + " KtiPtRoute objects with processing route descriptions.");
+
+	}
+	
 	void eaptus2010ForPhDThesis(final String[] args) {
 
 		final double[] VARY_LEARNING_RATE = new double[]{1.0, 0.1};

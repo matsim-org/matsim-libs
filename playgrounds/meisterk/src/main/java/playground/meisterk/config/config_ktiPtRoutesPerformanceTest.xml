@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+        [
+                <!ENTITY STUDY_BASE  "/data/matsim/switzerland">
+                <!ENTITY OUTPUT_BASE  "output">
+        ]
+>
+<config>
+
+	<module name="kti">
+		<param name="usePlansCalcRouteKti" value="true" />
+		<param name="pt_traveltime_matrix_filename" value="&STUDY_BASE;/ivt/studies/switzerland/externals/ptNationalModel/2005_OEV_Befoerderungszeit.mtx" />
+		<param name="pt_haltestellen_filename" value="&STUDY_BASE;/ivt/studies/switzerland/externals/ptNationalModel/Haltestellen.txt" />
+		<param name="worldInputFilename" value="&STUDY_BASE;/ivt/studies/switzerland/world/world-natModell.xml" />
+	</module>
+
+</config>
