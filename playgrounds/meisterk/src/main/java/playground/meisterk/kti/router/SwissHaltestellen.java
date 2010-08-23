@@ -67,6 +67,15 @@ public class SwissHaltestellen {
 		return this.haltestellen.get(coord.getX(), coord.getY());
 	}
 	
+	/**
+	 * This method looks up an entry in a collection backed by a QuadTree. It is very slow, possibly because of
+	 * - searching by iteration over a collection, and
+	 * - comparing string Id's via equals() which is known to be a performance killer.
+	 * TODO consider using Ids of primitive type such as int
+	 * 
+	 * @param id
+	 * @return
+	 */
 	public SwissHaltestelle getHaltestelle(Id id) {
 		
 		SwissHaltestelle swissStop = null;
