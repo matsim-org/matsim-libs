@@ -83,11 +83,6 @@ public class PopulationGenerator implements Runnable {
 
 	private PopulationWriter populationWriter;
 
-	public static void main(String[] args) {
-		PopulationGenerator potsdamPop = new PopulationGenerator();
-		potsdamPop.run();
-	}
-
 	@Override
 	public void run() {
 		scenario = new ScenarioImpl();

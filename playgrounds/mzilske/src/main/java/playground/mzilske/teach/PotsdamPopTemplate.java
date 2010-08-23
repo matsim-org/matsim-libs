@@ -18,7 +18,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
 public class PotsdamPopTemplate implements Runnable {

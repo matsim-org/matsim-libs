@@ -62,7 +62,6 @@ import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
 import org.xml.sax.SAXException;
 
-import playground.mrieser.pt.utils.MergeNetworks;
 import playground.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
 
 public class DataPrepare {

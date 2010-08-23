@@ -3,7 +3,7 @@ package playground.mzilske.modechoice;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.population.algorithms.ChooseRandomLegMode;
+import org.matsim.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ChangeLegModeOfOneSubtour extends AbstractMultithreadedModule {
@@ -16,8 +16,7 @@ public class ChangeLegModeOfOneSubtour extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		ChooseRandomLegMode chooseRandomLegMode = new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance());
-		chooseRandomLegMode.setChangeOnlyOneSubtour(true);
+		ChooseRandomLegModeForSubtour chooseRandomLegMode = new ChooseRandomLegModeForSubtour(this.availableModes, MatsimRandom.getLocalInstance());
 		return chooseRandomLegMode;
 	}
 
