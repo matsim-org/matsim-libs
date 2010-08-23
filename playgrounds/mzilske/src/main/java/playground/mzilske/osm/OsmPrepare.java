@@ -41,11 +41,11 @@ public class OsmPrepare {
 		String filename = this.infFile;
 		String targetFilename = this.outFile;
 		
-		FastXmlReader reader = new FastXmlReader(new File(filename), true, CompressionMethod.None);		
+		JOSMTolerantFastXMLReader reader = new JOSMTolerantFastXMLReader(new File(filename), true, CompressionMethod.None);		
 		UsedNodeFilter usedNodeFilter = new UsedNodeFilter(IdTrackerType.BitSet);
 		EntityProgressLogger logger= new EntityProgressLogger(10);
 		
-		FastXmlReader reader2 = new FastXmlReader(new File(filename), true, CompressionMethod.None);		
+		JOSMTolerantFastXMLReader reader2 = new JOSMTolerantFastXMLReader(new File(filename), true, CompressionMethod.None);		
 		EntityProgressLogger logger2= new EntityProgressLogger(10);
 				
 		TagFilter streetTagFilter = createStreetFilter(this.streetFilter);		
