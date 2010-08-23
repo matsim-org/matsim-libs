@@ -60,7 +60,7 @@ public class Run18 {
 				if (facilityIdInt % 2 == 0) {
 					// 10%: only electric parking
 					result.add(ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG);
-				} else if(facilityIdInt % 3 == 0) {
+				} else if(facilityIdInt % 10 == 0) {
 					// 10%: both electric and normal parking
 					result.add(ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG);
 					result.add(ParkingAttribute.DUMMY_DEFAULT_PARKING);
