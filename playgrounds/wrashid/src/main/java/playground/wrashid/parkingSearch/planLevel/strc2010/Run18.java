@@ -24,20 +24,23 @@ public class Run18 {
 		}.getClass().getEnclosingClass());
 		Controler controler = RunSeries.getControler(runNumber);
 
-		ParkingRoot.setParkingFacilityAttributes(getParkingFacilityAttributes());
-		ParkingRoot.setParkingFacilityAttributPersonPreferences(getParkingFacilityAttributPersonPreferences());
-		
-		GlobalRegistry.doPrintGraficDataToConsole=true;
-		
+		ParkingRoot
+				.setParkingFacilityAttributes(getParkingFacilityAttributes());
+		ParkingRoot
+				.setParkingFacilityAttributPersonPreferences(getParkingFacilityAttributPersonPreferences());
+
+		GlobalRegistry.doPrintGraficDataToConsole = true;
+
 		initPersonGroupsForStatistics();
-		
+
 		controler.run();
 	}
-	
-	public static ParkingFacilityAttributPersonPreferences getParkingFacilityAttributPersonPreferences(){
+
+	public static ParkingFacilityAttributPersonPreferences getParkingFacilityAttributPersonPreferences() {
 		return new ParkingFacilityAttributPersonPreferences() {
-			public ParkingAttribute getParkingFacilityAttributPreferencesOfPersonForActivity(Id personId, ActivityImpl activity) {
-				if (belongsToElectricVehilcleOwnerGroup(personId)){
+			public ParkingAttribute getParkingFacilityAttributPreferencesOfPersonForActivity(
+					Id personId, ActivityImpl activity) {
+				if (belongsToElectricVehilcleOwnerGroup(personId)) {
 					return ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG;
 				} else {
 					return ParkingAttribute.DUMMY_DEFAULT_PARKING;
@@ -45,54 +48,48 @@ public class Run18 {
 			}
 		};
 	}
-	
-	
-	private static ParkingFacilityAttributes getParkingFacilityAttributes(){
+
+	private static ParkingFacilityAttributes getParkingFacilityAttributes() {
 		return new ParkingFacilityAttributes() {
-			public LinkedList<ParkingAttribute> getParkingFacilityAttributes(Id facilityId) {
-				LinkedList<ParkingAttribute> result=new LinkedList<ParkingAttribute>();
-				
-				int facilityIdInt=new Integer(facilityId.toString());
-				
-				if (facilityIdInt%2==0){
-					if (facilityIdInt%3==0){
-						// 10%: only electric parking
-						result.add(ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG);
-					} else {
-						// 10%: both electric and normal parking
-						result.add(ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG);
-						result.add(ParkingAttribute.DUMMY_DEFAULT_PARKING);
-					}
-				} else {
-					// if does not work, introduce 1/3 strategie here.
-					// 90%: only dummy parking
+			public LinkedList<ParkingAttribute> getParkingFacilityAttributes(
+					Id facilityId) {
+				LinkedList<ParkingAttribute> result = new LinkedList<ParkingAttribute>();
+
+				int facilityIdInt = new Integer(facilityId.toString());
+
+				if (facilityIdInt % 2 == 0) {
+					// 10%: only electric parking
+					result.add(ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG);
+				} else if(facilityIdInt % 3 == 0) {
+					// 10%: both electric and normal parking
+					result.add(ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG);
 					result.add(ParkingAttribute.DUMMY_DEFAULT_PARKING);
 				}
-				
+
 				return result;
 			}
 		};
 	}
-	
-	private static boolean belongsToElectricVehilcleOwnerGroup(Id personId){
-		int personIdInt=new Integer(personId.toString());
-		if (personIdInt%5==0){
+
+	private static boolean belongsToElectricVehilcleOwnerGroup(Id personId) {
+		int personIdInt = new Integer(personId.toString());
+		if (personIdInt % 5 == 0) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	private static void initPersonGroupsForStatistics() {
 		PersonGroups personGroupsForStatistics = new PersonGroups();
 
 		for (int i = 1; i <= 1000; i++) {
-			Id personId=new IdImpl(i);
-			int groupId=belongsToElectricVehilcleOwnerGroup(personId)?0:1;
-				personGroupsForStatistics.addPersonToGroup(
-						"Group-" + groupId, personId);
+			Id personId = new IdImpl(i);
+			int groupId = belongsToElectricVehilcleOwnerGroup(personId) ? 0 : 1;
+			personGroupsForStatistics.addPersonToGroup("Group-" + groupId,
+					personId);
 		}
 
 		ParkingRoot.setPersonGroupsForStatistics(personGroupsForStatistics);
 	}
-	
+
 }
