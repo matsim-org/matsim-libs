@@ -71,15 +71,15 @@ import de.micromata.opengis.kml.v_2_2_0.Style;
  * @author dgrether
  *
  */
-public class DgOsmBBJunctionFilter {
+public class DgOsmBBJunctionDetectionTools {
 	
-	private static final Logger log = Logger.getLogger(DgOsmBBJunctionFilter.class);
+	private static final Logger log = Logger.getLogger(DgOsmBBJunctionDetectionTools.class);
 	
 	/**
 	 * This is a copy from OsmTransitMain needed to create network
 	 * Could also be placed in a NetworkSinkBuilder to avoid code duplication
 	 */
-	private static NetworkSink createAndInitNetworkSink(Scenario scenario, CoordinateTransformation coordinateTransformation){
+	private NetworkSink createAndInitNetworkSink(Scenario scenario, CoordinateTransformation coordinateTransformation){
 		NetworkSink networkGenerator = new NetworkSink(scenario.getNetwork(), coordinateTransformation);
 		networkGenerator.setHighwayDefaults(1, "motorway",      2, 120.0/3.6, 1.0, 2000, true);
 		networkGenerator.setHighwayDefaults(1, "motorway_link", 1,  80.0/3.6, 1.0, 1500, true);
@@ -99,7 +99,7 @@ public class DgOsmBBJunctionFilter {
 	/**
 	 * Parses an osm xml file and collects  all nodes tagged with "traffic_signals" in the returned OSMEntityCollector
 	 */
-	private static OSMEntityCollector detectAndWriteSignalizedOsmNodes(String osmFile, String nodesOutOsmFile, String nodesOutReportFile){
+	private OSMEntityCollector detectAndWriteSignalizedOsmNodes(String osmFile, String nodesOutOsmFile, String nodesOutReportFile){
 		Set<String> emptyKeys = Collections.emptySet();
 		Map<String, Set<String>> emptyKVs = Collections.emptyMap();
 		Map<String, Set<String>> tagKeyValues = new HashMap<String, Set<String>>();
@@ -128,7 +128,7 @@ public class DgOsmBBJunctionFilter {
 	/**
 	 * Creates an Matsim Network from the osm file 
 	 */
-	private static Network createMatsimNetwork(String osmFile){
+	private Network createMatsimNetwork(String osmFile){
 		// get a Matsim Network
 		// read the file again as NetworkSink modifies the data and the Entities are read-only if a EntityTee is used
 		Scenario sc = new ScenarioImpl();
@@ -149,7 +149,7 @@ public class DgOsmBBJunctionFilter {
 		return sc.getNetwork();
 	}
 	
-	private static TagFilter createTransitWaysFilter() {
+	private TagFilter createTransitWaysFilter() {
 		Map<String, Set<String>> tagKeyValues = new HashMap<String, Set<String>>();
 //		tagKeyValues.put("route", new HashSet<String>(Arrays.asList("tram", "train", "bus")));
 		Set<String> tagKeys = new HashSet<String>();
@@ -167,7 +167,7 @@ public class DgOsmBBJunctionFilter {
 	}
 	
 	
-	private static List<List<org.matsim.api.core.v01.network.Node>> detectAllJunctions(OSMEntityCollector signalizedOsmNodes, Network network){
+	private List<List<org.matsim.api.core.v01.network.Node>> detectAllJunctions(OSMEntityCollector signalizedOsmNodes, Network network){
 		Set<org.matsim.api.core.v01.network.Node> visitedNodes = new HashSet<org.matsim.api.core.v01.network.Node>();
 		
 		List<List<org.matsim.api.core.v01.network.Node>> junctions = new ArrayList<List<org.matsim.api.core.v01.network.Node>>();
@@ -194,7 +194,7 @@ public class DgOsmBBJunctionFilter {
 	}
 	
 	
-	private static List<org.matsim.api.core.v01.network.Node> detectJunction(org.matsim.api.core.v01.network.Node matsimNode, Set<org.matsim.api.core.v01.network.Node> visitedNodes, OSMEntityCollector signalizedOsmNodes){
+	private List<org.matsim.api.core.v01.network.Node> detectJunction(org.matsim.api.core.v01.network.Node matsimNode, Set<org.matsim.api.core.v01.network.Node> visitedNodes, OSMEntityCollector signalizedOsmNodes){
 		visitedNodes.add(matsimNode);
 		List<org.matsim.api.core.v01.network.Node> junctionMatsimNodes = new LinkedList<org.matsim.api.core.v01.network.Node>();
 		junctionMatsimNodes.add(matsimNode);
@@ -217,7 +217,7 @@ public class DgOsmBBJunctionFilter {
 
 	
 	
-	private static void writeJunctionsToKml(List<List<org.matsim.api.core.v01.network.Node>> junctions, String kmlJunctionsOutFile) {
+	private void writeJunctionNodesToKml(List<List<org.matsim.api.core.v01.network.Node>> junctions, String kmlJunctionsOutFile) {
 		CoordinateTransformation coordtransform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM33N, TransformationFactory.WGS84);
 		
 		final Kml kml = new Kml();
@@ -274,19 +274,19 @@ public class DgOsmBBJunctionFilter {
 		String baseInDirOsm = DgPaths.SHAREDSVN + "studies/countries/de/osm_berlinbrandenburg/workingset/";
 		String baseInDirTest = DgPaths.STUDIESDG + "osmBerlinSzenario/";
 		
-//		String baseInDir = baseInDirTest;
-		String baseInDir = baseInDirOsm;
+		String baseInDir = baseInDirTest;
+//		String baseInDir = baseInDirOsm;
 		
 		String bbOsmFile = baseInDirOsm + "berlinbrandenburg_filtered.osm";
 		String testOsmFile = baseInDirTest + "testdata/map_filtered.osm";
 
-//		String osmFile = testOsmFile;
-		String osmFile = bbOsmFile;
+		String osmFile = testOsmFile;
+//		String osmFile = bbOsmFile;
 		
 		String baseOutDirTest = baseInDirTest;
 		
-//		String baseOutDir = baseOutDirTest + "testdata/";
-		String baseOutDir = baseOutDirTest;
+		String baseOutDir = baseOutDirTest + "testdata/";
+//		String baseOutDir = baseOutDirTest;
 		
 		String nodesOutOsmFile = baseOutDir + "potential_junction_nodes.osm";
 		String nodesOutReportFile = baseOutDir + "nodes_filter_report.txt";
@@ -294,17 +294,20 @@ public class DgOsmBBJunctionFilter {
 		String kmlJunctionsOutFile = baseOutDir + "junctions.kml";
 		String kmlNetworkOutFile = baseOutDir + "network.kml";
 		
-		OSMEntityCollector signalizedOsmNodes = detectAndWriteSignalizedOsmNodes(osmFile, nodesOutOsmFile, nodesOutReportFile);
+		DgOsmBBJunctionDetectionTools tools = new DgOsmBBJunctionDetectionTools();
 		
+		OSMEntityCollector signalizedOsmNodes = tools.detectAndWriteSignalizedOsmNodes(osmFile, nodesOutOsmFile, nodesOutReportFile);
 
-		Network network = createMatsimNetwork(osmFile);
+		Network network = tools.createMatsimNetwork(osmFile);
 		new NetworkWriter(network).write(netOutFile);
 		
-		List<List<org.matsim.api.core.v01.network.Node>> junctions = detectAllJunctions(signalizedOsmNodes, network);
+		List<List<org.matsim.api.core.v01.network.Node>> junctionNodes = tools.detectAllJunctions(signalizedOsmNodes, network);
 		
-		writeJunctionsToKml(junctions, kmlJunctionsOutFile);
+		tools.writeJunctionNodesToKml(junctionNodes, kmlJunctionsOutFile);
+		
+		//write network to kml, might exceed max memory
 		new KmlNetworkVisualizer(network).write(kmlNetworkOutFile, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM33N, TransformationFactory.WGS84));
-		
+
 		signalizedOsmNodes.reset();
 		log.info("done!");
 	}
