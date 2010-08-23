@@ -17,6 +17,7 @@ import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.KtiTravelCostCalculatorFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
+import playground.meisterk.kti.scenario.KtiScenarioLoaderImpl;
 import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
 
 /**
@@ -48,11 +49,18 @@ public class KTIControler extends Controler {
 	}
 
 	@Override
-	protected void setUp() {
-
-		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			this.plansCalcRouteKtiInfo.prepare(this.getNetwork());
+	protected void loadData() {
+		if (!this.scenarioLoaded) {
+			this.loader = new KtiScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
+			this.loader.loadScenario();
+			this.network = this.scenarioData.getNetwork();
+			this.population = this.scenarioData.getPopulation();
+			this.scenarioLoaded = true;
 		}
+	}
+
+	@Override
+	protected void setUp() {
 
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				super.config,

@@ -116,16 +116,16 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		String expectedRouteDescription = "kti=321=40000=456.78=40001=654";
 		KtiPtRoute testee = new KtiPtRoute(null, null, this.plansCalcRouteKtiInfo);
 		testee.setRouteDescription(null, expectedRouteDescription, null);
-//		assertEquals(new IdImpl("321"), testee.getFromStop().getId());
-//		assertEquals(new IdImpl("654"), testee.getToStop().getId());
-//		assertEquals(new IdImpl("40000"), testee.getFromMunicipality().getId());
-//		assertEquals(new IdImpl("40001"), testee.getToMunicipality().getId());
-//		assertEquals(456.78, testee.getPtMatrixInVehicleTime().doubleValue());
-		assertNull(testee.getFromStop());
-		assertNull(testee.getToStop());
-		assertNull(testee.getFromMunicipality());
-		assertNull(testee.getToMunicipality());
-		assertNull(testee.getInVehicleTime());
+		assertEquals(new IdImpl("321"), testee.getFromStop().getId());
+		assertEquals(new IdImpl("654"), testee.getToStop().getId());
+		assertEquals(new IdImpl("40000"), testee.getFromMunicipality().getId());
+		assertEquals(new IdImpl("40001"), testee.getToMunicipality().getId());
+		assertEquals(456.78, testee.getInVehicleTime().doubleValue(), MatsimTestCase.EPSILON);
+//		assertNull(testee.getFromStop());
+//		assertNull(testee.getToStop());
+//		assertNull(testee.getFromMunicipality());
+//		assertNull(testee.getToMunicipality());
+//		assertNull(testee.getInVehicleTime());
 
 	}
 
