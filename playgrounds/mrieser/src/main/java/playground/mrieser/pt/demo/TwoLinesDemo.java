@@ -43,6 +43,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -307,7 +308,7 @@ public class TwoLinesDemo {
 		events.addHandler(analysis1);
 		events.addHandler(analysis2);
 
-		TransitQSimulation sim = new TransitQSimulation(this.scenario, events);
+		QSim sim = new QSim(this.scenario, events);
 		sim.addFeature(new OTFVisMobsimFeature(sim));
 		sim.run();
 

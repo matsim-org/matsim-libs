@@ -54,6 +54,7 @@ import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.replanning.TransitStrategyManagerConfigLoader;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
@@ -139,7 +140,7 @@ public class TransitControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		TransitQSimulation sim = new TransitQSimulation(this.scenarioData, this.events);
+		QSim sim = new QSim(this.scenarioData, this.events);
 		if (useOTFVis) {
 			OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(sim);
 			otfVisQSimFeature.setVisualizeTeleportedAgents(sim.getScenario().getConfig().otfVis().isShowTeleportedAgents());

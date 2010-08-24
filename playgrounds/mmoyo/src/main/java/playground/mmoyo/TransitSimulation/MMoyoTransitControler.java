@@ -8,6 +8,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.qsim.TransitQSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 import playground.mzilske.bvg09.TransitControler;
@@ -25,7 +26,7 @@ public class MMoyoTransitControler extends TransitControler {
 	
 	@Override
 	protected void runMobSim() {
-		TransitQSimulation sim = new TransitQSimulation(this.scenarioData, this.events);
+		QSim sim = new QSim(this.scenarioData, this.events);
 		sim.addFeature(new OTFVisMobsimFeature(sim));
 		sim.getQSimTransitEngine().setUseUmlaeufe(true);
 		sim.run();

@@ -45,6 +45,7 @@ import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.replanning.TransitStrategyManagerConfigLoader;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
@@ -108,7 +109,7 @@ public class TransitControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		new TransitQSimulation(this.scenarioData, this.events).run();
+		new QSim(this.scenarioData, this.events).run();
 //		new QueueSimulation(this.scenarioData, this.events).run();
 	}
 

@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
@@ -44,7 +45,7 @@ import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
-import org.matsim.pt.qsim.TransitQSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.layer.OTFSignalLayer;
@@ -105,6 +106,7 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 		}
 		
 		if (ownServer) {
+			Config config = this.queueSimulation.getScenario().getConfig();
 			UUID idOne = UUID.randomUUID();
 			this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), queueSimulation.getEventsManager());
 			this.otfServer.setSimulation(this);
@@ -122,13 +124,13 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 						OTFTeleportAgentsLayer.class);
 
 			}
-			if (queueSimulation instanceof TransitQSimulation) {
+			if (config.scenario().isUseTransit()) {
 				this.otfServer
 						.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
 								queueSimulation.getVisNetwork().getNetwork(),
 								((ScenarioImpl) queueSimulation.getScenario())
 										.getTransitSchedule(),
-								((TransitQSimulation) queueSimulation)
+								((QSim) queueSimulation)
 										.getQSimTransitEngine().getAgentTracker()));
 				this.connectionManager.connectWriterToReader(
 						FacilityDrawer.DataWriter_v1_0.class,
@@ -137,10 +139,7 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 						FacilityDrawer.DataReader_v1_0.class,
 						FacilityDrawer.DataDrawer.class);
 			}
-			if (this.queueSimulation.getScenario().getConfig().scenario()
-					.isUseLanes()
-					&& (!this.queueSimulation.getScenario().getConfig()
-							.scenario().isUseSignalSystems())) {
+			if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
 				this.connectionManager.connectQLinkToWriter(OTFLaneWriter.class);
 				this.connectionManager.connectWriterToReader(OTFLaneWriter.class,
 						OTFLaneReader.class);
@@ -148,11 +147,8 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 						OTFLaneSignalDrawer.class);
 				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
 						OTFLaneLayer.class);
-				this.queueSimulation.getScenario().getConfig().otfVis().setScaleQuadTreeRect(true);
-			} else if (this.queueSimulation.getScenario().getConfig()
-					.scenario().isUseLanes()
-					&& (this.queueSimulation.getScenario().getConfig()
-							.scenario().isUseSignalSystems())) {
+				config.otfVis().setScaleQuadTreeRect(true);
+			} else if (config.scenario().isUseLanes() && (config.scenario().isUseSignalSystems())) {
 				// data source to writer
 				this.connectionManager.connectQLinkToWriter(OTFSignalWriter.class);
 				// writer -> reader: from server to client
@@ -164,7 +160,7 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 				// drawer -> layer
 				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
 						OTFSignalLayer.class);
-				this.queueSimulation.getScenario().getConfig().otfVis().setScaleQuadTreeRect(true);
+				config.otfVis().setScaleQuadTreeRect(true);
 			}
 
 			OTFClientLive client = null;

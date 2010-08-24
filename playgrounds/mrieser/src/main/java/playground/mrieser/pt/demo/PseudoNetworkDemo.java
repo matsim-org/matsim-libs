@@ -42,6 +42,7 @@ import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
@@ -123,7 +124,7 @@ public class PseudoNetworkDemo {
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
 
-		final TransitQSimulation sim = new TransitQSimulation(scenario, events);
+		final QSim sim = new QSim(scenario, events);
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 		sim.addFeature(new OTFVisMobsimFeature(sim));
 		sim.run();

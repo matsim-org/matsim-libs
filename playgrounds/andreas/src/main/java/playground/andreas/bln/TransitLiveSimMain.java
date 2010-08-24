@@ -13,6 +13,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.qsim.TransitQSimulation;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
@@ -58,7 +59,7 @@ public class TransitLiveSimMain {
 		reconstructingUmlaufBuilder.build();
 
 		EventsManager events = new EventsManagerImpl();
-		TransitQSimulation sim = new TransitQSimulation(scenario, events);
+		QSim sim = new QSim(scenario, events);
 		sim.getQSimTransitEngine().setUseUmlaeufe(true);
 		OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(sim);
 		otfVisQSimFeature.setVisualizeTeleportedAgents(sim.getScenario().getConfig().otfVis().isShowTeleportedAgents());

@@ -10,6 +10,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.xml.sax.SAXException;
@@ -31,7 +32,7 @@ public class PtVehiclePlayer {
 		eventManager.addHandler(eventWriter);
 
 		//run simulation with OTFDemo
-		final TransitQSimulation trSimulation = new TransitQSimulation(scenario, eventManager);
+		final QSim trSimulation = new QSim(scenario, eventManager);
 		trSimulation.addFeature(new OTFVisMobsimFeature(trSimulation));
 		new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getVehicles()).run();
 		trSimulation.run();

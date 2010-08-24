@@ -468,7 +468,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 	 * @param now
 	 *
 	 * @param agent
-	 * @param link the link where the agent departs
+	 * @param LINK the link where the agent departs
 	 */
 	protected void agentDeparts(double now, final DriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
