@@ -39,10 +39,6 @@ public interface OTFLiveServerRemote extends OTFServerRemote {
 	public void play() throws RemoteException;
 	
 	public OTFQueryRemote answerQuery(AbstractQuery query) throws RemoteException;
-	
-	public int getControllerStatus() throws RemoteException;
-	
-	public boolean requestControllerStatus(int status) throws RemoteException;
 
 	public void removeQueries() throws RemoteException;
 	

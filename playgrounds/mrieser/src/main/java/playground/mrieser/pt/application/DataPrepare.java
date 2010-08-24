@@ -43,10 +43,11 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vis.otfvis.OTFVisQSim;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
 import org.xml.sax.SAXException;
@@ -209,7 +210,11 @@ public class DataPrepare {
 
 		log.info("start visualizer");
 		EventsManagerImpl events = new EventsManagerImpl();
-		OTFVisQSim client = new OTFVisQSim(visScenario, events);
+		QSim otfVisQSim = new QSim(visScenario, events);
+		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(queueSimulationFeature);
+		queueSimulationFeature.setVisualizeTeleportedAgents(visScenario.getConfig().otfVis().isShowTeleportedAgents());
+		QSim client = otfVisQSim;
 		client.run();
 	}
 

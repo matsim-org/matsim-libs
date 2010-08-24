@@ -22,7 +22,8 @@ package playground.cottbus;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.otfvis.OTFVisQSim;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 /**
  * @author	rschneid-btu
@@ -67,9 +68,13 @@ public class FourWaysVis {
 		loader.loadScenario();
 		
 		EventsManagerImpl events = new EventsManagerImpl();
+		QSim otfVisQSim = new QSim(scenario, events);
+		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(queueSimulationFeature);
+		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
 		
 		
-		OTFVisQSim client = new OTFVisQSim(scenario, events);
+		QSim client = otfVisQSim;
 		client.run();
 		
 		

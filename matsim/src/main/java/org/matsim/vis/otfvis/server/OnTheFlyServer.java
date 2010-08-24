@@ -44,7 +44,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.vis.otfvis.OTFVisControlerListener;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -93,14 +92,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private final Map<String, OTFServerQuad2> quads = new HashMap<String, OTFServerQuad2>();
 
 	private final List<OTFDataWriter<?>> additionalElements= new LinkedList<OTFDataWriter<?>>();
-
-	private int controllerStatus = OTFVisControlerListener.NOCONTROL;
-
-	private int controllerIteration = 0;
-
-	private int stepToIteration = 0;
-
-	private int requestStatus = 0;
 
 	private EventsManager events;
 
@@ -208,9 +199,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public void reset() {
 		status = Status.PAUSE;
 		localTime = 0;
-		controllerStatus = OTFVisControlerListener.RUNNING | controllerIteration;
-		stepToIteration = 0;
-		requestStatus = 0;
 		synchronized (paused) {
 			paused.notifyAll();
 		}
@@ -241,7 +229,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		localTime = (int) time;
 		if (status == Status.STEP) {
 			// Time and Iteration reached?
-			if( (stepToIteration <= controllerIteration) && (stepToTime <= localTime) ) {
+			if (stepToTime <= localTime) {
 				synchronized (stepDone) {
 					stepDone.notifyAll();
 					status = Status.PAUSE;
@@ -260,16 +248,15 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	public boolean requestNewTime(final int time, final TimePreference searchDirection) throws RemoteException {
-		if( ((searchDirection == TimePreference.RESTART) && (time < localTime))){
-			requestStatus = OTFVisControlerListener.CANCEL;
+		if( ((searchDirection == TimePreference.RESTART) && (time < localTime))) { 
 			doStep(time);
 			return true;
-		} else if ((stepToIteration < controllerIteration) || ((stepToIteration == controllerIteration) && (time < localTime)) ) {
+		} else if (time < localTime) {
 			// if requested time lies in the past, sorry we cannot do that right now
 			stepToTime = 0;
 			// if forward search is OK, then the actual timestep is the BEST fit
 			return (searchDirection != TimePreference.EARLIER);
-		} else if ((stepToIteration == controllerIteration) && (time == localTime)) {
+		} else if (time == localTime) {
 			stepToTime = 0;
 			return true;
 		} else {
@@ -414,39 +401,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public Collection<Double> getTimeSteps() throws RemoteException {
 		// There are no timesteps implemented here right now, so we return null instead
 		return null;
-	}
-
-	public boolean requestControllerStatus(int status) throws RemoteException {
-		stepToIteration = status & 0xffffff;
-		requestStatus = status & OTFVisControlerListener.ALL_FLAGS;
-		if(requestStatus == OTFVisControlerListener.CANCEL) {
-			requestStatus = OTFVisControlerListener.CANCEL;
-		}
-		return true;
-	}
-
-	public int getControllerStatus() {
-		if ((controllerStatus == OTFVisControlerListener.RUNNING) && (status == Status.PAUSE))
-			return  OTFVisControlerListener.RUNNING + OTFVisControlerListener.PAUSED;
-		return controllerStatus;
-	}
-
-	public void setControllerStatus(int controllerStatus) {
-		this.controllerStatus = controllerStatus;
-		switch(OTFVisControlerListener.getStatus(controllerStatus)) {
-		case OTFVisControlerListener.STARTUP:
-			// controller is starting up
-			localTime = -1;
-			break;
-		case OTFVisControlerListener.RUNNING:
-			// sim is running
-			controllerIteration = OTFVisControlerListener.getIteration(controllerStatus);
-			break;
-		case OTFVisControlerListener.REPLANNING:
-			// controller is replanning
-			localTime = -1;
-			break;
-		}
 	}
 
 	public void addAdditionalElement(OTFDataWriter<?> element) {

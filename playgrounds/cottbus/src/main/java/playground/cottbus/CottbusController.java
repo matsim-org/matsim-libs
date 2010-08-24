@@ -29,7 +29,8 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.otfvis.OTFVisQSim;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 public class CottbusController {
 	
@@ -56,8 +57,12 @@ public class CottbusController {
 		Scenario sc = scl.loadScenario();
 		sc.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		EventsManagerImpl e = new EventsManagerImpl();
+		QSim otfVisQSim = new QSim(sc, e);
+		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(queueSimulationFeature);
+		queueSimulationFeature.setVisualizeTeleportedAgents(sc.getConfig().otfVis().isShowTeleportedAgents());
 		
-		OTFVisQSim sim = new OTFVisQSim(sc, e);
+		QSim sim = otfVisQSim;
 		sim.run();
 		
 		

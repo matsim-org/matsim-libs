@@ -43,8 +43,6 @@ public class OTFHostConnectionManager {
 
 	protected OTFLiveServerRemote liveHost = null;
 
-	protected int controllerStatus = 0;
-
 	private final Map <String,OTFClientQuad> quads = new HashMap<String,OTFClientQuad>();
 
 	private final Map <String,OTFDrawer> drawer = new HashMap<String,OTFDrawer>();
@@ -81,7 +79,6 @@ public class OTFHostConnectionManager {
 			try {
 				if (host.isLive()){
 					liveHost = (OTFLiveServerRemote)host;
-					controllerStatus = liveHost.getControllerStatus();
 				}
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);

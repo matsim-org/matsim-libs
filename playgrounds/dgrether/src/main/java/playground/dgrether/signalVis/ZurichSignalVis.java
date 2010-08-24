@@ -26,11 +26,12 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.systems.SignalSystems;
-import org.matsim.vis.otfvis.OTFVisQSim;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 import playground.dgrether.DgPaths;
 
@@ -77,8 +78,12 @@ public class ZurichSignalVis {
 		
 		SignalSystemConfigurations signalConfigs = scenario.getSignalSystemConfigurations();
 		new MatsimSignalSystemConfigurationsReader(signalConfigs).readFile(signalConfigsFile);
+		QSim otfVisQSim = new QSim(scenario, events);
+		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(queueSimulationFeature);
+		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
 		
-		OTFVisQSim client = new OTFVisQSim(scenario, events);
+		QSim client = otfVisQSim;
 		client.run();
 	}
 

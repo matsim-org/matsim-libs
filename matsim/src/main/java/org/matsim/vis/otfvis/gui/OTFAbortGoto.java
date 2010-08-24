@@ -25,8 +25,6 @@ import java.rmi.RemoteException;
 import javax.swing.ProgressMonitor;
 
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.otfvis.OTFVisControlerListener;
-import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote.TimePreference;
 
@@ -42,14 +40,10 @@ public class OTFAbortGoto extends Thread  {
 	public boolean terminate = false;
 	private final OTFServerRemote host;
 	private final int toTime;
-	private int toIter = 0;
 	private ProgressMonitor progressMonitor;
-	private int actStatus = 0;
-	private int actIter = 0;
 
 	public OTFAbortGoto(OTFServerRemote host, int toTime, int toIter) {
 		this.toTime = toTime;
-		this.toIter = toIter;
 		this.host = host;
 	}
 
@@ -58,22 +52,17 @@ public class OTFAbortGoto extends Thread  {
 		int actTime = 0;
 		try {
 			actTime = host.getLocalTime();
-			if(host.isLive()) {
-				actStatus = ((OTFLiveServerRemote)host).getControllerStatus();
-				actIter = OTFVisControlerListener.getIteration(actStatus);
-			}
-
 		} catch (RemoteException e1) {
 			e1.printStackTrace();
 		}
-		int from = actTime+3600*30*actIter;
-		int to = toTime+ 3600*30*toIter;
+		int from = actTime;
+		int to = toTime;
 		// this is a reset! start from 00:00:00
-		if(from > to) from = 3600*30*actIter;
+		if(from > to) from = 0;
 
 		progressMonitor = new ProgressMonitor(null,
-                "Running Simulation forward to " + Time.writeTime(toTime),
-                "hat", from, to);
+				"Running Simulation forward to " + Time.writeTime(toTime),
+				"hat", from, to);
 
 		while (!terminate) {
 			try {
@@ -81,23 +70,15 @@ public class OTFAbortGoto extends Thread  {
 				int lastTime = actTime;
 				actTime = host.getLocalTime();
 				if(((lastTime > actTime) || (actTime == -1)) && (host.isLive())){
-					actStatus = ((OTFLiveServerRemote)host).getControllerStatus();
-					actIter = OTFVisControlerListener.getIteration(actStatus);
-					actStatus = OTFVisControlerListener.getStatus(actStatus);
 					if(actTime == -1) actTime = 0;
 				}
 
 				String message = String.format("Completed to Time: "+ Time.writeTime(actTime));
-				if(actStatus == OTFVisControlerListener.RUNNING){
-					message = String.format("Completed to Time: "+ actIter + "#" + Time.writeTime(actTime));
-				} else if( actStatus == OTFVisControlerListener.REPLANNING){
-					message = String.format("Completed to Iteration: "+ actIter + ": REPLANNING");
-				}
 				progressMonitor.setNote(message);
 				double pastMidnight = (actTime > 24*3600) ? (actTime -24*3600)/3600. : 0;
-				int progress = (pastMidnight>0 ? 24*3600 + (int)(5*3600*(pastMidnight/(pastMidnight+1))) : actTime) + 3600*30*actIter;
+				int progress = (pastMidnight>0 ? 24*3600 + (int)(5*3600*(pastMidnight/(pastMidnight+1))) : actTime);
 				progressMonitor.setProgress(progress);
-				if ( ((actIter >= toIter) && (actTime >= toTime)) || progressMonitor.isCanceled()) {
+				if ( (actTime >= toTime) || progressMonitor.isCanceled()) {
 					terminate = true;
 				}
 				//System.out.println("Loc time " + actTime);

@@ -47,7 +47,7 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientSwing;
-import org.matsim.vis.otfvis.OTFVisQSim;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis2.OTFVisClient;
@@ -248,7 +248,11 @@ public class OTFVis {
 		ScenarioImpl scenario = loader.getScenario();
 		EventsManagerImpl events = new EventsManagerImpl();
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
-		VisMobsim queueSimulation = new OTFVisQSim(scenario, events);
+		QSim otfVisQSim = new QSim(scenario, events);
+		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(queueSimulationFeature);
+		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
+		VisMobsim queueSimulation = otfVisQSim;
 
 		// replacing above line by following line runs this with core.mobsim.queuesimulation instead of QSim.
 		// There are, however, things that don't work, for example:

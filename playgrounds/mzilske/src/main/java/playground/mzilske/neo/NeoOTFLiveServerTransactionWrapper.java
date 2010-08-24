@@ -37,10 +37,6 @@ public class NeoOTFLiveServerTransactionWrapper implements OTFLiveServerRemote {
 		}
 	}
 
-	public int getControllerStatus() throws RemoteException {
-		return delegate.getControllerStatus();
-	}
-
 	public int getLocalTime() throws RemoteException {
 		return delegate.getLocalTime();
 	}
@@ -81,10 +77,6 @@ public class NeoOTFLiveServerTransactionWrapper implements OTFLiveServerRemote {
 
 	public void removeQueries() throws RemoteException {
 		delegate.removeQueries();
-	}
-
-	public boolean requestControllerStatus(int status) throws RemoteException {
-		return delegate.requestControllerStatus(status);
 	}
 
 	public boolean requestNewTime(int time, TimePreference searchDirection)

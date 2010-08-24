@@ -23,7 +23,8 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.vis.otfvis.OTFVisQSim;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 
 /* *********************************************************************** *
@@ -107,7 +108,11 @@ public class DgOTFVisReplayLastIteration {
     Gbl.setConfig(config);
     EventsManagerImpl events = new EventsManagerImpl();
     ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
-    OTFVisQSim queueSimulation = new OTFVisQSim(sc, events);
+	QSim otfVisQSim = new QSim(sc, events);
+	OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+	otfVisQSim.addFeature(queueSimulationFeature);
+	queueSimulationFeature.setVisualizeTeleportedAgents(sc.getConfig().otfVis().isShowTeleportedAgents());
+    QSim queueSimulation = otfVisQSim;
     queueSimulation.setControlerIO(controlerIO);
     queueSimulation.setIterationNumber(sc.getConfig().controler().getLastIteration());
     queueSimulation.run();

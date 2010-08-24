@@ -38,7 +38,8 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.otfvis.OTFVisQSim;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 import playground.dgrether.utils.LogOutputEventHandler;
 
@@ -60,7 +61,11 @@ public class DgTeleportationVisEquil {
 		events.addHandler(new LogOutputEventHandler());
 		scenario.getConfig().otfVis().setShowTeleportedAgents(true);
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		OTFVisQSim client = new OTFVisQSim(scenario, events);
+		QSim otfVisQSim = new QSim(scenario, events);
+		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(queueSimulationFeature);
+		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
+		QSim client = otfVisQSim;
 //		client.setVisualizeTeleportedAgents(true);
 		client.run();
 	}

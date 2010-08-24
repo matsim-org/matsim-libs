@@ -43,9 +43,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.OTFVisControlerListener;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 public final class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener {
 
@@ -113,9 +113,6 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		add(createButton(">", STEP_F, "buttonStepF", "go one timestep forward"));
 		add(createButton(">>", STEP_FF, "buttonStepFF", "go several timesteps forward"));
 		MessageFormat format = new MessageFormat("{0,number,00}:{1,number,00}:{2,number,00}");
-		if (this.masterHostConnectionManager.isLiveHost() && (hostControl.getControllerStatus() != OTFVisControlerListener.NOCONTROL)) {
-			format = new MessageFormat("{0,number,00}#{0,number,00}:{1,number,00}:{2,number,00}");
-		}
 		timeField = new JFormattedTextField(format);
 		timeField.setMaximumSize(new Dimension(100,30));
 		timeField.setMinimumSize(new Dimension(80,30));
@@ -233,12 +230,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	}
 
 	private void forwardToTime(String newTime) {
-		int index = newTime.indexOf('#');
-		String tmOfDay = newTime.substring(index + 1);
-		if ((index != -1) && (hostControl.getControllerStatus() != OTFVisControlerListener.NOCONTROL)) {
-			gotoIter = Integer.parseInt(newTime.substring(0, index));
-		}
-		final int newTime_s = (int) Time.parseTime(tmOfDay);
+		final int newTime_s = (int) Time.parseTime(newTime);
 		progressBar = new OTFAbortGoto(masterHostConnectionManager.getOTFServer(), newTime_s, gotoIter);
 		progressBar.start();
 		new Thread() {

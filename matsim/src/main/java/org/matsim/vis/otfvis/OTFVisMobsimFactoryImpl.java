@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.ptproject.qsim.QSim;
 
 
 /**
@@ -31,12 +32,16 @@ import org.matsim.core.mobsim.framework.Simulation;
  */
 public class OTFVisMobsimFactoryImpl implements MobsimFactory {
 
-  /**
-   * @see org.matsim.core.mobsim.framework.MobsimFactory#createMobsim(org.matsim.api.core.v01.Scenario, org.matsim.core.api.experimental.events.EventsManager)
-   */
-  @Override
-  public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
-    return new OTFVisQSim(sc, eventsManager);
-  }
+	/**
+	 * @see org.matsim.core.mobsim.framework.MobsimFactory#createMobsim(org.matsim.api.core.v01.Scenario, org.matsim.core.api.experimental.events.EventsManager)
+	 */
+	@Override
+	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+		QSim otfVisQSim = new QSim(sc, eventsManager);
+		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(queueSimulationFeature);
+		queueSimulationFeature.setVisualizeTeleportedAgents(sc.getConfig().otfVis().isShowTeleportedAgents());
+		return otfVisQSim;
+	}
 
 }

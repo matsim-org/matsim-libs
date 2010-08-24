@@ -149,12 +149,6 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	}
 
 	@Override
-	public int getControllerStatus() throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public void pause() throws RemoteException {
 		synchedPlayback = true;
 	}
@@ -168,11 +162,6 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	@Override
 	public void removeQueries() throws RemoteException {
 		queryServer.removeQueries();
-	}
-
-	@Override
-	public boolean requestControllerStatus(int status) throws RemoteException {
-		return false;
 	}
 
 	@Override

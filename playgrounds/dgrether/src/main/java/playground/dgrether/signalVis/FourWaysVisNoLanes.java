@@ -24,7 +24,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.otfvis.OTFVisQSim;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 
 
@@ -63,8 +64,12 @@ public class FourWaysVisNoLanes {
     loader.loadScenario();
     
     EventsManager events = new EventsManagerImpl();
+	QSim otfVisQSim = new QSim(scenario, events);
+	OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+	otfVisQSim.addFeature(queueSimulationFeature);
+	queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
     
-    OTFVisQSim client = new OTFVisQSim(scenario, events);
+    QSim client = otfVisQSim;
 //    client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
 //    client.setLaneDefinitions(scenario.getLaneDefinitions());
 //    client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());

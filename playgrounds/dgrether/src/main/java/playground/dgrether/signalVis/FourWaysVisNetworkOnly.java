@@ -26,7 +26,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
-import org.matsim.vis.otfvis.OTFVisQSim;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 
 public class FourWaysVisNetworkOnly {
@@ -57,8 +58,12 @@ public class FourWaysVisNetworkOnly {
 		
 		MatsimLaneDefinitionsReader lanesReader = new MatsimLaneDefinitionsReader(laneDefs);
 		lanesReader.readFile(lanesFile);
+		QSim otfVisQSim = new QSim(scenario, events);
+		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(queueSimulationFeature);
+		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
 		
-		OTFVisQSim client = new OTFVisQSim(scenario, events);
+		QSim client = otfVisQSim;
 		client.run();
 		
 		

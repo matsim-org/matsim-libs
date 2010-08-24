@@ -12,10 +12,10 @@ import javax.swing.event.ChangeListener;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.OTFVisControlerListener;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 public class OTFHostControl {
 
@@ -30,8 +30,6 @@ public class OTFHostControl {
 	private int loopStart = 0;
 
 	private int loopEnd = Integer.MAX_VALUE;
-
-	private int controllerStatus = 0;
 
 	private MovieTimer movieTimer = null;
 
@@ -76,11 +74,7 @@ public class OTFHostControl {
 	}
 
 	private void cancel() {
-		try {
-			((OTFLiveServerRemote) this.masterHostConnectionManager.getOTFServer()).requestControllerStatus(OTFVisControlerListener.CANCEL);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		throw new RuntimeException("Can't do that at the moment.");
 	}
 
 	public void stopMovie() {
@@ -115,9 +109,6 @@ public class OTFHostControl {
 	void fetchTimeAndStatus() {
 		try {
 			simTime.setValue(this.masterHostConnectionManager.getOTFServer().getLocalTime());
-			if(controllerStatus != OTFVisControlerListener.NOCONTROL){
-				controllerStatus = ((OTFLiveServerRemote) this.masterHostConnectionManager.getOTFServer()).getControllerStatus();
-			}
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -164,10 +155,6 @@ public class OTFHostControl {
 
 	void setSimTime(int simTime) {
 		this.simTime.setValue(simTime);
-	}
-
-	int getControllerStatus() {
-		return controllerStatus;
 	}
 
 	public void play(boolean synchronizedPlay) {

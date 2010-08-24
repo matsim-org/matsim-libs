@@ -64,7 +64,7 @@ public class OTFVisMobsimFeature implements VisMobsimFeature,
 SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener {
 
 	private static final Logger log = Logger.getLogger("noname");
-	
+
 	protected OnTheFlyServer otfServer = null;
 
 	private boolean ownServer = true;
@@ -77,10 +77,7 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 
 	private VisMobsim queueSimulation;
 
-	private final LinkedHashMap<Id, TeleportationVisData> visTeleportationData = 
-		new LinkedHashMap<Id, TeleportationVisData>();
-
-//	private final LinkedHashMap<Id, Integer> currentActivityNumbers = new LinkedHashMap<Id, Integer>();
+	private final LinkedHashMap<Id, TeleportationVisData> visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
 
 	private final LinkedHashMap<Id, Person> agents = new LinkedHashMap<Id, Person>();
 
@@ -94,17 +91,16 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 	}
 
 	@Override
-//	public void afterPrepareSim() {
 	public void notifySimulationInitialized(@SuppressWarnings("unused") SimulationInitializedEvent ev) {
 		log.warn("receiving simulationInitializedEvent") ;
-		
+
 		for ( MobsimAgent mag : this.queueSimulation.getAgents() ) {
 			if ( mag instanceof PersonAgent ) {
 				PersonAgent pag = (PersonAgent) mag ;
 				agents.put( pag.getPerson().getId(), pag.getPerson() ) ;
 			}
 		}
-		
+
 		if (ownServer) {
 			Config config = this.queueSimulation.getScenario().getConfig();
 			UUID idOne = UUID.randomUUID();
@@ -126,12 +122,12 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 			}
 			if (config.scenario().isUseTransit()) {
 				this.otfServer
-						.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
-								queueSimulation.getVisNetwork().getNetwork(),
-								((ScenarioImpl) queueSimulation.getScenario())
-										.getTransitSchedule(),
-								((QSim) queueSimulation)
-										.getQSimTransitEngine().getAgentTracker()));
+				.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
+						queueSimulation.getVisNetwork().getNetwork(),
+						((ScenarioImpl) queueSimulation.getScenario())
+						.getTransitSchedule(),
+						((QSim) queueSimulation)
+						.getQSimTransitEngine().getAgentTracker()));
 				this.connectionManager.connectWriterToReader(
 						FacilityDrawer.DataWriter_v1_0.class,
 						FacilityDrawer.DataReader_v1_0.class);
@@ -176,7 +172,6 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 	}
 
 	@Override
-//	public void beforeCleanupSim() {
 	public void notifySimulationBeforeCleanup( SimulationBeforeCleanupEvent ev ) {
 		if(ownServer) {
 			this.otfServer.cleanup();
@@ -184,21 +179,11 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 		this.otfServer = null;
 	}
 
-//	@Override
-//	public void beforeHandleAgentArrival(PersonAgent agent) {
-//	}
-
 	@Override
 	public void handleEvent( AgentArrivalEvent ev ) {
 		this.visTeleportationData.remove( ev.getPersonId() ) ;
 	}
 
-//	@Override
-//	public void afterAfterSimStep(final double time) {
-//		this.visualizeTeleportedAgents(time);
-//		this.otfServer.updateStatus(time);
-//	}
-	
 	@Override
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent event) {
 		double time = event.getSimulationTime() ;
@@ -211,34 +196,19 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 		throw new UnsupportedOperationException("although it would be nice to have and should not be that difficult, at this point" 
 				+ " live mode does not support iterations. kai, aug'10" ) ;
 	}
-	
-//	@Override
-//	public void beforeHandleUnknownLegMode(double now, final PersonAgent agent, Link currentLink, Link destinationLink ) {
-//		this.visTeleportationData.put( agent.getPerson().getId() , new TeleportationVisData( 
-//				now, agent.getPerson().getId(), currentLink, destinationLink, agent.getCurrentLeg().getTravelTime() 
-//				) );
-//	}
-	
-// yyyyyy teleportation HErE
 	@Override
 	public void handleEvent( AdditionalTeleportationDepartureEvent ev ) {
-//		/*
-//		 * Note: I cannot, from the transport mode alone, differentiate between teleported and other agents, since teleportation has
-//		 * to do with interaction between mode and mobsim capabilities. Therefore, I need a separate event. My own intuition would
-//		 * be to move this into the mobsim ... since the mobsim should know where agents are, not the visualization. kai, aug'10
-//		 */
-//		if ( eve instanceof AdditionalAgentTeleportationDepartureEventImpl ) {
-//			AdditionalAgentTeleportationDepartureEventImpl ev = (AdditionalAgentTeleportationDepartureEventImpl) eve ;
-			Id agentId = ev.getAgentId() ;
-			double now = ev.getTime() ;
-			Link currLink = this.getVisMobsim().getScenario().getNetwork().getLinks().get( ev.getLinkId() ) ;
-			Link destLink = this.getVisMobsim().getScenario().getNetwork().getLinks().get( ev.getDestinationLinkId() ) ;
-			double travTime = ev.getTravelTime() ;
-			this.visTeleportationData.put( agentId , new TeleportationVisData( now, agentId, currLink, destLink, travTime ) );
-//		}
-		
-		
-		
+		/*
+		 * Note: I cannot, from the transport mode alone, differentiate between teleported and other agents, since teleportation has
+		 * to do with interaction between mode and mobsim capabilities. Therefore, I need a separate event. My own intuition would
+		 * be to move this into the mobsim ... since the mobsim should know where agents are, not the visualization. kai, aug'10
+		 */
+		Id agentId = ev.getAgentId() ;
+		double now = ev.getTime() ;
+		Link currLink = this.getVisMobsim().getScenario().getNetwork().getLinks().get( ev.getLinkId() ) ;
+		Link destLink = this.getVisMobsim().getScenario().getNetwork().getLinks().get( ev.getDestinationLinkId() ) ;
+		double travTime = ev.getTravelTime() ;
+		this.visTeleportationData.put( agentId , new TeleportationVisData( now, agentId, currLink, destLink, travTime ) );
 	}
 
 	private void visualizeTeleportedAgents(double time) {
@@ -258,20 +228,6 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 		this.doVisualizeTeleportedAgents = active;
 	}
 
-//	@Override
-//	public void afterActivityBegins(PersonAgent agent) {
-////		currentActivityNumbers.put(agent.getPerson().getId(), planElementIndex);
-//	}
-
-//	public LinkedHashMap<Id, Integer> getCurrentActivityNumbers() {
-//		return currentActivityNumbers;
-//	}
-
-//	@Override
-//	public void afterActivityEnds(PersonAgent agent, double time) {
-////		currentActivityNumbers.remove(agent.getPerson().getId());
-//	}
-
 	@Override
 	public VisMobsim getVisMobsim() {
 		return queueSimulation;
@@ -288,20 +244,5 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 		}
 		return null;
 	}
-	
-//	@Override
-//	public void handleEvent( AgentEvent eve ) {
-//		if ( eve instanceof AgentCreationEventImpl ) {
-//			Person person = this.getVisMobsim().getScenario().getPopulation().getPersons().get( eve.getPersonId() ) ;
-//			if ( person != null ) {
-//				agents.put( eve.getPersonId(), person ) ;
-//			}
-//		}
-//	}
-
-//	@Override
-//	public void agentCreated(PersonAgent agent) {
-//		agents.put(agent.getPerson().getId(), agent);
-//	}
 
 }

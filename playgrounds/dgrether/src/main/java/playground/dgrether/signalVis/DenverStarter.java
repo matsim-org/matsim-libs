@@ -22,7 +22,8 @@ package playground.dgrether.signalVis;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.otfvis.OTFVisQSim;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
 import playground.dgrether.DgPaths;
 
@@ -42,8 +43,12 @@ public class DenverStarter {
 		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(configFile);
 		Scenario sc = scl.loadScenario();
 		EventsManagerImpl e = new EventsManagerImpl();
+		QSim otfVisQSim = new QSim(sc, e);
+		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
+		otfVisQSim.addFeature(queueSimulationFeature);
+		queueSimulationFeature.setVisualizeTeleportedAgents(sc.getConfig().otfVis().isShowTeleportedAgents());
 		
-		OTFVisQSim sim = new OTFVisQSim(sc, e);
+		QSim sim = otfVisQSim;
 		sim.run();
 		
 		
