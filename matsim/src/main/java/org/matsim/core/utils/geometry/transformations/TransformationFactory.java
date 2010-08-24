@@ -35,8 +35,9 @@ public abstract class TransformationFactory {
 	public final static String CH1903_LV03 = "CH1903_LV03"; // switzerland
 	public final static String GK4 = "GK4"; // berlin/germany, own implementation
 	public final static String WGS84_UTM47S = "WGS84_UTM47S"; // indonesia
-	public final static String WGS84_UTM35S = "WGS84_UTM35S"; // south-africa (Gauteng)
-	public final static String WGS84_UTM36S = "WGS84_UTM36S"; // south africa (eThekwini, Kwazulu-Natal)
+	public final static String WGS84_UTM35S = "WGS84_UTM35S"; // South Africa (Gauteng)
+	public final static String WGS84_UTM36S = "WGS84_UTM36S"; // South Africa (eThekwini, Kwazulu-Natal)
+	public final static String WGS84_Albers = "WGS84_Albers"; // South Africa (Africa Albers Equal Conic)
 	public final static String WGS84_UTM33N = "WGS84_UTM33N"; // Berlin
 	public final static String DHDN_GK4 = "DHDN_GK4"; // berlin/germany, for GeoTools
 	public final static String WGS84_UTM29N = "WGS84_UTM29N"; // coimbra/portugal
