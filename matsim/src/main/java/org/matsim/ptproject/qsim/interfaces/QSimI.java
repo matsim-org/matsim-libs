@@ -19,10 +19,13 @@
 
 package org.matsim.ptproject.qsim.interfaces;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.IOSimulation;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.AgentFactory;
 
@@ -93,5 +96,6 @@ public interface QSimI extends IOSimulation {
 //	 */
 //	@Deprecated // yyyy should be possible to get this from teh config.  kai, may'10
 //	double getStuckTime();
-
+	
+	
 }

@@ -26,6 +26,7 @@ public interface AgentEvent extends PersonEvent {
 
 	public Id getLinkId();
 
+	// yyyyyy why "legmode" for "agent event"?  kai, aug'10
 	public String getLegMode();
 
 }

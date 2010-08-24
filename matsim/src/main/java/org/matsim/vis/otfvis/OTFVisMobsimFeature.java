@@ -29,6 +29,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
@@ -42,7 +45,6 @@ import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.lanes.otfvis.layer.OTFLaneLayer;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.qsim.TransitQSimulation;
-import org.matsim.ptproject.qsim.interfaces.MobsimFeature;
 import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.layer.OTFSignalLayer;
@@ -57,7 +59,8 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
-public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature, SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener  {
+public class OTFVisMobsimFeature implements VisMobsimFeature, 
+SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener {
 
 	private static final Logger log = Logger.getLogger("noname");
 	
@@ -78,7 +81,7 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature, Sim
 
 //	private final LinkedHashMap<Id, Integer> currentActivityNumbers = new LinkedHashMap<Id, Integer>();
 
-	private final LinkedHashMap<Id, PersonAgent> agents = new LinkedHashMap<Id, PersonAgent>();
+	private final LinkedHashMap<Id, Person> agents = new LinkedHashMap<Id, Person>();
 
 	public OTFVisMobsimFeature(VisMobsim queueSimulation) {
 		this.queueSimulation = queueSimulation;
@@ -91,8 +94,16 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature, Sim
 
 	@Override
 //	public void afterPrepareSim() {
-	public void notifySimulationInitialized(SimulationInitializedEvent ev) {
+	public void notifySimulationInitialized(@SuppressWarnings("unused") SimulationInitializedEvent ev) {
 		log.warn("receiving simulationInitializedEvent") ;
+		
+		for ( MobsimAgent mag : this.queueSimulation.getAgents() ) {
+			if ( mag instanceof PersonAgent ) {
+				PersonAgent pag = (PersonAgent) mag ;
+				agents.put( pag.getPerson().getId(), pag.getPerson() ) ;
+			}
+		}
+		
 		if (ownServer) {
 			UUID idOne = UUID.randomUUID();
 			this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), queueSimulation.getEventsManager());
@@ -153,7 +164,7 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature, Sim
 				// drawer -> layer
 				this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
 						OTFSignalLayer.class);
-	       this.queueSimulation.getScenario().getConfig().otfVis().setScaleQuadTreeRect(true);
+				this.queueSimulation.getScenario().getConfig().otfVis().setScaleQuadTreeRect(true);
 			}
 
 			OTFClientLive client = null;
@@ -177,9 +188,13 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature, Sim
 		this.otfServer = null;
 	}
 
+//	@Override
+//	public void beforeHandleAgentArrival(PersonAgent agent) {
+//	}
+
 	@Override
-	public void beforeHandleAgentArrival(PersonAgent agent) {
-		this.visTeleportationData.remove(agent.getPerson().getId());
+	public void handleEvent( AgentArrivalEvent ev ) {
+		this.visTeleportationData.remove( ev.getPersonId() ) ;
 	}
 
 //	@Override
@@ -195,11 +210,39 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature, Sim
 		this.otfServer.updateStatus(time);
 	}
 
-
 	@Override
-	public void beforeHandleUnknownLegMode(double now, final PersonAgent agent, Link link) {
-		this.visTeleportationData.put(agent.getPerson().getId() , 
-				new TeleportationVisData(now, agent, link, this.queueSimulation.getVisNetwork().getNetwork().getLinks().get(agent.getDestinationLinkId())));
+	public void reset( @SuppressWarnings("unused") int cnt ) {
+		throw new UnsupportedOperationException("although it would be nice to have and should not be that difficult, at this point" 
+				+ " live mode does not support iterations. kai, aug'10" ) ;
+	}
+	
+//	@Override
+//	public void beforeHandleUnknownLegMode(double now, final PersonAgent agent, Link currentLink, Link destinationLink ) {
+//		this.visTeleportationData.put( agent.getPerson().getId() , new TeleportationVisData( 
+//				now, agent.getPerson().getId(), currentLink, destinationLink, agent.getCurrentLeg().getTravelTime() 
+//				) );
+//	}
+	
+// yyyyyy teleportation HErE
+	@Override
+	public void handleEvent( AdditionalTeleportationDepartureEvent ev ) {
+//		/*
+//		 * Note: I cannot, from the transport mode alone, differentiate between teleported and other agents, since teleportation has
+//		 * to do with interaction between mode and mobsim capabilities. Therefore, I need a separate event. My own intuition would
+//		 * be to move this into the mobsim ... since the mobsim should know where agents are, not the visualization. kai, aug'10
+//		 */
+//		if ( eve instanceof AdditionalAgentTeleportationDepartureEventImpl ) {
+//			AdditionalAgentTeleportationDepartureEventImpl ev = (AdditionalAgentTeleportationDepartureEventImpl) eve ;
+			Id agentId = ev.getAgentId() ;
+			double now = ev.getTime() ;
+			Link currLink = this.getVisMobsim().getScenario().getNetwork().getLinks().get( ev.getLinkId() ) ;
+			Link destLink = this.getVisMobsim().getScenario().getNetwork().getLinks().get( ev.getDestinationLinkId() ) ;
+			double travTime = ev.getTravelTime() ;
+			this.visTeleportationData.put( agentId , new TeleportationVisData( now, agentId, currLink, destLink, travTime ) );
+//		}
+		
+		
+		
 	}
 
 	private void visualizeTeleportedAgents(double time) {
@@ -243,16 +286,26 @@ public class OTFVisMobsimFeature implements MobsimFeature, VisMobsimFeature, Sim
 	}
 
 	public Person findPersonAgent(Id agentId) {
-		PersonAgent personAgentI = agents.get(agentId);
-		if (personAgentI != null) {
-			return personAgentI.getPerson();
+		Person person = agents.get(agentId);
+		if (person != null) {
+			return person ;
 		}
 		return null;
 	}
+	
+//	@Override
+//	public void handleEvent( AgentEvent eve ) {
+//		if ( eve instanceof AgentCreationEventImpl ) {
+//			Person person = this.getVisMobsim().getScenario().getPopulation().getPersons().get( eve.getPersonId() ) ;
+//			if ( person != null ) {
+//				agents.put( eve.getPersonId(), person ) ;
+//			}
+//		}
+//	}
 
-	@Override
-	public void agentCreated(PersonAgent agent) {
-		agents.put(agent.getPerson().getId(), agent);
-	}
+//	@Override
+//	public void agentCreated(PersonAgent agent) {
+//		agents.put(agent.getPerson().getId(), agent);
+//	}
 
 }

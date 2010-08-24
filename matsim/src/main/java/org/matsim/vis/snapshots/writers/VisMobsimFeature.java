@@ -3,12 +3,22 @@
  */
 package org.matsim.vis.snapshots.writers;
 
-/**This is mostly a hook since right now the access from the mobsim to the otfvis is implemented as a "feature",
- * and in order to go to the original mobsim, you need to go "up".  kai, may'10
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
+import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+
+/**This is a combination of capabilities that is needed to that the otfvis live mode can connect with the mobsim.  Historically,
+ * this used to be the MobsimFeature.  kai, aug'10
  * 
  * @author nagel
  *
  */
-public interface VisMobsimFeature {
+public interface VisMobsimFeature 
+extends 
+SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener,
+AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler
+{
 	VisMobsim getVisMobsim() ;
 }

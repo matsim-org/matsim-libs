@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * AgentDepartureEvent.java
+ * project: matsim
+ * AdditionalTeleportationDepartureEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,42 +21,64 @@
 package org.matsim.core.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 
-public class AgentDepartureEventImpl extends AgentEventImpl implements AgentDepartureEvent {
+/**
+ * @author nagel
+ *
+ */
+@Deprecated // this is a possibly temporary fix to remove the MobsimFeatures.  do not use.  kai, aug'10
+public class AdditionalTeleportationDepartureEvent extends EventImpl {
 
-	public static final String EVENT_TYPE = "departure";
-	
-	private Id destinationLinkId = null ;
-	private Double travelTime = null ;
-	private Boolean isTeleported = null ;
+	private final Id agentId;
+	private final Id linkId;
+	private final String mode;
+	private final Id destinationLinkId;
+	private final double travelTime;
 
-	public AgentDepartureEventImpl(final double time, final Id agentId, final Id linkId, final String legMode) {
-		super(time, agentId, linkId, legMode);
+	/**
+	 * @param time
+	 * @param travelTime 
+	 * @param destinationLinkId 
+	 * @param mode 
+	 * @param linkId 
+	 * @param agentId 
+	 */
+	@Deprecated // this is a possibly temporary fix to remove the MobsimFeatures.  do not use.  kai, aug'10
+	public AdditionalTeleportationDepartureEvent(double now, Id agentId, Id linkId, String mode, Id destinationLinkId, double travelTime) {
+		super(now);
+		this.agentId = agentId;
+		this.linkId = linkId;
+		this.mode = mode;
+		this.destinationLinkId = destinationLinkId;
+		this.travelTime = travelTime;
 	}
 
-	public AgentDepartureEventImpl(double now, Id agentId, Id linkId, String mode, boolean isTeleported, Id destinationLinkId, double travelTime) {
-		super(now, agentId, linkId, mode) ;
-		this.destinationLinkId = destinationLinkId ;
-		this.travelTime = travelTime ;
-		this.isTeleported = isTeleported ;
-	}
-
+	/* (non-Javadoc)
+	 * @see org.matsim.core.events.EventImpl#getEventType()
+	 */
 	@Override
 	public String getEventType() {
-		return EVENT_TYPE;
+		return "teleportation departure" ;
+	}
+
+	public Id getAgentId() {
+		return agentId;
+	}
+
+	public Id getLinkId() {
+		return linkId;
+	}
+
+	public String getMode() {
+		return mode;
 	}
 
 	public Id getDestinationLinkId() {
 		return destinationLinkId;
 	}
 
-	public Double getTravelTime() {
+	public double getTravelTime() {
 		return travelTime;
-	}
-	
-	public Boolean isTeleported() {
-		return this.isTeleported ;
 	}
 
 }

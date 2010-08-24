@@ -43,24 +43,26 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	private double currentX;
 	private double currentY;
 	private double starttime;
-	private Id id;
+	private Id agentId;
 	private int userDefined;
 	private int type;
 	private double colorval;
 	private AgentState state = AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE ;
 
-	public TeleportationVisData(double now, PersonAgent agent, Link fromLink, Link toLink) {
+//	public TeleportationVisData(double now, PersonAgent agent, Link fromLink, Link toLink) {
+	public TeleportationVisData(double now, Id personId, Link fromLink, Link toLink, double travelTime ) {
 		this.starttime = now;
-		this.id = agent.getPerson().getId();
+//		this.agentId = agent.getPerson().getId();
+		this.agentId = personId ;
 		this.startX = fromLink.getToNode().getCoord().getX();
 		this.startY = fromLink.getToNode().getCoord().getY();
-		double traveltime = agent.getCurrentLeg().getTravelTime();
+//		double traveltime = agent.getCurrentLeg().getTravelTime();
 		double endX = toLink.getToNode().getCoord().getX();
 		double endY = toLink.getToNode().getCoord().getY();
 		double dX = endX - startX;
 		double dY = endY - startY;
 		double length = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
-		this.stepsize = length / traveltime;
+		this.stepsize = length / travelTime;
 		this.normalX = dX / length;
 		this.normalY = dY / length;
 		this.currentX = startX;
@@ -85,7 +87,7 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	}
 
 	public Id getId(){
-		return this.id;
+		return this.agentId;
 	}
 
 	//	public double getLength(){

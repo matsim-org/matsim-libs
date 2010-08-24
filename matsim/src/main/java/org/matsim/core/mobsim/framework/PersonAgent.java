@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.PlanElement;
  * @author dgrether
  *
  */
-public interface PersonAgent {
+public interface PersonAgent extends MobsimAgent {
 	
 	public Id getDestinationLinkId();
 	

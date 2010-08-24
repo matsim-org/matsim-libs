@@ -777,43 +777,45 @@ public class TransitQueueSimulationTest {
 			System.out.println(event.toString());
 		}
 
-		assertEquals(23, allEvents.size());
+		int offset=1 ; // "1" if there is an additional teleportation dp event.  kai, aug'10
+
+		assertEquals(2*offset+23, allEvents.size());
 
 		assertTrue(allEvents.get(0) instanceof ActivityEndEventImpl);
 		assertEquals("h", ((ActivityEndEventImpl) allEvents.get(0)).getActType());
 		assertTrue(allEvents.get(1) instanceof AgentDepartureEventImpl);
-		assertTrue(allEvents.get(2) instanceof AgentArrivalEventImpl);
-		assertTrue(allEvents.get(3) instanceof ActivityStartEventImpl);
-		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEventImpl) allEvents.get(3)).getActType());
-		assertTrue(allEvents.get(4) instanceof ActivityEndEventImpl); // zero activity duration, waiting at stop is considered as leg
-		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEventImpl) allEvents.get(4)).getActType());
-		assertTrue(allEvents.get(5) instanceof AgentDepartureEventImpl);
+		assertTrue(allEvents.get(offset+2) instanceof AgentArrivalEventImpl);
+		assertTrue(allEvents.get(offset+3) instanceof ActivityStartEventImpl);
+		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEventImpl) allEvents.get(offset+3)).getActType());
+		assertTrue(allEvents.get(offset+4) instanceof ActivityEndEventImpl); // zero activity duration, waiting at stop is considered as leg
+		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEventImpl) allEvents.get(offset+4)).getActType());
+		assertTrue(allEvents.get(offset+5) instanceof AgentDepartureEventImpl);
 
-		assertTrue(allEvents.get(6) instanceof AgentDepartureEventImpl); // pt-driver
-		assertTrue(allEvents.get(7) instanceof AgentWait2LinkEventImpl); // pt-vehicle
+		assertTrue(allEvents.get(offset+6) instanceof AgentDepartureEventImpl); // pt-driver
+		assertTrue(allEvents.get(offset+7) instanceof AgentWait2LinkEventImpl); // pt-vehicle
 
-		assertTrue(allEvents.get(8) instanceof VehicleArrivesAtFacilityEvent);
-		assertTrue(allEvents.get(9) instanceof PersonEntersVehicleEventImpl);
-		assertTrue(allEvents.get(10) instanceof VehicleDepartsAtFacilityEvent);
+		assertTrue(allEvents.get(offset+8) instanceof VehicleArrivesAtFacilityEvent);
+		assertTrue(allEvents.get(offset+9) instanceof PersonEntersVehicleEventImpl);
+		assertTrue(allEvents.get(offset+10) instanceof VehicleDepartsAtFacilityEvent);
 
-		assertTrue(allEvents.get(11) instanceof LinkLeaveEventImpl); // pt-vehicle
-		assertTrue(allEvents.get(12) instanceof LinkEnterEventImpl); // pt-vehicle
+		assertTrue(allEvents.get(offset+11) instanceof LinkLeaveEventImpl); // pt-vehicle
+		assertTrue(allEvents.get(offset+12) instanceof LinkEnterEventImpl); // pt-vehicle
 
-		assertTrue(allEvents.get(13) instanceof VehicleArrivesAtFacilityEvent); // pt-vehicle
-		assertTrue(allEvents.get(14) instanceof PersonLeavesVehicleEventImpl);
+		assertTrue(allEvents.get(offset+13) instanceof VehicleArrivesAtFacilityEvent); // pt-vehicle
+		assertTrue(allEvents.get(offset+14) instanceof PersonLeavesVehicleEventImpl);
 
-		assertTrue(allEvents.get(15) instanceof AgentArrivalEventImpl);
-		assertTrue(allEvents.get(16) instanceof ActivityStartEventImpl);
-		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEventImpl) allEvents.get(16)).getActType());
-		assertTrue(allEvents.get(17) instanceof ActivityEndEventImpl); // zero activity duration, waiting at stop is considered as leg
-		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEventImpl) allEvents.get(17)).getActType());
+		assertTrue(allEvents.get(offset+15) instanceof AgentArrivalEventImpl);
+		assertTrue(allEvents.get(offset+16) instanceof ActivityStartEventImpl);
+		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEventImpl) allEvents.get(offset+16)).getActType());
+		assertTrue(allEvents.get(offset+17) instanceof ActivityEndEventImpl); // zero activity duration, waiting at stop is considered as leg
+		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEventImpl) allEvents.get(offset+17)).getActType());
 
-		assertTrue(allEvents.get(18) instanceof AgentDepartureEventImpl); // walk
-		assertTrue(allEvents.get(19) instanceof AgentArrivalEventImpl);
-		assertTrue(allEvents.get(20) instanceof ActivityStartEventImpl);
-		assertEquals("w", ((ActivityStartEventImpl) allEvents.get(20)).getActType());
+		assertTrue(allEvents.get(offset+18) instanceof AgentDepartureEventImpl); // walk
+		assertTrue(allEvents.get(2*offset+19) instanceof AgentArrivalEventImpl);
+		assertTrue(allEvents.get(2*offset+20) instanceof ActivityStartEventImpl);
+		assertEquals("w", ((ActivityStartEventImpl) allEvents.get(2*offset+20)).getActType());
 
-		assertTrue(allEvents.get(21) instanceof VehicleDepartsAtFacilityEvent);
-		assertTrue(allEvents.get(22) instanceof AgentArrivalEventImpl); // pt-driver
+		assertTrue(allEvents.get(2*offset+21) instanceof VehicleDepartsAtFacilityEvent);
+		assertTrue(allEvents.get(2*offset+22) instanceof AgentArrivalEventImpl); // pt-driver
 	}
 }

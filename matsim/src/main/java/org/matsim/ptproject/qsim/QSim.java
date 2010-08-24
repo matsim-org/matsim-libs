@@ -37,20 +37,21 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.ControlerIO;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.IOSimulation;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQSimEngine;
@@ -60,10 +61,9 @@ import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.helpers.QPersonAgent;
 import org.matsim.ptproject.qsim.helpers.QSimTimer;
 import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
-import org.matsim.ptproject.qsim.interfaces.AcceptsFeatures;
+import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.MobsimFeature;
 import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.interfaces.QSimEngineFactory;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
@@ -84,6 +84,7 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.VisMobsim;
+import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
@@ -94,7 +95,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author mrieser
  * @author dgrether
  */
-public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, AcceptsFeatures, QSimI {
+public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
@@ -134,7 +135,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	protected Scenario scenario = null;
 	private QSimSignalEngine signalEngine = null;
 
-	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>();
+//	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
 
 	private Integer iterationNumber = null;
@@ -144,6 +145,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	private TransitQSimEngine transitEngine;
 
 	private AgentCounterI agentCounter;
+
+	private Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
 
 	public QSim(final Scenario scenario, final EventsManager events) {
 		this(scenario, events, new DefaultQSimEngineFactory());
@@ -241,7 +244,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		if (this.scenario.getPopulation() == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
-		Collection<PersonAgent> agents = new ArrayList<PersonAgent>();
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			QPersonAgent agent = this.agentFactory.createPersonAgent(p);
@@ -262,11 +264,14 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			agents.addAll(a);
 		}
 
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			for (PersonAgent agent : agents) {
-				queueSimulationFeature.agentCreated(agent);
-			}
-		}
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//			for (PersonAgent agent : agents) {
+//				queueSimulationFeature.agentCreated(agent);
+//			}
+//		}
+//		for (PersonAgent agent : agents) {
+//			this.events.processEvent( new AgentCreationEventImpl( Time.UNDEFINED_TIME, agent.getPerson().getId(), null, null )) ;
+//		}
 	}
 
 	private void initSimTimer() {
@@ -330,7 +335,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	/**
 	 * Close any files, etc.
 	 */
-	protected void cleanupSim(final double seconds) {
+	protected final void cleanupSim(final double seconds) {
 		if (this.transitEngine != null) { // yyyy do after features
 			this.transitEngine.afterSim();
 		}
@@ -351,13 +356,15 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 		for (Tuple<Double, PersonDriverAgent> entry : this.teleportationList) {
 			PersonDriverAgent agent = entry.getSecond();
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
+			events.processEvent(events.getFactory().
+					createAgentStuckEvent(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 		}
 		this.teleportationList.clear();
 
 		for (PersonDriverAgent agent : this.activityEndsList) {
 			if (agent.getDestinationLinkId() != null) {
-				events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), null));
+				events.processEvent(events.getFactory().
+						createAgentStuckEvent(now, agent.getPerson().getId(), agent.getDestinationLinkId(), null));
 			}
 		}
 		this.activityEndsList.clear();
@@ -382,14 +389,21 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * @return true if the simulation needs to continue
 	 */
 	protected final boolean doSimStep(final double time) { // do not overwrite in inheritance.
+		// (network) change events engine:
 		if ( this.changeEventsEngine != null ) {
 			this.changeEventsEngine.doSimStep(time);
 		}
+		// signal engine:
 		if (this.signalEngine != null) {
 			this.signalEngine.doSimStep(time);
 		}
+		// teleportation "engine":
 		this.handleTeleportationArrivals(time);
+
+		// "facilities" "engine":
 		this.handleActivityEnds(time);
+
+		// network engine:
 		if ( this.netEngine != null ) {
 			this.netEngine.doSimStep(time);
 		}
@@ -408,22 +422,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 	protected void afterSimStep(final double time) {
 		// left empty for inheritance
-	}
-
-	private void doSnapshot(final double time) {
-		if (!this.snapshotManager.getSnapshotWriters().isEmpty()) {
-			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-			for (QLinkInternalI link : this.getQNetwork().getLinks().values()) {
-				link.getVisData().getVehiclePositions( positions);
-			}
-			for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
-				writer.beginSnapshot(time);
-				for (AgentSnapshotInfo position : positions) {
-					writer.addAgent(position);
-				}
-				writer.endSnapshot();
-			}
-		}
 	}
 
 	protected void handleTeleportationArrivals(final double now) {
@@ -448,23 +446,22 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 */
 	@Override
 	public void handleAgentArrival(final double now, final PersonDriverAgent agent) {
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.beforeHandleAgentArrival(agent);
-		}
-		getEventsManager().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//			queueSimulationFeature.beforeHandleAgentArrival(agent);
+//		}
+		getEventsManager().processEvent(getEventsManager().getFactory().createAgentArrivalEvent(now, agent.getPerson().getId(),
 				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 	}
 
 
 	/**
-	 * Registers this agent as performing an activity and makes sure that the
-	 * agent will be informed once his departure time has come.
+	 * Registers this agent as performing an activity and makes sure that the agent will be informed once his departure time has come.
 	 * @param agent
 	 *
 	 * @see PersonDriverAgent#getDepartureTime()
 	 */
 	@Override
-	@Deprecated // yyyyyy imho, planElementIndex does not make sense as argument.  imho, should be a Person.  kai, may'10
+	@Deprecated // yyyy should be a PersonAgent.  kai, may'10
 	public void scheduleActivityEnd(final PersonDriverAgent agent) {
 		this.activityEndsList.add(agent);
 		addToAgentsInActivities(agent);
@@ -544,25 +541,47 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	// depending on this, it is a "PersonAgent" or "DriverAgent".  kai, may'10
 	public void agentDeparts(final double now, final PersonDriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
+		Route route = leg.getRoute();
 		String mode = leg.getMode();
-		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, mode));
-//		if (this.notTeleportedModes.contains(mode)){
-		if ( this.handleKnownLegModeDeparture(now, agent, linkId, leg) ) {
+		events.processEvent(events.getFactory().createAgentDepartureEvent(now, agent.getPerson().getId(), linkId, mode ));
+		if ( handleKnownLegModeDeparture(now, agent, linkId, leg) ) {
 			return ;
 		} else {
-			visAndHandleUnknownLegMode(now, agent, linkId);
+			handleUnknownLegMode( now, agent, linkId, leg ) ;
+			events.processEvent(new AdditionalTeleportationDepartureEvent( now, agent.getPerson().getId(), linkId, mode, agent.getDestinationLinkId(), leg.getTravelTime() )) ;
 		}
+
+//		try {
+//			if ( agent.getDestinationLinkId()!=null // check if next operation possible
+//					&& agent.getDestinationLinkId().equals(linkId) // next activity is on same link
+//					&& route instanceof NetworkRoute         // check if next operation possible
+//					&& ((NetworkRoute)route).getLinkIds().isEmpty() // check if this is a leg without movement
+//					) {
+//				agent.legEnds(now) ;
+//			} else if ( this.handleKnownLegModeDeparture(now, agent, linkId, leg)  ) {
+//				return ;
+//			} else {
+//				handleUnknownLegMode(now, agent, linkId, leg);
+//			}
+//		} catch ( RuntimeException ee ) {
+//			throw ee ;
+//		}
+
 	}
 
-	protected void visAndHandleUnknownLegMode(final double now, final PersonDriverAgent agent, final Id linkId) {
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.scenario.getNetwork().getLinks().get(linkId));
-		}
+	private void handleUnknownLegMode(final double now, final PersonDriverAgent agent, final Id linkId, final Leg leg) {
+//		Link     currentLink = this.scenario.getNetwork().getLinks().get(linkId) ;
+//		Link destinationLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId()) ; 
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, currentLink, destinationLink );
+//		}
+		
 		double arrivalTime = now + agent.getCurrentLeg().getTravelTime();
 		this.teleportationList.add(new Tuple<Double, PersonDriverAgent>(arrivalTime, agent));
 	}
 
-	private boolean handleKnownLegModeDeparture(final double now, final PersonDriverAgent agent, final Id linkId, final Leg leg) {
+	private boolean handleKnownLegModeDeparture(final double now, final PersonDriverAgent agent, final Id linkId, final Leg leg) 
+	{
 		for (DepartureHandler departureHandler : this.departureHandlers) {
 			if ( departureHandler.handleDeparture(now, agent, linkId, leg) ) {
 				return true ;
@@ -579,17 +598,34 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	// ############################################################################################################################
 
 	private void printSimLog(final double time) {
-	    if (time >= this.infoTime) {
-	      this.infoTime += INFO_PERIOD;
-	      Date endtime = new Date();
-	      long diffreal = (endtime.getTime() - this.realWorldStarttime.getTime())/1000;
-	      double diffsim  = time - this.simTimer.getSimStartTime();
-	      int nofActiveLinks = this.netEngine.getNumberOfSimulatedLinks();
-	      log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + this.agentCounter.getLiving() + " lost=" + this.agentCounter.getLost() + " #links=" + nofActiveLinks
-	          + " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
-	      Gbl.printMemoryUsage();
-	    }
+		if (time >= this.infoTime) {
+			this.infoTime += INFO_PERIOD;
+			Date endtime = new Date();
+			long diffreal = (endtime.getTime() - this.realWorldStarttime.getTime())/1000;
+			double diffsim  = time - this.simTimer.getSimStartTime();
+			int nofActiveLinks = this.netEngine.getNumberOfSimulatedLinks();
+			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + this.agentCounter.getLiving() 
+					+ " lost=" + this.agentCounter.getLost() + " #links=" + nofActiveLinks
+					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
+			Gbl.printMemoryUsage();
 		}
+	}
+
+	private void doSnapshot(final double time) {
+		if (!this.snapshotManager.getSnapshotWriters().isEmpty()) {
+			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+			for (QLinkInternalI link : this.getQNetwork().getLinks().values()) {
+				link.getVisData().getVehiclePositions( positions);
+			}
+			for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
+				writer.beginSnapshot(time);
+				for (AgentSnapshotInfo position : positions) {
+					writer.addAgent(position);
+				}
+				writer.endSnapshot();
+			}
+		}
+	}
 
 	// ############################################################################################################################
 	// no real functionality beyond this point
@@ -659,9 +695,11 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 	@Override
-	public void addFeature(final MobsimFeature queueSimulationFeature) {
-		this.queueSimulationFeatures.add(queueSimulationFeature);
+	@Deprecated // if you think you need to use this, ask kai.  aug'10
+	public void addFeature(final VisMobsimFeature queueSimulationFeature) {
+//		this.queueSimulationFeatures.add(queueSimulationFeature);
 		this.addQueueSimulationListeners(queueSimulationFeature);
+		this.getEventsManager().addHandler(queueSimulationFeature) ;
 	}
 
 
@@ -719,6 +757,11 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	@Override
 	public void addQueueSimulationListeners(final SimulationListener listener){
 		this.listenerManager.addQueueSimulationListener(listener);
+	}
+
+	@Override
+	public Collection<MobsimAgent> getAgents() {
+		return this.agents ;
 	}
 
 	public TransitQSimEngine getQSimTransitEngine() {

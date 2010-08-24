@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * DriverAgent.java
+ * project: matsim
+ * AdditionalTeleportationDepartureEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,41 +18,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.framework;
+package org.matsim.core.events.handler;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 
 /**
  * @author nagel
  *
  */
-public interface DriverAgent extends MobsimAgent {
-
-	public Id getDestinationLinkId();
+@Deprecated // this is a possibly temporary fix to remove the MobsimFeatures.  do not use.  kai, aug'10
+public interface AdditionalTeleportationDepartureEventHandler extends EventHandler {
 	
-	/**
-	 * Returns the next link the vehicle will drive along.
-	 *
-	 * @return The next link the vehicle will drive on, or null if an error has happened.
-	 */
-	public Id chooseNextLinkId();
+	public void handleEvent( AdditionalTeleportationDepartureEvent eve ) ;
 
-
-//	// yyyy would be nice if this was (Basic)Vehicle, not QVehicle.  kai, may'10
-	public void setVehicle( QVehicle veh ) ;
-	public QVehicle getVehicle() ;
-	
-	/**
-	 * driver should know where she/he is
-	 */
-	public Id getCurrentLinkId();
-
-	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
-
-	/**
-	 * notifies the agent that it was moved over the node
-	 */
-	public void moveOverNode();
-	
 }

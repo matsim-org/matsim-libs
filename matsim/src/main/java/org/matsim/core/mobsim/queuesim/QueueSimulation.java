@@ -50,6 +50,7 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.IOSimulation;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
@@ -63,9 +64,8 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.comparators.DriverAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
-import org.matsim.ptproject.qsim.interfaces.AcceptsFeatures;
+import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
-import org.matsim.ptproject.qsim.interfaces.MobsimFeature;
 import org.matsim.ptproject.qsim.interfaces.QNetworkI;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
@@ -82,6 +82,7 @@ import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 import org.matsim.vis.snapshots.writers.VisMobsim;
+import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
@@ -92,7 +93,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author mrieser
  * @author dgrether
  */
-public class QueueSimulation implements IOSimulation, ObservableSimulation, VisMobsim, AcceptsFeatures, QSimI {
+public class QueueSimulation implements IOSimulation, ObservableSimulation, VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 	// yyyy not sure if I want this public but something has to give for integration with OTFVis.  kai, may'10
 
 	private int snapshotPeriod = 0;
@@ -104,7 +105,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	private final Config config;
 	private final Population population;
 	private QueueNetwork network;
-	protected /* yyyyyy */ Network networkLayer;
+	private Network networkLayer;
 
 	private static EventsManager events = null;
 
@@ -112,7 +113,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
 
-	protected QueueSimEngine simEngine = null;
+	private QueueSimEngine simEngine = null;
 
 	/**
 	 * Includes all agents that have transportation modes unknown to
@@ -145,7 +146,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
 
-	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>() ;
+//	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>() ;
 	private AgentCounterI agentCounter = new AgentCounter() ;
 	private SimTimerI simTimer ;
 
@@ -246,11 +247,15 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		}
 
 
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			for (PersonAgent agent : agents) {
-				queueSimulationFeature.agentCreated(agent);
-			}
-		}
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//			for (PersonAgent agent : agents) {
+//				queueSimulationFeature.agentCreated(agent);
+//			}
+//		}
+//		for (PersonAgent agent : agents) {
+//			QueueSimulation.events.processEvent( new AgentCreationEventImpl( Time.UNDEFINED_TIME, agent.getPerson().getId(), null, null )) ;
+//		}
+
 
 	}
 
@@ -449,9 +454,15 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	protected void handleUnknownLegMode(double now, final PersonDriverAgent agent) {
 		Id startLinkId = agent.getCurrentLeg().getRoute().getStartLinkId() ;
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, this.scenario.getNetwork().getLinks().get(startLinkId));
-		}
+		Leg leg = agent.getCurrentLeg() ;
+
+//		Link     currentLink = this.scenario.getNetwork().getLinks().get(startLinkId) ;
+//		Link destinationLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId()) ; 
+		
+
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, currentLink, destinationLink ) ;
+//		}
 
 //		double arrivalTime = this.simTimer.getTimeOfDayStatic() + agent.getCurrentLeg().getTravelTime();
 		double arrivalTime = this.simTimer.getTimeOfDay() + agent.getCurrentLeg().getTravelTime();
@@ -482,9 +493,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 */
 	@Override
 	public void handleAgentArrival(final double now, PersonDriverAgent agent){
-		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-			queueSimulationFeature.beforeHandleAgentArrival(agent);
-		}
+//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+//			queueSimulationFeature.beforeHandleAgentArrival(agent);
+//		}
 		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
 				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 	}
@@ -542,7 +553,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	public void agentDeparts(double now, final PersonDriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
 		String mode = leg.getMode();
-		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), linkId, leg.getMode()));
+		events.processEvent( events.getFactory().createAgentDepartureEvent( now, agent.getPerson().getId(), linkId, leg.getMode() ) ) ;
 		if (this.notTeleportedModes.contains(mode)){
 			this.handleKnownLegModeDeparture(now, agent, linkId, mode);
 		}
@@ -677,8 +688,11 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 
 	@Override
-	public void addFeature(MobsimFeature queueSimulationFeature) {
-		this.queueSimulationFeatures.add( queueSimulationFeature ) ;
+	public void addFeature(VisMobsimFeature queueSimulationFeature) {
+//		this.queueSimulationFeatures.add( queueSimulationFeature ) ;
+		this.addQueueSimulationListeners(queueSimulationFeature);
+		this.getEventsManager().addHandler(queueSimulationFeature) ;
+		throw new UnsupportedOperationException("not tested") ;
 	}
 
 
@@ -707,6 +721,13 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	@Override
 	public void setAgentFactory( org.matsim.ptproject.qsim.AgentFactory agentFactory) {
+		throw new UnsupportedOperationException() ;
+	}
+
+
+	@Override
+	public Collection<MobsimAgent> getAgents() {
+		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
 

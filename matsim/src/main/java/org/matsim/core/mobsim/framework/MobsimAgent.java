@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * DriverAgent.java
+ * project: matsim
+ * MatsimAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,39 +20,13 @@
 
 package org.matsim.core.mobsim.framework;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.ptproject.qsim.interfaces.QVehicle;
-
-/**
+/**An interface for all matsim mobsim agents.  mobsim agents are entities capable of autonomous behavior.  This could, in my view, 
+ * include signals.  "PersonAgent" as the joint super-interface is almost certainly too tight, since we want to include automatic
+ * drivers.  Possibly, it could be "MobileAgents".  kai, aug'10
+ * 
  * @author nagel
  *
  */
-public interface DriverAgent extends MobsimAgent {
+public interface MobsimAgent {
 
-	public Id getDestinationLinkId();
-	
-	/**
-	 * Returns the next link the vehicle will drive along.
-	 *
-	 * @return The next link the vehicle will drive on, or null if an error has happened.
-	 */
-	public Id chooseNextLinkId();
-
-
-//	// yyyy would be nice if this was (Basic)Vehicle, not QVehicle.  kai, may'10
-	public void setVehicle( QVehicle veh ) ;
-	public QVehicle getVehicle() ;
-	
-	/**
-	 * driver should know where she/he is
-	 */
-	public Id getCurrentLinkId();
-
-	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
-
-	/**
-	 * notifies the agent that it was moved over the node
-	 */
-	public void moveOverNode();
-	
 }
