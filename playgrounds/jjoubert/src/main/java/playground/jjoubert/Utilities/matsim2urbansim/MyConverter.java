@@ -63,7 +63,10 @@ public class MyConverter {
 			double b = 1.070014e-02;
 			double c = -1.464301e-06;
 			double d = 2.694900e-09;
-			double wt = a + b*walkDistance + c*Math.pow(walkDistance,2) + d*Math.pow(walkDistance, 3);
+			double wt = a + 
+						b*walkDistance + 
+						c*Math.pow(walkDistance,2) + 
+						d*Math.pow(walkDistance, 3);
 			/*
 			 * Since the model fitting in R was done on walking time in MINUTES,
 			 * we need to convert it back to seconds, just to be consistent.
