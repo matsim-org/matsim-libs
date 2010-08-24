@@ -38,7 +38,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;

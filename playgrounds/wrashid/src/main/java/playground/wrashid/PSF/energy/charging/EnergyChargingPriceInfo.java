@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.data.HubLinkMapping;
-import playground.wrashid.PSF.data.HubPriceInfo;
 
 public class EnergyChargingPriceInfo {
 	

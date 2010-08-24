@@ -25,8 +25,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;

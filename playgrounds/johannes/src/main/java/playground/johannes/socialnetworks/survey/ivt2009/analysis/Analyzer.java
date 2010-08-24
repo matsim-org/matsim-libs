@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TDoubleObjectIterator;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.File;
@@ -34,28 +32,19 @@ import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
 import org.opengis.referencing.FactoryException;
 
 import playground.johannes.socialnetworks.gis.BeelineCostFunction;
-import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
-import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
 import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbability;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCosts;
 import playground.johannes.socialnetworks.graph.spatial.analysis.GraphClippingFilter;
-import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCostFunction;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedEdgeCosts;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;

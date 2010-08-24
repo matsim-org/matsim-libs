@@ -29,7 +29,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-//import org.matsim.vis.netvis.NetVis;
 import org.matsim.vis.otfvis.OTFVisQSim;
 
 public class CottbusController {

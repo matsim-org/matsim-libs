@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.xml.sax.SAXException;
 

@@ -7,7 +7,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 
-import playground.gregor.sim2d.peekabot.PeekABotClient;
 import playground.gregor.sim2d.peekabot.Sim2DVis;
 import playground.gregor.sim2d.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d.simulation.Sim2D;

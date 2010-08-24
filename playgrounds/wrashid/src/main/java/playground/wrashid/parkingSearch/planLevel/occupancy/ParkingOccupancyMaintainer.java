@@ -1,6 +1,5 @@
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -10,16 +9,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 
-import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.list.ListElementMarkForRemoval;
-import playground.wrashid.lib.obj.list.Lists;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingTimeInfo;

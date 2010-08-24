@@ -2,13 +2,11 @@ package playground.gregor.flooding;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.QuadTree;
 
 import ucar.ma2.Array;
 import ucar.ma2.ArrayDouble;
@@ -23,8 +21,6 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Variable;
 import ucar.nc2.iosp.IOServiceProvider;
-
-import com.vividsolutions.jts.geom.Coordinate;
 
 public class CutFlooding {
 

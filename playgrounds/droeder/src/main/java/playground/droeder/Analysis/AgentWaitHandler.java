@@ -37,9 +37,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author droeder

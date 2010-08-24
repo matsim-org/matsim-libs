@@ -42,7 +42,6 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 /**
  * @author dstrippgen

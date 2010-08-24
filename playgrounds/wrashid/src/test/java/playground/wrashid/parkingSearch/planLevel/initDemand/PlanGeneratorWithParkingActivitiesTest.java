@@ -2,14 +2,14 @@ package playground.wrashid.parkingSearch.planLevel.initDemand;
 
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-
-import junit.framework.TestCase;
 
 public class PlanGeneratorWithParkingActivitiesTest extends TestCase{
 

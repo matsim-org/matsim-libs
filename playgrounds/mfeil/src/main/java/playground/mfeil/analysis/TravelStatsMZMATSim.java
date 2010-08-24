@@ -21,7 +21,6 @@
 package playground.mfeil.analysis;
 
 import java.io.File;
-
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Map;
@@ -30,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -37,9 +37,8 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.mfeil.AgentsAttributesAdder;
 

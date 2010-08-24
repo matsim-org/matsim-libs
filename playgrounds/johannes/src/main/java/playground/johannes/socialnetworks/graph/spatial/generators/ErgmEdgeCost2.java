@@ -42,7 +42,6 @@ import org.matsim.contrib.sna.math.Distribution;
 import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.mcmc.GraphProbability;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessability;
 import playground.johannes.socialnetworks.statistics.Discretizer;

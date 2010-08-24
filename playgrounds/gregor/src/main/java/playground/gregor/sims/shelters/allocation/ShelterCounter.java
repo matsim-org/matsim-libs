@@ -1,6 +1,5 @@
 package playground.gregor.sims.shelters.allocation;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -8,8 +7,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-//import org.matsim.core.api.experimental.events.LinkEnterEvent;
-//import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;

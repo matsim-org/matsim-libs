@@ -29,10 +29,10 @@ import org.matsim.core.mobsim.framework.Simulation;
 
 import playground.mrieser.core.sim.features.StatusFeature;
 import playground.mrieser.core.sim.impl.ActivityHandler;
+import playground.mrieser.core.sim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.sim.impl.LegHandler;
 import playground.mrieser.core.sim.impl.PlanSimulationImpl;
 import playground.mrieser.core.sim.impl.TeleportationHandler;
-import playground.mrieser.core.sim.impl.DefaultTimestepSimEngine;
 
 public class TeleportOnlySimFactory implements MobsimFactory {
 

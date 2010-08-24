@@ -2,8 +2,6 @@ package playground.wrashid.parkingSearch.planLevel.scoring;
 
 import org.matsim.core.facilities.ActivityFacilityImpl;
 
-import playground.wrashid.PSF.energy.charging.ChargeLog;
-
 
 /**
  * The facility is ordered accoring to the value (which can be a score, if ordering according to score is required)

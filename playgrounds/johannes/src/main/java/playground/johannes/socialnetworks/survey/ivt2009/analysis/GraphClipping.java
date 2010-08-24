@@ -24,8 +24,6 @@ import java.io.IOException;
 import org.geotools.feature.Feature;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
@@ -40,6 +38,8 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger

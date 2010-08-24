@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import playground.jjoubert.Utilities.MyActivityReader;
-import playground.jjoubert.Utilities.Clustering.DJCluster;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

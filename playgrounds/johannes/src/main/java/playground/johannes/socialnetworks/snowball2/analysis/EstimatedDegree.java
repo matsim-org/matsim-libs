@@ -27,7 +27,6 @@ import java.util.Set;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.VertexDecorator;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;

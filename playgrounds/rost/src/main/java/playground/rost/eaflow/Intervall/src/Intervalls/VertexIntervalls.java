@@ -25,7 +25,6 @@ package playground.rost.eaflow.Intervall.src.Intervalls;
 
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import org.matsim.api.core.v01.network.Link;
 

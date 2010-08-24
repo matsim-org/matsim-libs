@@ -9,7 +9,9 @@ package bibtex.expansions;
 import java.util.LinkedList;
 import java.util.List;
 
-import bibtex.dom.*;
+import bibtex.dom.BibtexFile;
+import bibtex.dom.BibtexPerson;
+import bibtex.dom.BibtexPersonList;
 import bibtex.dom.BibtexString;
 
 /**

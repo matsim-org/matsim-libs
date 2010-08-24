@@ -36,10 +36,7 @@ import playground.jjoubert.CommercialTraffic.Activity;
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.CommercialVehicle;
 import playground.jjoubert.CommercialTraffic.GPSPoint;
-import playground.jjoubert.CommercialTraffic.ChainAnalysis.MyCommercialChainAnalyser;
 import playground.jjoubert.Utilities.MyXmlConverter;
-
-import cern.colt.matrix.impl.SparseDoubleMatrix3D;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

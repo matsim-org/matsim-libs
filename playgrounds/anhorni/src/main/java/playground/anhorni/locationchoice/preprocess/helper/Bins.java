@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.io.IOUtils;

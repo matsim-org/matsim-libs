@@ -3,7 +3,7 @@ package playground.anhorni.counts;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-//import org.apache.log4j.Logger;
+
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class CountStation {

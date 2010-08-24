@@ -1,7 +1,5 @@
 package playground.wrashid.parkingSearch.planLevel.scoring;
 
-import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.obj.plan.PersonGroups;
 
 public class PersonGroupParkingScoreGraphicGenerator {

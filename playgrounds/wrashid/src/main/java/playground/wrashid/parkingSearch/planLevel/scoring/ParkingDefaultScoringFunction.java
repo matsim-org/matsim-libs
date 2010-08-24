@@ -1,16 +1,10 @@
 package playground.wrashid.parkingSearch.planLevel.scoring;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.ScoringFunction;
 
-import playground.wrashid.PSF.parking.ParkingInfo;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;

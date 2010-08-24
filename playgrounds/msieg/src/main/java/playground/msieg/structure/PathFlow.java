@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.Transformer;
-
 
 /**
  * This is to define a pathbased flow representation of an flow

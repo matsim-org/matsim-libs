@@ -23,10 +23,8 @@ package playground.dressler.ea_flow;
 //java imports
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ListIterator;
 
-//matsim imports
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 

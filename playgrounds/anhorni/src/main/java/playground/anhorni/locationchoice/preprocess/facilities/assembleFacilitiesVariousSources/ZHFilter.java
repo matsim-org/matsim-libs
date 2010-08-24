@@ -3,6 +3,7 @@ package playground.anhorni.locationchoice.preprocess.facilities.assembleFaciliti
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 

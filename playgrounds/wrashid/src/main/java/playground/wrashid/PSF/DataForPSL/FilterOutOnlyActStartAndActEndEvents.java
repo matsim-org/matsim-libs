@@ -9,8 +9,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 
-import opendap.util.gui.msg_box;
-
 public class FilterOutOnlyActStartAndActEndEvents implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	public static EventsManagerImpl eventManagerForWritingOutEvents;

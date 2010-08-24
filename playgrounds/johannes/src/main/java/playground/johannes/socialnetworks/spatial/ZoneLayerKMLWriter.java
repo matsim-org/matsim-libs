@@ -19,11 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.spatial;
 
-import java.awt.Color;
-
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
+
+import java.awt.Color;
+
 import net.opengis.kml._2.BoundaryType;
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;
@@ -41,7 +42,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.vis.kml.KMZWriter;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

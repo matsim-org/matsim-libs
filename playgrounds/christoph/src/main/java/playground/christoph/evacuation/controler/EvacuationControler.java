@@ -46,8 +46,6 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.EvacuationDuringActivityReplanningModule;
 import playground.christoph.evacuation.mobsim.EvacuationDuringLegReplanningModule;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
-import playground.christoph.evacuation.network.AddExitLinksToNetwork;
-import playground.christoph.evacuation.network.AddSecureFacilitiesToNetwork;
 import playground.christoph.evacuation.withinday.replanning.CurrentLegToRescueFacilityReplanner;
 import playground.christoph.evacuation.withinday.replanning.CurrentLegToSecureFacilityReplanner;
 import playground.christoph.evacuation.withinday.replanning.EndActivityAndEvacuateReplanner;

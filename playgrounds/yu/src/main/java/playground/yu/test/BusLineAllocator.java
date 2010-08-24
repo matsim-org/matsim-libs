@@ -30,8 +30,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -58,9 +58,9 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.api.TransitLine;

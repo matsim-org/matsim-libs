@@ -1,7 +1,6 @@
 package playground.wrashid.lib.tools.plan;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -10,8 +9,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.api.core.v01.population.Population;
-
 
 import playground.wrashid.lib.GeneralLib;
 

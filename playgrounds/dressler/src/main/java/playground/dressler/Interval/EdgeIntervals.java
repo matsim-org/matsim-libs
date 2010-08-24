@@ -25,11 +25,6 @@ package playground.dressler.Interval;
 //java imports
 import java.util.ArrayList;
 
-import javax.management.RuntimeErrorException;
-
-//playground imports
-import playground.dressler.control.FlowCalculationSettings;
-
 /**
  * class representing the flow of an edge in a Time Expanded Network
  * @author Manuel Schneider, Daniel Dressler

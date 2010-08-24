@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.PSF.ParametersPSF;
-import playground.wrashid.PSF.energy.charging.optimizedCharging.EnergyBalance;
 
 public class ChargeLog implements Comparable<ChargeLog> {
 

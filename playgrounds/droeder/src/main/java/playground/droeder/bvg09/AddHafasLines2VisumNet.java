@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -29,7 +29,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -40,7 +39,6 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;
-import playground.droeder.gis.DaShapeWriter;
 
 public class AddHafasLines2VisumNet {
 	

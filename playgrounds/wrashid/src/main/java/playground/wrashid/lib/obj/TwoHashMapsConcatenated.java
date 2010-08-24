@@ -1,8 +1,6 @@
 package playground.wrashid.lib.obj;
 
 import java.util.HashMap;
-
-import playground.wrashid.tryouts.plan.NewPopulation;
 //TODO: write tests.
 public class TwoHashMapsConcatenated<ClassKey1,ClassKey2,ClassValue> {
 

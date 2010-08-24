@@ -7,7 +7,6 @@ import java.util.Map;
 
 import playground.rost.eaflow.ea_flow.Flow;
 import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings;
-import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
 
 public class FlowMarketPlaceImpl implements MarketPlace<Flow>{
 

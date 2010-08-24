@@ -30,6 +30,7 @@
 package playground.rost.osm2matconverter.xmlosmbase;
 
 import java.math.BigInteger;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;

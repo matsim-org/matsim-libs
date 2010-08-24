@@ -5,9 +5,6 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-import playground.wrashid.PHEV.parking.data.Facility;
-import playground.wrashid.PHEV.parking.data.GarageParkingData;
-
 // This class can read the file located at 
 // C:\data\SandboxCVS\ivt\studies\switzerland\world\gg25_2001_infos.txt
 public class GG25Data {

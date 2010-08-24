@@ -29,14 +29,14 @@ import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 
+import playground.jjoubert.Utilities.MyShapefileReader;
+import playground.jjoubert.Utilities.KernelDensityEstimation.MyRaster;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-
-import playground.jjoubert.Utilities.MyShapefileReader;
-import playground.jjoubert.Utilities.KernelDensityEstimation.MyRaster;
 
 public class RunKdeAnalyser {
 	private final static Logger log = Logger.getLogger(RunKdeAnalyser.class);

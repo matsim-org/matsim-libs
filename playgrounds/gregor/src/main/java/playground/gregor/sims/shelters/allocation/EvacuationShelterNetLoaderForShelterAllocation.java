@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;

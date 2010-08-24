@@ -1,12 +1,12 @@
 package playground.anhorni.choiceSetGeneration.helper;
 
 //import org.apache.log4j.Logger;
+import java.util.Iterator;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordUtils;
-
-import java.util.Iterator;
-import java.util.TreeMap;
 
 public class ChoiceSet {
 

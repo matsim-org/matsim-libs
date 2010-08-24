@@ -20,25 +20,15 @@
 package playground.droeder.charts;
 
 import java.awt.Color;
-import java.awt.Paint;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.xy.XYDataset;
-import org.matsim.core.utils.io.IOUtils;
 
 import playground.droeder.DaColorScheme;
 

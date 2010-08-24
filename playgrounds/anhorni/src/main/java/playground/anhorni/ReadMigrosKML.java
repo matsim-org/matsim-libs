@@ -5,14 +5,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
-import org.w3c.dom.*;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException; 
+import org.xml.sax.SAXParseException;
 
 public class ReadMigrosKML {
 
@@ -23,8 +26,8 @@ public class ReadMigrosKML {
 	
 	public void read() {
 		
-		//TODO: Namen prüfen in KML
-		String [] kreise = {"Zürich","Altstetten", "Albisrieden", "Friesenberg", "Leimbach", "Wollishofen", "Witikon", "Hirzenbach", "Höngg", 
+		//TODO: Namen prï¿½fen in KML
+		String [] kreise = {"Zï¿½rich","Altstetten", "Albisrieden", "Friesenberg", "Leimbach", "Wollishofen", "Witikon", "Hirzenbach", "Hï¿½ngg", 
 				"Affoltern", "Seebach", "Oerlikon", "Saatlen", "Schwamendingen"};
 		
 		String outfile = "../../matsim/output/Migros.txt";	

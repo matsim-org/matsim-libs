@@ -1,7 +1,10 @@
 package playground.mmoyo.utils;
 
-import java.io.*;
-import java.util.zip.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**Extracts only station counts graphs and error graphs from a kmz file*/
 public class KMZ_Extractor {

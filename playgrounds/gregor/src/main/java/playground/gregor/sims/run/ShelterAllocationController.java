@@ -39,15 +39,15 @@ import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.gregor.sims.shelters.allocation.EvacuationShelterNetLoaderForShelterAllocation;
+import playground.gregor.sims.shelters.allocation.GreedyShelterAllocator;
+import playground.gregor.sims.shelters.allocation.ShelterAllocationRePlanner;
+import playground.gregor.sims.shelters.allocation.ShelterCounter;
+import playground.gregor.sims.shelters.allocation.ShelterLocationRePlannerII;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
-
-import playground.gregor.sims.shelters.allocation.EvacuationShelterNetLoaderForShelterAllocation;
-import playground.gregor.sims.shelters.allocation.ShelterAllocationRePlanner;
-import playground.gregor.sims.shelters.allocation.GreedyShelterAllocator;
-import playground.gregor.sims.shelters.allocation.ShelterCounter;
-import playground.gregor.sims.shelters.allocation.ShelterLocationRePlannerII;
 
 public class ShelterAllocationController extends Controler {
 

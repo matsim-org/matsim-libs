@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.GlobalRegistry;

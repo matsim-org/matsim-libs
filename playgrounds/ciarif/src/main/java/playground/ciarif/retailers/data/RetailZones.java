@@ -2,6 +2,7 @@ package playground.ciarif.retailers.data;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 

@@ -20,37 +20,20 @@
 
 package playground.mmoyo.ptRouterAdapted;
 
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.RouteWRefs;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.router.*;
 
 public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 	private static final Logger log = Logger.getLogger(AdaptedPlansCalcTransitRoute.class);

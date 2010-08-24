@@ -30,7 +30,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.benjamin.income.BkControlerIncome;
-import playground.dgrether.utils.LogOutputEventHandler;
 
 /**
  * Tests the routing of the BkControlerIncome

@@ -36,10 +36,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * @author illenberger

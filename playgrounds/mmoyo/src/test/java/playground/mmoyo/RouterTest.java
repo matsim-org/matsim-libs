@@ -21,29 +21,11 @@
 package playground.mmoyo;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.xml.sax.SAXException;
-
-import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 
 public class RouterTest extends MatsimTestCase {
 

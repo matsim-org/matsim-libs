@@ -3,9 +3,6 @@ package playground.wrashid.lib;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-import playground.wrashid.PSF.energy.charging.ChargeLog;
-import playground.wrashid.lib.obj.CoordXComparable;
-
 /**
  * The idea is, that you define intervals, where the function is defined.
  * Everywhere else the function is undefined and throws an error.

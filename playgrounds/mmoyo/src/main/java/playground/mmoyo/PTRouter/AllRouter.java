@@ -1,9 +1,11 @@
 package playground.mmoyo.PTRouter;
 
 import java.io.IOException;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.xml.sax.SAXException;
-import playground.mmoyo.PTRouter.PTValues;
+
 import playground.mmoyo.TransitSimulation.PlanRouter;
 
 /**routes scenario with a defined cost calculations and increasing parameters coefficients**/

@@ -56,8 +56,8 @@ import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCa
 import playground.christoph.router.util.SimpleRouterFactory;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 import playground.christoph.withinday.mobsim.InitialReplanningModule;
-import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.KnowledgeWithinDayQSim;
+import playground.christoph.withinday.mobsim.ReplanningManager;
 import playground.christoph.withinday.mobsim.WithinDayPersonAgent;
 import playground.christoph.withinday.mobsim.WithinDayQSim;
 import playground.christoph.withinday.replanning.InitialReplanner;

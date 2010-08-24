@@ -24,7 +24,6 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.xml.sax.SAXException;

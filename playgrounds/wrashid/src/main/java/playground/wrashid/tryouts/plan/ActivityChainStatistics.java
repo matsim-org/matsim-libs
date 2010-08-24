@@ -3,15 +3,12 @@ package playground.wrashid.tryouts.plan;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;

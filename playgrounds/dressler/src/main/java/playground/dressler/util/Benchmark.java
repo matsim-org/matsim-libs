@@ -5,7 +5,6 @@ import java.util.Random;
 import playground.dressler.Interval.EdgeInterval;
 import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.Interval;
-import playground.dressler.Interval.Intervals;
 import playground.dressler.Interval.VertexInterval;
 import playground.dressler.Interval.VertexIntervals;
 

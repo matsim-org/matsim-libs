@@ -5,13 +5,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.jfree.chart.JFreeChart;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.entity.StandardEntityCollection;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
-
 
 import com.lowagie.text.PageSize;
 

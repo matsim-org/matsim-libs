@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;

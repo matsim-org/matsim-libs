@@ -3,14 +3,13 @@ package playground.wrashid.parkingSearch.planLevel.analysis;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.apache.commons.math.stat.descriptive.moment.Mean;
+import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.Collections;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
-
-import org.apache.commons.math.stat.descriptive.moment.Mean;
-import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 
 public class ParkingWalkingDistanceMeanAndStandardDeviationGraph {
 

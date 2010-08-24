@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;

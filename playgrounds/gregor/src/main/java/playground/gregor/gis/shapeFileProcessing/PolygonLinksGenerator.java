@@ -20,11 +20,9 @@
 
 package playground.gregor.gis.shapeFileProcessing;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,13 +36,10 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 
-
-import com.sun.opengl.impl.Java2D;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;

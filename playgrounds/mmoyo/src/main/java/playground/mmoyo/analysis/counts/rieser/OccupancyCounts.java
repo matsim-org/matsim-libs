@@ -15,7 +15,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;

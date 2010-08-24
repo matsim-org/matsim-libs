@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
+
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 

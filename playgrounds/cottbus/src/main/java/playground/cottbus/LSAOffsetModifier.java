@@ -10,6 +10,7 @@ package playground.cottbus;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;

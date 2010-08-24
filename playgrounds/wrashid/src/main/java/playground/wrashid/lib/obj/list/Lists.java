@@ -2,7 +2,6 @@ package playground.wrashid.lib.obj.list;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Arrays;
 
 public class Lists {
 

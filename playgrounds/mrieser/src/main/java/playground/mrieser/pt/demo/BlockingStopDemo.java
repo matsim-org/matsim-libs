@@ -44,7 +44,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.api.Departure;

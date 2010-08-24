@@ -16,7 +16,6 @@ import org.openstreetmap.osmosis.core.task.v0_6.RunnableSource;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.core.xml.common.CompressionActivator;
 import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
-import org.openstreetmap.osmosis.core.xml.v0_6.impl.FastXmlParser;
 
 
 /**

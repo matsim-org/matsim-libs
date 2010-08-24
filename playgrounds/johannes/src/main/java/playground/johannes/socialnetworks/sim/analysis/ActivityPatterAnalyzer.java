@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.sim.analysis;
 
+import gnu.trove.TObjectIntHashMap;
+import gnu.trove.TObjectIntIterator;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -32,8 +32,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 
 import com.vividsolutions.jts.geom.GeometryFactory;

@@ -25,8 +25,6 @@ import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 import org.matsim.contrib.sna.graph.spatial.io.VertexDegreeColorizer;
 
-import playground.johannes.socialnetworks.snowball2.sim.VertexSamplingCounter;
-
 /**
  * @author illenberger
  *

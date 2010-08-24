@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;

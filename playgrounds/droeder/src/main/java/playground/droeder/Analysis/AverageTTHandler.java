@@ -19,22 +19,6 @@
  * *********************************************************************** */
 package playground.droeder.Analysis;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.apache.log4j.Logger;
-import org.jfree.chart.ChartColor;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
@@ -45,10 +29,6 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.utils.charts.XYLineChart;
-
-import playground.dgrether.analysis.charts.DgAxisBuilder;
-import playground.dgrether.analysis.charts.DgDefaultAxisBuilder;
 
 /**
  * @author droeder

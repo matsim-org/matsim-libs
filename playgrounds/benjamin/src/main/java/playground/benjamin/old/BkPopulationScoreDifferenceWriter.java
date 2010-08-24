@@ -1,26 +1,13 @@
 package playground.benjamin.old;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.jfree.chart.ChartColor;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.io.IOUtils;
-
-import playground.dgrether.analysis.charts.utils.DgChartWriter;
 
 public class BkPopulationScoreDifferenceWriter {
 

@@ -42,15 +42,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.network.NetworkChangeEvent;
 import org.xml.sax.SAXException;
 
 import playground.dressler.Interval.EdgeIntervals;
@@ -64,7 +61,6 @@ import playground.dressler.ea_flow.StepEdge;
 import playground.dressler.ea_flow.StepSinkFlow;
 import playground.dressler.ea_flow.StepSourceFlow;
 import playground.dressler.ea_flow.TimeExpandedPath;
-import playground.dressler.ea_flow.TwinTaskQueue;
 import playground.dressler.util.CPUTimer;
 import playground.dressler.util.ImportSimpleNetwork;
 

@@ -1,9 +1,6 @@
 package playground.wrashid.PSF.converter.scenario;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 
 import playground.wrashid.PSF.converter.addingParkings.AddParkingsToPlans;
 import playground.wrashid.PSF.converter.addingParkings.GenerateParkingFacilities;

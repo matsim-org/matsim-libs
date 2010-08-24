@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

@@ -33,7 +33,6 @@ import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSampledComponents;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 
 /**
  * @author illenberger

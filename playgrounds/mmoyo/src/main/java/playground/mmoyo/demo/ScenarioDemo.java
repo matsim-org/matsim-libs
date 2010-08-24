@@ -28,8 +28,8 @@ import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+
 import playground.mmoyo.TransitSimulation.MMoyoTransitControler;
-//import playground.mzilske.bvg09.TransitControler;
 
 /**copy of marcel.pt.demo.equilNet.EquilnetDemo.java to test the ptRouter in the simulation*/
 public class ScenarioDemo {

@@ -1,14 +1,14 @@
 package playground.mmoyo.Validators;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.api.core.v01.Id;
 
 import playground.mmoyo.utils.TransScenarioLoader;
-
-import java.util.ArrayList;
-import java.util.List;
 
 //validates a 1-1 relationship between stopFacility and link
 public class StopFacilityValidator {

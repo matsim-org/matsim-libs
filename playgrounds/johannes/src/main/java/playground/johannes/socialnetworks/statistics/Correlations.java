@@ -23,16 +23,16 @@
  */
 package playground.johannes.socialnetworks.statistics;
 
+import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TDoubleDoubleIterator;
+import gnu.trove.TDoubleIntHashMap;
+
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 
 import org.matsim.core.utils.io.IOUtils;
-
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
-import gnu.trove.TDoubleIntHashMap;
 
 /**
  * @author illenberger

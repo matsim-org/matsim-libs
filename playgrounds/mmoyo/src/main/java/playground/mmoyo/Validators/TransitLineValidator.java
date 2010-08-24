@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;

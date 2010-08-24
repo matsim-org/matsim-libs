@@ -5,7 +5,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.transitSchedule.api.TransitRoute;

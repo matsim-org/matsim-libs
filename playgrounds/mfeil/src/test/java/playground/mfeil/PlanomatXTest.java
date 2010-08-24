@@ -28,10 +28,10 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.testcases.MatsimTestCase;
+
 import playground.mfeil.FilesForTests.Initializer;
 
 

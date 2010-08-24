@@ -3,6 +3,7 @@ package playground.anhorni.choiceSetGeneration.io;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;

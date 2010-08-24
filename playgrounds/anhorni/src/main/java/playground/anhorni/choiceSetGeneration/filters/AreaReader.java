@@ -1,9 +1,9 @@
 package playground.anhorni.choiceSetGeneration.filters;
 
-import com.vividsolutions.jts.geom.Polygon;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
+
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -11,6 +11,7 @@ import org.geotools.feature.FeatureIterator;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class AreaReader {
 	

@@ -39,7 +39,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.api.Departure;

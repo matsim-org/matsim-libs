@@ -3,17 +3,11 @@ package playground.wrashid.parkingSearch.planLevel.occupancy;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.population.PlanImpl;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;

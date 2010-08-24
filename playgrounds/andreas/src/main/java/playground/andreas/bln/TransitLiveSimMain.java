@@ -12,7 +12,6 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
-import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;

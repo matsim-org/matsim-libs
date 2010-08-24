@@ -2,7 +2,7 @@ package playground.anhorni.counts;
 
 import java.util.Iterator;
 import java.util.List;
-//import org.apache.log4j.Logger;
+
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;

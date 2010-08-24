@@ -1,15 +1,11 @@
 package playground.joschka.lsacvs2kml;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -25,7 +21,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.xml.sax.SAXException;
 
 
 

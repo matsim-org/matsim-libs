@@ -14,12 +14,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.evacuation.flooding.FloodingInfo;
 import org.matsim.evacuation.flooding.FloodingLine;
 import org.matsim.evacuation.flooding.FloodingReader;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

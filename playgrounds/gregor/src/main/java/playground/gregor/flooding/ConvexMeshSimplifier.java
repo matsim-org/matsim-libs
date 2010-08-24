@@ -13,7 +13,6 @@ import java.util.Stack;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryRegistryException;
@@ -34,6 +33,8 @@ import org.matsim.evacuation.flooding.FloodingInfo;
 import org.matsim.evacuation.flooding.FloodingReader;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.gregor.MY_STATIC_STUFF;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -42,8 +43,6 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-
-import playground.gregor.MY_STATIC_STUFF;
 
 public class ConvexMeshSimplifier {
 

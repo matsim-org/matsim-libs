@@ -23,12 +23,6 @@
 package playground.dressler.Interval;
 
 //java imports
-import java.util.ArrayList;
-
-import javax.management.RuntimeErrorException;
-
-//playground imports
-import playground.dressler.control.FlowCalculationSettings;
 
 /**
  * Class representing a binary value over time.

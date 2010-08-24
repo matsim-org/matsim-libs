@@ -19,7 +19,6 @@ import org.xml.sax.SAXException;
 
 import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.utils.FileCompressor;
-import playground.mmoyo.utils.PlanFragmenter;
 import playground.mmoyo.utils.TransScenarioLoader;
 
 /**reads a config file, routes the transit plans and writes a routed plans file*/

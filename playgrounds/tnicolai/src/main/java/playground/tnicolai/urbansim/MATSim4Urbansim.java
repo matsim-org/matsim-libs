@@ -50,7 +50,6 @@ import org.xml.sax.SAXException;
 
 import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.matsimTest.MATSim4UrbanSimTest;
 import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.MyControlerListener;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;

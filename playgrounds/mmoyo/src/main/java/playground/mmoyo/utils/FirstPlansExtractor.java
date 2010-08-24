@@ -1,8 +1,11 @@
 package playground.mmoyo.utils;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -10,9 +13,8 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.api.core.v01.Id;
+
 import playground.mmoyo.Validators.PlanValidator;
-import java.util.Arrays;
 
 /**Reads a plan file, selects the first plans and creates a new plan file with them*/ 
 public class FirstPlansExtractor {

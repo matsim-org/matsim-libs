@@ -20,12 +20,7 @@
 package playground.droeder;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author droeder

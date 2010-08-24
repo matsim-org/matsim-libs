@@ -25,11 +25,11 @@ package playground.tnicolai.urbansim.matsimTest;
 
 import java.net.URL;
 
-import org.matsim.testcases.MatsimTestCase;
-import org.matsim.testcases.MatsimTestUtils;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.constants.Constants;

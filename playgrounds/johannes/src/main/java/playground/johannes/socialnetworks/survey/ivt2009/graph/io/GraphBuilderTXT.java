@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
 import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;

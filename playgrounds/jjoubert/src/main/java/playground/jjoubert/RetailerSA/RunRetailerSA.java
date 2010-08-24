@@ -33,7 +33,6 @@ import java.util.Scanner;
 import org.apache.log4j.Logger;
 
 import playground.jjoubert.Utilities.DateString;
-
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 

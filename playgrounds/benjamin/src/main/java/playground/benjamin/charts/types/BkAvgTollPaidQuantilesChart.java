@@ -40,11 +40,8 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.dgrether.analysis.charts.DgAvgDeltaMoneyQuantilesChart;
 import playground.dgrether.analysis.charts.DgAxisBuilder;
 import playground.dgrether.analysis.charts.DgDefaultAxisBuilder;
-import playground.dgrether.analysis.charts.IncomeChartUtils;
-import playground.dgrether.analysis.charts.DgAvgDeltaMoneyQuantilesChart.LabelGenerator;
 import playground.dgrether.analysis.charts.utils.DgColorScheme;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
 import playground.dgrether.analysis.population.DgPersonDataIncomeComparator;

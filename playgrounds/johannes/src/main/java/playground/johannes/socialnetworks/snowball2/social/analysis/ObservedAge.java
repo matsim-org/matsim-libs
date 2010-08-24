@@ -23,8 +23,6 @@ import gnu.trove.TDoubleDoubleHashMap;
 
 import java.util.Set;
 
-import org.matsim.contrib.sna.math.Distribution;
-
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.social.analysis.Age;
 import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;

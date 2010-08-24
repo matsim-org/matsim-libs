@@ -28,7 +28,6 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.KnowledgeImpl;
 
 /*

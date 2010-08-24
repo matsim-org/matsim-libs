@@ -7,7 +7,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 

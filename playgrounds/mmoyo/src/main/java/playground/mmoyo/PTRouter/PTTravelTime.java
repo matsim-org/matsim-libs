@@ -1,7 +1,8 @@
 package playground.mmoyo.PTRouter;
 
 import java.util.Arrays;
-import org.matsim.api.core.v01.network.Link;	
+
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelTime;
 
 /** Calculates the travel time of each link depending on its type */

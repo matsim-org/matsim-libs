@@ -1,7 +1,9 @@
 package playground.mmoyo.analysis.counts.rieser;
 
 import java.io.IOException;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.xml.sax.SAXException;
 
 /**Counts occupancy for routed plans with parameterized router*/

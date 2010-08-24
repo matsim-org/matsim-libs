@@ -1,10 +1,5 @@
 package playground.wrashid.PSF.data;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.HashMap;
-import java.util.StringTokenizer;
-
 import org.matsim.core.utils.charts.XYLineChart;
 
 import playground.wrashid.lib.GeneralLib;

@@ -23,7 +23,6 @@ import java.util.Comparator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;

@@ -26,15 +26,9 @@ import java.util.HashMap;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.referencing.CRS;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 
 import com.vividsolutions.jts.geom.Envelope;
 

@@ -1,7 +1,6 @@
 package playground.dressler.ea_flow;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 public interface TaskQueue extends Iterable<BFTask>{
 

@@ -36,7 +36,6 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
-import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 

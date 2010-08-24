@@ -20,9 +20,11 @@
 
 package playground.mfeil.miscellanous;
 
-import java.io.*;
-import org.matsim.core.utils.charts.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.StringTokenizer;
+
+import org.matsim.core.utils.charts.XYLineChart;
 
 
 

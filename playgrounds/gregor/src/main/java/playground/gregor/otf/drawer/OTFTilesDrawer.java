@@ -22,7 +22,6 @@ import org.matsim.evacuation.otfvis.drawer.Tile;
 import org.matsim.evacuation.otfvis.readerwriter.TileLoader;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 
-
 import com.sun.opengl.util.texture.TextureCoords;
 import com.sun.opengl.util.texture.TextureIO;
 

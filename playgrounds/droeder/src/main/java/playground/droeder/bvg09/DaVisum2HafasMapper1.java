@@ -19,36 +19,15 @@
  * *********************************************************************** */
 package playground.droeder.bvg09;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
-import org.matsim.transitSchedule.api.TransitScheduleReader;
-import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.xml.sax.SAXException;
-
-import playground.droeder.DaPaths;
 
 /**
  * @author droeder

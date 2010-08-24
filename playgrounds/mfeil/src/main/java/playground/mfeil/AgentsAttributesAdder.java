@@ -20,22 +20,23 @@
 
 package playground.mfeil;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.api.core.v01.ScenarioImpl;
 
 import playground.mfeil.attributes.AgentsHighestEducationAdder;
 

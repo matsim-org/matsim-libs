@@ -20,7 +20,6 @@
 
 package playground.dressler.ea_flow;
 
-import org.matsim.api.core.v01.network.Node;
 
 public interface PathStep {	
 

@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.matsim.contrib.sna.graph.GraphBuilder;
 import org.matsim.contrib.sna.graph.SparseEdge;
 import org.matsim.contrib.sna.graph.SparseGraph;
@@ -31,7 +33,6 @@ import org.matsim.contrib.sna.graph.SparseGraphBuilder;
 import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.Vertex;
 
-import junit.framework.TestCase;
 import playground.johannes.socialnetworks.graph.analysis.GirvanNewmanAlgorithm;
 
 /**

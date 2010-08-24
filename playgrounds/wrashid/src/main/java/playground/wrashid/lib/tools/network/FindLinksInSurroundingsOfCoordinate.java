@@ -4,9 +4,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;

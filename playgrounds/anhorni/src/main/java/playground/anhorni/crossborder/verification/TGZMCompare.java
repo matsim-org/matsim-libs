@@ -22,6 +22,7 @@ package playground.anhorni.crossborder.verification;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;

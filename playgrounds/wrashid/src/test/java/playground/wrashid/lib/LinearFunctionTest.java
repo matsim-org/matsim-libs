@@ -2,7 +2,6 @@ package playground.wrashid.lib;
 
 import junit.framework.TestCase;
 import playground.wrashid.lib.obj.Coord;
-import playground.wrashid.lib.obj.CoordXComparable;
 
 public class LinearFunctionTest extends TestCase{
 

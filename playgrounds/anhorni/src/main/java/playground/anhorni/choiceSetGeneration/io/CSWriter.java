@@ -1,7 +1,9 @@
 package playground.anhorni.choiceSetGeneration.io;
 
 import java.util.List;
+
 import org.apache.log4j.Logger;
+
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
 
 public abstract class CSWriter {

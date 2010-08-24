@@ -40,7 +40,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;

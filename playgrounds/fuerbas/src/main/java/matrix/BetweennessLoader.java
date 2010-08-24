@@ -1,12 +1,12 @@
 package matrix;
 
+import gnu.trove.TObjectLongHashMap;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import gnu.trove.TObjectLongHashMap;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;

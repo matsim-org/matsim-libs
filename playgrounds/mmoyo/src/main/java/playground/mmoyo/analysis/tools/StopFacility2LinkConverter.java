@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.CountsWriter;
+import org.matsim.counts.MatsimCountsReader;
 
 import playground.mmoyo.utils.TransScenarioLoader;
 

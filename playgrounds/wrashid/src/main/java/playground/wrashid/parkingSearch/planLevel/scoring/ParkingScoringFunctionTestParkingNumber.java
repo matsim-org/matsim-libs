@@ -5,10 +5,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.ActivityImpl;
 
-import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping;
-import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
 
 public class ParkingScoringFunctionTestParkingNumber extends ParkingScoringFunction {
 

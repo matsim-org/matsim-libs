@@ -20,7 +20,6 @@
 
 package playground.benjamin.charts.types;
 
-import java.util.Comparator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;

@@ -29,6 +29,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -36,14 +40,9 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
 
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.testUtils.TempDirectoryUtil;
-import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
 /**

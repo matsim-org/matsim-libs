@@ -22,12 +22,9 @@ package playground.mrieser.pt.fares;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-
-import playground.mrieser.pt.fares.BeelineDistanceBasedFares;
 
 public final class BeelineDistanceBasedFaresTest extends MatsimTestCase {
 

@@ -23,6 +23,7 @@ package playground.anhorni.locationchoice.analysis.plans;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;

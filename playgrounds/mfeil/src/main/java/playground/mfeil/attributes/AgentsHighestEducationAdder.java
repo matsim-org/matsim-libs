@@ -20,17 +20,16 @@
 
 package playground.mfeil.attributes;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mfeil.AgentsAttributesAdder;
 

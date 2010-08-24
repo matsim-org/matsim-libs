@@ -21,7 +21,6 @@ package playground.johannes.socialnetworks.graph.analysis;
 
 import gnu.trove.TIntDoubleIterator;
 import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectLongHashMap;
 
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;

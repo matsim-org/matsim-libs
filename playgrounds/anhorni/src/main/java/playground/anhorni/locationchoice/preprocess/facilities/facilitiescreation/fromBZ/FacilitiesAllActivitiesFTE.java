@@ -34,7 +34,6 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.FacilitiesProductionKTI;
 import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.FacilitiesProductionKTI.KTIYear;
 import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.entreprisecensus.EnterpriseCensus;
 import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.entreprisecensus.EnterpriseCensusParser;

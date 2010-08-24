@@ -23,14 +23,9 @@
  */
 package playground.tnicolai.urbansim.jaxbTest;
 
-import org.matsim.testcases.MatsimTestCase;
-import org.matsim.testcases.MatsimTestUtils;
-import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-
-import playground.tnicolai.urbansim.UpdateXMLParser;
+import org.matsim.testcases.MatsimTestCase;
 
 
 

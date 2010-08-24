@@ -26,7 +26,6 @@ import gnu.trove.TIntObjectIterator;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
-import java.util.Arrays;
 import java.util.TreeSet;
 
 import org.matsim.contrib.sna.graph.Vertex;

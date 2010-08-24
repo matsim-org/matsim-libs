@@ -16,7 +16,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;

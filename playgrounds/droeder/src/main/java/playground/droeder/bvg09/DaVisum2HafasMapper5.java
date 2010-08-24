@@ -1,10 +1,7 @@
 package playground.droeder.bvg09;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;

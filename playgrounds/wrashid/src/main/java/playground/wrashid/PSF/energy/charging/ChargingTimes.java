@@ -1,23 +1,18 @@
 package playground.wrashid.PSF.energy.charging;
 
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.charts.XYLineChart;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF.energy.consumption.EnergyConsumption;
 import playground.wrashid.PSF.energy.consumption.LinkEnergyConsumptionLog;
 import playground.wrashid.PSF.lib.PSFGeneralLib;
-import playground.wrashid.PSF.parking.ParkLog;
 import playground.wrashid.lib.GeneralLib;
 
 public class ChargingTimes {

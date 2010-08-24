@@ -1,6 +1,5 @@
 package playground.wrashid.lib;
 
-import org.jgap.Gene;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;

@@ -32,9 +32,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 
-//FIXME This no longer exists.
-//import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
-
 import playground.jjoubert.Utilities.DateString;
 
 public class AverageEventsToGAP {

@@ -31,10 +31,10 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.StringUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.gregor.MY_STATIC_STUFF;
+
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.MultiPolygon;
-
-import playground.gregor.MY_STATIC_STUFF;
 
 public class CVSToShapeFile {
 

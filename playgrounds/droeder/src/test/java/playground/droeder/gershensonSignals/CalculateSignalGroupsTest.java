@@ -19,25 +19,9 @@
  * *********************************************************************** */
 package playground.droeder.gershensonSignals;
 
-import java.util.SortedMap;
-
-import org.apache.commons.math.analysis.solvers.NewtonSolver;
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.signalsystems.systems.SignalGroupDefinition;
-
-import playground.droeder.DaPaths;
-import playground.droeder.gershensonSignals.CalculateSignalGroups;
-import playground.droeder.gershensonSignals.DenverScenarioGenerator;
-import playground.droeder.gershensonSignals.GershensonScenarioGenerator;
 
 /**
  * @author droeder

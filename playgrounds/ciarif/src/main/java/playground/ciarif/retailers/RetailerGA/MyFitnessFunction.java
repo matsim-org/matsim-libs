@@ -23,8 +23,8 @@ package playground.ciarif.retailers.RetailerGA;
 import java.util.ArrayList;
 import java.util.Collections;
 
-//import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
+
 import playground.ciarif.retailers.models.GravityModel;
 
 import com.vividsolutions.jts.geom.Coordinate;

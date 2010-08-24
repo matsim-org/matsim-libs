@@ -1,9 +1,6 @@
 package playground.wrashid.lib.obj;
 
-import java.util.Arrays;
 import java.util.LinkedList;
-
-import ucar.ma2.ArraySequence;
 
 import junit.framework.TestCase;
 

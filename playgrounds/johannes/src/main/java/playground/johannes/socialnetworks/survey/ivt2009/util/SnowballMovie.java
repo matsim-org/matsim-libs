@@ -37,9 +37,7 @@ import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.snowball2.sim.RandomResponse;
 import playground.johannes.socialnetworks.snowball2.sim.RandomSeedGenerator;
 import playground.johannes.socialnetworks.snowball2.sim.Sampler;
-import playground.johannes.socialnetworks.snowball2.spatial.io.IterationTimeTagger;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLTimeSpan;
-import playground.johannes.socialnetworks.snowball2.spatial.io.TimeTagger;
 import playground.johannes.socialnetworks.snowball2.spatial.io.TimeTagger2;
 
 /**

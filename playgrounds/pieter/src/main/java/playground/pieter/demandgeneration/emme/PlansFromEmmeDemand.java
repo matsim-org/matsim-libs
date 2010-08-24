@@ -27,8 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.world.Layer;
-import org.matsim.world.LayerImpl;
 import org.matsim.world.World;
 import org.matsim.world.WorldUtils;
 import org.matsim.world.Zone;

@@ -9,8 +9,6 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;

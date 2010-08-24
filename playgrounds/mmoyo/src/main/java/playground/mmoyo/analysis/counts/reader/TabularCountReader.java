@@ -1,7 +1,9 @@
 package playground.mmoyo.analysis.counts.reader;
 
 import java.io.IOException;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;

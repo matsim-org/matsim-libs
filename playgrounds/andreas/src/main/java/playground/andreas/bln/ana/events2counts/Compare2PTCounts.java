@@ -13,14 +13,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
 import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
-
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitStopFacility;
 
 
 

@@ -36,9 +36,6 @@ import org.matsim.contrib.sna.math.Distribution;
 import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
-import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCostFunction;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedEdgeCosts;
 import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
 import com.vividsolutions.jts.geom.Point;

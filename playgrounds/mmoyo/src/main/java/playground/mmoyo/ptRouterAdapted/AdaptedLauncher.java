@@ -2,13 +2,15 @@ package playground.mmoyo.ptRouterAdapted;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.api.core.v01.population.PopulationWriter;
+
 import playground.mmoyo.utils.FileCompressor;
 import playground.mmoyo.utils.PlanFragmenter;
 import playground.mmoyo.utils.TransScenarioLoader;

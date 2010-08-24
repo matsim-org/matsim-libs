@@ -22,7 +22,6 @@ package playground.mfeil;
 
 
 import java.io.File;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -34,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
@@ -46,7 +46,6 @@ import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mfeil.config.ScheduleRecyclingConfigGroup;
 

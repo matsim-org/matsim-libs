@@ -21,7 +21,6 @@ package playground.benjamin.analysis;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -40,7 +39,6 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
 import playground.benjamin.BkPaths;
-import playground.benjamin.analysis.filter.OnlyInnerZurichFilter;
 import playground.benjamin.charts.types.BkAvgTollPaidQuantilesChart;
 import playground.benjamin.events.MoneyEventHandler;
 import playground.dgrether.analysis.charts.DgAvgDeltaMoneyQuantilesChart;

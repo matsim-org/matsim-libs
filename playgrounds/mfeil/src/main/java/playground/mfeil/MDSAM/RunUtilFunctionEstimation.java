@@ -20,10 +20,6 @@
 
 package playground.mfeil.MDSAM;
 
-import java.util.List;
-import java.util.Map;
-import org.matsim.api.core.v01.Id;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;

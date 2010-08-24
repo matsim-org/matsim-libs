@@ -20,47 +20,26 @@
 
 package playground.wrashid.parkingSearch.planLevel.replanning;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.wrashid.lib.GlobalRegistry;
-import playground.wrashid.lib.Reflection;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
-import playground.wrashid.parkingSearch.planLevel.scoring.OrderedFacility;
-import playground.wrashid.parkingSearch.planLevel.scoring.ParkingTimeInfo;
 
 public class ParkingPlanAlgorithm implements PlanAlgorithm {
 

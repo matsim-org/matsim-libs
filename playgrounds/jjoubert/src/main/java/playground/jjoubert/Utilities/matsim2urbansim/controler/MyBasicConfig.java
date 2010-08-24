@@ -22,7 +22,6 @@ package playground.jjoubert.Utilities.matsim2urbansim.controler;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;

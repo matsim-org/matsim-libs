@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.RunLib;
 import playground.wrashid.lib.obj.plan.PersonGroups;
@@ -13,8 +12,6 @@ import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantFor
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPrice;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPrice1;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping;
-import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
-import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingDefaultScoringFunction;
 
 public class Run27  extends IncomeRelevantForParking implements ParkingPriceMapping {

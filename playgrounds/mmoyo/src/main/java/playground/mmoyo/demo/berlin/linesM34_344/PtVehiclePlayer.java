@@ -1,21 +1,20 @@
 package playground.mmoyo.demo.berlin.linesM34_344;
 
 import java.io.IOException;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.xml.sax.SAXException;
-
-import playground.mrieser.OTFDemo;
 
 /**runs only pt vehicles of a scenario*/
 public class PtVehiclePlayer {

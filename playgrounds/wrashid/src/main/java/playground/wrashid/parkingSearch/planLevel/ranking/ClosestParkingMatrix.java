@@ -5,12 +5,10 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.wrashid.lib.GeneralLib;

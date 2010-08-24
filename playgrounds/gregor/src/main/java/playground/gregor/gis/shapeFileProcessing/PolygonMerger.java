@@ -35,7 +35,6 @@ import org.geotools.feature.FeatureIterator;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;

@@ -1,6 +1,5 @@
 package playground.wrashid.PSF.data.energyConsumption;
 
-import playground.wrashid.PHEV.Utility.AverageSpeedEnergyConsumption;
 import junit.framework.TestCase;
 
 public class AverageEnergyConsumptionBinsTest extends TestCase{

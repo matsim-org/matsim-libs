@@ -20,7 +20,6 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
-import org.jfree.util.Log;
 
 public class M2UStringbuilder {
 	private String root;

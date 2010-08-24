@@ -21,22 +21,16 @@ package playground.dressler.ea_flow;
 
 // java imports
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.dressler.Interval.EdgeFlowI;
-import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.Pair;
 import playground.dressler.Interval.SourceIntervals;

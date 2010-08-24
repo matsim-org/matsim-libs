@@ -4,9 +4,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 

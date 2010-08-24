@@ -3,9 +3,9 @@ package playground.droeder.bvg09;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

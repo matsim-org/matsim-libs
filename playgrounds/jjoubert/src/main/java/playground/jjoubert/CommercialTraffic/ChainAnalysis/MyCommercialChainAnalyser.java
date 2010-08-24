@@ -35,13 +35,12 @@ import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 
-import cern.colt.matrix.impl.SparseDoubleMatrix3D;
-
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.CommercialVehicle;
 import playground.jjoubert.Utilities.MyVehicleIdentifier;
 import playground.jjoubert.Utilities.MyXmlConverter;
 import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
+import cern.colt.matrix.impl.SparseDoubleMatrix3D;
 
 /**
  * This class analyses all <code>XML</code> vehicle files from a given folder and generates 

@@ -4,10 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.junit.Assert;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.population.ActivityImpl;
-
 public class Reflection {
 
 	/**

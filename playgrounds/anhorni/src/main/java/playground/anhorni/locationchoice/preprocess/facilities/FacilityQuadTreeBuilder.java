@@ -2,6 +2,7 @@ package playground.anhorni.locationchoice.preprocess.facilities;
 
 import java.util.List;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;

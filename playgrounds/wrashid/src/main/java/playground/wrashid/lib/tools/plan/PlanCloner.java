@@ -2,10 +2,8 @@ package playground.wrashid.lib.tools.plan;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
 
 import playground.wrashid.lib.GeneralLib;
 

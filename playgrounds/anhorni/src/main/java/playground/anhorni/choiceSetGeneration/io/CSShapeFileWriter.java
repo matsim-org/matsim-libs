@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -19,9 +20,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
-import com.vividsolutions.jts.geom.Point;
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSetFacility;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 public class CSShapeFileWriter extends CSWriter {

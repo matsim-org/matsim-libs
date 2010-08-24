@@ -22,11 +22,11 @@ package playground.jjoubert.Utilities.KernelDensityEstimation;
 
 import org.apache.log4j.Logger;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
-
 import playground.jjoubert.Utilities.DateString;
 import playground.jjoubert.Utilities.MyKdeWriter;
 import playground.jjoubert.Utilities.MyShapefileReader;
+
+import com.vividsolutions.jts.geom.MultiPolygon;
 
 
 public class MyKernelDensityEstimator {

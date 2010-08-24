@@ -37,7 +37,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.snowball2.analysis.DegreeCorrelationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.EstimatedDegree;
 import playground.johannes.socialnetworks.snowball2.analysis.EstimatedTransitivity;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;

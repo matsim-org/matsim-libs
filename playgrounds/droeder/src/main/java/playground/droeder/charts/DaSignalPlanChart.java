@@ -30,7 +30,6 @@ import java.util.Map.Entry;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.annotations.CategoryAnnotation;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
@@ -38,8 +37,6 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.signalsystems.control.SignalGroupState;
-
-import playground.droeder.DaColorScheme;
 
 /**
  * @author droeder

@@ -1,24 +1,17 @@
 package playground.gregor.eafnetconverter;
 
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -26,7 +19,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class EAFSehtlerNetConverter {
 	

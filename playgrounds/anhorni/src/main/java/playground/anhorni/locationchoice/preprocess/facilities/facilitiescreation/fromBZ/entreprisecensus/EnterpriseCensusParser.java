@@ -23,6 +23,7 @@ package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreati
 import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;

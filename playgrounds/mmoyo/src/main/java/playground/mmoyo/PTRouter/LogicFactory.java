@@ -3,8 +3,6 @@ package playground.mmoyo.PTRouter;
 //import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -13,7 +11,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;

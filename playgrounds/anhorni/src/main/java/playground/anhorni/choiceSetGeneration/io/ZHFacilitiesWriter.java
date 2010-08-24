@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -16,10 +17,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
-import com.vividsolutions.jts.geom.Point;
-
 import playground.anhorni.choiceSetGeneration.helper.ZHFacilities;
 import playground.anhorni.choiceSetGeneration.helper.ZHFacility;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 public class ZHFacilitiesWriter {

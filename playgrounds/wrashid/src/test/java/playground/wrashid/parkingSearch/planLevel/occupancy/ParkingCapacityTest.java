@@ -1,10 +1,11 @@
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
+import junit.framework.TestCase;
+
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseNonControlerScenario;
-import junit.framework.TestCase;
 
 public class ParkingCapacityTest extends TestCase {
 

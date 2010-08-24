@@ -3,6 +3,7 @@ package playground.ciarif.retailers.IO;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+
 import cern.colt.matrix.impl.AbstractMatrix;
 
 public class WriteRetailersMatrices {

@@ -3,16 +3,16 @@ package playground.mmoyo.utils;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.run.OTFVis;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
 
 /**created a visual track of the transit route*/
 public class TransitRouteVisualizer {

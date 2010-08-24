@@ -1,7 +1,6 @@
 package playground.wrashid.lib.obj;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 public class Collections {
 

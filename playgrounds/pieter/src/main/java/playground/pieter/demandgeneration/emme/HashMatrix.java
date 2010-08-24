@@ -2,8 +2,15 @@ package playground.pieter.demandgeneration.emme;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.matsim.core.utils.io.IOUtils;

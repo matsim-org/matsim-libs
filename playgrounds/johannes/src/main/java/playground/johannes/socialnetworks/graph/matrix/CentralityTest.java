@@ -21,9 +21,9 @@ package playground.johannes.socialnetworks.graph.matrix;
 
 import java.io.IOException;
 
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-
 import junit.framework.TestCase;
+
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger

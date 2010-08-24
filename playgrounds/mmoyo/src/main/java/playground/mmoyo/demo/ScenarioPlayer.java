@@ -34,7 +34,6 @@ import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
@@ -42,8 +41,6 @@ import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.xml.sax.SAXException;
-
-import playground.mrieser.OTFDemo;
 /**
  * @author mrieser
  */

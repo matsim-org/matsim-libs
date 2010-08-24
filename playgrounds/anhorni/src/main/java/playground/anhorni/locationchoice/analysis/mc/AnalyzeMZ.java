@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;

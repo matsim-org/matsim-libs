@@ -23,8 +23,8 @@ import playground.wrashid.parkingSearch.planLevel.parkingType.DefaultParkingFaci
 import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingFacilityAttributPersonPreferences;
 import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingFacilityAttributes;
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
-import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunction;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingDefaultScoringFunction;
+import playground.wrashid.parkingSearch.planLevel.scoring.ParkingScoringFunction;
 
 public class ParkingRoot {
 

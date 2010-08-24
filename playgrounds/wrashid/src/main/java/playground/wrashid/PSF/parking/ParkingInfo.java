@@ -1,7 +1,6 @@
 package playground.wrashid.PSF.parking;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.Gbl;
 
 import playground.wrashid.PSF.ParametersPSF;
 

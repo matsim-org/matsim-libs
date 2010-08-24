@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
+
 import playground.jjoubert.CommercialTraffic.GPSPoint;
 import playground.jjoubert.Utilities.ProgressBar;
 

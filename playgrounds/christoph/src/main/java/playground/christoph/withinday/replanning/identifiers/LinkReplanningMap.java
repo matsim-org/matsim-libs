@@ -41,15 +41,15 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.Controler;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 
 import playground.christoph.withinday.mobsim.WithinDayQSim;
 

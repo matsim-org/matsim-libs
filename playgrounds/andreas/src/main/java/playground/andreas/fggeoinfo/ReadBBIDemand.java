@@ -4,23 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.transitSchedule.api.TransitSchedule;
-import org.xml.sax.SAXException;
-
-import playground.andreas.bln.pop.generate.TabReader;
 
 
 public class ReadBBIDemand implements TabularFileHandler{

@@ -6,15 +6,12 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.population.ActivityImpl;
 
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.obj.plan.PersonGroups;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
-import playground.wrashid.parkingSearch.planLevel.analysis.ParkingOccupancyAnalysis;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ParkingScoreExecutor {

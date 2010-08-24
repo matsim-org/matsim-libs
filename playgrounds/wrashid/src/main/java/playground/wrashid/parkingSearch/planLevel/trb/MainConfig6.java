@@ -2,7 +2,6 @@ package playground.wrashid.parkingSearch.planLevel.trb;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
 
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.obj.plan.PersonGroups;

@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.visibilityTest.packageA;
 
-import playground.dgrether.visibilityTest.packageA.A;
 
 
 interface AA extends A{

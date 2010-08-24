@@ -21,8 +21,8 @@
 package playground.jjoubert.CommercialModel.Listeners;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 
 public class MyIterationEndsListener implements IterationEndsListener {
 	

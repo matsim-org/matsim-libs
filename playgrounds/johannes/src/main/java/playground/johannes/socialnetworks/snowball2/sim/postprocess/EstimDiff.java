@@ -21,8 +21,6 @@ package playground.johannes.socialnetworks.snowball2.sim.postprocess;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
-import gnu.trove.TIntDoubleHashMap;
-import gnu.trove.TIntIntHashMap;
 
 import java.io.BufferedWriter;
 import java.io.File;

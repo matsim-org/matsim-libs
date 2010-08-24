@@ -23,8 +23,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class GisDebugger {
 

@@ -8,7 +8,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.transitSchedule.api.TransitRoute;
 

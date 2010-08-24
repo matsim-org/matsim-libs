@@ -3,10 +3,8 @@ package playground.droeder.bvg09;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitStopFacility;

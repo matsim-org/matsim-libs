@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+
 import playground.ciarif.retailers.RetailersLocationListener;
 
 public class CarPoolingTripsWriter { //TODO generalize this for all trips type, generalize trips class too

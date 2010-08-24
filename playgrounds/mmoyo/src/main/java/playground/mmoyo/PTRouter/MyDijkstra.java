@@ -1,11 +1,11 @@
 package playground.mmoyo.PTRouter;
 
-import org.matsim.core.network.LinkImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.api.core.v01.network.Network;
 
 /**
  * Implementation of Matsim Dijkstra algorithm adapted to the pt logic network

@@ -22,8 +22,8 @@ package playground.telaviv.population;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

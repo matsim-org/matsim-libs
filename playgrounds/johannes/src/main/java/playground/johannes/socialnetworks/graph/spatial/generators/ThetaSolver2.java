@@ -19,16 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
-import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
@@ -37,7 +34,6 @@ import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.commons.math.analysis.solvers.NewtonSolver;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;

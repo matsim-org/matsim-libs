@@ -22,22 +22,16 @@ package playground.droeder.Analysis.SignalSystems;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.signalsystems.control.SignalGroupState;
-
-import playground.droeder.DaPaths;
-import playground.droeder.charts.DaChartWriter;
-import playground.droeder.charts.DaSignalPlanChart;
 
 
 /**

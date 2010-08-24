@@ -28,7 +28,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.Config;
@@ -45,7 +44,6 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;

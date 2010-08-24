@@ -2,12 +2,12 @@ package playground.mmoyo.analysis.counts.reader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**parses a output text file containing counts comparisons*/
 public class CountsReader {

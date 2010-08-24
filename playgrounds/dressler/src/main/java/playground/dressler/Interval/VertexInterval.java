@@ -22,8 +22,6 @@
 package playground.dressler.Interval;
 
 //matsim imports
-import org.matsim.api.core.v01.network.Link;
-
 import playground.dressler.ea_flow.PathStep;
 
 

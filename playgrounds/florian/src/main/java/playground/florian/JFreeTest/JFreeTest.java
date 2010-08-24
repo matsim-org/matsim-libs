@@ -11,7 +11,6 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.xml.DatasetReader;
-import org.jfree.ui.ApplicationFrame;
 
 public class JFreeTest{
 	private final String title;

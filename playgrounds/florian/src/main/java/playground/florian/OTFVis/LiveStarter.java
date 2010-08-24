@@ -1,7 +1,6 @@
 package playground.florian.OTFVis;
 
 import org.matsim.run.OTFVis;
-import org.matsim.vis.otfvis.executables.OTFVisController;
 
 public class LiveStarter {
 	

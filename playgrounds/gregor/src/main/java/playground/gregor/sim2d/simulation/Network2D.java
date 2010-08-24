@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.collections.QuadTree;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 

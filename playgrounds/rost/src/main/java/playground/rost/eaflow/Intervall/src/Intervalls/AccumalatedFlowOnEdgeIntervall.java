@@ -1,6 +1,5 @@
 package playground.rost.eaflow.Intervall.src.Intervalls;
 
-import playground.rost.eaflow.Intervall.src.Intervalls.Intervall;
 
 public class AccumalatedFlowOnEdgeIntervall extends Intervall {
 	protected int flow;

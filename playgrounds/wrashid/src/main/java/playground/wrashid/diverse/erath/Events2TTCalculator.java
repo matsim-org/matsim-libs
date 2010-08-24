@@ -20,23 +20,9 @@
 
 package playground.wrashid.diverse.erath;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 

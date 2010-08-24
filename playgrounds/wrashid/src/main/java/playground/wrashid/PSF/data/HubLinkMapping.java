@@ -7,8 +7,6 @@ import java.util.StringTokenizer;
 
 import org.matsim.api.core.v01.network.Link;
 
-import playground.wrashid.PHEV.parking.data.Facility;
-import playground.wrashid.PHEV.parking.data.StreetParkingData;
 import playground.wrashid.PSF.ParametersPSF;
 
 /**

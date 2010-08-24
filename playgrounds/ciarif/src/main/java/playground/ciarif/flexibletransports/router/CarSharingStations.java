@@ -16,9 +16,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-import playground.meisterk.kti.router.SwissHaltestelle;
-import playground.meisterk.kti.router.SwissHaltestellen;
-
 public class CarSharingStations {
 	private final QuadTree<CarSharingStation> stations;
 

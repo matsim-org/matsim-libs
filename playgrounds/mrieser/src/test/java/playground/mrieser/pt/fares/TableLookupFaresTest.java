@@ -25,13 +25,10 @@ import java.util.Map;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-
-import playground.mrieser.pt.fares.TableLookupFares;
 
 public class TableLookupFaresTest extends MatsimTestCase {
 

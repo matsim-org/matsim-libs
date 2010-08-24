@@ -27,32 +27,14 @@ package playground.dressler.util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ImportSimpleNetwork {

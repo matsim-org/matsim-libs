@@ -1,5 +1,8 @@
 package playground.mmoyo.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
@@ -12,9 +15,6 @@ import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**Creates a plan with an agent repeated many times*/
 public class PlanRepeater {

@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;

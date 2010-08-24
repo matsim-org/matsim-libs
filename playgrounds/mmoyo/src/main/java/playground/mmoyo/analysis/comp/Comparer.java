@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 
 import playground.mmoyo.analysis.counts.chen.CountsComparingGraph;
@@ -12,7 +13,6 @@ import playground.mmoyo.analysis.counts.chen.CountsComparingGraphMinMax;
 import playground.mmoyo.ptRouterAdapted.AdaptedLauncher;
 import playground.mmoyo.ptRouterAdapted.MyTransitRouterConfig;
 import playground.yu.run.TrCtl;
-import org.matsim.core.config.ConfigWriter;
 
 public class Comparer {
 	final String configFile;

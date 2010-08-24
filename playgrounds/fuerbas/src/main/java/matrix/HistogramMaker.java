@@ -3,7 +3,6 @@ package matrix;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TDoubleObjectIterator;
-import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectLongHashMap;
 
 import java.io.BufferedReader;

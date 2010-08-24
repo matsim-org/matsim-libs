@@ -2,9 +2,8 @@ package playground.mfeil;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.api.core.v01.population.Person;
-
+import org.matsim.testcases.MatsimTestCase;
 
 import playground.mfeil.FilesForTests.Initializer;
 

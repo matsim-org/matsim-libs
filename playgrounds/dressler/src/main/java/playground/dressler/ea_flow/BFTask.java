@@ -1,6 +1,5 @@
 package playground.dressler.ea_flow;
 
-import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.VertexInterval;
 
 public class BFTask {

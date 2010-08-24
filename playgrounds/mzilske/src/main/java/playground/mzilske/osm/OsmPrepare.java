@@ -15,7 +15,6 @@ import org.openstreetmap.osmosis.core.merge.common.ConflictResolutionMethod;
 import org.openstreetmap.osmosis.core.merge.v0_6.EntityMerger;
 import org.openstreetmap.osmosis.core.progress.v0_6.EntityProgressLogger;
 import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
-import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
 import org.openstreetmap.osmosis.core.xml.v0_6.XmlWriter;
 
 public class OsmPrepare {

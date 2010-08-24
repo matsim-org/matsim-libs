@@ -38,7 +38,6 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.xml.sax.SAXException;
 
-import playground.johannes.socialnetworks.sim.interaction.EndTimeMutator;
 import playground.johannes.socialnetworks.statistics.Discretizer;
 import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 

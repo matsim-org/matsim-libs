@@ -1,19 +1,14 @@
 package playground.mmoyo;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
-
-import playground.mmoyo.demo.equil.MMoyoEquilnetDemo;
 
 public class EquilIterTest extends MatsimTestCase {
 	

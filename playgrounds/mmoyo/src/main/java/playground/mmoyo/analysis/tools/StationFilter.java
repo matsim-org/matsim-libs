@@ -4,14 +4,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.CountsWriter;
+import org.matsim.counts.MatsimCountsReader;
 
 import playground.mmoyo.utils.TransScenarioLoader;
 

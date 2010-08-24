@@ -10,9 +10,9 @@ import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
-import com.vividsolutions.jts.geom.Envelope;
-
 import playground.gregor.MY_STATIC_STUFF;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 public class ShapeFileCutter {
 	private static double max_x = 652088.;

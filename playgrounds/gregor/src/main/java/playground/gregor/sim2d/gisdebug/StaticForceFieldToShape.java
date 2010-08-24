@@ -13,20 +13,19 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import playground.gregor.sim2d.simulation.Force;
+import playground.gregor.sim2d.simulation.StaticForceField;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
-
-import playground.gregor.sim2d.simulation.Force;
-import playground.gregor.sim2d.simulation.StaticForceField;
 
 public class StaticForceFieldToShape {
 

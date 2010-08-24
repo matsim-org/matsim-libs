@@ -30,7 +30,6 @@ import org.matsim.contrib.sna.math.Distribution;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 import playground.johannes.socialnetworks.statistics.Discretizer;
 import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 

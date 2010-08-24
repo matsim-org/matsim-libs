@@ -1,12 +1,9 @@
 package playground.wrashid.PSF.PSS;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsReaderTXTv1;
 
 public class EventReadControler extends Controler {
 

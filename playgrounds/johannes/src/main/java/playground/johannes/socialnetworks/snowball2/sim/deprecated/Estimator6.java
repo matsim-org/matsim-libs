@@ -20,12 +20,6 @@
 package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TIntObjectIterator;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.math.Distribution;
@@ -34,7 +28,6 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
 
 import playground.johannes.socialnetworks.snowball2.sim.ProbabilityEstimator;
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
-import playground.johannes.socialnetworks.statistics.EstimatedDistribution;
 
 /**
  * @author illenberger

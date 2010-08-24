@@ -2,8 +2,6 @@ package playground.wrashid.tryouts.performance;
 
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.tryouts.performance.FastQueue;
-
 public class TestFastQueue extends MatsimTestCase {
 
 	public void testAdd() {

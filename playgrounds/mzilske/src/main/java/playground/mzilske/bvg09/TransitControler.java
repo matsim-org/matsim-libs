@@ -50,7 +50,6 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
-import org.matsim.pt.qsim.TransitQSimulation;
 import org.matsim.pt.replanning.TransitStrategyManagerConfigLoader;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;

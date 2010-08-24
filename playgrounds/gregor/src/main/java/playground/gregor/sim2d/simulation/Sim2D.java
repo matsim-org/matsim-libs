@@ -20,8 +20,6 @@ import org.matsim.vehicles.VehicleTypeImpl;
 
 import playground.gregor.sim2d.peekabot.Sim2DVis;
 
-//import playground.gregor.sim2d.peekabot.PeekABotClient;
-
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class Sim2D {

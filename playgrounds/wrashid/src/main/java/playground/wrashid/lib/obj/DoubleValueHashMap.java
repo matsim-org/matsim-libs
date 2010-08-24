@@ -2,8 +2,6 @@ package playground.wrashid.lib.obj;
 
 import java.util.HashMap;
 
-import playground.christoph.knowledge.utils.GetAllIncludedLinks;
-
 /**
  * Often one needs a HashMap, where the value can be incremented and
  * decremented. This data structure provides that facility for doubles.

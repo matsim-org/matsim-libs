@@ -89,7 +89,6 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
-import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;

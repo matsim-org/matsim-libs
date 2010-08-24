@@ -31,6 +31,15 @@ import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
 
 import org.apache.log4j.Logger;
+import org.geotools.factory.FactoryRegistryException;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultAttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -49,15 +58,8 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vis.kml.KMZWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+
+import playground.toronto.maneuvers.NetworkAddEmmeManeuverRestrictions;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -65,8 +67,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
-
-import playground.toronto.maneuvers.NetworkAddEmmeManeuverRestrictions;
 
 /**
  * Translates emme2 networks into matsim networks.

@@ -29,7 +29,6 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.droeder.DaPaths;

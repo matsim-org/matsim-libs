@@ -20,8 +20,8 @@
 
 package playground.mfeil;
 
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 

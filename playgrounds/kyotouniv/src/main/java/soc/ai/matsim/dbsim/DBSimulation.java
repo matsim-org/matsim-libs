@@ -62,9 +62,9 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 

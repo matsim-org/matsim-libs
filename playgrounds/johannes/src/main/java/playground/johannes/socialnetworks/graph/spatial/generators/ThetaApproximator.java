@@ -22,19 +22,11 @@ package playground.johannes.socialnetworks.graph.spatial.generators;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
-
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.statistics.Discretizer;
-import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
 /**
  * @author illenberger

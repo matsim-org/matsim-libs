@@ -1,6 +1,7 @@
 package playground.dressler.util;
 
-import java.lang.management.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 
 public class CPUTimer {	
 	ThreadMXBean bean;

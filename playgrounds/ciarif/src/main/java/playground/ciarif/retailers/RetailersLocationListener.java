@@ -15,6 +15,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
+
 import playground.ciarif.retailers.IO.FileRetailerReader;
 import playground.ciarif.retailers.IO.LinksRetailerReader;
 import playground.ciarif.retailers.IO.RetailersSummaryWriter;

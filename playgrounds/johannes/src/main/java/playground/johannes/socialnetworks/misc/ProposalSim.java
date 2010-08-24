@@ -31,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.SparseGraphBuilder;

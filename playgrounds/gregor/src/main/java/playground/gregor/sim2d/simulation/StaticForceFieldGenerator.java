@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2d.controller.Sim2DConfig;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;

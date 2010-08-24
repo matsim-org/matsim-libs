@@ -24,7 +24,6 @@ package playground.rost.controller.vismodule;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;

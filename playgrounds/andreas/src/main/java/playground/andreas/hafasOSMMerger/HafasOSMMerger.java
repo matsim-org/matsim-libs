@@ -12,17 +12,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.transitSchedule.TransitScheduleImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 import playground.mzilske.bvg09.HafasReader;
-import playground.mzilske.bvg09.VisumHafasScheduleMerger;
 
 public class HafasOSMMerger {
 	
