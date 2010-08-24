@@ -250,34 +250,33 @@ public class KMLActsWriter {
 		return this.kmzFileName;
 	}
 
-//	public static void main(String[] args) {
-//		final String netFilename = "E:\\oev-test\\output\\network.multimodal.xml";
-//		final String kmzFilename = "test.kmz";
-//		final String outputDirectory = "E:\\temp";
-//
-//		Gbl.createConfig(null);
-////		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-////		new MatsimNetworkReader(network).readFile(netFilename);
-//
-//		List<Activity> actList = new LinkedList<Activity>();
-//		Activity act = new ActivityImpl("whatever", new CoordImpl(4579260, 5841710));
-//		actList.add(act);
-//		act = new ActivityImpl("whatever", new CoordImpl(4579260, 5841710));
-//		actList.add(act);
-//		
-//		Activity act2 = new ActivityImpl("whatever2", new CoordImpl(4579260, 5841710));
-//		actList.add(act2);
-//		
-//		KMLActsWriter test = new KMLActsWriter(null, actList);
-//
-//		test.setCoordinateTransformation(new GK4toWGS84());
-//		test.setKmzFileName(kmzFilename);
-//		test.setOutputDirectory(outputDirectory);
-////		test.setNetwork(network);
-//
-//		test.writeFile();
-//
-//		log.info("Done!");
-//	}
+	public static void main(String[] args) {
+		final String netFilename = "E:\\_out\\test\\network.xml";
+		final String kmzFilename = "test.kmz";
+		final String outputDirectory = "E:\\temp";
 
+		Gbl.createConfig(null);
+//		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+//		new MatsimNetworkReader(network).readFile(netFilename);
+
+		List<Activity> actList = new LinkedList<Activity>();
+		Activity act = new ActivityImpl("whatever", new CoordImpl(4579260, 5841710));
+		actList.add(act);
+		act = new ActivityImpl("whatever", new CoordImpl(4579260, 5841710));
+		actList.add(act);
+		
+		Activity act2 = new ActivityImpl("whatever2", new CoordImpl(4579260, 5841710));
+		actList.add(act2);
+		
+		KMLActsWriter test = new KMLActsWriter(null, actList);
+
+		test.setCoordinateTransformation(new GK4toWGS84());
+		test.setKmzFileName(kmzFilename);
+		test.setOutputDirectory(outputDirectory);
+//		test.setNetwork(network);
+
+		test.writeFile();
+
+		log.info("Done!");
+	}
 }
