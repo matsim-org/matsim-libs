@@ -70,6 +70,7 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.qsim.TransitQSimEngine.TransitAgentTriesToTeleportException;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
@@ -213,7 +214,7 @@ public class TransitQueueSimulationTest {
 		assertEquals(9.0*3600, ((TransitDriverAgent) agents.get(4)).getDepartureTime(), MatsimTestCase.EPSILON);
 	}
 
-	protected static class TestCreateAgentsSimulation extends TransitQSimulation {
+	protected static class TestCreateAgentsSimulation extends QSim {
 		public final List<PersonDriverAgent> createdAgents = new ArrayList<PersonDriverAgent>();
 		public TestCreateAgentsSimulation(final ScenarioImpl scenario, final EventsManagerImpl events) {
 			super(scenario, events);
@@ -278,7 +279,7 @@ public class TransitQueueSimulationTest {
 
 		// run simulation
 		EventsManagerImpl events = new EventsManagerImpl();
-		TransitQSimulation simulation = new TransitQSimulation(scenario, events);
+		QSim simulation = new QSim(scenario, events);
 		simulation.run();
 
 		// check everything
@@ -346,7 +347,7 @@ public class TransitQueueSimulationTest {
 
 		// run simulation
 		EventsManagerImpl events = new EventsManagerImpl();
-		TransitQSimulation simulation = new TransitQSimulation(scenario, events);
+		QSim simulation = new QSim(scenario, events);
 		simulation.run();
 	}
 
@@ -514,7 +515,7 @@ public class TransitQueueSimulationTest {
 		link.setNumberOfLanes(1);
 	}
 
-	protected static class TestHandleStopSimulation extends TransitQSimulation {
+	protected static class TestHandleStopSimulation extends QSim {
 		protected SpyDriver driver = null;
 		private final TransitLine line;
 		private final TransitRoute route;
@@ -561,7 +562,7 @@ public class TransitQueueSimulationTest {
 		public final List<SpyHandleStopData> spyData = new ArrayList<SpyHandleStopData>();
 
 		public SpyDriver(final TransitLine line, final TransitRoute route, final Departure departure,
-				final TransitStopAgentTracker agentTracker, final TransitQSimulation sim) {
+				final TransitStopAgentTracker agentTracker, final QSim sim) {
 			super(line, route, departure, agentTracker, sim);
 		}
 
@@ -646,7 +647,7 @@ public class TransitQueueSimulationTest {
 		events.addHandler(collector);
 
 		// first test without special settings
-		TransitQSimulation sim = new TransitQSimulation(scenario, events);
+		QSim sim = new QSim(scenario, events);
 		sim.run();
 		assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -655,7 +656,7 @@ public class TransitQueueSimulationTest {
 		// second test with special start/end times
 		config.getQSimConfigGroup().setStartTime(depTime + 20.0);
 		config.getQSimConfigGroup().setEndTime(depTime + 90.0);
-		sim = new TransitQSimulation(scenario, events);
+		sim = new QSim(scenario, events);
 		sim.run();
 		assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -770,7 +771,7 @@ public class TransitQueueSimulationTest {
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
-		new TransitQSimulation(scenario, events).run();
+		new QSim(scenario, events).run();
 		List<Event> allEvents = collector.getEvents();
 
 		for (Event event : allEvents) {

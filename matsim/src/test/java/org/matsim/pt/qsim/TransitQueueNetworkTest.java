@@ -45,6 +45,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.fakes.FakeAgent;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.QPersonAgent;
 import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
 import org.matsim.ptproject.qsim.interfaces.QSimEngine;
@@ -951,7 +952,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		public final QLinkImpl qlink1, qlink2, qlink3;
 		public final TransitQVehicle transitVehicle;
 		public final QVehicle normalVehicle, normalVehicle2;
-    public final TransitQSimulation qsim;
+    public final QSim qsim;
 		/**
 		 * @param firstStopLocation
 		 * @param firstStopisBlocking
@@ -1027,7 +1028,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			Departure dep = builder.createDeparture(id1, 100);
 
 			// setup: simulation
-			qsim = new TransitQSimulation(scenario, new EventsManagerImpl());
+			qsim = new QSim(scenario, new EventsManagerImpl());
 			QNetwork qnet = qsim.getQNetwork();
 			this.qlink1 = (QLinkImpl) qnet.getQLink(id1);
 			this.qlink2 = (QLinkImpl) qnet.getQLink(id2);
@@ -1107,7 +1108,7 @@ public class TransitQueueNetworkTest extends TestCase {
 	private static class FakeTransitDriver extends TransitDriver {
 
 		public FakeTransitDriver(final TransitLine line, final TransitRoute route, final Departure departure,
-				final TransitStopAgentTracker agentTracker, final TransitQSimulation sim) {
+				final TransitStopAgentTracker agentTracker, final QSim sim) {
 			super(line, route, departure, agentTracker, sim);
 		}
 
