@@ -25,6 +25,15 @@ import org.matsim.api.core.v01.Id;
 /**
  * @author nagel
  *
+ * I needed a way to communicate to the visualizer the fact that a particular mode is executed by teleportation.  The arguably easiest
+ * way would have been to add this into the departure event, but that is thrown <i>before</i> departure and so the method of how
+ * the mobsim executes the mode is not known when the event is thrown.  And exchanging the sequencing of this caused additional
+ * problems.
+ * <p/>
+ * In the longer run, I still think that teleportation should be handled directly by the mobsim, i.e. it is not the task of the 
+ * visualizer to computed positions.
+ * <p/>
+ * kai, aug'10
  */
 @Deprecated // this is a possibly temporary fix to remove the MobsimFeatures.  do not use.  kai, aug'10
 public class AdditionalTeleportationDepartureEvent extends EventImpl {
