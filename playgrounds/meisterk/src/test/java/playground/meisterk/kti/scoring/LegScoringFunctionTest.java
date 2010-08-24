@@ -116,15 +116,13 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 	public void testCalcLegScorePt() {
 		this.runATest(TransportMode.pt, null, "\n\tabcd", -10.0);
 		this.ktiConfigGroup.setUsePlansCalcRouteKti(true);
-//		this.runATest(TransportMode.pt, null, "kti=8503006=26101=300.0=26102=8503015", -8.116533);
-		this.runATest(TransportMode.pt, null, "kti=8503006=26101=300.0=26102=8503015", -10.0);
+		this.runATest(TransportMode.pt, null, "kti=8503006=26101=300.0=26102=8503015", -8.116533179554773);
 	}
 
 	public void testCalcLegScorePtUnknown() {
 		this.runATest(TransportMode.pt, "unknown", "", -7.5);
 		this.ktiConfigGroup.setUsePlansCalcRouteKti(true);
-//		this.runATest(TransportMode.pt, "unknown", "kti=8503006=26101=300.0=26102=8503015", -8.010467);
-		this.runATest(TransportMode.pt, "unknown", "kti=8503006=26101=300.0=26102=8503015", -7.5);
+		this.runATest(TransportMode.pt, "unknown", "kti=8503006=26101=300.0=26102=8503015", -8.010467162376791);
 	}
 
 	public void testCalcLegScoreCar() {
