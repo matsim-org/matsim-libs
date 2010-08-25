@@ -19,7 +19,7 @@ therefore it does not function anymore.
 ===============================================================================================================
 runRW1003
 ==========
-quick fix done: 
+quick fix done (commented out): 
 class FacilityChargingPrice: "two slots with the same starting time => some thing is wrong..."
 class ChargingLog: "A car cannot charge using the same starting time twice..."
 
