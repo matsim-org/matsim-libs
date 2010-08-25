@@ -78,6 +78,7 @@ public class KtiConfigGroupTest extends MatsimTestCase {
 		assertEquals(0.3, testee.getDistanceCostPtUnknownTravelCard());
 		assertEquals(-3.1, testee.getTravelingBike());
 		assertEquals(3.42, testee.getIntrazonalPtSpeed());
+		assertEquals(true, testee.isInvalidateScores());
 	}
 	
 }

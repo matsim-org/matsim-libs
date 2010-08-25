@@ -97,7 +97,13 @@ public class KtiConfigGroup extends Module {
 		 * an intrazonal trip is estimated, the speed given here is used.
 		 * unit: [m/s] 
 		 */
-		INTRAZONAL_PT_SPEED("intrazonalPtSpeed", "1.0", "");
+		INTRAZONAL_PT_SPEED("intrazonalPtSpeed", "1.0", ""), 
+		/**
+		 * indicates whether plan scores are invalidated (set to null) when reading plans
+		 * used in simulation of initial datapuls population where plans have scores with an unknown meaning
+		 * this generates trouble when using a learning rate different to 1.0
+		 */
+		INVALIDATE_SCORES("invalidateScores", "false", "");
 		
 		private final String parameterName;
 		private final String defaultValue;
@@ -245,6 +251,10 @@ public class KtiConfigGroup extends Module {
 
 	public void setIntrazonalPtSpeed(double newValue) {
 		KtiConfigParameter.INTRAZONAL_PT_SPEED.setActualValue(Double.toString(newValue));
+	}
+
+	public boolean isInvalidateScores() {
+		return Boolean.parseBoolean(KtiConfigParameter.INVALIDATE_SCORES.getActualValue());
 	}
 	
 }
