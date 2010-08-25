@@ -217,7 +217,14 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	@Override
 	public void finish() {
-		super.finish();
+		
+		/*
+		 * workaround for correct handling of activity plans which have only one activity and no legs
+		 * TODO consider correction of standard implementations of scoring functions, as well as simplification of code
+		 */
+		if (this.lastActIndex > 0) {
+			super.finish();
+		}
 		this.score += this.getTooShortDurationScore();
 		this.score += this.getWaitingTimeScore();
 		this.score += this.getPerformanceScore();
@@ -226,6 +233,21 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	}
 
+	@Override
+	protected void handleAct(double time) {
+		
+		/*
+		 * workaround for correct handling of activity plans which have only one activity and no legs
+		 * TODO consider correction of standard implementations of scoring functions, as well as simplification of code
+		 */
+		if (this.lastActIndex == 0) {
+			Activity act = (Activity)this.plan.getPlanElements().get(this.index);
+			this.score += calcActScore(time, time + 24*3600, act);
+		} else {
+			super.handleAct(time);
+		}
+	}
+	
 	public double getFacilityPenaltiesScore() {
 
 		double facilityPenaltiesScore = 0.0;
