@@ -77,7 +77,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		UNCONNECTED, PAUSE, PLAY, STEP;
 	}
 
-	private Status status = Status.UNCONNECTED;
+	private volatile Status status = Status.UNCONNECTED;
 
 	private static Registry registry;
 
@@ -87,7 +87,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	private final Object updateFinished = new Object();
 
-	private int localTime = 0;
+	private volatile int localTime = 0;
 
 	private final Map<String, OTFServerQuad2> quads = new HashMap<String, OTFServerQuad2>();
 
@@ -101,7 +101,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	private final ByteBuffer buf = ByteBuffer.allocate(20000000);
 
-	private double stepToTime = 0;
+	private volatile double stepToTime = 0;
 
 	private OTFVisMobsimFeature otfVisQueueSimFeature;
 
@@ -127,7 +127,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 		@Override
 		public boolean awaitTermination(long timeout, TimeUnit unit)
-				throws InterruptedException {
+		throws InterruptedException {
 			return false;
 		}
 
@@ -382,11 +382,11 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	public OTFQueryRemote answerQuery(AbstractQuery query) throws RemoteException {
-			OTFServerQuad2 quad = quads.values().iterator().next();
-			query.installQuery(otfVisQueueSimFeature, events, quad);
-			activeQueries.add(query);
-			OTFQueryRemote stub = (OTFQueryRemote) UnicastRemoteObject.exportObject(query, 0);
-			return stub;
+		OTFServerQuad2 quad = quads.values().iterator().next();
+		query.installQuery(otfVisQueueSimFeature, events, quad);
+		activeQueries.add(query);
+		OTFQueryRemote stub = (OTFQueryRemote) UnicastRemoteObject.exportObject(query, 0);
+		return stub;
 	}
 
 	@Override
