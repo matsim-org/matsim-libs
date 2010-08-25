@@ -21,7 +21,7 @@ runRW1003
 ==========
 quick fix done (commented out): 
 class FacilityChargingPrice: "two slots with the same starting time => some thing is wrong..."
-class ChargingLog: "A car cannot charge using the same starting time twice..."
+class ChargeLog: "A car cannot charge using the same starting time twice..."
 
 even with this !!!HACK!!!, the program exits with the following error:
 exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: 96
