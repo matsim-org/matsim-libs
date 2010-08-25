@@ -26,37 +26,14 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 public class AgentDepartureEventImpl extends AgentEventImpl implements AgentDepartureEvent {
 
 	public static final String EVENT_TYPE = "departure";
-	
-	private Id destinationLinkId = null ;
-	private Double travelTime = null ;
-	private Boolean isTeleported = null ;
 
 	public AgentDepartureEventImpl(final double time, final Id agentId, final Id linkId, final String legMode) {
 		super(time, agentId, linkId, legMode);
 	}
 
-	public AgentDepartureEventImpl(double now, Id agentId, Id linkId, String mode, boolean isTeleported, Id destinationLinkId, double travelTime) {
-		super(now, agentId, linkId, mode) ;
-		this.destinationLinkId = destinationLinkId ;
-		this.travelTime = travelTime ;
-		this.isTeleported = isTeleported ;
-	}
-
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
-	}
-
-	public Id getDestinationLinkId() {
-		return destinationLinkId;
-	}
-
-	public Double getTravelTime() {
-		return travelTime;
-	}
-	
-	public Boolean isTeleported() {
-		return this.isTeleported ;
 	}
 
 }
