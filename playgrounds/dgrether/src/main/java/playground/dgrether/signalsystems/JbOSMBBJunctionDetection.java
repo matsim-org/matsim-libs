@@ -75,8 +75,8 @@ import de.micromata.opengis.kml.v_2_2_0.Style;
  */
 public class JbOSMBBJunctionDetection {
 	
-	private static final Logger log = Logger.getLogger(DgOsmBBJunctionDetectionToolsc.class);
-	
+	private static final Logger log = Logger.getLogger(JbOSMBBJunctionDetection.class);
+	private static final double  RESOLUTION = 30.0;
 	/**
 	 * This is a copy from OsmTransitMain needed to create network
 	 * Could also be placed in a NetworkSinkBuilder to avoid code duplication
@@ -171,7 +171,7 @@ public class JbOSMBBJunctionDetection {
 	
 	private List<List<org.matsim.api.core.v01.network.Node>> detectAllJunctions(OSMEntityCollector signalizedOsmNodes, Network network){
 		Set<org.matsim.api.core.v01.network.Node> visitedNodes = new HashSet<org.matsim.api.core.v01.network.Node>();
-		List<List<org.matsim.api.core.v01.network.Node>> junctions = new ArrayList<List<org.matsim.api.core.v01.network.Node>>();
+		List<List<org.matsim.api.core.v01.network.Node>> junctions = new LinkedList<List<org.matsim.api.core.v01.network.Node>>();
 		Set<org.matsim.api.core.v01.network.Node> mNodes = new HashSet<org.matsim.api.core.v01.network.Node>();
 
 		
@@ -186,68 +186,55 @@ public class JbOSMBBJunctionDetection {
 			}
 			mNodes.add(matsimNode);}
 		
-		
-		for (Node osmNode : signalizedOsmNodes.getAllNodes().values()){
-			log.info("processing potential junction node: " + osmNode.getId());
-			org.matsim.api.core.v01.network.Node matsimNode = network.getNodes().get(new IdImpl(osmNode.getId()));
-			if (matsimNode == null){
-				log.warn("OSMNode  " + osmNode.getId() + " is tagged as signalized but is not contained in MATSim Network");
-				continue;
+		for (org.matsim.api.core.v01.network.Node n : mNodes)
+		{
+			log.info("visiting: "+n.getId().toString());
+		if (visitedNodes.contains(n))
+			{
+			log.info("Node visited twice");
+			continue;
 			}
-
-			if (visitedNodes.contains(matsimNode)){
-				log.info("visited node twice " + matsimNode.getId());
-				continue;
-			}
-			List<org.matsim.api.core.v01.network.Node> jn = detectJunction(mNodes, matsimNode, visitedNodes, signalizedOsmNodes);
-			if (jn.size() >= 2) {
-				junctions.add(jn);
-			}
+		List<org.matsim.api.core.v01.network.Node> jn = detectJct(mNodes,n,visitedNodes);
+		visitedNodes.addAll(jn);
+		//log.info("jct consists now of "+jn.toString());
+		junctions.add(jn);
+		log.info("junctions found "+junctions.size());
+		//jn.clear();
 		}
-		return junctions;
+		
+		
+		
+	
+		
+		return  junctions;
 	}
-	
-	
-	private List<org.matsim.api.core.v01.network.Node> detectJunction(Set<org.matsim.api.core.v01.network.Node> mNodes, org.matsim.api.core.v01.network.Node matsimNode, Set<org.matsim.api.core.v01.network.Node> visitedNodes, OSMEntityCollector signalizedOsmNodes){
-		visitedNodes.add(matsimNode);
-		List<org.matsim.api.core.v01.network.Node> junctionMatsimNodes = new LinkedList<org.matsim.api.core.v01.network.Node>();
-		junctionMatsimNodes.add(matsimNode);
-		/*
-		ListIterator<org.matsim.api.core.v01.network.Node> it = junctionMatsimNodes.listIterator();
-		while (it.hasNext()){
-			org.matsim.api.core.v01.network.Node mNode = it.next();
-			for (Link l : mNode.getOutLinks().values()){
-				org.matsim.api.core.v01.network.Node toNode = l.getToNode();
-				Long toNodeId = Long.decode(toNode.getId().toString());
-				if (l.getLength() < 70.0 && signalizedOsmNodes.getAllNodes().containsKey(toNodeId)){
-					it.add(toNode);
-					visitedNodes.add(toNode);
-//					log.info("  detected junction node: " + toNodeId);
-				}
-			}
+	private List<org.matsim.api.core.v01.network.Node> detectJct(Set<org.matsim.api.core.v01.network.Node> mNodes, org.matsim.api.core.v01.network.Node currentNode,Set<org.matsim.api.core.v01.network.Node> visitedNodes){
+		List<org.matsim.api.core.v01.network.Node> jn = new LinkedList<org.matsim.api.core.v01.network.Node>();
 		
-		}*/
-		
-		//if (junctionMatsimNodes.size()<2){
-			mNodes.remove(matsimNode);
-			double xcord = matsimNode.getCoord().getX(); 
-			double ycord = matsimNode.getCoord().getY();
-			for (org.matsim.api.core.v01.network.Node n: mNodes){
-				double ndx = n.getCoord().getX(); 
-				double ndy = n.getCoord().getY();	
-				if (((ndx>=(xcord-30.0))&&(ndx<=(xcord+30.0)))&&((ndy>=(ycord-30.0))&&(ndy>(xcord+30.0)))) {
+		jn.add(currentNode);
+		log.info("added to new jct "+currentNode.getId());
+		double xcord = currentNode.getCoord().getX(); 
+		double ycord = currentNode.getCoord().getY();
+		for (org.matsim.api.core.v01.network.Node m : mNodes){
+				if (visitedNodes.contains(m))
+				{continue;}
+				double ndx = m.getCoord().getX(); 
+				double ndy = m.getCoord().getY();
+				if(!currentNode.getId().equals(m.getId())){
+				if (((ndx>=(xcord-RESOLUTION))&&(ndx<=(xcord+RESOLUTION)))&&((ndy>=(ycord-RESOLUTION))&&(ndy>(xcord+RESOLUTION)))) {
 
 					
-					junctionMatsimNodes.add(n);
-					visitedNodes.add(n);
+					jn.add(m);
+					log.info("added to existing jct "+m.getId());
 					
-				}
-			}
-		//}
-		
-		return junctionMatsimNodes;
+				}}
+			
+		}return jn;
 	}
 
+	
+	
+	
 	
 	
 	private void writeJunctionNodesToKml(List<List<org.matsim.api.core.v01.network.Node>> junctions, String kmlJunctionsOutFile) {
@@ -304,8 +291,8 @@ public class JbOSMBBJunctionDetection {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String baseInDirOsm = "/home/jbischoff/workingset/";
-		String baseInDirTest = "/home/jbischoff/osmBerlinSzenario/";
+		String baseInDirOsm = "/Users/JB/Documents/Work/workingset/";
+		String baseInDirTest = "/Users/JB/Documents/Work/osmBerlinSzenario/";
 		
 //		String baseInDir = baseInDirTest;
 		String baseInDir = baseInDirOsm;
@@ -313,18 +300,18 @@ public class JbOSMBBJunctionDetection {
 		String bbOsmFile = baseInDirOsm + "berlinbrandenburg_filtered.osm";
 		String testOsmFile = baseInDirTest + "testdata/map2_filtered.osm";
 
-		String osmFile = testOsmFile;
-//		String osmFile = bbOsmFile;
+//		String osmFile = testOsmFile;
+		String osmFile = bbOsmFile;
 		
 		String baseOutDirTest = baseInDirTest;
 		
-		String baseOutDir = baseOutDirTest + "testdata/";
-//		String baseOutDir = baseOutDirTest;
+//		String baseOutDir = baseOutDirTest + "testdata/";
+		String baseOutDir = baseOutDirTest;
 		
 		String nodesOutOsmFile = baseOutDir + "potential_junction_nodes.osm";
 		String nodesOutReportFile = baseOutDir + "nodes_filter_report.txt";
 		String netOutFile = baseOutDir + "network.xml";
-		String kmlJunctionsOutFile = baseOutDir + "junctions_tstim1.kml";
+		String kmlJunctionsOutFile = baseOutDir + "junctions_b1n_30.kml";
 		String kmlNetworkOutFile = baseOutDir + "network2.kml";
 		
 		JbOSMBBJunctionDetection tools = new JbOSMBBJunctionDetection();
@@ -339,7 +326,7 @@ public class JbOSMBBJunctionDetection {
 		tools.writeJunctionNodesToKml(junctionNodes, kmlJunctionsOutFile);
 		
 		//write network to kml, might exceed max memory
-		new KmlNetworkVisualizer(network).write(kmlNetworkOutFile, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM33N, TransformationFactory.WGS84));
+		//new KmlNetworkVisualizer(network).write(kmlNetworkOutFile, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM33N, TransformationFactory.WGS84));
 
 		signalizedOsmNodes.reset();
 		log.info("done!");
