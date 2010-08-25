@@ -29,6 +29,7 @@ import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.population.algorithms.PersonDeleteNonKtiCompatibleRoutes;
+import playground.meisterk.kti.population.algorithms.PersonInvalidateScores;
 
 public class KtiPopulationPreparation implements StartupListener {
 
@@ -54,6 +55,20 @@ public class KtiPopulationPreparation implements StartupListener {
 					new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 						public AbstractPersonAlgorithm getPersonAlgorithm() {
 							return new PersonDeleteNonKtiCompatibleRoutes();
+						}
+					});
+		}
+		
+		/*
+		 * for an explanation, see the element comment of the kti config parameter
+		 */
+		if (this.ktiConfigGroup.isInvalidateScores()) {
+			ParallelPersonAlgorithmRunner.run(
+					pop, 
+					config.global().getNumberOfThreads(),
+					new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+						public AbstractPersonAlgorithm getPersonAlgorithm() {
+							return new PersonInvalidateScores();
 						}
 					});
 		}
