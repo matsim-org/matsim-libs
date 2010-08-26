@@ -28,21 +28,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.geotools.referencing.GeodeticCalculator;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
 import org.openstreetmap.osmosis.core.misc.v0_6.NullWriter;
@@ -54,7 +55,6 @@ import org.openstreetmap.osmosis.core.xml.v0_6.XmlWriter;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.osm.OSMEntityCollector;
-import playground.dgrether.visualization.KmlNetworkVisualizer;
 import playground.mzilske.osm.NetworkSink;
 import de.micromata.opengis.kml.v_2_2_0.ColorMode;
 import de.micromata.opengis.kml.v_2_2_0.Coordinate;
@@ -74,6 +74,17 @@ import de.micromata.opengis.kml.v_2_2_0.Style;
 public class DgOsmBBJunctionDetectionTools {
 	
 	private static final Logger log = Logger.getLogger(DgOsmBBJunctionDetectionTools.class);
+	
+	private GeodeticCalculator geoCalculator;
+	private CoordinateReferenceSystem targetCRS;
+	
+	public DgOsmBBJunctionDetectionTools(){
+		this.targetCRS = MGC.getCRS(TransformationFactory.WGS84);
+		this.geoCalculator = new GeodeticCalculator(this.targetCRS);
+		log.info("axis unit " + this.geoCalculator.getEllipsoid().getAxisUnit());
+
+	}
+	
 	
 	/**
 	 * This is a copy from OsmTransitMain needed to create network
@@ -132,7 +143,7 @@ public class DgOsmBBJunctionDetectionTools {
 		// get a Matsim Network
 		// read the file again as NetworkSink modifies the data and the Entities are read-only if a EntityTee is used
 		Scenario sc = new ScenarioImpl();
-		NetworkSink networkGenerator = createAndInitNetworkSink(sc, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N));
+		NetworkSink networkGenerator = createAndInitNetworkSink(sc, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84));
 		TagFilter transitRelationsFilter = createTransitRelationsFilter();
 		TagFilter transitWaysFilter = createTransitWaysFilter();
 		
@@ -167,11 +178,12 @@ public class DgOsmBBJunctionDetectionTools {
 	}
 	
 	
-	private List<List<org.matsim.api.core.v01.network.Node>> detectAllJunctions(OSMEntityCollector signalizedOsmNodes, Network network){
-		Set<org.matsim.api.core.v01.network.Node> visitedNodes = new HashSet<org.matsim.api.core.v01.network.Node>();
-		
-		List<List<org.matsim.api.core.v01.network.Node>> junctions = new ArrayList<List<org.matsim.api.core.v01.network.Node>>();
-		
+	private List<Set<org.matsim.api.core.v01.network.Node>> detectAllJunctions(OSMEntityCollector signalizedOsmNodes, Network network){
+		Set<org.matsim.api.core.v01.network.Node> detectedJunctionNodes = new HashSet<org.matsim.api.core.v01.network.Node>();
+		List<Set<org.matsim.api.core.v01.network.Node>> junctions = new ArrayList<Set<org.matsim.api.core.v01.network.Node>>();
+
+		// get all matsim nodes for the osm nodes that are signalized
+		Set<org.matsim.api.core.v01.network.Node> matsimNodes = new HashSet<org.matsim.api.core.v01.network.Node>();
 		for (Node osmNode : signalizedOsmNodes.getAllNodes().values()){
 			log.info("processing potential junction node: " + osmNode.getId());
 			org.matsim.api.core.v01.network.Node matsimNode = network.getNodes().get(new IdImpl(osmNode.getId()));
@@ -179,46 +191,56 @@ public class DgOsmBBJunctionDetectionTools {
 				log.warn("OSMNode  " + osmNode.getId() + " is tagged as signalized but is not contained in MATSim Network");
 				continue;
 			}
+			matsimNodes.add(matsimNode);
+		}
 
-			if (visitedNodes.contains(matsimNode)){
-				log.info("visited node twice " + matsimNode.getId());
+		//detect the junctions
+		for (org.matsim.api.core.v01.network.Node matsimNode : matsimNodes){
+			if (detectedJunctionNodes.contains(matsimNode)){
+//				log.info("visited node twice " + matsimNode.getId());
 				continue;
 			}
-			
-			List<org.matsim.api.core.v01.network.Node> jn = detectJunction(matsimNode, visitedNodes, signalizedOsmNodes);
-			if (jn.size() > 1) {
-				junctions.add(jn);
-			}
+			Set<org.matsim.api.core.v01.network.Node> jn = detectJunction(matsimNode, detectedJunctionNodes, matsimNodes);
+			detectedJunctionNodes.addAll(jn);
+			junctions.add(jn);
 		}
 		return junctions;
 	}
 	
 	
-	private List<org.matsim.api.core.v01.network.Node> detectJunction(org.matsim.api.core.v01.network.Node matsimNode, Set<org.matsim.api.core.v01.network.Node> visitedNodes, OSMEntityCollector signalizedOsmNodes){
-		visitedNodes.add(matsimNode);
-		List<org.matsim.api.core.v01.network.Node> junctionMatsimNodes = new LinkedList<org.matsim.api.core.v01.network.Node>();
-		junctionMatsimNodes.add(matsimNode);
+	private Set<org.matsim.api.core.v01.network.Node> detectJunction(org.matsim.api.core.v01.network.Node startNode, Set<org.matsim.api.core.v01.network.Node> detectedJunctionNodes, Set<org.matsim.api.core.v01.network.Node> matsimNodes){
+		Set<org.matsim.api.core.v01.network.Node> junctionMatsimNodes = new HashSet<org.matsim.api.core.v01.network.Node>();
+		junctionMatsimNodes.add(startNode);
 		
-		ListIterator<org.matsim.api.core.v01.network.Node> it = junctionMatsimNodes.listIterator();
-		while (it.hasNext()){
-			org.matsim.api.core.v01.network.Node mNode = it.next();
-			for (Link l : mNode.getOutLinks().values()){
-				org.matsim.api.core.v01.network.Node toNode = l.getToNode();
-				Long toNodeId = Long.decode(toNode.getId().toString());
-				if (l.getLength() < 70.0 && signalizedOsmNodes.getAllNodes().containsKey(toNodeId)){
-					it.add(toNode);
-					visitedNodes.add(toNode);
-//					log.info("  detected junction node: " + toNodeId);
+		List<org.matsim.api.core.v01.network.Node> nodeBuffer = new LinkedList<org.matsim.api.core.v01.network.Node>();
+		nodeBuffer.add(startNode);
+		
+		org.matsim.api.core.v01.network.Node fromNode;
+		while (!nodeBuffer.isEmpty()){
+			fromNode = nodeBuffer.remove(0);
+			this.geoCalculator.setStartingGeographicPoint(fromNode.getCoord().getX(), fromNode.getCoord().getY());
+			
+			for (org.matsim.api.core.v01.network.Node toNode : matsimNodes){
+				if (detectedJunctionNodes.contains(toNode) || junctionMatsimNodes.contains(toNode)){
+					continue;
+				}
+				this.geoCalculator.setDestinationGeographicPoint(toNode.getCoord().getX(), toNode.getCoord().getY());
+				if (this.geoCalculator.getOrthodromicDistance() < 60.0){
+					nodeBuffer.add(toNode);
+					junctionMatsimNodes.add(toNode);
 				}
 			}
+			
+			
 		}
+		
 		return junctionMatsimNodes;
 	}
 
 	
 	
-	private void writeJunctionNodesToKml(List<List<org.matsim.api.core.v01.network.Node>> junctions, String kmlJunctionsOutFile) {
-		CoordinateTransformation coordtransform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM33N, TransformationFactory.WGS84);
+	private void writeJunctionNodesToKml(List<Set<org.matsim.api.core.v01.network.Node>> junctions, String kmlJunctionsOutFile) {
+		CoordinateTransformation coordtransform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84);
 		
 		final Kml kml = new Kml();
 		final Document document = new Document();
@@ -228,7 +250,7 @@ public class DgOsmBBJunctionDetectionTools {
 		
 		int colorSteps = (255 / junctions.size()) - 1;
 		
-		for (List<org.matsim.api.core.v01.network.Node> junction : junctions){
+		for (Set<org.matsim.api.core.v01.network.Node> junction : junctions){
 			i++;
 			final Style style = new Style();
 			document.getStyleSelector().add(style);
@@ -274,19 +296,36 @@ public class DgOsmBBJunctionDetectionTools {
 		String baseInDirOsm = DgPaths.SHAREDSVN + "studies/countries/de/osm_berlinbrandenburg/workingset/";
 		String baseInDirTest = DgPaths.STUDIESDG + "osmBerlinSzenario/";
 		
-		String baseInDir = baseInDirTest;
-//		String baseInDir = baseInDirOsm;
+		boolean test = false;
+		
+		String baseInDir;
+		if (test){
+			baseInDir = baseInDirTest;
+		}
+		else {
+			baseInDir = baseInDirOsm;
+		}
 		
 		String bbOsmFile = baseInDirOsm + "berlinbrandenburg_filtered.osm";
 		String testOsmFile = baseInDirTest + "testdata/map_filtered.osm";
 
-		String osmFile = testOsmFile;
-//		String osmFile = bbOsmFile;
+		String osmFile;
+		if (test){
+			osmFile = testOsmFile;
+		}
+		else {
+			osmFile = bbOsmFile;
+		}
 		
 		String baseOutDirTest = baseInDirTest;
 		
-		String baseOutDir = baseOutDirTest + "testdata/";
-//		String baseOutDir = baseOutDirTest;
+		String baseOutDir;
+		if (test){
+			baseOutDir = baseOutDirTest + "testdata/";
+		}
+		else {
+			baseOutDir = baseOutDirTest;
+		}
 		
 		String nodesOutOsmFile = baseOutDir + "potential_junction_nodes.osm";
 		String nodesOutReportFile = baseOutDir + "nodes_filter_report.txt";
@@ -301,12 +340,13 @@ public class DgOsmBBJunctionDetectionTools {
 		Network network = tools.createMatsimNetwork(osmFile);
 		new NetworkWriter(network).write(netOutFile);
 		
-		List<List<org.matsim.api.core.v01.network.Node>> junctionNodes = tools.detectAllJunctions(signalizedOsmNodes, network);
+		List<Set<org.matsim.api.core.v01.network.Node>> junctionNodes = tools.detectAllJunctions(signalizedOsmNodes, network);
 		
+		log.info("writing kml output...");
 		tools.writeJunctionNodesToKml(junctionNodes, kmlJunctionsOutFile);
 		
 		//write network to kml, might exceed max memory
-		new KmlNetworkVisualizer(network).write(kmlNetworkOutFile, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM33N, TransformationFactory.WGS84));
+//		new KmlNetworkVisualizer(network).write(kmlNetworkOutFile, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84));
 
 		signalizedOsmNodes.reset();
 		log.info("done!");
