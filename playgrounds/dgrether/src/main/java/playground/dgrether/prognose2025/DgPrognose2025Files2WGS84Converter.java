@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.tests.satellic;
+package playground.dgrether.prognose2025;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
