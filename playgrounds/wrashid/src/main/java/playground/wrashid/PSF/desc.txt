@@ -1,6 +1,7 @@
 Change name of framework to TESF (Transportation Energy Simulation Framework) or 
 MESF (Mobility Energy Simulation Framework).
 
+Electric Mobility Simulation Framework (EMSF)
 
 
 next:
