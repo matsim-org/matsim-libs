@@ -48,7 +48,7 @@ public class CarTimeEstimator {
 	 * <ul>
 	 * 	<li> an <code>output_network.xml.gz</code> file describing the network used;
 	 * 	<li> an <code>output_plans.xml.gz</code> file describing the agent plans used;
-	 * 	<li> the <code>*.linkstats.txt</code> file of the last iteration; and
+	 * 	<li> the <code>*.linkstats.txt</code> file of the last iteration (<b><i>Note: file must be unzipped</i></b>); and
 	 * 	<li> the <code>*.events.txt.gz</code> file of the last iteration that 
 	 * 		is used to build the travel time data required for the routing algorithm.
 	 * </ul>
