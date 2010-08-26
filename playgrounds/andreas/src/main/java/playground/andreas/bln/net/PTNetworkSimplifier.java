@@ -228,8 +228,8 @@ public class PTNetworkSimplifier {
 
 		}
 
-//		org.matsim.core.network.algorithms.NetworkCleaner nc = new org.matsim.core.network.algorithms.NetworkCleaner();
-//		nc.run(this.network);
+		NetworkRemoveUnusedNodes nc = new NetworkRemoveUnusedNodes();
+		nc.run(this.network);
 
 		nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(this.network);
