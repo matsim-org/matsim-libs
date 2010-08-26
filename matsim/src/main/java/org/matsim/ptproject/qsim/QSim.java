@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.ControlerIO;
@@ -51,7 +50,6 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQSimEngine;
@@ -541,7 +539,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	// depending on this, it is a "PersonAgent" or "DriverAgent".  kai, may'10
 	public void agentDeparts(final double now, final PersonDriverAgent agent, final Id linkId) {
 		Leg leg = agent.getCurrentLeg();
-		Route route = leg.getRoute();
+//		Route route = leg.getRoute();
 		String mode = leg.getMode();
 		events.processEvent(events.getFactory().createAgentDepartureEvent(now, agent.getPerson().getId(), linkId, mode ));
 		if ( handleKnownLegModeDeparture(now, agent, linkId, leg) ) {
@@ -571,16 +569,16 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 	private void handleUnknownLegMode(final double now, final PersonDriverAgent agent, final Id linkId, final Leg leg) {
 //		Link     currentLink = this.scenario.getNetwork().getLinks().get(linkId) ;
-//		Link destinationLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId()) ; 
+//		Link destinationLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId()) ;
 //		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 //			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, currentLink, destinationLink );
 //		}
-		
+
 		double arrivalTime = now + agent.getCurrentLeg().getTravelTime();
 		this.teleportationList.add(new Tuple<Double, PersonDriverAgent>(arrivalTime, agent));
 	}
 
-	private boolean handleKnownLegModeDeparture(final double now, final PersonDriverAgent agent, final Id linkId, final Leg leg) 
+	private boolean handleKnownLegModeDeparture(final double now, final PersonDriverAgent agent, final Id linkId, final Leg leg)
 	{
 		for (DepartureHandler departureHandler : this.departureHandlers) {
 			if ( departureHandler.handleDeparture(now, agent, linkId, leg) ) {
@@ -604,7 +602,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			long diffreal = (endtime.getTime() - this.realWorldStarttime.getTime())/1000;
 			double diffsim  = time - this.simTimer.getSimStartTime();
 			int nofActiveLinks = this.netEngine.getNumberOfSimulatedLinks();
-			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + this.agentCounter.getLiving() 
+			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + this.agentCounter.getLiving()
 					+ " lost=" + this.agentCounter.getLost() + " #links=" + nofActiveLinks
 					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
 			Gbl.printMemoryUsage();

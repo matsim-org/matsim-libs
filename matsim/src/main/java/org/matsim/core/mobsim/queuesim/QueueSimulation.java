@@ -45,7 +45,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -453,12 +452,12 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	}
 
 	protected void handleUnknownLegMode(double now, final PersonDriverAgent agent) {
-		Id startLinkId = agent.getCurrentLeg().getRoute().getStartLinkId() ;
-		Leg leg = agent.getCurrentLeg() ;
+//		Id startLinkId = agent.getCurrentLeg().getRoute().getStartLinkId() ;
+//		Leg leg = agent.getCurrentLeg() ;
 
 //		Link     currentLink = this.scenario.getNetwork().getLinks().get(startLinkId) ;
-//		Link destinationLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId()) ; 
-		
+//		Link destinationLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId()) ;
+
 
 //		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 //			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, currentLink, destinationLink ) ;
