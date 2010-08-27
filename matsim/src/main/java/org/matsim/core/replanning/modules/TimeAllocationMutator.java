@@ -23,9 +23,13 @@ package org.matsim.core.replanning.modules;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
+
+import visad.UnimplementedException;
+import visad.data.netcdf.UnsupportedOperationException;
 
 /**
  * Wraps the {@link org.matsim.population.algorithms.PlanMutateTimeAllocation}-
@@ -60,6 +64,15 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 			this.mutationRange = Integer.parseInt(range);
 			log.info("mutation range = " + this.mutationRange);
 		}
+		if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
+			useActivityDurations = true ;
+		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.END_TIME_ONLY ) ) {
+			useActivityDurations = false ;
+		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.TRY_END_TIME_THEN_DURATION ) ) {
+			throw new UnsupportedOperationException( "need to clarify the correct setting here.  Probably not a big deal, but not done yet.  kai, aug'10") ;
+		} else {
+			throw new IllegalStateException( "beahvior not defined for this configuration setting") ;
+		}
 	}
 
 	/**
@@ -79,8 +92,8 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 		return pmta;
 	}
 
-	public void setUseActivityDurations(boolean useActivityDurations) {
-		this.useActivityDurations = useActivityDurations;
-	}
+//	public void setUseActivityDurations(boolean useActivityDurations) {
+//		this.useActivityDurations = useActivityDurations;
+//	}
 
 }

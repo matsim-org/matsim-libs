@@ -90,7 +90,8 @@ public class TransitStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 	} else if (name.equals("TimeAllocationMutator")) {
 		strategy = new PlanStrategy(new RandomPlanSelector());
 		TransitTimeAllocationMutator tam = new TransitTimeAllocationMutator(controler.getConfig());
-		tam.setUseActivityDurations(controler.getConfig().vspExperimental().isUseActivityDurations());
+//		tam.setUseActivityDurations(controler.getConfig().vspExperimental().isUseActivityDurations());
+		// functionality moved into TimeAllocationMutation.  kai, aug'10
 		strategy.addStrategyModule(tam);
 	} else {
 		strategy = StrategyManagerConfigLoader.loadStrategy(controler, name, settings);

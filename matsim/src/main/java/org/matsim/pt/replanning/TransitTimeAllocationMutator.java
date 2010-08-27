@@ -22,10 +22,13 @@ package org.matsim.pt.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import visad.data.netcdf.UnsupportedOperationException;
 
 /**
  * Copy/Paste of TimeAllocationMutator, that calls TransitPlanMutateTimeAllocation instead
@@ -57,6 +60,15 @@ public class TransitTimeAllocationMutator extends AbstractMultithreadedModule {
 			this.mutationRange = Integer.parseInt(range);
 			log.info("mutation range = " + this.mutationRange);
 		}
+		if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
+			useActivityDurations = true ;
+		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.END_TIME_ONLY ) ) {
+			useActivityDurations = false ;
+		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.TRY_END_TIME_THEN_DURATION ) ) {
+			throw new UnsupportedOperationException( "need to clarify the correct setting here.  Probably not a big deal, but not done yet.  kai, aug'10") ;
+		} else {
+			throw new IllegalStateException( "beahvior not defined for this configuration setting") ;
+		}
 	}
 
 	/**
@@ -76,7 +88,7 @@ public class TransitTimeAllocationMutator extends AbstractMultithreadedModule {
 		return pmta;
 	}
 
-	public void setUseActivityDurations(final boolean useActivityDurations) {
-		this.useActivityDurations = useActivityDurations;
-	}
+//	public void setUseActivityDurations(final boolean useActivityDurations) {
+//		this.useActivityDurations = useActivityDurations;
+//	}
 }
