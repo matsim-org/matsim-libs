@@ -11,5 +11,7 @@
  * {@link org.matsim.population.algorithms}, ...). In this package are really only
  * classes with main-methods that offer some functionality to the outside by
  * using code from other packages.
+ * <br>
+ * <b>Please contact Marcel Rieser before you put anything into this directory.</b>
  */
 package org.matsim.run;
