@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
@@ -203,6 +204,7 @@ public class QPersonAgent implements PersonDriverAgent {
 	public void legEnds(final double now) {
 		this.simulation.handleAgentArrival(now, this);
 		if(!this.currentLinkId.equals(this.destinationLinkId)) {
+			// yyyyyy needs to throw a stuck/abort event
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.destinationLinkId
 					+ ", but arrived on link " + this.currentLinkId + ". Removing the agent from the simulation.");
 			this.simulation.getAgentCounter().decLiving();
@@ -269,7 +271,8 @@ public class QPersonAgent implements PersonDriverAgent {
 		double departure = 0;
 
 //		if (this.simulation.isUseActivityDurations()) {
-		if ( this.simulation.getScenario().getConfig().vspExperimental().isUseActivityDurations() ) {
+//		if ( this.simulation.getScenario().getConfig().vspExperimental().isUseActivityDurations() ) {
+		if ( this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation().equals(VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
 			/* The person leaves the activity either 'actDur' later or
 			 * when the end is defined of the activity, whatever comes first. */
 			if (act.getDuration() == Time.UNDEFINED_TIME) {
@@ -279,18 +282,33 @@ public class QPersonAgent implements PersonDriverAgent {
 			} else {
 				departure = Math.min(act.getEndTime(), now + act.getDuration());
 			}
-		}
-		else {
+		} else if ( this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation().equals(VspExperimentalConfigGroup.END_TIME_ONLY ) ) {
 			if (act.getEndTime() != Time.UNDEFINED_TIME) {
 				departure = act.getEndTime() ;
+				((ActivityImpl) act).setDuration(Time.UNDEFINED_TIME) ; 
+				// setting the duration to "undefined" so that the interpretation becomes explicit.  One could discuss, however, if
+				// the mobsim should be able to modify plans. Alternative would be in the PopulationWriter, which I would like
+				// better, but means configuration of the PopulationWriter.  kai, aug'10 (*)
+			} else {
+				throw new IllegalStateException("activity end time not set and using something else not allowed. personId: " + this.getPerson().getId());
 			}
-			else {
-				throw new IllegalStateException("Can not use activity end time as new departure time as it is not set for person: " + this.getPerson().getId());
+		} else if ( this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation().equals(VspExperimentalConfigGroup.TRY_END_TIME_THEN_DURATION ) ) {
+			// In fact, as of now I think that _this_ should be the default behavior.  kai, aug'10
+			if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
+				departure = act.getEndTime();
+				((ActivityImpl) act).setDuration(Time.UNDEFINED_TIME) ; 
+				// see comment (*) above
+			} else if ( act.getDuration() != Time.UNDEFINED_TIME ) {
+				departure = now + act.getDuration() ;
+			} else {
+				throw new IllegalStateException("neither activity end time nor activity duration defined; don't know what to do. personId: " + this.getPerson().getId());
 			}
+		} else {
+			throw new IllegalStateException("should not happen") ;
 		}
 
 		if (departure < now) {
-			// we cannot depart before we arrived, thus change the time so the timestamp in events will be right
+			// we cannot depart before we arrived, thus change the time so the time stamp in events will be right [[how can events not use the simulation time?  kai, aug'10]]
 			departure = now;
 			// actually, we will depart in (now+1) because we already missed the departing in this time step
 		}

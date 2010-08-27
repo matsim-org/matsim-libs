@@ -33,7 +33,12 @@ public class VspExperimentalConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "vspExperimental";
 
+	@Deprecated
 	private static final String USE_ACTIVITY_DURATIONS = "useActivityDurations";
+	private static final String ACTIVITY_DURATION_INTERPRETATION="activityDurationInterpretation" ;
+	public static final String MIN_OF_DURATION_AND_END_TIME="minOfDurationAndEndTime" ;
+	public static final String TRY_END_TIME_THEN_DURATION="tryEndTimeThenDuration" ;
+	public static final String END_TIME_ONLY="endTimeOnly" ;
 
 	private static final String INPUT_MZ05_FILE = "inputMZ05File";
 
@@ -42,8 +47,9 @@ public class VspExperimentalConfigGroup extends Module {
 
 	private static final String OFFSET_WALK = "offsetWalk";
 
-
-	private boolean useActivityDurations = true;
+//	@Deprecated
+//	private boolean useActivityDurations = true;
+	private String activityDurationInterpretation = "minOfDurationAndEndTime" ;
 
 	private String inputMZ05File = "";
 
@@ -61,6 +67,7 @@ public class VspExperimentalConfigGroup extends Module {
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(USE_ACTIVITY_DURATIONS, "Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
+		map.put(ACTIVITY_DURATION_INTERPRETATION, "String: " + MIN_OF_DURATION_AND_END_TIME + "', '" + TRY_END_TIME_THEN_DURATION + "', '" + END_TIME_ONLY + "'") ;
 
 		map.put(INPUT_MZ05_FILE, "Set this filename of MZ05 daily analysis");
 
@@ -73,8 +80,10 @@ public class VspExperimentalConfigGroup extends Module {
 
 	@Override
 	public String getValue(final String key) {
-		if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
+		/* if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
 			return Boolean.toString(this.isUseActivityDurations());
+		} else */ if (ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key)) {
+			return this.getActivityDurationInterpretation() ;
 		} else if (INPUT_MZ05_FILE.equalsIgnoreCase(key))
 			return this.getInputMZ05File();
 		else if (MODES_FOR_SUBTOURMODECHOICE.equalsIgnoreCase(key))
@@ -89,7 +98,14 @@ public class VspExperimentalConfigGroup extends Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
-			this.setUseActivityDurations(Boolean.parseBoolean(value));
+//			this.setUseActivityDurations(Boolean.parseBoolean(value));
+			if ( Boolean.parseBoolean(value) ) {
+				this.setActivityDurationInterpretation( MIN_OF_DURATION_AND_END_TIME ) ;
+			} else {
+				this.setActivityDurationInterpretation( END_TIME_ONLY ) ; 
+			}
+		} else if ( ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key)) {
+			this.setActivityDurationInterpretation(value) ;
 		} else if (INPUT_MZ05_FILE.equalsIgnoreCase(key))
 			this.setInputMZ05File(value);
 		else if (MODES_FOR_SUBTOURMODECHOICE.equalsIgnoreCase(key))
@@ -106,7 +122,8 @@ public class VspExperimentalConfigGroup extends Module {
 	@Override
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put(USE_ACTIVITY_DURATIONS, getValue(USE_ACTIVITY_DURATIONS));
+//		map.put(USE_ACTIVITY_DURATIONS, isUseActivityDurations() );
+		map.put(ACTIVITY_DURATION_INTERPRETATION, getActivityDurationInterpretation()) ;
 
 		map.put(INPUT_MZ05_FILE, getValue(INPUT_MZ05_FILE));
 
@@ -117,13 +134,13 @@ public class VspExperimentalConfigGroup extends Module {
 		return map;
 	}
 
-	public boolean isUseActivityDurations() {
-		return this.useActivityDurations;
-	}
-
-	public void setUseActivityDurations(final boolean useActivityDurations) {
-		this.useActivityDurations = useActivityDurations;
-	}
+//	public boolean isUseActivityDurations() {
+//		return this.useActivityDurations;
+//	}
+//
+//	public void setUseActivityDurations(final boolean useActivityDurations) {
+//		this.useActivityDurations = useActivityDurations;
+//	}
 
 	public String getInputMZ05File() {
 		return this.inputMZ05File;
@@ -155,6 +172,14 @@ public class VspExperimentalConfigGroup extends Module {
 
 	public void setOffsetWalk(final double offsetWalk) {
 		this.offsetWalk = offsetWalk;
+	}
+
+	public String getActivityDurationInterpretation() {
+		return activityDurationInterpretation;
+	}
+
+	public void setActivityDurationInterpretation(String activityDurationInterpretation) {
+		this.activityDurationInterpretation = activityDurationInterpretation;
 	}
 
 }
