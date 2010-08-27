@@ -72,7 +72,8 @@ public class LoadedNetworkRouter {
 	}
 
 	public void run(final String[] args) {
-		String rootPath="/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/nomwin_home/MatSimRouting/";
+		//String rootPath="/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/nomwin_home/MatSimRouting/";
+		String rootPath=System.getProperty("user.dir")+"/";
 		//String rootPath="/home/wrashid/erath/";
 
 		//String networkFile=rootPath + "network.car.xml.gz";
