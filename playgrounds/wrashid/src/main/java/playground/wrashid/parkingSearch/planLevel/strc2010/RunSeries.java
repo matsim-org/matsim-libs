@@ -51,6 +51,12 @@ public class RunSeries {
 				
 				//TODO: write tests for this, which fail when the variable or method names change (and as such can be easily adapted).
 				
+				// TODO: This can be avoided: load first the config file and change the outputDirectory variable and give that to
+				// controler constructor as parameter.
+				
+				
+				// TODO: perhaps config files are really not needed => just set all parameters in code.
+				
 				Reflection.setField(controler, "controlerIO", controlerIO);
 				
 				Reflection.setField(controler.getConfig().controler(), "outputDirectory", outputFolder);
