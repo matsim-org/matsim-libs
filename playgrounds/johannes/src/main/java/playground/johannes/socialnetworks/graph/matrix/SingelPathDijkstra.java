@@ -24,6 +24,7 @@ import gnu.trove.TIntArrayList;
 import java.util.Arrays;
 
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.sna.graph.matrix.DijkstraEngine;
 
 
 /**
