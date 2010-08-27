@@ -932,7 +932,8 @@ public final class MZControler {
 		} else if (name.equals("TimeAllocationMutator") || name.equals("threaded.TimeAllocationMutator")) {
 			strategy = new PlanStrategy(new RandomPlanSelector());
 			TimeAllocationMutator tam = new TimeAllocationMutator(config);
-			tam.setUseActivityDurations(config.vspExperimental().isUseActivityDurations());
+//			tam.setUseActivityDurations(config.vspExperimental().isUseActivityDurations());
+			// functionality moved into TimeAllocationMutator.  kai, aug'10
 			strategy.addStrategyModule(tam);
 		} else if (name.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
 			strategy = new PlanStrategy(new RandomPlanSelector());
