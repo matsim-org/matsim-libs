@@ -29,7 +29,7 @@ class Teleportation implements Updateable {
 	public void update() {}
 }
 
-public class Mobsim {
+class Mobsim {
 	
 	Map<Id,MobsimNode> mobsimNodes = null ; // dummy
 	Map<Id,MobsimLink> mobsimLinks = null ; // dummy
