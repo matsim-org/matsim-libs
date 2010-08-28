@@ -1,4 +1,4 @@
-package playground.kai.test2;
+package playground.kai.test.test2;
 
 import java.util.ArrayList;
 import java.util.List;
