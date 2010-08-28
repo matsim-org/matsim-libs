@@ -171,7 +171,7 @@ public class MultiModalQLinkImpl extends QLinkImpl {
 			// Check if PersonAgent has reached destination:
 			PersonDriverAgent driver = (PersonDriverAgent) tuple.getSecond();
 			if ((this.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
-				driver.legEnds(now);
+				driver.endLegAndAssumeControl(now);
 			}
 			/*
 			 * The PersonAgent can leave, therefore we move him to the waitingToLeave Queue.

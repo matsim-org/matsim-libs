@@ -500,12 +500,12 @@ public class QLinkLanesImpl implements QLinkInternalI {
 	}
 
 	@Override
-	public void addAgentInActivity(PersonAgent agent) {
+	public void registerAgentAtActivityLocation(PersonAgent agent) {
 		agentsInActivities.put(agent.getPerson().getId(), agent);
 	}
 
 	@Override
-	public void removeAgentInActivity(PersonAgent agent) {
+	public void unregisterAgentAtActivityLocation(PersonAgent agent) {
 		agentsInActivities.remove(agent.getPerson().getId());
 	}
 

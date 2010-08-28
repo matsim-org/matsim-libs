@@ -695,7 +695,7 @@ public class QSimTest {
 		sim.getSimTimer().setTime(100.0);
 		QPersonAgent agent = new QPersonAgent(person, sim);
 		agent.initializeAndCheckIfAlive();
-		agent.activityEnds(100.0);
+		agent.endActivityAndAssumeControl(100.0);
 
 		sim.getSimTimer().setTime(101.0);
 		sim.doSimStep(101.0); // agent should be moved to qlink2.buffer

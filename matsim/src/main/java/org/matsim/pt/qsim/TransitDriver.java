@@ -75,7 +75,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public void legEnds(final double now) {
+	public void endLegAndAssumeControl(final double now) {
 		this.getSimulation().handleAgentArrival(now, this);
 		this.getSimulation().getAgentCounter().decLiving();
 	}

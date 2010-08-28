@@ -56,7 +56,7 @@ public interface PersonAgent extends MobsimAgent {
 	 * 
 	 * @param now
 	 */
-	public void activityEnds(final double now);
+	public void endActivityAndAssumeControl(final double now);
 	
 	/**
 	 * Informs the agent that it arrived at the destination of the current leg.
@@ -65,7 +65,7 @@ public interface PersonAgent extends MobsimAgent {
 	 *
 	 * @param now the current time in the simulation
 	 */
-	public void legEnds(final double now);
+	public void endLegAndAssumeControl(final double now);
 	
 	public PlanElement getCurrentPlanElement() ;
 	// if this does not make sense for a class, then the class is maybe not a "Person"Agent.  kai, may'10

@@ -207,7 +207,7 @@ public class QNode implements VisNode {
       this.checkNextLinkSemantics(currentLink, nextLink, veh);
       if (nextQueueLink.hasSpace()) {
         qbufferedItem.popFirstFromBuffer();
-        veh.getDriver().moveOverNode();
+        veh.getDriver().notifyMoveOverNote();
         nextQueueLink.addFromIntersection(veh);
         return true;
       }
@@ -227,7 +227,7 @@ public class QNode implements VisNode {
               new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
         } else {
           qbufferedItem.popFirstFromBuffer();
-          veh.getDriver().moveOverNode();
+          veh.getDriver().notifyMoveOverNote();
           nextQueueLink.addFromIntersection(veh);
           return true;
         }

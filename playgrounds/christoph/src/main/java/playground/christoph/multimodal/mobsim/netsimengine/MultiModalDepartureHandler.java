@@ -61,7 +61,7 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 		MultiModalQLinkImpl qLink = (MultiModalQLinkImpl) qSim.getQNetwork().getQLink(linkId);
 		
 		if ((route.getEndLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
-			personAgent.legEnds(now);
+			personAgent.endLegAndAssumeControl(now);
 		} else {
 			qLink.addDepartingAgent(personAgent, now);
 		}				

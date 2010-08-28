@@ -89,7 +89,7 @@ public class WithinDayQSim extends QSim {
 		if (planElement instanceof Activity) {
 			ActivityImpl act = (ActivityImpl) planElement;
 			
-			withinDayPersonAgent.calculateDepatureTime(now, act);
+			withinDayPersonAgent.calculateDepartureTime(act);
 		} 
 		else log.warn("Cannot reset Activity Departure Time - Agent is currently performing a Leg. " + withinDayPersonAgent.getPerson().getId());
 		

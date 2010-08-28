@@ -185,7 +185,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public void legEnds(final double now) {
+	public void endLegAndAssumeControl(final double now) {
 		if (this.iUmlaufStueck.hasNext()) {
 			this.setNextLeg();
 			if (this.departureTime < now) {

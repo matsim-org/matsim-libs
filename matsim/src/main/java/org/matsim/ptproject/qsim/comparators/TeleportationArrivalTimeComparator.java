@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * DriverAgent.java
+ * project: matsim
+ * TeleportationArrivalTimeComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,41 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.framework;
+package org.matsim.ptproject.qsim.comparators;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import java.io.Serializable;
+import java.util.Comparator;
 
-/**
- * @author nagel
- *
- */
-public interface DriverAgent extends MobsimAgent {
+import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.utils.collections.Tuple;
 
-	public Id getDestinationLinkId();
-	
-	/**
-	 * Returns the next link the vehicle will drive along.
-	 *
-	 * @return The next link the vehicle will drive on, or null if an error has happened.
-	 */
-	public Id chooseNextLinkId();
-
-
-//	// yyyy would be nice if this was (Basic)Vehicle, not QVehicle.  kai, may'10
-	public void setVehicle( QVehicle veh ) ;
-	public QVehicle getVehicle() ;
-	
-	/**
-	 * driver should know where she/he is
-	 */
-	public Id getCurrentLinkId();
-
-	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
-
-	/**
-	 * notifies the agent that it was moved over the node
-	 */
-	public void notifyMoveOverNote();
-	
+public class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PersonAgent>>, Serializable {
+	private static final long serialVersionUID = 1L;
+	@Override
+	public int compare(final Tuple<Double, PersonAgent> o1, final Tuple<Double, PersonAgent> o2) {
+		int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
+		if (ret == 0) {
+			ret = o2.getSecond().getPerson().getId().compareTo(o1.getSecond().getPerson().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
+		}
+		return ret;
+	}
 }

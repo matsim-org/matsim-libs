@@ -20,10 +20,8 @@
 
 package org.matsim.ptproject.qsim;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -55,6 +53,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.ptproject.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.ptproject.qsim.comparators.DriverAgentDepartureTimeComparator;
+import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.helpers.QPersonAgent;
 import org.matsim.ptproject.qsim.helpers.QSimTimer;
@@ -122,8 +121,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
-	protected final PriorityQueue<Tuple<Double, PersonDriverAgent>> teleportationList =
-		new PriorityQueue<Tuple<Double, PersonDriverAgent>>(30, new TeleportationArrivalTimeComparator());
+	protected final PriorityQueue<Tuple<Double, PersonAgent>> teleportationList =
+		new PriorityQueue<Tuple<Double, PersonAgent>>(30, new TeleportationArrivalTimeComparator());
 	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100*3600;
 	private AgentFactory agentFactory;
@@ -157,8 +156,9 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 	/**
-	 * extended constructor method that can also be
-	 * after assignments of another constructor
+	 * extended constructor method that can also be after assignments of another constructor
+	 * <p/>
+	 * Definitely needs to be strongly protected since c'tor should not call non-protected methods. kai, aug'10
 	 * @param simEngineFac
 	 */
 	private void init(QSimEngineFactory simEngineFac){
@@ -272,23 +272,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 //		}
 	}
 
-	private void initSimTimer() {
-		double startTime = this.scenario.getConfig().getQSimConfigGroup().getStartTime();
-		this.stopTime = this.scenario.getConfig().getQSimConfigGroup().getEndTime();
-		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
-		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;
-		this.simTimer.setSimStartTime(24*3600);
-		this.simTimer.setTime(startTime);
-		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
-		double simStartTime = 0;
-		PersonDriverAgent firstAgent = this.activityEndsList.peek();
-		if (firstAgent != null) {
-			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
-		}
-		this.simTimer.setSimStartTime(simStartTime);
-		this.simTimer.setTime(simStartTime);
-	}
-
 
 	/**
 	 * Prepare the simulation and get all the settings from the configuration.
@@ -352,14 +335,14 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 		double now = this.simTimer.getTimeOfDay();
 
-		for (Tuple<Double, PersonDriverAgent> entry : this.teleportationList) {
-			PersonDriverAgent agent = entry.getSecond();
+		for (Tuple<Double, PersonAgent> entry : this.teleportationList) {
+			PersonAgent agent = entry.getSecond();
 			events.processEvent(events.getFactory().
 					createAgentStuckEvent(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 		}
 		this.teleportationList.clear();
 
-		for (PersonDriverAgent agent : this.activityEndsList) {
+		for (PersonAgent agent : this.activityEndsList) {
 			if (agent.getDestinationLinkId() != null) {
 				events.processEvent(events.getFactory().
 						createAgentStuckEvent(now, agent.getPerson().getId(), agent.getDestinationLinkId(), null));
@@ -424,12 +407,12 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 	protected void handleTeleportationArrivals(final double now) {
 		while (this.teleportationList.peek() != null ) {
-			Tuple<Double, PersonDriverAgent> entry = this.teleportationList.peek();
+			Tuple<Double, PersonAgent> entry = this.teleportationList.peek();
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
-				PersonDriverAgent driver = entry.getSecond();
-				driver.teleportToLink(driver.getDestinationLinkId());
-				driver.legEnds(now);
+				PersonAgent personAgent = entry.getSecond();
+				personAgent.teleportToLink(personAgent.getDestinationLinkId());
+				personAgent.endLegAndAssumeControl(now);
 			}
 			else {
 				break;
@@ -462,13 +445,13 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	@Deprecated // yyyy should be a PersonAgent.  kai, may'10
 	public void scheduleActivityEnd(final PersonDriverAgent agent) {
 		this.activityEndsList.add(agent);
-		addToAgentsInActivities(agent);
+		registerAgentAtActivityLocation(agent);
 //		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 //			queueSimulationFeature.afterActivityBegins(agent);
 //		}
 	}
 
-	private void addToAgentsInActivities(final PersonDriverAgent agent) {
+	private void registerAgentAtActivityLocation(final PersonDriverAgent agent) {
 		if (agent instanceof QPersonAgent) {
 			QPersonAgent pa = (QPersonAgent) agent;
 			PlanElement pe = pa.getCurrentPlanElement();
@@ -478,12 +461,12 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
 				QLinkInternalI qLink = this.netEngine.getQNetwork().getQLink(linkId);
-				qLink.addAgentInActivity(agent);
+				qLink.registerAgentAtActivityLocation(agent);
 			}
 		}
 	}
 
-	private void removeFromAgentsInActivities(final PersonDriverAgent agent) {
+	private void unregisterAgentAtActivityLocation(final PersonDriverAgent agent) {
 		if (agent instanceof QPersonAgent) {
 			QPersonAgent pa = (QPersonAgent) agent;
 			PlanElement pe = pa.getCurrentPlanElement();
@@ -493,7 +476,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
 				QLinkInternalI qLink = this.netEngine.getQNetwork().getQLink(linkId);
-				qLink.removeAgentInActivity(agent);
+				qLink.unregisterAgentAtActivityLocation(agent);
 			}
 		}
 	}
@@ -503,24 +486,9 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			PersonDriverAgent agent = this.activityEndsList.peek();
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
-				removeFromAgentsInActivities(agent);
-
-				agent.activityEnds(time);
-				// (... calls PersonAgent.advancePlanElement, which
-				// ... calls PersonAgent.initNextLeg if the next PlanElement is a leg, which
-				// ... calls QSim.agentDeparts, which
-				// ... calls QSim.handleKnownLegModeDeparture, which
-				// ... calls all departure handlers, which
-				// ... calls TransitQSimFeature.handleAgentPTDeparture if it is a pt leg, which
-				// ... puts the agent into the global agent tracker data structure, together with the correct stop id.
-				// kai, feb'10)
-
-//				for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//
-//					queueSimulationFeature.afterActivityEnds(agent, time);
-//					// (calls TransitQSimFeature.afterActivityEnds(...), but that does not do anything. kai, feb'10
-//
-//				}
+				unregisterAgentAtActivityLocation(agent);
+				agent.endActivityAndAssumeControl(time); 
+				// gives control to agent; comes back via "agentDeparts" or "scheduleActivityEnd"
 			} else {
 				return;
 			}
@@ -530,14 +498,15 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	/**
 	 * Informs the simulation that the specified agent wants to depart from its current activity.
 	 * The simulation can then put the agent onto its vehicle on a link or teleport it to its destination.
-	 * @param now
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
 	@Override
 	@Deprecated // unclear if this is "actEnd" or "departure"!  kai, may'10
 	// depending on this, it is a "PersonAgent" or "DriverAgent".  kai, may'10
-	public void agentDeparts(final double now, final PersonDriverAgent agent, final Id linkId) {
+	// I think it is departure, but still a person agent.  kai, aug'10
+	public void agentDeparts(final PersonAgent agent, final Id linkId) {
+		double now = this.getSimTimer().getTimeOfDay() ;
 		Leg leg = agent.getCurrentLeg();
 //		Route route = leg.getRoute();
 		String mode = leg.getMode();
@@ -567,21 +536,15 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 	}
 
-	private void handleUnknownLegMode(final double now, final PersonDriverAgent agent, final Id linkId, final Leg leg) {
-//		Link     currentLink = this.scenario.getNetwork().getLinks().get(linkId) ;
-//		Link destinationLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId()) ;
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, currentLink, destinationLink );
-//		}
-
-		double arrivalTime = now + agent.getCurrentLeg().getTravelTime();
-		this.teleportationList.add(new Tuple<Double, PersonDriverAgent>(arrivalTime, agent));
+	private void handleUnknownLegMode(final double now, final PersonAgent personAgent, final Id linkId, final Leg leg) {
+		double arrivalTime = now + personAgent.getCurrentLeg().getTravelTime();
+		this.teleportationList.add(new Tuple<Double, PersonAgent>(arrivalTime, personAgent));
 	}
 
-	private boolean handleKnownLegModeDeparture(final double now, final PersonDriverAgent agent, final Id linkId, final Leg leg)
+	private boolean handleKnownLegModeDeparture(final double now, final PersonAgent personAgent, final Id linkId, final Leg leg)
 	{
 		for (DepartureHandler departureHandler : this.departureHandlers) {
-			if ( departureHandler.handleDeparture(now, agent, linkId, leg) ) {
+			if ( departureHandler.handleDeparture(now, personAgent, linkId, leg) ) {
 				return true ;
 			}
 			// The code is not (yet?) very beautiful.  But structurally, this goes through all departure handlers and tries to
@@ -589,6 +552,27 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			// Otherwise, this method will return false, and then teleportation will be called. kai, jun'10
 		}
 		return false ;
+	}
+
+	// ############################################################################################################################
+	// private methods
+	// ############################################################################################################################
+
+	private void initSimTimer() {
+		double startTime = this.scenario.getConfig().getQSimConfigGroup().getStartTime();
+		this.stopTime = this.scenario.getConfig().getQSimConfigGroup().getEndTime();
+		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
+		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;
+		this.simTimer.setSimStartTime(24*3600);
+		this.simTimer.setTime(startTime);
+		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
+		double simStartTime = 0;
+		PersonDriverAgent firstAgent = this.activityEndsList.peek();
+		if (firstAgent != null) {
+			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
+		}
+		this.simTimer.setSimStartTime(simStartTime);
+		this.simTimer.setTime(simStartTime);
 	}
 
 	// ############################################################################################################################
@@ -651,18 +635,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 */
 	/*package*/ void setTeleportVehicles(final boolean teleportVehicles) {
 		this.carDepartureHandler.setTeleportVehicles(teleportVehicles);
-	}
-
-	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PersonDriverAgent>>, Serializable {
-		private static final long serialVersionUID = 1L;
-		@Override
-		public int compare(final Tuple<Double, PersonDriverAgent> o1, final Tuple<Double, PersonDriverAgent> o2) {
-			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
-			if (ret == 0) {
-				ret = o2.getSecond().getPerson().getId().compareTo(o1.getSecond().getPerson().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
-			}
-			return ret;
-		}
 	}
 
 	@Override

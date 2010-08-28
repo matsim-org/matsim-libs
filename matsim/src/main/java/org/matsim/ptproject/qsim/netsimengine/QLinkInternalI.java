@@ -97,9 +97,11 @@ public interface QLinkInternalI extends QBufferItem, VisLink, QLink {
   
   public QVehicle removeParkedVehicle(Id vehicleId);
 
-  public void addAgentInActivity(PersonAgent agent);
-
-  public void removeAgentInActivity(PersonAgent agent);
+  // yyyy these two functions should not be public since it exposes the internal mechanics that the departure logic is central
+  // while the visualization logic is link-based.  But it needs to be public as long as the network engine is a separate package. 
+  // kai, aug'10
+  public void registerAgentAtActivityLocation(PersonAgent agent);
+  public void unregisterAgentAtActivityLocation(PersonAgent agent);
   
   public void addDepartingVehicle(QVehicle vehicle);
 

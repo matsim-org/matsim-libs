@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.AgentFactory;
 
@@ -36,13 +37,11 @@ import org.matsim.ptproject.qsim.AgentFactory;
 public interface QSimI extends IOSimulation {
 
 	/**
-	 * @param now
-	 * @param abstractTransitDriver
 	 * @param startLinkId
+	 * @param abstractTransitDriver
 	 */
-	@Deprecated // yyyyyy unclear if this is "actEnd" or "departure"!  kai, may'10
 	// depending on this, it is a "PersonAgent" or "DriverAgent".  kai, may'10
-	void agentDeparts(double now, PersonDriverAgent driverAgent, Id startLinkId);
+	void agentDeparts(PersonAgent personAgent, Id startLinkId);
 
 	EventsManager getEventsManager();
 

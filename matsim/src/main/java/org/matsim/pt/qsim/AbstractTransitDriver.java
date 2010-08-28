@@ -57,7 +57,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
 
-	public abstract void legEnds(final double now);
+	public abstract void endLegAndAssumeControl(final double now);
 	public abstract NetworkRoute getCarRoute();
 	public abstract TransitLine getTransitLine();
 	public abstract TransitRoute getTransitRoute();
@@ -108,7 +108,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	@Override
-	public void moveOverNode() {
+	public void notifyMoveOverNote() {
 		this.nextLinkIndex++;
 	}
 
@@ -138,8 +138,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	@Override
-	public void activityEnds(final double now) {
-		this.sim.agentDeparts(now, this, this.getCurrentLeg().getRoute().getStartLinkId());
+	public void endActivityAndAssumeControl(final double now) {
+		this.sim.agentDeparts(this, this.getCurrentLeg().getRoute().getStartLinkId());
 	}
 
 	@Override
@@ -231,7 +231,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
 			agent.teleportToLink(this.currentStop.getStopFacility().getLinkId());
-			agent.legEnds(time);
+			agent.endLegAndAssumeControl(time);
 		}
 		return handled;
 	}

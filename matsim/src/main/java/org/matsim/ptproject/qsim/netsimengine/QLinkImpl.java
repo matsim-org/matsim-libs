@@ -319,7 +319,7 @@ public class QLinkImpl implements QLinkInternalI {
 			if (!handled) {
 				// Check if veh has reached destination:
 				if ((this.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
-					driver.legEnds(now);
+					driver.endLegAndAssumeControl(now);
 					this.addParkedVehicle(veh);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
@@ -658,12 +658,12 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 	@Override
-	public void addAgentInActivity(PersonAgent agent) {
+	public void registerAgentAtActivityLocation(PersonAgent agent) {
 		this.agentsInActivities.put(agent.getPerson().getId(), agent);
 	}
 
 	@Override
-	public void removeAgentInActivity(PersonAgent agent) {
+	public void unregisterAgentAtActivityLocation(PersonAgent agent) {
 		this.agentsInActivities.remove(agent.getPerson().getId());
 	}
 

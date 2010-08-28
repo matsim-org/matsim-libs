@@ -48,6 +48,7 @@ import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
@@ -62,6 +63,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.comparators.DriverAgentDepartureTimeComparator;
+import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
@@ -118,7 +120,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
 	 */
-	private final PriorityQueue<Tuple<Double, PersonDriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, PersonDriverAgent>>(30, new TeleportationArrivalTimeComparator());
+	private final PriorityQueue<Tuple<Double, PersonAgent>> teleportationList = 
+		new PriorityQueue<Tuple<Double, PersonAgent>>(30, new TeleportationArrivalTimeComparator());
 
 	private final Date starttime = new Date();
 
@@ -364,8 +367,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 //		double now = this.simTimer.getTimeOfDayStatic();
 		double now = this.simTimer.getTimeOfDay();
 
-		for (Tuple<Double, PersonDriverAgent> entry : this.teleportationList) {
-			PersonDriverAgent agent = entry.getSecond();
+		for (Tuple<Double, PersonAgent> entry : this.teleportationList) {
+			PersonAgent agent = entry.getSecond();
 			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
 		}
 		this.teleportationList.clear();
@@ -451,7 +454,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		QueueSimulation.events = events;
 	}
 
-	protected void handleUnknownLegMode(double now, final PersonDriverAgent agent) {
+	protected void handleUnknownLegMode(double now, final PersonAgent agent) {
 //		Id startLinkId = agent.getCurrentLeg().getRoute().getStartLinkId() ;
 //		Leg leg = agent.getCurrentLeg() ;
 
@@ -466,17 +469,17 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 //		double arrivalTime = this.simTimer.getTimeOfDayStatic() + agent.getCurrentLeg().getTravelTime();
 		double arrivalTime = this.simTimer.getTimeOfDay() + agent.getCurrentLeg().getTravelTime();
 
-		this.teleportationList.add(new Tuple<Double, PersonDriverAgent>(arrivalTime, agent));
+		this.teleportationList.add(new Tuple<Double, PersonAgent>(arrivalTime, agent));
 	}
 
 	protected void moveVehiclesWithUnknownLegMode(final double now) {
 		while (this.teleportationList.peek() != null ) {
-			Tuple<Double, PersonDriverAgent> entry = this.teleportationList.peek();
+			Tuple<Double, PersonAgent> entry = this.teleportationList.peek();
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
-				PersonDriverAgent driver = entry.getSecond();
-				driver.teleportToLink(driver.getDestinationLinkId());
-				driver.legEnds(now);
+				PersonAgent person = entry.getSecond();
+				person.teleportToLink(person.getDestinationLinkId());
+				person.endLegAndAssumeControl(now);
 				//				this.handleAgentArrival(now, driver);
 				//				getEvents().processEvent(new AgentArrivalEventImpl(now, driver.getPerson(),
 				//						destinationLink, driver.getCurrentLeg()));
@@ -530,7 +533,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 			PersonDriverAgent agent = this.activityEndsList.peek();
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
-				agent.activityEnds(time);
+				agent.endActivityAndAssumeControl(time);
 //				for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
 //					queueSimulationFeature.afterActivityEnds(agent, time);
 //				}
@@ -543,13 +546,12 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	/**
 	 * Informs the simulation that the specified agent wants to depart from its current activity.
 	 * The simulation can then put the agent onto its vehicle on a link or teleport it to its destination.
-	 * @param now
-	 *
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
 	@Override
-	public void agentDeparts(double now, final PersonDriverAgent agent, final Id linkId) {
+	public void agentDeparts(final PersonAgent agent, final Id linkId) {
+		double now = this.getSimTimer().getTimeOfDay() ;
 		Leg leg = agent.getCurrentLeg();
 		String mode = leg.getMode();
 		events.processEvent( events.getFactory().createAgentDepartureEvent( now, agent.getPerson().getId(), linkId, leg.getMode() ) ) ;
@@ -561,20 +563,24 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		}
 	}
 
-	protected void handleKnownLegModeDeparture(double now, PersonDriverAgent agent, Id linkId, String mode) {
-		Leg leg = agent.getCurrentLeg();
+	protected void handleKnownLegModeDeparture(double now, PersonAgent personAgent, Id linkId, String mode) {
+		Leg leg = personAgent.getCurrentLeg();
 		if (mode.equals(TransportMode.car)) {
+			if ( !(personAgent instanceof PersonDriverAgent) ) {
+				throw new IllegalStateException("PersonAgent that is not a DriverAgent cannot have car as mode") ;
+			}
+			PersonDriverAgent driverAgent = (PersonDriverAgent) personAgent ;
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			Id vehicleId = route.getVehicleId();
 			if (vehicleId == null) {
-				vehicleId = agent.getPerson().getId(); // backwards-compatibility
+				vehicleId = driverAgent.getPerson().getId(); // backwards-compatibility
 			}
 			QueueLink qlink = this.network.getQueueLink(linkId);
 			QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 			if (vehicle == null) {
 				// try to fix it somehow
 				if (this.teleportVehicles) {
-					vehicle = agent.getVehicle();
+					vehicle = driverAgent.getVehicle();
 					if (vehicle.getCurrentLink() != null) {
 						if (this.cntTeleportVehicle < 9) {
 							this.cntTeleportVehicle++;
@@ -589,11 +595,11 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 				}
 			}
 			if (vehicle == null) {
-				throw new RuntimeException("vehicle not available for agent " + agent.getPerson().getId() + " on link " + linkId);
+				throw new RuntimeException("vehicle not available for agent " + driverAgent.getPerson().getId() + " on link " + linkId);
 			}
-			vehicle.setDriver(agent);
-			if ((route.getEndLinkId().equals(linkId)) && (agent.chooseNextLinkId() == null)) {
-				agent.legEnds(now);
+			vehicle.setDriver(driverAgent);
+			if ((route.getEndLinkId().equals(linkId)) && (driverAgent.chooseNextLinkId() == null)) {
+				driverAgent.endLegAndAssumeControl(now);
 				qlink.processVehicleArrival(now, vehicle);
 			} else {
 				qlink.addDepartingVehicle(vehicle);
@@ -625,17 +631,17 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		this.teleportVehicles = teleportVehicles;
 	}
 
-	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PersonDriverAgent>>, Serializable {
-		private static final long serialVersionUID = 1L;
-		@Override
-		public int compare(final Tuple<Double, PersonDriverAgent> o1, final Tuple<Double, PersonDriverAgent> o2) {
-			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
-			if (ret == 0) {
-				ret = o2.getSecond().getPerson().getId().compareTo(o1.getSecond().getPerson().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
-			}
-			return ret;
-		}
-	}
+//	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PersonDriverAgent>>, Serializable {
+//		private static final long serialVersionUID = 1L;
+//		@Override
+//		public int compare(final Tuple<Double, PersonDriverAgent> o1, final Tuple<Double, PersonDriverAgent> o2) {
+//			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
+//			if (ret == 0) {
+//				ret = o2.getSecond().getPerson().getId().compareTo(o1.getSecond().getPerson().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
+//			}
+//			return ret;
+//		}
+//	}
 
 	QueueNetwork getQueueNetwork() {
 		return this.network;

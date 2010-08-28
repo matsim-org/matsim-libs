@@ -68,7 +68,7 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public void activityEnds(final double now) {
+	public void endActivityAndAssumeControl(final double now) {
 	}
 
 	@Override
@@ -107,11 +107,11 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public void legEnds(final double now) {
+	public void endLegAndAssumeControl(final double now) {
 	}
 
 	@Override
-	public void moveOverNode() {
+	public void notifyMoveOverNote() {
 	}
 
 	@Override
