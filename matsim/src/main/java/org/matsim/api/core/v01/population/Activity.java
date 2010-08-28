@@ -52,6 +52,12 @@ public String getType();
 
 public void setType(final String type);
 
+/**
+ * @return the coordinate of the activity, possibly null.
+ * <p/>
+ * Note that there is deliberately no way to set the coordinate except at creation.  
+ * We might consider something like moveActivityTo( linkid, coord ).  kai, aug'10 
+ */
 public Coord getCoord();
 
 public double getStartTime();
@@ -61,6 +67,13 @@ public double getStartTime();
 public void setStartTime(double seconds);
 // TODO kn not clear what this means (see above). --> remove for next version?
 
+/**
+ * @return the if of the link to which the activity is attached.  This may start as zero, but
+ * is usually set automatically by the control(l)er before the zeroth iteration.
+ * <p/>
+ * Note that there is deliberately no way to set the link id except at creation.  
+ * We might consider something like moveActivityTo( linkid, coord ).  kai, aug'10 
+ */
 public Id getLinkId();
 
 
