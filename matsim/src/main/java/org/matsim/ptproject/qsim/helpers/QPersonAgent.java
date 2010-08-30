@@ -148,11 +148,12 @@ public class QPersonAgent implements PersonDriverAgent {
 		advancePlanElement(now);
 	}
 
+	@Deprecated // yyyyyy I really don't think that this belongs here.
 	public final void teleportToLink(final Id linkId) {
 		this.currentLinkId = linkId;
 	}
 
-	public final void notifyMoveOverNote() {
+	public final void notifyMoveOverNode() {
 		this.currentLinkId = this.cachedNextLinkId;
 		this.currentLinkIdIndex++;
 		this.cachedNextLinkId = null; //reset cached nextLink
