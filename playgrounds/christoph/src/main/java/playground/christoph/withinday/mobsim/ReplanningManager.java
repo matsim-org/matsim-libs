@@ -25,16 +25,15 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 /*
  * This Class implements a QueueSimulationBeforeSimStepListener.
- * 
+ *
  * Each time a ListenerEvent is created it is checked
  * whether a WithinDayReplanning of the Agents Plans should
  * be done and / or is necessary.
  */
-public class ReplanningManager implements SimulationBeforeSimStepListener<QSimI>, SimulationInitializedListener<QSimI> {
+public class ReplanningManager implements SimulationBeforeSimStepListener, SimulationInitializedListener {
 
 	protected boolean initialReplanning = false;
 	protected boolean actEndReplanning = false;
@@ -43,10 +42,10 @@ public class ReplanningManager implements SimulationBeforeSimStepListener<QSimI>
 	protected InitialReplanningModule initialReplanningModule;
 	protected DuringActivityReplanningModule actEndReplanningModule;
 	protected DuringLegReplanningModule leaveLinkReplanningModule;
-	
+
 	public ReplanningManager() {
 	}
-	
+
 	/*
 	 * Using this Constructor is prefered. If the handed over
 	 * Replanning Modules are not null, the replanning will be
@@ -56,11 +55,11 @@ public class ReplanningManager implements SimulationBeforeSimStepListener<QSimI>
 		if (initialReplanningModule != null) {
 			this.initialReplanningModule = initialReplanningModule;
 			initialReplanning = true;
-		} 
+		}
 		else {
 			initialReplanning = false;
 		}
-		
+
 		if (actEndReplanningModule != null) {
 			this.actEndReplanningModule = actEndReplanningModule;
 			actEndReplanning = true;
@@ -68,7 +67,7 @@ public class ReplanningManager implements SimulationBeforeSimStepListener<QSimI>
 		else {
 			actEndReplanning = false;
 		}
-		
+
 		if (leaveLinkReplanningModule != null) {
 			this.leaveLinkReplanningModule = leaveLinkReplanningModule;
 			leaveLinkReplanning = true;
@@ -77,69 +76,70 @@ public class ReplanningManager implements SimulationBeforeSimStepListener<QSimI>
 			leaveLinkReplanning = false;
 		}
 	}
-	
+
 	public void doInitialReplanning(boolean value) {
 		initialReplanning = value;
 	}
-	
+
 	public boolean isInitialReplanning() {
 		return initialReplanning;
 	}
-	
+
 	public void setInitialReplanningModule(InitialReplanningModule module) {
-		this.initialReplanningModule = module;	
+		this.initialReplanningModule = module;
 	}
-	
+
 	public InitialReplanningModule getInitialReplanningModule() {
 		return this.initialReplanningModule;
 	}
-	
+
 	public void doActEndReplanning(boolean value) {
 		actEndReplanning = value;
 	}
-	
+
 	public boolean isActEndReplanning() {
 		return actEndReplanning;
 	}
-	
+
 	public void setActEndReplanningModule(DuringActivityReplanningModule module) {
-		this.actEndReplanningModule = module;	
+		this.actEndReplanningModule = module;
 	}
-	
+
 	public DuringActivityReplanningModule getActEndReplanningModule() {
 		return this.actEndReplanningModule;
 	}
-	
+
 	public void doLeaveLinkReplanning(boolean value) {
 		leaveLinkReplanning = value;
 	}
-	
+
 	public boolean isLeaveLinkReplanning() {
 		return leaveLinkReplanning;
 	}
-	
+
 	public void setLeaveLinkReplanningModule(DuringLegReplanningModule module) {
 		this.leaveLinkReplanningModule = module;
 	}
-	
+
 	public DuringLegReplanningModule getLeaveLinkReplanningModule() {
 		return this.leaveLinkReplanningModule;
 	}
-	
+
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent<QSimI> e) {
+	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 		if (isInitialReplanning()) {
 			initialReplanningModule.doReplanning(Time.UNDEFINED_TIME);
 		}
 	}
-	
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent<QSimI> e) {
+
+	@Override
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
 		if (isActEndReplanning()) {
 			actEndReplanningModule.doReplanning(e.getSimulationTime());
 		}
-		
+
 		if (isLeaveLinkReplanning()) {
 			leaveLinkReplanningModule.doReplanning(e.getSimulationTime());
-		}	
+		}
 	}
 }

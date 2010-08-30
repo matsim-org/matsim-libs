@@ -11,83 +11,86 @@ import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 /*
- * To avoid problems with the order of some QueueSimulationListeners we 
- * collect them and execute them in a fixed, given order. Even something 
- * like ParallelListenerHandling should not able to break the order. 
+ * To avoid problems with the order of some QueueSimulationListeners we
+ * collect them and execute them in a fixed, given order. Even something
+ * like ParallelListenerHandling should not able to break the order.
  */
-public class FixedOrderQueueSimulationListener implements SimulationInitializedListener<QSimI>,
-	SimulationBeforeSimStepListener<QSimI>, SimulationAfterSimStepListener<QSimI>, 
-	SimulationBeforeCleanupListener<QSimI> {
+public class FixedOrderQueueSimulationListener implements SimulationInitializedListener,
+	SimulationBeforeSimStepListener, SimulationAfterSimStepListener,
+	SimulationBeforeCleanupListener {
 
-	List<SimulationInitializedListener<QSimI>> simulationInitializedListener;
-	List<SimulationBeforeSimStepListener<QSimI>> simulationBeforeSimStepListener;
-	List<SimulationAfterSimStepListener<QSimI>> simulationAfterSimStepListener;
-	List<SimulationBeforeCleanupListener<QSimI>> simulationBeforeCleanupListener;
-	
+	List<SimulationInitializedListener> simulationInitializedListener;
+	List<SimulationBeforeSimStepListener> simulationBeforeSimStepListener;
+	List<SimulationAfterSimStepListener> simulationAfterSimStepListener;
+	List<SimulationBeforeCleanupListener> simulationBeforeCleanupListener;
+
 	public FixedOrderQueueSimulationListener() {
-		simulationInitializedListener = new ArrayList<SimulationInitializedListener<QSimI>>();
-		simulationBeforeSimStepListener = new ArrayList<SimulationBeforeSimStepListener<QSimI>>();
-		simulationAfterSimStepListener = new ArrayList<SimulationAfterSimStepListener<QSimI>>();
-		simulationBeforeCleanupListener = new ArrayList<SimulationBeforeCleanupListener<QSimI>>();
+		simulationInitializedListener = new ArrayList<SimulationInitializedListener>();
+		simulationBeforeSimStepListener = new ArrayList<SimulationBeforeSimStepListener>();
+		simulationAfterSimStepListener = new ArrayList<SimulationAfterSimStepListener>();
+		simulationBeforeCleanupListener = new ArrayList<SimulationBeforeCleanupListener>();
 	}
-	
-	public void addQueueSimulationInitializedListener(SimulationInitializedListener<QSimI> listener) {
+
+	public void addQueueSimulationInitializedListener(SimulationInitializedListener listener) {
 		simulationInitializedListener.add(listener);
 	}
-	
-	public void removeQueueSimulationInitializedListener(SimulationInitializedListener<QSimI> listener) {
+
+	public void removeQueueSimulationInitializedListener(SimulationInitializedListener listener) {
 		simulationInitializedListener.remove(listener);
 	}
 
-	public void notifySimulationInitialized(SimulationInitializedEvent<QSimI> e) {
-		for(SimulationInitializedListener<QSimI> listener : simulationInitializedListener) {
+	@Override
+	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+		for(SimulationInitializedListener listener : simulationInitializedListener) {
 			listener.notifySimulationInitialized(e);
 		}
 	}
-	
-	public void addQueueSimulationBeforeSimStepListener(SimulationBeforeSimStepListener<QSimI> listener) {
+
+	public void addQueueSimulationBeforeSimStepListener(SimulationBeforeSimStepListener listener) {
 		simulationBeforeSimStepListener.add(listener);
 	}
-	
-	public void removeQueueSimulationBeforeSimStepListener(SimulationBeforeSimStepListener<QSimI> listener) {
+
+	public void removeQueueSimulationBeforeSimStepListener(SimulationBeforeSimStepListener listener) {
 		simulationBeforeSimStepListener.remove(listener);
 	}
-	
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent<QSimI> e) {
-		for(SimulationBeforeSimStepListener<QSimI> listener : simulationBeforeSimStepListener) {
+
+	@Override
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+		for(SimulationBeforeSimStepListener listener : simulationBeforeSimStepListener) {
 			listener.notifySimulationBeforeSimStep(e);
 		}
 	}
-	
-	public void addQueueSimulationAfterSimStepListener(SimulationAfterSimStepListener<QSimI> listener) {
+
+	public void addQueueSimulationAfterSimStepListener(SimulationAfterSimStepListener listener) {
 		simulationAfterSimStepListener.add(listener);
 	}
-	
-	public void removeQueueSimulationAfterSimStepListener(SimulationAfterSimStepListener<QSimI> listener) {
+
+	public void removeQueueSimulationAfterSimStepListener(SimulationAfterSimStepListener listener) {
 		simulationAfterSimStepListener.remove(listener);
 	}
 
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent<QSimI> e) {
-		for(SimulationAfterSimStepListener<QSimI> listener : simulationAfterSimStepListener) {
+	@Override
+	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+		for(SimulationAfterSimStepListener listener : simulationAfterSimStepListener) {
 			listener.notifySimulationAfterSimStep(e);
 		}
 	}
 
-	public void addQueueSimulationBeforeCleanupListener(SimulationBeforeCleanupListener<QSimI> listener) {
+	public void addQueueSimulationBeforeCleanupListener(SimulationBeforeCleanupListener listener) {
 		simulationBeforeCleanupListener.add(listener);
 	}
-	
-	public void removeQueueSimulationBeforeCleanupListener(SimulationBeforeCleanupListener<QSimI> listener) {
+
+	public void removeQueueSimulationBeforeCleanupListener(SimulationBeforeCleanupListener listener) {
 		simulationBeforeCleanupListener.remove(listener);
 	}
-	
-	public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QSimI> e) {
-		for(SimulationBeforeCleanupListener<QSimI> listener : simulationBeforeCleanupListener) {
+
+	@Override
+	public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent e) {
+		for(SimulationBeforeCleanupListener listener : simulationBeforeCleanupListener) {
 			listener.notifySimulationBeforeCleanup(e);
 		}
 	}
-	
+
 }

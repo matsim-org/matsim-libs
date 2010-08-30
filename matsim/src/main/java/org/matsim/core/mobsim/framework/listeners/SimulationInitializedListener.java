@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.listeners;
 
-import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 
 
@@ -29,8 +28,8 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
  * @author dgrether
  *
  */
-public interface SimulationInitializedListener<T extends Simulation> extends SimulationListener<T> {
+public interface SimulationInitializedListener extends SimulationListener {
 
-	public void notifySimulationInitialized(SimulationInitializedEvent<T> e);
-	
+	public void notifySimulationInitialized(SimulationInitializedEvent e);
+
 }

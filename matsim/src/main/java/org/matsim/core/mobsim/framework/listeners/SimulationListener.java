@@ -21,14 +21,12 @@ package org.matsim.core.mobsim.framework.listeners;
 
 import java.util.EventListener;
 
-import org.matsim.core.mobsim.framework.Simulation;
-
 
 /**
  * A tagging interface that all QueueSimulationListeners must extend.
  * @author dgrether
  *
  */
-public interface SimulationListener<T extends Simulation> extends EventListener {
+public interface SimulationListener extends EventListener {
 
 }

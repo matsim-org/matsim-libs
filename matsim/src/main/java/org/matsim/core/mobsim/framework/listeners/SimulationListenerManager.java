@@ -40,20 +40,20 @@ import org.matsim.core.utils.misc.ClassUtils;
  *
  * @author dgrether
  */
-public class SimulationListenerManager<T extends Simulation> {
+public class SimulationListenerManager {
 
 	private final static Logger log = Logger.getLogger(SimulationListenerManager.class);
 
-	private final T sim;
+	private final Simulation sim;
 
 	private final EventListenerList listenerList = new EventListenerList();
 
-	public SimulationListenerManager(T sim){
+	public SimulationListenerManager(Simulation sim){
 		this.sim = sim;
 	}
 
 	@SuppressWarnings("unchecked")
-	public void addQueueSimulationListener(final SimulationListener<T> l) {
+	public void addQueueSimulationListener(final SimulationListener l) {
 		log.info("calling addQueueSimulationListener");
 		for (Class interfaceClass : ClassUtils.getAllTypes(l.getClass())) {
 			if (SimulationListener.class.isAssignableFrom(interfaceClass)) {
@@ -64,7 +64,7 @@ public class SimulationListenerManager<T extends Simulation> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void removeQueueSimulationListener(final SimulationListener<T> l) {
+	public void removeQueueSimulationListener(final SimulationListener l) {
 		for (Class interfaceClass : ClassUtils.getAllTypes(l.getClass())) {
 			if (SimulationListener.class.isAssignableFrom(interfaceClass)) {
 				this.listenerList.remove(interfaceClass, l);

@@ -126,7 +126,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100*3600;
 	private AgentFactory agentFactory;
-	private SimulationListenerManager<QSim> listenerManager;
+	private SimulationListenerManager listenerManager;
 	protected final PriorityBlockingQueue<PersonAgent> activityEndsList =
 		new PriorityBlockingQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
 	protected Scenario scenario = null;
@@ -164,7 +164,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	private void init(QSimEngineFactory simEngineFac){
 		log.info("Using QSim...");
 		Scenario sc = this.getScenario() ;
-		this.listenerManager = new SimulationListenerManager<QSim>(this);
+		this.listenerManager = new SimulationListenerManager(this);
 		this.agentCounter = new AgentCounter();
 		this.simTimer = new QSimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
 

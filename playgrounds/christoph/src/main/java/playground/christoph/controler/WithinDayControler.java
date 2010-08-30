@@ -102,7 +102,7 @@ public class WithinDayControler extends Controler {
 	protected int numReplanningThreads = 6;
 
 	protected TravelTime travelTime;
-	
+
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ParallelDuringActivityReplanner parallelActEndReplanner;
 	protected ParallelDuringLegReplanner parallelLeaveLinkReplanner;
@@ -112,7 +112,7 @@ public class WithinDayControler extends Controler {
 	protected WithinDayInitialReplanner initialReplanner;
 	protected WithinDayDuringActivityReplanner duringActivityReplanner;
 	protected WithinDayDuringLegReplanner duringLegReplanner;
-	
+
 	protected ReplanningManager replanningManager;
 	protected KnowledgeWithinDayQSim sim;
 	protected FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
@@ -150,7 +150,7 @@ public class WithinDayControler extends Controler {
 	 * By doing this every person can use a personalised Router.
 	 */
 	protected void initReplanningRouter() {
-		
+
 		travelTime = new TravelTimeCollector(network);
 		foqsl.addQueueSimulationInitializedListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
@@ -158,25 +158,25 @@ public class WithinDayControler extends Controler {
 		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
 
 //		travelTime = new FreeSpeedTravelTime();
-		
+
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 
 //		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
-		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring())); 
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory); 
-		
+		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring()));
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
+
 		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
 		this.initialReplanner.setAbstractMultithreadedModule(router);
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
-		
+
 		this.duringActivityIdentifier = new ActivityEndIdentifier(this);
 		this.duringActivityReplanner = new NextLegReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData, this.events);
 		this.duringActivityReplanner.setAbstractMultithreadedModule(router);
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
-		
+
 		this.duringLegIdentifier = new LeaveLinkIdentifier(this);
 		this.duringLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData, this.getEvents());
 		this.duringLegReplanner.setAbstractMultithreadedModule(router);
@@ -187,12 +187,12 @@ public class WithinDayControler extends Controler {
 	/*
 	 * Initializes the ParallelReplannerModules
 	 */
-	protected void initParallelReplanningModules() {		
+	protected void initParallelReplanningModules() {
 		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, this);
 		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, this);
 		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads, this);
 	}
-	
+
 	/*
 	 * Creates the Handler and Listener Object so that they can be handed over to the Within Day
 	 * Replanning Modules (TravelCostWrapper, etc).
@@ -204,26 +204,26 @@ public class WithinDayControler extends Controler {
 	}
 
 	@Override
-	protected void runMobSim() {	
+	protected void runMobSim() {
 		createHandlersAndListeners();
-		
+
 		sim = new KnowledgeWithinDayQSimFactory().createMobsim(this.scenarioData, this.events);
-	
+
 		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
 		foqsl.addQueueSimulationInitializedListener(rfi);
-		
+
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		 * ensure that they are started in the needed order.
 		 */
 		foqsl.addQueueSimulationInitializedListener(replanningManager);
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
-		
+
 		sim.addQueueSimulationListeners(foqsl);
 
 		log.info("Initialize Parallel Replanning Modules");
 		initParallelReplanningModules();
-		
+
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter();
 
@@ -249,26 +249,26 @@ public class WithinDayControler extends Controler {
 	}
 
 
-	public static class ReplanningFlagInitializer implements SimulationInitializedListener<QSimI> {
+	public static class ReplanningFlagInitializer implements SimulationInitializedListener {
 
 		protected WithinDayControler withinDayControler;
 		protected Map<Id, WithinDayPersonAgent> withinDayPersonAgents;
-				
+
 		protected int noReplanningCounter = 0;
 		protected int initialReplanningCounter = 0;
 		protected int actEndReplanningCounter = 0;
 		protected int leaveLinkReplanningCounter = 0;
-		
+
 		public ReplanningFlagInitializer(WithinDayControler controler) {
 			this.withinDayControler = controler;
 		}
-		
+
 		@Override
-		public void notifySimulationInitialized(SimulationInitializedEvent<QSimI> e) {
-			collectAgents(e.getQueueSimulation());
+		public void notifySimulationInitialized(SimulationInitializedEvent e) {
+			collectAgents((QSimI) e.getQueueSimulation());
 			setReplanningFlags();
 		}
-		
+
 		protected void setReplanningFlags() {
 			noReplanningCounter = 0;
 			initialReplanningCounter = 0;
@@ -276,7 +276,7 @@ public class WithinDayControler extends Controler {
 			leaveLinkReplanningCounter = 0;
 
 			Random random = MatsimRandom.getLocalInstance();
-			
+
 			for (WithinDayPersonAgent withinDayPersonAgent : this.withinDayPersonAgents.values()) {
 				double probability;
 				boolean noReplanning = true;
@@ -313,7 +313,7 @@ public class WithinDayControler extends Controler {
 				// (de)activate replanning if they are not needed
 				if (initialReplanningCounter == 0) withinDayControler.replanningManager.doInitialReplanning(false);
 				else withinDayControler.replanningManager.doInitialReplanning(true);
-				
+
 				if (actEndReplanningCounter == 0) withinDayControler.replanningManager.doActEndReplanning(false);
 				else withinDayControler.replanningManager.doActEndReplanning(true);
 
@@ -331,22 +331,22 @@ public class WithinDayControler extends Controler {
 			log.info(actEndReplanningCounter + " persons replan their plans after an activity (" + actEndReplanningCounter / numPersons * 100.0 + "%)");
 			log.info(leaveLinkReplanningCounter + " persons replan their plans at each node (" + leaveLinkReplanningCounter / numPersons * 100.0 + "%)");
 		}
-		
+
 		protected void collectAgents(QSimI sim) {
 			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
-			
+
 			for (PersonAgent personAgent : ((WithinDayQSim) sim).getPersonAgents().values()) {
 				withinDayPersonAgents.put(personAgent.getPerson().getId(), (WithinDayPersonAgent) personAgent);
 			}
 		}
 	}
-	
+
 	/*
 	 * ===================================================================
 	 * main
 	 * ===================================================================
 	 */
-	
+
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
@@ -363,10 +363,11 @@ public class WithinDayControler extends Controler {
 	public static class FreeSpeedTravelTime implements TravelTime, Cloneable
 	{
 
+		@Override
 		public double getLinkTravelTime(Link link, double time) {
 			return link.getFreespeed(time);
 		}
-		
+
 		@Override
 		public FreeSpeedTravelTime clone() {
 			return new FreeSpeedTravelTime();

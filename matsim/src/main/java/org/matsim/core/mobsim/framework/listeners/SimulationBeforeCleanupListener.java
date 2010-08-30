@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.listeners;
 
-import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 
 
@@ -29,9 +28,9 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
  * @author dgrether
  *
  */
-public interface SimulationBeforeCleanupListener<T extends Simulation> extends
-		SimulationListener<T> {
+public interface SimulationBeforeCleanupListener extends
+		SimulationListener {
 
-	public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<T> e);
-	
+	public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent e);
+
 }

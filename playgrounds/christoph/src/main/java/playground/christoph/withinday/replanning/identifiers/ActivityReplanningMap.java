@@ -51,23 +51,23 @@ import playground.christoph.withinday.mobsim.WithinDayQSim;
 /*
  * This Module is used by a NextLegReplanner. It calculates the time
  * when an agent should do NextLegReplanning.
- * 
+ *
  * When an ActivityStartEvent is thrown the Replanning Time is set to
  * the scheduled departure Time of the Activity.
  */
-public class ActivityReplanningMap implements AgentStuckEventHandler, 
+public class ActivityReplanningMap implements AgentStuckEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler,
-		SimulationInitializedListener<QSimI>, SimulationAfterSimStepListener<QSimI> {
-		
+		SimulationInitializedListener, SimulationAfterSimStepListener {
+
 	private QNetwork qNetwork;
-	
+
 	private static final Logger log = Logger.getLogger(ActivityReplanningMap.class);
 
 	/*
 	 * Agents that have started an Activity in the current Time Step.
 	 */
 	private Set<Id> startingAgents;	// PersonId
-	
+
 	/*
 	 * Contains the Agents that are currently performing an Activity.
 	 */
@@ -78,72 +78,74 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * The events only contain a PersonId.
 	 */
 	private Map<Id, PersonAgent> personAgentMapping;	// PersonId, PersonDriverAgent
-	
-	public ActivityReplanningMap(Controler controler) {	
+
+	public ActivityReplanningMap(Controler controler) {
 		// add ActivityReplanningMap to the QueueSimulation's EventsManager
 		controler.getEvents().addHandler(this);
-		
+
 		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
 		controler.getQueueSimulationListener().add(this);
-		
+
 		init();
 	}
-	
+
 	public ActivityReplanningMap(QSim qSim) {
 		//Add LinkReplanningMap to the QueueSimulation's EventsManager
 		qSim.getEventsManager().addHandler(this);
-		
+
 		// add ActivityReplanningMap to the QueueSimulation's SimulationListeners
 		qSim.addQueueSimulationListeners(this);
-		
+
 		init();
 	}
-	
+
 	private void init() {
 		this.personAgentMapping = new TreeMap<Id, PersonAgent>();
 		this.replanningSet = new TreeSet<Id>();
 		this.startingAgents = new TreeSet<Id>();
 	}
-	
+
 	/*
 	 * When the simulation starts the agents are all performing an activity.
 	 * There is no activity start event so we have to collect by hand by
 	 * iterating over all links and vehicles.
-	 * 
+	 *
 	 * Additionally we create the Mapping between the PersonIds and the
 	 * PersonDriverAgents.
 	 */
-	public void notifySimulationInitialized(SimulationInitializedEvent<QSimI> e) {			
+	@Override
+	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 
-		QSimI sim = e.getQueueSimulation();
-		
+		QSimI sim = (QSimI) e.getQueueSimulation();
+
 		// Update Reference to QNetwork
 		this.qNetwork = (QNetwork) sim.getQNetwork();
-		
+
 		personAgentMapping = null;
-		
+
 		if (sim instanceof WithinDayQSim) {
 			personAgentMapping = ((WithinDayQSim) sim).getPersonAgents();
-			
+
 			replanningSet.addAll(personAgentMapping.keySet());
 		}
 		else new HashMap<Id, PersonAgent>();
 	}
-	
+
 	/*
 	 * The Activity Start Events are thrown before the Activity Start has been handled
 	 * by the Simulation. As a result the Departure Time is not set at that time.
 	 * We have to wait until the SimStep has been fully simulated and retrieve
-	 * the Activity DepatureTimes then. 
+	 * the Activity DepatureTimes then.
 	 */
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent<QSimI> e) {
-		
+	@Override
+	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+
 		for (Id id : startingAgents) {
 			PersonAgent personAgent = personAgentMapping.get(id);
-			
+
 			double now = e.getSimulationTime();
 			double departureTime = personAgent.getDepartureTime();
-					
+
 			/*
 			 * If it is the last scheduled Activity the departureTime is -infinity.
 			 * Otherwise we select the agent for a replanning.
@@ -157,22 +159,24 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 		}
 		startingAgents.clear();
 	}
-	
+
 	/*
 	 * Collect the Agents that are starting an Activity in
 	 * the current Time Step.
 	 */
+	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		Id id = event.getPersonId();
 		this.startingAgents.add(id);
 	}
-	
+
 	/*
 	 * Nothing to do here?
 	 * Agents should be removed from the map if their
 	 * replanning time has come.
 	 */
-	public void handleEvent(ActivityEndEvent event) {	
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
 		startingAgents.remove(event.getPersonId());
 		replanningSet.remove(event.getPersonId());
 	}
@@ -182,45 +186,47 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * Agents should not be removed from the simulation
 	 * if they are performing an activity.
 	 */
+	@Override
 	public void handleEvent(AgentStuckEvent event) {
 //		replanningMap.remove(personAgentMapping.get(event.getPersonId()));
 	}
-	
+
 	/*
 	 * Returns a List of all Agents, that are currently performing an Activity.
 	 */
-	public synchronized List<PersonAgent> getActivityPerformingAgents() {		
+	public synchronized List<PersonAgent> getActivityPerformingAgents() {
 		ArrayList<PersonAgent> activityPerformingAgents = new ArrayList<PersonAgent>();
-		
+
 		for (Id id : replanningSet) activityPerformingAgents.add(personAgentMapping.get(id));
-		
+
 		return activityPerformingAgents;
 	}
-	
+
 	public synchronized List<PersonAgent> getReplanningDriverAgents(double time) {
 		ArrayList<PersonAgent> personAgentsToReplanActivityEnd = new ArrayList<PersonAgent>();
-				
+
 		Iterator<Id> ids = replanningSet.iterator();
 		while(ids.hasNext()) {
 			Id id = ids.next();
-			
+
 			PersonAgent personAgent = personAgentMapping.get(id);
-          	
+
 			double replanningTime = personAgent.getDepartureTime();
-	       
+
 			if (time >= replanningTime) {
 				ids.remove();
 				personAgentsToReplanActivityEnd.add(personAgent);
 			}
 //			else break;
 		}
-		
+
 		return personAgentsToReplanActivityEnd;
 	}
 
+	@Override
 	public void reset(int iteration) {
 		replanningSet.clear();
 		personAgentMapping.clear();
 	}
-	
+
 }

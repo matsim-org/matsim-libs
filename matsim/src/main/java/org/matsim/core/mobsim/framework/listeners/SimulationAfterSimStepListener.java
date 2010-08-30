@@ -20,7 +20,6 @@
 
 package org.matsim.core.mobsim.framework.listeners;
 
-import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 
 /**
@@ -29,9 +28,9 @@ import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
  *
  * @author mrieser
  */
-public interface SimulationAfterSimStepListener<T extends Simulation> extends
-		SimulationListener<T> {
+public interface SimulationAfterSimStepListener extends
+		SimulationListener {
 
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent<T> e);
-	
+	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e);
+
 }

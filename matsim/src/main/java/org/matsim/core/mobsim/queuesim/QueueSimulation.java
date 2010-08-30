@@ -131,7 +131,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	private AgentFactory agentFactory;
 
-	private SimulationListenerManager<QueueSimulation> listenerManager;
+	private SimulationListenerManager listenerManager;
 
 	private final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = new PriorityBlockingQueue<PersonDriverAgent>(500, new PersonAgentDepartureTimeComparator());
 
@@ -165,7 +165,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	protected QueueSimulation(final Scenario sc, final EventsManager events, final QueueNetworkFactory factory){
 		this.scenario = sc;
 		this.config = scenario.getConfig();
-		this.listenerManager = new SimulationListenerManager<QueueSimulation>(this);
+		this.listenerManager = new SimulationListenerManager(this);
 //		AbstractSimulation.reset(this.config.simulation().getStuckTime());
 
 //		this.agentCounter.setLiving(0);

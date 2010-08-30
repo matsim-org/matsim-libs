@@ -115,7 +115,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 
 	private AgentFactory agentFactory;
 
-	private SimulationListenerManager<DBSimulation> listenerManager;
+	private SimulationListenerManager listenerManager;
 
 	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
@@ -139,7 +139,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 	 */
 	public DBSimulation(final Scenario scenario, final EventsManager events) {
 		this.scenario = scenario;
-		this.listenerManager = new SimulationListenerManager<DBSimulation>(this);
+		this.listenerManager = new SimulationListenerManager(this);
 		AbstractSimulation.reset();
 		this.config = scenario.getConfig();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());

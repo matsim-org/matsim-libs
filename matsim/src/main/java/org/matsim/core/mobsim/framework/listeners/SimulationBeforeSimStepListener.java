@@ -19,18 +19,17 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.listeners;
 
-import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 
 
 /**
- *  Listeners of QueueSimulation should implement this if they want to be 
+ *  Listeners of QueueSimulation should implement this if they want to be
  *  notified after QueueSimulation.beforeSimStep() was invoked.
  * @author dgrether
  *
  */
-public interface SimulationBeforeSimStepListener<T extends Simulation> extends SimulationListener<T> {
+public interface SimulationBeforeSimStepListener extends SimulationListener {
 
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent<T> e);
-	
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e);
+
 }

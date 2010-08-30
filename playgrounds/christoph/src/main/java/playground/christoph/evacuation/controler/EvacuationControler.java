@@ -40,7 +40,6 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.EvacuationDuringActivityReplanningModule;
@@ -103,9 +102,9 @@ public class EvacuationControler extends MultiModalControler {
 	 * starts).
 	 */
 	public boolean doIterations = true;
-	
+
 //	public boolean multiModal = true;
-	
+
 	/*
 	 * Define the Probability that an Agent uses the
 	 * Replanning Strategy. It is possible to assign
@@ -131,9 +130,9 @@ public class EvacuationControler extends MultiModalControler {
 	 * TravelTimeCalculator.
 	 */
 	protected String initialEventsFile = "../../matsim/mysimulations/multimodal/input_10pct_zrhCutC/events_initial_traveltimes.txt.gz";
-	
+
 	protected TravelTime travelTime;
-	
+
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ParallelDuringActivityReplanner parallelDuringActivityReplanner;
 	protected ParallelDuringLegReplanner parallelDuringLegReplanner;
@@ -149,7 +148,7 @@ public class EvacuationControler extends MultiModalControler {
 	protected WithinDayDuringLegReplanner duringSecureLegReplanner;
 	protected WithinDayDuringLegReplanner duringInsecureLegReplanner;
 	protected WithinDayDuringLegReplanner currentInsecureLegReplanner;
-	
+
 	protected ReplanningManager replanningManager;
 	protected WithinDayQSim sim;
 	protected FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
@@ -173,7 +172,7 @@ public class EvacuationControler extends MultiModalControler {
 
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
-		
+
 //		already set in Multi Modal Controler
 //		/*
 //		 * Use a TravelTimeCalculator that buffers the TravelTimes form the
@@ -185,14 +184,14 @@ public class EvacuationControler extends MultiModalControler {
 	@Override
 	protected void loadData() {
 		super.loadData();
-		
+
 		/*
 		 * both only for WithinDay without iterations
 		 */
 //		// Add Rescue Links to Network
 //		new AddExitLinksToNetwork(this.scenarioData).createExitLinks();
-		
-//		// Add secure Facilities to secure Links. 
+
+//		// Add secure Facilities to secure Links.
 //		new AddSecureFacilitiesToNetwork(this.scenarioData).createSecureFacilities();
 	}
 
@@ -201,40 +200,40 @@ public class EvacuationControler extends MultiModalControler {
 	 * By doing this every person can use a personalized Router.
 	 */
 	protected void initReplanningRouter() {
-		
+
 		// iterative
 		if (doIterations) {
 			travelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) this.getTravelTimeCalculator());
-			
+
 			((TravelTimeCalculatorWithBuffer) this.getTravelTimeCalculator()).initTravelTimes(initialEventsFile);
 		}
 		// within day
-		else {	
+		else {
 			travelTime = new TravelTimeCollector(network);
 			foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeCollector) travelTime);	// for TravelTimeCollector
 			foqsl.addQueueSimulationAfterSimStepListener((TravelTimeCollector) travelTime);	// for TravelTimeCollector
-			this.events.addHandler((TravelTimeCollector) travelTime);	// for TravelTimeCollector			
+			this.events.addHandler((TravelTimeCollector) travelTime);	// for TravelTimeCollector
 		}
-		
+
 		// without social costs
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
-						
+
 //		CloneablePlansCalcRoute router = new CloneablePlansCalcRoute(config.plansCalcRoute(), network, travelCost, travelTime, new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring())));
 //		MultiModalPlansCalcRoute router = new MultiModalPlansCalcRoute(config.plansCalcRoute(), network, travelCost, travelTime, new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring())));
-		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring())); 
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory); 
-		
+		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring()));
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
+
 //		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 //		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
 //		this.initialReplanner.setReplanner(router);
 //		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 //		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
-		
+
 		/*
 		 * Create ActivityReplanningMap here and reuse it for both duringActivityReplanners!
 		 */
 		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this);
-		
+
 		this.duringSecureActivityIdentifier = new SecureActivityPerformingIdentifiers(activityReplanningMap, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius);
 		this.duringSecureActivityReplanner = new ExtendCurrentActivityReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
 		this.duringSecureActivityReplanner.setAbstractMultithreadedModule(router);
@@ -248,7 +247,7 @@ public class EvacuationControler extends MultiModalControler {
 		this.duringInsecureActivityReplanner.addAgentsToReplanIdentifier(this.duringInsecureActivityIdentifier);
 		this.duringInsecureActivityReplanner.setReplanningProbability(pReplanning);
 		this.parallelDuringActivityReplanner.addWithinDayReplanner(this.duringInsecureActivityReplanner);
-		
+
 		/*
 		 * Create LegReplanningMap here and reuse it for all three duringLegReplanners!
 		 */
@@ -260,14 +259,14 @@ public class EvacuationControler extends MultiModalControler {
 		this.duringSecureLegReplanner.addAgentsToReplanIdentifier(this.duringSecureLegIdentifier);
 		this.duringSecureLegReplanner.setReplanningProbability(pReplanning);
 		this.parallelDuringLegReplanner.addWithinDayReplanner(this.duringSecureLegReplanner);
-		
+
 		this.duringInsecureLegIdentifier = new InsecureLegPerformingIdentifier(linkReplanningMap, network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius);
 		this.duringInsecureLegReplanner = new CurrentLegToRescueFacilityReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
 		this.duringInsecureLegReplanner.setAbstractMultithreadedModule(router);
 		this.duringInsecureLegReplanner.addAgentsToReplanIdentifier(this.duringInsecureLegIdentifier);
 		this.duringInsecureLegReplanner.setReplanningProbability(pReplanning);
 		this.parallelDuringLegReplanner.addWithinDayReplanner(this.duringInsecureLegReplanner);
-		
+
 		this.currentInsecureLegIdentifier = new LeaveLinkIdentifier(linkReplanningMap);
 		this.currentInsecureLegReplanner = new CurrentLegReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData, this.getEvents());
 		this.currentInsecureLegReplanner.setAbstractMultithreadedModule(router);
@@ -279,12 +278,12 @@ public class EvacuationControler extends MultiModalControler {
 	/*
 	 * Initializes the ParallelReplannerModules
 	 */
-	protected void initParallelReplanningModules() {		
+	protected void initParallelReplanningModules() {
 		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, this);
 		this.parallelDuringActivityReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, this);
-		this.parallelDuringLegReplanner = new ParallelDuringLegReplanner(numReplanningThreads, this);		
+		this.parallelDuringLegReplanner = new ParallelDuringLegReplanner(numReplanningThreads, this);
 	}
-	
+
 	/*
 	 * Creates the Handler and Listener Object so that they can be handed over to the Within Day
 	 * Replanning Modules (TravelCostWrapper, etc).
@@ -300,22 +299,22 @@ public class EvacuationControler extends MultiModalControler {
 		super.setUp();
 
 		createHandlersAndListeners();
-		
+
 		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
 		foqsl.addQueueSimulationInitializedListener(rfi);
-		
+
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		 * ensure that they are started in the needed order.
 		 */
 		foqsl.addQueueSimulationInitializedListener(replanningManager);
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
-		
+
 		this.getQueueSimulationListener().add(foqsl);
-		
+
 		log.info("Initialize Parallel Replanning Modules");
 		initParallelReplanningModules();
-		
+
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter();
 
@@ -326,11 +325,11 @@ public class EvacuationControler extends MultiModalControler {
 		replanningManager.setInitialReplanningModule(initialReplanningModule);
 		replanningManager.setActEndReplanningModule(actEndReplanning);
 		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);
-		
+
 		log.info("Creating additional Plans");
 		clonePlans();
 	}
-	
+
 	/*
 	 * Ensure that each person holds the maximum amount of allowed Plans.
 	 * This is necessary because the replanning is done within day where
@@ -342,10 +341,10 @@ public class EvacuationControler extends MultiModalControler {
 				while (person.getPlans().size() < this.config.strategy().getMaxAgentPlanMemorySize()) {
 					((PersonImpl) person).copySelectedPlan();
 				}
-			}			
+			}
 		}
 	}
-	
+
 	/*
 	 * Always use a EvacuationQSimFactory - it will return
 	 * a (Parallel)QSim using a MultiModalQNetwork.
@@ -354,27 +353,27 @@ public class EvacuationControler extends MultiModalControler {
 	public MobsimFactory getMobsimFactory() {
 		return new EvacuationQSimFactory(this.getTravelTimeCalculator());
 	}
-		
-	public static class ReplanningFlagInitializer implements SimulationInitializedListener<QSimI> {
+
+	public static class ReplanningFlagInitializer implements SimulationInitializedListener {
 
 		protected EvacuationControler withinDayControler;
 		protected Map<Id, WithinDayPersonAgent> withinDayPersonAgents;
-				
+
 		protected int noReplanningCounter = 0;
 		protected int initialReplanningCounter = 0;
 		protected int actEndReplanningCounter = 0;
 		protected int leaveLinkReplanningCounter = 0;
-		
+
 		public ReplanningFlagInitializer(EvacuationControler controler) {
 			this.withinDayControler = controler;
 		}
-		
+
 		@Override
-		public void notifySimulationInitialized(SimulationInitializedEvent<QSimI> e) {
+		public void notifySimulationInitialized(SimulationInitializedEvent e) {
 			collectAgents((QSim)e.getQueueSimulation());
 			setReplanningFlags();
 		}
-		
+
 		protected void setReplanningFlags() {
 			noReplanningCounter = 0;
 			initialReplanningCounter = 0;
@@ -382,7 +381,7 @@ public class EvacuationControler extends MultiModalControler {
 			leaveLinkReplanningCounter = 0;
 
 			Random random = MatsimRandom.getLocalInstance();
-			
+
 			for (WithinDayPersonAgent withinDayPersonAgent : this.withinDayPersonAgents.values()) {
 				double probability;
 				boolean noReplanning = true;
@@ -423,7 +422,7 @@ public class EvacuationControler extends MultiModalControler {
 				// (de)activate replanning if they are not needed
 				if (initialReplanningCounter == 0) withinDayControler.replanningManager.doInitialReplanning(false);
 				else withinDayControler.replanningManager.doInitialReplanning(true);
-				
+
 				if (actEndReplanningCounter == 0) withinDayControler.replanningManager.doActEndReplanning(false);
 				else withinDayControler.replanningManager.doActEndReplanning(true);
 
@@ -442,23 +441,23 @@ public class EvacuationControler extends MultiModalControler {
 			log.info(actEndReplanningCounter + " persons replan their plans after an activity (" + actEndReplanningCounter / numPersons * 100.0 + "%)");
 			log.info(leaveLinkReplanningCounter + " persons replan their plans at each node (" + leaveLinkReplanningCounter / numPersons * 100.0 + "%)");
 		}
-		
+
 		protected void collectAgents(QSim sim) {
 			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
-			
+
 			for (PersonAgent personAgent : ((WithinDayQSim) sim).getPersonAgents().values()) {
 				withinDayPersonAgents.put(personAgent.getPerson().getId(), (WithinDayPersonAgent) personAgent);
 			}
 		}
-		
+
 	}
-	
+
 	/*
 	 * ===================================================================
 	 * main
 	 * ===================================================================
 	 */
-	
+
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
@@ -474,10 +473,11 @@ public class EvacuationControler extends MultiModalControler {
 
 	public static class FreeSpeedTravelTime implements TravelTime, Cloneable {
 
+		@Override
 		public double getLinkTravelTime(Link link, double time) {
 			return link.getFreespeed(time);
 		}
-		
+
 		@Override
 		public FreeSpeedTravelTime clone() {
 			return new FreeSpeedTravelTime();
