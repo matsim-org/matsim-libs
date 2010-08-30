@@ -47,9 +47,9 @@ import org.matsim.ptproject.qsim.interfaces.QVehicle;
  * <p/>
  * Apart from "teleportToLink", I think this class is reasonable in terms of what is public and/or final and what not.
  */
-public class QPersonAgent implements PersonDriverAgent {
+public class DefaultPersonDriverAgent implements PersonDriverAgent {
 
-	private static final Logger log = Logger.getLogger(QPersonAgent.class);
+	private static final Logger log = Logger.getLogger(DefaultPersonDriverAgent.class);
 
 	private final Person person;
 	private QVehicle vehicle;
@@ -73,7 +73,7 @@ public class QPersonAgent implements PersonDriverAgent {
 	// ============================================================================================================================
 	// c'tor
 
-	public QPersonAgent(final Person p, final QSimI simulation) {
+	public DefaultPersonDriverAgent(final Person p, final QSimI simulation) {
 		this.person = p;
 		this.simulation = simulation;
 	}

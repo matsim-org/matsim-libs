@@ -27,7 +27,7 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.helpers.QPersonAgent;
+import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
@@ -67,9 +67,9 @@ public class CarDepartureHandler implements DepartureHandler {
 		}
 		QLinkInternalI qlink = queueSimulation.getQNetwork().getQLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
-		if ((vehicle == null) && (teleportVehicles) && (agent instanceof QPersonAgent)) {
+		if ((vehicle == null) && (teleportVehicles) && (agent instanceof DefaultPersonDriverAgent)) {
 			// try to fix it somehow
-			vehicle = ((QPersonAgent) agent).getVehicle();
+			vehicle = ((DefaultPersonDriverAgent) agent).getVehicle();
 			if (vehicle.getCurrentLink() != null) {
 				if (cntTeleportVehicle < 9) {
 					cntTeleportVehicle++;

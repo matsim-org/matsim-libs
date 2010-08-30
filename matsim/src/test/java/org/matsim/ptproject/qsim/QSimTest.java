@@ -75,7 +75,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.helpers.QPersonAgent;
+import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
@@ -693,7 +693,7 @@ public class QSimTest {
 		qlink2.addParkedVehicle(vehicle2);
 
 		sim.getSimTimer().setTime(100.0);
-		QPersonAgent agent = new QPersonAgent(person, sim);
+		DefaultPersonDriverAgent agent = new DefaultPersonDriverAgent(person, sim);
 		agent.initializeAndCheckIfAlive();
 		agent.endActivityAndAssumeControl(100.0);
 

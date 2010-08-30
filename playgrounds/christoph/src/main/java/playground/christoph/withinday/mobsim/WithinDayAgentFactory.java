@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.helpers.QPersonAgent;
+import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 
 /*
  * Creates WithinDayPersonAgents instead of PersonAgents.
@@ -46,7 +46,7 @@ public class WithinDayAgentFactory extends AgentFactory {
 	}
 
 	@Override
-	public QPersonAgent createPersonAgent(final Person p) {
+	public DefaultPersonDriverAgent createPersonAgent(final Person p) {
 		WithinDayPersonAgent agent = new WithinDayPersonAgent(p, this.simulation);
 		personAgents.put(agent.getPerson().getId(), agent);
 		return agent;

@@ -55,7 +55,7 @@ import org.matsim.ptproject.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.ptproject.qsim.comparators.PersonAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
-import org.matsim.ptproject.qsim.helpers.QPersonAgent;
+import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.helpers.QSimTimer;
 import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
@@ -91,6 +91,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author dstrippgen
  * @author mrieser
  * @author dgrether
+ * @author knagel
  */
 public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, AcceptsVisMobsimFeatures, QSimI {
 
@@ -244,7 +245,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		}
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			QPersonAgent agent = this.agentFactory.createPersonAgent(p);
+			DefaultPersonDriverAgent agent = this.agentFactory.createPersonAgent(p);
 			QVehicle veh = new QVehicleImpl(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
@@ -448,8 +449,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 	private void registerAgentAtActivityLocation(final PersonAgent agent) {
-		if (agent instanceof QPersonAgent) { // yyyyyy is this necessary?
-			QPersonAgent pa = (QPersonAgent) agent;
+		if (agent instanceof DefaultPersonDriverAgent) { // yyyyyy is this necessary?
+			DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
 			PlanElement pe = pa.getCurrentPlanElement();
 			if (pe instanceof Leg) {
 				throw new RuntimeException();
@@ -463,8 +464,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 	private void unregisterAgentAtActivityLocation(final PersonAgent agent) {
-		if (agent instanceof QPersonAgent) {
-			QPersonAgent pa = (QPersonAgent) agent;
+		if (agent instanceof DefaultPersonDriverAgent) {
+			DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
 			PlanElement pe = pa.getCurrentPlanElement();
 			if (pe instanceof Leg) {
 				throw new RuntimeException();

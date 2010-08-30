@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.ptproject.qsim.helpers.QPersonAgent;
+import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.QNetworkI;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
@@ -38,7 +38,7 @@ import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
  * @author dgrether
  *
  */
-public class DgWithindayQPersonAgent extends QPersonAgent {
+public class DgWithindayQPersonAgent extends DefaultPersonDriverAgent {
 
 	private static final Logger log = Logger.getLogger(DgWithindayQPersonAgent.class);
 	private Random random;

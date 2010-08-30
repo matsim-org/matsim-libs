@@ -29,12 +29,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.ptproject.qsim.helpers.QPersonAgent;
+import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 import playground.christoph.withinday.replanning.WithinDayReplanner;
 
-public class WithinDayPersonAgent extends QPersonAgent {
+public class WithinDayPersonAgent extends DefaultPersonDriverAgent {
 
 	private static final Logger log = Logger.getLogger(WithinDayPersonAgent.class);
 

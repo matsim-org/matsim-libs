@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.WithindayConfigGroup;
 import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.helpers.QPersonAgent;
+import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 
 /**
  * Factory for withinday replanning agents
@@ -45,7 +45,7 @@ public class WithindayAgentFactory extends AgentFactory {
 	}
 
 	@Override
-	public QPersonAgent createPersonAgent(final Person p) {
+	public DefaultPersonDriverAgent createPersonAgent(final Person p) {
 		WithindayAgent agent = new WithindayAgent(p, this.simulation, this.withindayConfigGroup.getAgentVisibilityRange(), this.agentLogicFactory);
 		//set the agent's replanning interval
 		agent.setReplanningInterval(this.withindayConfigGroup.getReplanningInterval());

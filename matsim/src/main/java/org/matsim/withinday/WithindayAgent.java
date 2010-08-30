@@ -44,7 +44,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.ptproject.qsim.helpers.QPersonAgent;
+import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.withinday.beliefs.AgentBeliefs;
 import org.matsim.withinday.contentment.AgentContentment;
@@ -54,7 +54,7 @@ import org.matsim.withinday.routeprovider.RouteProvider;
 /**
  * @author dgrether
  */
-public class WithindayAgent extends QPersonAgent {
+public class WithindayAgent extends DefaultPersonDriverAgent {
 
 	private static final Logger log = Logger.getLogger(WithindayAgent.class);
 

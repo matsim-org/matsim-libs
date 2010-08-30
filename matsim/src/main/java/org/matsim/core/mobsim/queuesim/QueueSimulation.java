@@ -481,27 +481,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 				PersonAgent person = entry.getSecond();
 				person.teleportToLink(person.getDestinationLinkId());
 				person.endLegAndAssumeControl(now);
-				//				this.handleAgentArrival(now, driver);
-				//				getEvents().processEvent(new AgentArrivalEventImpl(now, driver.getPerson(),
-				//						destinationLink, driver.getCurrentLeg()));
-				//				driver.legEnds(now);
 			} else break;
 		}
 	}
-
-//	/**
-//	 * Should be a PersonAgentI as argument, but is needed because the old events form is still used also for tests
-//	 * @param now
-//	 * @param agent
-//	 */
-//	@Override
-//	public void handleAgentArrival(final double now, PersonDriverAgent agent){
-////		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-////			queueSimulationFeature.beforeHandleAgentArrival(agent);
-////		}
-//		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
-//				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
-//	}
 
 	private void handleNetworkChangeEvents(final double time) {
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)){
@@ -523,10 +505,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	@Override
 	public void scheduleActivityEnd(final PersonAgent agent) {
 		this.activityEndsList.add(agent);
-//		int planElementIndex = agent.getPerson().getSelectedPlan().getPlanElements().indexOf(agent.getCurrentPlanElement()) ; // yyyy Aaaarrrrgggghhh
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//			queueSimulationFeature.afterActivityBegins(agent);
-//		}
 	}
 
 	private void handleActivityEnds(final double time) {
@@ -535,9 +513,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
 				agent.endActivityAndAssumeControl(time);
-//				for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//					queueSimulationFeature.afterActivityEnds(agent, time);
-//				}
 			} else {
 				return;
 			}
