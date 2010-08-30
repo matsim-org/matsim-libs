@@ -50,6 +50,7 @@ import org.xml.sax.SAXException;
 
 import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.urbansim.matsimTest.MATSim4UrbanSimTest;
 import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.MyControlerListener;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
@@ -200,7 +201,7 @@ public class MATSim4Urbansim {
 			// crate a schema factory ...
 			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
 			// ... and initialize it with an xsd (xsd lies in the urbansim project)
-			// TODO: upload to matsim.org
+			// TODO: upload to matsim.org: see MatsimXmlParser line 204
 			File file2XSD = new File( getCurrentPath() +"xsd/MATSim4UrbanSimConfigSchema.xsd" );
 			// File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
 			if(!file2XSD.exists()){
