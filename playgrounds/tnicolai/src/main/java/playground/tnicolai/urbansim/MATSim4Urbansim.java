@@ -24,9 +24,18 @@
 package playground.tnicolai.urbansim;
 
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URL;
+import java.util.Stack;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -37,20 +46,28 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
+import org.dom4j.Document;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReaderMatsimV1;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.matsimTest.MATSim4UrbanSimTest;
+import playground.tnicolai.urbansim.utils.LoadFile;
 import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.MyControlerListener;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
@@ -202,11 +219,22 @@ public class MATSim4Urbansim {
 			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
 			// ... and initialize it with an xsd (xsd lies in the urbansim project)
 			// TODO: upload to matsim.org: see MatsimXmlParser line 204
-			File file2XSD = new File( getCurrentPath() +"xsd/MATSim4UrbanSimConfigSchema.xsd" );
-			// File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
-			if(!file2XSD.exists()){
-				log.error(file2XSD.getCanonicalPath() + " not found!!!");
-				return false;
+			ConfigReaderMatsimV1 configReader = new ConfigReaderMatsimV1(null);
+			
+			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, getCurrentPath() + "tmp/MATSim4UrbanSimConfigSchema.xsd");
+			File file2XSD = loadFile.loadMATSim4UrbanSimXSD();
+			
+//			File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
+			if(file2XSD == null || !file2XSD.exists()){
+				
+				log.warn(file2XSD.getCanonicalPath() + " is not available. Loading compensatory xsd instead (this may be is an older version).");
+				log.warn("Compensatory xsd file: " + getCurrentPath() + "tmp/MATSim4UrbanSimConfigSchema.xsd");
+				
+				file2XSD = new File(getCurrentPath() + "tmp/MATSim4UrbanSimConfigSchema.xsd");
+				if(!file2XSD.exists()){
+					log.error(file2XSD.getCanonicalPath() + " not found!!!");
+					return false;
+				}
 			}
 			log.info("Using following xsd schema: " + file2XSD.getCanonicalPath());
 			// create a schema object via the given xsd to validate the MATSim xml config.
