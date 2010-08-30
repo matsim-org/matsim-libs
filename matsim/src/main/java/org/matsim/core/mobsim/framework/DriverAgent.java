@@ -53,6 +53,6 @@ public interface DriverAgent extends MobsimAgent {
 	/**
 	 * notifies the agent that it was moved over the node
 	 */
-	public void notifyMoveOverNote();
+	public void notifyMoveOverNode();
 	
 }
