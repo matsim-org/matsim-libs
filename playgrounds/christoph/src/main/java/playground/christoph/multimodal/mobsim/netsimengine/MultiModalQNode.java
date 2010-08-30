@@ -119,7 +119,7 @@ public class MultiModalQNode extends QNode{
 			this.checkNextLinkSemantics(currentLink, nextLink, personAgent);
 			
 			// move Agent over the Node
-			((PersonDriverAgent)personAgent).notifyMoveOverNote();
+			((PersonDriverAgent)personAgent).notifyMoveOverNode();
 			
 			((MultiModalQLinkImpl)nextQLink).addAgentFromIntersection(personAgent, now);
 	    }
