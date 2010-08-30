@@ -24,7 +24,7 @@ public class StringMatrix {
 	}
 	
 	public int getInteger(int row, int column){
-		return new Integer(getString(row,column));
+		return new Integer((int) Math.round(new Double(getString(row,column))));
 	}
 	
 	public int convertDoubleToInteger(int row, int column){

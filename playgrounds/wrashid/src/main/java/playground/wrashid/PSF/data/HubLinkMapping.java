@@ -8,6 +8,8 @@ import java.util.StringTokenizer;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.wrashid.PSF.ParametersPSF;
+import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.obj.StringMatrix;
 
 /**
  * File format (for example see test case data).
@@ -29,6 +31,7 @@ public class HubLinkMapping {
 	// key: linkId, value: hub number
 	HashMap<String,Integer> linkHubMapping=new HashMap<String,Integer>();
 	private int numberOfHubs;
+	private boolean unMappedLinksAtZeroHub=false;
 
 	private void handleUnmappedLinksStart(){
 		if (ParametersPSF.getMainInitUnmappedLinks()!=null && ParametersPSF.getMainInitUnmappedLinks()){
@@ -48,14 +51,23 @@ public class HubLinkMapping {
 			this.numberOfHubs++;
 		}
 	}
-	
 
 	/**
 	 * reads the mappings from the file. The file has columns (first column for first hub and all the links corresponding to that hub below it) 
 	 * @param fileName
 	 */
 	public HubLinkMapping(String fileName, int numberOfHubs){
+		
 		this.numberOfHubs = numberOfHubs;
+		
+		if (fileName.contains(".mappingTable.")){
+			readMappingTable(fileName);
+			unMappedLinksAtZeroHub=true;
+			return;
+		}
+		
+		
+		
 		
 		handleUnmappedLinksStart();
 		
@@ -101,6 +113,15 @@ public class HubLinkMapping {
 	}
 
 
+	private void readMappingTable(String fileName) {
+		StringMatrix stringMatrix = GeneralLib.readStringMatrix(fileName);
+		int firstRowAfterTitle=1;
+		
+		for (int i=firstRowAfterTitle;i<stringMatrix.getNumberOfRows();i++){
+			linkHubMapping.put(stringMatrix.getString(i, 1), stringMatrix.getInteger(i, 0));
+		}
+	}
+
 	public int getNumberOfHubs() {
 		return numberOfHubs;
 	}
@@ -114,16 +135,17 @@ public class HubLinkMapping {
 
 
 	public int getHubNumber(String linkId) {
-		// just for debugging
-		if (linkHubMapping.get(linkId)==null){
-			System.out.println(linkId);
+		
+		if (linkHubMapping.get(linkId)==null && unMappedLinksAtZeroHub){
+			return 0;
 		}
 		
 		return linkHubMapping.get(linkId).intValue();
 	}
 	
 	public static void main(String[] args) {
-		new HubLinkMapping("A:/data/matsim/input/runRW1003/hubLinkMapping.txt",819);
+		HubLinkMapping hlm= new HubLinkMapping("C:/Users/Admin/Desktop/psl-temp/linkHub.mappingTable.txt",819);
+		//System.out.println(hlm.getHubNumber("17560001380400FTs"));
 	}
 	
 }     
