@@ -108,7 +108,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	@Override
-	public void notifyMoveOverNote() {
+	public void notifyMoveOverNode() {
 		this.nextLinkIndex++;
 	}
 
