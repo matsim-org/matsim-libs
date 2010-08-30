@@ -90,6 +90,9 @@ public class Constants {
 	public static final int TEST_RUN_SUCCESSFUL = 0;
 	public static final int TEST_RUN_FAILD = -1;
 	
+	/** xsd on matsim.org */
+	public static final String MATSim_4_UrbanSim_XSD = "http://www.matsim.org/files/dtd/MATSim4UrbanSimConfigSchema.xsd";
+	
 	/** MATSim properties */
 	public static final String MATSIM_PROPERTIES_FILE = "matsim.properties";
 	public static final String FIRST_ITERATION = "firstIteration";
