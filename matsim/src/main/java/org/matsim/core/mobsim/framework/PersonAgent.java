@@ -78,9 +78,11 @@ public interface PersonAgent extends MobsimAgent {
 	// Might go directly into the person, as some kind of minimal mobsim convenience method
 	// (although I am not convinced).  kai, jan/apr'10
 	// zzzz Teleportation should from my point of view not be included in a data class like Person dg apr'10
+	@Deprecated // does not belong here.  kai, aug'10
 	public void teleportToLink(final Id linkId);
 	
 	public boolean initializeAndCheckIfAlive();
-	// yyyy I don't like this "initialize" method that one can easily forget to call.  And I am confident that one can do without it.  kai, may'10 
+	// yyyy I don't like this "initialize" method that one can easily forget to call.  
+	// And I am confident that one can do without it.  kai, may'10 
 	
 }
