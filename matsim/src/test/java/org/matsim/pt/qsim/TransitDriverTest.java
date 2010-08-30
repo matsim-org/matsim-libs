@@ -109,13 +109,13 @@ public class TransitDriverTest extends MatsimTestCase {
 
 		assertEquals(link5.getId(), driver.getDestinationLinkId());
 		assertEquals(link2.getId(), driver.chooseNextLinkId());
-		driver.notifyMoveOverNote();
+		driver.notifyMoveOverNode();
 		assertEquals(link3.getId(), driver.chooseNextLinkId());
-		driver.notifyMoveOverNote();
+		driver.notifyMoveOverNode();
 		assertEquals(link4.getId(), driver.chooseNextLinkId());
-		driver.notifyMoveOverNote();
+		driver.notifyMoveOverNode();
 		assertEquals(link5.getId(), driver.chooseNextLinkId());
-		driver.notifyMoveOverNote();
+		driver.notifyMoveOverNode();
 		assertEquals(null, driver.chooseNextLinkId());
 	}
 
