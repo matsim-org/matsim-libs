@@ -11,10 +11,12 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.ptproject.qsim.comparators.PersonAgentDepartureTimeComparator;
 
 import playground.christoph.knowledge.container.DBStorage;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -43,7 +45,8 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 	 * really ends. This allows us for example to read the known nodes of a Person
 	 * from a Database before they are needed what should speed up the Simulation.
 	 */
-	protected final PriorityBlockingQueue<PersonDriverAgent> offsetActivityEndsList = new PriorityBlockingQueue<PersonDriverAgent>(500, new DriverAgentDepartureTimeComparator());
+	protected final PriorityBlockingQueue<PersonAgent> offsetActivityEndsList = 
+		new PriorityBlockingQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
 	protected final double timeOffset = 120.0;
 	
 //	private int count = 0;
@@ -167,7 +170,7 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 		// TODO Auto-generated method stub	
 	}
 	
-	public void scheduleActivityEnd(final PersonDriverAgent agent)
+	public void scheduleActivityEnd(final PersonAgent agent)
 	{	
 		offsetActivityEndsList.add(agent);
 	}
@@ -181,7 +184,7 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 	{		
 		while (this.offsetActivityEndsList.peek() != null)
 		{
-			PersonDriverAgent agent = this.offsetActivityEndsList.peek();
+			PersonAgent agent = this.offsetActivityEndsList.peek();
 			if (agent.getDepartureTime() <= time + timeOffset)
 			{
 				this.offsetActivityEndsList.poll();
@@ -194,20 +197,21 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 		} 
 	}
 	
-	/*
-	 * for the Knowledge Modules
-	 */
-	/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<PersonDriverAgent>, Serializable {
-
-		private static final long serialVersionUID = 1L;
-
-		public int compare(PersonDriverAgent agent1, PersonDriverAgent agent2) {
-			int cmp = Double.compare(agent1.getDepartureTime(), agent2.getDepartureTime());
-			if (cmp == 0) {
-				// Both depart at the same time -> let the one with the larger id be first (=smaller)
-				return agent2.getPerson().getId().compareTo(agent1.getPerson().getId());
-			}
-			return cmp;
-		}
-	}
+//	/*
+//	 * for the Knowledge Modules
+//	 */
+//	/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<PersonDriverAgent>, Serializable {
+//
+//		private static final long serialVersionUID = 1L;
+//
+//		public int compare(PersonDriverAgent agent1, PersonDriverAgent agent2) {
+//			int cmp = Double.compare(agent1.getDepartureTime(), agent2.getDepartureTime());
+//			if (cmp == 0) {
+//				// Both depart at the same time -> let the one with the larger id be first (=smaller)
+//				return agent2.getPerson().getId().compareTo(agent1.getPerson().getId());
+//			}
+//			return cmp;
+//		}
+//	}
+	// referring to a "central" comparator; hopefully ok.  kai, aug'10
 }

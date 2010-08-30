@@ -48,7 +48,7 @@ public interface QSimI extends IOSimulation {
 	AgentCounterI getAgentCounter();
 
 	// yyyyyy imho, should take a PersonAgent as argument.  kai, may'10
-	void scheduleActivityEnd(PersonDriverAgent personAgent);
+	void scheduleActivityEnd(PersonAgent personAgent);
 
 	/**
 	 * @param now

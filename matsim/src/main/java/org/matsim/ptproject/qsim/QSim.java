@@ -443,7 +443,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 */
 	@Override
 	@Deprecated // yyyy should be a PersonAgent.  kai, may'10
-	public void scheduleActivityEnd(final PersonDriverAgent agent) {
+	public void scheduleActivityEnd(final PersonAgent agent) {
 		this.activityEndsList.add(agent);
 		registerAgentAtActivityLocation(agent);
 //		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
@@ -451,8 +451,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 //		}
 	}
 
-	private void registerAgentAtActivityLocation(final PersonDriverAgent agent) {
-		if (agent instanceof QPersonAgent) {
+	private void registerAgentAtActivityLocation(final PersonAgent agent) {
+		if (agent instanceof QPersonAgent) { // yyyyyy is this necessary?
 			QPersonAgent pa = (QPersonAgent) agent;
 			PlanElement pe = pa.getCurrentPlanElement();
 			if (pe instanceof Leg) {

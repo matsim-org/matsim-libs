@@ -133,7 +133,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	private SimulationListenerManager listenerManager;
 
-	private final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = new PriorityBlockingQueue<PersonDriverAgent>(500, new PersonAgentDepartureTimeComparator());
+	private final PriorityBlockingQueue<PersonAgent> activityEndsList = 
+		new PriorityBlockingQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
 
 	private Scenario scenario = null;
 
@@ -332,7 +333,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 		double simStartTime = 0;
-		PersonDriverAgent firstAgent = this.activityEndsList.peek();
+		PersonAgent firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
 			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
 		}
@@ -373,7 +374,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		}
 		this.teleportationList.clear();
 
-		for (PersonDriverAgent agent : this.activityEndsList) {
+		for (PersonAgent agent : this.activityEndsList) {
 			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLinkId(), null));
 		}
 		this.activityEndsList.clear();
@@ -520,7 +521,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 * @see PersonDriverAgent#getDepartureTime()
 	 */
 	@Override
-	public void scheduleActivityEnd(final PersonDriverAgent agent) {
+	public void scheduleActivityEnd(final PersonAgent agent) {
 		this.activityEndsList.add(agent);
 //		int planElementIndex = agent.getPerson().getSelectedPlan().getPlanElements().indexOf(agent.getCurrentPlanElement()) ; // yyyy Aaaarrrrgggghhh
 //		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
@@ -530,7 +531,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
-			PersonDriverAgent agent = this.activityEndsList.peek();
+			PersonAgent agent = this.activityEndsList.peek();
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
 				agent.endActivityAndAssumeControl(time);
