@@ -67,7 +67,7 @@ public class WithinDayQSim extends QSim {
 	 * Used by the Activity End Replanning Module.
 	 * This contains all Agents that are going to end their Activities.
 	 */
-	public PriorityBlockingQueue<PersonDriverAgent> getActivityEndsList() {
+	public PriorityBlockingQueue<PersonAgent> getActivityEndsList() {
 		return super.activityEndsList;
 	}
 	

@@ -62,7 +62,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.comparators.DriverAgentDepartureTimeComparator;
+import org.matsim.ptproject.qsim.comparators.PersonAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
@@ -133,7 +133,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	private SimulationListenerManager<QueueSimulation> listenerManager;
 
-	private final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = new PriorityBlockingQueue<PersonDriverAgent>(500, new DriverAgentDepartureTimeComparator());
+	private final PriorityBlockingQueue<PersonDriverAgent> activityEndsList = new PriorityBlockingQueue<PersonDriverAgent>(500, new PersonAgentDepartureTimeComparator());
 
 	private Scenario scenario = null;
 

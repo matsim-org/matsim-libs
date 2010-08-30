@@ -52,7 +52,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.ptproject.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.ptproject.qsim.comparators.DriverAgentDepartureTimeComparator;
+import org.matsim.ptproject.qsim.comparators.PersonAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.helpers.QPersonAgent;
@@ -127,8 +127,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	private double stopTime = 100*3600;
 	private AgentFactory agentFactory;
 	private SimulationListenerManager<QSim> listenerManager;
-	protected final PriorityBlockingQueue<PersonDriverAgent> activityEndsList =
-		new PriorityBlockingQueue<PersonDriverAgent>(500, new DriverAgentDepartureTimeComparator());
+	protected final PriorityBlockingQueue<PersonAgent> activityEndsList =
+		new PriorityBlockingQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
 	protected Scenario scenario = null;
 	private QSimSignalEngine signalEngine = null;
 
@@ -466,7 +466,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		}
 	}
 
-	private void unregisterAgentAtActivityLocation(final PersonDriverAgent agent) {
+	private void unregisterAgentAtActivityLocation(final PersonAgent agent) {
 		if (agent instanceof QPersonAgent) {
 			QPersonAgent pa = (QPersonAgent) agent;
 			PlanElement pe = pa.getCurrentPlanElement();
@@ -483,7 +483,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
-			PersonDriverAgent agent = this.activityEndsList.peek();
+			PersonAgent agent = this.activityEndsList.peek();
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
 				unregisterAgentAtActivityLocation(agent);
@@ -567,7 +567,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		this.simTimer.setTime(startTime);
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 		double simStartTime = 0;
-		PersonDriverAgent firstAgent = this.activityEndsList.peek();
+		PersonAgent firstAgent = this.activityEndsList.peek();
 		if (firstAgent != null) {
 			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
 		}

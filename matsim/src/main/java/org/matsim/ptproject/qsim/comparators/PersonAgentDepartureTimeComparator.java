@@ -23,6 +23,7 @@ package org.matsim.ptproject.qsim.comparators;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
 /**
@@ -33,11 +34,11 @@ import org.matsim.core.mobsim.framework.PersonDriverAgent;
  * 
  * @see PersonDriverAgent#getDepartureTime()
  */
-public class DriverAgentDepartureTimeComparator implements Comparator<PersonDriverAgent>, Serializable {
+public class PersonAgentDepartureTimeComparator implements Comparator<PersonAgent>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public int compare(PersonDriverAgent agent1, PersonDriverAgent agent2) {
+	public int compare(PersonAgent agent1, PersonAgent agent2) {
 		int cmp = Double.compare(agent1.getDepartureTime(), agent2.getDepartureTime());
 		if (cmp == 0) {
 			// Both depart at the same time -> let the one with the larger id be first (=smaller)

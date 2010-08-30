@@ -33,7 +33,7 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 		}
 
 		// select agents, which should be replanned within this time step
-		for (PersonDriverAgent agent : queueSim.getActivityEndsList()) {
+		for (PersonAgent agent : queueSim.getActivityEndsList()) {
 			if (((PersonImpl) agent.getPerson()).getAge() == 56) {
 				System.out.println("found agent");
 				list.add(agent);
