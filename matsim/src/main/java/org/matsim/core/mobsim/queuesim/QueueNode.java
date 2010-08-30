@@ -112,7 +112,7 @@ class QueueNode implements VisNode {
 
 			if (nextQueueLink.hasSpace()) {
 				link.popFirstFromBuffer();
-				veh.getDriver().notifyMoveOverNote();
+				veh.getDriver().notifyMoveOverNode();
 				nextQueueLink.addFromIntersection(veh);
 				return true;
 			}
@@ -136,7 +136,7 @@ class QueueNode implements VisNode {
 							new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
 				} else {
 					link.popFirstFromBuffer();
-					veh.getDriver().notifyMoveOverNote();
+					veh.getDriver().notifyMoveOverNode();
 					nextQueueLink.addFromIntersection(veh);
 					return true;
 				}
