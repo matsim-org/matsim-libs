@@ -30,7 +30,11 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.AgentFactory;
 
-/**
+/**The logic is as follows:<ul>
+ * <li>When the agent starts something (an activity, a leg), the agent requests this from the central simulation.</li>
+ * <li>When something (an activity, a leg) ends, control is directly passed to the agent.</li>
+ *</ul>
+ *
  * @author nagel
  *
  */
@@ -50,13 +54,13 @@ public interface QSimI extends IOSimulation {
 	// yyyyyy imho, should take a PersonAgent as argument.  kai, may'10
 	void scheduleActivityEnd(PersonAgent personAgent);
 
-	/**
-	 * @param now
-	 * @param qPersonAgent
-	 */
-	@Deprecated // yyyyyy does not make much sense conceptually to have the "Person" in here ... what about
-	// automatic drivers?  kai, may'10
-	void handleAgentArrival(double now, PersonDriverAgent qPersonAgent);
+//	/**
+//	 * @param now
+//	 * @param qPersonAgent
+//	 */
+//	@Deprecated // yyyyyy does not make much sense conceptually to have the "Person" in here ... what about
+//	// automatic drivers?  kai, may'10
+//	void handleAgentArrival(double now, PersonDriverAgent qPersonAgent);
 
 //	/**
 //	 * @return

@@ -44,6 +44,8 @@ import org.matsim.ptproject.qsim.interfaces.QVehicle;
 /**
  * @author dgrether
  * @author nagel
+ * <p/>
+ * Apart from "teleportToLink", I think this class is reasonable in terms of what is public and/or final and what not.
  */
 public class QPersonAgent implements PersonDriverAgent {
 
@@ -135,7 +137,12 @@ public class QPersonAgent implements PersonDriverAgent {
 	}
 
 	public final void endLegAndAssumeControl(final double now) {
-		this.simulation.handleAgentArrival(now, this);
+
+//		this.simulation.handleAgentArrival(now, this);
+		this.simulation.getEventsManager().processEvent(
+				this.simulation.getEventsManager().getFactory().createAgentArrivalEvent(
+						now, this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
+
 		if(!this.currentLinkId.equals(this.destinationLinkId)) {
 			// yyyyyy needs to throw a stuck/abort event
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.destinationLinkId

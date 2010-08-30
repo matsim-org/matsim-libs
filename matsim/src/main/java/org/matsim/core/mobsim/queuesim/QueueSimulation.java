@@ -489,19 +489,19 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		}
 	}
 
-	/**
-	 * Should be a PersonAgentI as argument, but is needed because the old events form is still used also for tests
-	 * @param now
-	 * @param agent
-	 */
-	@Override
-	public void handleAgentArrival(final double now, PersonDriverAgent agent){
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//			queueSimulationFeature.beforeHandleAgentArrival(agent);
-//		}
-		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
-				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
-	}
+//	/**
+//	 * Should be a PersonAgentI as argument, but is needed because the old events form is still used also for tests
+//	 * @param now
+//	 * @param agent
+//	 */
+//	@Override
+//	public void handleAgentArrival(final double now, PersonDriverAgent agent){
+////		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+////			queueSimulationFeature.beforeHandleAgentArrival(agent);
+////		}
+//		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
+//				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
+//	}
 
 	private void handleNetworkChangeEvents(final double time) {
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)){

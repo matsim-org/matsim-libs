@@ -51,18 +51,15 @@ public interface PersonAgent extends MobsimAgent {
 	// But the transit driver does not have an activity (?!). kai, apr'10
 
 	/**
-	 * Informs the agent that the currently executed activity is ended / is
-	 * no longer performed.
+	 * Informs the agent that the activity has ended.  The agent is responsible for what comes next.
 	 * 
 	 * @param now
 	 */
 	public void endActivityAndAssumeControl(final double now);
 	
 	/**
-	 * Informs the agent that it arrived at the destination of the current leg.
-	 * The agent can then decide if he wants to start an activity, or continue
-	 * on another leg.
-	 *
+	 * Informs the agent that the leg has ended.  The agent is responsible for what comes next.
+	 * 
 	 * @param now the current time in the simulation
 	 */
 	public void endLegAndAssumeControl(final double now);
@@ -78,7 +75,10 @@ public interface PersonAgent extends MobsimAgent {
 	// Might go directly into the person, as some kind of minimal mobsim convenience method
 	// (although I am not convinced).  kai, jan/apr'10
 	// zzzz Teleportation should from my point of view not be included in a data class like Person dg apr'10
-	@Deprecated // does not belong here.  kai, aug'10
+	// This is here since a in a normal leg, the driver moves from node to node and eventually is at the destination.
+	// With teleportation, this does not work, and so another setting method needs to be found.  
+	// Can't say how this is done with transit.  kai, aug'10
+	@Deprecated // unclear, see somments above. kai, aug'10
 	public void teleportToLink(final Id linkId);
 	
 	public boolean initializeAndCheckIfAlive();

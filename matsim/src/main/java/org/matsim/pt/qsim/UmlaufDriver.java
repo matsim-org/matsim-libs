@@ -186,15 +186,18 @@ public class UmlaufDriver extends AbstractTransitDriver {
 
 	@Override
 	public void endLegAndAssumeControl(final double now) {
+		this.getSimulation().getEventsManager().processEvent(
+				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
+						now, this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 		if (this.iUmlaufStueck.hasNext()) {
 			this.setNextLeg();
 			if (this.departureTime < now) {
 				this.departureTime = now;
 			}
-			this.sim.handleAgentArrival(now, this);
+//			this.sim.handleAgentArrival(now, this);
 			this.sim.scheduleActivityEnd(this);
 		} else {
-			this.sim.handleAgentArrival(now, this);
+//			this.sim.handleAgentArrival(now, this);
 			this.getSimulation().getAgentCounter().decLiving();
 		}
 	}

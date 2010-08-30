@@ -420,19 +420,19 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		}
 	}
 
-	/**
-	 * Should be a PersonAgentI as argument, but is needed because the old events form is still used also for tests
-	 * @param now
-	 * @param agent
-	 */
-	@Override
-	public void handleAgentArrival(final double now, final PersonDriverAgent agent) {
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//			queueSimulationFeature.beforeHandleAgentArrival(agent);
-//		}
-		getEventsManager().processEvent(getEventsManager().getFactory().createAgentArrivalEvent(now, agent.getPerson().getId(),
-				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
-	}
+//	/**
+//	 * Should be a PersonAgentI as argument, but is needed because the old events form is still used also for tests
+//	 * @param now
+//	 * @param agent
+//	 */
+//	@Override
+//	public void handleAgentArrival(final double now, final PersonDriverAgent agent) {
+////		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
+////			queueSimulationFeature.beforeHandleAgentArrival(agent);
+////		}
+//		getEventsManager().processEvent(getEventsManager().getFactory().createAgentArrivalEvent(now, agent.getPerson().getId(),
+//				agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
+//	}
 
 
 	/**
@@ -442,13 +442,9 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * @see PersonDriverAgent#getDepartureTime()
 	 */
 	@Override
-	@Deprecated // yyyy should be a PersonAgent.  kai, may'10
 	public void scheduleActivityEnd(final PersonAgent agent) {
 		this.activityEndsList.add(agent);
 		registerAgentAtActivityLocation(agent);
-//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-//			queueSimulationFeature.afterActivityBegins(agent);
-//		}
 	}
 
 	private void registerAgentAtActivityLocation(final PersonAgent agent) {
@@ -517,23 +513,6 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			handleUnknownLegMode( now, agent, linkId, leg ) ;
 			events.processEvent(new AdditionalTeleportationDepartureEvent( now, agent.getPerson().getId(), linkId, mode, agent.getDestinationLinkId(), leg.getTravelTime() )) ;
 		}
-
-//		try {
-//			if ( agent.getDestinationLinkId()!=null // check if next operation possible
-//					&& agent.getDestinationLinkId().equals(linkId) // next activity is on same link
-//					&& route instanceof NetworkRoute         // check if next operation possible
-//					&& ((NetworkRoute)route).getLinkIds().isEmpty() // check if this is a leg without movement
-//					) {
-//				agent.legEnds(now) ;
-//			} else if ( this.handleKnownLegModeDeparture(now, agent, linkId, leg)  ) {
-//				return ;
-//			} else {
-//				handleUnknownLegMode(now, agent, linkId, leg);
-//			}
-//		} catch ( RuntimeException ee ) {
-//			throw ee ;
-//		}
-
 	}
 
 	private void handleUnknownLegMode(final double now, final PersonAgent personAgent, final Id linkId, final Leg leg) {
