@@ -21,7 +21,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 public class PopulationGenerator implements Runnable {
@@ -215,5 +217,24 @@ public class PopulationGenerator implements Runnable {
 		return zones;
 	}
 
+	Zone findZone(Coord coord) {
+		GeometryFactory gf = new GeometryFactory();
+		Point point = gf.createPoint(new Coordinate(coord.getX(), coord.getY()));
+		for (Zone zone : zones.values()) {
+			if (zone.geometry.contains(point)) {
+				return zone;
+			}
+		}
+		return null;
+	}
+	
+	Coord shootIntoSameZoneOrLeaveInPlace(Coord coord) {
+		Zone zone = findZone(coord);
+		if (zone != null) {
+			return shoot(zone);
+		} else {
+			return coord;
+		}
+	}
 
 }
