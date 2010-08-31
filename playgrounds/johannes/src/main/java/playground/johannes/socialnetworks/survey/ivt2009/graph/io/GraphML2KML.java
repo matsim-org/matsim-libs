@@ -31,7 +31,6 @@ import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
 import org.matsim.contrib.sna.graph.spatial.io.KMLPartitions;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.VertexDegreeColorizer;
-import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
@@ -86,9 +85,10 @@ public class GraphML2KML {
 		 * @see org.matsim.contrib.sna.graph.spatial.io.KMLPartitions#getPartitions(org.matsim.contrib.sna.graph.spatial.SpatialGraph)
 		 */
 		@Override
-		public List<Set<? extends SpatialVertex>> getPartitions(SpatialGraph graph) {
+		public List<Set<? extends SpatialVertex>> getPartitions(SpatialGraph g) {
+			SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = (SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>) g;
 			List<Set<? extends SpatialVertex>> list = new ArrayList<Set<? extends SpatialVertex>>(1);
-			Set<? extends SpatialVertex> set = (Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition((Set<SampledVertex>)graph.getVertices());
+			Set<? extends SpatialVertex> set = SnowballPartitions.createSampledPartition(graph.getVertices());
 			list.add(set);
 			return list;
 		}
