@@ -87,8 +87,11 @@ public class GraphML2KML {
 		@Override
 		public List<Set<? extends SpatialVertex>> getPartitions(SpatialGraph g) {
 			SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = (SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>) g;
-			List<Set<? extends SpatialVertex>> list = new ArrayList<Set<? extends SpatialVertex>>(1);
-			Set<? extends SpatialVertex> set = SnowballPartitions.createSampledPartition(graph.getVertices());
+			/*
+			 * generics do not work on hudson for some reason...
+			 */
+			List list = new ArrayList(1);
+			Set set = SnowballPartitions.createSampledPartition(graph.getVertices());
 			list.add(set);
 			return list;
 		}
