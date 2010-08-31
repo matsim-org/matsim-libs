@@ -36,7 +36,7 @@ public class PopulationV5Converter {
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 
-		String net = "examples/equil/network.xml";
+		String net = "examples/equil/network.xml"
 		
 //		String popv4 = "examples/equil/plans2.xml";
 		String popv4 = "test/input/org/matsim/integration/EquilTwoAgentsTest/plans2.xml";
