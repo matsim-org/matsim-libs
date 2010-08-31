@@ -1,0 +1,37 @@
+network
+========
+=> do not need any change.
+
+=> specify this network file in the config.xml
+
+facilities
+==========
+- use /wrashid/src/main/java/playground/wrashid/PSF/converter/scenario/Zurich.java to add parking facilities
+(should be done, when also adding parking activities to the plans file. if done separatly, one can just load the facilities and 
+invoke method for generating facities => TODO: separate the two steps).
+
+=> specify this facilities file in the config.xml
+
+plans
+======
+- probably you have a plans file mapped to a network. therefore you first need to remove the mapping using
+/wrashid/src/main/java/playground/wrashid/lib/tools/plan/RemoveNetworkInformationFromPlan.java).
+
+- After that, you can perform the mapping to a network. Just specify in a config the network, facilities and unmapped plans file and
+run it for one iteration. You will find the output_plans.xml in the output folder, which is mapped to the specified network.
+use /matsim/src/main/java/org/matsim/run/Controler.java for running controler.
+
+- After that, use the /wrashid/src/main/java/playground/wrashid/PSF/converter/scenario/Zurich.java to add parking activities to the plans.
+
+=> specify this plans file in the config.xml
+
+hubLinkMapping
+===============
+- if you have a file, containing hub_Id and coordinate (for each subhub), then you can use 
+/wrashid/src/main/java/playground/wrashid/PSF/data/hubCoordinates/hubLinkMapper/GenerateTableHubLinkMapping.java
+to print on the console the hub to link mapping (specify, that the console should be redirected into a file).
+-> remove top garbadage from file.
+-> rename the log file, so that it contains the string ".mappingTable.", e.g. linkHub.mappingTable.txt
+
+=> specify this mapping file in the config.xml under "main.hubLinkMappingPath"
+
