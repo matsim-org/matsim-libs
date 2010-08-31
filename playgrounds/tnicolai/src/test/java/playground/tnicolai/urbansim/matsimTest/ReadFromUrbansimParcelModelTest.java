@@ -35,6 +35,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -43,6 +45,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.testUtils.TempDirectoryUtil;
+import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
 /**
@@ -52,20 +55,36 @@ import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 
 	private static final Logger log = Logger.getLogger(ReadFromUrbansimParcelModelTest.class);
+	private int popSize = -1;
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	@Test
+	// Tests if facilities are created correctly
 	public void testReadFromUrbansimParcelModel(){
-		log.info("Starting testReadFromUrbansimParcelModel run: Testing computation of UrbanSim zones.");
-		prepareTest("testReadFromUrbansimParcelModel");		
+		log.info("Starting testReadFromUrbansimParcelModel1 run: Testing computation of UrbanSim zones.");
+		prepareTest("testReadFromUrbansimParcelModel1", 1);		
+	}
+	
+	@Test
+	// Tests if new population is created correctly
+	public void testReadFromUrbansimParcelModel2(){
+		log.info("Starting testReadFromUrbansimParcelModel2 run: Testing computation of UrbanSim zones.");
+		prepareTest("testReadFromUrbansimParcelModel2", 2);	
+	}
+	
+	@Test
+	// Tests if old population is recognized correctly
+	public void testReadFromUrbansimParcelModel3(){
+		log.info("Starting testReadFromUrbansimParcelModel3 run: Testing computation of UrbanSim zones.");
+		prepareTest("testReadFromUrbansimParcelModel3", 3);	
 	}
 	
 	/**
 	 * preparing ReadFromUrbansimParcelModel test run
 	 * @param testRunName name of current test case
 	 */
-	private void prepareTest(String testRunName){
+	private void prepareTest(String testRunName, int testNr){
 		
 		Constants.setOpusHomeDirectory( System.getProperty("java.io.tmpdir") );
 		// create temp directories
@@ -74,12 +93,28 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		// preparing input test file
 		int dummyYear = 2000;
 		String testFileDirectory = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY;
-		String testFileName = Constants.URBANSIM_PARCEL_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
-		createInputTestFile(testFileDirectory, testFileName);
+		String testFileName = null;
 		
-		// running ReadFromUrbansimParcelModel
-		ActivityFacilitiesImpl zones = testRun( dummyYear );
-		Assert.assertTrue( validateResult(zones) );
+		switch (testNr) {
+		case 1:
+			testFileName = Constants.URBANSIM_PARCEL_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
+			createParcelInputTestFile(testFileDirectory, testFileName);
+			// running ReadFromUrbansimParcelModel generating zones and facilities
+			ActivityFacilitiesImpl zones = testRunPracels( dummyYear );
+			Assert.assertTrue( validateResult(zones) );
+			break;
+
+		case 2:
+			testFileName = Constants.URBANSIM_PERSON_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
+			createPersonInputTestFile(testFileDirectory, testFileName);
+			// running ReadFromUrbansimParcelModel generating population
+			boolean result = testRunPopulation( dummyYear );
+			Assert.assertTrue(result);
+			break;
+			
+		case 3:
+			// TODO
+		}
 		
 		// remove temp directories
 		TempDirectoryUtil.cleaningUp();
@@ -125,7 +160,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 	 * @param year dummy year only needed to initialize ReadFromUrbansimParcelModel
 	 * @return ActivityFacilitiesImpl constructed zones
 	 */
-	private ActivityFacilitiesImpl testRun(int year){
+	private ActivityFacilitiesImpl testRunPracels(int year){
 		log.info("Running ReadFromUrbansimParcelModel with argument year = " + year);
 		// get the data from test urbansim parcels
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year );
@@ -138,12 +173,213 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 	}
 	
 	/**
+	 * Runs ReadFromUrbansimParcelModel 
+	 * @param year dummy year only needed to initialize ReadFromUrbansimParcelModel
+	 * @return returns true if number of generated population aproximatly equals 
+	 * 		   "sample rate * number of urbansim persons".
+	 */
+	private boolean testRunPopulation(int year){
+		
+		log.info("Running ReadFromUrbansimParcelModel with argument year = " + year);
+		
+		double sampleRate = 0.1;
+		
+		// get the data from urbansim (parcels and persons)
+		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year );
+
+		// read urbansim facilities (these are simply those entities that have the coordinates!)
+		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("dummy locations");
+		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("dummy zones");
+		readFromUrbansim.readFacilities(facilities, zones);
+		
+		Population oldPopulation = null;
+		Population newPopulation = new ScenarioImpl().getPopulation();
+		// read urbansim persons.  Generates hwh acts as side effect
+		readFromUrbansim.readPersons( oldPopulation, newPopulation, facilities, null, sampleRate );
+		
+		int populationCountLowerBorder = (int) (this.popSize * 0.05);
+		int populationCountUpperBorder = (int) (this.popSize * 0.2);
+		
+		int populationActualCount = newPopulation.getPersons().size();
+		
+		return (populationActualCount >= populationCountLowerBorder && populationActualCount <= populationCountUpperBorder);
+	}
+	
+	/**
+	 * creates person table
+	 * @param directory poits to the directory were to store the test input file
+	 * @param fileName name of the test input file
+	 * @return boolean indicates wether the creation of the test input file was successful
+	 */
+	private boolean createPersonInputTestFile(String directory, String fileName){
+		
+		int personID = 1;
+		int home_ID = 1;
+		int work_ID = 0;
+		
+		// create header line
+		StringBuffer testFileContent = new StringBuffer();
+		
+		// create header line
+		testFileContent.append( Constants.PERSON_ID + Constants.TAB + 
+								Constants.PARCEL_ID_HOME + Constants.TAB + 
+								Constants.PARCEL_ID_WORK + Constants.NEW_LINE);
+		
+		// build person table >> person_id	parcel_id_home	parcel_id_work
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		home_ID++;
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		home_ID++;
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		home_ID++;
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		home_ID++;
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		home_ID++;
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		home_ID++;
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		home_ID++;
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		home_ID++;
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		home_ID++;
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		home_ID++;
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		
+		this.popSize = personID;
+		
+		return testFileWiter(directory, fileName, testFileContent);
+	}
+	
+	/**
+	 * returns id's from 1 - 11 via modulo operation
+	 * @param workID
+	 * @return
+	 */
+	private int getNextWorkID(int workID){
+		
+		return (workID % 11)+1;
+	}
+	
+	/**
 	 * create a test parcel data set table 
 	 * @param directory poits to the directory were to store the test input file
 	 * @param fileName name of the test input file
 	 * @return boolean indicates wether the creation of the test input file was successful
 	 */
-	private boolean createInputTestFile(String directory, String fileName){
+	private boolean createParcelInputTestFile(String directory, String fileName){
 		
 		// test file will contain four zones:
 		// zone1 will have 4 facilities located at coordinates
@@ -186,6 +422,18 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		// put in zone 4 >> pracel_id	x_coordinate	y_coordinate	zone_id
 		testFileContent.append( "11" + Constants.TAB + "150" + Constants.TAB + "50" + Constants.TAB + "4" + Constants.NEW_LINE);
 		
+		return testFileWiter(directory, fileName, testFileContent);
+	}
+	
+	/**
+	 * writes the content of a created test file into a file
+	 * @param directory
+	 * @param fileName
+	 * @param testFileContent
+	 * @return ture if successful, flase otherwise
+	 */
+	private boolean testFileWiter(String directory, String fileName, StringBuffer testFileContent){
+		
 		FileWriter fileStream;
 		BufferedWriter bufferedOutput;
 		// write test input file into temp directory
@@ -206,6 +454,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 			return false;
 		}
 		return true;
+		
 	}
 }
 

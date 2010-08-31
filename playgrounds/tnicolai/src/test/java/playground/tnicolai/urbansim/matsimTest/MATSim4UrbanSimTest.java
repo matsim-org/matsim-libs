@@ -93,7 +93,7 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 	 */
 	private void testRun(String matsimConfigFileLocation){
 		log.info("Starting MATSim4UrbanSim with args = " + matsimConfigFileLocation);
-		String [] args = new String[]{matsimConfigFileLocation};
+		String [] args = new String[]{matsimConfigFileLocation}; // create progam arguments for MATSim
 		
 		MATSim4Urbansim.main(args);
 	}
@@ -104,6 +104,7 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 	 */
 	private void allocateUrbanSimDataForMATSimRun(String urbanSimDataPath){
 		
+		// set temp directory as opus_home
 		Constants.setOpusHomeDirectory(System.getProperty("java.io.tmpdir"));
 		// create temp directories
 		TempDirectoryUtil.createDirectories();
