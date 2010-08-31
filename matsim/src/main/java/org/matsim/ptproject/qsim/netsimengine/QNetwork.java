@@ -42,7 +42,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
  * @author mrieser
  * @author dgrether
  */
-public class QNetwork implements VisNetwork, QNetworkI {
+public final class QNetwork implements VisNetwork, QNetworkI {
 
 	private final Map<Id, QLinkInternalI> links;
 
@@ -51,36 +51,42 @@ public class QNetwork implements VisNetwork, QNetworkI {
 	private final Network networkLayer;
 
 	private final QNetworkFactory<QNode, QLinkInternalI> queueNetworkFactory;
-	
+
 	private QSim qSim ;
 	private QSimEngineImpl qSimEngine ;
 
-	public QNetwork(final QSim qs) {
+	/**
+	 * This is deliberately package-private.  Please use the factory
+	 */
+	QNetwork(final QSim qs) {
 		this(qs, new DefaultQNetworkFactory() ) ;
 	}
 
-	public QNetwork(final QSim qs, final QNetworkFactory<QNode, QLinkInternalI> factory ) {
+	/**
+	 * This is deliberately package-private.  Please use the factory
+	 */
+	QNetwork(final QSim qs, final QNetworkFactory<QNode, QLinkInternalI> factory ) {
 		this.qSim = qs ;
-    this.networkLayer = qs.getScenario().getNetwork();
-    this.queueNetworkFactory = factory;
-    this.links = new LinkedHashMap<Id, QLinkInternalI>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
-    this.nodes = new LinkedHashMap<Id, QNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.networkLayer = qs.getScenario().getNetwork();
+		this.queueNetworkFactory = factory;
+		this.links = new LinkedHashMap<Id, QLinkInternalI>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.nodes = new LinkedHashMap<Id, QNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 	}
 
-	
+
 	public void initialize(QSimEngine simEngine) {
 		this.qSimEngine = (QSimEngineImpl) simEngine ;
 		this.qSimEngine.setQNetwork( this ) ;
-    for (Node n : networkLayer.getNodes().values()) {
-      this.nodes.put(n.getId(), this.queueNetworkFactory.createQueueNode(n, simEngine));
-    }
-    for (Link l : networkLayer.getLinks().values()) {
-      this.links.put(l.getId(), this.queueNetworkFactory.createQueueLink(l, simEngine, this.nodes.get(l.getToNode().getId())));
-    }
-    for (QNode n : this.nodes.values()) {
-      n.init();
-    }
-  }
+		for (Node n : networkLayer.getNodes().values()) {
+			this.nodes.put(n.getId(), this.queueNetworkFactory.createQueueNode(n, simEngine));
+		}
+		for (Link l : networkLayer.getLinks().values()) {
+			this.links.put(l.getId(), this.queueNetworkFactory.createQueueLink(l, simEngine, this.nodes.get(l.getToNode().getId())));
+		}
+		for (QNode n : this.nodes.values()) {
+			n.init();
+		}
+	}
 
 	public Network getNetwork() {
 		return this.networkLayer;
@@ -110,6 +116,6 @@ public class QNetwork implements VisNetwork, QNetworkI {
 		return this.nodes.get(id);
 	}
 
-  
+
 
 }

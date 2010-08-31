@@ -61,6 +61,7 @@ import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.ptproject.qsim.interfaces.QNetworkI;
 import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.interfaces.QSimEngineFactory;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
@@ -173,17 +174,17 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		this.netEngine = (QSimEngineImpl) simEngineFac.createQSimEngine(this, MatsimRandom.getRandom());
 
 		// create the QNetwork ...
-		QNetwork network = null ;
+		QNetworkI network = null ;
 		if (sc.getConfig().scenario().isUseLanes()) {
 			if (((ScenarioImpl)sc).getLaneDefinitions() == null) {
 				throw new IllegalStateException("Lane definitions have to be set if feature is enabled!");
 			}
 			log.info("Lanes enabled...");
-			network = new QNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(),
+			network = DefaultQNetworkFactory.createQNetwork(this, new QLanesNetworkFactory(new DefaultQNetworkFactory(),
 					((ScenarioImpl)sc).getLaneDefinitions()));
 		}
 		else {
-			network = new QNetwork(this);
+			network = DefaultQNetworkFactory.createQNetwork(this);
 		}
 
 		// then tell the QNetwork to use the simEngine (this also creates qlinks and qnodes)

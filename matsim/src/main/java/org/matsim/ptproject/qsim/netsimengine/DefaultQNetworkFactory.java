@@ -21,7 +21,9 @@ package org.matsim.ptproject.qsim.netsimengine;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.QNetworkFactory;
+import org.matsim.ptproject.qsim.interfaces.QNetworkI;
 import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 
 
@@ -39,6 +41,14 @@ public final class DefaultQNetworkFactory implements QNetworkFactory<QNode, QLin
 	 */
 	public QNode createQueueNode(final Node node, QSimEngine simEngine) {
 		return new QNode(node, simEngine);
+	}
+
+	public static QNetworkI createQNetwork(QSim qs, QNetworkFactory<QNode, QLinkInternalI> factory) {
+		return new QNetwork(qs, factory);
+	}
+
+	public static QNetworkI createQNetwork(QSim qs) {
+		return new QNetwork(qs);
 	}
 
 }

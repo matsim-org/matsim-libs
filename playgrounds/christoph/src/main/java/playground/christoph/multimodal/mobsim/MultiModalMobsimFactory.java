@@ -30,7 +30,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.ptproject.qsim.ParallelQSimFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
+import org.matsim.ptproject.qsim.interfaces.QNetworkI;
+import org.matsim.ptproject.qsim.netsimengine.DefaultQNetworkFactory;
 
 import playground.christoph.multimodal.mobsim.netsimengine.MultiModalDepartureHandler;
 import playground.christoph.multimodal.mobsim.netsimengine.MultiModalQNetworkFactory;
@@ -94,7 +95,10 @@ public class MultiModalMobsimFactory implements MobsimFactory {
 		 *  set the QNetworkFactory in the QSim.
 		 */
 		log.info("Replacing QNetwork...");
-		QNetwork network = new QNetwork((QSim)sim, new MultiModalQNetworkFactory(multiModalTravelTime));
+		QNetworkI network = DefaultQNetworkFactory.createQNetwork((QSim)sim, new MultiModalQNetworkFactory(multiModalTravelTime));
+		// yyyy It is, I have to admint, not clear to me why this works, since the network will know the correct
+		// qsim, but the qsim will not know the correct network (or will it???).  kai, aug'10
+		// Well, the qSimEngine will have to correct network.  Weird.  kai, aug'10
 
 		// then tell the QNetwork to use the simEngine (this also creates qlinks and qnodes)
 		network.initialize(((QSim)sim).getQSimEngine());

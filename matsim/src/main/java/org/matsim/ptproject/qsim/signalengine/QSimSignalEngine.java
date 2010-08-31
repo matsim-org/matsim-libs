@@ -34,11 +34,11 @@ import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.QNetworkI;
 import org.matsim.ptproject.qsim.interfaces.SimEngine;
 import org.matsim.ptproject.qsim.netsimengine.QLane;
 import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
-import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.signalsystems.config.AdaptivePlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
@@ -79,7 +79,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
 
 	private SignalSystemConfigurations signalSystemsConfig;
 
-	private QNetwork qNetwork;
+	private QNetworkI qNetwork;
 
 	private QSim qSimulation;
 
