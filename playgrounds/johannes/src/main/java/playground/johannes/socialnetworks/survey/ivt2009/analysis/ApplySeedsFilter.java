@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Estimator.java
+ * ApplySeedsFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,35 +17,56 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
+
+import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 
 /**
- * A ProbabilityEstimator estimates the inclusion probability of a vertex in a
- * snowball sample.
- * 
  * @author illenberger
- * 
+ *
  */
-public interface ProbabilityEstimator {
+public class ApplySeedsFilter implements GraphFilter<SampledGraph> {
 
-	/**
-	 * Notifies the estimator that the sample has changed.
-	 * 
-	 * @param graph
-	 *            the sampled snwoball graph
+	/* (non-Javadoc)
+	 * @see playground.johannes.socialnetworks.graph.analysis.GraphFilter#apply(org.matsim.contrib.sna.graph.Graph)
 	 */
-	public void update(SampledGraph graph);
+	@Override
+	public SampledGraph apply(SampledGraph graph) {
+		Set<SampledVertex> neighbors = new HashSet<SampledVertex>();
+		neighbors.addAll(SnowballPartitions.createSampledPartition(graph.getVertices(), 0));
+		
+		for(SampledVertex vertex : neighbors) {
+			vertex.setSeed(vertex);
+		}
+		
+		while(!neighbors.isEmpty()) {
+			Set<SampledVertex> newNeighbors = new HashSet<SampledVertex>();
+			for(SampledVertex vertex : neighbors) {
+				expand(vertex, newNeighbors);
+			}
+			
+			neighbors = newNeighbors;
+		}
+		
+		return graph;
+	}
 
-	/**
-	 * Returns the inclusion probability of a vertex in the snowball sample.
-	 * 
-	 * @param vertex
-	 *            a sampled vertex
-	 * @return the inclusion probability of a vertex in the snowball sample.
-	 */
-	public double getProbability(SampledVertex vertex);
-
+	private void expand(SampledVertex ego, Set<SampledVertex> neighbors) {
+		int it = ego.getIterationSampled();
+		for(SampledVertex neighbor : ego.getNeighbours()) {
+			if(neighbor.getIterationDetected() == it) {
+				if(neighbor.getSeed() == null)
+					neighbor.setSeed(ego.getSeed());
+				if(neighbor.isSampled())
+					neighbors.add(neighbor);
+			}
+		}
+	}
 }

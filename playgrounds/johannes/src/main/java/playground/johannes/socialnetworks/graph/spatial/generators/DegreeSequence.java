@@ -41,7 +41,7 @@ public class DegreeSequence implements EdgeProbabilityFunction {
 	
 	@Override
 	public double probability(int i, int j) {
-		return kSequence[i]/(double)N;
+		return 2 * kSequence[i]/(double)N;
 	}
 
 }

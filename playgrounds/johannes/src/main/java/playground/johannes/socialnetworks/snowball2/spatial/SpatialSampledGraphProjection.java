@@ -25,9 +25,9 @@ import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 
 /**
  * Extension of {@link SampledGraphProjection} that implements

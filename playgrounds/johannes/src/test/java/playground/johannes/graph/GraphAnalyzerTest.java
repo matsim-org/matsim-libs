@@ -25,10 +25,10 @@ import junit.framework.TestCase;
 
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask;
 
 /**

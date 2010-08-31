@@ -56,7 +56,7 @@ public class BarabasiAlbertGenerator<G extends Graph, V extends Vertex, E extend
 		this.builder = factory;
 	}
 	
-	public Graph generate(int m_0, int m, int t, long randomSeed) {
+	public G generate(int m_0, int m, int t, long randomSeed) {
 		if(m_0 < 1)
 			throw new IllegalArgumentException("Number of initial nodes (m_0) must be m_0 >= 2!");
 		if(m > m_0)

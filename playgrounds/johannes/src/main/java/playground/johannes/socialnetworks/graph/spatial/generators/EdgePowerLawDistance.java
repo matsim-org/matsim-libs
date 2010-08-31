@@ -50,14 +50,14 @@ public class EdgePowerLawDistance implements EdgeProbabilityFunction {
 		distanceCalculator = new CartesianDistanceCalculator();
 		
 		konst = 1;
-//		double sum = 0;
-//		for(int i = 0; i < y.getVertexCount(); i++) {
-//			for(int j = i+1; j < y.getVertexCount(); j++) {
-//				sum += probability(i, j);
-//			}
-//		}
-//		
-//		konst = mExpect/sum;
+		double sum = 0;
+		for(int i = 0; i < y.getVertexCount(); i++) {
+			for(int j = i+1; j < y.getVertexCount(); j++) {
+				sum += probability(i, j);
+			}
+		}
+		
+		konst = mExpect/sum;
 	}
 	
 	@Override

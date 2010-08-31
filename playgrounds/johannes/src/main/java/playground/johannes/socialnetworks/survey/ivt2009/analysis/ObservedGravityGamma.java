@@ -26,9 +26,9 @@ import java.util.Set;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
 import playground.johannes.socialnetworks.graph.spatial.analysis.GravityGamma;
-import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
 
 /**
  * @author illenberger

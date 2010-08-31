@@ -22,12 +22,21 @@ package playground.johannes.socialnetworks.graph.spatial.analysis;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
+import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.math.Distribution;
 
+import playground.johannes.socialnetworks.gis.BeelineCostFunction;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
+import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
+import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -63,5 +72,27 @@ public class Accessability {
 		}
 		
 		return values;
+	}
+	
+	public static void main(String args[]) {
+		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
+		SpatialGraph graph = reader.read("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
+		
+		Set<Point> points = new HashSet<Point>();
+		for(SpatialVertex vertex: graph.getVertices())
+			points.add(vertex.getPoint());
+		
+		BeelineCostFunction func = new BeelineCostFunction();
+		func.setDistanceCalculator(new CartesianDistanceCalculator());
+		
+		TObjectDoubleHashMap<SpatialVertex> values = new Accessability().values(graph.getVertices(), func, points);
+		
+		SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
+		KMLIconVertexStyle style = new KMLIconVertexStyle(graph);
+		
+		style.setVertexColorizer(new NumericAttributeColorizer(values));
+		writer.setKmlVertexStyle(style);
+		writer.addKMZWriterListener(style);
+		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/plans/acces.kmz");
 	}
 }

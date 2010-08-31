@@ -22,8 +22,8 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.snowball.SampledGraphProjectionFactory;
 
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionFactory;
 
 
 /**

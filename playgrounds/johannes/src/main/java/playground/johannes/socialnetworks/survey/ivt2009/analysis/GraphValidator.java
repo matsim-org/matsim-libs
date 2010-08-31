@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Composite.java
+ * GraphValidator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,24 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.utils;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.matsim.contrib.sna.graph.Graph;
 
 /**
  * @author illenberger
  *
  */
-public abstract class Composite<T> {
+public interface GraphValidator<G extends Graph> {
 
-	protected List<T> components = new ArrayList<T>();
+	public boolean validate(G graph);
 	
-	public void addComponent(T component) {
-		components.add(component);
-	}
-	
-	public void removeComponent(T component) {
-		components.remove(component);
-	}
 }

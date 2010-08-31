@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialSampledGraphProjection.java
+ * SpatialSparseVertexPool.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,42 +17,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.social;
+package playground.johannes.socialnetworks.graph.social.io;
 
+import java.util.LinkedList;
 import java.util.Set;
 
-import org.matsim.contrib.sna.snowball.SampledGraphProjection;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.population.PersonImpl;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphFactory;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
- * @author illenberger
+ * @author jillenberger
  *
  */
-public class SocialSampledGraphProjection<G extends SocialGraph, V extends SocialVertex, E extends SocialEdge> extends SampledGraphProjection<G, V , E> implements SocialGraph {
+public class SocialSparseVertexPool extends SocialSparseGraphFactory {
 
-	public SocialSampledGraphProjection(G delegate) {
-		super(delegate);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends SocialSampledEdgeDecorator<E>> getEdges() {
-		return (Set<? extends SocialSampledEdgeDecorator<E>>) super.getEdges();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends SocialSampledVertexDecorator<V>> getVertices() {
-		return (Set<? extends SocialSampledVertexDecorator<V>>) super.getVertices();
+	private LinkedList<Person> persons;
+	
+	private GeometryFactory geoFactory;
+	/**
+	 * @param crs
+	 */
+	public SocialSparseVertexPool(Set<? extends Person> persons, CoordinateReferenceSystem crs) {
+		super(crs);
+		this.persons = new LinkedList<Person>(persons);
+		geoFactory = new GeometryFactory();
 	}
 
 	@Override
-	public CoordinateReferenceSystem getCoordinateReferenceSysten() {
-		return getDelegate().getCoordinateReferenceSysten();
+	public SocialSparseVertex createVertex() {
+		Person person = persons.poll();
+		if(person == null)
+			return null;
+		else {
+			Activity act = (Activity) person.getSelectedPlan().getPlanElements().get(0);
+			SocialPerson sPerson = new SocialPerson((PersonImpl) person);
+			return super.createVertex(sPerson, geoFactory.createPoint(new Coordinate(act.getCoord().getX(), act.getCoord().getY())));
+		}
 	}
 
 }

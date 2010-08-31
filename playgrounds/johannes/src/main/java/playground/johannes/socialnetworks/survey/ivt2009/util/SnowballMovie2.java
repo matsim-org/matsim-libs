@@ -29,22 +29,22 @@ import net.opengis.kml._2.FolderType;
 
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.VertexDecorator;
+import org.matsim.contrib.sna.graph.analysis.VertexFilter;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
 import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
 import org.matsim.contrib.sna.graph.spatial.io.KMLPartitions;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.sna.snowball.sim.Sampler;
+import org.matsim.contrib.sna.snowball.sim.SamplerListener;
+import org.matsim.contrib.sna.snowball.sim.SamplerListenerComposite;
 
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.io.SeedColorizer;
-import playground.johannes.socialnetworks.snowball2.sim.Sampler;
-import playground.johannes.socialnetworks.snowball2.sim.SamplerListener;
-import playground.johannes.socialnetworks.snowball2.sim.SamplerListenerComposite;
-import playground.johannes.socialnetworks.snowball2.sim.VertexPartition;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledEdgeDecorator;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
@@ -89,13 +89,13 @@ public class SnowballMovie2 {
 		final SocialSampledVertexDecorator<SocialSparseVertex> seed1 = getSeed("207");
 		final SocialSampledVertexDecorator<SocialSparseVertex> seed2 = getSeed("845");
 		
-		VertexPartition seedGenerator = new VertexPartition() {
+		VertexFilter seedGenerator = new VertexFilter() {
 			
 			@Override
-			public <V extends Vertex> Set<V> partition(Set<V> vertices) {
-				Set<V> seeds = new java.util.HashSet<V>();
-				seeds.add((V) seed1);
-				seeds.add((V) seed2);
+			public Set apply(Set vertices) {
+				Set seeds = new java.util.HashSet();
+				seeds.add(seed1);
+				seeds.add(seed2);
 				return seeds;
 			}
 		};

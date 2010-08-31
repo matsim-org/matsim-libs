@@ -33,6 +33,7 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
 
 
 /**

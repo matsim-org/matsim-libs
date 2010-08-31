@@ -20,6 +20,7 @@
 package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
 import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
+import org.matsim.contrib.sna.graph.GraphFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
@@ -33,6 +34,13 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class SocialSparseGraphBuilder extends AbstractSparseGraphBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> {
 
+	/**
+	 * @param factory
+	 */
+	public SocialSparseGraphBuilder(GraphFactory<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> factory) {
+		super(factory);
+	}
+
 	public SocialSparseGraphBuilder(CoordinateReferenceSystem crs) {
 		super(new SocialSparseGraphFactory(crs));
 	}
@@ -43,7 +51,12 @@ public class SocialSparseGraphBuilder extends AbstractSparseGraphBuilder<SocialS
 
 	@Override
 	public SocialSparseVertex addVertex(SocialSparseGraph g) {
-		throw new UnsupportedOperationException("Use addVertex(SampledSocialGraph, SocialPerson, Point) instead.");
+//		throw new UnsupportedOperationException("Use addVertex(SampledSocialGraph, SocialPerson, Point) instead.");
+		SocialSparseVertex vertex = ((SocialSparseGraphFactory)getFactory()).createVertex();
+		if(insertVertex(g, vertex))
+			return vertex;
+		else
+			return null;
 	}
 	
 	public SocialSparseVertex addVertex(SocialSparseGraph graph, SocialPerson person, Point point) {

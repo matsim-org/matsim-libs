@@ -22,11 +22,11 @@ package playground.johannes.socialnetworks.snowball2.analysis;
 import java.io.IOException;
 
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;

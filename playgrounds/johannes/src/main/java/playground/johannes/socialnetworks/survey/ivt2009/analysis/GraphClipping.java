@@ -23,13 +23,13 @@ import java.io.IOException;
 
 import org.geotools.feature.Feature;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.sna.snowball.SampledGraphProjectionBuilder;
 
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.analysis.GraphClippingFilter;
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLWriter;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;

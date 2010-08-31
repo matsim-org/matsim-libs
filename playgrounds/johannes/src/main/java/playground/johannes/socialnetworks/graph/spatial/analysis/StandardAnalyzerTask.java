@@ -23,12 +23,12 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
 import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 
 /**
  * @author illenberger

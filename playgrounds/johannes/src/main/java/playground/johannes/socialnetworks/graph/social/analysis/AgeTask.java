@@ -29,6 +29,7 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.math.Distribution;
 
+import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
@@ -46,6 +47,8 @@ public class AgeTask extends ModuleAnalyzerTask<Age> {
 	
 	public static final String AGE_MAX = "age_max";
 	
+	public static final String AGE_CORRELATION = "r_age";
+	
 	public AgeTask() {
 		setModule(new Age());
 	}
@@ -59,11 +62,13 @@ public class AgeTask extends ModuleAnalyzerTask<Age> {
 		double age_min = distr.min();
 		double age_max = distr.max();
 		double age_mean = distr.mean();
+		double r_age = age.correlationCoefficient((Set<? extends SocialEdge>) graph.getEdges());
 		
-		logger.info(String.format("Mean age = %1$.4f, min age = %2$s, max age = %3$s.", age_mean, age_min, age_max));
+		logger.info(String.format("Mean age = %1$.4f, min age = %2$s, max age = %3$s, r_age = %4$s.", age_mean, age_min, age_max, r_age));
 		stats.put(AGE_MIN, age_min);
 		stats.put(AGE_MAX, age_max);
 		stats.put(AGE_MEAN, age_mean);
+		stats.put(AGE_CORRELATION, r_age);
 		
 		if(getOutputDirectory() != null) {
 			try {

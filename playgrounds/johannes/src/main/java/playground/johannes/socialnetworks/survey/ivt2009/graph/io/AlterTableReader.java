@@ -43,7 +43,7 @@ public class AlterTableReader {
 	
 	private List<Tuple<VertexRecord, VertexRecord>> edgeList;
 	
-	private int dummyIdCounter = 10000000;
+	private int dummyIdCounter = 1000000;
 	
 	public class VertexRecord {
 		
@@ -74,6 +74,7 @@ public class AlterTableReader {
 				String[] tokens = line.split("\t");
 				String egoSQLId = tokens[0];
 				String egoId = tokens[1].substring(tokens[1].lastIndexOf(" ") + 1);
+								
 				String alterKey = tokens[2];
 				
 				String alterId;
@@ -85,7 +86,6 @@ public class AlterTableReader {
 					alterId = createDummyId();
 				else
 					alterId = tokens[10];
-
 				/*
 				 * find ego
 				 */
@@ -111,8 +111,6 @@ public class AlterTableReader {
 				 * find alter
 				 */
 				VertexRecord alter = vertexList.get(alterId);
-				if(alterId.equalsIgnoreCase("10434"))
-					System.err.println();
 				
 				if(alter == null) {
 					alter = new VertexRecord();

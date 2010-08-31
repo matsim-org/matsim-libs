@@ -32,13 +32,13 @@ import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
 import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.sna.snowball.SampledGraphProjectionBuilder;
+import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 import org.matsim.core.population.PersonImpl;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionBuilder;
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLWriter;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;

@@ -27,16 +27,16 @@ import java.util.Set;
 import net.opengis.kml._2.FolderType;
 
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.FixedSizeRandomPartition;
+import org.matsim.contrib.sna.graph.analysis.RandomPartition;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.graph.spatial.io.KMLPartitions;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
+import org.matsim.contrib.sna.snowball.sim.Sampler;
 
-import playground.johannes.socialnetworks.snowball2.sim.RandomResponse;
-import playground.johannes.socialnetworks.snowball2.sim.RandomSeedGenerator;
-import playground.johannes.socialnetworks.snowball2.sim.Sampler;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLTimeSpan;
 import playground.johannes.socialnetworks.snowball2.spatial.io.TimeTagger2;
 
@@ -59,8 +59,8 @@ public class SnowballMovie {
 		 * Run sampler
 		 */
 		Sampler<SpatialGraph, SpatialVertex, SpatialEdge> sampler = new Sampler<SpatialGraph, SpatialVertex, SpatialEdge>();
-		sampler.setResponseGenerator(new RandomResponse(1, 0));
-		sampler.setSeedGenerator(new RandomSeedGenerator(10, 0));
+		sampler.setResponseGenerator(new RandomPartition(1, 0));
+		sampler.setSeedGenerator(new FixedSizeRandomPartition(10, 0));
 //		final IterationTimeTagger tagger = new IterationTimeTagger();
 //		sampler.setListener(tagger);
 		

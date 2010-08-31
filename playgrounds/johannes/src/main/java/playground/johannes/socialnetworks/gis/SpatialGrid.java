@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.graph.spatial;
+package playground.johannes.socialnetworks.gis;
 
 import java.io.IOException;
 import java.util.Stack;
@@ -31,6 +31,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.xml.sax.Attributes;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 /**
@@ -93,24 +95,24 @@ public class SpatialGrid<T> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public T getValue(Coord coord) {
-		if(isInBounds(coord))
-			return (T)matrix[getRow(coord.getX())][getColumn(coord.getY())];
+	public T getValue(Point point) {
+		if(isInBounds(point))
+			return (T)matrix[getRow(point.getX())][getColumn(point.getY())];
 		else
 			return null;
 	}
 	
-	public boolean setValue(T value, Coord coord) {
-		if(isInBounds(coord)) {
-			matrix[getRow(coord.getX())][getColumn(coord.getY())] = value;
+	public boolean setValue(T value, Point point) {
+		if(isInBounds(point)) {
+			matrix[getRow(point.getX())][getColumn(point.getY())] = value;
 			return true;
 		} else
 			return false;
 	}
 	
-	public boolean isInBounds(Coord coord) {
-		return coord.getX() >= minX && coord.getX() <= maxX &&
-				coord.getY() >= minY && coord.getY() <= maxY;
+	public boolean isInBounds(Point point) {
+		return point.getX() >= minX && point.getX() <= maxX &&
+				point.getY() >= minY && point.getY() <= maxY;
 	}
 	
 	@SuppressWarnings("unchecked")

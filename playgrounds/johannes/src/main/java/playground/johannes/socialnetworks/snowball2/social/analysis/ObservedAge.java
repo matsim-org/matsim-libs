@@ -23,9 +23,10 @@ import gnu.trove.TDoubleDoubleHashMap;
 
 import java.util.Set;
 
+import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
+
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.social.analysis.Age;
-import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledVertexDecorator;
 
 /**

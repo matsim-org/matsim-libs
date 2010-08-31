@@ -25,6 +25,7 @@ import java.util.Map;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;

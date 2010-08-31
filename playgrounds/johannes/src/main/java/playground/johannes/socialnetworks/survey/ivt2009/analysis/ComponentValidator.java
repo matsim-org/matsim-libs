@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IterationSampleAnalyzer.java
+ * ComponentValidator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,48 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
+import org.matsim.contrib.sna.graph.analysis.Components;
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger
  *
  */
-public class IterationSampleAnalyzer extends SampleAnalyzer {
+public class ComponentValidator implements GraphValidator<SampledGraph> {
 
-	private int lastIteration;
-
-	public IterationSampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<ProbabilityEstimator> estimators, String output) {
-		super(tasks, estimators, output);
-		lastIteration = 0;
-	}
-	
+	/* (non-Javadoc)
+	 * @see playground.johannes.socialnetworks.survey.ivt2009.analysis.GraphValidator#validate(org.matsim.contrib.sna.graph.Graph)
+	 */
 	@Override
-	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
-		return true;
-	}
-
-	@Override
-	public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
-		if(sampler.getIteration() > lastIteration) {
-			File file = makeDirectories(String.format("%1$s/it.%2$s", getRootDirectory(), lastIteration));
-			analyse(sampler.getSampledGraph(), file.getAbsolutePath());
-			lastIteration = sampler.getIteration();
+	public boolean validate(SampledGraph graph) {
+		Components components = new Components();
+		List<Set<SampledVertex>> comps = components.components(graph);
+		
+		for(Set<SampledVertex> comp : comps) {
+			boolean found = false;
+			for(SampledVertex vertex : comp) {
+				if(vertex.isSampled() && vertex.getIterationSampled() == 0) {
+					found = true;
+					break;
+				}
+			}
+			
+			if(!found)
+//				return false;
+				System.err.println("No seed");
 		}
 		
 		return true;
 	}
-
-	@Override
-	public void endSampling(Sampler<?, ?, ?> sampler) {
-	}
-	
 
 }

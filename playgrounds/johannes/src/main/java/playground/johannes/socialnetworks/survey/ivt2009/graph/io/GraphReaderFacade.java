@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraphProjectionBuilder.java
+ * GraphReaderFacade.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2;
+package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphProjectionBuilder;
-import org.matsim.contrib.sna.graph.GraphProjectionFactory;
-import org.matsim.contrib.sna.graph.Vertex;
+import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
+import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
+import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraphProjectionBuilder<G extends Graph, V extends Vertex, E extends Edge> extends
-		GraphProjectionBuilder<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> {
-	
-	public SampledGraphProjectionBuilder() {
-		super(new SampledGraphProjectionFactory<G, V, E>());
-	}
+public class GraphReaderFacade {
 
-	/**
-	 * @param factory
-	 */
-	public SampledGraphProjectionBuilder(
-			GraphProjectionFactory<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> factory) {
-		super(factory);
-		// TODO Auto-generated constructor stub
+	public static SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> read(String filename) {
+		SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> reader =
+			new SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(new SocialSparseGraphMLReader());
+		reader.setGraphProjectionBuilder(new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>());
+		return (SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>) reader.readGraph(filename);
 	}
 }

@@ -30,13 +30,17 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
+import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.sna.graph.spatial.io.VertexDegreeColorizer;
+import org.matsim.contrib.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLWriter;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
@@ -44,6 +48,7 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.AlterTableReader.VertexRecord;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.io.GraphML2KML.SampledPartition;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -258,21 +263,31 @@ public class GraphBuilder {
 		GraphBuilder builder = new GraphBuilder();
 		
 		ArrayList<String> alterTables = new ArrayList<String>();
-		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/05-2010/SubSample1.fixed.txt");
-		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/05-2010/SubSample2.txt");
+		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/alters1.fixed.txt");
+		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/alters2.txt");
 		
 		ArrayList<String> egoTables = new ArrayList<String>();
-		egoTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/03-2010/SubSample1/egos.txt");
-		egoTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/03-2010/SubSample2/egos.txt");
+		egoTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/egos1.txt");
+		egoTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/egos2.txt");
 		
 		ArrayList<String> sqlDumps = new ArrayList<String>();
-		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/05-2010/snowball.csv");
+		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/snowball.csv");
 //		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/sqlDumpSub2.csv");
 		
 		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = builder.buildGraph(alterTables, egoTables, sqlDumps);
 		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SocialGraphMLWriter());
-		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/05-2010/graph/graph.graphml");
+		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/graph/graph.graphml");
 		
+//		SpatialGraphKMLWriter writer2 = new SpatialGraphKMLWriter();
+//		writer2.setKmlPartitition(new SampledPartition());
+//		writer2.setDrawEdges(false);
+//		KMLIconVertexStyle style = new KMLIconVertexStyle(graph);
+//		VertexDegreeColorizer colorizer = new VertexDegreeColorizer(graph);
+//		colorizer.setLogscale(true);
+//		style.setVertexColorizer(colorizer);
+//		writer2.setKmlVertexStyle(style);
+//		writer2.addKMZWriterListener(style);
+//		writer2.write((SpatialGraph) graph, args[1]);
 //		GraphAnalyzer.analyze(graph, new ObservedAnalyzerTask());
 	}
 }

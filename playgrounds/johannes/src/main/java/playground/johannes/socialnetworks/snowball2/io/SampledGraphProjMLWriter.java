@@ -26,12 +26,12 @@ import java.util.List;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.io.GraphMLWriter;
+import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 import org.matsim.contrib.sna.snowball.io.SampledGraphML;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 
 /**
  * @author illenberger

@@ -40,6 +40,9 @@ public class ErgmEdgeProba extends ErgmTerm {
 	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
 		double p = probaFunction.probability(i, j);
 
-		return (1 - p) / p;
+		if(p == 0)
+			return Double.POSITIVE_INFINITY;
+		else
+			return (1 - p) / p;
 	}
 }

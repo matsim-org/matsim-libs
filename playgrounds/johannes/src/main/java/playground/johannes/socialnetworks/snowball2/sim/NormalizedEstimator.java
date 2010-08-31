@@ -21,6 +21,7 @@ package playground.johannes.socialnetworks.snowball2.sim;
 
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
 
 /**
  * This estimator normalizes the estimates from a delegate estimator such that
@@ -77,7 +78,9 @@ public class NormalizedEstimator implements ProbabilityEstimator {
 		double sum = 0;
 		for (SampledVertex vertex : graph.getVertices()) {
 			if (vertex.isSampled()) {
-				sum += 1 / delegate.getProbability(vertex);
+				double p = delegate.getProbability(vertex);
+				if(p > 0)
+					sum += 1 / p;
 			}
 		}
 

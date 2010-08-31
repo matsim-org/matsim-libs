@@ -28,6 +28,7 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Transitivity;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
 
 /**

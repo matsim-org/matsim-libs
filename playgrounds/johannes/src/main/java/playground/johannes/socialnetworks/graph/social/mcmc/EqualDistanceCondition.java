@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraphProjectionFactory.java
+ * EqualDistanceCondition.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2;
+package playground.johannes.socialnetworks.graph.social.mcmc;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphProjectionFactory;
-import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.graph.mcmc.EdgeSwitchCondition;
+import playground.johannes.socialnetworks.statistics.Discretizer;
+import playground.johannes.socialnetworks.statistics.LinearDiscretizer;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraphProjectionFactory<G extends Graph, V extends Vertex, E extends Edge> implements
-		GraphProjectionFactory<G, V, E, SampledGraphProjection<G, V, E>, SampledVertexDecorator<V>, SampledEdgeDecorator<E>> {
+public class EqualDistanceCondition implements EdgeSwitchCondition {
 
+	private DistanceCalculator calculator = new CartesianDistanceCalculator();
+	
+	private Discretizer discretizer = new LinearDiscretizer(1000);
+	
+	private final double threshold = 0;
+	
 	@Override
-	public SampledEdgeDecorator<E> createEdge(E delegate) {
-		return new SampledEdgeDecorator<E>(delegate);
-	}
-
-	@Override
-	public SampledGraphProjection<G, V, E> createGraph(G delegate) {
-		return new SampledGraphProjection<G, V, E>(delegate);
-	}
-
-	@Override
-	public SampledVertexDecorator<V> createVertex(V delegate) {
-		return new SampledVertexDecorator<V>(delegate);
+	public boolean allowSwitch(AdjacencyMatrix<?> y, int i, int j, int u, int v) {
+		SpatialVertex vi = (SpatialVertex) y.getVertex(i);
+		SpatialVertex vj = (SpatialVertex) y.getVertex(j);
+		SpatialVertex vu = (SpatialVertex) y.getVertex(u);
+		SpatialVertex vv = (SpatialVertex) y.getVertex(v);
+		
+		double d_ij = discretizer.discretize(calculator.distance(vi.getPoint(), vj.getPoint()));
+		double d_uv = discretizer.discretize(calculator.distance(vu.getPoint(), vv.getPoint()));
+		
+		if(Math.abs(d_ij - d_uv) <= threshold)
+			return true;
+		else
+			return false;
 	}
 
 }

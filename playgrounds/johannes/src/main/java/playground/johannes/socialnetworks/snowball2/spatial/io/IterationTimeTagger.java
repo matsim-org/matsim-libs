@@ -23,11 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.snowball.SampledEdgeDecorator;
+import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.sna.snowball.sim.Sampler;
+import org.matsim.contrib.sna.snowball.sim.SamplerListener;
 
-import playground.johannes.socialnetworks.snowball2.SampledEdgeDecorator;
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
-import playground.johannes.socialnetworks.snowball2.sim.Sampler;
-import playground.johannes.socialnetworks.snowball2.sim.SamplerListener;
 
 /**
  * @author illenberger

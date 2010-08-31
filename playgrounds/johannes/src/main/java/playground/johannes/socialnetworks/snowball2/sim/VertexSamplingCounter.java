@@ -39,11 +39,16 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.VertexDecorator;
+import org.matsim.contrib.sna.graph.analysis.FixedSizeRandomPartition;
+import org.matsim.contrib.sna.graph.analysis.RandomPartition;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.sim.Sampler;
+import org.matsim.contrib.sna.snowball.sim.SamplerListener;
 
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 
 /**
  * @author illenberger
@@ -58,6 +63,8 @@ public class VertexSamplingCounter implements SamplerListener {
 	private Map<Vertex, double[]> probaTable;
 	
 	private int[] nsim = new int[maxIters];
+	
+	private int[] n_samples = new int[maxIters];
 	
 	private ProbabilityEstimator estimator;
 	
@@ -75,8 +82,9 @@ public class VertexSamplingCounter implements SamplerListener {
 	
 	public void reset(Graph graph) {
 		lastIteration = 0;
-//		estimator = new Estimator11(graph.getVertices().size());
-		estimator = new Estimator1(graph.getVertices().size());
+		int N = graph.getVertices().size();
+		estimator = new Estimator1(N);
+//		estimator = new NormalizedEstimator(new Estimator1(N), N);
 	}
 	
 	@Override
@@ -87,9 +95,11 @@ public class VertexSamplingCounter implements SamplerListener {
 	@Override
 	public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
 		if(sampler.getIteration() > lastIteration) {
-			int it = sampler.getIteration();;
+			int it = sampler.getIteration();
 			lastIteration = it;
 			nsim[it-1]++;
+			n_samples[it-1] += sampler.getNumSampledVertices();
+			
 			estimator.update(sampler.getSampledGraph());
 			
 			for(VertexDecorator<?> v : sampler.getSampledGraph().getVertices()) {
@@ -118,12 +128,14 @@ public class VertexSamplingCounter implements SamplerListener {
 		SparseGraph graph = reader.readGraph(args[0]);
 		
 		int nSims = Integer.parseInt(args[1]);
+		int seeds = Integer.parseInt(args[3]);
+		double proba = Double.parseDouble(args[4]);
 		
 		VertexSamplingCounter counter = new VertexSamplingCounter(graph);
 		for(int i = 0; i < nSims; i++) {
 			Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>();
-			sampler.setSeedGenerator(new RandomSeedGenerator(10, (long) (Math.random() * nSims)));
-			sampler.setResponseGenerator(new RandomResponse(0.25, (long) (Math.random() * nSims)));
+			sampler.setSeedGenerator(new FixedSizeRandomPartition(seeds, (long) (Math.random() * nSims)));
+			sampler.setResponseGenerator(new RandomPartition(proba, (long) (Math.random() * nSims)));
 			counter.reset(graph);
 			sampler.setListener(counter);
 			sampler.run(graph);
@@ -132,6 +144,8 @@ public class VertexSamplingCounter implements SamplerListener {
 		TIntIntHashMap[] count_k = new TIntIntHashMap[maxIters];
 		TDoubleDoubleHashMap[] p_obs_k = new TDoubleDoubleHashMap[maxIters];
 		TDoubleDoubleHashMap[] p_estim_k = new TDoubleDoubleHashMap[maxIters];
+		double[] mse = new double[maxIters];
+		
 		TIntIntHashMap[] count_estim_k = new TIntIntHashMap[maxIters];
 		
 		List<TIntObjectHashMap<TDoubleArrayList>> k_samples = new ArrayList<TIntObjectHashMap<TDoubleArrayList>>(maxIters);
@@ -140,7 +154,6 @@ public class VertexSamplingCounter implements SamplerListener {
 		}
 		int maxSize = 0;
 		
-		double[] diffs = new double[maxIters];
 		int[] samples = new int[maxIters];
 		for(Vertex v : graph.getVertices()) {
 			int k = v.getNeighbours().size();
@@ -161,11 +174,14 @@ public class VertexSamplingCounter implements SamplerListener {
 					
 					double p_estim = probas[i] / (double) n;
 					double diff = p_obs - p_estim;
-					diffs[i] += diff;
+					double s_error = diff*diff;
 					samples[i]++;
 					
 					p_estim_k[i].adjustOrPutValue(k, p_estim, p_estim);
 					count_estim_k[i].adjustOrPutValue(k, 1, 1);
+					
+					mse[i] += s_error;
+					
 				}
 				
 				
@@ -186,8 +202,12 @@ public class VertexSamplingCounter implements SamplerListener {
 			}
 		}
 		
-		for(int i = 0; i < diffs.length; i++) {
-			diffs[i] = diffs[i] / (double)samples[i];
+		for(int i = 0; i < counter.n_samples.length; i++) {
+			counter.n_samples[i] = (int) (counter.n_samples[i] / (double)counter.nsim[i]);
+		}
+		
+		for(int i = 0; i < mse.length; i++) {
+			mse[i] = mse[i] / (double)samples[i];
 		}
 		
 		for(int i = 0; i < p_obs_k.length; i++) {
@@ -210,13 +230,24 @@ public class VertexSamplingCounter implements SamplerListener {
 			}
 		}
 		
-		BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%1$s/diffs.txt", args[2])));
-		writer.write("it\tp");
+		BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%1$s/n_sampled.txt", args[2])));
+		writer.write("it\tn");
 		writer.newLine();
-		for(int i = 0; i < diffs.length; i++) {
+		for(int i = 0; i < counter.n_samples.length; i++) {
 			writer.write(String.valueOf(i));
 			writer.write("\t");
-			writer.write(String.valueOf(diffs[i]));
+			writer.write(String.valueOf(counter.n_samples[i]));
+			writer.newLine();
+		}
+		writer.close();
+		
+		writer = new BufferedWriter(new FileWriter(String.format("%1$s/mse.txt", args[2])));
+		writer.write("it\tmse");
+		writer.newLine();
+		for(int i = 0; i < mse.length; i++) {
+			writer.write(String.valueOf(i));
+			writer.write("\t");
+			writer.write(String.valueOf(mse[i]));
 			writer.newLine();
 		}
 		writer.close();
@@ -259,6 +290,27 @@ public class VertexSamplingCounter implements SamplerListener {
 				writer.newLine();
 			}
 			writer.close();
+		}
+		
+		for(int i = 0; i < p_obs_k.length; i++) {
+			if(p_obs_k[i] != null) {
+				writer = new BufferedWriter(new FileWriter(String.format("%1$s/%2$s.wdiff.txt", args[2], i)));
+				writer.write("k\twdiff");
+				writer.newLine();
+				
+				double ks[] = p_obs_k[i].keys();
+				Arrays.sort(ks);
+				
+				for(int j = 0; j < ks.length; j++) {
+					double k = ks[j];
+					double diff = (Math.abs(p_estim_k[i].get(k) - p_obs_k[i].get(k))) * count_estim_k[i].get((int)k);
+					writer.write(String.valueOf(k));
+					writer.write("\t");
+					writer.write(String.valueOf(diff));
+					writer.newLine();
+				}
+				writer.close();
+			}
 		}
 	}
 	

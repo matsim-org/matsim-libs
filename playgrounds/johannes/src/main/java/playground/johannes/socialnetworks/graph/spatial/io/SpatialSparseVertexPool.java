@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SamplerListenerComposite.java
+ * SpatialSparseVertexPool.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,44 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.graph.spatial.io;
 
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
-import playground.johannes.socialnetworks.utils.Composite;
+import java.util.LinkedList;
+import java.util.Set;
+
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphFactory;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
- * @author illenberger
+ * @author jillenberger
  *
  */
-public class SamplerListenerComposite extends Composite<SamplerListener> implements SamplerListener {
+public class SpatialSparseVertexPool extends SpatialSparseGraphFactory {
+
+	private LinkedList<Point> points;
 	
-	@Override
-	public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
-		boolean result = true;
-		for(SamplerListener listener : components) {
-			if(!listener.beforeSampling(sampler, vertex))
-				result = false;
-		}
-		return result;
+	/**
+	 * @param crs
+	 */
+	public SpatialSparseVertexPool(Set<Point> points, CoordinateReferenceSystem crs) {
+		super(crs);
+		this.points = new LinkedList<Point>(points);
 	}
 
-	
 	@Override
-	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
-		boolean result = true;
-		for(SamplerListener listener : components) {
-			if(!listener.afterSampling(sampler, vertex))
-				result = false;
-		}
-		return result;
-	}
-
-
-	@Override
-	public void endSampling(Sampler<?, ?, ?> sampler) {
-		for(SamplerListener listener : components) {
-			listener.endSampling(sampler);
-		}
+	public SpatialSparseVertex createVertex() {
+		Point p = points.poll();
+		if(p == null)
+			return null;
+		else
+			return super.createVertex(p);
 	}
 
 }

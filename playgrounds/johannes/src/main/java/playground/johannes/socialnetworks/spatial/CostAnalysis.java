@@ -28,13 +28,13 @@ import org.matsim.contrib.sna.graph.VertexDecorator;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.spatial.generators.EdgeCostFunction;
 import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCostFunction;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.statistics.Discretizer;

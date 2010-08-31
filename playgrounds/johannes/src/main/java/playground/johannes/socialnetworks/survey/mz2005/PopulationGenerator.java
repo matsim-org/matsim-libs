@@ -149,7 +149,7 @@ public class PopulationGenerator {
 		DataParser parser = new DataParser();
 		
 		Map<String, PersonData> persons = parser.readPersons(basedir + "Zielpersonen.dat");
-		parser.readTrips(basedir + "Wegeinland.dat", persons);
+		parser.readTrips(basedir + "Wegeinland.xy.dat", persons);
 		parser.readLegs(basedir + "Etappen.dat", persons);
 		
 		PopulationGenerator generator = new PopulationGenerator();

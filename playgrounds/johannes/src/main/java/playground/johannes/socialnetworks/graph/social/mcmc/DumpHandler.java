@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.generators;
+package playground.johannes.socialnetworks.graph.social.mcmc;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,31 +34,33 @@ import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 import org.matsim.contrib.sna.math.Distribution;
 
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixStatistics;
 import playground.johannes.socialnetworks.graph.mcmc.SampleHandler;
+import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
+import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class DumpHandler implements SampleHandler<SpatialSparseVertex> {
+public class DumpHandler implements SampleHandler<SocialSparseVertex> {
 
 	private static final Logger logger = Logger.getLogger(DumpHandler.class);
 	
-	private SpatialSparseGraph graph;
+	private SocialSparseGraph graph;
 	
-	private SpatialSparseGraphBuilder builder;
+	private SocialSparseGraphBuilder builder;
 	
 	private long burnin;
 	
@@ -80,7 +82,7 @@ public class DumpHandler implements SampleHandler<SpatialSparseVertex> {
 	
 	private AnalyzerTaskComposite analyzerTask;
 	
-	public DumpHandler(SpatialSparseGraph graph, SpatialSparseGraphBuilder builder, String outputDir) {
+	public DumpHandler(SocialSparseGraph graph, SocialSparseGraphBuilder builder, String outputDir) {
 		this.graph = graph;
 		this.builder = builder;
 		this.outputDir = outputDir;
@@ -101,10 +103,11 @@ public class DumpHandler implements SampleHandler<SpatialSparseVertex> {
 		task.addTask(new DegreeTask());
 		task.addTask(new TransitivityTask());
 		task.addTask(new DistanceTask());
+		task.addTask(new AgeTask());
 		
-		AcceptanceProbabilityTask ptask = new AcceptanceProbabilityTask();
-		ptask.setDistanceCalculator(new CartesianDistanceCalculator());
-		task.addTask(ptask);
+//		AcceptanceProbabilityTask ptask = new AcceptanceProbabilityTask();
+//		ptask.setDistanceCalculator(new CartesianDistanceCalculator());
+//		task.addTask(ptask);
 		
 		return task;
 	}
@@ -137,7 +140,7 @@ public class DumpHandler implements SampleHandler<SpatialSparseVertex> {
 		this.logInterval = logInterval;
 	}
 
-	public boolean handle(AdjacencyMatrix<SpatialSparseVertex> y, long iteration) {
+	public boolean handle(AdjacencyMatrix<SocialSparseVertex> y, long iteration) {
 		if(iteration % logInterval == 0) {
 			log(y, iteration);
 		}
@@ -153,7 +156,7 @@ public class DumpHandler implements SampleHandler<SpatialSparseVertex> {
 		}
 	}
 
-	private void log(AdjacencyMatrix<SpatialSparseVertex> y, long iteration) {
+	private void log(AdjacencyMatrix<SocialSparseVertex> y, long iteration) {
 		double m = y.countEdges();
 		double k_mean = AdjacencyMatrixStatistics.getMeanDegree(y);
 		double c_local = AdjacencyMatrixStatistics.getLocalClusteringCoefficient(y);
@@ -173,7 +176,7 @@ public class DumpHandler implements SampleHandler<SpatialSparseVertex> {
 		}	
 	}
 	
-	public SpatialGraph analyze(AdjacencyMatrix<SpatialSparseVertex> y, long iteration) {
+	public SpatialGraph analyze(AdjacencyMatrix<SocialSparseVertex> y, long iteration) {
 		String currentOutputDir = String.format("%1$s%2$s/", outputDir, iteration);
 		File file = new File(currentOutputDir);
 		file.mkdirs();
@@ -209,7 +212,7 @@ public class DumpHandler implements SampleHandler<SpatialSparseVertex> {
 			/* 
 			 * graphML
 			 */
-			SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
+			SocialGraphMLWriter writer = new SocialGraphMLWriter();
 			writer.write(graph, String.format("%1$sgraph.graphml", iterationDir));
 			/*
 			 * KML

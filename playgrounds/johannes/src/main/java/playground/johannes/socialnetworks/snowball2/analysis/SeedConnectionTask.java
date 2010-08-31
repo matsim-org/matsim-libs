@@ -34,6 +34,7 @@ import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.matrix.Dijkstra;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
 /**
  * @author illenberger

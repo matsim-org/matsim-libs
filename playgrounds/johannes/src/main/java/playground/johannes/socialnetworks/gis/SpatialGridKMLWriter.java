@@ -21,11 +21,9 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.graph.spatial.io;
+package playground.johannes.socialnetworks.gis;
 
 import java.awt.Color;
-
-import jj2000.j2k.roi.MaxShiftSpec;
 
 import net.opengis.kml._2.BoundaryType;
 import net.opengis.kml._2.DocumentType;
@@ -46,8 +44,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.vis.kml.KMZWriter;
-
-import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 
 /**
  * @author illenberger
@@ -90,9 +86,9 @@ public class SpatialGridKMLWriter {
 		}
 		
 		System.out.println("Min score = " + minVal + ", max socre = "+maxVal);
-		
-		minVal = 100;
-		maxVal = 250;
+//		
+//		minVal = 100;
+//		maxVal = 250;
 		double binSize = 1.0;
 		double numBins = (int) Math.ceil((maxVal - minVal)/binSize);
 		

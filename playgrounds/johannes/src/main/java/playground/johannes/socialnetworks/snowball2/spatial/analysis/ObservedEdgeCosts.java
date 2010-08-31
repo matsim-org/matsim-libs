@@ -23,10 +23,10 @@ import java.util.Set;
 
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
+import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCosts;
 import playground.johannes.socialnetworks.graph.spatial.generators.EdgeCostFunction;
-import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledVertexDecorator;
 
 /**

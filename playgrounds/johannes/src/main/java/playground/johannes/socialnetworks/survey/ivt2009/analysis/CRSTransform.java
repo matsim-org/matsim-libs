@@ -22,9 +22,9 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import java.io.IOException;
 
 import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLWriter;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;

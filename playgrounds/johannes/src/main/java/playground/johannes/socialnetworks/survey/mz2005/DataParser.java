@@ -225,8 +225,13 @@ public class DataParser {
 				
 				container.leisureType = Integer.parseInt(tokens[colNames.get("F5202")]);
 				
-//				container.startCoord = coordinates(tokens, colNames, "S");
-//				container.destCoord = coordinates(tokens, colNames, "Z");
+				double x_start = Double.parseDouble(tokens[colNames.get("x_start")]);
+				double y_start = Double.parseDouble(tokens[colNames.get("y_start")]);
+				container.startCoord = new double[]{x_start, y_start};
+				
+				double x_dest = Double.parseDouble(tokens[colNames.get("x_dest")]);
+				double y_dest = Double.parseDouble(tokens[colNames.get("y_dest")]);
+				container.destCoord = new double[]{x_dest, y_dest};
 				
 				PersonData pContainer = persons.get(container.personId);
 				if(pContainer != null) {

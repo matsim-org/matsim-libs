@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnowballEstimator.java
+ * NormalizedEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -24,66 +24,81 @@ import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
 
 /**
- * Estimates the inclusion probability of a vertex based on its degree and the
- * number of sampled vertices. <br>
- * p_i = 1 - (1 - (n^{(it - 1)} / N))^{k_i}
+ * This estimator normalizes the estimates from a delegate estimator such that
+ * <code>\sum_i{1/p_i} = N</code>.
  * 
  * @author illenberger
  * 
  */
-public class Estimator1 implements ProbabilityEstimator {
+public class NormalizedEstimator2 implements ProbabilityEstimator {
 
-	private final int N;
+	private ProbabilityEstimator delegate;
 
-	private SampleStats stats;
+	private final double N;
+
+	private double konst;
 
 	/**
 	 * Creates a new estimator.
 	 * 
+	 * @param delegate
+	 *            a delegate estimator
 	 * @param N
-	 *            the total population of vertices.
+	 *            the size of the total population of vertices
 	 */
-	public Estimator1(int N) {
+	public NormalizedEstimator2(ProbabilityEstimator delegate, int N) {
+		this.delegate = delegate;
 		this.N = N;
 	}
 
 	/**
-	 * @see {@link ProbabilityEstimator#update(SampledGraph)}
-	 */
-	public void update(SampledGraph graph) {
-		stats = new SampleStats(graph);
-	}
-
-	/**
-	 * Estimates the inclusion probability of a vertex based on its degree and
-	 * the number of vertices sampled.
+	 * Returns the estimate of the delegate estimator multiplied with
+	 * <code>\sum_i{1/p_i} / N</code>.
 	 * 
 	 * @param vertex
 	 *            a sampled vertex
+	 * @return the estimate of the delegate estimator multiplied with
+	 *         <code>\sum_i{1/p_i} / N</code>.
 	 */
+	@Override
 	public double getProbability(SampledVertex vertex) {
-		int it = stats.getMaxIteration();
-		
-		if (it == 0)
-			/*
-			 * In the 0th iteration we have random sampling.
-			 */
-			return stats.getNumSampled(0) / (double) N;
-		
-		else {
-			int n = stats.getAccumulatedNumSampled(it - 1);
-			/*
-			 * inclusion probability
-			 */
-			double p_k = 1 - Math.pow(1 - n / (double) N, vertex.getNeighbours().size());
-//			/*
-//			 * response rate
-//			 */
-//			double p = 1;
-//			if (vertex.getIterationSampled() == it)
-//				p = stats.getNumSampled(it) / ((double) stats.getNumDetected(it - 1) * stats.getResonseRate());
-			
-			return stats.getResonseRate() * p_k;
-		}
+		return konst * delegate.getProbability(vertex);
 	}
+
+	/**
+	 * Updates the delegate estaimtor and calculates the normalization constant.
+	 * 
+	 * @param graph
+	 *            a sampled graph
+	 */
+	@Override
+	public void update(SampledGraph graph) {
+		delegate.update(graph);
+
+		double sum_p_i = 0;
+		int n = 0;
+		for (SampledVertex vertex : graph.getVertices()) {
+			if (vertex.isSampled()) {
+				sum_p_i += delegate.getProbability(vertex);
+				n++;
+			}
+		}
+
+		konst = n*n /(N * sum_p_i);
+
+		
+//		double sum = 0;
+//		for (SampledVertex vertex : graph.getVertices()) {
+//			if (vertex.isSampled()) {
+//				sum += delegate.getProbability(vertex);
+//			}
+//		}
+//
+//		SampleStats stats = new SampleStats(graph);
+//		
+//		double n_square = Math.pow(stats.getAccumulatedNumSampled(stats.getMaxIteration()), 2);
+//		konst = n_square/(double)N * 1/sum;
+
+	}
+
 }

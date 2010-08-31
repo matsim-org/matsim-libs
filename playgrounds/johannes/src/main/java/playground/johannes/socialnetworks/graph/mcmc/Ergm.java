@@ -25,8 +25,8 @@ package playground.johannes.socialnetworks.graph.mcmc;
 
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.sna.util.Composite;
 
-import playground.johannes.socialnetworks.utils.Composite;
 
 
 
@@ -51,8 +51,9 @@ public class Ergm extends Composite<GraphProbability> implements GraphProbabilit
 
 	public <V extends Vertex> double difference(AdjacencyMatrix<V> y, int i, int j, boolean y_ij) {
 		double prod = 1;
-		for(int k = 0; k < components.size(); k++)
+		for(int k = 0; k < components.size(); k++) {
 			prod *= components.get(k).difference(y, i, j, y_ij);
+		}
 		
 //		if(Double.isInfinite(prod))
 //			throw new IllegalArgumentException("H(y) must not be infinity!");

@@ -31,8 +31,11 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.Components;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.sim.SampleAnalyzer;
+import org.matsim.contrib.sna.snowball.sim.Sampler;
 
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 
 /**
  * @author illenberger

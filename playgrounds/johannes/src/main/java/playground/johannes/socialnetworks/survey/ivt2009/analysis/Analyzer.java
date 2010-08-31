@@ -29,20 +29,20 @@ import java.util.Set;
 import org.geotools.feature.Feature;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.gis.ZoneLayer;
+import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.sna.snowball.SampledGraphProjectionBuilder;
 import org.opengis.referencing.FactoryException;
 
 import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.spatial.analysis.GraphClippingFilter;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
@@ -82,7 +82,7 @@ public class Analyzer {
 		 * analyze the complete graph
 		 */
 		String output = args[1];
-//		analyze(graph, zones, choiceSet, output);
+		analyze(graph, zones, choiceSet, output);
 		/*
 		 * analyze the swiss clipping
 		 */
@@ -100,9 +100,9 @@ public class Analyzer {
 		/*
 		 * 
 		 */
-		ObservedAccessability obsAccess = new ObservedAccessability();
+//		ObservedAccessability obsAccess = new ObservedAccessability();
 //		TObjectDoubleHashMap<SpatialVertex> values = obsAccess.values((Set<? extends SpatialVertex>) graph.getVertices(), new GravityCostFunction(1.6, 1.0), choiceSet);
-		TObjectDoubleHashMap<SpatialVertex> values = obsAccess.values((Set<? extends SpatialVertex>) graph.getVertices(), new BeelineCostFunction(), choiceSet);
+//		TObjectDoubleHashMap<SpatialVertex> values = obsAccess.values((Set<? extends SpatialVertex>) graph.getVertices(), new BeelineCostFunction(), choiceSet);
 		
 //		AttributePartition partition = new AttributePartition(new FixedSampleSizeDiscretizer(values.getValues(), 200));
 //		AttributePartition partition = new AttributePartition(new LinearDiscretizer(100));

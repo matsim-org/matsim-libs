@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 
 import com.vividsolutions.jts.geom.Point;
 

@@ -21,9 +21,9 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.snowball.SampledEdgeDecorator;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.snowball2.SampledEdgeDecorator;
 
 
 /**

@@ -20,8 +20,8 @@
 package playground.johannes.socialnetworks.graph.analysis;
 
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.util.Composite;
 
-import playground.johannes.socialnetworks.utils.Composite;
 
 /**
  * @author illenberger

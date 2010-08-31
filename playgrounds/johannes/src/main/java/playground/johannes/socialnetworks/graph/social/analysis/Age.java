@@ -31,8 +31,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.matsim.contrib.sna.math.Distribution;
 
+import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
@@ -82,6 +85,35 @@ public class Age {
 		}
 		
 		return Correlations.correlationMean(values1.toNativeArray(), values2.toNativeArray());
+	}
+	
+	public double correlationCoefficient(Set<? extends SocialEdge> edges) {
+		TDoubleArrayList values1 = new TDoubleArrayList(edges.size());
+		TDoubleArrayList values2 = new TDoubleArrayList(edges.size());
+		
+		for(SocialEdge edge : edges) {
+			double a1 = edge.getVertices().getFirst().getPerson().getAge();
+			double a2 = edge.getVertices().getSecond().getPerson().getAge();
+			if(a1 > 0 && a2 > 0) {
+				values1.add(a1);
+				values2.add(a2);
+			}
+		}
+//		int i_max = i;
+//		double mean1 = StatUtils.mean(values1);
+//		double mean2 = StatUtils.mean(values2);
+//		
+//		double sum = 0;
+//		double sum1square = 0;
+//		double sum2square = 0;
+//		for(i = 0; i < i_max; i++) {
+//			sum += (values1[i]-mean1) * (values2[i]-mean2);
+//			sum1square += Math.pow(values1[i]-mean1, 2);
+//			sum2square += Math.pow(values2[i]-mean2, 2);
+//		}
+//		
+//		return sum / (Math.sqrt(sum1square * sum2square));
+		return new PearsonsCorrelation().correlation(values1.toNativeArray(), values2.toNativeArray());
 	}
 	
 	public void boxplot(Set<? extends SocialVertex> vertices, String file) {

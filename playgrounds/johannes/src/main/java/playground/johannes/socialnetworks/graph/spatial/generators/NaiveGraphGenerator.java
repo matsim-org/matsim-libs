@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.gis.CRSUtils;
+import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
@@ -39,7 +40,6 @@ import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessability;
 import playground.johannes.socialnetworks.graph.spatial.analysis.StandardAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;

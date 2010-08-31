@@ -174,6 +174,7 @@ public class EgoTableReader {
 		}
 		
 		if(c != null) {
+//			return geoFactory.createPoint(new Coordinate(0,0));
 			return geoFactory.createPoint(new Coordinate(c.getX(), c.getY()));
 		} else {
 			return null;

@@ -30,9 +30,17 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.sna.graph.analysis.FixedSizeRandomPartition;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
+import org.matsim.contrib.sna.graph.analysis.RandomPartition;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
+import org.matsim.contrib.sna.graph.analysis.VertexFilter;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.sna.snowball.sim.FinalSampleAnalyzer;
+import org.matsim.contrib.sna.snowball.sim.IterationSampleAnalyzer;
+import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
+import org.matsim.contrib.sna.snowball.sim.Sampler;
+import org.matsim.contrib.sna.snowball.sim.SamplerListenerComposite;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 
@@ -72,7 +80,7 @@ public class Loader {
 		 * Init random seed generator.
 		 */
 		int numSeeds = Integer.parseInt(config.getParam(MODULENAME, "seeds"));
-		VertexPartition seedGenerator = new RandomSeedGenerator(numSeeds, randomSeed);
+		VertexFilter seedGenerator = new FixedSizeRandomPartition(numSeeds, randomSeed);
 		/*
 		 * Init response rate generator.
 		 */
@@ -84,7 +92,7 @@ public class Loader {
 		} else
 			responseRate = Double.parseDouble(str);
 		
-		VertexPartition reponseGenerator = new RandomResponse(responseRate, randomSeed);
+		VertexFilter reponseGenerator = new RandomPartition(responseRate, randomSeed);
 		/*
 		 * Init estimators.
 		 */
@@ -96,12 +104,17 @@ public class Loader {
 		
 		ProbabilityEstimator estim1 = new Estimator1(N);
 		ProbabilityEstimator estim1Norm = new NormalizedEstimator(estim1, N);
+		ProbabilityEstimator estim1Norm2 = new NormalizedEstimator2(estim1, N);
 		estimatorSet.add(estim1);
 		estimatorSet.add(estim1Norm);
+		estimatorSet.add(estim1Norm2);
 		estimators.put("estim1a", new EstimatorSet(estim1, null, null));
 		estimators.put("estim1b", new EstimatorSet(estim1, new HTEstimator(N), new HTEstimator(M)));
 		estimators.put("estim1c", new EstimatorSet(estim1Norm, null, null));
 		estimators.put("estim1d", new EstimatorSet(estim1Norm, new HTEstimator(N), new HTEstimator(M)));
+		estimators.put("estim1e", new EstimatorSet(estim1Norm2, null, null));
+		estimators.put("estim1f", new EstimatorSet(estim1Norm2, new HTEstimator(N), new HTEstimator(M)));
+		
 		
 //		BiasedDistribution estim2 = new Estimator2(N);
 //		estimatorSet.add(estim2);
@@ -165,7 +178,7 @@ public class Loader {
 		 */
 //		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(analyzers, estimatorSet, output);
 		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, estimatorSet, output);
-		CompleteSampleAnalyzer completeAnalyzer = new CompleteSampleAnalyzer(graph, analyzers, estimatorSet, output);
+		FinalSampleAnalyzer completeAnalyzer = new FinalSampleAnalyzer(analyzers, estimatorSet, output);
 //		ConnectionSampleAnalyzer connectionAnalyzer = new ConnectionSampleAnalyzer(numSeeds, analyzers, output);
 		/*
 		 * Init sampler listener.

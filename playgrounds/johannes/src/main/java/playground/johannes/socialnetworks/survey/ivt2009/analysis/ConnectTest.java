@@ -28,10 +28,10 @@ import java.util.Set;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.VertexDecorator;
 import org.matsim.contrib.sna.graph.analysis.Components;
+import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledVertexDecorator;

@@ -35,6 +35,8 @@ public class GibbsEdgeFlip extends GibbsSampler {
 
 	protected int[][] edges;
 	
+	private EdgeSwitchCondition switchCondition;
+	
 	public GibbsEdgeFlip() {
 		super();
 	}
@@ -43,8 +45,16 @@ public class GibbsEdgeFlip extends GibbsSampler {
 		super(seed);
 	}
 
+	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SampleHandler<V> handler, EdgeSwitchCondition condition) {
+		switchCondition = condition;
+		sample(y, d, handler);
+	}
+	
 	@Override
 	public <V extends Vertex> void sample(AdjacencyMatrix<V> y, GraphProbability d, SampleHandler<V> handler) {
+		if(switchCondition == null)
+			switchCondition = new GibbsEdgeSwitch.DefaultSwitchCondition();
+		
 		int N = y.getVertexCount();
 		int M = y.countEdges();
 		edges = new int[M][2];
@@ -78,11 +88,19 @@ public class GibbsEdgeFlip extends GibbsSampler {
 		
 		if(i != u && j != v && j != u && i != v && !y.getEdge(i, u) && !y.getEdge(j, v)) {
 			
-			double p_change = 1/d.difference(y, i, u, false)
-					* 1/d.difference(y, j, v, false)
-					* d.difference(y, i, j, true)
-					* d.difference(y, u, v, true); 
+			if(switchCondition.allowSwitch(y, i, j, i, u) && switchCondition.allowSwitch(y, u, v, j, v)) {
+			/*
+			 * ************************************************
+			 * TODO: CHECK THIS!
+			 */
+			double p_change = d.difference(y, i, u, false)
+					* d.difference(y, j, v, false)
+					* 1/d.difference(y, i, j, true)
+					* 1/d.difference(y, u, v, true); 
 			double p = 1 / (1 + p_change);
+			/*
+			 * ************************************************
+			 */
 			if(random.nextDouble() <= p) {
 				y.removeEdge(i, j);
 				y.removeEdge(u, v);
@@ -95,6 +113,7 @@ public class GibbsEdgeFlip extends GibbsSampler {
 				edges[idx_uv][1] = v;
 				
 				accept = true;
+			}
 			}
 		}
 		

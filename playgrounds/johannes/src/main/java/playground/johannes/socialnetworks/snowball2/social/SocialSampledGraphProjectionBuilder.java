@@ -19,10 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.social;
 
+import org.matsim.contrib.sna.snowball.SampledGraphProjectionBuilder;
+
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionBuilder;
 
 /**
  * @author illenberger

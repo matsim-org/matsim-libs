@@ -24,8 +24,8 @@ import gnu.trove.TIntIntHashMap;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
 
-import playground.johannes.socialnetworks.snowball2.sim.ProbabilityEstimator;
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
 /**

@@ -22,8 +22,8 @@ package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 import net.opengis.kml._2.PlacemarkType;
 
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSnowballDescriptor;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 

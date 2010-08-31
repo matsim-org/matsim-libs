@@ -26,10 +26,10 @@ import java.util.Set;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessability;
-import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
 
 import com.vividsolutions.jts.geom.Point;
 

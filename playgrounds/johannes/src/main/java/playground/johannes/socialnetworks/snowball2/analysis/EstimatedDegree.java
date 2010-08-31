@@ -30,8 +30,9 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
+import org.matsim.contrib.sna.snowball.sim.ProbabilityEstimator;
 
-import playground.johannes.socialnetworks.snowball2.sim.ProbabilityEstimator;
 import playground.johannes.socialnetworks.snowball2.sim.deprecated.PopulationEstimator;
 import playground.johannes.socialnetworks.statistics.EstimatedDistribution;
 

@@ -32,6 +32,7 @@ import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
 import playground.johannes.socialnetworks.graph.social.analysis.DegreeAgeTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeDensityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeEdgeLengthTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeGridTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCostsTask;
 import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCostFunction;
@@ -79,18 +80,9 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		kRhoTask.setModule(new ObservedDegree());
 		addTask(kRhoTask);
 		
-//		DegreeAccessabilityTask kAccessTask = new DegreeAccessabilityTask(choiceSet, new GravityCostFunction(1.6, 1.0));
-//		DegreeAccessabilityTask kAccessTask = new DegreeAccessabilityTask(choiceSet, new BeelineCostFunction());
-//		kAccessTask.setModule(new ObservedDegree());
-//		addTask(kAccessTask);
-		
 		AgeTask age = new AgeTask();
 		age.setModule(new ObservedAge());
 		addTask(age);
-		
-		DegreeDensityTask density = new DegreeDensityTask(zones);
-		density.setModule(new ObservedDegree());
-		addTask(density);
 		
 		addTask(new ComponentsTask());
 		
@@ -107,6 +99,10 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		DegreeAgeTask daTask = new DegreeAgeTask();
 		daTask.setModule(new ObservedDegree());
 		addTask(daTask);
+		
+		DegreeGridTask gridTask = new DegreeGridTask();
+		gridTask.setModule(new ObservedDegree());
+		addTask(gridTask);
 	}
 
 }

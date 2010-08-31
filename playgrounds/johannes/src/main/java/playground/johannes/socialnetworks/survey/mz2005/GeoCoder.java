@@ -185,7 +185,7 @@ public class GeoCoder {
 		else {
 			GeoCoordinate coord = googleLookup.requestCoordinate(builder.toString());
 			if(coord != null)
-				c = new CoordImpl(coord.getLatitude(), coord.getLongitude());
+				c = new CoordImpl(coord.getLongitude(), coord.getLatitude());
 		}
 		
 		if(c == null) {

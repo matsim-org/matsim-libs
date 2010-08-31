@@ -29,8 +29,8 @@ import org.matsim.contrib.sna.graph.EdgeDecorator;
 import org.matsim.contrib.sna.graph.VertexDecorator;
 import org.matsim.contrib.sna.snowball.SampledGraph;
 import org.matsim.contrib.sna.snowball.SampledVertex;
+import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
-import playground.johannes.socialnetworks.snowball2.analysis.SnowballPartitions;
 
 /**
  * @author illenberger

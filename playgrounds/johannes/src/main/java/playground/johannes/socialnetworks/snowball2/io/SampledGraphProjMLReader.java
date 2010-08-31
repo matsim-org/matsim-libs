@@ -26,13 +26,13 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.GraphUtils;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
+import org.matsim.contrib.sna.snowball.SampledEdgeDecorator;
+import org.matsim.contrib.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.sna.snowball.SampledGraphProjectionBuilder;
+import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 import org.matsim.contrib.sna.snowball.io.SampledGraphML;
 import org.xml.sax.Attributes;
 
-import playground.johannes.socialnetworks.snowball2.SampledEdgeDecorator;
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjection;
-import playground.johannes.socialnetworks.snowball2.SampledGraphProjectionBuilder;
-import playground.johannes.socialnetworks.snowball2.SampledVertexDecorator;
 
 /**
  * @author illenberger

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SeedGBe.java
+ * EdgeSwitchCondition.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,19 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.socialnetworks.graph.mcmc;
 
-import java.util.Set;
-
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger
  *
  */
-public interface SeedGenerator {
+public interface EdgeSwitchCondition {
 	
-	public Set<? extends Vertex> generate(Graph graph);
-
+	public boolean allowSwitch(AdjacencyMatrix<?> y, int i, int j, int u, int v);
+	
 }

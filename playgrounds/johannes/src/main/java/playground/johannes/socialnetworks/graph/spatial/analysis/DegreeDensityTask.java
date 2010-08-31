@@ -78,7 +78,7 @@ public class DegreeDensityTask extends ModuleAnalyzerTask<Degree> {
 				logger.warn(String.format("No zone found for %1$s vertices out of %2$s.", noZone, kMap.size()));
 			
 			try {
-				Correlations.writeToFile(Correlations.correlationMean(rhoValues, kValues, 1000), String.format("%1$s/k_rho.txt", getOutputDirectory()), "rho", "k_mean");
+				Correlations.writeToFile(Correlations.correlationMean(rhoValues, kValues, 3000), String.format("%1$s/k_rho.txt", getOutputDirectory()), "rho", "k_mean");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
