@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
@@ -45,7 +45,7 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 	//private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
 
 	public AdaptedPlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
-			final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator,
+			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig, MyTransitRouterConfig myTransitRouterConfig) {
 		//super(config, network, costCalculator, timeCalculator, factory);

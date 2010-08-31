@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BufferedTravelTime.java
+ * PersonalizableTravelTime.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,37 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.multimodal.router.costcalculator;
+package org.matsim.core.router.util;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 
-public class BufferedTravelTime implements PersonalizableTravelTime {
-
-	private double scaleFactor = 1.0;
-	private TravelTimeCalculatorWithBuffer buffer;
+public interface PersonalizableTravelTime extends TravelTime {
 	
-	public BufferedTravelTime (TravelTimeCalculatorWithBuffer buffer) {
-		this.buffer = buffer;
-	}
-	
-	public void setScaleFactor(double scaleFactor) {
-		this.scaleFactor = scaleFactor;
-	}
-	
-	public double getScaleFactor() {
-		return this.scaleFactor;
-	}
-	
-	@Override
-	public double getLinkTravelTime(Link link, double time) {
-		return buffer.getBufferedLinkTravelTime(link, time) * scaleFactor;
-	}
-
-	@Override
-	public void setPerson(Person person) {
-		// TODO Auto-generated method stub
-	}
-
+	void setPerson(Person person);
 }

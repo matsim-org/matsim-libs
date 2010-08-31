@@ -6,7 +6,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -18,11 +18,11 @@ public class SNPickFacilityFromAlter extends AbstractMultithreadedModule {
 	private String[] factypes={"home","work","shop","education","leisure"};
 	private Network network=null;
 	private PersonalizableTravelCost tcost=null;
-	private TravelTime ttime=null;
+	private PersonalizableTravelTime ttime=null;
 	private Knowledges knowledges;
 	private final SocNetConfigGroup snConfig;
 
-	public SNPickFacilityFromAlter(Config config, Network network, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges kn) {
+	public SNPickFacilityFromAlter(Config config, Network network, PersonalizableTravelCost tcost, PersonalizableTravelTime ttime, Knowledges kn) {
 		super(config.global());
 		log.info("initializing SNPickFacility");
     	this.network=network;

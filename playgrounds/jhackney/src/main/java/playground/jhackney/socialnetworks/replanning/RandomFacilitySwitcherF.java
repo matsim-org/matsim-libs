@@ -25,7 +25,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.jhackney.SocNetConfigGroup;
@@ -42,7 +42,7 @@ import playground.jhackney.SocNetConfigGroup;
 public class RandomFacilitySwitcherF extends AbstractMultithreadedModule {
 	private Network network=null;
 	private PersonalizableTravelCost tcost=null;
-	private TravelTime ttime=null;
+	private PersonalizableTravelTime ttime=null;
 	private ActivityFacilities facs=null;
 	/**
 	 * TODO [JH] Activity types are hard-coded here but have to match the
@@ -52,7 +52,7 @@ public class RandomFacilitySwitcherF extends AbstractMultithreadedModule {
 	private String[] factypes={"home","work","shop","education","leisure"};
 	private final SocNetConfigGroup snConfig;
 
-    public RandomFacilitySwitcherF(Config config, Network network, PersonalizableTravelCost tcost, TravelTime ttime, ActivityFacilities facs) {
+    public RandomFacilitySwitcherF(Config config, Network network, PersonalizableTravelCost tcost, PersonalizableTravelTime ttime, ActivityFacilities facs) {
     	super(config.global());
 		System.out.println("initializing RandomFacilitySwitcher");
     	this.network=network;

@@ -22,7 +22,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonPrepareForSim;
@@ -70,12 +70,12 @@ public class SNPickFacility implements PlanAlgorithm {
 	private final double[] cum_p_factype;
 	private final Network network;
 	private final PersonalizableTravelCost tcost;
-	private final TravelTime ttime;
+	private final PersonalizableTravelTime ttime;
 	private final String[] factypes;
 	private final Logger log = Logger.getLogger(SNPickFacility.class);
 	private final Knowledges knowledges;
 
-	public SNPickFacility(String[] factypes, NetworkLayer network, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges knowledges, SocNetConfigGroup snConfig){
+	public SNPickFacility(String[] factypes, NetworkLayer network, PersonalizableTravelCost tcost, PersonalizableTravelTime ttime, Knowledges knowledges, SocNetConfigGroup snConfig){
 		weights = snConfig.getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;

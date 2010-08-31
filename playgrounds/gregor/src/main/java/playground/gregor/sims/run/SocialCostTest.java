@@ -16,7 +16,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.evacuation.socialcost.MarginalTravelCostCalculatorII;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
@@ -54,7 +54,7 @@ public class SocialCostTest extends Controler {
 
 			@Override
 			public PersonalizableTravelCost createTravelCostCalculator(
-					TravelTime timeCalculator,
+					PersonalizableTravelTime timeCalculator,
 					CharyparNagelScoringConfigGroup cnScoringGroup) {
 				return new MarginalTravelCostCalculatorII(SocialCostTest.this.getTravelTimeCalculator(),sc);
 			}

@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
 
@@ -62,7 +63,49 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 	
 	@Override
 	public double getLinkTravelTime(Link link, double time) {
-		return link.getLength() / speed;
+		return calculateAgeScaleFactor() * link.getLength() / speed;
+	}
+	
+	/*
+	 * Scale the speed of walk/bike legs depending on the age
+	 * of an Agent.
+	 * 
+	 * We use for:
+	 * 		0-6 years: 		0.75	(we assume that babies are carried by their parents)
+	 * 		6-10 years: 	0.85
+	 * 		10-15 years:	0.95
+	 * 		15-50 years:	1.00
+	 * 		50-55 years:	0.95
+	 * 		55-60 years:	0.90
+	 * 		60-65 years:	0.85
+	 * 		65-70 years:	0.80
+	 * 		70-75 years:	0.75
+	 * 		75-80 years:	0.70
+	 * 		80-85 years:	0.65
+	 * 		85-90 years:	0.60
+	 * 		90-95 years:	0.55
+	 * 		95+ years:		0.50
+	 */
+	private double calculateAgeScaleFactor() {
+		if (person != null && person instanceof PersonImpl) {
+			int age = ((PersonImpl)person).getAge();
+			
+			if (age <= 6) return 0.75;
+			else if (age <= 10) return 0.85;
+			else if (age <= 15) return 0.95;
+			else if (age <= 50) return 1.00;
+			else if (age <= 55) return 0.95;
+			else if (age <= 60) return 0.90;
+			else if (age <= 65) return 0.85;
+			else if (age <= 70) return 0.80;
+			else if (age <= 75) return 0.75;
+			else if (age <= 80) return 0.70;
+			else if (age <= 85) return 0.65;
+			else if (age <= 90) return 0.60;
+			else if (age <= 95) return 0.55;
+			else return 0.50;
+		}
+		else return 1.0;
 	}
 	
 	@Override

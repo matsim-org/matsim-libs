@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelMinCost;
-import org.matsim.core.router.util.TravelTime;
 
 /**<p>
  * CostCalculator and TravelTimeCalculator for Links based on freespeed on links and
@@ -41,7 +41,7 @@ import org.matsim.core.router.util.TravelTime;
  * @author mrieser
  * @author dgrether
  */
-public class FreespeedTravelTimeCost implements PersonalizableTravelCost, TravelMinCost, TravelTime {
+public class FreespeedTravelTimeCost implements PersonalizableTravelCost, TravelMinCost, PersonalizableTravelTime {
 
 	private final double travelCostFactor;
 	private final double marginalUtlOfDistance;

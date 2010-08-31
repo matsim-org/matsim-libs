@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -44,7 +44,7 @@ public class RandomFacilitySwitcherK extends AbstractMultithreadedModule {
 	private final static Logger log = Logger.getLogger(RandomFacilitySwitcherK.class);
 	private Network network=null;
 	private PersonalizableTravelCost tcost=null;
-	private TravelTime ttime=null;
+	private PersonalizableTravelTime ttime=null;
 	/**
 	 * TODO [JH] Activity types are hard-coded here but have to match the
 	 * standard facility types in the facilities object as well as plans object.
@@ -54,7 +54,7 @@ public class RandomFacilitySwitcherK extends AbstractMultithreadedModule {
 	private Knowledges knowledges;
 	private final SocNetConfigGroup snConfig;
 
-    public RandomFacilitySwitcherK(Config config, Network network, PersonalizableTravelCost tcost, TravelTime ttime, Knowledges kn) {
+    public RandomFacilitySwitcherK(Config config, Network network, PersonalizableTravelCost tcost, PersonalizableTravelTime ttime, Knowledges kn) {
     	super(config.global());
 		log.info("initializing SNRandomFacilitySwitcher");
     	this.network=network;

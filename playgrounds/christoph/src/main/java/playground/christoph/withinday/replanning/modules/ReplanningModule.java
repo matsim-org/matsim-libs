@@ -5,7 +5,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.multimodal.router.MultiModalPlansCalcRoute;
@@ -15,11 +15,11 @@ public class ReplanningModule extends AbstractMultithreadedModule {
 	protected Config config;
 	protected Network network;
 	protected PersonalizableTravelCost costCalculator;
-	protected TravelTime timeCalculator;
+	protected PersonalizableTravelTime timeCalculator;
 	protected LeastCostPathCalculatorFactory factory;
 	
 	public ReplanningModule(Config config, Network network, 
-			PersonalizableTravelCost costCalculator, TravelTime timeCalculator, 
+			PersonalizableTravelCost costCalculator, PersonalizableTravelTime timeCalculator, 
 			LeastCostPathCalculatorFactory factory) {
 		super(config.global());
 		

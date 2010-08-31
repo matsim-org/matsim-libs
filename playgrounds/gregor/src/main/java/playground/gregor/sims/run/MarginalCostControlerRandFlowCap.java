@@ -24,7 +24,7 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.evacuation.socialcost.MarginalTravelCostCalculatorII;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 
@@ -60,7 +60,7 @@ public class MarginalCostControlerRandFlowCap extends Controler{
 
 			@Override
 			public PersonalizableTravelCost createTravelCostCalculator(
-					TravelTime timeCalculator,
+					PersonalizableTravelTime timeCalculator,
 					CharyparNagelScoringConfigGroup cnScoringGroup) {
 				return new MarginalTravelCostCalculatorII(MarginalCostControlerRandFlowCap.this.getTravelTimeCalculator(),sc);
 			}

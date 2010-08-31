@@ -37,7 +37,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.misc.ArgumentParser;
@@ -102,7 +102,7 @@ public class RoutePopulation {
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		plansWriter.startStreaming(this.config.plans().getOutputFile());
-		TravelTime travelTimes = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(network, this.config.travelTimeCalculator());
+		PersonalizableTravelTime travelTimes = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(network, this.config.travelTimeCalculator());
 		PersonalizableTravelCost travelCosts = new TravelCostCalculatorFactoryImpl().createTravelCostCalculator(travelTimes, this.config.charyparNagelScoring());
 		plans.addAlgorithm(new PersonPrepareForSim(new PlansCalcRoute(this.config.plansCalcRoute(), network, travelCosts, travelTimes, new DijkstraFactory()), network));
 		plans.addAlgorithm(plansWriter);

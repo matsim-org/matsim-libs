@@ -28,7 +28,7 @@ import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.locationchoice.LocationChoice;
 
 public class MyStrategyManagerConfigLoader {
@@ -83,7 +83,7 @@ public class MyStrategyManagerConfigLoader {
 	protected static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
 		Network network = controler.getNetwork();
 		PersonalizableTravelCost travelCostCalc = controler.createTravelCostCalculator();
-		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
+		PersonalizableTravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		Config config = controler.getConfig();
 
 		PlanStrategy strategy = null;

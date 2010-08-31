@@ -40,7 +40,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -61,11 +61,11 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 	private final double[] cum_p_factype;
 	private final Network network;
 	private final PersonalizableTravelCost tcost;
-	private final TravelTime ttime;
+	private final PersonalizableTravelTime ttime;
 	private final String[] factypes;
 	private final ActivityFacilities facs;
 
-	public RandomChangeLocationF(String[] factypes, Network network, PersonalizableTravelCost tcost, TravelTime ttime, ActivityFacilities facs, SocNetConfigGroup snConfig) {
+	public RandomChangeLocationF(String[] factypes, Network network, PersonalizableTravelCost tcost, PersonalizableTravelTime ttime, ActivityFacilities facs, SocNetConfigGroup snConfig) {
 		weights = snConfig.getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;

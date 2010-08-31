@@ -10,7 +10,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ReplanParkingSearchRoute implements LinkEnterEventHandler  {
@@ -32,7 +32,7 @@ public class ReplanParkingSearchRoute implements LinkEnterEventHandler  {
 		
 		
 		PersonalizableTravelCost travelCost=controler.createTravelCostCalculator() ;
-		TravelTime travelTime=controler.getTravelTimeCalculator();
+		PersonalizableTravelTime travelTime=controler.getTravelTimeCalculator();
 		
 		
 		PlanAlgorithm algorithm=new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(), travelCost, travelTime, new DijkstraFactory()); // maybe better: controler.getRoutingAlgorithm();

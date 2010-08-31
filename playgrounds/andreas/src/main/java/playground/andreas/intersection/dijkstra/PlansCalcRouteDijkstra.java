@@ -14,7 +14,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -29,7 +29,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 	Network wrappedNetwork;
 	Network originalNetwork;
 
-	public PlansCalcRouteDijkstra(final PlansCalcRouteConfigGroup config, final Network originalNetwork, final Network wrappedNetwork, final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator) {
+	public PlansCalcRouteDijkstra(final PlansCalcRouteConfigGroup config, final Network originalNetwork, final Network wrappedNetwork, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
 		super(config, wrappedNetwork, costCalculator, timeCalculator);
 		this.originalNetwork = originalNetwork;
 		this.wrappedNetwork = wrappedNetwork;

@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -40,7 +42,7 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -62,21 +64,24 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 	private IntermodalLeastCostPathCalculator rideRouteAlgo;
 	
 	private LeastCostPathCalculatorFactory factory;
-		
+	private PersonalizableTravelTime travelTime;	
+	
 	public MultiModalPlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network,
 			final PersonalizableTravelCost costCalculator,
-			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
+			final PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		super(group, network, costCalculator, timeCalculator, factory);
 		
 		this.factory = factory;
+		this.travelTime = timeCalculator;
 		initRouteAlgos(network, timeCalculator);
 	}
 
-	public MultiModalPlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator) {
+	public MultiModalPlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network,
+			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 
-	private void initRouteAlgos(Network network, TravelTime travelTime) {	
+	private void initRouteAlgos(Network network, PersonalizableTravelTime travelTime) {	
 		/*
 		 * Car
 		 * Add mode restriction because now the network is multi-modal and not car-only.
@@ -170,6 +175,19 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 		Set<String> rideModeRestrictions = new TreeSet<String>();
 		rideModeRestrictions.add(TransportMode.car);
 		rideRouteAlgo.setModeRestriction(rideModeRestrictions);
+	}
+	
+	/*
+	 * As long as the core does not use PersonalizableTravelTime we set the
+	 * person in the TimeCalculator here and then let the superclass do the
+	 * remaining work.
+	 */
+	@Override
+	protected void handlePlan(Person person, final Plan plan) {
+		if (travelTime != null) {
+			travelTime.setPerson(person);
+		}
+		super.handlePlan(person, plan);
 	}
 	
 	@Override

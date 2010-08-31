@@ -25,6 +25,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -32,7 +33,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 
 /**
  * A link travel time calculator which returns a travel time that comes
@@ -47,7 +48,7 @@ import org.matsim.core.router.util.TravelTime;
  *
  */
 public class LinearInterpolatingTTCalculator
-implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, TravelTime {
+implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, PersonalizableTravelTime {
 
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<EnterEvent, Double> enterEvents = new HashMap<EnterEvent, Double>();
@@ -258,6 +259,11 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName();
+	}
+
+	@Override
+	public void setPerson(Person person) {
+		// nothing to do here
 	}
 
 }

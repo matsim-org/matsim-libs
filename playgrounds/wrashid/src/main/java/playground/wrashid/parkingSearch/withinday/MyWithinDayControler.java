@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 
 import playground.christoph.controler.WithinDayControler;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
@@ -62,7 +62,7 @@ public class MyWithinDayControler extends Controler {
 	 */
 	protected int numReplanningThreads = 1;
 
-	protected TravelTime travelTime;
+	protected PersonalizableTravelTime travelTime;
 
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ParallelDuringActivityReplanner parallelActEndReplanner;

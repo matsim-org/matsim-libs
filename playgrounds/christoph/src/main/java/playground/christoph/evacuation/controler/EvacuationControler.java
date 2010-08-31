@@ -38,6 +38,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.ptproject.qsim.QSim;
 
@@ -131,7 +132,7 @@ public class EvacuationControler extends MultiModalControler {
 	 */
 	protected String initialEventsFile = "../../matsim/mysimulations/multimodal/input_10pct_zrhCutC/events_initial_traveltimes.txt.gz";
 
-	protected TravelTime travelTime;
+	protected PersonalizableTravelTime travelTime;
 
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ParallelDuringActivityReplanner parallelDuringActivityReplanner;

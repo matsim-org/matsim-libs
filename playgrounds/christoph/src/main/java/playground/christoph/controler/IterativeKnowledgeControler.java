@@ -14,7 +14,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.network.SubNetwork;
@@ -69,7 +69,7 @@ public class IterativeKnowledgeControler extends Controler{
 
 			@Override
 			public PersonalizableTravelCost createTravelCostCalculator(
-					TravelTime timeCalculator,
+					PersonalizableTravelTime timeCalculator,
 					CharyparNagelScoringConfigGroup cnScoringGroup) {
 				return travelCostWrapper;
 			}
@@ -94,7 +94,7 @@ public class IterativeKnowledgeControler extends Controler{
 		/*
 		 * We don't use the knowledge here - the initial routes will be anyway on the shortest path.
 		 */
-		TravelTime travelTime = new FreespeedTravelTimeCost(this.config.charyparNagelScoring());
+		PersonalizableTravelTime travelTime = new FreespeedTravelTimeCost(this.config.charyparNagelScoring());
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
 		

@@ -21,9 +21,9 @@
 package playground.christoph.multimodal.router.costcalculator;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 
-public interface MultiModalTravelTime extends TravelTime{
+public interface MultiModalTravelTime extends PersonalizableTravelTime {
 
 	public double getModalLinkTravelTime(Link link, double time, String transportMode);
 }

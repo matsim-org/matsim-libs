@@ -32,6 +32,7 @@ import java.util.concurrent.CyclicBarrier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -49,12 +50,12 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.withinday.network.WithinDayLinkImpl;
 
-public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
+public class TravelTimeCollector implements PersonalizableTravelTime, AgentStuckEventHandler,
 	LinkEnterEventHandler, LinkLeaveEventHandler,
 	AgentArrivalEventHandler, AgentDepartureEventHandler, SimulationInitializedListener,
 	SimulationBeforeSimStepListener, SimulationAfterSimStepListener {
@@ -190,6 +191,11 @@ public class TravelTimeCollector implements TravelTime, AgentStuckEventHandler,
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
 		// parallel Execution
 		this.run(e.getSimulationTime());
+	}
+	
+	@Override
+	public void setPerson(Person person) {
+		// nothing to do here
 	}
 
 	private class TripBin {

@@ -3,7 +3,7 @@ package playground.ciarif.flexibletransports.controler;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -80,7 +80,7 @@ public class FlexibleTransportControler extends Controler {
 	}
 
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
 
 		PlanAlgorithm router = null;
 

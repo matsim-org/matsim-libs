@@ -30,7 +30,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 
 /*
  * Extended version of PlansCalcRoute that tries to create 
@@ -39,13 +39,13 @@ import org.matsim.core.router.util.TravelTime;
 public class CloneablePlansCalcRoute extends PlansCalcRoute implements Cloneable{
 	
 	protected PersonalizableTravelCost costCalculator;
-	protected TravelTime timeCalculator;
+	protected PersonalizableTravelTime timeCalculator;
 	protected LeastCostPathCalculatorFactory factory;
 		
 	private final static Logger log = Logger.getLogger(CloneablePlansCalcRoute.class);
 				
 	public CloneablePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final PersonalizableTravelCost costCalculator,
-			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
+			final PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		super(group, network, costCalculator, timeCalculator, factory);
 
 		this.costCalculator = costCalculator;
@@ -57,7 +57,7 @@ public class CloneablePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	 * If no LeastCostPathCalculatorFactory is given use by Default
 	 * a DijkstraFactory.
 	 */
-	public CloneablePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator) {
+	public CloneablePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 		
@@ -81,7 +81,7 @@ public class CloneablePlansCalcRoute extends PlansCalcRoute implements Cloneable
 			log.warn("Could not clone the Travel Cost Calculator - use reference to the existing Calculator and hope the best...");
 		}
 		
-		TravelTime travelTimeClone = null;
+		PersonalizableTravelTime travelTimeClone = null;
 		if (timeCalculator instanceof Cloneable) {
 			try {
 				Method method;

@@ -42,7 +42,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
@@ -158,7 +158,7 @@ public class TransitControler extends Controler {
 	}
 
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
 		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 				this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.transitConfig);
 	}

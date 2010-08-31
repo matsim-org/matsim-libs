@@ -50,7 +50,7 @@ import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.locationchoice.LocationChoice;
 
 import playground.jhackney.socialnetworks.replanning.RandomFacilitySwitcherF;
@@ -79,7 +79,7 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 
 		Network network = controler.getNetwork();
 		PersonalizableTravelCost travelCostCalc = controler.createTravelCostCalculator();
-		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
+		PersonalizableTravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		ActivityFacilities facilities = controler.getFacilities();
 
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());

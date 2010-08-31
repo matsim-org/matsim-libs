@@ -109,7 +109,7 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorInvertedNetProxyFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
@@ -1002,7 +1002,7 @@ public class Controler {
 		return this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
 	}
 
-	public final TravelTime getTravelTimeCalculator() {
+	public final PersonalizableTravelTime getTravelTimeCalculator() {
 		return this.travelTimeCalculator;
 	}
 
@@ -1069,7 +1069,7 @@ public class Controler {
 	 *         be used by a single thread, use multiple instances for multiple
 	 *         threads!
 	 */
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final TravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
 		if (this.getScenario().getConfig().scenario().isUseRoadpricing()
 				&& (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scenarioData.getRoadPricingScheme().getType()))) {
 			return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this

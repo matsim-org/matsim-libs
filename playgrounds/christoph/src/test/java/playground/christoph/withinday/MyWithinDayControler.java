@@ -24,7 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 
 import playground.christoph.controler.WithinDayControler;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
@@ -73,7 +73,7 @@ public class MyWithinDayControler extends Controler {
 	 */
 	protected int numReplanningThreads = 1;
 
-	protected TravelTime travelTime;
+	protected PersonalizableTravelTime travelTime;
 
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ParallelDuringActivityReplanner parallelActEndReplanner;
@@ -99,7 +99,7 @@ public class MyWithinDayControler extends Controler {
 	protected void initReplanningRouter() {
 
 		// use dijkstra for replanning (routing)
-		travelTime=this.getTravelTimeCalculator();
+		travelTime = this.getTravelTimeCalculator();
 //		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
 

@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
@@ -38,7 +39,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
@@ -101,7 +102,7 @@ public class WithinDayControler extends Controler {
 	 */
 	protected int numReplanningThreads = 6;
 
-	protected TravelTime travelTime;
+	protected PersonalizableTravelTime travelTime;
 
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ParallelDuringActivityReplanner parallelActEndReplanner;
@@ -360,8 +361,7 @@ public class WithinDayControler extends Controler {
 		System.exit(0);
 	}
 
-	public static class FreeSpeedTravelTime implements TravelTime, Cloneable
-	{
+	public static class FreeSpeedTravelTime implements PersonalizableTravelTime, Cloneable {
 
 		@Override
 		public double getLinkTravelTime(Link link, double time) {
@@ -371,6 +371,11 @@ public class WithinDayControler extends Controler {
 		@Override
 		public FreeSpeedTravelTime clone() {
 			return new FreeSpeedTravelTime();
+		}
+
+		@Override
+		public void setPerson(Person person) {
+			// nothing to do here
 		}
 	}
 }

@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -44,7 +44,7 @@ public class IncomeTollTravelCostCalculatorFactory implements TravelCostCalculat
 		this.scheme = roadPricingScheme;
 	}
 	
-	public PersonalizableTravelCost createTravelCostCalculator(TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
+	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
 		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
 		final IncomeTollTravelCostCalculator incomeTollTravelCostCalculator = new IncomeTollTravelCostCalculator(personHouseholdMapping, scheme);
 		

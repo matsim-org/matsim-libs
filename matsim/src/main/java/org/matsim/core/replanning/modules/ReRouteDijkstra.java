@@ -27,7 +27,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -38,7 +38,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class ReRouteDijkstra extends AbstractMultithreadedModule {
 
 	PersonalizableTravelCost costCalculator = null;
-	TravelTime timeCalculator = null;
+	PersonalizableTravelTime timeCalculator = null;
 	Network network = null;
 	private PlansCalcRouteConfigGroup configGroup = null;
 	
@@ -47,14 +47,14 @@ public class ReRouteDijkstra extends AbstractMultithreadedModule {
 	 * as argument 
 	 */
 	@Deprecated
-	protected ReRouteDijkstra(GlobalConfigGroup globalConfigGroup, final Network network, final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator) {
+	protected ReRouteDijkstra(GlobalConfigGroup globalConfigGroup, final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
 		super(globalConfigGroup);
 		this.network = network;
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
 	}
 	
-	public ReRouteDijkstra(Config config, final Network network, final PersonalizableTravelCost costCalculator, final TravelTime timeCalculator) {
+	public ReRouteDijkstra(Config config, final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
 		this(config.global(), network, costCalculator, timeCalculator);
 		this.configGroup = config.plansCalcRoute();
 	}

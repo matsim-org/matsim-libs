@@ -22,31 +22,27 @@ package playground.christoph.router.util;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 
-public abstract class KnowledgeTravelTime implements TravelTime, Cloneable {
+public abstract class KnowledgeTravelTime implements PersonalizableTravelTime, Cloneable {
 
 	protected Person person;
 	
-	public double getLinkTravelTime(Link link, double time, Person person)
-	{
+	public double getLinkTravelTime(Link link, double time, Person person) {
 		this.person = person;
 		return getLinkTravelTime(link, time);
 	}
 	
-	public void setPerson(Person person)
-	{
+	public void setPerson(Person person) {
 		this.person = person;
 	}
 	
-	public Person getPerson()
-	{
+	public Person getPerson() {
 		return this.person;
 	}
 		
 	@Override
-	public KnowledgeTravelTime clone()
-	{
+	public KnowledgeTravelTime clone() {
 		return this;
 	}
 }

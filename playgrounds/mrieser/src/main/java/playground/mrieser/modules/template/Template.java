@@ -37,6 +37,7 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
@@ -137,7 +138,7 @@ public class Template implements MatsimModule {
 
 			@Override
 			public PersonalizableTravelCost createTravelCostCalculator(
-					TravelTime timeCalculator,
+					PersonalizableTravelTime timeCalculator,
 					CharyparNagelScoringConfigGroup cnScoringGroup) {
 				return new PersonalizableTravelCost() {
 

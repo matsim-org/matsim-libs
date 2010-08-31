@@ -34,7 +34,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -87,7 +87,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 
 				@Override
 				public PersonalizableTravelCost createTravelCostCalculator(
-						TravelTime timeCalculator,
+						PersonalizableTravelTime timeCalculator,
 						CharyparNagelScoringConfigGroup cnScoringGroup) {
 					return new TollTravelCostCalculator(previousTravelCostCalculatorFactory.createTravelCostCalculator(timeCalculator, cnScoringGroup), RoadPricing.this.scheme);
 				}

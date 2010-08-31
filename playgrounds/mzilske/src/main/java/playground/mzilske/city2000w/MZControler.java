@@ -99,7 +99,7 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorInvertedNetProxyFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -914,7 +914,7 @@ public final class MZControler {
 	private PlanStrategy loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings) {
 		Network network = this.network;
 		PersonalizableTravelCost travelCostCalc = this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
-		TravelTime travelTimeCalc = this.travelTimeCalculator;
+		PersonalizableTravelTime travelTimeCalc = this.travelTimeCalculator;
 		Config config = this.config;
 
 		PlanStrategy strategy = null;

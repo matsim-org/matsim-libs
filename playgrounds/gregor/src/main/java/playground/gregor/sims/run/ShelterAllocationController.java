@@ -23,7 +23,7 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -155,7 +155,7 @@ public class ShelterAllocationController extends Controler {
 
 				@Override
 				public PersonalizableTravelCost createTravelCostCalculator(
-						TravelTime timeCalculator,
+						PersonalizableTravelTime timeCalculator,
 						CharyparNagelScoringConfigGroup cnScoringGroup) {
 					return ShelterAllocationController.this.pluggableTravelCost;
 				}

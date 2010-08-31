@@ -15,7 +15,7 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationNetFromNetcdfGenerator;
@@ -110,7 +110,7 @@ public class EvacuationDelayController extends Controler {
 				
 				@Override
 				public PersonalizableTravelCost createTravelCostCalculator(
-						TravelTime timeCalculator,
+						PersonalizableTravelTime timeCalculator,
 						CharyparNagelScoringConfigGroup cnScoringGroup) {
 					return EvacuationDelayController.this.pluggableTravelCost;
 				}
