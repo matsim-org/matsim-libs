@@ -32,6 +32,7 @@ public class MyStrategy extends PlanStrategy {
 
 
 	public MyStrategy(Controler controler) {
+		// also possible: MyStrategy( Scenario scenario ).  But then I do not have events.  kai, aug'10
 		super(new RandomPlanSelector());
 
 		MyModule mod = new MyModule( controler ) ;
@@ -47,7 +48,7 @@ public class MyStrategy extends PlanStrategy {
 
 		Config config;
 		if ( args.length==0 ) {
-			config = Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
+			config = Gbl.createConfig(new String[] {"./kai/src/main/java/playground/kai/other/myconfig.xml"});
 		} else {
 			config = Gbl.createConfig(args) ;
 		}
