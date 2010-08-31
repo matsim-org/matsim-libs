@@ -24,18 +24,9 @@
 package playground.tnicolai.urbansim;
 
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.URL;
-import java.util.Stack;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -46,9 +37,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -59,14 +47,10 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.matsimTest.MATSim4UrbanSimTest;
 import playground.tnicolai.urbansim.utils.LoadFile;
 import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.MyControlerListener;
