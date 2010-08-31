@@ -208,7 +208,8 @@ public class MATSim4Urbansim {
 			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, getCurrentPath() + "tmp/MATSim4UrbanSimConfigSchema.xsd");
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD();
 			
-//			File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
+			// for debugging
+			// File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
 			if(file2XSD == null || !file2XSD.exists()){
 				
 				log.warn(file2XSD.getCanonicalPath() + " is not available. Loading compensatory xsd instead (this may be is an older version).");
