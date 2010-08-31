@@ -319,9 +319,9 @@ public class ReadFromUrbansimParcelModel {
 		List<Person> bakPersons = new ArrayList<Person>( backupPop.getPersons().values() ) ; // Population data structure not needed!
 		Collections.shuffle( bakPersons ) ;
 		for ( Person person : bakPersons ) {
-			if ( newPop.getPersons().size() >= samplingRate*NUrbansimPersons ) {
+			if ( newPop.getPersons().size() >= samplingRate*NUrbansimPersons )
 				break ;
-			}
+
 			newPop.addPerson( person ) ;
 		}
 

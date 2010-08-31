@@ -77,6 +77,9 @@ public class Constants {
 	public static final String TAB = "\t";
 	public static final String NEW_LINE	= "\r\n";
 	public static final String PARCEL_ID = "parcel_id";
+	public static final String PERSON_ID = "person_id";
+	public static final String PARCEL_ID_HOME = "parcel_id_home";
+	public static final String PARCEL_ID_WORK = "parcel_id_work";
 	public static final String X_COORDINATE = "x_coord_sp";
 	public static final String Y_COORDINATE = "y_coord_sp";
 	public static final String ZONE_ID = "zone_id";

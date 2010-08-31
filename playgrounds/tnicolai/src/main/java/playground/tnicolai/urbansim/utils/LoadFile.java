@@ -89,6 +89,14 @@ public class LoadFile {
 				bos.write(c);
 			}
 			log.info("Loading successfully.");
+			
+			if(bos != null){
+				bos.flush();
+				bos.close();
+			}
+			if (bis != null) bis.close();
+			if (is != null) is.close();
+			
 			return output;
 		}
 		catch(IOException io){
@@ -98,16 +106,6 @@ public class LoadFile {
 		catch (Exception e) {
 			e.printStackTrace();
 			return null;
-		}
-		finally{
-			try{
-				if(bos != null){
-					bos.flush();
-					bos.close();
-				}
-				if (bis != null) bis.close();
-				if (is != null) is.close();
-			} catch(Exception e){e.printStackTrace();}
 		}
 	}
 	
