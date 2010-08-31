@@ -20,6 +20,7 @@
 package org.matsim.contrib.sna.graph.spatial;
 
 import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
+import org.matsim.contrib.sna.graph.GraphFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Point;
@@ -33,6 +34,14 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class SpatialSparseGraphBuilder extends AbstractSparseGraphBuilder<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> {
 	
+	/**
+	 * @param factory
+	 */
+	public SpatialSparseGraphBuilder(GraphFactory<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> factory) {
+		super(factory);
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * Creates a new builder where all spatial information refers to the
 	 * coordinated reference system <tt>crs</tt>.

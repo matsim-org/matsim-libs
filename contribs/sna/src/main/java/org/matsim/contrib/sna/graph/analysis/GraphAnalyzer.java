@@ -1,0 +1,77 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * GraphAnalyzer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package org.matsim.contrib.sna.graph.analysis;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.matsim.contrib.sna.graph.Graph;
+
+/**
+ * Wrapper class for the execution of analyzer tasks.
+ * 
+ * @author illenberger
+ * 
+ */
+public class GraphAnalyzer {
+
+	/**
+	 * Applies the analyzer task on a graph and return the results in a map.
+	 * 
+	 * @see {@link AnalyzerTask}
+	 * @param graph
+	 *            a graph.
+	 * @param task
+	 *            a analyzer task.
+	 * @return the results of the analyzer.
+	 */
+	public static Map<String, Double> analyze(Graph graph, AnalyzerTask task) {
+		Map<String, Double> stats = new LinkedHashMap<String, Double>();
+		task.analyze(graph, stats);
+		return stats;
+	}
+
+	/**
+	 * Writes the results of an analyzer task to file.
+	 * 
+	 * @param stats
+	 *            the results of an analyzer task.
+	 * @param filename
+	 *            the file where to write the results.
+	 * @throws IOException
+	 */
+	public static void writeStats(Map<String, Double> stats, String filename) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+
+		writer.write("property\tvalue");
+		writer.newLine();
+		for (Entry<String, Double> entry : stats.entrySet()) {
+			writer.write(entry.getKey());
+			writer.write("\t");
+			writer.write(entry.getValue().toString());
+			writer.newLine();
+		}
+		writer.close();
+	}
+}

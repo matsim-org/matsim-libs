@@ -169,7 +169,7 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 		int N = Integer.parseInt(args[1]);
 		double p = Double.parseDouble(args[2]);
 		long seed = (long) (Math.random() * 1000);
-		if (args.length > 2)
+		if (args.length > 3)
 			seed = Long.parseLong(args[3]);
 
 		ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge>(

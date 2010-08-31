@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.FactoryException;
@@ -64,11 +65,9 @@ public class CRSUtils {
 		CoordinateReferenceSystem crs = crsMappings.get(srid);
 		if (crs == null) {
 			/*
-			 * TODO: There seems to be an issue with the order of latitude and
-			 * longitude information but i have no idea when this applies.
-			 * joh01/10
+			 * Force longitude/latitude order.
 			 */
-			CRSAuthorityFactory factory = CRS.getAuthorityFactory(false);
+			CRSAuthorityFactory factory = CRS.getAuthorityFactory(true);
 			try {
 				crs = factory.createCoordinateReferenceSystem("EPSG:" + srid);
 			} catch (NoSuchAuthorityCodeException e) {

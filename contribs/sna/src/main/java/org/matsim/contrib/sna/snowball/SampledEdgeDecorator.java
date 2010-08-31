@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledVertex.java
+ * SampledEdgeDecorator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,66 +19,44 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.snowball;
 
-import java.util.List;
-
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.EdgeDecorator;
 import org.matsim.contrib.sna.graph.Vertex;
-
+import org.matsim.core.utils.collections.Tuple;
 
 /**
- * Representation of a snowball sampled vertex.
- *  
+ * A decorated class that implements SampledEdge.
+ * 
  * @author illenberger
- *
+ * 
  */
-public interface SampledVertex extends Vertex {
+public class SampledEdgeDecorator<E extends Edge> extends EdgeDecorator<E> implements SampledEdge {
 
 	/**
-	 * @see {@link Vertex#getEdges()}
-	 */
-	public List<? extends SampledEdge> getEdges();
-	
-	/**
-	 * @see {@link Vertex#getNeighbours()}
-	 */
-	public List<? extends SampledVertex> getNeighbours();
-	
-	/**
-	 * @see {@link SnowballAttributes#detect(Integer)}
-	 */
-	public void detect(Integer iteration);
-	
-	/**
-	 * @see {@link SnowballAttributes#getIterationDeteted()}
-	 */
-	public Integer getIterationDetected();
-	
-	/**
-	 * @see {@link SnowballAttributes#isDetected()}
-	 */
-	public boolean isDetected();
-	
-	/**
-	 * @see {@link SnowballAttributes#sample(Integer)}
-	 */
-	public void sample(Integer iteration);
-	
-	/**
-	 * @see {@link SnowballAttributes#getIterationSampled()}
-	 */
-	public Integer getIterationSampled();
-	
-	/**
-	 * @see {@link SnowballAttributes#isSampled()}
-	 */
-	public boolean isSampled();
-
-	/**
-	 * Returns the seed vertex of the component containing this vertex. If there
-	 * are multiple seed vertices the closest one is returned.
+	 * Creates a new orphaned sampled edge decorator.
 	 * 
-	 * @return the seed vertex of the component containing this vertex.
+	 * @param delegate
+	 *            the original edge.
 	 */
-	public SampledVertex getSeed();
-	
-	public void setSeed(SampledVertex seed);
+	protected SampledEdgeDecorator(E delegate) {
+		super(delegate);
+	}
+
+	/**
+	 * @see {@link EdgeDecorator#getOpposite(Vertex)}
+	 */
+	@Override
+	public SampledVertexDecorator<?> getOpposite(Vertex v) {
+		return (SampledVertexDecorator<?>) super.getOpposite(v);
+	}
+
+	/**
+	 * @see {@link EdgeDecorator#getVertices()}
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public Tuple<? extends SampledVertexDecorator<?>, ? extends SampledVertexDecorator<?>> getVertices() {
+		return (Tuple<? extends SampledVertexDecorator<?>, ? extends SampledVertexDecorator<?>>) super.getVertices();
+	}
+
 }

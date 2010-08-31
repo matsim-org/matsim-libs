@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledVertex.java
+ * RandomSeedGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,68 +17,68 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.sna.snowball;
+package org.matsim.contrib.sna.graph.analysis;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Vertex;
 
-
 /**
- * Representation of a snowball sampled vertex.
- *  
+ * A vertex filter which creates a random subset of vertices with a fixed size.
+ * 
  * @author illenberger
- *
+ * 
  */
-public interface SampledVertex extends Vertex {
+public class FixedSizeRandomPartition<V extends Vertex> implements VertexFilter<V> {
+
+	private Random random;
+
+	private int n;
 
 	/**
-	 * @see {@link Vertex#getEdges()}
-	 */
-	public List<? extends SampledEdge> getEdges();
-	
-	/**
-	 * @see {@link Vertex#getNeighbours()}
-	 */
-	public List<? extends SampledVertex> getNeighbours();
-	
-	/**
-	 * @see {@link SnowballAttributes#detect(Integer)}
-	 */
-	public void detect(Integer iteration);
-	
-	/**
-	 * @see {@link SnowballAttributes#getIterationDeteted()}
-	 */
-	public Integer getIterationDetected();
-	
-	/**
-	 * @see {@link SnowballAttributes#isDetected()}
-	 */
-	public boolean isDetected();
-	
-	/**
-	 * @see {@link SnowballAttributes#sample(Integer)}
-	 */
-	public void sample(Integer iteration);
-	
-	/**
-	 * @see {@link SnowballAttributes#getIterationSampled()}
-	 */
-	public Integer getIterationSampled();
-	
-	/**
-	 * @see {@link SnowballAttributes#isSampled()}
-	 */
-	public boolean isSampled();
-
-	/**
-	 * Returns the seed vertex of the component containing this vertex. If there
-	 * are multiple seed vertices the closest one is returned.
+	 * Creates a new vertex filter.
 	 * 
-	 * @return the seed vertex of the component containing this vertex.
+	 * @param n
+	 *            the size of the subset
 	 */
-	public SampledVertex getSeed();
-	
-	public void setSeed(SampledVertex seed);
+	public FixedSizeRandomPartition(int n) {
+		random = new Random();
+		this.n = n;
+	}
+
+	/**
+	 * Creates a new vertex filter.
+	 * 
+	 * @param n
+	 *            the size of the subset
+	 * @param randomSeed
+	 *            a random seed number
+	 */
+	public FixedSizeRandomPartition(int numSeeds, long randomSeed) {
+		random = new Random(randomSeed);
+		this.n = numSeeds;
+	}
+
+	/**
+	 * Returns a random subset of vertices from <tt>vertices</tt> with a given
+	 * size.
+	 * 
+	 * @return a random subset.
+	 */
+	@Override
+	public Set<V> apply(Set<V> vertices) {
+		List<V> list = new ArrayList<V>(vertices);
+		Collections.shuffle(list, random);
+		Set<V> seeds = new HashSet<V>();
+		for (int i = 0; i < n; i++)
+			seeds.add(list.get(i));
+
+		return seeds;
+	}
+
 }

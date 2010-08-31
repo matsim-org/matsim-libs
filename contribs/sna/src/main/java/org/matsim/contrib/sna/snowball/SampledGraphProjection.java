@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledVertex.java
+ * SampledGraphProjection.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,66 +19,45 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.snowball;
 
-import java.util.List;
+import java.util.Set;
 
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphProjection;
 import org.matsim.contrib.sna.graph.Vertex;
 
-
 /**
- * Representation of a snowball sampled vertex.
- *  
+ * Representation of a snowball sampled graph that wraps the original graph and
+ * uses it as delegate.
+ * 
  * @author illenberger
- *
+ * 
  */
-public interface SampledVertex extends Vertex {
+public class SampledGraphProjection<G extends Graph, V extends Vertex, E extends Edge> extends GraphProjection<G, V, E>
+		implements SampledGraph {
 
 	/**
-	 * @see {@link Vertex#getEdges()}
+	 * @see {@link GraphProjection#GraphProjection(Graph)}
 	 */
-	public List<? extends SampledEdge> getEdges();
-	
-	/**
-	 * @see {@link Vertex#getNeighbours()}
-	 */
-	public List<? extends SampledVertex> getNeighbours();
-	
-	/**
-	 * @see {@link SnowballAttributes#detect(Integer)}
-	 */
-	public void detect(Integer iteration);
-	
-	/**
-	 * @see {@link SnowballAttributes#getIterationDeteted()}
-	 */
-	public Integer getIterationDetected();
-	
-	/**
-	 * @see {@link SnowballAttributes#isDetected()}
-	 */
-	public boolean isDetected();
-	
-	/**
-	 * @see {@link SnowballAttributes#sample(Integer)}
-	 */
-	public void sample(Integer iteration);
-	
-	/**
-	 * @see {@link SnowballAttributes#getIterationSampled()}
-	 */
-	public Integer getIterationSampled();
-	
-	/**
-	 * @see {@link SnowballAttributes#isSampled()}
-	 */
-	public boolean isSampled();
+	public SampledGraphProjection(G delegate) {
+		super(delegate);
+	}
 
 	/**
-	 * Returns the seed vertex of the component containing this vertex. If there
-	 * are multiple seed vertices the closest one is returned.
-	 * 
-	 * @return the seed vertex of the component containing this vertex.
+	 * @see {@link GraphProjection#getEdges()}
 	 */
-	public SampledVertex getSeed();
-	
-	public void setSeed(SampledVertex seed);
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SampledEdgeDecorator<E>> getEdges() {
+		return (Set<? extends SampledEdgeDecorator<E>>) super.getEdges();
+	}
+
+	/**
+	 * @see {@link GraphProjection#getVertices()}
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SampledVertexDecorator<V>> getVertices() {
+		return (Set<? extends SampledVertexDecorator<V>>) super.getVertices();
+	}
 }
