@@ -1,6 +1,7 @@
 package playground.wrashid.lib.obj;
 
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Often one needs a HashMap, where the value can be incremented and
@@ -14,6 +15,10 @@ public class IntegerValueHashMap<KeyClass> {
 
 	private HashMap<KeyClass, Integer> hm = new HashMap<KeyClass, Integer>();
 
+	public Set<KeyClass> getKeySet(){
+		return hm.keySet();
+	}
+	
 	public int get(KeyClass id) {
 		if (!hm.containsKey(id)) {
 			hm.put(id, 0);
