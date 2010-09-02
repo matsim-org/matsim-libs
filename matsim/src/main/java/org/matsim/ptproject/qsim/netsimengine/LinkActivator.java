@@ -22,7 +22,7 @@ package org.matsim.ptproject.qsim.netsimengine;
 
 
 
-abstract class LinkActivator {
+public abstract class LinkActivator {
 
 	abstract void activateLink(final QLinkInternalI link);
 
