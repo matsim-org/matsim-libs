@@ -1,19 +1,12 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY PROJBASE     ".">
 		<!ENTITY STUDYBASE    "test/scenarios/triangle/complete">
-		<!-- ENTITY STUDYBASE    "input" -->
-		<!ENTITY RUNSBASE     "runs">
 		<!ENTITY OUTPUTBASE   "test/output/playground/jhackney/socialnetworks/SocialNetworks2Test/test2EvolvingNetwork">
-		<!-- ENTITY OUTPUTBASE   "C:/Documents and Settings/jhackney/My Documents/sandbox00/ivt/studies/jhackney/output" -->
 		<!ENTITY INPUTBASE    "input">
-		<!ENTITY ANALYSISBASE "analysis">
-		<!ENTITY LOCALDTDBASE "dtd">
-		<!ENTITY HOMEPAGEBASE "http://www.matsim.org">
 	]
 >
-<config xml:lang="de-CH">
+<config>
 
 <!-- ====================================================================== -->
 <!-- Test Case for euclidrandom social network generation, friends made     -->
@@ -22,15 +15,8 @@
 <!-- Use playground.jhackney.controler.SNControler2 as main                 -->
 <!-- ====================================================================== -->
 
-	<module name="config">
-		<param name="outputConfigFile" value="&OUTPUTBASE;/output_config.xml" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="global">
 		<param name="randomSeed" value="4711" />
-		<param name="localDTDBase" value="&LOCALDTDBASE;/" />
 		<param name="numberOfThreads" value = "1" />
 	</module>
 
@@ -45,8 +31,7 @@
 
 	<module name="network">
 		<param name="inputNetworkFile" value="&STUDYBASE;/network.xml" />
-		<param name="outputNetworkFile" value="&OUTPUTBASE;/output_network.xml" />
-	</module> <!-- network -->
+	</module>
 
 <!-- ====================================================================== -->
 
@@ -220,8 +205,6 @@
 		<param name="switch_weights" value=".0,.0,1.0,.0,1.0" />
 
 	</module>
-
-
 
 <!-- ====================================================================== -->
 	<module name="kml21">
