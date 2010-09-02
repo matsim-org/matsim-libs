@@ -32,7 +32,7 @@ import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.netsimengine.ParallelQSimEngine.ExtendedQueueNode;
 
-public class QSimEngineThread extends Thread implements QSimEngine{
+public class QSimEngineRunner implements QSimEngine, Runnable {
 
 	private double time = 0.0;
 	private boolean simulateAllNodes = false;
@@ -52,7 +52,7 @@ public class QSimEngineThread extends Thread implements QSimEngine{
 	private final QSim qsim;
 	private final AgentSnapshotInfoBuilder positionInfoBuilder;
 
-	/*package*/ QSimEngineThread(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier,
+	/*package*/ QSimEngineRunner(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier,
 			QSim sim, AgentSnapshotInfoBuilder positionInfoBuilder)
 	{
 		this.simulateAllNodes = simulateAllNodes;

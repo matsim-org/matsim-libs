@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 
 /**
  * An extended version of the QSimEngine that uses an array of
@@ -49,8 +50,9 @@ import org.matsim.ptproject.qsim.QSim;
 public class ParallelQSimEngine extends QSimEngineImpl{
 	// yy I think we could consider moving the node-based rnd num gen also into the sequential version. kai, jun'10
 
-	private QSimEngineThread[] threads;
 	private int numOfThreads;
+	private Thread[] threads;
+	private QSimEngineRunner[] engines;
 
 	private ExtendedQueueNode[][] parallelNodesArrays;
 	private List<List<QLinkInternalI>> parallelSimLinksLists;
@@ -90,9 +92,10 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		 * Calling the afterSim Method of the QSimEngineThreads
 		 * will set their simulationRunning flag to false.
 		 */
-		for (QSimEngineThread thread : this.threads)
+//		for (QSimEngineThread thread : this.threads)
+		for (QSimEngineRunner engine : this.engines)
 		{
-			thread.afterSim();
+			engine.afterSim();
 		}
 
 		/*
@@ -130,9 +133,9 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		try
 		{
 			// set current Time
-			for (QSimEngineThread thread : this.threads)
+			for (QSimEngineRunner engine : this.engines)
 			{
-				thread.setTime(time);
+				engine.setTime(time);
 			}
 
 			this.startBarrier.await();
@@ -169,9 +172,9 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 
 		int numLinks = 0;
 
-		for (QSimEngineThread thread : this.threads)
+		for (QSimEngineRunner engine : this.engines)
 		{
-			numLinks = numLinks + thread.getNumberOfSimulatedLinks();
+			numLinks = numLinks + engine.getNumberOfSimulatedLinks();
 		}
 
 		return numLinks;
@@ -184,8 +187,9 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		createNodesArrays(this.simNodesArray);
 		createLinkLists(this.allLinks);
 
-		this.threads = new QSimEngineThread[numOfThreads];
-		LinkReActivator linkReActivator = new LinkReActivator(this.threads);
+		this.threads = new Thread[numOfThreads];
+		this.engines = new QSimEngineRunner[numOfThreads] ;
+		LinkReActivator linkReActivator = new LinkReActivator(this.engines);
 
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.separationBarrier = new CyclicBarrier(numOfThreads, linkReActivator);
@@ -194,14 +198,16 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++)
 		{
-			QSimEngineThread thread = new QSimEngineThread(simulateAllNodes, simulateAllLinks, this.startBarrier, this.separationBarrier, 
+			QSimEngineRunner engine = new QSimEngineRunner(simulateAllNodes, simulateAllLinks, this.startBarrier, this.separationBarrier, 
 					this.endBarrier, this.getQSim(), this.getAgentSnapshotInfoBuilder());
+			engine.setExtendedQueueNodeArray(this.parallelNodesArrays[i]);
+			engine.setLinks(this.parallelSimLinksLists.get(i));
+			Thread thread = new Thread( engine ) ;
 			thread.setName("QSimEngineThread" + i);
 
-			thread.setExtendedQueueNodeArray(this.parallelNodesArrays[i]);
-			thread.setLinks(this.parallelSimLinksLists.get(i));
 			thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
 			this.threads[i] = thread;
+			this.engines[i] = engine ;
 
 			thread.start();
 		}
@@ -289,7 +295,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 				for (Link outLink : n.getOutLinks().values())
 				{
 					QLinkInternalI qLink = this.getQSim().getQNetwork().getQLink(outLink.getId());
-					qLink.setQSimEngine(this.threads[thread]);
+					qLink.setQSimEngine(this.engines[thread]);
 				}
 			}
 			thread++;
@@ -336,11 +342,11 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 	 */
 	/*package*/ static class LinkReActivator implements Runnable
 	{
-		private final QSimEngineThread[] threads;
+		private final QSimEngineRunner[] runners;
 
-		public LinkReActivator(QSimEngineThread[] threads)
+		public LinkReActivator(QSimEngineRunner[] threads)
 		{
-			this.threads = threads;
+			this.runners = threads;
 		}
 
 		public void run()
@@ -348,13 +354,13 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 			/*
 			 * Each Thread contains a List of Links to activate.
 			 */
-			for (QSimEngineThread thread : this.threads)
+			for (QSimEngineRunner runner : this.runners)
 			{
 				/*
 				 * We do not redistribute the Links - they will be processed
 				 * by the same thread during the whole simulation.
 				 */
-				thread.activateLinks();
+				runner.activateLinks();
 			}
 		}
 
