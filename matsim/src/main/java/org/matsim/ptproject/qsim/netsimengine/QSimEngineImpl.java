@@ -146,7 +146,7 @@ private final double stucktimeCache;
 	}
 
 	@Override
-	void activateLink(final QLinkInternalI link) {
+	protected void activateLink(final QLinkInternalI link) {
 		if (!simulateAllLinks) {
 			this.simActivateThis.add(link);
 		}
@@ -171,7 +171,8 @@ private final double stucktimeCache;
     return this.qsim;
   }
 
-  public AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(){
+  @Override
+protected AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(){
   	return this.positionInfoBuilder;
   }
 

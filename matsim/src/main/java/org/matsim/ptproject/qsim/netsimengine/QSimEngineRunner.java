@@ -194,7 +194,7 @@ public class QSimEngineRunner extends QSimEngine implements Runnable {
 	}	// run()
 
 	@Override
-	void activateLink(QLinkInternalI link)
+	protected void activateLink(QLinkInternalI link)
 	{
 		if (!simulateAllLinks)
 		{

@@ -161,7 +161,7 @@ class ParallelQSimEngine extends QSimEngineImpl{
 	 * them as LinkActivators.
 	 */
 	@Override
-	synchronized void activateLink(final QLinkInternalI link)
+	protected synchronized void activateLink(final QLinkInternalI link)
 	{
 		super.activateLink(link);
 	}
