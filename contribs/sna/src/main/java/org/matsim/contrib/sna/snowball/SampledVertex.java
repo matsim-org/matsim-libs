@@ -23,12 +23,11 @@ import java.util.List;
 
 import org.matsim.contrib.sna.graph.Vertex;
 
-
 /**
  * Representation of a snowball sampled vertex.
- *  
+ * 
  * @author illenberger
- *
+ * 
  */
 public interface SampledVertex extends Vertex {
 
@@ -36,37 +35,37 @@ public interface SampledVertex extends Vertex {
 	 * @see {@link Vertex#getEdges()}
 	 */
 	public List<? extends SampledEdge> getEdges();
-	
+
 	/**
 	 * @see {@link Vertex#getNeighbours()}
 	 */
 	public List<? extends SampledVertex> getNeighbours();
-	
+
 	/**
 	 * @see {@link SnowballAttributes#detect(Integer)}
 	 */
 	public void detect(Integer iteration);
-	
+
 	/**
 	 * @see {@link SnowballAttributes#getIterationDeteted()}
 	 */
 	public Integer getIterationDetected();
-	
+
 	/**
 	 * @see {@link SnowballAttributes#isDetected()}
 	 */
 	public boolean isDetected();
-	
+
 	/**
 	 * @see {@link SnowballAttributes#sample(Integer)}
 	 */
 	public void sample(Integer iteration);
-	
+
 	/**
 	 * @see {@link SnowballAttributes#getIterationSampled()}
 	 */
 	public Integer getIterationSampled();
-	
+
 	/**
 	 * @see {@link SnowballAttributes#isSampled()}
 	 */
@@ -78,7 +77,17 @@ public interface SampledVertex extends Vertex {
 	 * 
 	 * @return the seed vertex of the component containing this vertex.
 	 */
+	/*
+	 * Not sure if this lasts for ever... This is rather pragmatic since we do
+	 * not have directed graphs. joh 08/10
+	 */
 	public SampledVertex getSeed();
-	
+
+	/**
+	 * Sets the seed vertex of the component containing the vertex.
+	 * 
+	 * @param seed
+	 *            a vertex.
+	 */
 	public void setSeed(SampledVertex seed);
 }

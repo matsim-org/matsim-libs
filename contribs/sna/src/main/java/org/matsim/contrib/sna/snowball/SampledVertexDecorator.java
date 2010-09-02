@@ -115,7 +115,6 @@ public class SampledVertexDecorator<V extends Vertex> extends VertexDecorator<V>
 	/**
 	 * @see {@link SampledVertex#getSeed()}
 	 */
-	@Deprecated
 	@Override
 	public SampledVertexDecorator<V> getSeed() {
 		return seed;

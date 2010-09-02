@@ -29,22 +29,43 @@ import java.util.Set;
 
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
-
 /**
+ * Utility class for creating subsets of snowball sampled vertices.
+ * 
  * @author illenberger
- *
+ * 
  */
 public class SnowballPartitions {
-	
+
+	/**
+	 * Creates a subset of sampled vertices.
+	 * 
+	 * @param <V>
+	 *            the vertex type.
+	 * @param vertices
+	 *            a set of vertices.
+	 * @return a subset of sampled vertices.
+	 */
 	public static <V extends SampledVertex> Set<V> createSampledPartition(Collection<V> vertices) {
 		Set<V> partition = new HashSet<V>();
-		for(V vertex : vertices) {
-			if(vertex.isSampled())
+		for (V vertex : vertices) {
+			if (vertex.isSampled())
 				partition.add(vertex);
 		}
 		return partition;
 	}
-	
+
+	/**
+	 * Creates a subset of vertices sampled in a specific iteration.
+	 * 
+	 * @param <V>
+	 *            the vertex type.
+	 * @param vertices
+	 *            a set of vertices.
+	 * @param iteration
+	 *            the snowball iteration.
+	 * @return a subset of vertices sampled in iteration <tt>iteration</tt>.
+	 */
 	public static <V extends SampledVertex> Set<V> createSampledPartition(Collection<V> vertices, int iteration) {
 		Set<V> partition = new HashSet<V>();
 		for (V vertex : vertices) {
@@ -55,7 +76,18 @@ public class SnowballPartitions {
 		}
 		return partition;
 	}
-	
+
+	/**
+	 * Creates a subset of vertices detected in a specific iteration.
+	 * 
+	 * @param <V>
+	 *            the vertex type.
+	 * @param vertices
+	 *            a set of vertices.
+	 * @param iteration
+	 *            the snowball iteration.
+	 * @return a subset of vertices detected in a specific iteration.
+	 */
 	public static <V extends SampledVertex> Set<V> createDetectedPartition(Collection<V> vertices, int iteration) {
 		Set<V> partition = new HashSet<V>();
 		for (V vertex : vertices) {
@@ -66,7 +98,18 @@ public class SnowballPartitions {
 		}
 		return partition;
 	}
-	
+
+	/**
+	 * Creates a list of sets of sampled vertices where the list index
+	 * corresponds to the iteration the vertices have been sampled.
+	 * 
+	 * @param <V>
+	 *            the vertex type.
+	 * @param vertices
+	 *            a set of vertices.
+	 * @return a list of sets of sampled vertices where the list index
+	 *         corresponds to the iteration the vertices have been sampled.
+	 */
 	public static <V extends SampledVertex> List<Set<V>> createSampledPartitions(Collection<V> vertices) {
 		TIntObjectHashMap<Set<V>> partitions = new TIntObjectHashMap<Set<V>>();
 		for (V vertex : vertices) {
@@ -81,12 +124,12 @@ public class SnowballPartitions {
 				partition.add(vertex);
 			}
 		}
-		
+
 		List<Set<V>> list = new ArrayList<Set<V>>(partitions.size());
-		for(int i = 0; i < partitions.size()-1; i++) {
+		for (int i = 0; i < partitions.size() - 1; i++) {
 			list.add(partitions.get(i));
 		}
-		
+
 		return list;
 	}
 }

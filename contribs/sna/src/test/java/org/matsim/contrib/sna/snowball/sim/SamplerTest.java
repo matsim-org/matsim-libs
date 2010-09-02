@@ -39,28 +39,36 @@ import org.matsim.core.utils.misc.CRCChecksum;
 
 /**
  * @author jillenberger
- *
+ * 
  */
 public class SamplerTest extends TestCase {
 
+	/**
+	 * Runs a snowball simulation and compares the degree distributions for each
+	 * iteration.
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public void test() throws FileNotFoundException, IOException {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(TestCaseUtils.getPackageInputDirecoty(getClass()) + "test.graphml.gz");
-		
+
 		Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>();
 		sampler.setSeedGenerator(new FixedSizeRandomPartition<Vertex>(1, 1));
 		sampler.run(graph);
-			
+
 		Degree degree = new Degree();
-		for(int it = 0; it <= sampler.getIteration(); it++) {
-			Set<? extends SampledVertex> vertices = SnowballPartitions.createSampledPartition(sampler.getSampledGraph().getVertices(), it);
+		for (int it = 0; it <= sampler.getIteration(); it++) {
+			Set<? extends SampledVertex> vertices = SnowballPartitions.createSampledPartition(sampler.getSampledGraph()
+					.getVertices(), it);
 			Distribution distr = degree.distribution(vertices);
-			
+
 			String reference = String.format("%1$s/k.%2$s.txt", TestCaseUtils.getPackageInputDirecoty(getClass()), it);
 			String tmp = String.format("%1$s/k.%2$s.txt", TestCaseUtils.getOutputDirectory(), it);
-			
+
 			Distribution.writeHistogram(distr.absoluteDistribution(), tmp);
-			
+
 			assertEquals(CRCChecksum.getCRCFromFile(reference), CRCChecksum.getCRCFromFile(tmp));
 		}
 	}
