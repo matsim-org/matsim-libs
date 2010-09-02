@@ -31,7 +31,6 @@ public class NetworkConfigGroup extends Module {
 	public static final String GROUP_NAME = "network";
 
 	private static final String INPUT_FILE= "inputNetworkFile";
-	private static final String OUTPUT_FILE = "outputNetworkFile";
 
 	private static final String TIME_VARIANT_NETWORK = "timeVariantNetwork";
 	private static final String CHANGE_EVENTS_INPUT_FILE = "inputChangeEventsFile";
@@ -40,7 +39,6 @@ public class NetworkConfigGroup extends Module {
 	public static final String LANEDEFINITIONSINPUTFILE = "laneDefinitionsFile";
 
 	private String inputFile = null;
-	private String outputFile = null;
 
 	private String changeEventsInputFile = null;
 	private String changeEventsOutputFile = null;
@@ -57,8 +55,6 @@ public class NetworkConfigGroup extends Module {
 	public String getValue(final String key) {
 		if (NetworkConfigGroup.INPUT_FILE.equals(key)) {
 			return getInputFile();
-		} else if (NetworkConfigGroup.OUTPUT_FILE.equals(key)) {
-			return getOutputFile();
 		} else if (NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE.equals(key)) {
 			return getChangeEventsInputFile();
 		} else if (NetworkConfigGroup.CHANGE_EVENTS_OUTPUT_FILE.equals(key)) {
@@ -77,8 +73,6 @@ public class NetworkConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (NetworkConfigGroup.INPUT_FILE.equals(key)) {
 			setInputFile(value.replace('\\', '/'));
-		} else if (NetworkConfigGroup.OUTPUT_FILE.equals(key)) {
-			setOutputFile(value.replace('\\', '/'));
 		} else if (NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE.equals(key)) {
 			setChangeEventInputFile(value.replace('\\', '/'));
 		} else if (NetworkConfigGroup.CHANGE_EVENTS_OUTPUT_FILE.equals(key)) {
@@ -96,7 +90,6 @@ public class NetworkConfigGroup extends Module {
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(NetworkConfigGroup.INPUT_FILE, getValue(NetworkConfigGroup.INPUT_FILE));
-		map.put(NetworkConfigGroup.OUTPUT_FILE, getValue(NetworkConfigGroup.OUTPUT_FILE));
 		map.put(NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE, getValue(NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE));
 		map.put(NetworkConfigGroup.CHANGE_EVENTS_OUTPUT_FILE, getValue(NetworkConfigGroup.CHANGE_EVENTS_OUTPUT_FILE));
 		map.put(NetworkConfigGroup.TIME_VARIANT_NETWORK, getValue(NetworkConfigGroup.TIME_VARIANT_NETWORK));
@@ -111,13 +104,6 @@ public class NetworkConfigGroup extends Module {
 	}
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
-	}
-
-	public String getOutputFile() {
-		return this.outputFile;
-	}
-	public void setOutputFile(final String outputFile) {
-		this.outputFile = outputFile;
 	}
 
 	public void setChangeEventInputFile(final String changeEventsInputFile) {

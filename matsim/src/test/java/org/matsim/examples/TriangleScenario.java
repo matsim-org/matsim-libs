@@ -23,7 +23,6 @@ package org.matsim.examples;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkWriter;
@@ -62,13 +61,11 @@ public abstract class TriangleScenario {
 
 	public static final void setUpScenarioConfig(final Config config, final String outputDirectory) {
 		TriangleScenario.config = config;
-		config.config().setOutputFile(outputDirectory + "output_config.xml");
 
 		config.world().setInputFile(studyfolder + "world.xml");
 		config.world().setOutputFile(outputDirectory + "output_world.xml");
 
 		config.network().setInputFile(studyfolder + "network.xml");
-		config.network().setOutputFile(outputDirectory + "output_network.xml");
 
 		config.facilities().setInputFile(studyfolder + "facilities.xml");
 		config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
@@ -111,16 +108,11 @@ public abstract class TriangleScenario {
 		System.out.println("  done.");
 	}
 
-	public static final void writeNetwork(Network network) {
+	public static final void writeNetwork(Network network, String filename) {
 		System.out.println("  writing network xml file... ");
 		NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write(TriangleScenario.config.network().getOutputFile());
+		network_writer.write(filename);
 		System.out.println("  done.");
 	}
 
-	public static final void writeConfig(final Config config) {
-		System.out.println("  writing config xml file... ");
-		new ConfigWriter(config).write(config.config().getOutputFile());
-		System.out.println("  done.");
-	}
 }

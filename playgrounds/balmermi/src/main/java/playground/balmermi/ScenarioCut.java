@@ -41,11 +41,8 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -292,9 +289,10 @@ public class ScenarioCut {
 			reducePopulation(scenario);
 		}
 		calcExtent(scenario);
-		new NetworkWriter(scenario.getNetwork()).write(scenario.getConfig().network().getOutputFile());
-		new FacilitiesWriter(scenario.getActivityFacilities()).write(scenario.getConfig().facilities().getOutputFile());
-		new PopulationWriter(scenario.getPopulation(),scenario.getNetwork(), scenario.getKnowledges()).write(scenario.getConfig().plans().getOutputFile());
+		throw new RuntimeException("no network-output filename specified. see code");
+//		new NetworkWriter(scenario.getNetwork()).write(scenario.getConfig().network().getOutputFile());
+//		new FacilitiesWriter(scenario.getActivityFacilities()).write(scenario.getConfig().facilities().getOutputFile());
+//		new PopulationWriter(scenario.getPopulation(),scenario.getNetwork(), scenario.getKnowledges()).write(scenario.getConfig().plans().getOutputFile());
 	}
 
 	//////////////////////////////////////////////////////////////////////

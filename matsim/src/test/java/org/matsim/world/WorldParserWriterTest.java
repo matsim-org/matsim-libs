@@ -77,7 +77,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 	private final void compareOutputNetwork() {
 		System.out.println("  comparing input and output network file... ");
 		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.network().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(this.config.network().getOutputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(getOutputDirectory() + "output_network.xml");
 		assertEquals(checksum_ref, checksum_run);
 		System.out.println("  done.");
 	}
@@ -143,7 +143,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
-		TriangleScenario.writeNetwork(network);
+		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -178,7 +178,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
-		TriangleScenario.writeNetwork(network);
+		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -214,7 +214,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
-		TriangleScenario.writeNetwork(network);
+		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -251,7 +251,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
-		TriangleScenario.writeNetwork(network);
+		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -288,7 +288,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
-		TriangleScenario.writeNetwork(network);
+		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -325,7 +325,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
-		TriangleScenario.writeNetwork(network);
+		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();

@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -126,7 +125,8 @@ public class RoutePopulation {
 				scenario.getNetwork().removeNode(node.getId());
 			}
 		}
-		new NetworkWriter(scenario.getNetwork()).write(scenario.getConfig().network().getOutputFile());
+		throw new RuntimeException("no output-network filename specified.");
+//		new NetworkWriter(scenario.getNetwork()).write(scenario.getConfig().network().getOutputFile());
 	}
 
 	/**

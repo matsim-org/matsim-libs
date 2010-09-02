@@ -18,17 +18,17 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.visum.VisumNetwork;
-import org.matsim.visum.VisumNetworkReader;
 import org.matsim.visum.VisumNetwork.EdgeType;
+import org.matsim.visum.VisumNetworkReader;
 
 import playground.mzilske.bvg09.StreamingVisumNetworkReader;
 import playground.mzilske.bvg09.VisumNetworkRowHandler;
 
 public class DataPrepare {
-	
+
 	private static final Logger log = Logger.getLogger(DataPrepare.class);
-	
-	
+
+
 	private static final Collection<String> usedIds = new ArrayList<String>();
 	private static final Collection<String> irrelevantIds = Arrays.asList("0", "1", "2", "3", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99");
 
@@ -48,29 +48,28 @@ public class DataPrepare {
 	}
 
 	private void prepareConfig() {
-		this.config.network().setOutputFile(OutNetworkFile);
 	}
 
 	private void convertNetwork() {
 		final NetworkLayer network = scenario.getNetwork();
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
-		
+
 		VisumNetworkRowHandler nodeRowHandler = new VisumNetworkRowHandler() {
-			
+
 			@Override
 			public void handleRow(Map<String, String> row) {
 				Id id = new IdImpl(row.get("NR"));
 				Coord coord = new CoordImpl(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
 				network.createAndAddNode(id, coord);
 			}
-			
+
 		};
 		streamingVisumNetworkReader.addRowHandler("KNOTEN", nodeRowHandler);
-		
+
 		VisumNetworkRowHandler edgeRowHandler = new VisumNetworkRowHandler() {
-		
+
 			@Override
-			public void handleRow(Map<String, String> row) {	
+			public void handleRow(Map<String, String> row) {
 				String nr = row.get("NR");
 				IdImpl id = new IdImpl(nr);
 				IdImpl fromNodeId = new IdImpl(row.get("VONKNOTNR"));
@@ -93,7 +92,7 @@ public class DataPrepare {
 					usedIds.add(edgeTypeIdString);
 				}
 			}
-			
+
 		};
 		streamingVisumNetworkReader.addRowHandler("STRECKE", edgeRowHandler);
 		streamingVisumNetworkReader.read(InVisumNetFile);

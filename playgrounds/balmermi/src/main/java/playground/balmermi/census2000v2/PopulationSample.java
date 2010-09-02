@@ -23,14 +23,9 @@ package playground.balmermi.census2000v2;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -75,14 +70,12 @@ public class PopulationSample {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		world.complete(config);
 		Gbl.printMemoryUsage();
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
-		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		world.complete(config);
 		Gbl.printMemoryUsage();
@@ -111,21 +104,6 @@ public class PopulationSample {
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-
-		log.info("  writing network xml file... ");
-		new NetworkWriter(network).write(config.network().getOutputFile());
-		Gbl.printMemoryUsage();
-		log.info("  done.");
-
-		log.info("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
-		Gbl.printMemoryUsage();
-		log.info("  done.");
-
-		log.info("  writing config xml file... ");
-		new ConfigWriter(config).write(config.config().getOutputFile());
-		Gbl.printMemoryUsage();
-		log.info("  done.");
 
 		log.info("done.");
 	}

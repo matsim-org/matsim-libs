@@ -50,19 +50,10 @@ public abstract class Scenario {
 	public static final Config setUpScenarioConfig() {
 		final Config config = Gbl.createConfig(null);
 
-		config.config().setOutputFile(output_directory + "output_config.xml");
-
-		config.world().setInputFile(input_directory + "world.xml");
-		config.world().setOutputFile(output_directory + "output_world.xml");
-
 		config.network().setInputFile(input_directory + "network.xml.gz");
-		config.network().setOutputFile(output_directory + "output_network.xml.gz");
 
 		config.facilities().setInputFile(input_directory + "facilities.xml");
 		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
-
-		config.matrices().setInputFile(input_directory + "matrices.xml");
-		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
 
 		config.plans().setInputFile(input_directory + "plans.xml");
 		config.plans().setOutputFile(output_directory + "output_plans.xml");
@@ -71,7 +62,7 @@ public abstract class Scenario {
 
 		config.counts().setCountsFileName(input_directory + "counts.xml");
 		config.counts().setOutputFile(output_directory + "output_counts.xml.gz");
-		
+
 		return config;
 	}
 

@@ -22,11 +22,9 @@ package playground.balmermi.census2000;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -78,15 +76,6 @@ public class InitRouteCreation {
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-
-		System.out.println("  writing network xml file... ");
-		NetworkWriter net_writer = new NetworkWriter(network);
-		net_writer.write(config.network().getOutputFile());
-		System.out.println("  done.");
-
-		System.out.println("  writing config xml file... ");
-		new ConfigWriter(config).write(config.config().getOutputFile());
-		System.out.println("  done.");
 
 		System.out.println("done.");
 		System.out.println();

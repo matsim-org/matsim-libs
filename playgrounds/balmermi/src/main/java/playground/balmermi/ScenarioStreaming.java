@@ -29,7 +29,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -135,10 +134,6 @@ public class ScenarioStreaming {
 		System.out.println("writing facilities...");
 		new FacilitiesWriter(af).write(config.facilities().getOutputFile());
 		System.out.println("done. (writing facilities)");
-
-		System.out.println("writing network...");
-		new NetworkWriter(network).write(config.network().getOutputFile());
-		System.out.println("done. (writing network)");
 
 		final PopulationImpl population = (PopulationImpl) sl.getScenario().getPopulation();
 		population.setIsStreaming(true);

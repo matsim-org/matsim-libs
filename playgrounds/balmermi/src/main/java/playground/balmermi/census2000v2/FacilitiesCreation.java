@@ -22,14 +22,12 @@ package playground.balmermi.census2000v2;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.facilities.algorithms.FacilitiesCombine;
 import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.WorldWriter;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.modules.FacilitiesCreateBuildingsFromCensus2000;
@@ -83,15 +81,6 @@ public class FacilitiesCreation {
 		System.out.println("  writing facilities xml file... ");
 		FacilitiesWriter fac_writer = new FacilitiesWriter(facilities);
 		fac_writer.write(config.facilities().getOutputFile());
-		System.out.println("  done.");
-
-		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(scenario.getWorld());
-		world_writer.write(config.world().getOutputFile());
-		System.out.println("  done.");
-
-		System.out.println("  writing config xml file... ");
-		new ConfigWriter(config).write(config.config().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("done.");

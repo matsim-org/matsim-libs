@@ -134,10 +134,8 @@ public class MakeScenario {
 		//////////////////////////////////////////////////////////////////////
 
 		Scenario.writePlans(plans, network);
-		Scenario.writeNetwork(network);
+		Scenario.writeNetwork(network, "outputNetwork.xml");
 		Scenario.writeFacilities(facilities);
-		Scenario.writeWorld(scenario.getWorld());
-		Scenario.writeConfig();
 
 		System.out.println("TEST SUCCEEDED.");
 		System.out.println();

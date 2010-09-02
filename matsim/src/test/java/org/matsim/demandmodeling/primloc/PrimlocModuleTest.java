@@ -23,7 +23,6 @@ package org.matsim.demandmodeling.primloc;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -61,13 +60,10 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		Config config = super.loadConfig( "test/input/org/matsim/demandmodeling/primloc/config_primloc_triangle.xml");
 		String outputDirectory = super.getOutputDirectory();
 
-		config.config().setOutputFile(outputDirectory + "output_config.xml");
-
 		config.world().setInputFile(inputfolder + "world.xml");
 		config.world().setOutputFile(outputDirectory + "output_world.xml");
 
 		config.network().setInputFile(inputfolder + "network.xml");
-		config.network().setOutputFile(outputDirectory + "output_network.xml");
 
 		config.facilities().setInputFile(inputfolder + "facilities.xml");
 		config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
@@ -130,16 +126,12 @@ public class PrimlocModuleTest extends MatsimTestCase{
 
 		System.out.println("  writing network xml file... ");
 		NetworkWriter network_writer = new NetworkWriter(scenario.getNetwork());
-		network_writer.write(config.network().getOutputFile());
+		network_writer.write(getOutputDirectory() + "output_network.xml");
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
 		world_writer.write(config.world().getOutputFile());
-		System.out.println("  done.");
-
-		System.out.println("  writing config xml file... ");
-		new ConfigWriter(config).write(config.config().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("TEST SUCCEEDED.");

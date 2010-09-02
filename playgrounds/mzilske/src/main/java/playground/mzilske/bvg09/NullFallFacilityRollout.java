@@ -61,8 +61,8 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.visum.VisumNetwork;
-import org.matsim.visum.VisumNetworkReader;
 import org.matsim.visum.VisumNetwork.StopPoint;
+import org.matsim.visum.VisumNetworkReader;
 import org.xml.sax.SAXException;
 
 import playground.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
@@ -135,7 +135,6 @@ public class NullFallFacilityRollout {
 		this.outConfig.scenario().setUseTransit(true);
 		this.outConfig.scenario().setUseVehicles(true);
 		this.outConfig.network().setInputFile(InNetworkFile);
-		this.outConfig.network().setOutputFile(OutNetworkFile);
 	}
 
 	private void loadData() {

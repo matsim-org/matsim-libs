@@ -49,7 +49,7 @@ public abstract class ConfigUtils {
 	}
 
 	public static void loadConfig(final Config config, final String filename) throws IOException {
-		if (config.config() == null) {
+		if (config.global() == null) {
 			config.addCoreModules();
 		}
 		try {

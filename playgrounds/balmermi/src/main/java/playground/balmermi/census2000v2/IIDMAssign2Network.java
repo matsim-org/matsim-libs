@@ -26,14 +26,12 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -137,16 +135,8 @@ public class IIDMAssign2Network {
 
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  writing network xml file... ");
-		new NetworkWriter(network).write(config.network().getOutputFile());
-		log.info("  done.");
-
 		log.info("  writing facilities xml file... ");
 		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
-		log.info("  done.");
-
-		log.info("  writing config xml file... ");
-		new ConfigWriter(config).write(config.config().getOutputFile());
 		log.info("  done.");
 
 		log.info("done.");

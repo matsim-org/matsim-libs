@@ -54,9 +54,9 @@ import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.visum.VisumNetwork;
-import org.matsim.visum.VisumNetworkReader;
 import org.matsim.visum.VisumNetwork.LineRouteItem;
 import org.matsim.visum.VisumNetwork.TransitLineRoute;
+import org.matsim.visum.VisumNetworkReader;
 
 
 public class NullFallDataPrepare {
@@ -90,29 +90,28 @@ public class NullFallDataPrepare {
 		this.config.scenario().setUseTransit(true);
 		this.config.scenario().setUseVehicles(true);
 		this.config.network().setInputFile(OutNetworkFile);
-		this.config.network().setOutputFile(OutNetworkFile);
 	}
 
 	private void convertNetwork() {
 		final NetworkLayer network = scenario.getNetwork();
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
-		
+
 		VisumNetworkRowHandler nodeRowHandler = new VisumNetworkRowHandler() {
-			
+
 			@Override
 			public void handleRow(Map<String, String> row) {
 				Id id = new IdImpl(row.get("NR"));
 				Coord coord = new CoordImpl(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
 				network.createAndAddNode(id, coord);
 			}
-			
+
 		};
 		streamingVisumNetworkReader.addRowHandler("KNOTEN", nodeRowHandler);
-		
+
 		VisumNetworkRowHandler edgeRowHandler = new VisumNetworkRowHandler() {
-		
+
 			@Override
-			public void handleRow(Map<String, String> row) {	
+			public void handleRow(Map<String, String> row) {
 				String nr = row.get("NR");
 				IdImpl id = new IdImpl(nr);
 				IdImpl fromNodeId = new IdImpl(row.get("VONKNOTNR"));
@@ -130,7 +129,7 @@ public class NullFallDataPrepare {
 				if (!edgeTypeIdString.isEmpty()) {
 					IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
 				}
-				
+
 //				ArrayList<Float> tValues = new ArrayList<Float>();
 //				for (String letter : Arrays.asList("B", "F", "P", "R", "S", "T", "U", "V")) {
 //					String key = "T-OEVSYS(" + letter + ")";
@@ -150,9 +149,9 @@ public class NullFallDataPrepare {
 //					throw new RuntimeException(tValues.toString());
 //				}
 				// capacity of 2000 isn't enough for areas with heavy pt traffic (zoo, spandau, alex)
-				network.createAndAddLink(id, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId), length * 1000, FreeSpeedCalculator.calculateFreeSpeedForEdge(row), 99999, 1);			
+				network.createAndAddLink(id, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId), length * 1000, FreeSpeedCalculator.calculateFreeSpeedForEdge(row), 99999, 1);
 			}
-			
+
 		};
 		streamingVisumNetworkReader.addRowHandler("STRECKE", edgeRowHandler);
 		streamingVisumNetworkReader.read(InVisumNetFile);
@@ -211,7 +210,7 @@ public class NullFallDataPrepare {
 				// check if stop was on link instead of node
 				if(link == null){
 					log.warn("No link found. Skipping to next node. Please check line " + transitLine.getId() + " manually.");
-					continue;					
+					continue;
 				} else {
 					linkIds.add(link.getId());
 					previousLineRouteItem = nextLineRouteItem;
@@ -271,6 +270,7 @@ public class NullFallDataPrepare {
 			}
 		}
 		Collections.sort(lineRouteItems, new Comparator<LineRouteItem>() {
+			@Override
 			public int compare(LineRouteItem o1, LineRouteItem o2) {
 				return new Integer(o1.index).compareTo(new Integer(o2.index));
 			}

@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -137,10 +136,6 @@ public class PopulationCreation {
 		System.out.println("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
 		world_writer.write(config.world().getOutputFile());
-		System.out.println("  done.");
-
-		System.out.println("  writing config xml file... ");
-		new ConfigWriter(config).write(config.config().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("done.");

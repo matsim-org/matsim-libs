@@ -281,7 +281,7 @@ public class MyControler1 extends Controler {
 		reader.read(scenario.getConfig().getParam(ItsumoSim.CONFIG_MODULE, "itsumoInputNetworkFile"));
 
 		NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write(scenario.getConfig().network().getOutputFile());
+		network_writer.write(scenario.getConfig().controler().getOutputDirectory() + "/network.xml");
 		log.info("  done");
 
 	}

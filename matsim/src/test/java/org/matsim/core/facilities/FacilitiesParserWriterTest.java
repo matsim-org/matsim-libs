@@ -97,7 +97,6 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 		this.runModules(facilities, world);
 
-		TriangleScenario.writeConfig(this.config);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeWorld(world);
 
@@ -123,7 +122,6 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 		this.runModules(facilities, world);
 
-		TriangleScenario.writeConfig(this.config);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeWorld(world);
 
@@ -154,7 +152,6 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 		this.runModules(facilities, world);
 
-		TriangleScenario.writeConfig(this.config);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeWorld(world);
 
@@ -186,7 +183,6 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		world.complete(this.config);
 		System.out.println("  done.");
 
-		TriangleScenario.writeConfig(this.config);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeWorld(world);
 

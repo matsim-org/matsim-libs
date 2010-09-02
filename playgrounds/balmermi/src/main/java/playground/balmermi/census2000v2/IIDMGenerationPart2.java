@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -151,10 +150,6 @@ public class IIDMGenerationPart2 {
 		log.info("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
 		world_writer.write(config.world().getOutputFile());
-		log.info("  done.");
-
-		log.info("  writing config xml file... ");
-		new ConfigWriter(config).write(config.config().getOutputFile());
 		log.info("  done.");
 
 		log.info("done.");

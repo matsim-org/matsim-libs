@@ -23,6 +23,7 @@ package playground.mrieser;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -54,10 +55,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkCalcLanes;
 import org.matsim.core.network.algorithms.NetworkFalsifier;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -72,7 +73,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ActLocationFalsifier;
@@ -280,32 +280,6 @@ public class MyRuns {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// calcNofLanes
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calcNofLanes(final String[] args) {
-
-		System.out.println("RUN: calcNofLanes");
-
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
-		sl.loadNetwork();
-
-		NetworkImpl network = sl.getScenario().getNetwork();
-
-		System.out.println("  calculating number of lanes... ");
-		new NetworkCalcLanes().run(network);
-		System.out.println("  done.");
-
-		System.out.println("  writing the network...");
-		final NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write(sl.getScenario().getConfig().network().getOutputFile());
-		System.out.println("  done.");
-
-		System.out.println("RUN: calcNofLanes finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
 	// subNetwork
 	//////////////////////////////////////////////////////////////////////
 	public static void subNetwork(final String[] args, final double x, final double y, final double minRadius, final double radiusStep, final double maxRadius) {
@@ -365,7 +339,7 @@ public class MyRuns {
 
 		System.out.println("  writing the falsified network...");
 		final NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write(sl.getScenario().getConfig().network().getOutputFile());
+		network_writer.write("falsifiedNetwork.xml");
 		System.out.println("  done.");
 
 		System.out.println("  processing plans...");
@@ -767,13 +741,10 @@ public class MyRuns {
 //		new NetworkWriter(scenario.getNetwork()).writeFile("/Users/mrieser/Downloads/switzerland.xml");
 //		OTFVis.main(new String[]{"/Users/mrieser/Downloads/switzerland.xml"});
 
+		Config config = new Config();
+		config.addCoreModules();
+		new ConfigWriter(config).writeStream(new PrintWriter(System.out));
 
-		try {
-			ConfigUtils.loadConfig("../mfeil/test/input/playground/mfeil/config.xml");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-//		new MatsimPopulationReader(new ScenarioImpl()).readFile("/data/coding/eclipse35/MATSim/examples/equil/plans100.xml");
 
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();

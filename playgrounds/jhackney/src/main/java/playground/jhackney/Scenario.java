@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -39,7 +38,6 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
-import org.matsim.world.WorldWriter;
 
 import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
 
@@ -95,19 +93,10 @@ public abstract class Scenario {
 		Config config = scenario.getConfig();
 		config.addModule(SocNetConfigGroup.GROUP_NAME, snConfig);
 
-		config.config().setOutputFile(output_directory + "output_config.xml");
-
-		config.world().setInputFile(input_directory + "output_world.xml.gz");
-		config.world().setOutputFile(output_directory + "output_world.xml");
-
 		config.network().setInputFile(input_directory + "output_network.xml.gz");
-		config.network().setOutputFile(output_directory + "output_network.xml");
 
 		config.facilities().setInputFile(input_directory + "output_facilities.xml.gz");
 		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
-
-		config.matrices().setInputFile(input_directory + "matrices.xml");
-		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
 
 		config.plans().setInputFile(input_directory + "output_plans.xml.gz");
 //		config.plans().setInputFile("output_plans.xml.gz");
@@ -118,8 +107,6 @@ public abstract class Scenario {
 
 		config.counts().setCountsFileName(input_directory + "counts.xml");
 		config.counts().setOutputFile(output_directory + "output_counts.xml.gz");
-
-		config.events().setInputFile("events.txt");
 
 		snConfig.setInDirName(input_directory);
 		snConfig.setOutDir(output_directory);
@@ -278,9 +265,9 @@ public abstract class Scenario {
 //		System.out.println("  done.");
 //	}
 
-	public static final void writeNetwork(final NetworkLayer network) {
+	public static final void writeNetwork(final NetworkLayer network, String filename) {
 		System.out.println("  writing network xml file... ");
-		new NetworkWriter(network).write(scenario.getConfig().network().getOutputFile());
+		new NetworkWriter(network).write(filename);
 		System.out.println("  done.");
 	}
 
@@ -290,17 +277,6 @@ public abstract class Scenario {
 		System.out.println("  done.");
 	}
 
-	public static final void writeWorld(final World world) {
-		System.out.println("  writing world xml file... ");
-		new WorldWriter(world).write(scenario.getConfig().world().getOutputFile());
-		System.out.println("  done.");
-	}
-
-	public static final void writeConfig() {
-		System.out.println("  writing config xml file... ");
-		new ConfigWriter(scenario.getConfig()).write(scenario.getConfig().config().getOutputFile());
-		System.out.println("  done.");
-	}
 	public static Config getConfig(){
 		return scenario.getConfig();
 	}

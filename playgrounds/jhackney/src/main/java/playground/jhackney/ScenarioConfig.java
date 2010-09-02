@@ -101,7 +101,6 @@ public abstract class ScenarioConfig {
 
 		configFileName = input_directory + "output_config.xml";
 		dtdFileName = "D:/eclipse_workspace/matsim/dtd/config_v1.dtd";
-		config.config().setOutputFile(output_directory + "output_config.xml");
 
 		config.world().setInputFile(input_directory + "output_world.xml.gz");
 		worldFileName=input_directory + "output_world.xml.gz";
@@ -109,7 +108,6 @@ public abstract class ScenarioConfig {
 
 		config.network().setInputFile(input_directory + "output_network.xml.gz");
 		netFileName=input_directory + "output_network.xml.gz";
-		config.network().setOutputFile(output_directory + "output_network.xml");
 
 		config.facilities().setInputFile(input_directory + "output_facilities.xml.gz");
 		facsFileName=input_directory + "output_facilities.xml.gz";

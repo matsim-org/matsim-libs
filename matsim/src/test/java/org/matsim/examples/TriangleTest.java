@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -86,7 +85,7 @@ public class TriangleTest extends MatsimTestCase {
 	private final void compareOutputNetwork() {
 		log.info("  comparing input and output network file... ");
 		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.network().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(this.config.network().getOutputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(getOutputDirectory() + "output_network.xml");
 		assertEquals("different network files", checksum_ref, checksum_run);
 		log.info("  done.");
 	}
@@ -185,7 +184,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  writing network xml file... ");
-		new NetworkWriter(network).write(this.config.network().getOutputFile());
+		new NetworkWriter(network).write(getOutputDirectory() + "output_network.xml");
 		log.info("  done.");
 
 		log.info("  writing facilities xml file... ");
@@ -194,10 +193,6 @@ public class TriangleTest extends MatsimTestCase {
 
 		log.info("  writing world xml file... ");
 		new WorldWriter(world).write(this.config.world().getOutputFile());
-		log.info("  done.");
-
-		log.info("  writing config xml file... ");
-		new ConfigWriter(this.config).write(this.config.config().getOutputFile());
 		log.info("  done.");
 
 		this.compareOutputNetwork();

@@ -27,7 +27,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.config.groups.ConfigConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.EvacuationConfigGroup;
@@ -66,12 +65,11 @@ public class Config {
 	//////////////////////////////////////////////////////////////////////
 
 	/** Map of all config-groups known to this instance. */
-	protected final TreeMap<String, Module> modules = new TreeMap<String,Module>();
+	private final TreeMap<String, Module> modules = new TreeMap<String,Module>();
 
 	/* the following members are for the direct access to the core config groups. */
 
 	private GlobalConfigGroup global = null;
-	private ConfigConfigGroup config = null;
 	private ControlerConfigGroup controler = null;
 	private SimulationConfigGroup simulation = null;
 	private WithindayConfigGroup withinDay = null;
@@ -100,7 +98,7 @@ public class Config {
 
 	private HouseholdsConfigGroup households;
 
-	private OTFVisConfigGroup otfVis ;
+	private OTFVisConfigGroup otfVis;
 
 	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
@@ -121,9 +119,6 @@ public class Config {
 	public void addCoreModules() {
 		this.global = new GlobalConfigGroup();
 		this.modules.put(GlobalConfigGroup.GROUP_NAME, this.global);
-
-		this.config  = new ConfigConfigGroup();
-		this.modules.put(ConfigConfigGroup.GROUP_NAME, this.config);
 
 		this.controler = new ControlerConfigGroup();
 		this.modules.put(ControlerConfigGroup.GROUP_NAME, this.controler);
@@ -367,10 +362,6 @@ public class Config {
 		return this.global;
 	}
 
-	public final ConfigConfigGroup config() {
-		return this.config;
-	}
-
 	public final ControlerConfigGroup controler() {
 		return this.controler;
 	}
@@ -403,7 +394,7 @@ public class Config {
 		return this.plans;
 	}
 
-	public final HouseholdsConfigGroup households(){
+	public final HouseholdsConfigGroup households() {
 		return this.households;
 	}
 
@@ -423,7 +414,7 @@ public class Config {
 		return this.roadpricing;
 	}
 
-	public final EvacuationConfigGroup evacuation(){
+	public final EvacuationConfigGroup evacuation() {
 		return this.evacuation;
 	}
 
@@ -443,11 +434,11 @@ public class Config {
 		return this.signalSystemConfigGroup;
 	}
 
-	public TravelTimeCalculatorConfigGroup travelTimeCalculator(){
+	public TravelTimeCalculatorConfigGroup travelTimeCalculator() {
 		return this.travelTimeCalculatorConfigGroup;
 	}
 
-	public ScenarioConfigGroup scenario(){
+	public ScenarioConfigGroup scenario() {
 		return this.scenarioConfigGroup;
 	}
 
@@ -465,9 +456,8 @@ public class Config {
 	}
 
 	public OTFVisConfigGroup otfVis() {
-		return this.otfVis ;
+		return this.otfVis;
 	}
-
 
   public QSimConfigGroup getQSimConfigGroup() {
     return this.qSimConfigGroup;

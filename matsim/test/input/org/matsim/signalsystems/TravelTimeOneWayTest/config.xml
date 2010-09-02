@@ -10,7 +10,6 @@
 
 	<module name="network">
 		<param name="inputNetworkFile" value="&INPUTBASE;/network.xml.gz" />
-		<param name="outputNetworkFile" value="&OUTPUTBASE;/network.xml" />
 	</module>
 
 	<module name="plans">

@@ -74,7 +74,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 	private final void compareOutputNetwork() {
 		log.info("  comparing input and output network file... ");
 		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.network().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(this.config.network().getOutputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(getOutputDirectory() + "output_network.xml");
 		assertEquals(checksum_ref, checksum_run);
 		log.info("  done.");
 	}
@@ -112,8 +112,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 
 		this.runModules((NetworkLayer) network, world);
 
-		TriangleScenario.writeConfig(this.config);
-		TriangleScenario.writeNetwork(network);
+		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 		TriangleScenario.writeWorld(world);
 
 		this.compareOutputNetwork();
@@ -144,8 +143,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 
 		this.runModules(network, world);
 
-		TriangleScenario.writeConfig(this.config);
-		TriangleScenario.writeNetwork(network);
+		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 		TriangleScenario.writeWorld(world);
 
 		this.compareOutputNetwork();
@@ -176,8 +174,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		world.complete(this.config);
 		log.info("  done.");
 
-		TriangleScenario.writeConfig(this.config);
-		TriangleScenario.writeNetwork(network);
+		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 		TriangleScenario.writeWorld(world);
 
 		this.compareOutputNetwork();
