@@ -2,13 +2,8 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
 <config>
 
-	<module name="config" >
-		<param name="outputConfigFile" value="./testdata/tmp/output_config.xml" />
-	</module>
-
 	<module name="counts">
 		<param name="inputCountsFile" value="test/scenarios/triangle/counts.xml" />
-		<param name="outputCountsFile" value="dummy/output_counts.xml" />
 	</module>
 	
 	<module name="network">
