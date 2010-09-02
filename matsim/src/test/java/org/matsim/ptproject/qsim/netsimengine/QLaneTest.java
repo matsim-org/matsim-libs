@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.ptproject.qsim;
+package org.matsim.ptproject.qsim.netsimengine;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -32,8 +32,9 @@ import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
 import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.netsimengine.QLane;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.testcases.MatsimTestCase;
@@ -133,7 +134,7 @@ public class QLaneTest extends MatsimTestCase {
 		
 		QSim queueSim = new QSim(scenario, null);
 		QNetwork queueNetwork = queueSim.getQNetwork();
-		QLinkInternalI ql = queueNetwork.getQLink(id1);
+		QLinkImpl ql = (QLinkImpl) queueNetwork.getQLink(id1);
 
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
 		assertEquals(268.0, ql.getSpaceCap());

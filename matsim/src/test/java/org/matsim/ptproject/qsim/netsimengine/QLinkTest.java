@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim;
+package org.matsim.ptproject.qsim.netsimengine;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -38,10 +38,11 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.DefaultPersonDriverAgent;
 import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
+import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.ptproject.qsim.netsimengine.QLinkImpl;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.testcases.MatsimTestCase;
@@ -92,8 +93,8 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles driving on a link are found with {@link QLinkInternalI#getVehicle(Id)}
-	 * and {@link QLinkInternalI#getAllVehicles()}.
+	 * Tests that vehicles driving on a link are found with {@link QLink#getVehicle(Id)}
+	 * and {@link QLink#getAllVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -138,8 +139,8 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles parked on a link are found with {@link QLinkInternalI#getVehicle(Id)}
-	 * and {@link QLinkInternalI#getAllVehicles()}.
+	 * Tests that vehicles parked on a link are found with {@link QLink#getVehicle(Id)}
+	 * and {@link QLink#getAllVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -173,8 +174,8 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles departing on a link are found with {@link QLinkInternalI#getVehicle(Id)}
-	 * and {@link QLinkInternalI#getAllVehicles()}.
+	 * Tests that vehicles departing on a link are found with {@link QLink#getVehicle(Id)}
+	 * and {@link QLink#getAllVehicles()}.
 	 *
 	 * @author mrieser
 	 */

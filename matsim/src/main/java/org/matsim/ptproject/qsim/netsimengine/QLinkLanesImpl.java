@@ -40,7 +40,9 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
+import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QSimEngine;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -105,7 +107,7 @@ import org.matsim.vis.snapshots.writers.VisData;
  * of its QueueLanes is active.</li>
  * </ul>
  */
-public class QLinkLanesImpl implements QLinkInternalI {
+public class QLinkLanesImpl extends QLinkInternalI {
 
 	final private static Logger log = Logger.getLogger(QLinkLanesImpl.class);
 
@@ -142,7 +144,7 @@ public class QLinkLanesImpl implements QLinkInternalI {
 
 	private VisData visdata = this.new VisDataImpl();
 
-	private QSimEngine qsimEngine = null;
+	private QSimEngineImpl qsimEngine = null;
 
 	/**
 	 * All vehicles from parkingList move to the waitingList as soon as their time
@@ -156,13 +158,16 @@ public class QLinkLanesImpl implements QLinkInternalI {
 	 * @param link2
 	 * @param queueNetwork
 	 * @param toNode
-	 * @see QLinkInternalI#createLanes(List)
+	 * @see QLink#createLanes(List)
 	 */
 	public QLinkLanesImpl(final Link link2, QSimEngine engine, 
 			final QNode toNode, Map<Id, Lane> laneMap) {
 		this.link = link2;
 		this.toQueueNode = toNode;
-		this.qsimEngine = engine;
+		this.qsimEngine = (QSimEngineImpl) engine;
+		// yyyy this cast is not so bad because this is not meant to be pluggable (QLinkImpl together with some other engine).
+		// But it would still be better to do it correctly.  kai, aug'10
+
 		this.queueLanes = new ArrayList<QLane>();
 		this.toNodeQueueLanes = new ArrayList<QLane>();
 		this.createLanes(laneMap);
@@ -441,10 +446,18 @@ public class QLinkLanesImpl implements QLinkInternalI {
 	public QSimEngine getQSimEngine(){
 		return this.qsimEngine;
 	}
+	
+	@Override
+	public QSimI getQSim() {
+		return this.qsimEngine.getQSim();
+	}
 
 	@Override
 	public void setQSimEngine(QSimEngine qsimEngine) {
-		this.qsimEngine = qsimEngine;
+		this.qsimEngine = (QSimEngineImpl) qsimEngine;
+		// yyyy this cast is not so bad because this is not meant to be pluggable (QLinkImpl together with some other engine).
+		// But it would still be better to do it correctly.  kai, aug'10
+
 	}
 
 	/**

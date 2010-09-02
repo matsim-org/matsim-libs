@@ -32,23 +32,23 @@ import org.matsim.ptproject.qsim.interfaces.QVehicle;
  * @author dgrether
  *
  */
-interface QBufferItem extends QSimFunctionalInterface {
-  /**
-   * equivalent to a Buffer.isEmpty() operation 
-   */
-  boolean bufferIsEmpty();
+abstract class QBufferItem implements QSimFunctionalInterface {
+	/**
+	 * equivalent to a Buffer.isEmpty() operation 
+	 */
+	abstract boolean bufferIsEmpty();
 
-  /**
-   * equivalent to a Buffer.pop() operation 
-   */
-  QVehicle popFirstFromBuffer();
-  /**
-   * equivalent to a Buffer.peek() operation 
-   */
-  QVehicle getFirstFromBuffer();
-  
-  double getBufferLastMovedTime();
+	/**
+	 * equivalent to a Buffer.pop() operation 
+	 */
+	abstract QVehicle popFirstFromBuffer();
+	/**
+	 * equivalent to a Buffer.peek() operation 
+	 */
+	abstract QVehicle getFirstFromBuffer();
 
-	boolean hasGreenForToLink(Id toLinkId);
-  
+	abstract double getBufferLastMovedTime();
+
+	abstract boolean hasGreenForToLink(Id toLinkId);
+
 }

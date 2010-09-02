@@ -1,6 +1,7 @@
 package playground.andreas.fixedHeadway;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.qsim.TransitStopAgentTracker;
@@ -18,11 +19,15 @@ public class FixedHeadwayCycleUmlaufDriver extends UmlaufDriver {
 	private final static Logger log = Logger.getLogger(FixedHeadwayCycleUmlaufDriver.class);
 	
 	private double additionalDelayAtNextStop = 0.0;
+	private static int useageCnt = 0 ;
 
 	public FixedHeadwayCycleUmlaufDriver(Umlauf umlauf, TransitStopAgentTracker thisAgentTracker,
 			QSimI transitQueueSimulation) {
 		super(umlauf, thisAgentTracker, transitQueueSimulation);
-		log.info(" will be used");
+		if ( useageCnt <1 ) {
+			useageCnt++ ;
+			log.info(" will be used. " + Gbl.ONLYONCE );
+		}
 	}
 	
 	

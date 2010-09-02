@@ -46,6 +46,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
+import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
@@ -63,9 +64,9 @@ import org.matsim.vis.snapshots.writers.VisData;
  * @author aneumann
  * @author mrieser
  */
-public class QLane implements QBufferItem {
+public class QLane extends QBufferItem {
 
-  private static final Logger log = Logger.getLogger(QLane.class);
+	private static final Logger log = Logger.getLogger(QLane.class);
 
 	private static int spaceCapWarningCount = 0;
 
@@ -159,17 +160,18 @@ public class QLane implements QBufferItem {
 
 	protected final TransitQLaneFeature transitQueueLaneFeature;
 
-	/*package*/ QLane(final QLinkInternalI ql, Lane laneData, boolean isOriginalLane) {
-		this.queueLink = ql;
+	/*package*/ QLane(final QLink ql, Lane laneData, boolean isOriginalLane) {
+		this.queueLink = (QLinkInternalI) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
 		this.transitQueueLaneFeature = new TransitQLaneFeature(this.getQLink());
 		this.isOriginalLane = isOriginalLane;
 		this.laneData = laneData;
 	}
 
 	public Id getId(){
+		// yyyy I think this can be replaced by getLane().getId().  kai, aug'10
 		return this.laneData.getId();
 	}
-	
+
 	public Lane getLane(){
 		return this.laneData;
 	}
@@ -200,17 +202,18 @@ public class QLane implements QBufferItem {
 			 */
 			double queueLinksNumberOfRepresentedLanes = this.queueLink.getLink().getNumberOfLanes(time);
 			this.simulatedFlowCapacity = this.simulatedFlowCapacity/queueLinksNumberOfRepresentedLanes
-				* this.laneData.getNumberOfRepresentedLanes();
+			* this.laneData.getNumberOfRepresentedLanes();
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQLink().getQSimEngine().getQSim().getSimTimer().getSimTimestepSize() * this.getQLink().getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQLink().getQSim().getSimTimer().getSimTimestepSize() 
+		* this.getQLink().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 	}
 
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = this.getQLink().getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
+		double storageCapFactor = this.getQLink().getQSim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 
 		double numberOfLanes = this.queueLink.getLink().getNumberOfLanes(time);
@@ -219,7 +222,7 @@ public class QLane implements QBufferItem {
 		}
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * numberOfLanes)
-				/ ((NetworkImpl) ((QLinkLanesImpl)this.queueLink).getQSimEngine().getQSim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
+		/ ((NetworkImpl) ((QLinkLanesImpl)this.queueLink).getQSimEngine().getQSim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -232,24 +235,24 @@ public class QLane implements QBufferItem {
 		 */
 		double tempStorageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
 		if (this.storageCapacity < tempStorageCapacity) {
-	    if (spaceCapWarningCount <= 10) {
-	    	if (!this.isOriginalLane  || (this.toLanes != null)) {
-	    		log.warn("Lane " + this.getId() + " on Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
-	    	}
-	    	else {
-	    		log.warn("Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
-	    	}
-        if (spaceCapWarningCount == 10) {
-            log.warn("Additional warnings of this type are suppressed.");
-        }
-        spaceCapWarningCount++;
-	    }
-	    this.storageCapacity = tempStorageCapacity;
+			if (spaceCapWarningCount <= 10) {
+				if (!this.isOriginalLane  || (this.toLanes != null)) {
+					log.warn("Lane " + this.getId() + " on Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
+				}
+				else {
+					log.warn("Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
+				}
+				if (spaceCapWarningCount == 10) {
+					log.warn("Additional warnings of this type are suppressed.");
+				}
+				spaceCapWarningCount++;
+			}
+			this.storageCapacity = tempStorageCapacity;
 		}
 	}
 
 
-	public void recalcTimeVariantAttributes(final double now) {
+	void recalcTimeVariantAttributes(final double now) {
 		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed(now);
 		calculateFlowCapacity(now);
 		calculateStorageCapacity(now);
@@ -271,7 +274,7 @@ public class QLane implements QBufferItem {
 		this.meterFromLinkEnd = meters;
 	}
 
-	public double getEndsAtMeterFromLinkEnd(){
+	double getEndsAtMeterFromLinkEnd(){
 		return this.meterFromLinkEnd;
 	}
 
@@ -279,6 +282,7 @@ public class QLane implements QBufferItem {
 	 * updated the status of the QueueLane's signal system
 	 */
 	public void updateGreenState(double time){
+		// "public" needed in signalengine :-(.  kai, aug'10
 		if (this.signalGroups == null) {
 			log.fatal("This should never happen, since every lane link at a signalized intersection" +
 					" should have at least one signal(group). Please check integrity of traffic light data on link " +
@@ -292,7 +296,8 @@ public class QLane implements QBufferItem {
 		}
 	}
 
-	public boolean bufferIsEmpty() {
+	@Override
+	 boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();
 	}
 
@@ -368,7 +373,7 @@ public class QLane implements QBufferItem {
 		 * is not delayed).
 		 */
 		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
-		  || (!this.bufferIsEmpty()) || this.transitQueueLaneFeature.isFeatureActive();
+		|| (!this.bufferIsEmpty()) || this.transitQueueLaneFeature.isFeatureActive();
 		return active;
 	}
 
@@ -413,8 +418,8 @@ public class QLane implements QBufferItem {
 			if (toQueueLane != null) {
 				if (toQueueLane.hasSpace()) {
 					this.buffer.poll();
-					this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
-					new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
+					this.getQLink().getQSim().getEventsManager().processEvent(
+							new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
 					toQueueLane.addToVehicleQueue(veh, now);
 				}
 				else {
@@ -456,8 +461,8 @@ public class QLane implements QBufferItem {
 		this.vehQueueEnterTimeMap.put(veh, now);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		if (this.isFireLaneEvents()) {
-			this.queueLink.getQSimEngine().getQSim().getEventsManager()
-			  .processEvent(new LaneEnterEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
+			this.queueLink.getQSim().getEventsManager()
+			.processEvent(new LaneEnterEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
 		}
 		double departureTime;
 		if (this.isOriginalLane) {
@@ -507,14 +512,19 @@ public class QLane implements QBufferItem {
 				|| (this.buffercap_accumulate >= 1.0)));
 	}
 
-	public QVehicle popFirstFromBuffer() {
-		double now = this.getQLink().getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
+	@Override
+	 QVehicle popFirstFromBuffer() {
+		double now = this.getQLink().getQSim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if (this.isFireLaneEvents()) {
-			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
+			this.getQLink().getQSim().getEventsManager().processEvent(new LaneLeaveEventImpl(
+					now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()
+			));
 		}
-		this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId()));
+		this.getQLink().getQSim().getEventsManager().processEvent(new LinkLeaveEventImpl(
+				now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId()
+		));
 		return veh;
 	}
 
@@ -526,19 +536,20 @@ public class QLane implements QBufferItem {
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
-	public double getSimulatedFlowCapacity() {
+	 double getSimulatedFlowCapacity() {
 		return this.simulatedFlowCapacity;
 	}
 
-	public QVehicle getFirstFromBuffer() {
+	@Override
+	 QVehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
 
-	public Queue<QVehicle> getVehiclesInBuffer() {
+	 Queue<QVehicle> getVehiclesInBuffer() {
 		return this.buffer;
 	}
 
-	public boolean isOriginalLane() {
+	boolean isOriginalLane() {
 		return this.isOriginalLane;
 	}
 
@@ -546,7 +557,7 @@ public class QLane implements QBufferItem {
 	 * @return <code>true</code> if there are less vehicles in buffer + vehQueue (=
 	 *         the whole link), than there is space for vehicles.
 	 */
-	public boolean hasSpace() {
+	boolean hasSpace() {
 		return this.usedStorageCapacity < getStorageCapacity();
 	}
 
@@ -558,25 +569,25 @@ public class QLane implements QBufferItem {
 	 * @return Returns the maximum number of vehicles that can be placed on the
 	 *         link at a time.
 	 */
-	public /*package*/ double getStorageCapacity() {
+	double getStorageCapacity() {
 		return this.storageCapacity;
 	}
 
 	void clearVehicles(double now) {
 		for (QVehicle veh : this.vehQueue) {
-			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
+			this.getQLink().getQSim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
-		this.queueLink.getQSimEngine().getQSim().getAgentCounter().decLiving(this.vehQueue.size());
-		this.queueLink.getQSimEngine().getQSim().getAgentCounter().incLost(this.vehQueue.size());
+		this.queueLink.getQSim().getAgentCounter().decLiving(this.vehQueue.size());
+		this.queueLink.getQSim().getAgentCounter().incLost(this.vehQueue.size());
 		this.vehQueue.clear();
 		this.vehQueueEnterTimeMap.clear();
 		for (QVehicle veh : this.buffer) {
-			this.getQLink().getQSimEngine().getQSim().getEventsManager().processEvent(
+			this.getQLink().getQSim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
-		this.queueLink.getQSimEngine().getQSim().getAgentCounter().decLiving(this.buffer.size());
-		this.queueLink.getQSimEngine().getQSim().getAgentCounter().incLost(this.buffer.size());
+		this.queueLink.getQSim().getAgentCounter().decLiving(this.buffer.size());
+		this.queueLink.getQSim().getAgentCounter().incLost(this.buffer.size());
 		this.buffer.clear();
 
 	}
@@ -598,7 +609,7 @@ public class QLane implements QBufferItem {
 	 * @return Returns a collection of all vehicles (driving, parking, in buffer,
 	 *         ...) on the link.
 	 */
-	public Collection<QVehicle> getAllVehicles() {
+	Collection<QVehicle> getAllVehicles() {
 		Collection<QVehicle> vehicles = new ArrayList<QVehicle>();
 		vehicles.addAll(this.transitQueueLaneFeature.getFeatureVehicles());
 		vehicles.addAll(this.vehQueue);
@@ -616,85 +627,85 @@ public class QLane implements QBufferItem {
 		this.fireLaneEvents = fireLaneEvents;
 	}
 
-  protected void addToLane(final QLane lane) {
-    if (this.toLanes == null) {
-      this.toLanes = new LinkedList<QLane>();
-    }
-    this.toLanes.add(lane);
-  }
-  
-  protected List<QLane> getToLanes(){
-  	return this.toLanes;
-  }
+	protected void addToLane(final QLane lane) {
+		if (this.toLanes == null) {
+			this.toLanes = new LinkedList<QLane>();
+		}
+		this.toLanes.add(lane);
+	}
 
-  protected void addDestinationLink(final Id linkId) {
-    this.destinationLinkIds.add(linkId);
-  }
+	protected List<QLane> getToLanes(){
+		return this.toLanes;
+	}
 
-  public Set<Id> getDestinationLinkIds(){
-    return this.destinationLinkIds;
-  }
+	protected void addDestinationLink(final Id linkId) {
+		this.destinationLinkIds.add(linkId);
+	}
 
-  public SortedMap<Id, SignalGroupDefinition> getSignalGroups() {
-    return this.signalGroups;
-  }
+	Set<Id> getDestinationLinkIds(){
+		return this.destinationLinkIds;
+	}
 
-  public LinkedList<QVehicle> getVehQueue() {
-    return this.vehQueue;
-  }
+	public SortedMap<Id, SignalGroupDefinition> getSignalGroups() {
+		return this.signalGroups;
+	}
 
-  public QLinkInternalI getQLink() {
-    return this.queueLink;
-  }
+	LinkedList<QVehicle> getVehQueue() {
+		return this.vehQueue;
+	}
 
-  public double getLength(){
-    return this.length;
-  }
+	public QLink getQLink() {
+		return this.queueLink;
+	}
 
-  @Override
-  public double getBufferLastMovedTime() {
-    return this.bufferLastMovedTime;
-  }
-  
-  @Override
-  public boolean hasGreenForToLink(Id toLinkId){
-  	return true;
-  }
-  
-  /**
-   * Inner class to capsulate visualization methods
-   *
-   * @author dgrether
-   */
-  class VisDataImpl implements VisData {
- 
-    public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
-		double time = QLane.this.getQLink().getQSimEngine().getQSim().getSimTimer().getTimeOfDay() ;
+	public double getLength(){
+		return this.length;
+	}
 
-    	
-    	AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLane.this.queueLink.getQSimEngine().getAgentSnapshotInfoBuilder();
-    	//the offset of this lane
-    	double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLane().getStartsAtMeterFromLinkEnd();// QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
-      agentSnapshotInfoBuilder.addVehiclePositions(positions, time, QLane.this.queueLink.getLink(), QLane.this.buffer, QLane.this.vehQueue,
-      		QLane.this.inverseSimulatedFlowCapacity, QLane.this.storageCapacity,
-      		QLane.this.bufferStorageCapacity, QLane.this.length, offset, QLane.this.visualizerLane*3, QLane.this.transitQueueLaneFeature);
+	@Override
+	 double getBufferLastMovedTime() {
+		return this.bufferLastMovedTime;
+	}
 
-      return positions;
-    }
-  }
+	@Override
+	public boolean hasGreenForToLink(Id toLinkId){
+		return true;
+	}
 
-	public static class FromLinkEndComparator implements Comparator<QLane>, Serializable {
-    private static final long serialVersionUID = 1L;
-    public int compare(final QLane o1, final QLane o2) {
-      if (o1.getEndsAtMeterFromLinkEnd() < o2.getEndsAtMeterFromLinkEnd()) {
-        return -1;
-      } else if (o1.getEndsAtMeterFromLinkEnd() > o2.getEndsAtMeterFromLinkEnd()) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-  }
+	/**
+	 * Inner class to capsulate visualization methods
+	 *
+	 * @author dgrether
+	 */
+	class VisDataImpl implements VisData {
+
+		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
+			double time = QLane.this.getQLink().getQSim().getSimTimer().getTimeOfDay() ;
+
+
+			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLane.this.queueLink.getQSimEngine().getAgentSnapshotInfoBuilder();
+			//the offset of this lane
+			double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLane().getStartsAtMeterFromLinkEnd();// QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
+			agentSnapshotInfoBuilder.addVehiclePositions(positions, time, QLane.this.queueLink.getLink(), QLane.this.buffer, QLane.this.vehQueue,
+					QLane.this.inverseSimulatedFlowCapacity, QLane.this.storageCapacity,
+					QLane.this.bufferStorageCapacity, QLane.this.length, offset, QLane.this.visualizerLane*3, QLane.this.transitQueueLaneFeature);
+
+			return positions;
+		}
+	}
+
+	static class FromLinkEndComparator implements Comparator<QLane>, Serializable {
+		private static final long serialVersionUID = 1L;
+		public int compare(final QLane o1, final QLane o2) {
+			if (o1.getEndsAtMeterFromLinkEnd() < o2.getEndsAtMeterFromLinkEnd()) {
+				return -1;
+			} else if (o1.getEndsAtMeterFromLinkEnd() > o2.getEndsAtMeterFromLinkEnd()) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	}
 
 	protected Lane getLaneData() {
 		return this.laneData;

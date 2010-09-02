@@ -29,30 +29,30 @@ import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 
 public class QLanesNetworkFactory implements QNetworkFactory<QNode, QLinkInternalI> {
 
-  private QNetworkFactory<QNode, QLinkInternalI> delegate;
+	private QNetworkFactory<QNode, QLinkInternalI> delegate;
 	private LaneDefinitions laneDefinitions;
 
-  public QLanesNetworkFactory(QNetworkFactory<QNode, QLinkInternalI> delegate, LaneDefinitions laneDefintions){
-    this.delegate = delegate;
-    this.laneDefinitions = laneDefintions;
-  }
+	public QLanesNetworkFactory(QNetworkFactory<QNode, QLinkInternalI> delegate, LaneDefinitions laneDefintions){
+		this.delegate = delegate;
+		this.laneDefinitions = laneDefintions;
+	}
 
-  @Override
-  public QLinkInternalI createQueueLink(Link link, QSimEngine engine,
-      QNode queueNode) {
-  	QLinkInternalI ql = null;
-  	if (this.laneDefinitions.getLanesToLinkAssignments().containsKey(link.getId())){
-  		ql = new QLinkLanesImpl(link, engine, queueNode, this.laneDefinitions.getLanesToLinkAssignments().get(link.getId()).getLanes());
-  	}
-  	else {
-  		ql = this.delegate.createQueueLink(link, engine, queueNode);
-  	}
-  	return ql;
-  }
+	@Override
+	public QLinkInternalI createQueueLink(Link link, QSimEngine engine,
+			QNode queueNode) {
+		QLinkInternalI ql = null;
+		if (this.laneDefinitions.getLanesToLinkAssignments().containsKey(link.getId())){
+			ql = new QLinkLanesImpl(link, engine, queueNode, this.laneDefinitions.getLanesToLinkAssignments().get(link.getId()).getLanes());
+		}
+		else {
+			ql = this.delegate.createQueueLink(link, engine, queueNode);
+		}
+		return ql;
+	}
 
-  @Override
-  public QNode createQueueNode(Node node, QSimEngine simEngine) {
-    return this.delegate.createQueueNode(node, simEngine);
-  }
+	@Override
+	public QNode createQueueNode(Node node, QSimEngine simEngine) {
+		return this.delegate.createQueueNode(node, simEngine);
+	}
 
 }

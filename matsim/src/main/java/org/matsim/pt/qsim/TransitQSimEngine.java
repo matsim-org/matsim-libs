@@ -40,9 +40,9 @@ import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.SimEngine;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -158,7 +158,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 		veh.setDriver(driver);
 		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 		driver.setVehicle(veh);
-		QLinkInternalI qlink = this.qSim.getQNetwork().getLinks().get(driver
+		QLink qlink = this.qSim.getQNetwork().getLinks().get(driver
 				.getCurrentLeg().getRoute().getStartLinkId());
 		qlink.addParkedVehicle(veh);
 		// yyyyyy this could, in principle, also be a method mobsim.addVehicle( ..., linkId), and then the qnetwork
@@ -184,7 +184,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 					veh.setDriver(driver);
 					veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 					driver.setVehicle(veh);
-					QLinkInternalI qlink = this.qSim.getQNetwork().getLinks().get(driver.getCurrentLeg().getRoute().getStartLinkId());
+					QLink qlink = this.qSim.getQNetwork().getLinks().get(driver.getCurrentLeg().getRoute().getStartLinkId());
 					// yyyyyy this could, in principle, also be a method mobsim.addVehicle( ..., linkId), and then the qnetwork
 					// would not need to be exposed at all.  kai, may'10
 					qlink.addParkedVehicle(veh);

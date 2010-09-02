@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.vis.snapshots.writers.VisData;
@@ -92,7 +93,7 @@ public class QNode implements VisNode {
 		this.active = true;
 	}
 
-	public final boolean isActive() {
+	 final boolean isActive() {
 		return this.active;
 	}
 
@@ -112,7 +113,7 @@ public class QNode implements VisNode {
 	 *          The current time in seconds from midnight.
 	 * @param random the random number generator to be used
 	 */
-	public void moveNode(final double now, final Random random) {
+	protected void moveNode(final double now, final Random random) {
 		int inLinksCounter = 0;
 		double inLinksCapSum = 0.0;
 		// Check all incoming links for buffered agents
@@ -250,13 +251,13 @@ public class QNode implements VisNode {
 		this.signalized = b;
 	}
 
-	public boolean isSignalized(){
+	 boolean isSignalized(){
 		return this.signalized;
 	}
 
-	protected static class QueueLinkIdComparator implements Comparator<QLinkInternalI>, Serializable {
+	protected static class QueueLinkIdComparator implements Comparator<QLink>, Serializable {
 		private static final long serialVersionUID = 1L;
-		public int compare(final QLinkInternalI o1, final QLinkInternalI o2) {
+		public int compare(final QLink o1, final QLink o2) {
 			return o1.getLink().getId().compareTo(o2.getLink().getId());
 		}
 	}

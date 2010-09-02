@@ -40,7 +40,7 @@ import org.matsim.ptproject.qsim.interfaces.QSimEngine;
  * @author dgrether
  * @author dstrippgen
  */
-public class QSimEngineImpl implements QSimEngine{
+public class QSimEngineImpl extends LinkActivator implements QSimEngine {
 
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one

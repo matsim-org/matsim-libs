@@ -274,7 +274,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 			}
 		}
 		else {
-			log.info("no facilities file set in config, not able to load them!");
+			log.info("no facilities file set in config, therefore not loading any facilities.  This is not a problem except if you are using facilities");
 		}
 	}
 

@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.ptproject.qsim.netsimengine.QNode;
 import org.matsim.ptproject.qsim.netsimengine.QSimEngineImpl;
 
@@ -35,7 +34,7 @@ public interface QNetworkI {
 
 	Network getNetwork();
 
-	Map<Id, QLinkInternalI> getLinks();
+	Map<Id, ? extends QLink> getLinks();
 	// yyyy this should arguable be getQLinks() or getMobsimLinks().  Esthetically less pleasing, but imho easier to use.  kai, may'10
 	
 	Map<Id,QNode> getNodes() ;
@@ -43,7 +42,7 @@ public interface QNetworkI {
 	/**
 	 * Convenience method for getLinks().get( id ).  May be renamed 
 	 */
-	public QLinkInternalI getQLink(final Id id) ;
+	public QLink getQLink(final Id id) ;
 
 	/**
 	 * Convenience method for getNodes().get( id ).  May be renamed 

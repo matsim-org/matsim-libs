@@ -114,7 +114,7 @@ public class MultiModalQLinkImpl extends QLinkImpl {
 	 *  If true is returned, it is kept active.
 	 */
 	@Override
-	public boolean moveLink(double now) {
+	protected boolean moveLink(double now) {
 		/*
 		 * super.moveLink(now) returns true, if the link is still active
 		 * moveAgents(now) returns true, if still Agents are walking/cycling/...

@@ -72,7 +72,7 @@ import org.matsim.pt.qsim.TransitQSimEngine.TransitAgentTriesToTeleportException
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
+import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.transitSchedule.api.Departure;
@@ -550,7 +550,7 @@ public class TransitQueueSimulationTest {
 			veh.setStopHandler(new SimpleTransitStopHandler());
 			this.driver.setVehicle(veh);
 			this.departure.setVehicleId(veh.getVehicle().getId());
-			QLinkInternalI qlink = this.getQNetwork().getQLink(this.driver.getCurrentLeg().getRoute().getStartLinkId());
+			QLink qlink = this.getQNetwork().getQLink(this.driver.getCurrentLeg().getRoute().getStartLinkId());
 			qlink.addParkedVehicle(veh);
 
 			this.scheduleActivityEnd(this.driver);

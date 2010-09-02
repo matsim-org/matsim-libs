@@ -34,10 +34,10 @@ import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QNetworkI;
 import org.matsim.ptproject.qsim.interfaces.SimEngine;
 import org.matsim.ptproject.qsim.netsimengine.QLane;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
 import org.matsim.signalsystems.config.AdaptivePlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.AdaptiveSignalSystemControlInfo;
@@ -143,7 +143,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
 		//init the signalGroupDefinitions
 		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<SignalGroupDefinition>>();
 		for (SignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitions().values()) {
-			QLinkInternalI queueLink = this.qNetwork.getQLink(signalGroupDefinition.getLinkRefId());
+			QLink queueLink = this.qNetwork.getQLink(signalGroupDefinition.getLinkRefId());
 			if (queueLink == null) {
 				throw new IllegalStateException("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " of SignalSystem Id:  " + signalGroupDefinition.getSignalSystemDefinitionId() + " is set to non existing Link with Id: " + signalGroupDefinition.getLinkRefId());
 			}

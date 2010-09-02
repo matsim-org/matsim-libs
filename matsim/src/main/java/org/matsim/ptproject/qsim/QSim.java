@@ -61,6 +61,7 @@ import org.matsim.ptproject.qsim.helpers.QVehicleImpl;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QNetworkI;
 import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.interfaces.QSimEngineFactory;
@@ -71,7 +72,6 @@ import org.matsim.ptproject.qsim.netsimengine.CarDepartureHandler;
 import org.matsim.ptproject.qsim.netsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.netsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.netsimengine.QLanesNetworkFactory;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 import org.matsim.ptproject.qsim.netsimengine.QSimEngineImpl;
 import org.matsim.ptproject.qsim.signalengine.QSimSignalEngine;
@@ -253,7 +253,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			agent.setVehicle(veh);
 			agents.add(agent);
 			if (agent.initializeAndCheckIfAlive()) {
-				QLinkInternalI qlink = this.netEngine.getQNetwork().getQLink(agent.getCurrentLinkId());
+				QLink qlink = this.netEngine.getQNetwork().getQLink(agent.getCurrentLinkId());
 				qlink.addParkedVehicle(veh);
 			}
 		}
@@ -458,7 +458,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				QLinkInternalI qLink = this.netEngine.getQNetwork().getQLink(linkId);
+				QLink qLink = this.netEngine.getQNetwork().getQLink(linkId);
 				qLink.registerAgentAtActivityLocation(agent);
 			}
 		}
@@ -473,7 +473,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				QLinkInternalI qLink = this.netEngine.getQNetwork().getQLink(linkId);
+				QLink qLink = this.netEngine.getQNetwork().getQLink(linkId);
 				qLink.unregisterAgentAtActivityLocation(agent);
 			}
 		}
@@ -577,7 +577,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	private void doSnapshot(final double time) {
 		if (!this.snapshotManager.getSnapshotWriters().isEmpty()) {
 			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-			for (QLinkInternalI link : this.getQNetwork().getLinks().values()) {
+			for (QLink link : this.getQNetwork().getLinks().values()) {
 				link.getVisData().getVehiclePositions( positions);
 			}
 			for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {

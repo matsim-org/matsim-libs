@@ -44,6 +44,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.QSimEngine;
+import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisData;
@@ -53,7 +54,7 @@ import org.matsim.vis.snapshots.writers.VisData;
  * @author dgrether
  * @author mrieser
  */
-public class QLinkImpl implements QLinkInternalI {
+public class QLinkImpl extends QLinkInternalI {
 
 	// static variables (no problem with memory)
 	final private static Logger log = Logger.getLogger(QLinkImpl.class);
@@ -144,19 +145,20 @@ public class QLinkImpl implements QLinkInternalI {
 	 * @param queueNetwork
 	 * @param toNode
 	 */
-	public QLinkImpl(final Link link2, QSimEngine engine, final QNode toNode) {
+	protected QLinkImpl(final Link link2, QSimEngine engine, final QNode toNode) {
 		this.link = link2;
 		this.toQueueNode = toNode;
 		this.length = this.getLink().getLength();
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
 		this.qsimEngine = engine;
+
 		this.calculateCapacities();
 
 		this.visdata = this.new VisDataImpl() ; // instantiating this here so we can cache some things
 	}
 
 	@Override
-	public void activateLink() {
+	protected void activateLink() {
 		if (!this.active) {
 			this.qsimEngine.activateLink(this);
 			this.active = true;
@@ -171,7 +173,7 @@ public class QLinkImpl implements QLinkInternalI {
 	 *          the vehicle
 	 */
 	@Override
-	public void addFromIntersection(final QVehicle veh) {
+	final void addFromIntersection(final QVehicle veh) {
 		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 		activateLink();
 		this.add(veh, now);
@@ -208,7 +210,7 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 	@Override
-	public void clearVehicles() {
+	protected void clearVehicles() {
 		this.parkedVehicles.clear();
 		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 
@@ -248,7 +250,7 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 	@Override
-	public QVehicle removeParkedVehicle(Id vehicleId) {
+	final QVehicle removeParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
 
@@ -260,7 +262,8 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 	@Override
-	public boolean moveLink(double now) {
+	protected boolean moveLink(double now) {
+		// yyyy needs to be final
 		boolean ret = false;
 		ret = this.moveLane(now);
 		this.active = ret;
@@ -375,12 +378,12 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 	@Override
-	public boolean bufferIsEmpty() {
+	final boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();
 	}
 
 	@Override
-	public boolean hasSpace() {
+	final boolean hasSpace() {
 		boolean storageOk = this.usedStorageCapacity < getStorageCapacity();
 		if ( !HOLES || !storageOk ) {
 			return storageOk ;
@@ -555,21 +558,29 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 	@Override
-	public QSimEngine getQSimEngine(){
+	protected QSimEngine getQSimEngine(){
 		return this.qsimEngine;
+	}
+	
+	@Override
+	public QSimI getQSim() {
+		return this.qsimEngine.getQSim();
 	}
 
 	@Override
-	public void setQSimEngine(QSimEngine qsimEngine) {
+	void setQSimEngine(QSimEngine qsimEngine) {
 		this.qsimEngine = qsimEngine;
 	}
 
 	/**
 	 * One should think about the need for this method
 	 * because it is only called by one testcase
+	 * </p>
+	 * If it is only called by the test case, can protect it by making it package-private and putting the test in the same
+	 * package.  kai, aug'10
 	 * @return
 	 */
-	public int vehOnLinkCount() {
+	int vehOnLinkCount() {
 		return this.vehQueue.size();
 	}
 
@@ -592,8 +603,7 @@ public class QLinkImpl implements QLinkInternalI {
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
-	@Override
-	public double getSimulatedFlowCapacity() {
+	double getSimulatedFlowCapacity() {
 		return this.flowCapacityPerTimeStep;
 	}
 
@@ -644,7 +654,7 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 	@Override
-	public QVehicle popFirstFromBuffer() {
+	QVehicle popFirstFromBuffer() {
 		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
@@ -653,7 +663,7 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 	@Override
-	public QVehicle getFirstFromBuffer() {
+	QVehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
 
@@ -668,7 +678,7 @@ public class QLinkImpl implements QLinkInternalI {
 	}
 
 	@Override
-	public double getBufferLastMovedTime() {
+	double getBufferLastMovedTime() {
 		return this.bufferLastMovedTime;
 	}
 

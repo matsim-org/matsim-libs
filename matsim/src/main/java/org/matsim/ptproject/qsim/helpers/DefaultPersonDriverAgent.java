@@ -285,8 +285,9 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 
 		} else if (pe instanceof Leg) {
 
-			initNextLeg(now, (Leg) pe);
-			this.simulation.agentDeparts(this, this.currentLinkId);
+			if ( initNextLeg(now, (Leg) pe) ) {
+				this.simulation.agentDeparts(this, this.currentLinkId);
+			}
 
 		} else {
 
@@ -295,13 +296,13 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 		}
 	}
 
-	private void initNextLeg(double now, final Leg leg) {
+	private boolean initNextLeg(double now, final Leg leg) {
 		Route route = leg.getRoute();
 		if (route == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
 			this.simulation.getAgentCounter().decLiving();
 			this.simulation.getAgentCounter().incLost();
-			return;
+			return false;
 		}
 		this.destinationLinkId = route.getEndLinkId();
 
@@ -310,7 +311,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 		this.cachedRouteLinkIds = null;
 		this.currentLinkIdIndex = 0;
 		this.cachedNextLinkId = null;
-
+		return true ;
 	}
 
 	private void initNextActivity(final Activity act) {

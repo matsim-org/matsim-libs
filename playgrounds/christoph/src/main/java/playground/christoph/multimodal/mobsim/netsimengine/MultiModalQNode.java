@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QSimEngine;
-import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.ptproject.qsim.netsimengine.QNode;
 
 public class MultiModalQNode extends QNode{
@@ -56,7 +56,7 @@ public class MultiModalQNode extends QNode{
 		 *  should be active or not).
 		 */
 		int inLinksCounter = 0;
-		for (QLinkInternalI link : this.inLinksArrayCache) {
+		for (QLink link : this.inLinksArrayCache) {
 			if(((MultiModalQLinkImpl) link).hasWaitingToLeaveAgents()) {
 				inLinksCounter++;
 			}
@@ -71,7 +71,7 @@ public class MultiModalQNode extends QNode{
 		 * At the moment we do not simulate capacities in the additional
 		 * modes. Therefore we move all agents over the node.
 		 */
-		for (QLinkInternalI link : this.inLinksArrayCache)
+		for (QLink link : this.inLinksArrayCache)
 		{			
 			PersonAgent personAgent = null;
 			while ( (personAgent = ((MultiModalQLinkImpl) link).getNextWaitingAgent(now)) != null ) {
@@ -109,11 +109,11 @@ public class MultiModalQNode extends QNode{
 		Id currentLinkId = ((PersonDriverAgent)personAgent).getCurrentLinkId();
 		Id nextLinkId = ((PersonDriverAgent)personAgent).chooseNextLinkId();
 
-		QLinkInternalI currentQLink = this.qSimEngine.getQSim().getQNetwork().getLinks().get(currentLinkId);
+		QLink currentQLink = this.qSimEngine.getQSim().getQNetwork().getLinks().get(currentLinkId);
 		Link currentLink = currentQLink.getLink();
 		
 		if (nextLinkId != null) {
-			QLinkInternalI nextQLink = this.qSimEngine.getQSim().getQNetwork().getLinks().get(nextLinkId);			
+			QLink nextQLink = this.qSimEngine.getQSim().getQNetwork().getLinks().get(nextLinkId);			
 			Link nextLink = nextQLink.getLink();
 			
 			this.checkNextLinkSemantics(currentLink, nextLink, personAgent);
