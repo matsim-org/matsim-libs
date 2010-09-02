@@ -34,7 +34,6 @@ public class CountsConfigGroup extends Module {
 	public static final String GROUP_NAME = "counts";
 
 	private static final String OUTPUTFORMAT = "outputformat";
-	private static final String OUTFILE = "outputCountsFile";
 	private static final String DISTANCEFILTER = "distanceFilter";
 	private static final String DISTANCEFILTERCENTERNODE = "distanceFilterCenterNode";
 	private static final String COUNTSINPUTFILENAME = "inputCountsFile";
@@ -71,8 +70,6 @@ public class CountsConfigGroup extends Module {
 	public String getValue(final String key) {
 		if (OUTPUTFORMAT.equals(key)) {
 			return getOutputFormat();
-		} else if (OUTFILE.equals(key)) {
-			return getOutputFile();
 		} else if (DISTANCEFILTER.equals(key)) {
 			if (getDistanceFilter() == null) {
 				return null;
@@ -93,8 +90,6 @@ public class CountsConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (OUTPUTFORMAT.equals(key)) {
 			setOutputFormat(value);
-		} else if (OUTFILE.equals(key)) {
-			setOutputFile(value.replace('\\', '/'));
 		} else if (DISTANCEFILTER.equals(key)) {
 			if (value == null) {
 				setDistanceFilter(null);
@@ -116,20 +111,11 @@ public class CountsConfigGroup extends Module {
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		this.addParameterToMap(map, OUTPUTFORMAT);
-		this.addParameterToMap(map, OUTFILE);
 		this.addParameterToMap(map, DISTANCEFILTER);
 		this.addParameterToMap(map, DISTANCEFILTERCENTERNODE);
 		this.addParameterToMap(map, COUNTSINPUTFILENAME);
 		this.addParameterToMap(map, COUNTSSCALEFACTOR);
 		return map;
-	}
-
-	public String getOutputFile() {
-		return this.outputFile;
-	}
-
-	public void setOutputFile(final String outputFile) {
-		this.outputFile = outputFile;
 	}
 
 	public String getOutputFormat() {
