@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.netsimengine.QNode;
+import org.matsim.ptproject.qsim.netsimengine.QSimEngine;
 
 public class MultiModalQNode extends QNode{
 	

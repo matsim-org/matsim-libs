@@ -42,6 +42,8 @@ public class CarDepartureHandler implements DepartureHandler {
 	private int cntTeleportVehicle = 0;
 
 	public CarDepartureHandler(QSim queueSimulation) {
+		// yyyy I don't understand why we need to explicitly instantiate this in the qsim; seems to me that this should come for 
+		// free from the netsim engine (i.e. the engines should provide their departure handlers).  kai, aug'10
 		this.queueSimulation = queueSimulation;
 	}
 

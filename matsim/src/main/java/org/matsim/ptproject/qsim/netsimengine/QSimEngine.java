@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QSimFunctionalInterface
+ * QSimEngine.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,14 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.ptproject.qsim.interfaces;
+
+package org.matsim.ptproject.qsim.netsimengine;
+
+import org.matsim.core.mobsim.framework.Steppable;
+import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
+import org.matsim.ptproject.qsim.interfaces.SimEngine;
 
 
 /**
- * Marker interface for other interfaces that are not related with
- * design decisions and are written solely to make QSim work.
+ * Coordinates the movement of vehicles on the links and the nodes.
+ *
+ * @author cdobler
  * @author dgrether
  */
-public interface QSimFunctionalInterface {
 
+public abstract class QSimEngine extends LinkActivator implements SimEngine, Steppable {
+
+	abstract AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder();
+	
 }

@@ -22,13 +22,9 @@ package org.matsim.ptproject.qsim.netsimengine;
 
 
 
-/*
- * 
- */
-public abstract class LinkActivator {
-    
-	// yyyy Looks like this is only called from _within_ the netsimengine package.  (But beware of extended links!)
+abstract class LinkActivator {
+
 	abstract void activateLink(final QLinkInternalI link);
-	
+
 	abstract int getNumberOfSimulatedLinks();
 } 

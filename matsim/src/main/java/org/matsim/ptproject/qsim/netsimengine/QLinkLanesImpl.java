@@ -41,7 +41,6 @@ import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
@@ -160,7 +159,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 * @param toNode
 	 * @see QLink#createLanes(List)
 	 */
-	public QLinkLanesImpl(final Link link2, QSimEngine engine, 
+	 QLinkLanesImpl(final Link link2, QSimEngine engine, 
 			final QNode toNode, Map<Id, Lane> laneMap) {
 		this.link = link2;
 		this.toQueueNode = toNode;
@@ -255,7 +254,8 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		}
 	}
 
-	public void activateLink() {
+	@Override
+	void activateLink() {
 		if (!this.active) {
 			this.qsimEngine.activateLink(this);
 			this.active = true;
@@ -269,7 +269,8 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 * @param veh
 	 *          the vehicle
 	 */
-	public void addFromIntersection(final QVehicle veh) {
+	@Override
+	void addFromIntersection(final QVehicle veh) {
 		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 		activateLink();
 		this.originalLane.addToVehicleQueue(veh, now);
@@ -279,7 +280,8 @@ public class QLinkLanesImpl extends QLinkInternalI {
 						this.getLink().getId()));
 	}
 
-	public void clearVehicles() {
+	@Override
+	void clearVehicles() {
 		double now = this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay();
 		this.parkedVehicles.clear();
 		for (QVehicle veh : this.waitingList) {
@@ -313,7 +315,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		this.activateLink();
 	}
 
-	public boolean moveLink(double now) {
+	boolean moveLink(double now) {
 		boolean ret = false;
 		for (QLane lane : this.queueLanes){
 			if (lane.moveLane(now)){
@@ -348,7 +350,8 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 
-	public boolean bufferIsEmpty() {
+	@Override
+	boolean bufferIsEmpty() {
 		//if there is only one lane...
 		if (this.toNodeQueueLanes == null){
 			return this.originalLane.bufferIsEmpty();
@@ -362,7 +365,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		return true;
 	}
 
-	public boolean hasSpace() {
+	boolean hasSpace() {
 		return this.originalLane.hasSpace();
 	}
 
@@ -443,7 +446,8 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		return this.originalLane.getSimulatedFlowCapacity();
 	}
 
-	public QSimEngine getQSimEngine(){
+	@Override
+	QSimEngine getQSimEngine(){
 		return this.qsimEngine;
 	}
 	
@@ -453,7 +457,8 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 	@Override
-	public void setQSimEngine(QSimEngine qsimEngine) {
+	void setQSimEngine(QSimEngine qsimEngine) {
+		// yyyy does it make sense to have this setter?  Seems that this should be immutable after construction. kai, aug'10
 		this.qsimEngine = (QSimEngineImpl) qsimEngine;
 		// yyyy this cast is not so bad because this is not meant to be pluggable (QLinkImpl together with some other engine).
 		// But it would still be better to do it correctly.  kai, aug'10
@@ -524,25 +529,25 @@ public class QLinkLanesImpl extends QLinkInternalI {
 
 
 	@Override
-	public double getBufferLastMovedTime() {
+	double getBufferLastMovedTime() {
 		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
 
 
 	@Override
-	public QVehicle getFirstFromBuffer() {
+	QVehicle getFirstFromBuffer() {
 		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
 
 
 	@Override
-	public boolean hasGreenForToLink(Id toLinkId) {
+	boolean hasGreenForToLink(Id toLinkId) {
 		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
 
 
 	@Override
-	public QVehicle popFirstFromBuffer() {
+	QVehicle popFirstFromBuffer() {
 		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
 

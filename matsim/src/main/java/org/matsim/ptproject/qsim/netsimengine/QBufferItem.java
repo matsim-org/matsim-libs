@@ -20,7 +20,6 @@
 package org.matsim.ptproject.qsim.netsimengine;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.ptproject.qsim.interfaces.QSimFunctionalInterface;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
 

@@ -23,9 +23,9 @@ package playground.christoph.multimodal.mobsim.netsimengine;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.ptproject.qsim.interfaces.QNetworkFactory;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.netsimengine.QLinkInternalI;
 import org.matsim.ptproject.qsim.netsimengine.QNode;
+import org.matsim.ptproject.qsim.netsimengine.QSimEngine;
 
 import playground.christoph.multimodal.router.costcalculator.MultiModalTravelTime;
 

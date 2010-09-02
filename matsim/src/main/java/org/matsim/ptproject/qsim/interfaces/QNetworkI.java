@@ -24,6 +24,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.ptproject.qsim.netsimengine.QNode;
+import org.matsim.ptproject.qsim.netsimengine.QSimEngine;
 import org.matsim.ptproject.qsim.netsimengine.QSimEngineImpl;
 
 /**

@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.vis.snapshots.writers.VisData;
 import org.matsim.vis.snapshots.writers.VisNode;
@@ -59,7 +58,7 @@ public class QNode implements VisNode {
 
   private QSimEngineImpl simEngine;
 
-	public QNode(final Node n, final QSimEngine simEngine) {
+	protected QNode(final Node n, final QSimEngine simEngine) {
 		this.node = n;
 		this.simEngine = (QSimEngineImpl) simEngine; // needs to be of correct impl type when it arrives here.  kai, jun'10
 		int nofInLinks = this.node.getInLinks().size();

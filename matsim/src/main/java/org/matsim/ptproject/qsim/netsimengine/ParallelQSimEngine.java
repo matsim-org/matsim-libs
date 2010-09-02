@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 
 /**
  * An extended version of the QSimEngine that uses an array of
@@ -47,7 +46,7 @@ import org.matsim.ptproject.qsim.interfaces.QSimEngine;
  * The ParallelQSimEngine (this class) will fulfill the QSimEngine interface upwards (i.e. against the QSim).
  * The QSimEngineThreads will fulfill the QSimEngine interface downwars (i.e. against nodes and links).
  */
-public class ParallelQSimEngine extends QSimEngineImpl{
+class ParallelQSimEngine extends QSimEngineImpl{
 	// yy I think we could consider moving the node-based rnd num gen also into the sequential version. kai, jun'10
 
 	private int numOfThreads;
@@ -62,7 +61,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 	private CyclicBarrier endBarrier;
 
 
-	public ParallelQSimEngine(final QSim sim, final Random random)
+	ParallelQSimEngine(final QSim sim, final Random random)
 	{
 		super(sim, random);
 		this.numOfThreads = this.getQSim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
@@ -162,7 +161,7 @@ public class ParallelQSimEngine extends QSimEngineImpl{
 	 * them as LinkActivators.
 	 */
 	@Override
-	public synchronized void activateLink(final QLinkInternalI link)
+	synchronized void activateLink(final QLinkInternalI link)
 	{
 		super.activateLink(link);
 	}

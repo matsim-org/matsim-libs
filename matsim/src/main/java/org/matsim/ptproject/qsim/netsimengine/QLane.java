@@ -64,7 +64,9 @@ import org.matsim.vis.snapshots.writers.VisData;
  * @author aneumann
  * @author mrieser
  */
-public class QLane extends QBufferItem {
+public final class QLane extends QBufferItem {
+	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
+	// syntax).  kai, aug'10
 
 	private static final Logger log = Logger.getLogger(QLane.class);
 
@@ -168,7 +170,7 @@ public class QLane extends QBufferItem {
 	}
 
 	public Id getId(){
-		// yyyy I think this can be replaced by getLane().getId().  kai, aug'10
+		// same as getLane().getId().  kai, aug'10
 		return this.laneData.getId();
 	}
 
@@ -176,7 +178,8 @@ public class QLane extends QBufferItem {
 		return this.laneData;
 	}
 
-	protected void addSignalGroupDefinition(final SignalGroupDefinition signalGroupDefinition) {
+	final void addSignalGroupDefinition(final SignalGroupDefinition signalGroupDefinition) {
+		// called from QLinkLanesImpl.  kai, aug'10
 		for (Id laneId : signalGroupDefinition.getLaneIds()) {
 			if (this.laneData.getId().equals(laneId)) {
 				if (this.signalGroups == null) {
@@ -282,7 +285,7 @@ public class QLane extends QBufferItem {
 	 * updated the status of the QueueLane's signal system
 	 */
 	public void updateGreenState(double time){
-		// "public" needed in signalengine :-(.  kai, aug'10
+		// "public" needed in signalengine.  kai, aug'10
 		if (this.signalGroups == null) {
 			log.fatal("This should never happen, since every lane link at a signalized intersection" +
 					" should have at least one signal(group). Please check integrity of traffic light data on link " +
@@ -297,15 +300,15 @@ public class QLane extends QBufferItem {
 	}
 
 	@Override
-	 boolean bufferIsEmpty() {
+	boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();
 	}
 
-	public boolean isThisTimeStepGreen(){
+	boolean isThisTimeStepGreen(){
 		return this.thisTimeStepGreen ;
 	}
 
-	protected void setThisTimeStepGreen(final boolean b) {
+	void setThisTimeStepGreen(final boolean b) {
 		this.thisTimeStepGreen = b;
 	}
 
@@ -668,7 +671,7 @@ public class QLane extends QBufferItem {
 	}
 
 	@Override
-	public boolean hasGreenForToLink(Id toLinkId){
+	boolean hasGreenForToLink(Id toLinkId){
 		return true;
 	}
 

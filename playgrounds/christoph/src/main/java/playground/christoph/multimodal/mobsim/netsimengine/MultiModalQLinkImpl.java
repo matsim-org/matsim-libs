@@ -35,9 +35,9 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.netsimengine.QLinkImpl;
 import org.matsim.ptproject.qsim.netsimengine.QNode;
+import org.matsim.ptproject.qsim.netsimengine.QSimEngine;
 
 import playground.christoph.multimodal.router.costcalculator.MultiModalTravelTime;
 

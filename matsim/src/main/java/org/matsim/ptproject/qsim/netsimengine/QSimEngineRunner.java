@@ -29,10 +29,9 @@ import java.util.concurrent.CyclicBarrier;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
-import org.matsim.ptproject.qsim.interfaces.QSimEngine;
 import org.matsim.ptproject.qsim.netsimengine.ParallelQSimEngine.ExtendedQueueNode;
 
-public class QSimEngineRunner implements QSimEngine, Runnable {
+public class QSimEngineRunner extends QSimEngine implements Runnable {
 
 	private double time = 0.0;
 	private boolean simulateAllNodes = false;
@@ -92,9 +91,10 @@ public class QSimEngineRunner implements QSimEngine, Runnable {
 		// nothing to do here
 	}
 
-	public void beforeSimStep( double time ) {
-		// nothing to do here
-	}
+//	public void beforeSimStep( double time ) {
+//		// nothing to do here
+//	}
+	// don't know what this was. kai, aug'10
 
 	@Override
 	public void run()
@@ -193,7 +193,8 @@ public class QSimEngineRunner implements QSimEngine, Runnable {
 		}
 	}	// run()
 
-	public void activateLink(QLinkInternalI link)
+	@Override
+	void activateLink(QLinkInternalI link)
 	{
 		if (!simulateAllLinks)
 		{
