@@ -21,6 +21,7 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 import java.util.Set;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
@@ -35,6 +36,7 @@ import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeEdgeLengt
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeGridTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCostsTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.TravelTimeTask;
 import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCostFunction;
 import playground.johannes.socialnetworks.snowball2.analysis.DegreeIterationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.ObservedDegree;
@@ -53,7 +55,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 	
-	public ObservedAnalyzerTask(ZoneLayer zones, Set<Point> choiceSet) {
+	public ObservedAnalyzerTask(ZoneLayer zones, Set<Point> choiceSet, Network network) {
 		addTask(new GraphSizeTask());
 		addTask(new WaveSizeTask());
 		
@@ -86,9 +88,9 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		
 		addTask(new ComponentsTask());
 		
-		EdgeCostsTask costs = new EdgeCostsTask(null);
-		costs.setModule(new ObservedEdgeCosts(new GravityEdgeCostFunction(1.6, 1.0)));
-		addTask(costs);
+//		EdgeCostsTask costs = new EdgeCostsTask(null);
+//		costs.setModule(new ObservedEdgeCosts(new GravityEdgeCostFunction(1.6, 1.0)));
+//		addTask(costs);
 		
 		addTask(new SeedConnectionTask());
 		
@@ -100,9 +102,11 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 		daTask.setModule(new ObservedDegree());
 		addTask(daTask);
 		
-		DegreeGridTask gridTask = new DegreeGridTask();
-		gridTask.setModule(new ObservedDegree());
-		addTask(gridTask);
+//		DegreeGridTask gridTask = new DegreeGridTask();
+//		gridTask.setModule(new ObservedDegree());
+//		addTask(gridTask);
+		
+//		addTask(new TravelTimeTask(network));
 	}
 
 }

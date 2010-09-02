@@ -109,7 +109,9 @@ public class EstimatedTransitivity extends Transitivity {
 		TObjectDoubleIterator<? extends Vertex> it = coefficients.iterator();
 		for(int i = 0; i < coefficients.size(); i++) {
 			it.advance();
-			distr.add(it.value(), 1/biasedDistribution.getProbability((SampledVertex) it.key()));
+			double p = biasedDistribution.getProbability((SampledVertex) it.key());
+			if(p > 0)
+				distr.add(it.value(), 1/p);
 		}
 		return distr;
 	}

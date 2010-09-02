@@ -61,8 +61,10 @@ public class EstimatedDegree extends Degree {
 		
 		Set<SampledVertex> samples = SnowballPartitions.<SampledVertex>createSampledPartition((Set<SampledVertex>)vertices);
 		for(SampledVertex vertex : samples) {
-			distr.add(vertex.getNeighbours().size(), 1/biasedDistribution.getProbability(vertex));
-//			distr.add(vertex.getNeighbours().size(), biasedDistribution.getWeight(vertex));
+			double p = biasedDistribution.getProbability(vertex);
+			if(p > 0) {
+				distr.add(vertex.getNeighbours().size(), 1/p);
+			}
 		}
 		
 		return distr;
@@ -76,12 +78,6 @@ public class EstimatedDegree extends Degree {
 
 	@Override
 	public double assortativity(Graph graph) {
-		double psum = 1;
-//		for(Vertex v : graph.getVertices()) {
-//			if(((SampledVertex)v).isSampled())
-//				psum += biasedDistribution.getProbability((SampledVertex)v);
-//		}
-		
 		EstimatedDistribution product = new EstimatedDistribution(edgeEstimator);
 		EstimatedDistribution sum = new EstimatedDistribution(edgeEstimator);
 		EstimatedDistribution squareSum = new EstimatedDistribution(edgeEstimator);
@@ -93,16 +89,18 @@ public class EstimatedDegree extends Degree {
 				int d_v1 = v1.getEdges().size();
 				int d_v2 = v2.getEdges().size();
 
-				double p_1 = biasedDistribution.getProbability(v1)/psum;
-				double p_2 = biasedDistribution.getProbability(v2)/psum;
-//				double p = Math.max(p_1, p_2);
-				double p = (p_1 + p_2) - (p_1*p_2);
+				double p_1 = biasedDistribution.getProbability(v1);
+				double p_2 = biasedDistribution.getProbability(v2);
 				
-				sum.add(0.5 * (d_v1 + d_v2), 1/p);
-				squareSum.add(0.5 * (Math.pow(d_v1, 2) + Math.pow(d_v2, 2)), 1/p);
-				product.add(d_v1 * d_v2, 1/p);
-				
-				edgecount++;
+				if (p_1 > 0 && p_2 > 0) {
+					double p = (p_1 + p_2) - (p_1 * p_2);
+
+					sum.add(0.5 * (d_v1 + d_v2), 1 / p);
+					squareSum.add(0.5 * (Math.pow(d_v1, 2) + Math.pow(d_v2, 2)), 1 / p);
+					product.add(d_v1 * d_v2, 1 / p);
+
+					edgecount++;
+				}
 			}
 		}
 		

@@ -19,14 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
@@ -35,9 +36,9 @@ import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.sna.snowball.SampledGraphProjectionBuilder;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.opengis.referencing.FactoryException;
 
-import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
@@ -68,6 +69,10 @@ public class Analyzer {
 		
 		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = reader.readGraph(args[0]);
 		
+		Scenario scenario = new ScenarioImpl();
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+//		netReader.readFile("/Users/jillenberger/Work/shared-svn/studies/countries/ch/data/network/osm20100831/network.xml.gz");
+		
 		ZoneLayer zones = ZoneLayerSHP.read("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/zones/Zones.shp");
 		zones.overwriteCRS(CRSUtils.getCRS(21781));
 		
@@ -82,7 +87,7 @@ public class Analyzer {
 		 * analyze the complete graph
 		 */
 		String output = args[1];
-		analyze(graph, zones, choiceSet, output);
+//		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);
 		/*
 		 * analyze the swiss clipping
 		 */
@@ -96,37 +101,12 @@ public class Analyzer {
 		
 		output = output+"/clip/";
 		new File(output).mkdirs();
-		analyze(graph, zones, choiceSet, output);
-		/*
-		 * 
-		 */
-//		ObservedAccessability obsAccess = new ObservedAccessability();
-//		TObjectDoubleHashMap<SpatialVertex> values = obsAccess.values((Set<? extends SpatialVertex>) graph.getVertices(), new GravityCostFunction(1.6, 1.0), choiceSet);
-//		TObjectDoubleHashMap<SpatialVertex> values = obsAccess.values((Set<? extends SpatialVertex>) graph.getVertices(), new BeelineCostFunction(), choiceSet);
-		
-//		AttributePartition partition = new AttributePartition(new FixedSampleSizeDiscretizer(values.getValues(), 200));
-//		AttributePartition partition = new AttributePartition(new LinearDiscretizer(100));
-//		TDoubleObjectHashMap<Set<SpatialVertex>> partitions = partition.partition(values);
-//		TDoubleObjectIterator<Set<SpatialVertex>> it = partitions.iterator();
-//		for(int i = 0; i < partitions.size(); i++) {
-//			it.advance();
-//			new File(output + "part." + it.key()).mkdirs();
-//			ObservedDistance distance = new ObservedDistance();
-//			Distribution.writeHistogram(distance.distribution(it.value()).absoluteDistributionLog2(1000), output + "part." + it.key() + "/d.txt");
-//			
-//			AcceptanceProbability accept = new ObservedAcceptanceProbability();
-//			Distribution.writeHistogram(accept.distribution(it.value(), choiceSet).absoluteDistributionLog2(1000), output + "part." + it.key() + "/p_accept.log2.txt");
-//			Distribution.writeHistogram(accept.distribution(it.value(), choiceSet).absoluteDistribution(1000), output + "part." + it.key() + "/p_accept.txt");
-//			
-//			EdgeCosts costs = new ObservedEdgeCosts(new GravityEdgeCostFunction(1.0, 1.0));
-//			double c_mean = costs.vertexCostsSum(it.value()).mean();
-//			System.out.println(it.key() + " = " + c_mean);
-//		}
+		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);
 		
 	}
 
-	private static void analyze(SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph, ZoneLayer zones, Set<Point> choiceSet, String output) {
-		ObservedAnalyzerTask task = new ObservedAnalyzerTask(zones, choiceSet);
+	private static void analyze(SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph, ZoneLayer zones, Set<Point> choiceSet, Network network, String output) {
+		ObservedAnalyzerTask task = new ObservedAnalyzerTask(zones, choiceSet, network);
 		task.setOutputDirectoy(output);
 		
 		try {
@@ -134,5 +114,16 @@ public class Analyzer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		EstimatedAnalyzerTask estimTask = new EstimatedAnalyzerTask(graph);
+		output = output + "/estim";
+		new File(output).mkdirs();
+		estimTask.setOutputDirectoy(output);
+		try {
+			GraphAnalyzer.writeStats(GraphAnalyzer.analyze(graph, estimTask), output + "/stats.txt");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 }
