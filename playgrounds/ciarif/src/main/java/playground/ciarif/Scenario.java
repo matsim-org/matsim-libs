@@ -61,7 +61,6 @@ public abstract class Scenario {
 		config.plans().setOutputSample(1.0);
 
 		config.counts().setCountsFileName(input_directory + "counts.xml");
-		config.counts().setOutputFile(output_directory + "output_counts.xml.gz");
 
 		return config;
 	}
