@@ -24,6 +24,7 @@ public class OsmToMatsim {
 
 	/**
 	 * @param args
+	 * This class creates a Matsim network from an OSM network file. 
 	 */
 	public static void main(String[] args) {
 		
@@ -56,7 +57,7 @@ public class OsmToMatsim {
 		osmReader.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600);
 //		 Wohngebiete
 		osmReader.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  600);
-//		 Spielstrassen RAUS
+//		 Spielstrassen irrelevant, since only tiny percentile
 //		 osmReader.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
 		
 		try {
@@ -89,7 +90,8 @@ public class OsmToMatsim {
 		simply.setNodesToMerge(nodeTypesToMerge);
 		simply.run(network);
 		new NetworkWriter(network).write(output + "_cl_simple.xml.gz");
-		System.out.println("Simplifier done!");
+		System.out.println("Simplifier done! Network saved as " + output + "_cl_simple.xml.gz");
+		System.out.println("Conversion completed!");
 		
 //		// Double Links
 //		NetworkSegmentDoubleLinks networkDoubleLinks = new NetworkSegmentDoubleLinks();
