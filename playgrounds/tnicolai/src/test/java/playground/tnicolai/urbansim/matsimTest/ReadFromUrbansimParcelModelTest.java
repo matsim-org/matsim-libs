@@ -44,9 +44,9 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.testUtils.TempDirectoryUtil;
 import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
+import playground.tnicolai.urbansim.utils.io.TempDirectoryUtil;
 
 /**
  * @author thomas
@@ -88,7 +88,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		
 		Constants.setOpusHomeDirectory( System.getProperty("java.io.tmpdir") );
 		// create temp directories
-		TempDirectoryUtil.createDirectories();
+		TempDirectoryUtil.createOPUSDirectories();
 		
 		// preparing input test file
 		int dummyYear = 2000;
@@ -117,7 +117,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		}
 		
 		// remove temp directories
-		TempDirectoryUtil.cleaningUp();
+		TempDirectoryUtil.cleaningUpOPUSDirectories();
 		log.info("End of " + testRunName + ".");
 	}
 	

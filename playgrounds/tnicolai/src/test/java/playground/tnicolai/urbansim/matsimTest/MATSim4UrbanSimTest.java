@@ -23,8 +23,6 @@
  */
 package playground.tnicolai.urbansim.matsimTest;
 
-import java.net.URL;
-
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,8 +31,9 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.testUtils.TempDirectoryUtil;
+import playground.tnicolai.urbansim.utils.CommonUtilities;
 import playground.tnicolai.urbansim.utils.io.FileCopy;
+import playground.tnicolai.urbansim.utils.io.TempDirectoryUtil;
 
 /**
  * @author thomas
@@ -51,21 +50,22 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 	@Test
 	public void testMATSimConfig(){
 		log.info("Starting testMATSimConfig run: Testing if MATSim config is valid.");
-		prepareTest("matsim_config_test_run.xml", "testMATSimConfig");
+		prepareTest("matsim_config_test_run.xml");
+		log.info("End of testMATSimConfig.");
 	}
 	
 	@Test
 	public void testMATSimRun(){
 		log.info("Starting testMATSimRun run: Testing if MATSim run is passes through.");
-		prepareTest("matsim_config_normal_run.xml", "testMATSimRun");
+		prepareTest("matsim_config_normal_run.xml");
+		log.info("End of testMATSimRun.");
 	}
 	
 	/**
 	 * preparing MATSim test run
 	 * @param configName name of MATSim config file
-	 * @param testRunName name of current test case
 	 */
-	private void prepareTest(String configName, String testRunName){
+	private void prepareTest(String configName){
 
 		String matsimConfigDir = getMATSimConfigDir();
 		String matsimConfigName = configName;
@@ -83,8 +83,7 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 		testRun( matsimConfigDir+matsimConfigName );
 		
 		// remove temp directories
-		TempDirectoryUtil.cleaningUp();
-		log.info("End of " + testRunName + ".");
+		TempDirectoryUtil.cleaningUpOPUSDirectories();
 	}
 	
 	/**
@@ -105,9 +104,9 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 	private void allocateUrbanSimDataForMATSimRun(String urbanSimDataPath){
 		
 		// set temp directory as opus_home
-		Constants.setOpusHomeDirectory(System.getProperty("java.io.tmpdir"));
+		// Constants.setOpusHomeDirectory(System.getProperty("java.io.tmpdir")); // moved to TempDirectoryUtil
 		// create temp directories
-		TempDirectoryUtil.createDirectories();
+		TempDirectoryUtil.createOPUSDirectories();
 		// set outpur directory for UrbanSim data to OPUS_HOME/opus_matsim/tmp
 		destinationDir = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY;
 
@@ -124,9 +123,15 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 	 */
 	private String getMATSimConfigDir(){
 		
-		String currentDir = getCurrentPath();
-		int index = currentDir.lastIndexOf("/");
-		return currentDir.substring(0, index) + "Data/xmlMATSimConfig/";
+		// old version
+		// String currentDir = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);
+		// int index = currentDir.lastIndexOf("/");
+		// return currentDir.substring(0, index) + "Data/xmlMATSimConfig/";
+		
+		String path = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);
+		String subPath = "matsimTestData/xmlMATSimConfig/";
+		
+		return CommonUtilities.replaceSubPath(1, path, subPath) + "/";
 	}
 	
 	/**
@@ -134,23 +139,16 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 	 * @return directory to the UrbanSim input data
 	 */
 	private String getUrbanSimInputDataDir(){
-		String currentDir = getCurrentPath();
-		int index = currentDir.lastIndexOf("matsimTest");
-		return currentDir.substring(0, index) + "matsimTestData/urbanSimOutput/";
-	}
-	
-	/**
-	 * returns the path of the current directory
-	 * @return
-	 */
-	private String getCurrentPath(){
-		try{
-			URL dirUrl = MATSim4UrbanSimTest.class.getResource("./"); // get my directory
-			return dirUrl.getFile();
-		}catch(Exception e){
-			e.printStackTrace();
-			return null;
-		}
+		
+		// old version
+		// String currentDir = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);;
+		// int index = currentDir.lastIndexOf("matsimTest");
+		// return currentDir.substring(0, index) + "matsimTestData/urbanSimOutput/";
+		
+		String path = CommonUtilities.getCurrentPath(MATSim4UrbanSimTest.class);
+		String subPath = "matsimTestData/urbanSimOutput/";
+		
+		return CommonUtilities.replaceSubPath(1, path, subPath) + "/";
 	}
 
 }
