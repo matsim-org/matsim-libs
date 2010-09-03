@@ -20,32 +20,24 @@
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphFactory;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.xml.sax.SAXException;
 
-import playground.johannes.socialnetworks.graph.generators.BarabasiAlbertGenerator;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialSparseVertexPool;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
@@ -80,11 +72,14 @@ public class ErgmSimulator {
 		long sampleInterval = (long)Double.parseDouble(config.getParam(MODULE_NAME, "sampleinterval"));
 		String outputDir = config.getParam(MODULE_NAME, "output");
 		
-//		double totalCost = Double.parseDouble(config.getParam(MODULE_NAME, "totalCost"));
+		double totalCost = Double.parseDouble(config.getParam(MODULE_NAME, "totalCost"));
 		double theta_edge = Double.parseDouble(config.getParam(MODULE_NAME, "thetaEdge"));
 		double gamma = Double.parseDouble(config.getParam(MODULE_NAME, "gamma"));
 		
-		logger.info("Creating random graph...");
+		double beta_k = Double.parseDouble(config.getParam(MODULE_NAME, "beta_k"));
+		double beta_c = Double.parseDouble(config.getParam(MODULE_NAME, "beta_c"));
+		
+//		logger.info("Creating random graph...");
 //		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten());
 //		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(builder);
 //		int k = (int)k_mean;
@@ -93,14 +88,14 @@ public class ErgmSimulator {
 //		generator.generate(graph, p, randomSeed);
 
 		
-		Set<Point> points = new HashSet<Point>();
-		for(SpatialVertex vertex : graph.getVertices())
-			points.add(vertex.getPoint());
-		
-		SpatialSparseGraphFactory factory = new SpatialSparseVertexPool(points, graph.getCoordinateReferenceSysten());
-		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(factory);
-		BarabasiAlbertGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new BarabasiAlbertGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(builder);
-		graph = generator.generate(2, 1, points.size() - 2 , randomSeed);
+//		Set<Point> points = new HashSet<Point>();
+//		for(SpatialVertex vertex : graph.getVertices())
+//			points.add(vertex.getPoint());
+//		
+//		SpatialSparseGraphFactory factory = new SpatialSparseVertexPool(points, graph.getCoordinateReferenceSysten());
+		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten());
+//		BarabasiAlbertGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new BarabasiAlbertGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(builder);
+//		graph = generator.generate(2, 1, points.size() - 2 , randomSeed);
 		/*
 		 * convert graph to matrix
 		 */
@@ -111,12 +106,16 @@ public class ErgmSimulator {
 		logger.info("Initializing ERGM...");
 		Ergm ergm = new Ergm();
 		
+		EdgeCostFunction func = new GravityEdgeCostFunction(gamma, 1, new CartesianDistanceCalculator());
+		UtilFuncDiff diff = new UtilFuncDiff(func, beta_k, beta_c, totalCost);
+		ergm.addComponent(diff);
+		
 //		ErgmDensity density = new ErgmDensity();
 //		density.setTheta(theta_edge);
 //		ergm.addComponent(density);
 		
-		EdgeProbabilityFunction func = new EdgePowerLawDistance(y, gamma, graph.getEdges().size());
-		ergm.addComponent(new ErgmEdgeProba(func));
+//		EdgeProbabilityFunction func = new EdgePowerLawDistance(y, gamma, graph.getEdges().size());
+//		ergm.addComponent(new ErgmEdgeProba(func));
 		
 //		EdgeProbabilityFunction func2 = new DegreeSequence(y);
 //		ergm.addComponent(new ErgmEdgeProba(func2));
@@ -130,8 +129,8 @@ public class ErgmSimulator {
 		/*
 		 * setup gibbs sampler.
 		 */
-		GibbsSampler sampler = new GibbsEdgeFlip(randomSeed);
-//		GibbsSampler sampler = new GibbsSampler(randomSeed);
+//		GibbsSampler sampler = new GibbsEdgeFlip(randomSeed);
+		GibbsSampler sampler = new GibbsSampler(randomSeed);
 		sampler.setInterval(1000000);
 		
 		DumpHandler handler = new DumpHandler(graph, builder, outputDir);

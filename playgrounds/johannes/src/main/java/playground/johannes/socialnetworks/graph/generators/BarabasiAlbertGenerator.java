@@ -56,10 +56,10 @@ public class BarabasiAlbertGenerator<G extends Graph, V extends Vertex, E extend
 		this.builder = factory;
 	}
 	
-	public G generate(int m_0, int m, int t, long randomSeed) {
-		if(m_0 < 1)
-			throw new IllegalArgumentException("Number of initial nodes (m_0) must be m_0 >= 2!");
-		if(m > m_0)
+	public G generate(int n_0, int m, int t, long randomSeed) {
+		if(n_0 < 1)
+			throw new IllegalArgumentException("Number of initial nodes (n_0) must be n_0 >= 2!");
+		if(m > n_0)
 			throw new IllegalArgumentException("Number of edges to attach per time step (m) must not be greater the number of initial nodes (m_0)!");
 		
 		Random random = new Random(randomSeed);
@@ -67,9 +67,9 @@ public class BarabasiAlbertGenerator<G extends Graph, V extends Vertex, E extend
 		 * Initialize graph.
 		 */
 		G g = builder.createGraph();
-		List<V> vertices = new ArrayList<V>(m_0 + (m*t));
+		List<V> vertices = new ArrayList<V>(n_0 + (m*t));
 		V previous = null;
-		for(int i = 0; i < m_0; i++) {
+		for(int i = 0; i < n_0; i++) {
 			V v = builder.addVertex(g);
 			if(v == null)
 				throw new RuntimeException("Vertex must nor be null!");
@@ -124,6 +124,10 @@ public class BarabasiAlbertGenerator<G extends Graph, V extends Vertex, E extend
 			int count = targets.size();
 			for(int k = 0; k < count; k++)
 				builder.addEdge(g, v, targets.get(k));
+			
+			if(i % 1000 == 0) {
+				logger.info(String.format("%1$s of %2$s time steps. %3$s edges.", i, t, g.getEdges().size()));
+			}
 		}
 		
 		return g;

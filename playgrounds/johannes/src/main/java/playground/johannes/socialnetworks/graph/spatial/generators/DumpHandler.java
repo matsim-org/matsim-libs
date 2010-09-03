@@ -102,9 +102,9 @@ public class DumpHandler implements SampleHandler<SpatialSparseVertex> {
 		task.addTask(new TransitivityTask());
 		task.addTask(new DistanceTask());
 		
-		AcceptanceProbabilityTask ptask = new AcceptanceProbabilityTask();
-		ptask.setDistanceCalculator(new CartesianDistanceCalculator());
-		task.addTask(ptask);
+//		AcceptanceProbabilityTask ptask = new AcceptanceProbabilityTask();
+//		ptask.setDistanceCalculator(new CartesianDistanceCalculator());
+//		task.addTask(ptask);
 		
 		return task;
 	}

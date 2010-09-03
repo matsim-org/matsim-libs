@@ -27,8 +27,8 @@ import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
-import playground.johannes.socialnetworks.gis.BeelineCostFunction;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCostFunction;
 
 /**
  * @author illenberger
@@ -39,10 +39,8 @@ public class StandardAnalyzerTask extends playground.johannes.socialnetworks.gra
 	public StandardAnalyzerTask() {
 		super();
 		addTask(new DistanceTask());
-		addTask(new AcceptanceProbabilityTask());
-		BeelineCostFunction cf = new BeelineCostFunction();
-		cf.setDistanceCalculator(new CartesianDistanceCalculator());
-		addTask(new AccessabilityTask(cf));
+//		addTask(new AcceptanceProbabilityTask());
+		addTask(new EdgeCostsTask(new GravityEdgeCostFunction(1.6, 1, new CartesianDistanceCalculator())));
 		
 	}
 	/**

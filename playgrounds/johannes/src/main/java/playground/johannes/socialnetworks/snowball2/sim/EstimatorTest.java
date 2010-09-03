@@ -66,6 +66,8 @@ public class EstimatorTest implements SamplerListener {
 	
 	private Map<Vertex, double[]> vertexProbas;
 	
+	private Map<Vertex, double[]> vertexWeights;
+	
 	private int[] nSimulations = new int[INIT_CAPACITY];
 	
 	private int[] nSampledVertices = new int[INIT_CAPACITY];
@@ -79,9 +81,11 @@ public class EstimatorTest implements SamplerListener {
 	public EstimatorTest(Graph graph) {
 		vertexCounts = new HashMap<Vertex, int[]>();
 		vertexProbas = new HashMap<Vertex, double[]>();
+		vertexWeights = new HashMap<Vertex, double[]>();
 		for(Vertex v : graph.getVertices()) {
 			vertexCounts.put(v, new int[INIT_CAPACITY]);
 			vertexProbas.put(v, new double[INIT_CAPACITY]);
+			vertexWeights.put(v, new double[INIT_CAPACITY]);
 		}
 		
 	}
@@ -89,9 +93,9 @@ public class EstimatorTest implements SamplerListener {
 	public void reset(Graph graph, String estimtype) {
 		lastIteration = 0;
 		int N = graph.getVertices().size();
-		if("estim1a".equalsIgnoreCase(estimtype))
+		if("estim1b".equalsIgnoreCase(estimtype))
 			estimator = new Estimator1(N);
-		else if("estim1b".equalsIgnoreCase(estimtype))
+		else if("estim1a".equalsIgnoreCase(estimtype))
 			estimator = new NormalizedEstimator(new Estimator1(N), N);
 		else {
 			logger.warn(String.format("Estimator type %1$s unkown!", estimtype));
@@ -121,7 +125,10 @@ public class EstimatorTest implements SamplerListener {
 					vertexCounts.get(delegate)[it - 1]++;
 
 					double[] probas = vertexProbas.get(delegate);
-					probas[it - 1] += estimator.getProbability(v);
+					double[] weights = vertexWeights.get(delegate);
+					double p = estimator.getProbability(v);
+					probas[it - 1] += p;
+					weights[it - 1] += 1/p;
 				}
 			}
 		}
@@ -141,9 +148,13 @@ public class EstimatorTest implements SamplerListener {
 		 */
 		TDoubleDoubleHashMap kHist = new Degree().distribution(graph.getVertices()).absoluteDistribution();
 		TDoubleDoubleHashMap[] pObs_k = new TDoubleDoubleHashMap[maxIteration + 1];
+		TDoubleDoubleHashMap[] wObs_k = new TDoubleDoubleHashMap[maxIteration + 1];
 		TDoubleDoubleHashMap[] pEstim_k = new TDoubleDoubleHashMap[maxIteration + 1];
-		double[] mse = new double[maxIteration + 1];
-		double[] bias = new double[maxIteration + 1];
+		TDoubleDoubleHashMap[] wEstim_k = new TDoubleDoubleHashMap[maxIteration + 1];
+		double[] mse_p = new double[maxIteration + 1];
+		double[] mse_w = new double[maxIteration + 1];
+		double[] bias_p = new double[maxIteration + 1];
+		double[] bias_w = new double[maxIteration + 1];
 
 		int[] samples = new int[maxIteration + 1];
 		TIntIntHashMap[] samples_k = new TIntIntHashMap[maxIteration + 1];
@@ -162,12 +173,14 @@ public class EstimatorTest implements SamplerListener {
 			int k = v.getNeighbours().size();
 			int[] vertexCount = vertexCounts.get(v);
 			double[] estimProba = vertexProbas.get(v);
+			double[] estimWeigth = vertexWeights.get(v);
 			/*
 			 * iterate over all snowball iterations
 			 */
 			for(int i = 0; i <= maxIteration; i++) {
 				int n_i = vertexCount[i];
 				double pObs_i = n_i / (double) nSimulations[i];
+				
 				double pRnd_i = nSampledVertices[i] / ((double)nSimulations[i] * N);
 				/*
 				 * initialize arrays
@@ -175,22 +188,35 @@ public class EstimatorTest implements SamplerListener {
 				if(pObs_k[i] == null) {
 					samples_k[i] = new TIntIntHashMap();
 					pObs_k[i] = new TDoubleDoubleHashMap();
+					wObs_k[i] = new TDoubleDoubleHashMap();
 					pEstim_k[i] = new TDoubleDoubleHashMap();
+					wEstim_k[i] = new TDoubleDoubleHashMap();
 				}
 				/*
 				 * accumulate samples
 				 */
 				pObs_k[i].adjustOrPutValue(k, pObs_i, pObs_i);
+				
 				if (n_i > 0) {
+					double wObs_i = 1/pObs_i;
+					wObs_k[i].adjustOrPutValue(k, wObs_i, wObs_i);
+					
 					samples[i]++;
 					
 					double pEstimMean = estimProba[i] / (double) n_i;
-					double diff = pObs_i - pEstimMean;
+					double wEstimMean = estimWeigth[i] / (double) n_i;
+//					double wEstimMean = 1/pEstimMean;
+					double diff_p = pObs_i - pEstimMean;
+					double diff_w = wObs_i - wEstimMean;
 					
-					mse[i] += diff * diff;
-					bias[i] += Math.abs(pObs_i - pRnd_i);
+					mse_p[i] += diff_p * diff_p;
+					mse_w[i] += diff_w * diff_w;
+					
+					bias_p[i] += Math.abs(pObs_i - pRnd_i);
+					bias_w[i] += Math.abs(wObs_i - 1/pRnd_i);
 					
 					pEstim_k[i].adjustOrPutValue(k, pEstimMean, pEstimMean);
+					wEstim_k[i].adjustOrPutValue(k, wEstimMean, wEstimMean);
 					samples_k[i].adjustOrPutValue(k, 1, 1);
 				}
 				/*
@@ -213,14 +239,24 @@ public class EstimatorTest implements SamplerListener {
 		 */
 		for(int i = 0; i <= maxIteration; i++) {
 			nSampledVertices[i] = (int) (nSampledVertices[i] / (double)nSimulations[i]);
-			mse[i] = mse[i] / (double)samples[i];
-			bias[i] = bias[i] / (double)samples[i];
+			mse_p[i] = mse_p[i] / (double)samples[i];
+			mse_w[i] = mse_w[i] / (double)samples[i];
+			bias_p[i] = bias_p[i] / (double)samples[i];
+			bias_w[i] = bias_w[i] / (double)samples[i];
 			
 			if(pObs_k[i] != null) {
 				TDoubleDoubleIterator it = pObs_k[i].iterator();
 				for(int k = 0; k < pObs_k[i].size(); k++) {
 					it.advance();
 					it.setValue(it.value() / (double)kHist.get((int)it.key()));
+				}
+			}
+			
+			if(wObs_k[i] != null) {
+				TDoubleDoubleIterator it = wObs_k[i].iterator();
+				for(int k = 0; k < wObs_k[i].size(); k++) {
+					it.advance();
+					it.setValue(it.value() / (double)samples_k[i].get((int)it.key()));
 				}
 			}
 			
@@ -231,15 +267,27 @@ public class EstimatorTest implements SamplerListener {
 					it.setValue(it.value() / (double)samples_k[i].get((int)it.key()));
 				}
 			}
+			
+			if(wEstim_k[i] != null) {
+				TDoubleDoubleIterator it = wEstim_k[i].iterator();
+				for(int k = 0; k < wEstim_k[i].size(); k++) {
+					it.advance();
+					it.setValue(it.value() / (double)samples_k[i].get((int)it.key()));
+				}
+			}
 		}
 		/*
 		 * write data
 		 */
 		writeIntArray(nSampledVertices, String.format("%1$s/n_sampled.txt", output), "it\tn");
-		writeDoubleArray(mse, String.format("%1$s/mse.txt", output), "it\tmse");
-		writeDoubleArray(bias, String.format("%1$s/bias.txt", output), "it\tbias");
+		writeDoubleArray(mse_p, String.format("%1$s/mse_p.txt", output), "it\tmse");
+		writeDoubleArray(mse_w, String.format("%1$s/mse_w.txt", output), "it\tmse");
+		writeDoubleArray(bias_p, String.format("%1$s/bias_p.txt", output), "it\tbias");
+		writeDoubleArray(bias_w, String.format("%1$s/bias_w.txt", output), "it\tbias");
 		writeHistogramArray(pObs_k, output, "pobs");
+		writeHistogramArray(wObs_k, output, "wobs");
 		writeHistogramArray(pEstim_k, output, "pestim");
+		writeHistogramArray(wEstim_k, output, "westim");
 		/*
 		 * boxplot
 		 */
