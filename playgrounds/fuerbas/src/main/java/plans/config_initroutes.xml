@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+>
+<config>
+
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="switzerland_matsim_cl_simple.xml.gz" />
+	</module>
+
+	<module name="plans">
+        <param name="inputPlansFile" value="plans_switzerland_simpleactivity.xml.gz" />
+		<param name="outputPlansFile" value="plans_switzerland_newroutes.xml.gz" />
+	</module>
+	
+
+</config>
