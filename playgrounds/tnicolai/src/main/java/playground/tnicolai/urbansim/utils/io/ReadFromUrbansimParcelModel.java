@@ -35,7 +35,7 @@ import org.matsim.world.Location;
 
 import playground.kai.urbansim.ids.ZoneId;
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.utils.CommonUtilities;
+import playground.tnicolai.urbansim.utils.CommonMATSimUtilities;
 
 /**
  * @author nagel
@@ -78,7 +78,7 @@ public class ReadFromUrbansimParcelModel {
 			String line = reader.readLine();
 
 			// get and initialize the column number of each header element
-			Map<String,Integer> idxFromKey = CommonUtilities.createIdxFromKey( line, Constants.TAB_SEPERATOR );
+			Map<String,Integer> idxFromKey = CommonMATSimUtilities.createIdxFromKey( line, Constants.TAB_SEPERATOR );
 			final int indexParcelID 	= idxFromKey.get( Constants.PARCEL_ID );
 			final int indexXCoodinate 	= idxFromKey.get( Constants.X_COORDINATE );
 			final int indexYCoodinate 	= idxFromKey.get( Constants.Y_COORDINATE );
@@ -198,7 +198,7 @@ public class ReadFromUrbansimParcelModel {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
 
 			String line = reader.readLine();
-			Map<String,Integer> idxFromKey = CommonUtilities.createIdxFromKey( line, Constants.TAB_SEPERATOR );
+			Map<String,Integer> idxFromKey = CommonMATSimUtilities.createIdxFromKey( line, Constants.TAB_SEPERATOR );
 
 			// We consider two cases:
 			// (1) We have an old population.  Then we look for those people who have the same id.
@@ -238,7 +238,7 @@ public class ReadFromUrbansimParcelModel {
 
 				PlanImpl plan = newPerson.createAndAddPlan(true);
 				plan.setSelected(true) ;
-				CommonUtilities.makeHomePlan(plan, homeCoord) ;
+				CommonMATSimUtilities.makeHomePlan(plan, homeCoord) ;
 
 				int idx = idxFromKey.get("parcel_id_work") ;
 				if ( parts[idx].equals("-1") ) {
@@ -257,7 +257,7 @@ public class ReadFromUrbansimParcelModel {
 						continue ;
 					}
 					Coord workCoord = jobLocation.getCoord() ;
-					CommonUtilities.completePlanToHwh(plan, workCoord) ;
+					CommonMATSimUtilities.completePlanToHwh(plan, workCoord) ;
 				}
 
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...

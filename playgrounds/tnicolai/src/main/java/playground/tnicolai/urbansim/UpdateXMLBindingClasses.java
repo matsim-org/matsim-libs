@@ -29,7 +29,10 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.urbansim.utils.CommonUtilities;
 import playground.tnicolai.urbansim.utils.io.FileCopy;
+import playground.tnicolai.urbansim.utils.io.LoadFile;
+import playground.tnicolai.urbansim.utils.io.TempDirectoryUtil;
 
 /**
  * @author thomas
@@ -38,9 +41,9 @@ import playground.tnicolai.urbansim.utils.io.FileCopy;
  * The JAXB executables are located outside the playground in "OPUS_HOME/libs".
  * 
  */
-public class UpdateXMLParser {
+public class UpdateXMLBindingClasses {
 	
-	private static final Logger log = Logger.getLogger(UpdateXMLParser.class);
+	private static final Logger log = Logger.getLogger(UpdateXMLBindingClasses.class);
 	
 	private static String jaxBLocation = null;
 	private static String outputPackage = null;
@@ -69,27 +72,39 @@ public class UpdateXMLParser {
 		log.info("XSD location: " + xsdLocation);
 		log.info("");
 		
-		String cmd = jaxBLocation + " -p " + outputPackage + " -d " + tmpDirectory + " " + xsdLocation;
+		String cmd = "java -jar " + jaxBLocation + " -p " + outputPackage + " -d " + tmpDirectory + " " + xsdLocation;
 		
 		try{
 			log.info("Running command: " + cmd );
-			Runtime.getRuntime().exec( cmd );
-			// copy generated files into destination directory
-			String source = tmpDirectory + outputPackage.replace(".", File.separator);
-			log.info("Copying generated files from " + source + " to " + outputDirectory);
-			FileCopy.copyTree(source, outputDirectory);
-//			File tempDir = new File(source);
-//			tempDir.delete();
+
+			// executing JAXB ...
+			Runtime rt = Runtime.getRuntime();
+            Process proc = rt.exec( cmd );
+            proc.waitFor();
+            int exitVal = proc.exitValue();
+            // ... and here the execution ends
+            
+            if( exitVal == 0){
+            	log.info("Runnung command successful!");
+				// copy generated files into destination directory
+				String source = tmpDirectory + outputPackage.replace(".", File.separator);
+				log.info("Copying generated files from " + source + " to " + outputDirectory);
+				FileCopy.copyTree(source, outputDirectory);
+            }
+			TempDirectoryUtil.deleteDirectory( tmpDirectory );
 		}
 		catch (IOException e) {
 			log.error("Error occoured executing command: " + cmd );
 			e.printStackTrace();
 		}
+		catch (InterruptedException ie) {
+			ie.printStackTrace();
+		}
 		log.info("Successful finished creating xml bindings ...");
 	}
 	
 	/**
-	 * 
+	 * checks correctness of input parameters
 	 * @param args
 	 * @return
 	 */
@@ -115,6 +130,9 @@ public class UpdateXMLParser {
 			}
 		}
 		
+		tmpDirectory = CommonUtilities.getCurrentPath(UpdateXMLBindingClasses.class) + "tmp/"; // Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY;
+		boolean dirExsists = TempDirectoryUtil.createDirectory( tmpDirectory );
+		
 		if(jaxBLocation == null){
 			log.info("JAXB libary not given...");
 			// set default location
@@ -123,15 +141,11 @@ public class UpdateXMLParser {
 		}
 		if(xsdLocation == null){
 			log.info("XSD location not given...");
-			// set default location
-			if( System.getenv("PYTHONPATH") == null){
-				log.error("Enviornment variable 'PYTHONPATH' not found!");
-				log.equals("Please add the 'PYTHONPATH' (the path to your UrbanSim source directory) to your enviornment variables");
-				log.equals("or add '--xsdLocation' (providing the path to the xsd file) parameter calling UpdateXMLParser.");
-				System.exit(-1);
-			}
-			xsdLocation = System.getenv("PYTHONPATH")+ "/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd";
-			log.info("Set default location to: " + xsdLocation);
+			// set default location			
+			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, tmpDirectory, "MATSim4UrbanSimConfigSchema.xsd");
+			xsdLocation = loadFile.loadMATSim4UrbanSimXSDString();
+			
+			log.info("Set xsd default location to: " + xsdLocation);
 		}
 		if(outputDirectory == null){
 			log.info("Destination not given...");
@@ -145,19 +159,22 @@ public class UpdateXMLParser {
 			outputPackage = "playground.tnicolai.urbansim.com.matsim.config";
 			log.info("Set default package name to: " + outputPackage);
 		}
-		
-		tmpDirectory = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY;
 
-		if( !(outputDirectory!= null && outputPackage != null && checkParameter(jaxBLocation) && checkParameter(xsdLocation) && tmpDirectory != null) )
+		if( !(outputDirectory!= null && 
+			  outputPackage != null && 
+			  isValidLocataion(jaxBLocation) && 
+			  isValidLocataion(xsdLocation) && 
+			  tmpDirectory != null && 
+			  dirExsists) )
 			return false;
 		return true;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * determines if a path wether exists or not
+	 * @return true if path exists otherwise false
 	 */
-	private static boolean checkParameter(String parameter){
+	private static boolean isValidLocataion(String parameter){
 		
 		try{
 			if(parameter != null){

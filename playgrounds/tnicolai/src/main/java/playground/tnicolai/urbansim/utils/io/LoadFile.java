@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.urbansim.utils;
+package playground.tnicolai.urbansim.utils.io;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -33,7 +33,7 @@ import java.net.URL;
 
 import org.apache.log4j.Logger;
 
-import playground.tnicolai.urbansim.MATSim4Urbansim;
+import playground.tnicolai.urbansim.utils.CommonUtilities;
 
 /**
  * @author thomas
@@ -44,8 +44,9 @@ public class LoadFile {
 	// logger
 	private static final Logger log = Logger.getLogger(LoadFile.class);
 	
-	private String source;
-	private String destination;
+	private String source 			= null;
+	private String destinationPath	= null;
+	private String fileName 		= null;
 	
 	@SuppressWarnings(value = "all")
 	private LoadFile(){
@@ -57,11 +58,28 @@ public class LoadFile {
 	 * @param source
 	 * @param destination
 	 */
-	public LoadFile(String source, String destination){
+	public LoadFile(String source, String destination, String fileName){
 		this.source = source;
-		this.destination = destination;
+		this.destinationPath = CommonUtilities.checkPathEnding( destination );
+		this.fileName = fileName;
 	}
-
+	
+	/**
+	 * linke loadMATSim4UrbanSimXSD() but returns the canonical path
+	 * of the loaded xsd file
+	 * @return path of loaded xsd file
+	 */
+	public String loadMATSim4UrbanSimXSDString(){
+		
+		try {
+			File f = loadMATSim4UrbanSimXSD();
+			return f.getCanonicalPath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	/**
 	 * creates a local copy of the MATSim4UrbanSim xsd file from matsim.org
 	 * and returns the reference to the created file
@@ -74,7 +92,7 @@ public class LoadFile {
 		BufferedOutputStream bos = null;
 		
 		log.info("Trying to load " + this.source + ". In some cases (e.g. network interface up but no connection), this may take a bit.");
-		log.info("The xsd file will be saved in " + this.destination + "."); 
+		log.info("The xsd file will be saved in " + this.destinationPath + "."); 
 		
 		try{
 			// input streams
@@ -82,7 +100,12 @@ public class LoadFile {
 			bis = new BufferedInputStream(is);
 			
 			// output
-			File output = new File(this.destination);
+			File dir = new File(this.destinationPath);
+			if(!dir.exists())
+				dir.mkdirs();
+			
+			File output = new File(destinationPath + fileName);
+			
 			bos = new BufferedOutputStream(new FileOutputStream(output));
 			
 			for(int c; (c = is.read()) != -1 ;){

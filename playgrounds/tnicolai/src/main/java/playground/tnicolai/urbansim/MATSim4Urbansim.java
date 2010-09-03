@@ -51,9 +51,10 @@ import org.xml.sax.SAXException;
 
 import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.utils.LoadFile;
+import playground.tnicolai.urbansim.utils.CommonUtilities;
 import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.MyControlerListener;
+import playground.tnicolai.urbansim.utils.io.LoadFile;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
 /**
@@ -202,10 +203,8 @@ public class MATSim4Urbansim {
 			// crate a schema factory ...
 			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
 			// ... and initialize it with an xsd (xsd lies in the urbansim project)
-			// TODO: upload to matsim.org: see MatsimXmlParser line 204
-			ConfigReaderMatsimV1 configReader = new ConfigReaderMatsimV1(null);
 			
-			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, getCurrentPath() + "tmp/MATSim4UrbanSimConfigSchema.xsd");
+			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/", "MATSim4UrbanSimConfigSchema.xsd");
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD();
 			
 			// for debugging
@@ -213,9 +212,9 @@ public class MATSim4Urbansim {
 			if(file2XSD == null || !file2XSD.exists()){
 				
 				log.warn(file2XSD.getCanonicalPath() + " is not available. Loading compensatory xsd instead (this may be is an older version).");
-				log.warn("Compensatory xsd file: " + getCurrentPath() + "tmp/MATSim4UrbanSimConfigSchema.xsd");
+				log.warn("Compensatory xsd file: " + CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/MATSim4UrbanSimConfigSchema.xsd");
 				
-				file2XSD = new File(getCurrentPath() + "tmp/MATSim4UrbanSimConfigSchema.xsd");
+				file2XSD = new File(CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/MATSim4UrbanSimConfigSchema.xsd");
 				if(!file2XSD.exists()){
 					log.error(file2XSD.getCanonicalPath() + " not found!!!");
 					return false;
@@ -279,20 +278,6 @@ public class MATSim4Urbansim {
 		if( (new File(matsimConfigFile)).exists() )
 			return true;
 		return false;
-	}
-	
-	/**
-	 * returns the path of the current directory
-	 * @return
-	 */
-	private static String getCurrentPath(){
-		try{
-			URL dirUrl = MATSim4Urbansim.class.getResource("./"); // get my directory
-			return dirUrl.getFile();
-		}catch(Exception e){
-			e.printStackTrace();
-			return null;
-		}
 	}
 }
 
