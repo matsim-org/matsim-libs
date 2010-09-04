@@ -37,7 +37,7 @@ public class EventsHandling {
 		final EventsManagerImpl events = new EventsManagerImpl();
 		final LegHistogram analysis = new LegHistogram(binSize);
 		events.addHandler(analysis);
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
+		new MatsimEventsReader(events).readFile(null /*filename not specified*/);
 		System.out.println("  done.");
 
 		analysis.write(System.out);

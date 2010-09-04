@@ -50,39 +50,39 @@ public class DatapulsConverter {
 	//////////////////////////////////////////////////////////////////////
 
 	public static void main(String[] args) throws IOException {
-		
+
 		log.info("gathering time bin size...");
 		int timeBinSize = Integer.parseInt(args[1]);
 		log.info("=> timeBinSize: "+timeBinSize);
 		log.info("done.");
-		
+
 		log.info("gathering output directory... ");
 		String outdir = args[2];
 		log.info("=> "+outdir);
 		log.info("done.");
-		
+
 		log.info("gathering case ");
 		int casetype = Integer.parseInt(args[3]);
 		log.info("=> "+casetype);
 		log.info("done.");
-		
+
 		log.info("loading scenario...");
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		((ScenarioImpl)scenario).getWorld().complete(scenario.getConfig());
 		log.info("done.");
-		
+
 		if (casetype == 0) {
 			new FacilitiesWriteTables().run(((ScenarioImpl) scenario).getActivityFacilities(),outdir);
 			new PopulationWriteTable(((ScenarioImpl) scenario).getActivityFacilities()).run(scenario.getPopulation(),outdir);
 
 			EventsManagerImpl events = new EventsManagerImpl();
-			
+
 			LinkTablesEventHandler handler = new LinkTablesEventHandler(timeBinSize,outdir,scenario.getPopulation());
-			
+
 			events.addHandler(handler);
-			
+
 			MatsimEventsReader eventsReader = new MatsimEventsReader(events);
-			eventsReader.readFile(scenario.getConfig().events().getInputFile());
+			eventsReader.readFile(null /*filename not specified*/);
 		}
 		else {
 //			FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());

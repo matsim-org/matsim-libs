@@ -59,13 +59,6 @@
 
 <!-- ====================================================================== -->
 
-	<module name="events">
-		<param name="inputFile" value="&OUTPUTBASE;/ITERS/it.0/0.deq_events.dat" />
-		<param name="outputFile" value="&OUTPUTBASE;/out.events.txt" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="facilities">
  		<param name="inputFacilitiesFile" value="&INPUTBASE;/empty_facilities.xml" />
 		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/output_facilities.xml" />
@@ -80,8 +73,6 @@
 		<param name="useRoadPricing" value="no" />
 		<param name="numberOfThreads" value="4" />
 	</module>
-
-<!-- ====================================================================== -->
 
 <!-- ====================================================================== -->
 
@@ -116,8 +107,6 @@
 
 <!-- ====================================================================== -->
 
-<!-- ====================================================================== -->
-
 	<module name="TimeAllocationMutator">
 		<param name="mutationRange" value="7200"/>
 	</module>
@@ -137,8 +126,6 @@
 		<param name="ModuleProbability_3" value="0.80" />
 		<param name="Module_3" value="SelectExpBeta" />
 	</module>
-
-<!-- ====================================================================== -->
 
 <!-- ====================================================================== -->
 

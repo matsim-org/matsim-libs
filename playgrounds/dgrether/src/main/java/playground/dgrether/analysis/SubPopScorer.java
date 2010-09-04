@@ -65,7 +65,7 @@ public class SubPopScorer {
 	}
 
   private void calculateScore(Set<Id> idSet, Config config) {
-  	String eventsFilePath = config.events().getInputFile();
+  	String eventsFilePath = null /*filename not specified*/;
   	FilteredEventsManagerImpl events = new FilteredEventsManagerImpl();
   	MatsimEventsReader reader = new MatsimEventsReader(events);
   	//set the filter

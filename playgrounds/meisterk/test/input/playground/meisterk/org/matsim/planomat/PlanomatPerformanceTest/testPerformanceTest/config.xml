@@ -4,12 +4,6 @@
 
 	<!-- ====================================================================== -->
 
-	<module name="events">
-		<param name="inputFile" value="/home/meisterk/workspace/MATSim/test/input/org/matsim/planomat/PlanomatPerformanceTest/0.events.txt.gz" />
-	</module>
-
-	<!-- ====================================================================== -->
-
 	<module name="global">
 		<param name="randomSeed" value="4711" />
 		<param name="coordinateSystem" value="CH1903_LV03" />

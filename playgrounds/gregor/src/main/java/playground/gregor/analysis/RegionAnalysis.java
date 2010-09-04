@@ -301,7 +301,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 //		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 //		log.info("done.");
 
-		String eventsfile = config.events().getInputFile();
+		String eventsfile = null /*filename not specified*/;
 
 		final CoordinateReferenceSystem targetCRS = CRS.parseWKT( WGS84_UTM47S);
 

@@ -102,7 +102,7 @@ public class EventFilterTestAveTraSpeCalOrPersonSpecificWithToll {
 
 		// read file, run algos
 		System.out.println("  reading events file and running events algos");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
+		new MatsimEventsReader(events).readFile(null /*filename not specified*/);
 		System.out.println("we have\t" + atsc.getCount()
 				+ "\tevents\tat last -- AveTraSpeCal.");
 		System.out.println("  done.");

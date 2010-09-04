@@ -124,6 +124,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 
 
 
+	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		double time = event.getTime();
 		if (time > this.oldTime + SNAPSHOT_PERIOD) {
@@ -174,6 +175,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 	}
 
 
+	@Override
 	public void reset(final int iteration) {
 
 	}
@@ -205,6 +207,6 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 
 		final CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
 
-		new StaticSnapshotGenerator(network,config.events().getInputFile(),shapeFilePrefix,targetCRS).run();
+		new StaticSnapshotGenerator(network,null /*filename not specified*/,shapeFilePrefix,targetCRS).run();
 	}
 }

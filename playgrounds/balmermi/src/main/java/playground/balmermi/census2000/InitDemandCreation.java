@@ -84,7 +84,7 @@ public class InitDemandCreation {
 		System.out.println("  reading matrices xml file... ");
 		Matrices matrices = new Matrices();
 		MatsimMatricesReader reader = new MatsimMatricesReader(matrices, scenario);
-		reader.readFile(config.matrices().getInputFile());
+		reader.readFile(null /*filename not specified*/);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -182,7 +182,7 @@ public class InitDemandCreation {
 
 		System.out.println("  writing matrices xml file... ");
 		MatricesWriter mat_writer = new MatricesWriter(matrices);
-		mat_writer.write(config.matrices().getOutputFile());
+		mat_writer.write(null /*filename not specified*/);
 		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");

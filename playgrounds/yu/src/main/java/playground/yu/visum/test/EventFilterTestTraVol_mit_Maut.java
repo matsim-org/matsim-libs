@@ -81,7 +81,7 @@ public class EventFilterTestTraVol_mit_Maut {
 
 		// read file, run algos
 		System.out.println("  reading events file and running events algos");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
+		new MatsimEventsReader(events).readFile(null /*filename not specified*/);
 		// System.out.println("we have " + attcetf.getCount()
 		// + " events at last -- LinkAveCalEventTimeFilter.");
 		System.out.println("we have " + tvc.getCount()

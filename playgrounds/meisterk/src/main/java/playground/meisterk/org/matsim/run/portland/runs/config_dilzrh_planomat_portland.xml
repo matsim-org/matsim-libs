@@ -51,13 +51,6 @@
 
 <!-- ====================================================================== -->
 
-	<module name="events" >
-		<param name="inputFile" value="null" />
-		<param name="outputFile" value="null" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="facilities" >
 		<param name="inputFacilitiesFile" value="&INPUTBASE;/facilities.xml.gz" />
 <!--		<param name="outputFacilitiesFile" value="null" />-->
@@ -71,13 +64,6 @@
 		<param name="numberOfThreads" value="2" />
 		<param name="randomSeed" value="4711" />
 	</module>
-
-<!-- ====================================================================== -->
-
-<!--	<module name="matrices" >-->
-<!--		<param name="inputMatricesFile" value="null" />-->
-<!--		<param name="outputMatricesFile" value="null" />-->
-<!--	</module>-->
 
 <!-- ====================================================================== -->
 

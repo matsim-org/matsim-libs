@@ -30,12 +30,10 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.EvacuationConfigGroup;
-import org.matsim.core.config.groups.EventsConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.HouseholdsConfigGroup;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
-import org.matsim.core.config.groups.MatricesConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -81,8 +79,6 @@ public class Config {
 	private PlanomatConfigGroup planomat = null;
 	private PlansCalcRouteConfigGroup plansCalcRoute = null;
 	private FacilitiesConfigGroup facilities = null;
-	private MatricesConfigGroup matrices = null;
-	private EventsConfigGroup events = null;
 	private RoadPricingConfigGroup roadpricing = null;
 	private EvacuationConfigGroup evacuation = null;
 	private StrategyConfigGroup strategy = null;
@@ -155,12 +151,6 @@ public class Config {
 
 		this.strategy = new StrategyConfigGroup();
 		this.modules.put(StrategyConfigGroup.GROUP_NAME, this.strategy);
-
-		this.matrices = new MatricesConfigGroup();
-		this.modules.put(MatricesConfigGroup.GROUP_NAME, this.matrices);
-
-		this.events = new EventsConfigGroup();
-		this.modules.put(EventsConfigGroup.GROUP_NAME, this.events);
 
 		this.roadpricing = new RoadPricingConfigGroup();
 		this.modules.put(RoadPricingConfigGroup.GROUP_NAME, this.roadpricing);
@@ -400,14 +390,6 @@ public class Config {
 
 	public final FacilitiesConfigGroup facilities() {
 		return this.facilities;
-	}
-
-	public final MatricesConfigGroup matrices() {
-		return this.matrices;
-	}
-
-	public final EventsConfigGroup events() {
-		return this.events;
 	}
 
 	public final RoadPricingConfigGroup roadpricing() {

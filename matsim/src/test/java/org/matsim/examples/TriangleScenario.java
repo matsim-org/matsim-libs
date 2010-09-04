@@ -27,8 +27,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.MatricesWriter;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 
@@ -70,9 +68,6 @@ public abstract class TriangleScenario {
 		config.facilities().setInputFile(studyfolder + "facilities.xml");
 		config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
 
-		config.matrices().setInputFile(studyfolder + "matrices.xml");
-		config.matrices().setOutputFile(outputDirectory + "output_matrices.xml");
-
 		config.plans().setOutputFile(outputDirectory + "output_plans.xml.gz");
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputSample(1.0);
@@ -100,13 +95,13 @@ public abstract class TriangleScenario {
 		new FacilitiesWriter(facilities).write(TriangleScenario.config.facilities().getOutputFile());
 		System.out.println("  done.");
 	}
-
-	public static final void writeMatrices(final Matrices matrices) {
-		System.out.println("  writing matrices xml file... ");
-		MatricesWriter matrices_writer = new MatricesWriter(matrices);
-		matrices_writer.write(TriangleScenario.config.matrices().getOutputFile());
-		System.out.println("  done.");
-	}
+//
+//	public static final void writeMatrices(final Matrices matrices, String filename) {
+//		System.out.println("  writing matrices xml file... ");
+//		MatricesWriter matrices_writer = new MatricesWriter(matrices);
+//		matrices_writer.write(filename);
+//		System.out.println("  done.");
+//	}
 
 	public static final void writeNetwork(Network network, String filename) {
 		System.out.println("  writing network xml file... ");

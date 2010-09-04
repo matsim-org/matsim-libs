@@ -82,7 +82,7 @@ public class EventFilterTestAveTraTimeCalOrWithToll {
 		// read file, run algos if streaming is on
 		System.out
 				.println("  reading events file and (probably) running events algos");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
+		new MatsimEventsReader(events).readFile(null /*filename not specified*/);
 		System.out.println("we have " + efa.getCount()
 				+ " events at last -- EventFilterAlgorithm.");
 		System.out.println("we have " + attc.getCount()

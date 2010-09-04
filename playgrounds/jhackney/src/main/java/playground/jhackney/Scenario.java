@@ -217,8 +217,7 @@ public abstract class Scenario {
 
 	public static final EventsManagerImpl readEvents(final int i, final EventsMapStartEndTimes epp) {
 		System.out.println("  reading plans xml file... ");
-		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+scenario.getConfig().events().getInputFile();
-//		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
+		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(epp);
 		System.out.println(filename);
@@ -230,7 +229,6 @@ public abstract class Scenario {
 
 	public static final EventsManagerImpl readEvents(final int i, final EventsMapStartEndTimes epp, final EventsToScore scoring) {
 		System.out.println("  reading plans xml file... ");
-//		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
 		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(epp);

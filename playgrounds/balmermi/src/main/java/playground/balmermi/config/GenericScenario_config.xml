@@ -48,13 +48,6 @@
 
 <!-- ====================================================================== -->
 
-	<module name="matrices">
-		<param name="inputMatricesFile" value="&STUDYBASE;/matrices.xml.gz" />
-		<param name="outputMatricesFile" value="&OUTPUTBASE;/output_matrices.xml.gz" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="plans">
 		<param name="inputPlansFile" value="&STUDYBASE;/plans.xml.gz" />
 		<param name="outputPlansFile" value="&OUTPUTBASE;/output_plans.xml.gz" />

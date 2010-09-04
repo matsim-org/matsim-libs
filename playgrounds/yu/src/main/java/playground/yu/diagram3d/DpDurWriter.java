@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 /**
- * 
+ *
  */
 package playground.yu.diagram3d;
 
@@ -40,9 +40,9 @@ import org.matsim.core.utils.io.IOUtils;
 
 /**
  * creats a matrix (departureTime, Duration, volume)
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class DpDurWriter implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
@@ -118,6 +118,7 @@ public class DpDurWriter implements AgentDepartureEventHandler,
 		}
 	}
 
+	@Override
 	public void reset(int iteration) {
 		closeFile();
 	}
@@ -133,11 +134,13 @@ public class DpDurWriter implements AgentDepartureEventHandler,
 		}
 	}
 
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		String agentId = event.getPersonId().toString();
 		agentDepTimes.put(agentId, (int) event.getTime());
 	}
 
+	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		String agentId = event.getPersonId().toString();
 		if (agentDepTimes.containsKey(agentId)) {
@@ -174,12 +177,7 @@ public class DpDurWriter implements AgentDepartureEventHandler,
 		events.addHandler(ddw);// TODO ...
 
 		System.out.println("@reading the eventsfile (TXTv1) ...");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());// One
-		// can
-		// also
-		// use
-		// readFile("..../...txt")
-		// hier
+		new MatsimEventsReader(events).readFile(null /*filename not specified*/);
 		System.out.println("@done.");
 
 		ddw.writeMatrix();

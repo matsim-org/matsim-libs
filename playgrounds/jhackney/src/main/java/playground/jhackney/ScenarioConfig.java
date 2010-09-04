@@ -113,9 +113,9 @@ public abstract class ScenarioConfig {
 		facsFileName=input_directory + "output_facilities.xml.gz";
 		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
 
-		config.matrices().setInputFile(input_directory + "matrices.xml");
+//		config.matrices().setInputFile(input_directory + "matrices.xml");
 		matsFileName=input_directory + "matrices.xml";
-		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
+//		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
 
 //		config.plans().setInputFile(input_directory + "output_plans.xml.gz");
 		config.plans().setInputFile("output_plans.xml.gz");
@@ -127,7 +127,7 @@ public abstract class ScenarioConfig {
 
 		config.counts().setCountsFileName(input_directory + "counts.xml");
 
-		config.events().setInputFile("events.txt");
+//		config.events().setInputFile("events.txt");
 
 		snConfig.setInDirName(input_directory);
 		snConfig.setOutDir(output_directory);
