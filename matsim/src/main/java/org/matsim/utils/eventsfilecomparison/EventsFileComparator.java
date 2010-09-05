@@ -97,8 +97,6 @@ public abstract class EventsFileComparator {
 				return;
 			}
 
-			System.out.println(this.worker1.isFinished());
-			System.out.println(this.worker2.isFinished());
 			if (this.worker1.isFinished() != this.worker2.isFinished()) {
 				log.warn("Events files have different number of time steps! Aborting!");
 				setExitCode(CODE_DIFFERENT_NUMBER_OF_TIMESTEPS);

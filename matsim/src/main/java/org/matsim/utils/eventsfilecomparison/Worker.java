@@ -67,7 +67,6 @@ public class Worker extends Thread implements BasicEventHandler{
 			new MatsimEventsReader(this.e).readFile(this.eFile);
 			this.finished = true;
 			try {
-				System.out.println("finishing " + this.eFile + " " + this.finished);
 				this.doComparison.await();
 			} catch (InterruptedException e1) {
 				throw new ComparatorInterruptedException(e1);
@@ -99,7 +98,6 @@ public class Worker extends Thread implements BasicEventHandler{
 	public void handleEvent(Event event) {
 		if (this.time != event.getTime()) {
 			try {
-				System.out.println("next Event in " + this.eFile + ": " + toLexicographicSortedString(event));
 				doComparison.await();
 			} catch (InterruptedException e1) {
 				throw new ComparatorInterruptedException(e1);
