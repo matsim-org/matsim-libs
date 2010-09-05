@@ -54,7 +54,6 @@
 
 	<module name="global" >
 		<param name="coordinateSystem" value="CH1903_LV03" />
-		<param name="localDTDBase" value="dtd/" />
 		<param name="numberOfThreads" value="2" />
 		<param name="randomSeed" value="4711" />
 	</module>

@@ -87,7 +87,6 @@ public abstract class ConfigUtils {
 		if (!prefix.endsWith("/") && !prefix.endsWith(File.separator)) {
 			prefix = prefix + File.separator;
 		}
-		config.global().setLocalDtdBase(getAbsolutePath(prefix, config.global().getLocalDtdBase()));
 		config.controler().setOutputDirectory(getAbsolutePath(prefix, config.controler().getOutputDirectory()));
 		config.network().setInputFile(getAbsolutePath(prefix, config.network().getInputFile()));
 		config.plans().setInputFile(getAbsolutePath(prefix, config.plans().getInputFile()));

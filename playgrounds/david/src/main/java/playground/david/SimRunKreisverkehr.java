@@ -22,7 +22,6 @@ package playground.david;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -49,9 +48,6 @@ public class SimRunKreisverkehr {
 
 		Gbl.startMeasurement();
 		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).getScenario();
-		Config config = scenario.getConfig();
-		String localDtdBase = "./dtd/";
-		config.global().setLocalDtdBase(localDtdBase);
 
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);

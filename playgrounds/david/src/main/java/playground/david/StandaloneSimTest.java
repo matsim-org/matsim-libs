@@ -60,9 +60,6 @@ public class StandaloneSimTest {
 		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).getScenario();
 		Config config = scenario.getConfig();
 
-		String localDtdBase = "./dtd/";
-		config.global().setLocalDtdBase(localDtdBase);
-
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 

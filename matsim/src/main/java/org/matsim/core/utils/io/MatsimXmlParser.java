@@ -65,7 +65,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	private boolean isValidating = true;
 	private boolean isNamespaceAware = true;
 
-	private String localDtdBase = null;
+	private String localDtdBase = "dtd/";
 
 	private String doctype = null;
 	/**
@@ -83,9 +83,6 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 
 	public MatsimXmlParser(final boolean validateXml) {
 		Config config = Gbl.getConfig();
-		if (config != null && config.global() != null) {
-			this.localDtdBase = config.global().getLocalDtdBase();
-		}
 		this.isValidating = validateXml;
 	}
 

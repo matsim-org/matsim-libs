@@ -1,16 +1,9 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY PROJBASE     ".">
 		<!ENTITY STUDYBASE    "test/scenarios/triangle/complete">
-		<!-- ENTITY STUDYBASE    "input" -->
-		<!ENTITY RUNSBASE     "runs">
 		<!ENTITY OUTPUTBASE   "test/output/org/matsim/socialnetworks/SocialNetworksTest/testEvolvingNetwork">
-		<!-- ENTITY OUTPUTBASE   "C:/Documents and Settings/jhackney/My Documents/sandbox00/ivt/studies/jhackney/output" -->
 		<!ENTITY INPUTBASE    "input">
-		<!ENTITY ANALYSISBASE "analysis">
-		<!ENTITY LOCALDTDBASE "dtd">
-		<!ENTITY HOMEPAGEBASE "http://www.matsim.org">
 	]
 >
 <config xml:lang="de-CH">
@@ -28,7 +21,6 @@
 
 	<module name="global">
 		<param name="randomSeed" value="4711" />
-		<param name="localDTDBase" value="&LOCALDTDBASE;/" />
 		<param name="numberOfThreads" value = "1" />
 	</module>
 

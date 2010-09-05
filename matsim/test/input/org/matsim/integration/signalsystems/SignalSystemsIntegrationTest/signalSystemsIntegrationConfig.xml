@@ -8,7 +8,6 @@
 <config>
   <module name="global">
     <param name="coordinateSystem" value="Atlantis" />
-    <param name="localDTDBase" value="dtd/" />
     <param name="numberOfThreads" value="2" />
     <param name="randomSeed" value="4711" />
   </module>

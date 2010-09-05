@@ -35,12 +35,10 @@ public class GlobalConfigGroup extends Module {
 	}
 
 	private static final String RANDOM_SEED = "randomSeed";
-	private static final String LOCAL_DTD_BASE = "localDTDBase";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String COORDINATE_SYSTEM = "coordinateSystem";
 
 	private long randomSeed = 4711L;
-	private String localDtdBase = "dtd/";
 	private int numberOfThreads = 2;
 	private String coordinateSystem = "Atlantis";
 
@@ -48,8 +46,6 @@ public class GlobalConfigGroup extends Module {
 	public String getValue(final String key) {
 		if (RANDOM_SEED.equals(key)) {
 			return Long.toString(getRandomSeed());
-		} else if (LOCAL_DTD_BASE.equals(key)) {
-			return getLocalDtdBase();
 		} else if (NUMBER_OF_THREADS.equals(key)) {
 			return Integer.toString(getNumberOfThreads());
 		} else if (COORDINATE_SYSTEM.equals(key)) {
@@ -63,8 +59,6 @@ public class GlobalConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (RANDOM_SEED.equals(key)) {
 			setRandomSeed(Long.parseLong(value));
-		} else if (LOCAL_DTD_BASE.equals(key)) {
-			setLocalDtdBase(value);
 		} else if (NUMBER_OF_THREADS.equals(key)) {
 			setNumberOfThreads(Integer.parseInt(value));
 		} else if (COORDINATE_SYSTEM.equals(key)) {
@@ -78,7 +72,6 @@ public class GlobalConfigGroup extends Module {
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(RANDOM_SEED, getValue(RANDOM_SEED));
-		addParameterToMap(map, LOCAL_DTD_BASE);
 		addParameterToMap(map, COORDINATE_SYSTEM);
 		addParameterToMap(map, NUMBER_OF_THREADS);
 		return map;
@@ -91,13 +84,6 @@ public class GlobalConfigGroup extends Module {
 	}
 	public void setRandomSeed(final long randomSeed) {
 		this.randomSeed = randomSeed;
-	}
-
-	public String getLocalDtdBase() {
-		return this.localDtdBase;
-	}
-	public void setLocalDtdBase(final String localDtdBase) {
-		this.localDtdBase = localDtdBase;
 	}
 
 	public int getNumberOfThreads() {

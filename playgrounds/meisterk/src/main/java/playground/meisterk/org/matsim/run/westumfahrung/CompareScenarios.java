@@ -159,8 +159,6 @@ public class CompareScenarios {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		Config config = scenario.getConfig();
-		config.global().setLocalDtdBase("dtd/");
-		System.out.println(config.global().getLocalDtdBase());
 
 		log.info("Processing command line parameters...");
 		this.processArgs(args);
