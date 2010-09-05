@@ -66,8 +66,8 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -265,7 +265,7 @@ public class ShopsOf2005ToFacilities {
 
 		System.out.println("Writing facilities xml file... ");
 		FacilitiesWriter facilities_writer = new FacilitiesWriter(shopsOf2005);
-		facilities_writer.write(config.facilities().getOutputFile());
+		facilities_writer.write(null /* filename not specified */);
 		System.out.println("Writing facilities xml file...done.");
 
 	}
@@ -1550,12 +1550,11 @@ public class ShopsOf2005ToFacilities {
 		System.out.println("Writing txt file...");
 		try {
 			FileUtils.writeLines(
-					new File(config.facilities().getOutputFile()),
+					new File((String) null /* filename not specified */),
 					"UTF-8",
 					txtLines
 			);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Writing txt file...done.");
@@ -1727,7 +1726,7 @@ public class ShopsOf2005ToFacilities {
 		facilitiesOpentimesKTIYear2.run(facilities_input);
 
 		System.out.println("Writing Facilities KTI Year 2 file...");
-		new FacilitiesWriter(facilities_input).write(config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities_input).write(null /* filename not specified */);
 
 	}
 

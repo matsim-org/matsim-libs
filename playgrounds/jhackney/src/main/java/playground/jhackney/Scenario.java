@@ -96,7 +96,7 @@ public abstract class Scenario {
 		config.network().setInputFile(input_directory + "output_network.xml.gz");
 
 		config.facilities().setInputFile(input_directory + "output_facilities.xml.gz");
-		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
+//		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
 
 		config.plans().setInputFile(input_directory + "output_plans.xml.gz");
 //		config.plans().setInputFile("output_plans.xml.gz");
@@ -268,9 +268,9 @@ public abstract class Scenario {
 		System.out.println("  done.");
 	}
 
-	public static final void writeFacilities(final ActivityFacilitiesImpl facilities) {
+	public static final void writeFacilities(final ActivityFacilitiesImpl facilities, String filename) {
 		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write(scenario.getConfig().facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(filename);
 		System.out.println("  done.");
 	}
 

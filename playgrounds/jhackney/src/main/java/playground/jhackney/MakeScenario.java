@@ -135,7 +135,7 @@ public class MakeScenario {
 
 		Scenario.writePlans(plans, network);
 		Scenario.writeNetwork(network, "outputNetwork.xml");
-		Scenario.writeFacilities(facilities);
+		Scenario.writeFacilities(facilities, "outputFacilties.xml");
 
 		System.out.println("TEST SUCCEEDED.");
 		System.out.println();

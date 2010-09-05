@@ -56,10 +56,10 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("  done.");
 	}
 
-	private final void compareOutputFacilities() {
+	private final void compareOutputFacilities(String filename) {
 		System.out.println("  comparing input and output facilities file... ");
 		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.facilities().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(this.config.facilities().getOutputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(filename);
 		assertEquals(checksum_ref, checksum_run);
 		System.out.println("  done.");
 	}
@@ -97,10 +97,10 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 		this.runModules(facilities, world);
 
-		TriangleScenario.writeFacilities(facilities);
+		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
 		TriangleScenario.writeWorld(world);
 
-		this.compareOutputFacilities();
+		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.checkEmptyOutputWorld();
 
 		System.out.println("done.");
@@ -122,10 +122,10 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 		this.runModules(facilities, world);
 
-		TriangleScenario.writeFacilities(facilities);
+		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
 		TriangleScenario.writeWorld(world);
 
-		this.compareOutputFacilities();
+		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.checkEmptyOutputWorld();
 
 		System.out.println("done.");
@@ -152,10 +152,10 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 		this.runModules(facilities, world);
 
-		TriangleScenario.writeFacilities(facilities);
+		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
 		TriangleScenario.writeWorld(world);
 
-		this.compareOutputFacilities();
+		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.compareOutputWorld();
 
 		System.out.println("done.");
@@ -183,10 +183,10 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		world.complete(this.config);
 		System.out.println("  done.");
 
-		TriangleScenario.writeFacilities(facilities);
+		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
 		TriangleScenario.writeWorld(world);
 
-		this.compareOutputFacilities();
+		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.compareOutputWorld();
 
 		System.out.println("done.");

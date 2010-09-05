@@ -66,7 +66,6 @@ public abstract class TriangleScenario {
 		config.network().setInputFile(studyfolder + "network.xml");
 
 		config.facilities().setInputFile(studyfolder + "facilities.xml");
-		config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
 
 		config.plans().setOutputFile(outputDirectory + "output_plans.xml.gz");
 		config.plans().setOutputVersion("v4");
@@ -90,9 +89,9 @@ public abstract class TriangleScenario {
 		System.out.println("  done.");
 	}
 
-	public static final void writeFacilities(ActivityFacilitiesImpl facilities) {
+	public static final void writeFacilities(ActivityFacilitiesImpl facilities, String filename) {
 		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write(TriangleScenario.config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(filename);
 		System.out.println("  done.");
 	}
 //

@@ -111,7 +111,7 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(null /* filename not specified */);
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");

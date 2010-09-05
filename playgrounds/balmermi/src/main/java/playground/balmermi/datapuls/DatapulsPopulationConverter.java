@@ -34,7 +34,7 @@ import playground.balmermi.datapuls.modules.LinkTablesFromPopulation;
 import playground.balmermi.datapuls.modules.PopulationWriteTable;
 
 public class DatapulsPopulationConverter {
-	
+
 	private final static Logger log = Logger.getLogger(DatapulsConverter.class);
 
 	public static void main(String[] args) {
@@ -42,17 +42,17 @@ public class DatapulsPopulationConverter {
 		int timeBinSize = Integer.parseInt(args[1]);
 		log.info("=> timeBinSize: "+timeBinSize);
 		log.info("done.");
-		
+
 		log.info("loading scenario...");
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		log.info("done.");
 
 		log.info("extracting output directory... ");
-		String outdir = scenario.getConfig().facilities().getOutputFile();
+		String outdir = null;//scenario.getConfig().facilities().getOutputFile();
 		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
 		log.info("=> "+outdir);
 		log.info("done.");
-		
+
 		new FacilitiesWriteTables().run(((ScenarioImpl) scenario).getActivityFacilities(),outdir);
 		new PopulationWriteTable(((ScenarioImpl) scenario).getActivityFacilities()).run(scenario.getPopulation(),outdir);
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());

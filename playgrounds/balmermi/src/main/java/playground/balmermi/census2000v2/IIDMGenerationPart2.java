@@ -74,7 +74,7 @@ public class IIDMGenerationPart2 {
 		log.info("  done.");
 
 		log.info("  extracting output directory... ");
-		String outdir = config.facilities().getOutputFile();
+		String outdir = null;//config.facilities().getOutputFile();
 		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
 		log.info("    "+outdir);
 		log.info("  done.");
@@ -144,7 +144,7 @@ public class IIDMGenerationPart2 {
 		log.info("  done.");
 
 		log.info("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(null);//config.facilities().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing world xml file... ");

@@ -75,10 +75,10 @@ public class WorldCompletionTest extends MatsimTestCase {
 		log.info("  done.");
 	}
 
-	private final void compareOutputFacilities() {
+	private final void compareOutputFacilities(String filename) {
 		log.info("  comparing input and output facilities file... ");
 		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.facilities().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(this.config.facilities().getOutputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(filename);
 		assertEquals(checksum_ref, checksum_run);
 		log.info("  done.");
 	}
@@ -148,11 +148,11 @@ public class WorldCompletionTest extends MatsimTestCase {
 		log.info("    done.");
 
 		TriangleScenario.writeWorld(world);
-		TriangleScenario.writeFacilities(facilities);
+		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
 		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
 		this.compareOutputWorld();
-		this.compareOutputFacilities();
+		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.compareOutputNetwork();
 
 		log.info("done.");

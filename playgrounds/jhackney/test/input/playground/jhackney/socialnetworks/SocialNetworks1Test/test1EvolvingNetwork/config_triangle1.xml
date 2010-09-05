@@ -32,13 +32,12 @@
 
 	<module name="network">
 		<param name="inputNetworkFile" value="&STUDYBASE;/network.xml" />
-	</module> <!-- network -->
+	</module>
 
 <!-- ====================================================================== -->
 
 	<module name="facilities">
 		<param name="inputFacilitiesFile" value="&STUDYBASE;/facilities.xml" />
-		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/output_facilities.xml" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -48,7 +47,7 @@
 		<param name="outputPlansFile" value="&OUTPUTBASE;/output_plans.xml" />
 		<param name="outputVersion" value="v4" />
 		<param name="outputSample" value="1.00" />
-	</module> <!-- plans -->
+	</module>
 	
 <!-- ====================================================================== -->
 

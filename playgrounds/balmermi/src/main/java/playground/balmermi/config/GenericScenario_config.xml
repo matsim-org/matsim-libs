@@ -1,17 +1,11 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY PROJBASE     ".">
 		<!ENTITY STUDYBASE    "input">
-		<!ENTITY RUNSBASE     "output">
 		<!ENTITY OUTPUTBASE   "output">
-		<!ENTITY INPUTBASE    "input">
-		<!ENTITY ANALYSISBASE "analysis">
-		<!ENTITY LOCALDTDBASE "dtd">
-		<!ENTITY HOMEPAGEBASE "http://www.matsim.org/files/dtd">
 	]
 >
-<config xml:lang="de-CH">
+<config>
 
 	<module name="config">
 		<param name="outputConfigFile" value="&OUTPUTBASE;/output_config.xml" />
@@ -36,7 +30,6 @@
 
 	<module name="facilities">
 		<param name="inputFacilitiesFile" value="&STUDYBASE;/facilities.xml.gz" />
-		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/output_facilities.xml.gz" />
 	</module>
 
 <!-- ====================================================================== -->

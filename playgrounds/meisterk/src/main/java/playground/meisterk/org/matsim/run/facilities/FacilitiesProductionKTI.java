@@ -98,7 +98,7 @@ public class FacilitiesProductionKTI {
 		log.info("Adding and running facilities algorithms...done.");
 
 		System.out.println("  writing facilities file... ");
-		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(null);//config.facilities().getOutputFile());
 		System.out.println("  done.");
 
 	}

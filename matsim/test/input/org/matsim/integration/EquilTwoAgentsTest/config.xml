@@ -7,13 +7,8 @@
 		<param name="coordinateSystem" value="Atlantis" />
 	</module>
 
-	<module name="world">
-
-	</module>
-
 	<module name="network">
 	</module>
-
 
 	<module name="plans">
 		<param name="inputPlansFile" value="./plans2.xml" />
@@ -31,9 +26,6 @@
 		<param name="endTime" value="00:00:00" />
  		<param name="flowCapacityFactor" value="1.0" />
 		<param name="storageCapacityFactor" value="1.0" /> 
-
-		<!-- <param name = "snapshotperiod"	value = "00:01:00"/>--> <!-- 00:00:00 means NO snapshot writing -->
-		<!-- <param name = "snapshotFormat"	value = "netvis"/>--> <!-- netvis, googleearth, transims -->
 	</module>
 
 	<module name="planCalcScore">
@@ -73,10 +65,7 @@
 
 		<param name="ModuleProbability_1" value="0.9" />
 		<param name="Module_1" value="ChangeExpBeta" />
-<!--
-		<param name="ModuleProbability_2" value="0" />
-		<param name="Module_2" value="ReRoute" />
--->
+
 		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="TimeAllocationMutator" />
 

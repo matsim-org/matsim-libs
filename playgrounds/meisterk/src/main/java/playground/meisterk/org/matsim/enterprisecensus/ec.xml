@@ -19,10 +19,6 @@
 		<param name="presenceCodeSeparator" value=";" />
 	</module>
 	
-	<module name="facilities">
-		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/facilities_KTIYear2_activities.xml.gz" />
-	</module>
-	
 	<module name="global">
 		<param name="randomSeed" value="4711" />
 	</module>

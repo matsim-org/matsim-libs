@@ -31,10 +31,8 @@ public class FacilitiesConfigGroup extends Module {
 	public static final String GROUP_NAME = "facilities";
 
 	private static final String INPUT_FILE= "inputFacilitiesFile";
-	private static final String OUTPUT_FILE = "outputFacilitiesFile";
 
 	private String inputFile = null;
-	private String outputFile = null;
 
 	public FacilitiesConfigGroup() {
 		super(GROUP_NAME);
@@ -44,8 +42,6 @@ public class FacilitiesConfigGroup extends Module {
 	public String getValue(final String key) {
 		if (INPUT_FILE.equals(key)) {
 			return getInputFile();
-		} else if (OUTPUT_FILE.equals(key)) {
-			return getOutputFile();
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -55,8 +51,6 @@ public class FacilitiesConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (INPUT_FILE.equals(key)) {
 			setInputFile(value.replace('\\', '/'));
-		} else if (OUTPUT_FILE.equals(key)) {
-			setOutputFile(value.replace('\\', '/'));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -66,7 +60,6 @@ public class FacilitiesConfigGroup extends Module {
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		addParameterToMap(map, INPUT_FILE);
-		addParameterToMap(map, OUTPUT_FILE);
 		return map;
 	}
 
@@ -77,13 +70,6 @@ public class FacilitiesConfigGroup extends Module {
 	}
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
-	}
-
-	public String getOutputFile() {
-		return this.outputFile;
-	}
-	public void setOutputFile(final String outputFile) {
-		this.outputFile = outputFile;
 	}
 
 }

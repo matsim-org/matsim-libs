@@ -68,12 +68,6 @@ public class IIDMAssign2Network {
 		log.info("    "+indir);
 		log.info("  done.");
 
-		log.info("  extracting output directory... ");
-		String outdir = config.facilities().getOutputFile();
-		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
-		log.info("    "+outdir);
-		log.info("  done.");
-
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading facilities xml file...");
@@ -136,7 +130,7 @@ public class IIDMAssign2Network {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(null);//config.facilities().getOutputFile());
 		log.info("  done.");
 
 		log.info("done.");

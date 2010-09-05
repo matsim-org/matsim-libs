@@ -74,9 +74,9 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("  done.");
 	}
 
-	private final void checkEnrichedOutputFacilities() {
+	private final void checkEnrichedOutputFacilities(String filename) {
 		log.info("  checksum check of enriched output facilities... ");
-		long checksum_facilities = CRCChecksum.getCRCFromFile(this.config.facilities().getOutputFile());
+		long checksum_facilities = CRCChecksum.getCRCFromFile(filename);
 		long refChecksum = CRCChecksum.getCRCFromFile(getInputDirectory() + "facilities.xml");
 		assertEquals("different facilities files", refChecksum, checksum_facilities);
 		log.info("  done.");
@@ -188,7 +188,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write(this.config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(getOutputDirectory() + "output_facilities.xml");
 		log.info("  done.");
 
 		log.info("  writing world xml file... ");
@@ -196,7 +196,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("  done.");
 
 		this.compareOutputNetwork();
-		this.checkEnrichedOutputFacilities();
+		this.checkEnrichedOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.compareOutputWorld();
 		this.compareOutputPlans();
 

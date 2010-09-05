@@ -72,12 +72,6 @@ public class DilutedZurichFilter {
 		log.info("    "+indir);
 		log.info("  done.");
 
-		log.info("  extracting output directory... ");
-		String outdir = config.facilities().getOutputFile();
-		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
-		log.info("    "+outdir);
-		log.info("  done.");
-
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading facilities xml file...");

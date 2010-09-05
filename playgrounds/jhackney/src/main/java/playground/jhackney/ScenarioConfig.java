@@ -111,7 +111,7 @@ public abstract class ScenarioConfig {
 
 		config.facilities().setInputFile(input_directory + "output_facilities.xml.gz");
 		facsFileName=input_directory + "output_facilities.xml.gz";
-		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
+//		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
 
 //		config.matrices().setInputFile(input_directory + "matrices.xml");
 		matsFileName=input_directory + "matrices.xml";

@@ -43,9 +43,9 @@ public class Analysis {
 
 	private final static Logger log = Logger.getLogger(Analysis.class);
 
-	
+
 	//////////////////////////////////////////////////////////////////////
-	// parse File 
+	// parse File
 	//////////////////////////////////////////////////////////////////////
 
 	private static final Set<IdImpl> setLinkSet(String infile) {
@@ -66,26 +66,26 @@ public class Analysis {
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		
+
 		return linkSet;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////
 
 	public static void main(String[] args) {
-		
+
 		log.info("loading scenario...");
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		log.info("done.");
-		
-		log.info("extracting output directory... ");
-		String outdir = scenario.getConfig().facilities().getOutputFile();
-		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
-		log.info("=> "+outdir);
-		log.info("done.");
-		
+
+//		log.info("extracting output directory... ");
+//		String outdir = scenario.getConfig().facilities().getOutputFile();
+//		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
+//		log.info("=> "+outdir);
+//		log.info("done.");
+
 		new PopulationAnalysis().run(scenario.getPopulation(),setLinkSet(args[1]));
 	}
 }

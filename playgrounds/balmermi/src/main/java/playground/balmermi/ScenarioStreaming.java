@@ -26,7 +26,6 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -131,9 +130,9 @@ public class ScenarioStreaming {
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 
-		System.out.println("writing facilities...");
-		new FacilitiesWriter(af).write(config.facilities().getOutputFile());
-		System.out.println("done. (writing facilities)");
+//		System.out.println("writing facilities...");
+//		new FacilitiesWriter(af).write(config.facilities().getOutputFile());
+//		System.out.println("done. (writing facilities)");
 
 		final PopulationImpl population = (PopulationImpl) sl.getScenario().getPopulation();
 		population.setIsStreaming(true);

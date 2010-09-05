@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
@@ -118,9 +117,9 @@ public class ScenarioIO {
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 
-		System.out.println("writing facilities...");
-		new FacilitiesWriter(af).write(config.facilities().getOutputFile());
-		System.out.println("done. (writing facilities)");
+//		System.out.println("writing facilities...");
+//		new FacilitiesWriter(af).write(null /* filename not specified */);
+//		System.out.println("done. (writing facilities)");
 
 		System.out.println("loading population...");
 		sl.loadPopulation();

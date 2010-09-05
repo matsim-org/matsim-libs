@@ -53,7 +53,7 @@ public abstract class Scenario {
 		config.network().setInputFile(input_directory + "network.xml.gz");
 
 		config.facilities().setInputFile(input_directory + "facilities.xml");
-		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
+//		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
 
 		config.plans().setInputFile(input_directory + "plans.xml");
 		config.plans().setOutputFile(output_directory + "output_plans.xml");

@@ -61,7 +61,7 @@ public class PopulationSample {
 		log.info("  done.");
 
 		log.info("  extracting output directory... ");
-		String outdir = config.facilities().getOutputFile();
+		String outdir = null;
 		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
 		log.info("    "+outdir);
 		Gbl.printMemoryUsage();

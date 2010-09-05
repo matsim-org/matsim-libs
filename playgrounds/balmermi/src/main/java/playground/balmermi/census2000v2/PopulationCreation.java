@@ -64,7 +64,7 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		System.out.println("  extracting output directory... ");
-		String outdir = config.facilities().getOutputFile();
+		String outdir = null;
 		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
 		System.out.println("    "+outdir);
 		System.out.println("  done.");
@@ -130,7 +130,7 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(null /* filename not specified */);
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");

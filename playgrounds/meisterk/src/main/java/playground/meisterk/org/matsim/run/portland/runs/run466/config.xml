@@ -46,14 +46,8 @@
 
 <!-- ====================================================================== -->
 
-<!--	<module name="evacuation" >-->
-<!--	</module>-->
-
-<!-- ====================================================================== -->
-
 	<module name="facilities" >
 		<param name="inputFacilitiesFile" value="&INPUTBASE;/facilities.xml.gz" />
-<!--		<param name="outputFacilitiesFile" value="null" />-->
 	</module>
 
 <!-- ====================================================================== -->
@@ -911,15 +905,7 @@
 	<module name="plans" >
 		<param name="inputPlansFile" value="&INPUTBASE;/plans.xml.gz" />
 		<param name="outputPlansFile" value="&INPUTBASE;/output_plans.xml.gz" />
-<!--		<param name="outputSample" value="1.0" />-->
-<!--		<param name="outputVersion" value="v4" />-->
-<!--		<param name="switchOffPlansStreaming" value="no" />-->
 	</module>
-
-<!-- ====================================================================== -->
-
-<!--	<module name="roadpricing" >-->
-<!--	</module>-->
 
 <!-- ====================================================================== -->
 
@@ -941,33 +927,6 @@
 
 <!-- ====================================================================== -->
 
-<!--	<module name="socialnetwork" >-->
-<!--		<param name="degree_saturation_rate" value="null" />-->
-<!--		<param name="edge_type" value="null" />-->
-<!--		<param name="factype_ns" value="null" />-->
-<!--		<param name="fract_introduce_friends" value="null" />-->
-<!--		<param name="fract_ns_interact" value="null" />-->
-<!--		<param name="fract_s_interact" value="null" />-->
-<!--		<param name="grid_spacing" value="null" />-->
-<!--		<param name="kbar" value="null" />-->
-<!--		<param name="max_sn_iter" value="null" />-->
-<!--		<param name="nonspatial_interactor_type" value="null" />-->
-<!--		<param name="num_ns_interactions" value="null" />-->
-<!--		<param name="outputDirSocialNets" value="socialnets/" />-->
-<!--		<param name="prob_befriend" value="null" />-->
-<!--		<param name="replanning_interval" value="null" />-->
-<!--		<param name="s_weights" value="null" />-->
-<!--		<param name="socnetalgorithm" value="null" />-->
-<!--		<param name="socnetlinkremovalage" value="null" />-->
-<!--		<param name="socnetlinkremovalalgorithm" value="null" />-->
-<!--		<param name="socnetlinkremovalp" value="null" />-->
-<!--		<param name="socnetlinkstrengthalgorithm" value="null" />-->
-<!--		<param name="spatial_interactor_type" value="null" />-->
-<!--		<param name="switch_weights" value="null" />-->
-<!--	</module>-->
-
-<!-- ====================================================================== -->
-
 	<module name="strategy" >
 		<param name="ExternalExeConfigTemplate" value="null" />
 		<param name="ExternalExeTimeOut" value="3600" />
@@ -985,18 +944,6 @@
 		<param name="Module_2" value="TimeAllocationMutator" />
 		<param name="Module_3" value="SelectExpBeta" />
 		<param name="maxAgentPlanMemorySize" value="4" />
-	</module>
-
-<!-- ====================================================================== -->
-
-<!--	<module name="withinday" >-->
-<!--	</module>-->
-
-<!-- ====================================================================== -->
-
-	<module name="world" >
-		<param name="inputWorldFile" value="null" />
-		<param name="outputWorldFile" value="null" />
 	</module>
 
 <!-- ====================================================================== -->

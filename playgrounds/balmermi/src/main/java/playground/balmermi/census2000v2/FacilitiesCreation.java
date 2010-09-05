@@ -80,7 +80,7 @@ public class FacilitiesCreation {
 
 		System.out.println("  writing facilities xml file... ");
 		FacilitiesWriter fac_writer = new FacilitiesWriter(facilities);
-		fac_writer.write(config.facilities().getOutputFile());
+		fac_writer.write(null);//config.facilities().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("done.");

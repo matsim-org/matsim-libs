@@ -24,17 +24,14 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
-import org.matsim.world.WorldWriter;
 
 /**
  * Test case that uses the "primloc" module in a matsim setting.
@@ -66,7 +63,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		config.network().setInputFile(inputfolder + "network.xml");
 
 		config.facilities().setInputFile(inputfolder + "facilities.xml");
-		config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
+//		config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
 
 		config.plans().setInputFile(inputfolder + "init_plans.xml.gz" );
 		config.plans().setOutputFile(outputDirectory + "output_plans.xml.gz");
@@ -120,19 +117,19 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		new PopulationWriter(population, scenario.getNetwork()).write(config.plans().getOutputFile());
 		System.out.println("  done.");
 
-		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
-		System.out.println("  done.");
-
-		System.out.println("  writing network xml file... ");
-		NetworkWriter network_writer = new NetworkWriter(scenario.getNetwork());
-		network_writer.write(getOutputDirectory() + "output_network.xml");
-		System.out.println("  done.");
-
-		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write(config.world().getOutputFile());
-		System.out.println("  done.");
+//		System.out.println("  writing facilities xml file... ");
+//		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
+//		System.out.println("  done.");
+//
+//		System.out.println("  writing network xml file... ");
+//		NetworkWriter network_writer = new NetworkWriter(scenario.getNetwork());
+//		network_writer.write(getOutputDirectory() + "output_network.xml");
+//		System.out.println("  done.");
+//
+//		System.out.println("  writing world xml file... ");
+//		WorldWriter world_writer = new WorldWriter(world);
+//		world_writer.write(config.world().getOutputFile());
+//		System.out.println("  done.");
 
 		System.out.println("TEST SUCCEEDED.");
 		System.out.println();

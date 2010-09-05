@@ -40,7 +40,7 @@ public class FacilitiesTypeReduction {
 		System.out.println("TEST RUN 01:");
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		
+
 		System.out.println("  reading facilities xml file... ");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
@@ -49,9 +49,9 @@ public class FacilitiesTypeReduction {
 		System.out.println("  running facilities modules... ");
 		new FacilitiesReduceTypes().run(facilities);
 		System.out.println("  done.");
-		
+
 		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
+		new FacilitiesWriter(facilities).write(null);//config.facilities().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("TEST SUCCEEDED.");
