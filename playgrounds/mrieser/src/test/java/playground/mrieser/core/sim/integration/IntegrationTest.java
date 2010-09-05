@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.testcases.utils.EventsLogger;
 
 import playground.mrieser.core.sim.features.DefaultNetworkFeature;
@@ -61,7 +60,7 @@ public class IntegrationTest {
 		planSim.setSimEngine(engine);
 
 		// setup network
-		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(f.scenario.getNetwork(), engine, MatsimRandom.getRandom());
+		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(f.scenario.getNetwork(), engine);
 		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
 
 		// setup features; order is important!
@@ -103,7 +102,7 @@ public class IntegrationTest {
 		planSim.setSimEngine(engine);
 
 		// setup network
-		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(f.scenario.getNetwork(), engine, MatsimRandom.getRandom());
+		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(f.scenario.getNetwork(), engine);
 		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
 
 		// setup features; order is important!
@@ -141,7 +140,7 @@ public class IntegrationTest {
 		planSim.setSimEngine(engine);
 
 		// setup network
-		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(f.scenario.getNetwork(), engine, MatsimRandom.getRandom());
+		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(f.scenario.getNetwork(), engine);
 		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
 
 		// setup features; order is important!

@@ -19,8 +19,6 @@
 
 package playground.mrieser.core.sim.network.queueNetwork;
 
-import java.util.Random;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -231,7 +229,7 @@ public class QueueLinkTest {
 		link.setCapacity(3600.0);
 		link.setNumberOfLanes(1.0);
 		FakeSimEngine engine = new FakeSimEngine();
-		QueueNetwork qnet = new QueueNetwork(engine, new Random());
+		QueueNetwork qnet = new QueueNetwork(engine);
 		QueueLink qlink = new QueueLink(link, qnet);
 
 		VehicleTypeImpl vehType = new VehicleTypeImpl(new IdImpl("5-11"));
@@ -284,7 +282,7 @@ public class QueueLinkTest {
 			this.link.setCapacity(3600.0);
 			this.link.setNumberOfLanes(1.0);
 			this.engine = new FakeSimEngine();
-			this.qnet = new QueueNetwork(this.engine, new Random());
+			this.qnet = new QueueNetwork(this.engine);
 			this.qlink = new QueueLink(this.link, this.qnet);
 		}
 	}

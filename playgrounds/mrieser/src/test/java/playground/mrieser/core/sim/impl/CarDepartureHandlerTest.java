@@ -22,7 +22,6 @@ package playground.mrieser.core.sim.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import junit.framework.Assert;
 
@@ -395,7 +394,7 @@ public class CarDepartureHandlerTest {
 			EventsManager events = new EventsManagerImpl();
 			this.sim = new PlanSimulationImpl(this.scenario);
 			this.simEngine = new DefaultTimestepSimEngine(this.sim, events);
-			this.networkFeature = new DefaultNetworkFeature(QueueNetworkCreator.createQueueNetwork(network, this.simEngine, new Random(1)));
+			this.networkFeature = new DefaultNetworkFeature(QueueNetworkCreator.createQueueNetwork(network, this.simEngine));
 		}
 
 		private static Link setLinkAttributes(final Link link, final double length, final double capacity, final double freespeed, final int nOfLanes) {

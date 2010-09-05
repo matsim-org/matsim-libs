@@ -19,8 +19,6 @@
 
 package playground.mrieser.core.sim.network.queueNetwork;
 
-import java.util.Random;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Link;
@@ -204,7 +202,7 @@ public class QueueBufferTest {
 			this.link.setCapacity(3600.0);
 			this.link.setNumberOfLanes(1.0);
 			this.engine = new FakeSimEngine();
-			this.qnet = new QueueNetwork(this.engine, new Random());
+			this.qnet = new QueueNetwork(this.engine);
 			this.qlink = new QueueLink(this.link, this.qnet);
 		}
 	}

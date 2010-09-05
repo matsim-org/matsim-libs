@@ -43,10 +43,12 @@ import playground.mrieser.core.sim.network.api.SimNode;
 	private final Node node;
 	private final QueueLink[] inLinks;
 	private final QueueLink[] tempLinks;
+	private final Random random;
 
-	public QueueNode(final Node node, final QueueNetwork network) {
+	public QueueNode(final Node node, final QueueNetwork network, final Random random) {
 		this.node = node;
 		this.network = network;
+		this.random = random;
 		this.inLinks = new QueueLink[node.getInLinks().size()];
 		this.tempLinks = new QueueLink[node.getInLinks().size()];
 		int idx = 0;
@@ -71,9 +73,8 @@ import playground.mrieser.core.sim.network.api.SimNode;
 	 *
 	 * @param now
 	 *          The current time in seconds from midnight.
-	 * @param random the random number generator to be used
 	 */
-	/*package*/ final void moveNode(final double now, final Random random) {
+	/*package*/ final void moveNode(final double now) {
 		int inLinksCounter = 0;
 		double inLinksCapSum = 0.0;
 		// Check all incoming links for buffered agents
@@ -92,7 +93,7 @@ import playground.mrieser.core.sim.network.api.SimNode;
 		int auxCounter = 0;
 		// randomize based on capacity
 		while (auxCounter < inLinksCounter) {
-			double rnd = random.nextDouble();
+			double rnd = this.random.nextDouble();
 //			System.out.println(now + "  NODE " + this.node.getId() + "  RND " + rnd);
 			double rndNum = rnd * inLinksCapSum;
 			double selCap = 0.0;

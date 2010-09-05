@@ -19,11 +19,10 @@
 
 package playground.mrieser.core.sim.network.queueNetwork;
 
-import java.util.Random;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.mrieser.core.sim.api.TimestepSimEngine;
 import playground.mrieser.core.sim.network.api.SimNetwork;
@@ -33,14 +32,14 @@ import playground.mrieser.core.sim.network.api.SimNetwork;
  */
 public abstract class QueueNetworkCreator {
 
-	public static SimNetwork createQueueNetwork(final Network network, final TimestepSimEngine simEngine, final Random random) {
-		QueueNetwork qnet = new QueueNetwork(simEngine, random);
+	public static SimNetwork createQueueNetwork(final Network network, final TimestepSimEngine simEngine) {
+		QueueNetwork qnet = new QueueNetwork(simEngine);
 
 		for (Link link : network.getLinks().values()) {
 			qnet.addLink(new QueueLink(link, qnet));
 		}
 		for (Node node : network.getNodes().values()) {
-			qnet.addNode(new QueueNode(node, qnet));
+			qnet.addNode(new QueueNode(node, qnet, MatsimRandom.getLocalInstance()));
 		}
 
 		return qnet;

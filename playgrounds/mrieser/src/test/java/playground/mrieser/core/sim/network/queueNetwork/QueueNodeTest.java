@@ -52,7 +52,7 @@ public class QueueNodeTest {
 		f.qlink1.buffer.updateCapacity();
 		f.qlink1.buffer.addVehicle(veh1, 100);
 		Assert.assertEquals(0, driver.count);
-		f.qnode.moveNode(100, new Random(1));
+		f.qnode.moveNode(100);
 		Assert.assertEquals(1, driver.count);
 		f.qlink3.parkVehicle(veh1);
 		Assert.assertEquals(veh1, f.qlink3.getParkedVehicle(veh1.getId()));
@@ -75,7 +75,7 @@ public class QueueNodeTest {
 		f.qlink1.buffer.addVehicle(veh2, 100);
 		Assert.assertEquals(0, driver1.count);
 		Assert.assertEquals(0, driver2.count);
-		f.qnode.moveNode(100, new Random(1));
+		f.qnode.moveNode(100);
 		Assert.assertEquals(1, driver1.count);
 		Assert.assertEquals(1, driver2.count);
 		f.qlink3.parkVehicle(veh1);
@@ -102,21 +102,21 @@ public class QueueNodeTest {
 		Assert.assertEquals(0, driver1.count);
 		Assert.assertFalse(f.qlink1.buffer.hasSpace());
 		f.qlink1.buffer.updateCapacity();
-		f.qnode.moveNode(10, new Random(1));
+		f.qnode.moveNode(10);
 		Assert.assertEquals(0, driver1.count);
 		f.qlink1.buffer.updateCapacity();
-		f.qnode.moveNode(50, new Random(1));
+		f.qnode.moveNode(50);
 		Assert.assertEquals(0, driver1.count);
 		f.qlink1.buffer.updateCapacity();
-		f.qnode.moveNode(99, new Random(1));
-		Assert.assertEquals(0, driver1.count);
-		Assert.assertFalse(f.qlink1.buffer.hasSpace());
-		f.qlink1.buffer.updateCapacity();
-		f.qnode.moveNode(100, new Random(1)); // not moved to next link
+		f.qnode.moveNode(99);
 		Assert.assertEquals(0, driver1.count);
 		Assert.assertFalse(f.qlink1.buffer.hasSpace());
 		f.qlink1.buffer.updateCapacity();
-		f.qnode.moveNode(101, new Random(1));
+		f.qnode.moveNode(100); // not moved to next link
+		Assert.assertEquals(0, driver1.count);
+		Assert.assertFalse(f.qlink1.buffer.hasSpace());
+		f.qlink1.buffer.updateCapacity();
+		f.qnode.moveNode(101);
 		Assert.assertEquals(0, driver1.count); // not moved to next link
 		f.qlink1.buffer.updateCapacity();
 		Assert.assertTrue(f.qlink1.buffer.hasSpace()); // but no longer in buffer
@@ -144,21 +144,21 @@ public class QueueNodeTest {
 		Assert.assertEquals(0, driver1.count);
 		Assert.assertFalse(f.qlink1.buffer.hasSpace());
 		f.qlink1.buffer.updateCapacity();
-		f.qnode.moveNode(10, new Random(1));
+		f.qnode.moveNode(10);
 		Assert.assertEquals(0, driver1.count);
 		f.qlink1.buffer.updateCapacity();
-		f.qnode.moveNode(5, new Random(1));
+		f.qnode.moveNode(5);
 		Assert.assertEquals(0, driver1.count);
 		f.qlink1.buffer.updateCapacity();
-		f.qnode.moveNode(19, new Random(1));
-		Assert.assertEquals(0, driver1.count);
-		Assert.assertFalse(f.qlink1.buffer.hasSpace());
-		f.qlink1.buffer.updateCapacity();
-		f.qnode.moveNode(20, new Random(1)); // not moved to next link
+		f.qnode.moveNode(19);
 		Assert.assertEquals(0, driver1.count);
 		Assert.assertFalse(f.qlink1.buffer.hasSpace());
 		f.qlink1.buffer.updateCapacity();
-		f.qnode.moveNode(21, new Random(1));
+		f.qnode.moveNode(20); // not moved to next link
+		Assert.assertEquals(0, driver1.count);
+		Assert.assertFalse(f.qlink1.buffer.hasSpace());
+		f.qlink1.buffer.updateCapacity();
+		f.qnode.moveNode(21);
 		Assert.assertEquals(0, driver1.count); // not moved to next link
 		f.qlink1.buffer.updateCapacity();
 		Assert.assertTrue(f.qlink1.buffer.hasSpace()); // but no longer in buffer
@@ -205,14 +205,14 @@ public class QueueNodeTest {
 			this.net.addLink(this.link2);
 			this.net.addLink(this.link3);
 			this.engine = new FakeSimEngine();
-			this.qnet = new QueueNetwork(this.engine, new Random());
+			this.qnet = new QueueNetwork(this.engine);
 			this.qlink1 = new QueueLink(this.link1, this.qnet);
 			this.qlink2 = new QueueLink(this.link2, this.qnet);
 			this.qlink3 = new QueueLink(this.link3, this.qnet);
 			this.qnet.addLink(this.qlink1);
 			this.qnet.addLink(this.qlink2);
 			this.qnet.addLink(this.qlink3);
-			this.qnode = new QueueNode(node, this.qnet);
+			this.qnode = new QueueNode(node, this.qnet, new Random(1));
 		}
 	}
 

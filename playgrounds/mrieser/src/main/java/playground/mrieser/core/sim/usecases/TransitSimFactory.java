@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 
@@ -54,7 +53,7 @@ public class TransitSimFactory implements MobsimFactory {
 		planSim.setSimEngine(engine);
 
 		// setup network
-		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(scenario.getNetwork(), engine, MatsimRandom.getRandom());
+		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(scenario.getNetwork(), engine);
 		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
 
 		// setup features; order is important!
