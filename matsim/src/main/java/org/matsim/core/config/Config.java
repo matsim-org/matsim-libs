@@ -45,7 +45,6 @@ import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.config.groups.WithindayConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
@@ -69,7 +68,6 @@ public class Config {
 	private GlobalConfigGroup global = null;
 	private ControlerConfigGroup controler = null;
 	private SimulationConfigGroup simulation = null;
-	private WithindayConfigGroup withinDay = null;
 	private CountsConfigGroup counts = null;
 	private CharyparNagelScoringConfigGroup charyparNagelScoring = null;
 	private NetworkConfigGroup network = null;
@@ -119,9 +117,6 @@ public class Config {
 
 		this.simulation = new SimulationConfigGroup();
 		this.modules.put(SimulationConfigGroup.GROUP_NAME, this.simulation);
-
-		this.withinDay = new WithindayConfigGroup(WithindayConfigGroup.GROUP_NAME);
-		this.modules.put(WithindayConfigGroup.GROUP_NAME, this.withinDay);
 
 		this.counts = new CountsConfigGroup();
 		this.modules.put(CountsConfigGroup.GROUP_NAME, this.counts);
@@ -361,10 +356,6 @@ public class Config {
 
 	public final CharyparNagelScoringConfigGroup charyparNagelScoring() {
 		return this.charyparNagelScoring;
-	}
-
-	public final WithindayConfigGroup withinday() {
-		return this.withinDay;
 	}
 
 	public final NetworkConfigGroup network() {
