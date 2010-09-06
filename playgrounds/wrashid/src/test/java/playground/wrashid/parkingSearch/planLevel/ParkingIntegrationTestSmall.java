@@ -1,5 +1,3 @@
-package playground.wrashid.parkingSearch.planLevel;
-
 /* *********************************************************************** *
  * project: org.matsim.*
  *                                                                         *
@@ -19,26 +17,28 @@ package playground.wrashid.parkingSearch.planLevel;
  *                                                                         *
  * *********************************************************************** */
 
+package playground.wrashid.parkingSearch.planLevel;
+
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
 
 public class ParkingIntegrationTestSmall extends MatsimTestCase {
- 
+
 	// just to test, that the system runs without errors.
-	public void testScenario(){   
+	public void testScenario(){
 		Controler controler;
-		String configFilePath="test/input/playground/wrashid/parkingSearch/planLevel/chessConfig2.xml";
-		controler = new Controler(configFilePath);
-		
+		String configFilePath = super.getPackageInputDirectory() + "chessConfig2.xml";
+		controler = new Controler(super.loadConfig(configFilePath));
+
 		new BaseControlerScenario(controler);
-		
+
 		controler.run();
 	}
-	
-	
-	
-	
+
+
+
+
 
 }
