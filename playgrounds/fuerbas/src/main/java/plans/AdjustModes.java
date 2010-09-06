@@ -18,12 +18,11 @@
  */
 package plans;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
-import org.matsim.api.core.v01.population.Activity;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -36,15 +35,13 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ArgumentParser;
 
 public class AdjustModes {
-
-	/**
-	 * 
-	 *
-	 * @param args
-	 */
 	
+	private static final String CAR_MODE = "car";
+	
+	private static final Logger logger = Logger.getLogger(AdjustModes.class);
 	
 	private Config config;
+	
 	private String configfile = null;	
 	
 	private void parseArguments(final String[] args) {
@@ -75,31 +72,37 @@ public class AdjustModes {
 
 		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();	
 		
-		List<Person> toBeRemoved = new ArrayList<Person>(); 
-		
+		logger.info("Processing persons...");
+		Set<Person> toBeRemoved = new HashSet<Person>(); 
+		int cntr = 0;
 		for (Person person : plans.getPersons().values()) {
+			
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement element : plan.getPlanElements()){ 
 					if(element instanceof Leg) {
-						if (((Leg) element).getMode() != "car")	{
+						if (!((Leg) element).getMode().equalsIgnoreCase(CAR_MODE))	{
 							toBeRemoved.add(person);
 						}
 					}
 				}
 			}
+			
+			cntr++;
+			if(cntr % 1000 == 0)
+				logger.info(String.format("Parsed %1$s person - %2$s to be removed.", cntr, toBeRemoved.size()));
 		}
 		
+		logger.info("Removing persons...");
 		for (Person person : toBeRemoved) {
-			if (plans.getPersons().containsValue(person)) plans.getPersons().remove(person);
+			plans.getPersons().remove(person.getId());
 		}
-		
-		plans.setIsStreaming(false);
-		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
-		plans.addAlgorithm(plansWriter);
-		plans.printPlansCount();
-		plansWriter.write(this.config.findParam("plans", "outputPlansFile"));
+		logger.info(String.format("Removed %1$s of %2$s persons - new size: %3$s", toBeRemoved.size(), cntr, plans.getPersons().size()));
 
-		System.out.println("done.");
+		logger.info("Writing persons...");
+		PopulationWriter plansWriter = new PopulationWriter(plans, network);
+		String outfile = this.config.findParam("plans", "inputPlansFile") + "out";
+		plansWriter.write(outfile);
+		logger.info("Done.");
 		
 	}
 	
