@@ -96,7 +96,7 @@ public final class QLane extends QBufferItem {
 
 	/*package*/ double inverseSimulatedFlowCapacity; // optimization, cache 1.0 / simulatedFlowCapacity
 
-	protected int bufferStorageCapacity; // optimization, cache Math.ceil(simulatedFlowCap)
+	private int bufferStorageCapacity; // optimization, cache Math.ceil(simulatedFlowCap)
 
 	private double flowCapFraction; // optimization, cache simulatedFlowCap - (int)simulatedFlowCap
 
@@ -160,7 +160,7 @@ public final class QLane extends QBufferItem {
 	 */
 	private boolean fireLaneEvents = false;
 
-	protected final TransitQLaneFeature transitQueueLaneFeature;
+	/*package*/ final TransitQLaneFeature transitQueueLaneFeature;
 
 	/*package*/ QLane(final QLink ql, Lane laneData, boolean isOriginalLane) {
 		this.queueLink = (QLinkInternalI) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
@@ -208,7 +208,7 @@ public final class QLane extends QBufferItem {
 			* this.laneData.getNumberOfRepresentedLanes();
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQLink().getQSim().getSimTimer().getSimTimestepSize() 
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQLink().getQSim().getSimTimer().getSimTimestepSize()
 		* this.getQLink().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
@@ -682,6 +682,7 @@ public final class QLane extends QBufferItem {
 	 */
 	class VisDataImpl implements VisData {
 
+		@Override
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
 			double time = QLane.this.getQLink().getQSim().getSimTimer().getTimeOfDay() ;
 
@@ -699,6 +700,7 @@ public final class QLane extends QBufferItem {
 
 	static class FromLinkEndComparator implements Comparator<QLane>, Serializable {
 		private static final long serialVersionUID = 1L;
+		@Override
 		public int compare(final QLane o1, final QLane o2) {
 			if (o1.getEndsAtMeterFromLinkEnd() < o2.getEndsAtMeterFromLinkEnd()) {
 				return -1;

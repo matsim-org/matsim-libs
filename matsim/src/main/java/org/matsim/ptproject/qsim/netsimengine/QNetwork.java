@@ -51,21 +51,21 @@ public final class QNetwork implements VisNetwork, QNetworkI {
 
 	private final QNetworkFactory<QNode, QLinkInternalI> queueNetworkFactory;
 
-	private QSim qSim ;
-	private QSimEngineImpl qSimEngine ;
+//	private QSim qSim;
+	private QSimEngineImpl qSimEngine;
 
 	/**
 	 * This is deliberately package-private.  Please use the factory
 	 */
 	QNetwork(final QSim qs) {
-		this(qs, new DefaultQNetworkFactory() ) ;
+		this(qs, new DefaultQNetworkFactory());
 	}
 
 	/**
 	 * This is deliberately package-private.  Please use the factory
 	 */
 	QNetwork(final QSim qs, final QNetworkFactory<QNode, QLinkInternalI> factory ) {
-		this.qSim = qs ;
+//		this.qSim = qs;
 		this.networkLayer = qs.getScenario().getNetwork();
 		this.queueNetworkFactory = factory;
 		this.links = new LinkedHashMap<Id, QLinkInternalI>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
@@ -73,9 +73,10 @@ public final class QNetwork implements VisNetwork, QNetworkI {
 	}
 
 
+	@Override
 	public void initialize(QSimEngine simEngine) {
-		this.qSimEngine = (QSimEngineImpl) simEngine ;
-		this.qSimEngine.setQNetwork( this ) ;
+		this.qSimEngine = (QSimEngineImpl) simEngine;
+		this.qSimEngine.setQNetwork(this);
 		for (Node n : networkLayer.getNodes().values()) {
 			this.nodes.put(n.getId(), this.queueNetworkFactory.createQueueNode(n, simEngine));
 		}
@@ -87,30 +88,37 @@ public final class QNetwork implements VisNetwork, QNetworkI {
 		}
 	}
 
+	@Override
 	public Network getNetwork() {
 		return this.networkLayer;
 	}
 
+	@Override
 	public Map<Id, QLinkInternalI> getLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
+	@Override
 	public Map<Id, ? extends VisLink> getVisLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
+	@Override
 	public Map<Id, QNode> getNodes() {
 		return Collections.unmodifiableMap(this.nodes);
 	}
 
+	@Override
 	public Map<Id, ? extends VisNode> getVisNodes() {
 		return Collections.unmodifiableMap(this.nodes);
 	}
 
+	@Override
 	public QLinkInternalI getQLink(final Id id) {
 		return this.links.get(id);
 	}
 
+	@Override
 	public QNode getQNode(final Id id) {
 		return this.nodes.get(id);
 	}
