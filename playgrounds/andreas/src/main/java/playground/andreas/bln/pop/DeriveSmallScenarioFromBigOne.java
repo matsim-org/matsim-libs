@@ -104,7 +104,7 @@ public class DeriveSmallScenarioFromBigOne {
 
 		config.setParam("network", "inputNetworkFile", smallNetworkFile);
 		config.setParam("plans", "inputPlansFile", setBoundingBoxOut);
-		config.setParam("plans", "outputPlansFile", xy2linksOut);
+//		config.setParam("plans", "outputPlansFile", xy2linksOut);
 
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(config);
 		sl.loadNetwork();
@@ -115,7 +115,7 @@ public class DeriveSmallScenarioFromBigOne {
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
-		plansWriter.startStreaming(null);//config.plans().getOutputFile());
+		plansWriter.startStreaming(xy2linksOut);//config.plans().getOutputFile());
 		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links((NetworkLayer) network));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
