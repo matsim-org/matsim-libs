@@ -7,23 +7,9 @@
 >
 <config>
 
-	<module name="config">
-		<param name="outputConfigFile" value="&OUTPUTBASE;/output_config.xml" />
-	</module>
-
-	<!-- ====================================================================== -->
-
 	<module name="global">
 		<param name="randomSeed" value="4711" />
-		<param name="outputTimeFormat" value="HH:mm:ss" />
 		<param name="useRoadPricing" value="no" />
-	</module>
-
-	<!-- ====================================================================== -->
-	
-	<module name="world">
-		<param name="inputWorldFile" value="&STUDYBASE;/world.xml.gz" />
-		<param name="outputWorldFile" value="&OUTPUTBASE;/output_world.xml.gz" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -36,15 +22,12 @@
 
 	<module name="network">
  		<param name="inputNetworkFile" value="&STUDYBASE;/network.xml.gz" />
-		<param name="outputNetworkFile" value="&OUTPUTBASE;/output_network.xml.gz" />
 	</module>
 
 <!-- ====================================================================== -->
 
 	<module name="plans">
 		<param name="inputPlansFile" value="&STUDYBASE;/plans.xml.gz" />
-		<param name="outputSample" value="1.00" />
-		<param name="switchOffPlansStreaming" value="yes" />
 	</module>
 
 <!-- ====================================================================== -->

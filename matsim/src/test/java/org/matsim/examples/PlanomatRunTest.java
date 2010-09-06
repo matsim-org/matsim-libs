@@ -76,7 +76,7 @@ public class PlanomatRunTest extends MatsimTestCase {
 		testee.setCreateGraphs(false);
 		testee.setWriteEventsInterval(0);
 		testee.run();
-		
-	}	
-	
+
+	}
+
 }

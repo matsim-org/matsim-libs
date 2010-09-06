@@ -50,7 +50,7 @@ public class CreateKMZFromOutput {
 
 //		config.plans().setInputFile(Scenario.getSNInDir() + "output_plans"+i+".xml");
 
-		World world = Scenario.readWorld();
+		World world = Scenario.readWorld(null /*filename not specified*/);
 		ActivityFacilities facilities = Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
 		new WorldConnectLocations(config).run(world);

@@ -6,16 +6,12 @@
 		<!ENTITY INPUTBASE    "input">
 	]
 >
-<config xml:lang="de-CH">
+<config>
 
 <!-- ====================================================================== -->
 <!-- output validation for world_v2, network_v1, facilities_v1 and plans_v4 -->
 <!-- use org.matsim.ValidationTest as the main class                        -->
 <!-- ====================================================================== -->
-
-	<module name="config">
-		<param name="outputConfigFile" value="&OUTPUTBASE;/output_config.xml" />
-	</module>
 
 <!-- ====================================================================== -->
 
@@ -26,16 +22,8 @@
 
 <!-- ====================================================================== -->
 
-	<module name="world">
-		<param name="inputWorldFile" value="&STUDYBASE;/world.xml" />
-		<param name="outputWorldFile" value="&OUTPUTBASE;/output_world.xml" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="network">
 		<param name="inputNetworkFile" value="&STUDYBASE;/network.xml" />
-		<param name="outputNetworkFile" value="&OUTPUTBASE;/output_network.xml" />
 	</module> <!-- network -->
 
 <!-- ====================================================================== -->

@@ -32,23 +32,9 @@ import org.matsim.world.WorldWriter;
 
 public abstract class TriangleScenario {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
 	public static final long CHECKSUM_WORLD_EMPTY = 4202206189L;
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
 	private static final String studyfolder = "test/scenarios/triangle/";
-
-	private static Config config = null;
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
 
 	private TriangleScenario() {
 	}
@@ -58,9 +44,6 @@ public abstract class TriangleScenario {
 	//////////////////////////////////////////////////////////////////////
 
 	public static final void setUpScenarioConfig(final Config config, final String outputDirectory) {
-		TriangleScenario.config = config;
-		config.world().setInputFile(studyfolder + "world.xml");
-		config.world().setOutputFile(outputDirectory + "output_world.xml");
 		config.network().setInputFile(studyfolder + "network.xml");
 		config.facilities().setInputFile(studyfolder + "facilities.xml");
 	}
@@ -75,10 +58,10 @@ public abstract class TriangleScenario {
 		System.out.println("  done.");
 	}
 
-	public static final void writeWorld(final World world) {
+	public static final void writeWorld(final World world, String filename) {
 		System.out.println("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write(TriangleScenario.config.world().getOutputFile());
+		world_writer.write(filename);
 		System.out.println("  done.");
 	}
 
@@ -87,13 +70,6 @@ public abstract class TriangleScenario {
 		new FacilitiesWriter(facilities).write(filename);
 		System.out.println("  done.");
 	}
-//
-//	public static final void writeMatrices(final Matrices matrices, String filename) {
-//		System.out.println("  writing matrices xml file... ");
-//		MatricesWriter matrices_writer = new MatricesWriter(matrices);
-//		matrices_writer.write(filename);
-//		System.out.println("  done.");
-//	}
 
 	public static final void writeNetwork(Network network, String filename) {
 		System.out.println("  writing network xml file... ");

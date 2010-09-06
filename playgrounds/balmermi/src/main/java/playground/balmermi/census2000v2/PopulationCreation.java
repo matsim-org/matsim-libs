@@ -73,7 +73,7 @@ public class PopulationCreation {
 
 		System.out.println("  reading world xml file...");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile(config.world().getInputFile());
+		worldReader.readFile(null);//config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file...");
@@ -130,12 +130,12 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write(null /* filename not specified */);
+		new FacilitiesWriter(facilities).write(outdir+"/output_facilities.xml");
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write(config.world().getOutputFile());
+		world_writer.write(outdir+"/output_world.xml");
 		System.out.println("  done.");
 
 		System.out.println("done.");

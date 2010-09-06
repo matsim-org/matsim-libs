@@ -47,7 +47,6 @@ import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.systems.SignalSystems;
-import org.matsim.world.MatsimWorldReader;
 import org.xml.sax.SAXException;
 
 /**
@@ -106,7 +105,6 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 	  String currentDir = new File("tmp").getAbsolutePath();
 	  currentDir = currentDir.substring(0, currentDir.length() - 3);
 	  log.info("loading scenario from base directory: " + currentDir);
-		this.loadWorld();
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
@@ -237,27 +235,6 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 				log.info("no lane definition file set in config or feature disabled, not able to load anything");
 			}
 	}
-
-	private void loadWorld() {
-		String worldFileName = null;
-		if (this.config.world() != null) {
-			worldFileName = this.config.world().getInputFile();
-		}
-		if (worldFileName != null) {
-			log.info("loading world from " + worldFileName);
-			try {
-				new MatsimWorldReader(getScenario()).parse(worldFileName);
-			} catch (SAXException e) {
-				throw new RuntimeException(e);
-			} catch (ParserConfigurationException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
-
 
 	@SuppressWarnings("deprecation")
 	public void loadActivityFacilities() {

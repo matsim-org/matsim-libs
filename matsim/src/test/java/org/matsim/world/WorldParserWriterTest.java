@@ -58,10 +58,10 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		System.out.println("  done.");
 	}
 
-	private final void compareOutputWorld() {
+	private final void compareOutputWorld(String refFilename, String testFilename) {
 		System.out.println("  comparing input and output world file... ");
-		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.world().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(this.config.world().getOutputFile());
+		long checksum_ref = CRCChecksum.getCRCFromFile(refFilename);
+		long checksum_run = CRCChecksum.getCRCFromFile(testFilename);
 		assertEquals(checksum_ref, checksum_run);
 		System.out.println("  done.");
 	}
@@ -90,11 +90,11 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl(this.config);
 		World world = scenario.getWorld();
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile(this.config.world().getInputFile());
+		worldReader.readFile("test/scenarios/triangle/world.xml");
 
-		TriangleScenario.writeWorld(world);
+		TriangleScenario.writeWorld(world, getOutputDirectory() + "output_world.xml");
 
-		this.compareOutputWorld();
+		this.compareOutputWorld("test/scenarios/triangle/world.xml", getOutputDirectory() + "output_world.xml");
 	}
 
 	public void testParserWriter1() {
@@ -105,14 +105,14 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl(this.config);
 		World world = scenario.getWorld();
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile(this.config.world().getInputFile());
+		worldReader.readFile("test/scenarios/triangle/world.xml");
 		System.out.println("  done.");
 
 		this.runModules(world);
 
-		TriangleScenario.writeWorld(world);
+		TriangleScenario.writeWorld(world, getOutputDirectory() + "output_world.xml");
 
-		this.compareOutputWorld();
+		this.compareOutputWorld("test/scenarios/triangle/world.xml", getOutputDirectory() + "output_world.xml");
 
 		System.out.println("done.");
 	}
@@ -126,7 +126,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		System.out.println("  reading world xml file... ");
 		ScenarioImpl scenario = new ScenarioImpl(this.config);
 		World world = scenario.getWorld();
-		new MatsimWorldReader(scenario).readFile(this.config.world().getInputFile());
+		new MatsimWorldReader(scenario).readFile("test/scenarios/triangle/world.xml");
 		System.out.println("  done.");
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
@@ -141,11 +141,11 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		this.runModules(world);
 
-		TriangleScenario.writeWorld(world);
+		TriangleScenario.writeWorld(world, getOutputDirectory() + "output_world.xml");
 		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
 		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
-		this.compareOutputWorld();
+		this.compareOutputWorld("test/scenarios/triangle/world.xml", getOutputDirectory() + "output_world.xml");
 		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.compareOutputNetwork();
 
@@ -161,7 +161,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		System.out.println("  reading world xml file... ");
 		ScenarioImpl scenario = new ScenarioImpl(this.config);
 		World world = scenario.getWorld();
-		new MatsimWorldReader(scenario).readFile(this.config.world().getInputFile());
+		new MatsimWorldReader(scenario).readFile("test/scenarios/triangle/world.xml");
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file as a layer of the world...");
@@ -176,11 +176,11 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		this.runModules(world);
 
-		TriangleScenario.writeWorld(world);
+		TriangleScenario.writeWorld(world, getOutputDirectory() + "output_world.xml");
 		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
 		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
-		this.compareOutputWorld();
+		this.compareOutputWorld("test/scenarios/triangle/world.xml", getOutputDirectory() + "output_world.xml");
 		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.compareOutputNetwork();
 
@@ -202,7 +202,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		System.out.println("  done.");
 
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(scenario).readFile(this.config.world().getInputFile());
+		new MatsimWorldReader(scenario).readFile("test/scenarios/triangle/world.xml");
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file as a layer of the world...");
@@ -212,11 +212,11 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		this.runModules(world);
 
-		TriangleScenario.writeWorld(world);
+		TriangleScenario.writeWorld(world, getOutputDirectory() + "output_world.xml");
 		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
 		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
-		this.compareOutputWorld();
+		this.compareOutputWorld("test/scenarios/triangle/world.xml", getOutputDirectory() + "output_world.xml");
 		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.compareOutputNetwork();
 
@@ -244,16 +244,16 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile(this.config.world().getInputFile());
+		worldReader.readFile("test/scenarios/triangle/world.xml");
 		System.out.println("  done.");
 
 		this.runModules(world);
 
-		TriangleScenario.writeWorld(world);
+		TriangleScenario.writeWorld(world, getOutputDirectory() + "output_world.xml");
 		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
 		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
-		this.compareOutputWorld();
+		this.compareOutputWorld("test/scenarios/triangle/world.xml", getOutputDirectory() + "output_world.xml");
 		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.compareOutputNetwork();
 
@@ -276,7 +276,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile(this.config.world().getInputFile());
+		worldReader.readFile("test/scenarios/triangle/world.xml");
 		System.out.println("  done.");
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
@@ -286,11 +286,11 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		this.runModules(world);
 
-		TriangleScenario.writeWorld(world);
+		TriangleScenario.writeWorld(world, getOutputDirectory() + "output_world.xml");
 		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
 		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
-		this.compareOutputWorld();
+		this.compareOutputWorld("test/scenarios/triangle/world.xml", getOutputDirectory() + "output_world.xml");
 		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.compareOutputNetwork();
 
@@ -318,16 +318,16 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile(this.config.world().getInputFile());
+		worldReader.readFile("test/scenarios/triangle/world.xml");
 		System.out.println("  done.");
 
 		this.runModules(world);
 
-		TriangleScenario.writeWorld(world);
+		TriangleScenario.writeWorld(world, getOutputDirectory() + "output_world.xml");
 		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
 		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
-		this.compareOutputWorld();
+		this.compareOutputWorld("test/scenarios/triangle/world.xml", getOutputDirectory() + "output_world.xml");
 		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.compareOutputNetwork();
 

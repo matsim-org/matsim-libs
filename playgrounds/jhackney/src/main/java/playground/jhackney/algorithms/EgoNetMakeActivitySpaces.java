@@ -53,7 +53,7 @@ public class EgoNetMakeActivitySpaces {
 		SocNetConfigGroup snConfig = Scenario.setUpScenarioConfig();
 		Config config = Scenario.getConfig();
 
-		World world = Scenario.readWorld();
+		World world = Scenario.readWorld(null /*filename not specified*/);
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
 

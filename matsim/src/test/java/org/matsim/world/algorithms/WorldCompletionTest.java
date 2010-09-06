@@ -67,10 +67,10 @@ public class WorldCompletionTest extends MatsimTestCase {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void compareOutputWorld() {
+	private final void compareOutputWorld(String refFilename, String testFilename) {
 		log.info("  comparing input and output world file... ");
-		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.world().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(this.config.world().getOutputFile());
+		long checksum_ref = CRCChecksum.getCRCFromFile(refFilename);
+		long checksum_run = CRCChecksum.getCRCFromFile(testFilename);
 		assertEquals(checksum_ref, checksum_run);
 		log.info("  done.");
 	}
@@ -104,7 +104,7 @@ public class WorldCompletionTest extends MatsimTestCase {
 		log.info("  reading world xml file... ");
 		ScenarioImpl scenario = new ScenarioImpl(this.config);
 		World world = scenario.getWorld();
-		new MatsimWorldReader(scenario).readFile(this.config.world().getInputFile());
+		new MatsimWorldReader(scenario).readFile("test/scenarios/triangle/world.xml");
 		log.info("  done.");
 
 		log.info("  reading facilites xml file as a layer of the world...");
@@ -147,11 +147,11 @@ public class WorldCompletionTest extends MatsimTestCase {
 		new WorldConnectLocations(excludingLinkTypes, this.config).run(world);
 		log.info("    done.");
 
-		TriangleScenario.writeWorld(world);
+		TriangleScenario.writeWorld(world, getOutputDirectory() + "output_world.xml");
 		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
 		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
-		this.compareOutputWorld();
+		this.compareOutputWorld("test/scenarios/triangle/world.xml", getOutputDirectory() + "output_world.xml");
 		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 		this.compareOutputNetwork();
 

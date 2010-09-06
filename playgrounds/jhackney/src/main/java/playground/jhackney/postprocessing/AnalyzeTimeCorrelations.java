@@ -75,7 +75,7 @@ public class AnalyzeTimeCorrelations {
 		SocNetConfigGroup snConfig = Scenario.setUpScenarioConfig();
 		Config config = Scenario.getConfig();
 
-		World world = Scenario.readWorld();
+		World world = Scenario.readWorld(null /*filename not specified*/);
 		facilities= Scenario.readFacilities();
 		network =Scenario.readNetwork();
 		new WorldConnectLocations(config).run(world);

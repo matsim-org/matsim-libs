@@ -22,13 +22,6 @@
 
 <!-- ====================================================================== -->
 
-	<module name="world">
-		<param name="inputWorldFile" value="&STUDYBASE;/world.xml" />
-		<param name="outputWorldFile" value="&OUTPUTBASE;/output_world.xml" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="network">
 		<param name="inputNetworkFile" value="&STUDYBASE;/network.xml" />
 	</module>

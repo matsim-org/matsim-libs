@@ -92,7 +92,6 @@ public abstract class ConfigUtils {
 		config.plans().setInputFile(getAbsolutePath(prefix, config.plans().getInputFile()));
 		config.facilities().setInputFile(getAbsolutePath(prefix, config.facilities().getInputFile()));
 		config.counts().setCountsFileName(getAbsolutePath(prefix, config.counts().getCountsFileName()));
-		config.world().setInputFile(getAbsolutePath(prefix, config.world().getInputFile()));
 		config.households().setInputFile(getAbsolutePath(prefix, config.households().getInputFile()));
 		config.roadpricing().setTollLinksFile(getAbsolutePath(prefix, config.roadpricing().getTollLinksFile()));
 	}

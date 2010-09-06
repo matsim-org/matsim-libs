@@ -38,8 +38,6 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.RandomLocationMutator;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 
 public class ConnectHomesAndWorkplaces {
 
@@ -69,12 +67,12 @@ public class ConnectHomesAndWorkplaces {
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 
 		// create/read the world (probably empty input file)
-		final World world = scenario.getWorld();
-		if (this.config.world().getInputFile() != null) {
-			final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-			worldReader.readFile(this.config.world().getInputFile());
-		}
-		world.complete(config);
+//		final World world = scenario.getWorld();
+//		if (this.config.world().getInputFile() != null) {
+//			final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
+//			worldReader.readFile(this.config.world().getInputFile());
+//		}
+//		world.complete(config);
 
 		MatsimFacilitiesReader fr = new MatsimFacilitiesReader(scenario) ;
 		fr.readFile( this.config.facilities().getInputFile() ) ;

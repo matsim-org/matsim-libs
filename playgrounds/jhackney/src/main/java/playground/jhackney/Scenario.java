@@ -144,9 +144,9 @@ public abstract class Scenario {
 //		System.out.println("  Done");
 //		return Gbl.getConfig();
 //	}
-	public static final World readWorld() {
+	public static final World readWorld(String filename) {
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(scenario).readFile(scenario.getConfig().world().getInputFile());
+		new MatsimWorldReader(scenario).readFile(filename);
 		System.out.println("  done.");
 		return scenario.getWorld();
 	}
@@ -274,9 +274,6 @@ public abstract class Scenario {
 
 	public static Config getConfig(){
 		return scenario.getConfig();
-	}
-	public static World getWorld() {
-		return scenario.getWorld();
 	}
 	public static ScenarioImpl getScenarioImpl() {
 		return scenario;

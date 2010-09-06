@@ -55,9 +55,6 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		Config config = super.loadConfig( "test/input/org/matsim/demandmodeling/primloc/config_primloc_triangle.xml");
 		String outputDirectory = super.getOutputDirectory();
 
-		config.world().setInputFile(inputfolder + "world.xml");
-		config.world().setOutputFile(outputDirectory + "output_world.xml");
-
 		config.network().setInputFile(inputfolder + "network.xml");
 
 		config.facilities().setInputFile(inputfolder + "facilities.xml");
@@ -71,7 +68,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 
 		System.out.println("  reading world xml file... ");
 		World world = scenario.getWorld();
-		new MatsimWorldReader(scenario).readFile(config.world().getInputFile());
+		new MatsimWorldReader(scenario).readFile(inputfolder + "world.xml");
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");

@@ -38,7 +38,7 @@ public class ScenarioParsing {
 
 		Scenario.setUpScenarioConfig();
 
-		Scenario.readWorld();
+		Scenario.readWorld(null /*filename not specified*/);
 		NetworkLayer network = Scenario.readNetwork();
 		Population plans = Scenario.readPlans();
 

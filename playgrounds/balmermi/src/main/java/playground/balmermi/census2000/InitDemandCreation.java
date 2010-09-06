@@ -73,7 +73,7 @@ public class InitDemandCreation {
 		World world = scenario.getWorld();
 
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(scenario).readFile(config.world().getInputFile());
+		new MatsimWorldReader(scenario).readFile(null);//config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
@@ -191,7 +191,7 @@ public class InitDemandCreation {
 
 		System.out.println("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write(config.world().getOutputFile());
+		world_writer.write("output/output_facilities.xml");
 		System.out.println("  done.");
 
 		System.out.println("done.");

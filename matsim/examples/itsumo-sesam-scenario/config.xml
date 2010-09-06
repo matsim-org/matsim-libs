@@ -14,7 +14,6 @@
 
 	<module name="network">
 		<param name="inputNetworkFile" value="&OUTPUTBASE;/convertedItsumoNetwork.xml" />
-		<param name="outputNetworkFile" value="&OUTPUTBASE;/convertedItsumoNetwork.xml" />
 	</module>
 
 	<module name="plans">

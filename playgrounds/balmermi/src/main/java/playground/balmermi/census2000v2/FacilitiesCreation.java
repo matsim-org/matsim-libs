@@ -58,7 +58,7 @@ public class FacilitiesCreation {
 
 		System.out.println("  reading world xml file...");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile(config.world().getInputFile());
+		worldReader.readFile(null);//config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file...");

@@ -1,23 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY PROJBASE     ".">
-		<!ENTITY RUNSBASE     "runs">
 		<!ENTITY OUTPUTBASE   "output">
 		<!ENTITY INPUTBASE    "input">
-		<!ENTITY ANALYSISBASE "analysis">
-		<!ENTITY LOCALDTDBASE "dtd">
-		<!ENTITY HOMEPAGEBASE "http://www.matsim.org">
 	]
 >
 
 <config>
-
-<!-- ====================================================================== -->
-
-	<module name="config" >
-		<param name="outputConfigFile" value="&OUTPUTBASE;/run_planomat_charyparNagel_ignorept/output_config.xml.gz" />
-	</module>
 
 <!-- ====================================================================== -->
 
@@ -66,10 +55,7 @@
 <!-- ====================================================================== -->
 
 	<module name="network" >
-		<param name="inputChangeEventsFile" value="null" />
 		<param name="inputNetworkFile" value="&INPUTBASE;/network.xml" />
-		<param name="outputChangeEventsFile" value="null" />
-		<param name="outputNetworkFile" value="null" />
 		<param name="timeVariantNetwork" value="false" />
 	</module>
 

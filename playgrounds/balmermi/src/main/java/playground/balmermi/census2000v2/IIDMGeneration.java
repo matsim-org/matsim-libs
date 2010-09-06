@@ -88,7 +88,7 @@ public class IIDMGeneration {
 
 		log.info("  reading world xml file...");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile(config.world().getInputFile());
+		worldReader.readFile(null);//config.world().getInputFile());
 		log.info("  done.");
 
 		log.info("  reading facilities xml file...");
@@ -201,7 +201,7 @@ public class IIDMGeneration {
 
 		log.info("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write(config.world().getOutputFile());
+		world_writer.write(outdir + "/output_world.xml");
 		log.info("  done.");
 
 		log.info("done.");
