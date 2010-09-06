@@ -17,7 +17,7 @@ API-Changes:
 
 - ScenarioImpl.getPopulation() returns Population instead of PopulationImpl (r11288)
 - A bunch of classes no longer implement or extend Serializable, mostly for Network and Population data structure (r11637, r11638, r11650 - r11653, r11655)
-- remove no longer supported config parameters (r11975)
+- remove no longer supported config parameters (r11975, <http://sourceforge.net/mailarchive/forum.php?thread_name=F3A57F88000BEE4FBC74E5DC0562E8D987E9CF%40axonlu-msvr2.teledata.local&forum_name=matsim-devel>)
 - Use String instead of enum TransportMode for specifying modes of transportation (r11985, r11987)
 
 
@@ -25,9 +25,10 @@ Bug-Fixes:
 
 - Swing-OTFVis can open mvi-files created by conversion from events (r11476)
 
-Non-API Refactorings:
+Non-API Changes:
 
 - QVehicle.getBasicVehicle() has been renamed to QVehicle.getVehicle()
+- org.matsim.withinday is completely removed
 
 
 Release version 0.1.1
