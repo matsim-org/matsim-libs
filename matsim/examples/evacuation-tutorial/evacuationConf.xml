@@ -38,8 +38,6 @@
 
 	<module name="plans">
 		<param name="inputPlansFile" value="&INPUTBASE;/siouxfalls_plans.xml.gz" />
-		<param name="outputPlansFile" value="&OUTPUTBASE;/evacuationplans_siouxfalls.xml" />
-		<param name="outputVersion" value="v4" />
 	</module>
 
 	<module name="network">

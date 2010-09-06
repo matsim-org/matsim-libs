@@ -75,7 +75,6 @@ public class XY2LinksTest extends MatsimTestCase {
 		// prepare config for test
 		config.network().setInputFile(NETWORK_FILE);
 		config.plans().setInputFile(PLANS_FILE_TESTINPUT);
-		config.plans().setOutputFile(PLANS_FILE_TESTOUTPUT);
 		new ConfigWriter(config).write(CONFIG_FILE);
 		Gbl.setConfig(null); // needed to delete the global config etc for the test
 
@@ -83,7 +82,7 @@ public class XY2LinksTest extends MatsimTestCase {
 		assertFalse("Output-File should not yet exist.", new File(PLANS_FILE_TESTOUTPUT).exists());
 
 		// now run the tested class
-		XY2Links.main(new String[] {CONFIG_FILE});
+		XY2Links.main(new String[] {CONFIG_FILE, PLANS_FILE_TESTOUTPUT});
 
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());

@@ -903,7 +903,6 @@
 
 	<module name="plans" >
 		<param name="inputPlansFile" value="&INPUTBASE;/plans.xml.gz" />
-		<param name="outputPlansFile" value="&INPUTBASE;/output_plans.xml.gz" />
 	</module>
 
 <!-- ====================================================================== -->

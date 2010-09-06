@@ -68,7 +68,7 @@ public class SelectedPlans extends NewPopulation {
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
 
-		SelectedPlans sp = new SelectedPlans(network, population, scenario.getConfig().plans().getOutputFile());
+		SelectedPlans sp = new SelectedPlans(network, population, null);//scenario.getConfig().plans().getOutputFile());
 		sp.run(population);
 		sp.writeEndPlans();
 	}

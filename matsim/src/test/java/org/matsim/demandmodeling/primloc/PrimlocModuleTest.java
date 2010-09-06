@@ -23,11 +23,9 @@ package org.matsim.demandmodeling.primloc;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.MatsimWorldReader;
@@ -66,10 +64,6 @@ public class PrimlocModuleTest extends MatsimTestCase{
 //		config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
 
 		config.plans().setInputFile(inputfolder + "init_plans.xml.gz" );
-		config.plans().setOutputFile(outputDirectory + "output_plans.xml.gz");
-		config.plans().setOutputVersion("v4");
-		config.plans().setOutputSample(1.0);
-
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
 
@@ -85,7 +79,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+//		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
@@ -113,10 +107,10 @@ public class PrimlocModuleTest extends MatsimTestCase{
 
 		// writing all available input
 
-		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(population, scenario.getNetwork()).write(config.plans().getOutputFile());
-		System.out.println("  done.");
-
+//		System.out.println("  writing plans xml file... ");
+//		new PopulationWriter(population, scenario.getNetwork()).write(getOutputDirectory() + "plans.xml");
+//		System.out.println("  done.");
+//
 //		System.out.println("  writing facilities xml file... ");
 //		new FacilitiesWriter(facilities).write(config.facilities().getOutputFile());
 //		System.out.println("  done.");

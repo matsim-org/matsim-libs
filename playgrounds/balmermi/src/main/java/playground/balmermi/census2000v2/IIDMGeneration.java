@@ -188,7 +188,7 @@ public class IIDMGeneration {
 		log.info("  done.");
 
 		log.info("  writing plans xml file... ");
-		new PopulationWriter(pop, scenario.getNetwork()).write(config.plans().getOutputFile());
+		new PopulationWriter(pop, scenario.getNetwork()).write(null);//config.plans().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing f2z_mapping... ");

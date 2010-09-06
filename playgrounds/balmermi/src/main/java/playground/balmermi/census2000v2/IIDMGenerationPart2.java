@@ -112,7 +112,7 @@ public class IIDMGenerationPart2 {
 		Knowledges knowledges =  scenario.getKnowledges();
 		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop, scenario.getNetwork(), knowledges);
-		pop_writer.startStreaming(config.plans().getOutputFile());
+		pop_writer.startStreaming(null);//config.plans().getOutputFile());
 		PopulationReader pop_reader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 

@@ -19,8 +19,6 @@
 
 	<module name="plans">
 		<param name="inputPlansFile" value="&INPUTBASE;/plans/0.plans.xml" />
-		<param name="outputPlansFile" value="&OUTPUTBASE;/plans.xml" />
-		<param name="outputVersion" value="v4" />
 	</module>
 
 	<module name="controler">

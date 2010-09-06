@@ -59,26 +59,19 @@ public abstract class TriangleScenario {
 
 	public static final void setUpScenarioConfig(final Config config, final String outputDirectory) {
 		TriangleScenario.config = config;
-
 		config.world().setInputFile(studyfolder + "world.xml");
 		config.world().setOutputFile(outputDirectory + "output_world.xml");
-
 		config.network().setInputFile(studyfolder + "network.xml");
-
 		config.facilities().setInputFile(studyfolder + "facilities.xml");
-
-		config.plans().setOutputFile(outputDirectory + "output_plans.xml.gz");
-		config.plans().setOutputVersion("v4");
-		config.plans().setOutputSample(1.0);
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// write output
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void writePlans(Population plans, Network network) {
+	public static final void writePlans(Population plans, Network network, String filename) {
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans, network).write(TriangleScenario.config.plans().getOutputFile());
+		new PopulationWriter(plans, network).write(filename);
 		System.out.println("  done.");
 	}
 

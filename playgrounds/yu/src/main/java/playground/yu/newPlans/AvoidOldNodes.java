@@ -97,7 +97,7 @@ public class AvoidOldNodes extends NewPopulation {
 
 		Population population = scenario.getPopulation();
 
-		AvoidOldNodes aon = new AvoidOldNodes(scenario.getNetwork(), population, scenario.getConfig().plans().getOutputFile());
+		AvoidOldNodes aon = new AvoidOldNodes(scenario.getNetwork(), population, null);//scenario.getConfig().plans().getOutputFile());
 		aon.addNode("100000");
 		aon.addLink("3000000");
 		aon.addLink("3000001");

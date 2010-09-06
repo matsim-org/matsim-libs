@@ -12,7 +12,6 @@
 
 	<module name="plans">
 		<param name="inputPlansFile" value="test/scenarios/equil/plans100.xml" />
-		<param name="outputPlansFile" value="somewhere/equil_plans.xml" />
 	</module>
 
 	<module name="controler">

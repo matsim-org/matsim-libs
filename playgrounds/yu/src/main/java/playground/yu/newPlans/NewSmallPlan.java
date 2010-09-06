@@ -75,8 +75,8 @@ public class NewSmallPlan extends NewPopulation {
 		Population population = s.getPopulation();
 		Config c = s.getConfig();
 		PlansConfigGroup pcg = c.plans();
-		pcg.setOutputFile(outputPopFilename);
-		pcg.setOutputSample(0.01);
+//		pcg.setOutputFile(outputPopFilename);
+//		pcg.setOutputSample(0.01);
 
 		new MatsimPopulationReader(s).readFile(inputPopFilename);
 

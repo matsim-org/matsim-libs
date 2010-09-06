@@ -159,7 +159,7 @@ public class EgoNetMakeActivitySpaces {
 		pwast.close();
 		System.out.println("  done.");
 
-		Scenario.writePlans(socialPlans, network);
+		Scenario.writePlans(socialPlans, network, "outputPlans.xml");
 //		Scenario.writeNetwork(network);
 //		Scenario.writeFacilities(facilities);
 //		Scenario.writeWorld(Gbl.getWorld());

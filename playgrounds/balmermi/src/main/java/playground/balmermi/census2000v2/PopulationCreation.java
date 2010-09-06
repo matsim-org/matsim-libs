@@ -122,7 +122,7 @@ public class PopulationCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans, null).write(config.plans().getOutputFile());
+		new PopulationWriter(plans, null).write(null);//config.plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing households txt file... ");

@@ -138,7 +138,7 @@ public class ScenarioStreaming {
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		PopulationWriter plansWriter = new PopulationWriter(population,network, sl.getScenario().getKnowledges());
-		plansWriter.startStreaming(sl.getScenario().getConfig().plans().getOutputFile());
+		plansWriter.startStreaming(null);//sl.getScenario().getConfig().plans().getOutputFile());
 
 		System.out.println("adding algorithms...");
 		population.addAlgorithm(new PersonResetCoordAndLink(af));

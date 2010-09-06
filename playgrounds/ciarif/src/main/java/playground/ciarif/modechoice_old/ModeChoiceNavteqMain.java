@@ -88,7 +88,7 @@ public class ModeChoiceNavteqMain {
 
 //		PlansParser plansParser = new MatsimPopulationReader(plans);
 		PopulationWriter plansWriter = new PopulationWriter(plans, network);
-		plansWriter.startStreaming(config.plans().getOutputFile());
+		plansWriter.startStreaming(null);//config.plans().getOutputFile());
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 		System.out.println("  adding plans algorithm... ");

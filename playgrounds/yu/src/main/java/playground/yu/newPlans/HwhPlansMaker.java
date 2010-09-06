@@ -39,7 +39,6 @@ import org.matsim.population.algorithms.PlanSimplifyForDebug;
 
 /**
  * @author ychen
- *
  */
 public class HwhPlansMaker extends PlanSimplifyForDebug {
 
@@ -59,7 +58,7 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 			loadActType(eduActs, i);
 		}
 		pw = new PopulationWriter(plans, network);
-		pw.writeStartPlans(config.plans().getOutputFile());
+		pw.writeStartPlans(null);//config.plans().getOutputFile());
 	}
 
 	protected void loadActType(Set<String> acts, int i) {

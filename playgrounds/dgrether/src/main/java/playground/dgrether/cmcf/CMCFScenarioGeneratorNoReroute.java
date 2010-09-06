@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -162,9 +162,6 @@ public class CMCFScenarioGeneratorNoReroute {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		this.config = scenario.getConfig();
-
-		this.config.plans().setOutputVersion("v4");
-		this.config.plans().setOutputFile(plansOut);
 
 		this.network = scenario.getNetwork();
 		MatsimIo.loadNetwork(networkFile, scenario);

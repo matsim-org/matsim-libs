@@ -56,9 +56,7 @@ public abstract class Scenario {
 //		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
 
 		config.plans().setInputFile(input_directory + "plans.xml");
-		config.plans().setOutputFile(output_directory + "output_plans.xml");
-		config.plans().setOutputVersion("v4");
-		config.plans().setOutputSample(1.0);
+//		config.plans().setOutputFile(output_directory + "output_plans.xml");
 
 		config.counts().setCountsFileName(input_directory + "counts.xml");
 

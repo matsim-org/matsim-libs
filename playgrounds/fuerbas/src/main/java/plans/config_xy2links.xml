@@ -14,8 +14,6 @@
 
 	<module name="plans">
         <param name="inputPlansFile" value="/home/sfuerbas/workspace/Schweiz/plans_new.xml.gz" />
-		<param name="outputPlansFile" value="/home/sfuerbas/workspace/Schweiz/src/plans/plans_switzerland.xml.gz" />
 	</module>
 	
-
 </config>

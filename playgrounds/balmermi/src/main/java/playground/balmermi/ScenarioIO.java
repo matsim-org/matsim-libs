@@ -144,7 +144,7 @@ public class ScenarioIO {
 		System.out.println("done. (running algorithms)");
 
 		System.out.println("writing population...");
-		new PopulationWriter(population,network, sl.getScenario().getKnowledges()).write(config.plans().getOutputFile());
+		new PopulationWriter(population,network, sl.getScenario().getKnowledges()).write(null);//config.plans().getOutputFile());
 		System.out.println("done. (writing population)");
 
 //		System.out.println("running algorithms...");

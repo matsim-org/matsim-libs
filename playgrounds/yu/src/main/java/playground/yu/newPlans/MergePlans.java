@@ -22,8 +22,6 @@ package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -85,8 +83,6 @@ public class MergePlans {
 		// "sum_plans_100pt_201-300.xml";
 
 		final int lower_limit = 1000000000;
-		Config config = Gbl.createConfig(null);
-		config.plans().setOutputFile(outputPlansFilename);
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
@@ -97,7 +93,7 @@ public class MergePlans {
 		PopulationImpl plansA = (PopulationImpl) scenarioA.getPopulation();
 		plansA.setIsStreaming(true);
 		PopulationWriter pw = new PopulationWriter(plansA, network);
-		pw.startStreaming(config.plans().getOutputFile());
+		pw.startStreaming(outputPlansFilename);
 		new MatsimPopulationReader(scenarioA).readFile(plansFilenameA);
 		new CopyPlans(pw).run(plansA);
 

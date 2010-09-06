@@ -48,7 +48,7 @@ public class RemoveRoutes {
 			((PlanImpl) plan).getNextActivity(((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity())).setType("h");
 		}
 
-		new PopulationWriter(pop, net).write(sc.getConfig().plans().getOutputFile());
+		new PopulationWriter(pop, net).write(null);//sc.getConfig().plans().getOutputFile());
 
 	}
 

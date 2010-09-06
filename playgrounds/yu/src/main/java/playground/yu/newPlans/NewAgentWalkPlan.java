@@ -119,7 +119,7 @@ public class NewAgentWalkPlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 
-		NewAgentWalkPlan nawp = new NewAgentWalkPlan(scenario.getNetwork(), scenario.getPopulation(), scenario.getConfig().plans().getOutputFile());
+		NewAgentWalkPlan nawp = new NewAgentWalkPlan(scenario.getNetwork(), scenario.getPopulation(), null);//scenario.getConfig().plans().getOutputFile());
 		nawp.run(scenario.getPopulation());
 		nawp.writeEndPlans();
 	}

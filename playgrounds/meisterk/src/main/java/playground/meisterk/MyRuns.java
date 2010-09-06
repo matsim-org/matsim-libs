@@ -64,8 +64,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
-import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
+import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.run.XY2Links;
 import org.xml.sax.SAXException;
 
@@ -150,7 +150,7 @@ public class MyRuns {
 	}
 
 	void ktiPtRoutesPerformanceTest(final String[] args) {
-		
+
 		ScenarioImpl scenario = new ScenarioImpl();
 		Config config = scenario.getConfig();
 		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
@@ -159,17 +159,17 @@ public class MyRuns {
 		reader.readFile(args[0]);
 
 		NetworkLayer network = scenario.getNetwork();
-		
+
 		NodeImpl node = null;
-		
+
 		node = new NodeImpl(new IdImpl(1));
 		node.setCoord(new CoordImpl(-824635.0, -799519.0));
 		network.addNode(node);
-		
+
 		node = new NodeImpl(new IdImpl(2));
 		node.setCoord(new CoordImpl(2732681.5, 2625289.25));
 		network.addNode(node);
-		
+
 		PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);
 		plansCalcRouteKtiInfo.prepare(network);
 
@@ -187,15 +187,15 @@ public class MyRuns {
 		logger.info("Constructed " + max + " KtiPtRoute objects with processing route descriptions.");
 
 	}
-	
+
 	void eaptus2010ForPhDThesis(final String[] args) {
 
 		final double[] VARY_LEARNING_RATE = new double[]{1.0, 0.1};
-		
+
 		for (double learningRate : VARY_LEARNING_RATE) {
 			MyControler myControler = new MyControler(args);
 			myControler.setCreateGraphs(false);
-			
+
 			myControler.getConfig().charyparNagelScoring().setLearningRate(learningRate);
 			myControler.getConfig().controler().setOutputDirectory("output/eaptus2010ForPhDThesis/equil/learningRate_" + Double.toString(learningRate));
 			myControler.run();
@@ -244,7 +244,7 @@ public class MyRuns {
 		XY2Links xY2Links = new XY2Links();
 
 		// write out new initial demand
-		new PopulationWriter(population, network).write(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(population, network).write(null);//scenario.getConfig().plans().getOutputFile());
 
 	}
 
@@ -483,7 +483,7 @@ public class MyRuns {
 		psfaet.run(population);
 
 		logger.info("Writing plans file...");
-		new PopulationWriter(population, scenario.getNetwork()).write(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(population, scenario.getNetwork()).write(null);//scenario.getConfig().plans().getOutputFile());
 		logger.info("Writing plans file...DONE.");
 	}
 

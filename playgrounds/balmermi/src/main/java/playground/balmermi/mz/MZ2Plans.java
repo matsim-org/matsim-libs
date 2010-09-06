@@ -45,7 +45,7 @@ public class MZ2Plans {
 		System.out.println("  done.");
 
 		System.out.println("  extracting output directory... ");
-		String outdir = config.plans().getOutputFile();
+		String outdir = null;//config.plans().getOutputFile();
 		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
 		System.out.println("    "+outdir);
 		System.out.println("  done.");
@@ -67,7 +67,7 @@ public class MZ2Plans {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans, null).write(config.plans().getOutputFile());
+		new PopulationWriter(plans, null).write(null);//config.plans().getOutputFile());
 		System.out.println("  done.");
 
 //		System.out.println("  writing config xml file... ");

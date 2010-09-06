@@ -79,7 +79,6 @@ public class InitRoutesTest extends MatsimTestCase {
 		// prepare config for test
 		config.network().setInputFile(NETWORK_FILE);
 		config.plans().setInputFile(PLANS_FILE_TESTINPUT);
-		config.plans().setOutputFile(PLANS_FILE_TESTOUTPUT);
 		new ConfigWriter(config).write(CONFIG_FILE);
 		Gbl.reset(); // needed to delete the global config etc for the test
 
@@ -87,7 +86,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		assertFalse("Output-File should not yet exist.", new File(PLANS_FILE_TESTOUTPUT).exists());
 
 		// now run the tested class
-		InitRoutes.main(new String[] {CONFIG_FILE});
+		InitRoutes.main(new String[] {CONFIG_FILE, PLANS_FILE_TESTOUTPUT});
 
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());

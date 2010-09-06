@@ -133,7 +133,7 @@ public class MakeScenario {
 
 		//////////////////////////////////////////////////////////////////////
 
-		Scenario.writePlans(plans, network);
+		Scenario.writePlans(plans, network, "outputPlans.xml");
 		Scenario.writeNetwork(network, "outputNetwork.xml");
 		Scenario.writeFacilities(facilities, "outputFacilties.xml");
 

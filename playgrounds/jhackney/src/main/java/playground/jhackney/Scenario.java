@@ -101,9 +101,7 @@ public abstract class Scenario {
 		config.plans().setInputFile(input_directory + "output_plans.xml.gz");
 //		config.plans().setInputFile("output_plans.xml.gz");
 //		config.plans().setInputFile("plans.xml.gz");//AnalyzeScores
-		config.plans().setOutputFile(output_directory + "output_plans.xml.gz");
-		config.plans().setOutputVersion("v4");
-		config.plans().setOutputSample(1.0);
+//		config.plans().setOutputFile(output_directory + "output_plans.xml.gz");
 
 		config.counts().setCountsFileName(input_directory + "counts.xml");
 
@@ -244,9 +242,9 @@ public abstract class Scenario {
 	// write output
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void writePlans(final Population plans, final Network network) {
+	public static final void writePlans(final Population plans, final Network network, String filename) {
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans, network).write(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(plans, network).write(filename);
 		System.out.println("  done.");
 	}
 //

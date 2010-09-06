@@ -66,7 +66,7 @@ public class PopulationCut {
 		for (Id id : toRemove) { scenario.getPopulation().getPersons().remove(id); }
 		System.out.println("=> "+scenario.getPopulation().getPersons().size()+" persons left.");
 		System.out.println("done. " + (new Date()));
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), ((ScenarioImpl) scenario).getKnowledges()).write(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), ((ScenarioImpl) scenario).getKnowledges()).write(null);//scenario.getConfig().plans().getOutputFile());
 	}
 
 	//////////////////////////////////////////////////////////////////////

@@ -87,7 +87,7 @@ public class PopulationSample {
 		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop, scenario.getNetwork());
-		pop_writer.startStreaming(config.plans().getOutputFile());
+		pop_writer.startStreaming(null);//config.plans().getOutputFile());
 		pop.addAlgorithm(pop_writer);
 		PopulationReader pop_reader = new MatsimPopulationReader(scenario);
 		Gbl.printMemoryUsage();

@@ -39,6 +39,7 @@ import org.matsim.core.utils.misc.ArgumentParser;
  * All given activities must have a link assigned already (use XY2Links).
  *
  * @author balmermi
+ * @author mrieser
  */
 public class InitRoutes {
 
@@ -48,6 +49,7 @@ public class InitRoutes {
 
 	private Config config;
 	private String configfile = null;
+	private String plansfile = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// parse methods
@@ -71,6 +73,7 @@ public class InitRoutes {
 			System.exit(0);
 		} else {
 			this.configfile = arg;
+			this.plansfile = argIter.next();
 			if (argIter.hasNext()) {
 				System.out.println("Too many arguments.");
 				printUsage();
@@ -119,7 +122,7 @@ public class InitRoutes {
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
-		plansWriter.startStreaming(config.plans().getOutputFile());
+		plansWriter.startStreaming(this.plansfile);
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc)));
 		plans.addAlgorithm(plansWriter);

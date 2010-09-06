@@ -108,7 +108,7 @@ public class IIDMAssign2Network {
 		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop, network);
-		pop_writer.startStreaming(config.plans().getOutputFile());
+		pop_writer.startStreaming(null);//config.plans().getOutputFile());
 		PopulationReader pop_reader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 

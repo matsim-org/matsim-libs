@@ -11,7 +11,7 @@
 	<module name="plans">
 <!--		<param name="inputPlansFile" value="z:/output/raw_plans_out_w.xml" />-->
 		<param name="inputPlansFile" value="D:/Berlin/BVG/berlin-bvg09/pop/baseplan_900s_subset_bb.xml.gz" />
-		<param name="outputPlansFile" value="./baseplan_900s_subset_bb_xy2links.xml.gz" />
+		<!--<param name="outputPlansFile" value="./baseplan_900s_subset_bb_xy2links.xml.gz" />-->
 	</module>
 
 	<module name="controler">

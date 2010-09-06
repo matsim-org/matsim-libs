@@ -73,7 +73,7 @@ public class PersonSubtoursStreaming {
 		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans, scenario.getNetwork());
-		plansWriter.startStreaming(config.plans().getOutputFile());
+		plansWriter.startStreaming(null);//config.plans().getOutputFile());
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 

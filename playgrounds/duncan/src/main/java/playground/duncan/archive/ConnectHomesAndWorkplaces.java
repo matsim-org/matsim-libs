@@ -87,7 +87,7 @@ public class ConnectHomesAndWorkplaces {
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, scenario.getNetwork(), knowledges);
-		plansWriter.startStreaming(config.plans().getOutputFile());
+		plansWriter.startStreaming(null);//config.plans().getOutputFile());
 		plans.addAlgorithm(locachoice);
 		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added
 

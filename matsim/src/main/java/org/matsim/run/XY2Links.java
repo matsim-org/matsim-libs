@@ -42,6 +42,7 @@ public class XY2Links {
 
 	private Config config;
 	private String configfile = null;
+	private String plansfile = null;
 
 	/**
 	 * Parses all arguments and sets the corresponding members.
@@ -61,6 +62,7 @@ public class XY2Links {
 			System.exit(0);
 		} else {
 			this.configfile = arg;
+			this.plansfile = argIter.next();
 			if (argIter.hasNext()) {
 				System.out.println("Too many arguments.");
 				printUsage();
@@ -76,11 +78,10 @@ public class XY2Links {
 		System.out.println("a link based on the coordinates given in the activity. The modified plans/");
 		System.out.println("persons are then written out to file again.");
 		System.out.println();
-		System.out.println("usage: XY2Links [OPTIONS] configfile");
+		System.out.println("usage: XY2Links [OPTIONS] configfile plansfile");
 		System.out.println("       The following parameters must be given in the config-file:");
 		System.out.println("       - network.inputNetworkFile");
 		System.out.println("       - plans.inputPlansFile");
-		System.out.println("       - plans.outputPlansFile");
 		System.out.println();
 		System.out.println("Options:");
 		System.out.println("-h, --help:     Displays this message.");
@@ -105,7 +106,7 @@ public class XY2Links {
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
-		plansWriter.startStreaming(this.config.plans().getOutputFile());
+		plansWriter.startStreaming(this.plansfile);
 		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());

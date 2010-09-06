@@ -48,6 +48,7 @@ public class InitRoutes {
 
 	private Config config;
 	private String configfile = null;
+	private String plansfile = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// parse methods
@@ -71,6 +72,7 @@ public class InitRoutes {
 			System.exit(0);
 		} else {
 			this.configfile = arg;
+			this.plansfile = argIter.next();
 			if (argIter.hasNext()) {
 				System.out.println("Too many arguments.");
 				printUsage();
@@ -90,11 +92,10 @@ public class InitRoutes {
 		System.out.println("a an initial route (freespeed) based on the given netowrk. The modified plans/");
 		System.out.println("persons are then written out to file again.");
 		System.out.println();
-		System.out.println("usage: InitRoutes [OPTIONS] configfile");
+		System.out.println("usage: InitRoutes [OPTIONS] configfile outputPlansFile");
 		System.out.println("       The following parameters must be given in the config-file:");
 		System.out.println("       - network.inputNetworkFile");
 		System.out.println("       - plans.inputPlansFile");
-		System.out.println("       - plans.outputPlansFile");
 		System.out.println();
 		System.out.println("Options:");
 		System.out.println("-h, --help:     Displays this message.");
@@ -119,7 +120,7 @@ public class InitRoutes {
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
-		plansWriter.startStreaming(config.plans().getOutputFile());
+		plansWriter.startStreaming(this.plansfile);
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc)));
 		plans.addAlgorithm(plansWriter);

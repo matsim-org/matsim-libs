@@ -5,7 +5,7 @@
 	<module name="global">
 		<param name="randomSeed" value="4711" />
 		<param name="coordinateSystem" value="Atlantis" />
-                <param name="numberOfThreads" value="1" />
+    <param name="numberOfThreads" value="1" />
 	</module>
 
 	<module name="network">
@@ -18,7 +18,6 @@
 
 	<module name="plans">
 		<param name="inputPlansFile" value="/Users/nagel/shared-svn/studies/north-america/ca/metro-vancouver/plans/plans.xml.gz" />
-		<param name="outputPlansFile" value="/Users/nagel/shared-svn/studies/north-america/ca/metro-vancouver/plans/output-plans.xml.gz" />
 	</module>
 
 	<module name="planCalcScore">

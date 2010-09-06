@@ -121,9 +121,7 @@ public abstract class ScenarioConfig {
 		config.plans().setInputFile("output_plans.xml.gz");
 		popFileName="output_plans.xml.gz";
 //		config.plans().setInputFile("plans.xml.gz");//AnalyzeScores
-		config.plans().setOutputFile(output_directory + "new_output_plans.xml.gz");
-		config.plans().setOutputVersion("v4");
-		config.plans().setOutputSample(1.0);
+//		config.plans().setOutputFile(output_directory + "new_output_plans.xml.gz");
 
 		config.counts().setCountsFileName(input_directory + "counts.xml");
 

@@ -13,7 +13,6 @@
 
 	<module name="plans">
 		<param name="inputPlansFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/plansGauteng5000_Sample10.xml" />
-		<param name="outputPlansFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/plansGauteng5000_Sample10.xml" />
 	</module>
 
 	<module name="controler">

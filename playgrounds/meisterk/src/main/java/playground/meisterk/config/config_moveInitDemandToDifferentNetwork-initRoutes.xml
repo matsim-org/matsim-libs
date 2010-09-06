@@ -13,6 +13,6 @@
 
 	<module name="plans">
 		<param name="inputPlansFile" value="&OUTPUT_BASE;/plans-census2000_dilZh30km_miv_transitincl_10pct-ivtch-changed-wu-flama-xy2links.xml.gz" />
-		<param name="outputPlansFile" value="&OUTPUT_BASE;/plans-census2000_dilZh30km_miv_transitincl_10pct-ivtch-changed-wu-flama-complete.xml.gz" />
+		<!--<param name="outputPlansFile" value="&OUTPUT_BASE;/plans-census2000_dilZh30km_miv_transitincl_10pct-ivtch-changed-wu-flama-complete.xml.gz" />-->
 	</module>
 </config>

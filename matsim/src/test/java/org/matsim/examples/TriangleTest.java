@@ -93,7 +93,7 @@ public class TriangleTest extends MatsimTestCase {
 	private final void compareOutputPlans() {
 		log.info("  comparing reference and output plans file... ");
 		long checksum_ref = CRCChecksum.getCRCFromFile(getInputDirectory() + "plans.xml.gz");
-		long checksum_run = CRCChecksum.getCRCFromFile(this.config.plans().getOutputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(getOutputDirectory() + "output_plans.xml");
 		assertEquals("different plans files", checksum_ref, checksum_run);
 		log.info("  done.");
 	}
@@ -180,7 +180,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 
 		log.info("  writing plans xml file... ");
-		new PopulationWriter(plans, network, kn).write(this.config.plans().getOutputFile());
+		new PopulationWriter(plans, network, kn).write(getOutputDirectory() + "output_plans.xml");
 		log.info("  done.");
 
 		log.info("  writing network xml file... ");

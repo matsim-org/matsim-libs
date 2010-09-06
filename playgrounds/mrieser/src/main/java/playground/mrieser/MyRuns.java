@@ -104,7 +104,7 @@ public class MyRuns {
 		plans.setIsStreaming(true);
 		plans.addAlgorithm(new PersonFilterSelectedPlan());
 		final PopulationWriter plansWriter = new PopulationWriter(plans, scenario.getNetwork());
-		plansWriter.startStreaming(scenario.getConfig().plans().getOutputFile());
+		plansWriter.startStreaming(null);//scenario.getConfig().plans().getOutputFile());
 		plans.addAlgorithm(plansWriter);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 
@@ -161,7 +161,7 @@ public class MyRuns {
 		new PlansFilterByLegMode(TransportMode.car, false).run(scenario.getPopulation());
 
 		System.out.println("  writing plans...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(null);//scenario.getConfig().plans().getOutputFile());
 
 		System.out.println("RUN: filterCars finished.");
 		System.out.println();
@@ -184,7 +184,7 @@ public class MyRuns {
 		new PlansFilterByLegMode(TransportMode.pt, true).run(plans);
 
 		System.out.println("  writing plans...");
-		new PopulationWriter(plans, scenario.getNetwork()).write(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(plans, scenario.getNetwork()).write(null);//scenario.getConfig().plans().getOutputFile());
 
 		System.out.println("RUN: filterPt finished.");
 		System.out.println();
@@ -206,7 +206,7 @@ public class MyRuns {
 		new PersonRemovePlansWithoutLegs().run(scenario.getPopulation());
 		new PlansFilterPersonHasPlans().run(scenario.getPopulation());
 
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(null);//scenario.getConfig().plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("RUN: filterWork finished.");
@@ -222,7 +222,7 @@ public class MyRuns {
 		new PlanFilterActTypes(new String[] {"work1", "work2", "work3", "edu", "uni"}).run(scenario.getPopulation());
 		new PlansFilterPersonHasPlans().run(scenario.getPopulation());
 
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(null);//scenario.getConfig().plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("RUN: filterWorkEdu finished.");
@@ -245,7 +245,7 @@ public class MyRuns {
 		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, sl.getScenario().getNetwork());
-		plansWriter.startStreaming(config.plans().getOutputFile());
+		plansWriter.startStreaming(null);//config.plans().getOutputFile());
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		System.out.println("  done.");
 
@@ -271,7 +271,7 @@ public class MyRuns {
 		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, sl.getScenario().getNetwork());
-		plansWriter.startStreaming(config.plans().getOutputFile());
+		plansWriter.startStreaming(null);//config.plans().getOutputFile());
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 
 		plans.addAlgorithm(plansWriter);
@@ -346,7 +346,7 @@ public class MyRuns {
 		final PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(population, network);
-		plansWriter.startStreaming(scenario.getConfig().plans().getOutputFile());
+		plansWriter.startStreaming(null);//scenario.getConfig().plans().getOutputFile());
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		population.addAlgorithm(new ActLocationFalsifier(200));
 		population.addAlgorithm(new XY2Links(network));

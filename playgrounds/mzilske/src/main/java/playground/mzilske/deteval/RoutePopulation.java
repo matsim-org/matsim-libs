@@ -100,7 +100,7 @@ public class RoutePopulation {
 		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
-		plansWriter.startStreaming(this.config.plans().getOutputFile());
+		plansWriter.startStreaming(null);//this.config.plans().getOutputFile());
 		PersonalizableTravelTime travelTimes = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(network, this.config.travelTimeCalculator());
 		PersonalizableTravelCost travelCosts = new TravelCostCalculatorFactoryImpl().createTravelCostCalculator(travelTimes, this.config.charyparNagelScoring());
 		plans.addAlgorithm(new PersonPrepareForSim(new PlansCalcRoute(this.config.plansCalcRoute(), network, travelCosts, travelTimes, new DijkstraFactory()), network));

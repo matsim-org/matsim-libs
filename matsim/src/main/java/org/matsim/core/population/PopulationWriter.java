@@ -63,7 +63,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 	 * @param population the population to write to file
 	 */
 	public PopulationWriter(final Population population, final Network network) {
-		this(population, network, (Gbl.getConfig() == null ? 1.0 : Gbl.getConfig().plans().getOutputSample()));
+		this(population, network, 1.0);
 	}
 
 	/**
@@ -254,6 +254,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 	/**
 	 * Writes all plans to the file. If plans-streaming is on, this will end the writing and close the file.
 	 */
+	@Override
 	public void write(final String filename) {
 //		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
 //			log.info("PlansStreaming is on -- plans already written, just closing file if it's open.");
@@ -298,6 +299,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 
 	// implementation of PersonAlgorithm
 	// this is primarily to use the PlansWriter with filters and other algorithms.
+	@Override
 	public void run(final Person person) {
 		writePerson(person);
 	}

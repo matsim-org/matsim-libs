@@ -38,7 +38,6 @@
 
 	<module name="plans">
 		<param name="inputPlansFile" value="&INPUTBASE;/plans.xml.gz" />
-		<param name="outputPlansFile" value="&OUTPUTBASE;/plans.xml.gz" />
 	</module>
 
 <!-- ====================================================================== -->

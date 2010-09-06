@@ -14,8 +14,6 @@
 
 	<module name="plans">
         <param name="inputPlansFile" value="plans_switzerland_newroutes.xml.gz" />
-		<param name="outputPlansFile" value="plans_switzerland_newroutes_car_only.xml.gz" />
 	</module>
 	
-
 </config>

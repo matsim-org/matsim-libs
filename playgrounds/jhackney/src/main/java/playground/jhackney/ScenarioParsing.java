@@ -130,7 +130,7 @@ public class ScenarioParsing {
 
 		//////////////////////////////////////////////////////////////////////
 
-		Scenario.writePlans(plans, network);
+		Scenario.writePlans(plans, network, "outputPlans.xml");
 //		Scenario.writeNetwork(network);
 //		Scenario.writeFacilities(facilities);
 //		Scenario.writeWorld(Gbl.getWorld());
