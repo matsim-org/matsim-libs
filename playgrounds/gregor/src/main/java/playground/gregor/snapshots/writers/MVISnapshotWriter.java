@@ -79,10 +79,18 @@ public class MVISnapshotWriter extends OTFFileWriter{
 //		final String LINKS_FILE =  CVSROOT + "/studies/padang/gis/network_v20080618/links.shp";
 		
 	//	final String NODES_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_nodes.shp";
+	
 	final String BUILDINGS_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/shelters.shp";
+	
+	
 //	final String BUILDINGS_FILE =  "/home/laemmel/devel/allocation/data/buildings.shp";
-	final String LINKS_FILE = OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/links.shp";
-	final String NODES_FILE = OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/nodes.shp";
+	
+//	final String LINKS_FILE = OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/links.shp";
+//	final String NODES_FILE = OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/nodes.shp";
+	
+	final String LINKS_FILE = "/home/laemmel/devel/sim2d/data/duisburg/links.shp";
+	final String NODES_FILE = "/home/laemmel/devel/sim2d/data/duisburg/nodes.shp";
+	
 	final String REGION_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/region.shp";
 	final String SAFE_FILE =  OTFSnapshotGenerator.SHARED_SVN + "/countries/id/padang/gis/vis/safe.shp";
 	final private static float [] regionColor = new float [] {.9f,.82f,.82f,1.f};
@@ -113,6 +121,11 @@ public class MVISnapshotWriter extends OTFFileWriter{
 	}
 
 
+	public MVISnapshotWriter(ScenarioImpl sc, String mVIFILE) {
+		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()).getQNetwork()),mVIFILE, new OTFFileWriterConnectionManagerFactory());
+	}
+
+
 	public void setLabel(String label) {
 		this.label = label;
 	}
@@ -128,8 +141,8 @@ public class MVISnapshotWriter extends OTFFileWriter{
 
 		
 		try {
-			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.REGION_FILE),regionColor));
-			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.SAFE_FILE),safeColor));
+//			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.REGION_FILE),regionColor));
+//			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.SAFE_FILE),safeColor));
 			this.quad.addAdditionalElement(new TileDrawerDataWriter());
 			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.LINKS_FILE),linksColor));
 			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.NODES_FILE),nodesColor));

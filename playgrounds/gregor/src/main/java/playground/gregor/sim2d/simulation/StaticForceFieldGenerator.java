@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * StaticForceFieldGenerator.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.gregor.sim2d.simulation;
 
 
@@ -5,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2d.controller.Sim2DConfig;
+import playground.gregor.sim2d.gisdebug.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -56,12 +76,24 @@ public class StaticForceFieldGenerator {
 			for (double y = this.envelope.getMinY(); y <= this.envelope.getMaxY(); y += Sim2DConfig.STATIC_FORCE_RESOLUTION) {
 				yloop++;
 				Point point = this.geofac.createPoint(new Coordinate(x,y));
-				if (!this.structure.covers(point) && this.structure.distance(point)>0.1) {
+				if (!this.structure.covers(point)  && this.structure.distance(point)>0.1) {
 					Force f = calculateForce(x,y);
 					if (f != null) {
-						this.forcesQuadTree.put(f.getXCoord(), f.getYCoord(), f);
+						try {
+							
+							this.forcesQuadTree.put(f.getXCoord(), f.getYCoord(), f);
+						} catch (Exception e) {
+							e.printStackTrace();
+							GisDebugger.dump("/home/laemmel/devel/sim2d/tmp/staticForcesDbg.shp");
+							throw new RuntimeException(e);
+						}
+						
 					}
+					
 				}
+//				if (this.forcesQuadTree.size() > 1000) {
+//					return;
+//				}
 			}
 		}
 		
@@ -111,8 +143,8 @@ public class StaticForceFieldGenerator {
 		Coordinate [] cooo = new Coordinate[] {new Coordinate(f.getXCoord(),f.getYCoord()),new Coordinate(f.getXCoord()+0.01,f.getYCoord()+0.01),new Coordinate(f.getXCoord()+f.getFx(),f.getYCoord()+f.getFy()),new Coordinate(f.getXCoord(),f.getYCoord())};
 		LinearRing lr = this.geofac.createLinearRing(cooo);
 		Polygon ppp = this.geofac.createPolygon(lr, null);
-//		GisDebugger.addGeometry(ppp);
-//		GisDebugger.dump("../../tmp/staticForcesDbg.shp");
+		GisDebugger.addGeometry(ppp);
+
 		return f;
 	}
 
@@ -131,7 +163,7 @@ public class StaticForceFieldGenerator {
 				return false;
 			}
 			
-			//DEBUG
+//			//DEBUG
 //			GisDebugger.addGeometry(p);
 //			Coordinate[] tmp1 = new Coordinate[]{tmp[0],new Coordinate(tmp[0].x+0.01,tmp[0].y+0.01),tmp[1],tmp[0]};
 //			LinearRing lr = this.geofac.createLinearRing(tmp1);
@@ -162,7 +194,7 @@ public class StaticForceFieldGenerator {
 		for (Coordinate c : geo.getCoordinates()) {
 			this.envelope.expandToInclude(c);
 		}
-		this.forcesQuadTree = new QuadTree<Force>(this.envelope.getMinX(),this.envelope.getMinY(),this.envelope.getMaxX(),this.envelope.getMaxY());
+		this.forcesQuadTree = new QuadTree<Force>(this.envelope.getMinX()-1000,this.envelope.getMinY()-1000,this.envelope.getMaxX()+1000,this.envelope.getMaxY()+1000);
 	}
 
 //	@Deprecated

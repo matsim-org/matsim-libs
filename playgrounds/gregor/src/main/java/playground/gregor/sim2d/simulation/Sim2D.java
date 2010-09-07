@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Sim2D.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.gregor.sim2d.simulation;
 
 import java.util.HashMap;
@@ -6,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -18,8 +38,14 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
+import playground.gregor.sim2d.controller.Sim2DConfig;
+import playground.gregor.sim2d.events.XYZEventsGenerator;
+import playground.gregor.sim2d.events.XYZEventsManager;
 import playground.gregor.sim2d.peekabot.Sim2DVis;
 
+//import playground.gregor.sim2d.peekabot.PeekABotClient;
+
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class Sim2D {
@@ -38,9 +64,10 @@ public class Sim2D {
 	protected final PriorityBlockingQueue<Agent2D>  agentsToRemoveList  = new PriorityBlockingQueue<Agent2D>(500, new Agent2DDepartureTimeComparator());
 
 	private Sim2DVis sim2DVis;
+	private XYZEventsGenerator xyzEventsGen = null;
 	
 	
-	public Sim2D(final Network network, final Map<MultiPolygon,List<Link>> floors, final Population plans, final EventsManager events, final StaticForceField sff, final Config config){
+	public Sim2D(final Network network, final Map<MultiPolygon,List<Link>> floors, final Map<Id,LineString> ls, final Population plans, final EventsManager events, final SegmentedStaticForceField sff, final Config config){
 		this.config = config;
 		this.endTime = 9*3600+30*60;
 		this.network = (NetworkLayer) network;
@@ -48,11 +75,11 @@ public class Sim2D {
 		for (Entry<MultiPolygon,List<Link>> e : floors.entrySet()) {
 			f.put(e.getKey(),this.network);
 		}
-		this.network2D = new Network2D(this.network,f,sff);
+		this.network2D = new Network2D(this.network,f,sff,ls);
 
 		this.population = plans;
 		setEvents(events);
-		SimulationTimer.reset(1);
+		SimulationTimer.reset(Sim2DConfig.TIME_STEP_SIZE);
 	}
 
 
@@ -76,7 +103,7 @@ public class Sim2D {
 	private boolean doSimStep(double time) {
 		handleActivityEnds(time);
 		handleAgentRemoves(time);
-		moveFloors();
+		this.network2D.move(time);
 		if (time >= this.endTime) {
 			return false;
 		}
@@ -87,8 +114,7 @@ public class Sim2D {
 		while (this.agentsToRemoveList.peek() != null) {
 			Agent2D agent = this.agentsToRemoveList.poll();
 			//TODO works only as long as there is only one floor!!
-			Floor floor = this.network2D.getFloors().get(0);
-			floor.removeAgent(agent);
+			this.network2D.removeAgent(agent);
 //			this.peekABotVis.removeBot(Integer.parseInt(agent.getId().toString()));
 		}
 	}
@@ -113,12 +139,6 @@ public class Sim2D {
 				return;
 			}
 		}
-	}
-
-	private void moveFloors() {
-				for (Floor floor : this.network2D.getFloors()) {
-					floor.move();
-				}
 	}
 
 
@@ -157,8 +177,8 @@ public class Sim2D {
 			Agent2D agent = new Agent2D(p,this);
 
 			if (agent.initialize()) {
-				Floor floor = this.network2D.getFloors().get(0);
-				floor.addAgent(agent);
+				this.network2D.addAgent(agent);
+				
 			}
 
 		}
@@ -169,6 +189,9 @@ public class Sim2D {
 	protected void afterSimStep(final double time) {
 		if (this.sim2DVis != null) {
 			this.sim2DVis.draw(time);
+		}
+		if (this.xyzEventsGen != null) {
+			this.xyzEventsGen.generateEvents(time);
 		}
 	}
 
@@ -203,7 +226,10 @@ public class Sim2D {
 
 
 
-
+	public void setXYZEventsManager(XYZEventsGenerator xyzEvents) {
+		this.xyzEventsGen  = xyzEvents;
+		this.xyzEventsGen.setNetwork2D(this.network2D);
+	}
 
 
 	public void setSim2DVis(Sim2DVis sim2DVis) {

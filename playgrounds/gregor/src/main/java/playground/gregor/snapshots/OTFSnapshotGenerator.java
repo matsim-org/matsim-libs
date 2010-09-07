@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * OTFSnapshotGenerator.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.gregor.snapshots;
 
 
@@ -36,12 +55,12 @@ import playground.gregor.snapshots.writers.SnapshotGenerator;
 public class OTFSnapshotGenerator {
 
 	public static String SHARED_SVN = "../../../../../arbeit/svn/shared-svn/studies";
-		public static String RUNS_SVN = "../../../../../arbeit/svn/runs-svn/run1019/output";
+		public static String RUNS_SVN = "../../../../../arbeit/svn/runs-svn/run1020/output";
 //		public static String RUNS_SVN = "/home/laemmel/devel/EAF/output";
 //	public static String RUNS_SVN = "../../../matsim/test/output/org/matsim/evacuation/run/ShelterEvacuationControllerTest/testShelterEvacuationController";
 	
 	public static String MVI_FILE;
-	private static boolean firstIteration = false;
+	private static boolean firstIteration = true;
 
 
 	private final String lsFile;
@@ -69,7 +88,7 @@ public class OTFSnapshotGenerator {
 		this.scenario.getConfig().simulation().setSnapshotFormat("otfvis");
 		this.scenario.getConfig().simulation().setSnapshotPeriod(60);
 		//		this.scenario.getConfig().simulation().setEndTime(4*3600+30*60);
-		if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.night) {
+		if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.night || this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.from_file) {
 			this.startTime = 3 * 3600.;
 			this.scenario.getConfig().simulation().setEndTime(5*3600);	
 		} else if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.day) {
@@ -78,7 +97,9 @@ public class OTFSnapshotGenerator {
 		} else if (this.scenario.getConfig().evacuation().getEvacuationScanrio() == EvacuationScenario.afternoon) {
 			this.startTime = 16 * 3600.;
 			this.scenario.getConfig().simulation().setEndTime(18*3600);
-		}
+		} 
+		
+//		this.scenario.getConfig().simulation().set
 		this.scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 
 		this.scenario.getConfig().evacuation().setBuildingsFile(SHARED_SVN + "/countries/id/padang/gis/buildings_v20100315/evac_zone_buildings_v20100315.shp");
@@ -91,7 +112,8 @@ public class OTFSnapshotGenerator {
 			it = 0;
 		}
 //		it = 250;
-		MVI_FILE = RUNS_SVN + "/movie.it" + it + ".mvi";
+//		MVI_FILE = RUNS_SVN + "/movie.it" + it + ".mvi";
+		MVI_FILE = "/home/laemmel/tmp/flooding.mvi";
 		sl.loadNetwork();
 		this.eventsFile = RUNS_SVN + "/ITERS/it." + it + "/" + it + ".events.txt.gz";
 
@@ -118,9 +140,10 @@ public class OTFSnapshotGenerator {
 		} 
 		TimeDependentColorizer t = new TimeDependentColorizer(startTime);
 		ev.addHandler(t);
-		//		EventsImpl evII = new EventsImpl();
-		//		evII.addHandler(t);
-		//		new EventsReaderTXTv1(evII).readFile("../../outputs/output_inf_floCap/ITERS/it.0/0.events.txt.gz");
+		
+//		EventsManagerImpl evII = new EventsManagerImpl();
+//		evII.addHandler(t);
+//		new EventsReaderTXTv1(evII).readFile("/home/laemmel/devel/EAF/output/ITERS/it.0/0.events.txt.gz");
 
 		SheltersColorizer s = new SheltersColorizer(this.scenario.getConfig().evacuation().getBuildingsFile(),this.scenario.getConfig().simulation().getSnapshotPeriod(), this.scenario.getConfig().evacuation().getSampleSize());
 		ev.addHandler(s);
@@ -221,7 +244,7 @@ public class OTFSnapshotGenerator {
 	}
 
 	public static void main(String [] args) {
-		LABEL = "Run 3.3 (SO)";
+		LABEL = "Run 4.1 (SP)";
 		if (args.length == 3) {
 			String outputDir = args[0];
 			String svnRoot = args[1];

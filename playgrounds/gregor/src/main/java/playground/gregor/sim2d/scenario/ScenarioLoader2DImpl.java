@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ScenarioLoader2DImpl.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.gregor.sim2d.scenario;
 
 import java.io.IOException;
@@ -18,8 +37,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -30,15 +51,19 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.sim2d.controller.Sim2DConfig;
 import playground.gregor.sim2d.gisdebug.StaticForceFieldToShape;
+import playground.gregor.sim2d.network.NetworkFromLsFile;
 import playground.gregor.sim2d.network.NetworkLoader;
 import playground.gregor.sim2d.network.NetworkLoaderImpl;
 import playground.gregor.sim2d.network.NetworkLoaderImplII;
+import playground.gregor.sim2d.simulation.SegmentedStaticForceField;
 import playground.gregor.sim2d.simulation.StaticForceField;
 import playground.gregor.sim2d.simulation.StaticForceFieldGenerator;
+import playground.gregor.sim2d.simulation.StaticForceFieldGeneratorII;
 import playground.gregor.sim2d.simulation.StaticForceFieldReader;
 import playground.gregor.sim2d.simulation.StaticForceFieldWriter;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
@@ -46,6 +71,10 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 	private Map<MultiPolygon, List<Link>> mps;
 
 	private StaticForceField sff;
+	
+	private SegmentedStaticForceField ssff;
+
+	private HashMap<Id, LineString> lsmp;
 
 	public ScenarioLoader2DImpl(ScenarioImpl scenarioData) {
 		super(scenarioData);
@@ -53,10 +82,21 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 
 	@Override
 	public void loadNetwork() {
+		if (Sim2DConfig.NETWORK_LOADER_LS) {
+			loadLsMp();
+			NetworkFromLsFile loader = new NetworkFromLsFile(getScenario(),this.lsmp);
+			loader.loadNetwork();
+			loadMps();
+			loadStaticForceFieldII(loader.getLinkSubLinkMapping());
+			return;
+		}
+		
+		
+		
 		if (Sim2DConfig.LOAD_NETWORK_FROM_XML_FILE) {
 			super.loadNetwork();
 			loadMps();
-
+			loadLsMp();
 		} else if (!Sim2DConfig.NETWORK_LOADERII) {
 			NetworkLoader loader = new NetworkLoaderImpl(getScenario().getNetwork(), getScenario().getConfig().charyparNagelScoring());
 			this.mps = loader.getFloors();
@@ -84,8 +124,37 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 			loader.loadNetwork();
 			new NetworkWriter(getScenario().getNetwork()).write(getScenario().getConfig().network().getInputFile());
 			loadMps();
+			loadLsMp();
 		}
 		loadStaticForceField();
+	}
+
+
+
+	private void loadLsMp() {
+		FeatureSource fs = null;
+		try {
+			fs = ShapeFileReader.readDataFile(Sim2DConfig.LS_SHAPE_FILE);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		Iterator it = null;
+		try {
+			it = fs.getFeatures().iterator();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		
+		this.lsmp = new HashMap<Id, LineString>();
+		
+		while (it.hasNext()) {
+			Feature ft = (Feature) it.next();
+			Id id = new IdImpl((Long) ft.getAttribute("ID"));
+			this.lsmp.put(id, (LineString) ft.getDefaultGeometry().getGeometryN(0));
+			
+		}
+		
 	}
 
 	private void loadMps() {
@@ -134,14 +203,22 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 
 	}
 
+	private void loadStaticForceFieldII(Map<Id, List<Id>> linkSubLinkMapping) {
+		this.ssff = new StaticForceFieldGeneratorIII(linkSubLinkMapping).getStaticForceField();
+		
+		
+	}
+
+	
 	private void loadStaticForceField() {
 		if (Sim2DConfig.LOAD_STATIC_FORCE_FIELD_FROM_FILE) {
 			this.sff = new StaticForceFieldReader(Sim2DConfig.STATIC_FORCE_FIELD_FILE).getStaticForceField();
 		} else {
-			this.sff = new StaticForceFieldGenerator(this.mps.keySet().iterator().next()).loadStaticForceField();
+//			this.sff = new StaticForceFieldGenerator(this.mps.keySet().iterator().next()).loadStaticForceField();
+			this.sff = new StaticForceFieldGeneratorII(this.mps.keySet().iterator().next()).loadStaticForceField();
 			new StaticForceFieldWriter().write(Sim2DConfig.STATIC_FORCE_FIELD_FILE, this.sff);
 		}
-		new StaticForceFieldToShape(this.sff).createShp();
+//		new StaticForceFieldToShape(this.sff).createShp();
 	}
 
 	public Map<MultiPolygon,List<Link>> getFloorLinkMapping() {
@@ -150,6 +227,14 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 
 	public StaticForceField getStaticForceField() {
 		return this.sff;
+	}
+
+	public Map<Id,LineString> getLsMap() {
+		return this.lsmp;
+	}
+
+	public SegmentedStaticForceField getSegmentedStaticForceField() {
+		return this.ssff;
 	}
 
 }

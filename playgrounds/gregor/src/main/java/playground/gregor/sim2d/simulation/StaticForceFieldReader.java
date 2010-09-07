@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * StaticForceFieldReader.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.gregor.sim2d.simulation;
 
 import java.io.IOException;
@@ -17,7 +36,7 @@ public class StaticForceFieldReader extends MatsimXmlParser {
 	
 	private static final Logger log = Logger.getLogger(StaticForceFieldReader.class);
 	
-	private List<Force> forces;
+	private Stack<Force> forces;
 
 	private double maxY = Double.NEGATIVE_INFINITY;
 
@@ -40,7 +59,8 @@ public class StaticForceFieldReader extends MatsimXmlParser {
 	}
 	
 	private void readStaticForceField() {
-		this.forces = new ArrayList<Force>();
+		this.forces = new Stack<Force>();
+		log.info("parsing static force file...");
 		try {
 			super.parse(this.file);
 		} catch (SAXException e) {
@@ -50,11 +70,15 @@ public class StaticForceFieldReader extends MatsimXmlParser {
 		} catch (IOException e) {
 			log.fatal("Error during parsing.", e);
 		}
+		log.info("done.");
+		
+		log.info("loading forces into quad tree...");
 		this.ret = new QuadTree<Force>(this.minX,this.minY,this.maxX,this.maxY);
-		for (Force f : this.forces) {
+		while (this.forces.size() > 0) {
+			Force f = this.forces.pop();
 			this.ret.put(f.getXCoord(), f.getYCoord(), f);
 		}
-	
+		log.info("done.");
 	}
 
 	public StaticForceField getStaticForceField() {
@@ -68,7 +92,7 @@ public class StaticForceFieldReader extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(this.currentForce != null) {
-			this.forces.add(this.currentForce);
+			this.forces.push(this.currentForce);
 			this.currentForce = null;
 		}
 	}

@@ -1,6 +1,27 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Agent2D.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.gregor.sim2d.simulation;
 
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -26,7 +47,7 @@ public class Agent2D  {
 
 	private static final Logger log = Logger.getLogger(Agent2D.class);
 
-	private static final double ACTIVITY_DIST = 1.0;
+	private static final double ACTIVITY_DIST = 3.0;
 
 	private final Person person;
 	private final Plan currentPlan;
@@ -44,9 +65,9 @@ public class Agent2D  {
 
 	private AgentState state;
 
-	private final double disieredVelocity = 1 + MatsimRandom.getRandom().nextDouble()-0.25;
-//	private final double disieredVelocity = 1.34;
-	private final double weight = 1000*(90 + 40*MatsimRandom.getRandom().nextDouble()-20);
+//	private final double disieredVelocity = 1 + MatsimRandom.getRandom().nextDouble()-0.25;
+	private final double disieredVelocity = 1.35 + MatsimRandom.getRandom().nextDouble()/2-0.25;
+	private final double weight = 80*1000;//1000*(90 + 40*MatsimRandom.getRandom().nextDouble()-20);
 
 	private Activity currentAct;
 
@@ -54,6 +75,7 @@ public class Agent2D  {
 
 	private Activity oldAct;
 
+	private ArrayList<Agent2D> neighbors = new ArrayList<Agent2D>();
 
 	public Agent2D(Person p, Sim2D sim2D) {
 		this.person = p;
@@ -181,6 +203,14 @@ public class Agent2D  {
 			return true;
 		}
 		return false;
+	}
+	
+	public ArrayList<Agent2D> getNeighbors() {
+		return this.neighbors;
+	}
+	
+	public void setNeighbors(ArrayList<Agent2D> neighbors) {
+		this.neighbors = neighbors;
 	}
 
 }

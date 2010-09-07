@@ -24,7 +24,7 @@ import playground.gregor.snapshots.writers.PositionInfo;
 
 public class EvacuationLinksTeleporter implements PostProcessorI{
 
-	private final static double TELEPORTATION_SPEED = 100.0;
+	private final static double TELEPORTATION_SPEED = -100.0;
 	protected final static String TELEPORTATION_X = "0.0";
 	protected final static String TELEPORTATION_Y = "0.0";
 	protected final static double D_TELEPORTATION_X = 0.0;

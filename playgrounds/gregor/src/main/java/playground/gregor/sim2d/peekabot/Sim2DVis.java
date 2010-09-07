@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Sim2DVis.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.gregor.sim2d.peekabot;
 
 import java.util.List;
@@ -59,6 +78,7 @@ public class Sim2DVis {
 
 	public void draw(double time) {
 
+		//sync mode
 		long wait = (long) ((this.oldSystemTime + (1000*Sim2DConfig.TIME_STEP_SIZE)) - System.currentTimeMillis());
 		if (wait > 0) {
 			try {
@@ -68,7 +88,8 @@ public class Sim2DVis {
 			}
 		}
 
-		this.oldSystemTime = System.currentTimeMillis();			
+		this.oldSystemTime = System.currentTimeMillis();
+				
 		for (Floor floor : this.network2d.getFloors()) {
 			draw(floor);
 		}

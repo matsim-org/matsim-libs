@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Force.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.gregor.sim2d.simulation;
 
 public class Force {
@@ -58,15 +77,15 @@ public class Force {
 		return this.oldY;
 	}
 
-	//DEBUG
-	double interactionX = 0;
-	double interactionY = 0;
-	double envX = 0;
-	double envY = 0;
-	double driveX = 0;
-	double driveY = 0;
-	double pathX = 0;
-	double pathY = 0;
+//	//DEBUG
+//	double interactionX = 0;
+//	double interactionY = 0;
+//	double envX = 0;
+//	double envY = 0;
+//	double driveX = 0;
+//	double driveY = 0;
+//	double pathX = 0;
+//	double pathY = 0;
 
 
 }
