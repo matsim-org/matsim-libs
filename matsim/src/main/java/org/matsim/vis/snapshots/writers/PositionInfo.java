@@ -20,9 +20,7 @@
 
 package org.matsim.vis.snapshots.writers;
 
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 /**
  * A helper class to store information about agents (id, position, speed), mainly used to create
@@ -34,7 +32,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author mrieser, knagel
  */
 public class PositionInfo implements AgentSnapshotInfo {
-	
+
 	private static final long serialVersionUID = -8168936182264521667L;
 
 	private Id agentId;
@@ -47,44 +45,10 @@ public class PositionInfo implements AgentSnapshotInfo {
 	private Id linkId;
 	private int type = 0;
 	private int user = 0;
-	
+
 	/* package-private */ PositionInfo() { }
-	
-//	/**
-//	 * This is here so that the data class can be initialized in an incomplete state.  
-//	 */
-//	/* package-private */ PositionInfo( final Id agentId ) {
-//		this.agentId = agentId ;
-//	}
-	
 
-//	/* package-private */ PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth ) {
-//		this.agentId = driverId;
-//		this.linkId = null;
-//		this.easting = easting;
-//		this.northing = northing;
-//		this.elevation = elevation;
-//		this.azimuth = azimuth;
-//	}
-
-
-//	/**
-//	 * Creates a new PositionInfo with the specified position and speed.
-//	 *
-//	 * @param driverId
-//	 * @param easting
-//	 * @param northing
-//	 * @param elevation
-//	 * @param azimuth
-//	 * @param speed
-//	 * @param agentState The state of the vehicle (Parking, Driving)
-//	 */
-//	protected PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final AgentState agentState) {
-//		this( driverId, easting, northing, elevation, azimuth ) ;
-//		this.speed = speed;
-//		this.agentState = agentState;
-//	}
-	
+	@Override
 	public final Id getId() {
 		return this.agentId;
 	}
@@ -92,6 +56,7 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.agentId = tmp ;
 	}
 
+	@Override
 	public final double getEasting() {
 		return this.easting;
 	}
@@ -99,6 +64,7 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.easting = tmp ;
 	}
 
+	@Override
 	public final double getNorthing() {
 		return this.northing;
 	}
@@ -106,6 +72,7 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.northing = tmp ;
 	}
 
+	@Override
 	public final double getElevation() {
 		return this.elevation;
 	}
@@ -113,6 +80,7 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.elevation = tmp ;
 	}
 
+	@Override
 	public final double getAzimuth() {
 		return this.azimuth;
 	}
@@ -120,16 +88,20 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.azimuth = tmp ;
 	}
 
+	@Override
 	public final double getColorValueBetweenZeroAndOne() {
 		return this.colorValue;
 	}
+	@Override
 	public final void setColorValueBetweenZeroAndOne( double tmp ) {
 		this.colorValue = tmp ;
 	}
 
+	@Override
 	public final AgentState getAgentState(){
 		return this.agentState;
 	}
+	@Override
 	public final void setAgentState( AgentState state ) {
 		this.agentState = state ;
 	}
@@ -141,27 +113,31 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.linkId = tmp ;
 	}
 
+	@Override
 	@Deprecated // yyyy I don't know what this is.  kai, jan'10
 	public int getType() {
 		return this.type;
 	}
-	
+
+	@Override
 	@Deprecated // yyyy I don't know what this is.  kai, jan'10
 	public void setType( int tmp ) {
 		this.type = tmp ;
 	}
 
+	@Override
 	public int getUserDefined() {
 		return this.user;
 	}
+	@Override
 	public void setUserDefined( int tmp ) {
 		this.user = tmp ;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "PositionInfo; agentId: " + this.agentId.toString() 
-		+ " easting: " + this.easting 
+		return "PositionInfo; agentId: " + this.agentId.toString()
+		+ " easting: " + this.easting
 		+ " northing: " + this.northing ;
 	}
 

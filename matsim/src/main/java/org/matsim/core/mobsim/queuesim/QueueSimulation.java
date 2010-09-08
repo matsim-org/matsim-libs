@@ -20,10 +20,8 @@
 
 package org.matsim.core.mobsim.queuesim;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -44,11 +42,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerIO;
-import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
@@ -120,7 +116,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
 	 */
-	private final PriorityQueue<Tuple<Double, PersonAgent>> teleportationList = 
+	private final PriorityQueue<Tuple<Double, PersonAgent>> teleportationList =
 		new PriorityQueue<Tuple<Double, PersonAgent>>(30, new TeleportationArrivalTimeComparator());
 
 	private final Date starttime = new Date();
@@ -133,7 +129,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	private SimulationListenerManager listenerManager;
 
-	private final PriorityBlockingQueue<PersonAgent> activityEndsList = 
+	private final PriorityBlockingQueue<PersonAgent> activityEndsList =
 		new PriorityBlockingQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
 
 	private Scenario scenario = null;

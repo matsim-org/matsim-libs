@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.vis.otfvis.gui;
 
 import java.rmi.RemoteException;
@@ -15,7 +34,6 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
-import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 public class OTFHostControl {
 
@@ -42,7 +60,7 @@ public class OTFHostControl {
 		Collection<Double> steps = getTimeStepsdrawer();
 		if (steps != null) {
 			// Movie mode with timesteps
-			Double[] dsteps = steps.toArray(new Double[steps.size()]);		
+			Double[] dsteps = steps.toArray(new Double[steps.size()]);
 			int min = dsteps[0].intValue();
 			int max = dsteps[dsteps.length-1].intValue();
 			simTime = new DefaultBoundedRangeModel(min, 0 /* extent */, min, max);

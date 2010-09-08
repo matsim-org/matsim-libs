@@ -39,8 +39,6 @@ public class CountsConfigGroup extends Module {
 	private static final String COUNTSINPUTFILENAME = "inputCountsFile";
 	private static final String COUNTSSCALEFACTOR = "countsScaleFactor";
 
-	private String outputFile;
-
 	private String outputFormat;
 
 	/**

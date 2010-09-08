@@ -21,9 +21,7 @@ package org.matsim.vis.otfvis.data.teleportation;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
  *
@@ -78,14 +76,17 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 		//		log.error("currentY " + currentY);
 	}
 
+	@Override
 	public double getEasting() {
 		return this.currentX;
 	}
 
+	@Override
 	public double getNorthing() {
 		return this.currentY;
 	}
 
+	@Override
 	public Id getId(){
 		return this.agentId;
 	}

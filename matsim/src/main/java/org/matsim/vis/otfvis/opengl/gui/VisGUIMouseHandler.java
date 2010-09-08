@@ -36,7 +36,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.rmi.RemoteException;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;

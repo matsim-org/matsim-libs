@@ -45,7 +45,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
-import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 public final class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener {
 

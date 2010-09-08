@@ -28,9 +28,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 
-import visad.UnimplementedException;
-import visad.data.netcdf.UnsupportedOperationException;
-
 /**
  * Wraps the {@link org.matsim.population.algorithms.PlanMutateTimeAllocation}-
  * PlanAlgorithm into a {@link PlanStrategyModule} so it can be used for plans

@@ -34,9 +34,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D.Double;
-import java.rmi.RemoteException;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.JComponent;
 
@@ -75,13 +74,13 @@ abstract class OTFSwingDrawable implements OTFDrawable, OTFDataReceiver{
  * @author dstrippgen
  */
 public class OTFSwingDrawer extends JComponent {
-	
+
 	public static Graphics2D g2d = null;
 
 	private static final Color netColor = new Color(180,180,210,128);
-	
+
 	double scale = 1;
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private static final float linkWidth = 100;
@@ -93,7 +92,7 @@ public class OTFSwingDrawer extends JComponent {
 	private final OTFClientQuad quad;
 
 	private OTFQueryHandler queryHandler;
-	
+
 	OTFHostControlBar hostControlBar;
 
 	private OTFSwingDrawerContainer parentDrawer;
@@ -144,11 +143,11 @@ public class OTFSwingDrawer extends JComponent {
 		return networkClippingMaxNorthing() - (0 - 1);
 	}
 
-	
+
 	public float getScale() {
 		return (float) scale;
 	}
-	
+
 	AffineTransform getBoxTransform() {
 
 		// two original extreme coordinates ...
@@ -263,7 +262,7 @@ public class OTFSwingDrawer extends JComponent {
 				quad[3].x = resizer/this.oldResizer * (quad[3].x - quad[1].x) + quad[1].x;
 				quad[3].y = resizer/this.oldResizer * (quad[3].y - quad[1].y) + quad[1].y;
 				this.oldResizer=resizer;
-				
+
 				poly.addPoint((int)(quad[0].x), (int)(quad[0].y));
 				poly.addPoint((int)(quad[1].x), (int)(quad[1].y));
 				poly.addPoint((int)(quad[3].x), (int)(quad[3].y));
@@ -272,14 +271,14 @@ public class OTFSwingDrawer extends JComponent {
 				display.fill(poly);
 			}
 
-			
+
 			// Show LinkIds
 			if (OTFClientControl.getInstance().getOTFVisConfig().drawLinkIds()){
 			    float idSize = 4*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
-			    int fontSize = (int)idSize; 
+			    int fontSize = (int)idSize;
 			    float middleX = (float)(0.5*this.quad[0].x + (0.5)*this.quad[3].x);
 			    float middleY = (float)(0.5*this.quad[0].y + (0.5)*this.quad[3].y);
-				Line2D line = new Line2D.Float(middleX, middleY, (float)(middleX + idSize),(float)(middleY + idSize));
+				Line2D line = new Line2D.Float(middleX, middleY, (middleX + idSize),(middleY + idSize));
 				display.setColor(Color.blue);
 				display.draw(line);
 				java.awt.Font font_old = display.getFont();
@@ -296,8 +295,8 @@ public class OTFSwingDrawer extends JComponent {
 				display.transform(tx);
 				display.setFont(font_old);
 			}
-		    
-			
+
+
 			//display.setColor(Color.BLUE);
 			//display.draw(poly);
 		}
@@ -360,7 +359,7 @@ public class OTFSwingDrawer extends JComponent {
 			//			final int lane = (RANDOMIZE_LANES ? (agent.hashCode()
 			//			% lanes + 1) : agent.getLane());
 
-			
+
 			final double agentWidth = linkWidth *0.9;
 			final double agentLength = agentWidth*0.9;
 			float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
@@ -373,7 +372,7 @@ public class OTFSwingDrawer extends JComponent {
 				display.setColor(color);
 			}
 //			display.fillOval((int)Math.round(pos.x + offsetX), (int)pos.y, (int)Math.round(agentLength), (int)Math.round(agentWidth));
-			display.fillOval((int)Math.round(pos.x + offsetX), (int)pos.y, (int)Math.round(agentSize), (int)Math.round(agentSize));
+			display.fillOval((int)Math.round(pos.x + offsetX), (int)pos.y, Math.round(agentSize), Math.round(agentSize));
 		}
 
 	}
@@ -392,7 +391,7 @@ public class OTFSwingDrawer extends JComponent {
 		Rectangle2D.Double origRect = new Rectangle2D.Double(currentRect.x + this.quad.offsetEast, currentRect.y + this.quad.offsetNorth, currentRect.width, currentRect.height);
 		if(this.queryHandler != null) this.queryHandler.handleClick(this.quad.getId(), origRect, button);
 	}
-	
+
 	public void setQueryHandler(OTFQueryHandler queryHandler) {
 		if(queryHandler != null) this.queryHandler = queryHandler;
 	}
