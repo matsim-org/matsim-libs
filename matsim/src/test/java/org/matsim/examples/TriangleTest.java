@@ -30,7 +30,6 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -135,7 +134,6 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("  running network modules... ");
 		NetworkSummary ns_algo = new NetworkSummary();
 		ns_algo.run(network);
-		new NetworkCalcTopoType().run(network);
 		log.info("  done.");
 
 		log.info("\n");

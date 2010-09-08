@@ -39,7 +39,7 @@ public class FacilityMoveTest extends MatsimTestCase {
 	private static final Id ZONE_ID = new IdImpl("zone");
 
 	private static final Coord[] COORDS = {
-		new CoordImpl(1.0,1.0), new CoordImpl(0.5,1.0), new CoordImpl(0.5,0.5),
+		new CoordImpl(1.0,1.0), new CoordImpl(0.5,1.0), new CoordImpl(0.5,0.6),
 		new CoordImpl(0.0,0.0), new CoordImpl(-0.5,-0.5)
 	};
 	private static final String[] F_UP_ZONEID = { "z", "z", "z", "z00", null };
@@ -88,8 +88,9 @@ public class FacilityMoveTest extends MatsimTestCase {
 		}
 		else { assertEquals(0,f.getUpMapping().size()); }
 
-		if (world.getLayer(NetworkLayer.LAYER_TYPE) != null) { assertEquals(F_DOWN_LINKID[i],f.getLinkId().toString()); }
-		else { assertEquals(0,f.getDownMapping().size()); }
+		if (world.getLayer(NetworkLayer.LAYER_TYPE) != null) {
+			assertEquals(F_DOWN_LINKID[i],f.getLinkId().toString());
+		 } else { assertEquals(0,f.getDownMapping().size()); }
 	}
 
 	//////////////////////////////////////////////////////////////////////
