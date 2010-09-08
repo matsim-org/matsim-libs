@@ -257,10 +257,12 @@ public class QuadTree<T> implements Serializable {
 							return this.next;
 						}
 
+						@Override
 						public boolean hasNext() {
 							return this.next != null;
 						}
 
+						@Override
 						public T next() {
 							if (this.next == null) {
 								return null;
@@ -292,6 +294,7 @@ public class QuadTree<T> implements Serializable {
 							}
 						}
 
+						@Override
 						public void remove() {
 							throw new UnsupportedOperationException();
 						}
@@ -580,19 +583,23 @@ public class QuadTree<T> implements Serializable {
 		/* default */ T get(final double x, final double y, final MutableDouble bestDistance) {
 			if (this.hasChilds) {
 				T closest = null;
-				if (this.northwest.bounds.calcDistance(x, y) < bestDistance.value) {
+				Node<T> bestChild = this.getChild(x, y);
+				if (bestChild != null) {
+					closest = bestChild.get(x, y, bestDistance);
+				}
+				if (bestChild != this.northwest && this.northwest.bounds.calcDistance(x, y) < bestDistance.value) {
 					T value = this.northwest.get(x, y, bestDistance);
 					if (value != null) { closest = value; }
 				}
-				if (this.northeast.bounds.calcDistance(x, y) < bestDistance.value) {
+				if (bestChild != this.northeast && this.northeast.bounds.calcDistance(x, y) < bestDistance.value) {
 					T value = this.northeast.get(x, y, bestDistance);
 					if (value != null) { closest = value; }
 				}
-				if (this.southeast.bounds.calcDistance(x, y) < bestDistance.value) {
+				if (bestChild != this.southeast && this.southeast.bounds.calcDistance(x, y) < bestDistance.value) {
 					T value = this.southeast.get(x, y, bestDistance);
 					if (value != null) { closest = value; }
 				}
-				if (this.southwest.bounds.calcDistance(x, y) < bestDistance.value) {
+				if (bestChild != this.southwest && this.southwest.bounds.calcDistance(x, y) < bestDistance.value) {
 					T value = this.southwest.get(x, y, bestDistance);
 					if (value != null) { closest = value; }
 				}
