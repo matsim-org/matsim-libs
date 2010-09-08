@@ -38,6 +38,42 @@ public class QuadTreePerformanceTest extends TestCase {
 	private static final Logger log = Logger.getLogger(QuadTreePerformanceTest.class);
 
 	/**
+	 * Test the performance of getting the nearest objects to a given coordinate in a QuadTree with a large number of entries.
+	 */
+	public void testGet() {
+		final double minX = 200000.0;
+		final double maxX = 400000.0;
+		final double minY = 500000.0;
+		final double maxY = 700000.0;
+
+		final long nOfEntries = 25000;
+		final long nOfQueries = 25000;
+
+		Random r = new Random(4711);
+		double deltaX = maxX - minX;
+		double deltaY = maxY - minY;
+
+		log.info("build quadtree, adding " + nOfEntries + " entries...");
+
+		QuadTree<Long> qt = new QuadTree<Long>(minX, minY, maxX, maxY);
+		for (long i = 0; i < nOfEntries; i++) {
+			double x = r.nextDouble() * deltaX + minX;
+			double y = r.nextDouble() * deltaY + minY;
+			qt.put(x, y, Long.valueOf(i));
+		}
+
+		log.info("start get-Queries");
+		Gbl.startMeasurement();
+		for (long i = 0; i < nOfQueries; i++) {
+			double x = r.nextDouble() * deltaX + minX;
+			double y = r.nextDouble() * deltaY + minY;
+			qt.get(x, y);
+		}
+		Gbl.printElapsedTime();
+		log.info("get-Queries ended.");
+	}
+
+	/**
 	 * Test the performance of iterating over a QuadTree with a large number of entries.
 	 */
 	public void testValuesIterator() {
@@ -71,4 +107,5 @@ public class QuadTreePerformanceTest extends TestCase {
 		log.info("iterator ended.");
 		assertEquals(nOfEntries, i);
 	}
+
 }
