@@ -45,6 +45,8 @@ public class UpdateXMLBindingClasses {
 	
 	private static final Logger log = Logger.getLogger(UpdateXMLBindingClasses.class);
 	
+	private static String helpMessage = null;
+	
 	private static String jaxBLocation = null;
 	private static String outputPackage = null;
 	private static String outputDirectory = null;
@@ -55,6 +57,15 @@ public class UpdateXMLBindingClasses {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+		// set help message
+		helpMessage = "Please run this program as described below:\n" +
+					  "java UpdateXMLBindingClasses --jaxbLocation=my path/libs/jaxb-2.1.7/bin/xjc.sh\n" +
+					  "Optional you can define:\n"+
+					  "- the location of your xsd file, otherwise a default xsd file from matsim.org is used: --xsdLocation=path/to/your/xsd.file\n" +
+					  "- the desired location of the generated binding classes: --destination=your/destination/path\n" +
+					  "- the desierd package structure: --package=your.desired.package.structure\n";
+					  
 		
 		// script to create jaxb bindings
 		log.info("Start generating xml bindings ...");
@@ -124,40 +135,38 @@ public class UpdateXMLBindingClasses {
 			else if ( parts[0].equals("--package") ) {
 				outputPackage = parts[1];
 			}
-			else if ( parts[0].equals("--help") ) {
-				log.info("Enter the location of the JAXB libary and the location of the schema file (xsd) as described below:");
-				log.info("java UpdateXMLParser --jaxbLocation=[path/to/your/jaxb/libar] --xsdLocation=[path/to/your/xsd.file]");
-			}
+			else if ( parts[0].equals("--help") )
+				log.info(helpMessage);
 		}
 		
 		tmpDirectory = CommonUtilities.getCurrentPath(UpdateXMLBindingClasses.class) + "tmp/"; // Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY;
 		boolean dirExsists = TempDirectoryUtil.createDirectory( tmpDirectory );
 		
 		if(jaxBLocation == null){
-			log.info("JAXB libary not given...");
-			// set default location
-			jaxBLocation = Constants.OPUS_HOME + "/libs/jaxb-2.1.7/bin/xjc.sh";
-			log.info("Set default location to: " + jaxBLocation);
+			log.warn("JAXB libary location to \"/jaxb/bin/xjc.sh\" not given.");
+//			// set default location
+//			jaxBLocation = Constants.OPUS_HOME + "/libs/jaxb-2.1.7/bin/xjc.sh";
+//			log.warn("Set default location to: " + jaxBLocation);
 		}
 		if(xsdLocation == null){
-			log.info("XSD location not given...");
+			log.warn("XSD location not given (optional)...");
 			// set default location			
 			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, tmpDirectory, "MATSim4UrbanSimConfigSchema.xsd");
 			xsdLocation = loadFile.loadMATSim4UrbanSimXSDString();
 			
-			log.info("Set xsd default location to: " + xsdLocation);
+			log.warn("Set xsd default location to: " + xsdLocation);
 		}
 		if(outputDirectory == null){
-			log.info("Destination not given...");
+			log.warn("Destination not given (optional)...");
 			// set default location
 			outputDirectory = Constants.MATSIM_WORKING_DIRECTORY + "/tnicolai/src/main/java/playground/tnicolai/urbansim/com/matsim/config";
-			log.info("Set default destination to: " + outputDirectory);
+			log.warn("Set default destination to: " + outputDirectory);
 		}
 		if(outputPackage == null){
-			log.info("Package name not given...");
+			log.warn("Package name not given (optional)...");
 			// set default location
 			outputPackage = "playground.tnicolai.urbansim.com.matsim.config";
-			log.info("Set default package name to: " + outputPackage);
+			log.warn("Set default package name to: " + outputPackage);
 		}
 
 		if( !(outputDirectory!= null && 
@@ -166,7 +175,10 @@ public class UpdateXMLBindingClasses {
 			  isValidLocataion(xsdLocation) && 
 			  tmpDirectory != null && 
 			  dirExsists) )
+		{
+			log.warn(helpMessage);
 			return false;
+		}
 		return true;
 	}
 	
