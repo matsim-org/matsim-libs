@@ -28,8 +28,6 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import visad.data.netcdf.UnsupportedOperationException;
-
 /**
  * Copy/Paste of TimeAllocationMutator, that calls TransitPlanMutateTimeAllocation instead
  * of PlanMutateTimeAllocation.
