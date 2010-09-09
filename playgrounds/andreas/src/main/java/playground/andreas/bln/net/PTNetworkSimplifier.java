@@ -377,8 +377,10 @@ public class PTNetworkSimplifier {
 	
 	public void simplifyPTNetwork(){
 
+		log.info("Start...");
 		Scenario scenario = new ScenarioImpl();
 		this.network = scenario.getNetwork();
+		log.info("Reading " + this.netInFile);
 		new MatsimNetworkReader(scenario).readFile(this.netInFile);
 					
 		ScenarioImpl osmScenario = new ScenarioImpl();
@@ -389,6 +391,7 @@ public class PTNetworkSimplifier {
 		ScenarioLoaderImpl osmLoader = new ScenarioLoaderImpl(osmScenario);
 		osmLoader.loadScenario();
 	
+		log.info("Reading " + this.scheduleInFile);
 		try {
 			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork()).readFile(this.scheduleInFile);
 		} catch (SAXException e) {
@@ -402,11 +405,14 @@ public class PTNetworkSimplifier {
 			e.printStackTrace();
 		}		
 
-		run(this.network, osmScenario.getTransitSchedule());
+		log.info("Running simplifier...");
+		run(this.network, osmScenario.getTransitSchedule());		
 		TransitScheduleCleaner.removeRoutesAndStopsOfLinesWithMissingLinksInNetwork(osmScenario.getTransitSchedule(), this.network);
 		
+		log.info("Writing network to " + this.netOutFile);
 		new NetworkWriter(this.network).write(this.netOutFile);
 		try {
+			log.info("Writing transit schedule to " + this.scheduleOutFile);
 			new TransitScheduleWriter(osmScenario.getTransitSchedule()).writeFile(this.scheduleOutFile);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
