@@ -38,6 +38,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
+import org.matsim.vis.kml.NetworkKmlStyleFactory;
 
 import playground.dgrether.DgPaths;
 
@@ -60,6 +61,8 @@ public class KmlNetworkVisualizer {
 	private FolderType mainFolder;
 
 	private KMZWriter writer;
+
+	private NetworkKmlStyleFactory styleFactory;
 
 	public KmlNetworkVisualizer(final Network network) {
 		this.network = network;
@@ -86,6 +89,8 @@ public class KmlNetworkVisualizer {
 			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(logo));
 			KmlNetworkWriter netWriter = new KmlNetworkWriter(this.network,
 					transform, this.writer, this.mainDoc);
+			
+			netWriter.setNetworkKmlStyleFactory(new DgNetworkKmlStyleFactory(this.writer, this.mainDoc));
 			FolderType networkFolder = netWriter.getNetworkFolder();
 			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(networkFolder));
 		} catch (IOException e) {
@@ -95,6 +100,10 @@ public class KmlNetworkVisualizer {
 		this.writer.writeMainKml(this.mainKml);
 		this.writer.close();
 		log.info("Network written to kmz!");
+	}
+	
+	public void setNetworkKmlStyleFactory(NetworkKmlStyleFactory styleFac){
+		this.styleFactory = styleFac;
 	}
 
 	protected static Network loadNetwork(final String networkFile) {

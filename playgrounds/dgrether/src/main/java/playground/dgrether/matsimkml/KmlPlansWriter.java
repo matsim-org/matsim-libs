@@ -38,6 +38,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
 import org.matsim.vis.kml.NetworkFeatureFactory;
+import org.matsim.vis.kml.NetworkKmlStyleFactory;
 
 
 /**
@@ -50,7 +51,7 @@ public class KmlPlansWriter {
 
 	private NetworkLayer network;
 
-	private MatsimKmlStyleFactory styleFactory;
+	private NetworkKmlStyleFactory styleFactory;
 
 	private NetworkFeatureFactory featureFactory;
 

@@ -53,6 +53,7 @@ import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
 import org.matsim.vis.kml.NetworkFeatureFactory;
+import org.matsim.vis.kml.NetworkKmlStyleFactory;
 
 public class KMLPersonWriter {
 
@@ -73,7 +74,7 @@ public class KMLPersonWriter {
 	protected boolean writeRouteNodes = true;
 	protected boolean writeNetwork = false;
 
-	private MatsimKmlStyleFactory styleFactory;
+	private NetworkKmlStyleFactory styleFactory;
 	private final ObjectFactory kmlObjectFactory = new ObjectFactory();
 	private StyleType networkLinkStyle;
 	private NetworkFeatureFactory networkFeatureFactory;

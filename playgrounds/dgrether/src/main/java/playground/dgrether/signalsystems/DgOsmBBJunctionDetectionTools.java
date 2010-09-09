@@ -53,7 +53,6 @@ import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
 import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
 import org.openstreetmap.osmosis.core.xml.v0_6.XmlWriter;
 
-import playground.dgrether.DgPaths;
 import playground.dgrether.osm.OSMEntityCollector;
 import playground.mzilske.osm.NetworkSink;
 import de.micromata.opengis.kml.v_2_2_0.ColorMode;
@@ -82,7 +81,6 @@ public class DgOsmBBJunctionDetectionTools {
 		this.targetCRS = MGC.getCRS(TransformationFactory.WGS84);
 		this.geoCalculator = new GeodeticCalculator(this.targetCRS);
 		log.info("axis unit " + this.geoCalculator.getEllipsoid().getAxisUnit());
-
 	}
 	
 	
@@ -238,6 +236,18 @@ public class DgOsmBBJunctionDetectionTools {
 	}
 
 	
+	private void writeJunctionNodesToOsm(
+			List<Set<org.matsim.api.core.v01.network.Node>> junctionNodes, String osmJunctionsOutFile) {
+
+		DgOsmJunctionSource junctionSource = new DgOsmJunctionSource(junctionNodes);
+		XmlWriter writer = new XmlWriter(new File(osmJunctionsOutFile), CompressionMethod.None);
+		junctionSource.setSink(writer);
+		junctionSource.run();
+		writer.complete();
+		
+	}
+
+	
 	
 	private void writeJunctionNodesToKml(List<Set<org.matsim.api.core.v01.network.Node>> junctions, String kmlJunctionsOutFile) {
 		CoordinateTransformation coordtransform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84);
@@ -293,8 +303,8 @@ public class DgOsmBBJunctionDetectionTools {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String baseInDirOsm = DgPaths.SHAREDSVN + "studies/countries/de/osm_berlinbrandenburg/workingset/";
-		String baseInDirTest = DgPaths.STUDIESDG + "osmBerlinSzenario/";
+		String baseInDirOsm = DgOsmBBPaths.BASE_IN_DIR;
+		String baseInDirTest = DgOsmBBPaths.BASE_OUT_DIR;
 		
 		boolean test = false;
 		
@@ -329,7 +339,8 @@ public class DgOsmBBJunctionDetectionTools {
 		
 		String nodesOutOsmFile = baseOutDir + "potential_junction_nodes.osm";
 		String nodesOutReportFile = baseOutDir + "nodes_filter_report.txt";
-		String netOutFile = baseOutDir + "network.xml";
+		String netOutFile = DgOsmBBPaths.NETWORK_GENERATED;
+		String osmJunctionsOutFile = baseOutDir + "osm_bb_junctions.osm";
 		String kmlJunctionsOutFile = baseOutDir + "junctions.kml";
 		String kmlNetworkOutFile = baseOutDir + "network.kml";
 		
@@ -342,6 +353,10 @@ public class DgOsmBBJunctionDetectionTools {
 		
 		List<Set<org.matsim.api.core.v01.network.Node>> junctionNodes = tools.detectAllJunctions(signalizedOsmNodes, network);
 		
+		log.info("writing osm output...");
+		
+		tools.writeJunctionNodesToOsm(junctionNodes, osmJunctionsOutFile);
+		
 		log.info("writing kml output...");
 		tools.writeJunctionNodesToKml(junctionNodes, kmlJunctionsOutFile);
 		
@@ -351,7 +366,5 @@ public class DgOsmBBJunctionDetectionTools {
 		signalizedOsmNodes.reset();
 		log.info("done!");
 	}
-
-	
 	
 }
