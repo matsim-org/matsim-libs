@@ -238,7 +238,7 @@ public class PTNetworkSimplifier {
 				this.network.getLinks().size() + " links.");
 		log.info("done.");
 		
-		TransitScheduleCleaner.removeRoutesAndStopsOfLinesWithMissingLinksInNetwork(this.transitSchedule, this.network);
+		TransitScheduleCleaner.removeAllRoutesWithMissingLinksFromSchedule(this.transitSchedule, this.network);
 		TransitScheduleCleaner.removeEmptyLines(this.transitSchedule);
 		TransitScheduleCleaner.removeStopsNotUsed(this.transitSchedule);
 	}
@@ -407,7 +407,7 @@ public class PTNetworkSimplifier {
 
 		log.info("Running simplifier...");
 		run(this.network, osmScenario.getTransitSchedule());		
-		TransitScheduleCleaner.removeRoutesAndStopsOfLinesWithMissingLinksInNetwork(osmScenario.getTransitSchedule(), this.network);
+		TransitScheduleCleaner.removeAllRoutesWithMissingLinksFromSchedule(osmScenario.getTransitSchedule(), this.network);
 		
 		log.info("Writing network to " + this.netOutFile);
 		new NetworkWriter(this.network).write(this.netOutFile);

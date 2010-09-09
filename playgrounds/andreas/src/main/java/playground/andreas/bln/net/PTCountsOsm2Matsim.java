@@ -12,8 +12,6 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.xml.sax.SAXException;
 
-import com.sun.xml.xsom.impl.scd.Iterators.Map;
-
 import playground.andreas.bln.net.osm2counts.Osm2Counts;
 import playground.mzilske.osm.OsmPrepare;
 import playground.mzilske.osm.OsmTransitMain;
@@ -36,7 +34,7 @@ public class PTCountsOsm2Matsim {
 		String[] streetFilter = new String[]{"motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary"};
 		
 //		String[] transitFilter = new String[]{"ferry", "subway", "light_rail", "tram", "train", "bus", "trolleybus"};
-		String[] transitFilter = new String[]{"fdsf"};
+		String[] transitFilter = new String[]{"bus"};
 		
 		OsmPrepare osmPrepare = new OsmPrepare(osmRepository + osmFile, filteredOsmFile, streetFilter, transitFilter);
 		osmPrepare.prepareOsm();
