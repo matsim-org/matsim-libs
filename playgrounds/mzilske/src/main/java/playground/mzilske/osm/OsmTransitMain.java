@@ -3,6 +3,7 @@ package playground.mzilske.osm;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -12,6 +13,8 @@ import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
 import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
 
 public class OsmTransitMain {
+	
+	private final static Logger log = Logger.getLogger(OsmTransitMain.class);
 	
 	String inFile;
 	String fromCoordSystem;
@@ -32,7 +35,12 @@ public class OsmTransitMain {
 	}
 	
 	public void convertOsm2Matsim(){
+		convertOsm2Matsim(null);
+	}
 		
+	public void convertOsm2Matsim(String[] transitFilter){
+		
+		log.info("Start...");		
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
 		JOSMTolerantFastXMLReader reader = new JOSMTolerantFastXMLReader(new File(inFile), false, CompressionMethod.None);		
@@ -67,17 +75,22 @@ public class OsmTransitMain {
 		// Spielstrassen
 		networkGenerator.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300, false);
 		
+		log.info("Reading " + this.inFile);
 		TransitNetworkSink transitNetworkSink = new TransitNetworkSink(scenario.getNetwork(), scenario.getTransitSchedule(), coordinateTransformation, IdTrackerType.BitSet);
+		transitNetworkSink.setTransitModes(transitFilter);
 		reader.setSink(networkGenerator);
 		networkGenerator.setSink(transitNetworkSink);
 		reader.run();
+		log.info("Writing network to " + this.networkOutFile);
 		new NetworkWriter(scenario.getNetwork()).write(this.networkOutFile);
 		try {
+			log.info("Writing transit schedule to " + this.transitScheduleOutFile);
 			new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(this.transitScheduleOutFile);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		log.info("Done...");
 	}
 
 }

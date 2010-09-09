@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
 import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
 import org.openstreetmap.osmosis.core.filter.v0_6.UsedNodeFilter;
@@ -18,6 +19,8 @@ import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
 import org.openstreetmap.osmosis.core.xml.v0_6.XmlWriter;
 
 public class OsmPrepare {
+	
+	private final static Logger log = Logger.getLogger(OsmPrepare.class);
 	
 	private final String infFile;
 	private final String outFile;
@@ -37,8 +40,13 @@ public class OsmPrepare {
 	}
 	
 	public void prepareOsm(){
+		log.info("Start...");
+		log.info("StreetFilter: " + this.streetFilter.toString());
+		log.info("TransitFilter: " + this.transitFilter.toString());
 		String filename = this.infFile;
 		String targetFilename = this.outFile;
+		
+		log.info("Reading " + this.infFile);
 		
 		JOSMTolerantFastXMLReader reader = new JOSMTolerantFastXMLReader(new File(filename), true, CompressionMethod.None);		
 		UsedNodeFilter usedNodeFilter = new UsedNodeFilter(IdTrackerType.BitSet);
@@ -79,7 +87,8 @@ public class OsmPrepare {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
-		
+		log.info(this.outFile + " written");
+		log.info("Done...");
 	}
 
 	private static TagFilter createStreetFilter(String[] filter) {

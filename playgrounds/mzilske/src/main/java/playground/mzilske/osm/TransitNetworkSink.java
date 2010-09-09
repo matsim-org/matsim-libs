@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -74,6 +75,8 @@ public class TransitNetworkSink implements Sink {
 
 	private CoordinateTransformation coordinateTransformation;
 
+	private TreeSet<String> transitModes;
+
 	public TransitNetworkSink(Network network, TransitSchedule transitSchedule, CoordinateTransformation coordinateTransformation, IdTrackerType idTrackerType) {
 		this.network = network;
 		this.transitSchedule = transitSchedule;
@@ -125,8 +128,14 @@ public class TransitNetworkSink implements Sink {
 			public void process(RelationContainer relationContainer) {
 				Relation relation = relationContainer.getEntity();
 				Map<String, String> tags = new TagCollectionImpl(relation.getTags()).buildMap();
-				if ("route".equals(tags.get("type"))){// && "bus".equals(tags.get("route"))) {
-					transitLines.add(relationContainer);
+				if ("route".equals(tags.get("type"))){
+					if(tags.get("route") == null){
+						log.info("Got an empty route tag for tags " + tags.toString());
+					} else {
+						if(getTransitModes().contains(tags.get("route"))) {//&& "tram".equals(tags.get("route"))) {
+							transitLines.add(relationContainer);
+						}
+					}
 				}
 			}
 
@@ -159,7 +168,7 @@ public class TransitNetworkSink implements Sink {
 			NodeContainer nodeContainer = nodeIterator.next();
 			Node node = nodeContainer.getEntity();
 			if (stopNodes.get(node.getId())) {
-				System.out.println(node.getId());
+//				System.out.println(node.getId());
 				stopNodeStore.add(node.getId(), nodeContainer);
 			}
 		}
@@ -229,7 +238,7 @@ public class TransitNetworkSink implements Sink {
 						Node node = nodeReader.get(relationMember.getMemberId()).getEntity();
 						Coord coordinate = coordinateTransformation.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
 						String role = relationMember.getMemberRole();
-						if (role.startsWith("stop")) {
+						if (role.isEmpty() || role.startsWith("stop")) {
 							stopsH.addLast(node);
 							stopsR.addFirst(node);
 							stitcher.addForwardStop(node);
@@ -291,9 +300,17 @@ public class TransitNetworkSink implements Sink {
 		Iterator<Double> k = travelTimes.iterator();
 		Node firstStopNode = j.next();
 		Coord firstCoordinate = coordinateTransformation.transform(new CoordImpl(firstStopNode.getLongitude(), firstStopNode.getLatitude()));
-		Link entryLink = network.getFactory().createLink(new IdImpl(routeRef + "_ENTRY"), node.getId(), node.getId());
+		Map<String, String> firstStopTags = new TagCollectionImpl(firstStopNode.getTags()).buildMap();
+		String firstStopName = firstStopTags.get("name");
+		if(firstStopName != null){
+			firstStopName = firstStopName.replace('"', ' ').trim();
+			firstStopName = firstStopName.replace('&', ' ').trim();
+		} else {
+			firstStopName = "";
+		}
+		Link entryLink = network.getFactory().createLink(new IdImpl(routeRef + firstStopName + "_ENTRY"), node.getId(), node.getId());
 		network.addLink(entryLink);
-		TransitStopFacility firstFacility = transitSchedule.getFactory().createTransitStopFacility(createTransitStopId(routeRef, stopNo), firstCoordinate, false);
+		TransitStopFacility firstFacility = transitSchedule.getFactory().createTransitStopFacility(createTransitStopId(routeRef, firstStopName, stopNo), firstCoordinate, false);
 		transitSchedule.addStopFacility(firstFacility);
 		stopNo++;
 		double time = 0;
@@ -307,7 +324,15 @@ public class TransitNetworkSink implements Sink {
 			}
 			Node stopNode = j.next();
 			Coord coordinate = coordinateTransformation.transform(new CoordImpl(stopNode.getLongitude(), stopNode.getLatitude()));
-			TransitStopFacility facility = transitSchedule.getFactory().createTransitStopFacility(createTransitStopId(routeRef, stopNo), coordinate, false);
+			Map<String, String> stopTags = new TagCollectionImpl(stopNode.getTags()).buildMap();
+			String stopName = stopTags.get("name");
+			if(stopName != null){
+				stopName = stopName.replace('"', ' ').trim();
+				stopName = stopName.replace('&', ' ').trim();
+			} else {
+				stopName = "";
+			}
+			TransitStopFacility facility = transitSchedule.getFactory().createTransitStopFacility(createTransitStopId(routeRef, stopName, stopNo), coordinate, false);
 			stopNo++;
 			transitSchedule.addStopFacility(facility);
 			time += k.next();
@@ -317,8 +342,8 @@ public class TransitNetworkSink implements Sink {
 		return transitRouteStops;
 	}
 
-	private IdImpl createTransitStopId(String ref, int stopNo) {
-		return new IdImpl(ref + "_" + stopNo);
+	private IdImpl createTransitStopId(String ref, String stopName, int stopNo) {
+		return new IdImpl(ref + "_" + stopName + "_" + stopNo);
 	}
 
 	private NetworkRoute createNetworkRoute(List<Id> plinkIds) {
@@ -333,6 +358,30 @@ public class TransitNetworkSink implements Sink {
 	@Override
 	public void release() {
 
+	}
+
+	public void setTransitModes(String[] transitModes) {
+		if(transitModes == null){
+			setTransitModes(transitModes);
+		} else {
+			TreeSet<String> modes = new TreeSet<String>();
+			for (String string : transitModes) {
+				modes.add(string);
+			}
+			setTransitModes(modes);
+		}
+	}
+
+	public void setTransitModes(TreeSet<String> transitModes) {
+		if(transitModes == null){
+			this.transitModes = new TreeSet<String>();
+		} else {
+			this.transitModes = transitModes;
+		}
+	}
+
+	public TreeSet<String> getTransitModes() {
+		return this.transitModes;
 	}
 
 }
