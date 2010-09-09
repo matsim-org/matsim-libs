@@ -32,6 +32,7 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
+import playground.andreas.bln.net.TransitScheduleCleaner;
 import playground.andreas.fixedHeadway.FixedHeadwayControler;
 import playground.andreas.fixedHeadway.FixedHeadwayCycleUmlaufDriverFactory;
 
@@ -42,9 +43,7 @@ public class TransitControler extends Controler {
 
 	private final static Logger log = Logger.getLogger(TransitControler.class);
 
-//	private final static String COUNTS_MODULE_NAME = "ptCounts";
-
-	private boolean useOTFVis = false;
+	private boolean useOTFVis = true;
 	private boolean useHeadwayControler = true;
 	
 	public TransitControler(Config config) {
@@ -82,43 +81,11 @@ public class TransitControler extends Controler {
 			}
 		}
 		simulation.run();
+	}	
+	
+	void setUseOTFVis(boolean useOTFVis) {
+		this.useOTFVis = useOTFVis;
 	}
-
-	//	public static class OccupancyAnalyzerListener implements
-	//			BeforeMobsimListener, AfterMobsimListener {
-	//
-	//		private OccupancyAnalyzer occupancyAnalyzer;
-	//
-	//		public OccupancyAnalyzerListener(OccupancyAnalyzer occupancyAnalyzer) {
-	//			this.occupancyAnalyzer = occupancyAnalyzer;
-	//		}
-	//
-	//		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-	//			int iter = event.getIteration();
-	//			if (iter % 10 == 0&& iter > event.getControler().getFirstIteration()) {
-	//				occupancyAnalyzer.reset(iter);
-	//				event.getControler().getEvents().addHandler(occupancyAnalyzer);
-	//			}
-	//		}
-	//
-	//		public void notifyAfterMobsim(AfterMobsimEvent event) {
-	//			int it = event.getIteration();
-	//			if (it % 10 == 0 && it > event.getControler().getFirstIteration()) {
-	//				event.getControler().getEvents().removeHandler(occupancyAnalyzer);
-	//				occupancyAnalyzer.write(event.getControler().getControlerIO()
-	//						.getIterationFilename(it, "occupancyAnalysis.txt"));
-	//			}
-	//		}
-	//
-	//	}
-	
-	//	boolean isUseOTFVis() {
-	//		return this.useOTFVis;
-	//	}
-	
-		void setUseOTFVis(boolean useOTFVis) {
-			this.useOTFVis = useOTFVis;
-		}
 
 	public static void main(final String[] args) {
 		Config config = new Config();
@@ -127,10 +94,11 @@ public class TransitControler extends Controler {
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		
+				
 		TransitControler tc = new TransitControler(config);
-		if(args.length > 1 && args[1].equalsIgnoreCase("true")){
-			tc.setUseOTFVis(true);
-		}
+//		if(args.length > 1 && args[1].equalsIgnoreCase("true")){
+//			tc.setUseOTFVis(true);
+//		}
 		tc.setOverwriteFiles(true);
 //		tc.setCreateGraphs(false);
 		tc.run();
