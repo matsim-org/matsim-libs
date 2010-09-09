@@ -34,7 +34,7 @@ import org.matsim.core.gbl.MatsimResource;
 /**
  * @author dgrether
  */
-public class MatsimKmlStyleFactory {
+public class MatsimKmlStyleFactory implements NetworkKmlStyleFactory {
 	public static final String DEFAULTLINKICON ="link.png";
 
 	public static final String DEFAULTNODEICON ="node.png";
@@ -66,7 +66,8 @@ public class MatsimKmlStyleFactory {
 		this.writer = writer;
 		this.document = document;
 	}
-
+	
+	@Override
 	public StyleType createDefaultNetworkNodeStyle() throws IOException {
 		if (this.defaultnetworknodestyle == null) {
 			this.defaultnetworknodestyle = kmlObjectFactory.createStyleType();
@@ -85,6 +86,7 @@ public class MatsimKmlStyleFactory {
 		return this.defaultnetworknodestyle;
 	}
 
+	@Override
 	public StyleType createDefaultNetworkLinkStyle() throws IOException {
 		if (this.defaultnetworklinkstyle == null) {
 			this.defaultnetworklinkstyle = kmlObjectFactory.createStyleType();
