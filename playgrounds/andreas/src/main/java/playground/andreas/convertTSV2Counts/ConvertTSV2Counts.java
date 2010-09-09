@@ -41,7 +41,12 @@ public class ConvertTSV2Counts {
 		
 		log.info("Reading counts...");
 		Counts counts = new Counts();
+		// set some nonsense, cause writer allows for empty fields, but reader complains
+		counts.setYear(2009);
+		counts.setName("hab ich nicht");
+		counts.setLayer("hab ich keinen");
 		
+				
 		for (CountStationDataBox countStation : countStationsMap.values()) {
 			counts.createCount(new IdImpl(countStation.getShortName()), countStation.getShortName());
 			counts.getCount(new IdImpl(countStation.getShortName())).setCoord(countStation.getCoord());
