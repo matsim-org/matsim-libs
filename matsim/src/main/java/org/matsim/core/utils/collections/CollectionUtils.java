@@ -19,6 +19,7 @@
 
 package org.matsim.core.utils.collections;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -61,6 +62,9 @@ public abstract class CollectionUtils {
 	}
 
 	public static final Set<String> stringToSet(final String values) {
+		if (values == null) {
+			return Collections.emptySet();
+		}
 		String[] parts = StringUtils.explode(values, ',');
 		Set<String> tmp = new LinkedHashSet<String>();
 		for (String part : parts) {

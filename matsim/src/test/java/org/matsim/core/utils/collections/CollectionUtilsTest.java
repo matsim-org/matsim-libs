@@ -76,6 +76,12 @@ public class CollectionUtilsTest {
 	}
 
 	@Test
+	public void testNullStringToSet() {
+		Set<String> set = CollectionUtils.stringToSet(null);
+		Assert.assertEquals(0, set.size());
+	}
+
+	@Test
 	public void testStringToArray() {
 		String[] testStrings = new String[] {
 				"Aaa,Bbb,Ddd,Ccc",
@@ -97,4 +103,11 @@ public class CollectionUtilsTest {
 			Assert.assertEquals("Ccc", array[3]);
 		}
 	}
+
+	@Test
+	public void testNullStringToArray() {
+		String[] array = CollectionUtils.stringToArray(null);
+		Assert.assertEquals(0, array.length);
+	}
+
 }
