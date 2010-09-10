@@ -29,22 +29,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.replanning.TransitStrategyManagerConfigLoader;
-import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
@@ -57,8 +50,24 @@ public class TransitControler extends Controler {
 
 	private final TransitConfigGroup transitConfig;
 
+	/**
+	 * @deprecated to not use, does not work properly!
+	 * @param args
+	 */
+	@Deprecated
 	public TransitControler(final String[] args) {
 		super(args);
+		this.transitConfig = new TransitConfigGroup();
+		init();
+	}
+
+	/**
+	 * @deprecated do not use, does not work properly!
+	 * @param configFile
+	 */
+	@Deprecated
+	public TransitControler(final String configFile) {
+		super(configFile);
 		this.transitConfig = new TransitConfigGroup();
 		init();
 	}
@@ -95,30 +104,30 @@ public class TransitControler extends Controler {
 
 		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
-		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
-		addControlerListener(cl);
+//		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
+//		addControlerListener(cl);
 	}
 
-	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		TransitStrategyManagerConfigLoader.load(this, this.config, manager);
-		return manager;
-	}
+//	@Override
+//	protected StrategyManager loadStrategyManager() {
+//		StrategyManager manager = new StrategyManager();
+//		TransitStrategyManagerConfigLoader.load(this, this.config, manager);
+//		return manager;
+//	}
 
-	@Override
-	protected void runMobSim() {
-		new QSim(this.scenarioData, this.events).run();
-//		new QueueSimulation(this.scenarioData, this.events).run();
-	}
+//	@Override
+//	protected void runMobSim() {
+//		new QSim(this.scenarioData, this.events).run();
+////		new QueueSimulation(this.scenarioData, this.events).run();
+//	}
 
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
-		// if I see this correctly, in the following the first 5 arguments are just passed through.  That is,
-		// "getLeastCostPathCalculatorFactory()" just defines the (car) routing algo from the standard controler.  kai, nov'09
-		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
-				this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.transitConfig);
-	}
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
+//		// if I see this correctly, in the following the first 5 arguments are just passed through.  That is,
+//		// "getLeastCostPathCalculatorFactory()" just defines the (car) routing algo from the standard controler.  kai, nov'09
+//		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
+//				this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.transitConfig);
+//	}
 
 	public static class TransitControlerListener implements StartupListener {
 
@@ -128,6 +137,7 @@ public class TransitControler extends Controler {
 			this.config = config;
 		}
 
+		@Override
 		public void notifyStartup(final StartupEvent event) {
 			if (this.config.getTransitScheduleFile() != null) {
 				try {

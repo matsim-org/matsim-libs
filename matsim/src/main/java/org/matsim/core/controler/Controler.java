@@ -59,10 +59,10 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
@@ -171,7 +171,7 @@ public class Controler {
 	public static final String FILENAME_CONFIG = "output_config.xml.gz";
 
 	private final static String COUNTS_MODULE_NAME = "ptCounts";
-	
+
 	private enum ControlerState {
 		Init, Running, Shutdown, Finished
 	}
@@ -258,7 +258,7 @@ public class Controler {
 
 	private MobsimFactory mobsimFactory = new QueueSimulationFactory();
 
-	private TransitConfigGroup transitConfig;
+	private TransitConfigGroup transitConfig = null;
 
 	/** initializes Log4J */
 	static {
@@ -340,10 +340,6 @@ public class Controler {
 		this.population = this.scenarioData.getPopulation();
 		Gbl.setConfig(this.config);
 		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
-
-		if (this.config.scenario().isUseTransit()) {
-			setupTransitConfig();
-		}
 	}
 
 	/**
@@ -363,6 +359,9 @@ public class Controler {
 	private void init() {
 		loadConfig();
 		setUpOutputDir();
+		if (this.config.scenario().isUseTransit()) {
+			setupTransitConfig();
+		}
 		initEvents();
 		initLogging();
 		loadData();
@@ -372,6 +371,7 @@ public class Controler {
 	}
 
 	private final void setupTransitConfig() {
+		log.info("setting up transit simulation");
 		this.transitConfig = new TransitConfigGroup();
 		if (this.config.getModule(TransitConfigGroup.GROUP_NAME) == null) {
 			this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
@@ -386,12 +386,15 @@ public class Controler {
 		if (!this.config.scenario().isUseVehicles()) {
 			log.warn("Your are using Transit but not Vehicles. This most likely won't work.");
 		}
+
 		Set<EventsFileFormat> formats = EnumSet.copyOf(this.config.controler().getEventsFileFormats());
 		formats.add(EventsFileFormat.xml);
 		this.config.controler().setEventsFileFormats(formats);
+
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 		this.config.charyparNagelScoring().addActivityParams(transitActivityParams);
+
 		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 	}
 
@@ -423,6 +426,7 @@ public class Controler {
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
 				return new PersonPrepareForSim(createRoutingAlgorithm(), Controler.this.network);
 			}
@@ -1194,6 +1198,7 @@ public class Controler {
 			}
 		}
 
+		@Override
 		public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 			Controler controler = event.getControler();
 			controler.events.resetHandlers(event.getIteration());
@@ -1226,6 +1231,7 @@ public class Controler {
 			controler.events.initProcessing();
 		}
 
+		@Override
 		public void notifyAfterMobsim(final AfterMobsimEvent event) {
 			Controler controler = event.getControler();
 			int iteration = event.getIteration();
@@ -1256,6 +1262,7 @@ public class Controler {
 			}
 		}
 
+		@Override
 		public void notifyShutdown(final ShutdownEvent event) {
 			for (EventWriter writer : this.eventWriters) {
 				writer.closeFile();
@@ -1265,6 +1272,7 @@ public class Controler {
 
 	public class TransitControlerListener implements StartupListener {
 
+		@Override
 		public void notifyStartup(final StartupEvent event) {
 			if (Controler.this.transitConfig.getTransitScheduleFile() != null) {
 				try {
@@ -1308,6 +1316,7 @@ public class Controler {
 			this.occupancyAnalyzer = occupancyAnalyzer;
 		}
 
+		@Override
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 			int iter = event.getIteration();
 			if (iter % 10 == 0&& iter > event.getControler().getFirstIteration()) {
@@ -1316,6 +1325,7 @@ public class Controler {
 			}
 		}
 
+		@Override
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			int it = event.getIteration();
 			if (it % 10 == 0 && it > event.getControler().getFirstIteration()) {
