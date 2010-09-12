@@ -26,7 +26,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.xml.sax.SAXException;
 
@@ -35,10 +36,35 @@ public class OSM2MATSim {
 	public static void main(final String[] args) {
 
 		NetworkLayer network = new NetworkLayer();
-		OsmNetworkReader osmReader = new OsmNetworkReader(network, new WGS84toCH1903LV03());
+		OsmNetworkReader osmReader = new OsmNetworkReader(network, TransformationFactory.getCoordinateTransformation("WGS84", "DHDN_GK4"), false);
 		osmReader.setKeepPaths(false);
+
+		osmReader.setHighwayDefaults(1, "motorway",      2, 120.0/3.6, 1.0, 2000, true);
+		osmReader.setHighwayDefaults(1, "motorway_link", 1,  80.0/3.6, 1.0, 1500, true);
+		osmReader.setHighwayDefaults(2, "trunk",         1,  80.0/3.6, 1.0, 2000);
+		osmReader.setHighwayDefaults(2, "trunk_link",    1,  50.0/3.6, 1.0, 1500);
+		osmReader.setHighwayDefaults(3, "primary",       1,  80.0/3.6, 1.0, 1500);
+		osmReader.setHighwayDefaults(3, "primary_link",  1,  60.0/3.6, 1.0, 1500);
+		osmReader.setHighwayDefaults(4, "secondary",     1,  60.0/3.6, 1.0, 1000);
+		osmReader.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  600);
+		osmReader.setHighwayDefaults(5, "minor",         1,  45.0/3.6, 1.0,  600);
+		osmReader.setHighwayDefaults(5, "unclassified",  1,  45.0/3.6, 1.0,  600);
+		osmReader.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  600);
+		osmReader.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
+
+//		freespeeds
+//		AT:urban=50
+//		AT:rural=100
+//		CH:urban=50
+//		CH:rural=80
+//		DE:urban=50
+//		DE:rural=100
+
+//		osmReader.setHierarchyLayer(52.652, 13.155, 52.37, 13.643, 6);
+//		osmReader.setHierarchyLayer(80, 3, 40, 20, 5);
 		try {
-			osmReader.parse("../mystudies/osmnet/switzerland-20090313.osm");
+			osmReader.parse("/data/projects/bvg2010/Daten/20100902_brandenburg.osm");
+//			osmReader.parse("../mystudies/osmnet/switzerland-20090313.osm");
 //			osmReader.parse("../mystudies/osmnet/zueri-20080410.osm");
 		} catch (SAXException e) {
 			e.printStackTrace();
@@ -47,8 +73,11 @@ public class OSM2MATSim {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		new NetworkWriter(network).write("../mystudies/osmnet/switzerland-20090313.xml");
+		new NetworkWriter(network).write("/data/projects/bvg2010/Daten/20100902_brandenburg.net.xml");
+//		new NetworkWriter(network).write("../mystudies/osmnet/switzerland-20090313.xml");
 //		new NetworkWriter(network, "../mystudies/osmnet/zueri-20080410.xml").write();
+		new NetworkCleaner().run(network);
+		new NetworkWriter(network).write("/data/projects/bvg2010/Daten/20100902_brandenburg.clean-net.xml");
 	}
 
 }

@@ -21,7 +21,7 @@ package playground.mrieser.routedistance;
 
 import org.matsim.api.core.v01.population.Route;
 
-import playground.mrieser.core.sim.utils.ClassBasedMap;
+import playground.mrieser.core.mobsim.utils.ClassBasedMap;
 
 /**
  * Manages a set of {@link RouteDistanceCalculator}s to calculate / retrieve the
