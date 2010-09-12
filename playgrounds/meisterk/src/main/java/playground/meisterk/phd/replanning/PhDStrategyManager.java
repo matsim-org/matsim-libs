@@ -40,11 +40,19 @@ public class PhDStrategyManager extends StrategyManager {
 	 */
 	private TreeMap<String, Set<Person>> personTreatment = new TreeMap<String, Set<Person>>();
 
+//	@Override
+//	public void run(Population population, int iteration) {
+//		// keep selection of persons to plan strategies until right before new selection 
+//		this.personTreatment.clear();
+//		super.run(population, iteration);
+//	}
+	//
+	// replaced by "beforeRunHook".  This really exchanges the sequence of "handleChangeRequests" and "personTreatment.clear()",
+	// but it looks to me like this should not matter.  kai, sep'10
+	
 	@Override
-	public void run(Population population, int iteration) {
-		// keep selection of persons to plan strategies until right before new selection 
-		this.personTreatment.clear();
-		super.run(population, iteration);
+	protected void beforeRunHook( @SuppressWarnings("unused") Population population ) {
+		this.personTreatment.clear() ;
 	}
 
 	@Override

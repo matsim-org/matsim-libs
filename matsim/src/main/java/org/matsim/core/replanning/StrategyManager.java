@@ -111,9 +111,13 @@ public class StrategyManager {
 	 * @param population
 	 * @param iteration the current iteration we're handling
 	 */
-	public void run(final Population population, final int iteration) {
+	public final void run(final Population population, final int iteration) {
 		handleChangeRequests(iteration);
 		run(population);
+	}
+	
+	protected void beforeRunHook( @SuppressWarnings("unused") Population population ) {
+		// left empty for inheritance
 	}
 
 	/**
@@ -122,30 +126,53 @@ public class StrategyManager {
 	 *
 	 * @param population
 	 */
+	@Deprecated // do not override this function.  Use the "hooks" instead.  yyyy will eventually be made final.  kai, sep'10
 	public void run(final Population population) {
+		beforeRunHook( population ) ;
+		
 		// initialize all strategies
 		for (PlanStrategy strategy : this.strategies) {
 			strategy.init();
 		}
-		// then go through the population and assign each person to a strategy
+		
+		// then go through the population and ...
 		for (Person person : population.getPersons().values()) {
+			
+			// ... reduce the number of plans to the allowed maximum (in evol comp lang this is "selection")
 			if ((this.maxPlansPerAgent > 0) && (person.getPlans().size() > this.maxPlansPerAgent)) {
 				removePlans((PersonImpl) person, this.maxPlansPerAgent);
 			}
+			
+			// ... choose the strategy to be used for this person (in evol comp lang this would be the choice of the mutation operator)
 			PlanStrategy strategy = this.chooseStrategy();
+			
+			// ... and run the strategy:
 			if (strategy != null) {
 				strategy.run(person);
 			} else {
 				Gbl.errorMsg("No strategy found!");
 			}
 		}
+		
 		// finally make sure all strategies have finished there work
 		for (PlanStrategy strategy : this.strategies) {
 			strategy.finish();
 		}
+		
+		afterRunHook( population ) ;
 	}
 	
-	protected void afterRemovePlan( @SuppressWarnings("unused") Plan plan ) {
+	protected void afterRunHook( @SuppressWarnings("unused") Population population ) {
+		// left empty for inheritance
+	}
+	
+	/**This is a hook into "removePlans", called after an individual plan has been removed.  This is usually needed in derived
+	 * methods that keep a "shadow" plans registry.  Note that this is called after every plan, not at the end of the
+	 * "removePlanS" method.  kai, sep'10
+	 * 
+	 * @param the plan that is to be removed
+	 */
+	protected void afterRemovePlanHook( @SuppressWarnings("unused") Plan plan ) {
 		// left empty for inheritance.  kai, sep'10
 	}
 	
@@ -156,7 +183,7 @@ public class StrategyManager {
 			if (plan == person.getSelectedPlan()) {
 				person.setSelectedPlan(person.getRandomPlan());
 			}
-			afterRemovePlan( plan ) ;
+			afterRemovePlanHook( plan ) ;
 		}
 	}
 
@@ -165,7 +192,7 @@ public class StrategyManager {
 	 *
 	 * @param iteration
 	 */
-	private void handleChangeRequests(final int iteration) {
+	private final void handleChangeRequests(final int iteration) {
 		Map<PlanStrategy, Double> changes = this.changeRequests.remove(Integer.valueOf(iteration));
 		if (changes != null) {
 			for (java.util.Map.Entry<PlanStrategy, Double> entry : changes.entrySet()) {
