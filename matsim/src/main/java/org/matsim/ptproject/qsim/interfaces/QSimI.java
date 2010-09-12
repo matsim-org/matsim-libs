@@ -51,5 +51,16 @@ public interface QSimI extends IOSimulation {
 	SimTimerI getSimTimer();
 
 	QNetworkI getQNetwork();
+	
+	/**Registering and unregistering agents on links for visualization.  
+	 * 
+	 * Design decision: In theory, the links could also ask the central
+	 * "activities" or "agentTracker" data structures, but in practice this is too slow.  kai, aug'10
+	 * 
+	 * yyyy not sure if this could not be the more general "registerOnLink" function.  kai, aug'10
+	 * 	 */
+	void registerAgentAtPtWaitLocation( final PersonAgent agent ) ;
+	void unregisterAgentAtPtWaitLocation( final PersonAgent agent ) ;
+
 
 }

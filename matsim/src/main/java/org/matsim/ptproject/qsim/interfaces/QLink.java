@@ -56,8 +56,8 @@ public interface QLink extends VisLink {
 	// yyyy these two functions should not be public since it exposes the internal mechanics that the departure logic is central
 	// while the visualization logic is link-based.  But it needs to be public as long as the network engine is a separate package. 
 	// kai, aug'10
-	public void registerAgentAtActivityLocation(PersonAgent agent);
-	public void unregisterAgentAtActivityLocation(PersonAgent agent);
+	public void registerAgentOnLink(PersonAgent agent);
+	public void unregisterAgentOnLink(PersonAgent agent);
 
 	
 	//	######################
@@ -83,8 +83,8 @@ public interface QLink extends VisLink {
 	public Collection<QVehicle> getAllVehicles();
 	// not terribly efficient, but a possible method also for general mobsims
 
-	public VisData getVisData();
-	// necessary (called from otfvis)
+	Collection<QVehicle> getAllNonParkedVehicles();
+	// not terribly efficient, but a possible method also for general mobsims
 
 	public QNode getToQueueNode();
 	// I think this is essentially ok since you can't do that much with a QNode.  yyyy Should probably be called getMobsimNode, 
@@ -92,5 +92,8 @@ public interface QLink extends VisLink {
 
 	public void addDepartingVehicle(QVehicle vehicle);
 	// necessary (called from the "facilities"engine)
+
+//	void reinsertBus(QVehicle bus);
+
 
 }

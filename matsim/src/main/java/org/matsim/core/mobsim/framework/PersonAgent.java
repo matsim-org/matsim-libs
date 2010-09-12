@@ -67,8 +67,14 @@ public interface PersonAgent extends MobsimAgent {
 	public PlanElement getCurrentPlanElement() ;
 	// if this does not make sense for a class, then the class is maybe not a "Person"Agent.  kai, may'10
 
+	/**
+	 * @return "(Leg) getCurrentPlanElement()"
+	 */
 	public Leg getCurrentLeg();
 
+	/**
+	 * @return the underlying person (data class)
+	 */
 	public Person getPerson();
 	
 	// yyyy "Teleportation" certainly does NOT belong into a vehicle.  Also not into the driver.  

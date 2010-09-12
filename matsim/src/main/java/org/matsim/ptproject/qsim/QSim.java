@@ -450,32 +450,51 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 	private void registerAgentAtActivityLocation(final PersonAgent agent) {
+		// if the "activities" engine were separate, this would need to be public.  kai, aug'10
 		if (agent instanceof DefaultPersonDriverAgent) { // yyyyyy is this necessary?
-			DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
-			PlanElement pe = pa.getCurrentPlanElement();
+//			DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
+			PlanElement pe = agent.getCurrentPlanElement();
 			if (pe instanceof Leg) {
 				throw new RuntimeException();
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
 				QLink qLink = this.netEngine.getQNetwork().getQLink(linkId);
-				qLink.registerAgentAtActivityLocation(agent);
+				qLink.registerAgentOnLink(agent);
 			}
+		}
+	}
+	
+	public final void registerAgentAtPtWaitLocation(final PersonAgent agent) {
+		if (agent instanceof DefaultPersonDriverAgent) { // yyyy but why is this needed?  Does the driver get registered?
+			Leg leg = (Leg) agent.getCurrentPlanElement() ;
+			Id linkId = leg.getRoute().getStartLinkId();
+			QLink qLink = this.netEngine.getQNetwork().getQLink(linkId) ;
+			qLink.registerAgentOnLink( agent ) ;
 		}
 	}
 
 	private void unregisterAgentAtActivityLocation(final PersonAgent agent) {
-		if (agent instanceof DefaultPersonDriverAgent) {
-			DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
-			PlanElement pe = pa.getCurrentPlanElement();
+		if (agent instanceof DefaultPersonDriverAgent) { // yyyy but why is this needed?
+//			DefaultPersonDriverAgent pa = (DefaultPersonDriverAgent) agent;
+			PlanElement pe = agent.getCurrentPlanElement();
 			if (pe instanceof Leg) {
 				throw new RuntimeException();
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
 				QLink qLink = this.netEngine.getQNetwork().getQLink(linkId);
-				qLink.unregisterAgentAtActivityLocation(agent);
+				qLink.unregisterAgentOnLink(agent);
 			}
+		}
+	}
+	
+	public final void unregisterAgentAtPtWaitLocation( final PersonAgent agent ) {
+		if (agent instanceof DefaultPersonDriverAgent) { // yyyy but why is this needed?
+			Leg leg = (Leg) agent.getCurrentPlanElement() ;
+			Id linkId = leg.getRoute().getStartLinkId();
+			QLink qLink = this.netEngine.getQNetwork().getQLink(linkId) ;
+			qLink.unregisterAgentOnLink( agent ) ;
 		}
 	}
 

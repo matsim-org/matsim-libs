@@ -51,7 +51,7 @@ public class PhDStrategyManager extends StrategyManager {
 	public void run(Population population) {
 		
 		// initialize all strategies
-		for (PlanStrategy strategy : this.strategies) {
+		for (PlanStrategy strategy : this.getStrategies() ) {
 			strategy.init();
 		}
 		
@@ -80,7 +80,7 @@ public class PhDStrategyManager extends StrategyManager {
 			}
 		}
 		// finally make sure all strategies have finished there work
-		for (PlanStrategy strategy : this.strategies) {
+		for (PlanStrategy strategy : this.getStrategies() ) {
 			strategy.finish();
 		}
 	}

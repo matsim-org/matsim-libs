@@ -709,4 +709,18 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	}
 
 
+	@Override
+	public void registerAgentAtPtWaitLocation(PersonAgent agent) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+
+	@Override
+	public void unregisterAgentAtPtWaitLocation(PersonAgent agent) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+
 }

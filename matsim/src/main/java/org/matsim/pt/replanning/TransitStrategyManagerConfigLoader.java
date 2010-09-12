@@ -73,7 +73,7 @@ public class TransitStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 				} else {
 					/* The controler starts at a later iteration than this change request is scheduled for.
 					 * make the change right now.					 */
-					manager.changeStrategy(strategy, 0.0);
+					manager.changeWeightOfStrategy(strategy, 0.0);
 				}
 			}
 		}

@@ -1,6 +1,7 @@
 package playground.christoph.withinday;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.matsim.core.basic.v01.IdImpl;
@@ -36,11 +37,13 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 		}
 		
 		QLink tmpLink = queueSim.getQNetwork().getLinks().get(new IdImpl("6"));
-		List<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getVehQueue();
+//		Collection<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getVehQueue();
+		Collection<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getAllNonParkedVehicles();
 
 		// select agents, which should be replanned within this time step
 		for (QLink link:queueSim.getQNetwork().getLinks().values()){
-			for (QVehicle vehicle : link.getVehQueue()) {
+//			for (QVehicle vehicle : link.getVehQueue()) {
+				for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
 				PersonDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getPerson().getId());
 				if (((PersonImpl) agent.getPerson()).getAge() == 18) {

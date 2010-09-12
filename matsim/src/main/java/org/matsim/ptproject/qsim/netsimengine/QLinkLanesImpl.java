@@ -315,7 +315,8 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		this.activateLink();
 	}
 
-	boolean moveLink(double now) {
+	@Override
+	protected boolean moveLink(double now) {
 		boolean ret = false;
 		for (QLane lane : this.queueLanes){
 			if (lane.moveLane(now)){
@@ -393,9 +394,16 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		return ret;
 	}
 
-	public Collection<QVehicle> getAllVehicles() {
-		Collection<QVehicle> ret = new ArrayList<QVehicle>(this.parkedVehicles.values());
-		ret.addAll(this.waitingList);
+	@Override
+	public final Collection<QVehicle> getAllVehicles() {
+		Collection<QVehicle> ret = getAllNonParkedVehicles() ;
+		ret.addAll(this.parkedVehicles.values());
+		return ret ;
+	}
+	
+	@Override
+	public final Collection<QVehicle> getAllNonParkedVehicles() {
+		Collection<QVehicle> ret = new ArrayList<QVehicle>(this.waitingList);
 		for  (QLane lane : this.queueLanes){
 			ret.addAll(lane.getAllVehicles());
 		}
@@ -405,6 +413,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	/**
 	 * @return the total space capacity available on that link (includes the space on lanes if available)
 	 */
+	@Override
 	public double getSpaceCap() {
 		double total = 0.0;
 		for (QLane ql : this.getQueueLanes()) {
@@ -418,7 +427,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 * because it is only called by one testcase
 	 * @return
 	 */
-	protected int vehOnLinkCount() {
+	int vehOnLinkCount() {
 		int count = 0;
 		for (QLane ql : this.queueLanes){
 			count += ql.vehOnLinkCount();
@@ -518,12 +527,12 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 	@Override
-	public void registerAgentAtActivityLocation(PersonAgent agent) {
+	public void registerAgentOnLink(PersonAgent agent) {
 		agentsInActivities.put(agent.getPerson().getId(), agent);
 	}
 
 	@Override
-	public void unregisterAgentAtActivityLocation(PersonAgent agent) {
+	public void unregisterAgentOnLink(PersonAgent agent) {
 		agentsInActivities.remove(agent.getPerson().getId());
 	}
 
@@ -550,5 +559,6 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	QVehicle popFirstFromBuffer() {
 		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
+
 
 }

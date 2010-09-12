@@ -34,6 +34,6 @@ import org.matsim.ptproject.qsim.interfaces.SimEngine;
 
 public abstract class QSimEngine extends LinkActivator implements SimEngine, Steppable {
 
-	protected abstract AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder();
+	abstract AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder();
 	
 }

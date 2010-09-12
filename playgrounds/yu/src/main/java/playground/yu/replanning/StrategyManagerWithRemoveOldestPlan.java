@@ -49,7 +49,7 @@ public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 
 	public void run(final Population population) {
 		// initialize all strategies
-		for (PlanStrategy strategy : this.strategies)
+		for (PlanStrategy strategy : this.getStrategies() )
 			strategy.init();
 
 		int maxPlansPerAgent = getMaxPlansPerAgent();
@@ -72,7 +72,7 @@ public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 		}
 
 		// finally make sure all strategies have finished there work
-		for (PlanStrategy strategy : this.strategies)
+		for (PlanStrategy strategy : this.getStrategies() )
 			strategy.finish();
 
 		// make the new selected Plan "young" (with the biggest index in List),

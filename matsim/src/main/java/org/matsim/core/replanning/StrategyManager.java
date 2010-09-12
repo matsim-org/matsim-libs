@@ -43,7 +43,7 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
  */
 public class StrategyManager {
 
-	protected final ArrayList<PlanStrategy> strategies = new ArrayList<PlanStrategy>();
+	private final ArrayList<PlanStrategy> strategies = new ArrayList<PlanStrategy>();
 	private final ArrayList<Double> weights = new ArrayList<Double>();
 	private double totalWeights = 0.0;
 	private int maxPlansPerAgent = 0;
@@ -61,7 +61,7 @@ public class StrategyManager {
 	 * @param strategy
 	 * @param weight
 	 */
-	public void addStrategy(final PlanStrategy strategy, final double weight) {
+	public final void addStrategy(final PlanStrategy strategy, final double weight) {
 		this.strategies.add(strategy);
 		this.weights.add(Double.valueOf(weight));
 		this.totalWeights += weight;
@@ -74,7 +74,7 @@ public class StrategyManager {
 	 * @return true if the strategy was successfully removed from this manager,
 	 * 		false if the strategy was not part of this manager and could thus not be removed.
 	 */
-	public boolean removeStrategy(final PlanStrategy strategy) {
+	public final boolean removeStrategy(final PlanStrategy strategy) {
 		int idx = this.strategies.indexOf(strategy);
 		if (idx != -1) {
 			this.strategies.remove(idx);
@@ -93,7 +93,7 @@ public class StrategyManager {
 	 * @return true if the strategy is part of this manager and the weight could
 	 * 		be changed successfully, false otherwise.
 	 */
-	public boolean changeStrategy(final PlanStrategy strategy, final double newWeight) {
+	public final boolean changeWeightOfStrategy(final PlanStrategy strategy, final double newWeight) {
 		int idx = this.strategies.indexOf(strategy);
 		if (idx != -1) {
 			double oldWeight = this.weights.set(idx, Double.valueOf(newWeight)).doubleValue();
@@ -169,7 +169,7 @@ public class StrategyManager {
 		Map<PlanStrategy, Double> changes = this.changeRequests.remove(Integer.valueOf(iteration));
 		if (changes != null) {
 			for (java.util.Map.Entry<PlanStrategy, Double> entry : changes.entrySet()) {
-				changeStrategy(entry.getKey(), entry.getValue().doubleValue());
+				changeWeightOfStrategy(entry.getKey(), entry.getValue().doubleValue());
 			}
 		}
 	}
@@ -179,7 +179,7 @@ public class StrategyManager {
 	 *
 	 * @return the chosen strategy
 	 */
-	protected PlanStrategy chooseStrategy() {
+	protected final PlanStrategy chooseStrategy() {
 		double rnd = MatsimRandom.getRandom().nextDouble() * this.totalWeights;
 
 		double sum = 0.0;
@@ -200,11 +200,11 @@ public class StrategyManager {
 	 *
 	 * @param maxPlansPerAgent
 	 */
-	public void setMaxPlansPerAgent(final int maxPlansPerAgent) {
+	public final void setMaxPlansPerAgent(final int maxPlansPerAgent) {
 		this.maxPlansPerAgent = maxPlansPerAgent;
 	}
 	
-	public int getMaxPlansPerAgent() {
+	public final int getMaxPlansPerAgent() {
 		return this.maxPlansPerAgent;
 	}
 
@@ -216,7 +216,7 @@ public class StrategyManager {
 	 * @param strategy
 	 * @param newWeight
 	 */
-	public void addChangeRequest(final int iteration, final PlanStrategy strategy, final double newWeight) {
+	public final void addChangeRequest(final int iteration, final PlanStrategy strategy, final double newWeight) {
 		Integer iter = Integer.valueOf(iteration);
 		Map<PlanStrategy, Double> iterationRequests = this.changeRequests.get(iter);
 		if (iterationRequests == null) {
@@ -235,11 +235,11 @@ public class StrategyManager {
 	 * 
 	 * @see #setMaxPlansPerAgent(int)
 	 */
-	public void setPlanSelectorForRemoval(final PlanSelector planSelector) {
+	public final void setPlanSelectorForRemoval(final PlanSelector planSelector) {
 		this.removalPlanSelector = planSelector;
 	}
 
-	public List<PlanStrategy> getStrategies() {
+	public final List<PlanStrategy> getStrategies() {
 		return Collections.unmodifiableList(this.strategies);
 	}
 

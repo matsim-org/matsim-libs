@@ -84,7 +84,7 @@ public class QLinkImpl extends QLinkInternalI {
 
 	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
 
-	private final Map<Id, PersonAgent> agentsInActivities = new LinkedHashMap<Id, PersonAgent>();
+	private final Map<Id, PersonAgent> additionalAgentsOnLink = new LinkedHashMap<Id, PersonAgent>();
 
 	/*package*/ VisData visdata = null ;
 
@@ -100,7 +100,7 @@ public class QLinkImpl extends QLinkInternalI {
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
 	 */
-	/*package*/ private final LinkedList<QVehicle> vehQueue = new LinkedList<QVehicle>();
+	private final LinkedList<QVehicle> vehQueue = new LinkedList<QVehicle>();
 
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
@@ -191,7 +191,7 @@ public class QLinkImpl extends QLinkInternalI {
 	 * @param veh
 	 * @param now the current time
 	 */
-	/*package*/ void add(final QVehicle veh, final double now) {
+	private void add(final QVehicle veh, final double now) {
 		// yyyy only called by "add(veh)", i.e. they can be consolidated. kai, jan'10
 		this.vehQueue.add(veh);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
@@ -252,6 +252,11 @@ public class QLinkImpl extends QLinkInternalI {
 	final QVehicle removeParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
+	
+//	@Override
+//	public void reinsertBus( QVehicle vehicle ) {
+//		this.vehQueue.addFirst(vehicle);
+//	}
 
 	@Override
 	public void addDepartingVehicle(QVehicle vehicle) {
@@ -289,7 +294,7 @@ public class QLinkImpl extends QLinkInternalI {
 		this.remainingBufferCap = this.flowCapacityPerTimeStep;
 		if ( HOLES ) {
 			this.remainingInputFlowCap = Math.ceil( 2.*this.flowCapacityPerTimeStep ); // make sure this is at least one
-//			log.warn( " inputFlowCap: " + this.inputFlowCap ) ;
+			//			log.warn( " inputFlowCap: " + this.inputFlowCap ) ;
 		}
 		if (this.buffercap_accumulate < 1.0) {
 			this.buffercap_accumulate += this.flowCapFractionCache;
@@ -390,16 +395,16 @@ public class QLinkImpl extends QLinkInternalI {
 		// at this point, storage is ok!
 		Hole hole = holes.peek();
 		if ( hole==null ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
-//			log.warn( " !hasSpace since no holes available ") ;
+			//			log.warn( " !hasSpace since no holes available ") ;
 			return false ;
 		}
 		if ( hole.getEarliestLinkEndTime() > this.getQSimEngine().getQSim().getSimTimer().getTimeOfDay() ) {
-//			log.warn( " !hasSpace since all hole arrival times lie in future ") ;
+			//			log.warn( " !hasSpace since all hole arrival times lie in future ") ;
 			return false ;
 		}
-//		if ( this.inputFlowCap < 1. ) {
-//			return false ;
-//		}
+		//		if ( this.inputFlowCap < 1. ) {
+		//			return false ;
+		//		}
 		this.remainingInputFlowCap -- ;
 		return true ;
 	}
@@ -422,8 +427,8 @@ public class QLinkImpl extends QLinkInternalI {
 		this.flowCapacityPerTimeStep = ((LinkImpl)this.getLink()).getFlowCapacity(time);
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
 		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep
-		   * this.getQSimEngine().getQSim().getSimTimer().getSimTimestepSize()
-		   * this.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+		* this.getQSimEngine().getQSim().getSimTimer().getSimTimestepSize()
+		* this.getQSimEngine().getQSim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacityCache = 1.0 / this.flowCapacityPerTimeStep;
 		this.flowCapFractionCache = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
 	}
@@ -486,13 +491,13 @@ public class QLinkImpl extends QLinkInternalI {
 					+ " len: " + this.link.getLength()
 					+ " bnFlowCap: " + bnFlowCap_s
 					+ " congDens: " + congestedDensity
-					) ;
+			) ;
 			for ( int ii=0 ; ii<nHoles ; ii++ ) {
 				Hole hole = new Hole() ;
 				hole.setEarliestLinkEndTime( 0. ) ;
 				holes.add( hole ) ;
 			}
-//			System.exit(-1);
+			//			System.exit(-1);
 		}
 	}
 
@@ -531,6 +536,7 @@ public class QLinkImpl extends QLinkInternalI {
 		return vehicles;
 	}
 
+	@Override
 	public Collection<QVehicle> getAllNonParkedVehicles(){
 		Collection<QVehicle> vehicles = new ArrayList<QVehicle>();
 		vehicles.addAll(this.transitQueueLaneFeature.getFeatureVehicles());
@@ -560,7 +566,7 @@ public class QLinkImpl extends QLinkInternalI {
 	protected QSimEngine getQSimEngine(){
 		return this.qsimEngine;
 	}
-	
+
 	@Override
 	public QSimI getQSim() {
 		return this.qsimEngine.getQSim();
@@ -667,13 +673,13 @@ public class QLinkImpl extends QLinkInternalI {
 	}
 
 	@Override
-	public void registerAgentAtActivityLocation(PersonAgent agent) {
-		this.agentsInActivities.put(agent.getPerson().getId(), agent);
+	public void registerAgentOnLink(PersonAgent agent) {
+		this.additionalAgentsOnLink.put(agent.getPerson().getId(), agent);
 	}
 
 	@Override
-	public void unregisterAgentAtActivityLocation(PersonAgent agent) {
-		this.agentsInActivities.remove(agent.getPerson().getId());
+	public void unregisterAgentOnLink(PersonAgent agent) {
+		this.additionalAgentsOnLink.remove(agent.getPerson().getId());
 	}
 
 	@Override
@@ -682,9 +688,9 @@ public class QLinkImpl extends QLinkInternalI {
 	}
 
 	@Override
-  public boolean hasGreenForToLink(Id toLinkId){
-  	return true;
-  }
+	public boolean hasGreenForToLink(@SuppressWarnings("unused") Id toLinkId){
+		return true;
+	}
 
 
 
@@ -717,7 +723,7 @@ public class QLinkImpl extends QLinkInternalI {
 					QLinkImpl.this.waitingList, QLinkImpl.this.transitQueueLaneFeature);
 
 			snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkImpl.this.link,
-					QLinkImpl.this.agentsInActivities.values(), cnt2);
+					QLinkImpl.this.additionalAgentsOnLink.values(), cnt2);
 
 			// return:
 			return positions;

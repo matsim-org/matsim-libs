@@ -68,4 +68,7 @@ public interface NetworkRoute extends RouteWRefs {
 	 * @return the id of the vehicle that should be used to drive along this route.
 	 */
 	public abstract Id getVehicleId();
+	// Does it really make sense to couple the vehicle to the route?  I would have coupled it to the leg.  kai, aug'10
+	// Well, I guess now it belongs to the route. :-)  kai, aug'10
+
 }

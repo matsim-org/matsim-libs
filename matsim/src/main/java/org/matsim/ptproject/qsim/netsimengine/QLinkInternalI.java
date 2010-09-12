@@ -9,18 +9,22 @@ public abstract class QLinkInternalI extends QBufferItem implements QLink {
 
 	abstract void setQSimEngine(QSimEngine qsimEngine);
 
-	abstract boolean moveLink(double now);
+	protected abstract boolean moveLink(double now);
 
 	abstract boolean hasSpace();
 
 	abstract void clearVehicles();
 
 	abstract QVehicle removeParkedVehicle(Id vehicleId);
+	// in contrast to "addParkedVehicle", this here does not need to be public since it is only used internally.  kai, aug'10
 
 	abstract void activateLink();
 
 	abstract void addFromIntersection(final QVehicle veh);
 
 	abstract QSimEngine getQSimEngine() ;
+	
+//	@Deprecated // not needed here (I think)
+//	public abstract LinkedList<QVehicle> getVehQueue() ;
 
 }

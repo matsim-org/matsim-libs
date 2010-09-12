@@ -31,6 +31,7 @@ import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
+import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
@@ -217,6 +218,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		boolean handled = this.vehicle.addPassenger(passenger);
 		if(handled){
 			this.agentTracker.removeAgentFromStop(passenger, this.currentStop.getStopFacility());
+			this.getSimulation().unregisterAgentAtPtWaitLocation( (PersonAgent) passenger ) ;
 			PersonDriverAgent agent = (PersonDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time, agent.getPerson().getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));

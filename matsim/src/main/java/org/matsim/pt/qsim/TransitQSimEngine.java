@@ -202,6 +202,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 	}
 
 	private void handleAgentPTDeparture(final PersonAgent agent, Id linkId, Leg leg) {
+		// this puts the agent into the transit stop.  
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + agent.getPerson().getId().toString());
 			log.info("route: "
@@ -225,6 +226,7 @@ public class TransitQSimEngine implements  DepartureHandler, SimEngine {
 				TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
 				if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
 					this.agentTracker.addAgentToStop((PassengerAgent) agent, stop);
+					this.getQSim().registerAgentAtPtWaitLocation(agent) ;
 				} else {
 					throw new TransitAgentTriesToTeleportException("Agent "+agent.getPerson().getId() + " tries to enter a transit stop at link "+stop.getLinkId()+" but really is at "+linkId+"!");
 				}

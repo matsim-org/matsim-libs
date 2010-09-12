@@ -105,7 +105,11 @@ public class TransitQLaneFeature {
 			if ((stop != null) && (stop.getLinkId().equals(queueLane.getLink().getId()))) {
 				double delay = transitDriver.handleTransitStop(stop, now);
 				if (delay > 0.0) {
+					
 					veh.setEarliestLinkExitTime(now + delay);
+					// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
+					// kai, aug'10)
+					
 					if (!stop.getIsBlockingLane()) {
 						queueLane.getVehQueue().poll(); // remove the bus from the queue
 						this.transitVehicleStopQueue.add(veh); // and add it to the stop queue

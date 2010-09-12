@@ -63,7 +63,6 @@ public class CarDepartureHandler implements DepartureHandler {
 	private void handleCarDeparture(double now, PersonDriverAgent agent, Id linkId, Leg leg) {
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Id vehicleId = route.getVehicleId();
-		// yyyy does it really make sense to couple the vehicle to the route?  I would have coupled it to the leg.  kai, aug'10
 		if (vehicleId == null) {
 			vehicleId = agent.getPerson().getId(); // backwards-compatibility
 		}
