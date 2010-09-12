@@ -145,13 +145,18 @@ public class StrategyManager {
 		}
 	}
 	
-	protected void removePlans(final PersonImpl person, final int maxNumberOfPlans) {
+	protected void afterRemovePlan( @SuppressWarnings("unused") Plan plan ) {
+		// left empty for inheritance.  kai, sep'10
+	}
+	
+	protected final void removePlans(final PersonImpl person, final int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
 			Plan plan = this.removalPlanSelector.selectPlan(person);
 			person.getPlans().remove(plan);
 			if (plan == person.getSelectedPlan()) {
 				person.setSelectedPlan(person.getRandomPlan());
 			}
+			afterRemovePlan( plan ) ;
 		}
 	}
 
