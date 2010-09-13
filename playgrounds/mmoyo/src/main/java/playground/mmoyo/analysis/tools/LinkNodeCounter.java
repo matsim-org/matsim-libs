@@ -10,7 +10,7 @@ import playground.mmoyo.utils.TransScenarioLoader;
 public class LinkNodeCounter {
 
 	public static void main(String[] args) {
-		String conf = "../playgrounds/mmoyo/output/20/config_20plans.xml";
+		String conf = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		ScenarioImpl scenario  = new TransScenarioLoader().loadScenario(conf);
 		
 		String strMiv = "miv";

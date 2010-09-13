@@ -20,6 +20,7 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.PTRouter.LogicFactory;
 import playground.mmoyo.PTRouter.MyDijkstra;
+import playground.mmoyo.utils.TransScenarioLoader;
 
 /**
  * Identifies isolated TransitRoutes
@@ -116,7 +117,7 @@ public class TransitRouteValidator {
 		}else{
 			config= "../playgrounds/mmoyo/output/trRoutVis/config.xml";
 		}
-		ScenarioImpl scenarioImpl = new playground.mmoyo.utils.TransScenarioLoader().loadScenario(config);
+		ScenarioImpl scenarioImpl = new TransScenarioLoader().loadScenarioWithTrSchedule(config);
 		new TransitRouteValidator(scenarioImpl.getTransitSchedule()).findRepetedStops();
 	}
 	

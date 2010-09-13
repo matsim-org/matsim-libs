@@ -9,10 +9,9 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.core.controler.Controler;
 
-import playground.mzilske.bvg09.TransitControler;
-
-public class MMoyoTransitControler extends TransitControler {
+public class MMoyoTransitControler extends Controler {
 	boolean launchOTFDemo=false;
 	private Config config;
 	

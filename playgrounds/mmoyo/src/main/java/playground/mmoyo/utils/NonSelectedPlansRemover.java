@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AdaptedControler.java
+ * NonSelectedPlansRemover.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,26 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.analysis.comp;
+package playground.mmoyo.utils;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.controler.Controler;
-import playground.mmoyo.utils.TransScenarioLoader;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationWriter;
 
-/**
- * @author manuel
- * 
- * invokes a standard MATSim transit simulation
- */
-public class Controler_launcher {
+ /**
+  *filters all plans leaving only the selected ones
+  * @author manuel
+  */
+public class NonSelectedPlansRemover {
+
+	public void writeOnlySelectedPlans(ScenarioImpl scenario){
+		for (Person person : scenario.getPopulation().getPersons().values()){
+			Collection <Plan> selectedPlanList = new ArrayList<Plan>();
+			selectedPlanList.add(person.getSelectedPlan());
+			person.getPlans().retainAll(selectedPlanList);
+		}
+		
+		String outputFile = scenario.getConfig().controler().getOutputDirectory() + "/onlySelPlans.xml";
+		System.out.println("writing output plan file..." + outputFile);
+		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
+		popwriter.write(outputFile) ;
+		System.out.println("done");
+	}
 	
 	public static void main(String[] args) {
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+		String configFile;
+
+		if (args.length==1){
+			configFile = args[0];
+		}else{
+			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+		}
+
 		ScenarioImpl scenario = new TransScenarioLoader().loadScenario(configFile);
-		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		controler.setOverwriteFiles(true);
-		controler.setWriteEventsInterval(5); 
-		controler.run();
+		new NonSelectedPlansRemover().writeOnlySelectedPlans(scenario);
 	}
+
 }

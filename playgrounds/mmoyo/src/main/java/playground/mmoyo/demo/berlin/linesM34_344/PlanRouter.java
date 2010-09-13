@@ -75,6 +75,6 @@ public class PlanRouter {
 		}
 
 		/**load scenario */
-		new PlanRouter(new TransScenarioLoader().loadScenario(configFile));
+		new PlanRouter(new TransScenarioLoader().loadScenarioWithTrSchedule(configFile));
 	}
 }

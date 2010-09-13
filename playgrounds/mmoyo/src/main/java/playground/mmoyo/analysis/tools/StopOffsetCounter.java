@@ -37,9 +37,9 @@ public class StopOffsetCounter {
 		if (args.length>0) {
 			configFile = args[0];	
 		}else{
-			configFile = "../playgrounds/mmoyo/output/comparison/Berlin/16plans/difConfig.xml";	
+			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";	
 		}
-		ScenarioImpl scenario = new TransScenarioLoader().loadScenario(configFile);
+		ScenarioImpl scenario = new TransScenarioLoader().loadScenarioWithTrSchedule(configFile);
 		new StopOffsetCounter().countDifferentOffsets(scenario);
 	}
 	

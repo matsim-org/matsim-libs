@@ -53,9 +53,8 @@ import org.matsim.transitSchedule.api.TransitSchedule;
  */
 public class AdaptedTransitRouter extends TransitRouter {
 
-	public AdaptedTransitRouter(MyTransitRouterConfig myTRConfig, final TransitSchedule schedule) {
-		super(schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig));
-		
+	public AdaptedTransitRouter(MyTransitRouterConfig myTRConfig, final TransitSchedule schedule) {   //creado una vez
+		super(schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig));    
 		//attention : the transit network is created first in the upper class   with "this.adaptedTransitNetwork = buildNetwork()";
 	}
 
@@ -127,8 +126,9 @@ public class AdaptedTransitRouter extends TransitRouter {
 	/**necessary to override since it uses a different algo than marcel.  kai, apr'10 
 	 * 
 	 */
-	@Override 
+	@Override
 	protected TransitRouterNetwork buildNetwork() {
+				
 		final TransitRouterNetwork network = new TransitRouterNetwork();
 
 		// build nodes and links connecting the nodes according to the transit routes
@@ -172,12 +172,11 @@ public class AdaptedTransitRouter extends TransitRouter {
 			network.createLink(tuple.getFirst(), tuple.getSecond(), null, null);
 		}
 
-		System.out.println("\n\n\n\ntransfers:" + transfers);
 		System.out.println("adapted router network statistics:");
 		System.out.println(" # nodes: " + network.getNodes().size());
 		System.out.println(" # links: " + network.getLinks().size());
 		System.out.println(" # transfer links: " + toBeAdded.size());
-
+		System.out.println(" # transfers:" + transfers);
 		return network;
 	}
 

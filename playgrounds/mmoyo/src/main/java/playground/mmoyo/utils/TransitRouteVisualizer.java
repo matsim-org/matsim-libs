@@ -20,7 +20,7 @@ public class TransitRouteVisualizer {
 	public TransitRouteVisualizer(String config,String strTrRouteId){
 		
 		//find transitRoute
-		ScenarioImpl scenario = new TransScenarioLoader ().loadScenario(config);
+		ScenarioImpl scenario = new TransScenarioLoader ().loadScenarioWithTrSchedule(config);
 		TransitRoute transitRoute = null;
 		Iterator<Entry<Id, TransitLine>> iter = scenario.getTransitSchedule().getTransitLines().entrySet().iterator();
 		while(transitRoute==null && iter.hasNext()){
@@ -87,8 +87,8 @@ public class TransitRouteVisualizer {
 		if (args.length==1){
 			config = args[0];
 		}else{
-			config= "../playgrounds/mmoyo/output/trRoutVis/config.xml";
-			strTrRouteId = "B-296.101.901.H";
+			config= "../playgrounds/mmoyo/output/100plans_bestValues_config.xml";
+			strTrRouteId = "S-42.002.001.H";
 		}
 		new TransitRouteVisualizer(config, strTrRouteId);
 	}

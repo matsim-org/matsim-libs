@@ -20,7 +20,7 @@ import playground.mmoyo.utils.TransScenarioLoader;
 /**finds connections with transfer point that are farther than the destination point **/ 
 public class FindRoundaboutConnections {
 	
-	private Population createDetouredPlan (ScenarioImpl scenario){
+	private Population createDetouredPlan (final ScenarioImpl scenario){
 		Population detouredPopulation = new PopulationImpl(scenario);
 
 		/*
@@ -31,9 +31,9 @@ public class FindRoundaboutConnections {
 		new PlanRouter(scenario);
 		*/
 
-		scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));  //fragmented plans! otherwise it analyzes only the first leg
+		Population fragmentedPopulation = new PlanFragmenter().run(scenario.getPopulation());  //fragmented plans! otherwise it analyzes only the first leg
 		
-		for (Person person : scenario.getPopulation().getPersons().values() ){
+		for (Person person : fragmentedPopulation.getPersons().values() ){
 			Plan plan =  person.getSelectedPlan();   
 			
 			List<Leg> legList = new ArrayList<Leg>();
@@ -77,15 +77,15 @@ public class FindRoundaboutConnections {
 	
 	public static void main(String[] args) {
 		//String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/BerlinBrandenburg/routed_1x_subset_xy2links_ptplansonly/fragmented/config/config_routedPlans_MoyoParameterized.xml";
-		String configFile = "../playgrounds/mmoyo/output/comparison/Berlin/16plans/difConfig.xml";
+		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		//if (args[0]!= null) configFile = args[0];
 		
-		ScenarioImpl scenario = new TransScenarioLoader().loadScenario(configFile);
+		ScenarioImpl scenario = new TransScenarioLoader().loadScenarioWithTrSchedule(configFile);
 		Population detouredPopulation = new FindRoundaboutConnections().createDetouredPlan(scenario);
 		
 		System.out.println("writing detoured population plan file in output folder..." );
 		PopulationWriter popwriter = new PopulationWriter(detouredPopulation, scenario.getNetwork());
-		popwriter.write(scenario.getConfig().controler().getOutputDirectory() + "/detouredPopulation.xml") ;
+		popwriter.write(scenario.getConfig().controler().getOutputDirectory() + "detouredPopulation.xml") ;
 		System.out.println("done");
 	}
 	

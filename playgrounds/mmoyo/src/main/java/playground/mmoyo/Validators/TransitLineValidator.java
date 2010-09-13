@@ -76,7 +76,7 @@ public class TransitLineValidator {
 			configFile= "../playgrounds/mmoyo/output/config.xml"; 
 		}
 		
-		ScenarioImpl scenarioImpl = new playground.mmoyo.utils.TransScenarioLoader().loadScenario(configFile);
+		ScenarioImpl scenarioImpl = new playground.mmoyo.utils.TransScenarioLoader().loadScenarioWithTrSchedule(configFile);
 		new TransitLineValidator(scenarioImpl);
 	}
 }

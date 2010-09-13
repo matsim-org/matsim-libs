@@ -14,7 +14,7 @@ import playground.mmoyo.utils.TransScenarioLoader;
 public class StopFacilityValidator {
 	
 	public StopFacilityValidator(String config){
-		ScenarioImpl scenario = new TransScenarioLoader ().loadScenario(config);
+		ScenarioImpl scenario = new TransScenarioLoader ().loadScenarioWithTrSchedule(config);
 		TransitSchedule trSchedule = scenario.getTransitSchedule();
 		List<Id> LinkIdList = new ArrayList<Id>();
 		for (TransitStopFacility transitStopFacility: trSchedule.getFacilities().values()){

@@ -27,7 +27,7 @@ public class AdaptedLauncher {
 	public String route(final String configFile){
 		
 		//load scenario
-		ScenarioImpl scenarioImpl = new TransScenarioLoader ().loadScenario(configFile); 
+		ScenarioImpl scenarioImpl = new TransScenarioLoader ().loadScenarioWithTrSchedule(configFile); 
 		
 		//create output directory if does not exist
 		if (!new File(scenarioImpl.getConfig().controler().getOutputDirectory()).exists()){

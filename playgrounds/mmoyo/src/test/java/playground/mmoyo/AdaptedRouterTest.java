@@ -34,7 +34,7 @@ public class AdaptedRouterTest extends MatsimTestCase {
 		myConfig.minStationsNum= 2;
 		myConfig.scenarioName= "test";
 
-		ScenarioImpl scenarioImpl = new TransScenarioLoader ().loadScenario(configFile);
+		ScenarioImpl scenarioImpl = new TransScenarioLoader ().loadScenarioWithTrSchedule(configFile);
 		AdaptedTransitRouterNetworkTravelTimeCost adaptedTravelTimeCost = new AdaptedTransitRouterNetworkTravelTimeCost(myConfig);
 		AdaptedTransitRouter adaptedTransitRouter = new AdaptedTransitRouter(myConfig, scenarioImpl.getTransitSchedule());
 

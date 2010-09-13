@@ -13,14 +13,10 @@ import org.xml.sax.SAXException;
 
 public class TransScenarioLoader {
 
-	public ScenarioImpl loadScenario(String configFile) {
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
-		ScenarioImpl scenario = scenarioLoader.getScenario();
-		scenarioLoader.loadScenario();
+	public ScenarioImpl loadScenarioWithTrSchedule(String configFile) {
+		ScenarioImpl scenario = this.loadScenario(configFile);
 
-		////////load transit schedule by config/////////////////
-		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
+		//load transit schedule by config
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		try {
 			new TransitScheduleReaderV1(schedule, scenario.getNetwork()).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
@@ -29,9 +25,17 @@ public class TransScenarioLoader {
 		} catch (IOException e) {e.printStackTrace();
 		}
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
-		/////////////////////////////////////
-		
-		return scenario;
-	}
 
+		return scenario;	
+	}
+	
+	public ScenarioImpl loadScenario(String configFile) {
+		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(configFile);
+		ScenarioImpl scenario = scenarioLoader.getScenario();
+		scenarioLoader.loadScenario();
+		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().scenario().setUseVehicles(true);
+		return scenario;	
+	}
+	
 }

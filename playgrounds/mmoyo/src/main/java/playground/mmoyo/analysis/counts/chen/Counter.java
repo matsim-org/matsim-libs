@@ -59,12 +59,8 @@ public class Counter {
 				throw new FileNotFoundException("Can not find alighting counts file : " + alightFile.getPath());
 			}
 			
-			
 			System.out.println("\n\n  procesing: " + completePath);
 			TrCtl.main(new String[]{completePath});
 		}
-		
-		//Runtime runtime = Runtime.getRuntime();
-		//runtime.exec("shutdown -s -t 120 -f");  
 	}
 }

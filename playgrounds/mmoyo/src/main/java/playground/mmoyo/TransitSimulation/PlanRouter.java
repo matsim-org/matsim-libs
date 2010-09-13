@@ -86,7 +86,7 @@ public class PlanRouter {
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/config.xml";
 		}
 
-		ScenarioImpl scenarioImpl = new TransScenarioLoader ().loadScenario(configFile); 
+		ScenarioImpl scenarioImpl = new TransScenarioLoader ().loadScenarioWithTrSchedule(configFile); 
 		
 		new PlanRouter(scenarioImpl);
 		System.out.println("total duration: " + (System.currentTimeMillis()-startTime));
