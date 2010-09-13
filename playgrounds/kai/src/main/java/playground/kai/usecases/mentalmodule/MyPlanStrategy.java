@@ -19,44 +19,34 @@
 
 package playground.kai.usecases.mentalmodule;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 
-public class MyStrategy extends PlanStrategy {
+public class MyPlanStrategy extends PlanStrategy {
 
-
-
-	public MyStrategy(Controler controler) {
+	public MyPlanStrategy(Controler controler) {
 		// also possible: MyStrategy( Scenario scenario ).  But then I do not have events.  kai, aug'10
-		super(new RandomPlanSelector());
-
-		MyModule mod = new MyModule( controler ) ;
-
+		
+		// A PlanStrategy is something that can be applied to a person(!).  
+		
+		// It first selects one of the plans:
+		super( new MyPlanSelector() );
+		
+		// the plan selector may, at the same time, collect events:
+		controler.getEvents().addHandler( (EventHandler) this.getPlanSelector() ) ;
+		
+		// if you just want to select plans, you can stop here.  
+		
+		// Otherwise, to do something with that plan, one needs to add modules into the strategy.  If there is at least 
+		// one module added here, then the plan is copied and then modified.
+		MyPlanStrategyModule mod = new MyPlanStrategyModule( controler ) ;
 		addStrategyModule(mod) ;
 
-		EventsManager events = controler.getEvents() ;
-		events.addHandler( mod ) ;
-
-	}
-
-	public static void main(final String[] args) {
-
-		Config config;
-		if ( args.length==0 ) {
-			config = Gbl.createConfig(new String[] {"./kai/src/main/java/playground/kai/other/myconfig.xml"});
-		} else {
-			config = Gbl.createConfig(args) ;
-		}
-
-		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-		controler.run();
-
+		// these modules may, at the same time, be events listeners (so that they can collect information):
+		controler.getEvents().addHandler( mod ) ;
+		
 	}
 
 }
