@@ -19,10 +19,13 @@
 
 package playground.mrieser.core.mobsim.network.fastQueueNetwork;
 
+import java.util.Random;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -220,9 +223,10 @@ public class QueueLinkTest {
 	@Test
 	public void testHasSpace() {
 
+		Node node;
 		NetworkLayer net = new NetworkLayer();
 		net.addNode(net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
-		net.addNode(net.getFactory().createNode(new IdImpl(2), new CoordImpl(100, 0)));
+		net.addNode(node = net.getFactory().createNode(new IdImpl(2), new CoordImpl(100, 0)));
 		Link link = net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
 		link.setLength(100);
 		link.setFreespeed(10);
@@ -231,6 +235,9 @@ public class QueueLinkTest {
 		FakeSimEngine engine = new FakeSimEngine();
 		QueueNetwork qnet = new QueueNetwork(engine);
 		QueueLink qlink = new QueueLink(link, qnet);
+		QueueNode qnode = new QueueNode(node, qnet, new Random(1980));
+		qnet.addNode(qnode);
+		qlink.buffer.init();
 
 		VehicleTypeImpl vehType = new VehicleTypeImpl(new IdImpl("5-11"));
 		SimVehicle[] vehicles = new SimVehicle[20];
@@ -271,19 +278,26 @@ public class QueueLinkTest {
 		/*package*/ final FakeSimEngine engine;
 		/*package*/ final QueueNetwork qnet;
 		/*package*/ final QueueLink qlink;
+		private final QueueNode qnode;
 
 		/*package*/ Fixture() {
 			this.net = new NetworkLayer();
+			Node node2 = this.net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
 			this.net.addNode(this.net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
-			this.net.addNode(this.net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0)));
+			this.net.addNode(node2);
 			this.link = this.net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
 			this.link.setLength(1000);
 			this.link.setFreespeed(10);
 			this.link.setCapacity(3600.0);
 			this.link.setNumberOfLanes(1.0);
+
 			this.engine = new FakeSimEngine();
 			this.qnet = new QueueNetwork(this.engine);
 			this.qlink = new QueueLink(this.link, this.qnet);
+			this.qnet.addLink(this.qlink);
+			this.qnode = new QueueNode(node2, this.qnet, new Random(1980));
+			this.qnet.addNode(this.qnode);
+			this.qlink.buffer.init();
 		}
 	}
 
