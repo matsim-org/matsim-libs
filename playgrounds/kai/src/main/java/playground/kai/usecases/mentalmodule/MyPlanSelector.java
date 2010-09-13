@@ -20,6 +20,7 @@
 package playground.kai.usecases.mentalmodule;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
@@ -34,6 +35,11 @@ class MyPlanSelector implements PlanSelector,
 ActivityEndEventHandler // as an example
 {
 	private static final Logger log = Logger.getLogger("dummy");
+	private Scenario sc;
+	
+	MyPlanSelector( Scenario scenario ) {
+		this.sc = scenario ;
+	}
 
 	@Override
 	public Plan selectPlan(Person person) {

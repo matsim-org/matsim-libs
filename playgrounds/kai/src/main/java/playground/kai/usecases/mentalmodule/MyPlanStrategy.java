@@ -32,7 +32,7 @@ public class MyPlanStrategy extends PlanStrategy {
 		// A PlanStrategy is something that can be applied to a person(!).  
 		
 		// It first selects one of the plans:
-		super( new MyPlanSelector() );
+		super( new MyPlanSelector( controler.getScenario() ) );
 		
 		// the plan selector may, at the same time, collect events:
 		controler.getEvents().addHandler( (EventHandler) this.getPlanSelector() ) ;
