@@ -66,7 +66,7 @@ public class DoublePop extends NewPopulation {
 		long oldId = Integer.parseInt(person.getId().toString());
 		// produce new Person with new Id
 		// if (n == 1) {
-		for (int i = 1; i < 10; i++)
+		for (int i = 1; i < 2; i++)
 		// createNewPerson(oldId + i);
 
 		{
@@ -99,9 +99,9 @@ public class DoublePop extends NewPopulation {
 
 	public static void main(final String[] args) {
 
-		String networkFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/network.xml";
-		String plansFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/plans100.xml";
-		String outputPlansFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/pop1k.xml";
+		String networkFilename = "../../matsim/examples/equil/network.xml";
+		String plansFilename = "../../MATSim_integration_demandCalibration/tests/plans100withPt.xml";
+		String outputPlansFilename = "../../MATSim_integration_demandCalibration/tests/plans200withPt.xml";
 
 		ScenarioImpl s = new ScenarioImpl();
 

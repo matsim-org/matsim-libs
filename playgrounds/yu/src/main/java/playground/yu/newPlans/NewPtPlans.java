@@ -114,9 +114,9 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		final String netFilename = "yu/test/input/playground/yu/pseudoPt/network.xml";
-		final String plansFilename = "yu/test/input/playground/yu/pseudoPt/plans100.xml";
-		final String outputFilename = "yu/test/input/playground/yu/pseudoPt/plans100withPt.xml";
+		final String netFilename = "../../matsim/examples/equil/network.xml";
+		final String plansFilename = "../../matsim/examples/equil/plans100.xml";
+		final String outputFilename = "../../MATSim_integration_demandCalibration/tests/plans100withPt.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkImpl network = scenario.getNetwork();
