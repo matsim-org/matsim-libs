@@ -218,7 +218,7 @@ public class FacilitiesAllActivitiesFTE {
 					if (ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
 						// create the work activity and its capacity according to all the computation done before
 						a = f.createActivityOption("work");
-						a.setCapacity(tempFacilities.get(tempFacilityId));
+						a.setCapacity((double) tempFacilities.get(tempFacilityId));
 
 						// create the other activities
 						if (this.facilityActivities.containsKey(attributeId)) {
@@ -247,7 +247,7 @@ public class FacilitiesAllActivitiesFTE {
 						} else if(sector.equals(ProductionSector.SECTOR3)) {
 							a = f.createActivityOption(FacilitiesProductionKTI.WORK_SECTOR3);
 						}
-						a.setCapacity(tempFacilities.get(tempFacilityId));
+						a.setCapacity((double) tempFacilities.get(tempFacilityId));
 
 						// add more activities as planned for KTI Year 2008
 						if (this.facilityActivities.containsKey(activityId)) {
@@ -257,7 +257,7 @@ public class FacilitiesAllActivitiesFTE {
 							// so capacity depends on the number of people working somewhere
 							// this is especially opposed to using sales area as trip attraction/trip production parameter
 							// as used in established transport models
-							a.setCapacity(tempFacilities.get(tempFacilityId) * (10 + random.nextInt(10)));
+							a.setCapacity((double) (tempFacilities.get(tempFacilityId) * (10 + random.nextInt(10))));
 						}
 					}
 

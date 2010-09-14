@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 
 /**
@@ -69,7 +69,7 @@ public class NewSmallPlan extends NewPopulation {
 
 		Scenario s = new ScenarioImpl();
 
-		NetworkLayer network = (NetworkLayer) s.getNetwork();
+		NetworkImpl network = (NetworkImpl) s.getNetwork();
 		new MatsimNetworkReader(s).readFile(netFilename);
 
 		Population population = s.getPopulation();

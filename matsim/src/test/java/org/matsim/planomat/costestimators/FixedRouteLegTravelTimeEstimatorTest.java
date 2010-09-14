@@ -39,7 +39,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -446,7 +446,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		assertEquals(linkEndTime, Time.parseTime("06:02:48"), EPSILON);
 
 		// for start times outside the time bin, the free speed travel time is returned
-		double freeSpeedTravelTime = ((LinkImpl) ((NetworkLayer)this.scenario.getNetwork()).getLinks().get(linkId)).getFreespeedTravelTime(Time.UNDEFINED_TIME);
+		double freeSpeedTravelTime = ((LinkImpl) ((NetworkImpl)this.scenario.getNetwork()).getLinks().get(linkId)).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 
 		startTime = Time.parseTime("05:59:00");
 		linkEndTime = testee.processLink(this.scenario.getNetwork().getLinks().get(linkId), startTime);

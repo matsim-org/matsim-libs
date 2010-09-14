@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -91,7 +91,7 @@ public class ScenarioDilute {
 		System.out.println("done. (loading network)");
 
 		Config config = sl.getScenario().getConfig();
-		NetworkLayer network = sl.getScenario().getNetwork();
+		NetworkImpl network = sl.getScenario().getNetwork();
 
 		System.out.println("complete world...");
 		Set<String> exTxpes = new TreeSet<String>();
@@ -103,7 +103,7 @@ public class ScenarioDilute {
 		exTxpes.add("4-4130-1"); // ferry
 		exTxpes.add("4-4130-2"); // train
 		exTxpes.add("7-4130-1"); // ferry
-		sc.getWorld().complete(exTxpes, config);
+		// sc.getWorld().complete(exTxpes, config);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 

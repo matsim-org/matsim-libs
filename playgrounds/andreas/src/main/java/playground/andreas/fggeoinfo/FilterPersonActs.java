@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
@@ -140,7 +140,7 @@ public class FilterPersonActs extends NewPopulation {
 		String inPlansFile = "d:\\Berlin\\berlin-sharedsvn\\plans\\baseplan_900s.xml.gz";
 		String outPlansFile = inputDir + "baseplan_900s_movedToBBI.xml.gz";
 
-		NetworkLayer net = sc.getNetwork();
+		NetworkImpl net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();

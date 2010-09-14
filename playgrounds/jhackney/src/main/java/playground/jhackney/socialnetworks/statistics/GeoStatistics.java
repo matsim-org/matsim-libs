@@ -55,7 +55,8 @@ public class GeoStatistics {
 
 			ActivityFacility aHome = this.facilities.getFacilities().get(((PlanImpl) aPerson.getSelectedPlan()).getFirstActivity().getFacilityId());
 			//			Each facility should only have one location but UpMapping is a TreeMap so pick the first entry
-			MappedLocation aLoc = ((ActivityFacilityImpl) aHome).getUpMapping().get(((ActivityFacilityImpl) aHome).getUpMapping().firstKey());
+			// MappedLocation aLoc = ((ActivityFacilityImpl) aHome).getUpMapping().get(((ActivityFacilityImpl) aHome).getUpMapping().firstKey());
+			MappedLocation aLoc = null;
 			if(this.locVertex.containsKey(aLoc)){
 				v=this.locVertex.get(aLoc);
 //				System.out.println("  ### GEOSTAT: Graph contains vertex "+ v+" "+aLoc.getId());
@@ -84,9 +85,12 @@ public class GeoStatistics {
 
 			ActivityFacilityImpl aHome=(ActivityFacilityImpl) this.facilities.getFacilities().get(((PlanImpl) personA.getSelectedPlan()).getFirstActivity().getFacilityId());
 			ActivityFacilityImpl bHome=(ActivityFacilityImpl) this.facilities.getFacilities().get(((PlanImpl) personB.getSelectedPlan()).getFirstActivity().getFacilityId());
-			MappedLocation aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
-			MappedLocation bLoc = bHome.getUpMapping().get(bHome.getUpMapping().firstKey());
+			// MappedLocation aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
+			// MappedLocation bLoc = bHome.getUpMapping().get(bHome.getUpMapping().firstKey());
 
+			MappedLocation aLoc = null;
+			MappedLocation bLoc = null;
+			
 			Vertex aVertex = this.locVertex.get(aLoc);
 			Vertex bVertex = this.locVertex.get(bLoc);
 

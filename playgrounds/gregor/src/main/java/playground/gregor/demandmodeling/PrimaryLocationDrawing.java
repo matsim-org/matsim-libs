@@ -40,7 +40,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -69,7 +69,7 @@ public class PrimaryLocationDrawing {
 
 	private static double BETA = 0.0013;
 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final String zonesFilename;
 	private final String demandFilename;
 	private final String districts;
@@ -85,7 +85,7 @@ public class PrimaryLocationDrawing {
 
 	private static final Logger log = Logger.getLogger(PrimaryLocationDrawing.class);
 
-	public PrimaryLocationDrawing(final NetworkLayer network, final String zonesFile, final String demandFilename, final String districts) {
+	public PrimaryLocationDrawing(final NetworkImpl network, final String zonesFile, final String demandFilename, final String districts) {
 		this.network = network;
 		this.zonesFilename = zonesFile;
 		this.demandFilename = demandFilename;
@@ -347,7 +347,7 @@ public class PrimaryLocationDrawing {
 
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		new PrimaryLocationDrawing(network,zonesFilename,demandFilename,districts).run(scenario.getConfig());

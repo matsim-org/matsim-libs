@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -82,7 +82,7 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 		final String networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String outputDir = "../runs_SVN/run674/it.1000/1000.analysis/";
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		Population population = scenario.getPopulation();

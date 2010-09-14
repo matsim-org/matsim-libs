@@ -153,12 +153,6 @@ public class FakeLink implements Link {
 		return this.id;
 	}
 
-	@Deprecated
-	@Override
-	public Layer getLayer() {
-		throw new UnsupportedOperationException();
-	}
-
 	@Override
 	public Coord getCoord() {
 		throw new UnsupportedOperationException();

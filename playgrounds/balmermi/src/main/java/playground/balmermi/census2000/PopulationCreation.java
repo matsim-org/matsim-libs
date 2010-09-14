@@ -52,13 +52,9 @@ public class PopulationCreation {
 		System.out.println("MATSim-POP: create Population based on census2000 data.");
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		World world = scenario.getWorld();
+		World world = new World();
 
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile(null);//config.world().getInputFile());
-		System.out.println("  done.");
-
+		
 		System.out.println("  reading facilities xml file... ");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());

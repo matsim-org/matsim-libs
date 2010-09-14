@@ -24,26 +24,26 @@ package playground.rost.eaflow.ea_flow;
 import java.util.Hashtable;
 
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 
 public class Distances {
 
 	/**----------- Fields -------------*/
-	final NetworkLayer network;
+	final NetworkImpl network;
 	
 	private Hashtable<Node, Integer> distLables = new Hashtable<Node, Integer>();
 	
 	/**----------- Constructor -------------*/
 	
-	public Distances(final NetworkLayer network){
+	public Distances(final NetworkImpl network){
 		this.network = network;
 		for(Node node : network.getNodes().values()){
 			distLables.put(node, Integer.MAX_VALUE);
 		}
 	}
 
-	public Distances(final NetworkLayer network, Node specialNode){
+	public Distances(final NetworkImpl network, Node specialNode){
 		this.network = network;
 		for(Node node : network.getNodes().values()){
 			if(node == specialNode){

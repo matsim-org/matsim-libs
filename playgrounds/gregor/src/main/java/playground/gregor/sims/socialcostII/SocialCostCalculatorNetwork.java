@@ -38,14 +38,14 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.IntegerCache;
 
 public class SocialCostCalculatorNetwork implements IterationStartsListener,  AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 
 	private final int travelTimeBinSize;
 	private final int numSlots;
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final EventsManager events ;
 
 
@@ -61,15 +61,15 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 	static int iteration = 0;
 	private final double storageCapFactor;
 
-	public SocialCostCalculatorNetwork(final NetworkLayer network, final double storageCapFactor, final EventsManager events ) {
+	public SocialCostCalculatorNetwork(final NetworkImpl network, final double storageCapFactor, final EventsManager events ) {
 		this(network, 15*60, 30*3600, storageCapFactor, events );	// default timeslot-duration: 15 minutes
 	}
 
-	public SocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice, final double storageCapFactor, final EventsManager events ) {
+	public SocialCostCalculatorNetwork(final NetworkImpl network, final int timeslice, final double storageCapFactor, final EventsManager events ) {
 		this(network, timeslice, 30*3600, storageCapFactor, events ); // default: 30 hours at most
 	}
 
-	public SocialCostCalculatorNetwork(final NetworkLayer network, final int timeslice,	final int maxTime, final double storageCapFactor, final EventsManager events ) {
+	public SocialCostCalculatorNetwork(final NetworkImpl network, final int timeslice,	final int maxTime, final double storageCapFactor, final EventsManager events ) {
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
 		this.network = network;
@@ -259,7 +259,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 
 		// first guess at storageCapacity:
 		double storageCapacity = (link.getLength() * link.getNumberOfLanes())
-				/ ((NetworkLayer) link.getLayer()).getEffectiveCellSize() * storageCapFactor;
+				/ ((NetworkImpl) ((LinkImpl) link).getNetwork()).getEffectiveCellSize() * storageCapFactor;
 
 		return (int) Math.max(Math.floor(storageCapacity),1);
 	}

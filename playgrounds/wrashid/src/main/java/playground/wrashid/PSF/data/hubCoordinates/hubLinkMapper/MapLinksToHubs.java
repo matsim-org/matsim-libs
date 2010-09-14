@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.GeneralLib;
@@ -23,7 +23,7 @@ public class MapLinksToHubs {
 		// key: hub number, value: linkIds
 		LinkedListValueHashMap<Integer,LinkedList<Id>> hubLinkMapping=new LinkedListValueHashMap<Integer,LinkedList<Id>>();
 		StringMatrix matrix=GeneralLib.readStringMatrix("A:/data/ewz daten/GIS_coordinates_of_managers.txt");
-		NetworkLayer network=GeneralLib.readNetwork("A:/data/matsim/input/runRW1003/network-osm-ch.xml.gz");
+		NetworkImpl network=GeneralLib.readNetwork("A:/data/matsim/input/runRW1003/network-osm-ch.xml.gz");
 		
 		double averageHubSubManagers=6.381134321058625;
 		

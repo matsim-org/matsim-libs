@@ -26,7 +26,7 @@ import java.awt.Graphics;
 
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.rost.controller.map.BasicMap;
 import playground.rost.controller.vismodule.AbstractVisModuleImpl;
@@ -34,9 +34,9 @@ import playground.rost.controller.vismodule.VisModuleContainer;
 
 public class MarkNodeVisModule extends AbstractVisModuleImpl {
 
-	NetworkLayer network;
+	NetworkImpl network;
 	
-	public MarkNodeVisModule(VisModuleContainer vMContainer, NetworkLayer network)
+	public MarkNodeVisModule(VisModuleContainer vMContainer, NetworkImpl network)
 	{
 		super(vMContainer, "MarkNodeView");
 		this.network = network;

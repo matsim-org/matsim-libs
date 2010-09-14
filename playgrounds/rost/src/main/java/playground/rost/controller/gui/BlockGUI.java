@@ -33,7 +33,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
 import org.xml.sax.SAXException;
@@ -51,12 +51,12 @@ import playground.rost.util.PathTracker;
 
 public class BlockGUI extends AbstractBasicMapGUIImpl {
 
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 	protected BlockCreator blockCreator;
 	protected JButton btnWriteNetworkAndBlocks;
 	protected JPanel pInfo;
 	
-	public BlockGUI(NetworkLayer network) {
+	public BlockGUI(NetworkImpl network) {
 		super("Block GUI");
 		this.network = network;
 		
@@ -133,7 +133,7 @@ public class BlockGUI extends AbstractBasicMapGUIImpl {
 	{
 		// TODO Auto-generated method stub
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
 		try {
 			nReader.parse(PathTracker.resolve("matExtract"));

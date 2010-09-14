@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
@@ -92,7 +92,7 @@ public class EmptyPlans {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(networkfile);
 	//	Node sink = network.getNode(sinkid);

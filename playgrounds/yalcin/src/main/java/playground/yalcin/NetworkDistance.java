@@ -38,7 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.router.Dijkstra;
@@ -67,7 +67,7 @@ public class NetworkDistance {
 
 	public static void exportNetwork() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
@@ -103,7 +103,7 @@ public class NetworkDistance {
 
 	public static void convertNetwork() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
@@ -113,7 +113,7 @@ public class NetworkDistance {
 
 	public static void findDistances() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(wgs84NetworkFilename);
 
 		// set the config to only look at distance costs, not travel time costs

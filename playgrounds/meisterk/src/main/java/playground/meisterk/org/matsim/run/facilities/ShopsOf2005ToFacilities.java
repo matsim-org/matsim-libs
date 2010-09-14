@@ -58,6 +58,7 @@ import net.opengis.kml._2.TimeSpanType;
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -768,7 +769,7 @@ public class ShopsOf2005ToFacilities {
 
 			facilityId = shopId.getShopId();
 			//System.out.println(facilityId);
-			ActivityFacilityImpl theCurrentPickpay = facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacilityImpl theCurrentPickpay = (ActivityFacilityImpl) facilities.getFacilities().get(new IdImpl(facilityId));
 			if (theCurrentPickpay != null) {
 
 				// yeah, we can use the open times
@@ -875,9 +876,9 @@ public class ShopsOf2005ToFacilities {
 			System.out.println(facilityId);
 			System.out.flush();
 
-			ActivityFacilityImpl theCurrentMigrosZH = facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacility theCurrentMigrosZH = facilities.getFacilities().get(new IdImpl(facilityId));
 			if (theCurrentMigrosZH != null) {
-				ActivityOptionImpl shopping = theCurrentMigrosZH.createActivityOption(ACTIVITY_TYPE_SHOP);
+				ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentMigrosZH).createActivityOption(ACTIVITY_TYPE_SHOP);
 				String openTimeString = tokens[6];
 				openHourTokens = openTimeString.split(ANYTHING_BUT_DIGITS);
 				openDayTokens = openTimeString.split(ANYTHING_BUT_LETTERS);
@@ -1048,7 +1049,7 @@ public class ShopsOf2005ToFacilities {
 			addressLinePointer++;
 
 			//System.out.println(facilityId);
-			ActivityFacilityImpl theCurrentMigrosOstschweiz = facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacilityImpl theCurrentMigrosOstschweiz = (ActivityFacilityImpl) facilities.getFacilities().get(new IdImpl(facilityId));
 			if (theCurrentMigrosOstschweiz != null) {
 
 				ActivityOptionImpl shopping = theCurrentMigrosOstschweiz.createActivityOption(ACTIVITY_TYPE_SHOP);
@@ -1142,10 +1143,10 @@ public class ShopsOf2005ToFacilities {
 			shopId = new ShopId(COOP, tokens[7], tokens[8], COOP_ZH, tokens[43], tokens[44], tokens[42]);
 			String facilityId = shopId.getShopId();
 			System.out.println(facilityId);
-			ActivityFacilityImpl theCurrentCoopZH = facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacility theCurrentCoopZH = facilities.getFacilities().get(new IdImpl(facilityId));
 			if (theCurrentCoopZH != null) {
 
-				ActivityOptionImpl shopping = theCurrentCoopZH.createActivityOption(ACTIVITY_TYPE_SHOP);
+				ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentCoopZH).createActivityOption(ACTIVITY_TYPE_SHOP);
 
 				for (int tokenPos = START_OPEN_TOKEN_INDEX; tokenPos <= END_OPEN_TOKEN_INDEX; tokenPos++) {
 
@@ -1224,7 +1225,7 @@ public class ShopsOf2005ToFacilities {
 
 			String facilityId = shopId.getShopId();
 			System.out.println(facilityId);
-			ActivityFacilityImpl theCurrentCoopTG = facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacilityImpl theCurrentCoopTG = (ActivityFacilityImpl) facilities.getFacilities().get(new IdImpl(facilityId));
 			if (theCurrentCoopTG != null) {
 				ActivityOptionImpl shopping = theCurrentCoopTG.createActivityOption(ACTIVITY_TYPE_SHOP);
 
@@ -1384,9 +1385,9 @@ public class ShopsOf2005ToFacilities {
 				System.out.println(saturdayToken);
 				System.out.println();
 
-				ActivityFacilityImpl theCurrentDenner = facilities.getFacilities().get(new IdImpl(shopId.getShopId()));
+				ActivityFacility theCurrentDenner = facilities.getFacilities().get(new IdImpl(shopId.getShopId()));
 				if (theCurrentDenner != null) {
-					ActivityOptionImpl shopping = theCurrentDenner.createActivityOption(ACTIVITY_TYPE_SHOP);
+					ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentDenner).createActivityOption(ACTIVITY_TYPE_SHOP);
 					for (String openTimeString : new String[]{weekDayToken, saturdayToken}) {
 
 						openHourTokens = openTimeString.split(ANYTHING_BUT_DIGITS);
@@ -1485,11 +1486,11 @@ public class ShopsOf2005ToFacilities {
 		facilities_reader.readFile(config.facilities().getInputFile());
 		System.out.println("Reading facilities xml file...done.");
 
-		Iterator<ActivityFacilityImpl> facilityIterator = shopsOf2005.getFacilities().values().iterator();
+		Iterator<ActivityFacility> facilityIterator = shopsOf2005.getFacilities().values().iterator();
 
 		while (facilityIterator.hasNext()) {
 
-			ActivityFacilityImpl facility = facilityIterator.next();
+			ActivityFacilityImpl facility = (ActivityFacilityImpl) facilityIterator.next();
 			facilityId = facility.getId().toString();
 			System.out.println(facilityId);
 
@@ -1512,7 +1513,7 @@ public class ShopsOf2005ToFacilities {
 				(int) facility.getCoord().getX();
 			;
 
-			ActivityOptionImpl shopping = facility.getActivityOptions().get(ACTIVITY_TYPE_SHOP);
+			ActivityOptionImpl shopping = (ActivityOptionImpl) facility.getActivityOptions().get(ACTIVITY_TYPE_SHOP);
 			if (shopping != null) {
 
 				// open times (variable length)
@@ -1643,10 +1644,10 @@ public class ShopsOf2005ToFacilities {
 			shopIconLink.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
 			System.out.println("Initializing KML...done.");
 
-			Iterator<? extends ActivityFacilityImpl> facilityIterator = facilities.getFacilities().values().iterator();
+			Iterator<ActivityFacility> facilityIterator = facilities.getFacilities().values().iterator();
 
 			while (facilityIterator.hasNext()) {
-				ActivityFacilityImpl facility = facilityIterator.next();
+				ActivityFacilityImpl facility = (ActivityFacilityImpl) facilityIterator.next();
 				facilityId = facility.getId().toString();
 //				System.out.println(facility.toString());
 				//System.out.println(facilityId);

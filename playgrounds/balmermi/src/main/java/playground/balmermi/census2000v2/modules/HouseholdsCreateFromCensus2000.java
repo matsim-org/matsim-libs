@@ -104,7 +104,7 @@ public class HouseholdsCreateFromCensus2000 {
 				
 				// check for existing facility
 				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
-				ActivityFacilityImpl f = this.facilities.getFacilities().get(f_id);
+				ActivityFacilityImpl f = (ActivityFacilityImpl) this.facilities.getFacilities().get(f_id);
 				if (f == null) { throw new RuntimeException("Line "+line_cnt+": Facility id="+f_id+" does not exist!"); }
 				if (f.getActivityOptions().get(CAtts.ACT_HOME) == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
 				

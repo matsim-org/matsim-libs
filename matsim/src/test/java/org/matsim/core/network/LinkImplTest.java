@@ -48,7 +48,7 @@ public class LinkImplTest extends MatsimTestCase {
 		 * The network contains an exactly horizontal, an exactly vertical, an exactly diagonal
 		 * and another link with no special slope to also test possible special cases.
 		 */
-		final NetworkLayer network = new NetworkLayer();
+		final NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 1000));
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1000, 2000));
@@ -142,7 +142,7 @@ public class LinkImplTest extends MatsimTestCase {
 	}
 
 	public void testSetAttributes() {
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		network.setCapacityPeriod(3600.0);
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(50, 50));

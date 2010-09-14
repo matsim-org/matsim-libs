@@ -22,7 +22,7 @@ package playground.toronto.maneuvers;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 
@@ -60,7 +60,7 @@ public class ManeuverCreation {
 		naemr.printInfo("");
 		
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkfile);
 		naemr.run(network);
 		new NetworkCleaner().run(network);

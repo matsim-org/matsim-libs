@@ -41,7 +41,7 @@ import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelCost;
@@ -51,7 +51,7 @@ import org.matsim.core.utils.misc.IntegerCache;
 public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBeforeCleanupListener, BeforeMobsimListener, LinkEnterEventHandler, AgentStuckEventHandler{
 
 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final int binSize;
 	private final TravelTimeCalculator travelTimeCalculator;
 	private final Population population;
@@ -64,7 +64,7 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, SimulationBe
 	Set<Id> stuckedAgents = new HashSet<Id>();
 
 
-	public SocialCostCalculatorMultiLinkII(NetworkLayer network, int binSize, TravelTimeCalculator travelTimeCalculator, Population population, EventsManager events ) {
+	public SocialCostCalculatorMultiLinkII(NetworkImpl network, int binSize, TravelTimeCalculator travelTimeCalculator, Population population, EventsManager events ) {
 		this.network = network;
 		this.binSize = binSize;
 		this.minK = (int)(3 * 3600 / (double)binSize); //just a HACK needs to be fixed

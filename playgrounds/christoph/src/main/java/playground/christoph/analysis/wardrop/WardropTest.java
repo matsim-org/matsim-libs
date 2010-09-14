@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -38,7 +38,7 @@ public class WardropTest {
 	//protected static ScenarioData scenarioData;
 	protected static ScenarioImpl scenario;
 	protected static Population population;
-	protected static NetworkLayer network;
+	protected static NetworkImpl network;
 	protected static Config config;
 //	protected static NetworkFactory networkFactory = new NetworkFactory();
 

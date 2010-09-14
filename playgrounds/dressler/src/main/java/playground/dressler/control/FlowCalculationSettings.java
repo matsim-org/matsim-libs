@@ -27,7 +27,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.dressler.Interval.Interval;
 
@@ -84,7 +84,7 @@ public class FlowCalculationSettings {
 	private HashMap<Link, Integer> _capacities;
 	private HashMap<Link, Integer> _lengths;
 
-	private NetworkLayer _network;
+	private NetworkImpl _network;
 
 	// leave these untouched!
 	private HashMap<Node, Integer> _demands = null;
@@ -117,7 +117,7 @@ public class FlowCalculationSettings {
 		return prepare(false); // default is to prepare just once
 	}
 
-	public void setNetwork(NetworkLayer network) {
+	public void setNetwork(NetworkImpl network) {
 		this._network = network;
 	}
 
@@ -364,7 +364,7 @@ public class FlowCalculationSettings {
 	  return this._lengths.get(edge);
 	}
 
-	public NetworkLayer getNetwork() {
+	public NetworkImpl getNetwork() {
 		return this._network;
 	}
 

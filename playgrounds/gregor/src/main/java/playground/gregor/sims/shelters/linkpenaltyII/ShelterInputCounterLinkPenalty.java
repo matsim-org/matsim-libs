@@ -30,7 +30,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.evacuation.base.Building;
 
 public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, LinkEnterEventHandler {
@@ -47,7 +47,7 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 	private int it;
 
 
-	public ShelterInputCounterLinkPenalty(NetworkLayer network, HashMap<Id,Building> shelterLinkMapping, EventsManagerImpl events) {
+	public ShelterInputCounterLinkPenalty(NetworkImpl network, HashMap<Id,Building> shelterLinkMapping, EventsManagerImpl events) {
 
 		this.events = events;
 		this.shelterLinkMapping = shelterLinkMapping;

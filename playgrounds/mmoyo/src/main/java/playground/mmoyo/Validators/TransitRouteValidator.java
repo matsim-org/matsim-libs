@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -26,7 +26,7 @@ import playground.mmoyo.utils.TransScenarioLoader;
  * Identifies isolated TransitRoutes
  */
 public class TransitRouteValidator {
-	private NetworkLayer logicNetwork;
+	private NetworkImpl logicNetwork;
 	private TransitSchedule transitSchedule;
 	private static final Logger log = Logger.getLogger(TransitRouteValidator.class);
 	

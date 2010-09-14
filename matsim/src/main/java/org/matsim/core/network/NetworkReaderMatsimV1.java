@@ -100,8 +100,8 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startNetwork(final Attributes atts) {
-		if (network instanceof NetworkLayer){
-			((NetworkLayer) this.network).setName(atts.getValue("name"));
+		if (network instanceof NetworkImpl){
+			((NetworkImpl) this.network).setName(atts.getValue("name"));
 		}
 		else {
 			log.warn("used instance of Network doesn't support names, ignoring attribute.");

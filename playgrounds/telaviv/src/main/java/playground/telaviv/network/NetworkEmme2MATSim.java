@@ -49,6 +49,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -141,7 +142,7 @@ public class NetworkEmme2MATSim {
 	
 	private static String separator = ",";
 	
-	public static void readNetwork(NetworkLayer network, boolean useWGS84) {
+	public static void readNetwork(NetworkImpl network, boolean useWGS84) {
 		network.setCapacityPeriod(3600.) ;
 		network.setEffectiveLaneWidth(3.75) ;
 //		network.setEffectiveCellSize(7.5) ;
@@ -272,8 +273,8 @@ public class NetworkEmme2MATSim {
 
 
 	public static void main(String[] args) {
-		NetworkLayer networkITM = new NetworkLayer();
-		NetworkLayer networkWGS84 = new NetworkLayer();
+		NetworkImpl networkITM = NetworkImpl.createNetwork();
+		NetworkImpl networkWGS84 = NetworkImpl.createNetwork();
 
 		log.info("reading network ...");
 		readNetwork(networkITM, false);
@@ -350,7 +351,7 @@ public class NetworkEmme2MATSim {
 	}
 	
 	
-	public static Collection<Feature> generateLinksFromNet(NetworkLayer network) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
+	public static Collection<Feature> generateLinksFromNet(NetworkImpl network) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
 
 		GeometryFactory geoFac = new GeometryFactory();
 		Collection<Feature> features = new ArrayList<Feature>();
@@ -374,7 +375,7 @@ public class NetworkEmme2MATSim {
 		return features;
 	}
 
-	public static Collection<Feature> generateNodesFromNet(NetworkLayer network) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
+	public static Collection<Feature> generateNodesFromNet(NetworkImpl network) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
 
 		GeometryFactory geoFac = new GeometryFactory();
 		Collection<Feature> features = new ArrayList<Feature>();

@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.dressler.ea_flow.Flow;
 //
@@ -14,7 +14,7 @@ public class ExampleMain {
 
 		FlowCalculationSettings settings = new FlowCalculationSettings();
 
-		NetworkLayer network = null;
+		NetworkImpl network = null;
 		HashMap<Node, Integer> demands = null;
 
 		// TODO

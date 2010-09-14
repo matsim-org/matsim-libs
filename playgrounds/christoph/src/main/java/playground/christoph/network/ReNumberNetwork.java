@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 
@@ -46,7 +46,7 @@ public class ReNumberNetwork {
 
 	private static final Logger log = Logger.getLogger(WithinDayControler.class);
 	
-	private static NetworkLayer network;
+	private static NetworkImpl network;
 	private static String networkFile = "mysimulations/kt-zurich-cut/network.xml";
 	private static String outputNetworkFile = "mysimulations/kt-zurich-cut/mapped_network.xml.gz";
 	

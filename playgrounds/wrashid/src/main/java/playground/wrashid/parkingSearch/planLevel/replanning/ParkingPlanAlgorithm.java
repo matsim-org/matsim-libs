@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -138,7 +138,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		//ParkingGeneralLib.printAllParkingFacilityIds(plan);
 		
 		replaceParking(plan, targetActivity, newParking, GlobalRegistry.controler,
-				(NetworkLayer) GlobalRegistry.controler.getNetwork());
+				(NetworkImpl) GlobalRegistry.controler.getNetwork());
 		
 		//ParkingGeneralLib.printAllParkingFacilityIds(plan);
 		
@@ -157,7 +157,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 	 * @param network
 	 */
 	public static void replaceParking(final Plan plan, ActivityImpl targetActivity, ActivityFacilityImpl newParking,
-			Controler controler, NetworkLayer network) {
+			Controler controler, NetworkImpl network) {
 		// make new parking activity activity
 
 		ActivityImpl newParkingActivity = createNewParkingActivity(newParking, network, ParkingRoot.getParkingActivityDuration()
@@ -223,7 +223,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		plan.getPlanElements().add(indexOfDepartingParkingAct, newParkingActivity);
 	}
 
-	private static ActivityImpl createNewParkingActivity(ActivityFacilityImpl newParking, NetworkLayer network,
+	private static ActivityImpl createNewParkingActivity(ActivityFacilityImpl newParking, NetworkImpl network,
 			double parkingActivityDuration) {
 		ActivityImpl newParkingActivity = new ActivityImpl("parking", newParking.getCoord());
 		newParkingActivity.setFacilityId(newParking.getId());

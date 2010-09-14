@@ -44,7 +44,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -99,7 +99,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 	 * @return A HashMap<Node,Integer> containing the demands for every node in the file
 	 * @throws IOException if file reading fails
 	 */
-	private static HashMap<Node,Integer> readDemands(final NetworkLayer network, final String filename) throws IOException{
+	private static HashMap<Node,Integer> readDemands(final NetworkImpl network, final String filename) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		HashMap<Node,Integer> demands = new HashMap<Node,Integer>();
 		String inline = null;
@@ -154,7 +154,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 
 	}
 
-	public Flow calcEAFlow(EvacArea evacArea, NetworkLayer network, PopulationNodeMap populationNodeMap)
+	public Flow calcEAFlow(EvacArea evacArea, NetworkImpl network, PopulationNodeMap populationNodeMap)
 	{
 		Map<Node, Integer> demands = new HashMap<Node, Integer>();
 		for(String id : populationNodeMap.populationForNode.keySet())

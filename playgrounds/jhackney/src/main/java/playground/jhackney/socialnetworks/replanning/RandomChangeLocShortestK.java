@@ -30,7 +30,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -53,14 +53,14 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 
 	private final double[] cum_p_factype;
 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final PersonalizableTravelCost tcost;
 	private final PersonalizableTravelTime ttime;
 	private final String[] factypes;
 
 	private final Knowledges knowledges;
 
-	public RandomChangeLocShortestK(String[] factypes, NetworkLayer network, PersonalizableTravelCost tcost, PersonalizableTravelTime ttime, Knowledges knowledges, SocNetConfigGroup snConfig) {
+	public RandomChangeLocShortestK(String[] factypes, NetworkImpl network, PersonalizableTravelCost tcost, PersonalizableTravelTime ttime, Knowledges knowledges, SocNetConfigGroup snConfig) {
 		weights = snConfig.getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;

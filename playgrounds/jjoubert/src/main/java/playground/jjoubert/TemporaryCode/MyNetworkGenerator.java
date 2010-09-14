@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -42,7 +43,7 @@ public class MyNetworkGenerator {
 	public static void main(String [] args) {
 		String osm = "/Users/johanwjoubert/Downloads/map.osm";
 
-		Network net = new NetworkLayer();
+		Network net = NetworkImpl.createNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, UTM35S);
 
 		OsmNetworkReader onr = new OsmNetworkReader(net,ct);

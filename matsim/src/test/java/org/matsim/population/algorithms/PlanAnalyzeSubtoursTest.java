@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.BasicLocations;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -39,11 +40,10 @@ import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLa
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.Layer;
 
 /**
  * Test class for {@link PlanAnalyzeSubtours}.
@@ -80,7 +80,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
-		this.runDemo((NetworkLayer) network, config.planomat());
+		this.runDemo((NetworkImpl) network, config.planomat());
 	}
 	
 	public void testFacilitiesBased() {
@@ -93,7 +93,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void runDemo(Layer layer, PlanomatConfigGroup planomatConfigGroup) {
+	protected void runDemo(BasicLocations layer, PlanomatConfigGroup planomatConfigGroup) {
 		String UNDEFINED_UNDEFINED_UNDEFINED = Integer
 				.toString(PlanAnalyzeSubtours.UNDEFINED)
 				+ " "
@@ -122,13 +122,13 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		doTest(layer, planomatConfigGroup, "1 2 3 4 2 5 3 6 1", "1 0 0 0 1 1 1 1", 2, map(1,NULL).map(0,1));
 	}
 
-	private void doTest(Layer layer, PlanomatConfigGroup planomatConfigGroup,
+	private void doTest(BasicLocations layer, PlanomatConfigGroup planomatConfigGroup,
 			String facString, String expectedSubtourIndexationString,
 			int expectedNumSubtoursForThis, Map<Integer, Integer> childToParent) {
+		TripStructureAnalysisLayerOption linksOrFacilities = planomatConfigGroup.getTripStructureAnalysisLayer();
+		PlanImpl plan = createPlan(layer, facString, linksOrFacilities);
 		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours();
-		testee.setTripStructureAnalysisLayer(planomatConfigGroup.getTripStructureAnalysisLayer());
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
-		PlanImpl plan = TestsUtil.createPlan(layer, person, TransportMode.car, facString, planomatConfigGroup.getTripStructureAnalysisLayer());
+		testee.setTripStructureAnalysisLayer(linksOrFacilities);
 		testee.run(plan);
 		StringBuilder builder = new StringBuilder();
 		List<Integer> actualSubtourIndexation = toList(testee.getSubtourIndexation());
@@ -150,6 +150,20 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 				assertEquals(entry.getValue(), testee.getParentTours().get(entry.getKey()));
 			}
 		}
+	}
+
+	private PlanImpl createPlan(BasicLocations layer, String facString,
+			TripStructureAnalysisLayerOption linksOrFacilities) {
+		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PlanImpl plan;
+		if (linksOrFacilities.equals(TripStructureAnalysisLayerOption.facility)) {
+			plan = TestsUtil.createPlanFromFacilities((ActivityFacilitiesImpl) layer, person, TransportMode.car, facString);
+		} else if (linksOrFacilities.equals(TripStructureAnalysisLayerOption.link)) {
+			plan = TestsUtil.createPlanFromLinks((NetworkImpl) layer, person, TransportMode.car, facString);
+		} else {
+			throw new RuntimeException("Unknown option.");
+		}
+		return plan;
 	}
 
 

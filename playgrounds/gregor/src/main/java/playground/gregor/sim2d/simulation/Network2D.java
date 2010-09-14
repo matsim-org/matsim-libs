@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -55,7 +56,7 @@ public class Network2D {
 
 	private final Floor floor;
 
-	private NetworkLayer networkLayer;
+	private NetworkImpl networkLayer;
 
 	private HashMap<Link, LineString> finishLines;
 
@@ -79,7 +80,7 @@ public class Network2D {
 
 
 
-	public Network2D(NetworkLayer network, Map<MultiPolygon, NetworkLayer> floors, SegmentedStaticForceField sff, Map<Id, LineString> ls) {
+	public Network2D(NetworkImpl network, Map<MultiPolygon, NetworkLayer> floors, SegmentedStaticForceField sff, Map<Id, LineString> ls) {
 		this.ls = ls;
 		if (floors.size() > 1) {
 			throw new RuntimeException("this has not been implemented yet!");

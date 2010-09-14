@@ -32,7 +32,7 @@ import org.matsim.core.events.EventsManagerFactoryImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
@@ -70,7 +70,7 @@ public class ScenarioPlayer {
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(configFile);
 		ScenarioImpl scenario = sl.getScenario();
 
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 		sl.loadScenario();

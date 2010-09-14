@@ -28,6 +28,7 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -91,7 +92,7 @@ public class CountsAnalyser {
 	/**
 	 * the network
 	 */
-	private NetworkLayer network;
+	private NetworkImpl network;
 
 	/**
 	 * the name(path) to the output file
@@ -239,10 +240,10 @@ public class CountsAnalyser {
 	 *
 	 * @return the network layer
 	 */
-	protected NetworkLayer loadNetwork() {
+	protected NetworkImpl loadNetwork() {
 		// - read network: which buildertype??
 		printNote("", "  creating network layer... ");
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		printNote("", "  done");
 
 		printNote("", "  reading network xml file... ");

@@ -42,7 +42,6 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -166,7 +165,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	public void testLongTravelTimeInEmptySlot() {
 		ScenarioImpl scenario = new ScenarioImpl();
 
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));

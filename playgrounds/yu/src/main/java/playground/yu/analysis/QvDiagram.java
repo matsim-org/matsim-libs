@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.charts.XYScatterChart;
 
 /**
@@ -24,7 +24,7 @@ public class QvDiagram {
 		final String picFilename = "../runs/run628/it.500/500.qv/";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		EventsManagerImpl events = new EventsManagerImpl();

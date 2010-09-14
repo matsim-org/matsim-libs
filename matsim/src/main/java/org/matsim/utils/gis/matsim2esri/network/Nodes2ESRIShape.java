@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -126,7 +126,7 @@ public class Nodes2ESRIShape {
 //		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		log.info("loading network from " + netfile);
-		final NetworkLayer network = scenario.getNetwork();
+		final NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 

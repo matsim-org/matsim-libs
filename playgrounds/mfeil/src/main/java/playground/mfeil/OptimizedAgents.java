@@ -52,9 +52,9 @@ public class OptimizedAgents {
 			double tmpDistance=0;
 			if (this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).size()>1){
 				for (int k=0;k<this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).size()-1;k++){
-					tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).get(k).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).get(k+1).getLocation().getCoord());
+					tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).get(k).getFacility().getCoord(), this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).get(k+1).getFacility().getCoord());
 				}
-				tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).get(this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).size()-1).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).get(0).getLocation().getCoord());
+				tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).get(this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).size()-1).getFacility().getCoord(), this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).get(0).getFacility().getCoord());
 			}
 			this.distancesTestAgents.add(tmpDistance);
 		}
@@ -81,9 +81,9 @@ public class OptimizedAgents {
 		double tmpDistance=0;
 		if (this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size()>1){
 			for (int k=0;k<this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size()-1;k++){
-				tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k+1).getLocation().getCoord());
+				tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getFacility().getCoord(), this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k+1).getFacility().getCoord());
 			}
-			tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size()-1).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(0).getLocation().getCoord());
+			tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size()-1).getFacility().getCoord(), this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(0).getFacility().getCoord());
 		}
 		this.distancesTestAgents.add(tmpDistance);
 	}

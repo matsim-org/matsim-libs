@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.evacuation.base.Building;
 import org.matsim.signalsystems.control.SignalSystemController;
 
@@ -46,7 +46,7 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 	
 	private EventsManager events ;
 
-	public ShelterInputCounter(NetworkLayer network, HashMap<Id,Building> shelterLinkMapping, EventsManager events) {
+	public ShelterInputCounter(NetworkImpl network, HashMap<Id,Building> shelterLinkMapping, EventsManager events) {
 
 		this.shelterLinkMapping = shelterLinkMapping;
 		this.events = events ;

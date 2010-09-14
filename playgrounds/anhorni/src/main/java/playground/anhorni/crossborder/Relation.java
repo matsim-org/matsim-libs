@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 public class Relation {
 
@@ -101,7 +101,7 @@ public class Relation {
 		this.startTime = startTime;
 	}
 
-	private void assignVolumesToLinks(final NetworkLayer network) {
+	private void assignVolumesToLinks(final NetworkImpl network) {
 		computeTotalLinkCapacities(network);
 
 		Iterator<Integer> n_it = this.fromZone.getNodes().iterator();
@@ -135,7 +135,7 @@ public class Relation {
 		}//while
 	}//assignVolumesToLinks
 
-	private void computeTotalLinkCapacities(final NetworkLayer network) {
+	private void computeTotalLinkCapacities(final NetworkImpl network) {
 		this.totalOutLinkCapacity=0.0;
 		this.totalInLinkCapacity=0.0;
 
@@ -160,7 +160,7 @@ public class Relation {
 		}
 	}
 
-	public void assignPlansToRelations(final NetworkLayer network) {
+	public void assignPlansToRelations(final NetworkImpl network) {
 
 		if (!(this.volume>0.0)) return;
 

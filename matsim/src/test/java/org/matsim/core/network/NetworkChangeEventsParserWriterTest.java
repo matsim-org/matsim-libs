@@ -37,7 +37,7 @@ public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
 	public void testChangeEventsParserWriter(){
 		String input = getInputDirectory() + "testNetworkChangeEvents.xml";
 		String output  = getOutputDirectory() + "outputTestNetworkChangeEvents.xml";
-		final NetworkLayer network = new NetworkLayer();
+		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		network.setFactory(nf);

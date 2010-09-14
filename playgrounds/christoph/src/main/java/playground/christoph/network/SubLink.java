@@ -138,13 +138,6 @@ public class SubLink implements Link{
 	}
 
 	@Override
-	@Deprecated
-	public Layer getLayer()
-	{
-		return this.parentLink.getLayer();
-	}
-
-	@Override
 	public Coord getCoord()
 	{
 		return this.parentLink.getCoord();

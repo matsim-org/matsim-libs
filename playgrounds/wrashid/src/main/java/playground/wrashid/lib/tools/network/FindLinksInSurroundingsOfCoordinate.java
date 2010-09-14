@@ -2,7 +2,7 @@ package playground.wrashid.lib.tools.network;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.GeneralLib;
@@ -25,7 +25,7 @@ public class FindLinksInSurroundingsOfCoordinate {
 		BasicPointVisualizer basicPointVisualizer=new BasicPointVisualizer();
 		
 		
-		NetworkLayer network= GeneralLib.readNetwork(inputNetworkPath);
+		NetworkImpl network= GeneralLib.readNetwork(inputNetworkPath);
 		
 		for (Link link:network.getLinks().values()){
 			if (GeneralLib.getDistance(coordInFocus, link.getCoord())<maxDistanceInMeters){

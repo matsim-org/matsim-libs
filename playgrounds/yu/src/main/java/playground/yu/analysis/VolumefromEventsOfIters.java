@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -52,7 +52,7 @@ public class VolumefromEventsOfIters {
 
 		System.out.println(">>>>>reading the network...");
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		System.out.println(">>>>>reading the counts...");

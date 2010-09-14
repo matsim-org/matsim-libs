@@ -47,7 +47,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -79,10 +79,10 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 	private FeatureType ft;
 	private final GeometryFactory geofac;
 	private final String eventsfile;
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 
 
-	public RegionAnalysis(final CoordinateReferenceSystem targetCRS, final String shapefile, final String eventsfile, final NetworkLayer network) {
+	public RegionAnalysis(final CoordinateReferenceSystem targetCRS, final String shapefile, final String eventsfile, final NetworkImpl network) {
 
 		this.network = network;
 		initColorMap();
@@ -277,12 +277,10 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 		Config config = Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		World world = scenario.getWorld();
 
 		log.info("loading network from " + config.network().getInputFile());
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		world.complete(config);
 		log.info("done.");
 
 //		log.info("loading shape file from " + district_shape_file);

@@ -146,13 +146,6 @@ public class MappingLinkImpl extends MappingLink {
 	}
 
 	@Override
-	public Layer getLayer()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Coord getCoord()
 	{
 		return this.coord;

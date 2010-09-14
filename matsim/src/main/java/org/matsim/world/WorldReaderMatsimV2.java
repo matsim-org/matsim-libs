@@ -49,9 +49,9 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 	private Layer currUpLayer = null;
 	private Layer currDownLayer = null;
 
-	public WorldReaderMatsimV2(final ScenarioImpl scenario) {
+	public WorldReaderMatsimV2(final ScenarioImpl scenario, World world) {
 		this.scenario = scenario;
-		this.world = scenario.getWorld();
+		this.world = world;
 	}
 
 	@Override

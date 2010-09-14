@@ -36,7 +36,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.households.HouseholdsReaderV10;
@@ -135,7 +134,7 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
 			}
-				if (network instanceof NetworkLayer) {
+				if (network instanceof NetworkImpl) {
 					try {
 						new MatsimNetworkReader(this.scenario).parse(networkFileName);
 					} catch (SAXException e) {
@@ -245,9 +244,6 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 				new MatsimFacilitiesReader(this.getScenario()).parse(facilitiesFileName);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
-			}
-			if (this.getScenario().getWorld() != null) {
-				this.getScenario().getWorld().complete(config);
 			}
 		}
 		else {

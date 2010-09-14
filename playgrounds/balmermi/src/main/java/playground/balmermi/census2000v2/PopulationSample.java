@@ -49,7 +49,7 @@ public class PopulationSample {
 		log.info("samplePopulation...");
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		World world = scenario.getWorld();
+//		World world = scenario.getWorld();
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -71,13 +71,13 @@ public class PopulationSample {
 
 		log.info("  reading facilities xml file...");
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-		world.complete(config);
+//		world.complete(config);
 		Gbl.printMemoryUsage();
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		world.complete(config);
+//		world.complete(config);
 		Gbl.printMemoryUsage();
 		System.out.println("  done.");
 

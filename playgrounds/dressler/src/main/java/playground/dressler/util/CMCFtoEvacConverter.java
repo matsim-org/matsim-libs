@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
@@ -52,12 +52,12 @@ import org.matsim.core.utils.geometry.CoordImpl;
  */
 public class CMCFtoEvacConverter {
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private Population population;
 
-	public static NetworkLayer constructNetwork(String networkfile, String demandfile) throws JDOMException, IOException{
+	public static NetworkImpl constructNetwork(String networkfile, String demandfile) throws JDOMException, IOException{
 		// read networ and add en1 and en2 and el1
-		NetworkLayer network = CMCFNetworkConverter.readCMCFNetwork(networkfile);
+		NetworkImpl network = CMCFNetworkConverter.readCMCFNetwork(networkfile);
 		Coord coord1 = new CoordImpl("0","0");
 		Coord coord2 = new CoordImpl("1","1");
 		Id matsimid1  = new IdImpl("en1");
@@ -93,7 +93,7 @@ public class CMCFtoEvacConverter {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Population readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
+	public static Population readCMCFDemands(String filename, NetworkImpl network, boolean coordinates) throws JDOMException, IOException{
 		Population result = new ScenarioImpl().getPopulation();
 		PopulationFactory pb = result.getFactory() ;
 		SAXBuilder builder = new SAXBuilder();
@@ -173,7 +173,7 @@ public class CMCFtoEvacConverter {
 		String plansfileout = "~/skywalker/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
 
 		try {
-			NetworkLayer network = constructNetwork(networkfile, demandfile);
+			NetworkImpl network = constructNetwork(networkfile, demandfile);
 			new NetworkWriter(network).write(networkfileout);
 			System.out.println(networkfile+"  converted successfully \n"+"output written in: "+networkfileout);
 			Population population = readCMCFDemands(demandfile, network, false);

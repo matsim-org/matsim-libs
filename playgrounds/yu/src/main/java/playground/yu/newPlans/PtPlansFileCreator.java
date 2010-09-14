@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -38,7 +38,7 @@ public class PtPlansFileCreator {
 		this.pop = pop;
 	}
 
-	public void setNetwork(final NetworkLayer network) {
+	public void setNetwork(final NetworkImpl network) {
 		this.network = network;
 	}
 
@@ -46,9 +46,9 @@ public class PtPlansFileCreator {
 		return this.pop;
 	}
 
-	private NetworkLayer network = null;
+	private NetworkImpl network = null;
 
-	public NetworkLayer getNetwork() {
+	public NetworkImpl getNetwork() {
 		return this.network;
 	}
 

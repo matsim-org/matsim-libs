@@ -26,7 +26,7 @@ package playground.rost.eaflow.ea_flow;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 
 public class ReadNetwork {
@@ -34,7 +34,7 @@ public class ReadNetwork {
 	public static void main(String[] args) {
 		 System.out.println("Ich lebe");
 		 ScenarioImpl scenario = new ScenarioImpl();
-		 NetworkLayer network = scenario.getNetwork();
+		 NetworkImpl network = scenario.getNetwork();
 		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenario);
 
 		 networkReader.readFile("./examples/equil/network.xml");

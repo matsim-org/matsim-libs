@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -50,7 +50,7 @@ public class Links2ESRIShape {
 	private static Logger log = Logger.getLogger(Links2ESRIShape.class);
 
 	private final FeatureGenerator featureGenerator;
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final String filename;
 
 
@@ -59,7 +59,7 @@ public class Links2ESRIShape {
 	}
 
 	public Links2ESRIShape(final Network network, final String filename, final FeatureGeneratorBuilder builder) {
-		this.network = (NetworkLayer) network;
+		this.network = (NetworkImpl) network;
 		this.filename = filename;
 		this.featureGenerator = builder.createFeatureGenerator();
 

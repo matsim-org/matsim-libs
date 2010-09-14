@@ -32,6 +32,7 @@ import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -54,7 +55,7 @@ public class NetworkFromLineStrings {
 //	private QuadTree<LineString> tree;
 	private QuadTree<Node> nodes;
 //	private HashSet<LineString> lineStrings;
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private int nodeId;
 	private int linkId;
 
@@ -70,16 +71,16 @@ public class NetworkFromLineStrings {
 		String ls = "/home/laemmel/devel/sim2d/data/duisburg/d_ls.shp";
 		FeatureSource fs = ShapeFileReader.readDataFile(ls);
 		Envelope e = fs.getBounds();
-		NetworkLayer net = new NetworkFromLineStrings(fs, e).generateFromGraph();
+		NetworkImpl net = new NetworkFromLineStrings(fs, e).generateFromGraph();
 		new NetworkWriter(net).write("/home/laemmel/devel/sim2d/data/duisburg/network.xml");
 		
 	}
 
 
-	public NetworkLayer generateFromGraph() throws IOException {
+	public NetworkImpl generateFromGraph() throws IOException {
 
 		log.info("parsing features, building up NetworkLayer and running  NetworkCleaner as well ...");
-		this.network = new NetworkLayer();
+		this.network = NetworkImpl.createNetwork();
 		this.nodes = new QuadTree<Node>(this.envelope.getMinX(), this.envelope.getMinY(), this.envelope.getMaxX(), this.envelope.getMaxY());
 		this.nodeId = 0;
 		this.linkId = 0;

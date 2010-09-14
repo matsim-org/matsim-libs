@@ -64,6 +64,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -186,7 +187,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 
 		setupNumberHomesPerZone( population );
 
-		setupNumberJobsPerZone((ActivityFacilitiesImpl) world.getLayer(ActivityFacilitiesImpl.LAYER_TYPE));
+		setupNumberJobsPerZone(world.getFacilities());
 
 		normalizeJobHomeVectors();
 
@@ -321,13 +322,13 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		// In this case we take the capacities of the existing Facilities
 		// and maintain a list of Facilities per Zone
 		core.J = new double[ core.numZ ];
-		for( ActivityFacilityImpl facility : facilities.getFacilities().values() ){
-			ActivityOptionImpl act = facility.getActivityOptions().get(primaryActivityName);
+		for( ActivityFacility facility : facilities.getFacilities().values() ){
+			ActivityOptionImpl act = (ActivityOptionImpl) facility.getActivityOptions().get(primaryActivityName);
 			if( act != null ){
 				ArrayList<MappedLocation> list = zoneLayer.getNearestLocations( facility.getCoord(), null);
 				Zone zone = (Zone) list.get(0);
 				core.J[ zoneids.get(zone) ] += act.getCapacity();
-				primActFacilitiesPerZone.get( zone ).add( facility );
+				primActFacilitiesPerZone.get( zone ).add( (ActivityFacilityImpl) facility );
 			}
 		}
 	}

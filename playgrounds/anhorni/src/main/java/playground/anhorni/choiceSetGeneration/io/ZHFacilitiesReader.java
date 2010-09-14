@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.choiceSetGeneration.helper.ZHFacilities;
@@ -31,10 +31,10 @@ import playground.anhorni.choiceSetGeneration.helper.ZHFacility;
 
 public class ZHFacilitiesReader {
 	
-	private NetworkLayer network = null;
+	private NetworkImpl network = null;
 	private final static Logger log = Logger.getLogger(ZHFacilitiesReader.class);
 		
-	public ZHFacilitiesReader(NetworkLayer network) {
+	public ZHFacilitiesReader(NetworkImpl network) {
 		this.network = network;
 	}
 	

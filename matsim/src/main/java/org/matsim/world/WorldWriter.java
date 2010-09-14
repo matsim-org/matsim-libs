@@ -23,6 +23,7 @@ package org.matsim.world;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimWriter;

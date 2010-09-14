@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -31,7 +31,7 @@ public class CountsCutter {
 	private static Coord distanceFilterCenterNodeCoord;
 	private static double distanceFilter;
 
-	public static boolean isInRange(final Id linkid, final NetworkLayer net) {
+	public static boolean isInRange(final Id linkid, final NetworkImpl net) {
 		Link l = net.getLinks().get(linkid);
 		if (l == null) {
 			System.out.println("Cannot find requested link: "
@@ -56,7 +56,7 @@ public class CountsCutter {
 		int validCountsstationNo = 0;
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer net = scenario.getNetwork();
+		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		distanceFilterCenterNodeCoord = net.getNodes().get(new IdImpl(distanceFilterCenterNodeId))
 				.getCoord();

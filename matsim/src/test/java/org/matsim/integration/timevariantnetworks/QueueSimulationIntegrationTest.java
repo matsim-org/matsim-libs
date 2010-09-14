@@ -39,7 +39,7 @@ import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -63,7 +63,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	public void testFreespeed() {
 		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
 
-		NetworkLayer network = createNetwork(scenario);
+		NetworkImpl network = createNetwork(scenario);
 		Link link1 = network.getLinks().get(new IdImpl("1"));
 		Link link2 = network.getLinks().get(new IdImpl("2"));
 		Link link3 = network.getLinks().get(new IdImpl("3"));
@@ -105,7 +105,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 
 		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
 
-		NetworkLayer network = createNetwork(scenario);
+		NetworkImpl network = createNetwork(scenario);
 		Link link1 = network.getLinks().get(new IdImpl("1"));
 		Link link2 = network.getLinks().get(new IdImpl("2"));
 		Link link3 = network.getLinks().get(new IdImpl("3"));
@@ -165,11 +165,11 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * @return a network.
 	 * @author illenberger
 	 */
-	private NetworkLayer createNetwork(ScenarioImpl scenario) {
+	private NetworkImpl createNetwork(ScenarioImpl scenario) {
 		// create a network
 		NetworkFactoryImpl nf = scenario.getNetwork().getFactory();
 		nf.setLinkFactory(new TimeVariantLinkFactory());
-		final NetworkLayer network = scenario.getNetwork();
+		final NetworkImpl network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 
 		// the network has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
@@ -195,7 +195,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * @return a list of persons where the ordering corresponds to the departure times.
 	 * @author illenberger
 	 */
-	private List<PersonImpl> createPersons(final double depTime, final Link depLink, final Link destLink, final NetworkLayer network,
+	private List<PersonImpl> createPersons(final double depTime, final Link depLink, final Link destLink, final NetworkImpl network,
 			final int count) {
 		double departureTime = depTime;
 		List<PersonImpl> persons = new ArrayList<PersonImpl>(count);

@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings;
@@ -46,7 +46,7 @@ public class ShortestDistanceFromSupersource {
 	private static final Logger log = Logger.getLogger(ShortestDistanceFromSupersource.class);
 
 	CostFunction cf;
-	NetworkLayer network;
+	NetworkImpl network;
 	EvacArea evacArea;
 
 	Id sSID = new IdImpl(GlobalFlowCalculationSettings.superSinkId);
@@ -59,7 +59,7 @@ public class ShortestDistanceFromSupersource {
 
 	protected PriorityQueue<NodeCost> queue = new PriorityQueue<NodeCost>();
 
-	public ShortestDistanceFromSupersource(CostFunction cf, NetworkLayer network, EvacArea evacArea)
+	public ShortestDistanceFromSupersource(CostFunction cf, NetworkImpl network, EvacArea evacArea)
 	{
 		this.cf = cf;
 		this.network = network;

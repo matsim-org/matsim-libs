@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
@@ -20,7 +20,7 @@ public class LinkFacilityAssociationTest extends MatsimTestCase {
 	public void testGeneralFacility() {
 		ScenarioImpl sc = new ScenarioImpl();
 
-		NetworkLayer net = BaseNonControlerScenario.loadNetwork(sc);
+		NetworkImpl net = BaseNonControlerScenario.loadNetwork(sc);
 
 		LinkFacilityAssociation lfa = new LinkFacilityAssociation(sc.getActivityFacilities(), net);
 
@@ -54,7 +54,7 @@ public class LinkFacilityAssociationTest extends MatsimTestCase {
 	public void testParkingFacility() {
 		ScenarioImpl sc = new ScenarioImpl();
 
-		NetworkLayer net = BaseNonControlerScenario.loadNetwork(sc);
+		NetworkImpl net = BaseNonControlerScenario.loadNetwork(sc);
 
 		LinkParkingFacilityAssociation lpfa = new LinkParkingFacilityAssociation(sc.getActivityFacilities(), net);
 

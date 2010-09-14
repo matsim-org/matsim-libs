@@ -21,7 +21,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -34,7 +34,7 @@ import org.matsim.counts.MatsimCountsReader;
  *
  */
 public class CountsSimCompareTest {
-	private static boolean isInRange(final Id linkid, final NetworkLayer net) {
+	private static boolean isInRange(final Id linkid, final NetworkImpl net) {
 		Link l = net.getLinks().get(linkid);
 		if (l == null) {
 			System.out.println("Cannot find requested link: "
@@ -56,7 +56,7 @@ public class CountsSimCompareTest {
 
 		System.out.println("  reading the network...");
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		System.out.println("  reading the counts...");

@@ -26,37 +26,22 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 
 public class ActivityOptionImpl implements ActivityOption {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
 	private final String type;
 	private Double capacity = Double.valueOf(Integer.MAX_VALUE);
 	private final ActivityFacilityImpl facility;
-
-	// TreeMap(String day,TreeSet(Opentime opentime))
 	private Map<DayType, SortedSet<OpeningTime>> opentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
-
-	//////////////////////////////////////////////////////////////////////
-	// constructor
-	//////////////////////////////////////////////////////////////////////
-
 
 	public ActivityOptionImpl(final String type, final ActivityFacilityImpl facility) {
 		this.type = type;
 		this.facility = facility;
 		if (this.facility == null) { Gbl.errorMsg("facility=null not allowed!"); }
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// add methods
-	//////////////////////////////////////////////////////////////////////
 
 	public void addOpeningTime(OpeningTime opentime) {
 		DayType day = opentime.getDay();
@@ -107,22 +92,6 @@ public class ActivityOptionImpl implements ActivityOption {
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// query methods
-	//////////////////////////////////////////////////////////////////////
-
-//	public final boolean containsOpentime(final BasicOpeningTime o) {
-//		Set<BasicOpeningTime> o_set = this.getOpeningTimes(o.getDay());
-//		if (o_set == null) {
-//			return false;
-//		}
-//		return o_set.contains(o);
-//	}
-
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
-
 	public final void setCapacity(Double capacity) {
 		if (capacity < 0) {
 			throw new NumberFormatException("A capacity of an activity must be >= 0.");
@@ -132,14 +101,6 @@ public class ActivityOptionImpl implements ActivityOption {
 
 	public void setOpeningTimes(Map<DayType, SortedSet<OpeningTime>> opentimes) {
 		this.opentimes = opentimes;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
-
-	public BasicLocation getLocation() {
-		return this.getFacility();
 	}
 
 	public final String getType() {
@@ -169,10 +130,6 @@ public class ActivityOptionImpl implements ActivityOption {
 		return this.opentimes.get(day);
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
-
 	@Override
 	public final String toString() {
 		return "[type=" + this.type + "]" +
@@ -180,9 +137,5 @@ public class ActivityOptionImpl implements ActivityOption {
 				"[facility_id=" + this.facility.getId() + "]" +
 				"[nof_opentimes=" + this.getOpeningTimes().size() + "]";
 	}
-
-
-	public void setCapacity(int cap) {
-		setCapacity((double) cap);
-	}
+	
 }

@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
@@ -20,12 +20,12 @@ public class AddBorderCrossingTraffic {
 	private Population oldPlans;
 	private final static Logger log = Logger.getLogger(AddBorderCrossingTraffic.class);
 
-	public void run(Population plans, NetworkLayer network) {
+	public void run(Population plans, NetworkImpl network) {
 		this.init(network);
 		this.assignTTA(plans);
 	}
 
-	private void init(NetworkLayer network) {
+	private void init(NetworkImpl network) {
 		ScenarioImpl oldScenario = new ScenarioImpl();
 		oldScenario.setNetwork(network);
 		this.oldPlans = oldScenario.getPopulation();

@@ -15,7 +15,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -89,7 +89,7 @@ public class TestSubNetwork {
 	
 	private void loadNetwork()
 	{
-		NetworkLayer network = this.scenario.getNetwork();
+		NetworkImpl network = this.scenario.getNetwork();
 		network.getFactory().setLinkFactory(new MyLinkFactoryImpl());
 		
 		new MatsimNetworkReader(this.scenario).readFile(networkFile);

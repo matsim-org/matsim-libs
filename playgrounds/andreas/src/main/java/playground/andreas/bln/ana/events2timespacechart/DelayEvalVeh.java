@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
@@ -24,7 +24,7 @@ public class DelayEvalVeh {
 	private String outputDir;
 	
 	
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private TransitSchedule transitSchedule;
 	HashMap<Id, String> stopIDNameMap;
 	

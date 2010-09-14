@@ -6,6 +6,7 @@ import java.util.Iterator;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -47,12 +48,12 @@ public class CreatePlans {
 
 
 		// get home and work activity
-		ActivityOptionImpl home=null;
-		ActivityOptionImpl work=null;
-		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			Iterator<ActivityOptionImpl> a_it = f.getActivityOptions().values().iterator();
+		ActivityOption home=null;
+		ActivityOption work=null;
+		for (ActivityFacility f : facilities.getFacilities().values()) {
+			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
-				ActivityOptionImpl a = a_it.next();
+				ActivityOption a = a_it.next();
 				//System.out.println(a.getType());
 				if (a.getType().equals("home")) {
 					home=a;

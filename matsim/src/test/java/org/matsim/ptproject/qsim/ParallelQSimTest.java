@@ -62,7 +62,6 @@ import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -1238,7 +1237,7 @@ public class ParallelQSimTest extends TestCase {
 	private static final class Fixture {
 		final Config config;
 		final Scenario scenario;
-		final NetworkLayer network;
+		final NetworkImpl network;
 		final Node node1;
 		final Node node2;
 		final Node node3;
@@ -1259,7 +1258,7 @@ public class ParallelQSimTest extends TestCase {
 			this.config.getQSimConfigGroup().setStorageCapFactor(1.0);
 
 			/* build network */
-			this.network = (NetworkLayer) this.scenario.getNetwork();
+			this.network = (NetworkImpl) this.scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
 			this.node1 = this.network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 			this.node2 = this.network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));

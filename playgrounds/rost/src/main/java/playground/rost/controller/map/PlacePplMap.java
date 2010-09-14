@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.rost.controller.uicontrols.PopulationDensity;
 import playground.rost.graph.Point;
@@ -44,9 +44,9 @@ public class PlacePplMap extends BasicMapImpl {
 	
 	protected PopulationDensity popDensity;
 	
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 	
-	public PlacePplMap(int maxDensity, NetworkLayer network, PopulationDensity popDensity)
+	public PlacePplMap(int maxDensity, NetworkImpl network, PopulationDensity popDensity)
 	{
 		this.maxDensity = maxDensity;
 		this.popDensity = popDensity;
@@ -90,7 +90,7 @@ public class PlacePplMap extends BasicMapImpl {
 		return nodeDensity.get(n);
 	}
 	
-	public NetworkLayer getNetwork()
+	public NetworkImpl getNetwork()
 	{
 		return network;
 	}

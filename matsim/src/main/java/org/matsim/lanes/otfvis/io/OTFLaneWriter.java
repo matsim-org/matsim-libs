@@ -28,7 +28,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.ptproject.qsim.interfaces.QLink;
@@ -122,7 +122,7 @@ public class OTFLaneWriter extends OTFDataWriter<QLink> implements OTFWriterFact
 					if (qLane.getLane().getToLinkIds() != null){
 						out.putInt(qLane.getLane().getToLinkIds().size());
 						for (Id toLinkId :  qLane.getLane().getToLinkIds()){
-							Link toLink = ((Network) this.src.getLink().getLayer()).getLinks().get(toLinkId);
+							Link toLink = ((LinkImpl) this.src.getLink()).getNetwork().getLinks().get(toLinkId);
 							if (toLink == null) {
 								throw new IllegalStateException("No Link found with id: " + toLinkId + " this is set as toLink of Lane " + qLane.getId() + " on Link " + qLane.getQLink().getLink().getId());
 							}

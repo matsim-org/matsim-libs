@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -27,8 +28,8 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
  */
 
 public class LogicFactory{
-	private NetworkLayer logicNet= new NetworkLayer();
-	private NetworkLayer plainNet= new NetworkLayer();
+	private NetworkImpl logicNet= NetworkImpl.createNetwork();
+	private NetworkImpl plainNet= NetworkImpl.createNetwork();
 	private LogicIntoPlainTranslator logicToPlainTranslator;
 
 	long newLinkId=0;
@@ -192,11 +193,11 @@ public class LogicFactory{
 	}
 
 	/****************get methods************/
-	public NetworkLayer getLogicNet(){
+	public NetworkImpl getLogicNet(){
 		return this.logicNet;
 	}
 
-	public NetworkLayer getPlainNet(){
+	public NetworkImpl getPlainNet(){
 		return this.plainNet;
 	}
 

@@ -25,7 +25,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.rost.controller.map.BasicMap;
 import playground.rost.controller.vismodule.AbstractVisModuleImpl;
@@ -33,9 +33,9 @@ import playground.rost.controller.vismodule.VisModuleContainer;
 
 public class LinkVisModule extends AbstractVisModuleImpl {
 	
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 	
-	public LinkVisModule(VisModuleContainer vMContainer, NetworkLayer network)
+	public LinkVisModule(VisModuleContainer vMContainer, NetworkImpl network)
 	{
 		super(vMContainer, "LinkView");
 		this.network = network;

@@ -10,11 +10,11 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 public class ScaleFactorToChangeEvent {
 	
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private BufferedWriter writer;
 	
 	private TreeMap<String, Double> timeScaleFactorMap = new TreeMap<String, Double>();
@@ -62,7 +62,7 @@ public class ScaleFactorToChangeEvent {
 		this.writer.close();		
 	}
 	
-	private NetworkLayer readNetwork(String networkFile){
+	private NetworkImpl readNetwork(String networkFile){
 		ScenarioImpl scenario = new ScenarioImpl();
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
 		matsimNetReader.readFile(networkFile);

@@ -25,7 +25,7 @@ import java.io.IOException;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -48,7 +48,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 //		String outDbf = getOutputDirectory() + "acts.dbf";
 
 		ScenarioImpl scenario = new ScenarioImpl(super.loadConfig(null));
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		Population population = scenario.getPopulation();
@@ -85,7 +85,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 //		String outDbf = getOutputDirectory() + "legs.dbf";
 
 		ScenarioImpl scenario = new ScenarioImpl(super.loadConfig(null));
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		Population population = scenario.getPopulation();

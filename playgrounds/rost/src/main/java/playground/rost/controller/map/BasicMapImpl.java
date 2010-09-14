@@ -39,13 +39,13 @@ import javax.swing.JPanel;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.rost.graph.BoundingBox;
 import playground.rost.graph.GraphAlgorithms;
 
 public class BasicMapImpl extends JPanel implements BasicMap{
-	public NetworkLayer network;
+	public NetworkImpl network;
 	
 	double minX, minY, maxX, maxY;
 	

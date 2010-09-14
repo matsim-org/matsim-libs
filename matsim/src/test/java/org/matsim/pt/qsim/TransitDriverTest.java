@@ -34,6 +34,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -76,7 +77,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 		ArrayList<Id> linkIds = new ArrayList<Id>();
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));

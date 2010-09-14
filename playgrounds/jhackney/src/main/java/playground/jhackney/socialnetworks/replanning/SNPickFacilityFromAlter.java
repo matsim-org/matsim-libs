@@ -3,7 +3,7 @@ package playground.jhackney.socialnetworks.replanning;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -35,6 +35,6 @@ public class SNPickFacilityFromAlter extends AbstractMultithreadedModule {
     @Override
 		public PlanAlgorithm getPlanAlgoInstance() {
 
-    	return new SNPickFacility(factypes, (NetworkLayer) network, tcost, ttime, this.knowledges, this.snConfig);
+    	return new SNPickFacility(factypes, (NetworkImpl) network, tcost, ttime, this.knowledges, this.snConfig);
     }
 }

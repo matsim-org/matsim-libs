@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -212,7 +213,7 @@ public class PlanImplTest extends MatsimTestCase {
 	}
 
 	public void testCopyPlan_NetworkRoute() {
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Node node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(2000, 0));
@@ -238,7 +239,7 @@ public class PlanImplTest extends MatsimTestCase {
 	}
 
 	public void testCopyPlan_GenericRoute() {
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Node node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(2000, 0));

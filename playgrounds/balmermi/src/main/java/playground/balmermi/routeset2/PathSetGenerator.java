@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -54,7 +54,7 @@ public class PathSetGenerator {
 
 	private final static Logger log = Logger.getLogger(PathSetGenerator.class);
 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final double avLinkDensityPerNodeNetwork;
 	private final double avLinkDensityPerNonePassNodeNetwork;
 
@@ -85,7 +85,7 @@ public class PathSetGenerator {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PathSetGenerator(final NetworkLayer network) {
+	public PathSetGenerator(final NetworkImpl network) {
 		if (network == null) { throw new RuntimeException("Network must exist."); }
 		this.network = network;
 		this.frespeedCost = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());

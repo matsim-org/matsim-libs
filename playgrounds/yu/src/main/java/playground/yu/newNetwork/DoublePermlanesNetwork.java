@@ -25,7 +25,7 @@ package playground.yu.newNetwork;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 
 /**
@@ -56,7 +56,7 @@ public class DoublePermlanesNetwork {
 		final String outputNetFilename = "../schweiz-ivtch/tmp/ivtch-changed-wu.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetFilename);
 		new NetworkWriter(network).write(outputNetFilename);
 	}

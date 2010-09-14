@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.VehicleImpl;
@@ -224,7 +225,7 @@ public class QueueLinkTest {
 	public void testHasSpace() {
 
 		Node node;
-		NetworkLayer net = new NetworkLayer();
+		NetworkImpl net = NetworkImpl.createNetwork();
 		net.addNode(net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
 		net.addNode(node = net.getFactory().createNode(new IdImpl(2), new CoordImpl(100, 0)));
 		Link link = net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
@@ -273,7 +274,7 @@ public class QueueLinkTest {
 
 	private static class Fixture {
 
-		/*package*/ final NetworkLayer net;
+		/*package*/ final NetworkImpl net;
 		/*package*/ final Link link;
 		/*package*/ final FakeSimEngine engine;
 		/*package*/ final QueueNetwork qnet;
@@ -281,7 +282,7 @@ public class QueueLinkTest {
 		private final QueueNode qnode;
 
 		/*package*/ Fixture() {
-			this.net = new NetworkLayer();
+			this.net = NetworkImpl.createNetwork();
 			Node node2 = this.net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
 			this.net.addNode(this.net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
 			this.net.addNode(node2);

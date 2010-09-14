@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.GeneralLib;
@@ -35,7 +35,7 @@ public class GenerateTableHubLinkMapping {
 		Coord bottomLeft = (Coord) genericResult[0];
 		Coord topRight = (Coord) genericResult[1];
 
-		NetworkLayer network = GeneralLib
+		NetworkImpl network = GeneralLib
 				.readNetwork("C:/Users/Admin/Desktop/psl-temp/network.xml.gz");
 
 		System.out.println("network loaded...");

@@ -14,7 +14,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.data.Retailer;
@@ -95,17 +95,17 @@ public class LinksRetailerReader {
 				// header: l_id  max_fac
 				// index:   0       1
 				Id lId = new IdImpl (entries[0]);
-				LinkRetailersImpl l = new LinkRetailersImpl(controler.getNetwork().getLinks().get(lId),(NetworkLayer) controler.getNetwork());
+				LinkRetailersImpl l = new LinkRetailersImpl(controler.getNetwork().getLinks().get(lId),(NetworkImpl) controler.getNetwork());
 				// ciarif: if facilities are already on this link the number of already
 				// existing facilities is compared with the max from the file. The larger is taken.
 				//TODO verify if it is still actual
-				if (l.getUpMapping().size()>(Integer.parseInt(entries[1]))) {
-
-					l.setMaxFacOnLink(l.getUpMapping().size());
-				}
-				else {
-					l.setMaxFacOnLink(Integer.parseInt(entries[1]));
-				}
+//				if (l.getUpMapping().size()>(Integer.parseInt(entries[1]))) {
+//
+//					l.setMaxFacOnLink(l.getUpMapping().size());
+//				}
+//				else {
+//					l.setMaxFacOnLink(Integer.parseInt(entries[1]));
+//				}
 
 				this.freeLinks.put(l.getId(),l);
 				this.allLinks.put(l.getId(),l);
@@ -121,7 +121,7 @@ public class LinksRetailerReader {
 		for (Retailer r:retailers.getRetailers().values()) {
 			for (ActivityFacility af: r.getFacilities().values()){
 				Link fLink = this.controler.getNetwork().getLinks().get(af.getLinkId());
-				LinkRetailersImpl link = new LinkRetailersImpl(fLink, (NetworkLayer) controler.getNetwork());
+				LinkRetailersImpl link = new LinkRetailersImpl(fLink, (NetworkImpl) controler.getNetwork());
 				links.put(link.getId(),link);
 				log.info(("The facility " + af.getId()+ " is currently on the link: " + link.getId()));
 			}
@@ -139,7 +139,7 @@ public class LinksRetailerReader {
 
 		while (this.freeLinks.size()<(newLinksMax)) {
 			int rd = MatsimRandom.getRandom().nextInt(controler.getNetwork().getLinks().values().size());
-			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLinks().values().toArray()[rd],(NetworkLayer) controler.getNetwork());
+			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLinks().values().toArray()[rd],(NetworkImpl) controler.getNetwork());
 			if (currentLinks.containsKey(link.getId())) {}
 			else {
 				if ((freeLinks.containsKey(link.getId())))	{log.info("The link " + link.getId() + " is already in the list");}

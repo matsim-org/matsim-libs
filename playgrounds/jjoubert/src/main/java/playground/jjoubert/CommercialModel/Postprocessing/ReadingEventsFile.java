@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.jjoubert.CommercialModel.Listeners.MyCommercialActivityDensityWriter;
 
@@ -45,7 +45,7 @@ public class ReadingEventsFile {
 			bw = new BufferedWriter(new FileWriter(new File( outputCommercialActivityDensityFilename )));
 			try{
 				ScenarioImpl scenario = new ScenarioImpl();
-				NetworkLayer nl = scenario.getNetwork();
+				NetworkImpl nl = scenario.getNetwork();
 				MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
 				nr.readFile(networkFilename);
 				

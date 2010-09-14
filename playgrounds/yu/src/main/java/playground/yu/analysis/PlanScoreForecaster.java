@@ -44,7 +44,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -267,7 +266,7 @@ public class PlanScoreForecaster {
 		new MatsimConfigReader(cf).readFile(configFilename);
 		CharyparNagelScoringConfigGroup scoring = cf.charyparNagelScoring();
 
-		NetworkLayer net = (NetworkLayer) sc.getNetwork();
+		NetworkImpl net = (NetworkImpl) sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);
 
 		Population pop = sc.getPopulation();

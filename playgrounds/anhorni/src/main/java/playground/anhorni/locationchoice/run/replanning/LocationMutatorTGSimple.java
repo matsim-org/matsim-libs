@@ -39,7 +39,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -60,7 +59,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	private final static Logger log = Logger.getLogger(LeisureFacilityExtractor.class);
 
 
-	public LocationMutatorTGSimple(final NetworkLayer network, Controler controler,
+	public LocationMutatorTGSimple(final NetworkImpl network, Controler controler,
 			Knowledges knowledges,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {

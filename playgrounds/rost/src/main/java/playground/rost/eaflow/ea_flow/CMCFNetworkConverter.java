@@ -28,6 +28,7 @@ import org.jdom.input.SAXBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -47,8 +48,8 @@ public class CMCFNetworkConverter {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	public static NetworkLayer readCMCFNetwork(String filename) throws JDOMException, IOException{
-		NetworkLayer result = new NetworkLayer();
+	public static NetworkImpl readCMCFNetwork(String filename) throws JDOMException, IOException{
+		NetworkImpl result = NetworkImpl.createNetwork();
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfGraph = builder.build(filename);
 		Element basegraph = cmcfGraph.getRootElement();
@@ -102,7 +103,7 @@ public class CMCFNetworkConverter {
 			outfile = args[1];
 		}
 		try {
-			NetworkLayer network = readCMCFNetwork(inputfile);
+			NetworkImpl network = readCMCFNetwork(inputfile);
 			new NetworkWriter(network).write(outfile);
 			System.out.println(inputfile+"  converted successfully \n"+"output written in: "+outfile);
 		} catch (JDOMException e) {

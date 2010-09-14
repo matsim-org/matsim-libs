@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -44,7 +45,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getNetworkRouteInstance(final Id fromLinkId, final Id toLinkId, final NetworkLayer network) {
+	public NetworkRoute getNetworkRouteInstance(final Id fromLinkId, final Id toLinkId, final NetworkImpl network) {
 		SubsequentLinksAnalyzer subsequent = new SubsequentLinksAnalyzer(network);
 		return new CompressedNetworkRouteImpl(fromLinkId, toLinkId, network, subsequent.getSubsequentLinks());
 	}
@@ -57,7 +58,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	 */
 	@Test
 	public void testGetLinks_setLinks() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Link link1 = network.getLinks().get(new IdImpl("1"));
 		Link link22 = network.getLinks().get(new IdImpl("22"));
 		Link link12 = network.getLinks().get(new IdImpl("12"));
@@ -79,7 +80,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetLinks_onlySubsequentLinks() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Link link0 = network.getLinks().get(new IdImpl("0"));
 		Link link1 = network.getLinks().get(new IdImpl("1"));
 		Link link2 = network.getLinks().get(new IdImpl("2"));
@@ -111,7 +112,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	 */
 	@Test
 	public void testGetLinkIds_incompleteInitialization() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Link link0 = network.getLinks().get(new IdImpl("0"));
 		Link link1 = network.getLinks().get(new IdImpl("1"));
 		Link link2 = network.getLinks().get(new IdImpl("2"));
@@ -140,7 +141,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		Id id5 = new IdImpl(5);
 		Id id6 = new IdImpl(6);
 
-		Network network = new NetworkLayer();
+		Network network = NetworkImpl.createNetwork();
 		NetworkFactory builder = network.getFactory();
 
 		Node node1 = builder.createNode(id1, new CoordImpl(0, 1000));

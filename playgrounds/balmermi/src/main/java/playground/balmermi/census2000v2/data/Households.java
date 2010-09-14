@@ -113,7 +113,7 @@ public class Households {
 				int hhtpz = Integer.parseInt(entries[4]);
 
 				Municipality m = this.municipalities.getMunicipality(mid);
-				ActivityFacilityImpl f = facilities.getFacilities().get(fid);
+				ActivityFacilityImpl f = (ActivityFacilityImpl) facilities.getFacilities().get(fid);
 
 				Household hh = new Household(hhid,m,f);
 				if (hhtpw != Integer.MIN_VALUE) { hh.setHHTPW(hhtpw); }

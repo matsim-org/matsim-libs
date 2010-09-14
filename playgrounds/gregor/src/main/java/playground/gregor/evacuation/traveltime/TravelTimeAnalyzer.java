@@ -44,7 +44,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -63,9 +63,9 @@ public class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArri
 	private final String eventsFile;
 	private QuadTree<PolygonFeature> quad;
 	private final Map<Id,PolygonFeature> agentPolygonMapping = new HashMap<Id,PolygonFeature>();
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 
-	public TravelTimeAnalyzer(String outputShapeFile,  String events, List<MultiPolygon> polygons, NetworkLayer net) {
+	public TravelTimeAnalyzer(String outputShapeFile,  String events, List<MultiPolygon> polygons, NetworkImpl net) {
 		this.polygons = polygons;
 		this.eventsFile = events;
 		this.out = outputShapeFile;

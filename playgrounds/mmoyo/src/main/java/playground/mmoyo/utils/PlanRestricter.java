@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -25,7 +25,7 @@ public class PlanRestricter {
 		Gbl.startMeasurement();
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer net = scenario.getNetwork();
+		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		Population population = scenario.getPopulation();

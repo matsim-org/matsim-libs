@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.transitSchedule.api.TransitSchedule;
@@ -26,9 +26,9 @@ public class DynamicConnection {
 	private PlainTimeTable plainTimeTable;
 	private Map <Coord, Collection<NodeImpl>> nearStopMap; 
 	private Map <Id, List<StaticConnection>> connectionMap;
-	private NetworkLayer net;
+	private NetworkImpl net;
 
-	public DynamicConnection(TransitSchedule transitSchedule, NetworkLayer net, Map <Coord, Collection<NodeImpl>> nearStopMap, Map <Id, List<StaticConnection>> connectionMap ) {
+	public DynamicConnection(TransitSchedule transitSchedule, NetworkImpl net, Map <Coord, Collection<NodeImpl>> nearStopMap, Map <Id, List<StaticConnection>> connectionMap ) {
 		this.transitSchedule =  transitSchedule;
 		this.net = net;
 		this.nearStopMap = nearStopMap; 

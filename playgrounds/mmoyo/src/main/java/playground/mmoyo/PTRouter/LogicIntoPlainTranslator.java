@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -43,7 +43,7 @@ import org.matsim.core.utils.misc.RouteUtils;
  * Translates logic nodes and links into plain nodes and links.
  */
 public class LogicIntoPlainTranslator {
-	private final NetworkLayer plainNet;
+	private final NetworkImpl plainNet;
 	//private Map<Id,Node> logicToPlainStopMap;
 	//private Map<Id,LinkImpl> logicToPlainLinkMap;
 	//private Map<Id,LinkImpl> lastLinkMap;
@@ -59,7 +59,7 @@ public class LogicIntoPlainTranslator {
 	}
 	*/
 
-	public LogicIntoPlainTranslator(final NetworkLayer plainNetwork){
+	public LogicIntoPlainTranslator(final NetworkImpl plainNetwork){
 		this.plainNet= plainNetwork;
 	}
 

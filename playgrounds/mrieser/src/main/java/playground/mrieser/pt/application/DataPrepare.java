@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -132,7 +133,7 @@ public class DataPrepare {
 	}
 
 	protected void createNetworkFromSchedule() {
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), network, "tr_").createNetwork();
 		new NetworkWriter(network).write(TRANSIT_NETWORK_FILE);
 		try {
@@ -144,9 +145,9 @@ public class DataPrepare {
 
 	protected void mergeNetworks() {
 		ScenarioImpl transitScenario = new ScenarioImpl();
-		NetworkLayer transitNetwork = transitScenario.getNetwork();
+		NetworkImpl transitNetwork = transitScenario.getNetwork();
 		ScenarioImpl streetScenario = new ScenarioImpl();
-		NetworkLayer streetNetwork = streetScenario.getNetwork();
+		NetworkImpl streetNetwork = streetScenario.getNetwork();
 		try {
 			new MatsimNetworkReader(transitScenario).parse(TRANSIT_NETWORK_FILE);
 			new MatsimNetworkReader(streetScenario).parse(NETWORK_FILE);

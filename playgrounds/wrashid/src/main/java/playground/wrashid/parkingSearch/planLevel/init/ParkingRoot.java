@@ -6,7 +6,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.obj.plan.PersonGroups;
@@ -82,7 +82,7 @@ public class ParkingRoot {
 		return parkingActivityDurationPenaltyScalingFactor;
 	}
 
-	public static void init(ActivityFacilitiesImpl facilities, NetworkLayer network, Controler controler) {
+	public static void init(ActivityFacilitiesImpl facilities, NetworkImpl network, Controler controler) {
 		parkingWalkingDistanceGraph=new ParkingWalkingDistanceMeanAndStandardDeviationGraph();
 		mapDebugTrace=new BasicPointVisualizer();
 		cpm = new ClosestParkingMatrix(facilities, network);

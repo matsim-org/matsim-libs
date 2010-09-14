@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 
 public class NetworkWrapper {
@@ -22,9 +23,9 @@ public class NetworkWrapper {
 	 *            The real network
 	 * @return The converted network
 	 */
-	public static NetworkLayer wrapNetwork(Network networkLayer) {
+	public static NetworkImpl wrapNetwork(Network networkLayer) {
 
-		NetworkLayer wrappedNetwork = new NetworkLayer();
+		NetworkImpl wrappedNetwork = NetworkImpl.createNetwork();
 		int numberOfNodesGenerated = 0;
 		int numberOfLinksGenerated = 0;
 

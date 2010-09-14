@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.xml.sax.SAXException;
 
 /**
@@ -26,7 +26,7 @@ public class CMCFNetworkWriter {
 
 	private final String netFile;
 	private final MatsimNetworkReader netReader;
-	private final NetworkLayer netLayer;
+	private final NetworkImpl netLayer;
 	private String netName;
 
 	/**

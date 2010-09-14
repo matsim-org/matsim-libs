@@ -22,9 +22,9 @@ package playground.jhackney.postprocessing;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
 import playground.jhackney.algorithms.PersonCalcASD2;
@@ -45,8 +45,8 @@ public class AnalyzeActivitySpaces {
 
 		World world = Scenario.readWorld(null /*filename not specified*/);
 		Scenario.readFacilities();
-		NetworkLayer network =Scenario.readNetwork();
-		new WorldConnectLocations(config).run(world);
+		NetworkImpl network =Scenario.readNetwork();
+//		new WorldConnectLocations(config).run(world);
 
 		Population plans = Scenario.readPlans();
 			//read in social network

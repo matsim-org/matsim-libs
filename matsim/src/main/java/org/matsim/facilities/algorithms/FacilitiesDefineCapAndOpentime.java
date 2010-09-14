@@ -22,8 +22,9 @@ package org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
@@ -63,7 +64,7 @@ public class FacilitiesDefineCapAndOpentime {
 		int shop_cnt = 0;
 		int leis_cnt = 0;
 
-		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
+		for (ActivityFacility f : facilities.getFacilities().values()) {
 			Iterator<String> at_it = f.getActivityOptions().keySet().iterator();
 			while (at_it.hasNext()) {
 				String at = at_it.next();
@@ -81,31 +82,31 @@ public class FacilitiesDefineCapAndOpentime {
 		System.out.println("      shop_cnt = " + shop_cnt);
 		System.out.println("      leis_cnt = " + leis_cnt);
 
-		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			Iterator<ActivityOptionImpl> a_it = f.getActivityOptions().values().iterator();
+		for (ActivityFacility f : facilities.getFacilities().values()) {
+			Iterator<? extends ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
-				ActivityOptionImpl a = a_it.next();
+				ActivityOptionImpl a = (ActivityOptionImpl) a_it.next();
 				if (a.getType().equals("home")) {
-					a.setCapacity(this.nof_persons/home_cnt);
+					a.setCapacity((double) (this.nof_persons/home_cnt));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wk, TIME_0000, TIME_2400));
 				}
 				else if (a.getType().equals("work")) {
-					a.setCapacity(this.nof_persons/work_cnt);
+					a.setCapacity((double) (this.nof_persons/work_cnt));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_0800, TIME_1800));
 				}
 				else if (a.getType().equals("education")) {
-					a.setCapacity(this.nof_persons/educ_cnt);
+					a.setCapacity((double) (this.nof_persons/educ_cnt));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_0800, TIME_1200));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1300, TIME_1700));
 				}
 				else if (a.getType().equals("shop")) {
-					a.setCapacity(this.nof_persons/shop_cnt);
+					a.setCapacity((double) (this.nof_persons/shop_cnt));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_0830, TIME_1200));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1330, TIME_2000));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.sat, TIME_0900, TIME_1700));
 				}
 				else if (a.getType().equals("leisure")) {
-					a.setCapacity(this.nof_persons/leis_cnt);
+					a.setCapacity((double) (this.nof_persons/leis_cnt));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1700, TIME_2400));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkend, TIME_2000, TIME_2400));
 				}

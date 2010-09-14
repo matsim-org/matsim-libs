@@ -31,7 +31,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.rost.graph.GraphAlgorithms;
 
@@ -59,7 +59,7 @@ public class Block {
 		
 	}
 	
-	public static Block create(NetworkLayer network, long id, double x, double y, double areaSize, List<String> borderIds)
+	public static Block create(NetworkImpl network, long id, double x, double y, double areaSize, List<String> borderIds)
 	{
 		List<Node> borderNodes = new LinkedList<Node>();
 		Block result = new Block();

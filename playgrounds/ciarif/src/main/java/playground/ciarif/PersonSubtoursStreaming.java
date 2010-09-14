@@ -44,10 +44,10 @@ public class PersonSubtoursStreaming {
 		System.out.println("Run...");
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		World world = scenario.getWorld();
+		World world = null;
 
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(scenario).readFile(null);//config.world().getInputFile());
+		new MatsimWorldReader(scenario, world).readFile(null);//config.world().getInputFile());
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

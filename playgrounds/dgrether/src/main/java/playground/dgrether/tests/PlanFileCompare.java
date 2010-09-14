@@ -22,7 +22,7 @@ package playground.dgrether.tests;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 
 
@@ -35,7 +35,7 @@ public class PlanFileCompare {
 	public void comparePlans(String networkFile, String plansFile1, String plansFile2) {
 		ScenarioImpl scenario1 = new ScenarioImpl();
 		
-		NetworkLayer network = scenario1.getNetwork();
+		NetworkImpl network = scenario1.getNetwork();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario1);
 		netReader.readFile(networkFile);
 

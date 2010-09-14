@@ -25,9 +25,9 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
 import playground.jhackney.SocNetConfigGroup;
@@ -52,8 +52,8 @@ public class CreateKMZFromOutput {
 
 		World world = Scenario.readWorld(null /*filename not specified*/);
 		ActivityFacilities facilities = Scenario.readFacilities();
-		NetworkLayer network =Scenario.readNetwork();
-		new WorldConnectLocations(config).run(world);
+		NetworkImpl network =Scenario.readNetwork();
+//		new WorldConnectLocations(config).run(world);
 
 
 //		Write out the KML for the EgoNet of a chosen agent

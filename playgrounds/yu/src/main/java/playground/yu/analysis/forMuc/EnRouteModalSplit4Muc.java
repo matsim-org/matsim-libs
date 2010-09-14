@@ -21,7 +21,7 @@ import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -297,7 +297,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 
 		ScenarioImpl scenario = new ScenarioImpl();
 
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Population population = scenario.getPopulation();

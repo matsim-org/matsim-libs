@@ -188,7 +188,7 @@ public class LayerImpl implements Layer {
 		return locs;
 	}
 
-	public final TreeMap<Id, ? extends MappedLocation> getLocations() {
+	public final Map<Id, MappedLocation> getLocations() {
 		return this.locations;
 	}
 

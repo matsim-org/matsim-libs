@@ -30,7 +30,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 
 import playground.rost.graph.evacarea.EvacArea;
@@ -39,7 +39,7 @@ public class AreaExtractor {
 
 	private static final Logger log = Logger.getLogger(AreaExtractor.class);
 
-	public static NetworkLayer extractNetwork(Border border, NetworkLayer network, Set<String> evacAreaNodeIds, Set<String> evacBorderNodeIds)
+	public static NetworkImpl extractNetwork(Border border, NetworkImpl network, Set<String> evacAreaNodeIds, Set<String> evacBorderNodeIds)
 	{
 		boolean fromInHull;
 		boolean toInHull;
@@ -132,7 +132,7 @@ public class AreaExtractor {
 		return network;
 	}
 
-	public static void extractNetworkAndWriteIntoFile(Border border, NetworkLayer network, String networkFile, String evacAreaFile)
+	public static void extractNetworkAndWriteIntoFile(Border border, NetworkImpl network, String networkFile, String evacAreaFile)
 	{
 		Set<String> nodeIdsInArea = new HashSet<String>();
 		Set<String> nodeIdsBorder = new HashSet<String>();

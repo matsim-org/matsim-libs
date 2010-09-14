@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 public class NetworkWithDemands {
-	public NetworkLayer network;
+	public NetworkImpl network;
 	public Map<Node, Integer> demands = new HashMap<Node, Integer>();
 	public Node superSink;
 	
@@ -17,7 +17,7 @@ public class NetworkWithDemands {
 	
 	protected int totalDemands;
 	
-	public NetworkWithDemands(NetworkLayer network, Node sink)
+	public NetworkWithDemands(NetworkImpl network, Node sink)
 	{
 		this.network = network;
 		this.superSink = sink;

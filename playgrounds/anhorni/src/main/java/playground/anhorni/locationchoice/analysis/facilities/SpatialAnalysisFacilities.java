@@ -2,6 +2,7 @@ package playground.anhorni.locationchoice.analysis.facilities;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -65,12 +66,12 @@ public class SpatialAnalysisFacilities {
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFile);
 		
 		TreeMap<Id,ActivityFacilityImpl> shop_facilities = new TreeMap<Id,ActivityFacilityImpl>();
-		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_gt2500sqm"));
-		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_get1000sqm"));
-		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_get400sqm"));
-		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_get100sqm"));
-		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_lt100sqm"));
-		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_other"));
+		shop_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) facilities.getFacilitiesForActivityType("shop_retail_gt2500sqm"));
+		shop_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) facilities.getFacilitiesForActivityType("shop_retail_get1000sqm"));
+		shop_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) facilities.getFacilitiesForActivityType("shop_retail_get400sqm"));
+		shop_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) facilities.getFacilitiesForActivityType("shop_retail_get100sqm"));
+		shop_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) facilities.getFacilitiesForActivityType("shop_retail_lt100sqm"));
+		shop_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) facilities.getFacilitiesForActivityType("shop_other"));
 
 		return shop_facilities;
 	}

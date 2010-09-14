@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -65,8 +66,8 @@ public class AddLeisureFacility2EveryLink {
 			Id id = new IdImpl(10000000 + facilityNbr);
 			this.scenario.getActivityFacilities().createFacility(id, link.getCoord());
 			
-			ActivityFacilityImpl facility = this.scenario.getActivityFacilities().getFacilities().get(id);
-			facility.createActivityOption("leisure");
+			ActivityFacility facility = this.scenario.getActivityFacilities().getFacilities().get(id);
+			((ActivityFacilityImpl) facility).createActivityOption("leisure");
 			facility.getActivityOptions().get("leisure").setCapacity(1.0);
 			facility.getActivityOptions().get("leisure").addOpeningTime(new OpeningTimeImpl(DayType.wk, 0.0 * 3600, 24.0 * 3600));
 			

@@ -31,6 +31,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -53,7 +54,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 		Config config = new Config();
 		config.addCoreModules();
 
-		NetworkLayer network = this.createNetwork();
+		NetworkImpl network = this.createNetwork();
 
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(network, 900);
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(network, config.travelTimeCalculator());
@@ -151,9 +152,9 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 
 	}
 
-	private NetworkLayer createNetwork() {
+	private NetworkImpl createNetwork() {
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 
 		network.addNode(network.getFactory().createNode(new IdImpl(1), new CoordImpl(    0.0, 10000.0)));
 		network.addNode(network.getFactory().createNode(new IdImpl(2), new CoordImpl(10000.0, 10000.0)));

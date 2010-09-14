@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
@@ -122,7 +122,7 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 		String signalSystemsFile = DgPaths.STUDIESDG + "signalSystemsZh/signalSystems.xml";
 		String signalSystemsConfigFile = DgPaths.STUDIESDG + "signalSystemsZh/signalSystemsConfig.xml";
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer net = scenario.getNetwork();
+		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 	  log.info("read network");
 	  

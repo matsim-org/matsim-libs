@@ -88,7 +88,7 @@ public class FacilitiesWork9To18 {
 				// in the data, the number of fulltime job equivalents is >0, but the rounding might be ==0
 				// but there has to be at least one job
 				jobsPerFacility = Math.max(B01EQTS2 / B01S2, 1);
-				a.setCapacity(jobsPerFacility);
+				a.setCapacity((double) jobsPerFacility);
 
 				a.addOpeningTime(new OpeningTimeImpl(DayType.wk, 9*3600, 18*3600));
 			}
@@ -102,7 +102,7 @@ public class FacilitiesWork9To18 {
 				// in the data, the number of fulltime job equivalents is >0, but the rounding might be ==0
 				// but there has to be at least one job
 				jobsPerFacility = Math.max(B01EQTS3 / B01S3, 1);
-				a.setCapacity(jobsPerFacility);
+				a.setCapacity((double) jobsPerFacility);
 
 				a.addOpeningTime(new OpeningTimeImpl(DayType.wk, 9*3600, 18*3600));
 			}

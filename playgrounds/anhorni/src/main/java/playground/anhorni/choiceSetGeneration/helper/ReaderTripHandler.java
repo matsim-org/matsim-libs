@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -19,7 +19,7 @@ public class ReaderTripHandler {
 	private Id chosenFacilityId;
 
 
-	public void constructTrip(String [] entries, NetworkLayer network, ZHFacilities facilities,
+	public void constructTrip(String [] entries, NetworkImpl network, ZHFacilities facilities,
 			MZTrip mzTrip, int tripNr) {
 
 		Coord beforeShoppingCoord = new CoordImpl(

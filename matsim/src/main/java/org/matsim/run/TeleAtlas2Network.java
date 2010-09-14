@@ -23,6 +23,7 @@ package org.matsim.run;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderTeleatlas;
 import org.matsim.core.network.NetworkWriter;
@@ -305,7 +306,7 @@ public class TeleAtlas2Network {
 //		str = str.trim();
 //		args = str.split(" ");
 
-		network = new NetworkLayer();
+		network = NetworkImpl.createNetwork();
 		parseArguments(args);
 		convert();
 		// TODO balmermi: more options

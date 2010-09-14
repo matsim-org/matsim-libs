@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.vis.otfvis.data.fileio.OTFObjectInputStream;
 
 
@@ -43,7 +43,7 @@ public class PopProviderFile implements PopulationProvider {
 
 	String filename;
 	Population population;
-	NetworkLayer network;
+	NetworkImpl network;
 
 	public PopProviderFile(String filename) {
 		this.filename = filename;
@@ -55,7 +55,7 @@ public class PopProviderFile implements PopulationProvider {
 			BufferedInputStream is = new BufferedInputStream(zipFile.getInputStream(infoEntry),5000000);
 			ObjectInputStream inFile = new OTFObjectInputStream(is);
 
-			network = (NetworkLayer)inFile.readObject();
+			network = (NetworkImpl)inFile.readObject();
 			population = (Population)inFile.readObject();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

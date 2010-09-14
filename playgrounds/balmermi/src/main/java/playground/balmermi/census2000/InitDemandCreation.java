@@ -70,11 +70,7 @@ public class InitDemandCreation {
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		ScenarioImpl scenario = sl.getScenario();
 		Config config = scenario.getConfig();
-		World world = scenario.getWorld();
-
-		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(scenario).readFile(null);//config.world().getInputFile());
-		System.out.println("  done.");
+		World world = new World();
 
 		System.out.println("  reading facilities xml file... ");
 		sl.loadActivityFacilities();

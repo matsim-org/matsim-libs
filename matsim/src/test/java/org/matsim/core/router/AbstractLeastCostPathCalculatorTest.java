@@ -36,6 +36,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -312,7 +313,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 	 * @author mrieser
 	 */
 	private static class MultiModeFixture {
-		/*package*/ final NetworkLayer network = new NetworkLayer();
+		/*package*/ final NetworkImpl network = NetworkImpl.createNetwork();
 		/*package*/ final Node[] nodes = new NodeImpl[8];
 		/*package*/ final Link[] links = new LinkImpl[12];
 

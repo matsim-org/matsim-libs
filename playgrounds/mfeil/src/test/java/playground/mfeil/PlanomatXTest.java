@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
@@ -91,8 +92,8 @@ public class PlanomatXTest extends MatsimTestCase{
 		PlanomatXPlan [] neighbourhood = {plan1,plan2,plan3,plan4,plan5,plan6,plan7,plan8,plan9,plan10};
 		int [][] infoOnNeighbourhood = new int [10][3];
 		ArrayList<ActivityOptionImpl> primActs = new ArrayList<ActivityOptionImpl>();
-		primActs.add(new ActivityOptionImpl("home", this.scenario_input.getActivityFacilities().getFacilities().get(new IdImpl(1))));
-		primActs.add(new ActivityOptionImpl("work", this.scenario_input.getActivityFacilities().getFacilities().get(new IdImpl(10))));
+		primActs.add(new ActivityOptionImpl("home", (ActivityFacilityImpl) this.scenario_input.getActivityFacilities().getFacilities().get(new IdImpl(1))));
+		primActs.add(new ActivityOptionImpl("work", (ActivityFacilityImpl) this.scenario_input.getActivityFacilities().getFacilities().get(new IdImpl(10))));
 		List<String> actTypes = new ArrayList<String>();
 		actTypes.add("home");
 		actTypes.add("work");

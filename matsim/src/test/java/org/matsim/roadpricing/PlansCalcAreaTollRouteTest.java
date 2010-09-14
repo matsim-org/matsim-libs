@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -48,7 +48,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		Fixture.createNetwork2(scenario);
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme();
@@ -107,7 +107,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		Fixture.createNetwork2(scenario);
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme();
@@ -138,7 +138,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		Fixture.createNetwork2(scenario);
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme();
@@ -166,7 +166,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		Fixture.createNetwork2(scenario);
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme();

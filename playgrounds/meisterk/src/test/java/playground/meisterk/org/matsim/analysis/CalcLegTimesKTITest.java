@@ -33,7 +33,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -85,7 +85,7 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(testee);
 
-		NetworkLayer testNetwork = scenario.getNetwork();
+		NetworkImpl testNetwork = scenario.getNetwork();
 		Node node1 = testNetwork.createAndAddNode(new IdImpl("1"), new CoordImpl(0.0, 0.0));
 		Node node2 = testNetwork.createAndAddNode(new IdImpl("2"), new CoordImpl(100.0, 100.0));
 		Link link = testNetwork.createAndAddLink(new IdImpl("200"), node1, node2, 0, 0, 0, 0);

@@ -22,8 +22,10 @@ package playground.balmermi.census2000.modules;
 
 import java.util.Iterator;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 
 /**
@@ -58,12 +60,12 @@ public class FacilitiesSetCapacity {
 	public void run(ActivityFacilitiesImpl facilities) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
-		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			Iterator<ActivityOptionImpl> act_it = f.getActivityOptions().values().iterator();
+		for (ActivityFacility f : facilities.getFacilities().values()) {
+			Iterator<ActivityOption> act_it = f.getActivityOptions().values().iterator();
 			while (act_it.hasNext()) {
-				ActivityOptionImpl activity = act_it.next();
+				ActivityOptionImpl activity = (ActivityOptionImpl) act_it.next();
 				if ((activity.getCapacity() <= 0) || (activity.getCapacity() == Integer.MAX_VALUE)) {
-					activity.setCapacity(1);
+					activity.setCapacity((double) 1);
 					if (HOME.equals(activity.getType())) {
 						System.out.println("      Fac id=" + f.getId() + ": home cap undefined. Setting to one.");
 					}

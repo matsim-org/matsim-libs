@@ -48,13 +48,16 @@ public class MatsimWorldReader extends MatsimXmlParser {
 	private final ScenarioImpl scenario;
 	private MatsimXmlParser delegate = null;
 
+	private World world;
+
 	/**
 	 * Creates a new reader for MATSim world files.
 	 *
 	 * @param scenario The Scenario-object to store the world in.
 	 */
-	public MatsimWorldReader(final ScenarioImpl scenario) {
+	public MatsimWorldReader(final ScenarioImpl scenario, final World world) {
 		this.scenario = scenario;
+		this.world = world;
 	}
 
 	@Override
@@ -89,7 +92,7 @@ public class MatsimWorldReader extends MatsimXmlParser {
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
 		if (WORLD_V2.equals(doctype)) {
-			this.delegate = new WorldReaderMatsimV2(this.scenario);
+			this.delegate = new WorldReaderMatsimV2(this.scenario, world);
 			log.info("using world_v2-reader.");
 		} else if (WORLD_V0.equals(doctype)) {
 			throw new IllegalArgumentException("world_v0.dtd is no longer supported..");

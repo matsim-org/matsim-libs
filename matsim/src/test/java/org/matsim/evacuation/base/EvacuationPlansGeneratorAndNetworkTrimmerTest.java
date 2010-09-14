@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -41,7 +41,7 @@ public class EvacuationPlansGeneratorAndNetworkTrimmerTest extends MatsimTestCas
 		String refNet = getInputDirectory() + "evacuationnetwork.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl(c);
-		NetworkLayer net = scenario.getNetwork();
+		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(c.network().getInputFile());
 
 		Population pop = scenario.getPopulation();

@@ -31,7 +31,7 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.jjoubert.CommercialTraffic.SAZone;
 
@@ -41,12 +41,12 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 	private Map<Id, SAZone> map;
 	private Map<Id, ArrayList<ArrayList<Double>>> linkSpeeds;
 	private Map<Id, Double> eventMap;
-	private NetworkLayer networkLayer;
+	private NetworkImpl networkLayer;
 	private Integer lowerAgentId;
 	private Integer upperAgentId;
 	private boolean weighLinksByUse = false;
 	
-	public MyPrivateVehicleSpeedAnalyser(Map<Id, SAZone> map, NetworkLayer nl, int lowerAgentId, int upperAgentId, int hours){
+	public MyPrivateVehicleSpeedAnalyser(Map<Id, SAZone> map, NetworkImpl nl, int lowerAgentId, int upperAgentId, int hours){
 		this.map = map;
 		this.networkLayer = nl;
 		this.lowerAgentId = lowerAgentId;

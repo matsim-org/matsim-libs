@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -112,7 +112,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 				Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 				Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-				NetworkRoute tollRoute = (NetworkRoute) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+				NetworkRoute tollRoute = (NetworkRoute) ((NetworkImpl) this.network).getFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
 				NetworkRoute noTollRoute = null;
 
 				// # start searching a route where agent may pay the toll
@@ -144,7 +144,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 					 * will still be a route returned.
 					 */
 					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-					noTollRoute = (NetworkRoute) ((NetworkLayer) this.network).getFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+					noTollRoute = (NetworkRoute) ((NetworkImpl) this.network).getFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
 					noTollRoute.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 					noTollRoute.setTravelTime((int) path.travelTime);
 					noTollRoute.setTravelCost(path.travelCost);

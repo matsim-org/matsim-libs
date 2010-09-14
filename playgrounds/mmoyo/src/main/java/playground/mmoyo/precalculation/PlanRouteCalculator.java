@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -48,12 +48,12 @@ public class PlanRouteCalculator {
 	private DynamicConnection  dynamicConnection;
 	private Map <Id, List<StaticConnection>> connectionMap = new TreeMap <Id, List<StaticConnection>>();;
 	private TransitSchedule transitSchedule;
-	private NetworkLayer net;
+	private NetworkImpl net;
 	private Population population;
 	private KroutesCalculator kRoutesCalculator;
 	PlainTimeTable plainTimeTable;
 
-	public PlanRouteCalculator(final TransitSchedule transitSchedule, final NetworkLayer net, Map <Id, List<StaticConnection>> connectionMap, Population population, KroutesCalculator kRoutesCalculator){
+	public PlanRouteCalculator(final TransitSchedule transitSchedule, final NetworkImpl net, Map <Id, List<StaticConnection>> connectionMap, Population population, KroutesCalculator kRoutesCalculator){
 		this.transitSchedule = transitSchedule;
 		this.net = net;
 		this.connectionMap = connectionMap;

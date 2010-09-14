@@ -30,7 +30,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -146,9 +146,10 @@ public abstract class Scenario {
 //	}
 	public static final World readWorld(String filename) {
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(scenario).readFile(filename);
+		World world = new World();
+		new MatsimWorldReader(scenario, world).readFile(filename);
 		System.out.println("  done.");
-		return scenario.getWorld();
+		return world;
 	}
 
 	public static final ActivityFacilitiesImpl readFacilities() {
@@ -159,10 +160,10 @@ public abstract class Scenario {
 		return facilities;
 	}
 
-	public static final NetworkLayer readNetwork() {
+	public static final NetworkImpl readNetwork() {
 		System.out.println("  reading the network xml file...");
 		System.out.println(scenario.getConfig().network().getInputFile());
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		System.out.println("  done.");
 		return network;
@@ -260,7 +261,7 @@ public abstract class Scenario {
 //		System.out.println("  done.");
 //	}
 
-	public static final void writeNetwork(final NetworkLayer network, String filename) {
+	public static final void writeNetwork(final NetworkImpl network, String filename) {
 		System.out.println("  writing network xml file... ");
 		new NetworkWriter(network).write(filename);
 		System.out.println("  done.");

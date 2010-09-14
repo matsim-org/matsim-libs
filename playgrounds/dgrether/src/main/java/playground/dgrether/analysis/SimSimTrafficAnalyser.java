@@ -26,7 +26,7 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
@@ -46,7 +46,7 @@ public class SimSimTrafficAnalyser {
 
 	private static final Logger log = Logger.getLogger(SimSimTrafficAnalyser.class);
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private CalcLinkStats linkStats;
 	private CalcLinkStats linkStats2;
 

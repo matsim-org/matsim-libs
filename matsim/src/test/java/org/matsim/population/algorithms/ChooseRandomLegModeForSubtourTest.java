@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.BasicLocations;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -42,13 +43,12 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.Layer;
 
 /**
  * @author mrieser
@@ -126,8 +126,8 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		TripStructureAnalysisLayerOption tripStructureAnalysisLayer = PlanomatConfigGroup.TripStructureAnalysisLayerOption.link;
 		config.planomat().setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
-		this.testSubTourMutationToCar((NetworkLayer) network, tripStructureAnalysisLayer);
-		this.testSubTourMutationToPt((NetworkLayer) network, tripStructureAnalysisLayer);
+		this.testSubTourMutationToCar((NetworkImpl) network, tripStructureAnalysisLayer);
+		this.testSubTourMutationToPt((NetworkImpl) network, tripStructureAnalysisLayer);
 	}
 
 	public void testSubTourMutationFacilitiesBased() {
@@ -147,18 +147,18 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
-		testCarDoesntTeleport((NetworkLayer) network, config.planomat(), TransportMode.car, TransportMode.pt);
-		testCarDoesntTeleport((NetworkLayer) network, config.planomat(), TransportMode.pt, TransportMode.car);
+		testCarDoesntTeleport((NetworkImpl) network, config.planomat(), TransportMode.car, TransportMode.pt);
+		testCarDoesntTeleport((NetworkImpl) network, config.planomat(), TransportMode.pt, TransportMode.car);
 	}
 
-	public void testSubTourMutationToCar(Layer layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+	public void testSubTourMutationToCar(BasicLocations layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
 		String expectedMode = TransportMode.car;
 		String originalMode = TransportMode.pt;
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour(new String[] {expectedMode, originalMode}, MatsimRandom.getRandom());
 		testee.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = TestsUtil.createPlan(layer, person, originalMode, activityChainString, tripStructureAnalysisLayer);
+			PlanImpl plan = createPlan(layer, activityChainString, tripStructureAnalysisLayer, originalMode);
 			PlanImpl originalPlan = new PlanImpl(person);
 			originalPlan.copyPlan(plan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
@@ -168,14 +168,14 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 
 	}
 
-	public void testSubTourMutationToPt(Layer layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+	public void testSubTourMutationToPt(BasicLocations layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
 		String expectedMode = TransportMode.pt;
 		String originalMode = TransportMode.car;
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour(new String[] {expectedMode, originalMode}, MatsimRandom.getRandom());
 		testee.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = TestsUtil.createPlan(layer, person, originalMode, activityChainString, tripStructureAnalysisLayer);
+			PlanImpl plan = createPlan(layer, activityChainString, tripStructureAnalysisLayer, originalMode);
 			PlanImpl originalPlan = new PlanImpl(person);
 			originalPlan.copyPlan(plan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
@@ -185,11 +185,11 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 
 	}
 
-	public void testCarDoesntTeleport(Layer layer, PlanomatConfigGroup planomatConfigGroup, String originalMode, String otherMode) {
+	public void testCarDoesntTeleport(BasicLocations layer, PlanomatConfigGroup planomatConfigGroup, String originalMode, String otherMode) {
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour(new String[] {originalMode, otherMode}, MatsimRandom.getRandom());
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		testee.setTripStructureAnalysisLayer(planomatConfigGroup.getTripStructureAnalysisLayer());
 		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = TestsUtil.createPlan(layer, person, originalMode, activityChainString, TripStructureAnalysisLayerOption.facility);
+			PlanImpl plan = createPlan(layer, activityChainString, planomatConfigGroup.getTripStructureAnalysisLayer(), originalMode);
 			testee.run(plan);
 			Iterator<PlanElement> i = plan.getPlanElements().iterator();
 			Activity firstActivity = (Activity) i.next();
@@ -258,6 +258,20 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 			return false;
 		}
 		return true;
+	}
+	
+	private PlanImpl createPlan(BasicLocations layer, String facString,
+			TripStructureAnalysisLayerOption linksOrFacilities, String mode) {
+		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PlanImpl plan;
+		if (linksOrFacilities.equals(TripStructureAnalysisLayerOption.facility)) {
+			plan = TestsUtil.createPlanFromFacilities((ActivityFacilitiesImpl) layer, person, mode, facString);
+		} else if (linksOrFacilities.equals(TripStructureAnalysisLayerOption.link)) {
+			plan = TestsUtil.createPlanFromLinks((NetworkImpl) layer, person, mode, facString);
+		} else {
+			throw new RuntimeException("Unknown option.");
+		}
+		return plan;
 	}
 
 }

@@ -32,8 +32,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.world.algorithms.WorldConnectLocations;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 public class World {
 
@@ -48,6 +49,8 @@ public class World {
 
 	private Layer top_layer = null;
 	private Layer bottom_layer = null;
+
+	private ActivityFacilitiesImpl facilities;
 
 	private final static Logger log = Logger.getLogger(World.class);
 
@@ -68,7 +71,7 @@ public class World {
 	public final void complete(Set<String> excludingLinkTypes, final Config config) {
 		// 1. remove rules and mappings containing network and/or facility layers
 		Layer f_layer = this.layers.get(ActivityFacilitiesImpl.LAYER_TYPE);
-		Layer n_layer = this.layers.get(NetworkLayer.LAYER_TYPE);
+		Layer n_layer = this.layers.get(NetworkImpl.LAYER_TYPE);
 		for (Layer l : layers.values()) {
 			if (f_layer != null) {
 				this.removeMappingRule(f_layer.getType(),l.getType());
@@ -85,7 +88,7 @@ public class World {
 		Iterator<Id> lid_it = this.layers.keySet().iterator();
 		while (lid_it.hasNext()) {
 			Id lid = lid_it.next();
-			if ((lid != NetworkLayer.LAYER_TYPE) && (lid != ActivityFacilitiesImpl.LAYER_TYPE)) {
+			if ((lid != NetworkImpl.LAYER_TYPE) && (lid != ActivityFacilitiesImpl.LAYER_TYPE)) {
 				zlayers.add((ZoneLayer)this.layers.get(lid));
 			}
 		}
@@ -135,8 +138,7 @@ public class World {
 				this.bottom_layer = this.bottom_layer.getDownLayer();
 			}
 		}
-		// 5. connect the locations from neighbor layers
-		new WorldConnectLocations(excludingLinkTypes, config).run(this);
+		
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -204,8 +206,8 @@ public class World {
 		if (this.layers.containsKey(type)) {
 			throw new IllegalArgumentException("Layer type=" + type + " already exixts.");
 		}
-		if (type.equals(ActivityFacilitiesImpl.LAYER_TYPE)) { return this.createFacilityLayer(); }
-		if (type.equals(NetworkLayer.LAYER_TYPE)) { return this.createNetworkLayer(); }
+		if (type.equals(ActivityFacilitiesImpl.LAYER_TYPE)) { throw new RuntimeException(); }
+		if (type.equals(NetworkImpl.LAYER_TYPE)) { throw new RuntimeException(); }
 		return this.createZoneLayer(type,name);
 	}
 
@@ -230,8 +232,8 @@ public class World {
 	}
 
 	@Deprecated
-	private final NetworkLayer createNetworkLayer() {
-		NetworkLayer n = new NetworkLayer();
+	private final NetworkImpl createNetworkLayer() {
+		NetworkImpl n = NetworkImpl.createNetwork();
 		setNetworkLayer(n);
 		return n;
 	}
@@ -242,19 +244,12 @@ public class World {
 
 	@Deprecated
 	public void setFacilityLayer(final ActivityFacilitiesImpl facilityLayer) {
-		if (facilityLayer == null) {
-			throw new IllegalArgumentException("facilityLayer=null not allowed!");
-		}
-		this.layers.put(ActivityFacilitiesImpl.LAYER_TYPE, facilityLayer);
+		this.facilities = facilityLayer;
 	}
 
 	@Deprecated
-	public void setNetworkLayer(final NetworkLayer network) {
-		if (network == null) {
-			throw new IllegalArgumentException("network=null not allowed!");
-		}
-		Map<Id,Layer> lll = this.layers ;
-		lll.put(NetworkLayer.LAYER_TYPE, network);
+	public void setNetworkLayer(final NetworkImpl network) {
+		throw new RuntimeException();
 	}
 
 	protected final void setName(final String name) {
@@ -344,6 +339,10 @@ public class World {
 				"[nof_layers=" + this.layers.size() + "]" +
 				"[top_layer=" + this.top_layer + "]" +
 				"[bottom_layer=" + this.bottom_layer + "]";
+	}
+
+	public ActivityFacilitiesImpl getFacilities() {
+		return facilities;
 	}
 
 }

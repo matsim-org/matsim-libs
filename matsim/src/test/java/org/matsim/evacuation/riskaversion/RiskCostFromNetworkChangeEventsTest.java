@@ -29,6 +29,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
@@ -45,7 +46,7 @@ public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase{
 
 
 	public void testRiskCostCalculatorNoCostsForEqualRiskLinks() {
-		NetworkLayer net = new NetworkLayer();
+		NetworkImpl net = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(net);
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		net.setFactory(nf);
@@ -108,7 +109,7 @@ public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase{
 	}
 
 	public void testRiskCostCalculatorChargeEqualRiskLinks() {
-		NetworkLayer net = new NetworkLayer();
+		NetworkImpl net = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(net);
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		net.setFactory(nf);

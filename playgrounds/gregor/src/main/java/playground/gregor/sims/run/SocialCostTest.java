@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -89,7 +89,7 @@ public class SocialCostTest extends Controler {
 		super.loadData();
 
 		// generate Network
-		NetworkLayer net = this.scenarioData.getNetwork();
+		NetworkImpl net = this.scenarioData.getNetwork();
 		net.setCapacityPeriod(1);
 		net.setEffectiveCellSize(0.26);
 		net.setEffectiveLaneWidth(0.71);

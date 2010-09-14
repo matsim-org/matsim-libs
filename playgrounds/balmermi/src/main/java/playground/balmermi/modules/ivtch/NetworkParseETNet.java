@@ -26,7 +26,7 @@ import java.io.IOException;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -53,7 +53,7 @@ public class NetworkParseETNet {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void parseNodes(final NetworkLayer network) {
+	private final void parseNodes(final NetworkImpl network) {
 		try {
 			FileReader file_reader = new FileReader(this.nodefile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -73,7 +73,7 @@ public class NetworkParseETNet {
 		}
 	}
 
-	private final void parseLinksET(final NetworkLayer network) {
+	private final void parseLinksET(final NetworkImpl network) {
 		try {
 			FileReader file_reader = new FileReader(this.linkfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -104,7 +104,7 @@ public class NetworkParseETNet {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final NetworkLayer network) {
+	public void run(final NetworkImpl network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		if (!network.getNodes().isEmpty()) { Gbl.errorMsg("links already exist."); }

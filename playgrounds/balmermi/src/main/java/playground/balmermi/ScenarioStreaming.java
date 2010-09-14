@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -86,7 +86,7 @@ public class ScenarioStreaming {
 		System.out.println("done. (loading network)");
 
 		Config config = sl.getScenario().getConfig();
-		NetworkLayer network = sl.getScenario().getNetwork();
+		NetworkImpl network = sl.getScenario().getNetwork();
 		ActivityFacilitiesImpl af = sl.getScenario().getActivityFacilities();
 
 		System.out.println("complete world...");
@@ -126,7 +126,7 @@ public class ScenarioStreaming {
 //		exTxpes.add("90"); exTxpes.add("91"); exTxpes.add("92"); exTxpes.add("93");
 //		exTxpes.add("94"); exTxpes.add("95"); exTxpes.add("96"); exTxpes.add("97");
 //		exTxpes.add("98"); exTxpes.add("99");
-		sc.getWorld().complete(exTxpes, sc.getConfig());
+//		sc.getWorld().complete(exTxpes, sc.getConfig());
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 

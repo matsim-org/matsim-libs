@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Count;
@@ -52,7 +52,7 @@ import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 public class LinkStatsAnalyser {
 
 	//the network
-	private NetworkLayer network;
+	private NetworkImpl network;
 
 	/**
 	 * the number of the iteration which can be set in the config file
@@ -204,10 +204,10 @@ public class LinkStatsAnalyser {
 	 *
 	 * @return the network layer
 	 */
-	protected NetworkLayer loadNetwork() {
+	protected NetworkImpl loadNetwork() {
 		printNote("", "  creating network layer... ");
 		Scenario scenario = new ScenarioImpl();
-		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		printNote("", "  done");
 
 		printNote("", "  reading network xml file... ");

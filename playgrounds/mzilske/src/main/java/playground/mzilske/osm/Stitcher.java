@@ -25,7 +25,7 @@ public class Stitcher {
 	
 	private Network network;
 	
-	private NetworkLayer networkForThisRoute = new NetworkLayer(); 
+	private NetworkImpl networkForThisRoute = NetworkImpl.createNetwork(); 
 
 	private LinkedList<Id> forwardStops = new LinkedList<Id>();
 

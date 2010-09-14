@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -60,7 +60,7 @@ public class NetworkFromLsFile {
 	}
 	
 	private void createLinks() {
-		NetworkLayer net = (NetworkLayer)this.sc.getNetwork();
+		NetworkImpl net = (NetworkImpl)this.sc.getNetwork();
 		int count = 0;
 		
 		for (Entry<Id, LineString> e : this.lsmp.entrySet()) {
@@ -88,7 +88,7 @@ public class NetworkFromLsFile {
 	}
 
 	private void createNodes() {
-		NetworkLayer net = (NetworkLayer)this.sc.getNetwork();
+		NetworkImpl net = (NetworkImpl)this.sc.getNetwork();
 		int count = 0;
 		for (LineString ls : this.lsmp.values()) {
 			for (int i = 0; i < ls.getNumPoints(); i ++) {

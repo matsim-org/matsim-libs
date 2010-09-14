@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkAdaptLength;
 import org.matsim.core.network.algorithms.NetworkSummary;
 
@@ -37,7 +37,7 @@ import playground.anhorni.crossborder.verification.Verification;
 
 public class InitDemandCreation {
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private ArrayList<String> files;
 	private Verification verification;
 
@@ -89,7 +89,7 @@ public class InitDemandCreation {
 
 	private void readNetwork() {
 		Scenario scenario = new ScenarioImpl();
-		this.network = (NetworkLayer) scenario.getNetwork();
+		this.network = (NetworkImpl) scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(Config.networkFile);
 
 		// running Network adaptation algorithms

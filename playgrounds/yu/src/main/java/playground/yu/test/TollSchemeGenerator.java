@@ -38,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -1237,7 +1238,7 @@ public class TollSchemeGenerator {
 	// private static final String[] linkIdsToFilterArray = { "101222", "101221"
 	// };
 	private final Config config;
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private final Coord[] usedCoords;
 
 	// TODO change used data here:
@@ -1270,7 +1271,7 @@ public class TollSchemeGenerator {
 		usedCoords = parseGoogleEarthCoord(config);
 		System.out.println("this.config.network() : "
 				+ config.network().toString());
-		NetworkLayer tollNetwork = createTollScheme(config);
+		NetworkImpl tollNetwork = createTollScheme(config);
 
 		// write kml
 		writeKml(tollNetwork, usedOut);
@@ -1280,25 +1281,25 @@ public class TollSchemeGenerator {
 
 	}
 
-	private void writeShapeFile(final NetworkLayer network, final Coord[] coords) {
+	private void writeShapeFile(final NetworkImpl network, final Coord[] coords) {
 		new ShapeFileNetworkWriter().writeNetwork(network, usedGisOut
 				+ "Network.shp");
 		new ShapeFilePolygonWriter().writePolygon(coords, usedGisOut
 				+ "MoutArea.shp");
 	}
 
-	private NetworkLayer createTollScheme(final Config config) {
+	private NetworkImpl createTollScheme(final Config config) {
 		System.out.println("createTollScheme(config)->config : "
 				+ config.toString());
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
-		network = (NetworkLayer) loader.loadScenario().getNetwork();
+		network = (NetworkImpl) loader.loadScenario().getNetwork();
 
 		// network = new NetworkLayer();
 		// new MatsimNetworkReader(network).readFile(config.network()
 		// .getInputFile());
 
 		System.out.println("network : " + network.toString());
-		NetworkLayer net = filterNetwork(network, false);
+		NetworkImpl net = filterNetwork(network, false);
 		log.info("Filtered the network, filtered network layer contains "
 				+ net.getLinks().size() + " links.");
 		System.out
@@ -1320,7 +1321,7 @@ public class TollSchemeGenerator {
 	}
 
 	private RoadPricingScheme createRoadPricingScheme(
-			final NetworkLayer tollNetwork) {
+			final NetworkImpl tollNetwork) {
 		RoadPricingScheme scheme = new RoadPricingScheme();
 		for (Link l : tollNetwork.getLinks().values())
 			scheme.addLink(l.getId());
@@ -1355,7 +1356,7 @@ public class TollSchemeGenerator {
 		return ret;
 	}
 
-	private void writeKml(final NetworkLayer net, final String filename) {
+	private void writeKml(final NetworkImpl net, final String filename) {
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
 
@@ -1427,9 +1428,9 @@ public class TollSchemeGenerator {
 		log.info("Network written to kmz!");
 	}
 
-	private NetworkLayer filterNetwork(final NetworkLayer net,
+	private NetworkImpl filterNetwork(final NetworkImpl net,
 			final boolean full) {
-		NetworkLayer n = new NetworkLayer();
+		NetworkImpl n = NetworkImpl.createNetwork();
 		GeometryFactory geofac = new GeometryFactory();
 		Coordinate[] geoToolCoords = new Coordinate[usedCoords.length];
 		int i = 0;

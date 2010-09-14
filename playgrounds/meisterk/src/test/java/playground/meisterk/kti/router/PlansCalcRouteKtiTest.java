@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -39,7 +40,7 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 public class PlansCalcRouteKtiTest extends MatsimTestCase {
 
 	private Config config = null;
-	private NetworkLayer network = null;
+	private NetworkImpl network = null;
 	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
 
 	@Override
@@ -55,7 +56,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		ktiConfigGroup.setWorldInputFilename(this.getClassInputDirectory() + "world.xml");
 		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
 
-		network = new NetworkLayer();
+		network = NetworkImpl.createNetwork();
 
 		network.createAndAddNode(new IdImpl(1), new CoordImpl(1000.0, 1000.0));
 		network.createAndAddNode(new IdImpl(2), new CoordImpl(1100.0, 1100.0));

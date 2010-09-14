@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -100,7 +101,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 	 */
 	private void runMutationRangeTest(final TimeAllocationMutator mutator, final int expectedMutationRange) {
 		// setup network
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));

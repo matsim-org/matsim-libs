@@ -38,7 +38,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -71,8 +71,8 @@ public class PTActWriter {
 	private LinkImpl egressLink;
 	private final double firstWalkRange;
 
-	private final NetworkLayer logicNet;
-	private NetworkLayer plainNet;
+	private final NetworkImpl logicNet;
+	private NetworkImpl plainNet;
 	private final PTRouter ptRouter;
 	private final LogicIntoPlainTranslator logicToPlainConverter;
 

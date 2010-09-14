@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
@@ -25,10 +25,10 @@ import playground.wrashid.parkingSearch.planLevel.scoring.OrderedFacility;
  */
 public class ClosestParkingMatrix {
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 	LinkParkingFacilityAssociation parkingAssociations;
 
-	public ClosestParkingMatrix(ActivityFacilitiesImpl facilities, NetworkLayer network) {
+	public ClosestParkingMatrix(ActivityFacilitiesImpl facilities, NetworkImpl network) {
 		this.network = network;
 		this.parkingAssociations = new LinkParkingFacilityAssociation(facilities, network);
 	}

@@ -21,14 +21,18 @@
 package org.matsim.utils.gis.matsim2esri.network;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 public class LanesBasedWidthCalculator implements WidthCalculator{
 
 	private final double effectiveLaneWidth;
 	private final double widthCoefficient;
 
-	public LanesBasedWidthCalculator(final NetworkLayer network, final Double coef) {
+	/**
+	 * This constructor is used by reflection.
+	 * It's signature mustn't be changed or it won't work anymore. :-(
+	 */
+	public LanesBasedWidthCalculator(final NetworkImpl network, final Double coef) {
 		this.effectiveLaneWidth = network.getEffectiveLaneWidth();
 		this.widthCoefficient = coef;
 	}

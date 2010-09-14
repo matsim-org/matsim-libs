@@ -53,7 +53,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -158,7 +157,7 @@ public class MyRuns {
 		MatsimConfigReader reader = new MatsimConfigReader(config);
 		reader.readFile(args[0]);
 
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 
 		NodeImpl node = null;
 
@@ -510,7 +509,7 @@ public class MyRuns {
 		return population;
 	}
 
-	public static void readEvents(final EventsManagerImpl events, final NetworkLayer network, final String eventsInputFile) {
+	public static void readEvents(final EventsManagerImpl events, final NetworkImpl network, final String eventsInputFile) {
 
 		// load test events
 		long startTime, endTime;

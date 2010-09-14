@@ -26,7 +26,7 @@ import java.awt.Graphics;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.rost.controller.map.BasicMap;
 import playground.rost.controller.vismodule.VisModuleContainer;
@@ -35,10 +35,10 @@ import playground.rost.graph.GraphAlgorithms;
 
 public class AreaNodeVisModule extends NodeVisModule {
 
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 	protected Border border;
 	
-	public AreaNodeVisModule(VisModuleContainer vMContainer, Border border, NetworkLayer network)
+	public AreaNodeVisModule(VisModuleContainer vMContainer, Border border, NetworkImpl network)
 	{
 		super(vMContainer, network);
 		this.network = network;

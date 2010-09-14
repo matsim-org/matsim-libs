@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -42,7 +42,7 @@ public class CountsCreator {
 
 	private static final Logger log = Logger.getLogger(CountsCreator.class);
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 
 	/*
 	 * main NODES: 9233, 1563, 1558, 1562, 1564, 1000597, 1565, 1525, 1519, 1518,

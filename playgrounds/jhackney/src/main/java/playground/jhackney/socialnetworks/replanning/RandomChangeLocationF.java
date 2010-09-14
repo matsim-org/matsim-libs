@@ -30,9 +30,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -166,7 +167,7 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 					newAct.setLinkId(fFromFacilities.getLinkId());
 					newAct.setCoord(fFromFacilities.getCoord());
 					newAct.setFacilityId(fFromFacilities.getId());
-					((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity(fFromFacilities.getActivityOptions().get(factype));
+					((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity((ActivityOptionImpl) fFromFacilities.getActivityOptions().get(factype));
 					changed = true;
 				}
 			}
@@ -181,7 +182,7 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 //				Reset the score.
 				newPlan.setScore(null);
 
-				new PersonPrepareForSim(new PlansCalcRoute(null, network, tcost, ttime, new DijkstraFactory()), (NetworkLayer) network).run(newPlan.getPerson());
+				new PersonPrepareForSim(new PlansCalcRoute(null, network, tcost, ttime, new DijkstraFactory()), (NetworkImpl) network).run(newPlan.getPerson());
 //				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
 
 				((PersonImpl) person).setSelectedPlan(newPlan);

@@ -27,7 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -38,9 +38,9 @@ import org.xml.sax.XMLReader;
 
 public class ITSUMONetworkReader {
 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 
-	public ITSUMONetworkReader(final NetworkLayer network) {
+	public ITSUMONetworkReader(final NetworkImpl network) {
 		this.network = network;
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		System.out.println("\n##################################################################################################\n" +

@@ -401,7 +401,8 @@ public class SocialNetworkStatistics {
 
 			//Geographical aggregation
 			ActivityFacilityImpl myHome=(ActivityFacilityImpl) this.facilities.getFacilities().get(((ActivityImpl)(myPerson.getSelectedPlan().getPlanElements().get(0))).getFacilityId());
-			Location myLoc=myHome.getUpMapping().get(myHome.getUpMapping().firstKey());
+//			Location myLoc=myHome.getUpMapping().get(myHome.getUpMapping().firstKey());
+			Location myLoc = null;
 			Vertex myVertex=gstat.getLocVertex().get(myLoc);
 			double pop=(Integer) myVertex.getUserDatum("population");
 

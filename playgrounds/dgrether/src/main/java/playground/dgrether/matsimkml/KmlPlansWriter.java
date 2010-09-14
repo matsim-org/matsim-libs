@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.kml.KMZWriter;
@@ -49,7 +49,7 @@ public class KmlPlansWriter {
 
 	private static final Logger log = Logger.getLogger(KmlPlansWriter.class);
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 
 	private NetworkKmlStyleFactory styleFactory;
 
@@ -61,7 +61,7 @@ public class KmlPlansWriter {
 
 	private StyleType networkNodeStyle;
 
-	public KmlPlansWriter(final NetworkLayer network, final CoordinateTransformation coordTransform, KMZWriter writer, DocumentType doc) {
+	public KmlPlansWriter(final NetworkImpl network, final CoordinateTransformation coordTransform, KMZWriter writer, DocumentType doc) {
 		this.network = network;
 		this.styleFactory = new MatsimKmlStyleFactory(writer, doc);
 		this.featureFactory = new NetworkFeatureFactory(coordTransform, network);

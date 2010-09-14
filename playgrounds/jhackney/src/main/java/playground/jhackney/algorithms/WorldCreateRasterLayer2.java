@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.jhackney.algorithms;
 
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -27,6 +28,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -111,7 +113,7 @@ public class WorldCreateRasterLayer2 {
 		System.out.println("      done.");
 
 		System.out.println("      creating " + n + " x " + m + " cells...");
-		TreeMap<Id,Zone> zones = (TreeMap<Id,Zone>)layer.getLocations();
+		Map<Id, MappedLocation> zones = layer.getLocations();
 		for (int i=0; i<n ; i++) {
 			for (int j=0; j<m; j++) {
 				Coord z_min = new CoordImpl(min.getX()+j*cellsize,min.getY()+i*cellsize);

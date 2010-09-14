@@ -727,11 +727,6 @@ public class FastDijkstra extends Dijkstra {
 		}
 
 		@Override
-		public Layer getLayer() {
-			return this.link.getLayer();
-		}
-
-		@Override
 		public Coord getCoord() {
 			return this.link.getCoord();
 		}

@@ -38,7 +38,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
-import org.matsim.world.Layer;
 
 
 /**
@@ -204,11 +203,6 @@ public final class TransitRouterNetwork implements Network {
 
 		@Override
 		public boolean setToNode(final Node node) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Layer getLayer() {
 			throw new UnsupportedOperationException();
 		}
 

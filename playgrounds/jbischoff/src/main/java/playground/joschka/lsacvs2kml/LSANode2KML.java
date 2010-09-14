@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -32,7 +32,7 @@ public class LSANode2KML {
 		
 		
 		Scenario scenario = new ScenarioImpl();
-		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("/home/jbischoff/m44_344_big.xml");
 		List<LSA> ampelliste = new ArrayList<LSA>();
 		Map<Id,Node> nodeList = new HashMap<Id,Node>();

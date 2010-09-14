@@ -159,7 +159,7 @@ public class AddSecureFacilitiesToNetwork {
 			 */
 			String idString = "secureFacility" + link.getId();
 			ActivityFacility secureFacility = ((ScenarioImpl)scenario).getActivityFacilities().createFacility(scenario.createId(idString), link.getCoord());
-			((ActivityFacilityImpl)secureFacility).addDownMapping((LinkImpl)link);
+			((ActivityFacilityImpl)secureFacility).setLinkId(((LinkImpl)link).getId());
 			
 			ActivityOption activityOption = ((ActivityFacilityImpl)secureFacility).createActivityOption("rescue");
 			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));

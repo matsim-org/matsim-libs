@@ -30,10 +30,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.ScenarioConfig;
 import playground.jhackney.SocNetConfigGroup;
@@ -71,7 +71,7 @@ public class AnalyzeScores {
 		World world = ScenarioConfig.readWorld();
 		facilities = ScenarioConfig.readFacilities();
 		network =ScenarioConfig.readNetwork();
-		new WorldConnectLocations(config).run(world);
+//		new WorldConnectLocations(config).run(world);
 		int iplans=500;
 		int isoc=500;
 		knowledges = new KnowledgesImpl();

@@ -24,7 +24,7 @@ package playground.dressler.util;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 
 /**
@@ -45,7 +45,7 @@ public class NetworkRounder {
 	 * @param network
 	 * @param newcap
 	 */
-	public static void roundNetwork(NetworkLayer network,int newcap, double flowCapacityFactor, double lengthFactor, boolean forEAF){
+	public static void roundNetwork(NetworkImpl network,int newcap, double flowCapacityFactor, double lengthFactor, boolean forEAF){
 		double oldcap = network.getCapacityPeriod();
 		int roundedtozerocap = 0;
 		int roundedtozerotime = 0;
@@ -103,10 +103,10 @@ public class NetworkRounder {
 		//}
 	}
 
-	public static NetworkLayer roundNetwork(String filename, int newcap, double flowCapacityFactor, double lengthFactor, boolean forEAF){
+	public static NetworkImpl roundNetwork(String filename, int newcap, double flowCapacityFactor, double lengthFactor, boolean forEAF){
 		//read network
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(filename);
 		System.out.println("Network stats: Nodes = " + network.getNodes().size() + ", Edges = " + network.getLinks().size());
@@ -154,12 +154,12 @@ public class NetworkRounder {
 //		}
 
 		if (outputfile_forEAF != null) {
-		  NetworkLayer network = roundNetwork(inputfile,cap, flowCapacityFactor, lengthFactor, true);
+		  NetworkImpl network = roundNetwork(inputfile,cap, flowCapacityFactor, lengthFactor, true);
 		  new NetworkWriter(network).write(outputfile_forEAF);
 		}
 		if (outputfile_forMatsim != null) {
 			  // Matsim needs the real transit time ("false") & capacity ("1.0d")
-			  NetworkLayer network = roundNetwork(inputfile,cap, 1.0d, lengthFactor, false);
+			  NetworkImpl network = roundNetwork(inputfile,cap, 1.0d, lengthFactor, false);
 			  new NetworkWriter(network).write(outputfile_forMatsim);
 		}
 	}

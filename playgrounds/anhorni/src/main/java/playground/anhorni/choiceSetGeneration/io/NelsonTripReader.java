@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
@@ -32,10 +32,10 @@ public class NelsonTripReader {
 	private List<ChoiceSet> choiceSets;
 	private final static Logger log = Logger.getLogger(NelsonTripReader.class);
 	private TreeMap<Id, MZTrip> mzTrips = null; 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final ZHFacilities facilities;
 		
-	public NelsonTripReader(NetworkLayer network, ZHFacilities facilities) {
+	public NelsonTripReader(NetworkImpl network, ZHFacilities facilities) {
 		this.network = network;
 		this.facilities = facilities;
 	}

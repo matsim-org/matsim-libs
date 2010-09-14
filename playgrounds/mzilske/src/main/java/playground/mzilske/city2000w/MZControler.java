@@ -21,25 +21,12 @@
 package playground.mzilske.city2000w;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.helpers.Loader;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
@@ -48,15 +35,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.controler.ControlerIO;
@@ -68,13 +50,8 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.external.ExternalMobsim;
-import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.PlanStrategy;
@@ -100,24 +77,18 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorInvertedNetProxyFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
-import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.pt.PtConstants;
-import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.ptproject.qsim.ParallelQSimFactory;
-import org.matsim.ptproject.qsim.QSimFactory;
 
 
 
@@ -151,16 +122,13 @@ public final class MZControler {
 	private ControlerState state = ControlerState.Init;
 
 	private String outputPath = null;
-
-	private static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout("%d{ISO8601} %5p %C{1}:%L %m%n");
-
+	
 	private boolean overwriteFiles = false;
+	
 	private Integer iteration = null;
 
 	/** The Config instance the Controler uses. */
 	private final Config config;
-	private final String configFileName;
-	private final String dtdFileName;
 
 	private EventsManagerImpl events = null;
 	private Network network = null;
@@ -185,23 +153,11 @@ public final class MZControler {
 
 	private final IterationStopWatch stopwatch = new IterationStopWatch();
 	final private Scenario scenarioData;
-	private boolean scenarioLoaded = false;
-	/**
-	 * This variable is used to store the log4j output before it can be written
-	 * to a file. This is needed to set the output directory before logging.
-	 */
-	private CollectLogMessagesAppender collectLogMessagesAppender = null;
 
 	/**
 	 * Attribute for the routing factory
 	 */
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-	/**
-	 * This instance encapsulates all behavior concerning the
-	 * ControlerEvents/Listeners
-	 */
-
-	private final List<SimulationListener> simulationListener = new ArrayList<SimulationListener>();
 
 	private Thread shutdownHook = new Thread() {
 		@Override
@@ -209,7 +165,6 @@ public final class MZControler {
 			shutdown(true);
 		}
 	};
-	private ScenarioLoaderImpl loader;
 
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 
@@ -219,53 +174,16 @@ public final class MZControler {
 	private MobsimFactory mobsimFactory = new QueueSimulationFactory();
 
 	private EventsToScore planScorer;
-	private TransitConfigGroup transitConfig;
 
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 	private static int externalCounter = 0;
 
-	/** initializes Log4J */
-	static {
-		final String logProperties = "log4j.xml";
-		URL url = Loader.getResource(logProperties);
-		if (url != null) {
-			PropertyConfigurator.configure(url);
-		} else {
-			Logger root = Logger.getRootLogger();
-			root.setLevel(Level.INFO);
-			ConsoleAppender consoleAppender = new ConsoleAppender(DEFAULTLOG4JLAYOUT, "System.out");
-			consoleAppender.setName("A1");
-			root.addAppender(consoleAppender);
-			//			consoleAppender.setLayout(DEFAULTLOG4JLAYOUT);
-			//			log.error("");
-			//			log.error("Could not find configuration file " + logProperties + " for Log4j in the classpath.");
-			//			log.error("A default configuration is used, setting log level to INFO with a ConsoleAppender.");
-			//			log.error("");
-			//			log.error("");
-		}
-	}
-
 	public MZControler(final Scenario scenario) {
-		// catch logs before doing something
-		this.collectLogMessagesAppender = new CollectLogMessagesAppender();
-		Logger.getRootLogger().addAppender(this.collectLogMessagesAppender);
-		Gbl.printSystemInfo();
-		Gbl.printBuildInfo();
-		log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
-		this.configFileName = null;
-		this.dtdFileName = null;
-
-		this.scenarioLoaded = true;
 		this.scenarioData = scenario;
 		this.config = scenario.getConfig();
-
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
 		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
-
-		if (this.config.scenario().isUseTransit()) {
-			setupTransitConfig();
-		}
 	}
 
 	/**
@@ -273,47 +191,23 @@ public final class MZControler {
 	 */
 	public void run() {
 		if (this.state == ControlerState.Init) {
-			init();
-			coreStartup();
-			scoringStartup();
-			doIterations();
-			shutdown(false);
+			doRun();
 		} else {
-			log.error("Controler in wrong state to call 'run()'. Expected state: <Init> but was <" + this.state + ">");
+			throw new RuntimeException("Controler in wrong state to call 'run()'. Expected state: <Init> but was <" + this.state + ">");
 		}
 	}
 
-	private void init() {
-		loadConfig();
+	private void doRun() {
 		setUpOutputDir();
 		initEvents();
-		initLogging();
-		loadData();
 		setUp();
+		scoringStartup();
+		preparePersonsForSim();
+		doIterations();
+		shutdown(false);
 	}
 
-	private final void setupTransitConfig() {
-		this.transitConfig = new TransitConfigGroup();
-		if (this.config.getModule(TransitConfigGroup.GROUP_NAME) == null) {
-			this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
-		} else {
-			// this would not be necessary if TransitConfigGroup is part of core config
-			Module oldModule = this.config.getModule(TransitConfigGroup.GROUP_NAME);
-			this.config.removeModule(TransitConfigGroup.GROUP_NAME);
-			this.transitConfig.addParam("transitScheduleFile", oldModule.getValue("transitScheduleFile"));
-			this.transitConfig.addParam("vehiclesFile", oldModule.getValue("vehiclesFile"));
-			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
-		}
-		if (!this.config.scenario().isUseVehicles()) {
-			log.warn("Your are using Transit but not Vehicles. This most likely won't work.");
-		}
-		Set<EventsFileFormat> formats = EnumSet.copyOf(this.config.controler().getEventsFileFormats());
-		formats.add(EventsFileFormat.xml);
-		this.config.controler().setEventsFileFormats(formats);
-		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
-		transitActivityParams.setTypicalDuration(120.0);
-		this.config.charyparNagelScoring().addActivityParams(transitActivityParams);
-	}
+
 
 	/**
 	 * select if single cpu handler to use or parallel
@@ -340,14 +234,6 @@ public final class MZControler {
 	}
 
 	private void doIterations() {
-		// make sure all routes are calculated.
-		ParallelPersonAlgorithmRunner.run(this.population, this.config.global().getNumberOfThreads(),
-				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(createRoutingAlgorithm(), (NetworkImpl) network);
-			}
-		});
-
 		int firstIteration = this.config.controler().getFirstIteration();
 		int lastIteration = this.config.controler().getLastIteration();
 		this.state = ControlerState.Running;
@@ -362,7 +248,7 @@ public final class MZControler {
 			makeIterationPath(this.iteration);
 			resetRandomNumbers();
 
-			scoringIterationStarts(iteration);
+			this.planScorer.reset(iteration);
 			if (this.iteration > firstIteration) {
 				this.stopwatch.beginOperation("replanning");
 				replanningReplanning(iteration);
@@ -377,9 +263,8 @@ public final class MZControler {
 			log.info(marker + "ITERATION " + this.iteration + " fires after mobsim event");
 			coreAfterMobsim(iteration);
 			log.info(marker + "ITERATION " + this.iteration + " fires scoring event");
-			scoringScoring(this.iteration);
+			this.planScorer.finish();
 			log.info(marker + "ITERATION " + this.iteration + " fires iteration end event");
-			iterationEndsEvent(this.iteration);
 			this.stopwatch.endOperation("iteration");
 			this.stopwatch.write(this.controlerIO.getOutputFilename("stopwatch.txt"));
 			log.info(marker + "ITERATION " + this.iteration + " ENDS");
@@ -388,9 +273,13 @@ public final class MZControler {
 		this.iteration = null;
 	}
 
-	private void iterationEndsEvent(Integer iteration2) {
-		// TODO Auto-generated method stub
-
+	private void preparePersonsForSim() {
+		ParallelPersonAlgorithmRunner.run(this.population, this.config.global().getNumberOfThreads(),
+				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+			public AbstractPersonAlgorithm getPersonAlgorithm() {
+				return new PersonPrepareForSim(createRoutingAlgorithm(), (NetworkImpl) network);
+			}
+		});
 	}
 
 	private void shutdown(final boolean unexpected) {
@@ -422,7 +311,6 @@ public final class MZControler {
 				log.info("Cannot remove shutdown hook. " + e.getMessage());
 			}
 			this.shutdownHook = null; // important for test cases to free the memory
-			this.collectLogMessagesAppender = null;
 			IOUtils.closeOutputDirLogging();
 		}
 	}
@@ -472,55 +360,6 @@ public final class MZControler {
 
 
 		this.strategyManager = loadStrategyManager();
-	}
-
-	/*
-	 * ===================================================================
-	 * private methods
-	 * ===================================================================
-	 */
-
-	/**
-	 * Initializes log4j to write log output to files in output directory.
-	 */
-	private void initLogging() {
-		Logger.getRootLogger().removeAppender(this.collectLogMessagesAppender);
-		try {
-			IOUtils.initOutputDirLogging(this.config.controler().getOutputDirectory(), this.collectLogMessagesAppender
-					.getLogEvents(), this.config.controler().getRunId());
-			this.collectLogMessagesAppender.close();
-			this.collectLogMessagesAppender = null;
-		} catch (IOException e) {
-			log.error("Cannot create logfiles: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Loads the configuration object with the correct settings.
-	 */
-	private void loadConfig() {
-		if (this.configFileName != null) {
-			try {
-				new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
-			} catch (IOException e) {
-				log.error("Problem loading the configuration file from " + this.configFileName);
-				throw new RuntimeException(e);
-			}
-		}
-		log.info("Checking consistency of config...");
-		this.config.checkConsistency();
-		log.info("Complete config dump:");
-		StringWriter writer = new StringWriter();
-		new ConfigWriter(this.config).writeStream(new PrintWriter(writer));
-		log.info("\n\n" + writer.getBuffer().toString());
-		log.info("Complete config dump done.");
-
-		/* use writeEventsInterval from config file, only if not already
-		 * initialized programmatically */
-		if (this.writeEventsInterval == -1) {
-			this.writeEventsInterval = this.config.controler().getWriteEventsInterval();
-		}
 	}
 
 	private final List<EventWriter> eventWriters = new LinkedList<EventWriter>();
@@ -577,19 +416,6 @@ public final class MZControler {
 		}
 	}
 
-	/**
-	 * Load all the required data. Currently, this only loads the Scenario if it was
-	 * not given in the Constructor.
-	 */
-	private void loadData() {
-		if (!this.scenarioLoaded) {
-			this.loader = new ScenarioLoaderImpl(this.scenarioData);
-			this.loader.loadScenario();
-			this.network = this.scenarioData.getNetwork();
-			this.population = this.scenarioData.getPopulation();
-			this.scenarioLoaded = true;
-		}
-	}
 
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
@@ -639,95 +465,8 @@ public final class MZControler {
 	}
 
 	private void runMobSim() {
-		// dg feb 09: this null checks are not really safe
-		// consider the case that a user copies a config with some
-		// externalMobsim or JDEQSim information in it and isn't aware
-		// that those configs will be used instead of the "normal"
-		// queuesimulation
-		// configuration
-		/*
-		 * well, that's the user's problem if he doesn't know what settings he
-		 * starts his simulation with. mr/mar09
-		 */
-		if (this.config.simulation().getExternalExe() == null) {
-			final String JDEQ_SIM = "JDEQSim";
-			if (this.config.getModule(JDEQ_SIM) != null) {
-				JDEQSimulation sim = new JDEQSimulation(this.scenarioData, this.events);
-				sim.run();
-			} else {
-				Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
-				if (simulation instanceof IOSimulation){
-					((IOSimulation)simulation).setControlerIO(this.getControlerIO());
-					((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
-				}
-				if (simulation instanceof ObservableSimulation){
-					for (SimulationListener l : this.getQueueSimulationListener()) {
-						((ObservableSimulation)simulation).addQueueSimulationListeners(l);
-					}
-				}
-				simulation.run();
-			}
-		} else {
-			ExternalMobsim sim = new ExternalMobsim(this.scenarioData, this.events);
-			sim.setControlerIO(this.controlerIO);
-			sim.setIterationNumber(this.getIterationNumber());
-			sim.run();
-		}
-	}
-
-
-
-	/*
-	 * ===================================================================
-	 * Options
-	 * ===================================================================
-	 */
-
-	/**
-	 * Sets whether the Controler is allowed to overwrite files in the output
-	 * directory or not. <br>
-	 * When starting, the Controler can check that the output directory is empty
-	 * or does not yet exist, so no files will be overwritten (default setting).
-	 * While useful in a productive environment, this security feature may be
-	 * interfering in test cases or while debugging. <br>
-	 * <strong>Use this setting with caution, as it can result in data loss!</strong>
-	 *
-	 * @param overwrite
-	 *            whether files and directories should be overwritten (true) or
-	 *            not (false)
-	 */
-	public final void setOverwriteFiles(final boolean overwrite) {
-		this.overwriteFiles = overwrite;
-	}
-
-	/**
-	 * Returns whether the Controler is currently allowed to overwrite files in
-	 * the output directory.
-	 *
-	 * @return true if the Controler is currently allowed to overwrite files in
-	 *         the output directory, false if not.
-	 */
-	public final boolean getOverwriteFiles() {
-		return this.overwriteFiles;
-	}
-
-	/**
-	 * Sets in which iterations events should be written to a file. If set to
-	 * <tt>1</tt>, the events will be written in every iteration. If set to
-	 * <tt>2</tt>, the events are written every second iteration. If set to
-	 * <tt>10</tt>, the events are written in every 10th iteration. To
-	 * disable writing of events completely, set the interval to <tt>0</tt>
-	 * (zero).
-	 *
-	 * @param interval
-	 *            in which iterations events should be written
-	 */
-	public final void setWriteEventsInterval(final int interval) {
-		this.writeEventsInterval = interval;
-	}
-
-	public final int getWriteEventsInterval() {
-		return this.writeEventsInterval;
+		Simulation simulation = mobsimFactory.createMobsim(this.scenarioData, this.events);
+		simulation.run();
 	}
 
 
@@ -741,30 +480,6 @@ public final class MZControler {
 		return new PlansCalcRoute(this.config.plansCalcRoute(), this.network, this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring()), this.travelTimeCalculator, this.leastCostPathCalculatorFactory);
 	}
 
-	public final EventsManager getEvents() {
-		return this.events;
-	}
-
-	public final Scenario getScenario() {
-		return this.scenarioData;
-	}
-
-	private void coreStartup() {
-		Config c = getScenario().getConfig();
-		QSimConfigGroup conf = (QSimConfigGroup) c.getModule(QSimConfigGroup.GROUP_NAME);
-		if (conf != null){
-			if (conf.getNumberOfThreads() > 1) {
-				setMobsimFactory(new ParallelQSimFactory());
-			}
-			else {
-				setMobsimFactory(new QSimFactory());
-			}
-		}
-		else if (c.getModule("JDEQSim") == null) {
-			log.warn("There might be no configuration for a mobility simulation in the config. The Controler " +
-			" uses the default QueueSimulation that might not have all features implemented.");
-		}
-	}
 
 	private void coreBeforeMobsim(int iteration) {
 		events.resetHandlers(iteration);
@@ -774,10 +489,10 @@ public final class MZControler {
 			for (EventsFileFormat format : config.controler().getEventsFileFormats()) {
 				switch (format) {
 				case txt:
-					this.eventWriters.add(new EventWriterTXT(getControlerIO().getIterationFilename(iteration,FILENAME_EVENTS_TXT)));
+					this.eventWriters.add(new EventWriterTXT(this.controlerIO.getIterationFilename(iteration,FILENAME_EVENTS_TXT)));
 					break;
 				case xml:
-					this.eventWriters.add(new EventWriterXML(getControlerIO().getIterationFilename(iteration, FILENAME_EVENTS_XML)));
+					this.eventWriters.add(new EventWriterXML(this.controlerIO.getIterationFilename(iteration, FILENAME_EVENTS_XML)));
 					break;
 				default:
 					log.warn("Unknown events file format specified: " + format.toString() + ".");
@@ -804,7 +519,7 @@ public final class MZControler {
 
 		for (EventWriter writer : this.eventWriters) {
 			writer.closeFile();
-			getEvents().removeHandler(writer);
+			events.removeHandler(writer);
 		}
 		this.eventWriters.clear();
 
@@ -814,11 +529,11 @@ public final class MZControler {
 
 		if ((iteration % 10 == 0) && (iteration > this.config.controler().getFirstIteration())) {
 			events.removeHandler(volumes);
-			linkStats.writeFile(getControlerIO().getIterationFilename(iteration, FILENAME_LINKSTATS));
+			linkStats.writeFile(this.controlerIO.getIterationFilename(iteration, FILENAME_LINKSTATS));
 		}
 
 		if (legTimes != null) {
-			legTimes.writeStats(getControlerIO().getIterationFilename(iteration, "tripdurations.txt"));
+			legTimes.writeStats(this.controlerIO.getIterationFilename(iteration, "tripdurations.txt"));
 			// - print averages in log
 			log.info("[" + iteration + "] average trip duration is: " + (int) legTimes.getAverageTripDuration()
 					+ " seconds = " + Time.writeTime(legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
@@ -829,27 +544,6 @@ public final class MZControler {
 		for (EventWriter writer : eventWriters) {
 			writer.closeFile();
 		}
-	}
-
-	private List<SimulationListener> getQueueSimulationListener() {
-		return this.simulationListener;
-	}
-
-
-	ControlerIO getControlerIO() {
-		return this.controlerIO;
-	}
-
-	/**
-	 * @return the iteration number of the current iteration when the Controler is iterating,
-	 * null if the Controler is in the startup/shutdown process
-	 */
-	public Integer getIterationNumber() {
-		return this.iteration;
-	}
-
-	public MobsimFactory getMobsimFactory() {
-		return this.mobsimFactory;
 	}
 
 	public void setMobsimFactory(MobsimFactory mobsimFactory) {
@@ -863,7 +557,7 @@ public final class MZControler {
 	 * @param controler the {@link MZControler} that provides miscellaneous data for the replanning modules
 	 * @param manager the {@link StrategyManager} to be configured according to the configuration
 	 */
-	public void load(final StrategyManager manager) {
+	private void load(final StrategyManager manager) {
 		Config config = this.config;
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
@@ -905,7 +599,7 @@ public final class MZControler {
 			stopwatch.beginOperation("dump all plans");
 			log.info("dumping plans...");
 			new PopulationWriter(this.population, this.network)
-			.write(getControlerIO().getIterationFilename(iteration, "plans.xml.gz"));
+			.write(this.controlerIO.getIterationFilename(iteration, "plans.xml.gz"));
 			log.info("finished plans dump.");
 			stopwatch.endOperation("dump all plans");
 		}
@@ -943,8 +637,8 @@ public final class MZControler {
 			externalCounter++;
 			strategy = new PlanStrategy(new RandomPlanSelector());
 			String exePath = settings.getExePath();
-			ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controlerIO, getScenario(), 1);
-			em.setIterationNumber(getIterationNumber());
+			ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controlerIO, scenarioData, 1);
+			em.setIterationNumber(iteration);
 			strategy.addStrategyModule(em);
 		} else if (name.equals("BestScore")) {
 			strategy = new PlanStrategy(new BestPlanSelector());
@@ -971,7 +665,7 @@ public final class MZControler {
 					Constructor<? extends PlanStrategy> c = null;
 					try{
 						c = klas.getConstructor(args);
-						strategy = c.newInstance(getScenario());
+						strategy = c.newInstance(scenarioData);
 					} catch(NoSuchMethodException e){
 						log.warn("Cannot find Constructor in PlanStrategy " + name + " with single argument of type Scenario. " +
 								"This is not fatal, trying to find other constructor, however a constructor expecting Scenario as " +
@@ -1003,7 +697,7 @@ public final class MZControler {
 		return strategy;
 	}
 
-	public static class ReRoute extends AbstractMultithreadedModule {
+	private static class ReRoute extends AbstractMultithreadedModule {
 
 		private final MZControler controler;
 
@@ -1027,27 +721,11 @@ public final class MZControler {
 	private void scoringStartup() {
 		this.planScorer = new EventsToScore(this.population, this.scoringFunctionFactory, this.config.charyparNagelScoring().getLearningRate());
 		Logger.getLogger(PlansScoring.class).debug("PlanScoring loaded ScoringFunctionFactory");
-		getEvents().addHandler(this.planScorer);
-	}
-
-	private void scoringIterationStarts(int iteration) {
-		this.planScorer.reset(iteration);
-	}
-
-	private void scoringScoring(int iteration) {
-		this.planScorer.finish();
-	}
-
-	TravelTimeCalculator getTravelTimeCalculator() {
-		return travelTimeCalculator;
+		events.addHandler(this.planScorer);
 	}
 
 	void setScoringFunctionFactory(ScoringFunctionFactory scoringFunctionFactory) {
 		this.scoringFunctionFactory = scoringFunctionFactory;
-	}
-
-	ScoringFunctionFactory getScoringFunctionFactory() {
-		return scoringFunctionFactory;
 	}
 
 }

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -50,7 +50,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignToNetwork(final NetworkLayer network, final ActivityFacilities facilities, final Config config) {
+	public PersonAssignToNetwork(final NetworkImpl network, final ActivityFacilities facilities, final Config config) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());

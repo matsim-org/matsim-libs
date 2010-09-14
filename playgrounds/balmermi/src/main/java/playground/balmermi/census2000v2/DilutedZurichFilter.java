@@ -34,16 +34,16 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldConnectLocations;
 
 public class DilutedZurichFilter {
 
@@ -62,7 +62,7 @@ public class DilutedZurichFilter {
 		log.info("MATSim-DB: filterDemand...");
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		World world = scenario.getWorld();
+		World world = new World();
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -81,7 +81,7 @@ public class DilutedZurichFilter {
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		world.complete(config);
 		System.out.println("  done.");
@@ -89,7 +89,7 @@ public class DilutedZurichFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  running world modules... ");
-		new WorldConnectLocations(config).run(world);
+		// new WorldConnectLocations(config).run(world);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

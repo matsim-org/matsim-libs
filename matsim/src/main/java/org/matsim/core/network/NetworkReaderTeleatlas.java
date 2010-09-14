@@ -159,8 +159,8 @@ public class NetworkReaderTeleatlas {
 		this.readLinksFromNWshp();
 		log.info("done.");
 		// TODO balmermi: adding date and check if you get more info from the input files to include into the name
-		if (network instanceof NetworkLayer) {
-			((NetworkLayer) network).setName("teleatlas");
+		if (network instanceof NetworkImpl) {
+			((NetworkImpl) network).setName("teleatlas");
 		}
 	}
 

@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.qsim.TransitAgent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -58,7 +58,7 @@ public class TransitAgentTest extends TestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));
@@ -101,7 +101,7 @@ public class TransitAgentTest extends TestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -104,9 +105,9 @@ public class PersonSetActToLinkWithNonNullFacility extends AbstractPersonAlgorit
 				if (coord == null) { Gbl.errorMsg("Each act must have a coord!"); }
 				double nearest_dist = Double.MAX_VALUE;
 				ActivityFacilityImpl nearest_f = null;
-				Iterator<? extends ActivityFacilityImpl> f_it = this.facilities.getFacilities().values().iterator();
+				Iterator<ActivityFacility> f_it = this.facilities.getFacilities().values().iterator();
 				while (f_it.hasNext()) {
-					ActivityFacilityImpl f = f_it.next();
+					ActivityFacilityImpl f = (ActivityFacilityImpl) f_it.next();
 					if (f.getActivityOptions().containsKey(type)) {
 						double dist = f.calcDistance(coord);
 						if (dist < nearest_dist) {

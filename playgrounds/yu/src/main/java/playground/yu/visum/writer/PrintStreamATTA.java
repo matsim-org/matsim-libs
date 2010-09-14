@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 /**
  * prints much imformation in a .att-file of VISUM.
@@ -31,10 +31,10 @@ public abstract class PrintStreamATTA extends PrintStreamVisum9_3A {
 
 	protected List<UserDefAtt> udas = new ArrayList<UserDefAtt>();
 
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 
 	/* --------------------------CONSTUCTOR----------------------------- */
-	public PrintStreamATTA(String fileName, NetworkLayer network) {
+	public PrintStreamATTA(String fileName, NetworkImpl network) {
 		this.network = network;
 		try {
 			out = new DataOutputStream(new BufferedOutputStream(

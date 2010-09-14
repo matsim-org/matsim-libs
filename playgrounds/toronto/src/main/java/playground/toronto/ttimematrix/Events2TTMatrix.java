@@ -33,7 +33,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
@@ -107,7 +107,7 @@ public class Events2TTMatrix {
 		
 		// reading the network
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkfile);
 
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network,3600,30*3600, scenario.getConfig().travelTimeCalculator());

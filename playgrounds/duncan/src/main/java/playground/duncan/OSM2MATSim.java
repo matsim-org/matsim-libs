@@ -26,6 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -41,7 +42,7 @@ public class OSM2MATSim {
 		log.error( "This still doesn't have the coordinate transform problem fixed.  kai, jan09" ) ; 
 
 		Gbl.startMeasurement();
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		OsmNetworkReader osmReader = new OsmNetworkReader(network, new WGS84toCH1903LV03()); // wrong coordinate system! that's for Switzerland
 		try {
 //			osmReader.parse("../mystudies/zueri.osm");

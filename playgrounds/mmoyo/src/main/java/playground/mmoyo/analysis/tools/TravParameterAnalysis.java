@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -68,7 +68,7 @@ public class TravParameterAnalysis {
 
 	public List<Path> routePopulation(ScenarioImpl scenario){
 		LogicFactory logicFactory = new LogicFactory (scenario.getTransitSchedule());
-		NetworkLayer logicNet = logicFactory.getLogicNet();
+		NetworkImpl logicNet = logicFactory.getLogicNet();
 		PTRouter ptRouter = new PTRouter(logicNet);
 
 		List<Path> pathList = new ArrayList<Path>();

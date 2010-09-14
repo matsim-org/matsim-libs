@@ -27,8 +27,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.world.World;
-import org.matsim.world.WorldWriter;
 
 public abstract class TriangleScenario {
 
@@ -55,13 +53,6 @@ public abstract class TriangleScenario {
 	public static final void writePlans(Population plans, Network network, String filename) {
 		System.out.println("  writing plans xml file... ");
 		new PopulationWriter(plans, network).write(filename);
-		System.out.println("  done.");
-	}
-
-	public static final void writeWorld(final World world, String filename) {
-		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write(filename);
 		System.out.println("  done.");
 	}
 

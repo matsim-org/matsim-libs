@@ -76,8 +76,9 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 
 		Map<DayType, SortedSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
 
-		List<MappedLocation> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
-		ActivityOptionImpl shopsOf2005ShopAct = ((ActivityFacilityImpl) closestShops.get(0)).getActivityOptions().get(FacilitiesProductionKTI.ACT_TYPE_SHOP);
+		// List<MappedLocation> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
+		List closestShops = null;
+		ActivityOptionImpl shopsOf2005ShopAct = (ActivityOptionImpl) ((ActivityFacilityImpl) closestShops.get(0)).getActivityOptions().get(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpeningTimes();
 		} else {

@@ -28,6 +28,7 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.facilities.algorithms.FacilitiesCombine;
 import org.matsim.world.MatsimWorldReader;
+import org.matsim.world.World;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.modules.FacilitiesCreateBuildingsFromCensus2000;
@@ -57,21 +58,22 @@ public class FacilitiesCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading world xml file...");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
+		World world = new World();
+		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario, world);
 		worldReader.readFile(null);//config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-		scenario.getWorld().complete(config);
+		world.complete(config);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running facilities modules...");
 		new FacilitiesRenameAndRemoveNOGAActTypes().run(facilities);
-		new FacilitiesCreateBuildingsFromCensus2000(indir+"/ETHZ_Pers.tab",scenario.getWorld().getLayer(Municipalities.MUNICIPALITY)).run(facilities);
+		new FacilitiesCreateBuildingsFromCensus2000(indir+"/ETHZ_Pers.tab",world.getLayer(Municipalities.MUNICIPALITY)).run(facilities);
 		new FacilitiesDistributeCenter().run(facilities);
 		new FacilitiesCombine().run(facilities); // to check for coord uniqueness
 		System.out.println("  done.");

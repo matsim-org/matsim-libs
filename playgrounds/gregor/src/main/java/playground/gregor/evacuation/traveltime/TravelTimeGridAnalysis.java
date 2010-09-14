@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.gregor.gis.helper.GTH;
@@ -78,7 +78,7 @@ public class TravelTimeGridAnalysis {
 		return mps;
 	}
 
-	private static Envelope getEnvelope(NetworkLayer net) {
+	private static Envelope getEnvelope(NetworkImpl net) {
 		Envelope e = null; 
 		for (Node n : net.getNodes().values()) {
 			if (e == null) {

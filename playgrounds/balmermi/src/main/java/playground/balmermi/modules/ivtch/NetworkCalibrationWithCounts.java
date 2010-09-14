@@ -27,7 +27,7 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -55,7 +55,7 @@ public class NetworkCalibrationWithCounts {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void writeGTFfile(final NetworkLayer network) {
+	private final void writeGTFfile(final NetworkImpl network) {
 		try {
 //			double capperiod = network.getCapacityPeriod();
 			FileWriter fw = new FileWriter(this.gtf_outfile);
@@ -100,7 +100,7 @@ public class NetworkCalibrationWithCounts {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkLayer network) {
+	public void run(NetworkImpl network) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 //		for (Link l : network.getLinks().values()) { l.setCapacity(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)*1.5); }
 		for (Link l : network.getLinks().values()) { l.setCapacity(10000.0); l.setNumberOfLanes(5.0); l.setFreespeed(36.0/3.6); }

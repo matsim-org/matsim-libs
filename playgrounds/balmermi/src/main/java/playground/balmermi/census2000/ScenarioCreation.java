@@ -43,10 +43,6 @@ public class ScenarioCreation {
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
 
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile(null);//config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();

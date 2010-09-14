@@ -33,7 +33,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.rost.graph.block.xmlblocks.BlockBorder;
 import playground.rost.graph.block.xmlblocks.BlockList;
@@ -62,7 +62,7 @@ public class Blocks {
 		return blocks;
 	}
 	
-	public static Blocks readXMLFile(NetworkLayer network, String filename) throws JAXBException, IOException
+	public static Blocks readXMLFile(NetworkImpl network, String filename) throws JAXBException, IOException
 	{
 		Blocks blocks = new Blocks();
 		

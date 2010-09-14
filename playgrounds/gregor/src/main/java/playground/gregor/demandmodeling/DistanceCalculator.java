@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -39,14 +39,14 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class DistanceCalculator {
 	private final static Logger log = Logger.getLogger(DistanceCalculator.class);
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final String csvfile;
 	private final List<String []> entries = new ArrayList<String []>();
 	private final HashMap<String,Household> housholds = new HashMap<String,Household>();
 	private final String outfile;
 	private final CharyparNagelScoringConfigGroup config;
 
-	public DistanceCalculator(NetworkLayer network, String csvfile, String outfile, CharyparNagelScoringConfigGroup config) {
+	public DistanceCalculator(NetworkImpl network, String csvfile, String outfile, CharyparNagelScoringConfigGroup config) {
 		this.network = network;
 		this.csvfile = csvfile;
 		this.outfile = outfile;
@@ -159,7 +159,7 @@ public class DistanceCalculator {
 
 		log.info("loading network layer...");
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 

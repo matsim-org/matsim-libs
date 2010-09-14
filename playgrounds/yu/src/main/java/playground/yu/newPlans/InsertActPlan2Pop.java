@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -65,7 +65,7 @@ public class InsertActPlan2Pop extends NewPopulation implements PlanAlgorithm {
 
 		ScenarioImpl s = new ScenarioImpl();
 
-		NetworkLayer network = s.getNetwork();
+		NetworkImpl network = s.getNetwork();
 		new MatsimNetworkReader(s).readFile(netFilename);
 
 		Population population = s.getPopulation();

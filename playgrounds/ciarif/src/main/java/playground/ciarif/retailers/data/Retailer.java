@@ -43,7 +43,7 @@ public class Retailer {
 	public final boolean addStrategy (Controler controler, String strategyName) {
 		
 		if (strategyName.contains(RandomRetailerStrategy.NAME)) {
-			this.strategy = new RandomRetailerStrategy(controler.getScenario().getWorld());
+			this.strategy = new RandomRetailerStrategy(null);
 			return true;
 		}
 		else if (strategyName.contains(MaxLinkRetailerStrategy.NAME)) {

@@ -3,7 +3,7 @@ package playground.anhorni.choiceSetGeneration.helper;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -80,7 +80,7 @@ public class Line {
 		return true;		
 	}
 	
-	public void constructTrip(String [] entries, NetworkLayer network, ZHFacilities facilities, MZTrip mzTrip) {
+	public void constructTrip(String [] entries, NetworkImpl network, ZHFacilities facilities, MZTrip mzTrip) {
 		this.tripHandler = new ReaderTripHandler();
 		this.tripHandler.constructTrip(entries, network, facilities, mzTrip, this.tripNr);
 		

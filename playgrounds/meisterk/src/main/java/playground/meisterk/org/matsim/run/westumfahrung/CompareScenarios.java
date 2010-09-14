@@ -42,6 +42,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -169,7 +170,7 @@ public class CompareScenarios {
 		log.info("Init...done.");
 		System.out.flush();
 		log.info("Performing analyses...");
-		this.doAnalyses(scenario.getWorld());
+		this.doAnalyses(null);
 		log.info("Performing analyses...done.");
 		System.out.flush();
 		log.info("Writing out results...");
@@ -337,7 +338,7 @@ public class CompareScenarios {
 			personIdRecorders.put(analysis, new TreeMap<String, PersonIdRecorder>());
 		}
 		TreeMap<String, Population> scenarioPlans = new TreeMap<String, Population>();
-		TreeMap<String, NetworkLayer> scenarioNetworks = new TreeMap<String, NetworkLayer>();
+		TreeMap<String, NetworkImpl> scenarioNetworks = new TreeMap<String, NetworkImpl>();
 
 		PersonIdRecorder personIdRecorder = null;
 		PersonFilter filterAlgorithm = null;
@@ -345,7 +346,7 @@ public class CompareScenarios {
 		for (String scenarioName : this.scenarioNames) {
 
 			ScenarioImpl scenario = new ScenarioImpl();
-			NetworkLayer network = scenario.getNetwork();
+			NetworkImpl network = scenario.getNetwork();
 			new MatsimNetworkReader(scenario).readFile(this.networkInputFilenames.get(scenarioName));
 			scenarioNetworks.put(scenarioName, network);
 

@@ -34,7 +34,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
@@ -115,7 +115,7 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 
 		ScenarioImpl s = new ScenarioImpl();
 
-		NetworkLayer network = s.getNetwork();
+		NetworkImpl network = s.getNetwork();
 		new MatsimNetworkReader(s).readFile(netFilename);
 		// facilities
 		if (facilitiesFilename != null) {

@@ -21,12 +21,15 @@
 package org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTime;
 
@@ -44,21 +47,21 @@ public class FacilitiesCombine {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void combine(ActivityFacilityImpl f,ActivityFacilityImpl f2) {
+	private final void combine(ActivityFacility f,ActivityFacilityImpl f2) {
 		System.out.println("      Combining f_id=" + f.getId() + " into f2_id=" + f2.getId());
-		Iterator<ActivityOptionImpl> a_it = f.getActivityOptions().values().iterator();
+		Iterator<? extends ActivityOption> a_it = f.getActivityOptions().values().iterator();
 		while (a_it.hasNext()) {
-			ActivityOptionImpl a = a_it.next();
+			ActivityOptionImpl a = (ActivityOptionImpl) a_it.next();
 			if (f2.getActivityOptions().get(a.getType()) == null) {
 				ActivityOptionImpl a2 = f2.createActivityOption(a.getType());
 				a2.setCapacity(a.getCapacity());
 			}
 			else {
-				ActivityOptionImpl a2 = f2.getActivityOptions().get(a.getType());
+				ActivityOptionImpl a2 = (ActivityOptionImpl) f2.getActivityOptions().get(a.getType());
 				double cap2 = a2.getCapacity();
 				double cap = a.getCapacity();
 				if ((cap < Integer.MAX_VALUE) && (cap2 < Integer.MAX_VALUE)) { a2.setCapacity(cap + cap2); }
-				else { a2.setCapacity(Integer.MAX_VALUE); }
+				else { a2.setCapacity((double) Integer.MAX_VALUE); }
 			}
 			Iterator<SortedSet<OpeningTime>> ts_it = a.getOpeningTimes().values().iterator();
 			while (ts_it.hasNext()) {
@@ -72,7 +75,7 @@ public class FacilitiesCombine {
 		}
 		if (Integer.parseInt(f2.getId().toString()) > Integer.parseInt(f.getId().toString())) {
 			System.out.println("      => assigning f_id="+f.getId()+" to f2.");
-			f2.setId(f.getId());
+			throw new RuntimeException("Can't set ids anymore.");
 		}
 	}
 	
@@ -87,7 +90,7 @@ public class FacilitiesCombine {
 		// TreeMap<XCOORD,TreeMap<YCOORD,FACILITY>>
 		TreeMap<Double,TreeMap<Double,ActivityFacilityImpl>> facs = new TreeMap<Double, TreeMap<Double,ActivityFacilityImpl>>();
 
-		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
+		for (ActivityFacility f : facilities.getFacilities().values()) {
 			Double x = f.getCoord().getX();
 			Double y = f.getCoord().getY();
 			if (facs.containsKey(x)) { // same x coord
@@ -97,17 +100,17 @@ public class FacilitiesCombine {
 					this.combine(f,f2);
 				}
 				else { // not the same y coord
-					tree.put(y,f);
+					tree.put(y,(ActivityFacilityImpl) f);
 				}
 			}
 			else { // not the same x coord
 				TreeMap<Double,ActivityFacilityImpl> tree = new TreeMap<Double, ActivityFacilityImpl>();
-				tree.put(y,f);
+				tree.put(y,(ActivityFacilityImpl) f);
 				facs.put(x,tree);
 			}
 		}
 
-		TreeMap<Id, ActivityFacilityImpl> fs = (TreeMap<Id, ActivityFacilityImpl>)facilities.getFacilities();
+		Map<Id, ActivityFacility> fs = facilities.getFacilities();
 		fs.clear();
 
 		Iterator<TreeMap<Double,ActivityFacilityImpl>> t_it = facs.values().iterator();

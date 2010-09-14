@@ -12,8 +12,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -36,8 +38,8 @@ public class PopulationWriteTable {
 	public PopulationWriteTable(final ActivityFacilitiesImpl facilities) {
 		log.info("init " + this.getClass().getName() + " module...");
 		log.info("  extract actOptTypes...");
-		for (ActivityFacilityImpl facility : facilities.getFacilities().values()) {
-			for (ActivityOptionImpl actOpt : facility.getActivityOptions().values()) {
+		for (ActivityFacility facility : facilities.getFacilities().values()) {
+			for (ActivityOption actOpt : facility.getActivityOptions().values()) {
 				if (!actOpt.getType().startsWith("B")) {
 					actOptTypes.add(actOpt.getType());
 				}

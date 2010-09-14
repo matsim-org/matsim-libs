@@ -33,7 +33,6 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.TriangleScenario;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 
 /**
  *
@@ -61,7 +60,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void runModules(final NetworkLayer network, final World world) {
+	private final void runModules(final NetworkImpl network) {
 		log.info("  running network modules... ");
 		new NetworkSummary().run(network);
 		new NetworkCleaner().run(network);
@@ -79,21 +78,6 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("  done.");
 	}
 
-	private final void compareOutputWorld(String refFilename, String testFilename) {
-		log.info("  comparing input and output world file... ");
-		long checksum_ref = CRCChecksum.getCRCFromFile(refFilename);
-		long checksum_run = CRCChecksum.getCRCFromFile(testFilename);
-		assertEquals(checksum_ref, checksum_run);
-		log.info("  done.");
-	}
-
-	private final void checkEmptyOutputWorld(String filename) {
-		log.info("  checksum check of empty output world... ");
-		long checksum_world = CRCChecksum.getCRCFromFile(filename);
-		assertEquals(TriangleScenario.CHECKSUM_WORLD_EMPTY, checksum_world);
-		log.info("  done.");
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// tests
 	//////////////////////////////////////////////////////////////////////
@@ -101,56 +85,25 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 	public void testParserWriter_independentOfWorld() {
 		log.info("running testParserWriter1()...");
 
-		final World world = new World();
 
 		log.info("  reading network xml file independent of the world...");
 		Scenario scenario = new ScenarioImpl(this.config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
-		world.complete(this.config);
 		log.info("  done.");
 
-		this.runModules((NetworkLayer) network, world);
+		this.runModules((NetworkImpl) network);
 
 		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
-		TriangleScenario.writeWorld(world, getOutputDirectory() + "output_world.xml");
 
 		this.compareOutputNetwork();
-		this.checkEmptyOutputWorld(getOutputDirectory() + "output_world.xml");
 
 		log.info("done.");
 	}
 
 	//////////////////////////////////////////////////////////////////////
 
-	public void testParserWriter_withWorld_readWorldFirst() {
-		log.info("running testParserWriter3()...");
 
-		ScenarioImpl scenario = new ScenarioImpl(this.config);
-		final World world = scenario.getWorld();
-
-		log.info("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile("test/scenarios/triangle/world.xml");
-		world.complete(this.config);
-		log.info("  done.");
-
-		log.info("  reading network xml file as a layer of the world... ");
-		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
-		world.complete(this.config);
-		log.info("  done.");
-
-		this.runModules(network, world);
-
-		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
-		TriangleScenario.writeWorld(world, getOutputDirectory() + "output_world.xml");
-
-		this.compareOutputNetwork();
-		this.compareOutputWorld("test/scenarios/triangle/world.xml", getOutputDirectory() + "output_world.xml");
-
-		log.info("done.");
-	}
 
 	//////////////////////////////////////////////////////////////////////
 
@@ -158,27 +111,17 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("running testParserWriter4()...");
 
 		ScenarioImpl scenario = new ScenarioImpl(this.config);
-		final World world = scenario.getWorld();
 
 		log.info("  reading network xml file as a layer of the world... ");
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
-		world.complete(this.config);
 		log.info("  done.");
 
-		this.runModules(network, world);
-
-		log.info("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile("test/scenarios/triangle/world.xml");
-		world.complete(this.config);
-		log.info("  done.");
+		this.runModules(network);
 
 		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
-		TriangleScenario.writeWorld(world, getOutputDirectory() + "output_world.xml");
 
 		this.compareOutputNetwork();
-		this.compareOutputWorld("test/scenarios/triangle/world.xml", getOutputDirectory() + "output_world.xml");
 
 		log.info("done.");
 	}

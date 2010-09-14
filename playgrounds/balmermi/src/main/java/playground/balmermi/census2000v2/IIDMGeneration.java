@@ -68,7 +68,7 @@ public class IIDMGeneration {
 
 		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).getScenario();
 		Config config = scenario.getConfig();
-		World world = scenario.getWorld();
+		World world = new World();
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -86,11 +86,7 @@ public class IIDMGeneration {
 
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  reading world xml file...");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
-		worldReader.readFile(null);//config.world().getInputFile());
-		log.info("  done.");
-
+	
 		log.info("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());

@@ -7,7 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
@@ -26,7 +26,7 @@ public class ReadTransitSchedule {
 		return ReadTransitSchedule.readTransitSchedule(scenario.getNetwork(), transitScheduleFile);
 	}
 	
-	public static TransitSchedule readTransitSchedule(NetworkLayer network, String transitScheduleFile) {
+	public static TransitSchedule readTransitSchedule(NetworkImpl network, String transitScheduleFile) {
 		TransitSchedule transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, network);
 		try {

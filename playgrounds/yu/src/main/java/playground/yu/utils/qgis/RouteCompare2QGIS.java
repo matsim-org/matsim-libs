@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
@@ -45,7 +45,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 
 	public RouteCompare2QGIS(Population population,
 			final CoordinateReferenceSystem crs, final String outputDir,
-			final NetworkLayer network,
+			final NetworkImpl network,
 			final Map<List<Id>, Integer> routeCountersA,
 			final Map<List<Id>, Integer> routeCountersB) {
 		super(population, crs, outputDir, network, routeCountersA);
@@ -150,7 +150,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		final String outputDir = args[3];
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		// ------------------------RouteSummaryA--------------------------------
 		ScenarioImpl scenarioA = new ScenarioImpl();

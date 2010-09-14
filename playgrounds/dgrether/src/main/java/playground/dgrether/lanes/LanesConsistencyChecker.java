@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsImpl;
@@ -128,7 +128,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 		String netFile = DgPaths.IVTCHBASE + "baseCase/network/ivtch-osm.xml";
 		String lanesFile = DgPaths.STUDIESDG + "signalSystemsZh/laneDefinitions.xml";
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer net = scenario.getNetwork();
+		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 	  log.info("read network");
 	  

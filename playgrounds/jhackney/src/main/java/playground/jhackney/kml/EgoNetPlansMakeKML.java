@@ -60,7 +60,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -101,7 +101,7 @@ public class EgoNetPlansMakeKML {
 	private static Config config = null;
 
 
-	public static void setUp(Config config, NetworkLayer network, ActivityFacilities facilities) {
+	public static void setUp(Config config, NetworkImpl network, ActivityFacilities facilities) {
 		EgoNetPlansMakeKML.facilities = facilities;
 		EgoNetPlansMakeKML.config=config;
 		if(config.getModule(KML21_MODULE)==null) return;

@@ -30,7 +30,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ClassUtils;
@@ -49,7 +48,6 @@ import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesImpl;
-import org.matsim.world.World;
 
 
 /**
@@ -80,11 +78,9 @@ public class ScenarioImpl implements Scenario {
 	private TransitSchedule transitSchedule = null;
 
 	private Households households;
-  private Vehicles vehicles;
+	private Vehicles vehicles;
 
-  private Knowledges knowledges;
-
-  private World world;
+	private Knowledges knowledges;
 
 	public ScenarioImpl(){
 		this.config = new Config();
@@ -99,13 +95,9 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	private void initContainers() {
-		this.world = new World();
-		this.network = new NetworkLayer();
-		this.world.setNetworkLayer((NetworkLayer) this.network);
-		this.world.complete(config);
+		this.network = NetworkImpl.createNetwork();
 		this.population = new PopulationImpl(this);
 		this.facilities = new ActivityFacilitiesImpl();
-		this.world.setFacilityLayer(this.facilities);
 
 		if (this.config.scenario().isUseHouseholds()){
 			this.createHouseholdsContainer();
@@ -159,18 +151,13 @@ public class ScenarioImpl implements Scenario {
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 	}
 
-	@Deprecated
-	public World getWorld() {
-		return this.world;
-	}
-
 	public ActivityFacilitiesImpl getActivityFacilities() {
 		return this.facilities;
 	}
 
 	@Override
-	public NetworkLayer getNetwork() {
-		return (NetworkLayer) this.network;
+	public NetworkImpl getNetwork() {
+		return this.network;
 	}
 
 	@Override
@@ -244,7 +231,7 @@ public class ScenarioImpl implements Scenario {
 
 	@Deprecated
 	public void setNetwork(NetworkImpl network2) {
-		this.network = network2;
+		this.network = (NetworkImpl) network2;
 	}
 
 	@Deprecated

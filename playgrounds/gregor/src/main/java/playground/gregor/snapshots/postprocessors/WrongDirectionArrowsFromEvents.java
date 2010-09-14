@@ -21,7 +21,7 @@ package playground.gregor.snapshots.postprocessors;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
 
@@ -33,7 +33,7 @@ public class WrongDirectionArrowsFromEvents extends ConfluenceArrowsFromEvents{
 	private final OTFBackgroundTexturesDrawer wrongDir;
 
 	public WrongDirectionArrowsFromEvents(OTFBackgroundTexturesDrawer arrows, OTFBackgroundTexturesDrawer wrongDir,
-			NetworkLayer network) {
+			NetworkImpl network) {
 		super(arrows, network);
 		this.wrongDir = wrongDir;
 	}

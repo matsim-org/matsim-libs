@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -53,7 +53,7 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 
 	public void testGenerationDistribution() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer testNetwork = scenario.getNetwork();
+		NetworkImpl testNetwork = scenario.getNetwork();
 		Node node1 = testNetwork.createAndAddNode(new IdImpl("1"), new CoordImpl(0.0, 0.0));
 		Node node2 = testNetwork.createAndAddNode(new IdImpl("2"), new CoordImpl(500.0, 500.0));
 		Node node3 = testNetwork.createAndAddNode(new IdImpl("3"), new CoordImpl(1000.0, 1000.0));

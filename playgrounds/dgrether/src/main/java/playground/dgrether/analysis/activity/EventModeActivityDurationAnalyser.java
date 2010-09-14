@@ -38,7 +38,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -88,7 +88,7 @@ public class EventModeActivityDurationAnalyser {
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
 
-		NetworkLayer net = scenario.getNetwork();
+		NetworkImpl net = scenario.getNetwork();
 		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
 		reader.readFile(NETWORK);
 

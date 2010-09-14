@@ -34,7 +34,7 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -65,7 +65,7 @@ public class GeneralLib {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Population population = scenario.getPopulation();
 
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
@@ -94,7 +94,7 @@ public class GeneralLib {
 	/*
 	 * Reads the network from the network file.
 	 */
-	public static NetworkLayer readNetwork(String networkFile) {
+	public static NetworkImpl readNetwork(String networkFile) {
 		ScenarioImpl sc = new ScenarioImpl();
 
 		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
@@ -556,7 +556,7 @@ public class GeneralLib {
 	 * @param outputPlansFileName
 	 * @param network
 	 */
-	public static void writePersons(Collection<? extends Person> persons, String outputPlansFileName, NetworkLayer network) {
+	public static void writePersons(Collection<? extends Person> persons, String outputPlansFileName, NetworkImpl network) {
 		PopulationWriter popWriter = new PopulationWriter(new PopulationImpl(null), network);
 		popWriter.writeStartPlans(outputPlansFileName);
 

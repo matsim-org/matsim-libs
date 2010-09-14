@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -47,7 +48,7 @@ public class LegHistogramTest extends MatsimTestCase {
 	 * handled correctly.
 	 */
 	public void testDeparturesMiscModes() {
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);
@@ -99,7 +100,7 @@ public class LegHistogramTest extends MatsimTestCase {
 	 * do not lead to an exception.
 	 */
 	public void testNofBins() {
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);
@@ -138,7 +139,7 @@ public class LegHistogramTest extends MatsimTestCase {
 	}
 
 	public void testReset() {
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);

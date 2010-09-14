@@ -23,6 +23,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.world.Layer;
+import org.matsim.world.World;
 import org.matsim.world.WorldUtils;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -291,7 +292,7 @@ public class ModdedConverterE {
 
 		ModdedConverterE c = new ModdedConverterE();
 
-		c.setZones((ZoneLayer) scenario.getWorld().createLayer(new IdImpl("zones"), "toronto_test"));
+		c.setZones((ZoneLayer) new World().createLayer(new IdImpl("zones"), "toronto_test"));
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
 
 		// reading zone.txt "zone,x,y" ...

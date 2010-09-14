@@ -44,7 +44,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationWriter;
@@ -115,7 +115,7 @@ public class MultiSourceEAF {
 	 * @return A HashMap<Node,Integer> containing the demands for every node in the file
 	 * @throws IOException if file reading fails
 	 */
-	public static HashMap<Node,Integer> readDemands(final NetworkLayer network, final String filename) throws IOException{
+	public static HashMap<Node,Integer> readDemands(final NetworkImpl network, final String filename) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		HashMap<Node,Integer> demands = new HashMap<Node,Integer>();
 		String inline = null;
@@ -188,7 +188,7 @@ public class MultiSourceEAF {
 	}
 	
 	
-	private static List<NetworkChangeEvent> readChangeEvents(final NetworkLayer network, final String filename) throws IOException{
+	private static List<NetworkChangeEvent> readChangeEvents(final NetworkImpl network, final String filename) throws IOException{
 		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
 		try {
 			parser.parse(filename);
@@ -203,7 +203,7 @@ public class MultiSourceEAF {
 	}
 
 	
-	public static void readShelterFile(NetworkLayer network,final String filename,
+	public static void readShelterFile(NetworkImpl network,final String filename,
 			final int totaldemands,HashMap<Node, Integer> demands,final boolean addshelterlinks) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		String inline = null;
@@ -253,7 +253,7 @@ public class MultiSourceEAF {
 		in.close();
 		
 	}
-	public static List<TimeExpandedPath> readPathFlow(NetworkLayer network, String filename ) throws IOException{
+	public static List<TimeExpandedPath> readPathFlow(NetworkImpl network, String filename ) throws IOException{
 		List<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		String inline = null;
@@ -919,7 +919,7 @@ public class MultiSourceEAF {
 		}
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		HashMap<Node, Integer> demands = null;
 		HashMap<Id, Interval> whenAvailable = null;
 		Node sink = null;

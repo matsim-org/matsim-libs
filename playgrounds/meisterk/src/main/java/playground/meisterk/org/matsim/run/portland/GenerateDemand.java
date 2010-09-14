@@ -26,7 +26,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -50,10 +50,9 @@ public class GenerateDemand {
 	private static void generateDemand(Config config) {
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		World world = scenario.getWorld();
 
 		System.out.println("Reading network...");
-		NetworkLayer networkLayer = scenario.getNetwork();
+		NetworkImpl networkLayer = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		System.out.println("Reading network...done.");
 
@@ -63,7 +62,6 @@ public class GenerateDemand {
 		//facilities_reader.setValidating(false);
 		facilities_reader.readFile(config.facilities().getInputFile());
 		facilityLayer.printFacilitiesCount();
-		world.complete(null);
 		System.out.println("Reading facilities...done.");
 
 		System.out.println("Setting up plans objects...");

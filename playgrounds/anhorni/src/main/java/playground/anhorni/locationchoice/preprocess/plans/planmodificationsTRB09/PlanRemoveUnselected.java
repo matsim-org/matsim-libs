@@ -7,19 +7,19 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldConnectLocations;
 
 public class PlanRemoveUnselected {
 
 	private Population plans=null;
-	private NetworkLayer network=null;
+	private NetworkImpl network=null;
 	private ActivityFacilitiesImpl  facilities =null;
 	private String outputpath="";
 
@@ -75,12 +75,6 @@ public class PlanRemoveUnselected {
 		this.facilities = scenario.getActivityFacilities();
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
-
-		World world = scenario.getWorld();
-		world.complete(scenario.getConfig());
-		new WorldConnectLocations(scenario.getConfig()).run(world);
-		log.info("world checking done.");
-
 
 		this.plans=scenario.getPopulation();
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);

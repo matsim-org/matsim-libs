@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -25,9 +26,9 @@ public class ReadKonradFacilities {
 		ActivityFacilitiesImpl facilities=scenario.getActivityFacilities();
 		new FacilitiesReaderMatsimV1(scenario).readFile(file);
 		
-		Iterator<? extends ActivityFacilityImpl> facilities_it = facilities.getFacilities().values().iterator();
+		Iterator<ActivityFacility> facilities_it = facilities.getFacilities().values().iterator();
 		while (facilities_it.hasNext()) {
-			ActivityFacilityImpl facility = facilities_it.next();
+			ActivityFacility facility = facilities_it.next();
 		
 			String [] entries = facility.getId().toString().trim().split("_", -1);
 			String retailerCategory = entries[0].trim();

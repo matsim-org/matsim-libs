@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -89,8 +89,8 @@ public class ApiNetworkReader extends MatsimXmlParser {
 	}
 
 	private void startNetwork(final Attributes atts) {
-		if (network instanceof NetworkLayer){
-			((NetworkLayer) this.network).setName(atts.getValue("name"));
+		if (network instanceof NetworkImpl){
+			((NetworkImpl) this.network).setName(atts.getValue("name"));
 		}
 		else {
 			log.warn("used instance of Network doesn't support names, ignoring attribute.");

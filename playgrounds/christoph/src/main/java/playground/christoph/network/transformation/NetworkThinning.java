@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.misc.Time;
@@ -67,7 +67,7 @@ public class NetworkThinning {
 		// String networkFile = "test/scenarios/berlin/network.xml.gz";
 		// String networkFile = "test/scenarios/chessboard/network.xml";
 
-		NetworkLayer nw = scenario.getNetwork();
+		NetworkImpl nw = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		log.info("Network has " + nw.getNodes().size() + " Nodes.");

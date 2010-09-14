@@ -20,12 +20,13 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -108,7 +109,7 @@ public class ReadFromUrbansimParcelModel {
 			Id       parcelId =            entry.getKey();
 			ZoneId   zoneId   = (ZoneId)   entry.getValue() ;
 
-			Location parcel = parcels.getFacilities().get(parcelId) ;
+			ActivityFacility parcel = parcels.getFacilities().get(parcelId) ;
 			assert( parcel!= null ) ;
 			Coord coord = parcel.getCoord();
 
@@ -132,7 +133,7 @@ public class ReadFromUrbansimParcelModel {
 
 	}
 
-	public void readPersons(final Population oldPop, final Population newPop, final ActivityFacilitiesImpl facilities, final NetworkLayer network, final double samplingRate ) {
+	public void readPersons(final Population oldPop, final Population newPop, final ActivityFacilitiesImpl facilities, final NetworkImpl network, final double samplingRate ) {
 		String filename = this.PATH_TO_OPUS_MATSIM+"tmp/person__dataset_table__exported_indicators__" + this.year + ".tab" ;
 		log.info( "Starting to read persons from " + filename ) ;
 
@@ -166,7 +167,7 @@ public class ReadFromUrbansimParcelModel {
 				flag = false ;
 
 				Id homeParcelId = new IdImpl( parts[idxFromKey.get("parcel_id_home")] ) ;
-				Location homeLocation = facilities.getFacilities().get( homeParcelId ) ;
+				ActivityFacility homeLocation = facilities.getFacilities().get( homeParcelId ) ;
 				if ( homeLocation==null ) {
 					log.warn( "homeLocation==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
 					continue ;
@@ -187,7 +188,7 @@ public class ReadFromUrbansimParcelModel {
 				} else {
 					newPerson.setEmployed(Boolean.TRUE);
 					Id workParcelId = new IdImpl( parts[idx] ) ;
-					Location jobLocation = facilities.getFacilities().get( workParcelId ) ;
+					ActivityFacility jobLocation = facilities.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {
 						if ( jobLocationIdNullCnt < 1 ) {
 							jobLocationIdNullCnt++ ;
@@ -270,7 +271,7 @@ public class ReadFromUrbansimParcelModel {
 		log.info( "Done with reading persons." ) ;
 	}
 
-	private boolean actHasChanged ( final Activity oldAct, final Activity newAct, final NetworkLayer network ) {
+	private boolean actHasChanged ( final Activity oldAct, final Activity newAct, final NetworkImpl network ) {
 		if ( !oldAct.getCoord().equals( newAct.getCoord() ) ) {
 //			log.info( "act location changed" ) ;
 			return true ;

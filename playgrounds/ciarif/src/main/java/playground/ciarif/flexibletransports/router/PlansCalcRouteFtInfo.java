@@ -35,9 +35,9 @@ public class PlansCalcRouteFtInfo {
 
 		// municipality layer from world file
 		ScenarioImpl localScenario = new ScenarioImpl();
-		this.localWorld = localScenario.getWorld();
+		this.localWorld = null;
 		try {
-			new MatsimWorldReader(localScenario).parse(ftConfigGroup.getWorldInputFilename());
+			new MatsimWorldReader(localScenario, this.localWorld).parse(ftConfigGroup.getWorldInputFilename());
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {

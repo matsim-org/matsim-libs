@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.zip.Adler32;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -96,13 +97,13 @@ LegTravelTimeEstimator {
 
 	private static class DynamicODMatrixEntry {
 
-		private final Location origin;
-		private final Location destination;
+		private final BasicLocation origin;
+		private final BasicLocation destination;
 		private final String mode;
 		private final double departureTime;
 		private final int hash;
 
-		public DynamicODMatrixEntry(Location origin, Location destination,
+		public DynamicODMatrixEntry(BasicLocation origin, BasicLocation destination,
 				String mode, double departureTime) {
 			super();
 			this.origin = origin;

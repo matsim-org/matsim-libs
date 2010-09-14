@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -38,7 +39,7 @@ public class BasicEventsHandlerTest extends MatsimTestCase {
 		events.addHandler(handler);
 		events.printEventHandlers();
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link link1 = network.getFactory().createLink(new IdImpl(1), node1, node2, network, 1000.0, 10.0, 3600.0, 0);

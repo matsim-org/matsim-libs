@@ -67,8 +67,8 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		// reading all available input
 
 		System.out.println("  reading world xml file... ");
-		World world = scenario.getWorld();
-		new MatsimWorldReader(scenario).readFile(inputfolder + "world.xml");
+		World world = new World();
+		new MatsimWorldReader(scenario, world).readFile(inputfolder + "world.xml");
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
@@ -80,6 +80,8 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
+		world.setFacilityLayer(scenario.getActivityFacilities());
+		
 		System.out.println("  creating plans object... ");
 		Population population = scenario.getPopulation();
 		System.out.println("  done.");

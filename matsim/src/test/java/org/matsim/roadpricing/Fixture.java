@@ -35,7 +35,7 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -68,7 +68,7 @@ import org.matsim.core.utils.misc.Time;
 		 */
 		/* The vehicles can travel with 18km/h = 5m/s, so it should take them 20 seconds
 		 * to travel along one link.		 */
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(100, 0));
@@ -106,7 +106,7 @@ import org.matsim.core.utils.misc.Time;
 		 *
 		 * each link is 100m long and can be traveled along with 18km/h = 5m/s = 20s for 100m
 		 */
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node0 = network.createAndAddNode(new IdImpl( "0"), new CoordImpl(  0,   10));
 		Node node1 = network.createAndAddNode(new IdImpl( "1"), new CoordImpl(  0,  100));
@@ -141,7 +141,7 @@ import org.matsim.core.utils.misc.Time;
 	 **/
 	protected static void createPopulation1(final ScenarioImpl scenario) {
 		Population population = scenario.getPopulation();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 
 		Link link0 = network.getLinks().get(new IdImpl(0));
 		Link link1 = network.getLinks().get(new IdImpl(1));
@@ -170,7 +170,7 @@ import org.matsim.core.utils.misc.Time;
 	 **/
 	protected static void createPopulation2(final ScenarioImpl scenario) {
 		Population population = scenario.getPopulation();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 
 		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLinks().get(new IdImpl("1")), network.getLinks().get(new IdImpl("7")), network.getLinks().get(new IdImpl("13"))), population);
 	}

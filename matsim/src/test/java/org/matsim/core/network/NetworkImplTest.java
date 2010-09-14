@@ -37,7 +37,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 
 	@Override
 	public NetworkImpl getEmptyTestNetwork() {
-		return new NetworkLayer();  // TODO should be NetworkImpl, but that doesn't work
+		return NetworkImpl.createNetwork();  // TODO should be NetworkImpl, but that doesn't work
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 */
 	@Test
 	public void testAddLink_existingId() {
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Id id1 = new IdImpl(1);
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);

@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -93,7 +93,7 @@ public class NullFallDataPrepare {
 	}
 
 	private void convertNetwork() {
-		final NetworkLayer network = scenario.getNetwork();
+		final NetworkImpl network = scenario.getNetwork();
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
 
 		VisumNetworkRowHandler nodeRowHandler = new VisumNetworkRowHandler() {
@@ -280,7 +280,7 @@ public class NullFallDataPrepare {
 
 	private Link findLink(LineRouteItem previousLineRouteItem,
 			LineRouteItem nextLineRouteItem) {
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		return findLink(network.getNodes().get(previousLineRouteItem.nodeId), network.getNodes().get(nextLineRouteItem.nodeId));
 	}
 
@@ -300,7 +300,7 @@ public class NullFallDataPrepare {
 	}
 
 	private Link createOrFindInitialLink(LineRouteItem initialLineRouteItem) {
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		Node node = network.getNodes().get(initialLineRouteItem.nodeId);
 		Link initialLink = initialLinks.get(node);
 		if (initialLink == null) {
@@ -325,7 +325,7 @@ public class NullFallDataPrepare {
 
 	private void writeNetworkAndScheduleAndVehicles() throws IOException,
 			FileNotFoundException {
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		log.info("writing network to file.");
 		new NetworkWriter(network).write(OutNetworkFile);
 		log.info("writing TransitSchedule to file.");

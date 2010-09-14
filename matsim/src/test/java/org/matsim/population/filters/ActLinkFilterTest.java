@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -42,7 +43,7 @@ public class ActLinkFilterTest extends MatsimTestCase {
 		final String NINETEEN_HOUR_HOME_ACT_TYPE = "h19";
 
 		// fixture: 2 links and 2 persons
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(100.0, 100.0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(200.0, 200.0));
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(300.0, 300.0));

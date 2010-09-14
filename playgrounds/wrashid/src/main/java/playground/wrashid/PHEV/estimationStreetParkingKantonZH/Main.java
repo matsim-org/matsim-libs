@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.world.Layer;
 import org.matsim.world.MatsimWorldReader;
@@ -64,7 +64,7 @@ public class Main {
 
 	public static HashMap<Integer, GG25Data> communityData=null; //key= communityId
 	public static World world=null;
-	public static NetworkLayer network=null;
+	public static NetworkImpl network=null;
 	public static LinkedList<Coord> streetData=null;
 
 	// key=linkId, value=NumberOfParkings
@@ -259,8 +259,8 @@ public class Main {
 
 
 		// read world data
-		world=scenario.getWorld();
-		MatsimWorldReader worldReader = new MatsimWorldReader(scenario);
+		world=new World();
+		MatsimWorldReader worldReader = new MatsimWorldReader(scenario, world);
 		worldReader .readFile("C:\\data\\SandboxCVS\\ivt\\studies\\switzerland\\world\\world.xml");
 		//Layer layer = world.getLayer("municipality");
 

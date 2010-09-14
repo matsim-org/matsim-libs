@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
 public class NetworkWriterReaderV1Test extends AbstractNetworkWriterReaderTest {
 
 	@Override
-	protected void writeNetwork(final NetworkLayer network, final String filename) {
+	protected void writeNetwork(final NetworkImpl network, final String filename) {
 		new NetworkWriter(network).write(filename);
 	}
 	

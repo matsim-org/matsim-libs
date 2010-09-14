@@ -30,20 +30,22 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.world.AbstractLocation;
 
-public class LinkImpl extends AbstractLocation implements Link {
+public class LinkImpl implements Link {
 
 	private final static Logger log = Logger.getLogger(LinkImpl.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
+
+	private Id id;
 
 	protected Node from = null;
 	protected Node to = null;
@@ -63,36 +65,32 @@ public class LinkImpl extends AbstractLocation implements Link {
 
 	protected double euklideanDist;
 
+	private Network network;
+
 	private static int fsWarnCnt = 0 ;
 	private static int cpWarnCnt = 0 ;
 	private static int plWarnCnt = 0 ;
 	private static int lengthWarnCnt = 0;
 	private static int loopWarnCnt = 0 ;
 	private static int maxFsWarnCnt = 1;
-  private static int maxCpWarnCnt = 1;
-  private static int maxPlWarnCnt = 1;
-  private static int maxLengthWarnCnt = 1;
-  private static int maxLoopWarnCnt = 1;
+	private static int maxCpWarnCnt = 1;
+	private static int maxPlWarnCnt = 1;
+	private static int maxLengthWarnCnt = 1;
+	private static int maxLoopWarnCnt = 1;
 
 
 
-	protected LinkImpl(final Id id, final Node from, final Node to,
-			final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
-		super(network, id,
-				new CoordImpl(0.5*(from.getCoord().getX() + to.getCoord().getX()), 0.5*(from.getCoord().getY() + to.getCoord().getY()))
-		);
+	protected LinkImpl(final Id id, final Node from, final Node to, final NetworkImpl network, final double length, final double freespeed, final double capacity, final double lanes) {
+		this.id = id;
+		this.network = network;
 		this.from = from;
 		this.to = to;
-
-		// set attributes and do semantic checks
 		this.allowedModes.add(TransportMode.car);
 		this.setLength(length);
 		this.setFreespeed(freespeed);
 		this.setCapacity(capacity);
 		this.setNumberOfLanes(lanes);
-
 		this.euklideanDist = CoordUtils.calcDistance(this.from.getCoord(), this.to.getCoord());
-
 		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
 			loopWarnCnt++ ;
 			log.warn("[from=to=" + this.to + " link is a loop]");
@@ -101,8 +99,12 @@ public class LinkImpl extends AbstractLocation implements Link {
 	}
 
 	private void calculateFlowCapacity() {
-		this.flowCapacity = this.capacity / ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+		this.flowCapacity = this.capacity / getCapacityPeriod();
 		this.checkCapacitiySemantics();
+	}
+
+	protected double getCapacityPeriod() {
+		return network.getCapacityPeriod();
 	}
 
 	private void checkCapacitiySemantics() {
@@ -137,11 +139,6 @@ public class LinkImpl extends AbstractLocation implements Link {
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// calc methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
 	public final double calcDistance(final Coord coord) {
 		// yyyy should, in my view, call the generalized utils method. kai, jul09
 		Coord fc = this.from.getCoord();
@@ -329,6 +326,22 @@ public class LinkImpl extends AbstractLocation implements Link {
 		"[permlanes=" + this.nofLanes + "]" +
 		"[origid=" + this.origid + "]" +
 		"[type=" + this.type + "]";
+	}
+
+	@Override
+	public Id getId() {
+		return id;
+	}
+
+	@Override
+	public Coord getCoord() {
+		Coord fromXY = getFromNode().getCoord();
+		Coord toXY = getToNode().getCoord();
+		return new CoordImpl((fromXY.getX() + toXY.getX()) / 2.0, (fromXY.getY() + toXY.getY()) / 2.0);
+	}
+
+	public Network getNetwork() {
+		return network;
 	}
 
 }

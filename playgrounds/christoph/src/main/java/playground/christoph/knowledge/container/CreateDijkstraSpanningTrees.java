@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelCost;
 
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
@@ -53,7 +53,7 @@ public class CreateDijkstraSpanningTrees {
 
 	private final static Logger log = Logger.getLogger(CreateDijkstraSpanningTrees.class);
 	
-	private NetworkLayer network;
+	private NetworkImpl network;
 
 	private int numOfThreads = 8;
 
@@ -96,7 +96,7 @@ public class CreateDijkstraSpanningTrees {
 //		new CreateDijkstraSpanningTrees(network);
 	}
 	
-	public CreateDijkstraSpanningTrees(NetworkLayer network)
+	public CreateDijkstraSpanningTrees(NetworkImpl network)
 	{	
 		this.network = network;
 		

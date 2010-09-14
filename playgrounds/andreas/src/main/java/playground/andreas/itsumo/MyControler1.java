@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -277,7 +277,7 @@ public class MyControler1 extends Controler {
 		log.info("  done");
 
 		log.info("  reading network xml file... ");
-		ITSUMONetworkReader reader = new ITSUMONetworkReader((NetworkLayer) network);
+		ITSUMONetworkReader reader = new ITSUMONetworkReader((NetworkImpl) network);
 		reader.read(scenario.getConfig().getParam(ItsumoSim.CONFIG_MODULE, "itsumoInputNetworkFile"));
 
 		NetworkWriter network_writer = new NetworkWriter(network);

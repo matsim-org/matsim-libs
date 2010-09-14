@@ -28,7 +28,7 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
@@ -87,7 +87,7 @@ public class CountsAnalyser {
 	/**
 	 * the network
 	 */
-	private NetworkLayer network;
+	private NetworkImpl network;
 
 	/**
 	 * the name(path) to the output file

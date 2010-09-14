@@ -47,7 +47,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -68,7 +68,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 	private final String weights;
 
 	private final double[] cum_p_factype;
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final PersonalizableTravelCost tcost;
 	private final PersonalizableTravelTime ttime;
 	private final String[] factypes;
@@ -77,7 +77,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 
 	private final Knowledges knowledges;
 
-	public PlanRandomReplaceSecLoc(String[] factypes, NetworkLayer network, ActivityFacilitiesImpl facilities, PersonalizableTravelCost tcost, PersonalizableTravelTime ttime, Knowledges knowledges, SocNetConfigGroup snConfig) {
+	public PlanRandomReplaceSecLoc(String[] factypes, NetworkImpl network, ActivityFacilitiesImpl facilities, PersonalizableTravelCost tcost, PersonalizableTravelTime ttime, Knowledges knowledges, SocNetConfigGroup snConfig) {
 		weights = snConfig.getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;

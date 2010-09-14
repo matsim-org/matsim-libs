@@ -38,7 +38,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -102,7 +102,7 @@ public class NewDemandWithFacilities4Zrh {
 				afMap.put(coord, af);
 			}
 			act.setFacilityId(af.getId());
-			ActivityOptionImpl ao = af.getActivityOptions().get(type);
+			ActivityOptionImpl ao = (ActivityOptionImpl) af.getActivityOptions().get(type);
 			if (ao == null)
 				ao = af.createActivityOption(type);
 			// 3 primary type in Zurich scenario
@@ -133,7 +133,7 @@ public class NewDemandWithFacilities4Zrh {
 
 		ScenarioImpl scenario = new ScenarioImpl();
 
-		NetworkLayer net = scenario.getNetwork();
+		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Knowledges knowledges = scenario.getKnowledges();

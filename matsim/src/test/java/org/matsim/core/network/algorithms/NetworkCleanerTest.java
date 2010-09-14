@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -38,7 +39,7 @@ public class NetworkCleanerTest extends TestCase {
 
 	public void testSink() {
 		// create a simple network
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(  0,   0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100,   0));
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(100, 100));
@@ -63,7 +64,7 @@ public class NetworkCleanerTest extends TestCase {
 
 	public void testDoubleSink() {
 		// create a simple network
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(  0,   0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100,   0));
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(100, 100));
@@ -89,7 +90,7 @@ public class NetworkCleanerTest extends TestCase {
 
 	public void testSource() {
 		// create a simple network
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(  0,   0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100,   0));
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(100, 100));
@@ -114,7 +115,7 @@ public class NetworkCleanerTest extends TestCase {
 
 	public void testDoubleSource() {
 		// create a simple network
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(  0,   0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100,   0));
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(100, 100));

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.SortedSet;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
@@ -57,8 +58,8 @@ public class FacilitiesWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	public final void write(final String filename) {
 		this.writeOpenAndInit(filename);
-		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			this.writeFacility(f);
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
+			this.writeFacility((ActivityFacilityImpl) f);
 		}
 		this.writeFinish();
 	}
@@ -80,13 +81,13 @@ public class FacilitiesWriter extends MatsimXmlWriter implements MatsimWriter {
 	private final void writeFacility(final ActivityFacilityImpl f) {
 		try {
 			this.handler.startFacility(f, this.writer);
-			Iterator<ActivityOptionImpl> a_it = f.getActivityOptions().values().iterator();
+			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
-				ActivityOptionImpl a = a_it.next();
-				this.handler.startActivity(a, this.writer);
-				this.handler.startCapacity(a, this.writer);
+				ActivityOption a = a_it.next();
+				this.handler.startActivity((ActivityOptionImpl) a, this.writer);
+				this.handler.startCapacity((ActivityOptionImpl) a, this.writer);
 				this.handler.endCapacity(this.writer);
-				Iterator<SortedSet<OpeningTime>> o_set_it = a.getOpeningTimes().values().iterator();
+				Iterator<SortedSet<OpeningTime>> o_set_it = ((ActivityOptionImpl) a).getOpeningTimes().values().iterator();
 				while (o_set_it.hasNext()) {
 					SortedSet<OpeningTime> o_set = o_set_it.next();
 					Iterator<OpeningTime> o_it = o_set.iterator();

@@ -31,13 +31,13 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.balmermi.census2000v2.modules.PersonAssignToNetwork;
 
@@ -58,7 +58,7 @@ public class IIDMAssign2Network {
 		log.info("MATSim-DB: assignNetwork...");
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		World world = scenario.getWorld();
+		World world = new World();
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -76,7 +76,7 @@ public class IIDMAssign2Network {
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		world.complete(null);
 		System.out.println("  done.");
@@ -99,7 +99,7 @@ public class IIDMAssign2Network {
 		excludingLinkTypes.add("90"); excludingLinkTypes.add("91"); excludingLinkTypes.add("92"); excludingLinkTypes.add("93");
 		excludingLinkTypes.add("94"); excludingLinkTypes.add("95"); excludingLinkTypes.add("96"); excludingLinkTypes.add("97");
 		excludingLinkTypes.add("98"); excludingLinkTypes.add("99");
-		new WorldConnectLocations(excludingLinkTypes, config).run(world);
+//		new WorldConnectLocations(excludingLinkTypes, config).run(world);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

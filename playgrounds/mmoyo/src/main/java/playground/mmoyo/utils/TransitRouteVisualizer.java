@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.run.OTFVis;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -35,7 +35,7 @@ public class TransitRouteVisualizer {
 		
 		//create net
 		ScenarioImpl newScenario = new ScenarioImpl();
-		NetworkLayer newNetwork = newScenario.getNetwork();
+		NetworkImpl newNetwork = newScenario.getNetwork();
 
 		
 		//<- add initial link

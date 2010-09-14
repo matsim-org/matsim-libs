@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -43,7 +44,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -118,7 +119,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		facilityShop.createActivityOption("shop");
 
 		// generate network
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(    0.0, 0.0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(  500.0, 0.0));
@@ -142,8 +143,8 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	public void testNoTrips() {
 		
 		PersonImpl person = (PersonImpl) this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
-		NetworkLayer network = this.scenario.getNetwork();
-		ActivityFacilityImpl facilityHome = this.scenario.getActivityFacilities().getFacilities().get(FACILITY_HOME_ID);
+		NetworkImpl network = this.scenario.getNetwork();
+		ActivityFacility facilityHome = this.scenario.getActivityFacilities().getFacilities().get(FACILITY_HOME_ID);
 		
 		// generate desires
 		Desires desires = person.createDesires("test desires");
@@ -180,11 +181,11 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	private void createAndAddMultiActivityPlan() {
 		
 		PersonImpl person = (PersonImpl) this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
-		NetworkLayer network = this.scenario.getNetwork();
-		ActivityFacilityImpl facilityHome = this.scenario.getActivityFacilities().getFacilities().get(FACILITY_HOME_ID);
-		ActivityFacilityImpl facilityWork = this.scenario.getActivityFacilities().getFacilities().get(FACILITY_WORK_ID);
-		ActivityFacilityImpl facilityLeisure = this.scenario.getActivityFacilities().getFacilities().get(FACILITY_LEISURE_ID);
-		ActivityFacilityImpl facilityShop = this.scenario.getActivityFacilities().getFacilities().get(FACILITY_SHOP_ID);
+		NetworkImpl network = this.scenario.getNetwork();
+		ActivityFacilityImpl facilityHome = (ActivityFacilityImpl) this.scenario.getActivityFacilities().getFacilities().get(FACILITY_HOME_ID);
+		ActivityFacilityImpl facilityWork = (ActivityFacilityImpl) this.scenario.getActivityFacilities().getFacilities().get(FACILITY_WORK_ID);
+		ActivityFacilityImpl facilityLeisure = (ActivityFacilityImpl) this.scenario.getActivityFacilities().getFacilities().get(FACILITY_LEISURE_ID);
+		ActivityFacilityImpl facilityShop = (ActivityFacilityImpl) this.scenario.getActivityFacilities().getFacilities().get(FACILITY_SHOP_ID);
 			
 		// generate desires
 		Desires desires = person.createDesires("test desires");
@@ -289,10 +290,10 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		ActivityOptionImpl actOpt = null;
 
-		actOpt = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("3")).getActivityOptions().get("work_sector3");
+		actOpt = (ActivityOptionImpl) this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("3")).getActivityOptions().get("work_sector3");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("18:00:00")));
 
-		actOpt = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("5")).getActivityOptions().get("leisure");
+		actOpt = (ActivityOptionImpl) this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("5")).getActivityOptions().get("leisure");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("16:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}
@@ -318,11 +319,11 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		ActivityOptionImpl actOpt = null;
 
-		actOpt = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("3")).getActivityOptions().get("work_sector3");
+		actOpt = (ActivityOptionImpl) this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("3")).getActivityOptions().get("work_sector3");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("14:00:00")));
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
 
-		actOpt = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("5")).getActivityOptions().get("leisure");
+		actOpt = (ActivityOptionImpl) this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("5")).getActivityOptions().get("leisure");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}
@@ -348,15 +349,15 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		ActivityOptionImpl actOpt = null;
 
-		actOpt = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("3")).getActivityOptions().get("work_sector3");
+		actOpt = (ActivityOptionImpl) this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("3")).getActivityOptions().get("work_sector3");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("10:00:00")));
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("10:30:00"), Time.parseTime("14:00:00")));
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
 
-		actOpt = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("5")).getActivityOptions().get("leisure");
+		actOpt = (ActivityOptionImpl) this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("5")).getActivityOptions().get("leisure");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
-		actOpt = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("7")).getActivityOptions().get("shop");
+		actOpt = (ActivityOptionImpl) this.scenario.getActivityFacilities().getFacilities().get(new IdImpl("7")).getActivityOptions().get("shop");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("12:00:00"), Time.parseTime("27:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}

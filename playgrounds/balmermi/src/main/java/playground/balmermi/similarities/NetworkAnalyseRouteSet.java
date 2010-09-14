@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 public class NetworkAnalyseRouteSet {
 
@@ -74,7 +74,7 @@ public class NetworkAnalyseRouteSet {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void readNodeHeight(String inputfile, NetworkLayer network) {
+	private final void readNodeHeight(String inputfile, NetworkImpl network) {
 		try {
 			FileReader file_reader = new FileReader(inputfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -102,7 +102,7 @@ public class NetworkAnalyseRouteSet {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void readLinkAtts(String inputfile, NetworkLayer network) {
+	private final void readLinkAtts(String inputfile, NetworkImpl network) {
 		try {
 			FileReader file_reader = new FileReader(inputfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -134,7 +134,7 @@ public class NetworkAnalyseRouteSet {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void readRoutes(String inputfile, NetworkLayer network) {
+	private final void readRoutes(String inputfile, NetworkImpl network) {
 		try {
 			FileReader file_reader = new FileReader(inputfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -297,7 +297,7 @@ public class NetworkAnalyseRouteSet {
 		System.out.print(formatter.format(ampel_nofl) + "\n");
 	}
 
-	private final void analysis(NetworkLayer network) {
+	private final void analysis(NetworkImpl network) {
 		double length = 0.0;
 		double rise_av = 0.0;
 		double rise_min = 0.0;
@@ -436,7 +436,7 @@ public class NetworkAnalyseRouteSet {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkLayer network) {
+	public void run(NetworkImpl network) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
 		System.out.println("      reading in heights of the nodes...");

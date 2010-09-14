@@ -35,7 +35,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 
@@ -117,7 +117,7 @@ public class NetworkSimplifier {
 
 									// Only merge links with same attributes
 									if(bothLinksHaveSameLinkStats(inLink, outLink)){
-										LinkImpl newLink = ((NetworkLayer) network).createAndAddLink(
+										LinkImpl newLink = ((NetworkImpl) network).createAndAddLink(
 												new IdImpl(inLink.getId() + "-" + outLink.getId()),
 												inLink.getFromNode(),
 												outLink.getToNode(),

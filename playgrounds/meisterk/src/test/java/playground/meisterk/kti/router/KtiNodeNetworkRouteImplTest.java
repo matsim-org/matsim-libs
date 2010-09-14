@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.AbstractNetworkRouteTest;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -53,11 +54,6 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 	}
 
 	@Override
-	protected NetworkRoute getNetworkRouteInstance(Id fromLinkId, Id toLinkId, NetworkLayer network) {
-		return new KtiLinkNetworkRouteImpl(fromLinkId, toLinkId, network, this.config.planomat().getSimLegInterpretation());
-	}
-
-	@Override
 	@Test
 	public void testGetDistance() {
 
@@ -65,7 +61,7 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 		expectedDistances.put(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible, 5000.0);
 		expectedDistances.put(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 6000.0);
 
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Link link1 = network.getLinks().get(new IdImpl("1"));
 		Link link4 = network.getLinks().get(new IdImpl("4"));
 		link4.setLength(2000.0);
@@ -101,6 +97,13 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 					MatsimTestCase.EPSILON);
 
 		}
+
+	}
+
+	@Override
+	protected NetworkRoute getNetworkRouteInstance(Id fromLinkId, Id toLinkId,
+			NetworkImpl network) {
+		return new KtiLinkNetworkRouteImpl(fromLinkId, toLinkId, network, this.config.planomat().getSimLegInterpretation());
 
 	}
 }

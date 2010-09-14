@@ -26,12 +26,12 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
 import playground.jhackney.SocNetConfigGroup;
@@ -55,7 +55,7 @@ public class EgoNetMakeActivitySpaces {
 
 		World world = Scenario.readWorld(null /*filename not specified*/);
 		Scenario.readFacilities();
-		NetworkLayer network =Scenario.readNetwork();
+		NetworkImpl network =Scenario.readNetwork();
 
 		System.out.println("  reading plans xml file... ");
 		System.out.println(config.plans().getInputFile());
@@ -72,7 +72,7 @@ public class EgoNetMakeActivitySpaces {
 
 		//read in facilities knowledge
 		new InitializeKnowledge(plans, facilities,  knowledges, network, snConfig);
-		new WorldConnectLocations(config).run(world);
+//		new WorldConnectLocations(config).run(world);
 		//////////////////////////////////////////////////////////////////////
 
 //		// ch.cut.640000.200000.740000.310000.xml

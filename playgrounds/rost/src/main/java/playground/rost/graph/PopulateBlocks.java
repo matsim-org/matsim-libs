@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.rost.graph.block.Block;
 import playground.rost.graph.block.Blocks;
@@ -36,7 +36,7 @@ public class PopulateBlocks {
 	
 	public static Map<Node, Integer> nodePopulation = new HashMap<Node, Integer>();
 	
-	public synchronized static Map<Block, Integer> getPopulation(PopulationPointCollection popPointCollection, Blocks blocks, NetworkLayer network)
+	public synchronized static Map<Block, Integer> getPopulation(PopulationPointCollection popPointCollection, Blocks blocks, NetworkImpl network)
 	{
 		//calc min distance for every node
 		for(Node node : network.getNodes().values())

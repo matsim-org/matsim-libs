@@ -34,7 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -341,7 +341,7 @@ public class CreateSelectedPlansTables {
 		}
 
 		@Override
-		public NetworkLayer getNetwork() {
+		public NetworkImpl getNetwork() {
 			return this.scenario.getNetwork();
 		}
 

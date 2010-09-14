@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
@@ -87,7 +87,7 @@ public class TeleatlasIvtcheuMerger {
 		log.info("done.");
 	}
 
-	private static final void mergeNetworks(NetworkLayer networkTeleatlas, NetworkLayer networkIvtcheu, String i2tmappingfile) {
+	private static final void mergeNetworks(NetworkImpl networkTeleatlas, NetworkImpl networkIvtcheu, String i2tmappingfile) {
 		log.info("adapt mergeNetworks...");
 		log.info("  init number of links (networkTeleatlas): "+networkTeleatlas.getLinks().size());
 		log.info("  init number of nodes (networkTeleatlas): "+networkTeleatlas.getNodes().size());
@@ -173,11 +173,11 @@ public class TeleatlasIvtcheuMerger {
 		String outNetFile = args[4].trim();
 
 		ScenarioImpl taScenario = new ScenarioImpl();
-		NetworkLayer networkTeleatlas = taScenario.getNetwork();
+		NetworkImpl networkTeleatlas = taScenario.getNetwork();
 		new MatsimNetworkReader(taScenario).readFile(teleatlasfile);
 
 		ScenarioImpl ivtcheuScenario = new ScenarioImpl();
-		NetworkLayer networkIvtcheu = ivtcheuScenario.getNetwork();
+		NetworkImpl networkIvtcheu = ivtcheuScenario.getNetwork();
 		new MatsimNetworkReader(ivtcheuScenario).readFile(ivtcheufile);
 
 		deleteLinks(networkIvtcheu,il2deletefile);

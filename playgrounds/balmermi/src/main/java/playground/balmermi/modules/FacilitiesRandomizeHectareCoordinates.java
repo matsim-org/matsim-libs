@@ -21,6 +21,7 @@
 package playground.balmermi.modules;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -37,7 +38,7 @@ public class FacilitiesRandomizeHectareCoordinates {
 
 		int cnt = 0;
 		
-		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
+		for (ActivityFacility f : facilities.getFacilities().values()) {
 			Coord coord = f.getCoord();
 			int x = (int)coord.getX();
 			int y = (int)coord.getY();

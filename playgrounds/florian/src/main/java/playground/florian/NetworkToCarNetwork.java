@@ -40,7 +40,7 @@ public class NetworkToCarNetwork {
 		new MatsimNetworkReader(sc).readFile(NET_FILE);
 //		Network net2 = sc.getNetwork();
 //		net2.setCapacityPeriod(3600);
-		NetworkLayer net3 = new NetworkLayer();
+		NetworkImpl net3 = NetworkImpl.createNetwork();
 		net3.setCapacityPeriod(1);
 		net3.setEffectiveLaneWidth(3.5);
 		net3.setEffectiveCellSize(7.5);

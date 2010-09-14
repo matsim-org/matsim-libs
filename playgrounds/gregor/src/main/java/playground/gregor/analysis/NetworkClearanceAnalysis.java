@@ -44,7 +44,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -66,7 +66,7 @@ public class NetworkClearanceAnalysis {
 	private static final String INPUT_BASE="../../outputs/";
 	private final String ev2;
 	private final String ev1;
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final CoordinateReferenceSystem crs;
 	private final String outfile;
 
@@ -85,7 +85,7 @@ public class NetworkClearanceAnalysis {
 	private final Map<String,PolygonInfo> linkMapping2 = new HashMap<String,PolygonInfo>();
 
 	public NetworkClearanceAnalysis(final String eventsFile1, final String eventsFile2,
-			final NetworkLayer network, final String outfile, final CoordinateReferenceSystem crs) {
+			final NetworkImpl network, final String outfile, final CoordinateReferenceSystem crs) {
 		this.ev1 = eventsFile1;
 		this.ev2 = eventsFile2;
 		this.network = network;
@@ -245,7 +245,7 @@ public class NetworkClearanceAnalysis {
 		String outfile = INPUT_BASE + "output_100m_so/analysis/runComp.shp";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer net = scenario.getNetwork();
+		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(network);
 
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM47S);

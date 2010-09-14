@@ -117,11 +117,6 @@ public class NeoLinkImpl implements Link {
 	}
 
 	@Override
-	public Layer getLayer() {
-		throw new RuntimeException();
-	}
-
-	@Override
 	public Coord getCoord() {
 		return getToNode().getCoord();
 	}

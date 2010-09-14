@@ -132,7 +132,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 						facs.put(af.getCoord().getX(),af.getCoord().getY(),af);
 					}
 					else if (((CoordImpl)af.getCoord()).equals(c)) {
-						ActivityOptionImpl ao = af.getActivityOptions().get(a.getType());
+						ActivityOptionImpl ao = (ActivityOptionImpl) af.getActivityOptions().get(a.getType());
 						if (ao == null) {
 							ao = af.createActivityOption(a.getType());
 							ao.setCapacity(1.0);

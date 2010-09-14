@@ -18,7 +18,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.xml.sax.SAXException;
 
@@ -213,7 +213,7 @@ public class MainGUI extends JFrame {
 			e.printStackTrace();
 		}
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
 		try {
 			nReader.parse(PathTracker.resolve("matExtract"));
@@ -373,10 +373,10 @@ public class MainGUI extends JFrame {
 		protected Flow result = null;
 
 		protected EvacArea evacArea;
-		protected NetworkLayer network;
+		protected NetworkImpl network;
 		protected PopulationNodeMap populationNodeMap;
 		
-		public CalcEAFlow(EvacArea evacArea, NetworkLayer network, PopulationNodeMap populationNodeMap, EdgeTypeEnum edgeType)
+		public CalcEAFlow(EvacArea evacArea, NetworkImpl network, PopulationNodeMap populationNodeMap, EdgeTypeEnum edgeType)
 		{
 			this.evacArea = evacArea;
 			this.network = network;

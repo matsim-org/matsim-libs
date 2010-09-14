@@ -7,11 +7,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 
 public class MyNetwork2 implements Network {
 	
-	Network delegate = new NetworkLayer() ;
+	Network delegate = NetworkImpl.createNetwork() ;
 
 	public void addLink(Link ll) {
 		delegate.addLink(ll);

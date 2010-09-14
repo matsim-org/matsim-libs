@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -57,11 +58,11 @@ public class OSM2MATConverter {
 
 	protected static Map<BigInteger, Node> mapNd2Node;
 	
-	public static NetworkLayer readOSM(String filename) throws JAXBException, IOException {
+	public static NetworkImpl readOSM(String filename) throws JAXBException, IOException {
 		
 		long kreuzungId = 99999;
 		Osm osmdata;
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		JAXBContext context = JAXBContext.newInstance("playground.rost.osm2matconverter.xmlosmbase");
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		osmdata = (Osm)unmarshaller.unmarshal(new FileReader(filename));
@@ -71,7 +72,7 @@ public class OSM2MATConverter {
 		return network;
 	}
 	
-	protected static void parseStrassen(NetworkLayer network, Osm osmdata, Map<BigInteger, Node> strassenKnoten)
+	protected static void parseStrassen(NetworkImpl network, Osm osmdata, Map<BigInteger, Node> strassenKnoten)
 	{
 		Map<String, Integer> roadStats = new HashMap<String, Integer>();
 		
@@ -199,7 +200,7 @@ public class OSM2MATConverter {
 	 * @param osmdata Osm-Daten
 	 * @return Map von Knoten Id auf Knoten
 	 */
-	protected static Map<BigInteger, Node> parseNodes(NetworkLayer network, Osm osmdata)
+	protected static Map<BigInteger, Node> parseNodes(NetworkImpl network, Osm osmdata)
 	{
 		long debug_count = 0;
 		long debug_iter = 0;
@@ -302,7 +303,7 @@ public class OSM2MATConverter {
 		String inputfile = PathTracker.resolve("osmMap");
 		String outfile = PathTracker.resolve("matMap");
 		try {
-			NetworkLayer network = readOSM(inputfile);
+			NetworkImpl network = readOSM(inputfile);
 			network.setCapacityPeriod(1); //TODO changed
 			new NetworkWriter(network).write(outfile);
 			System.out.println(inputfile + "  converted successfully \n"

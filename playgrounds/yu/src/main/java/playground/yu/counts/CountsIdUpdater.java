@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -49,14 +49,14 @@ public class CountsIdUpdater {
 		int cnt = 0;
 
 		ScenarioImpl oldScenario = new ScenarioImpl();
-		NetworkLayer oldNet = oldScenario.getNetwork();
+		NetworkImpl oldNet = oldScenario.getNetwork();
 		new MatsimNetworkReader(oldScenario).readFile(oldNetFile);
 
 		Counts oldCounts = new Counts();
 		new MatsimCountsReader(oldCounts).readFile(oldCountsFile);
 
 		ScenarioImpl newScenario = new ScenarioImpl();
-		NetworkLayer newNet = newScenario.getNetwork();
+		NetworkImpl newNet = newScenario.getNetwork();
 		new MatsimNetworkReader(newScenario).readFile(newNetFile);
 
 		Counts newCounts = new Counts();
@@ -100,7 +100,7 @@ public class CountsIdUpdater {
 	}
 
 	private static Id searchLinkPerNodeIdPair(final Id fromNodeId,
-			final Id toNodeId, final NetworkLayer net) {
+			final Id toNodeId, final NetworkImpl net) {
 		Node fromNode = net.getNodes().get(fromNodeId);
 		if (fromNode == null) {
 			System.err.println("Node with Id " + fromNodeId.toString()
@@ -122,7 +122,7 @@ public class CountsIdUpdater {
 		return null;
 	}
 
-	private static Id searchLinkPerLinkIdString(Id oldLinkId, NetworkLayer net) {
+	private static Id searchLinkPerLinkIdString(Id oldLinkId, NetworkImpl net) {
 		String oldLinkIdStr = oldLinkId.toString();
 		for (Id newLinkId : net.getLinks().keySet()) {
 			String newLinkIdStr = newLinkId.toString();

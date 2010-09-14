@@ -37,7 +37,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
@@ -71,7 +71,7 @@ public class PseudoNetworkDemo {
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
 
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		if (networkFile != null) {
 			try {

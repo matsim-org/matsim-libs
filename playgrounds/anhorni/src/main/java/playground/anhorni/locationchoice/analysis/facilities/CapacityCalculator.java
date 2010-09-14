@@ -3,8 +3,10 @@ package playground.anhorni.locationchoice.analysis.facilities;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 
 public class CapacityCalculator {
@@ -145,15 +147,15 @@ public class CapacityCalculator {
 	
 	private void calculateCapacitiesPerType(ActivityFacilitiesImpl facilities, TreeMap<String, CapacityPerNOGAType> nogaFacilities,
 			String[] nogaTypes, String type) {
-		Iterator< ? extends ActivityFacilityImpl> facility_it = facilities.getFacilities().values().iterator();
+		Iterator<ActivityFacility> facility_it = facilities.getFacilities().values().iterator();
 		while (facility_it.hasNext()) {
-			ActivityFacilityImpl facility = facility_it.next();	
+			ActivityFacility facility = facility_it.next();	
 			
 			for (int i = 0; i < nogaTypes.length; i++) {						
 				if (facility.getActivityOptions().get(nogaTypes[i]) != null) {
-					Iterator<ActivityOptionImpl> options_it = facility.getActivityOptions().values().iterator();
+					Iterator<? extends ActivityOption> options_it = facility.getActivityOptions().values().iterator();
 					while (options_it.hasNext()) {
-						ActivityOptionImpl actOpt = options_it.next();
+						ActivityOption actOpt = options_it.next();
 						
 						// if there is a shopping or leisure act in the same buidling
 						if (actOpt.getType().startsWith(type)) {

@@ -50,7 +50,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	 * @param network
 	 * @param filename
 	 */
-	protected abstract void writeNetwork(final NetworkLayer network, final String filename);
+	protected abstract void writeNetwork(final NetworkImpl network, final String filename);
 
 	/**
 	 * Reads a network from the specified file into the given network data structure.
@@ -73,7 +73,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	}
 
 	private void doTestAllowedModes(final Set<String> modes, final String filename) {
-		NetworkLayer network1 = new NetworkLayer();
+		NetworkImpl network1 = NetworkImpl.createNetwork();
 		Node n1 = network1.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node n2 = network1.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
 		Link l1 = network1.createAndAddLink(new IdImpl("1"), n1, n2, 1000.0, 10.0, 3600.0, 1.0);

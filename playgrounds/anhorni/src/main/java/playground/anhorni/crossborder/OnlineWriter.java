@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -17,7 +17,7 @@ class OnlineWriter {
 	private boolean fileOpened = false;
 	private ArrayList<Plan> allPlans;
 	private String fileName;
-	private NetworkLayer network;
+	private NetworkImpl network;
 	
 	public OnlineWriter() {}
 		
@@ -30,7 +30,7 @@ class OnlineWriter {
 			Gbl.errorMsg(e);
 		}
 	}
-	public void setNetwork(NetworkLayer network){
+	public void setNetwork(NetworkImpl network){
 		this.network=network;
 	}
 	

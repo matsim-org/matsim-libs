@@ -2,7 +2,7 @@ package playground.wrashid.lib;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.lib.obj.StringMatrix;
@@ -21,7 +21,7 @@ public class GeneralLibTest extends MatsimTestCase {
 	}
 	
 	public void testReadNetwork(){
-		NetworkLayer network = GeneralLib.readNetwork("test/scenarios/equil/network.xml");
+		NetworkImpl network = GeneralLib.readNetwork("test/scenarios/equil/network.xml");
 		assertEquals(23, network.getLinks().size());
 	}
 

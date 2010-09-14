@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
@@ -87,7 +87,7 @@ public class EAFSehtlerNetConverter {
 	}
 
 	private static void extendNetwork(ScenarioImpl sc) {
-		NetworkLayer net = sc.getNetwork();
+		NetworkImpl net = sc.getNetwork();
 		List<Tuple<Node, Id>> nodes = new ArrayList<Tuple<Node,Id>>();
 			
 		

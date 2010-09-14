@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -88,7 +88,7 @@ public class TeachOsmNetworkReader {
 	private final Set<String> unknownHighways = new HashSet<String>();
 	private long id = 0;
 	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	/*package*/ final CoordinateTransformation transform;
 	private boolean keepPaths = false;
 	private boolean scaleMaxSpeed = false;
@@ -115,7 +115,7 @@ public class TeachOsmNetworkReader {
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
 	public TeachOsmNetworkReader(final Network network, final CoordinateTransformation transformation, boolean useHighwayDefaults) {
-		this.network = (NetworkLayer) network;
+		this.network = (NetworkImpl) network;
 		this.transform = transformation;
 
 		if (useHighwayDefaults) {
@@ -370,7 +370,7 @@ public class TeachOsmNetworkReader {
 		}
 	}
 
-	private void createLink(final NetworkLayer network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
+	private void createLink(final NetworkImpl network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
 		String highway = way.tags.get("highway");
 
 		// load defaults

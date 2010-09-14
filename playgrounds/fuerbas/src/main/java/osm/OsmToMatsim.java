@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkSegmentDoubleLinks;
@@ -48,7 +49,7 @@ public class OsmToMatsim {
 	 */
 	public static void main(String[] args) {
 		
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		OsmNetworkReader osmReader = new OsmNetworkReader(network,
 				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 						TransformationFactory.CH1903_LV03), false);
@@ -99,7 +100,7 @@ public class OsmToMatsim {
 		
 		// Simplyfy Network
 		Scenario scenario = new ScenarioImpl();
-		network = (NetworkLayer) scenario.getNetwork();
+		network = (NetworkImpl) scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(output + "_cl.xml.gz");
 
 		Simplifier simply = new Simplifier();

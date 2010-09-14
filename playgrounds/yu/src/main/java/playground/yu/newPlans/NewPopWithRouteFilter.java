@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -77,7 +77,7 @@ public class NewPopWithRouteFilter extends NewPopulation {
 
 		Scenario s = new ScenarioImpl();
 
-		NetworkLayer network = (NetworkLayer) s.getNetwork();
+		NetworkImpl network = (NetworkImpl) s.getNetwork();
 		new MatsimNetworkReader(s).readFile(netFilename);
 
 		Population population = s.getPopulation();

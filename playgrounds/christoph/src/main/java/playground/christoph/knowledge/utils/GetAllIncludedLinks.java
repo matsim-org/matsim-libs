@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 public class GetAllIncludedLinks {
 
@@ -66,7 +66,7 @@ public class GetAllIncludedLinks {
 	 * @return A link from the network is included in the returned ArrayList, if its
 	 * start- and end node are included in the includedNodes ArrayList.
 	 */
-	public ArrayList<Link> getAllLinks(NetworkLayer network, Map<Id, Node> includedNodesMap)
+	public ArrayList<Link> getAllLinks(NetworkImpl network, Map<Id, Node> includedNodesMap)
 	{
 		ArrayList<Link> includedLinks = new ArrayList<Link>();
 		getAllLinks(network, includedNodesMap, includedLinks);
@@ -110,7 +110,7 @@ public class GetAllIncludedLinks {
 	 * @param Map< Id, Node > includedNodesMap
 	 * @param ArrayList< Link > includedLinks
 	 */
-	public void getAllLinks(NetworkLayer network, Map<Id, Node> includedNodesMap, ArrayList<Link> includedLinks)
+	public void getAllLinks(NetworkImpl network, Map<Id, Node> includedNodesMap, ArrayList<Link> includedLinks)
 	{	
 		// get all links of the network
 		Map<Id, ? extends Link> linkMap = network.getLinks();

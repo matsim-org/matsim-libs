@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -23,7 +23,7 @@ import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
 public class PlanGeneratorWithParkingActivities {
 
 	ClosestParkingMatrix closestParkingMatrix;
-	NetworkLayer network;
+	NetworkImpl network;
 	ScenarioImpl scenario;
 
 	public ScenarioImpl getScenario() {

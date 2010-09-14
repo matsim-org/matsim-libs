@@ -23,7 +23,7 @@ package playground.balmermi.modules;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 public class NetworkAdaptCaps {
 
@@ -46,7 +46,7 @@ public class NetworkAdaptCaps {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkLayer network) {
+	public void run(NetworkImpl network) {
 		log.info("running "+this.getClass().getName()+" module...");
 		for (Link l : network.getLinks().values()) {
 			double cap = l.getCapacity();

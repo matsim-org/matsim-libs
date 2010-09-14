@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.misc.ArgumentParser;
 
@@ -62,7 +62,7 @@ public class NetworkCleaner {
 	 */
 	public void run(final String inputNetworkFile, final String outputNetworkFile) {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 
 		new org.matsim.core.network.algorithms.NetworkCleaner().run(network);

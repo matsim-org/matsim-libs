@@ -14,7 +14,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -75,7 +75,7 @@ public class SNPickFacility implements PlanAlgorithm {
 	private final Logger log = Logger.getLogger(SNPickFacility.class);
 	private final Knowledges knowledges;
 
-	public SNPickFacility(String[] factypes, NetworkLayer network, PersonalizableTravelCost tcost, PersonalizableTravelTime ttime, Knowledges knowledges, SocNetConfigGroup snConfig){
+	public SNPickFacility(String[] factypes, NetworkImpl network, PersonalizableTravelCost tcost, PersonalizableTravelTime ttime, Knowledges knowledges, SocNetConfigGroup snConfig){
 		weights = snConfig.getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
@@ -204,7 +204,7 @@ public class SNPickFacility implements PlanAlgorithm {
 			}
 
 			if(changed){
-				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity(f.getActivityOptions().get(factype));
+				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity((ActivityOptionImpl) f.getActivityOptions().get(factype));
 //				System.out.println(" Activity locatoin changed this many activities:"+k.getActivities().size());
 				//		 loop over all <leg>s, remove route-information
 				List<? extends PlanElement> bestactslegs = newPlan.getPlanElements();
@@ -215,7 +215,7 @@ public class SNPickFacility implements PlanAlgorithm {
 //				Reset the score.
 //				newPlan.setScore(null);
 
-				new PersonPrepareForSim(new PlansCalcRoute(null, network, tcost, ttime, new DijkstraFactory()), (NetworkLayer) network).run(newPlan.getPerson());
+				new PersonPrepareForSim(new PlansCalcRoute(null, network, tcost, ttime, new DijkstraFactory()), (NetworkImpl) network).run(newPlan.getPerson());
 //				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
 
 //				Not needed with new change to Act --> Facility JH 7.2008

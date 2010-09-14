@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -55,7 +55,7 @@ public class RandomDijkstraRoute extends SimpleRouter {
 		super(network);
 		this.travelCost = travelCost;
 		this.travelTime = travelTime;
-		this.leastCostPathCalculator = new CloningDijkstraFactory().createPathCalculator((NetworkLayer)network, travelCost, travelTime);
+		this.leastCostPathCalculator = new CloningDijkstraFactory().createPathCalculator((NetworkImpl)network, travelCost, travelTime);
 	}
 	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)

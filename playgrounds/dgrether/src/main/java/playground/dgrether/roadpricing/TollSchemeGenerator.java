@@ -45,6 +45,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -145,7 +146,7 @@ public class TollSchemeGenerator {
 
 	private Config config;
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 
 	private Coord[] usedCoords;
 
@@ -195,7 +196,7 @@ public class TollSchemeGenerator {
 
 		//do something
 		//filter the network with polygon
-		NetworkLayer tollNetwork = this.createTollScheme(this.config);
+		NetworkImpl tollNetwork = this.createTollScheme(this.config);
 		//filter the highway links explicitly
 //		tollNetwork = this.applyLinkIdFilter(tollNetwork, linkIdsToFilter);
 		//filter the highways by capacity
@@ -214,7 +215,7 @@ public class TollSchemeGenerator {
 
 	}
 
-	private void writeShapeFile(NetworkLayer network, Coord [] coords) {
+	private void writeShapeFile(NetworkImpl network, Coord [] coords) {
 		new ShapeFileNetworkWriter().writeNetwork(network, usedGisOut + "Network.shp");
 		new ShapeFilePolygonWriter().writePolygon(coords, usedGisOut + "MoutArea.shp");
 	}
@@ -242,12 +243,12 @@ public class TollSchemeGenerator {
 		return tollNetwork;
 	}
 
-	private NetworkLayer createTollScheme(Config config) {
+	private NetworkImpl createTollScheme(Config config) {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadNetwork();
 		this.network = loader.getScenario().getNetwork();
 
-		NetworkLayer net = filterNetwork(this.network, false);
+		NetworkImpl net = filterNetwork(this.network, false);
 		log.info("Filtered the network, filtered network layer contains "
 				+ net.getLinks().size() + " links.");
 		return net;
@@ -264,7 +265,7 @@ public class TollSchemeGenerator {
 		log.info("RoadPricingScheme written to: "  + this.usedSchemeOut);
 	}
 
-	private RoadPricingScheme createRoadPricingScheme(NetworkLayer tollNetwork) {
+	private RoadPricingScheme createRoadPricingScheme(NetworkImpl tollNetwork) {
 		RoadPricingScheme scheme = new RoadPricingScheme();
 		for (Link l : tollNetwork.getLinks().values()) {
 			scheme.addLink(l.getId());
@@ -301,7 +302,7 @@ public class TollSchemeGenerator {
 
 
 
-	private void writeKml(NetworkLayer net, String filename) {
+	private void writeKml(NetworkImpl net, String filename) {
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
 		KmlType mainKml;
@@ -366,8 +367,8 @@ public class TollSchemeGenerator {
 		log.info("Network written to kmz!");
 	}
 
-	private NetworkLayer filterNetwork(final NetworkLayer net, boolean full) {
-		NetworkLayer n = new NetworkLayer();
+	private NetworkImpl filterNetwork(final NetworkImpl net, boolean full) {
+		NetworkImpl n = NetworkImpl.createNetwork();
 		GeometryFactory geofac = new GeometryFactory();
 		Coordinate[] geoToolCoords = new Coordinate[this.usedCoords.length];
 		int i = 0;

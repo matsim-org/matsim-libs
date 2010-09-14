@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -106,7 +106,7 @@ public class NewMultiModalNetworkWithoutBusLink {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
 
-		NetworkLayer multiModalNetwork = scenario.getNetwork();
+		NetworkImpl multiModalNetwork = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(multiModalNetworkFile);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();

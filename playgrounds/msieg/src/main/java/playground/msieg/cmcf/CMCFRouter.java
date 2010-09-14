@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.xml.sax.SAXException;
@@ -51,7 +51,7 @@ public abstract class CMCFRouter {
 	private final String networkFile, plansFile, cmcfFile;
 
 	private final ScenarioImpl scenario;
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 	protected Population population;
 	protected PathFlow<Node, Link> pathFlow;
 

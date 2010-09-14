@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
@@ -69,7 +69,7 @@ public class StripPersonPlan extends NewPopulation {
 		String inPlansFile = "./plans3.xml.gz";
 		String outPlansFile = "./plans3_stripped.xml.gz";
 
-		NetworkLayer net = sc.getNetwork();
+		NetworkImpl net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();

@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -53,7 +54,7 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		ktiConfigGroup.setIntrazonalPtSpeed(10.0);
 		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
 
-		NetworkLayer dummyNetwork = new NetworkLayer();
+		NetworkImpl dummyNetwork = NetworkImpl.createNetwork();
 		dummyNetwork.createAndAddNode(new IdImpl("1000"), new CoordImpl(900.0, 900.0));
 		dummyNetwork.createAndAddNode(new IdImpl("1001"), new CoordImpl(3200.0, 3200.0));
 

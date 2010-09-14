@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -44,7 +44,7 @@ public class CountsCapacityComparison {
 		final String outputFilename = "../matsimTests/countsCapacityComparison/output_zurich.txt";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Counts counts = new Counts();

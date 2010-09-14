@@ -69,7 +69,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			for (int k=0;k<probs.length;k++) {
 				if (r<=probs [k]) {
 					Link l = this.controler.getNetwork().getLinks().get(newLinkIds.get(k));
-					((ActivityFacilityImpl) f).moveTo(l.getCoord());
+					((ActivityFacilityImpl) f).setCoord(l.getCoord());
 					this.movedFacilities.put(f.getId(),f);
 				}
 			}

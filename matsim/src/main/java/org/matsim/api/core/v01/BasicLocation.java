@@ -24,10 +24,8 @@ package org.matsim.api.core.v01;
 /**
  * @author dgrether
  */
-public interface BasicLocation {
+public interface BasicLocation extends Identifiable {
 
 	public Coord getCoord();
-
-//	public void setCoord( Coord coord ) ;
 
 }

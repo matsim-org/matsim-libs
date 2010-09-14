@@ -20,7 +20,7 @@ package playground.dgrether.analysis.gis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 
 /**
@@ -41,14 +41,14 @@ public class ShapeFileNetworkWriter {
 	
 	public void writeNetwork(String network, String outfile) {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer net = scenario.getNetwork();
+		NetworkImpl net = scenario.getNetwork();
 		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
 		reader.readFile(network);
 		writeNetwork(net, outfile);
 	}
 	
 	
-	public void writeNetwork(NetworkLayer network, String outfile) {
+	public void writeNetwork(NetworkImpl network, String outfile) {
 		//uncomment the following lines to let the tool work
 //		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 //		MATSimNet2QGIS.setFlowCapFactor(0.1);

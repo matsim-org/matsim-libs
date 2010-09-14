@@ -191,11 +191,6 @@ public class NeoBatchNetworkImpl implements Network {
 		}
 
 		@Override
-		public Layer getLayer() {
-			throw new RuntimeException();
-		}
-
-		@Override
 		public Coord getCoord() {
 			throw new RuntimeException();
 		}

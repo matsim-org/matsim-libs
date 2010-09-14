@@ -37,7 +37,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData.LinkInfo;
@@ -60,10 +60,10 @@ public class NodeCostShapeCreator {
 	private final Map<Id, LinkInfo> links;
 	private FeatureType ftPoint;
 	private Collection<Feature> pointFeatures;
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 
 	public NodeCostShapeCreator(final Map<Id, LinkInfo> lis,
-			final CoordinateReferenceSystem crs, NetworkLayer network) {
+			final CoordinateReferenceSystem crs, NetworkImpl network) {
 		this.targetCRS = crs;
 		this.links = lis;
 		this.network = network;

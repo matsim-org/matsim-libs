@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
@@ -30,7 +30,7 @@ public class TransitLineFilter {
 		final String[] linesArray = {"S45", "S46", "S47", "BVU----U7", "BVU----U8", "BVB----M11", "BVB----M29", "BVB----M41", "BVB----M44", "BVB----M46", "BVB----X11", "BVB----104",  "BVB----167", "BVB----170",  "BVB----171", "BVB----172", "BVB----181", "BVB----194", "BVB----246", "BVB----277", "BVB----344", "735", "736",  "BVB----N8"};
 		
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		TransitSchedule filteredTransitSchedule = builder.createTransitSchedule();

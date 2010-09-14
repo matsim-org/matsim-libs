@@ -56,7 +56,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public TimeVariantLinkImpl(final Id id, final Node from, final Node to, final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
+	public TimeVariantLinkImpl(final Id id, final Node from, final Node to, final NetworkImpl network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(id, from, to, network, length, freespeed, capacity, lanes);
 	}
 
@@ -173,7 +173,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		int key = Arrays.binarySearch(this.aFlowCapacityTimes, time);
 		key = key >= 0 ? key : -key - 2;
 
-		double capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+		double capacityPeriod = getCapacityPeriod();
 		return this.aFlowCapacityValues[key] * capacityPeriod;
 	}
 
@@ -234,7 +234,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		this.aFlowCapacityTimes = new double [this.aFlowCapacityEvents];
 		this.aFlowCapacityValues = new double [this.aFlowCapacityEvents];
 		this.aFlowCapacityTimes[0] = Double.NEGATIVE_INFINITY;
-		double capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+		double capacityPeriod = getCapacityPeriod();
 		this.aFlowCapacityValues[0] = this.capacity / capacityPeriod;
 
 		int numEvent = 0;

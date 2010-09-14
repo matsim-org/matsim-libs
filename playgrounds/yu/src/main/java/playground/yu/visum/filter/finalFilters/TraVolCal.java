@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.yu.visum.writer.UserDefAtt;
 
@@ -68,7 +68,7 @@ public class TraVolCal extends FinalEventFilterA {
 	 * @param network -
 	 *            a NetworkLayer-object in the simulation
 	 */
-	public TraVolCal(final Population plans, final NetworkLayer network) {
+	public TraVolCal(final Population plans, final NetworkImpl network) {
 		super(plans, network);
 	}
 

@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
@@ -47,7 +47,7 @@ public class Main {
 		transitScheduleFile  = 	"src/playground/marcel/pt/demo/equilnet/transitSchedule.xml";
 		*/
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		PTActWriter ptActWriter;
@@ -138,7 +138,7 @@ public class Main {
 				break;
 			case 9:
 				/**Counts nodes, transfer links*/
-				NetworkLayer logicNetwork=logicFactory.getLogicNet();
+				NetworkImpl logicNetwork=logicFactory.getLogicNet();
 
 				int transfers=0;
 				int standard=0;

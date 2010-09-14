@@ -46,7 +46,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -73,7 +73,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 	private final static double MIN_Y = 9892835;
 
 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final String eventsFile;
 	private double oldTime = 3 * 3600;
 
@@ -84,7 +84,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 	private FeatureType ft;
 	private final Concaver concaver;
 
-	public StaticSnapshotGenerator(final NetworkLayer network, final String inputFile, final String shapeFilePrefix, final CoordinateReferenceSystem targetCRS) {
+	public StaticSnapshotGenerator(final NetworkImpl network, final String inputFile, final String shapeFilePrefix, final CoordinateReferenceSystem targetCRS) {
 		this.network = network;
 		this.eventsFile = inputFile;
 		this.shapeFilePrefix = shapeFilePrefix;
@@ -202,7 +202,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 
 		final String shapeFilePrefix =  CVSROOT + "/runs/run314/qgis/evacProgress";
 
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 
 		final CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM47S);

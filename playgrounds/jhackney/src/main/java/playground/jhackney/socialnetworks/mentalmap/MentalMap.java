@@ -117,7 +117,8 @@ public class MentalMap {
 					// Else the activity is null and we choose an activity to assign to the act
 					Link myLink = this.network.getLinks().get(myAct.getLinkId());
 					// These Locations are facilities by the new convention
-					Collection<MappedLocation> locations = ((LinkImpl) myLink).getUpMapping().values();
+					// Collection<MappedLocation> locations = ((LinkImpl) myLink).getUpMapping().values();
+					Collection<MappedLocation> locations = null;
 					// These Objects are facilities by convention
 					Object[] facs =  locations.toArray();
 					// Assign a random activity (a facility) on the link to the act
@@ -125,7 +126,7 @@ public class MentalMap {
 					while(myActivity==null){
 						int k = MatsimRandom.getRandom().nextInt(facs.length);
 						ActivityFacilityImpl f = (ActivityFacilityImpl) facs[k];
-						myActivity = f.getActivityOptions().get(myAct.getType());
+						myActivity = (ActivityOptionImpl) f.getActivityOptions().get(myAct.getType());
 						if(myActivity!=null){
 							myAct.setFacilityId(myActivity.getFacility().getId());
 							//TODO JH add logic to label this activity primary or secondary

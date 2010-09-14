@@ -2,6 +2,7 @@ package playground.rost.eaflow.TestNetworks;
 
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -9,7 +10,7 @@ public class TestNetwork {
 	public static NetworkWithDemands getSimple1SourceForwardNetwork()
 	{
 		//create network
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		network.createAndAddNode(new IdImpl("source"), new CoordImpl(0,0));
 		network.createAndAddNode(new IdImpl("between node"), new CoordImpl(1,0));
 		network.createAndAddNode(new IdImpl("superSink"), new CoordImpl(2,0));
@@ -43,7 +44,7 @@ public class TestNetwork {
 	public static NetworkWithDemands getSimple2SourceForwardNetwork()
 	{
 		//create network
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		network.createAndAddNode(new IdImpl("source1"), new CoordImpl(0,2));
 		network.createAndAddNode(new IdImpl("source2"), new CoordImpl(0,0));
 		network.createAndAddNode(new IdImpl("between node"), new CoordImpl(1,1));
@@ -89,7 +90,7 @@ public class TestNetwork {
 	public static NetworkWithDemands get2SourceNetworkWithBackwardEdgeUse()
 	{
 		//create network
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		network.createAndAddNode(new IdImpl("source1"), new CoordImpl(0,2));
 		network.createAndAddNode(new IdImpl("source2"), new CoordImpl(0,0));
 		network.createAndAddNode(new IdImpl("bAbove"), new CoordImpl(1,2));
@@ -150,7 +151,7 @@ public class TestNetwork {
 	public static NetworkWithDemands getCrazyNetwork()
 	{
 		//create network
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		network.createAndAddNode(new IdImpl("source1"), new CoordImpl(0,2));
 		network.createAndAddNode(new IdImpl("source2"), new CoordImpl(0,0));
 		network.createAndAddNode(new IdImpl("source3"), new CoordImpl(0,0));

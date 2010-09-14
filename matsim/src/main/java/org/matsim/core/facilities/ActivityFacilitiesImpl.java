@@ -25,16 +25,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.BasicLocations;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.world.LayerImpl;
-import org.matsim.world.MappedLocation;
 
-public class ActivityFacilitiesImpl extends LayerImpl implements ActivityFacilities {
+public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocations {
 
 	@Deprecated
 	public static final Id LAYER_TYPE = new IdImpl("facility");
@@ -48,12 +49,16 @@ public class ActivityFacilitiesImpl extends LayerImpl implements ActivityFacilit
 
 	private static final Logger log = Logger.getLogger(ActivityFacilitiesImpl.class);
 
+	private Map<Id, ActivityFacility> facilities = new TreeMap<Id, ActivityFacility>();
+
+	private String name;
+
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 	
 	public ActivityFacilitiesImpl(final String name) {
-		super(LAYER_TYPE, name);
+		this.name = name;
 	}
 
 	/**
@@ -68,12 +73,11 @@ public class ActivityFacilitiesImpl extends LayerImpl implements ActivityFacilit
 	//////////////////////////////////////////////////////////////////////
 
 	public final ActivityFacilityImpl createFacility(final Id id, final Coord center) {
-		if (this.getLocations().containsKey(id)) {
+		if (facilities.containsKey(id)) {
 			Gbl.errorMsg("Facility id=" + id + " already exists.");
 		}
-		ActivityFacilityImpl f = new ActivityFacilityImpl(this,id,center);
-		Map<Id,MappedLocation> locations = (Map<Id, MappedLocation>) this.getLocations();
-		locations.put(f.getId(),f);
+		ActivityFacilityImpl f = new ActivityFacilityImpl(id,center,null);
+		facilities.put(f.getId(),f);
 
 		// show counter
 		this.counter++;
@@ -89,18 +93,17 @@ public class ActivityFacilitiesImpl extends LayerImpl implements ActivityFacilit
 		throw new UnsupportedOperationException( "The factory for facilities needs to be implemented.  kai, jul09" ) ; 
 	}
 
-	@SuppressWarnings("unchecked")
-	public final Map<Id, ActivityFacilityImpl> getFacilities() {
-		return (Map<Id, ActivityFacilityImpl>) getLocations();
+	public final Map<Id, ActivityFacility> getFacilities() {
+		return facilities;
 	}
 
 	//Added 27.03.08 JH for random secondary location changes
-	public final TreeMap<Id,ActivityFacilityImpl> getFacilitiesForActivityType(final String act_type) {
-		TreeMap<Id,ActivityFacilityImpl> facs = new TreeMap<Id, ActivityFacilityImpl>();
-		Iterator<? extends ActivityFacilityImpl> iter = this.getFacilities().values().iterator();
+	public final TreeMap<Id, ActivityFacility> getFacilitiesForActivityType(final String act_type) {
+		TreeMap<Id,ActivityFacility> facs = new TreeMap<Id, ActivityFacility>();
+		Iterator<ActivityFacility> iter = this.facilities.values().iterator();
 		while (iter.hasNext()){
-			ActivityFacilityImpl f = iter.next();
-			Map<String, ActivityOptionImpl> a = f.getActivityOptions();
+			ActivityFacility f = iter.next();
+			Map<String, ? extends ActivityOption> a = f.getActivityOptions();
 			if(a.containsKey(act_type)){
 				facs.put(f.getId(),f);
 			}
@@ -108,11 +111,21 @@ public class ActivityFacilitiesImpl extends LayerImpl implements ActivityFacilit
 		return facs;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
-
 	public final void printFacilitiesCount() {
 		log.info("    facility # " + this.counter);
 	}
+
+	@Override
+	public BasicLocation getLocation(Id locationId) {
+		return getFacilities().get(locationId);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 }

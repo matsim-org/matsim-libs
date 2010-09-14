@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -52,7 +52,7 @@ public class CMCFPlanSplitter {
 	 */
 	public static void main(final String[] args) {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer net = scenario.getNetwork();
+		NetworkImpl net = scenario.getNetwork();
 		MatsimIo.loadNetwork(DgPaths.IVTCHNET, scenario);
 //		Plans plansCmcf = MatsimIo.loadPlans(cmcfPlansFile);
 		Population plans = MatsimIo.loadPlans(plansFile, net);

@@ -3,36 +3,43 @@ package org.matsim.population.algorithms;
 import java.util.List;
 
 import org.junit.Ignore;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.world.Layer;
-import org.matsim.world.Location;
 
 @Ignore
 public class TestsUtil {
 
-	static PlanImpl createPlan(Layer layer, PersonImpl person, String mode,
-			String facString, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+	static PlanImpl createPlanFromFacilities(ActivityFacilitiesImpl layer, PersonImpl person, String mode, String facString) {
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
-			Location location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
+			BasicLocation location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
 			ActivityImpl act;
-			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
-				act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
-				act.setFacilityId(location.getId());
-			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
-				act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], location.getId());
-			} else {
-				throw new RuntimeException("Unknown tripStrucureAnalysisLayerOption");
+			act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
+			act.setFacilityId(location.getId());
+			act.setEndTime(10*3600);
+			if (aa != (locationIdSequence.length - 1)) {
+				plan.createAndAddLeg(mode);
 			}
+		}
+		return plan;
+	}
+
+	static PlanImpl createPlanFromLinks(NetworkImpl layer, PersonImpl person, String mode, String linkString) {
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		String[] locationIdSequence = linkString.split(" ");
+		for (int aa=0; aa < locationIdSequence.length; aa++) {
+			BasicLocation location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
+			ActivityImpl act;
+			act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], location.getId());
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {
 				plan.createAndAddLeg(mode);

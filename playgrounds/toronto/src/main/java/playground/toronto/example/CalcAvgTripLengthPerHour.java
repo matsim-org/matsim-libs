@@ -31,7 +31,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 /**
  * Calculates the average length of all trips started in a hour.
@@ -48,9 +48,9 @@ public class CalcAvgTripLengthPerHour implements AgentDepartureEventHandler, Age
 	private Map<Id, Double> travelStartPerAgent = new HashMap<Id, Double>(1000);
 	private Map<Id, Double> travelDistancePerAgent = new HashMap<Id, Double>(1000);
 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 
-	public CalcAvgTripLengthPerHour(final NetworkLayer network) {
+	public CalcAvgTripLengthPerHour(final NetworkImpl network) {
 		this.network = network;
 	}
 

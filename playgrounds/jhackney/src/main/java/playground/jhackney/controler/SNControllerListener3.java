@@ -41,9 +41,9 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.SocNetConfigGroup;
 import playground.jhackney.activitySpaces.ActivitySpaces;
@@ -142,7 +142,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		this.snConfig = (SocNetConfigGroup) event.getControler().getConfig().getModule(SocNetConfigGroup.GROUP_NAME);
 		this.knowledges = (controler.getScenario()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
-		new WorldConnectLocations(this.controler.getConfig()).run(event.getControler().getScenario().getWorld());
+		//new WorldConnectLocations(this.controler.getConfig()).run(event.getControler().getScenario().getWorld());
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 

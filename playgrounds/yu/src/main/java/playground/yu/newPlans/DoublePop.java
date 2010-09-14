@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 
@@ -105,7 +105,7 @@ public class DoublePop extends NewPopulation {
 
 		ScenarioImpl s = new ScenarioImpl();
 
-		NetworkLayer network = s.getNetwork();
+		NetworkImpl network = s.getNetwork();
 		new MatsimNetworkReader(s).readFile(networkFilename);
 
 		Population population = s.getPopulation();

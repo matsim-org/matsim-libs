@@ -33,13 +33,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ImportSimpleNetwork {
 
-	private NetworkLayer _network = null;
+	private NetworkImpl _network = null;
 	private HashMap<Node, Integer> _demands = null;
 	private HashMap<Integer, Node> _newnodes = null;
 	private String _filename; 
@@ -53,7 +54,7 @@ public class ImportSimpleNetwork {
 		_filename = filename;
 	}
 	
-	public NetworkLayer getNetwork() throws IOException {
+	public NetworkImpl getNetwork() throws IOException {
 		if (_network == null) {
 		  readSimpleNetwork(_filename);
 		}
@@ -69,7 +70,7 @@ public class ImportSimpleNetwork {
 	private void readSimpleNetwork(final String filename) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		
-		_network = new NetworkLayer();
+		_network = NetworkImpl.createNetwork();
 		_network.setCapacityPeriod(1.0);
 		_demands = new HashMap<Node, Integer>();
 		_newnodes = new HashMap<Integer,Node>();

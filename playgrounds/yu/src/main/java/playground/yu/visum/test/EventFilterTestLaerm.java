@@ -28,7 +28,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -46,7 +46,7 @@ public class EventFilterTestLaerm {
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		// network
 		System.out.println("  creating network object... ");
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		System.out.println("  done.");
 
 		System.out.println("  reading network file... ");

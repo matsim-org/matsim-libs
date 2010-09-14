@@ -135,7 +135,7 @@ public class SpatialInteractorActs {
 			for (PlanElement pe : plan1.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act1 = (Activity) pe;
-					ActivityOptionImpl activity1=((ActivityFacilityImpl) this.facilities.getFacilities().get(act1.getFacilityId())).getActivityOptions().get(act1.getType());
+					ActivityOptionImpl activity1=(ActivityOptionImpl) ((ActivityFacilityImpl) this.facilities.getFacilities().get(act1.getFacilityId())).getActivityOptions().get(act1.getType());
 					ArrayList<Person> actList=new ArrayList<Person>();
 
 					if(!activityMap.keySet().contains(activity1)){

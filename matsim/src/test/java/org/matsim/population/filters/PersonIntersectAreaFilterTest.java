@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -47,7 +48,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 	public void testFilter() throws Exception {
 		/* create a simple network where agents can drive from the lower left
 		 * to the upper right */
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node0 = network.createAndAddNode(new IdImpl("0"), new CoordImpl(0, 0));
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(10, 10));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(90, 10));

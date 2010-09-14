@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -41,7 +41,7 @@ public class MkLinkStats {
 		
 		ScenarioImpl scenario = new ScenarioLoaderImpl(outDir + "/output_config.xml.gz").getScenario();
 		
-		NetworkLayer netzzz = scenario.getNetwork();
+		NetworkImpl netzzz = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(net);
 		
 		EventsManagerImpl events = new EventsManagerImpl();

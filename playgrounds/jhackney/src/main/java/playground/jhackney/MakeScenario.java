@@ -27,12 +27,12 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.world.algorithms.WorldConnectLocations;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 import playground.jhackney.algorithms.PersonSetActToLinkWithNonNullFacility;
 
@@ -62,7 +62,7 @@ public class MakeScenario {
 
 		System.out.println("  reading the network xml file...");
 //		NetworkLayer network = null;
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -90,7 +90,7 @@ public class MakeScenario {
 
 		//////////////////////////////////////////////////////////////////////
 		System.out.println("  Completing World ... ");
-		new WorldConnectLocations(config).run(scenario.getWorld());
+		//new WorldConnectLocations(config).run(scenario.getWorld());
 		System.out.println("  done.");
 		//////////////////////////////////////////////////////////////////////
 

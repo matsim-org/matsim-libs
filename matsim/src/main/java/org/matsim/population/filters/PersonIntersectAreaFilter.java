@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.world.WorldUtils;
 
 /**
  * Filters all persons out whose routes do not lead at least once through
@@ -138,7 +138,7 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 			toCoord = this.network.getLinks().get(toAct.getLinkId()).getCoord();
 		}
 
-		return (WorldUtils.distancePointLinesegment(fromCoord, toCoord, this.aoiCenter) <= this.aoiRadius);
+		return (CoordUtils.distancePointLinesegment(fromCoord, toCoord, this.aoiCenter) <= this.aoiRadius);
 	}
 
 }

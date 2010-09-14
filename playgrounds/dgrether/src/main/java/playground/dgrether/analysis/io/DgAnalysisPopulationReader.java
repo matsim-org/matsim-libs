@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
@@ -47,7 +47,7 @@ public class DgAnalysisPopulationReader {
 
 	private static final Logger log = Logger.getLogger(DgAnalysisPopulationReader.class);
 
-	private Map<String, NetworkLayer> loadedNetworks = new HashMap<String, NetworkLayer>();
+	private Map<String, NetworkImpl> loadedNetworks = new HashMap<String, NetworkImpl>();
 
 	
 	private List<DgAnalysisReaderFilter> filterList = null;
@@ -58,7 +58,7 @@ public class DgAnalysisPopulationReader {
 	public DgAnalysisPopulation readAnalysisPopulation(DgAnalysisPopulation analysisPopulation, final Id runId, final String networkPath, final String firstPlanPath) {
 		ScenarioImpl sc = new ScenarioImpl();
 		Population population;
-		NetworkLayer net;
+		NetworkImpl net;
 		if (this.loadedNetworks.containsKey(networkPath)){
 			net = loadedNetworks.get(networkPath);
 			sc.setNetwork(net);

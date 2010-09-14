@@ -26,7 +26,7 @@ package playground.yu.newNetwork;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 
 /**
@@ -44,7 +44,7 @@ public class NetworkFreeSpeedAdapter {
 		// String logFilename = "output/Toronto/FreeSpeedAdaptor.log";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetFilename);
 
 		// try {

@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -28,7 +28,7 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 public class PTRouter{
-	private NetworkLayer logicNet;
+	private NetworkImpl logicNet;
 	//private MultiNodeDijkstra multiNodeDijkstra;
 	private LeastCostPathCalculator myDijkstra;
 	private TravelCost ptTravelCost;
@@ -42,7 +42,7 @@ public class PTRouter{
 	final String DESTINATION_ID = "W2";
 
 
-	public PTRouter(final NetworkLayer logicNet) {
+	public PTRouter(final NetworkImpl logicNet) {
 		init(logicNet);
 	}
 
@@ -50,7 +50,7 @@ public class PTRouter{
 		init(new LogicFactory(schedule).getLogicNet());
 	}
 
-	private final void init(final NetworkLayer logicNet){
+	private final void init(final NetworkImpl logicNet){
 		this.logicNet = logicNet;
 		this.ptTravelTime =new PTTravelTime();
 		this.ptTravelCost = new PTTravelCost(ptTravelTime);

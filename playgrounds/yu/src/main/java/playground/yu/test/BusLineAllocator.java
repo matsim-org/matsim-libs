@@ -50,7 +50,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -866,7 +865,7 @@ public class BusLineAllocator {
 		}
 
 		ScenarioImpl carScenario = new ScenarioImpl();
-		NetworkLayer carNet = carScenario.getNetwork();
+		NetworkImpl carNet = carScenario.getNetwork();
 		new MatsimNetworkReader(carScenario).readFile(carNetFile);
 
 		BusLineAllocator busLineAllocator = new BusLineAllocator(carNet,

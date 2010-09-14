@@ -1,6 +1,7 @@
 package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
@@ -11,7 +12,7 @@ import playground.mrieser.pt.utils.MergeNetworks;
 public class CreateMultimodalNet {
 
 	public void run(ScenarioImpl scenario, final String outputFile) {
-		NetworkLayer ptNetwork = new NetworkLayer();
+		NetworkImpl ptNetwork = NetworkImpl.createNetwork();
 		new CreatePseudoNetwork(scenario.getTransitSchedule(), ptNetwork, "tr_").createNetwork();
 		MergeNetworks.merge(scenario.getNetwork(), "", ptNetwork, "", scenario.getNetwork());
 		new NetworkWriter(scenario.getNetwork()).write(outputFile);

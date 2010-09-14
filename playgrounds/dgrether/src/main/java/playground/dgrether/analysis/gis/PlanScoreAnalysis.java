@@ -45,7 +45,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.opengis.referencing.FactoryException;
@@ -140,7 +140,7 @@ public class PlanScoreAnalysis {
 
 	private void doAnalysis() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer net = scenario.getNetwork();
+		NetworkImpl net = scenario.getNetwork();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(NETWORK);
 //		Gbl.getWorld().setNetworkLayer(net);

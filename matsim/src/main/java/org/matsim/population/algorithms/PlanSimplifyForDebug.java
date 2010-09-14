@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -65,7 +65,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 
-	public PlanSimplifyForDebug(final NetworkLayer network) {
+	public PlanSimplifyForDebug(final NetworkImpl network) {
 		this.homeActs = new HashSet<String>();
 		// this.homeActs.add("h0.5");
 

@@ -14,8 +14,7 @@ public class FacilityRetailersImpl extends ActivityFacilityImpl {
 	private static final long serialVersionUID = 1L;
 
 	protected FacilityRetailersImpl(ActivityFacilitiesImpl layer, Id id, Coord center) {
-		super(layer, id, center);
-		// TODO Auto-generated constructor stub
+		super(id, center, null);
 	}
 
 	private int score;

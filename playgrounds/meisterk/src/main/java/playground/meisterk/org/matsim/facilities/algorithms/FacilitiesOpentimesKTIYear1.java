@@ -26,8 +26,10 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
@@ -45,11 +47,11 @@ public class FacilitiesOpentimesKTIYear1 {
 
 		this.loadOpeningTimes();
 
-		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			Iterator<ActivityOptionImpl> a_it = f.getActivityOptions().values().iterator();
+		for (ActivityFacility f : facilities.getFacilities().values()) {
+			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 
-				ActivityOptionImpl a = a_it.next();
+				ActivityOptionImpl a = (ActivityOptionImpl) a_it.next();
 				String actType = a.getType();
 
 				// delete all existing open times info

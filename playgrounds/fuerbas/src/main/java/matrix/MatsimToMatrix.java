@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.johannes.socialnetworks.graph.matrix.EdgeCostFunction;
 import playground.johannes.socialnetworks.graph.matrix.MatrixCentrality;
@@ -48,7 +48,7 @@ public class MatsimToMatrix {
 	public static void main(String args[]) throws IOException {
 	
 	Scenario scenario = new ScenarioImpl();
-	NetworkLayer network = (NetworkLayer) scenario.getNetwork();
+	NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 	new MatsimNetworkReader(scenario).readFile(args[0]);
 	BufferedWriter bwLinks = new BufferedWriter(new FileWriter(args[1]));	// Output Directory for List of Links
 	BufferedWriter bwBetw = new BufferedWriter(new FileWriter(args[2]));	//Output Directory for Betweenness Calculation Results

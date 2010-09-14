@@ -113,12 +113,12 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 
 				// home facility creation
 				Coord coord = new CoordImpl(entries[CAtts.I_XACH],entries[CAtts.I_YACH]);
-				ActivityFacilityImpl f = facilities.getFacilities().get(f_id);
+				ActivityFacilityImpl f = (ActivityFacilityImpl) facilities.getFacilities().get(f_id);
 				if (f == null) {
 					// create new home facility id
 					f = facilities.createFacility(f_id,coord);
 					ActivityOptionImpl act = f.createActivityOption(CAtts.ACT_HOME);
-					act.setCapacity(1);
+					act.setCapacity((double) 1);
 
 					// store some info
 					home_fac_cnt++;
@@ -133,7 +133,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 					}
 
 					// add 1 to capacity
-					ActivityOptionImpl act = f.getActivityOptions().get(CAtts.ACT_HOME);
+					ActivityOptionImpl act = (ActivityOptionImpl) f.getActivityOptions().get(CAtts.ACT_HOME);
 					act.setCapacity(act.getCapacity()+1);
 
 					// store some info

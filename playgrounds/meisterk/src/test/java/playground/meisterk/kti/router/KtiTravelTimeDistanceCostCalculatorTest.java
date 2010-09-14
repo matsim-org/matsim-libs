@@ -30,6 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
@@ -45,13 +46,13 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 	private static final Id TEST_LINK_ID = new IdImpl(1);
 	private static final Id DUMMY_PERSON_ID = new IdImpl(1000);
 	
-	private NetworkLayer network = null;
+	private NetworkImpl network = null;
 	private KtiTravelTimeDistanceCostCalculator testee = null;
 	private EventsManager events = null;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.network = new NetworkLayer();
+		this.network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(1000.0, 1000.0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(2000.0, 1000.0));
 		network.createAndAddLink(TEST_LINK_ID, node1, node2, 1000.0, 50.0/3.6, 2000.0, 1);

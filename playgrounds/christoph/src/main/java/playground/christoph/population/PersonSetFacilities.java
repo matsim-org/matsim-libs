@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -81,7 +82,7 @@ public class PersonSetFacilities extends AbstractPersonAlgorithm implements Plan
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -100,7 +101,7 @@ public class PersonSetFacilities extends AbstractPersonAlgorithm implements Plan
 		this.leisureQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		this.ttaQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		
-		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOptions().get(HOME) != null) {
 				this.homeQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}

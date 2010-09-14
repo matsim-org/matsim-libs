@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 
 import playground.rost.graph.block.Block;
@@ -53,7 +53,7 @@ public class BlockCreator {
 
 	private static final Logger log = Logger.getLogger(BlockCreator.class);
 
-	public NetworkLayer network;
+	public NetworkImpl network;
 
 	public Map<Node, Integer> demandMap = new HashMap<Node, Integer>();
 
@@ -74,7 +74,7 @@ public class BlockCreator {
 	public double areaBlockSum;
 	public double areaBorder;
 
-	public BlockCreator(NetworkLayer network)
+	public BlockCreator(NetworkImpl network)
 	{
 		PropertyConfigurator.configure(PathTracker.resolve("distriLogger"));
 		this.network = network;

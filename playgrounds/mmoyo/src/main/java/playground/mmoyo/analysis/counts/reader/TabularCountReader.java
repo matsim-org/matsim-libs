@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -48,7 +48,7 @@ public class TabularCountReader implements TabularFileHandler {
 
 	private void setTransitSchedule(final String transitScheddulePath, final String ptNetworkPath){
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		this.transitSchedule = builder.createTransitSchedule();
 

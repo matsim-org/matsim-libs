@@ -36,7 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 
 import playground.anhorni.choiceSetGeneration.choicesetextractors.ExtractChoiceSetsRouting;
@@ -66,7 +66,7 @@ public class GenerateChoiceSets {
 	private Config config = null;
 	private Population choiceSetPopulation = scenario.getPopulation();
 
-	private final NetworkLayer network = (NetworkLayer) scenario.getNetwork();
+	private final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 	//private TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<ZHFacility>>();
 
 	private ZHFacilities zhFacilities;

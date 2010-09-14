@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 
@@ -63,7 +63,7 @@ public class Simplifier {
 						if(inLink != null && outLink != null){
 							if(!outLink.getToNode().equals(inLink.getFromNode())){
 								if(bothLinksHaveSameLinkStats(inLink, outLink)){
-									LinkImpl newLink = ((NetworkLayer) network).createAndAddLink(
+									LinkImpl newLink = ((NetworkImpl) network).createAndAddLink(
 											new IdImpl(inLink.getId() + "-" + outLink.getId()),
 											inLink.getFromNode(),
 											outLink.getToNode(),

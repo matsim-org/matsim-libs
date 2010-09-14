@@ -27,8 +27,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -88,7 +90,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOptions().get(SHOP) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -102,9 +104,9 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.shopFacQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
-		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOptions().get(SHOP) != null) {
-				this.shopFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
+				this.shopFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacilityImpl) f);
 			}
 		}
 		System.out.println("      done.");
@@ -118,7 +120,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOptions().get(LEISURE) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -132,9 +134,9 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.leisFacQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
-		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOptions().get(LEISURE) != null) {
-				this.leisFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
+				this.leisFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacilityImpl) f);
 			}
 		}
 		System.out.println("      done.");
@@ -148,7 +150,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOptions().get(EDUCATION) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -162,9 +164,9 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.educFacQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
-		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOptions().get(EDUCATION) != null) {
-				this.educFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
+				this.educFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacilityImpl) f);
 			}
 		}
 		System.out.println("      done.");
@@ -195,18 +197,19 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		int[] dist_sum = new int[fs.size()];
 		Iterator<ActivityFacilityImpl> f_it = fs.iterator();
 		ActivityFacilityImpl f = f_it.next();
-		dist_sum[i] = f.getActivityOptions().get(act_type).getCapacity().intValue();
+		ActivityOptionImpl activityOption = (ActivityOptionImpl) f.getActivityOptions().get(act_type);
+		dist_sum[i] = activityOption.getCapacity().intValue();
 		if ((dist_sum[i] == 0) || (dist_sum[i] == Integer.MAX_VALUE)) {
 			dist_sum[i] = 1;
-			f.getActivityOptions().get(act_type).setCapacity(1);
+			activityOption.setCapacity((double) 1);
 		}
 		while (f_it.hasNext()) {
 			f = f_it.next();
 			i++;
-			int val = f.getActivityOptions().get(act_type).getCapacity().intValue();
+			int val = activityOption.getCapacity().intValue();
 			if ((val == 0) || (val == Integer.MAX_VALUE)) {
 				val = 1;
-				f.getActivityOptions().get(act_type).setCapacity(1);
+				activityOption.setCapacity((double) 1);
 			}
 			dist_sum[i] = dist_sum[i-1] + val;
 		}

@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 
 /**
@@ -68,7 +69,7 @@ public class NetworkFilterManager {
 		log.info("applying filters to network...");
 		int nodeCount = 0;
 		int linkCount = 0;
-		NetworkLayer net = new NetworkLayer();
+		NetworkImpl net = NetworkImpl.createNetwork();
 		if (!this.nodeFilters.isEmpty()) {
 			for (Node n : this.network.getNodes().values()) {
 				boolean add = true;

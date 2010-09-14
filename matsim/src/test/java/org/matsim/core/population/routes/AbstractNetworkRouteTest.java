@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -45,11 +46,11 @@ public abstract class AbstractNetworkRouteTest {
 
 	static private final Logger log = Logger.getLogger(AbstractNetworkRouteTest.class);
 
-	abstract protected NetworkRoute getNetworkRouteInstance(final Id fromLinkId, final Id toLinkId, final NetworkLayer network);
+	abstract protected NetworkRoute getNetworkRouteInstance(final Id fromLinkId, final Id toLinkId, final NetworkImpl network);
 
 	@Test
 	public void testSetLinkIds() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		List<Id> links = NetworkUtils.getLinkIds("-22 2 3 24 14");
 		final Id link11 = new IdImpl("11");
 		final Id link15 = new IdImpl("15");
@@ -67,7 +68,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testSetLinks_linksNull() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id link1 = new IdImpl("1");
 		Id link4 = new IdImpl("4");
 		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
@@ -83,7 +84,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testSetLinks_AllNull() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id link1 = new IdImpl("1");
 		Id link4 = new IdImpl("4");
 		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
@@ -98,7 +99,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetDistance() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id link1 = new IdImpl("1");
 		Id link4 = new IdImpl("4");
 		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
@@ -110,7 +111,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetLinkIds() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id link1 = new IdImpl("1");
 		Id link4 = new IdImpl("4");
 		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
@@ -126,7 +127,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetSubRoute() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id id0 = new IdImpl("0");
 		Id id3 = new IdImpl("3");
 		Id id12 = new IdImpl("12");
@@ -147,7 +148,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetSubRoute_fromStart() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id id0 = new IdImpl("0");
 		Id id1 = new IdImpl("1");
 		Id id3 = new IdImpl("3");
@@ -171,7 +172,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetSubRoute_toEnd() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id id0 = new IdImpl("0");
 		Id id3 = new IdImpl("3");
 		Id id15 = new IdImpl("15");
@@ -191,7 +192,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetSubRoute_startOnly() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id id0 = new IdImpl("0");
 		Id id15 = new IdImpl("15");
 		NetworkRoute route = getNetworkRouteInstance(id0, id15, network);
@@ -206,7 +207,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetSubRoute_endOnly() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id id0 = new IdImpl("0");
 		Id id15 = new IdImpl("15");
 		NetworkRoute route = getNetworkRouteInstance(id0, id15, network);
@@ -221,7 +222,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetSubRoute_wrongStart() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id id0 = new IdImpl("0");
 		Id id1 = new IdImpl("1");
 		Id id15 = new IdImpl("15");
@@ -238,7 +239,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetSubRoute_wrongEnd() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id id1 = new IdImpl("1");
 		Id id14 = new IdImpl("14");
 		Id id15 = new IdImpl("15");
@@ -255,7 +256,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetSubRoute_sameLinks() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id id1 = new IdImpl("1");
 		Id id12 = new IdImpl("12");
 		Id id14 = new IdImpl("14");
@@ -271,7 +272,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetSubRoute_sameLinks_emptyRoute1() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id id1 = new IdImpl("1");
 		NetworkRoute route = getNetworkRouteInstance(id1, id1, network);
 		route.setLinkIds(id1, null, id1);
@@ -285,7 +286,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetSubRoute_sameLinks_emptyRoute2() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id id1 = new IdImpl("1");
 		Id id2 = new IdImpl("2");
 		NetworkRoute route = getNetworkRouteInstance(id1, id2, network);
@@ -306,7 +307,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetSubRoute_fullRoute() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id id0 = new IdImpl("0");
 		Id id4 = new IdImpl("4");
 		NetworkRoute route = getNetworkRouteInstance(id0, id4, network);
@@ -326,7 +327,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testStartAndEndOnSameLinks_setLinks() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id link = new IdImpl("3");
 		NetworkRoute route = getNetworkRouteInstance(link, link, network);
 		route.setLinkIds(link, new ArrayList<Id>(0), link);
@@ -335,7 +336,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testStartAndEndOnSubsequentLinks_setLinks() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		final Id link13 = new IdImpl("13");
 		final Id link14 = new IdImpl("14");
 		NetworkRoute route = getNetworkRouteInstance(link13, link14, network);
@@ -345,7 +346,7 @@ public abstract class AbstractNetworkRouteTest {
 
 	@Test
 	public void testVehicleId() {
-		NetworkLayer network = createTestNetwork();
+		NetworkImpl network = createTestNetwork();
 		Id link0 = new IdImpl("0");
 		Id link15 = new IdImpl("15");
 		NetworkRoute route = getNetworkRouteInstance(link0, link15, network);
@@ -357,7 +358,7 @@ public abstract class AbstractNetworkRouteTest {
 		Assert.assertNull(route.getVehicleId());
 	}
 
-	protected NetworkLayer createTestNetwork() {
+	protected NetworkImpl createTestNetwork() {
 		/*
 		 *  (11)----11---->(12)----12---->(13)----13---->(14)----14---->(15)----15---->(16)
 		 *                  |^             |^             |^
@@ -367,7 +368,7 @@ public abstract class AbstractNetworkRouteTest {
 		 *    v             v|             v|             v|
 		 *  ( 1)-----1---->( 2)-----2---->( 3)-----3---->( 4)-----4---->( 5)
 		 */
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node0 = network.createAndAddNode(new IdImpl("0"), new CoordImpl(   0, 500));
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));

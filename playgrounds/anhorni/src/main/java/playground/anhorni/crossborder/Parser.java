@@ -2,18 +2,18 @@ package playground.anhorni.crossborder;
 
 import java.util.ArrayList;
 
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 abstract class Parser {
 	
 	
 	protected ArrayList<Relation> relations;
 	protected String file;
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 
 	public Parser() {}
 	
-	public Parser(NetworkLayer network, String file) {
+	public Parser(NetworkImpl network, String file) {
 		this.relations=new ArrayList<Relation>();
 		this.file=file;
 		this.network=network;

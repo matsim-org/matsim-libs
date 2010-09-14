@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 
 public class ParkingCapacity {
@@ -22,13 +24,13 @@ public class ParkingCapacity {
 
 	public ParkingCapacity(ActivityFacilitiesImpl facilities) {
 
-		for (ActivityFacilityImpl facility : facilities.getFacilities().values()) {
+		for (ActivityFacility facility : facilities.getFacilities().values()) {
 
-			for (ActivityOptionImpl activityOption : facility.getActivityOptions().values()) {
+			for (ActivityOption activityOption : facility.getActivityOptions().values()) {
 
 				if (activityOption.getType().equalsIgnoreCase("parking")) {
 					facilityCapacity.put(facility.getId(), (int) Math.round(Math.floor(activityOption.getCapacity())));
-					parkingFacilities.add(facility);
+					parkingFacilities.add((ActivityFacilityImpl) facility);
 				}
 
 			}

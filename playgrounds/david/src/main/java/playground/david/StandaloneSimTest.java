@@ -36,7 +36,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -60,7 +60,7 @@ public class StandaloneSimTest {
 		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).getScenario();
 		Config config = scenario.getConfig();
 
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		Population population = scenario.getPopulation();

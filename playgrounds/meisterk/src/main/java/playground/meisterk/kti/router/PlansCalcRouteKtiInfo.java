@@ -58,9 +58,9 @@ public class PlansCalcRouteKtiInfo {
 
 		// municipality layer from world file
 		ScenarioImpl localScenario = new ScenarioImpl();
-		this.localWorld = localScenario.getWorld();
+		this.localWorld = new World();
 		try {
-			new MatsimWorldReader(localScenario).parse(ktiConfigGroup.getWorldInputFilename());
+			new MatsimWorldReader(localScenario, localWorld).parse(ktiConfigGroup.getWorldInputFilename());
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {

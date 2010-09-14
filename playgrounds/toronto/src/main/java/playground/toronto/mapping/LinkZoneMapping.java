@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.ArgumentParser;
 
 public class LinkZoneMapping {
@@ -48,7 +48,7 @@ public class LinkZoneMapping {
 	
 	public void run(final String inputNetworkFile, final String outputMappingFile) {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 		new NetworkCreateL2ZMapping(outputMappingFile).run(network);
 	}

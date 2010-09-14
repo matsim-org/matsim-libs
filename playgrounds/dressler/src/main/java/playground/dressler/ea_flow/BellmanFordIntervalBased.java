@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.dressler.Interval.EdgeFlowI;
 import playground.dressler.Interval.Interval;
@@ -62,7 +62,7 @@ public class BellmanFordIntervalBased {
 	 * between runs!
 	 * This is simply for quick access.
 	 */
-	final NetworkLayer _network;
+	final NetworkImpl _network;
 
 	/**
 	 * data structure to keep distance labels on nodes during and after one iteration of the shortest TimeExpandedPath Algorithm

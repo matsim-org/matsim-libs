@@ -24,6 +24,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -31,7 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class FeatureGeneratorBuilderImpl implements FeatureGeneratorBuilder {
 
 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private CoordinateReferenceSystem crs;
 
 	private Constructor<? extends FeatureGenerator> featureGeneratorPrototypeContructor;
@@ -40,11 +41,11 @@ public class FeatureGeneratorBuilderImpl implements FeatureGeneratorBuilder {
 	private Constructor<? extends WidthCalculator> widthCalculatorPrototypeContructor;
 
 	private double widthCoefficient = 1;
-	private static final Class[] WIDTH_CALCULATOR_PROTOTYPECONSTRUCTOR =  { NetworkLayer.class, Double.class};
+	private static final Class[] WIDTH_CALCULATOR_PROTOTYPECONSTRUCTOR =  { NetworkImpl.class, Double.class};
 
 
 	public FeatureGeneratorBuilderImpl(final Network network, final String coordinateSystem) {
-		this.network = (NetworkLayer) network;
+		this.network = (NetworkImpl) network;
 		this.crs = MGC.getCRS(coordinateSystem);
 		try {
 			this.featureGeneratorPrototypeContructor = PolygonFeatureGenerator.class.getConstructor(FEATURE_GENERATOR_PROTOTYPECONSTRUCTOR);

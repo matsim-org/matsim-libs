@@ -39,19 +39,19 @@ public class WorldUtilsTest extends MatsimTestCase {
 		CoordImpl p3 = new CoordImpl(10, 40);
 		CoordImpl p4 = new CoordImpl(20, 30);
 
-		assertEquals(10.0, WorldUtils.distancePointLinesegment(p1, p3, p4), 1e-10);
+		assertEquals(10.0, CoordUtils.distancePointLinesegment(p1, p3, p4), 1e-10);
 
 		assertEquals("special case where lineFrom == lineTo",
-				10.0, WorldUtils.distancePointLinesegment(p1, p1, p2), 1e-10);
+				10.0, CoordUtils.distancePointLinesegment(p1, p1, p2), 1e-10);
 
 		assertEquals("special case where point before lineFrom",
-				10.0, WorldUtils.distancePointLinesegment(p2, p3, p1), 1e-10);
+				10.0, CoordUtils.distancePointLinesegment(p2, p3, p1), 1e-10);
 
 		assertEquals("special case where point after lineTo",
-				10.0, WorldUtils.distancePointLinesegment(p1, p2, p3), 1e-10);
+				10.0, CoordUtils.distancePointLinesegment(p1, p2, p3), 1e-10);
 
 		assertEquals("special case where point on line segment",
-				0.0, WorldUtils.distancePointLinesegment(p1, p3, p2), 1e-10);
+				0.0, CoordUtils.distancePointLinesegment(p1, p3, p2), 1e-10);
 
 	}
 

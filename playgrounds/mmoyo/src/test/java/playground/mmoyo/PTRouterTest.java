@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -44,16 +44,16 @@ public class PTRouterTest extends MatsimTestCase {
 
 		/* read transit schedule, plain net create logic elements */
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(NETWORK);
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(transitSchedule, network).readFile(TRANSITSCHEDULE);
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
-		NetworkLayer logicNet= logicFactory.getLogicNet();
+		NetworkImpl logicNet= logicFactory.getLogicNet();
 		PTRouter ptRouter = new PTRouter (logicNet);
 
-		NetworkLayer plainNetwork= logicFactory.getPlainNet();
+		NetworkImpl plainNetwork= logicFactory.getPlainNet();
 		LogicIntoPlainTranslator logicIntoPlainTranslator = logicFactory.getLogicToPlainTranslator();
 
 		/**Tests transfer times*/

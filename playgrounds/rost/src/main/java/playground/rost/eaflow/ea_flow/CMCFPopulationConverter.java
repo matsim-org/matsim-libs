@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
@@ -57,7 +57,7 @@ public class CMCFPopulationConverter {
 
 	@SuppressWarnings("unchecked")
 	public static Population readCMCFDemands(String filename, ScenarioImpl scenario, boolean coordinates) throws JDOMException, IOException{
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		Population result = scenario.getPopulation();
 		PopulationFactory pb = result.getFactory() ;
 		SAXBuilder builder = new SAXBuilder();
@@ -151,7 +151,7 @@ public class CMCFPopulationConverter {
 		}
 		try {
 			ScenarioImpl scenario = new ScenarioImpl();
-			NetworkLayer network = scenario.getNetwork();
+			NetworkImpl network = scenario.getNetwork();
 			NetworkReaderMatsimV1 netreader = new NetworkReaderMatsimV1(scenario);
 			netreader.parse(netfile);
 			Population population = readCMCFDemands(inputfile,scenario,coordinates);

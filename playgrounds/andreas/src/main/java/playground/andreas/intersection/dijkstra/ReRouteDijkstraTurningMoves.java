@@ -21,7 +21,7 @@ package playground.andreas.intersection.dijkstra;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -36,7 +36,7 @@ public class ReRouteDijkstraTurningMoves extends AbstractMultithreadedModule {
 
 	PersonalizableTravelTime timeCalculator = null;
 
-	NetworkLayer wrappedNetwork = null;
+	NetworkImpl wrappedNetwork = null;
 
 	Network originalNetwork = null;
 

@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.jjoubert.CommercialModel.Listeners.MyPrivateVehicleSpeedAnalyser;
 import playground.jjoubert.CommercialTraffic.SAZone;
@@ -86,7 +86,7 @@ public class PrivateVehicleSpeedEvaluator {
 
 		String networkFile = root + "Commercial/Input/network" + province + ".xml";
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer nl = scenario.getNetwork();
+		NetworkImpl nl = scenario.getNetwork();
 		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
 		nr.readFile(networkFile);
 

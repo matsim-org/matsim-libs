@@ -29,6 +29,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -50,7 +51,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 
 	protected Config config = null;
-	private NetworkLayer network = null;
+	private NetworkImpl network = null;
 	private PersonImpl person = null;
 	private PlanImpl plan = null;
 
@@ -77,7 +78,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		params.setTypicalDuration(8*3600);
 		scoring.addActivityParams(params);
 
-		this.network = new NetworkLayer();
+		this.network = NetworkImpl.createNetwork();
 		Node node1 = this.network.createAndAddNode(new IdImpl("1"), new CoordImpl(    0.0, 0.0));
 		Node node2 = this.network.createAndAddNode(new IdImpl("2"), new CoordImpl(  500.0, 0.0));
 		Node node3 = this.network.createAndAddNode(new IdImpl("3"), new CoordImpl( 5500.0, 0.0));

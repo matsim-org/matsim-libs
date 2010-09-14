@@ -40,7 +40,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -150,7 +150,7 @@ public class MyControler2 {
 
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.
-		NetworkLayer network = scenarioData.getNetwork() ;
+		NetworkImpl network = scenarioData.getNetwork() ;
 		log.info("") ; 	log.info("cleaning network ...");
 		NetworkCleaner nwCleaner = new NetworkCleaner() ;
 		nwCleaner.run( network ) ;

@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -52,9 +52,9 @@ public class NetworkLoaderImplII implements NetworkLoader{
 	
 	private boolean initialized = false;
 	private QuadTree<NodeInfo> quad;
-	private NetworkLayer net;
+	private NetworkImpl net;
 
-	public NetworkLoaderImplII(NetworkLayer net) {
+	public NetworkLoaderImplII(NetworkImpl net) {
 		this.net = net;
 	}
 	

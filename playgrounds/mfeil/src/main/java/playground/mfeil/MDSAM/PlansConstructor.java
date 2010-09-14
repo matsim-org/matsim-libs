@@ -621,7 +621,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		else if (act.getType().equalsIgnoreCase("l")) actType = "leisure";
 		else log.warn("Unerkannter act type: "+act.getType());
 
-		List <ActivityFacilityImpl> facs = new ArrayList<ActivityFacilityImpl>(afImpl.getFacilitiesForActivityType(actType).values());
+		// List <ActivityFacilityImpl> facs = new ArrayList<ActivityFacilityImpl>(afImpl.getFacilitiesForActivityType(actType).values());
+		List <ActivityFacilityImpl> facs = null;
 		ActivityFacilityImpl fac;
 		do {
 			int position = (int) (MatsimRandom.getRandom().nextDouble()*facs.size());

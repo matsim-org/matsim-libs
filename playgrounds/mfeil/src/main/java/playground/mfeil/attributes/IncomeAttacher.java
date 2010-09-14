@@ -91,7 +91,7 @@ public class IncomeAttacher {
 		new MatsimNetworkReader(scenario).readFile(network);
 		new MatsimFacilitiesReader(scenario).readFile(facilities);
 		new MatsimPopulationReader(scenario).readFile(populationInput);
-		new MatsimWorldReader(scenario).readFile(world);
+		//new MatsimWorldReader(scenario).readFile(world);
 
 		IncomeAttacher att = new IncomeAttacher(scenario);
 		att.run(municipalityIncome, agentsEducation, haushalte, zielpersonen);
@@ -129,7 +129,8 @@ public class IncomeAttacher {
 
 		log.info("  reading municipality income information... ");
 		this.municipalities = new Municipalities(municipalityIncome);
-		Layer municipalityLayer = scenario.getWorld().getLayer(new IdImpl(Municipalities.MUNICIPALITY));
+		// Layer municipalityLayer = scenario.getWorld().getLayer(new IdImpl(Municipalities.MUNICIPALITY));
+		Layer municipalityLayer = null;
 		this.municipalities.parse(municipalityLayer);
 		log.info("  done.");
 

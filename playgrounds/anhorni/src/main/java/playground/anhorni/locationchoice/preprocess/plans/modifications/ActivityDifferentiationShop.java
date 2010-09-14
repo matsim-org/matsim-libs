@@ -1,5 +1,6 @@
 package playground.anhorni.locationchoice.preprocess.plans.modifications;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
@@ -128,12 +129,12 @@ public class ActivityDifferentiationShop {
 		
 		List<ActivityFacilityImpl> groceryFacilities = new Vector<ActivityFacilityImpl>();
 		for (int i = 0; i < nogatypes.shopGrocery.length; i++) {
-			groceryFacilities.addAll(this.facilitiesActDiff.getFacilitiesForActivityType(nogatypes.shopGrocery[i]).values());
+			groceryFacilities.addAll((Collection<? extends ActivityFacilityImpl>) this.facilitiesActDiff.getFacilitiesForActivityType(nogatypes.shopGrocery[i]).values());
 		}
 				
 		List<ActivityFacilityImpl> nonGroceryFacilities = new Vector<ActivityFacilityImpl>();
 		for (int i = 0; i < nogatypes.shopNonGrocery.length; i++) {
-			nonGroceryFacilities.addAll(this.facilitiesActDiff.getFacilitiesForActivityType(nogatypes.shopNonGrocery[i]).values());
+			nonGroceryFacilities.addAll((Collection<? extends ActivityFacilityImpl>) this.facilitiesActDiff.getFacilitiesForActivityType(nogatypes.shopNonGrocery[i]).values());
 		}
 
 		FacilityQuadTreeBuilder builder = new FacilityQuadTreeBuilder();

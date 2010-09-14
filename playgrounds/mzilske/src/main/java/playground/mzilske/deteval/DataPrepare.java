@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.visum.VisumNetwork;
@@ -51,7 +51,7 @@ public class DataPrepare {
 	}
 
 	private void convertNetwork() {
-		final NetworkLayer network = scenario.getNetwork();
+		final NetworkImpl network = scenario.getNetwork();
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
 
 		VisumNetworkRowHandler nodeRowHandler = new VisumNetworkRowHandler() {
@@ -138,7 +138,7 @@ public class DataPrepare {
 
 	private void writeNetwork() throws IOException,
 			FileNotFoundException {
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		log.info("writing network to file.");
 		new NetworkWriter(network).write(OutNetworkFile);
 	}

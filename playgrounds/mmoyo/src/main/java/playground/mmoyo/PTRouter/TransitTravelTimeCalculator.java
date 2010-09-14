@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -22,12 +22,12 @@ public class TransitTravelTimeCalculator{
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	public Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 
-	public TransitTravelTimeCalculator(final TransitSchedule logicTransitSchedule, final NetworkLayer logicNetwork){
+	public TransitTravelTimeCalculator(final TransitSchedule logicTransitSchedule, final NetworkImpl logicNetwork){
 		calculateTravelTimes(logicTransitSchedule,logicNetwork);
 	}
 
 	/**fills  a map of travelTime for links and  a map of departures for each node to create a TransitTimeTable*/
-	public void calculateTravelTimes(TransitSchedule logicTransitSchedule, NetworkLayer logicNetwork){
+	public void calculateTravelTimes(TransitSchedule logicTransitSchedule, NetworkImpl logicNetwork){
 		for (TransitLine transitLine : logicTransitSchedule.getTransitLines().values()){
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 				Node lastNode = null;

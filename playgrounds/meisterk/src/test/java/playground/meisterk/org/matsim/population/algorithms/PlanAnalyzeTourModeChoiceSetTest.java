@@ -39,7 +39,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -85,7 +85,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		log.info("Reading facilities xml file...done.");
 
 		// run
-		this.runDemo(facilities, facilities, null);
+		this.runDemo((Layer) facilities, facilities, null);
 
 	}
 
@@ -94,7 +94,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		// load data
 		log.info("Reading network xml file...");
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		log.info("Reading network xml file...done.");
 
@@ -102,7 +102,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		this.config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
 
 		// run
-		this.runDemo(network, null, network);
+		this.runDemo((Layer) network, null, network);
 
 	}
 
@@ -411,7 +411,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		// load data
 		log.info("Reading network xml file...");
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		log.info("Reading network xml file...done.");
 
@@ -419,7 +419,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		this.config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
 
 		String facString = "1 2 3 4 3 2 1";
-		PlanImpl testPlan = this.generateTestPlan(facString, network);
+		PlanImpl testPlan = this.generateTestPlan(facString, (Layer) network);
 		Set<String> chainBasedModes = new HashSet<String>();
 		chainBasedModes.add(TransportMode.bike);
 		chainBasedModes.add(TransportMode.car);

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -89,7 +90,7 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 			double miny = Double.POSITIVE_INFINITY;
 			double maxx = Double.NEGATIVE_INFINITY;
 			double maxy = Double.NEGATIVE_INFINITY;
-			for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
+			for (ActivityFacility f : this.facilities.getFacilities().values()) {
 				String[] type_set = this.getFacilityActTypes(types[i]);
 				boolean ok = false;
 				for (int j=0; j<type_set.length; j++) {
@@ -105,13 +106,13 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 			minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 			log.info("        type="+types[i]+": xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 			QuadTree<ActivityFacilityImpl> qt = new QuadTree<ActivityFacilityImpl>(minx,miny,maxx,maxy);
-			for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
+			for (ActivityFacility f : this.facilities.getFacilities().values()) {
 				String[] type_set = this.getFacilityActTypes(types[i]);
 				boolean ok = false;
 				for (int j=0; j<type_set.length; j++) {
 					if (f.getActivityOptions().keySet().contains(type_set[j])) { ok = true; }
 				}
-				if (ok) { qt.put(f.getCoord().getX(),f.getCoord().getY(),f); }
+				if (ok) { qt.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacilityImpl) f); }
 			}
 			log.info("        "+qt.size()+" facilities of type="+types[i]+" added.");
 			this.fqts.put(types[i],qt);

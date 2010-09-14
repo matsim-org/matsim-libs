@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
@@ -45,13 +45,13 @@ import com.vividsolutions.jts.geom.Polygon;
 public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		X2QGIS {
 	protected Map<List<Id>, Integer> routeCounters;
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 	private FeatureType featureTypeRoute;
 	private boolean writeRoutes = true;
 
 	public Route2QGIS(Population population,
 			final CoordinateReferenceSystem crs, final String outputDir,
-			final NetworkLayer network,
+			final NetworkImpl network,
 			final Map<List<Id>, Integer> routeCounters) {
 		super(population, network, crs, outputDir);
 		this.network = network;
@@ -166,7 +166,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		final String outputDir = args[2];
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		Population population = scenario.getPopulation();

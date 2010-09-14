@@ -22,42 +22,43 @@ package org.matsim.core.network;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.BasicLocations;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.world.Layer;
-import org.matsim.world.LayerImpl;
-import org.matsim.world.MappedLocation;
 
 /**
  * @author nagel
  * @author mrieser
  */
-public class NetworkImpl implements Network {
+public class NetworkImpl implements Network, BasicLocations {
+
 	private final static Logger log = Logger.getLogger(NetworkImpl.class);
 
 	public static final Id LAYER_TYPE = new IdImpl("link");
 
-	// ////////////////////////////////////////////////////////////////////
-	// member variables
-	// ////////////////////////////////////////////////////////////////////
-
-	protected Layer layerDelegate = new LayerImpl( LAYER_TYPE, null ) ;
-
+	public static NetworkImpl createNetwork() {
+		return new NetworkImpl();
+	}
+	
 	private double capperiod = 3600.0 ;
 
 	protected final Map<Id, Node> nodes = new TreeMap<Id, Node>();
+	
+	private Map<Id, Link> links = new TreeMap<Id, Link>();
 
 	protected QuadTree<Node> nodeQuadTree = null;
 
@@ -71,23 +72,14 @@ public class NetworkImpl implements Network {
 
 	private Collection<NetworkChangeEvent> networkChangeEvents = null;
 
-	// ////////////////////////////////////////////////////////////////////
-	// creational methods
-	// ////////////////////////////////////////////////////////////////////
+	private String name = null;
 
-	/**
-	 * All creational methods are in NetworkLayer, since the creational methods interact with the Layer functionality
-	 * (mostly: links get registered as locations).
-	 */
-	protected NetworkImpl() {}
-
-	// ////////////////////////////////////////////////////////////////////
-	// add methods
-	// ////////////////////////////////////////////////////////////////////
+	protected NetworkImpl() {
+		this.factory = new NetworkFactoryImpl(this);
+	}
 
 	public void addLink(final Link link) {
-		Map<Id,MappedLocation> locations = (Map<Id, MappedLocation>) this.layerDelegate.getLocations() ;
-		Link testLink = (Link) locations.get(link.getId());
+		Link testLink = links.get(link.getId());
 		if (testLink != null) {
 			if (testLink == link) {
 				log.warn("Trying to add a link a second time to the network. link id = " + link.getId().toString());
@@ -101,7 +93,7 @@ public class NetworkImpl implements Network {
 		fromNode.addOutLink(link);
 		Node toNode = link.getToNode();
 		toNode.addInLink(link);
-		locations.put( link.getId(), (LinkImpl) link);
+		links.put(link.getId(), link);
 	}
 
 	public void addNode(final Node nn) {
@@ -147,7 +139,7 @@ public class NetworkImpl implements Network {
 
 	@Override
 	public Link removeLink(final Id linkId) {
-		Link l = this.getLinks().remove(linkId);
+		Link l = this.links.remove(linkId);
 		if (l == null) {
 			return null;
 		}
@@ -487,13 +479,66 @@ public class NetworkImpl implements Network {
 		log.info("Building QuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
 	}
 
-	@SuppressWarnings("unchecked")
 	public Map<Id, Link> getLinks() {
-		return (Map) this.layerDelegate.getLocations();
+		return Collections.unmodifiableMap(links);
 	}
 
 	public void setFactory(final NetworkFactoryImpl networkFactory) {
 		this.factory = networkFactory;
+	}
+
+	@Override
+	public BasicLocation getLocation(Id locationId) {
+		return getLinks().get(locationId);
+	}
+
+	public final Node createAndAddNode(final Id id, final Coord coord) {
+		if (this.nodes.containsKey(id)) {
+			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
+		}
+		NodeImpl n = this.factory.createNode(id, coord);
+		this.addNode(n) ;
+		return n;
+	}
+
+	public final Node createAndAddNode(final Id id, final Coord coord, final String nodeType) {
+		NodeImpl n = (NodeImpl) createAndAddNode(id, coord);
+		n.setType(nodeType);
+		return n;
+	}
+
+	public final Link createAndAddLink(final Id id, final Node fromNode,
+			final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
+				return createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
+			}
+
+	public final LinkImpl createAndAddLink(final Id id, final Node fromNode,
+			final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes,
+			final String origId, final String type) {
+			
+				if (this.nodes.get(fromNode.getId()) == null) {
+					throw new IllegalArgumentException(this+"[from="+fromNode+" does not exist]");
+				}
+			
+				if (this.nodes.get(toNode.getId()) == null) {
+					throw new IllegalArgumentException(this+"[to="+toNode+" does not exist]");
+				}
+			
+				LinkImpl link = (LinkImpl) this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
+				link.setType(type);
+				link.setOrigId(origId);
+			
+				this.addLink( link ) ;
+			
+				return link;
+			}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

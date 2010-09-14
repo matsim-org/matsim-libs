@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -142,7 +143,7 @@ public class PseudoGravityModel {
 		// for every job, add it to the pseudoCell
 		for ( Iterator<Id> it = locationFromJob.values().iterator(); it.hasNext(); ) {
 			LocationId parcelId = (LocationId) it.next();
-			Location parcel = facilities.getFacilities().get( parcelId ) ;
+			ActivityFacility parcel = facilities.getFacilities().get( parcelId ) ;
 			Coord cc = parcel.getCoord() ;
 			int bin = binFromXY( cc.getX() , cc.getY() ) ;
 			PseudoCell pc = pseudoCells.get(bin) ;

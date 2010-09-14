@@ -145,7 +145,7 @@ public class Emme2FacilitiesCreator {
 			Coord coord = new CoordImpl(centerX + unitVectorX, centerY + unitVectorY);
 			
 			ActivityFacilityImpl facility = activityFacilities.createFacility(id, coord);
-			facility.addDownMapping((LinkImpl)link);
+			facility.setLinkId(((LinkImpl)link).getId());
 			
 			createAndAddActivityOptions(facility);
 			
@@ -183,7 +183,7 @@ public class Emme2FacilitiesCreator {
 			
 			for (Link externalLink : externalNode.getOutLinks().values())
 			{
-				ActivityFacilityImpl facility = activityFacilities.getFacilities().get(externalLink.getId());
+				ActivityFacility facility = activityFacilities.getFacilities().get(externalLink.getId());
 				
 				// if already a facility exists we have nothing left to do
 				if (facility != null) continue;
@@ -213,9 +213,9 @@ public class Emme2FacilitiesCreator {
 				Coord coord = new CoordImpl(centerX + unitVectorX, centerY + unitVectorY);
 				
 				facility = activityFacilities.createFacility(externalLink.getId(), coord);
-				facility.addDownMapping((LinkImpl)externalLink);
+				((ActivityFacilityImpl) facility).setLinkId(((LinkImpl)externalLink).getId());
 				
-				ActivityOptionImpl activityOption = facility.createActivityOption("tta");
+				ActivityOptionImpl activityOption = ((ActivityFacilityImpl) facility).createActivityOption("tta");
 				activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
 				activityOption.setCapacity(capacity);
 			}

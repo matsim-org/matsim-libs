@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -35,7 +36,7 @@ public class OSM2MATSim {
 
 	public static void main(final String[] args) {
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		OsmNetworkReader osmReader = new OsmNetworkReader(network, TransformationFactory.getCoordinateTransformation("WGS84", "DHDN_GK4"), false);
 		osmReader.setKeepPaths(false);
 

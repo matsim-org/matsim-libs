@@ -7,13 +7,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 public class StreetSegment extends LinkImpl {
 	
 	public final Set<Link> links = new HashSet<Link>();
 
-	public StreetSegment(Id id, Node from, Node to, NetworkLayer network, double length, double freespeed, double capacity, double lanes) {
+	public StreetSegment(Id id, Node from, Node to, NetworkImpl network, double length, double freespeed, double capacity, double lanes) {
 		super(id, from, to, network, length, freespeed, capacity, lanes);
 	}
 }

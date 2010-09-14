@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.world.WorldUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.anhorni.locationchoice.analysis.mc.MZTrip;
 
@@ -29,7 +29,7 @@ public class ZHTripFilter {
 	
 	private boolean intersect(MZTrip mzTrip, double radius, CoordImpl center) {
 		
-		double distance = WorldUtils.distancePointLinesegment(
+		double distance = CoordUtils.distancePointLinesegment(
 				mzTrip.getCoordStart(), mzTrip.getCoordEnd(), center);
 		
 		if (distance <= radius) return true;

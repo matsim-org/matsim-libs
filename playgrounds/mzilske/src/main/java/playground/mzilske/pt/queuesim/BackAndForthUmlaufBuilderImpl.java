@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -40,12 +40,12 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 
 	};
 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final Collection<TransitLine> transitLines;
 	private ArrayList<Umlauf> umlaeufe;
 	private final CharyparNagelScoringConfigGroup config;
 
-	public BackAndForthUmlaufBuilderImpl(NetworkLayer network, Collection<TransitLine> transitLines, CharyparNagelScoringConfigGroup config) {
+	public BackAndForthUmlaufBuilderImpl(NetworkImpl network, Collection<TransitLine> transitLines, CharyparNagelScoringConfigGroup config) {
 		this.network = network;
 		this.transitLines = transitLines;
 		this.config = config;

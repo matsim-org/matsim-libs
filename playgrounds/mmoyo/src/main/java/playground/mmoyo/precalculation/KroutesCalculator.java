@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
@@ -22,12 +22,12 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 public class KroutesCalculator {
 	private AdjList adjList;
 	private TransitSchedule transitSchedule;
-	private NetworkLayer plainNet;
+	private NetworkImpl plainNet;
 	private Map <Id, List<StaticConnection>> connectionMap;
 	private Map <Coord, Collection<NodeImpl>> nearStopMap;
 
 	/**Calculates a set of connections between two coordinates*/
-	public KroutesCalculator(final TransitSchedule transitSchedule, final NetworkLayer plainNet, Map <Id, List<StaticConnection>> connectionMap, Map <Coord, Collection<NodeImpl>> nearStopMap) {
+	public KroutesCalculator(final TransitSchedule transitSchedule, final NetworkImpl plainNet, Map <Id, List<StaticConnection>> connectionMap, Map <Coord, Collection<NodeImpl>> nearStopMap) {
 		this.transitSchedule= transitSchedule;
 		this.plainNet = plainNet;
 		this.connectionMap = connectionMap;

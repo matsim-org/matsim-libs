@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -75,7 +75,7 @@ public class Flow {
 	 * The network on which we find routes.
 	 * We expect the network not to change between runs!
 	 */
-	private final NetworkLayer _network;
+	private final NetworkImpl _network;
 
 	/**
 	 * Edge representation of flow on the network
@@ -2404,7 +2404,7 @@ public class Flow {
 	/**
 	 * @return the network
 	 */
-	public NetworkLayer getNetwork() {
+	public NetworkImpl getNetwork() {
 		return this._network;
 	}
 

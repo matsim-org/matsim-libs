@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.anhorni.crossborder.verification.Verification;
 
@@ -15,7 +15,7 @@ public class FMAParser extends Parser {
 	private Hashtable<Integer, Zone> zones = new Hashtable<Integer, Zone>();
 	private Verification verification;
 
-	public FMAParser(NetworkLayer network, String file, Hashtable<Integer, Zone> zones) {
+	public FMAParser(NetworkImpl network, String file, Hashtable<Integer, Zone> zones) {
 		super(network, file);
 		this.zones=zones;
 	}

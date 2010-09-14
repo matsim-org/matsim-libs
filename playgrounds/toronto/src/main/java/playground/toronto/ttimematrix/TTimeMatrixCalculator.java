@@ -36,7 +36,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentArrivalEventHandler {
@@ -50,7 +50,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	private final Map<Id,Set<Id>> z2nMapping;
 	private final Set<Integer> hours;
 	private final SpanningTree st;
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 
 	private int hour = 0;
 	private Map<Id,Map<Id,Tuple<Double,Integer>>> ttimeMatrix = new HashMap<Id, Map<Id,Tuple<Double,Integer>>>();
@@ -62,7 +62,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TTimeMatrixCalculator(final Map<Id,Id> l2zMapping, final int[] hours, final SpanningTree st, final NetworkLayer network) {
+	public TTimeMatrixCalculator(final Map<Id,Id> l2zMapping, final int[] hours, final SpanningTree st, final NetworkImpl network) {
 		log.info("init...");
 		this.l2zMapping = l2zMapping;
 		this.st = st;

@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -52,7 +52,7 @@ public class GeneratePathSets {
 	// methods
 	//////////////////////////////////////////////////////////////////////
 
-	private static final Map<Id,Tuple<Node,Node>> parseODs(String inputFileName, NetworkLayer network) throws IOException {
+	private static final Map<Id,Tuple<Node,Node>> parseODs(String inputFileName, NetworkImpl network) throws IOException {
 		Map<Id,Tuple<Node,Node>> ods = new TreeMap<Id,Tuple<Node,Node>>();
 		int lineCnt = 0;
 		FileReader fr = new FileReader(inputFileName);
@@ -154,7 +154,7 @@ public class GeneratePathSets {
 		log.info("outputPathSetFile: "+outputPathSetFile);
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 
 		Gbl.printMemoryUsage();

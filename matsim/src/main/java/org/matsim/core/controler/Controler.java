@@ -144,7 +144,6 @@ import org.matsim.signalsystems.SignalSystemConfigurationsWriter11;
 import org.matsim.signalsystems.SignalSystemsWriter11;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.world.WorldWriter;
 import org.xml.sax.SAXException;
 
 /**
@@ -485,8 +484,6 @@ public class Controler {
 			new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges()).write(this.controlerIO.getOutputFilename(FILENAME_POPULATION));
 			// dump network
 			new NetworkWriter(this.network).write(this.controlerIO.getOutputFilename(FILENAME_NETWORK));
-			// dump world
-			new WorldWriter(this.getScenario().getWorld()).write(this.controlerIO.getOutputFilename("output_world.xml.gz"));
 			// dump config
 			new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(FILENAME_CONFIG));
 			// dump facilities

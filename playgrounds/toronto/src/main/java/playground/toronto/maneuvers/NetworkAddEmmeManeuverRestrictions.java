@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkExpandNode;
 import org.matsim.core.utils.collections.Tuple;
@@ -68,7 +68,7 @@ public class NetworkAddEmmeManeuverRestrictions {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final Map<Id,ArrayList<Tuple<Id,Id>>> parseManeuvers(final NetworkLayer network) {
+	private final Map<Id,ArrayList<Tuple<Id,Id>>> parseManeuvers(final NetworkImpl network) {
 		log.info("  parsing maneuvers...");
 		Map<Id,ArrayList<Tuple<Id,Id>>> illegalManeuvers = new HashMap<Id, ArrayList<Tuple<Id,Id>>>();
 		try {
@@ -123,7 +123,7 @@ public class NetworkAddEmmeManeuverRestrictions {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final NetworkLayer network) throws Exception {
+	public void run(final NetworkImpl network) throws Exception {
 		log.info("running " + this.getClass().getName() + " module...");
 
 		int nodesAssignedCnt = 0;

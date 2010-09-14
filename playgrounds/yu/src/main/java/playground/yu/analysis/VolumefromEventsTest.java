@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 public class VolumefromEventsTest {
 
@@ -38,7 +38,7 @@ public class VolumefromEventsTest {
 		// final String plansFilename = "./examples/equil/plans100.xml";
 		final String eventsFilename = "./test/yu/test/input/miv_zrh30km_10pct100.events.txt.gz";
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 		EventsManagerImpl events = new EventsManagerImpl();
 		VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1,

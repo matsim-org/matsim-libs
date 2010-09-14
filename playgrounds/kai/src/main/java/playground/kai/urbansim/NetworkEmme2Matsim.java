@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -40,7 +41,7 @@ public class NetworkEmme2Matsim {
 
 	private static final int NW_NAME = PSRC ;
 
-	public static void readNetwork( NetworkLayer network ) {
+	public static void readNetwork( NetworkImpl network ) {
 		network.setCapacityPeriod(3600.) ;
 		network.setEffectiveLaneWidth(3.75) ;
 //		network.setEffectiveCellSize(7.5) ;
@@ -132,7 +133,7 @@ public class NetworkEmme2Matsim {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		NetworkLayer network = new NetworkLayer() ;
+		NetworkImpl network = NetworkImpl.createNetwork() ;
 
 		log.info("reading network ...");
 		readNetwork(network) ;

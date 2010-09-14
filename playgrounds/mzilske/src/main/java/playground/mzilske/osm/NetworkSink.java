@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -59,7 +59,7 @@ public class NetworkSink implements SinkSource {
 			for (int i = 1, n = wayNodes.size(); i < n; i++) {
 				WayNode toNode = wayNodes.get(i);
 				double length = CoordUtils.calcDistance(network.getNodes().get(new IdImpl(fromNode.getNodeId())).getCoord(), network.getNodes().get(new IdImpl(toNode.getNodeId())).getCoord());
-				createLink((NetworkLayer) this.network, entry, fromNode, toNode, length);
+				createLink((NetworkImpl) this.network, entry, fromNode, toNode, length);
 				fromNode = toNode;
 			}
 		}
@@ -80,7 +80,7 @@ public class NetworkSink implements SinkSource {
 		sink.release();
 	}
 
-	private void createLink(final NetworkLayer network, final Way way, final WayNode fromNode, final WayNode toNode, final double length) {
+	private void createLink(final NetworkImpl network, final Way way, final WayNode fromNode, final WayNode toNode, final double length) {
 		TagCollectionImpl tagCollection = new TagCollectionImpl(way.getTags());
 		Map<String, String> tags = tagCollection.buildMap();
 		String highway = tags.get("highway");

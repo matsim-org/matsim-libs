@@ -25,8 +25,8 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 
 public class FacilitiesScenarioCut {
 
@@ -50,7 +50,7 @@ public class FacilitiesScenarioCut {
 		Iterator<Id> fid_it = facilities.getFacilities().keySet().iterator();
 		while (fid_it.hasNext()) {
 			Id fid = fid_it.next();
-			ActivityFacilityImpl f = facilities.getFacilities().get(fid);
+			ActivityFacility f = facilities.getFacilities().get(fid);
 			Coord coord = f.getCoord();
 			double x = coord.getX();
 			double y = coord.getY();

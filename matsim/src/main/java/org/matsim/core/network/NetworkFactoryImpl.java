@@ -43,9 +43,9 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	private final Map<String, RouteFactory> routeFactories = new HashMap<String, RouteFactory>();
 	private RouteFactory defaultFactory = new GenericRouteFactory();
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 
-	public NetworkFactoryImpl(final NetworkLayer network) {
+	public NetworkFactoryImpl(final NetworkImpl network) {
 		this.network = network;
 		this.linkFactory = new LinkFactoryImpl();
 		this.routeFactories.put(TransportMode.car, new LinkNetworkRouteFactory());
@@ -68,7 +68,7 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	}
 
 	public Link createLink(final Id id, final Node from, final Node to,
-			final NetworkLayer network, final double length, final double freespeedTT, final double capacity,
+			final NetworkImpl network, final double length, final double freespeedTT, final double capacity,
 			final double lanes) {
 		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);
 	}
@@ -117,7 +117,7 @@ public class NetworkFactoryImpl implements NetworkFactory {
 		return (this.linkFactory instanceof TimeVariantLinkFactory);
 	}
 
-	public void setNetwork(final NetworkLayer networkLayer) {
+	public void setNetwork(final NetworkImpl networkLayer) {
 		this.network = networkLayer;
 	}
 

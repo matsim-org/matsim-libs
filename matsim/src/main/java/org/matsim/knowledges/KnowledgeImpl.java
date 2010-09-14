@@ -28,6 +28,7 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.PersonImpl;
 
@@ -64,10 +65,10 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 	 */
 	private static class KActivity {
 		/*package*/ boolean isPrimary;
-		/*package*/ final ActivityOptionImpl activity;
+		/*package*/ final ActivityOption activity;
 
-		/*package*/ KActivity(ActivityOptionImpl activity, boolean isPrimary) {
-			this.activity = activity;
+		/*package*/ KActivity(ActivityOption home, boolean isPrimary) {
+			this.activity = home;
 			this.isPrimary = isPrimary;
 		}
 
@@ -102,14 +103,14 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 	 *
 	 * <p> Use {@link #setPrimaryFlag(ActivityOptionImpl, boolean)} to change the {@code isPrimary} flag of an already present {@link ActivityOptionImpl}.</p>
 	 *
-	 * @param activity The {@link ActivityOptionImpl} to add to the {@link PersonImpl}s {@link KnowledgeImpl}.
+	 * @param home The {@link ActivityOptionImpl} to add to the {@link PersonImpl}s {@link KnowledgeImpl}.
 	 * @param isPrimary To define if the {@code activity} is a primary activity
 	 * @return <code>true</code> if the {@code activity} is not already present in the list (independent of the {@code isPrimary} flag)
 	 */
-	public final boolean addActivityOption(ActivityOptionImpl activity, boolean isPrimary) {
-		if (activity == null) { return false; }
+	public final boolean addActivityOption(ActivityOption home, boolean isPrimary) {
+		if (home == null) { return false; }
 		if (activities == null) { activities = new LinkedHashSet<KActivity>(INIT_ACTIVITY_CAPACITY); }
-		KActivity ka = new KActivity(activity,isPrimary);
+		KActivity ka = new KActivity(home,isPrimary);
 		return activities.add(ka);
 	}
 
@@ -223,8 +224,8 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		if (activities == null) { return new ArrayList<ActivityOptionImpl>(0); }
 		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>(INIT_ACTIVITY_CAPACITY);
 		for (KActivity ka : activities) {
-			if (ka.activity.getFacility().getId().equals(facilityId)) {
-				acts.add(ka.activity);
+			if (((ActivityOptionImpl) ka.activity).getFacility().getId().equals(facilityId)) {
+				acts.add((ActivityOptionImpl) ka.activity);
 			}
 		}
 		return acts;
@@ -240,7 +241,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>(INIT_ACTIVITY_CAPACITY);
 		for (KActivity ka : activities) {
 			if (ka.isPrimary == isPrimary) {
-				acts.add(ka.activity);
+				acts.add((ActivityOptionImpl) ka.activity);
 			}
 		}
 		return acts;
@@ -254,7 +255,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		if (activities == null) { return new ArrayList<ActivityOptionImpl>(0); }
 		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>(activities.size());
 		for (KActivity ka : activities) {
-			acts.add(ka.activity);
+			acts.add((ActivityOptionImpl) ka.activity);
 		}
 		return acts;
 	}
@@ -270,7 +271,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>(activities.size());
 		for (KActivity ka : activities) {
 			if ((ka.isPrimary == isPrimary) && (ka.activity.getType().equals(act_type))) {
-				acts.add(ka.activity);
+				acts.add((ActivityOptionImpl) ka.activity);
 			}
 		}
 		return acts;
@@ -286,7 +287,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>(activities.size());
 		for (KActivity ka : activities) {
 			if (ka.activity.getType().equals(act_type)) {
-				acts.add(ka.activity);
+				acts.add((ActivityOptionImpl) ka.activity);
 			}
 		}
 		return acts;
@@ -333,7 +334,7 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		}
 		for (KActivity ka : activities) {
 			if ((ka.isPrimary) &&  (ka.activity.getType().equals(act_type)) &&
-					(ka.activity.getFacility().getId().equals(facilityId))) {
+					(((ActivityOptionImpl) ka.activity).getFacility().getId().equals(facilityId))) {
 				return true;
 			}
 		}

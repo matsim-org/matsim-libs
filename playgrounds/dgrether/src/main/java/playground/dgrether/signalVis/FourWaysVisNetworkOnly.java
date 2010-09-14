@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.ptproject.qsim.QSim;
@@ -48,7 +48,7 @@ public class FourWaysVisNetworkOnly {
 		//this is hack
 		ScenarioImpl scenario = new ScenarioImpl();
     scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 //		PopulationImpl population = scenario.getPopulation();
 		EventsManagerImpl events = new EventsManagerImpl();

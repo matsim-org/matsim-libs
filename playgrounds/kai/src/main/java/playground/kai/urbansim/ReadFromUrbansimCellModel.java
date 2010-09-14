@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -142,7 +143,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 
 				idx = idxFromKey.get("grid_id:i4") ;
 				LocationId homeGridId = new LocationId( parts[idx] ) ;
-				Location homeLocation = facilities.getFacilities().get( homeGridId ) ;
+				ActivityFacility homeLocation = facilities.getFacilities().get( homeGridId ) ;
 				if ( homeLocation==null ) {
 					log.warn("no home location; hhId: " + hhId.toString() ) ;
 					line = reader.readLine(); // next line

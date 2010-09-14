@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -129,7 +130,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 	private boolean validateResult(ActivityFacilitiesImpl zones){
 		
 		Id zone_ID;
-		ActivityFacilityImpl af;
+		ActivityFacility af;
 		Coord coord;
 		
 		boolean zone1 = false;
@@ -137,7 +138,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		boolean zone3 = false; 
 		boolean zone4 = false;
 		
-		for( Entry<Id, ActivityFacilityImpl> entry : (zones.getFacilities()).entrySet() ){
+		for( Entry<Id, ActivityFacility> entry : (zones.getFacilities()).entrySet() ){
 			zone_ID = entry.getKey();
 			af = entry.getValue();
 			coord = af.getCoord();

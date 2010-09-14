@@ -8,13 +8,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 public class CellNetworkMapping {
 
 	private final static Logger log = Logger.getLogger(TestCellKnowledge.class);
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private Map <Node, Cell> nodesMapping;
 	private Map <Integer, Cell> cells;
 
@@ -26,7 +26,7 @@ public class CellNetworkMapping {
 	private int yZones = 2;
 	private int maxNodesPerZone = 25;
 
-	public CellNetworkMapping(NetworkLayer network)
+	public CellNetworkMapping(NetworkImpl network)
 	{
 		this.network = network;
 	}
@@ -41,7 +41,7 @@ public class CellNetworkMapping {
 		return nodesMapping.get(node);
 	}
 
-	public NetworkLayer getNetwork()
+	public NetworkImpl getNetwork()
 	{
 		return network;
 	}

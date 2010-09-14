@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 
 /**
@@ -26,7 +27,7 @@ public class NetworkInverter {
 
 	private Network originalNetwork;
 
-	private NetworkLayer invertedNetwork = null;
+	private NetworkImpl invertedNetwork = null;
 
 	public NetworkInverter(Network originalNet) {
 		this.originalNetwork = originalNet;
@@ -40,7 +41,7 @@ public class NetworkInverter {
 	}
 
 	private void invertNetwork(){
-		this.invertedNetwork = new NetworkLayer();
+		this.invertedNetwork = NetworkImpl.createNetwork();
 		int numberOfNodesGenerated = 0;
 		int numberOfLinksGenerated = 0;
 

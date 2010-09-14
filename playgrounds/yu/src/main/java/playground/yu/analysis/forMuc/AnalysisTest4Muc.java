@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -99,7 +99,7 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 		// only for Munich.
 
 		ScenarioImpl sc = new ScenarioImpl();
-		NetworkLayer network = sc.getNetwork();
+		NetworkImpl network = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);
 
 		// toll

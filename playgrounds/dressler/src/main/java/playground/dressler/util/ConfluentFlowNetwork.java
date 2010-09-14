@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 /**
  * @author Daniel Dressler, Manuel Schneider
@@ -54,7 +54,7 @@ public class ConfluentFlowNetwork {
 	 * @param network
 	 * @param newcap
 	 */
-	public static void roundNetwork(NetworkLayer network,int newcap, double flowCapacityFactor, double lengthFactor){
+	public static void roundNetwork(NetworkImpl network,int newcap, double flowCapacityFactor, double lengthFactor){
 		double oldcap = network.getCapacityPeriod();
 		int roundedtozerocap = 0;
 		int roundedtozerotime = 0;
@@ -107,10 +107,10 @@ public class ConfluentFlowNetwork {
 		//}
 	}
 
-	public static NetworkLayer roundNetwork(String filename, int newcap, double flowCapacityFactor, double lengthFactor){
+	public static NetworkImpl roundNetwork(String filename, int newcap, double flowCapacityFactor, double lengthFactor){
 		//read network
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(filename);
 		System.out.println("Network stats: Nodes = " + network.getNodes().size() + ", Edges = " + network.getLinks().size());
@@ -119,7 +119,7 @@ public class ConfluentFlowNetwork {
 
 	}
 
-	public static void writeCFdata (String outfile, NetworkLayer network, HashMap<Node,Integer> demands){
+	public static void writeCFdata (String outfile, NetworkImpl network, HashMap<Node,Integer> demands){
 		FileWriter fout;
         try {
             fout = new FileWriter(outfile);
@@ -181,7 +181,7 @@ public class ConfluentFlowNetwork {
 
 
 
-   private static HashMap<Node,Integer> readDemands(final NetworkLayer network, final String filename) throws IOException{
+   private static HashMap<Node,Integer> readDemands(final NetworkImpl network, final String filename) throws IOException{
 	BufferedReader in = new BufferedReader(new FileReader(filename));
 	HashMap<Node,Integer> demands = new HashMap<Node,Integer>();
 	String inline = null;
@@ -212,7 +212,7 @@ public class ConfluentFlowNetwork {
 		String outputfile_forCF = null;
 		outputfile_forCF  = "/homes/combi/dressler/F/Confluent_Flow/code/frommatsim.dat";
 
-		NetworkLayer network = roundNetwork(inputfile, cap, flowCapacityFactor, lengthFactor);
+		NetworkImpl network = roundNetwork(inputfile, cap, flowCapacityFactor, lengthFactor);
 
 		HashMap<Node,Integer> demands = new HashMap<Node, Integer>();
 

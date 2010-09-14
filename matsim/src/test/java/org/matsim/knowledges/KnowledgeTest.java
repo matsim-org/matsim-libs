@@ -27,11 +27,10 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class KnowledgeTest extends MatsimTestCase {
@@ -150,7 +149,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  ---------- add ----------");
 
 		log.info("  adding all activities of facility 1...");
-		assertTrue(k.addActivityOption(f1.getActivityOptions().get(H),true));
+		assertTrue(k.addActivityOption((ActivityOptionImpl) f1.getActivityOptions().get(H),true));
 		actsF1.add(f1.getActivityOptions().get(H));
 		actsPrim.add(f1.getActivityOptions().get(H));
 		actsAll.add(f1.getActivityOptions().get(H));
@@ -158,7 +157,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		actsHAll.add(f1.getActivityOptions().get(H));
 		typesPrim.add(H);
 		typesAll.add(H);
-		assertTrue(k.addActivityOption(f1.getActivityOptions().get(W),true));
+		assertTrue(k.addActivityOption((ActivityOptionImpl) f1.getActivityOptions().get(W),true));
 		actsF1.add(f1.getActivityOptions().get(W));
 		actsPrim.add(f1.getActivityOptions().get(W));
 		actsAll.add(f1.getActivityOptions().get(W));
@@ -166,7 +165,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		actsWAll.add(f1.getActivityOptions().get(W));
 		typesPrim.add(W);
 		typesAll.add(W);
-		assertTrue(k.addActivityOption(f1.getActivityOptions().get(E),false));
+		assertTrue(k.addActivityOption((ActivityOptionImpl) f1.getActivityOptions().get(E),false));
 		actsF1.add(f1.getActivityOptions().get(E));
 		actsSec.add(f1.getActivityOptions().get(E));
 		actsAll.add(f1.getActivityOptions().get(E));
@@ -174,7 +173,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		actsEAll.add(f1.getActivityOptions().get(E));
 		typesSec.add(E);
 		typesAll.add(E);
-		assertTrue(k.addActivityOption(f1.getActivityOptions().get(S),false));
+		assertTrue(k.addActivityOption((ActivityOptionImpl) f1.getActivityOptions().get(S),false));
 		actsF1.add(f1.getActivityOptions().get(S));
 		actsSec.add(f1.getActivityOptions().get(S));
 		actsAll.add(f1.getActivityOptions().get(S));
@@ -182,7 +181,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		actsSAll.add(f1.getActivityOptions().get(S));
 		typesSec.add(S);
 		typesAll.add(S);
-		assertTrue(k.addActivityOption(f1.getActivityOptions().get(L),false));
+		assertTrue(k.addActivityOption((ActivityOptionImpl) f1.getActivityOptions().get(L),false));
 		actsF1.add(f1.getActivityOptions().get(L));
 		actsSec.add(f1.getActivityOptions().get(L));
 		actsAll.add(f1.getActivityOptions().get(L));
@@ -194,17 +193,17 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  done. prim(h1,w1); sec(e1,s1,l1)");
 		
 		log.info("  adding again activity 'h' of facility 1...");
-		assertFalse(k.addActivityOption(f1.getActivityOptions().get(H),true));
+		assertFalse(k.addActivityOption((ActivityOptionImpl) f1.getActivityOptions().get(H),true));
 		check(k,f1,f2);
 		log.info("  done. prim(h1,w1); sec(e1,s1,l1)");
 		
 		log.info("  adding again activity 'h' of facility 1 with isPrimary=false...");
-		assertFalse(k.addActivityOption(f1.getActivityOptions().get(H),false));
+		assertFalse(k.addActivityOption((ActivityOptionImpl) f1.getActivityOptions().get(H),false));
 		check(k,f1,f2);
 		log.info("  done. prim(h1,w1); sec(e1,s1,l1)");
 		
 		log.info("  adding again activity 'h' of facility 2...");
-		assertTrue(k.addActivityOption(f2.getActivityOptions().get(H),true));
+		assertTrue(k.addActivityOption((ActivityOptionImpl) f2.getActivityOptions().get(H),true));
 		actsF2.add(f2.getActivityOptions().get(H));
 		actsPrim.add(f2.getActivityOptions().get(H));
 		actsAll.add(f2.getActivityOptions().get(H));
@@ -216,7 +215,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  done. prim(h1,w1,h2); sec(e1,s1,l1)");
 		
 		log.info("  adding again activity 'w' of facility 2 with isPrimary=false...");
-		assertTrue(k.addActivityOption(f2.getActivityOptions().get(W),false));
+		assertTrue(k.addActivityOption((ActivityOptionImpl) f2.getActivityOptions().get(W),false));
 		actsF2.add(f2.getActivityOptions().get(W));
 		actsSec.add(f2.getActivityOptions().get(W));
 		actsAll.add(f2.getActivityOptions().get(W));
@@ -235,12 +234,12 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  ---------- remove ----------");
 
 		log.info("  removing 'H' act of f1 with isPrimary=false...");
-		assertFalse(k.removeActivity(f1.getActivityOptions().get(H),false));
+		assertFalse(k.removeActivity((ActivityOptionImpl) f1.getActivityOptions().get(H),false));
 		check(k,f1,f2);
 		log.info("  done. prim(h1,w1,h2); sec(e1,s1,l1,w2)");
 		
 		log.info("  removing 'H' act of f1 with isPrimary=true...");
-		assertTrue(k.removeActivity(f1.getActivityOptions().get(H),true));
+		assertTrue(k.removeActivity((ActivityOptionImpl) f1.getActivityOptions().get(H),true));
 		actsF1.remove(f1.getActivityOptions().get(H));
 		actsPrim.remove(f1.getActivityOptions().get(H));
 		actsAll.remove(f1.getActivityOptions().get(H));
@@ -250,7 +249,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  done. prim(w1,h2); sec(e1,s1,l1,w2)");
 		
 		log.info("  removing again 'H' act of f1 with isPrimary=true...");
-		assertFalse(k.removeActivity(f1.getActivityOptions().get(H),true));
+		assertFalse(k.removeActivity((ActivityOptionImpl) f1.getActivityOptions().get(H),true));
 		check(k,f1,f2);
 		log.info("  done. prim(w1,h2); sec(e1,s1,l1,w2)");
 		
@@ -260,7 +259,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  done. prim(w1,h2); sec(e1,s1,l1,w2)");
 		
 		log.info("  removing 'L' act of f1...");
-		assertTrue(k.removeActivity(f1.getActivityOptions().get(L)));
+		assertTrue(k.removeActivity((ActivityOptionImpl) f1.getActivityOptions().get(L)));
 		actsF1.remove(f1.getActivityOptions().get(L));
 		actsSec.remove(f1.getActivityOptions().get(L));
 		actsAll.remove(f1.getActivityOptions().get(L));
@@ -279,7 +278,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  ---------- set ----------");
 		
 		log.info("  setting 'W' act of f2 to primary...");
-		assertTrue(k.setPrimaryFlag(f2.getActivityOptions().get(W),true));
+		assertTrue(k.setPrimaryFlag((ActivityOptionImpl) f2.getActivityOptions().get(W),true));
 		actsPrim.add(f2.getActivityOptions().get(W));
 		actsSec.remove(f2.getActivityOptions().get(W));
 		actsWPrim.add(f2.getActivityOptions().get(W));
@@ -289,12 +288,12 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  done. prim(w1,h2,w2); sec(e1,s1)");
 
 		log.info("  setting again 'W' act of f2 to primary...");
-		assertTrue(k.setPrimaryFlag(f2.getActivityOptions().get(W),true));
+		assertTrue(k.setPrimaryFlag((ActivityOptionImpl) f2.getActivityOptions().get(W),true));
 		check(k,f1,f2);
 		log.info("  done. prim(w1,h2,w2); sec(e1,s1)");
 
 		log.info("  setting (not existing) 'L' act of f1 to secondary...");
-		assertFalse(k.setPrimaryFlag(f1.getActivityOptions().get(L),false));
+		assertFalse(k.setPrimaryFlag((ActivityOptionImpl) f1.getActivityOptions().get(L),false));
 		check(k,f1,f2);
 		log.info("  done. prim(w1,h2,w2); sec(e1,s1)");
 

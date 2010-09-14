@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -308,7 +309,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		assertEquals(2132, cnt3);
 	}
 
-	private NetworkLayer createNetwork() {
+	private NetworkImpl createNetwork() {
 		//we use a simple "red bus / blue bus paradox" network
 		// Sketch of the network
 		// Note: Node (4) is necessary since MATSim still operates on node based routes and without this
@@ -333,7 +334,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		//              |7
 		//             (5)
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node n1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0,10));
 		Node n2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(3,2));
 		Node n3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(0,0));

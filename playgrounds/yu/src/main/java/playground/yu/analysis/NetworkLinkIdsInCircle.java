@@ -29,7 +29,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -47,9 +47,9 @@ public class NetworkLinkIdsInCircle {
 	 *            linkId
 	 */
 	final private HashSet<String> areaInCircle = new HashSet<String>();
-	final private NetworkLayer network;
+	final private NetworkImpl network;
 
-	public NetworkLinkIdsInCircle(NetworkLayer network) {
+	public NetworkLinkIdsInCircle(NetworkImpl network) {
 		System.out.println("RUN: extract links out of Network with a circle");
 		this.network = network;
 	}

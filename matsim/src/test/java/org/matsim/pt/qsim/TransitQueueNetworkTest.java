@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.fakes.FakeAgent;
@@ -976,7 +976,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			Id id4 = scenario.createId("4");
 
 			// setup: network
-			NetworkLayer network = scenario.getNetwork();
+			NetworkImpl network = scenario.getNetwork();
 			Node node1 = network.createAndAddNode(id1, scenario.createCoord(   0, 0));
 			Node node2 = network.createAndAddNode(id2, scenario.createCoord(1000, 0));
 			Node node3 = network.createAndAddNode(id3, scenario.createCoord(2000, 0));

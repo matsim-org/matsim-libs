@@ -3,7 +3,7 @@ package playground.wrashid.lib.tools.plan;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.lib.GeneralLib;
 
@@ -37,7 +37,7 @@ public class PlanCloner {
 			scenario.getPopulation().addPerson(person);
 		}
 		
-		GeneralLib.writePersons(scenario.getPopulation().getPersons().values(), outputPlansFile, (NetworkLayer) scenario.getNetwork());
+		GeneralLib.writePersons(scenario.getPopulation().getPersons().values(), outputPlansFile, (NetworkImpl) scenario.getNetwork());
 	}
 	
 	

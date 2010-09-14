@@ -10,7 +10,7 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.yu.visum.filter.finalFilters.FinalEventFilterA;
 
@@ -23,7 +23,7 @@ public class PrintStreamLinkATT extends PrintStreamATTA {
 	private final static String tableName = "Strecken";
 
 	/*------------------------CONSTRUCTOR------------------*/
-	public PrintStreamLinkATT(String fileName, NetworkLayer network) {
+	public PrintStreamLinkATT(String fileName, NetworkImpl network) {
 		super(fileName, network);
 		try {
 			out.writeBytes(tableName + "\n$LINK:NO;FROMNODENO;TONODENO");

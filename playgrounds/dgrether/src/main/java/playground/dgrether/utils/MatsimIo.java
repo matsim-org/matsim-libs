@@ -31,7 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -70,7 +70,7 @@ public class MatsimIo {
 	}
 
 
-	public static Population loadPlans(final String filename, final NetworkLayer network) {
+	public static Population loadPlans(final String filename, final NetworkImpl network) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.setNetwork(network);
 		Population plans = scenario.getPopulation();

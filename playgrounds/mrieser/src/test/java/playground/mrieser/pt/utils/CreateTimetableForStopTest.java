@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
@@ -53,7 +53,7 @@ public class CreateTimetableForStopTest {
 		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getCanonicalName().replace('.', '/') + "/";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();

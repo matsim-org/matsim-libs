@@ -32,7 +32,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  */
 public class Network2LinkGraph extends X2GraphImpl implements X2Graph {
 
-	public Network2LinkGraph(NetworkLayer network,
+	public Network2LinkGraph(NetworkImpl network,
 			CoordinateReferenceSystem coordinateReferenceSystem) {
 		this.geofac = new GeometryFactory();
 		this.network = network;

@@ -23,6 +23,7 @@ package org.matsim.vis.snapshots;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -42,7 +43,7 @@ public class PositionInfoTest extends MatsimTestCase {
 	 */
 	public void testDistanceOnLink_shortLink() {
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 1000));
 		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1000, 10, 9999, 1);
@@ -63,7 +64,7 @@ public class PositionInfoTest extends MatsimTestCase {
 	 */
 	public void testDistanceOnLink_longLink() {
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 1000));
 		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 2000, 10, 9999, 1);

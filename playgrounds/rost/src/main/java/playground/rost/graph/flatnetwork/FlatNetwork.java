@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -44,7 +45,7 @@ import playground.rost.graph.Point;
 public class FlatNetwork {
 	private static final Logger log = Logger.getLogger(FlatNetwork.class);
 
-	protected NetworkLayer input;
+	protected NetworkImpl input;
 	protected Map<Long, Set<FlatLink>> mapLinks = new HashMap<Long, Set<FlatLink>>();
 	protected Set<FlatLink> links = new HashSet<FlatLink>();
 	protected Map<Point, Set<FlatLink>> intersections = new HashMap<Point, Set<FlatLink>>();
@@ -289,9 +290,9 @@ public class FlatNetwork {
 		links.add(fL2);
 	}
 
-	protected NetworkLayer composeOutputNetwork()
+	protected NetworkImpl composeOutputNetwork()
 	{
-		NetworkLayer output = new NetworkLayer();
+		NetworkImpl output = NetworkImpl.createNetwork();
 
 		NodeImpl newNode;
 		CoordImpl newCoord;
@@ -375,13 +376,13 @@ public class FlatNetwork {
 		return output;
 	}
 
-	public NetworkLayer flatten(NetworkLayer input)
+	public NetworkImpl flatten(NetworkImpl input)
 	{
 		this.input = input;
 		parseNetwork();
 		calcIntersections();
 		createNewNodesAndLinks();
-		NetworkLayer output = composeOutputNetwork();
+		NetworkImpl output = composeOutputNetwork();
 		return output;
 	}
 

@@ -37,7 +37,7 @@ import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
@@ -54,11 +54,11 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class NetworkToGraph {
 	private final static String WGS84_UTM47S = "PROJCS[\"WGS_1984_UTM_Zone_47S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000.0],PARAMETER[\"False_Northing\",10000000.0],PARAMETER[\"Central_Meridian\",99.0],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]";
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final CoordinateReferenceSystem crs;
 	private final GeometryFactory geofac;
 
-	public NetworkToGraph(NetworkLayer network, CoordinateReferenceSystem coordinateReferenceSystem) {
+	public NetworkToGraph(NetworkImpl network, CoordinateReferenceSystem coordinateReferenceSystem) {
 		this.geofac = new GeometryFactory();
 		this.network = network;
 		this.crs = coordinateReferenceSystem;
@@ -134,7 +134,7 @@ public class NetworkToGraph {
 	public static void main(String [] args) throws FactoryException, FactoryRegistryException, SchemaException, IllegalAttributeException, IOException {
 		String netfile = "./networks/padang_net_v20080618.xml";
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		CoordinateReferenceSystem crs = CRS.parseWKT(WGS84_UTM47S);
 		Collection<Feature> ft = new NetworkToGraph(network,crs).generateFromNet();

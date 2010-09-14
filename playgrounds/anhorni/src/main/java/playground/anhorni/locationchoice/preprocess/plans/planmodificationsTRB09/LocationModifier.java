@@ -22,6 +22,7 @@ package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB0
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -35,7 +36,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -51,23 +52,23 @@ public class LocationModifier extends Modifier {
 
 	private final static Logger log = Logger.getLogger(LocationModifier.class);
 
-	public LocationModifier(Population plans, NetworkLayer network, ActivityFacilitiesImpl  facilities) {
+	public LocationModifier(Population plans, NetworkImpl network, ActivityFacilitiesImpl  facilities) {
 		super(plans, network, facilities);
 		this.initShopLeisure();
 	}
 
 	private void initShopLeisure(){
 
-		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_gt2500sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_get1000sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_get400sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_get100sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilitiesForActivityType("shop_retail_lt100sqm"));
+		this.shop_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) this.facilities.getFacilitiesForActivityType("shop_retail_gt2500sqm"));
+		this.shop_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) this.facilities.getFacilitiesForActivityType("shop_retail_get1000sqm"));
+		this.shop_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) this.facilities.getFacilitiesForActivityType("shop_retail_get400sqm"));
+		this.shop_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) this.facilities.getFacilitiesForActivityType("shop_retail_get100sqm"));
+		this.shop_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) this.facilities.getFacilitiesForActivityType("shop_retail_lt100sqm"));
 		//this.shop_facilities.putAll(this.facilities.getFacilities("shop_other"));
 
-		this.leisure_facilities.putAll(this.facilities.getFacilitiesForActivityType("leisure_gastro"));
-		this.leisure_facilities.putAll(this.facilities.getFacilitiesForActivityType("leisure_culture"));
-		this.leisure_facilities.putAll(this.facilities.getFacilitiesForActivityType("leisure_sports"));
+		this.leisure_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) this.facilities.getFacilitiesForActivityType("leisure_gastro"));
+		this.leisure_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) this.facilities.getFacilitiesForActivityType("leisure_culture"));
+		this.leisure_facilities.putAll((Map<? extends Id, ? extends ActivityFacilityImpl>) this.facilities.getFacilitiesForActivityType("leisure_sports"));
 
 		this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities);
 		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities);

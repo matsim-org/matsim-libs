@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -418,10 +419,10 @@ public class MultiNodeDijkstraTest extends TestCase {
 	 * @author mrieser
 	 */
 	/*package*/ static class Fixture {
-		/*package*/ NetworkLayer network;
+		/*package*/ NetworkImpl network;
 
 		public Fixture() {
-			this.network = new NetworkLayer();
+			this.network = NetworkImpl.createNetwork();
 			Node node1 = this.network.createAndAddNode(new IdImpl(1), new CoordImpl(1000,    0));
 			Node node2 = this.network.createAndAddNode(new IdImpl(2), new CoordImpl( 500,    0));
 			Node node3 = this.network.createAndAddNode(new IdImpl(3), new CoordImpl(   0,    0));

@@ -29,7 +29,7 @@ import javax.swing.JButton;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.xml.sax.SAXException;
 
@@ -46,7 +46,7 @@ import playground.rost.util.PathTracker;
 
 public class SelectAreaGUI extends AbstractBasicMapGUIImpl {
 
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 	protected JButton btnExtract;
 	protected Border border;
 	
@@ -57,7 +57,7 @@ public class SelectAreaGUI extends AbstractBasicMapGUIImpl {
 
 	}
 	
-	public SelectAreaGUI(NetworkLayer network) {
+	public SelectAreaGUI(NetworkImpl network) {
 		super("Select Area");
 		this.network = network;
 		
@@ -97,7 +97,7 @@ public class SelectAreaGUI extends AbstractBasicMapGUIImpl {
 	{
 		// TODO Auto-generated method stub
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
 		try {
 			nReader.parse(PathTracker.resolve("matMap"));

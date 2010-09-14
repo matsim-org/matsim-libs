@@ -28,20 +28,18 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.facilities.algorithms.FacilitiesDefineCapAndOpentime;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.algorithms.PersonCreatePlanFromKnowledge;
 import org.matsim.population.algorithms.PlansCreateFromNetwork;
 import org.matsim.population.algorithms.PlansDefineKnowledge;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
-import org.matsim.world.WorldWriter;
 
 public class TriangleTest extends MatsimTestCase {
 
@@ -106,11 +104,6 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("running testInitDemand()...");
 
 		final ScenarioImpl scenario = new ScenarioImpl();
-		final World world = scenario.getWorld();
-
-		log.info("  reading world xml file... ");
-		new MatsimWorldReader(scenario).readFile("test/scenarios/triangle/world.xml");
-		log.info("  done.");
 
 		log.info("  reading facilites xml file as a layer of the world...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
@@ -118,15 +111,16 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  reading network xml file... ");
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
-		world.complete(config);
 		log.info("  done.");
 
 		log.info("\n");
 		log.info("1. VALIDATE AND COMPLETE THE WORLD");
 		log.info("\n");
 
+		new WorldConnectLocations(config).connectFacilitiesWithLinks(scenario.getActivityFacilities(), scenario.getNetwork());
+		
 		log.info("\n");
 		log.info("2. SUMMARY INFORMATION OF THE NETWORK");
 		log.info("\n");
@@ -189,13 +183,8 @@ public class TriangleTest extends MatsimTestCase {
 		new FacilitiesWriter(facilities).write(getOutputDirectory() + "output_facilities.xml");
 		log.info("  done.");
 
-		log.info("  writing world xml file... ");
-		new WorldWriter(world).write(getOutputDirectory() + "output_world.xml");
-		log.info("  done.");
-
 		this.compareOutputNetwork();
 		this.checkEnrichedOutputFacilities(getOutputDirectory() + "output_facilities.xml");
-		this.compareOutputWorld("test/scenarios/triangle/world.xml", getOutputDirectory() + "output_world.xml");
 		this.compareOutputPlans();
 
 		log.info("done.");

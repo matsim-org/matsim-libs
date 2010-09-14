@@ -37,7 +37,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 
 	/** Tests the method {@link TimeVariantLinkImpl#getFreespeedTravelTime(double)}.	 */
 	public void testGetFreespeedTravelTime(){
-		final NetworkLayer network = new NetworkLayer();
+		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		network.setFactory(nf);
@@ -74,7 +74,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 * Tests whether an absolute change in the freespeed really can be seen in the link's travel time
 	 */
 	public void testFreespeedChangeAbsolute() {
-		final NetworkLayer network = new NetworkLayer();
+		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		network.setFactory(nf);
@@ -115,7 +115,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 * Tests whether a relative change in the freespeed really can be seen in the link's travel time
 	 */
 	public void testFreespeedChangeRelative() {
-		final NetworkLayer network = new NetworkLayer();
+		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		network.setFactory(nf);
@@ -156,7 +156,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 * Tests how multiple freespeed changes interact with each other on the link.
 	 */
 	public void testMultipleFreespeedChanges() {
-		final NetworkLayer network = new NetworkLayer();
+		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		network.setFactory(nf);
@@ -251,7 +251,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 * Tests whether an absolute change to the flow capacity really can be observed on the link .
 	 */
 	public void testFlowCapChangeAbsolute() {
-		final NetworkLayer network = new NetworkLayer();
+		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		network.setFactory(nf);
@@ -286,7 +286,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 * Tests whether an absolute change to the number of lanes really can be observed on the link.
 	 */
 	public void testLanesChangeAbsolute() {
-		final NetworkLayer network = new NetworkLayer();
+		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		network.setFactory(nf);

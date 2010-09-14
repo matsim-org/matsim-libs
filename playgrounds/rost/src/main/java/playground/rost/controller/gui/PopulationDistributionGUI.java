@@ -37,7 +37,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.xml.sax.SAXException;
 
@@ -63,13 +63,13 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 
 	private static final Logger log = Logger.getLogger(PopulationDistributionGUI.class);
 	
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 	protected BlockCreator popDistri;
 	protected PopulationDensity popVis;
 	protected Blocks blocks;
 	protected PlacePplMap pplMap;
 	
-	public PopulationDistributionGUI(NetworkLayer network, Blocks blocks) {
+	public PopulationDistributionGUI(NetworkImpl network, Blocks blocks) {
 		super("PPL Distribution");
 		
 		this.network = network;
@@ -232,7 +232,7 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 	public static PopulationDistributionGUI parseNetworkAndBlocksAndShowGUI()
 	{
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
 		try {
 			nReader.parse(PathTracker.resolve("flatNetwork"));

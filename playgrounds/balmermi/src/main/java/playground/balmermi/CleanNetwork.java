@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -44,13 +45,13 @@ public class CleanNetwork {
 	public static void cleanNetwork(final String[] args) {
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(args[0]);
 
 //		Counts counts = new Counts();
 //		new MatsimCountsReader(counts).readFile("../../input/counts.xml.gz");
 
-		NetworkLayer subNet = new NetworkLayer();
+		NetworkImpl subNet = NetworkImpl.createNetwork();
 
 		Set<String> modes = new HashSet<String>();
 		modes.add(TransportMode.walk);

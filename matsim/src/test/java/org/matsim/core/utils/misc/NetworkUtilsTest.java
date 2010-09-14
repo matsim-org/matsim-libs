@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -38,7 +39,7 @@ public class NetworkUtilsTest extends MatsimTestCase {
 	private final static Logger log = Logger.getLogger(NetworkUtilsTest.class);
 
 	public void testGetNodes_Empty() {
-		NetworkLayer network = getTestNetwork();
+		NetworkImpl network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, "");
 		assertEquals(0, nodes.size());
 
@@ -50,13 +51,13 @@ public class NetworkUtilsTest extends MatsimTestCase {
 	}
 
 	public void testGetNodes_Null() {
-		NetworkLayer network = getTestNetwork();
+		NetworkImpl network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, null);
 		assertEquals(0, nodes.size());
 	}
 
 	public void testGetNodes_mixedDelimiters() {
-		NetworkLayer network = getTestNetwork();
+		NetworkImpl network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, " 1\t\t2 \n4\t \t5      3 ");
 		assertEquals(5, nodes.size());
 		assertEquals(network.getNodes().get(new IdImpl(1)), nodes.get(0));
@@ -67,7 +68,7 @@ public class NetworkUtilsTest extends MatsimTestCase {
 	}
 
 	public void testGetNodes_NonExistant() {
-		NetworkLayer network = getTestNetwork();
+		NetworkImpl network = getTestNetwork();
 		try {
 			NetworkUtils.getNodes(network, "1 3 ab 5");
 			fail("expected Exception, but didn't happen.");
@@ -77,7 +78,7 @@ public class NetworkUtilsTest extends MatsimTestCase {
 	}
 	
 	public void testGetLinks_Empty() {
-		NetworkLayer network = getTestNetwork();
+		NetworkImpl network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, "");
 		assertEquals(0, links.size());
 		
@@ -89,13 +90,13 @@ public class NetworkUtilsTest extends MatsimTestCase {
 	}
 	
 	public void testGetLinks_StringNull() {
-		NetworkLayer network = getTestNetwork();
+		NetworkImpl network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, (String)null);
 		assertEquals(0, links.size());
 	}
 	
 	public void testGetLinks_mixedDelimiters() {
-		NetworkLayer network = getTestNetwork();
+		NetworkImpl network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, " 1\t\t2 \n4\t \t      3 ");
 		assertEquals(4, links.size());
 		assertEquals(network.getLinks().get(new IdImpl(1)), links.get(0));
@@ -105,7 +106,7 @@ public class NetworkUtilsTest extends MatsimTestCase {
 	}
 	
 	public void testGetLinks_NonExistant() {
-		NetworkLayer network = getTestNetwork();
+		NetworkImpl network = getTestNetwork();
 		try {
 			NetworkUtils.getLinks(network, "1 3 ab 4");
 			fail("expected Exception, but didn't happen.");
@@ -114,10 +115,10 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		}
 	}
 	
-	private NetworkLayer getTestNetwork() {
+	private NetworkImpl getTestNetwork() {
 		int numOfLinks = 5;
 		
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node[] nodes = new Node[numOfLinks+1];
 		for (int i = 0; i <= numOfLinks; i++) {
 			nodes[i] = network.createAndAddNode(new IdImpl(i), new CoordImpl(1000 * i, 0));

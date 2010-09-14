@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Shape2ZoneLayerTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,38 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.demandmodeling;
+package org.matsim.core.api.experimental;
 
-import java.io.IOException;
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Id;
 
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.World;
-import org.matsim.world.WorldWriter;
-import org.matsim.world.ZoneLayer;
 
-/**
- * Creates a simple world with zones taken from an ESRI shape file. The created
- * zones only have a center coordinate defined, but no extent.
- *
- * @author mrieser
- */
-public class ShapeFile2ZoneLayerTest extends MatsimTestCase {
+public interface BasicLocations {
 
-	public void testShp2ZoneLayer() throws IOException {
-		final World world = new World();
-		final ZoneLayer layer = (ZoneLayer) world.createLayer(new IdImpl("zones"), "zones");
-		final String shpFileName = getInputDirectory() + "zones.shp";
-		final String worldFileName = getOutputDirectory() + "zones.xml";
-		final String referenceFileName = getInputDirectory() + "zones.xml";
+	public BasicLocation getLocation(Id id);
 
-		ShapeFile2ZoneLayer shp2zl = new ShapeFile2ZoneLayer();
-		shp2zl.shp2ZoneLayer(shpFileName, layer);
-		world.complete(null);
-		new WorldWriter(world).write(worldFileName);
-
-		assertEquals("Created world does not match reference file.",
-				CRCChecksum.getCRCFromFile(worldFileName), CRCChecksum.getCRCFromFile(referenceFileName));
-	}
 }

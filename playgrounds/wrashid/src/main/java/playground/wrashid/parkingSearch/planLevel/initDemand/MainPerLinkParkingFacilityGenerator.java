@@ -9,7 +9,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 /**
  * Add parking facilities to each road according to their length (at least on per road).
@@ -31,7 +31,7 @@ public class MainPerLinkParkingFacilityGenerator {
 		String facilitiesPath = "C:\\data\\workspace\\playgrounds\\wrashid\\test\\scenarios\\berlin\\parkingFacilities.xml.gz";
 
 		new MatsimNetworkReader(sc).readFile(networkFile);
-		NetworkLayer net = sc.getNetwork();
+		NetworkImpl net = sc.getNetwork();
 
 		ActivityFacilitiesImpl activityFacilities = new ActivityFacilitiesImpl();
 
@@ -43,7 +43,7 @@ public class MainPerLinkParkingFacilityGenerator {
 			int parkingCapacity = (int) Math.round(Math.ceil(link.getLength() / 2.0 / 5.0/100.0/2));
 			totalNumberOfParkingsAdded+=parkingCapacity;
 			ActivityFacilityImpl activityFacility = activityFacilities.createFacility(new IdImpl(parkPlatzId), link.getCoord());
-			activityFacility.createActivityOption("parking").setCapacity(parkingCapacity);
+			activityFacility.createActivityOption("parking").setCapacity((double) parkingCapacity);
 			parkPlatzId++;
 		}
 		

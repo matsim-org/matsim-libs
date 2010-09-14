@@ -6,7 +6,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.world.WorldUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.anhorni.locationchoice.preprocess.helper.Utils;
 
@@ -61,7 +61,7 @@ public class TripMeasureDistribution {
 	
 	// in our simulation there are only shopping facilities inside zh circle
 	private boolean intersect(MZTrip mzTrip, double radius, CoordImpl center) {		
-		double distance = WorldUtils.distancePointLinesegment(
+		double distance = CoordUtils.distancePointLinesegment(
 				mzTrip.getCoordStart(), mzTrip.getCoordEnd(), center);
 		
 		if (distance <= radius) return true;

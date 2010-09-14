@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.evacuation.base.Building;
@@ -36,14 +36,14 @@ import org.matsim.evacuation.shelters.EvacuationShelterNetLoader;
 
 public class EvacuationShelterNetLoaderForShelterAllocation extends EvacuationShelterNetLoader {
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private List<Building> buildings;
 	private Scenario scenario;
 
 	public EvacuationShelterNetLoaderForShelterAllocation(
 			List<Building> buildings, Scenario scenario, List<FloodingReader> netcdf) {
 		super(buildings, scenario,netcdf);
-		this.network = (NetworkLayer) scenario.getNetwork();
+		this.network = (NetworkImpl) scenario.getNetwork();
 		this.buildings = buildings;
 		this.scenario = scenario;
 	}

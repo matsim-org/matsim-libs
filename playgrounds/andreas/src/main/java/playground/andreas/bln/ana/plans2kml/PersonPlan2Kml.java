@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
@@ -41,7 +41,7 @@ public class PersonPlan2Kml extends NewPopulation{
 
 	boolean warningPrinted = false;
 	String outputDir;
-	NetworkLayer network;
+	NetworkImpl network;
 	TreeSet<String> agentIds;
 
 	/**
@@ -52,7 +52,7 @@ public class PersonPlan2Kml extends NewPopulation{
 	 * @param outputDir Directory for kml output
 	 * @param agentIds Ids of agents to be converted. Be careful: If <code>null</code> every agent will be converted.
 	 */
-	public PersonPlan2Kml(NetworkLayer network, Population population, String outputDir, TreeSet<String> agentIds) {
+	public PersonPlan2Kml(NetworkImpl network, Population population, String outputDir, TreeSet<String> agentIds) {
 		super(network, population, "nofile.xml");
 		this.outputDir = outputDir;
 		this.network = network;
@@ -87,7 +87,7 @@ public class PersonPlan2Kml extends NewPopulation{
 
 		ScenarioImpl s = new ScenarioImpl();
 
-		NetworkLayer network = s.getNetwork();
+		NetworkImpl network = s.getNetwork();
 		new MatsimNetworkReader(s).readFile(networkFilename);
 
 		Population population = s.getPopulation();

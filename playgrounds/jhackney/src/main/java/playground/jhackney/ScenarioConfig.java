@@ -33,7 +33,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.MatsimWorldReader;
@@ -213,9 +213,10 @@ public abstract class ScenarioConfig {
 	public static final World readWorld() {
 		System.out.println("  reading world xml file... ");
 //		new MatsimWorldReader(Gbl.getWorld()).readFile(Gbl.getConfig().world().getInputFile());
-		new MatsimWorldReader(scenario).readFile(worldFileName);
+		World world = new World();
+		new MatsimWorldReader(scenario, world).readFile(worldFileName);
 		System.out.println("  done.");
-		return scenario.getWorld();
+		return world;
 	}
 
 	public static final ActivityFacilitiesImpl readFacilities() {
@@ -227,10 +228,10 @@ public abstract class ScenarioConfig {
 		return facilities;
 	}
 
-	public static final NetworkLayer readNetwork() {
+	public static final NetworkImpl readNetwork() {
 		System.out.println("  reading the network xml file...");
 		System.out.println(scenario.getConfig().network().getInputFile());
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 //		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 		System.out.println("  done.");

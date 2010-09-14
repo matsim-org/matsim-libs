@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -57,12 +57,12 @@ public class DeriveSmallScenarioFromBigOne {
 
 		ScenarioImpl bigNetScenario = new ScenarioImpl();
 		log.info("Reading network " + bigNetworkFile);
-		NetworkLayer bigNet = bigNetScenario.getNetwork();
+		NetworkImpl bigNet = bigNetScenario.getNetwork();
 		new MatsimNetworkReader(bigNetScenario).readFile(bigNetworkFile);
 
 		ScenarioImpl smallNetScenario = new ScenarioImpl();
 		log.info("Reading network " + smallNetworkFile);
-		NetworkLayer smallNet = smallNetScenario.getNetwork();
+		NetworkImpl smallNet = smallNetScenario.getNetwork();
 		new MatsimNetworkReader(smallNetScenario).readFile(smallNetworkFile);
 
 		log.info("Reading routed population: " + wholeRoutedPlansFile);
@@ -116,7 +116,7 @@ public class DeriveSmallScenarioFromBigOne {
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(xy2linksOut);//config.plans().getOutputFile());
-		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links((NetworkLayer) network));
+		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links((NetworkImpl) network));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();

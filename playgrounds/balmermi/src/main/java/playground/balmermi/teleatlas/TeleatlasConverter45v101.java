@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
@@ -512,7 +512,7 @@ public class TeleatlasConverter45v101 {
 		new NetworkWriteAsTable(outputDir.toString()).run(scenario.getNetwork());
 
 		log.info("fix double links...");
-		new NetworkDoubleLinks("d").run((NetworkLayer)scenario.getNetwork());
+		new NetworkDoubleLinks("d").run((NetworkImpl)scenario.getNetwork());
 
 		log.info("write final version of network...");
 		outputDir = new File(outdir+"/final");

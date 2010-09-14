@@ -27,8 +27,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
@@ -57,8 +59,8 @@ public class FacilitiesAnalysis {
 	private final Set<String> getActOptTypes(ActivityFacilitiesImpl facilities) {
 		log.info("  extract actOptTypes...");
 		Set<String> actOptTypes = new TreeSet<String>();
-		for (ActivityFacilityImpl facility : facilities.getFacilities().values()) {
-			for (ActivityOptionImpl actOpt : facility.getActivityOptions().values()) {
+		for (ActivityFacility facility : facilities.getFacilities().values()) {
+			for (ActivityOption actOpt : facility.getActivityOptions().values()) {
 				actOptTypes.add(actOpt.getType());
 			}
 		}
@@ -73,8 +75,8 @@ public class FacilitiesAnalysis {
 		BufferedWriter out = IOUtils.getBufferedWriter(outdir+"/facilities_"+actOptType+".txt.gz");
 		out.write("ID\tX\tY\tCAPACITY\n");
 		out.flush();
-		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			ActivityOptionImpl ao = f.getActivityOptions().get(actOptType);
+		for (ActivityFacility f : facilities.getFacilities().values()) {
+			ActivityOption ao = f.getActivityOptions().get(actOptType);
 			if (ao != null) {
 				out.write(f.getId().toString()+"\t");
 				out.write(f.getCoord().getX()+"\t");

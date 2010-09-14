@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -57,7 +58,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 
 			System.out.println("|--------------------------------------------------------------------------------------------------|") ;
 			long cnt = 0 ; long percentDone = 0 ;
-			for ( ActivityFacilityImpl fromZone : zones.getFacilities().values() ) {
+			for ( ActivityFacility fromZone : zones.getFacilities().values() ) {
 				if ( (int) (100.*cnt/zones.getFacilities().size()) > percentDone ) {
 					percentDone++ ; System.out.print('.') ;
 				}
@@ -68,7 +69,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 				assert( fromNode != null ) ;
 				st.setOrigin( fromNode ) ;
 				st.run(network) ;
-				for ( ActivityFacilityImpl toZone : zones.getFacilities().values() ) {
+				for ( ActivityFacility toZone : zones.getFacilities().values() ) {
 					Coord toCoord = toZone.getCoord() ;
 					Node toNode = network.getNearestNode( toCoord ) ;
 					double arrTime = st.getTree().get(toNode.getId()).getTime();

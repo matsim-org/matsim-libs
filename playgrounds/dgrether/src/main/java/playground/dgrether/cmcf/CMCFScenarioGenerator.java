@@ -29,7 +29,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -89,7 +89,7 @@ public class CMCFScenarioGenerator {
 
 	private Config config;
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 
 	public CMCFScenarioGenerator() throws Exception {
 		init();

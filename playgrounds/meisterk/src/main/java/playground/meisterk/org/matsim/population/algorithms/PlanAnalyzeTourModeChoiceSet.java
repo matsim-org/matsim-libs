@@ -194,9 +194,9 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			if (!modeTracker.containsKey(mode)) {
 				if (chainBasedModes.contains(mode)) {
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
-						currentLocation = (ActivityFacilityImpl) facilities.getFacilities().get(((PlanImpl) plan).getFirstActivity().getFacilityId());
+						currentLocation = (MappedLocation) facilities.getFacilities().get(((PlanImpl) plan).getFirstActivity().getFacilityId());
 					} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
-						currentLocation = (LinkImpl) network.getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId());
+						currentLocation = (MappedLocation) network.getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId());
 					}
 					modeTracker.put(mode, currentLocation);
 				}
@@ -215,15 +215,15 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 				if (chainBasedModes.contains(legMode)) {
 					currentLocation = modeTracker.get(legMode);
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
-						requiredLocation = (ActivityFacilityImpl) facilities.getFacilities().get(((PlanImpl) plan).getPreviousActivity(currentLeg).getFacilityId());
+						requiredLocation = (MappedLocation) facilities.getFacilities().get(((PlanImpl) plan).getPreviousActivity(currentLeg).getFacilityId());
 					} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
-						requiredLocation = (LinkImpl) network.getLinks().get(((PlanImpl) plan).getPreviousActivity(currentLeg).getLinkId());
+						requiredLocation = (MappedLocation) network.getLinks().get(((PlanImpl) plan).getPreviousActivity(currentLeg).getLinkId());
 					}
 					if (currentLocation.equals(requiredLocation)) {
 						if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
-							nextLocation = (ActivityFacilityImpl) facilities.getFacilities().get(((PlanImpl) plan).getNextActivity(currentLeg).getFacilityId());
+							nextLocation = (MappedLocation) facilities.getFacilities().get(((PlanImpl) plan).getNextActivity(currentLeg).getFacilityId());
 						} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
-							nextLocation = (LinkImpl) network.getLinks().get(((PlanImpl) plan).getNextActivity(currentLeg).getLinkId());
+							nextLocation = (MappedLocation) network.getLinks().get(((PlanImpl) plan).getNextActivity(currentLeg).getLinkId());
 						}
 						modeTracker.put(legMode, nextLocation);
 					} else {
@@ -243,12 +243,12 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			HashSet<MappedLocation> allowedLocations = new HashSet<MappedLocation>();
 			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility
 					.equals(tripStructureAnalysisLayer)) {
-				allowedLocations.add((ActivityFacilityImpl) facilities.getFacilities().get(((PlanImpl) plan).getFirstActivity().getFacilityId()));
-				allowedLocations.add((ActivityFacilityImpl) facilities.getFacilities().get(((PlanImpl) plan).getLastActivity().getFacilityId()));
+				allowedLocations.add((MappedLocation) facilities.getFacilities().get(((PlanImpl) plan).getFirstActivity().getFacilityId()));
+				allowedLocations.add((MappedLocation) facilities.getFacilities().get(((PlanImpl) plan).getLastActivity().getFacilityId()));
 			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link
 					.equals(tripStructureAnalysisLayer)) {
-				allowedLocations.add((LinkImpl) network.getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId()));
-				allowedLocations.add((LinkImpl) network.getLinks().get(((PlanImpl) plan).getLastActivity().getLinkId()));
+				allowedLocations.add((MappedLocation) network.getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId()));
+				allowedLocations.add((MappedLocation) network.getLinks().get(((PlanImpl) plan).getLastActivity().getLinkId()));
 			}
 
 			Iterator<String> modeTrackerCheck = modeTracker.keySet().iterator();

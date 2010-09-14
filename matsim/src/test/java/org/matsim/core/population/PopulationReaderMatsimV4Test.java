@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.testcases.utils.AttributesBuilder;
 import org.xml.sax.Attributes;
@@ -183,7 +183,7 @@ public class PopulationReaderMatsimV4Test {
 	@Test
 	public void testReadActivity() {
 		final ScenarioImpl scenario = new ScenarioImpl();
-		final NetworkLayer network = scenario.getNetwork();
+		final NetworkImpl network = scenario.getNetwork();
 		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(0, 0));
 		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(0, 1000));
 		Link link3 = network.createAndAddLink(scenario.createId("3"), node1, node2, 1000.0, 10.0, 2000.0, 1);

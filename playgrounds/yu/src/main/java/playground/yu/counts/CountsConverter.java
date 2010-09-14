@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -30,7 +30,7 @@ public class CountsConverter {
 	public static void main(String[] args) {
 		// ------------READ MATSIM NETWORK-----------------
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario)
 				.readFile("../berlin data/old_wip/wip_net.xml");
 		// ------------READ .ATT COUNTSFILE----------------

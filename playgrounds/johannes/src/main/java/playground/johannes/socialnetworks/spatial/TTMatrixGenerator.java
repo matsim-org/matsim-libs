@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
@@ -79,7 +79,7 @@ public class TTMatrixGenerator {
 		 * read network
 		 */
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
 		reader.parse(args[0]);
 		/*
@@ -119,7 +119,7 @@ public class TTMatrixGenerator {
 		
 		private static final Logger logger = Logger.getLogger(RunThread.class);
 		
-		private NetworkLayer network;
+		private NetworkImpl network;
 		
 		private Queue<ZoneLegacy> zones;
 		
@@ -133,7 +133,7 @@ public class TTMatrixGenerator {
 		
 		private Map<ZoneLegacy, Set<Node>> nodeMapping;
 		
-		public RunThread(NetworkLayer network, Queue<ZoneLegacy> zones, ZoneLayerLegacy zoneLayer, TravelTimeMatrix matrix, final TravelTimeCalculator ttCalculator) {
+		public RunThread(NetworkImpl network, Queue<ZoneLegacy> zones, ZoneLayerLegacy zoneLayer, TravelTimeMatrix matrix, final TravelTimeCalculator ttCalculator) {
 			total = zones.size() * zones.size();
 			this.network = network;
 			this.zones = zones;

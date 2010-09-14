@@ -25,6 +25,6 @@ import org.matsim.core.facilities.ActivityOption;
 
 public interface ActivityFacility extends Facility {
 
-	public Map<String, ? extends ActivityOption> getActivityOptions();
+	public Map<String, ActivityOption> getActivityOptions();
 
 }

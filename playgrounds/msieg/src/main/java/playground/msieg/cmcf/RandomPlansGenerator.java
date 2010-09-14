@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -58,7 +58,7 @@ import org.xml.sax.SAXException;
  */
 public class RandomPlansGenerator {
 
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 
 	private Random rand;
 

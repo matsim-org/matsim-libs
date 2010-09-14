@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
@@ -47,7 +47,7 @@ import playground.msieg.structure.Commodity;
 
 public class CMCFDemandWriter{
 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	private final Population plans;
 	private final PopulationReader popReader;
 	private final ScenarioImpl scenario;

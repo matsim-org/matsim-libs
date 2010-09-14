@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -36,7 +37,7 @@ public class PlansCensusV1Adapter {
 				"home", facilities.getFacilitiesForActivityType("home"));
 
 
-		TreeMap<Id, ActivityFacilityImpl> educationTreeMap =
+		TreeMap<Id, ActivityFacility> educationTreeMap =
 			facilities.getFacilitiesForActivityType("education_kindergarten");
 		educationTreeMap.putAll(facilities.getFacilitiesForActivityType("education_primary"));
 		educationTreeMap.putAll(facilities.getFacilitiesForActivityType("education_secondary"));
@@ -47,7 +48,7 @@ public class PlansCensusV1Adapter {
 				"education", educationTreeMap);
 
 
-		TreeMap<Id, ActivityFacilityImpl> workTreeMap =
+		TreeMap<Id, ActivityFacility> workTreeMap =
 			facilities.getFacilitiesForActivityType("work_sector2");
 		workTreeMap.putAll(facilities.getFacilitiesForActivityType("work_sector3"));
 		workTreeMap.putAll(facilities.getFacilitiesForActivityType("work"));

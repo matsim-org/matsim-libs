@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -39,7 +40,7 @@ public class BasicLinkImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testAllowedModes() {
-		NetworkLayer network = new NetworkLayer();
+		NetworkImpl network = NetworkImpl.createNetwork();
 		Node n1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node n2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link l = network.createAndAddLink(new IdImpl(1), n1, n2, 1000, 10, 3600, 1);

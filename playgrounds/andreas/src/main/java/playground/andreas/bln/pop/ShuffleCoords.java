@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
@@ -114,7 +114,7 @@ public class ShuffleCoords extends NewPopulation {
 		String inPlansFile = "./plan_korridor_50x.xml.gz";
 		String outPlansFile = "./plan_korridor_50x_sc.xml.gz";
 
-		NetworkLayer net = sc.getNetwork();
+		NetworkImpl net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();

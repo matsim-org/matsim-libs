@@ -25,7 +25,7 @@ import java.awt.event.MouseEvent;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.rost.graph.Border;
 import playground.rost.graph.GraphAlgorithms;
@@ -37,8 +37,8 @@ public class SelectBorderMap extends BasicMapImpl {
 
 	public Border border = new Border();
 	
-	NetworkLayer network;
-	public SelectBorderMap(NetworkLayer network)
+	NetworkImpl network;
+	public SelectBorderMap(NetworkImpl network)
 	{
 		this.network = network;
 	}

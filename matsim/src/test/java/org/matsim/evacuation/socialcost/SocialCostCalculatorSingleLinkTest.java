@@ -17,7 +17,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 
 public class SocialCostCalculatorSingleLinkTest extends TestCase {
 
@@ -149,7 +149,7 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 	private static class Fixture {
 		/*package*/ ArrayList<Vehicle> agents;
 		/*package*/ ScenarioImpl sc;
-		/*package*/ NetworkLayer network;
+		/*package*/ NetworkImpl network;
 		/*package*/ Id l0;
 		/*package*/ LinkImpl link0;
 

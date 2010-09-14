@@ -30,7 +30,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -237,7 +237,7 @@ public class QLinkTest extends MatsimTestCase {
 	  ScenarioImpl scenario = new ScenarioImpl(conf);
 	  conf.setQSimConfigGroup(new QSimConfigGroup());
 
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1, 0));
@@ -369,7 +369,7 @@ public class QLinkTest extends MatsimTestCase {
 		/*package*/ Fixture() {
 			this.scenario = new ScenarioImpl();
 			this.scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
-			NetworkLayer network = this.scenario.getNetwork();
+			NetworkImpl network = this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
 			Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 			Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1, 0));

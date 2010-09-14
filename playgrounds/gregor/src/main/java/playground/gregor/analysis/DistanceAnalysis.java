@@ -50,7 +50,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -355,7 +355,7 @@ public class DistanceAnalysis {
 		ScenarioImpl scenario = new ScenarioImpl(config);
 
 		log.info("loading network from " + config.network().getInputFile());
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
 
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());

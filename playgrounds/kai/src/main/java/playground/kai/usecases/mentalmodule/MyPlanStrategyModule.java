@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 
 @SuppressWarnings("unused")
@@ -42,7 +42,7 @@ ActivityEndEventHandler // this is just there as an example
 	private static final Logger log = Logger.getLogger(MyPlanStrategyModule.class);
 
 	ScenarioImpl sc;
-	NetworkLayer net;
+	NetworkImpl net;
 	Population pop;
 
 	public MyPlanStrategyModule(Controler controler) {

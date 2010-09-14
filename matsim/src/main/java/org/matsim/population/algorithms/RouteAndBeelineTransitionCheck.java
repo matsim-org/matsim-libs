@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -46,7 +46,7 @@ import org.matsim.core.router.util.DijkstraFactory;
  */
 public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 
-	private NetworkLayer network = null;
+	private NetworkImpl network = null;
 	private Set<Id> aOI = new HashSet<Id>();
 	private PlansCalcRoute router = null;
 
@@ -57,7 +57,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 	// count[3] --> # beeline intersect AOI, plan leg intersect AOI
 	public int[] count;
 
-	public RouteAndBeelineTransitionCheck(final NetworkLayer net, final Set<Id> areaOfInterest) {
+	public RouteAndBeelineTransitionCheck(final NetworkImpl net, final Set<Id> areaOfInterest) {
 		this.network = net;
 		this.aOI = areaOfInterest;
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup());

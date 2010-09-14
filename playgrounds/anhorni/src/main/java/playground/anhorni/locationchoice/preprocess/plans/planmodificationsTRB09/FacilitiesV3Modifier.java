@@ -26,14 +26,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Counter;
 
 public class FacilitiesV3Modifier extends Modifier {
 
 	private final static Logger log = Logger.getLogger(FacilitiesV3Modifier.class);
 
-	public FacilitiesV3Modifier(Population plans, NetworkLayer network, ActivityFacilitiesImpl  facilities){
+	public FacilitiesV3Modifier(Population plans, NetworkImpl network, ActivityFacilitiesImpl  facilities){
 		super(plans, network, facilities);
 	}
 

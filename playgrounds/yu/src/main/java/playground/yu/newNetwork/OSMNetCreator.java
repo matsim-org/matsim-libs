@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 
 import playground.yu.analysis.NetworkLinkIdsInCircle;
@@ -57,7 +57,7 @@ public class OSMNetCreator {
 			}
 	}
 
-	public OSMNetCreator(final NetworkLayer network) {
+	public OSMNetCreator(final NetworkImpl network) {
 		capperiod = network.getCapacityPeriod() / 3600.0;// ss-->hh
 	}
 
@@ -68,7 +68,7 @@ public class OSMNetCreator {
 		// final String outputNetFilename = "test/yu/utils/ivtch-osm.1.3.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 		// (1) -----------links in Circle---------------------------
 		Set<String> linkIdsInCircle = new NetworkLinkIdsInCircle(network)
