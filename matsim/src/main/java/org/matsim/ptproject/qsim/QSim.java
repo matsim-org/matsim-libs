@@ -67,6 +67,7 @@ import org.matsim.ptproject.qsim.interfaces.QSimEngineFactory;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.ptproject.qsim.interfaces.SimTimerI;
+import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.ptproject.qsim.netsimengine.CarDepartureHandler;
 import org.matsim.ptproject.qsim.netsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.netsimengine.DefaultQSimEngineFactory;
@@ -112,7 +113,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 	private QSimEngineImpl netEngine = null;
 	private NetworkChangeEventsEngine changeEventsEngine = null;
-
+	private MultiModalSimEngine multiModalEngine = null;
+	
 	private CarDepartureHandler carDepartureHandler;
 
 	private SimTimerI simTimer;
@@ -157,6 +159,10 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		init(simEngineFac);
 	}
 
+	public void setMultiModalSimEngine(MultiModalSimEngine multiModalEngine) {
+		this.multiModalEngine = multiModalEngine;
+	}
+	
 	/**
 	 * extended constructor method that can also be after assignments of another constructor
 	 * <p/>
@@ -286,6 +292,9 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		if ( this.netEngine != null ) {
 			this.netEngine.onPrepareSim();
 		}
+		if (this.multiModalEngine != null) {
+			this.multiModalEngine.onPrepareSim();
+		}
 		if (this.signalEngine != null) {
 			this.signalEngine.onPrepareSim();
 		}
@@ -333,6 +342,10 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 		if ( this.netEngine != null ) {
 			this.netEngine.afterSim();
+		}
+		
+		if (this.multiModalEngine != null) {
+			this.multiModalEngine.afterSim();
 		}
 
 		double now = this.simTimer.getTimeOfDay();
@@ -385,12 +398,17 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 		// "facilities" "engine":
 		this.handleActivityEnds(time);
-
+		
 		// network engine:
 		if ( this.netEngine != null ) {
 			this.netEngine.doSimStep(time);
 		}
 
+		// multi modal engine:
+		if (this.multiModalEngine != null) {
+			this.multiModalEngine.doSimStep(time);
+		}
+		
 		this.printSimLog(time);
 		if (time >= this.snapshotTime) {
 			this.snapshotTime += this.snapshotPeriod;
@@ -589,6 +607,15 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + this.agentCounter.getLiving()
 					+ " lost=" + this.agentCounter.getLost() + " #links=" + nofActiveLinks
 					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
+
+			if (this.multiModalEngine != null) {
+				nofActiveLinks = this.multiModalEngine.getNumberOfSimulatedLinks();
+				int nofActiveNodes = this.multiModalEngine.getNumberOfSimulatedNodes();
+				log.info("SIMULATION (MultiModalSim) AT " + Time.writeTime(time) + 
+						" #links=" + nofActiveLinks +
+						" #nodes=" + nofActiveNodes);
+			}
+			
 			Gbl.printMemoryUsage();
 		}
 	}

@@ -23,6 +23,8 @@ package org.matsim.ptproject.qsim.netsimengine;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -32,13 +34,14 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.utils.customize.Customizable;
 import org.matsim.vis.snapshots.writers.VisData;
 import org.matsim.vis.snapshots.writers.VisNode;
 
 /**
  * Represents a node in the QueueSimulation.
  */
-public class QNode implements VisNode {
+public class QNode implements VisNode, Customizable {
 
 	private static final Logger log = Logger.getLogger(QNode.class);
 
@@ -51,6 +54,9 @@ public class QNode implements VisNode {
 
 	private final Node node;
 
+	// for Customizable
+	private Map<String, Object> customAttributes = new HashMap<String, Object>();
+	
 	/**
 	 * Indicates whether this node is signalized or not
 	 */
@@ -264,6 +270,11 @@ public class QNode implements VisNode {
 	@Override
 	public VisData getVisData() {
 		return null;
+	}
+	
+	@Override
+	public Map<String, Object> getCustomAttributes() {
+		return customAttributes;
 	}
 
 }
