@@ -54,7 +54,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	protected int unsuccessfullLC = 0;
 	private final DefineFlexibleActivities defineFlexibleActivities;
 	private final LeisureFacilityExtractor leisureFacilityExtractor;
-	private final QuadTreeRing<ActivityFacilityImpl> leisureQuadtree;
+	private final QuadTreeRing<ActivityFacility> leisureQuadtree;
 
 	private final static Logger log = Logger.getLogger(LeisureFacilityExtractor.class);
 
@@ -198,10 +198,10 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	private boolean modifyLeisureLocation(ActivityImpl act, CoordImpl coordActPre) {
 
 		String type = act.getType();
-		ActivityFacilityImpl facility = null;
+		ActivityFacility facility = null;
 		if (type.equals("leisure*") || type.equals("leisure")) {	// FOR DEBUIGGING // mode ride
-			ArrayList<ActivityFacilityImpl> facilitySet =
-				(ArrayList<ActivityFacilityImpl>)this.leisureQuadtree.get(coordActPre.getX(), coordActPre.getY(),
+			ArrayList<ActivityFacility> facilitySet =
+				(ArrayList<ActivityFacility>)this.leisureQuadtree.get(coordActPre.getX(), coordActPre.getY(),
 					MatsimRandom.getRandom().nextInt(5 * 1000));
 			if (facilitySet.size() > 1) {
 				facility = facilitySet.get(MatsimRandom.getRandom().nextInt(facilitySet.size()));

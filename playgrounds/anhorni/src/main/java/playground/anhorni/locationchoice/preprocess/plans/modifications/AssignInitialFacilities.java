@@ -23,7 +23,7 @@ package playground.anhorni.locationchoice.preprocess.plans.modifications;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Counter;
@@ -33,9 +33,9 @@ import org.matsim.locationchoice.utils.QuadTreeRing;
 public class AssignInitialFacilities {
 
 	private final static Logger log = Logger.getLogger(AssignInitialFacilities.class);
-	private QuadTreeRing<ActivityFacilityImpl> actTree = null;
+	private QuadTreeRing<ActivityFacility> actTree = null;
 
-	public AssignInitialFacilities(final QuadTreeRing<ActivityFacilityImpl> actTree) {
+	public AssignInitialFacilities(final QuadTreeRing<ActivityFacility> actTree) {
 		this.actTree = actTree;
 	}
 

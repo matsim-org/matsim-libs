@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.locationchoice.utils.QuadTreeRing;
@@ -19,11 +18,11 @@ import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeB
 
 public class PlansCensusV1Adapter {
 
-	private QuadTreeRing<ActivityFacilityImpl> shopTree;
-	private QuadTreeRing<ActivityFacilityImpl> leisureTree;
-	private QuadTreeRing<ActivityFacilityImpl> homeTree;
-	private QuadTreeRing<ActivityFacilityImpl> educationTree;
-	private QuadTreeRing<ActivityFacilityImpl> workTree;
+	private QuadTreeRing<ActivityFacility> shopTree;
+	private QuadTreeRing<ActivityFacility> leisureTree;
+	private QuadTreeRing<ActivityFacility> homeTree;
+	private QuadTreeRing<ActivityFacility> educationTree;
+	private QuadTreeRing<ActivityFacility> workTree;
 
 	private void init(ActivityFacilitiesImpl facilities) {
 		FacilityQuadTreeBuilder builder = new FacilityQuadTreeBuilder();
