@@ -130,8 +130,8 @@ public class StrategyManager {
 	 *
 	 * @param population
 	 */
-	// do not override this function.  Use the "hooks" instead.  kai, sep'10
-	public final void run(final Population population) {
+	@Deprecated // do not override this function.  Use the "hooks" instead.  kai, sep'10
+	public void run( final Population population) {
 		beforePopulationRunHook( population ) ;
 		
 		// initialize all strategies
