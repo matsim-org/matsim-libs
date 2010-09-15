@@ -63,14 +63,6 @@ public class TriangleTest extends MatsimTestCase {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void compareOutputWorld(String refFilename, String testFilename) {
-		log.info("  comparing input and output world file... ");
-		long checksum_ref = CRCChecksum.getCRCFromFile(refFilename);
-		long checksum_run = CRCChecksum.getCRCFromFile(testFilename);
-		assertEquals("different world files", checksum_ref, checksum_run);
-		log.info("  done.");
-	}
-
 	private final void checkEnrichedOutputFacilities(String filename) {
 		log.info("  checksum check of enriched output facilities... ");
 		long checksum_facilities = CRCChecksum.getCRCFromFile(filename);
@@ -120,7 +112,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 
 		new WorldConnectLocations(config).connectFacilitiesWithLinks(scenario.getActivityFacilities(), scenario.getNetwork());
-		
+
 		log.info("\n");
 		log.info("2. SUMMARY INFORMATION OF THE NETWORK");
 		log.info("\n");

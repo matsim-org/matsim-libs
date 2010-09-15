@@ -100,12 +100,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startNetwork(final Attributes atts) {
-		if (network instanceof NetworkImpl){
-			((NetworkImpl) this.network).setName(atts.getValue("name"));
-		}
-		else {
-			log.warn("used instance of Network doesn't support names, ignoring attribute.");
-		}
+		this.network.setName(atts.getValue("name"));
 		if (atts.getValue("type") != null) {
 			log.info("Attribute 'type' is deprecated. There's always only ONE network, where the links and nodes define, which transportation mode is allowed to use it (for the future)");
 		}

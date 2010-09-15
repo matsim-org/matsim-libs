@@ -134,20 +134,15 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
 			}
-				if (network instanceof NetworkImpl) {
-					try {
-						new MatsimNetworkReader(this.scenario).parse(networkFileName);
-					} catch (SAXException e) {
-						throw new RuntimeException(e);
-					} catch (ParserConfigurationException e) {
-						throw new RuntimeException(e);
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
-				} else {
-					throw new IllegalStateException(
-							"Implementation of Network interface not supported, a specific parser is needed for this implementation of Network interface!");
-				}
+			try {
+				new MatsimNetworkReader(this.scenario).parse(networkFileName);
+			} catch (SAXException e) {
+				throw new RuntimeException(e);
+			} catch (ParserConfigurationException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + config.network().getChangeEventsInputFile());
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);

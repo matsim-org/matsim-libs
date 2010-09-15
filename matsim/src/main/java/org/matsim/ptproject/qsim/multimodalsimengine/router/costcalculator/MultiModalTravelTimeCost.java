@@ -34,47 +34,47 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 	private PlansCalcRouteConfigGroup group;
 	private double speed = 1.0;
 	private Person person;
-	
+
 	/*
 	 * By default: use Walk as TransportMode.
 	 */
 	public MultiModalTravelTimeCost(PlansCalcRouteConfigGroup group) {
 		this(group, TransportMode.walk);
 	}
-	
+
 	public MultiModalTravelTimeCost(PlansCalcRouteConfigGroup group, String transportMode) {
 		this.group = group;
-		
+
 		if (transportMode.equals(TransportMode.bike)) speed = group.getBikeSpeed();
 		else if (transportMode.equals(TransportMode.walk)) speed = group.getWalkSpeed();
 		else if (transportMode.equals(TransportMode.pt)) ;	// nothing to do here
 		else if (transportMode.equals(TransportMode.ride)) ; // nothing to do here
 		else throw new RuntimeException("Not supported TransportMode: " + transportMode);
-		
+
 		/*
 		 * By default: us FreeSpeedTravelTimes.
 		 */
 		travelTime = new FreeSpeedTravelTime();
 	}
-	
+
 	public void setTravelTime(TravelTime travelTime) {
 		this.travelTime = travelTime;
 	}
-	
+
 	@Override
 	public double getLinkTravelTime(Link link, double time) {
 		return calculateAgeScaleFactor() * link.getLength() / speed;
 	}
-	
+
 	@Override
 	public double getLinkTravelCost(Link link, double time) {
 		return getLinkTravelTime(link, time);
 	}
-	
+
 	/*
 	 * Scale the speed of walk/bike legs depending on the age
 	 * of an Agent.
-	 * 
+	 *
 	 * We use for:
 	 * 		0-6 years: 		0.75	(we assume that babies are carried by their parents)
 	 * 		6-10 years: 	0.85
@@ -94,7 +94,7 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 	private double calculateAgeScaleFactor() {
 		if (person != null && person instanceof PersonImpl) {
 			int age = ((PersonImpl)person).getAge();
-			
+
 			if (age <= 6) return 0.75;
 			else if (age <= 10) return 0.85;
 			else if (age <= 15) return 0.95;
@@ -113,12 +113,13 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 		else return 1.0;
 	}
 
+	@Override
 	public double getModalLinkTravelTime(Link link, double time, String transportMode) {
 		double speed = 1.0;
-		
+
 		if (transportMode.equals(TransportMode.bike)) {
 			/*
-			 * If the link allows bike trips, we use bike speed. 
+			 * If the link allows bike trips, we use bike speed.
 			 * Otherwise we check whether walk trips are allowed and return walk speed.
 			 * If neither bike nor walk is allowed on the link, the default speed of 1.0
 			 * is used.
@@ -128,10 +129,10 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 		}
 		else if (transportMode.equals(TransportMode.walk)) {
 			/*
-			 * If the link allows walk or bike trips, we use walk speed. 
+			 * If the link allows walk or bike trips, we use walk speed.
 			 * If both modes are not allowed, use the default speed of 1.0 instead.
 			 */
-			if (link.getAllowedModes().contains(TransportMode.walk) || 
+			if (link.getAllowedModes().contains(TransportMode.walk) ||
 				link.getAllowedModes().contains(TransportMode.bike)) speed = group.getWalkSpeed();
 		}
 		else if (transportMode.equals(TransportMode.pt)) {
@@ -153,7 +154,7 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 					link.getAllowedModes().contains(TransportMode.walk)) speed = group.getWalkSpeed();
 		}
 		else throw new RuntimeException("Not supported TransportMode: " + transportMode);
-		
+
 		return link.getLength() / speed;
 	}
 
@@ -164,9 +165,9 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 	public void setPerson(Person person) {
 		this.person = person;
 	}
-	
-	private class FreeSpeedTravelTime implements TravelTime {
-		
+
+	private static class FreeSpeedTravelTime implements TravelTime {
+
 		@Override
 		public double getLinkTravelTime(Link link, double time) {
 			return link.getLength() / link.getFreespeed(time);

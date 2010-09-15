@@ -33,8 +33,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 public class World {
 
@@ -138,7 +136,7 @@ public class World {
 				this.bottom_layer = this.bottom_layer.getDownLayer();
 			}
 		}
-		
+
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -222,20 +220,6 @@ public class World {
 		ZoneLayer l = new ZoneLayer(type,name);
 		this.layers.put(l.getType(),l);
 		return l;
-	}
-
-	@Deprecated
-	private final ActivityFacilitiesImpl createFacilityLayer() {
-		ActivityFacilitiesImpl f = new ActivityFacilitiesImpl();
-		this.setFacilityLayer(f);
-		return f;
-	}
-
-	@Deprecated
-	private final NetworkImpl createNetworkLayer() {
-		NetworkImpl n = NetworkImpl.createNetwork();
-		setNetworkLayer(n);
-		return n;
 	}
 
 	//////////////////////////////////////////////////////////////////////
