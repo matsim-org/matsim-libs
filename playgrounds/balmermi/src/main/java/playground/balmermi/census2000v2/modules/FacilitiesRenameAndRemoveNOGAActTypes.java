@@ -21,12 +21,10 @@
 package playground.balmermi.census2000v2.modules;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 
 public class FacilitiesRenameAndRemoveNOGAActTypes {
 
@@ -54,9 +52,9 @@ public class FacilitiesRenameAndRemoveNOGAActTypes {
 		log.info("    running " + this.getClass().getName() + " module...");
 		log.info("      # facilities = " + facilities.getFacilities().size());
 
-		ArrayList<ActivityFacilityImpl> facs = new ArrayList<ActivityFacilityImpl>((Collection<? extends ActivityFacilityImpl>) facilities.getFacilities().values());
+		ArrayList<ActivityFacility> facs = new ArrayList<ActivityFacility>(facilities.getFacilities().values());
 		facilities.getFacilities().clear();
-		for (ActivityFacilityImpl f : facs) {
+		for (ActivityFacility f : facs) {
 			throw new RuntimeException("Can't set ids anymore.");
 //			ArrayList<String> types = new ArrayList<String>();
 //			for (String type : f.getActivityOptions().keySet()) { types.add(type); }
