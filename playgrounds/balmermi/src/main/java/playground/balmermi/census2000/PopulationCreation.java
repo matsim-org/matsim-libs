@@ -32,9 +32,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;
-import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
-import org.matsim.world.WorldWriter;
 
 import playground.balmermi.census2000.data.Households;
 import playground.balmermi.census2000.data.Municipalities;
@@ -54,7 +52,7 @@ public class PopulationCreation {
 		ScenarioImpl scenario = new ScenarioImpl();
 		World world = new World();
 
-		
+
 		System.out.println("  reading facilities xml file... ");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
@@ -110,10 +108,10 @@ public class PopulationCreation {
 		new FacilitiesWriter(facilities).write(null /* filename not specified */);
 		System.out.println("  done.");
 
-		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write(null);//config.world().getOutputFile());
-		System.out.println("  done.");
+//		System.out.println("  writing world xml file... ");
+//		WorldWriter world_writer = new WorldWriter(world);
+//		world_writer.write(null);//config.world().getOutputFile());
+//		System.out.println("  done.");
 
 		System.out.println("done.");
 		System.out.println();

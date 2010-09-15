@@ -23,16 +23,12 @@ package playground.ciarif.modechoice_old;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkSummary;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.algorithms.PersonCreatePlanFromKnowledge;
@@ -40,7 +36,6 @@ import org.matsim.population.algorithms.PlansCreateFromNetwork;
 import org.matsim.population.algorithms.PlansDefineKnowledge;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
-import org.matsim.world.WorldWriter;
 
 public class Mode_choice_main {
 
@@ -158,15 +153,15 @@ public class Mode_choice_main {
 	//	new PopulationWriter(plans, network).write(config.plans().getOutputFile());
 		System.out.println("  done.");
 
-		System.out.println("  writing network xml file... ");
-		NetworkWriter network_writer = new NetworkWriter(network);
+//		System.out.println("  writing network xml file... ");
+//		NetworkWriter network_writer = new NetworkWriter(network);
 	//	network_writer.write(config.network().getOutputFile());
-		System.out.println("  done.");
+//		System.out.println("  done.");
 
-		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(world);
+//		System.out.println("  writing world xml file... ");
+//		WorldWriter world_writer = new WorldWriter(world);
 	//	world_writer.write(config.world().getOutputFile());
-		System.out.println("  done.");
+//		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
 	//ssss	new ConfigWriter(config).write(config.config().getOutputFile());

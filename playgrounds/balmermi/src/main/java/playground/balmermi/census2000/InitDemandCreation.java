@@ -34,9 +34,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;
-import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
-import org.matsim.world.WorldWriter;
 import org.matsim.world.ZoneLayer;
 
 import playground.balmermi.census2000.data.ActChains;
@@ -185,10 +183,10 @@ public class InitDemandCreation {
 		new FacilitiesWriter(facilities).write(null);//config.facilities().getOutputFile());
 		System.out.println("  done.");
 
-		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write("output/output_facilities.xml");
-		System.out.println("  done.");
+//		System.out.println("  writing world xml file... ");
+//		WorldWriter world_writer = new WorldWriter(world);
+//		world_writer.write("output/output_facilities.xml");
+//		System.out.println("  done.");
 
 		System.out.println("done.");
 		System.out.println();

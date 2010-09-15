@@ -33,9 +33,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
-import org.matsim.world.WorldWriter;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
@@ -86,7 +84,7 @@ public class IIDMGeneration {
 
 		//////////////////////////////////////////////////////////////////////
 
-	
+
 		log.info("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
@@ -195,10 +193,10 @@ public class IIDMGeneration {
 		new FacilitiesWriter(facilities).write(null);//config.facilities().getOutputFile());
 		log.info("  done.");
 
-		log.info("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write(outdir + "/output_world.xml");
-		log.info("  done.");
+//		log.info("  writing world xml file... ");
+//		WorldWriter world_writer = new WorldWriter(world);
+//		world_writer.write(outdir + "/output_world.xml");
+//		log.info("  done.");
 
 		log.info("done.");
 	}
