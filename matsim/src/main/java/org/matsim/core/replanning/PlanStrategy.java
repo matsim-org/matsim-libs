@@ -58,7 +58,7 @@ public class PlanStrategy {
 	 *
 	 * @param module
 	 */
-	public void addStrategyModule(final PlanStrategyModule module) {
+	public final void addStrategyModule(final PlanStrategyModule module) {
 		if (this.firstModule == null) {
 			this.firstModule = module;
 		} else {
@@ -69,7 +69,7 @@ public class PlanStrategy {
 	/**
 	 * @return the number of strategy modules added to this strategy
 	 */
-	public int getNumberOfStrategyModules() {
+	public final int getNumberOfStrategyModules() {
 		if (this.firstModule == null) {
 			return 0;
 		}
@@ -86,6 +86,7 @@ public class PlanStrategy {
 	 * @see #finish()
 	 */
 	public void run(final Person person) {
+		// yyyy "Ablaufsteuerung" should be final (in my view).  kai, sep'10
 		this.counter++;
 		
 		// if there is at least one unscored plan, find that one:
@@ -118,7 +119,7 @@ public class PlanStrategy {
 	 * Tells this strategy to initialize its modules. Called before a bunch of
 	 * person are handed to this strategy.
 	 */
-	public void init() {
+	public final void init() {
 		if (this.firstModule != null) {
 			this.firstModule.prepareReplanning();
 		}
@@ -130,7 +131,8 @@ public class PlanStrategy {
 	 *
 	 * @see #run(PersonImpl)
 	 */
-	public void finish() {
+	public final void finish() {
+		// yyyy I don't think this needs to be public once StrategyManager.run is final.  kai, sep'10
 		if (this.firstModule != null) {
 			// finish the first module
 				this.firstModule.finishReplanning();
@@ -168,7 +170,7 @@ public class PlanStrategy {
 		return name.toString();
 	}
 
-	public PlanSelector getPlanSelector() {
+	public final PlanSelector getPlanSelector() {
 		return planSelector;
 	}
 	

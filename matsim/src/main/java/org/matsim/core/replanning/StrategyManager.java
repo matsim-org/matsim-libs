@@ -116,7 +116,11 @@ public class StrategyManager {
 		run(population);
 	}
 	
-	protected void beforeRunHook( @SuppressWarnings("unused") Population population ) {
+	protected void beforePopulationRunHook( Population population ) {
+		// left empty for inheritance
+	}
+	
+	protected void beforeStrategyRunHook( Person person, PlanStrategy strategy ) {
 		// left empty for inheritance
 	}
 
@@ -126,9 +130,9 @@ public class StrategyManager {
 	 *
 	 * @param population
 	 */
-	@Deprecated // do not override this function.  Use the "hooks" instead.  yyyy will eventually be made final.  kai, sep'10
-	public void run(final Population population) {
-		beforeRunHook( population ) ;
+	// do not override this function.  Use the "hooks" instead.  kai, sep'10
+	public final void run(final Population population) {
+		beforePopulationRunHook( population ) ;
 		
 		// initialize all strategies
 		for (PlanStrategy strategy : this.strategies) {
@@ -146,6 +150,8 @@ public class StrategyManager {
 			// ... choose the strategy to be used for this person (in evol comp lang this would be the choice of the mutation operator)
 			PlanStrategy strategy = this.chooseStrategy();
 			
+			beforeStrategyRunHook( person, strategy ) ;
+			
 			// ... and run the strategy:
 			if (strategy != null) {
 				strategy.run(person);
@@ -162,7 +168,7 @@ public class StrategyManager {
 		afterRunHook( population ) ;
 	}
 	
-	protected void afterRunHook( @SuppressWarnings("unused") Population population ) {
+	protected void afterRunHook( Population population ) {
 		// left empty for inheritance
 	}
 	
@@ -172,11 +178,11 @@ public class StrategyManager {
 	 * 
 	 * @param the plan that is to be removed
 	 */
-	protected void afterRemovePlanHook( @SuppressWarnings("unused") Plan plan ) {
+	protected void afterRemovePlanHook( Plan plan ) {
 		// left empty for inheritance.  kai, sep'10
 	}
 	
-	protected final void removePlans(final PersonImpl person, final int maxNumberOfPlans) {
+	private final void removePlans(final PersonImpl person, final int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
 			Plan plan = this.removalPlanSelector.selectPlan(person);
 			person.getPlans().remove(plan);
@@ -206,7 +212,7 @@ public class StrategyManager {
 	 *
 	 * @return the chosen strategy
 	 */
-	protected final PlanStrategy chooseStrategy() {
+	private final PlanStrategy chooseStrategy() {
 		double rnd = MatsimRandom.getRandom().nextDouble() * this.totalWeights;
 
 		double sum = 0.0;

@@ -51,46 +51,51 @@ public class PhDStrategyManager extends StrategyManager {
 	// but it looks to me like this should not matter.  kai, sep'10
 	
 	@Override
-	protected void beforeRunHook( @SuppressWarnings("unused") Population population ) {
+	protected void beforePopulationRunHook( @SuppressWarnings("unused") Population population ) {
 		this.personTreatment.clear() ;
 	}
 
+//	@Override
+//	public void run(Population population) {
+//		
+//		// initialize all strategies
+//		for (PlanStrategy strategy : this.getStrategies() ) {
+//			strategy.init();
+//		}
+//		
+//		// then go through the population and assign each person to a strategy
+//		for (Person person : population.getPersons().values()) {
+//			
+//			if ((this.getMaxPlansPerAgent() > 0) && (person.getPlans().size() > this.getMaxPlansPerAgent())) {
+//				removePlans((PersonImpl) person, this.getMaxPlansPerAgent());
+//			}
+//			PlanStrategy strategy = this.chooseStrategy();
+//			
+//			beforeStrategyRunHook(person, strategy);
+//			
+//			if (strategy != null) {
+//				strategy.run(person);
+//			} else {
+//				Gbl.errorMsg("No strategy found!");
+//			}
+//		}
+//		// finally make sure all strategies have finished there work
+//		for (PlanStrategy strategy : this.getStrategies() ) {
+//			strategy.finish();
+//		}
+//	}
+	// the modification from the parent class is replaced by "beforeStrategyRunHook" below.   kai, sep'10
+
 	@Override
-	public void run(Population population) {
-		
-		// initialize all strategies
-		for (PlanStrategy strategy : this.getStrategies() ) {
-			strategy.init();
+	protected void beforeStrategyRunHook(Person person, PlanStrategy strategy) {
+		Set<Person> personIdSet = null;
+		if (this.personTreatment.containsKey(strategy.toString())) {
+			personIdSet = this.personTreatment.get(strategy.toString());
+		} else {
+			personIdSet = new HashSet<Person>();
+			this.personTreatment.put(strategy.toString(), personIdSet);
 		}
-		
-		int maxPlansPerAgent = this.getMaxPlansPerAgent();
-		// then go through the population and assign each person to a strategy
-		for (Person person : population.getPersons().values()) {
-			
-			if ((maxPlansPerAgent > 0) && (person.getPlans().size() > maxPlansPerAgent)) {
-				removePlans((PersonImpl) person, maxPlansPerAgent);
-			}
-			PlanStrategy strategy = this.chooseStrategy();
-			
-			Set<Person> personIdSet = null;
-			if (this.personTreatment.containsKey(strategy.toString())) {
-				personIdSet = this.personTreatment.get(strategy.toString());
-			} else {
-				personIdSet = new HashSet<Person>();
-				this.personTreatment.put(strategy.toString(), personIdSet);
-			}
-			personIdSet.add(person);
-			
-			if (strategy != null) {
-				strategy.run(person);
-			} else {
-				Gbl.errorMsg("No strategy found!");
-			}
-		}
-		// finally make sure all strategies have finished there work
-		for (PlanStrategy strategy : this.getStrategies() ) {
-			strategy.finish();
-		}
+		personIdSet.add(person);
 	}
 
 	public Map<String, Set<Person>> getPersonTreatment() {

@@ -25,6 +25,8 @@ import org.matsim.core.replanning.PlanStrategy;
 
 
 public class MyPlanStrategy extends PlanStrategy {
+	// the reason why this class needs to is that this is defined in the config file
+	// yyyy it has to use inheritance since there is no interface.  kai, sep'10
 
 	public MyPlanStrategy(Controler controler) {
 		// also possible: MyStrategy( Scenario scenario ).  But then I do not have events.  kai, aug'10
