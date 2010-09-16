@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.GraphBuilder;
@@ -48,6 +49,8 @@ import org.matsim.contrib.sna.graph.io.GraphMLWriter;
  * 
  */
 public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Edge> {
+	
+	private static final Logger logger = Logger.getLogger(ErdosRenyiGenerator.class);
 
 	private GraphBuilder<G, V, E> builder;
 
@@ -137,7 +140,7 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 
 	@SuppressWarnings("unchecked")
 	private G randomDraw(G graph, double p, long randomSeed) {
-		int n = graph.getVertices().size();
+		long n = graph.getVertices().size();
 		long M = n * (n - 1) / 2;
 		int m = (int) (p * M);
 
@@ -146,10 +149,13 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 		for (int i = 0; i < m; i++) {
 			E edge = null;
 			while (edge == null) {
-				V vi = vertices.get(random.nextInt(n));
-				V vj = vertices.get(random.nextInt(n));
+				V vi = vertices.get(random.nextInt((int)n));
+				V vj = vertices.get(random.nextInt((int)n));
 				edge = builder.addEdge(graph, vi, vj);
 			}
+			
+			if(i % 10000 == 0)
+				logger.info(String.format("Created %1$s of %2$s edges.", i+1, m));
 		}
 
 		return graph;
@@ -174,6 +180,7 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 
 		ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge>(
 				new SparseGraphBuilder());
+		generator.setRandomDrawMode(true);
 		Graph g = generator.generate(N, p, seed);
 
 		GraphMLWriter writer = new GraphMLWriter();
