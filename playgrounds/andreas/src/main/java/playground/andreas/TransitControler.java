@@ -1,23 +1,3 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * PtControler.java
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package playground.andreas;
 
 import org.apache.log4j.Logger;
@@ -32,7 +12,6 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
-import playground.andreas.bln.net.TransitScheduleCleaner;
 import playground.andreas.fixedHeadway.FixedHeadwayControler;
 import playground.andreas.fixedHeadway.FixedHeadwayCycleUmlaufDriverFactory;
 
@@ -44,7 +23,7 @@ public class TransitControler extends Controler {
 	private final static Logger log = Logger.getLogger(TransitControler.class);
 
 	private boolean useOTFVis = true;
-	private boolean useHeadwayControler = true;
+	private boolean useHeadwayControler = false;
 	
 	public TransitControler(Config config) {
 		super(config);
@@ -96,9 +75,9 @@ public class TransitControler extends Controler {
 		
 				
 		TransitControler tc = new TransitControler(config);
-//		if(args.length > 1 && args[1].equalsIgnoreCase("true")){
-//			tc.setUseOTFVis(true);
-//		}
+		if(args.length > 1 && args[1].equalsIgnoreCase("true")){
+			tc.setUseOTFVis(true);
+		}
 		tc.setOverwriteFiles(true);
 //		tc.setCreateGraphs(false);
 		tc.run();
