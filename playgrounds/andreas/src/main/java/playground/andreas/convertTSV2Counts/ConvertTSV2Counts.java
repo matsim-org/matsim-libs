@@ -20,8 +20,8 @@ public class ConvertTSV2Counts {
 	 */
 	public static void main(String[] args) {
 		
-		String workingDir = "F:\\cgtest\\";
-		String startTag = "Di-Do";
+		String workingDir = "F:\\convert\\";
+		String startTag = "Mo-So";
 		String countStationsFileName = workingDir + "DZS-Koordinaten.csv";
 		String countsOutFile = workingDir + startTag + "_counts.xml";
 		
@@ -50,7 +50,7 @@ public class ConvertTSV2Counts {
 		for (CountStationDataBox countStation : countStationsMap.values()) {
 			counts.createCount(new IdImpl(countStation.getShortName()), countStation.getShortName());
 			counts.getCount(new IdImpl(countStation.getShortName())).setCoord(countStation.getCoord());
-			String filename = workingDir + "Wochenübersicht_" + countStation.getShortName() + ".tsv"; 
+			String filename = workingDir + "Tagesübersicht_" + countStation.getShortName() + ".tsv"; 
 			ReadCountDataForWeek.readCountDataForWeek(filename, counts.getCount(new IdImpl(countStation.getShortName())), startTag);			
 		}
 		
