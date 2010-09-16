@@ -30,6 +30,13 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
+/**
+ * Generates population from counts data for specified lines. Additional group of agents can be added as an option.
+ * 
+ * @author aneumann
+ *
+ */
+
 public class Counts2Plans {
 
 	private static final Logger log = Logger.getLogger(Counts2Plans.class);
