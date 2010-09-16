@@ -41,8 +41,8 @@ import org.matsim.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.SAXException;
 
-import playground.andreas.bln.net.TransitScheduleCleaner;
 import playground.andreas.utils.net.NetworkRemoveUnusedNodes;
+import playground.andreas.utils.pt.TransitScheduleCleaner;
 
 /**
  * Simplifies a given network, by merging links.
