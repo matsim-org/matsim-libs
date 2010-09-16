@@ -1,4 +1,4 @@
-package playground.andreas.bln.net.osm2counts;
+package playground.andreas.osmBB.osm2counts;
 
 import java.util.HashMap;
 

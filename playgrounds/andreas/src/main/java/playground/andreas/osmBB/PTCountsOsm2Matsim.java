@@ -1,4 +1,4 @@
-package playground.andreas.bln.net;
+package playground.andreas.osmBB;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.xml.sax.SAXException;
 
-import playground.andreas.bln.net.osm2counts.Osm2Counts;
+import playground.andreas.osmBB.osm2counts.Osm2Counts;
 import playground.mzilske.osm.OsmPrepare;
 import playground.mzilske.osm.OsmTransitMain;
 

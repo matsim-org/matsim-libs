@@ -1,4 +1,4 @@
-package playground.andreas.bln.net;
+package playground.andreas.utils.net;
 
 import java.util.ArrayList;
 import java.util.List;
