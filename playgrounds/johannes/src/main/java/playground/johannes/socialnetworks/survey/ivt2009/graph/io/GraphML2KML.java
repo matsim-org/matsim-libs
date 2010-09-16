@@ -31,11 +31,13 @@ import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
 import org.matsim.contrib.sna.graph.spatial.io.KMLPartitions;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.sna.graph.spatial.io.VertexDegreeColorizer;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
+import playground.johannes.socialnetworks.survey.ivt2009.analysis.SampledVertexFilter;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
@@ -53,17 +55,22 @@ public class GraphML2KML {
 //		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 //		SpatialGraph graph = reader.readGraph(args[0]);
 		
+		SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
 		SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> reader = new SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(new SocialSparseGraphMLReader());
-		reader.setGraphProjectionBuilder(new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>());
+		reader.setGraphProjectionBuilder(builder);
 		SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = (SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>) reader.readGraph(args[0]);
+		
+		SampledVertexFilter filter = new SampledVertexFilter(builder);
+		filter.apply(graph);
+		builder.synchronize(graph);
 		
 		
 		SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
-		writer.setKmlPartitition(new SampledPartition());
+//		writer.setKmlPartitition(new SampledPartition());
 		writer.setDrawEdges(false);
 		KMLIconVertexStyle style = new KMLIconVertexStyle(graph);
 		VertexDegreeColorizer colorizer = new VertexDegreeColorizer(graph);
-		colorizer.setLogscale(true);
+		colorizer.setLogscale(false);
 		style.setVertexColorizer(colorizer);
 		writer.setKmlVertexStyle(style);
 		writer.addKMZWriterListener(style);

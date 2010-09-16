@@ -61,16 +61,21 @@ public class UtilFuncDiff implements GraphProbability {
 		double c_sum = 0;
 		SpatialVertex v_i = (SpatialVertex) y.getVertex(i);
 		SpatialVertex v_j = (SpatialVertex) y.getVertex(j);
+		double c_ij = costFunc.edgeCost(v_i, v_j);
+		
 		TIntArrayList neighbors = y.getNeighbours(i);
 		for(int k = 0; k < neighbors.size(); k++) {
-			
 			SpatialVertex v2 = (SpatialVertex) y.getVertex(neighbors.get(k));
 			c_sum += costFunc.edgeCost(v_i, v2);
 		}
 		
+		if(yIj)
+			c_sum -= c_ij; 
+		
 		double c_diff_m = Math.abs(budget - c_sum);
 		
-		c_sum += costFunc.edgeCost(v_i, v_j);
+		c_sum += c_ij;
+		
 		double c_diff_p = Math.abs(budget - c_sum);
 		
 		return Math.exp(- beta_k + beta_c * (c_diff_m - c_diff_p));

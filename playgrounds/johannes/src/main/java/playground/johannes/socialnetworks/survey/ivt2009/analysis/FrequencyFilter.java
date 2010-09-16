@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSocialTie.java
+ * FrequencyFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.graph;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
-import org.matsim.core.utils.collections.Tuple;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.matsim.contrib.sna.graph.GraphBuilder;
+
+import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SocialSparseEdge extends SpatialSparseEdge implements SocialEdge {//, SampledEdge {
+public class FrequencyFilter implements GraphFilter<SocialGraph> {
 
-	private double frequency;
+	private GraphBuilder<SocialGraph, SocialVertex, SocialEdge> builder;
+	
+	private double threshold;
+	
+	public FrequencyFilter(GraphBuilder<? extends SocialGraph, ? extends SocialVertex, ? extends SocialEdge> builder, double threshold) {
+		this.builder = (GraphBuilder<SocialGraph, SocialVertex, SocialEdge>) builder;
+		this.threshold = threshold;
+	}
 	
 	@Override
-	public SocialSparseVertex getOpposite(Vertex v) {
-		return (SocialSparseVertex) super.getOpposite(v);
+	public SocialGraph apply(SocialGraph graph) {
+		Set<SocialEdge> remove = new HashSet<SocialEdge>();
+		
+		for(SocialEdge edge : graph.getEdges()) {
+			if(edge.getFrequency() < threshold) {
+				remove.add(edge);
+			}
+		}
+		
+		for(SocialEdge edge : remove)
+			builder.removeEdge(graph, edge);
+		
+		return graph;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Tuple<? extends SocialSparseVertex, ? extends SocialSparseVertex> getVertices() {
-		return (Tuple<? extends SocialSparseVertex, ? extends SocialSparseVertex>) super.getVertices();
-	}
-
-	public void setFrequency(double frequency) {
-		this.frequency = frequency;
-	}
-	
-	public double getFrequency() {
-		return frequency;
-	}
 }

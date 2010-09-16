@@ -24,6 +24,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.util.Collection;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
@@ -42,6 +43,8 @@ import playground.johannes.socialnetworks.statistics.EstimatedDistribution;
  */
 public class EstimatedDegree extends Degree {
 
+	private static final Logger logger = Logger.getLogger(EstimatedDegree.class);
+	
 	private ProbabilityEstimator biasedDistribution;
 	
 	private PopulationEstimator vertexEstimator;
@@ -58,14 +61,20 @@ public class EstimatedDegree extends Degree {
 	@Override
 	public Distribution distribution(Set<? extends Vertex> vertices) {
 		Distribution distr = new EstimatedDistribution(vertexEstimator);
+	
+		int cntk0 = 0;
 		
 		Set<SampledVertex> samples = SnowballPartitions.<SampledVertex>createSampledPartition((Set<SampledVertex>)vertices);
 		for(SampledVertex vertex : samples) {
 			double p = biasedDistribution.getProbability(vertex);
 			if(p > 0) {
 				distr.add(vertex.getNeighbours().size(), 1/p);
-			}
+			} else
+				cntk0++;
 		}
+		
+		if(cntk0 > 0)
+			logger.warn(String.format("There are %1$s vertices with probability 0.!", cntk0));
 		
 		return distr;
 	}

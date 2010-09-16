@@ -51,14 +51,18 @@ public class AlterTableReader {
 		
 		public String egoSQLId;
 		
-		public String alterKey;
+//		public String alterKey;
 		
-		public boolean isEgo() {
-			if(alterKey == null)
-				return true;
-			else
-				return false;
-		}
+		public boolean isEgo;
+		
+//		public boolean isEgo() {
+//			if(alterKey == null)
+//				return true;
+//			else
+//				return false;
+//		}
+		
+		public Map<String, String> alterKeys = new HashMap<String, String>();
 	}
 	
 	public AlterTableReader(List<String> files) throws IOException {
@@ -94,18 +98,20 @@ public class AlterTableReader {
 					ego = new VertexRecord();
 					ego.id = egoId;
 					ego.egoSQLId = egoSQLId;
+					ego.isEgo = true;
 					
 					vertexList.put(egoId, ego);
 				} else {
 					/*
 					 * overwrite old values in case an alter turned into an ego;
 					 */
-					if(!ego.isEgo())
+					if(!ego.isEgo)
 						logger.info(String.format("Alter %1$s turned into ego.", egoId));
 					
 					ego.id = egoId;
 					ego.egoSQLId = egoSQLId;
-					ego.alterKey = null;
+					ego.isEgo = true;
+//					ego.alterKey = null; keep the alter key for edge attributes
 				}
 				/*
 				 * find alter
@@ -115,10 +121,17 @@ public class AlterTableReader {
 				if(alter == null) {
 					alter = new VertexRecord();
 					alter.id = alterId;
-					alter.egoSQLId = ego.egoSQLId;
-					alter.alterKey = alterKey;
+//					alter.egoSQLId = ego.egoSQLId;
+//					alter.alterKey = alterKey;
+					
+					alter.alterKeys.put(ego.egoSQLId, alterKey);
 					
 					vertexList.put(alterId, alter);
+				} else {
+					/*
+					 * alter already exists -> named multiple times
+					 */
+					alter.alterKeys.put(ego.egoSQLId, alterKey);
 				}
 				/*
 				 * add edge
@@ -132,7 +145,7 @@ public class AlterTableReader {
 		int numEgos = 0;
 		int numAlters = 0;
 		for(Entry<String, VertexRecord> record : vertexList.entrySet()) {
-			if(record.getValue().isEgo())
+			if(record.getValue().isEgo)
 				numEgos++;
 			else
 				numAlters++;

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
+import geo.google.datamodel.GeoCoordinate;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -29,6 +31,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 
+import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleLocationLookup;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -49,7 +52,9 @@ public class EgoTableReader {
 	
 	private Map<String, Record> egos;
 	
-	private GoogleLocationLookup lookup = new GoogleLocationLookup();
+//	private GoogleLocationLookup lookup = new GoogleLocationLookup();
+	
+	private GoogleGeoCoder lookup;
 	
 	private GeometryFactory geoFactory = new GeometryFactory();
 	
@@ -70,6 +75,8 @@ public class EgoTableReader {
 	}
 	
 	public EgoTableReader(List<String> files) throws IOException {
+		lookup = new GoogleGeoCoder(500);
+		
 		egos = new HashMap<String, Record>();
 		for(String file : files) {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -159,23 +166,24 @@ public class EgoTableReader {
 		/*
 		 * try obtaining coordinates
 		 */
-		Coord c = lookup.locationToCoord(builder.toString());
-		if (lookup.getLastErrorCode() == 620) {
-			while (lookup.getLastErrorCode() == 620) {
-				if (interval > 5000) {
-					logger.warn("Lookup interval is 5 secs. Seems we reached the request limit!");
-					System.exit(-1);
-				}
-				logger.warn(String.format("Increasing lookup interval, now %1$s msecs.", interval));
-				interval += 100;
-				Thread.sleep(interval);
-				c = lookup.locationToCoord(builder.toString());
-			}
-		}
+		GeoCoordinate c = lookup.requestCoordinate(builder.toString());
+//		Coord c = lookup.locationToCoord(builder.toString());
+//		if (lookup.getLastErrorCode() == 620) {
+//			while (lookup.getLastErrorCode() == 620) {
+//				if (interval > 5000) {
+//					logger.warn("Lookup interval is 5 secs. Seems we reached the request limit!");
+//					System.exit(-1);
+//				}
+//				logger.warn(String.format("Increasing lookup interval, now %1$s msecs.", interval));
+//				interval += 100;
+//				Thread.sleep(interval);
+//				c = lookup.locationToCoord(builder.toString());
+//			}
+//		}
 		
 		if(c != null) {
 //			return geoFactory.createPoint(new Coordinate(0,0));
-			return geoFactory.createPoint(new Coordinate(c.getX(), c.getY()));
+			return geoFactory.createPoint(new Coordinate(c.getLongitude(), c.getLatitude()));
 		} else {
 			return null;
 		}

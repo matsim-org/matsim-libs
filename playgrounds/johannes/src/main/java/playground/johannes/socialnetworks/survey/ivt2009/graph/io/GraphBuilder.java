@@ -93,6 +93,7 @@ public class GraphBuilder {
 		Map<SocialSparseVertex, SampledVertexDecorator<SocialSparseVertex>> projMap =
 			new HashMap<SocialSparseVertex, SampledVertexDecorator<SocialSparseVertex>>();
 		Map<String, SocialSparseVertex> idMap = new HashMap<String, SocialSparseVertex>();
+//		Map<String, VertexRecord> recordMap = new HashMap<String, VertexRecord>();
 		
 		for(Entry<String, VertexRecord> entry : alterReader.getVertices().entrySet()) {
 			VertexRecord vRecord = entry.getValue();
@@ -100,7 +101,7 @@ public class GraphBuilder {
 			 * Extract the home location.
 			 */
 			Point point;
-			if(vRecord.isEgo()) {
+			if(vRecord.isEgo) {
 				point = sqlReader.getEgoLocation(vRecord.egoSQLId);
 				if(point == null) {
 					/*
@@ -110,10 +111,10 @@ public class GraphBuilder {
 					point = egoReader.getEgoLocation(vRecord.id);
 				}
 			} else {
-				point = sqlReader.getAlterLocation(vRecord.egoSQLId, vRecord.alterKey);
+				point = sqlReader.getAlterLocation(vRecord.alterKeys);
 			}
 			if(point == null) {
-				errLogger.logNoCoordinate(vRecord.isEgo());
+				errLogger.logNoCoordinate(vRecord.isEgo);
 				point = geoFacotry.createPoint(new Coordinate(0, 0));
 			}
 			/*
@@ -124,13 +125,14 @@ public class GraphBuilder {
 			/*
 			 * If it is an ego set the snowball attributes.
 			 */
-			if(vRecord.isEgo()) {
+			if(vRecord.isEgo) {
 				vProj.sample(infereIterationSampled(new Integer(vRecord.id)));
 				vProj.detect(vProj.getIterationSampled() - 1);
 			}
 			
 			projMap.put(vertex, vProj);
 			idMap.put(vRecord.id, vertex);
+//			recordMap.put(vRecord.id, vRecord);
 		}
 		/*
 		 * Create the edges.
@@ -169,6 +171,19 @@ public class GraphBuilder {
 					else
 						vProj2.detect(vProj1.getIterationSampled());
 				}
+				/*
+				 * add edge attributes
+				 */
+				VertexRecord rec1 = edge.getFirst();
+				VertexRecord rec2 = edge.getSecond();
+				double freq = 0;
+				if(rec1.isEgo) {
+					freq = sqlReader.getF2FFrequencey(rec1.egoSQLId, rec2.alterKeys.get(rec1.egoSQLId));
+				} else {
+					freq = sqlReader.getF2FFrequencey(rec2.egoSQLId, rec1.alterKeys.get(rec2.egoSQLId));
+				}
+				socialEdge.setFrequency(freq);
+				
 			} else {
 				errLogger.logDoubleEdge();
 			}
@@ -182,15 +197,29 @@ public class GraphBuilder {
 		SocialPerson person = new SocialPerson(matsimPerson);
 		
 		int age;
-		if(record.isEgo())
+		if(record.isEgo)
 			age = sqlData.getEgoAge(record.egoSQLId);
 		else
-			age = sqlData.getAlterAge(record.egoSQLId, record.alterKey);
+			age = sqlData.getAlterAge(record.alterKeys);
 		
 		if(age < 0)
-			errLogger.logNoAge(record.isEgo());
+			errLogger.logNoAge(record.isEgo);
 		else
 			matsimPerson.setAge(age);
+		
+		String sex = sqlData.getSex(record);
+		if(sex != null)
+			matsimPerson.setSex(sex);
+		else
+			errLogger.logNoSex(record.isEgo);
+		
+		if(record.isEgo)
+			matsimPerson.setLicence(sqlData.getLicense(record));
+		
+		if(record.isEgo)
+			matsimPerson.setCarAvail(sqlData.getCarAvail(record));
+		
+		person.setCitizenship(sqlData.getCitizenship(record));
 		
 		return person;
 	}
@@ -208,10 +237,6 @@ public class GraphBuilder {
 		}
 	}
 	
-	private void setSeedVertices(SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> proj) {
-		
-	}
-	
 	private class ErrorLogger {
 		
 		private int noEgoCoords;
@@ -223,6 +248,10 @@ public class GraphBuilder {
 		private int noAlterAge;
 		
 		private int doubleEdges;
+		
+		private int noEgoSex;
+		
+		private int noAlterSex;
 		
 		public void logNoCoordinate(boolean isEgo) {
 			if(isEgo)
@@ -242,6 +271,13 @@ public class GraphBuilder {
 				noAlterAge++;
 		}
 		
+		public void logNoSex(boolean isEgo) {
+			if(isEgo)
+				noEgoSex++;
+			else
+				noAlterSex++;
+		}
+		
 		public String toString() {
 			StringBuilder builder = new StringBuilder();
 			builder.append("The following warnings occurred:\n");
@@ -254,7 +290,11 @@ public class GraphBuilder {
 			builder.append(String.valueOf(noAlterAge));
 			builder.append(" alters without age\n");
 			builder.append(String.valueOf(doubleEdges));
-			builder.append(" double edges.");
+			builder.append(" double edges\n");
+			builder.append(String.valueOf(noEgoSex));
+			builder.append(" egos without sex\n");
+			builder.append(String.valueOf(noAlterSex));
+			builder.append(" alters without sex\n");
 			return builder.toString();
 		}
 	}
@@ -263,31 +303,18 @@ public class GraphBuilder {
 		GraphBuilder builder = new GraphBuilder();
 		
 		ArrayList<String> alterTables = new ArrayList<String>();
-		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/alters1.fixed.txt");
-		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/alters2.txt");
+		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/alters1.test.txt");
+		alterTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/alters2.txt");
 		
 		ArrayList<String> egoTables = new ArrayList<String>();
-		egoTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/egos1.txt");
-		egoTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/egos2.txt");
+		egoTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/egos1.txt");
+		egoTables.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/egos2.txt");
 		
 		ArrayList<String> sqlDumps = new ArrayList<String>();
-		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/snowball.csv");
-//		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/04-2010/sqlDumpSub2.csv");
+		sqlDumps.add("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/snowball.filter.csv");
 		
 		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = builder.buildGraph(alterTables, egoTables, sqlDumps);
-		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SocialGraphMLWriter());
-		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/graph/graph.graphml");
-		
-//		SpatialGraphKMLWriter writer2 = new SpatialGraphKMLWriter();
-//		writer2.setKmlPartitition(new SampledPartition());
-//		writer2.setDrawEdges(false);
-//		KMLIconVertexStyle style = new KMLIconVertexStyle(graph);
-//		VertexDegreeColorizer colorizer = new VertexDegreeColorizer(graph);
-//		colorizer.setLogscale(true);
-//		style.setVertexColorizer(colorizer);
-//		writer2.setKmlVertexStyle(style);
-//		writer2.addKMZWriterListener(style);
-//		writer2.write((SpatialGraph) graph, args[1]);
-//		GraphAnalyzer.analyze(graph, new ObservedAnalyzerTask());
+		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SocialSparseGraphMLWriter());
+		writer.write(graph, "/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/09-2010/graph/graph.graphml");
 	}
 }

@@ -78,4 +78,13 @@ public class SimSocialEdge extends SpatialSparseEdge implements SocialEdge {
 		usage.add(iteration);
 		lastUsed = iteration;
 	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.socialnetworks.graph.social.SocialEdge#getFrequency()
+	 */
+	@Override
+	public double getFrequency() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

@@ -94,4 +94,8 @@ public class SampleStats {
 	public double getResonseRate() {
 		return responseRate;
 	}
+	
+	public double getResponseRate(int it) {
+		return sampledAccumulated.get(it)/(double)detectedAccumulated.get(it - 1);
+	}
 }

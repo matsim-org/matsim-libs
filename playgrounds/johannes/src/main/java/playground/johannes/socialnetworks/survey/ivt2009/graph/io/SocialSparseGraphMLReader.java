@@ -67,9 +67,10 @@ public class SocialSparseGraphMLReader
 	}
 
 	@Override
-	protected SocialSparseEdge addEdge(SocialSparseVertex v1,
-			SocialSparseVertex v2, Attributes attrs) {
-		return builder.addEdge(getGraph(), v1, v2);
+	protected SocialSparseEdge addEdge(SocialSparseVertex v1, SocialSparseVertex v2, Attributes attrs) {
+		SocialSparseEdge edge = builder.addEdge(getGraph(), v1, v2);
+		edge.setFrequency(Double.parseDouble(attrs.getValue(SocialSparseGraphML.FREQUENCY_ATTR)));
+		return edge;
 	}
 
 	@Override
@@ -92,6 +93,10 @@ public class SocialSparseGraphMLReader
 		 */
 		SocialPerson sPerson = new SocialPerson((PersonImpl) person);
 		SocialSparseVertex vertex = builder.addVertex(getGraph(), sPerson, SpatialGraphML.newPoint(attrs));
+		/*
+		 * add citizenship attribute
+		 */
+		sPerson.setCitizenship(attrs.getValue(SocialSparseGraphML.CITIZENSHIP_ATTR));
 		
 		return vertex;
 	}

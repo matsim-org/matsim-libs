@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSocialTie.java
+ * PlansAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.graph;
+package playground.johannes.socialnetworks.sim.analysis;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
-import org.matsim.core.utils.collections.Tuple;
+import java.util.Map;
+import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
+import org.matsim.api.core.v01.population.Plan;
 
 /**
  * @author illenberger
  *
  */
-public class SocialSparseEdge extends SpatialSparseEdge implements SocialEdge {//, SampledEdge {
+public interface PlansAnalyzerTask {
 
-	private double frequency;
+	public void analyze(Set<Plan> plans, Map<String, Double> stats);
 	
-	@Override
-	public SocialSparseVertex getOpposite(Vertex v) {
-		return (SocialSparseVertex) super.getOpposite(v);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Tuple<? extends SocialSparseVertex, ? extends SocialSparseVertex> getVertices() {
-		return (Tuple<? extends SocialSparseVertex, ? extends SocialSparseVertex>) super.getVertices();
-	}
-
-	public void setFrequency(double frequency) {
-		this.frequency = frequency;
-	}
-	
-	public double getFrequency() {
-		return frequency;
-	}
 }

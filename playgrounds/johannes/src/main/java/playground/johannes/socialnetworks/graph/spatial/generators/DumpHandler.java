@@ -47,6 +47,7 @@ import playground.johannes.socialnetworks.graph.mcmc.SampleHandler;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeCostsTask;
 
 /**
  * @author illenberger
@@ -105,7 +106,7 @@ public class DumpHandler implements SampleHandler<SpatialSparseVertex> {
 //		AcceptanceProbabilityTask ptask = new AcceptanceProbabilityTask();
 //		ptask.setDistanceCalculator(new CartesianDistanceCalculator());
 //		task.addTask(ptask);
-		
+		task.addTask(new EdgeCostsTask(new GravityEdgeCostFunction(1.6, 1, new CartesianDistanceCalculator())));
 		return task;
 	}
 	

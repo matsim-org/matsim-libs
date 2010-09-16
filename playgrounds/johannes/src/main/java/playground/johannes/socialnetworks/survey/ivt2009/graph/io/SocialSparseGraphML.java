@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSocialTie.java
+ * SocialSparseGraphML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.graph;
-
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
-import org.matsim.core.utils.collections.Tuple;
-
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
+package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
 /**
  * @author illenberger
  *
  */
-public class SocialSparseEdge extends SpatialSparseEdge implements SocialEdge {//, SampledEdge {
+public interface SocialSparseGraphML {
 
-	private double frequency;
+	public static final String CITIZENSHIP_ATTR = "citizen";
 	
-	@Override
-	public SocialSparseVertex getOpposite(Vertex v) {
-		return (SocialSparseVertex) super.getOpposite(v);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Tuple<? extends SocialSparseVertex, ? extends SocialSparseVertex> getVertices() {
-		return (Tuple<? extends SocialSparseVertex, ? extends SocialSparseVertex>) super.getVertices();
-	}
-
-	public void setFrequency(double frequency) {
-		this.frequency = frequency;
-	}
+	public static final String FREQUENCY_ATTR = "frequency";
 	
-	public double getFrequency() {
-		return frequency;
-	}
 }

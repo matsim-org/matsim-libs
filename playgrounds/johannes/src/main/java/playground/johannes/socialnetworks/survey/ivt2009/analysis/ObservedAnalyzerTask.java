@@ -31,6 +31,8 @@ import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
 import playground.johannes.socialnetworks.graph.social.analysis.DegreeAgeTask;
+import playground.johannes.socialnetworks.graph.social.analysis.DegreeGenderTask;
+import playground.johannes.socialnetworks.graph.social.analysis.GenderTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeDensityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeEdgeLengthTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeGridTask;
@@ -107,6 +109,13 @@ public class ObservedAnalyzerTask extends AnalyzerTaskComposite {
 //		addTask(gridTask);
 		
 //		addTask(new TravelTimeTask(network));
+		
+		addTask(new FrequencyTask());
+		addTask(new GenderTask());
+		
+		DegreeGenderTask kgTask = new DegreeGenderTask();
+		kgTask.setModule(new ObservedDegree());
+		addTask(kgTask);
 	}
 
 }

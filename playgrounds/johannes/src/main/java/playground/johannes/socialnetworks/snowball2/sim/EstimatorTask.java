@@ -52,7 +52,8 @@ public class EstimatorTask extends AnalyzerTask {
 	public void analyze(Graph graph, Map<String, Double> stats) {
 		TIntDoubleHashMap probas = new TIntDoubleHashMap(graph.getVertices().size());
 		TIntIntHashMap counts = new TIntIntHashMap(graph.getVertices().size());
-				
+		
+		double wsum = 0;
 		for(Vertex vertex : graph.getVertices()) {
 			if(((SampledVertex)vertex).isSampled()) {
 				int k = vertex.getNeighbours().size();
@@ -60,9 +61,14 @@ public class EstimatorTask extends AnalyzerTask {
 
 				probas.adjustOrPutValue(k, p, p);
 				counts.adjustOrPutValue(k, 1, 1);
+				
+				if(p > 0)
+					wsum += 1/p;
 			}
 		}
 
+		System.out.println("N_estim = " + wsum);
+		
 		TIntDoubleIterator it = probas.iterator();
 		for(int i = 0; i < probas.size(); i++) {
 			it.advance();

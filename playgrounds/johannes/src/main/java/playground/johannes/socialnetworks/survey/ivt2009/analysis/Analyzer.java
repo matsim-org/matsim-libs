@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.gis.ZoneLayer;
+import org.matsim.contrib.sna.graph.GraphBuilder;
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
@@ -42,9 +43,13 @@ import org.opengis.referencing.FactoryException;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
+import playground.johannes.socialnetworks.graph.social.SocialEdge;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.spatial.analysis.GraphClippingFilter;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
+import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
@@ -65,9 +70,10 @@ public class Analyzer {
 		SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> reader =
 			new SampledGraphProjMLReader<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(new SocialSparseGraphMLReader());
 		
-		reader.setGraphProjectionBuilder(new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>());
+		SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(); 
+		reader.setGraphProjectionBuilder(builder);
 		
-		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = reader.readGraph(args[0]);
+		SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = (SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>) reader.readGraph(args[0]);
 		
 		Scenario scenario = new ScenarioImpl();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
@@ -87,7 +93,7 @@ public class Analyzer {
 		 * analyze the complete graph
 		 */
 		String output = args[1];
-//		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);
+		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);
 		/*
 		 * analyze the swiss clipping
 		 */
@@ -96,10 +102,27 @@ public class Analyzer {
 		geometry.setSRID(21781);
 		GraphFilter<SpatialGraph> filter = new GraphClippingFilter(new SocialSparseGraphBuilder(graph.getDelegate().getCoordinateReferenceSysten()), geometry);
 		filter.apply(graph.getDelegate());
-		SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
+//		SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
 		builder.synchronize(graph);
 		
 		output = output+"/clip/";
+		new File(output).mkdirs();
+		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);
+		
+//		FrequencyFilter fFilter = new FrequencyFilter((GraphBuilder<? extends SocialGraph, ? extends SocialVertex, ? extends SocialEdge>) builder, 11.0);
+//		fFilter.apply(graph);
+//		builder.synchronize(graph);
+//		
+//		output = output+"/clip/f2f/";
+//		new File(output).mkdirs();
+//		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);
+		
+		RemoveOrpahnedComponents rm = new RemoveOrpahnedComponents();
+		rm.setBuilder(builder);
+		rm.apply(graph);
+		builder.synchronize(graph);
+		
+		output = args[1] + "/cleaned/";
 		new File(output).mkdirs();
 		analyze(graph, zones, choiceSet, scenario.getNetwork(), output);
 		

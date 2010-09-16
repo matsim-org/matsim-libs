@@ -19,16 +19,25 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
+import geo.google.datamodel.GeoCoordinate;
+
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+
+import playground.johannes.socialnetworks.survey.ivt2009.graph.io.AlterTableReader.VertexRecord;
+import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -64,13 +73,34 @@ public class SQLDumpReader {
 	
 	private static final String ALTER_YEAR_KEY = "84967X54X137";
 	
+	private static final String ALTER_F2F_FREQ_KEY = "84967X54X145Unit";
+	
+	private static final String ALTER_F2F_UNIT_KEY = "84967X54X145Freq";
+	
+	private static final String SEX_KEY = "84967X53X107";
+	
+	private static final String ALTER_SEX_KEY = "84967X54X135";
+	
+	private static final String LICENSE_KEY = "84967X53X104";
+	
+	private static final String CAR_AVAIL_KEY = "84967X53X105";
+	
+	private static final String CITZEN_KEY = "84967X53X110";
+	
+	private static final String ALTER_CITIZEN_KEY = "84967X54X138";
+	
 	private static final int SURVEY_YEAR = 2010;
 	
 	private final GeometryFactory geoFactory = new GeometryFactory();
 
 	private Map<String, Map<String, String>> rawData;
 	
+	private GoogleGeoCoder geoCoder;
+	
+	private Map<String, String> countries;
+	
 	public SQLDumpReader(List<String> files) throws IOException {
+		geoCoder = new GoogleGeoCoder(500);
 		rawData = new HashMap<String, Map<String,String>>();
 		
 		for(String file : files) {
@@ -128,20 +158,26 @@ public class SQLDumpReader {
 	}
 	
 	private Point makePoint(String location) {
+		Point point = null;
 		String[] tokens = location.split("@");
-		if(tokens.length >= 2) {
-			String latitude = tokens[0];
-			String longitude = tokens[1];
-			if(!longitude.isEmpty() && !longitude.isEmpty())
-				return geoFactory.createPoint(new Coordinate(Double.parseDouble(longitude), Double.parseDouble(latitude)));
-			else {
-				logger.warn("Invalid coordinate string (empty string)!");
-				return null;
+		if(tokens.length >= 3) {
+			String response = tokens[2];
+			if(response.equalsIgnoreCase("200")) {
+				String latitude = tokens[0];
+				String longitude = tokens[1];
+				point = geoFactory.createPoint(new Coordinate(Double.parseDouble(longitude), Double.parseDouble(latitude)));
+			} else if(response.equalsIgnoreCase("602")) {
+				logger.info("Response code 602 - requesting google geo-coder...");
+				GeoCoordinate coord = geoCoder.requestCoordinate(tokens[6]);
+				if(coord != null)
+					point = geoFactory.createPoint(new Coordinate(coord.getLongitude(), coord.getLatitude()));
 			}
-		} else {
-			logger.warn("Invalid coordinate string!");
-			return null;
 		}
+		
+		if(point == null)
+			logger.warn(String.format("Cannot decode location string: \"%1$s\".", location));
+		
+		return point;
 	}
 	
 	public Point getEgoLocation(String egoId) {
@@ -152,8 +188,8 @@ public class SQLDumpReader {
 				String homeLoc = getValue(egoId, HOME_LOC_KEY + i);
 				if(homeLoc != null)
 					homeLocs.put(new Integer(year), homeLoc);
-				else
-					logger.warn(String.format("Missing home location string. egoId = %1$s, entry = %2$s", egoId, i));
+//				else
+//					logger.warn(String.format("Missing home location string. egoId = %1$s, entry = %2$s", egoId, i));
 			}
 		}
 		
@@ -164,12 +200,13 @@ public class SQLDumpReader {
 		return makePoint(lastLoc);
 	}
 	
-	public Point getAlterLocation(String egoId, String alterKey) {
-		String location = getValue(egoId, makeKey(alterKey, ALTER_LOC_KEY));
-		if(location != null)
-			return makePoint(location);
-		else
-			return null;
+	public Point getAlterLocation(Map<String, String> alterKeys) {
+		for (Entry<String, String> entry : alterKeys.entrySet()) {
+			String location = getValue(entry.getKey(), makeKey(entry.getValue(), ALTER_LOC_KEY));
+			if (location != null)
+				return makePoint(location);
+		}
+		return null;
 	}
 	
 	public int getEgoAge(String egoId) {
@@ -181,11 +218,147 @@ public class SQLDumpReader {
 			return -1;
 	}
 	
-	public int getAlterAge(String egoId, String alterKey) {
-		String val = getValue(egoId, makeKey(alterKey, ALTER_YEAR_KEY));
-		if(val != null) {
-			return SURVEY_YEAR - Integer.parseInt(val);
-		} else
-			return -1;
+	public int getAlterAge(Map<String, String> alterKeys) {
+		double sum = 0;
+		int cnt = 0;
+		for(Entry<String, String> entry : alterKeys.entrySet()) {
+			String val = getValue(entry.getKey(), makeKey(entry.getValue(), ALTER_YEAR_KEY));
+			if (val != null) {
+				sum += SURVEY_YEAR - Integer.parseInt(val);
+				cnt++;
+			}
+		}
+
+		return (int) (sum/cnt);
+	}
+	
+	public String getSex(VertexRecord record) {
+		if(record.isEgo)
+			return getEgoSex(record.egoSQLId);
+		else
+			return getAlterSex(record.alterKeys);
+	}
+	
+	public String getEgoSex(String egoId) {
+		String val = getValue(egoId, SEX_KEY);
+		if("1".equalsIgnoreCase(val))
+			return "m";
+		else if("2".equalsIgnoreCase(val))
+			return "f";
+		else
+			return null;
+	}
+	
+	public String getAlterSex(Map<String, String> alterKeys) {
+		for(Entry<String, String> entry : alterKeys.entrySet()) {
+			String val = getValue(entry.getKey(), makeKey(entry.getValue(), ALTER_SEX_KEY));
+			if (val != null) {
+				if ("1".equalsIgnoreCase(val))
+					return "m";
+				else if ("2".equalsIgnoreCase(val))
+					return "f";
+			}
+		}
+		
+		return null;
+	}
+	
+	public String getLicense(VertexRecord record) {
+		String val = getValue(record.egoSQLId, LICENSE_KEY);
+		if("1".equalsIgnoreCase(val))
+			return "yes";
+		else if("2".equalsIgnoreCase(val))
+			return "no";
+		else
+			return null;
+	}
+	
+	public String getCarAvail(VertexRecord record) {
+		String val = getValue(record.egoSQLId, CAR_AVAIL_KEY);
+		if("1".equalsIgnoreCase(val))
+			return "always";
+		else if ("2".equalsIgnoreCase(val))
+//			return "often";
+			return "always";
+		else if ("3".equalsIgnoreCase(val))
+			return "sometimes";
+		else if ("4".equalsIgnoreCase(val))
+			return "never";
+		else
+			return null;
+	}
+	
+	public String getCitizenship(VertexRecord record) {
+		if(countries == null)
+			countries = loadCountries();
+		
+		if(record.isEgo) {
+			String val = getValue(record.egoSQLId, CITZEN_KEY);
+			if(val != null)
+				return countries.get(val);
+		} else {
+			for(Entry<String, String> entry : record.alterKeys.entrySet()) {
+				String val = getValue(entry.getKey(), makeKey(entry.getValue(), ALTER_CITIZEN_KEY));
+				if(val != null)
+					return countries.get(val);
+			}
+		}
+		
+		return null;
+	}
+	
+	public double getF2FFrequencey(String egoId, String alterKey) {
+		String freq = getValue(egoId, makeKey(alterKey, ALTER_F2F_FREQ_KEY));
+		String unit = getValue(egoId, makeKey(alterKey, ALTER_F2F_UNIT_KEY));
+		
+		if(freq != null && unit != null) {
+			double factor = 0;
+			if(unit.equalsIgnoreCase("0"))
+				return 0;
+			else if(unit.equalsIgnoreCase("1"))
+				factor = 365;
+			else if(unit.equalsIgnoreCase("2"))
+				factor = 52;
+			else if(unit.equalsIgnoreCase("3"))
+				factor = 12;
+			else if(unit.equalsIgnoreCase("4"))
+				factor = 1;
+			else
+				return 0;
+			
+			int idx = freq.indexOf("-");
+			if(idx > 0) {
+				freq = freq.substring(0, idx);
+			}
+			
+			freq = freq.replace(",", ".");
+			
+			double frequency = 0;
+			try {
+				frequency = Double.parseDouble(freq);
+			} catch (NumberFormatException e) {
+				logger.warn(String.format("Cannot parse frequency! (%1$s)", freq));
+			}
+			return  frequency * factor;
+		}
+		
+		return 0;
+	}
+	
+	private Map<String, String> loadCountries() {
+		try {
+			InputStream stream = ClassLoader.getSystemResourceAsStream("playground/johannes/socialnetworks/survey/ivt2009/graph/io/countries.txt");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			String line;
+			Map<String, String> map = new HashMap<String, String>();
+			while ((line = reader.readLine()) != null) {
+				String tokens[] = line.split("\t");
+				map.put(tokens[0], tokens[1]);
+			}
+			return map;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

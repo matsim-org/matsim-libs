@@ -37,9 +37,13 @@ import playground.johannes.socialnetworks.graph.spatial.generators.GravityEdgeCo
 public class StandardAnalyzerTask extends playground.johannes.socialnetworks.graph.analysis.StandardAnalyzerTask {
 
 	public StandardAnalyzerTask() {
-		super();
-		addTask(new DistanceTask());
-//		addTask(new AcceptanceProbabilityTask());
+//		super();
+//		addTask(new DistanceTask());
+		AcceptanceProbabilityTask acc = new AcceptanceProbabilityTask();
+//		AcceptanceProbability p = new AcceptanceProbability();
+//		p.setDistanceCalculator(new CartesianDistanceCalculator());
+		acc.setDistanceCalculator(new CartesianDistanceCalculator());
+		addTask(acc);
 		addTask(new EdgeCostsTask(new GravityEdgeCostFunction(1.6, 1, new CartesianDistanceCalculator())));
 		
 	}

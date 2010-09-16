@@ -54,6 +54,10 @@ public class GoogleGeoCoder {
 		standardizer.setRateLimitInterval(START_INTERVAL);
 	}
 	
+	public GoogleGeoCoder(long intervall) {
+		standardizer.setRateLimitInterval(intervall);
+	}
+	
 	public GeoCoordinate requestCoordinate(String query) {
 		Level level = Logger.getRootLogger().getLevel();
 		Logger.getRootLogger().setLevel(Level.INFO);

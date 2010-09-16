@@ -33,4 +33,9 @@ public interface SocialEdge extends SpatialEdge {
 	
 	public Tuple<? extends SocialVertex, ? extends SocialVertex> getVertices();
 	
+	/*
+	 * subject to change!
+	 */
+	public double getFrequency();
+	
 }

@@ -68,5 +68,16 @@ public class SocialSampledVertexDecorator<V extends SocialVertex> extends Sample
 	public Point getPoint() {
 		return getDelegate().getPoint();
 	}
+	
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("id=");
+		builder.append(getDelegate().getPerson().getId().toString());
+		builder.append(", sampled=");
+		builder.append(String.valueOf(getIterationSampled()));
+		builder.append(", detected=");
+		builder.append(String.valueOf(getIterationDetected()));
+		return builder.toString();
+	}
 
 }

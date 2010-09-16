@@ -42,16 +42,14 @@ import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
  */
 public class SeedConnectionTask extends AnalyzerTask {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.sna.graph.analysis.AnalyzerTask#analyze(org.matsim.contrib.sna.graph.Graph, java.util.Map)
-	 */
+	public static final String NUM_CONNECTS = "n_connects";
+	
 	@Override
 	public void analyze(Graph graph, Map<String, Double> stats) {
 		Set<SampledVertex> seedSet = (Set<SampledVertex>) SnowballPartitions.createSampledPartition((Set<? extends SampledVertex>)graph.getVertices(), 0);
 		List<SampledVertex> seeds = new ArrayList<SampledVertex>(seedSet);
 		
 		int[][] connects = new int[seeds.size()][seeds.size()];
-//		Arrays.fill(connects, -1);
 		
 		AdjacencyMatrix<SampledVertex> y = new AdjacencyMatrix<SampledVertex>(graph);
 		Dijkstra dijkstra = new Dijkstra(y);
@@ -71,7 +69,17 @@ public class SeedConnectionTask extends AnalyzerTask {
 				}
 			}
 		}
-
+		
+		int nConnects = 0;
+		for(int i = 0; i < connects.length; i++) {
+			for(int j = i+1; j < connects.length; j++) {
+				if(connects[i][j] > 0)
+					nConnects++;
+			}
+		}
+		
+		stats.put(NUM_CONNECTS, new Double(nConnects));
+		
 		if(getOutputDirectory() != null) {
 			try {
 				BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%1$s/seedconnects.txt", getOutputDirectory())));
@@ -89,7 +97,6 @@ public class SeedConnectionTask extends AnalyzerTask {
 				}
 				writer.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

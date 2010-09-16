@@ -67,7 +67,7 @@ public class SnowballAttributesValidator implements GraphValidator<SampledGraph>
 	}
 
 	public static void main(String args[]) {
-		SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = GraphReaderFacade.read("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/05-2010/graph/graph.graphml");
+		SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = GraphReaderFacade.read("/Users/jillenberger/Work/work/socialnets/data/ivt2009/raw/06-2010/graph/graph.graphml");
 		
 //		SnowballAttributesValidator validator = new SnowballAttributesValidator();
 //		if(validator.validate(graph)) {

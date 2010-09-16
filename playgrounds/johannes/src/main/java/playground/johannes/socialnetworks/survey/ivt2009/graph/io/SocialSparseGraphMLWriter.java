@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSocialTie.java
+ * SocialSparseGraphMLWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.graph;
+package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
+import java.util.List;
+
+import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
+import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public class SocialSparseEdge extends SpatialSparseEdge implements SocialEdge {//, SampledEdge {
+public class SocialSparseGraphMLWriter extends SocialGraphMLWriter {
 
-	private double frequency;
-	
 	@Override
-	public SocialSparseVertex getOpposite(Vertex v) {
-		return (SocialSparseVertex) super.getOpposite(v);
+	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
+		List<Tuple<String, String>> attrs = super.getVertexAttributes(v);
+		String val = ((SocialSparseVertex) v).getPerson().getCitizenship();
+		if (val != null) {
+			Tuple<String, String> attr = new Tuple<String, String>(SocialSparseGraphML.CITIZENSHIP_ATTR, val);
+			attrs.add(attr);
+		}
+		return attrs;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Tuple<? extends SocialSparseVertex, ? extends SocialSparseVertex> getVertices() {
-		return (Tuple<? extends SocialSparseVertex, ? extends SocialSparseVertex>) super.getVertices();
+	protected List<Tuple<String, String>> getEdgeAttributes(Edge e) {
+		List<Tuple<String, String>> attrs = super.getEdgeAttributes(e);
+		Tuple<String, String> tuple = new Tuple<String, String>(SocialSparseGraphML.FREQUENCY_ATTR, String
+				.valueOf(((SocialSparseEdge) e).getFrequency()));
+		attrs.add(tuple);
+		return attrs;
 	}
 
-	public void setFrequency(double frequency) {
-		this.frequency = frequency;
-	}
-	
-	public double getFrequency() {
-		return frequency;
-	}
 }

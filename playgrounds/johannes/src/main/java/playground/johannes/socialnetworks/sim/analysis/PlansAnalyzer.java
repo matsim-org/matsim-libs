@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialSampledEdgeDecorator.java
+ * PlanAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,43 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.social;
+package playground.johannes.socialnetworks.sim.analysis;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.snowball.SampledEdgeDecorator;
-import org.matsim.core.utils.collections.Tuple;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 
 /**
  * @author illenberger
  *
  */
-public class SocialSampledEdgeDecorator<E extends SocialEdge> extends SampledEdgeDecorator<E> implements SocialEdge {
+public class PlansAnalyzer {
 
-	protected SocialSampledEdgeDecorator(E delegate) {
-		super(delegate);
+	public static Map<String, Double> analyze(Set<Plan> plans, PlansAnalyzerTask task) {
+		Map<String, Double> stats = new HashMap<String, Double>();
+		task.analyze(plans, stats);
+		return stats;
+	}
+	
+	public static Map<String, Double> analyzeSelectedPlans(Population population, PlansAnalyzerTask task) {
+		Set<Plan> plans = new HashSet<Plan>();
+		
+		for(Person person : population.getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			if(plan != null)
+				plans.add(plan);
 		}
-
-	@Override
-	public SocialSampledVertexDecorator<?> getOpposite(Vertex vertex) {
-		return (SocialSampledVertexDecorator<?>) super.getOpposite(vertex);
+		
+		return analyze(plans, task);
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Tuple<? extends SocialSampledVertexDecorator<?>, ? extends SocialSampledVertexDecorator<?>> getVertices() {
-		return (Tuple<? extends SocialSampledVertexDecorator<?>, ? extends SocialSampledVertexDecorator<?>>) super.getVertices();
+	
+	public static void write(Map<String, Double> stats, String filename) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+		
+		for(Entry<String, Double> entry : stats.entrySet()) {
+			writer.write(entry.getKey());
+			writer.write("\t");
+			writer.write(entry.getValue().toString());
+			writer.newLine();
+		}
+		
+		writer.close();
 	}
-
-	@Override
-	public double length() {
-		return getDelegate().length();
-	}
-
-	@Override
-	public double getFrequency() {
-		return getDelegate().getFrequency();
-	}
-
 }

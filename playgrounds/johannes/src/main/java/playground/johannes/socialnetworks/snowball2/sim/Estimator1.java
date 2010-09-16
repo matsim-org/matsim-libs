@@ -62,6 +62,7 @@ public class Estimator1 implements ProbabilityEstimator {
 	 *            a sampled vertex
 	 */
 	public double getProbability(SampledVertex vertex) {
+//		int it = vertex.getIterationSampled();//stats.getMaxIteration();
 		int it = stats.getMaxIteration();
 		
 		if (it == 0)
@@ -83,7 +84,8 @@ public class Estimator1 implements ProbabilityEstimator {
 //			if (vertex.getIterationSampled() == it)
 //				p = stats.getNumSampled(it) / ((double) stats.getNumDetected(it - 1) * stats.getResonseRate());
 			
-			return stats.getResonseRate() * p_k;
+//			return p_k;
+			return stats.getResponseRate(it) * p_k;
 		}
 	}
 }

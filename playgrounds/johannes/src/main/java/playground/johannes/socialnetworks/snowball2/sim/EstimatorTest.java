@@ -72,9 +72,11 @@ public class EstimatorTest implements SamplerListener {
 	
 	private int[] nSampledVertices = new int[INIT_CAPACITY];
 	
+	private TDoubleArrayList[] N_estim = new TDoubleArrayList[INIT_CAPACITY];
+	
 	private ProbabilityEstimator estimator;
 	
-	private static final int INIT_CAPACITY = 40;
+	private static final int INIT_CAPACITY = 100;
 	
 	private int maxIteration = 0;
 	
@@ -117,10 +119,14 @@ public class EstimatorTest implements SamplerListener {
 			nSimulations[it-1]++;
 			nSampledVertices[it-1] += sampler.getNumSampledVertices();
 			
+			if(N_estim[it-1] == null)
+				N_estim[it-1] = new TDoubleArrayList();
+			
 			estimator.update(sampler.getSampledGraph());
 			
+			double wsum = 0;
 			for(SampledVertexDecorator<?> v : sampler.getSampledGraph().getVertices()) {
-				if (v.isSampled()) {
+				if (v.isSampled() && v.getNeighbours().size() > 0) { // ignore isolated vertices
 					Vertex delegate = v.getDelegate();
 					vertexCounts.get(delegate)[it - 1]++;
 
@@ -129,8 +135,12 @@ public class EstimatorTest implements SamplerListener {
 					double p = estimator.getProbability(v);
 					probas[it - 1] += p;
 					weights[it - 1] += 1/p;
+					
+					wsum += 1/p;
 				}
 			}
+			
+			N_estim[it-1].add(wsum);
 		}
 		
 		return true;
@@ -155,6 +165,8 @@ public class EstimatorTest implements SamplerListener {
 		double[] mse_w = new double[maxIteration + 1];
 		double[] bias_p = new double[maxIteration + 1];
 		double[] bias_w = new double[maxIteration + 1];
+		Distribution[] p_ratio = new Distribution[maxIteration + 1];
+		Distribution[] w_ratio = new Distribution[maxIteration + 1];
 
 		int[] samples = new int[maxIteration + 1];
 		TIntIntHashMap[] samples_k = new TIntIntHashMap[maxIteration + 1];
@@ -191,6 +203,8 @@ public class EstimatorTest implements SamplerListener {
 					wObs_k[i] = new TDoubleDoubleHashMap();
 					pEstim_k[i] = new TDoubleDoubleHashMap();
 					wEstim_k[i] = new TDoubleDoubleHashMap();
+					p_ratio[i] = new Distribution();
+					w_ratio[i] = new Distribution();
 				}
 				/*
 				 * accumulate samples
@@ -218,6 +232,9 @@ public class EstimatorTest implements SamplerListener {
 					pEstim_k[i].adjustOrPutValue(k, pEstimMean, pEstimMean);
 					wEstim_k[i].adjustOrPutValue(k, wEstimMean, wEstimMean);
 					samples_k[i].adjustOrPutValue(k, 1, 1);
+					
+					p_ratio[i].add(pEstimMean/pObs_i);
+					w_ratio[i].add(wEstimMean/wObs_i);
 				}
 				/*
 				 * boxplot for probability to sample k
@@ -288,6 +305,11 @@ public class EstimatorTest implements SamplerListener {
 		writeHistogramArray(wObs_k, output, "wobs");
 		writeHistogramArray(pEstim_k, output, "pestim");
 		writeHistogramArray(wEstim_k, output, "westim");
+		
+		writeDistributionArray(p_ratio, output, "p_ratio");
+		writeDistributionBoxplot(p_ratio, output, "p_ratio_boxplot");
+		writeDistributionArray(w_ratio, output, "w_ratio");
+		writeDistributionBoxplot(w_ratio, output, "w_ratio_boxplot");
 		/*
 		 * boxplot
 		 */
@@ -371,6 +393,45 @@ public class EstimatorTest implements SamplerListener {
 		for(int i = 0; i < array.length; i++) {
 			Distribution.writeHistogram(array[i], String.format("%1$s/%2$s.%3$s.txt", basedir, i, filename));
 		}
+	}
+	
+	private void writeDistributionArray(Distribution[] distrs, String basedir, String filename) throws FileNotFoundException, IOException {
+		for(int i = 0; i< distrs.length; i++) {
+			double binsize = (distrs[i].max() - distrs[i].min())/50.0;
+			Distribution.writeHistogram(distrs[i].absoluteDistribution(binsize), String.format("%1$s/%2$s.%3$s.txt", basedir, i, filename));
+		}
+	}
+	
+	private void writeDistributionBoxplot(Distribution[] distrs, String basedir, String filename) throws IOException {
+		List<double[]> valueList = new ArrayList<double[]>(distrs.length);
+		int maxLength = 0;
+		for(int i = 0; i < distrs.length; i++) {
+			double[] values = distrs[i].getValues();
+			valueList.add(values);
+			maxLength = Math.max(maxLength, values.length);
+		}
+		
+		BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%1$s/%2$s.txt", basedir, filename)));
+		for(int i = 0; i < distrs.length; i++) {
+			writer.write(String.valueOf(i));
+			writer.write("\t");
+		}
+		writer.newLine();
+		
+		for (int k = 0; k < maxLength; k++) {
+			for (int i = 0; i < distrs.length; i++) {
+				double[] values = valueList.get(i);
+				if(k < values.length) {
+					writer.write(String.valueOf(values[k]));
+				} else {
+					writer.write("\t");
+				}
+				writer.write("\t");
+			}
+			writer.newLine();
+		}
+		
+		writer.close();
 	}
 	
 	public static void main(String args[]) throws IOException {

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSocialTie.java
+ * FrequencyTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,11 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.graph;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
-import org.matsim.core.utils.collections.Tuple;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.sna.math.Distribution;
 
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 
@@ -29,26 +35,24 @@ import playground.johannes.socialnetworks.graph.social.SocialEdge;
  * @author illenberger
  *
  */
-public class SocialSparseEdge extends SpatialSparseEdge implements SocialEdge {//, SampledEdge {
+public class FrequencyTask extends AnalyzerTask {
 
-	private double frequency;
-	
 	@Override
-	public SocialSparseVertex getOpposite(Vertex v) {
-		return (SocialSparseVertex) super.getOpposite(v);
+	public void analyze(Graph graph, Map<String, Double> stats) {
+		DescriptiveStatistics distr = new Frequency().statistics((Set<SocialEdge>) graph.getEdges());
+		
+		if(getOutputDirectory() != null) {
+			Distribution distr2 = new Distribution(distr.getValues());
+			try {
+				writeHistograms(distr2, 1.0, false, "freq.txt");
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Tuple<? extends SocialSparseVertex, ? extends SocialSparseVertex> getVertices() {
-		return (Tuple<? extends SocialSparseVertex, ? extends SocialSparseVertex>) super.getVertices();
-	}
-
-	public void setFrequency(double frequency) {
-		this.frequency = frequency;
-	}
-	
-	public double getFrequency() {
-		return frequency;
-	}
 }

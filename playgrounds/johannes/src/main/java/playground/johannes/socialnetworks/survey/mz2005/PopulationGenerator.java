@@ -99,14 +99,14 @@ public class PopulationGenerator {
 			/*
 			 * create next activity
 			 */
-			ActivityImpl next = new ActivityImpl(activityType(trip.type), new CoordImpl(0, 0));
+			ActivityImpl next = new ActivityImpl(activityType(trip.type, trip.leisureType), new CoordImpl(0, 0));
 			next.setStartTime(trip.endTime * 60);
 			next.setCoord(null);
 			if(trip.destCoord !=  null) {
 				next.setCoord(new CoordImpl(trip.destCoord[0], trip.destCoord[1]));
 			}
 			if(trip.outwardTrip) {
-				next.setType(activityType(trip.type));
+				next.setType(activityType(trip.type, trip.leisureType));
 			} else
 				next.setType(ActivityType.home.name());
 			
@@ -129,16 +129,28 @@ public class PopulationGenerator {
 		return person;
 	}
 	
-	private String activityType(int id) {
-		if(id == 2 || id == 6 || id == 7)
+	private String activityType(int id, int ltype) {
+		if (id == 2 || id == 6 || id == 7)
 			return "work";
-		else if(id == 3)
+		else if (id == 3)
 			return "edu";
-		else if(id == 4 || id == 5)
+		else if (id == 4 || id == 5)
 			return "shop";
-		else if(id == 8)
-			return "leisure";
-		else if(id == 11)
+		else if (id == 8) {
+			if (ltype == 1)
+				return "visit";
+			else if (ltype == 2)
+				return "bar";
+			else if (ltype == 3 || ltype == 9)
+				return "loutdoor";
+			else if (ltype < 1) {
+				return "nonleisure";
+				// System.err.println("Leisure type not specified. Treating as nonleisure!");
+			} else
+				return "lindoor";
+		}
+		// return "leisure";
+		else if (id == 11)
 			return "home";
 		else
 			return "unknown";

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialSampledEdgeDecorator.java
+ * SampledVertexFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,43 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.social;
+package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.snowball.SampledEdgeDecorator;
-import org.matsim.core.utils.collections.Tuple;
+import java.util.HashSet;
+import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
+import org.matsim.contrib.sna.graph.GraphBuilder;
+import org.matsim.contrib.sna.snowball.SampledEdge;
+import org.matsim.contrib.sna.snowball.SampledGraph;
+import org.matsim.contrib.sna.snowball.SampledVertex;
+
+import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 
 /**
  * @author illenberger
  *
  */
-public class SocialSampledEdgeDecorator<E extends SocialEdge> extends SampledEdgeDecorator<E> implements SocialEdge {
+public class SampledVertexFilter implements GraphFilter<SampledGraph> {
 
-	protected SocialSampledEdgeDecorator(E delegate) {
-		super(delegate);
+	private GraphBuilder<SampledGraph, SampledVertex, SampledEdge> builder;
+	
+	public SampledVertexFilter(GraphBuilder<? extends SampledGraph, ? extends SampledVertex, ? extends SampledEdge> builder) {
+		this.builder = (GraphBuilder<SampledGraph, SampledVertex, SampledEdge>) builder;
+	}
+	
+	@Override
+	public SampledGraph apply(SampledGraph graph) {
+		Set<SampledVertex> remove = new HashSet<SampledVertex>();
+		
+		for(SampledVertex vertex : graph.getVertices()) {
+			if(!vertex.isSampled())
+				remove.add(vertex);
 		}
-
-	@Override
-	public SocialSampledVertexDecorator<?> getOpposite(Vertex vertex) {
-		return (SocialSampledVertexDecorator<?>) super.getOpposite(vertex);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Tuple<? extends SocialSampledVertexDecorator<?>, ? extends SocialSampledVertexDecorator<?>> getVertices() {
-		return (Tuple<? extends SocialSampledVertexDecorator<?>, ? extends SocialSampledVertexDecorator<?>>) super.getVertices();
-	}
-
-	@Override
-	public double length() {
-		return getDelegate().length();
-	}
-
-	@Override
-	public double getFrequency() {
-		return getDelegate().getFrequency();
+		
+		for(SampledVertex vertex : remove) {
+			Set<SampledEdge> edges = new HashSet<SampledEdge>(vertex.getEdges());
+			for(SampledEdge edge : edges) {
+				builder.removeEdge(graph, edge);
+			}
+			
+			builder.removeVertex(graph, vertex);
+		}
+		
+		return graph;
 	}
 
 }
