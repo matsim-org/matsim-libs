@@ -1,4 +1,4 @@
-package playground.andreas.bln.ana.acts2kml;
+package playground.andreas.utils.ana.acts2kml;
 
 import net.opengis.kml._2.AbstractFeatureType;
 import net.opengis.kml._2.ObjectFactory;

@@ -1,4 +1,4 @@
-package playground.andreas.bln.ana.plans2kml;
+package playground.andreas.utils.ana.plans2kml;
 
 import net.opengis.kml._2.AbstractFeatureType;
 import net.opengis.kml._2.FolderType;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.bln.ana.acts2kml;
+package playground.andreas.utils.ana.acts2kml;
 
 import java.io.IOException;
 import java.util.Collection;

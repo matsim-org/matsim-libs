@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.bln.ana.plans2kml;
+package playground.andreas.utils.ana.plans2kml;
 
 import java.util.TreeSet;
 

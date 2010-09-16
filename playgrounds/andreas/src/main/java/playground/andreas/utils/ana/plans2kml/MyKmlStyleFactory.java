@@ -1,9 +1,6 @@
-package playground.andreas.bln.ana.acts2kml;
+package playground.andreas.utils.ana.plans2kml;
 
-import java.awt.Color;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
 
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.IconStyleType;
@@ -12,7 +9,6 @@ import net.opengis.kml._2.LinkType;
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.StyleType;
 
-import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
 
@@ -23,15 +19,7 @@ public class MyKmlStyleFactory extends MatsimKmlStyleFactory{
 	
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	private DocumentType document;
-	private KMZWriter writer = null;
-	
-	private int blue = 0;
-	private int green = -250;
-	private int red = -500;
-	
-	private LinkedList<Color> colors;
-	
-	private HashMap<String, StyleType> styleMap = new HashMap<String, StyleType>();
+//	private KMZWriter writer = null;
 	
 	
 	private StyleType myCarNetworklinkStyle;
@@ -54,49 +42,8 @@ public class MyKmlStyleFactory extends MatsimKmlStyleFactory{
 
 	public MyKmlStyleFactory(KMZWriter writer, DocumentType document) {
 		super(writer, document);
-		this.writer = writer;
+//		this.writer = writer;
 		this.document = document;
-		this.colors = new LinkedList<Color>();
-		this.colors.add(Color.YELLOW);
-		this.colors.add(Color.RED);
-		this.colors.add(Color.PINK);
-		this.colors.add(Color.ORANGE);
-		this.colors.add(Color.MAGENTA);
-		this.colors.add(Color.GREEN);
-		this.colors.add(Color.CYAN);
-		this.colors.add(Color.BLUE);	
-	}
-	
-	public StyleType createDefaultColoredNodeStyle(String type) throws IOException {
-		if(this.styleMap.get(type) == null){
-			
-			StyleType styleType = this.kmlObjectFactory.createStyleType();
-			styleType.setId(String.valueOf(Math.random()));
-			LinkType iconLink = this.kmlObjectFactory.createLinkType();
-			iconLink.setHref(DEFAULTNODEICON);
-			if(this.styleMap.size() == 0){
-				this.writer.addNonKMLFile(MatsimResource.getAsInputStream(DEFAULTNODEICONRESOURCE), DEFAULTNODEICON);
-			}
-			IconStyleType iStyle = this.kmlObjectFactory.createIconStyleType();
-			iStyle.setIcon(iconLink);			
-			// The order of expression is aabbggrr, where aa=alpha (00 to ff); bb=blue (00 to ff); gg=green (00 to ff); rr=red (00 to ff).
-			Color color = this.colors.pollFirst();
-			if(color != null){
-				iStyle.setColor(new byte[]{(byte) 255, (byte) color.getBlue(), (byte) color.getGreen(), (byte) color.getRed()});
-			} else {
-				iStyle.setColor(new byte[]{(byte) 255, (byte) (Math.random() * 255), (byte) (Math.random() * 255), (byte) (Math.random() * 255)});
-			}
-			
-			this.blue += 50;
-			this.green += 50;
-			this.red += 50;
-			iStyle.setScale(MyKmlStyleFactory.ICONSCALE);
-			styleType.setIconStyle(iStyle);
-			this.document.getAbstractStyleSelectorGroup().add(this.kmlObjectFactory.createStyle(styleType));
-			this.styleMap.put(type, styleType);
-		}	
-	
-		return this.styleMap.get(type);
 	}
 	
 	public StyleType createCarNetworkLinkStyle() throws IOException {
