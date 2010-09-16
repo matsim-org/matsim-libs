@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.network.refQueueNetwork;
+package playground.mrieser.core.mobsim.features.refQueueNetworkFeature;
 
 import java.io.Serializable;
 import java.util.Arrays;

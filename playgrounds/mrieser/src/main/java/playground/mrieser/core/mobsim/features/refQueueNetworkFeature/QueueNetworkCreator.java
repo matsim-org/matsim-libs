@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.network.fastQueueNetwork;
+package playground.mrieser.core.mobsim.features.refQueueNetworkFeature;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,7 +30,7 @@ import playground.mrieser.core.mobsim.network.api.SimNetwork;
 /**
  * @author mrieser
  */
-public abstract class QueueNetworkCreator {
+/*package*/ abstract class QueueNetworkCreator {
 
 	public static SimNetwork createQueueNetwork(final Network network, final TimestepSimEngine simEngine) {
 		QueueNetwork qnet = new QueueNetwork(simEngine);
@@ -40,9 +40,6 @@ public abstract class QueueNetworkCreator {
 		}
 		for (Node node : network.getNodes().values()) {
 			qnet.addNode(new QueueNode(node, qnet, MatsimRandom.getLocalInstance()));
-		}
-		for (QueueLink ql : qnet.getLinks().values()) {
-			ql.buffer.init();
 		}
 
 		return qnet;

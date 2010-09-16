@@ -17,32 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.network.refQueueNetwork;
+package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.MatsimRandom;
 
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.network.api.SimNetwork;
 
-/**
- * @author mrieser
- */
-public abstract class QueueNetworkCreator {
+public class FastQueueNetworkFeature implements NetworkFeature {
 
-	public static SimNetwork createQueueNetwork(final Network network, final TimestepSimEngine simEngine) {
-		QueueNetwork qnet = new QueueNetwork(simEngine);
+	private final SimNetwork network;
 
-		for (Link link : network.getLinks().values()) {
-			qnet.addLink(new QueueLink(link, qnet));
-		}
-		for (Node node : network.getNodes().values()) {
-			qnet.addNode(new QueueNode(node, qnet, MatsimRandom.getLocalInstance()));
-		}
+	public FastQueueNetworkFeature(final Network network, final TimestepSimEngine simEngine) {
+		this.network = QueueNetworkCreator.createQueueNetwork(network, simEngine);
+	}
 
-		return qnet;
+	@Override
+	public void doSimStep(double time) {
+		this.network.doSimStep(time);
+	}
+
+	@Override
+	public SimNetwork getSimNetwork() {
+		return this.network;
 	}
 
 }

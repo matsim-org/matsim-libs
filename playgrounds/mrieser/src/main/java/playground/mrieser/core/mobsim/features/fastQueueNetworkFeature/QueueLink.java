@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.network.refQueueNetwork;
+package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -42,6 +42,7 @@ import playground.mrieser.core.mobsim.network.api.SimLink;
 
 	/*package*/ final QueueNetwork network;
 	/*package*/ final Link link;
+	private boolean active = false;
 
 	/* DRIVING VEHICLE QUEUE */
 
@@ -131,6 +132,7 @@ import playground.mrieser.core.mobsim.network.api.SimLink;
 			return;
 		}
 		if (position == SimLink.POSITION_AT_FROM_NODE) {
+			activate();
 			// vehicle enters from intersection
 			this.vehQueue.add(vehicle);
 			double earliestLeaveTime = (int) (now + this.freespeedTravelTime); // (int) for backwards compatibility
@@ -139,6 +141,7 @@ import playground.mrieser.core.mobsim.network.api.SimLink;
 			this.network.simEngine.getEventsManager().processEvent(
 					new LinkEnterEventImpl(now, vehicle.getId(), this.link.getId()));
 		} else {
+			activate();
 			if (priority == SimLink.PRIORITY_IMMEDIATELY) {
 				this.usedStorageCapacity += vehicle.getSizeInEquivalents();
 				// vehicle enters from a driveway
@@ -168,6 +171,7 @@ import playground.mrieser.core.mobsim.network.api.SimLink;
 	public void continueVehicle(final SimVehicle vehicle) {
 		if (this.parkedVehicles.remove(vehicle.getId()) != null) {
 			this.waitingList.add(vehicle);
+			this.activate();
 		} else {
 			// TODO
 		}
@@ -199,6 +203,22 @@ import playground.mrieser.core.mobsim.network.api.SimLink;
 		this.buffer.updateCapacity();
 		moveLinkToBuffer(time);
 		moveWaitToBuffer(time);
+		checkActive();
+	}
+
+	private void checkActive() {
+		this.active = !this.vehQueue.isEmpty() || !this.waitingList.isEmpty() || this.buffer.isActive();
+	}
+
+	/*package*/ boolean isActive() {
+		return this.active;
+	}
+
+	/*package*/ void activate() {
+		if (!this.active) {
+			this.network.activateLink(this);
+			this.active = true;
+		}
 	}
 
 	private void moveLinkToBuffer(final double time) {

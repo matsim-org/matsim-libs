@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.network.fastQueueNetwork;
+package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

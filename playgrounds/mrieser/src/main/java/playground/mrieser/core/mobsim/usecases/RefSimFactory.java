@@ -27,17 +27,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 
-import playground.mrieser.core.mobsim.features.DefaultNetworkFeature;
-import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
+import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.RefQueueNetworkFeature;
 import playground.mrieser.core.mobsim.impl.ActivityHandler;
 import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
-import playground.mrieser.core.mobsim.network.api.SimNetwork;
-import playground.mrieser.core.mobsim.network.refQueueNetwork.QueueNetworkCreator;
 
 public class RefSimFactory implements MobsimFactory {
 
@@ -49,8 +46,8 @@ public class RefSimFactory implements MobsimFactory {
 		planSim.setSimEngine(engine);
 
 		// setup network
-		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(scenario.getNetwork(), engine);
-		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
+		RefQueueNetworkFeature netFeature = new RefQueueNetworkFeature(scenario.getNetwork(), engine);
+//		SimNetwork simNetwork = netFeature.getSimNetwork();
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);

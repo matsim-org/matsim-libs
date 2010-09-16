@@ -17,16 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.features;
+package playground.mrieser.core.mobsim.features.refQueueNetworkFeature;
 
+import org.matsim.api.core.v01.network.Network;
+
+import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.network.api.SimNetwork;
 
-public class DefaultNetworkFeature implements NetworkFeature {
+public class RefQueueNetworkFeature implements NetworkFeature {
 
 	private final SimNetwork network;
 
-	public DefaultNetworkFeature(final SimNetwork network) {
-		this.network = network;
+	public RefQueueNetworkFeature(final Network network, final TimestepSimEngine simEngine) {
+		this.network = QueueNetworkCreator.createQueueNetwork(network, simEngine);
 	}
 
 	@Override
