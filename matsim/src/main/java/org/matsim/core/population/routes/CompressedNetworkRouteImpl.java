@@ -139,7 +139,6 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 
 		if (!foundFromLink || !equalFromTo) {
 			for (Id linkId : getLinkIds()) {
-				System.out.println("try link id " + linkId);
 				if (linkId.equals(toLinkId)) {
 					collectLinks = false;
 					if (equalFromTo) {
