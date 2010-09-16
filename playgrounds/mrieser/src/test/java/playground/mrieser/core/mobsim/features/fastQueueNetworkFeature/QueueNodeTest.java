@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.network.refQueueNetwork;
+package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 
 import java.util.Random;
 
@@ -35,10 +35,10 @@ import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.api.SimVehicle;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
 import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
+import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueLink;
+import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueNetwork;
+import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueNode;
 import playground.mrieser.core.mobsim.network.api.SimLink;
-import playground.mrieser.core.mobsim.network.refQueueNetwork.QueueLink;
-import playground.mrieser.core.mobsim.network.refQueueNetwork.QueueNetwork;
-import playground.mrieser.core.mobsim.network.refQueueNetwork.QueueNode;
 
 /**
  * @author mrieser
@@ -184,12 +184,15 @@ public class QueueNodeTest {
 		/*package*/ final QueueNode qnode;
 
 		/*package*/ Fixture() {
-			Node node;
+			Node node1;
+			Node node2;
+			Node node3;
+			Node node4;
 			this.net = NetworkImpl.createNetwork();
-			this.net.addNode(this.net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
-			this.net.addNode(this.net.getFactory().createNode(new IdImpl(2), new CoordImpl(0, 10000)));
-			this.net.addNode(node = this.net.getFactory().createNode(new IdImpl(3), new CoordImpl(500, 500)));
-			this.net.addNode(this.net.getFactory().createNode(new IdImpl(4), new CoordImpl(1500, 500)));
+			this.net.addNode(node1 = this.net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
+			this.net.addNode(node2 = this.net.getFactory().createNode(new IdImpl(2), new CoordImpl(0, 10000)));
+			this.net.addNode(node3 = this.net.getFactory().createNode(new IdImpl(3), new CoordImpl(500, 500)));
+			this.net.addNode(node4 = this.net.getFactory().createNode(new IdImpl(4), new CoordImpl(1500, 500)));
 			this.link1 = this.net.getFactory().createLink(new IdImpl(1), new IdImpl(1), new IdImpl(3));
 			this.link1.setLength(1000);
 			this.link1.setFreespeed(10);
@@ -216,7 +219,17 @@ public class QueueNodeTest {
 			this.qnet.addLink(this.qlink1);
 			this.qnet.addLink(this.qlink2);
 			this.qnet.addLink(this.qlink3);
-			this.qnode = new QueueNode(node, this.qnet, new Random(1));
+			QueueNode qn1 = new QueueNode(node1, this.qnet, new Random(1));
+			QueueNode qn2 = new QueueNode(node2, this.qnet, new Random(1));
+			this.qnode = new QueueNode(node3, this.qnet, new Random(1));
+			QueueNode qn4 = new QueueNode(node4, this.qnet, new Random(1));
+			this.qnet.addNode(qn1);
+			this.qnet.addNode(qn2);
+			this.qnet.addNode(this.qnode);
+			this.qnet.addNode(qn4);
+			this.qlink1.buffer.init();
+			this.qlink2.buffer.init();
+			this.qlink3.buffer.init();
 		}
 	}
 

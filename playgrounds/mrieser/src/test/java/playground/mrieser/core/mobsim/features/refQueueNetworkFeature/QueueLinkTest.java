@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.network.refQueueNetwork;
+package playground.mrieser.core.mobsim.features.refQueueNetworkFeature;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,10 +33,10 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.api.SimVehicle;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
+import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueLink;
+import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueNetwork;
 import playground.mrieser.core.mobsim.impl.DefaultSimVehicle;
 import playground.mrieser.core.mobsim.network.api.SimLink;
-import playground.mrieser.core.mobsim.network.refQueueNetwork.QueueLink;
-import playground.mrieser.core.mobsim.network.refQueueNetwork.QueueNetwork;
 
 /**
  * @author mrieser

@@ -29,9 +29,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.testcases.utils.EventsLogger;
 
-import playground.mrieser.core.mobsim.features.DefaultNetworkFeature;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
+import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.RefQueueNetworkFeature;
 import playground.mrieser.core.mobsim.impl.ActivityHandler;
 import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
@@ -40,7 +40,6 @@ import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.network.api.SimLink;
 import playground.mrieser.core.mobsim.network.api.SimNetwork;
-import playground.mrieser.core.mobsim.network.refQueueNetwork.QueueNetworkCreator;
 
 /**
  * @author mrieser
@@ -60,8 +59,8 @@ public class IntegrationTest {
 		planSim.setSimEngine(engine);
 
 		// setup network
-		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(f.scenario.getNetwork(), engine);
-		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
+		NetworkFeature netFeature = new RefQueueNetworkFeature(f.scenario.getNetwork(), engine);
+		SimNetwork simNetwork = netFeature.getSimNetwork();
 
 		// setup features; order is important!
 		planSim.addSimFeature(new StatusFeature());
@@ -102,8 +101,8 @@ public class IntegrationTest {
 		planSim.setSimEngine(engine);
 
 		// setup network
-		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(f.scenario.getNetwork(), engine);
-		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
+		NetworkFeature netFeature = new RefQueueNetworkFeature(f.scenario.getNetwork(), engine);
+		SimNetwork simNetwork = netFeature.getSimNetwork();
 
 		// setup features; order is important!
 		planSim.addSimFeature(new StatusFeature());
@@ -140,8 +139,8 @@ public class IntegrationTest {
 		planSim.setSimEngine(engine);
 
 		// setup network
-		SimNetwork simNetwork = QueueNetworkCreator.createQueueNetwork(f.scenario.getNetwork(), engine);
-		NetworkFeature netFeature = new DefaultNetworkFeature(simNetwork);
+		NetworkFeature netFeature = new RefQueueNetworkFeature(f.scenario.getNetwork(), engine);
+		SimNetwork simNetwork = netFeature.getSimNetwork();
 
 		// setup features; order is important!
 		planSim.addSimFeature(new StatusFeature());

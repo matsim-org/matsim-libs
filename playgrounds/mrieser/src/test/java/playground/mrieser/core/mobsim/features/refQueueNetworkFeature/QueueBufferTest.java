@@ -17,14 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.network.fastQueueNetwork;
-
-import java.util.Random;
+package playground.mrieser.core.mobsim.features.refQueueNetworkFeature;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -38,6 +35,9 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import playground.mrieser.core.mobsim.api.SimVehicle;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
 import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
+import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueBuffer;
+import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueLink;
+import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueNetwork;
 import playground.mrieser.core.mobsim.impl.DefaultSimVehicle;
 
 /**
@@ -54,7 +54,6 @@ public class QueueBufferTest {
 		SimVehicle veh3 = new DefaultSimVehicle(null);
 
 		QueueBuffer buffer = new QueueBuffer(f.qlink);
-		buffer.init();
 		buffer.setFlowCapacity(2.0);
 		buffer.updateCapacity();
 		Assert.assertTrue(buffer.hasSpace());
@@ -66,7 +65,6 @@ public class QueueBufferTest {
 		Assert.assertFalse(buffer.hasSpace());
 
 		buffer = new QueueBuffer(f.qlink);
-		buffer.init();
 		buffer.setFlowCapacity(2.5); // at the beginning, 3 vehicles have place
 		buffer.updateCapacity();
 		Assert.assertTrue(buffer.hasSpace());
@@ -100,7 +98,6 @@ public class QueueBufferTest {
 
 	private void doTestFlowCapacity(final int vehPerHour, final Fixture f, final SimVehicle[] vehicles) {
 		QueueBuffer buffer = new QueueBuffer(f.qlink);
-		buffer.init();
 		buffer.setFlowCapacity(vehPerHour / 3600.0);
 		int cntInsert = 0;
 		int cntExtract = 0;
@@ -118,7 +115,6 @@ public class QueueBufferTest {
 
 		// test with 1800 veh/h
 		buffer = new QueueBuffer(f.qlink);
-		buffer.init();
 		buffer.setFlowCapacity(0.5);
 		cntInsert = 0;
 		cntExtract = 0;
@@ -136,7 +132,6 @@ public class QueueBufferTest {
 
 		// test with 7200 veh/h
 		buffer = new QueueBuffer(f.qlink);
-		buffer.init();
 		buffer.setFlowCapacity(2.0);
 		cntInsert = 0;
 		cntExtract = 0;
@@ -154,7 +149,6 @@ public class QueueBufferTest {
 
 		// test with 2880 veh/h
 		buffer = new QueueBuffer(f.qlink);
-		buffer.init();
 		buffer.setFlowCapacity(0.8);
 		cntInsert = 0;
 		cntExtract = 0;
@@ -176,7 +170,6 @@ public class QueueBufferTest {
 	public void testGetLastMovedTime() {
 		Fixture f = new Fixture();
 		QueueBuffer buffer = new QueueBuffer(f.qlink);
-		buffer.init();
 		buffer.setFlowCapacity(2.0);
 		buffer.updateCapacity();
 
@@ -202,26 +195,19 @@ public class QueueBufferTest {
 		/*package*/ final FakeSimEngine engine;
 		/*package*/ final QueueNetwork qnet;
 		/*package*/ final QueueLink qlink;
-		/*package*/ final QueueNode qnode;
 
 		/*package*/ Fixture() {
 			this.net = NetworkImpl.createNetwork();
-			Node node2 = this.net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
 			this.net.addNode(this.net.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0)));
-			this.net.addNode(node2);
+			this.net.addNode(this.net.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0)));
 			this.link = this.net.getFactory().createLink(new IdImpl(5), new IdImpl(1), new IdImpl(2));
 			this.link.setLength(1000);
 			this.link.setFreespeed(10);
 			this.link.setCapacity(3600.0);
 			this.link.setNumberOfLanes(1.0);
-
 			this.engine = new FakeSimEngine();
 			this.qnet = new QueueNetwork(this.engine);
 			this.qlink = new QueueLink(this.link, this.qnet);
-			this.qnet.addLink(this.qlink);
-			this.qnode = new QueueNode(node2, this.qnet, new Random(1980));
-			this.qnet.addNode(this.qnode);
-			this.qlink.buffer.init();
 		}
 	}
 }

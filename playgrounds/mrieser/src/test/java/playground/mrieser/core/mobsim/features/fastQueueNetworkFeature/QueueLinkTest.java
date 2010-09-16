@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.network.fastQueueNetwork;
+package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 
 import java.util.Random;
 
@@ -36,6 +36,9 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.api.SimVehicle;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
+import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueLink;
+import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueNetwork;
+import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueNode;
 import playground.mrieser.core.mobsim.impl.DefaultSimVehicle;
 import playground.mrieser.core.mobsim.network.api.SimLink;
 
