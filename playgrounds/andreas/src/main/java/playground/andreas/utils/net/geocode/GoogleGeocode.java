@@ -1,4 +1,4 @@
-package playground.andreas.bln.net;
+package playground.andreas.utils.net.geocode;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
