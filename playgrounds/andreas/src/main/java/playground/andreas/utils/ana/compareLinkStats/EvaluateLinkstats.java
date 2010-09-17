@@ -1,4 +1,4 @@
-package playground.andreas.bln.ana;
+package playground.andreas.utils.ana.compareLinkStats;
 
 import java.io.IOException;
 import java.util.ArrayList;
