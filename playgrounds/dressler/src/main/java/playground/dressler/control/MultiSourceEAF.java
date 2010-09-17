@@ -232,7 +232,7 @@ public class MultiSourceEAF {
 					Link link = network.getLinks().get(linkid);
 					if (link == null) {
 						//	link = new LinkImpl(linkid, node, shelter, network, 10.66, 1.66, flowcapacity, 1);
-						link = network.getFactory().createLink(linkid, node, shelter, network, 10.66, 1.66, flowcapacity, 1);
+						link = network.getFactory().createLink(linkid, node, shelter, network, 10.66, 1.66, flowcapacity, 1.);
 						network.addLink(link);
 					}
 					//set new demands
@@ -707,7 +707,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 48;
+		int instance = 11;
 		// 1 = siouxfalls, demand 500
 		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
@@ -733,7 +733,7 @@ public class MultiSourceEAF {
 			sinkid = "supersink";
 		}else if (instance == 11) {
 			networkfile  = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
-			uniformDemands = 1000;
+			uniformDemands = 10;
 			timeStep = 5;
 			flowFactor = 1.0;
 			sinkid = "supersink";
@@ -1067,7 +1067,7 @@ public class MultiSourceEAF {
 		//settings.useVertexCleanup = false;
 		settings.useImplicitVertexCleanup = true;
 		//settings.useShadowFlow = false;		
-		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
+		settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_FORWARD;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_MIXED;
 		//settings.searchAlgo = FlowCalculationSettings.SEARCHALGO_REVERSE;
 		settings.useRepeatedPaths = true; // not compatible with costs!
@@ -1076,11 +1076,11 @@ public class MultiSourceEAF {
 		//settings.sortPathsBeforeAugmenting = true;
 		settings.checkTouchedNodes = false;
 		settings.keepPaths = true; // store paths at all! This is sadly needed to compute costs & arrival pattern.
-		settings.unfoldPaths = true; // unfold stored paths into forward paths
+		settings.unfoldPaths = false; // unfold stored paths into forward paths
 		settings.delaySinkPropagation = true; // propagate sinks (and resulting intervals) only if the search has nothing else to do 
 		settings.quickCutOff = false; // stop as soon as the first good path is found
 		settings.mapLinksToTEP = true; // remember which path uses an edge at a given time
-		
+		settings.useHoldover=true;//only forward no unwind no cost
 		//settings.whenAvailable = new HashMap<Link, Interval>();
 		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
 

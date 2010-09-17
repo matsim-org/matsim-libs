@@ -30,8 +30,7 @@ import java.util.LinkedList;
  * @author Manuel Schneider
  */
 public class HoldoverIntervals extends Intervals<HoldoverInterval> implements EdgeFlowI{
-
-
+	//TODO holdover done implement HoldoverIntervalls
 	
 	/**
 	 * availability for easy access
@@ -94,7 +93,7 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 		ArrayList<Interval> result = new ArrayList<Interval>();
 		HoldoverInterval current;
 		Interval toinsert;
-
+		//if(true) return result;
 
 		int low = -1;
 		int high = -1;						
@@ -102,6 +101,9 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 		if(primal){
 			int effectiveStart = incoming.getHighBound() ;
 			int effectiveEnd = timehorizon ;
+			if(effectiveStart==effectiveEnd){
+				return result;
+			}
 			current = this.getIntervalAt(effectiveStart);
 
 			while (current.getLowBound() < effectiveEnd) {
@@ -122,19 +124,20 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 						if (low < high) {
 							toinsert = new Interval(low, high);					  
 							result.add(toinsert);
+							collecting =false;		
 							break;
 						}
 						collecting = false;
 					}
 				}
-
+				System.out.println("current loww bound"+ current.getLowBound());
 				if (this.isLast(current)) {
 					break;
 				} 
 				current = this.getIntervalAt(current.getHighBound());
 
 			}
-
+			System.out.println("done looping");
 			if (collecting) { // finish the Interval
 				low = Math.max(low, effectiveStart);
 				high = Math.min(high, effectiveEnd);
@@ -144,9 +147,10 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 				}
 				collecting = false;
 			}
-		}else{  //TODO cover residual holdover
-			
+		}else{  //TODO holdover a implement propagation residual holdover
+			;
 		}
+		
 		return result;
 	}
 	
@@ -213,6 +217,8 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 		this.cleanup();
 		
 	}
+	
+	
 	private Pair<LinkedList<HoldoverInterval>,Pair<Integer,Integer>> getIntersecting(int tstart,int tstop){
 		LinkedList<HoldoverInterval> list = new LinkedList<HoldoverInterval>();
 		HoldoverInterval temp = this.getIntervalAt(tstart);

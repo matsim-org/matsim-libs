@@ -49,13 +49,15 @@ public class StepHold implements PathStep {
 	@Override
 	public PathStep copyShiftedToStart(int newStart) {
 	    int shift = newStart - this.startTime;
+	  //TODO holdover z repair shifted to arrival
 		return new StepHold(this.node, newStart, this.arrivalTime + shift, this.forward); 
 	}
 	
 	@Override
 	public PathStep copyShiftedToArrival(int newArrival) {
-		int shift = newArrival - this.arrivalTime;
-		return new StepHold(this.node, this.startTime + shift, newArrival, this.forward);
+		//int shift = newArrival - this.arrivalTime;
+		//TODO holdover done repair shifted to arrival 
+		return new StepHold(this.node, this.startTime , newArrival, this.forward);
 	}
 	
 	@Override

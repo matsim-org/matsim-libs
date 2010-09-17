@@ -50,6 +50,8 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import playground.dressler.Interval.EdgeFlowI;
 import playground.dressler.Interval.EdgeInterval;
 import playground.dressler.Interval.EdgeIntervals;
+import playground.dressler.Interval.HoldoverInterval;
+import playground.dressler.Interval.HoldoverIntervals;
 import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.ShadowEdgeFlow;
 import playground.dressler.Interval.SinkIntervals;
@@ -82,7 +84,8 @@ public class Flow {
 	 */
 //	private HashMap<Link, EdgeIntervals> _flow;
 	private HashMap<Link, EdgeFlowI> _flow;
-
+	//TODO holdover done declare _holdover
+	private HashMap<Node,EdgeFlowI>_holdover;
 
 	/**
 	 * Source outflow, somewhat like holdover for sources
@@ -180,7 +183,7 @@ public class Flow {
 		this._edgePathMap =new HashMap<Link,TreeMap<Integer,LinkedList<TimeExpandedPath>>>();
 		this._sinkPathMap =new HashMap<Node,TreeMap<Integer,LinkedList<TimeExpandedPath>>>();
 		this._sourcePathMap =new HashMap<Node,TreeMap<Integer,LinkedList<TimeExpandedPath>>>();
-		
+		this._holdover =new HashMap<Node,EdgeFlowI>();
 		for(Node node : this._network.getNodes().values()){
 			if (this._settings.isSource(node)) {
 				int i = this._settings.getDemand(node);
@@ -194,6 +197,12 @@ public class Flow {
 				EdgeInterval temp = new EdgeInterval(0,this._settings.TimeHorizon);
 				this._sinkflow.put(node, new SinkIntervals(temp));
 				this._demands.put(node, i);
+			}
+			//TODO holdover done initialize _holdover
+			if(settings.useHoldover){
+				HoldoverInterval temp = new HoldoverInterval(0,settings.TimeHorizon);
+				HoldoverIntervals temps = new HoldoverIntervals(temp,Integer.MAX_VALUE);
+				this._holdover.put(node,temps);
 			}
 		}
 
@@ -248,7 +257,7 @@ public class Flow {
 
 		this._timeHorizon = settings.TimeHorizon;
 		this.totalflow = 0;
-
+		
 	}
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -2378,6 +2387,12 @@ public class Flow {
 	public EdgeFlowI getFlow(Link edge) {
 		return this._flow.get(edge);
 	}
+	
+	public EdgeFlowI getHoldover(Node node){
+		return this._holdover.get(node);
+	}
+	//TODO holdover done implement getHoldover
+	
 
 	public SourceIntervals getSourceOutflow(Node node) {
 		return this._sourceoutflow.get(node);

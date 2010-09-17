@@ -161,6 +161,7 @@ public class FlowCalculationSettings {
 				return false;
 			}
 		}
+		//TODO holdover check for incompatible setting no unwind paths, no backwards/mixed search no no cost
 
 		if (this.searchAlgo != this.SEARCHALGO_REVERSE && this.trackUnreachableVertices) {
 			System.out.println("TrackUnreachableVertices does not make sense with anything but REVERSE search! I will disable it now.");

@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.dressler.Interval.EdgeFlowI;
+import playground.dressler.Interval.HoldoverInterval;
 import playground.dressler.Interval.Interval;
 import playground.dressler.Interval.Pair;
 import playground.dressler.Interval.SourceIntervals;
@@ -430,6 +431,13 @@ public class BellmanFordIntervalBased {
 						} else {
 							toLabel = this._labels.get(toNode).getIntervalAt(toTime);
 						}
+
+					}else if (pred instanceof StepHold) {
+						if (pred.getForward()) {
+							toLabel = this._labels.get(toNode).getIntervalAt(toTime);
+							//TODO holdover done construct Routes
+							
+						}	
 					} else {
 						throw new RuntimeException("Unknown instance of PathStep in ConstructRoutes()");
 					}
@@ -441,7 +449,7 @@ public class BellmanFordIntervalBased {
 				result.add(TEP);
 			}
 		}
-		//System.out.println(result);
+		System.out.println(result.size());
 		return result;
 	}
 	
@@ -846,7 +854,7 @@ public class BellmanFordIntervalBased {
 			}
 		}
 		if(this._settings.useHoldover){
-			ArrayList<VertexInterval> changed = relabelHoldover(v, inter, this._settings.TimeHorizon);
+			ArrayList<VertexInterval> changed = relabelHoldover(v, inter,true,false, this._settings.TimeHorizon);
 			if(changed!=null){
 				for(VertexInterval changedinterval : changed){
 					queue.add(new BFTask(new VirtualNormalNode(v, 0), changedinterval, false));
@@ -857,10 +865,57 @@ public class BellmanFordIntervalBased {
 		return new Pair<TaskQueue, Interval>(queue, inter);
 	}
 	
-	private ArrayList<VertexInterval> relabelHoldover(Node v, Interval inter,
+	private ArrayList<VertexInterval> relabelHoldover(Node v, Interval inter,boolean original, boolean reverse,
 			int timeHorizon) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		VertexIntervals labelto = _labels.get(v);
+		EdgeFlowI flowover = this._flow.getHoldover(v);
+		ArrayList<VertexInterval> changed;
+
+
+		ArrayList<Interval> arrive;
+
+		VertexInterval arriveProperties = new VertexInterval();
+		arriveProperties.setReachable(true);				
+
+		if (!reverse) {
+
+			// Create predecessor. It is not shifted correctly.
+			PathStep pred;
+
+			pred = new StepHold(v, inter.getHighBound(), inter.getHighBound(), original);
+			//FIXME holdover may be incorrect build correct preds
+			arriveProperties.setPredecessor(pred);
+		} else {
+			if(reverse){
+				throw new RuntimeException("no propagating of holdover implemented for reverse search"); 
+			}
+			//TODO holdover z implement reverse relabel
+			/*// Create successor. It is not shifted correctly.			
+			PathStep succ;
+			if (original) {
+				succ = new StepEdge(over, 0, this._settings.getLength(over), original);
+			} else {
+				succ = new StepEdge(over, this._settings.getLength(over), 0, original);				
+			}
+			arriveProperties.setSuccessor(succ);*/
+		}
+
+
+
+		arrive = flowover.propagate(inter, original, reverse, timeHorizon);
+
+
+		if(arrive != null && !arrive.isEmpty()){
+			System.out.println("setti arrive ho"+arrive.size());
+			//FIXME holdover  a causes loops
+			//changed = labelto.setTrueList(arrive, arriveProperties);
+			System.out.println("done setti arrive ho");
+			return null; //changed;
+			
+		}else{					
+			return null;
+		}					
 	}
 
 
@@ -880,12 +935,13 @@ public class BellmanFordIntervalBased {
 		// safety check, should not happen
 		if (!reverse) {
 			if (!inter.getReachable() || inter.getPredecessor() == null) {
-				System.out.println("Node " + v.getId() + " was not reachable or had no predecessor!");
+
+				System.out.println("Node " + v.getId() + " was not reachable "+inter.getReachable()+" or had no predecessor!");
 				return new Pair<Boolean, Interval>(false, inter);
 			} 
 		} else {
 			if (!inter.getReachable() || inter.getSuccessor() == null) {
-				System.out.println("Node " + v.getId() + " was not reachable or had no successor!");
+				System.out.println("Node " + v.getId() + " was not reachable "+inter.getReachable()+" or had no successor!");
 				return new Pair<Boolean, Interval>(false, inter);
 
 			}
