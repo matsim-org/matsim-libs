@@ -47,14 +47,9 @@ import playground.mrieser.core.mobsim.api.PlanElementHandler;
 import playground.mrieser.core.mobsim.api.SimVehicle;
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
 import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
-import playground.mrieser.core.mobsim.features.DefaultNetworkFeature;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
-import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
-import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
-import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
-import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
+import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.RefQueueNetworkFeature;
 import playground.mrieser.core.mobsim.network.api.SimLink;
-import playground.mrieser.core.mobsim.network.refQueueNetwork.QueueNetworkCreator;
 
 /**
  * @author mrieser
@@ -398,7 +393,7 @@ public class CarDepartureHandlerTest {
 			EventsManager events = new EventsManagerImpl();
 			this.sim = new PlanSimulationImpl(this.scenario);
 			this.simEngine = new DefaultTimestepSimEngine(this.sim, events);
-			this.networkFeature = new DefaultNetworkFeature(QueueNetworkCreator.createQueueNetwork(network, this.simEngine));
+			this.networkFeature = new RefQueueNetworkFeature(network, this.simEngine);
 		}
 
 		private static Link setLinkAttributes(final Link link, final double length, final double capacity, final double freespeed, final int nOfLanes) {
