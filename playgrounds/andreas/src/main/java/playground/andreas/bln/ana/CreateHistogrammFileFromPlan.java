@@ -20,7 +20,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.Time;
 
-import playground.andreas.bln.pop.NewPopulation;
+import playground.andreas.utils.pop.NewPopulation;
 
 /**
  * Filter persons, not using a specific TransportMode.

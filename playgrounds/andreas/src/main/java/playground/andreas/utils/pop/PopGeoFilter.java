@@ -1,4 +1,4 @@
-package playground.andreas.bln.pop;
+package playground.andreas.utils.pop;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +23,8 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.core.utils.misc.RouteUtils;
+
+import playground.andreas.bln.pop.SharedNetScenario;
 
 
 /**

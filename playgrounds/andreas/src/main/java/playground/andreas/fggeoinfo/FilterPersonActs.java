@@ -21,8 +21,8 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 
-import playground.andreas.bln.pop.NewPopulation;
 import playground.andreas.utils.ana.acts2kml.KMLActsWriter;
+import playground.andreas.utils.pop.NewPopulation;
 
 /**
  * Filter persons, depending on ID

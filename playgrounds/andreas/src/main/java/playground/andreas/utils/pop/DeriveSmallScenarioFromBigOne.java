@@ -1,4 +1,4 @@
-package playground.andreas.bln.pop;
+package playground.andreas.utils.pop;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -16,6 +16,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.andreas.bln.pop.SharedNetScenario;
 import playground.mzilske.bvg09.DataPrepare;
 
 public class DeriveSmallScenarioFromBigOne {

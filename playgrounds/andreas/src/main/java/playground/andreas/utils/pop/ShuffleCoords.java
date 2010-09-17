@@ -17,64 +17,92 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.bln.pop;
+package playground.andreas.utils.pop;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
- * Filter persons, not using a specific TransportMode.
+ * Change the coords of a given plan for every person, except the original one.
+ * It is assumed that the original persons has a digit only Id.
  *
  * @author aneumann
  *
  */
-public class FilterPersonPlan extends NewPopulation {
-	private int planswritten = 0;
-	private int personshandled = 0;
+public class ShuffleCoords extends NewPopulation {
 
-	public FilterPersonPlan(Network network, Population plans, String filename) {
+	private double radius; // meter
+	private String homeActString = null;
+
+	public ShuffleCoords(Network network, Population plans, String filename, double radius) {
 		super(network, plans, filename);
+		this.radius = radius;
+	}
+
+	/**
+	 * If set, the coords of a home activity will only be changed once, thus all home acts have the same shuffled coords.
+	 *
+	 * @param givenHomeActString The String defining a home act
+	 */
+	public void setChangeHomeActsOnlyOnceTrue(String givenHomeActString) {
+		this.homeActString = givenHomeActString;
 	}
 
 	@Override
 	public void run(Person person) {
 
-		this.personshandled++;
-
-		if(person.getPlans().size() != 1){
-			System.err.println("Person got more than one plan");
-		} else {
+		try {
+			// Keep old person untouched
+			Double.parseDouble(person.getId().toString());
+			this.popWriter.writePerson(person);
+		} catch (Exception e) {
+			// clones need to be handled
 
 			Plan plan = person.getPlans().get(0);
-			boolean keepPlan = true;
 
-			// only keep person if every leg is a car leg
+			CoordImpl coordOfHomeAct = null;
+
 			for (PlanElement planElement : plan.getPlanElements()) {
-				if(planElement instanceof Leg){
-					if(((Leg)planElement).getMode() != TransportMode.car && ((Leg)planElement).getMode() != TransportMode.pt){
-						keepPlan = false;
+				if(planElement instanceof ActivityImpl){
+					ActivityImpl act = (ActivityImpl) planElement;
+
+					double x = -0.5 + MatsimRandom.getRandom().nextDouble();
+					double y = -0.5 + MatsimRandom.getRandom().nextDouble();
+
+					double scale = Math.sqrt((this.radius * this.radius)/(x * x + y * y)) * MatsimRandom.getRandom().nextDouble();
+
+					CoordImpl shuffledCoords = new CoordImpl(act.getCoord().getX() + x * scale, act.getCoord().getY() + y * scale);
+
+					if(this.homeActString != null){
+						if(act.getType().equalsIgnoreCase(this.homeActString)){
+							if (coordOfHomeAct == null){
+								coordOfHomeAct = shuffledCoords;
+							}
+							act.setCoord(coordOfHomeAct);
+						} else {
+							act.setCoord(shuffledCoords);
+						}
+					} else {
+						act.setCoord(shuffledCoords);
 					}
+
 				}
 			}
 
-			if(keepPlan){
-				this.popWriter.writePerson(person);
-				this.planswritten++;
-			}
-
+			this.popWriter.writePerson(person);
 		}
-
 	}
 
 	public static void main(final String[] args) {
@@ -83,8 +111,8 @@ public class FilterPersonPlan extends NewPopulation {
 		ScenarioImpl sc = new ScenarioImpl();
 
 		String networkFile = "./bb_cl.xml.gz";
-		String inPlansFile = "./baseplan.xml.gz";
-		String outPlansFile = "./baseplan_car_pt_only.xml.gz";
+		String inPlansFile = "./plan_korridor_50x.xml.gz";
+		String outPlansFile = "./plan_korridor_50x_sc.xml.gz";
 
 		NetworkImpl net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(networkFile);
@@ -93,10 +121,9 @@ public class FilterPersonPlan extends NewPopulation {
 		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
-		FilterPersonPlan dp = new FilterPersonPlan(net, inPop, outPlansFile);
-		dp.run(inPop);
-		System.out.println(dp.personshandled + " persons handled; " + dp.planswritten + " plans written to file");
-		dp.writeEndPlans();
+		ShuffleCoords shuffleCoords = new ShuffleCoords(net, inPop, outPlansFile, 10.0);
+		shuffleCoords.run(inPop);
+		shuffleCoords.writeEndPlans();
 
 		Gbl.printElapsedTime();
 	}

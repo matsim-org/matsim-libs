@@ -10,7 +10,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 
-import playground.andreas.bln.pop.NewPopulation;
+import playground.andreas.utils.pop.NewPopulation;
 
 /**
  * Filter persons, depending on ID

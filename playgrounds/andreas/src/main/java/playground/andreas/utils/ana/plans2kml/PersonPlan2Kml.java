@@ -32,7 +32,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 
-import playground.andreas.bln.pop.NewPopulation;
+import playground.andreas.utils.pop.NewPopulation;
 
 
 public class PersonPlan2Kml extends NewPopulation{

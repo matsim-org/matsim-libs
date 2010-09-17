@@ -1,4 +1,4 @@
-package playground.andreas.bln.pop;
+package playground.andreas.utils.pop;
 
 import java.io.File;
 
@@ -9,6 +9,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+
+import playground.andreas.bln.pop.SharedNetScenario;
 
 /**
  * Combines DuplicatePlans and ShuffleCoords to<br>

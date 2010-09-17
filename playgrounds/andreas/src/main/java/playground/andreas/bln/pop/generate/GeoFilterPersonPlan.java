@@ -34,8 +34,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 
-import playground.andreas.bln.pop.NewPopulation;
 import playground.andreas.bln.pop.SharedNetScenario;
+import playground.andreas.utils.pop.NewPopulation;
 
 /**
  * Filters persons with plans which do not have one node of a given network in common.
