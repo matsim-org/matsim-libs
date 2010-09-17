@@ -1,4 +1,4 @@
-package playground.andreas.dummy;
+package playground.andreas.utils.dummy;
 
 import java.io.BufferedWriter;
 import java.io.File;
