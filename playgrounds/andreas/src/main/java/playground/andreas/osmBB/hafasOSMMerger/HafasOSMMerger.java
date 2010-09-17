@@ -1,4 +1,4 @@
-package playground.andreas.hafasOSMMerger;
+package playground.andreas.osmBB.hafasOSMMerger;
 
 import java.io.IOException;
 import java.util.Map;
