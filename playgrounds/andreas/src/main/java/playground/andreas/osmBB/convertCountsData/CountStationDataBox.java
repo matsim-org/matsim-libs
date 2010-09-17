@@ -13,19 +13,19 @@ public class CountStationDataBox {
 	private int numberOfLanesDetected;
 	private int errorCodeFromMapping;
 	
-	protected String getShortName() {
+	public String getShortName() {
 		return this.shortName;
 	}
 	protected void setShortName(String shortName) {
 		this.shortName = shortName;
 	}
-	protected String getUnitName() {
+	public String getUnitName() {
 		return this.unitName;
 	}
 	protected void setUnitName(String unitName) {
 		this.unitName = unitName;
 	}
-	protected Coord getCoord() {
+	public Coord getCoord() {
 		return this.coord;
 	}
 	protected void setCoord(Coord coord) {
@@ -61,7 +61,7 @@ public class CountStationDataBox {
 	protected void setNumberOfLanesDetected(int numberOfLanesDetected) {
 		this.numberOfLanesDetected = numberOfLanesDetected;
 	}
-	protected int getErrorCodeFromMapping() {
+	public int getErrorCodeFromMapping() {
 		return this.errorCodeFromMapping;
 	}
 	protected void setErrorCodeFromMapping(int errorCodeFromMapping) {
