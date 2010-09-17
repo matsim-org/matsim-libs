@@ -47,17 +47,14 @@ public class CleanNetwork {
 	public static void cleanNetwork(final String[] args) {
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(args[0]);
 		
 		NetworkImpl subNetwork = new ScenarioImpl().getNetwork();
 		Set<String> modes = new HashSet<String>();
 		modes.add(TransportMode.car);
-		new TransportModeNetworkFilter(network).filter(subNetwork,modes);
-		new NetworkAdaptLength().run(subNetwork);
+		new TransportModeNetworkFilter(scenario.getNetwork()).filter(subNetwork,modes);
 		new NetworkCleaner().run(subNetwork);
-		
-		for (Link l : network.getLinks().values()) {
+		for (Link l : scenario.getNetwork().getLinks().values()) {
 			LinkImpl l2 = (LinkImpl)subNetwork.getLinks().get(l.getId());
 			if (l2 != null) {
 				l2.setOrigId(((LinkImpl) l).getOrigId());
@@ -65,11 +62,10 @@ public class CleanNetwork {
 			}
 		}
 		new NetworkDoubleLinks("-dl").run(subNetwork);
+		new NetworkAdaptLength().run(subNetwork);
 
-		NetworkWriteAsTable nwat = new NetworkWriteAsTable(args[1]);
-		nwat.run(network);
-
-		new NetworkWriter(network).write(args[1]+"/network.xml.gz");
+		new NetworkWriteAsTable(args[1]).run(subNetwork);
+		new NetworkWriter(subNetwork).write(args[1]+"/network.xml.gz");
 	}
 
 	//////////////////////////////////////////////////////////////////////
