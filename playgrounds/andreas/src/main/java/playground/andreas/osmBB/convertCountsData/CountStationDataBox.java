@@ -1,4 +1,4 @@
-package playground.andreas.convertTSV2Counts;
+package playground.andreas.osmBB.convertCountsData;
 
 import org.matsim.api.core.v01.Coord;
 
