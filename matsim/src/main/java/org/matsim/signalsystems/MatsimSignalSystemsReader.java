@@ -29,7 +29,6 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.signalsystems.systems.SignalSystems;
-
 import org.xml.sax.SAXException;
 
 /**
@@ -47,6 +46,7 @@ public class MatsimSignalSystemsReader {
 
 	public static final String SIGNALSYSTEMS11 = "http://www.matsim.org/files/dtd/signalSystems_v1.1.xsd";
 
+	public static final String SIGNALSYSTEMS20 = "http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd";
 	
 	private SignalSystems lightSignalSystems;
 	@Deprecated 
