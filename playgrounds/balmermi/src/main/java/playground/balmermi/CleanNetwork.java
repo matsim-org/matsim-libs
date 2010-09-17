@@ -30,11 +30,13 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkAdaptLength;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+
+import playground.balmermi.modules.NetworkDoubleLinks;
 
 public class CleanNetwork {
 
@@ -47,49 +49,27 @@ public class CleanNetwork {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(args[0]);
-
-//		Counts counts = new Counts();
-//		new MatsimCountsReader(counts).readFile("../../input/counts.xml.gz");
-
-		NetworkImpl subNet = NetworkImpl.createNetwork();
-
+		
+		NetworkImpl subNetwork = new ScenarioImpl().getNetwork();
 		Set<String> modes = new HashSet<String>();
-		modes.add(TransportMode.walk);
-		modes.add(TransportMode.bike);
-
-		new TransportModeNetworkFilter(network).filter(subNet, modes);
-//		new NetworkAdaptLength().run(network);
-//		new NetworkDoubleLinks("-dl").run(network);
-//		new NetworkThinner().run(network,counts);
-		new NetworkCleaner().run(subNet);
-
+		modes.add(TransportMode.car);
+		new TransportModeNetworkFilter(network).filter(subNetwork,modes);
+		new NetworkAdaptLength().run(subNetwork);
+		new NetworkCleaner().run(subNetwork);
+		
 		for (Link l : network.getLinks().values()) {
-			LinkImpl l2 = (LinkImpl) subNet.getLinks().get(l.getId());
+			LinkImpl l2 = (LinkImpl)subNetwork.getLinks().get(l.getId());
 			if (l2 != null) {
 				l2.setOrigId(((LinkImpl) l).getOrigId());
 				l2.setType(((LinkImpl) l).getType());
 			}
 		}
-
-//		new NetworkShiftFreespeed().run(network);
-//
-//		for (LinkImpl l : network.getLinks().values()) {
-//			if (l.getType().startsWith("2-") || l.getType().startsWith("3-")) {
-//				if (l.getNumberOfLanes(Time.UNDEFINED_TIME) == 2) {
-//					l.setNumberOfLanes(1);
-//					l.setCapacity(2000);
-//				}
-//				if (l.getNumberOfLanes(Time.UNDEFINED_TIME) > 1) {
-//					System.out.println(l.toString());
-//				}
-//			}
-//		}
+		new NetworkDoubleLinks("-dl").run(subNetwork);
 
 		NetworkWriteAsTable nwat = new NetworkWriteAsTable(args[1]);
-		nwat.run(subNet);
+		nwat.run(network);
 
-//		new CountsWriter(counts).writeFile("../../output/output_counts.xml.gz");
-		new NetworkWriter(subNet).write(args[1]+"/network.xml.gz");
+		new NetworkWriter(network).write(args[1]+"/network.xml.gz");
 	}
 
 	//////////////////////////////////////////////////////////////////////
