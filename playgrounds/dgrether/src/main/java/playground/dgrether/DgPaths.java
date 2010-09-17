@@ -29,7 +29,13 @@ public interface DgPaths {
 	
 	final String WORKBASE = DATA + "work/";
 
-	final String SCMWORKSPACE = WORKBASE + "repos/";
+	final String REPOS = WORKBASE + "repos/";
+
+	/**
+	 * @deprecated use REPOS instead
+	 */
+	@Deprecated 
+	final String SCMWORKSPACE = REPOS;
 	
 	final String WSBASE = WORKBASE + "matsimHeadWorkspace/";
 	
