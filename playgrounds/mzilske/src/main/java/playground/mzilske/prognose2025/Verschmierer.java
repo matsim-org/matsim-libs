@@ -18,6 +18,10 @@ public class Verschmierer {
 
 	private String filename;
 	
+	public Verschmierer(){
+		filename = LANDKREISE;
+	}
+	
 	public void prepare() {
 		readShape();
 	}
@@ -25,7 +29,7 @@ public class Verschmierer {
 	private void readShape() {
 		FeatureSource landkreisSource;
 		try {
-			landkreisSource = ShapeFileReader.readDataFile(LANDKREISE);
+			landkreisSource = ShapeFileReader.readDataFile(filename);
 			landkreisSource.getFeatures();
 			Collection<Feature> landkreise = landkreisSource.getFeatures();
 			for (Feature landkreis : landkreise) {
@@ -39,6 +43,10 @@ public class Verschmierer {
 	
 	public Coord shootIntoSameZoneOrLeaveInPlace(Coord coord) {
 		return populationBuilder.shootIntoSameZoneOrLeaveInPlace(coord);
+	}
+	
+	public void setFilename(String filename){
+		this.filename = filename;
 	}
 
 }
