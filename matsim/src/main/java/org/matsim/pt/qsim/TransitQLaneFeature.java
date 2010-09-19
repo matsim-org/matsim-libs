@@ -159,22 +159,30 @@ public class TransitQLaneFeature {
 //				position.setAgentState( AgentState.TRANSIT_DRIVER ) ;
 //				positions.add(position);
 ////				vehPosition -= veh.getSizeInEquivalents() * cellSize;
-//				// yyyy also add the passengers (so we can track them)? kai, apr'10
+//				// also add the passengers (so we can track them)? kai, apr'10
+				// This is now done (see below). kai, sep'10
 
-				Collection<PersonAgent> peopleInVehicle = getPassengers(veh);
-				boolean first = true;
-				for (PersonAgent passenger : peopleInVehicle) {
+				List<PersonAgent> peopleInVehicle = getPassengers(veh);
+				boolean last = false ;
+				cnt2 += peopleInVehicle.size() ;
+//				for (PersonAgent passenger : peopleInVehicle) {
+				for ( ListIterator<PersonAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
+					// this now goes backwards through the list so that the sequence is consistent with that of the moving transit vehicle.
+					// yyyy Not so great that the "plot passenger" functionality is at two different places. kai, sep'10
+					PersonAgent passenger = it.previous();
+					if ( !it.hasPrevious() ) {
+						last = true ;
+					}
 					AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getPerson().getId(), queueLane.getLink(), cnt2); // for the time being, same position as facilities
 					if ( passenger.getPerson().getId().toString().startsWith("pt")) {
 						passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
-					} else if (first) {
+					} else if (last) {
 						passengerPosition.setAgentState(AgentState.PERSON_DRIVING_CAR);
 					} else {
 						passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE);
 					}
 					positions.add(passengerPosition);
-					first = false;
-					cnt2++ ;
+					cnt2-- ;
 				}
 
 			}
@@ -182,12 +190,12 @@ public class TransitQLaneFeature {
 		}
 	}
 
-	public Collection<PersonAgent> getPassengers(QVehicle queueVehicle) {
+	public List<PersonAgent> getPassengers(QVehicle queueVehicle) {
 		// yyyy warum macht diese Methode Sinn?  TransitVehicle.getPassengers() gibt doch
 		// bereits eine Collection<PersonAgent> zurück.  Dann braucht das Umkopieren hier doch
 		// bloss Zeit?  kai, feb'10
 			if (queueVehicle instanceof TransitVehicle) {
-				Collection<PersonAgent> passengers = new ArrayList<PersonAgent>();
+				List<PersonAgent> passengers = new ArrayList<PersonAgent>();
 				for (PassengerAgent passenger : ((TransitVehicle) queueVehicle).getPassengers()) {
 					passengers.add((PersonAgent) passenger);
 				}

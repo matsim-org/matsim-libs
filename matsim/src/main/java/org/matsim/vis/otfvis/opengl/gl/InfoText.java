@@ -80,7 +80,10 @@ public class InfoText implements Serializable {
 	}
 	
 	public void draw3D(GL gl) {
-		float size = this.size; // kai: this is where font for labels can be made smaller
+		float size = this.size ; // kai: this is where font for labels can be made smaller
+		if ( line.contains("pt interaction") ) {
+			size = size/3 ;
+		}
 		//z -= 0.5*z;
 		float border=15.f;
 		// draw relative to camera aka do not resize

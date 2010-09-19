@@ -22,6 +22,8 @@ package org.matsim.ptproject.qsim.helpers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
@@ -33,8 +35,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 /**
  * A builder for AgentSnapshotInfo objects that can be used by links with queue logic
@@ -178,7 +180,7 @@ public class AgentSnapshotInfoBuilder {
 			else {
 				lane = laneNumber;
 			}
-			Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+			List<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
 			this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distanceOnLink, link, lane, speed, offset);
 			lastDistance = distanceOnLink;
 		}
@@ -213,7 +215,7 @@ public class AgentSnapshotInfoBuilder {
 			}
 			int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : link.getFreespeed();
-			Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+			List<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
 			createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, queueEnd, link, lane, speed, offset);
 			queueEnd -= vehSpacing;
 		}
@@ -256,7 +258,7 @@ public class AgentSnapshotInfoBuilder {
 				}
 				int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
-				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+				List<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
 				createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distFromFromNode, link, lane, speed, offset);
 				distFromFromNode -= spacing;
 			}
@@ -266,7 +268,7 @@ public class AgentSnapshotInfoBuilder {
 				int lane = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 				int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
-				Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, null);
+				List<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, null);
 				createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distFromFromNode, link, lane, speed, offset);
 				distFromFromNode -= spacing;
 			}
@@ -274,13 +276,18 @@ public class AgentSnapshotInfoBuilder {
 	}
 
 	private void createAndAddSnapshotInfoForPeopleInMovingVehicle(Collection<AgentSnapshotInfo> positions,
-			Collection<PersonAgent> peopleInVehicle, double distanceOnLink, Link link, int lane, double speed, double offset)
+			List<PersonAgent> peopleInVehicle, double distanceOnLink, Link link, int lane, double speed, double offset)
 	{
 		distanceOnLink += offset;
-		int cnt = 0 ;
-		for (PersonAgent passenger : peopleInVehicle) {
+		int cnt = peopleInVehicle.size() - 1 ;
+//		for (PersonAgent passenger : peopleInVehicle) {
+		for ( ListIterator<PersonAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
+			// this now runs backwards so that the BVG vehicle type color is on top.  kai, sep'10
+			PersonAgent passenger = it.previous();
 			AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getPerson().getId(), link, distanceOnLink, lane, cnt);
 			passengerPosition.setColorValueBetweenZeroAndOne(speed);
+//			double tmp = ( Double.valueOf( passenger.getPerson().getId().toString() ) % 100 ) / 100. ;
+//			passengerPosition.setColorValueBetweenZeroAndOne(tmp);
 			if (passenger.getPerson().getId().toString().startsWith("pt")) {
 				passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
 			} else if (cnt==0) {
@@ -289,7 +296,7 @@ public class AgentSnapshotInfoBuilder {
 				passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE); // in 2010, probably a passenger
 			}
 			positions.add(passengerPosition);
-			cnt++ ;
+			cnt-- ;
 		}
 	}
 
@@ -342,8 +349,8 @@ public class AgentSnapshotInfoBuilder {
 	 * @param transitQueueLaneFeature
 	 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
 	 */
-	private Collection<PersonAgent> getPeopleInVehicle(QVehicle vehicle, TransitQLaneFeature transitQueueLaneFeature) {
-		Collection<PersonAgent> passengers = null;
+	private List<PersonAgent> getPeopleInVehicle(QVehicle vehicle, TransitQLaneFeature transitQueueLaneFeature) {
+		List<PersonAgent> passengers = null;
 		if (transitQueueLaneFeature != null) {
 			passengers = transitQueueLaneFeature
 			.getPassengers(vehicle); // yy seems to me that "getPassengers" is a vehicle feature???

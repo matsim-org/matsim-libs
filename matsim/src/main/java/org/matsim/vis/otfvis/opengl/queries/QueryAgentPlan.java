@@ -301,7 +301,7 @@ public class QueryAgentPlan extends AbstractQuery {
 			if (this.agentText == null) {
 				this.agentText = InfoTextContainer.showTextPermanent(
 						this.agentId, (float) pos.x, (float) pos.y,
-						-0.0005f);
+						-0.001f);
 				this.agentText.setAlpha(0.7f);
 			}
 		}
