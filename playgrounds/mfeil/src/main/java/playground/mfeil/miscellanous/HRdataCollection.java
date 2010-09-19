@@ -47,7 +47,7 @@ import playground.mfeil.Counter;
  */
 public class HRdataCollection {
 
-	//private static final Logger log = Logger.getLogger(HRdataCollection.class);
+	private static final Logger log = Logger.getLogger(HRdataCollection.class);
 
 	public static void main (final String [] args){
 		String inputFile = "D:/Documents and Settings/Matthias Feil/My Documents/Engagements/MU1939/Improve/Baselining/NL Maintal - Anwesenheit 0-24h 2010-02.txt";
