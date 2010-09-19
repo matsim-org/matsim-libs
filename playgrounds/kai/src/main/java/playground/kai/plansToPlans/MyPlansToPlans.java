@@ -20,14 +20,14 @@
 package playground.kai.plansToPlans;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
 import org.matsim.core.config.Config;
-import org.matsim.population.algorithms.PlansFilterByLegMode;
-import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 /**
  * @author kn after mrieser
@@ -65,15 +65,23 @@ public class MyPlansToPlans {
 //		plansWriter.closeStreaming();
 
 		ScenarioLoader sl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader(
-				"../berlin-bvg09/pt/nullfall_berlin_brandenburg/kai-config.xml") ;
+//		"../berlin-bvg09/pt/nullfall_berlin_brandenburg/kai-config.xml") ;
+		"../runs-svn/berlin-bvg09/presentation_20100408/bb_10p/config.xml") ;
 		Scenario sc = sl.loadScenario() ;
 		Population pop = sc.getPopulation();
 
-		PlansFilterByLegMode pf = new PlansFilterByLegMode( TransportMode.pt, FilterType.keepAllPlansWithMode ) ;
-		pf.run(pop) ;
+//		PlansFilterByLegMode pf = new PlansFilterByLegMode( TransportMode.pt, FilterType.keepAllPlansWithMode ) ;
+//		pf.run(pop) ;
+		
+		Population newPop = new PopulationImpl(null) ;
+		for ( Person person : pop.getPersons().values() ) {
+			if ( Math.random() < 0.1 ) 
+				newPop.addPerson( person ); 
+		}
+		
 
-		PopulationWriter popwriter = new PopulationWriter(pop,sc.getNetwork()) ;
-		popwriter.write("/Users/nagel/kw/output/pop.xml.gz") ;
+		PopulationWriter popwriter = new PopulationWriter(newPop,sc.getNetwork()) ;
+		popwriter.write("/Users/nagel/kw/pop.xml.gz") ;
 
 		System.out.println("done.");
 	}
