@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -18,6 +19,8 @@ import org.matsim.vehicles.Vehicles;
 
 
 public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
+	private static final Logger log = Logger.getLogger("dummy");
+
 
 	private static final Comparator<UmlaufStueck> departureTimeComparator = new Comparator<UmlaufStueck>() {
 
@@ -46,10 +49,18 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	public Collection<Umlauf> build() {
 		createEmptyUmlaeufe();
 		createUmlaufStuecke();
+		log.info("Generating Umlaeufe; this may not be very fast:") ;
+		System.out.flush() ;
+		int cnt = 0 ;
 		for (UmlaufStueck umlaufStueck : umlaufStuecke) {
 			Umlauf umlauf = umlaeufe.get(umlaufStueck.getDeparture().getVehicleId());
 			umlaufInterpolator.addUmlaufStueckToUmlauf(umlaufStueck, umlauf);
+			cnt++ ;
+			if ( cnt%100==0 ) System.out.print('.') ;
+			if ( cnt%10000==0 ) System.out.println();
 		}
+		System.out.println() ;
+		System.out.flush() ;
 		return umlaeufe.values();
 	}
 
@@ -63,15 +74,23 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 
 	private void createUmlaufStuecke() {
 		this.umlaufStuecke = new ArrayList<UmlaufStueck>();
+		log.info("Generating UmlaufStuecke") ;
+		System.out.flush() ;
+		int cnt = 0 ;
 		for (TransitLine line : transitLines) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
 					UmlaufStueck umlaufStueck = new UmlaufStueck(line, route,
 							departure);
 					umlaufStuecke.add(umlaufStueck);
+					cnt++ ;
+					if ( cnt%100==0 ) System.out.print('.') ;
+					if ( cnt%10000==0 ) System.out.println();
 				}
 			}
 		}
+		System.out.println() ;
+		System.out.flush() ;
 		Collections.sort(this.umlaufStuecke, departureTimeComparator);
 	}
 
