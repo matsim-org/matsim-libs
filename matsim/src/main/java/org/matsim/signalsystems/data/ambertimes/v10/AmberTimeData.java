@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.data.ambertimes.v10;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 
 
@@ -41,5 +43,14 @@ public interface AmberTimeData {
 	public void setAmberTimeOfSignal(Id signalId, Integer seconds);
 	
 	public void setRedAmberTimeOfSignal(Id signalId, Integer seconds);
+	
+	/**
+	 * @return A map with signal ids as keys and amber times for that signal in seconds as values
+	 */
+	public Map<Id, Integer> getSignalAmberMap();
+	/**
+	 * @return A map with signal ids as keys and red-amber times for that signal in seconds as values
+	 */
+	public Map<Id, Integer> getSignalRedAmberMap();
 	
 }
