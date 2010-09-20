@@ -117,7 +117,7 @@ public class EnsureActivityReachability extends AbstractPersonAlgorithm implemen
 				
 				Link link = scenario.getNetwork().getLinks().get(activity.getLinkId());
 				
-				Set<String> allowedModes = link.getAllowedModes();
+				Set<String> allowedModes = new HashSet<String>(link.getAllowedModes());
 				
 				// PT is currently allowed on all kinds of links
 				allowedModes.add(TransportMode.pt);

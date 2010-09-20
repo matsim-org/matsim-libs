@@ -64,7 +64,7 @@ public class MultiModalNetworkCreator implements NetworkRunnable {
 		
 		for (Link link : network.getLinks().values()) {
 			if (Math.round(link.getFreespeed()) <= cutoffSpeed) {
-				Set<String> allowedModes = link.getAllowedModes();
+				Set<String> allowedModes = new HashSet<String>(link.getAllowedModes());
 				allowedModes.addAll(modes);
 				link.setAllowedModes(allowedModes);
 			}
