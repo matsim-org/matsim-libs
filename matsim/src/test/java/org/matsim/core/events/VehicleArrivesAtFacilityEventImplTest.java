@@ -18,15 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01.events;
+package org.matsim.core.events;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
-import org.matsim.core.events.XmlEventsTester;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
-public class BasicVehicleArrivesAtFacilityEventImplTest extends MatsimTestCase {
+public class VehicleArrivesAtFacilityEventImplTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		VehicleArrivesAtFacilityEventImpl event = new VehicleArrivesAtFacilityEventImpl(Time.parseTime("10:55:00"), new IdImpl(5), new IdImpl(11), -1.2);
