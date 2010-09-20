@@ -23,6 +23,7 @@ package org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -31,22 +32,27 @@ import org.matsim.core.router.util.TravelTime;
 public class MultiModalTravelTimeCost implements MultiModalTravelTime, PersonalizableTravelCost {
 
 	private TravelTime travelTime;
-	private PlansCalcRouteConfigGroup group;
+	private PlansCalcRouteConfigGroup plansCalcGroup;
 	private double speed = 1.0;
+	private double ptScaleFactor = 1.0;
 	private Person person;
 
 	/*
 	 * By default: use Walk as TransportMode.
+	 * Only calls to getLinkTravelTime(...) will use walk speed,
+	 * calls to getModalLinkTravelTime(...) will use the speed of the
+	 * given TransportMode.
 	 */
-	public MultiModalTravelTimeCost(PlansCalcRouteConfigGroup group) {
-		this(group, TransportMode.walk);
+	public MultiModalTravelTimeCost(PlansCalcRouteConfigGroup plansCalcGroup, MultiModalConfigGroup multiModalGroup) {
+		this(plansCalcGroup, multiModalGroup, TransportMode.walk);
 	}
 
-	public MultiModalTravelTimeCost(PlansCalcRouteConfigGroup group, String transportMode) {
-		this.group = group;
-
-		if (transportMode.equals(TransportMode.bike)) speed = group.getBikeSpeed();
-		else if (transportMode.equals(TransportMode.walk)) speed = group.getWalkSpeed();
+	public MultiModalTravelTimeCost(PlansCalcRouteConfigGroup plansCalcGroup, MultiModalConfigGroup multiModalGroup, String transportMode) {
+		this.plansCalcGroup = plansCalcGroup;
+		this.ptScaleFactor = multiModalGroup.getPtScaleFactor();
+		
+		if (transportMode.equals(TransportMode.bike)) speed = plansCalcGroup.getBikeSpeed();
+		else if (transportMode.equals(TransportMode.walk)) speed = plansCalcGroup.getWalkSpeed();
 		else if (transportMode.equals(TransportMode.pt)) ;	// nothing to do here
 		else if (transportMode.equals(TransportMode.ride)) ; // nothing to do here
 		else throw new RuntimeException("Not supported TransportMode: " + transportMode);
@@ -56,11 +62,11 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 		 */
 		travelTime = new FreeSpeedTravelTime();
 	}
-
+	
 	public void setTravelTime(TravelTime travelTime) {
 		this.travelTime = travelTime;
 	}
-
+	
 	@Override
 	public double getLinkTravelTime(Link link, double time) {
 		return calculateAgeScaleFactor() * link.getLength() / speed;
@@ -124,8 +130,8 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 			 * If neither bike nor walk is allowed on the link, the default speed of 1.0
 			 * is used.
 			 */
-			if (link.getAllowedModes().contains(TransportMode.bike)) speed = group.getBikeSpeed();
-			else if (link.getAllowedModes().contains(TransportMode.walk)) speed = group.getWalkSpeed();
+			if (link.getAllowedModes().contains(TransportMode.bike)) speed = plansCalcGroup.getBikeSpeed();
+			else if (link.getAllowedModes().contains(TransportMode.walk)) speed = plansCalcGroup.getWalkSpeed();
 		}
 		else if (transportMode.equals(TransportMode.walk)) {
 			/*
@@ -133,16 +139,16 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 			 * If both modes are not allowed, use the default speed of 1.0 instead.
 			 */
 			if (link.getAllowedModes().contains(TransportMode.walk) ||
-				link.getAllowedModes().contains(TransportMode.bike)) speed = group.getWalkSpeed();
+				link.getAllowedModes().contains(TransportMode.bike)) speed = plansCalcGroup.getWalkSpeed();
 		}
 		else if (transportMode.equals(TransportMode.pt)) {
 			/*
 			 * If it is a car link, we use car travel times. Else we check whether it is
 			 * a bike / walk link - if it is one, we use walk travel times.
 			 */
-			if (link.getAllowedModes().contains(TransportMode.car)) return travelTime.getLinkTravelTime(link, time);
+			if (link.getAllowedModes().contains(TransportMode.car)) return ptScaleFactor * travelTime.getLinkTravelTime(link, time);
 			else if (link.getAllowedModes().contains(TransportMode.bike) ||
-					link.getAllowedModes().contains(TransportMode.walk)) speed = group.getWalkSpeed();
+					link.getAllowedModes().contains(TransportMode.walk)) speed = plansCalcGroup.getWalkSpeed();
 		}
 		else if (transportMode.equals(TransportMode.ride)) {
 			/*
@@ -151,7 +157,7 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 			 */
 			if (link.getAllowedModes().contains(TransportMode.car)) return travelTime.getLinkTravelTime(link, time);
 			else if (link.getAllowedModes().contains(TransportMode.bike) ||
-					link.getAllowedModes().contains(TransportMode.walk)) speed = group.getWalkSpeed();
+					link.getAllowedModes().contains(TransportMode.walk)) speed = plansCalcGroup.getWalkSpeed();
 		}
 		else throw new RuntimeException("Not supported TransportMode: " + transportMode);
 

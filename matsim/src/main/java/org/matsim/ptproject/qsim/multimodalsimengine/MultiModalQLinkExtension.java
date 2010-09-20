@@ -35,7 +35,6 @@ import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.interfaces.QLink;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.netsimengine.QNode;
 
 public class MultiModalQLinkExtension {
@@ -44,7 +43,7 @@ public class MultiModalQLinkExtension {
 	private final MultiModalQNodeExtension toNode;
 	protected MultiModalSimEngine simEngine;
 	private PlansCalcRouteConfigGroup configGroup;
-	private final MultiModalTravelTime multiModalTravelTime;
+//	private final MultiModalTravelTime multiModalTravelTime;
 	
 	/*
 	 * Is set to "true" if the MultiModalQLinkExtension has active Agents.
@@ -55,12 +54,11 @@ public class MultiModalQLinkExtension {
 	protected Queue<PersonAgent> waitingAfterActivityAgents = new LinkedList<PersonAgent>();
 	protected Queue<PersonAgent> waitingToLeaveAgents = new LinkedList<PersonAgent>();
 	
-	public MultiModalQLinkExtension(QLink qLink, MultiModalSimEngine simEngine, QNode toNode, MultiModalTravelTime multiModalTravelTime) {
+	public MultiModalQLinkExtension(QLink qLink, MultiModalSimEngine simEngine, QNode toNode) {
 		this.qLink = qLink;
 		this.simEngine = simEngine;
 		this.toNode = simEngine.getMultiModalQNodeExtension(toNode);
 		this.configGroup = simEngine.getQSim().getScenario().getConfig().plansCalcRoute();
-		this.multiModalTravelTime = multiModalTravelTime;
 
 		if (configGroup == null) configGroup = new PlansCalcRouteConfigGroup(); 	
 	}
@@ -90,7 +88,7 @@ public class MultiModalQLinkExtension {
 	}
 
 	private void addAgent(PersonAgent personAgent, double now) {	
-		double travelTime = multiModalTravelTime.getModalLinkTravelTime(qLink.getLink(), now, personAgent.getCurrentLeg().getMode());
+		double travelTime = simEngine.getMultiModalTravelTime().getModalLinkTravelTime(qLink.getLink(), now, personAgent.getCurrentLeg().getMode());
 		double departureTime = now + travelTime;
 		
 		departureTime = Math.round(departureTime);

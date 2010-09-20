@@ -20,10 +20,14 @@
 
 package org.matsim.ptproject.qsim.multimodalsimengine;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.ptproject.qsim.QSim;
@@ -33,24 +37,28 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 
 	private QSim qSim;
 	private MultiModalSimEngine simEngine;
+	private Set<String> handledModes = new HashSet<String>();
 	
-	public MultiModalDepartureHandler(QSim qSim, MultiModalSimEngine simEngine) {
+	public MultiModalDepartureHandler(QSim qSim, MultiModalSimEngine simEngine, MultiModalConfigGroup multiModalConfigGroup) {
 		this.qSim = qSim;
 		this.simEngine = simEngine;
+		
+		String simulatedModes = multiModalConfigGroup.getSimulatedModes();
+		if (simulatedModes.contains("walk")) handledModes.add(TransportMode.walk);
+		if (simulatedModes.contains("bike")) handledModes.add(TransportMode.bike);
+		if (simulatedModes.contains("ride")) handledModes.add(TransportMode.ride);
+		if (simulatedModes.contains("pt")) handledModes.add(TransportMode.pt);
 	}
 	
 	@Override
 	public boolean handleDeparture(double now, PersonAgent personAgent, Id linkId, Leg leg) {
 
-		if (leg.getMode().equals(TransportMode.walk) || 
-			leg.getMode().equals(TransportMode.bike) ||
-			leg.getMode().equals(TransportMode.ride) ||
-			leg.getMode().equals(TransportMode.pt)) {
-			if ( personAgent instanceof PersonDriverAgent ) {
+		if (handledModes.contains(leg.getMode())) {
+			if (personAgent instanceof PersonDriverAgent) {
 				handleMultiModalDeparture(now, (PersonDriverAgent)personAgent, linkId, leg);
 				return true;
 			} else {
-				throw new UnsupportedOperationException("not supported TransportMode found: " + leg.getMode());
+				throw new UnsupportedOperationException("PersonAgent is not from type PersonDriverAgent - cannot handle departure. Found PersonAgent class is " + personAgent.getClass().toString());
 			}
 		}
 		

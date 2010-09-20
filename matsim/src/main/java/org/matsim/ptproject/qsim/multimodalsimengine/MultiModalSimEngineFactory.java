@@ -24,14 +24,13 @@ import org.apache.log4j.Logger;
 import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QNetworkI;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.netsimengine.QNode;
 
 public class MultiModalSimEngineFactory {
 
 	final private static Logger log = Logger.getLogger(MultiModalSimEngineFactory.class);
 	
-	public MultiModalSimEngine createMultiModalSimEngine(QSimI sim, MultiModalTravelTime multiModalTravelTime) {
+	public MultiModalSimEngine createMultiModalSimEngine(QSimI sim) {
 		
 		MultiModalSimEngine simEngine;
 		
@@ -44,12 +43,12 @@ public class MultiModalSimEngineFactory {
 			simEngine = new MultiModalSimEngine(sim);			
 		}
 		
-		addMultiModalToQNetwork(sim.getQNetwork(), simEngine, multiModalTravelTime);
+		addMultiModalToQNetwork(sim.getQNetwork(), simEngine);
 		
 		return simEngine;
 	}
 	
-	private void addMultiModalToQNetwork(QNetworkI network, MultiModalSimEngine simEngine, MultiModalTravelTime multiModalTravelTime) {
+	private void addMultiModalToQNetwork(QNetworkI network, MultiModalSimEngine simEngine) {
 		for (QNode node : network.getNodes().values()) {
 			MultiModalQNodeExtension extension = new MultiModalQNodeExtension(node.getNode(), simEngine);
 			node.getCustomAttributes().put(MultiModalQNodeExtension.class.getName(), extension);
@@ -57,7 +56,7 @@ public class MultiModalSimEngineFactory {
 		
 		for (QLink link : network.getLinks().values()) {
 			QNode toNode = link.getToQueueNode();
-			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, simEngine, toNode, multiModalTravelTime);
+			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, simEngine, toNode);
 			link.getCustomAttributes().put(MultiModalQLinkExtension.class.getName(), extension);
 		}
 		

@@ -20,32 +20,26 @@
 
 package org.matsim.ptproject.qsim.multimodalsimengine;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.CheckActivityReachability;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalPlansCalcRoute;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBufferFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.tools.EnsureActivityReachability;
+import org.matsim.ptproject.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
+import org.matsim.ptproject.qsim.multimodalsimengine.tools.NonCarRouteDropper;
 
 public class MultiModalControler extends Controler {
 
 	private static final Logger log = Logger.getLogger(MultiModalControler.class);
 	
 	protected boolean checkActivityReachability = false;
-	protected boolean dropNonCarRoutes = true;
-	protected boolean createMultiModeNetwork = true;
 	
 	public MultiModalControler(String[] args) {
 		super(args);
@@ -64,16 +58,18 @@ public class MultiModalControler extends Controler {
 	@Override
 	public MobsimFactory getMobsimFactory() {
 		return new MultiModalMobsimFactory(super.getMobsimFactory(), this.getTravelTimeCalculator());
-//		return new MultiModalMobsimFactory(this.getTravelTimeCalculator());
 	}
-		
+	
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
-		return new MultiModalPlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
+		return new MultiModalPlansCalcRoute(this.config.plansCalcRoute(), this.config.multiModal(), this.network, 
+				travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
 	}
 	
 	@Override
 	protected void loadData() {
+		
+		MultiModalConfigGroup configGroup = scenarioData.getConfig().multiModal();
 		
 		log.info("replacing RouteFactories for non car modes...");
 		super.scenarioData.getNetwork().getFactory().setRouteFactory(TransportMode.bike, new LinkNetworkRouteFactory());
@@ -84,58 +80,22 @@ public class MultiModalControler extends Controler {
 		
 		super.loadData();
 
-		if (createMultiModeNetwork) {
+		if (configGroup.isCreateMultiModalNetwork()) {
 			log.info("creating multi modal network...");
-			createMultiModalNetwork();
+			new MultiModalNetworkCreator(configGroup).run(scenarioData.getNetwork());
 			log.info("done.");			
 		}
 		
 		if (checkActivityReachability) {
 			log.info("moving activities that cannot be reached by the transport modes of the from- and/or to-legs...");
-			new CheckActivityReachability(this.scenarioData).checkAndUpdateActivityFacilities();
+			new EnsureActivityReachability(this.scenarioData).run(scenarioData.getPopulation());
 			log.info("done.");
 		}
 		
-		if (dropNonCarRoutes) {
+		if (configGroup.isDropNonCarRoutes()) {
 			log.info("dropping existing walk and bike routes...");
-			dropNonCarRoutes();
+			new NonCarRouteDropper(configGroup).run(scenarioData.getPopulation());
 			log.info("done.");			
-		}
-	}
-	
-	private void dropNonCarRoutes() {
-		/*
-		 * Drop Walk Routes - they have to be recreated.
-		 */
-		for (Person person : this.population.getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				for (PlanElement planElement : plan.getPlanElements()) {
-					if (planElement instanceof Leg) {
-						Leg leg = (Leg) planElement;
-						if (leg.getMode().equals(TransportMode.walk)) {
-							leg.setRoute(null);
-						} else if (leg.getMode().equals(TransportMode.bike)) {
-							leg.setRoute(null); 
-						} else if (leg.getMode().equals(TransportMode.pt)) {
-							leg.setRoute(null);
-						} else if (leg.getMode().equals(TransportMode.ride)) {
-							leg.setRoute(null);
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	private void createMultiModalNetwork() {
-		for (Link link : this.network.getLinks().values()) {
-			if (Math.round(link.getFreespeed() * 3.6) <= 100) {
-				Set<String> allowedModes = link.getAllowedModes();
-				allowedModes.add(TransportMode.walk);
-				allowedModes.add(TransportMode.bike);
-				allowedModes.add(TransportMode.pt);
-				link.setAllowedModes(allowedModes);
-			}
 		}
 	}
 	

@@ -26,24 +26,15 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 
 public class BufferedTravelTime implements PersonalizableTravelTime {
 
-	private double scaleFactor = 1.0;
 	private TravelTimeCalculatorWithBuffer buffer;
 	
 	public BufferedTravelTime (TravelTimeCalculatorWithBuffer buffer) {
 		this.buffer = buffer;
 	}
 	
-	public void setScaleFactor(double scaleFactor) {
-		this.scaleFactor = scaleFactor;
-	}
-	
-	public double getScaleFactor() {
-		return this.scaleFactor;
-	}
-	
 	@Override
 	public double getLinkTravelTime(Link link, double time) {
-		return buffer.getBufferedLinkTravelTime(link, time) * scaleFactor;
+		return buffer.getBufferedLinkTravelTime(link, time);
 	}
 
 	@Override

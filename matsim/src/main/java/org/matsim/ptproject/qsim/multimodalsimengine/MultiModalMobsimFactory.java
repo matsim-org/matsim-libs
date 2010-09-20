@@ -28,6 +28,7 @@ import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.BufferedTravelTime;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTimeCost;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBuffer;
 
@@ -38,46 +39,38 @@ public class MultiModalMobsimFactory implements MobsimFactory {
 	private MobsimFactory delegate;
 	private TravelTime travelTime;
 	
-	public MultiModalMobsimFactory(MobsimFactory mobsimFactory,  TravelTime travelTime) {
+	public MultiModalMobsimFactory(MobsimFactory mobsimFactory, TravelTime travelTime) {
 		this.delegate = mobsimFactory;
 		this.travelTime = travelTime;
 	}
 	
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
-		
 		Simulation sim = delegate.createMobsim(sc, eventsManager);
 		
 		if (sim instanceof QSim) {
 			log.info("Using MultiModalMobsim...");
 			
 			QSim qSim = (QSim) sim;
+
+			TravelTime tt = this.travelTime;
 			
-			/*
-			 * Create a MultiModalTravelTime Calculator. It is passed over the the MultiModalQNetwork which
-			 * needs it to estimate the TravelTimes of the NonCarModes.
-			 * If the Controler uses a TravelTimeCalculatorWithBuffer (which is strongly recommended), a
-			 * BufferedTravelTime Object is created and set as TravelTimeCalculator in the MultiModalTravelTimeCost
-			 * Object.
-			 */
-			MultiModalTravelTimeCost multiModalTravelTime = new MultiModalTravelTimeCost(sc.getConfig().plansCalcRoute());
-			
-			if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
+			if (tt instanceof TravelTimeCalculatorWithBuffer) {
 				BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
-				bufferedTravelTime.setScaleFactor(1.25);
-				multiModalTravelTime.setTravelTime(bufferedTravelTime);
+				tt = bufferedTravelTime;
 			} else {
 				log.warn("TravelTime is not instance of TravelTimeCalculatorWithBuffer!");
-				log.warn("No BufferedTravelTime Object could be created. Using FreeSpeedTravelTimes instead.");
+				log.warn("No BufferedTravelTime Object could be created. Using TravelTimeCalculator as it is... (should return free speed travel times).");
 			}
 			
-			MultiModalSimEngine multiModalSimEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, multiModalTravelTime);
-						
-			// set MultiModalSimEngine
-			qSim.setMultiModalSimEngine(multiModalSimEngine);
-						
-			// add MultiModalDepartureHandler
-			qSim.addDepartureHandler(new MultiModalDepartureHandler(qSim, multiModalSimEngine));
+			MultiModalTravelTime modalTravelTime = qSim.getMultiModalSimEngine().getMultiModalTravelTime();
+			if (modalTravelTime instanceof MultiModalTravelTimeCost) {
+				((MultiModalTravelTimeCost) modalTravelTime).setTravelTime(tt);
+			} else {
+				log.error("TravelTimeCalculator is not instance of MultiModalTravelTime. " +
+					"TravelTimeCalculator cannot be handed over to the MultiModalMobsim - " +
+					"free speed travel times will be used.");
+			}			
 		}
 		else {
 			log.error("Simulation Object is not from type QSim - cannot use MultiModalMobsim!");

@@ -34,6 +34,7 @@ import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.HouseholdsConfigGroup;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
+import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -83,6 +84,7 @@ public class Config {
 	private ScenarioConfigGroup scenarioConfigGroup = null;
 	private VspExperimentalConfigGroup vspExperimentalGroup = null;
 	private QSimConfigGroup qSimConfigGroup = null;
+	private MultiModalConfigGroup multiModal = null;
 
 	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup;
 
@@ -168,7 +170,9 @@ public class Config {
 
 		this.otfVis = new OTFVisConfigGroup() ;
 		this.modules.put( OTFVisConfigGroup.GROUP_NAME, this.otfVis ) ;
-
+		
+		this.multiModal = new MultiModalConfigGroup();
+		this.modules.put(MultiModalConfigGroup.GROUP_NAME, this.multiModal);
 	}
 
 	/** Checks each module for consistency, e.g. if the parameters that are currently set make sense
@@ -422,7 +426,11 @@ public class Config {
 	public OTFVisConfigGroup otfVis() {
 		return this.otfVis;
 	}
-
+	
+	public MultiModalConfigGroup multiModal() {
+		return this.multiModal;
+	}
+	
   public QSimConfigGroup getQSimConfigGroup() {
     return this.qSimConfigGroup;
   }

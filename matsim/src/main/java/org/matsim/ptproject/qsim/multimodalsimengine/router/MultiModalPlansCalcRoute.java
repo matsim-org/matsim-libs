@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -62,22 +63,24 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 	private IntermodalLeastCostPathCalculator ptRouteAlgo;
 	private IntermodalLeastCostPathCalculator rideRouteAlgo;
 	
+	private MultiModalConfigGroup multiModalGroup;
 	private LeastCostPathCalculatorFactory factory;
-	private PersonalizableTravelTime travelTime;	
+	private PersonalizableTravelTime travelTime;
 	
-	public MultiModalPlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network,
-			final PersonalizableTravelCost costCalculator,
+	public MultiModalPlansCalcRoute(final PlansCalcRouteConfigGroup group, final MultiModalConfigGroup multiModalGroup, 
+			final Network network, final PersonalizableTravelCost costCalculator,
 			final PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		super(group, network, costCalculator, timeCalculator, factory);
 		
+		this.multiModalGroup = multiModalGroup;
 		this.factory = factory;
 		this.travelTime = timeCalculator;
 		initRouteAlgos(network, timeCalculator);
 	}
 
-	public MultiModalPlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network,
-			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
-		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
+	public MultiModalPlansCalcRoute(final PlansCalcRouteConfigGroup group, final MultiModalConfigGroup multiModalGroup,
+			final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
+		this(group, multiModalGroup, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 
 	private void initRouteAlgos(Network network, PersonalizableTravelTime travelTime) {	
@@ -96,7 +99,7 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 		/*
 		 * Walk
 		 */
-		MultiModalTravelTimeCost walkTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.walk);
+		MultiModalTravelTimeCost walkTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, this.multiModalGroup, TransportMode.walk);
 		walkRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, walkTravelTimeCost, walkTravelTimeCost);
 			
 		Set<String> walkModeRestrictions = new TreeSet<String>();
@@ -108,7 +111,7 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 		/*
 		 * Bike
 		 */
-		MultiModalTravelTimeCost bikeTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.bike);
+		MultiModalTravelTimeCost bikeTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, this.multiModalGroup, TransportMode.bike);
 		bikeRouteAlgo = (IntermodalLeastCostPathCalculator)factory.createPathCalculator(network, bikeTravelTimeCost, bikeTravelTimeCost);
 		
 		/*
@@ -126,13 +129,10 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 		 * PT
 		 * If possible, we use "real" TravelTimes from previous iterations - if not,
 		 * freeSpeedTravelTimes are used.
-		 * We set the ScaleFactor to 1.25 which means that the returned TravelTimes
-		 * will be higher (e.g. to respect stops that a bus performs to pick up agents).
 		 */
-		MultiModalTravelTimeCost ptTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.pt);
+		MultiModalTravelTimeCost ptTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, this.multiModalGroup, TransportMode.pt);
 		if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
 			BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
-			bufferedTravelTime.setScaleFactor(1.25);
 			ptTravelTimeCost.setTravelTime(bufferedTravelTime);
 		}
 		
@@ -159,10 +159,9 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 		 * If possible, we use "real" TravelTimes from previous iterations - if not,
 		 * freeSpeedTravelTimes are used.
 		 */
-		MultiModalTravelTimeCost rideTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, TransportMode.ride);
+		MultiModalTravelTimeCost rideTravelTimeCost = new MultiModalTravelTimeCost(this.configGroup, this.multiModalGroup, TransportMode.ride);
 		if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
 			BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
-			bufferedTravelTime.setScaleFactor(1.0);
 			rideTravelTimeCost.setTravelTime(bufferedTravelTime);
 		}
 		
@@ -213,8 +212,7 @@ public class MultiModalPlansCalcRoute extends PlansCalcRoute {
 	 * Adapted from PlansCalcRoute.handleCarLeg(...) - exchanged only the routeAlgo and the routeFactory.
 	 */
 	private double handleMultiModalLeg(Leg leg, Activity fromAct, Activity toAct, double depTime, 
-			IntermodalLeastCostPathCalculator routeAlgo, RouteFactory routeFactory)
-	{
+			IntermodalLeastCostPathCalculator routeAlgo, RouteFactory routeFactory) {
 		double travTime = 0;
 		Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
 		Link toLink = this.network.getLinks().get(toAct.getLinkId());

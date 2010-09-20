@@ -171,8 +171,9 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		// setup runners
 		for (int i = 0; i < numOfThreads; i++) {
 			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(startBarrier, reactivateLinksBarrier, 
-					separationBarrier, reactivateNodesBarrier, endBarrier, this.getQSim());
-			Thread thread = new Thread(engine) ;
+					separationBarrier, reactivateNodesBarrier, endBarrier, this.getQSim(), multiModalTravelTime);
+
+			Thread thread = new Thread(engine);
 			thread.setName("MultiModalSimEngineRunner" + i);
 
 //			thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically

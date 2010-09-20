@@ -30,11 +30,14 @@ import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.SimEngine;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTimeCost;
 import org.matsim.ptproject.qsim.netsimengine.QNode;
 
 public class MultiModalSimEngine implements SimEngine, NetworkElementActivator, Steppable {
 
 	/*package*/ QSimI qSim;
+	/*package*/ MultiModalTravelTime multiModalTravelTime;
 	/*package*/ List<MultiModalQLinkExtension> allLinks = null;
 	/*package*/ List<MultiModalQLinkExtension> activeLinks;
 	/*package*/ List<MultiModalQNodeExtension> activeNodes;
@@ -52,8 +55,11 @@ public class MultiModalSimEngine implements SimEngine, NetworkElementActivator, 
 		nodesToActivate = new ConcurrentLinkedQueue<MultiModalQNodeExtension>();	// thread-safe Queue!
 //		linksToActivate = new ArrayList<MultiModalQLinkExtension>();
 //		nodesToActivate = new ArrayList<MultiModalQNodeExtension>();
+		
+		multiModalTravelTime = new MultiModalTravelTimeCost(qSim.getScenario().getConfig().plansCalcRoute(), 
+				qSim.getScenario().getConfig().multiModal());
 	}
-
+	
 	@Override
 	public QSimI getQSim() {
 		return qSim;
@@ -149,6 +155,10 @@ public class MultiModalSimEngine implements SimEngine, NetworkElementActivator, 
 			activeNodes.addAll(nodesToActivate);
 			nodesToActivate.clear();
 		}
+	}
+
+	/*package*/ MultiModalTravelTime getMultiModalTravelTime() {
+		return this.multiModalTravelTime;
 	}
 	
 	/*package*/ MultiModalQNodeExtension getMultiModalQNodeExtension(QNode qNode) {

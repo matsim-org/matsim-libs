@@ -67,7 +67,10 @@ import org.matsim.ptproject.qsim.interfaces.QSimEngineFactory;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 import org.matsim.ptproject.qsim.interfaces.SimTimerI;
+import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
+import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTimeCost;
 import org.matsim.ptproject.qsim.netsimengine.CarDepartureHandler;
 import org.matsim.ptproject.qsim.netsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.netsimengine.DefaultQSimEngineFactory;
@@ -207,6 +210,35 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			this.signalEngine.setSignalSystems(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
 		}
 
+		if (sc.getConfig().multiModal().isMultiModalSimulationEnabled()) {
+			
+			/*
+			 * Create a MultiModalTravelTime Calculator. It is passed over the the MultiModalQNetwork which
+			 * needs it to estimate the TravelTimes of the NonCarModes.
+			 * If the Controller uses a TravelTimeCalculatorWithBuffer (which is strongly recommended), a
+			 * BufferedTravelTime Object is created and set as TravelTimeCalculator in the MultiModalTravelTimeCost
+			 * Object.
+			 */
+//			MultiModalTravelTimeCost multiModalTravelTime = new MultiModalTravelTimeCost(sc.getConfig().plansCalcRoute(), sc.getConfig().multiModal());
+			
+//			TravelTime travelTime = ((MultiModalMobsimFactory)simEngineFac).getTravelTime();
+//			
+//			if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
+//				BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
+//				bufferedTravelTime.setScaleFactor(1.25);
+//				multiModalTravelTime.setTravelTime(bufferedTravelTime);
+//			} else {
+//				log.warn("TravelTime is not instance of TravelTimeCalculatorWithBuffer!");
+//				log.warn("No BufferedTravelTime Object could be created. Using FreeSpeedTravelTimes instead.");
+//			}
+			
+			// create MultiModalSimEngine
+			multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(this);
+			
+			// add MultiModalDepartureHandler
+			this.addDepartureHandler(new MultiModalDepartureHandler(this, multiModalEngine, scenario.getConfig().multiModal()));
+		}
+		
 		this.agentFactory = new AgentFactory(this);
 
 		this.carDepartureHandler = new CarDepartureHandler(this);
@@ -691,6 +723,10 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		return this.signalEngine;
 	}
 
+	public MultiModalSimEngine getMultiModalSimEngine() {
+		return this.multiModalEngine;
+	}
+	
 	@Override
 	@Deprecated // if you think you need to use this, ask kai.  aug'10
 	public void addFeature(final VisMobsimFeature queueSimulationFeature) {

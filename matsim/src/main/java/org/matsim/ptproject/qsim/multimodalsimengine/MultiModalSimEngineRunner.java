@@ -25,6 +25,7 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
 
 public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Runnable {
 
@@ -38,13 +39,15 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 	private final CyclicBarrier endBarrier;
 		
 	/*package*/ MultiModalSimEngineRunner(CyclicBarrier startBarrier, CyclicBarrier reactivateNodesBarrier,
-			CyclicBarrier separationBarrier, CyclicBarrier reactivateLinksBarrier, CyclicBarrier endBarrier, QSimI sim) {
+			CyclicBarrier separationBarrier, CyclicBarrier reactivateLinksBarrier, CyclicBarrier endBarrier,
+			QSimI sim, MultiModalTravelTime multiModalTravelTime) {
 		super(sim);
 		this.startBarrier = startBarrier;
 		this.reactivateNodesBarrier = reactivateNodesBarrier;
 		this.separationBarrier = separationBarrier;
 		this.reactivateLinksBarrier = reactivateLinksBarrier;
 		this.endBarrier = endBarrier;
+		this.multiModalTravelTime = multiModalTravelTime;
 	}
 
 	/*
