@@ -47,7 +47,6 @@ public class Wardrop {
 
 	private static final Logger log = Logger.getLogger(Wardrop.class);
 	
-	//protected NetworkLayer network;
 	protected Network network;
 	protected Population population;
 	
@@ -67,8 +66,7 @@ public class Wardrop {
 	double endTime = 3600*36; // [sec]
 	double minCellDistance = 30000.0; // [m]
 	
-	public Wardrop(Network network, Population population)
-	{
+	public Wardrop(Network network, Population population) {
 		this.network = network;
 		this.population = population;
 		
@@ -76,8 +74,7 @@ public class Wardrop {
 		this.wardropZones.createMapping();
 	}
 	
-	public void createZoneMatrix()
-	{
+	public void createZoneMatrix() {
 		// create new ZoneMatrix
 		int zones = wardropZones.getZonesCount();
 		
@@ -85,38 +82,30 @@ public class Wardrop {
 		
 		zoneMatrix = new Trips[zones][zones];
 		
-		for(int i = 0; i < zones; i++)
-		{
-			for(int j = 0; j < zones; j++)
-			{
+		for(int i = 0; i < zones; i++) {
+			for(int j = 0; j < zones; j++) {
 				zoneMatrix[i][j] = new Trips();
 			}
 //			if (i % 100 == 0) log.info("Created " + i + "/" + zonesX*zonesY + " rows of the Zone Matrix");
 		}
 	}
 	
-	public void resetZoneMatrix()
-	{
-		if (zoneMatrix != null)
-		{		
+	public void resetZoneMatrix() {
+		if (zoneMatrix != null) {		
 			int zones = wardropZones.getZonesCount();
 		
-			for(int i = 0; i < zones; i++)
-			{
-				for(int j = 0; j < zones; j++)
-				{
+			for(int i = 0; i < zones; i++) {
+				for(int j = 0; j < zones; j++) {
 					zoneMatrix[i][j].reset();
 				}
 			}
 		}
-		else
-		{
+		else {
 			createZoneMatrix();
 		}
 	}
 	
-	public void fillMatrixFromEventFile(String file)
-	{
+	public void fillMatrixFromEventFile(String file) {
 		log.info("Resetting Zone Matrix");
 		resetZoneMatrix();
 
@@ -128,14 +117,12 @@ public class Wardrop {
 		
 	}
 	
-	public void fillMatrixViaActTimesCollectorObject(ActTimesCollector actTimesCollector)
-	{
+	public void fillMatrixViaActTimesCollectorObject(ActTimesCollector actTimesCollector) {
 		this.actTimesCollector = actTimesCollector;
 		fillMatrixViaActTimesCollectorObject();
 	}
 	
-	public void fillMatrixViaActTimesCollectorObject()
-	{
+	public void fillMatrixViaActTimesCollectorObject() {
 		log.info("Resetting Zone Matrix");
 		resetZoneMatrix();
 		
@@ -143,10 +130,8 @@ public class Wardrop {
 		getTripsFromEvents();
 	}
 	
-	public void fillMatrixFromPlans()
-	{		
-		for (Person person : population.getPersons().values()) 
-		{
+	public void fillMatrixFromPlans() {		
+		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			
 			ArrayList<Activity> acts = new ArrayList<Activity>();
@@ -157,8 +142,7 @@ public class Wardrop {
 			}
 			
 			// The last Act is only the end of a leg and not the beginning of a new one!
-			for(int i = 0; i < acts.size() - 1; i++)
-			{
+			for(int i = 0; i < acts.size() - 1; i++) {
 				Activity startAct = acts.get(i);
 				Activity endAct = acts.get(i + 1);
 				
@@ -171,10 +155,8 @@ public class Wardrop {
 				List<Integer> startZones = wardropZones.getZones(startCoord);
 				List<Integer> endZones = wardropZones.getZones(endCoord);
 				
-				for (int startZone : startZones)
-				{
-					for (int endZone : endZones)
-					{
+				for (int startZone : startZones) {
+					for (int endZone : endZones) {
 						Trips trip = zoneMatrix[startZone][endZone];
 						trip.addTrip(startTime, endTime, startCoord, endCoord);
 					}
@@ -193,9 +175,8 @@ public class Wardrop {
 		}
 	}
 	
-	// gets all ActStart- and ActEndEvents from a given Eventsfile
-	protected void processEvents(String file)
-	{
+	// gets all ActStart- and ActEndEvents from a given EventsFile
+	protected void processEvents(String file) {
 		// Instance which takes over line by line of the events file
 		// and throws events of added types
 		EventsManagerImpl events = new EventsManagerImpl();
@@ -222,18 +203,15 @@ public class Wardrop {
 	
 	
 	// gets all Trips from a given ActTimesCollector
-	protected void getTripsFromEvents()
-	{
+	protected void getTripsFromEvents() {
 		double sum = 0.0;
 		
 		int correct = 0;
 		int tripcounter = 0;
 		int wrong = 0;
 		
-		if (actTimesCollector != null)
-		{
-			for(Person person:this.population.getPersons().values())
-			{
+		if (actTimesCollector != null) {
+			for(Person person:this.population.getPersons().values()) {
 				Id id = person.getId();
 				ArrayList<Double> startTimes = (ArrayList<Double>) actTimesCollector.getStartTimes(id);
 				ArrayList<Double> endTimes = (ArrayList<Double>) actTimesCollector.getEndTimes(id);
@@ -242,30 +220,24 @@ public class Wardrop {
 
 				// trying to correct "wrong" data
 				// looks like the person has started a trip but didn't finish it so delete start time
-				if (endTimes.size() == startTimes.size() + 1)
-				{
+				if (endTimes.size() == startTimes.size() + 1) {
 					// remove last item in List
 					endTimes.remove(endTimes.size()-1);
 				}
 					
 				
-				if (endTimes.size() != startTimes.size())
-				{
+				if (endTimes.size() != startTimes.size()) {
 					wrong++;
 //					log.warn("Found more ending Activities than starting ones!");
 				}
-				else
-				{
+				else {
 					correct++;
-					for(int i = 0; i < startTimes.size(); i++)
-					{
+					for(int i = 0; i < startTimes.size(); i++) {
 						List<Integer> startZones = wardropZones.getZones(startCoords.get(i));
 						List<Integer> endZones = wardropZones.getZones(endCoords.get(i));
 						
-						for (int startZone : startZones)
-						{
-							for (int endZone : endZones)
-							{
+						for (int startZone : startZones) {
+							for (int endZone : endZones) {
 								tripcounter++;
 								
 								Trips trips = zoneMatrix[startZone][endZone];
@@ -275,14 +247,12 @@ public class Wardrop {
 								sum = sum + tripDuration;
 								
 								// without length correction
-								if (!useLengthCorrection)
-								{
+								if (!useLengthCorrection) {
 									trips.addTrip(endTimes.get(i), startTimes.get(i), endCoords.get(i), startCoords.get(i));
 								}
 
 								// with correction
-								else
-								{
+								else {
 									double correctedDuration = distanceCorrection(endCoords.get(i), startCoords.get(i), endZone, startZone, tripDuration);
 									trips.addTrip(endTimes.get(i), endTimes.get(i) + correctedDuration, endCoords.get(i), startCoords.get(i));
 								}
@@ -329,16 +299,13 @@ public class Wardrop {
 //			log.info("Zone length in y direction: " + (yMax - yMin) / zonesY);
 			
 		}	// if (actTimesCollector != null
-		
-		else
-		{
+		else {
 			log.warn("ActTimesCollector Object was not initialized!");
 		}
 		
 	}	// getTrips
 	
-	protected double distanceCorrection(Coord start, Coord end, int startZone, int endZone, double tripDuration)
-	{	
+	protected double distanceCorrection(Coord start, Coord end, int startZone, int endZone, double tripDuration) {	
 		if (startZone == endZone) return tripDuration;
 		
 		Coord startCentre = wardropZones.getZoneCentre(startZone);
@@ -358,8 +325,7 @@ public class Wardrop {
 		
 	} // distanceCorrection
 	
-	public void getResults()
-	{	
+	public void getResults() {	
 		// format the output strings
 		NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
 		nf.setMaximumFractionDigits(1);
@@ -388,12 +354,9 @@ public class Wardrop {
 		int sumTrips = 0;
 		double sumStandardDeviation = 0.0;
 		
-		for (double time = startTime; time < endTime; time = time + timeStep)
-		{
-			for(int i = 0; i < zoneMatrix.length; i++)
-			{
-				for(int j = 0; j < zoneMatrix.length; j++)
-				{
+		for (double time = startTime; time < endTime; time = time + timeStep) {
+			for(int i = 0; i < zoneMatrix.length; i++) {
+				for(int j = 0; j < zoneMatrix.length; j++) {
 					Trips trips = zoneMatrix[i][j];
 					
 					boolean calcTripResults = true;
@@ -401,8 +364,7 @@ public class Wardrop {
 					/*
 					 * If it's traffic within one cell, there is no need to calc a wardrop equilibrium.
 					 */
-					if (i == j)
-					{
+					if (i == j) {
 						calcTripResults = false;
 					}
 					
@@ -410,8 +372,7 @@ public class Wardrop {
 					 *  Check if the total sum of trips is higher than the minimum number within a time step.
 					 *  If not - skip it!
 					 */
-					if (calcTripResults && trips.getIds().size() < minTrips)
-					{
+					if (calcTripResults && trips.getIds().size() < minTrips) {
 						calcTripResults = false;
 					}
 					
@@ -421,19 +382,16 @@ public class Wardrop {
 					 */
 					//double cellDistance = ((CoordImpl)getZoneCentre(i)).calcDistance(getZoneCentre(j));
 					double cellDistance = ((CoordImpl)wardropZones.getZoneCentre(i)).calcDistance(wardropZones.getZoneCentre(j));
-					if (calcTripResults &&  cellDistance < minCellDistance)
-					{
+					if (calcTripResults &&  cellDistance < minCellDistance) {
 						calcTripResults = false;
 					}
 					
-					if (calcTripResults)
-					{
+					if (calcTripResults) {
 						//double[] results = zoneMatrix[i][j].calcMedianTripDuration(time, time + timeStep);
 						double[] results = calcMedianTripDuration(trips, time, time + timeStep);
 						
 						// Needed amount of trips between two cells
-						if (results[2] > minTrips) 
-						{
+						if (results[2] > minTrips) {
 							String outString = "Found " + nf2.format(results[2]) + " trips";
 							outString = outString + " from Zone " + i;
 							outString = outString + " to Zone " + j;
@@ -470,8 +428,7 @@ public class Wardrop {
 	 * double[1] = standard deviation
 	 * double[2] = number of trips within the specified time
 	 */
-	public double[] calcMedianTripDuration(Trips trips, double startTime, double endTime)
-	{
+	public double[] calcMedianTripDuration(Trips trips, double startTime, double endTime) {
 		List<Double> startTimes = trips.getStartTimes();
 		List<Double> endTimes = trips.getEndTimes();
 		
@@ -491,8 +448,7 @@ public class Wardrop {
 		 *  Check if the startTimes has been initialized.
 		 *  If there are no trips stored, it's not to save memory!
 		 */
-		if (startTimes != null)
-		{
+		if (startTimes != null) {
 			for(int i = 0; i < startTimes.size(); i++)
 			{
 				// if trip started within the given time slot (means that the activity ended within the given time slot)
@@ -511,15 +467,13 @@ public class Wardrop {
 		
 		//if (counter == 0) return 0.0;
 		if (durations.size() == 0) return results;
-		if (durations.size() == 1)
-		{
+		if (durations.size() == 1) {
 			results[0] = durations.get(0);
 			return results;
 		}
 		
 		double sum = 0.0;
-		for (Double duration : durations) 
-		{
+		for (Double duration : durations) {
 			sum = sum + duration;
 		}
 		
@@ -527,8 +481,7 @@ public class Wardrop {
 		results[0] = mean;
 		
 		double diffsum = 0.0;
-		for(Double duration : durations)
-		{
+		for(Double duration : durations) {
 			diffsum = diffsum + Math.pow((duration - mean), 2); 
 		}
 		
@@ -539,38 +492,31 @@ public class Wardrop {
 		return results;
 	}
 
-	public double calcMeanLinksPerTrip()
-	{
+	public double calcMeanLinksPerTrip() {
 		int linkCounter = 0;
 		int legCounter = 0;
 		int PersonCounter = 0;
 		
-		for (Person person : population.getPersons().values()) 
-		{
+		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 						
 			//ArrayList<BasicLegImpl> legs = new ArrayList<BasicLegImpl>();
 
-			for (PlanElement planElement : plan.getPlanElements())
-			{
-				if (planElement instanceof Leg)
-				{
+			for (PlanElement planElement : plan.getPlanElements()) {
+				if (planElement instanceof Leg) {
 					Leg leg = (Leg) planElement;
 					
-					if (leg.getRoute() instanceof NetworkRoute)
-					{
+					if (leg.getRoute() instanceof NetworkRoute) {
 						//BasicRouteImpl route = (BasicRouteImpl) leg.getRoute();
 						NetworkRoute route = (NetworkRoute) leg.getRoute();
 						linkCounter = linkCounter + route.getLinkIds().size();
 						legCounter++;
 					}
-					else
-					{
+					else {
 						log.error("Expected Route to be from Class NetworkRoute but found Class: " + leg.getRoute().getClass());
 					}
 				}
 			}
-
 			PersonCounter++;
 		}
 		
@@ -594,8 +540,7 @@ public class Wardrop {
 	/*
 	 * Internal data structure with information about a trip between two Activities.
 	 */
-	static class Trip
-	{
+	static class Trip {
 		static long TripIdCounter = 0;
 		
 		double startTime;
@@ -604,8 +549,7 @@ public class Wardrop {
 		Coord endCoord;
 		long id;
 		
-		public Trip(double startTime, double endTime, Coord startCoord, Coord endCoord)
-		{
+		public Trip(double startTime, double endTime, Coord startCoord, Coord endCoord) {
 			this.startTime = startTime;
 			this.endTime = endTime;
 			this.startCoord = startCoord;
@@ -614,13 +558,11 @@ public class Wardrop {
 			this.id = getNewId();
 		}
 		
-		static long getTripCounter()
-		{
+		static long getTripCounter() {
 			return TripIdCounter;
 		}
 		
-		static long getNewId()
-		{
+		static long getNewId() {
 			TripIdCounter++;
 			return TripIdCounter;
 		}
@@ -670,31 +612,25 @@ public class Wardrop {
 	/*
 	 * Internal data structure with information about all trip between two Traffic Cells.
 	 */	
-	static class Trips
-	{
+	static class Trips {
 		static long TripIdCounter = 0;
 		static Map<Long, Trip> trips = new TreeMap<Long, Trip>();
 
 		List<Long> Ids;
 		
-		public Trips()
-		{
+		public Trips() {
 		}
 		
 		// Initialize the ArrayList only then, if there are really stored some Trips!
-		protected void init()
-		{
+		protected void init() {
 			Ids = new ArrayList<Long>();
 			
 			trimmArrayLists();
 		}
 		
-		public void reset()
-		{
-			if (Ids != null)
-			{
-				for(Long id : Ids)
-				{			
+		public void reset() {
+			if (Ids != null) {
+				for(Long id : Ids) {			
 					trips.remove(id);
 				}
 				Ids = null;
@@ -702,8 +638,7 @@ public class Wardrop {
 			}
 		}
 		
-		public void addTrip(double startTime, double endTime, Coord startCoord, Coord endCoord)
-		{	
+		public void addTrip(double startTime, double endTime, Coord startCoord, Coord endCoord) {	
 			if (Ids == null) init();
 	
 			Trip trip = new Trip(startTime, endTime, startCoord, endCoord);
@@ -714,67 +649,57 @@ public class Wardrop {
 			trimmArrayLists();
 		}
 		
-		public List<Double> getStartTimes()
-		{
+		public List<Double> getStartTimes() {
 			if (Ids == null) return new ArrayList<Double>();
 			ArrayList<Double> times = new ArrayList<Double>();
 			
-			for(Long id:Ids)
-			{
+			for(Long id:Ids) {
 				times.add(trips.get(id).getStartTime());
 			}
 			
 			return times;
 		}
 		
-		public List<Double> getEndTimes()
-		{
+		public List<Double> getEndTimes() {
 			if (Ids == null) return new ArrayList<Double>();
 			ArrayList<Double> times = new ArrayList<Double>();
 			
-			for(Long id:Ids)
-			{
+			for(Long id:Ids) {
 				times.add(trips.get(id).getEndTime());
 			}
 			
 			return times;
 		}
 
-		public List<Coord> getStartCoords()
-		{
+		public List<Coord> getStartCoords() {
 			if (Ids == null) return  new ArrayList<Coord>();
 			ArrayList<Coord> coords = new ArrayList<Coord>();
 			
-			for(Long id:Ids)
-			{
+			for(Long id:Ids) {
 				coords.add(trips.get(id).getStartCoord());
 			}
 			
 			return coords;
 		}
 		
-		public List<Coord> getEndCoords()
-		{
+		public List<Coord> getEndCoords() {
 			if (Ids == null) return  new ArrayList<Coord>();
 			ArrayList<Coord> coords = new ArrayList<Coord>();
 			
-			for(Long id:Ids)
-			{
+			for(Long id:Ids) {
 				coords.add(trips.get(id).getEndCoord());
 			}
 			
 			return coords;
 		}
 		
-		public List<Long> getIds()
-		{
+		public List<Long> getIds() {
 			if (Ids == null) return  new ArrayList<Long>();
 			else return Ids;
 		}
 		
 		// should free some memory
-		public void trimmArrayLists()
-		{
+		public void trimmArrayLists() {
 			((ArrayList<Long>)Ids).trimToSize();
 		}
 			
@@ -794,6 +719,5 @@ public class Wardrop {
 
 	public void setUseLengthCorrection(boolean useLengthCorrection) {
 		this.useLengthCorrection = useLengthCorrection;
-	}
-	
+	}	
 }

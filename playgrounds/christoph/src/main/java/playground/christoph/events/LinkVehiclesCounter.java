@@ -213,29 +213,6 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 			else count = countLastTimeStepMap.get(id);
 
 			countChangedMap.put(id, count + 1);
-
-			/*
-			 * The QueueSimulation additionally checks "&& agent.chooseNextLink() == null"
-			 * The agent seems to be still null here - it is set after the event was created :(
-			 */
-//			NetworkRoute route = (NetworkRoute) leg.getRoute();
-//
-//			LinkImpl link = queueNetwork.getNetworkLayer().getLink(event.getLinkId());
-//			QueueVehicle vehicle = queueNetwork.getQueueLink(event.getLinkId()).getVehicle(route.getVehicleId());
-//			DriverAgent agent = vehicle.getDriver();
-//
-//			if (route.getEndLink() == link && agent.chooseNextLink() == null)
-//			{
-//				// nothing to do here... ArrivalEvent is created and that is handled elsewere.
-//			}
-//			else
-//			{
-//				vehCount = waitingMap.get(id);
-//				vehCount++;
-//				waitingMap.put(id, vehCount);
-//
-//				countChangedMap.put(id, vehCount);
-//			}
 		} else {
 			log.warn("Unknown Leg Mode!");
 		}
@@ -419,16 +396,6 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 
             link.setVehiclesCount(vehiclesCount);
         }
-
-//        for (Link link : this.queueNetwork.getNetworkLayer().getLinks().values())
-//        {
-//        	if (this.getLinkDrivingVehiclesCount(link.getId()) != ((MyLinkImpl)link).getVehiclesCount())
-//        	{
-//        		double v1 = this.getLinkDrivingVehiclesCount(link.getId());
-//        		double v2 = ((MyLinkImpl)link).getVehiclesCount();
-//        		log.error("Vehicles Count does not match! " + link.getId().toString() + " " + v1 + " " + v2);
-//        	}
-//        }
 	}
 
 	/*

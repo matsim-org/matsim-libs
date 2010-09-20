@@ -42,7 +42,6 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 	
 	// <Person's Id, Person's EventData>
 	protected TreeMap<Id, EventData> data = new TreeMap<Id, EventData>();
-	//protected NetworkLayer network;
 	protected Network network;
 	protected Population population;
 	
@@ -50,245 +49,117 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 	protected double endTime = Double.MAX_VALUE;
 	private final Map<Id, Integer> agentActIndex = new HashMap<Id, Integer>();
 	
-	public void reset(int iteration) 
-	{
+	public void reset(int iteration) {
 		data.clear();
 		network = null;
 		population = null;
 	}
 	
 	@Override
-	public void handleEvent(ActivityStartEvent event) 
-	{	
+	public void handleEvent(ActivityStartEvent event) {	
 		Id personId = event.getPersonId();
-//		Id linkId = event.getLinkId();
 		Activity eventAct = getCurrentActivity(event.getPersonId());
-/*		
-		if (event.getPersonId() != null)
-		{
-			personId = event.getPersonId();
-		}	
-		else
-		{
-			log.error("Something ToDo here!");
-			personId = event.getPersonId();
-			//TODO [CD] Still needed?
-//			personId = new IdImpl(event.agentId);
-		}
-*/
-		
-/*		
-		if (event.getLink() != null)
-		{
-			linkId = event.getLinkId();
-		}
-		else
-		{
-			log.error("Something ToDo here!");
-			linkId = event.getLinkId();
-//TODO [CD] Still needed?
-//			linkId = new IdImpl(event.linkId);
-		}
-*/
 		
 		if (!data.containsKey(personId)) data.put(personId, new EventData());
 		
 		EventData eventData = data.get(personId);
 				
-//		if ((event instanceof ActivityStartEventImpl) && (((ActivityStartEventImpl)event).getAct() != null))
-//		{
-			eventData.addStartActivityEvent(event.getTime(), eventAct.getCoord());
-//		}
-//		else if (network != null)
-//		{
-//			Link link = network.getLinks().get(linkId);
-//			//eventData.addStartActivityEvent(event.getTime(), link.getCenter());
-//			eventData.addStartActivityEvent(event.getTime(), link.getCoord());
-//		}
-//		else
-//		{
-//			if ((startTime <= event.getTime()) && (event.getTime() >= endTime))
-//			{
-//				eventData.addStartActivityEvent(event.getTime(), linkId);
-//			}
-//		}
+		eventData.addStartActivityEvent(event.getTime(), eventAct.getCoord());
 	}
 
 	@Override
-	public void handleEvent(ActivityEndEvent event)
-	{
+	public void handleEvent(ActivityEndEvent event) {
 		Id personId = event.getPersonId();
-//		Id linkId = event.getLinkId();
 		Activity eventAct = getCurrentActivity(event.getPersonId());
-
-/*		
-		if (event.getPersonId() != null)
-		{
-			personId = event.getPersonId();
-		}
-		else
-		{
-			//personId = new IdImpl(event.agentId);
-			personId = event.getPersonId();
-		}
-*/
-
-/*		
-		if (event.getLinkId() != null)
-		{
-			linkId = event.getLinkId();
-		}
-		else
-		{
-			log.error("Something ToDo here!");
-			linkId = event.getLinkId();
-//TODO [CD] Still needed?
-	//		linkId = new IdImpl(event.linkId);
-		}
-*/		
+	
 		if (!data.containsKey(personId)) data.put(personId, new EventData());
 		
 		EventData eventData = data.get(personId);
-		
-//		if ((event instanceof ActivityEndEventImpl) && (((ActivityEndEventImpl)event).getAct() != null))
-//		{
-			eventData.addEndActivityEvent(event.getTime(), eventAct.getCoord());
-//		}
-//		else if (network != null)
-//		{
-//			Link link = network.getLinks().get(linkId);
-//			eventData.addEndActivityEvent(event.getTime(), link.getCoord());
-//			//eventData.addEndActivityEvent(event.time, link.getCenter());
-//		}
-//		else
-//		{
-//			if ((startTime <= event.getTime()) && (event.getTime() >= endTime))
-//			{
-//				eventData.addEndActivityEvent(event.getTime(), linkId);
-//			}
-//		}
 	}
-	
-	public void getTrips(Id id)
-	{
+
+	public List<Double> getStartTimes(Id id) {
 		EventData eventData = data.get(id);
 		
-		if (eventData != null)
-		{
-			
-		}
-		else
-		{
-//			return null;
-		}
-	}
-	
-	public List<Double> getStartTimes(Id id)
-	{
-		EventData eventData = data.get(id);
-		
-		if (eventData != null)
-		{
+		if (eventData != null) {
 			return eventData.getStartTimes();
 		}
-		else
-		{
+		else {
 			return new ArrayList<Double>();
 		}
 	}
 
-	public List<Double> getEndTimes(Id id)
-	{		
+	public List<Double> getEndTimes(Id id) {		
 		EventData eventData = data.get(id);
 	
-		if (eventData != null)
-		{
+		if (eventData != null) {
 			return eventData.getEndTimes();
 		}
-		else
-		{
+		else {
 			return new ArrayList<Double>();
 		}
 	}
 
-	public List<Coord> getStartCoords(Id id)
-	{
+	public List<Coord> getStartCoords(Id id) {
 		EventData eventData = data.get(id);
 		
-		if (eventData != null)
-		{
+		if (eventData != null) {
 			return eventData.getStartCoords();
 		}
-		else
-		{
+		else {
 			return new ArrayList<Coord>();
 		}
 	}
 
-	public List<Coord> getEndCoords(Id id)
-	{
+	public List<Coord> getEndCoords(Id id) {
 		EventData eventData = data.get(id);
 		
-		if (eventData != null)
-		{
+		if (eventData != null) {
 			return eventData.getEndCoords();
 		}
-		else
-		{
+		else {
 			return new ArrayList<Coord>();
 		}
 	}
 
-	public List<Id> getStartId(Id id)
-	{
+	public List<Id> getStartId(Id id) {
 		EventData eventData = data.get(id);
 		
-		if (eventData != null)
-		{
+		if (eventData != null) {
 			return eventData.getStartId();
 		}
-		else
-		{
+		else {
 			return new ArrayList<Id>();
 		}
 	}
 
-	public List<Id> getEndId(Id id)
-	{
+	public List<Id> getEndId(Id id) {
 		EventData eventData = data.get(id);
 		
-		if (eventData != null)
-		{
+		if (eventData != null) {
 			return eventData.getEndId();
 		}
-		else
-		{
+		else {
 			return new ArrayList<Id>();
 		}
 	}
 	
-	public void setNetwork(Network nw)
-	{
+	public void setNetwork(Network nw) {
 		network = nw;
 	}
 	
-	public Network getNetwork()
-	{
+	public Network getNetwork() {
 		return network;
 	}
 	
-	public void setPopulation(Population pop)
-	{
+	public void setPopulation(Population pop) {
 		population = pop;
 	}
 	
-	public Population getPopulation()
-	{
+	public Population getPopulation() {
 		return population;
 	}
 	
-	class EventData
-	{
+	class EventData {
 		List<Double> startTimes;
 		List<Double> endTimes;
 		List<Coord> startCoords;
@@ -296,8 +167,7 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 		List<Id> startId;
 		List<Id> endId;
 				
-		public EventData()
-		{
+		public EventData() {
 			startTimes = new ArrayList<Double>();
 			endTimes = new ArrayList<Double>();
 			startCoords = new ArrayList<Coord>();
@@ -306,37 +176,32 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 			endId = new ArrayList<Id>();
 		}
 		
-		public void addStartActivityEvent(double time, Coord coord)
-		{
+		public void addStartActivityEvent(double time, Coord coord) {
 			startTimes.add(time);
 			startCoords.add(coord);
 			trimmArrayLists();
 		}
 		
-		public void addStartActivityEvent(double time, Id linkId)
-		{
+		public void addStartActivityEvent(double time, Id linkId) {
 			startTimes.add(time);
 			startId.add(linkId);
 			trimmArrayLists();
 		}
 		
-		public void addEndActivityEvent(double time, Coord coord)
-		{
+		public void addEndActivityEvent(double time, Coord coord) {
 			endTimes.add(time);
 			endCoords.add(coord);
 			trimmArrayLists();
 		}
 		
-		public void addEndActivityEvent(double time, Id linkId)
-		{
+		public void addEndActivityEvent(double time, Id linkId) {
 			endTimes.add(time);
 			endId.add(linkId);
 			trimmArrayLists();
 		}
 
 		// should free some memory
-		public void trimmArrayLists()
-		{
+		public void trimmArrayLists() {
 			((ArrayList<Double>)startTimes).trimToSize();
 			((ArrayList<Double>)endTimes).trimToSize();
 			((ArrayList<Coord>)startCoords).trimToSize();
@@ -345,33 +210,27 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 			((ArrayList<Id>)endId).trimToSize();		
 		}
 		
-		public List<Double> getStartTimes()
-		{
+		public List<Double> getStartTimes() {
 			return startTimes;
 		}
 
-		public List<Double> getEndTimes()
-		{
+		public List<Double> getEndTimes() {
 			return endTimes;
 		}
 
-		public List<Coord> getStartCoords()
-		{
+		public List<Coord> getStartCoords() {
 			return startCoords;
 		}
 
-		public List<Coord> getEndCoords()
-		{
+		public List<Coord> getEndCoords() {
 			return endCoords;
 		}
 
-		public List<Id> getStartId()
-		{
+		public List<Id> getStartId() {
 			return startId;
 		}
 
-		public List<Id> getEndId()
-		{
+		public List<Id> getEndId() {
 			return endId;
 		}
 		

@@ -45,7 +45,7 @@ public class GetAllIncludedLinks {
 
 	/**
 	 * Returns an ArrayList of Links.
-	 * @param NetworkLayer network
+	 * @param NetworkImpl network
 	 * @param ArrayList< Node > includedNodes
 	 *  
 	 * @return A link from the network is included in the returned ArrayList, if its
@@ -60,7 +60,7 @@ public class GetAllIncludedLinks {
 
 	/**
 	 * Returns an ArrayList of Links.
-	 * @param NetworkLayer network
+	 * @param NetworkImpl network
 	 * @param Map< Id, Node > includedNodesMap
 	 *  
 	 * @return A link from the network is included in the returned ArrayList, if its
@@ -77,7 +77,7 @@ public class GetAllIncludedLinks {
 	 * A link from the network is added to the includedLinks ArrayList, if its
 	 * start- and end node are included in the includedNodes ArrayList.
 	 *  
-	 * @param NetworkLayer network
+	 * @param NetworkImpl network
 	 * @param ArrayList< Node > includedNodes
 	 * @param ArrayList< Link > includedLinks
 	 */
@@ -106,7 +106,7 @@ public class GetAllIncludedLinks {
 	 * A link from the network is added to the includedLinks ArrayList, if its
 	 * start- and end node are included in the includedNodes ArrayList.
 	 *  
-	 * @param NetworkLayer network
+	 * @param NetworkImpl network
 	 * @param Map< Id, Node > includedNodesMap
 	 * @param ArrayList< Link > includedLinks
 	 */

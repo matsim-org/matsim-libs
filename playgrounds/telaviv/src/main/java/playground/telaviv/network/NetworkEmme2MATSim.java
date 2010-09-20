@@ -50,7 +50,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordImpl;
