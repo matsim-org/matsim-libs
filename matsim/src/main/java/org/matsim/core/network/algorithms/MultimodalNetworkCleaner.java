@@ -22,6 +22,7 @@ package org.matsim.core.network.algorithms;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class MultimodalNetworkCleaner {
 		List<Link> allLinks = new ArrayList<Link>(this.network.getLinks().values());
 		for (Link link : allLinks) {
 			if (!biggestCluster.containsKey(link.getId())) {
-				Set<String> reducedModes = link.getAllowedModes();
+				Set<String> reducedModes = new HashSet<String>(link.getAllowedModes());
 				reducedModes.removeAll(modes);
 				link.setAllowedModes(reducedModes);
 				if (reducedModes.isEmpty()) {

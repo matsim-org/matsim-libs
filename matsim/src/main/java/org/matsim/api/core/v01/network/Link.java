@@ -114,6 +114,9 @@ public interface Link extends BasicLocation {
 
 	public void setAllowedModes(Set<String> modes);
 
+	/**
+	 * @return an <b>immutable</b> set containing all transport modes that are allowed on that link.
+	 */
 	public Set<String> getAllowedModes();
 
 }

@@ -22,6 +22,7 @@ package org.matsim.core.network;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -55,7 +56,8 @@ public class LinkImpl implements Link {
 	protected double capacity = Double.NaN;
 	protected double nofLanes = Double.NaN;
 
-	protected HashSet<String> allowedModes = new HashSet<String>();
+	private final HashSet<String> allowedModes = new HashSet<String>();
+	private final Set<String> allowedModesSafe = Collections.unmodifiableSet(this.allowedModes);
 
 	private double flowCapacity;
 
@@ -292,7 +294,7 @@ public class LinkImpl implements Link {
 
 	@Override
 	public final Set<String> getAllowedModes() {
-		return new HashSet<String>(this.allowedModes);
+		return this.allowedModesSafe;
 	}
 
 	@Override
