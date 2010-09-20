@@ -49,7 +49,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	public Collection<Umlauf> build() {
 		createEmptyUmlaeufe();
 		createUmlaufStuecke();
-		log.info("Generating Umlaeufe; this may not be very fast:") ;
+		log.info("Generating Umlaeufe; if this is extremely slow, try more memory:") ;
 		System.out.flush() ;
 		int cnt = 0 ;
 		for (UmlaufStueck umlaufStueck : umlaufStuecke) {
