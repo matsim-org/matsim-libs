@@ -191,7 +191,7 @@ public class ScenarioImpl implements Scenario {
 			this.createLaneDefinitionsContainer();
 		}
 		else if (!this.config.scenario().isUseLanes()){
-			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
+			log.warn("lanes: " + NON_ENABLED_ATTRIBUTE_WARNING);
 		}
 		return laneDefinitions;
 	}
@@ -202,7 +202,7 @@ public class ScenarioImpl implements Scenario {
 			this.createSignalSystemsContainers();
 		}
 		else if (!this.config.scenario().isUseSignalSystems()){
-			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
+			log.warn("signal systems: " + NON_ENABLED_ATTRIBUTE_WARNING);
 		}
 		return signalSystems;
 	}
@@ -213,7 +213,7 @@ public class ScenarioImpl implements Scenario {
 			this.createSignalSystemsContainers();
 		}
 		else if (!this.config.scenario().isUseSignalSystems()){
-			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
+			log.warn("signal systems configuration: " + NON_ENABLED_ATTRIBUTE_WARNING);
 		}
 		return signalSystemConfigurations;
 	}
@@ -224,7 +224,7 @@ public class ScenarioImpl implements Scenario {
 			this.createRoadPricingScheme();
 		}
 		else if (!this.config.scenario().isUseRoadpricing()){
-			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
+			log.warn("road pricing: " + NON_ENABLED_ATTRIBUTE_WARNING);
 		}
 		return roadPricingScheme;
 	}
@@ -249,7 +249,7 @@ public class ScenarioImpl implements Scenario {
 			this.createHouseholdsContainer();
 		}
 		else if (!this.config.scenario().isUseHouseholds()){
-			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
+			log.warn("households: " + NON_ENABLED_ATTRIBUTE_WARNING);
 		}
 		return this.households;
 	}
@@ -259,7 +259,7 @@ public class ScenarioImpl implements Scenario {
 			this.createVehicleContainer();
 		}
 		else if (!this.config.scenario().isUseVehicles()){
-			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
+			log.warn("vehicles: " + NON_ENABLED_ATTRIBUTE_WARNING);
 		}
 		return this.vehicles;
 	}
@@ -269,7 +269,7 @@ public class ScenarioImpl implements Scenario {
 			this.createKnowledges();
 		}
 		else if (!this.config.scenario().isUseKnowledges()){
-			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
+			log.warn("knowledges: " + NON_ENABLED_ATTRIBUTE_WARNING);
 		}
 		return this.knowledges;
 	}
@@ -279,7 +279,7 @@ public class ScenarioImpl implements Scenario {
 			this.createTransit();
 		}
 		else if (!this.config.scenario().isUseTransit()) {
-			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
+			log.warn("transit schedule: " + NON_ENABLED_ATTRIBUTE_WARNING);
 		}
 		return this.transitSchedule;
 	}
