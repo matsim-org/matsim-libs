@@ -19,10 +19,10 @@
 
 package playground.mrieser.core.mobsim.features;
 
-import playground.mrieser.core.mobsim.network.api.SimNetwork;
+import playground.mrieser.core.mobsim.network.api.MobSimNetwork;
 
-public interface NetworkFeature extends SimFeature {
+public interface NetworkFeature extends MobSimFeature {
 
-	public SimNetwork getSimNetwork();
+	public MobSimNetwork getSimNetwork();
 
 }

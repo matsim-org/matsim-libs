@@ -19,21 +19,18 @@
 
 package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.ListIterator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
-import playground.mrieser.core.mobsim.network.api.SimNetwork;
+import playground.mrieser.core.mobsim.network.api.MobSimNetwork;
 
 /**
  * @author mrieser
  */
-/*package*/ class QueueNetwork implements SimNetwork {
+/*package*/ class QueueNetwork implements MobSimNetwork {
 
 	protected final TimestepSimEngine simEngine;
 	private final Map<Id, QueueLink> links;
@@ -42,52 +39,28 @@ import playground.mrieser.core.mobsim.network.api.SimNetwork;
 	private double effectiveCellSize = 7.5;
 	private boolean removeStuckVehicles = true;
 	private double stuckTime = 100;
-	private final LinkedList<QueueLink> activeLinks = new LinkedList<QueueLink>();
-	private final LinkedList<QueueNode> activeNodes = new LinkedList<QueueNode>();
-	private final ArrayList<QueueLink> linksToActivate = new ArrayList<QueueLink>(100);
-	private final ArrayList<QueueNode> nodesToActivate = new ArrayList<QueueNode>(100);
+	private final Operator operator;
 
-	public QueueNetwork(final TimestepSimEngine simEngine) {
+	public QueueNetwork(final TimestepSimEngine simEngine, final Operator operator) {
 		this.simEngine = simEngine;
+		this.operator = operator;
 		this.links = new LinkedHashMap<Id, QueueLink>();
 		this.nodes = new LinkedHashMap<Id, QueueNode>();
 	}
 
 	@Override
+	public void beforeMobSim() {
+		this.operator.beforeMobSim();
+	}
+
+	@Override
 	public void doSimStep(final double time) {
-		this.activeNodes.addAll(this.nodesToActivate);
-		this.nodesToActivate.clear();
-		ListIterator<QueueNode> simNodes = this.activeNodes.listIterator();
-		while (simNodes.hasNext()) {
-			QueueNode node = simNodes.next();
-			node.moveNode(time);
-			if (!node.isActive()) {
-				simNodes.remove();
-			}
-		}
-
-		this.activeLinks.addAll(this.linksToActivate);
-		this.linksToActivate.clear();
-		ListIterator<QueueLink> simLinks = this.activeLinks.listIterator();
-		while (simLinks.hasNext()) {
-			QueueLink link = simLinks.next();
-			link.doSimStep(time);
-			if (!link.isActive()) {
-				simLinks.remove();
-			}
-		}
-		if (time % 3600 == 0) {
-			System.out.println("@@@ # active links = " + this.activeLinks.size());
-			System.out.println("@@@ # active nodes = " + this.activeNodes.size());
-		}
+		this.operator.doSimStep(time);
 	}
 
-	/*package*/ void activateLink(final QueueLink link) {
-		this.linksToActivate.add(link);
-	}
-
-	/*package*/ void activateNode(final QueueNode node) {
-		this.nodesToActivate.add(node);
+	@Override
+	public void afterMobSim() {
+		this.operator.afterMobSim();
 	}
 
 	@Override

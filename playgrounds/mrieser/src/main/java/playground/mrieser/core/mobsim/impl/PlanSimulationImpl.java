@@ -25,15 +25,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.Simulation;
 
+import playground.mrieser.core.mobsim.api.AgentSource;
 import playground.mrieser.core.mobsim.api.NewSimEngine;
+import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
 import playground.mrieser.core.mobsim.api.PlanSimulation;
-import playground.mrieser.core.mobsim.features.SimFeature;
+import playground.mrieser.core.mobsim.features.MobSimFeature;
 import playground.mrieser.core.mobsim.utils.ClassBasedMap;
 
 /**
@@ -46,7 +46,8 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 	private final Scenario scenario;
 	private NewSimEngine simEngine = null;
 	private final ClassBasedMap<PlanElement, PlanElementHandler> peHandlers = new ClassBasedMap<PlanElement, PlanElementHandler>();
-	private final LinkedList<SimFeature> simFeatures = new LinkedList<SimFeature>();
+	private final LinkedList<MobSimFeature> simFeatures = new LinkedList<MobSimFeature>();
+	private final LinkedList<AgentSource> agentSources = new LinkedList<AgentSource>();
 
 	public PlanSimulationImpl(final Scenario scenario) {
 		this.scenario = scenario;
@@ -100,23 +101,29 @@ public class PlanSimulationImpl implements PlanSimulation, Simulation { // TODO 
 	}
 
 	private void initAgents() {
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
-			this.simEngine.handleAgent(new DefaultPlanAgent(plan));
+		for (AgentSource source : this.agentSources) {
+			for (PlanAgent agent : source.getAgents()) {
+				this.simEngine.handleAgent(agent);
+			}
 		}
 	}
 
 	@Override
-	public void addSimFeature(final SimFeature feature) {
+	public void addAgentSource(final AgentSource agentSource) {
+		this.agentSources.add(agentSource);
+	}
+
+	@Override
+	public void addSimFeature(final MobSimFeature feature) {
 		this.simFeatures.add(feature);
 	}
 
-	public void removeSimFeature(final SimFeature feature) {
+	public void removeSimFeature(final MobSimFeature feature) {
 		this.simFeatures.remove(feature);
 	}
 
 	@Override
-	public List<SimFeature> getSimFeatures() {
+	public List<MobSimFeature> getSimFeatures() {
 		return Collections.unmodifiableList(this.simFeatures);
 	}
 }

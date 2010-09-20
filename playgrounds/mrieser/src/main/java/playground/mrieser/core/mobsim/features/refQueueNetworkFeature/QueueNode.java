@@ -31,9 +31,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
 
 import playground.mrieser.core.mobsim.api.SimVehicle;
-import playground.mrieser.core.mobsim.network.api.SimNode;
+import playground.mrieser.core.mobsim.network.api.MobSimNode;
 
-/*package*/ class QueueNode implements SimNode {
+/*package*/ class QueueNode implements MobSimNode {
 
 	private final static Logger log = Logger.getLogger(QueueNode.class);
 

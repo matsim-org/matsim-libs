@@ -38,7 +38,7 @@ import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
 import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueLink;
 import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueNetwork;
 import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueNode;
-import playground.mrieser.core.mobsim.network.api.SimLink;
+import playground.mrieser.core.mobsim.network.api.MobSimLink;
 
 /**
  * @author mrieser
@@ -235,7 +235,7 @@ public class QueueNodeTest {
 			return -1.0;
 		}
 		@Override
-		public void handleNextAction(final SimLink link) {
+		public void handleNextAction(final MobSimLink link) {
 		}
 	}
 

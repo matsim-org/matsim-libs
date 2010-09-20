@@ -37,6 +37,7 @@ import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
+import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.impl.TransitDepartureHandler;
 
@@ -71,6 +72,10 @@ public class TransitSimFactory implements MobsimFactory {
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
 		lh.setDepartureHandler(TransportMode.walk, teleporter);
 		lh.setDepartureHandler(TransportMode.bike, teleporter);
+
+		// register agent sources
+		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation()));
+		// TODO transit agent source
 
 		return planSim;
 	}

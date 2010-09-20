@@ -36,7 +36,7 @@ import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
 import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueLink;
 import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueNetwork;
 import playground.mrieser.core.mobsim.impl.DefaultSimVehicle;
-import playground.mrieser.core.mobsim.network.api.SimLink;
+import playground.mrieser.core.mobsim.network.api.MobSimLink;
 
 /**
  * @author mrieser
@@ -51,7 +51,7 @@ public class QueueLinkTest {
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
 		Assert.assertNull(f.qlink.getParkedVehicle(veh1Id));
-		f.qlink.insertVehicle(vehicle1, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_PARKING);
+		f.qlink.insertVehicle(vehicle1, MobSimLink.POSITION_AT_FROM_NODE, MobSimLink.PRIORITY_PARKING);
 		Assert.assertEquals(vehicle1, f.qlink.getParkedVehicle(veh1Id));
 		Assert.assertNull(f.qlink.getParkedVehicle(new IdImpl("1980")));
 
@@ -59,7 +59,7 @@ public class QueueLinkTest {
 		SimVehicle vehicle2 = new DefaultSimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1979"))));
 
 		Assert.assertNull(f.qlink.getParkedVehicle(veh2Id));
-		f.qlink.insertVehicle(vehicle2, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_PARKING);
+		f.qlink.insertVehicle(vehicle2, MobSimLink.POSITION_AT_FROM_NODE, MobSimLink.PRIORITY_PARKING);
 		Assert.assertEquals(vehicle2, f.qlink.getParkedVehicle(veh2Id));
 		Assert.assertEquals(vehicle1, f.qlink.getParkedVehicle(veh1Id));
 		Assert.assertNull(f.qlink.getParkedVehicle(new IdImpl("1979")));
@@ -73,8 +73,8 @@ public class QueueLinkTest {
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 		Id veh2Id = new IdImpl(5);
 		SimVehicle vehicle2 = new DefaultSimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1979"))));
-		f.qlink.insertVehicle(vehicle1, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_PARKING);
-		f.qlink.insertVehicle(vehicle2, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_PARKING);
+		f.qlink.insertVehicle(vehicle1, MobSimLink.POSITION_AT_FROM_NODE, MobSimLink.PRIORITY_PARKING);
+		f.qlink.insertVehicle(vehicle2, MobSimLink.POSITION_AT_FROM_NODE, MobSimLink.PRIORITY_PARKING);
 
 		Assert.assertEquals(vehicle1, f.qlink.getParkedVehicle(veh1Id));
 		Assert.assertEquals(vehicle2, f.qlink.getParkedVehicle(veh2Id));
@@ -122,8 +122,8 @@ public class QueueLinkTest {
 		SimVehicle vehicle2 = new DefaultSimVehicle(new VehicleImpl(veh2Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
 		f.engine.setCurrentTime(200);
-		f.qlink.insertVehicle(vehicle1, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
-		f.qlink.insertVehicle(vehicle2, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
+		f.qlink.insertVehicle(vehicle1, MobSimLink.POSITION_AT_TO_NODE, MobSimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
+		f.qlink.insertVehicle(vehicle2, MobSimLink.POSITION_AT_TO_NODE, MobSimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
 		f.qlink.doSimStep(201);
 		Assert.assertEquals(vehicle1, f.qlink.buffer.getFirstVehicleInBuffer());
 		f.qlink.removeVehicle(vehicle2);
@@ -184,7 +184,7 @@ public class QueueLinkTest {
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
 		f.engine.setCurrentTime(200);
-		f.qlink.insertVehicle(vehicle1, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
+		f.qlink.insertVehicle(vehicle1, MobSimLink.POSITION_AT_TO_NODE, MobSimLink.PRIORITY_AS_SOON_AS_SPACE_AVAILABLE);
 		Assert.assertNull(f.qlink.buffer.getFirstVehicleInBuffer());
 		f.qlink.doSimStep(201);
 		Assert.assertEquals(vehicle1, f.qlink.buffer.getFirstVehicleInBuffer());
@@ -198,7 +198,7 @@ public class QueueLinkTest {
 		SimVehicle vehicle1 = new DefaultSimVehicle(new VehicleImpl(veh1Id, new VehicleTypeImpl(new IdImpl("1980"))));
 
 		f.engine.setCurrentTime(200);
-		f.qlink.insertVehicle(vehicle1, SimLink.POSITION_AT_TO_NODE, SimLink.PRIORITY_PARKING);
+		f.qlink.insertVehicle(vehicle1, MobSimLink.POSITION_AT_TO_NODE, MobSimLink.PRIORITY_PARKING);
 		Assert.assertEquals(vehicle1, f.qlink.getParkedVehicle(vehicle1.getId()));
 		f.qlink.continueVehicle(vehicle1);
 		Assert.assertNull(f.qlink.getParkedVehicle(vehicle1.getId()));
@@ -303,7 +303,7 @@ public class QueueLinkTest {
 			return -1.0;
 		}
 		@Override
-		public void handleNextAction(final SimLink link) {
+		public void handleNextAction(final MobSimLink link) {
 		}
 	}
 

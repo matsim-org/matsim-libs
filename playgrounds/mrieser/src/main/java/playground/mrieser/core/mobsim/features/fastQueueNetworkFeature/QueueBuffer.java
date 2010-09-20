@@ -38,7 +38,7 @@ import playground.mrieser.core.mobsim.api.SimVehicle;
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	private final Queue<SimVehicle> buffer = new LinkedList<SimVehicle>();
+	private final Queue<SimVehicle> buffer = new LinkedList<SimVehicle>();//ConcurrentLinkedQueue<SimVehicle>(); // must be thread-safe data structure
 	private int storageCapacity = 0;
 	/**
 	 * The (flow) capacity available in one time step to move vehicles into the

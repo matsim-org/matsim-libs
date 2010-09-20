@@ -20,6 +20,7 @@
 package playground.mrieser.core.mobsim.impl;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -39,7 +40,7 @@ public class LegHandler implements PlanElementHandler, SimKeepAlive {
 
 	private final NewSimEngine simEngine;
 	private final ConcurrentHashMap<String, DepartureHandler> departureHandlers = new ConcurrentHashMap<String, DepartureHandler>();
-	private int onRoute = 0;
+	private AtomicInteger onRoute = new AtomicInteger(0);
 
 	public LegHandler(final NewSimEngine simEngine) {
 		this.simEngine = simEngine;
@@ -72,12 +73,12 @@ public class LegHandler implements PlanElementHandler, SimKeepAlive {
 			throw new NullPointerException("No DepartureHandler registered for mode " + leg.getMode());
 		}
 		depHandler.handleDeparture(agent);
-		this.onRoute++;
+		this.onRoute.incrementAndGet();
 	}
 
 	@Override
 	public void handleEnd(final PlanAgent agent) {
-		this.onRoute--;
+		this.onRoute.decrementAndGet();
 		Leg leg = (Leg) agent.getCurrentPlanElement();
 		EventsManager em = this.simEngine.getEventsManager();
 
@@ -115,7 +116,7 @@ public class LegHandler implements PlanElementHandler, SimKeepAlive {
 
 	@Override
 	public boolean keepAlive() {
-		return this.onRoute > 0;
+		return this.onRoute.intValue() > 0;
 	}
 
 }

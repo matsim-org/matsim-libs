@@ -32,12 +32,12 @@ import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
 import playground.mrieser.core.mobsim.api.SimKeepAlive;
-import playground.mrieser.core.mobsim.features.SimFeature;
+import playground.mrieser.core.mobsim.features.MobSimFeature;
 
 /**
  * @author mrieser
  */
-public class ActivityHandler implements PlanElementHandler, SimFeature, SimKeepAlive {
+public class ActivityHandler implements PlanElementHandler, MobSimFeature, SimKeepAlive {
 
 	private final static Logger log = Logger.getLogger(ActivityHandler.class);
 
@@ -88,11 +88,19 @@ public class ActivityHandler implements PlanElementHandler, SimFeature, SimKeepA
 	}
 
 	@Override
+	public void beforeMobSim() {
+	}
+
+	@Override
 	public void doSimStep(final double time) {
 		while ((!this.activityEndsList.isEmpty()) && (this.activityEndsList.peek().endTime <= time)) {
 			ActivityData data = this.activityEndsList.poll();
 			this.simEngine.handleAgent(data.agent);
 		}
+	}
+
+	@Override
+	public void afterMobSim() {
 	}
 
 	@Override

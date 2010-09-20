@@ -34,9 +34,9 @@ import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.network.LinkImpl;
 
 import playground.mrieser.core.mobsim.api.SimVehicle;
-import playground.mrieser.core.mobsim.network.api.SimLink;
+import playground.mrieser.core.mobsim.network.api.MobSimLink;
 
-/*package*/ class QueueLink implements SimLink, Steppable {
+/*package*/ class QueueLink implements MobSimLink, Steppable {
 
 	private final static Logger log = Logger.getLogger(QueueLink.class);
 
@@ -120,17 +120,17 @@ import playground.mrieser.core.mobsim.network.api.SimLink;
 	}
 
 	/*package*/ void addVehicleFromIntersection(final SimVehicle vehicle) {
-		insertVehicle(vehicle, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_IMMEDIATELY);
+		insertVehicle(vehicle, MobSimLink.POSITION_AT_FROM_NODE, MobSimLink.PRIORITY_IMMEDIATELY);
 	}
 
 	@Override
 	public void insertVehicle(final SimVehicle vehicle, final double position, final double priority) {
 		double now = this.network.simEngine.getCurrentTime();
-		if (priority == SimLink.PRIORITY_PARKING) {
+		if (priority == MobSimLink.PRIORITY_PARKING) {
 			this.parkedVehicles.put(vehicle.getId(), vehicle);
 			return;
 		}
-		if (position == SimLink.POSITION_AT_FROM_NODE) {
+		if (position == MobSimLink.POSITION_AT_FROM_NODE) {
 			// vehicle enters from intersection
 			this.vehQueue.add(vehicle);
 			double earliestLeaveTime = (int) (now + this.freespeedTravelTime); // (int) for backwards compatibility
@@ -139,7 +139,7 @@ import playground.mrieser.core.mobsim.network.api.SimLink;
 			this.network.simEngine.getEventsManager().processEvent(
 					new LinkEnterEventImpl(now, vehicle.getId(), this.link.getId()));
 		} else {
-			if (priority == SimLink.PRIORITY_IMMEDIATELY) {
+			if (priority == MobSimLink.PRIORITY_IMMEDIATELY) {
 				this.usedStorageCapacity += vehicle.getSizeInEquivalents();
 				// vehicle enters from a driveway
 				this.vehQueue.addFirst(vehicle);

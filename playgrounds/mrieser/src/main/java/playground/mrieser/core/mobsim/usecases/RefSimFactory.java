@@ -34,6 +34,7 @@ import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
+import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 
 public class RefSimFactory implements MobsimFactory {
@@ -70,6 +71,9 @@ public class RefSimFactory implements MobsimFactory {
 		planSim.addSimFeature(teleporter); // how should a user know teleporter is a simfeature?
 		planSim.addSimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
 		planSim.addSimFeature(netFeature); // order of features is important!
+
+		// register agent sources
+		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation()));
 
 		return planSim;
 	}

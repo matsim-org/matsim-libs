@@ -32,12 +32,12 @@ import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.SimKeepAlive;
-import playground.mrieser.core.mobsim.features.SimFeature;
+import playground.mrieser.core.mobsim.features.MobSimFeature;
 
 /**
  * @author mrieser
  */
-public class TeleportationHandler implements DepartureHandler, SimFeature, SimKeepAlive {
+public class TeleportationHandler implements DepartureHandler, MobSimFeature, SimKeepAlive {
 
 	private final static Logger log = Logger.getLogger(TeleportationHandler.class);
 
@@ -72,10 +72,18 @@ public class TeleportationHandler implements DepartureHandler, SimFeature, SimKe
 	}
 
 	@Override
+	public void beforeMobSim() {
+	}
+
+	@Override
 	public void doSimStep(double time) {
 		while ((!this.teleportationList.isEmpty()) && this.teleportationList.peek().getFirst().doubleValue() <= time) {
 			this.simEngine.handleAgent(this.teleportationList.poll().getSecond());
 		}
+	}
+
+	@Override
+	public void afterMobSim() {
 	}
 
 	@Override
@@ -85,6 +93,7 @@ public class TeleportationHandler implements DepartureHandler, SimFeature, SimKe
 
 	/*package*/ static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PlanAgent>>, Serializable {
 		private static final long serialVersionUID = 1L;
+		@Override
 		public int compare(final Tuple<Double, PlanAgent> o1, final Tuple<Double, PlanAgent> o2) {
 			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
 			if (ret == 0) {

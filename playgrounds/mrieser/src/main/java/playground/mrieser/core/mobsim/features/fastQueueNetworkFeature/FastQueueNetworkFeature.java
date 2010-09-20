@@ -23,14 +23,25 @@ import org.matsim.api.core.v01.network.Network;
 
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
-import playground.mrieser.core.mobsim.network.api.SimNetwork;
+import playground.mrieser.core.mobsim.network.api.MobSimNetwork;
 
 public class FastQueueNetworkFeature implements NetworkFeature {
 
-	private final SimNetwork network;
+	private final MobSimNetwork network;
 
 	public FastQueueNetworkFeature(final Network network, final TimestepSimEngine simEngine) {
-		this.network = QueueNetworkCreator.createQueueNetwork(network, simEngine);
+		this.network = QueueNetworkCreator.createQueueNetwork(network, simEngine, new SingleCPUOperator());
+	}
+
+	public FastQueueNetworkFeature(final Network network, final TimestepSimEngine simEngine, final int nOfThreads) {
+		ParallelOperator operator = new ParallelOperator(nOfThreads);
+		this.network = QueueNetworkCreator.createQueueNetwork(network, simEngine, operator);
+		operator.setQueueNetwork((QueueNetwork) this.network);
+	}
+
+	@Override
+	public void beforeMobSim() {
+		this.network.beforeMobSim();
 	}
 
 	@Override
@@ -39,7 +50,12 @@ public class FastQueueNetworkFeature implements NetworkFeature {
 	}
 
 	@Override
-	public SimNetwork getSimNetwork() {
+	public void afterMobSim() {
+		this.network.afterMobSim();
+	}
+
+	@Override
+	public MobSimNetwork getSimNetwork() {
 		return this.network;
 	}
 

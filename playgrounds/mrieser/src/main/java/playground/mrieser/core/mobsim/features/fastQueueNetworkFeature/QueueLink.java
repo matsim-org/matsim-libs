@@ -34,12 +34,13 @@ import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.network.LinkImpl;
 
 import playground.mrieser.core.mobsim.api.SimVehicle;
-import playground.mrieser.core.mobsim.network.api.SimLink;
+import playground.mrieser.core.mobsim.network.api.MobSimLink;
 
-/*package*/ class QueueLink implements SimLink, Steppable {
+/*package*/ class QueueLink implements MobSimLink, Steppable {
 
 	private final static Logger log = Logger.getLogger(QueueLink.class);
 
+	private Operator operator;
 	/*package*/ final QueueNetwork network;
 	/*package*/ final Link link;
 	private boolean active = false;
@@ -76,11 +77,16 @@ import playground.mrieser.core.mobsim.network.api.SimLink;
 
 	private static int spaceCapWarningCount = 0;
 
-	public QueueLink(final Link link, final QueueNetwork network) {
+	public QueueLink(final Link link, final QueueNetwork network, final Operator operator) {
 		this.link = link;
 		this.network = network;
+		this.operator = operator;
 		this.buffer = new QueueBuffer(this);
 		recalculateAttributes();
+	}
+
+	/*package*/ void setOperator(final Operator operator) {
+		this.operator = operator;
 	}
 
 	private void recalculateAttributes() {
@@ -121,17 +127,17 @@ import playground.mrieser.core.mobsim.network.api.SimLink;
 	}
 
 	/*package*/ void addVehicleFromIntersection(final SimVehicle vehicle) {
-		insertVehicle(vehicle, SimLink.POSITION_AT_FROM_NODE, SimLink.PRIORITY_IMMEDIATELY);
+		insertVehicle(vehicle, MobSimLink.POSITION_AT_FROM_NODE, MobSimLink.PRIORITY_IMMEDIATELY);
 	}
 
 	@Override
 	public void insertVehicle(final SimVehicle vehicle, final double position, final double priority) {
 		double now = this.network.simEngine.getCurrentTime();
-		if (priority == SimLink.PRIORITY_PARKING) {
+		if (priority == MobSimLink.PRIORITY_PARKING) {
 			this.parkedVehicles.put(vehicle.getId(), vehicle);
 			return;
 		}
-		if (position == SimLink.POSITION_AT_FROM_NODE) {
+		if (position == MobSimLink.POSITION_AT_FROM_NODE) {
 			activate();
 			// vehicle enters from intersection
 			this.vehQueue.add(vehicle);
@@ -142,7 +148,7 @@ import playground.mrieser.core.mobsim.network.api.SimLink;
 					new LinkEnterEventImpl(now, vehicle.getId(), this.link.getId()));
 		} else {
 			activate();
-			if (priority == SimLink.PRIORITY_IMMEDIATELY) {
+			if (priority == MobSimLink.PRIORITY_IMMEDIATELY) {
 				this.usedStorageCapacity += vehicle.getSizeInEquivalents();
 				// vehicle enters from a driveway
 				this.vehQueue.addFirst(vehicle);
@@ -216,7 +222,7 @@ import playground.mrieser.core.mobsim.network.api.SimLink;
 
 	/*package*/ void activate() {
 		if (!this.active) {
-			this.network.activateLink(this);
+			this.operator.activateLink(this);
 			this.active = true;
 		}
 	}

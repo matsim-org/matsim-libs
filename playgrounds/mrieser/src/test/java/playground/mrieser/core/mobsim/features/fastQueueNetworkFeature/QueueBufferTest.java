@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
@@ -38,10 +37,6 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import playground.mrieser.core.mobsim.api.SimVehicle;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
 import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
-import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueBuffer;
-import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueLink;
-import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueNetwork;
-import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueNode;
 import playground.mrieser.core.mobsim.impl.DefaultSimVehicle;
 
 /**
@@ -207,6 +202,7 @@ public class QueueBufferTest {
 		/*package*/ final QueueNetwork qnet;
 		/*package*/ final QueueLink qlink;
 		/*package*/ final QueueNode qnode;
+		private final Operator operator = new SingleCPUOperator();
 
 		/*package*/ Fixture() {
 			this.net = NetworkImpl.createNetwork();
@@ -220,10 +216,10 @@ public class QueueBufferTest {
 			this.link.setNumberOfLanes(1.0);
 
 			this.engine = new FakeSimEngine();
-			this.qnet = new QueueNetwork(this.engine);
-			this.qlink = new QueueLink(this.link, this.qnet);
+			this.qnet = new QueueNetwork(this.engine, this.operator);
+			this.qlink = new QueueLink(this.link, this.qnet, this.operator);
 			this.qnet.addLink(this.qlink);
-			this.qnode = new QueueNode(node2, this.qnet, new Random(1980));
+			this.qnode = new QueueNode(node2, this.qnet, this.operator, new Random(1980));
 			this.qnet.addNode(this.qnode);
 			this.qlink.buffer.init();
 		}

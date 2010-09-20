@@ -19,11 +19,19 @@
 
 package playground.mrieser.core.mobsim.features;
 
-public class OTFVisFeature implements SimFeature {
+public class OTFVisFeature implements MobSimFeature {
+
+	@Override
+	public void beforeMobSim() {
+	}
 
 	@Override
 	public void doSimStep(double time) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void afterMobSim() {
 	}
 
 }

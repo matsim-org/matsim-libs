@@ -61,12 +61,12 @@ public class UseCase4_OptimizedCarSim {
 
 		if (true) {
 			ew = new EventWriterXML("testEventsNewBln.xml");
-			events.addHandler(ew);
-			Simulation sim = new OptimizedCarSimFactory().createMobsim(scenario, events);
+//			events.addHandler(ew);
+			Simulation sim = new OptimizedCarSimFactory(2).createMobsim(scenario, events);
 			sim.run(); // replace with PlanSimulation.runSim();
 		} else {
 			ew = new EventWriterXML("testEventsOldBln.xml");
-			events.addHandler(ew);
+//			events.addHandler(ew);
 			config.setQSimConfigGroup(new QSimConfigGroup());
 //			config.getQSimConfigGroup().setEndTime(10.0 * 3600);
 			Simulation oldSim = new QSimFactory().createMobsim(scenario, events);

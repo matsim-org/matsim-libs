@@ -26,7 +26,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.impl.DefaultSimVehicle;
-import playground.mrieser.core.mobsim.network.api.SimLink;
+import playground.mrieser.core.mobsim.network.api.MobSimLink;
 
 /**
  * @author mrieser
@@ -67,7 +67,7 @@ public class DefaultSimVehicleTest {
 			return -1.0;
 		}
 		@Override
-		public void handleNextAction(final SimLink link) {
+		public void handleNextAction(final MobSimLink link) {
 		}
 	}
 }

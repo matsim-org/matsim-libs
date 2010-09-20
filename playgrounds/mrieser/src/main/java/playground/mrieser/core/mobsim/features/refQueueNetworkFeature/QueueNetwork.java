@@ -27,12 +27,12 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
-import playground.mrieser.core.mobsim.network.api.SimNetwork;
+import playground.mrieser.core.mobsim.network.api.MobSimNetwork;
 
 /**
  * @author mrieser
  */
-/*package*/ class QueueNetwork implements SimNetwork {
+/*package*/ class QueueNetwork implements MobSimNetwork {
 
 	protected final TimestepSimEngine simEngine;
 	private final Map<Id, QueueLink> links;
@@ -50,6 +50,10 @@ import playground.mrieser.core.mobsim.network.api.SimNetwork;
 	}
 
 	@Override
+	public void beforeMobSim() {
+	}
+
+	@Override
 	public void doSimStep(final double time) {
 		if (this.nodesArray == null) {
 			initialize();
@@ -60,6 +64,10 @@ import playground.mrieser.core.mobsim.network.api.SimNetwork;
 		for (QueueLink link : this.links.values()) {
 			link.doSimStep(time);
 		}
+	}
+
+	@Override
+	public void afterMobSim() {
 	}
 
 	private void initialize() {

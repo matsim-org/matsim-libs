@@ -34,9 +34,19 @@ import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
 import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
 import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
+import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 
 public class OptimizedCarSimFactory implements MobsimFactory {
+
+	private final int nOfThreads;
+
+	/**
+	 * @param nOfThreads use <code>0</code> if you do not want to use threads
+	 */
+	public OptimizedCarSimFactory(final int nOfThreads) {
+		this.nOfThreads = nOfThreads;
+	}
 
 	@Override
 	public Simulation createMobsim(final Scenario scenario, final EventsManager eventsManager) {
@@ -46,7 +56,12 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 		planSim.setSimEngine(engine);
 
 		// setup network
-		FastQueueNetworkFeature netFeature = new FastQueueNetworkFeature(scenario.getNetwork(), engine);
+		FastQueueNetworkFeature netFeature;
+		if (this.nOfThreads == 0) {
+			netFeature = new FastQueueNetworkFeature(scenario.getNetwork(), engine);
+		} else {
+			netFeature = new FastQueueNetworkFeature(scenario.getNetwork(), engine, this.nOfThreads);
+		}
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
@@ -69,6 +84,9 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 		planSim.addSimFeature(teleporter); // how should a user know teleporter is a simfeature?
 		planSim.addSimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
 		planSim.addSimFeature(netFeature); // order of features is important!
+
+		// register agent sources
+		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation()));
 
 		return planSim;
 	}

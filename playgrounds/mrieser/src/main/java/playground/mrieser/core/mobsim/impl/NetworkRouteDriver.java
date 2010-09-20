@@ -28,7 +28,7 @@ import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.api.NewSimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.SimVehicle;
-import playground.mrieser.core.mobsim.network.api.SimLink;
+import playground.mrieser.core.mobsim.network.api.MobSimLink;
 
 public class NetworkRouteDriver implements DriverAgent {
 
@@ -84,13 +84,13 @@ public class NetworkRouteDriver implements DriverAgent {
 	@Override
 	public double getNextActionOnCurrentLink() {
 		if (this.nextLinkId == null) {
-			return SimLink.POSITION_AT_TO_NODE;
+			return MobSimLink.POSITION_AT_TO_NODE;
 		}
 		return -1.0;
 	}
 
 	@Override
-	public void handleNextAction(final SimLink link) {
+	public void handleNextAction(final MobSimLink link) {
 		link.parkVehicle(this.vehicle);
 		this.simEngine.handleAgent(this.agent);
 	}

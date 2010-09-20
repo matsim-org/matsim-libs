@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 
 import playground.mrieser.core.mobsim.api.SimVehicle;
 
-public interface SimLink {
+public interface MobSimLink {
 
 	public static final double POSITION_AT_FROM_NODE = 0.0;
 	public static final double POSITION_AT_TO_NODE = 1.0;
@@ -44,12 +44,12 @@ public interface SimLink {
 	 * between 0.0 and 1.0 may be handled differently by different
 	 * implementations. If a vehicle cannot immediately be inserted into the
 	 * traffic flow, the request is cached and performed once space is available.
-	 * The special case {@link SimLink#PRIORITY_PARKING} is used to initially
+	 * The special case {@link MobSimLink#PRIORITY_PARKING} is used to initially
 	 * place the vehicles on the network.
 	 *
 	 * @param vehicle
-	 * @param position value between 0.0 ({@link SimLink#POSITION_AT_FROM_NODE}) and 1.0 ({@link SimLink#POSITION_AT_TO_NODE})
-	 * @param priority value between 0.0 ({@link SimLink#PRIORITY_AS_SOON_AS_SPACE_AVAILABLE}) and 1.0 ({@link SimLink#PRIORITY_IMMEDIATELY}), or {@link SimLink#PRIORITY_PARKING}.
+	 * @param position value between 0.0 ({@link MobSimLink#POSITION_AT_FROM_NODE}) and 1.0 ({@link MobSimLink#POSITION_AT_TO_NODE})
+	 * @param priority value between 0.0 ({@link MobSimLink#PRIORITY_AS_SOON_AS_SPACE_AVAILABLE}) and 1.0 ({@link MobSimLink#PRIORITY_IMMEDIATELY}), or {@link MobSimLink#PRIORITY_PARKING}.
 	 */
 	public void insertVehicle(final SimVehicle vehicle, final double position, final double priority);
 
@@ -66,7 +66,7 @@ public interface SimLink {
 	 * other traffic.
 	 *
 	 * @param vehicle
-	 * @see SimLink#continueVehicle(SimVehicle)
+	 * @see MobSimLink#continueVehicle(SimVehicle)
 	 */
 	public void stopVehicle(final SimVehicle vehicle);
 
@@ -75,8 +75,8 @@ public interface SimLink {
 	 * vehicle was not stopped or parked before, the method does nothing.
 	 *
 	 * @param vehicle
-	 * @see SimLink#stopVehicle(SimVehicle)
-	 * @see SimLink#parkVehicle(SimVehicle)
+	 * @see MobSimLink#stopVehicle(SimVehicle)
+	 * @see MobSimLink#parkVehicle(SimVehicle)
 	 */
 	public void continueVehicle(final SimVehicle vehicle);
 
@@ -86,8 +86,8 @@ public interface SimLink {
 	 * nothing happens.
 	 *
 	 * @param vehicle
-	 * @see SimLink#getParkedVehicle(Id)
-	 * @see SimLink#continueVehicle(SimVehicle)
+	 * @see MobSimLink#getParkedVehicle(Id)
+	 * @see MobSimLink#continueVehicle(SimVehicle)
 	 */
 	public void parkVehicle(final SimVehicle vehicle);
 

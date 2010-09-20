@@ -19,11 +19,19 @@
 
 package playground.mrieser.core.mobsim.features;
 
-public class SignalSystemsFeature implements SimFeature {
+public class SignalSystemsFeature implements MobSimFeature {
+
+	@Override
+	public void beforeMobSim() {
+	}
 
 	@Override
 	public void doSimStep(double time) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void afterMobSim() {
 	}
 
 }

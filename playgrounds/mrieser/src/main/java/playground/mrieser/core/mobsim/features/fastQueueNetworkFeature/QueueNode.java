@@ -31,9 +31,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
 
 import playground.mrieser.core.mobsim.api.SimVehicle;
-import playground.mrieser.core.mobsim.network.api.SimNode;
+import playground.mrieser.core.mobsim.network.api.MobSimNode;
 
-/*package*/ class QueueNode implements SimNode {
+/*package*/ class QueueNode implements MobSimNode {
 
 	private final static Logger log = Logger.getLogger(QueueNode.class);
 
@@ -45,10 +45,12 @@ import playground.mrieser.core.mobsim.network.api.SimNode;
 	private final QueueLink[] tempLinks;
 	private final Random random;
 	private boolean active = false;
+	private Operator operator;
 
-	public QueueNode(final Node node, final QueueNetwork network, final Random random) {
+	public QueueNode(final Node node, final QueueNetwork network, final Operator operator, final Random random) {
 		this.node = node;
 		this.network = network;
+		this.operator = operator;
 		this.random = random;
 		this.inLinks = new QueueLink[node.getInLinks().size()];
 		this.tempLinks = new QueueLink[node.getInLinks().size()];
@@ -214,8 +216,11 @@ import playground.mrieser.core.mobsim.network.api.SimNode;
 	/*package*/ void activate() {
 		if (!this.active) {
 			this.active = true;
-			this.network.activateNode(this);
+			this.operator.activateNode(this);
 		}
 	}
 
+	/*package*/ void setOperator(final Operator operator) {
+		this.operator = operator;
+	}
 }

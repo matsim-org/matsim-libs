@@ -17,29 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.api;
+package playground.mrieser.core.mobsim.network.api;
+
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.Steppable;
 
-import playground.mrieser.core.mobsim.network.api.MobSimLink;
+public interface MobSimNetwork extends Steppable {
 
-public interface DriverAgent {
+	public void beforeMobSim();
 
-	/**
-	 * Returns the next link the vehicle will drive along.
-	 *
-	 * @return The next link the vehicle will drive on, or null if an error has happened.
-	 */
-	public Id getNextLinkId();
+	public void afterMobSim();
 
-	public void notifyMoveToNextLink();
+	Map<Id, ? extends MobSimLink> getLinks();
 
-	/**
-	 * @return value between 0.0 and 1.0 (both included) for signaling there is an
-	 * action to be performed, any other value (e.g. -1.0) for "no action on this link"
-	 */
-	public double getNextActionOnCurrentLink();
-
-	public void handleNextAction(final MobSimLink link);
+	Map<Id, ? extends MobSimNode> getNodes();
 
 }

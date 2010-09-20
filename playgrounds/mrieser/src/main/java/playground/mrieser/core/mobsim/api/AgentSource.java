@@ -17,17 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.network.api;
+package playground.mrieser.core.mobsim.api;
 
-import java.util.Map;
+import java.util.List;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.Steppable;
+/**
+ * @author mrieser
+ */
+public interface AgentSource {
 
-public interface SimNetwork extends Steppable {
-
-	Map<Id, ? extends SimLink> getLinks();
-
-	Map<Id, ? extends SimNode> getNodes();
+	public List<PlanAgent> getAgents();
 
 }

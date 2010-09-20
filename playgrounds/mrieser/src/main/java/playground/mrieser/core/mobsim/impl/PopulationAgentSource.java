@@ -17,29 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.api;
+package playground.mrieser.core.mobsim.impl;
 
-import org.matsim.api.core.v01.Id;
+import java.util.ArrayList;
+import java.util.List;
 
-import playground.mrieser.core.mobsim.network.api.MobSimLink;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 
-public interface DriverAgent {
+import playground.mrieser.core.mobsim.api.AgentSource;
+import playground.mrieser.core.mobsim.api.PlanAgent;
 
-	/**
-	 * Returns the next link the vehicle will drive along.
-	 *
-	 * @return The next link the vehicle will drive on, or null if an error has happened.
-	 */
-	public Id getNextLinkId();
+public class PopulationAgentSource implements AgentSource {
 
-	public void notifyMoveToNextLink();
+	private final Population population;
 
-	/**
-	 * @return value between 0.0 and 1.0 (both included) for signaling there is an
-	 * action to be performed, any other value (e.g. -1.0) for "no action on this link"
-	 */
-	public double getNextActionOnCurrentLink();
+	public PopulationAgentSource(final Population population) {
+		this.population = population;
+	}
 
-	public void handleNextAction(final MobSimLink link);
+	@Override
+	public List<PlanAgent> getAgents() {
+		List<PlanAgent> agents = new ArrayList<PlanAgent>(this.population.getPersons().size());
+		for (Person person : this.population.getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			agents.add(new DefaultPlanAgent(plan));
+		}
+		return agents;
+	}
 
 }

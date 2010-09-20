@@ -17,29 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.api;
+package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 
-import org.matsim.api.core.v01.Id;
+/*package*/ interface Operator {
 
-import playground.mrieser.core.mobsim.network.api.MobSimLink;
+	public void activateNode(final QueueNode node);
 
-public interface DriverAgent {
+	public void activateLink(final QueueLink link);
 
-	/**
-	 * Returns the next link the vehicle will drive along.
-	 *
-	 * @return The next link the vehicle will drive on, or null if an error has happened.
-	 */
-	public Id getNextLinkId();
+	public void beforeMobSim();
 
-	public void notifyMoveToNextLink();
+	public void doSimStep(final double time);
 
-	/**
-	 * @return value between 0.0 and 1.0 (both included) for signaling there is an
-	 * action to be performed, any other value (e.g. -1.0) for "no action on this link"
-	 */
-	public double getNextActionOnCurrentLink();
-
-	public void handleNextAction(final MobSimLink link);
+	public void afterMobSim();
 
 }

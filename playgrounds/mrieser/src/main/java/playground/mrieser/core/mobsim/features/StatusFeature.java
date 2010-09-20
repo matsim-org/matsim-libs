@@ -22,7 +22,7 @@ package playground.mrieser.core.mobsim.features;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.Time;
 
-public class StatusFeature implements SimFeature {
+public class StatusFeature implements MobSimFeature {
 
 	private final static Logger log = Logger.getLogger(StatusFeature.class);
 
@@ -31,6 +31,10 @@ public class StatusFeature implements SimFeature {
 	private boolean isFirst = true;
 	private double firstTime = Double.NaN;
 	private long firstRealTime = 0;
+
+	@Override
+	public void beforeMobSim() {
+	}
 
 	@Override
 	public void doSimStep(final double time) {
@@ -45,6 +49,10 @@ public class StatusFeature implements SimFeature {
 		while (this.nextTime <= time) {
 			this.nextTime += 3600.0;
 		}
+	}
+
+	@Override
+	public void afterMobSim() {
 	}
 
 }

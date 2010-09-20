@@ -28,17 +28,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.mrieser.core.mobsim.api.DriverAgent;
 import playground.mrieser.core.mobsim.api.SimVehicle;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
 import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
-import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueLink;
-import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueNetwork;
-import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.QueueNode;
-import playground.mrieser.core.mobsim.network.api.SimLink;
+import playground.mrieser.core.mobsim.network.api.MobSimLink;
 
 /**
  * @author mrieser
@@ -182,6 +178,7 @@ public class QueueNodeTest {
 		/*package*/ final QueueLink qlink2;
 		/*package*/ final QueueLink qlink3;
 		/*package*/ final QueueNode qnode;
+		private final Operator operator = new SingleCPUOperator();
 
 		/*package*/ Fixture() {
 			Node node1;
@@ -212,17 +209,17 @@ public class QueueNodeTest {
 			this.net.addLink(this.link2);
 			this.net.addLink(this.link3);
 			this.engine = new FakeSimEngine();
-			this.qnet = new QueueNetwork(this.engine);
-			this.qlink1 = new QueueLink(this.link1, this.qnet);
-			this.qlink2 = new QueueLink(this.link2, this.qnet);
-			this.qlink3 = new QueueLink(this.link3, this.qnet);
+			this.qnet = new QueueNetwork(this.engine, this.operator);
+			this.qlink1 = new QueueLink(this.link1, this.qnet, this.operator);
+			this.qlink2 = new QueueLink(this.link2, this.qnet, this.operator);
+			this.qlink3 = new QueueLink(this.link3, this.qnet, this.operator);
 			this.qnet.addLink(this.qlink1);
 			this.qnet.addLink(this.qlink2);
 			this.qnet.addLink(this.qlink3);
-			QueueNode qn1 = new QueueNode(node1, this.qnet, new Random(1));
-			QueueNode qn2 = new QueueNode(node2, this.qnet, new Random(1));
-			this.qnode = new QueueNode(node3, this.qnet, new Random(1));
-			QueueNode qn4 = new QueueNode(node4, this.qnet, new Random(1));
+			QueueNode qn1 = new QueueNode(node1, this.qnet, this.operator, new Random(1));
+			QueueNode qn2 = new QueueNode(node2, this.qnet, this.operator, new Random(1));
+			this.qnode = new QueueNode(node3, this.qnet, this.operator, new Random(1));
+			QueueNode qn4 = new QueueNode(node4, this.qnet, this.operator, new Random(1));
 			this.qnet.addNode(qn1);
 			this.qnet.addNode(qn2);
 			this.qnet.addNode(this.qnode);
@@ -248,7 +245,7 @@ public class QueueNodeTest {
 			return -1.0;
 		}
 		@Override
-		public void handleNextAction(final SimLink link) {
+		public void handleNextAction(final MobSimLink link) {
 		}
 	}
 
