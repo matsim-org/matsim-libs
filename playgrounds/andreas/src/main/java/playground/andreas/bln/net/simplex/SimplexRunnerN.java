@@ -29,9 +29,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
-import playground.jhackney.optimization.Objective;
-import playground.jhackney.optimization.ParamPoint;
-import playground.jhackney.optimization.SimplexOptimization;
+import playground.andreas.optimization.Objective;
+import playground.andreas.optimization.ParamPoint;
+import playground.andreas.optimization.SimplexOptimization;
 
 
 public class SimplexRunnerN {
