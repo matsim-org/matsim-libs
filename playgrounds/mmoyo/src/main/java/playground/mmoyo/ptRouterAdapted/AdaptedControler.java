@@ -46,6 +46,10 @@ public class AdaptedControler extends Controler {
 		super(scenario);
 	}
 	
+	public AdaptedControler(final Config config) {
+		super(config);
+	}
+	
 	//loads the AdaptedStrategyManagerConfigLoader to get the MmoyoTimeAllocationMutatorReRoute strategy
 	@Override
 	protected StrategyManager loadStrategyManager() {
