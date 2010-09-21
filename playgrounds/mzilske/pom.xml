@@ -25,6 +25,11 @@
 			<id>openstreetmap-snapshots</id>
 			<url>https://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
 		</repository>
+		<repository>
+			<id>geotools</id>
+			<name>Geotools repository</name>
+			<url>http://maven.geotools.fr/repository</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
