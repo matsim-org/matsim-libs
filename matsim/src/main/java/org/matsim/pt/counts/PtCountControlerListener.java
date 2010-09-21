@@ -30,9 +30,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 
-/**
- * @author yu
- */
 public class PtCountControlerListener implements StartupListener, IterationEndsListener {
 
 	private final static String MODULE_NAME = "ptCounts";

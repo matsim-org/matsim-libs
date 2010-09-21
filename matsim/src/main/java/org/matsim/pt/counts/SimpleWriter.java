@@ -12,9 +12,10 @@ import java.io.IOException;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
- * a small and simple writer
+ * a small and simple writer, in order to avoid copious "try" and "catch" for
+ * "Exception"
  * 
- * @author yu
+ * @author yChen
  * 
  */
 public class SimpleWriter implements Closeable, Flushable {

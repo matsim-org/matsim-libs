@@ -59,9 +59,6 @@ import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.NetworkFeatureFactory;
 
-/**
- * @author dgrether
- */
 public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	/**
 	 * constant for the name of the stops

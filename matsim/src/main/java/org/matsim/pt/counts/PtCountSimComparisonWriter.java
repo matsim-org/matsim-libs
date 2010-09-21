@@ -28,10 +28,6 @@ import java.util.List;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.CountSimComparisonTimeFilter;
 
-/**
- * @author yu
- * 
- */
 public abstract class PtCountSimComparisonWriter {
 	protected int iter;
 

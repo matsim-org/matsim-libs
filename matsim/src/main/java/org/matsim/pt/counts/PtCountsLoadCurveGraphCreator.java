@@ -34,10 +34,6 @@ import org.matsim.counts.algorithms.graphs.CountsGraphsCreator;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
 import org.matsim.counts.algorithms.graphs.helper.MyURL;
 
-/**
- * @author yu
- *
- */
 public class PtCountsLoadCurveGraphCreator extends CountsGraphsCreator {
 
 	/**

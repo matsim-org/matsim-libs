@@ -42,7 +42,7 @@ import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
- * @author yu
+ * @author yChen
  * 
  */
 public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,

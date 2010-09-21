@@ -29,10 +29,6 @@ import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
-/**
- * @author yu
- *
- */
 public class PtBoardCountComparisonAlgorithm extends
 		PtCountsComparisonAlgorithm {
 

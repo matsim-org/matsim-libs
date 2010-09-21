@@ -33,10 +33,8 @@ import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 
 /**
- * This algorithm can be used to obtain a List of CountSimComparison objects
- * from the LinkAttributes of a run. A time filter can be specified.
- *
- * @author dgrether
+ * This is a modified copy of CountsComparisonAlgorithm, in order to realize the
+ * same functionality for pt counts.
  */
 public abstract class PtCountsComparisonAlgorithm {
 	/**
