@@ -63,11 +63,11 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public class BavariaGvCreator {
 
-	public static final String shapeFile = DgPaths.SCMWORKSPACE + "shared-svn/projects/detailedEval/Net/shapeFromVISUM/Verkehrszellen_Umrisse_area.SHP";
+	public static final String shapeFile = DgPaths.REPOS + "shared-svn/projects/detailedEval/Net/shapeFromVISUM/Verkehrszellen_Umrisse_area.SHP";
 	
 	private static final String popPrognose2025_2004 = "";
 	
-	private static final String netPrognose2025_2004 = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/demand/network_cleaned_wgs84.xml.gz";
+	private static final String netPrognose2025_2004 = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/network_cleaned_wgs84.xml.gz";
 	
 	private static final String events2004 = "";
 

@@ -41,26 +41,26 @@ public class DgPrognose2025Files2WGS84Converter {
 
 	private static final Logger log = Logger.getLogger(DgPrognose2025Files2WGS84Converter.class);
 	
-	private String knoten2004strasse = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten.csv";
-	private String knoten2004strasseOut = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten_wgs84.csv";
-	private String knoten2004wasser = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/wasser/knoten.csv";
-	private String knoten2004wasserOut = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/wasser/knoten_wgs84.csv";
-	private String knoten2004schiene = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/schiene/knoten.csv";
-	private String knoten2004schieneOut = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/schiene/knoten_wgs84.csv";
-	private String knoten2004luft = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/luft/knoten.csv";
-	private String knoten2004luftOut = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/luft/knoten_wgs84.csv";
+	private String knoten2004strasse = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten.csv";
+	private String knoten2004strasseOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten_wgs84.csv";
+	private String knoten2004wasser = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/wasser/knoten.csv";
+	private String knoten2004wasserOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/wasser/knoten_wgs84.csv";
+	private String knoten2004schiene = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/schiene/knoten.csv";
+	private String knoten2004schieneOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/schiene/knoten_wgs84.csv";
+	private String knoten2004luft = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/luft/knoten.csv";
+	private String knoten2004luftOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/luft/knoten_wgs84.csv";
 	
-	private String knoten2025strasse = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/strasse/knoten.csv";
-	private String knoten2025strasseOut = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/strasse/knoten_wgs84.csv";
-	private String knoten2025wasser = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/wasser/knoten.csv";
-	private String knoten2025wasserOut = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/wasser/knoten_wgs84.csv";
-	private String knoten2025schiene = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/schiene/knoten.csv";
-	private String knoten2025schieneOut = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/schiene/knoten_wgs84.csv";
-	private String knoten2025luft = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/luft/knoten.csv";
-	private String knoten2025luftOut = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/luft/knoten_wgs84.csv";
+	private String knoten2025strasse = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/strasse/knoten.csv";
+	private String knoten2025strasseOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/strasse/knoten_wgs84.csv";
+	private String knoten2025wasser = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/wasser/knoten.csv";
+	private String knoten2025wasserOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/wasser/knoten_wgs84.csv";
+	private String knoten2025schiene = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/schiene/knoten.csv";
+	private String knoten2025schieneOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/schiene/knoten_wgs84.csv";
+	private String knoten2025luft = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/luft/knoten.csv";
+	private String knoten2025luftOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/luft/knoten_wgs84.csv";
 	
 	
-	private String f = DgPaths.SCMWORKSPACE + "shared-svn/studies/countries/de/prognose_2025/orig/netze/coordinateTransformationLookupTable.csv";
+	private String f = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/coordinateTransformationLookupTable.csv";
 	private ApproximatelyCoordianteTransformation transform = new ApproximatelyCoordianteTransformation(f);
 	
 	private void startConversion(String file, String outFile, int indexX, int indexY) {

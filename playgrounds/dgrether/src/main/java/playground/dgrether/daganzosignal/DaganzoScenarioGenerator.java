@@ -76,7 +76,7 @@ public class DaganzoScenarioGenerator {
 
 	public static String DAGANZO_SVN_DIR = "shared-svn/studies/dgrether/daganzo2010/";
 
-	public static String DAGANZOBASEDIR = DgPaths.SCMWORKSPACE + DAGANZO_SVN_DIR;
+	public static String DAGANZOBASEDIR = DgPaths.REPOS + DAGANZO_SVN_DIR;
 
 	public static final String DAGANZO_NETWORK = "daganzoNetwork2.xml";
 	

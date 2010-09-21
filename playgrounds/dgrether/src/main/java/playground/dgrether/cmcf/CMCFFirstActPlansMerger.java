@@ -40,11 +40,11 @@ public class CMCFFirstActPlansMerger {
 
 	private static final Logger log = Logger.getLogger(CMCFFirstActPlansMerger.class);
 
-  private static final String cmcfPlansFile = DgPaths.SCMWORKSPACE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_simplified_acts_types_reduced_cmcf.xml";
+  private static final String cmcfPlansFile = DgPaths.REPOS + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_simplified_acts_types_reduced_cmcf.xml";
 
-  private static final String plansFile = DgPaths.SCMWORKSPACE + "studies/schweiz-ivtch/baseCase/plans/plans_miv_zrh30km_10pct.xml.gz";
+  private static final String plansFile = DgPaths.REPOS + "studies/schweiz-ivtch/baseCase/plans/plans_miv_zrh30km_10pct.xml.gz";
 
-  private static final String outPlansFile = DgPaths.SCMWORKSPACE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_cmcf_first_act.xml.gz";
+  private static final String outPlansFile = DgPaths.REPOS + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_cmcf_first_act.xml.gz";
 
 	/**
 	 * @param args

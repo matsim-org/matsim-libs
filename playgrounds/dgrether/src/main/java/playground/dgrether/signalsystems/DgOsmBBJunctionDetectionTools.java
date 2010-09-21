@@ -268,7 +268,7 @@ public class DgOsmBBJunctionDetectionTools {
 			final IconStyle iconstyle = new IconStyle();
 			style.setIconStyle(iconstyle);
 			String hexColor = Integer.toHexString(i * colorSteps);
-			iconstyle.setColor("ff00" + hexColor + hexColor);
+			iconstyle.setColor("ff" + hexColor + hexColor);
 			iconstyle.setColorMode(ColorMode.NORMAL);
 			iconstyle.setScale(0.7d);
 

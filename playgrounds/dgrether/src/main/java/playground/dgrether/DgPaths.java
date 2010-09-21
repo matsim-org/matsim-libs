@@ -31,19 +31,13 @@ public interface DgPaths {
 
 	final String REPOS = WORKBASE + "repos/";
 
-	/**
-	 * @deprecated use REPOS instead
-	 */
-	@Deprecated 
-	final String SCMWORKSPACE = REPOS;
-	
 	final String WSBASE = WORKBASE + "matsimHeadWorkspace/";
 	
 	final String VSPCVSBASE = WORKBASE + "repos/vsp-cvs/";
 	
-	final String SHAREDSVN = SCMWORKSPACE + "shared-svn/";
+	final String SHAREDSVN = REPOS + "shared-svn/";
 
-  final String RUNBASE = SCMWORKSPACE + "runs-svn/";
+  final String RUNBASE = REPOS + "runs-svn/";
 
   final String IVTCHNET = SHAREDSVN + "studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
   

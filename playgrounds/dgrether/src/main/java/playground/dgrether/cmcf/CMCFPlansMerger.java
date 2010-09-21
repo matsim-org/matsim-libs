@@ -41,7 +41,7 @@ public class CMCFPlansMerger {
 
 	private static final Logger log = Logger.getLogger(CMCFPlansMerger.class);
 
-	private static final String plansFile = DgPaths.SCMWORKSPACE + "studies/schweiz-ivtch/baseCase/plans/plans_miv_zrh30km_10pct.xml.gz";
+	private static final String plansFile = DgPaths.REPOS + "studies/schweiz-ivtch/baseCase/plans/plans_miv_zrh30km_10pct.xml.gz";
 
 //	private static final String cmcfPlansFile = DgPaths.VSPSVNBASE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_one_act_cmcf.xml";
 
@@ -49,9 +49,9 @@ public class CMCFPlansMerger {
 
   //new paths nov 08
 
-	private static final String cmcfPlansFile = DgPaths.SCMWORKSPACE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_one_act_newcmcf.xml.gz";
+	private static final String cmcfPlansFile = DgPaths.REPOS + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_one_act_newcmcf.xml.gz";
 
-	private static final String outPlansFile = DgPaths.SCMWORKSPACE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_all_acts_newcmcf.xml.gz";
+	private static final String outPlansFile = DgPaths.REPOS + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_all_acts_newcmcf.xml.gz";
 
 	/**
 	 * @param args

@@ -35,7 +35,7 @@ public class CmcfOtfStarter {
 	public static void main(String[] args) {
 		String base = DgPaths.VSPCVSBASE + "runs/run";
 		 
-		String networkFileOld = DgPaths.SCMWORKSPACE + "studies/dgrether/cmcf/daganzoNetworkOldRenamed.xml";
+		String networkFileOld = DgPaths.REPOS + "studies/dgrether/cmcf/daganzoNetworkOldRenamed.xml";
 
 		String networkFile 	= networkFileOld;
 		

@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -52,20 +52,20 @@ public class CMCFScenarioGeneratorNoReroute {
 	private static final Logger log = Logger
 			.getLogger(CMCFScenarioGeneratorNoReroute.class);
 
-	private static final String networkFileOld = DgPaths.SCMWORKSPACE
+	private static final String networkFileOld = DgPaths.REPOS
 			+ "studies/dgrether/cmcf/daganzoNetworkOldRenamed.xml";
 
-	public static final String networkFileNew = DgPaths.SCMWORKSPACE
+	public static final String networkFileNew = DgPaths.REPOS
 			+ "studies/dgrether/cmcf/daganzoNetworkLessBottleneck.xml";
 
 	// public static final String networkFile = networkFileOld;
 
 	public static final String networkFile = networkFileNew;
 
-	private static final String plans1Out = DgPaths.SCMWORKSPACE
+	private static final String plans1Out = DgPaths.REPOS
 			+ "studies/dgrether/cmcf/daganzoPlansNoReroute.xml";
 
-	private static final String plans2Out = DgPaths.SCMWORKSPACE
+	private static final String plans2Out = DgPaths.REPOS
 			+ "studies/dgrether/cmcf/daganzoPlansAltRouteNoReroute.xml";
 
 	// public static final String config1Out = DgPaths.VSPSVNBASE +
@@ -74,10 +74,10 @@ public class CMCFScenarioGeneratorNoReroute {
 	// public static final String config2Out = DgPaths.VSPSVNBASE +
 	// "studies/dgrether/cmcf/daganzoConfigAltRoute.xml";
 
-	public static final String config1Out = DgPaths.SCMWORKSPACE
+	public static final String config1Out = DgPaths.REPOS
 			+ "studies/dgrether/cmcf/daganzoConfigNoReroute.xml";
 
-	public static final String config2Out = DgPaths.SCMWORKSPACE
+	public static final String config2Out = DgPaths.REPOS
 			+ "studies/dgrether/cmcf/daganzoConfigAltRouteNoReroute.xml";
 
 	public static String configOut, plansOut;

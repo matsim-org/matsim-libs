@@ -31,9 +31,9 @@ import playground.dgrether.DgPaths;
 public class CMCFConfigRunner {
 
 	
-	private static final String configSO = DgPaths.SCMWORKSPACE + "studies/dgrether/cmcf/daganzoConfig_cmcf_so.xml";
+	private static final String configSO = DgPaths.REPOS + "studies/dgrether/cmcf/daganzoConfig_cmcf_so.xml";
 	
-	private static final String configUE = DgPaths.SCMWORKSPACE + "studies/dgrether/cmcf/daganzoConfig_cmcf_ue.xml";
+	private static final String configUE = DgPaths.REPOS + "studies/dgrether/cmcf/daganzoConfig_cmcf_ue.xml";
 	
 	private static final String config	= configUE;
 	
