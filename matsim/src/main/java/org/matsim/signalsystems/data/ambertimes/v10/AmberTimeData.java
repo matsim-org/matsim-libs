@@ -36,6 +36,7 @@ public interface AmberTimeData {
 	
 	public Integer getDefaultAmber();
 	
+	
 	public Integer getRedAmberOfSignal(Id signalId);
 	
 	public Integer getAmberOfSignal(Id signalId);
@@ -43,6 +44,12 @@ public interface AmberTimeData {
 	public void setAmberTimeOfSignal(Id signalId, Integer seconds);
 	
 	public void setRedAmberTimeOfSignal(Id signalId, Integer seconds);
+	
+
+	public void setDefaultRedAmber(Integer seconds);
+	
+	public void setDefaultAmber(Integer seconds);
+
 	
 	/**
 	 * @return A map with signal ids as keys and amber times for that signal in seconds as values
@@ -53,4 +60,5 @@ public interface AmberTimeData {
 	 */
 	public Map<Id, Integer> getSignalRedAmberMap();
 	
+
 }

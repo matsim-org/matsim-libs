@@ -36,9 +36,16 @@ public interface AmberTimesData {
 	
 	public Integer getDefaultAmber();
 	
+	
 	public Map<Id, AmberTimeData> getAmberTimeDataBySystemId();
 	
 	public void addAmberTimeData(AmberTimeData amberTimeData);
+	
+	public void setDefaultRedAmber(Integer seconds);
+	
+	public void setDefaultAmber(Integer seconds);
+	
+	public void setDefaultAmberTimeGreen(Double proportion);
 	
 }
 
