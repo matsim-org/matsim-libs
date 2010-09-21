@@ -92,23 +92,27 @@ public class PtRouteUtill {
 	}
 
 	public List<Link> getLinks(){
-		int firstLinkIndex = this.transitRoute.getRoute().getLinkIds().indexOf(this.expTrRoute.getStartLinkId());
-		int lastLinkIndex = this.transitRoute.getRoute().getLinkIds().indexOf(this.expTrRoute.getEndLinkId());
+		List<Id> completeIdList = new ArrayList<Id>();
+		completeIdList.add(this.transitRoute.getRoute().getStartLinkId());
+		completeIdList.addAll(1, this.transitRoute.getRoute().getLinkIds());
+		completeIdList.add(this.transitRoute.getRoute().getEndLinkId());
 		
-		//System.out.println(this.expTrRoute.getStartLinkId() + " firstLinkIndex " + firstLinkIndex);
-		//System.out.println(this.expTrRoute.getEndLinkId() + " lastLinkIndex " + lastLinkIndex);
-		
+		int firstLinkIndex = completeIdList.indexOf(this.expTrRoute.getStartLinkId());
+		int lastLinkIndex = completeIdList.indexOf(this.expTrRoute.getEndLinkId());
+	
 		if (firstLinkIndex == -1){
 			throw new RuntimeException("first link of transitRoute does not exit: " + this.expTrRoute.getStartLinkId() ); 
 		} 
 		if (lastLinkIndex == -1){
+			System.err.println(this.expTrRoute.getRouteDescription());
+			System.err.println(completeIdList.toString());
 			throw new RuntimeException("last link of transitRoute does not exit: " + this.expTrRoute.getEndLinkId() );
 		}
-
+		
 		//<- the description should include also initial and final node
 		List<Link> linkList= new ArrayList<Link>();
 		for (int linkIndex = firstLinkIndex; linkIndex <= lastLinkIndex; linkIndex++) {
-			Id linkId = this.transitRoute.getRoute().getLinkIds().get(linkIndex);
+			Id linkId = completeIdList.get(linkIndex);
 			linkList.add(this.network.getLinks().get(linkId));
 		}
 	
