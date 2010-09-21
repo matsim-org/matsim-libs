@@ -27,17 +27,15 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.MappedLocation;
 
 /**
  * Feasible mode chain analysis according to section 3.2 of
@@ -186,17 +184,19 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
 		boolean isModeChainFeasible = true;
 
-		MappedLocation currentLocation = null, requiredLocation = null, nextLocation = null;
+//		MappedLocation currentLocation = null, requiredLocation = null, nextLocation = null;
+		BasicLocation currentLocation = null, requiredLocation = null, nextLocation = null;
 
 		// setup the trackers for all chain-based modes, set all chain-based modes starting at the first location (usually home)
-		HashMap<String, MappedLocation> modeTracker = new HashMap<String, MappedLocation>();
+//		HashMap<String, MappedLocation> modeTracker = new HashMap<String, MappedLocation>();
+		HashMap<String, BasicLocation> modeTracker = new HashMap<String, BasicLocation>();
 		for (String mode : candidate) {
 			if (!modeTracker.containsKey(mode)) {
 				if (chainBasedModes.contains(mode)) {
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
-						currentLocation = (MappedLocation) facilities.getFacilities().get(((PlanImpl) plan).getFirstActivity().getFacilityId());
+						currentLocation = (BasicLocation) facilities.getFacilities().get(((PlanImpl) plan).getFirstActivity().getFacilityId());
 					} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
-						currentLocation = (MappedLocation) network.getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId());
+						currentLocation = (BasicLocation) network.getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId());
 					}
 					modeTracker.put(mode, currentLocation);
 				}
@@ -215,15 +215,15 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 				if (chainBasedModes.contains(legMode)) {
 					currentLocation = modeTracker.get(legMode);
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
-						requiredLocation = (MappedLocation) facilities.getFacilities().get(((PlanImpl) plan).getPreviousActivity(currentLeg).getFacilityId());
+						requiredLocation = (BasicLocation) facilities.getFacilities().get(((PlanImpl) plan).getPreviousActivity(currentLeg).getFacilityId());
 					} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
-						requiredLocation = (MappedLocation) network.getLinks().get(((PlanImpl) plan).getPreviousActivity(currentLeg).getLinkId());
+						requiredLocation = (BasicLocation) network.getLinks().get(((PlanImpl) plan).getPreviousActivity(currentLeg).getLinkId());
 					}
 					if (currentLocation.equals(requiredLocation)) {
 						if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
-							nextLocation = (MappedLocation) facilities.getFacilities().get(((PlanImpl) plan).getNextActivity(currentLeg).getFacilityId());
+							nextLocation = (BasicLocation) facilities.getFacilities().get(((PlanImpl) plan).getNextActivity(currentLeg).getFacilityId());
 						} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
-							nextLocation = (MappedLocation) network.getLinks().get(((PlanImpl) plan).getNextActivity(currentLeg).getLinkId());
+							nextLocation = (BasicLocation) network.getLinks().get(((PlanImpl) plan).getNextActivity(currentLeg).getLinkId());
 						}
 						modeTracker.put(legMode, nextLocation);
 					} else {
@@ -240,15 +240,15 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 		if (isModeChainFeasible) {
 
 			// chain-based modes must finish at the location of the last activity of the plan
-			HashSet<MappedLocation> allowedLocations = new HashSet<MappedLocation>();
+			HashSet<BasicLocation> allowedLocations = new HashSet<BasicLocation>();
 			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility
 					.equals(tripStructureAnalysisLayer)) {
-				allowedLocations.add((MappedLocation) facilities.getFacilities().get(((PlanImpl) plan).getFirstActivity().getFacilityId()));
-				allowedLocations.add((MappedLocation) facilities.getFacilities().get(((PlanImpl) plan).getLastActivity().getFacilityId()));
+				allowedLocations.add((BasicLocation) facilities.getFacilities().get(((PlanImpl) plan).getFirstActivity().getFacilityId()));
+				allowedLocations.add((BasicLocation) facilities.getFacilities().get(((PlanImpl) plan).getLastActivity().getFacilityId()));
 			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link
 					.equals(tripStructureAnalysisLayer)) {
-				allowedLocations.add((MappedLocation) network.getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId()));
-				allowedLocations.add((MappedLocation) network.getLinks().get(((PlanImpl) plan).getLastActivity().getLinkId()));
+				allowedLocations.add((BasicLocation) network.getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId()));
+				allowedLocations.add((BasicLocation) network.getLinks().get(((PlanImpl) plan).getLastActivity().getLinkId()));
 			}
 
 			Iterator<String> modeTrackerCheck = modeTracker.keySet().iterator();
