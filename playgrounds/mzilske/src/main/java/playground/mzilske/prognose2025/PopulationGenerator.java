@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -18,6 +19,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -27,7 +29,11 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 public class PopulationGenerator implements Runnable {
-
+	
+//	private static final Logger log = Logger.getLogger(PopulationGenerator.class);
+	
+	private Random random = MatsimRandom.getLocalInstance();
+	
 	private static Point getRandomPointInFeature(Random rnd, Geometry g) {
 		Point p = null;
 		double x, y;
@@ -191,8 +197,7 @@ public class PopulationGenerator implements Runnable {
 	}
 
 	private Coord shoot(Zone source) {
-		Random r = new Random();
-		Point point = getRandomPointInFeature(r, source.geometry);
+		Point point = getRandomPointInFeature(this.random, source.geometry);
 		CoordImpl coordImpl = new CoordImpl(point.getX(), point.getY());
 		// return ct.transform(coordImpl);
 		return coordImpl;
@@ -225,6 +230,7 @@ public class PopulationGenerator implements Runnable {
 				return zone;
 			}
 		}
+//		log.error("Cannot find zone for coordinate: " + coord);
 		return null;
 	}
 	
