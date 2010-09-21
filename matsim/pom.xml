@@ -155,10 +155,10 @@
 			<name>Geotools repository</name>
 			<url>http://maven.geotools.fr/repository</url>
 		</repository>
-		<repository>
+		<!--repository>
 			<id>org.codehaus.mojo</id>
 			<url>http://repository.codehaus.org/org/codehaus/mojo/</url>
-		</repository>
+		</repository-->
 		<repository>
 			<id>matsim</id>
 			<url>http://matsim.org/m2repo</url>
