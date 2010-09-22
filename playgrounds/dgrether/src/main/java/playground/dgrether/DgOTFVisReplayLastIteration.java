@@ -20,7 +20,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.ptproject.qsim.QSim;
@@ -70,7 +69,7 @@ public class DgOTFVisReplayLastIteration {
     configReader.readFile(newConfigFile);
     ControlerIO oldConfControlerIO;
     if (config.controler().getRunId() != null){
-      oldConfControlerIO = new ControlerIO(currentDirectory, new IdImpl(config.controler().getRunId()));   
+      oldConfControlerIO = new ControlerIO(currentDirectory, new IdImpl(config.controler().getRunId()));
     }
     else {
     	oldConfControlerIO = new ControlerIO(currentDirectory);
@@ -84,8 +83,8 @@ public class DgOTFVisReplayLastIteration {
       config.signalSystems().setSignalSystemFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_SIGNALSYSTEMS));
       config.signalSystems().setSignalSystemConfigFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_SIGNALSYSTEMS_CONFIG));
     }
-    
-    
+
+
     log.info("Complete config dump:");
     StringWriter writer = new StringWriter();
     new ConfigWriter(config).writeStream(new PrintWriter(writer));
@@ -102,10 +101,9 @@ public class DgOTFVisReplayLastIteration {
     }
     //disable snapshot writing as the snapshot should not be overwritten
     config.getQSimConfigGroup().setSnapshotPeriod(0.0);
-    
+
     ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
     Scenario sc = loader.loadScenario();
-    Gbl.setConfig(config);
     EventsManagerImpl events = new EventsManagerImpl();
     ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
 	QSim otfVisQSim = new QSim(sc, events);
@@ -146,23 +144,23 @@ public class DgOTFVisReplayLastIteration {
 	public static final String chooseFile() {
     JFileChooser fc = new JFileChooser();
 
-    fc.setFileFilter( new FileFilter() { 
-      @Override public boolean accept( File f ) { 
-        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".xml" ); 
+    fc.setFileFilter( new FileFilter() {
+      @Override public boolean accept( File f ) {
+        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".xml" );
       }
-      @Override public String getDescription() { return "MATSim config file (*.xml)"; } 
-    } ); 
+      @Override public String getDescription() { return "MATSim config file (*.xml)"; }
+    } );
 
-    fc.setFileFilter( new FileFilter() { 
-      @Override public boolean accept( File f ) { 
-        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".xml.gz" ); 
+    fc.setFileFilter( new FileFilter() {
+      @Override public boolean accept( File f ) {
+        return f.isDirectory() || f.getName().toLowerCase().endsWith( ".xml.gz" );
       }
-      @Override public String getDescription() { return "MATSim zipped config file (*.xml.gz)"; } 
-    } ); 
+      @Override public String getDescription() { return "MATSim zipped config file (*.xml.gz)"; }
+    } );
 
-    
-    int state = fc.showOpenDialog( null ); 
-    if ( state == JFileChooser.APPROVE_OPTION ) { 
+
+    int state = fc.showOpenDialog( null );
+    if ( state == JFileChooser.APPROVE_OPTION ) {
       String args_new = fc.getSelectedFile().getAbsolutePath();
       return args_new;
     }
@@ -172,8 +170,8 @@ public class DgOTFVisReplayLastIteration {
 
   /**
    * @param args
-   * @throws IOException 
-   * @throws FileNotFoundException 
+   * @throws IOException
+   * @throws FileNotFoundException
    */
   public static void main(String[] args) throws FileNotFoundException, IOException {
 //    args = new String[1];

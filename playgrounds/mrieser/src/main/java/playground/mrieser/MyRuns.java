@@ -23,7 +23,6 @@ package playground.mrieser;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +54,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -725,6 +723,13 @@ public class MyRuns {
 //		someTest(args);
 
 		Gbl.printSystemInfo();
+		long maxMem = Runtime.getRuntime().maxMemory();
+		long totalMem = Runtime.getRuntime().totalMemory();
+		long freeMem = Runtime.getRuntime().freeMemory();
+		long usedMem = totalMem - freeMem;
+		System.out.println("used RAM: " + usedMem + "B = " + (usedMem/1024) + "kB = " + (usedMem/1024/1024) + "MB" +
+				"  free: " + freeMem + "B = " + (freeMem/1024/1024) + "MB  total: " + totalMem + "B = " + (totalMem/1024/1024) + "MB" +
+				"  max: " + maxMem + "B = " + (maxMem/1024/1024) + "MB");
 
 		//		Scenario scenario = new ScenarioImpl();
 //		OsmNetworkReader osmReader = new OsmNetworkReader(scenario.getNetwork(), new WGS84toCH1903LV03());
@@ -741,9 +746,9 @@ public class MyRuns {
 //		new NetworkWriter(scenario.getNetwork()).writeFile("/Users/mrieser/Downloads/switzerland.xml");
 //		OTFVis.main(new String[]{"/Users/mrieser/Downloads/switzerland.xml"});
 
-		Config config = new Config();
-		config.addCoreModules();
-		new ConfigWriter(config).writeStream(new PrintWriter(System.out));
+//		Config config = new Config();
+//		config.addCoreModules();
+//		new ConfigWriter(config).writeStream(new PrintWriter(System.out));
 
 
 		System.out.println("stop at " + (new Date()));

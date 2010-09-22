@@ -1263,7 +1263,6 @@ public class TollSchemeGenerator {
 		// read the config
 		config = new Config();
 		config.addCoreModules();
-		Gbl.setConfig(config);
 		MatsimConfigReader confReader = new MatsimConfigReader(config);
 		System.out.println("this.usedConf : " + usedConf);
 		confReader.readFile(usedConf);

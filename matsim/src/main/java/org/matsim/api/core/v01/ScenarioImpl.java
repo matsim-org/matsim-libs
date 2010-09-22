@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -85,7 +84,6 @@ public class ScenarioImpl implements Scenario {
 	public ScenarioImpl(){
 		this.config = new Config();
 		this.config.addCoreModules();
-		Gbl.setConfig(config);
 		initContainers();
 	}
 
@@ -231,7 +229,7 @@ public class ScenarioImpl implements Scenario {
 
 	@Deprecated
 	public void setNetwork(NetworkImpl network2) {
-		this.network = (NetworkImpl) network2;
+		this.network = network2;
 	}
 
 	@Deprecated

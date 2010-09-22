@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -45,7 +44,6 @@ public class PlansDumping {
 			System.out.println("Problem loading the configuration file from " + configFileName);
 			throw new RuntimeException(e);
 		}
-		Gbl.setConfig(config);
 		ScenarioImpl scenario = new ScenarioImpl(config);
 
 		NetworkImpl network = scenario.getNetwork();

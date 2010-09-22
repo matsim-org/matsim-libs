@@ -49,7 +49,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -211,7 +210,6 @@ public class MyRuns {
 		config.addModule(MeisterkConfigGroup.GROUP_NAME, meisterkConfigGroup);
 		MatsimConfigReader reader = new MatsimConfigReader(config);
 		reader.readFile(args[0]);
-		Gbl.setConfig(config);
 		MatsimRandom.reset(config.global().getRandomSeed());
 
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);

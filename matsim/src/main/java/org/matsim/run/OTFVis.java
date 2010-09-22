@@ -37,7 +37,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -214,7 +213,7 @@ public class OTFVis {
 		playConfig(new String[]{configFilename});
 	}
 
-	public static final void playConfig_Swing(String configFileName) {		
+	public static final void playConfig_Swing(String configFileName) {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(configFileName);
 		loader.loadScenario();
 		Scenario scenario = loader.getScenario();
@@ -305,7 +304,6 @@ public class OTFVis {
 			snapshotPeriod = Integer.parseInt(args[4]);
 		}
 		Scenario scenario = new ScenarioImpl();
-		Gbl.setConfig(scenario.getConfig());
 		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		QSim sim = new QSim(scenario, new EventsManagerImpl());

@@ -16,7 +16,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 
@@ -151,7 +150,6 @@ public class TestCellKnowledge {
 			log.error("Problem loading the configuration file from " + this.configFileName);
 			throw new RuntimeException(e);
 		}
-		Gbl.setConfig(config);
 		log.info("Loading Config ... done");
 	}
 /*

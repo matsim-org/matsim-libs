@@ -344,7 +344,6 @@ public class Controler {
 		}
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
-		Gbl.setConfig(this.config);
 		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
 	}
 
@@ -381,14 +380,14 @@ public class Controler {
 
 	private final void setupMultiModalConfig() {
 		log.info("setting up multi modal simulation");
-		
+
 		// Use a TravelTimeCalculator that buffers the TravelTimes form the previous Iteration.
 		setTravelTimeCalculatorFactory(new TravelTimeCalculatorWithBufferFactory());
-		
+
 //		return new MultiModalMobsimFactory(super.getMobsimFactory(), this.getTravelTimeCalculator());
 //		setMobsimFactory(mobsimFactory)
-		
-		
+
+
 		// set Route Factories
 		String simulatedModes = config.multiModal().getSimulatedModes();
 		if (simulatedModes.contains("bike")) this.getNetwork().getFactory().setRouteFactory(TransportMode.bike, new LinkNetworkRouteFactory());
@@ -396,7 +395,7 @@ public class Controler {
 		if (simulatedModes.contains("ride")) this.getNetwork().getFactory().setRouteFactory(TransportMode.ride, new LinkNetworkRouteFactory());
 		if (simulatedModes.contains("pt")) this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
 	}
-	
+
 	private final void setupTransitConfig() {
 		log.info("setting up transit simulation");
 		this.transitConfig = new TransitConfigGroup();
@@ -562,7 +561,7 @@ public class Controler {
 	 */
 	protected void setUp() {
 		if (config.multiModal().isMultiModalSimulationEnabled()) multiModalSetUp();
-		
+
 		if (this.travelTimeCalculator == null) {
 			this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config
 					.travelTimeCalculator());
@@ -604,24 +603,24 @@ public class Controler {
 
 		this.strategyManager = loadStrategyManager();
 	}
-	
+
 	private void multiModalSetUp() {
 		if (config.multiModal().isCreateMultiModalNetwork()) {
 			log.info("Creating multi modal network.");
-			new MultiModalNetworkCreator(config.multiModal()).run(scenarioData.getNetwork());	
+			new MultiModalNetworkCreator(config.multiModal()).run(scenarioData.getNetwork());
 		}
-		
+
 		if (config.multiModal().isEnsureActivityReachability()) {
 			log.info("Relocating activities that cannot be reached by the transport modes of their from- and/or to-legs...");
 			new EnsureActivityReachability(this.scenarioData).run(scenarioData.getPopulation());
 		}
-		
+
 		if (config.multiModal().isDropNonCarRoutes()) {
 			log.info("Dropping existing routes of modes which are simulated with the multi modal mobsim.");
-			new NonCarRouteDropper(config.multiModal()).run(scenarioData.getPopulation());			
+			new NonCarRouteDropper(config.multiModal()).run(scenarioData.getPopulation());
 		}
 	}
-		
+
 	/*
 	 * ===================================================================
 	 * private methods
@@ -1126,7 +1125,7 @@ public class Controler {
 			return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 					this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.transitConfig);
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-			return new MultiModalPlansCalcRoute(this.config.plansCalcRoute(), this.config.multiModal(), this.network, 
+			return new MultiModalPlansCalcRoute(this.config.plansCalcRoute(), this.config.multiModal(), this.network,
 					travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
 		} else {
 			return new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
@@ -1244,9 +1243,9 @@ public class Controler {
 				 * If a multi modal simulation should be run, we use a MultiModalMobsimFactory
 				 * which is only a wrapper. It hands over the TravelTimeCalculator to the
 				 * MultiModalSimEngine.
-				 * I do not like this - but at the moment I see no better way to do so...  
+				 * I do not like this - but at the moment I see no better way to do so...
 				 */
-				if (c.multiModal().isMultiModalSimulationEnabled()) {	
+				if (c.multiModal().isMultiModalSimulationEnabled()) {
 					MobsimFactory factory = event.getControler().getMobsimFactory();
 					MobsimFactory multiModalFactory = new MultiModalMobsimFactory(factory, event.getControler().getTravelTimeCalculator());
 					event.getControler().setMobsimFactory(multiModalFactory);

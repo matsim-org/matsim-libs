@@ -31,7 +31,6 @@ import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
@@ -84,7 +83,6 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		this.config = this.scenario.getConfig();
 		MatsimConfigReader reader = new MatsimConfigReader(this.config);
 		reader.readFile(configFilename);
-		Gbl.setConfig(this.config);
 		MatsimRandom.reset(config.global().getRandomSeed());
 	}
 

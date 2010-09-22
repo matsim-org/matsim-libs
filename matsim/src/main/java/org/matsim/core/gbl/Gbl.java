@@ -46,13 +46,6 @@ import org.xml.sax.SAXException;
 public abstract class Gbl {
 	public final static String ONLYONCE=" This message given only once.";
 
-	/**
-	 * @deprecated The Controler should hold the config instance without any
-	 * static reference to the object.
-	 */
-	@Deprecated
-	private static Config config = null;
-
 	private static final Logger log = Logger.getLogger(Gbl.class);
 
 	//////////////////////////////////////////////////////////////////////
@@ -69,16 +62,12 @@ public abstract class Gbl {
 	 */
 	@Deprecated
 	public static final Config createConfig(final String[] args) {
-		if (Gbl.config != null) {
-			Gbl.errorMsg("config exists already! Cannot create a 2nd global config.");
-		}
-
-		Gbl.config = new Config();
-		Gbl.config.addCoreModules();
+		Config config = new Config();
+		config.addCoreModules();
 
 		if ((args != null) && (args.length == 1)) {
 			log.info("Input config file: " + args[0]);
-			MatsimConfigReader reader = new MatsimConfigReader(Gbl.config);
+			MatsimConfigReader reader = new MatsimConfigReader(config);
 			try {
 				reader.parse(args[0]);
 			} catch (SAXException e) {
@@ -91,29 +80,13 @@ public abstract class Gbl {
 		} else if ((args != null) && (args.length >= 1)) {
 			log.info("Input config file: " + args[0]);
 			log.info("Input local config dtd: " + args[1]);
-			ConfigReaderMatsimV1 reader = new ConfigReaderMatsimV1(Gbl.config);
+			ConfigReaderMatsimV1 reader = new ConfigReaderMatsimV1(config);
 			reader.readFile(args[0], args[1]);
 		}
 
-		MatsimRandom.reset(Gbl.config.global().getRandomSeed());
+		MatsimRandom.reset(config.global().getRandomSeed());
 
-		return Gbl.config;
-	}
-
-	/**
-	 * Having config as a static member makes a lot of features of OO programming
-	 * quite useless. Thus this method will be removed in the future. If the
-	 * config is used somewhere in the code, the config (or the needed
-	 * parameters) need to be passed explicitly.
-	 */
-	@Deprecated
-	public static final Config getConfig() {
-		return Gbl.config;
-	}
-
-	@Deprecated
-	public static final void setConfig(final Config config) {
-		Gbl.config = config;
+		return config;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -123,7 +96,6 @@ public abstract class Gbl {
 	@Deprecated
 	public static final void reset() {
 		log.info("Gbl.reset() -- reset config");
-		Gbl.config = null;
 		MatsimRandom.reset();
 	}
 

@@ -178,7 +178,6 @@ public class TollSchemeGenerator {
 		//read the config
 		this.config = new Config();
 		this.config.addCoreModules();
-		Gbl.setConfig(this.config);
 		MatsimConfigReader confReader = new MatsimConfigReader(this.config);
 		confReader.readFile(this.usedConf);
 

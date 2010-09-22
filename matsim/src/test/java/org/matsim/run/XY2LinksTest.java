@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -76,7 +75,6 @@ public class XY2LinksTest extends MatsimTestCase {
 		config.network().setInputFile(NETWORK_FILE);
 		config.plans().setInputFile(PLANS_FILE_TESTINPUT);
 		new ConfigWriter(config).write(CONFIG_FILE);
-		Gbl.setConfig(null); // needed to delete the global config etc for the test
 
 		// some pre-tests
 		assertFalse("Output-File should not yet exist.", new File(PLANS_FILE_TESTOUTPUT).exists());

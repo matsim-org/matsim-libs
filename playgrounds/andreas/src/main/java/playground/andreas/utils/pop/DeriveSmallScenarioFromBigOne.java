@@ -27,7 +27,6 @@ public class DeriveSmallScenarioFromBigOne {
 
 		Config config = new Config();
 		config.addCoreModules();
-		Gbl.setConfig(config);
 
 		String bigNetworkFile = "D:/Berlin/BVG/berlin-bvg09/pt/baseplan_900s_bignetwork/network.multimodal.xml.gz";
 		String smallNetworkFile = "D:/Berlin/BVG/berlin-bvg09/net/miv_small/m44_344_small_ba.xml.gz";
