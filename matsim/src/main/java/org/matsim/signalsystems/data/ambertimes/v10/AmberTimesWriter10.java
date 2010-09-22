@@ -43,14 +43,20 @@ import org.matsim.jaxb.amberTimes10.XMLAmberTimesType.XMLAmber;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimesType.XMLRedAmber;
 import org.matsim.jaxb.amberTimes10.XMLGlobalDefaultsType.XMLAmberTimeGreen;
 
+
+/**
+ * @author jbischoff
+ * @author dgrether
+ */
 public class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
-		
+	
 		private static final Logger log = Logger.getLogger(AmberTimesWriter10.class);
 		
 		private AmberTimesData amberTimesData;
 		
 		private XMLAmberTimes xmlAmberTimes;
-		
+	
+		public static final String AMBERTIMES10 = "http://www.matsim.org/files/dtd/amberTimes_v1.0.xsd";
 		public AmberTimesWriter10(AmberTimesData amberTimesData){
 			this.amberTimesData = amberTimesData;
 			this.xmlAmberTimes = convertDataToXml();
@@ -119,7 +125,7 @@ public class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 			try {
 				jc = JAXBContext.newInstance(org.matsim.jaxb.amberTimes10.ObjectFactory.class);
 				Marshaller m = jc.createMarshaller();
-				super.setMarshallerProperties("http://www.matsim.org/files/dtd/amberTimes_v1.0.xsd", m);
+				super.setMarshallerProperties(AmberTimesWriter10.AMBERTIMES10, m);
 				BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
 				m.marshal(this.xmlAmberTimes, bufout);
 				bufout.close();

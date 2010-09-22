@@ -37,24 +37,29 @@ import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem.XMLSignal;
 import org.xml.sax.SAXException;
 
+/**
+ * @author jbischoff
+ * @author dgrether
+ */
 public class AmberTimesReader10 extends MatsimJaxbXmlParser {
+
 	private static final Logger log = Logger.getLogger(AmberTimesReader10.class);
-	private AmberTimesData amberTimesData;	
-	
-	public AmberTimesReader10(AmberTimesData amberTimesData,String schemaLocation) {
+	private AmberTimesData amberTimesData;
+
+	public AmberTimesReader10(AmberTimesData amberTimesData, String schemaLocation) {
 		super(schemaLocation);
-		this.amberTimesData=amberTimesData;
-	
+		this.amberTimesData = amberTimesData;
+
 	}
 
 	@Override
-	public void readFile(final String filename) throws JAXBException,
-			SAXException, ParserConfigurationException, IOException {
+	public void readFile(final String filename) throws JAXBException, SAXException,
+			ParserConfigurationException, IOException {
 		// create jaxb infrastructure
 		JAXBContext jc;
 		XMLAmberTimes xmlatdefs = null;
-		jc = JAXBContext
-				.newInstance(org.matsim.jaxb.signalsystems20.ObjectFactory.class);
+
+		jc = JAXBContext.newInstance(org.matsim.jaxb.amberTimes10.ObjectFactory.class);
 		Unmarshaller u = jc.createUnmarshaller();
 		// validate XML file
 		log.info("starting to validate " + filename);
@@ -62,47 +67,49 @@ public class AmberTimesReader10 extends MatsimJaxbXmlParser {
 		log.info("starting unmarshalling " + filename);
 		InputStream stream = null;
 		try {
-		  stream = IOUtils.getInputstream(filename);
-		  xmlatdefs = (XMLAmberTimes) u.unmarshal(stream);
-		}
-		catch (Exception ex){
+			stream = IOUtils.getInputstream(filename);
+			xmlatdefs = (XMLAmberTimes) u.unmarshal(stream);
+		} catch (Exception ex) {
 			ex.printStackTrace();
-		}
-		finally {
+		} finally {
 			try {
-				if (stream != null) { stream.close();	}
+				if (stream != null) {
+					stream.close();
+				}
 			} catch (IOException e) {
 				log.warn("Could not close stream.", e);
 			}
 		}
-		
-		//convert from Jaxb types to MATSim-API conform types
-		
-		//Global Defaults
-		amberTimesData.setDefaultAmber(xmlatdefs.getGlobalDefaults().getAmber().getSeconds().intValue());
-		amberTimesData.setDefaultRedAmber(xmlatdefs.getGlobalDefaults().getRedAmber().getSeconds().intValue());
-		amberTimesData.setDefaultAmberTimeGreen(xmlatdefs.getGlobalDefaults().getAmberTimeGreen().getProportion().doubleValue());
-		
-		for (XMLSignalSystem xmlss : xmlatdefs.getSignalSystem()){
-			AmberTimeData atdata = null;
-			
+
+		// convert from Jaxb types to MATSim-API conform types
+
+		// Global Defaults
+		amberTimesData
+				.setDefaultAmber(xmlatdefs.getGlobalDefaults().getAmber().getSeconds().intValue());
+		amberTimesData.setDefaultRedAmber(xmlatdefs.getGlobalDefaults().getRedAmber().getSeconds()
+				.intValue());
+		amberTimesData.setDefaultAmberTimeGreen(xmlatdefs.getGlobalDefaults().getAmberTimeGreen()
+				.getProportion().doubleValue());
+
+		for (XMLSignalSystem xmlss : xmlatdefs.getSignalSystem()) {
+			Id ssid = new IdImpl(xmlss.getRefId().toString());
+			AmberTimeData atdata = new AmberTimeDataImpl(ssid);
+
 			// Signalsystem Defaults
 			atdata.setDefaultAmber(xmlss.getSystemDefaults().getAmber().getSeconds().intValue());
 			atdata.setDefaultRedAmber(xmlss.getSystemDefaults().getRedAmber().getSeconds().intValue());
-			
-			for (XMLSignal xmls : xmlss.getSignal()){
-			
-			Id sid = new IdImpl(xmls.getRefId());
-			atdata.setAmberTimeOfSignal(sid,xmls.getAmber().getSeconds().intValue()); 
-			atdata.setRedAmberTimeOfSignal(sid, xmls.getRedAmber().getSeconds().intValue());
-			
+
+			for (XMLSignal xmls : xmlss.getSignal()) {
+
+				Id sid = new IdImpl(xmls.getRefId());
+				atdata.setAmberTimeOfSignal(sid, xmls.getAmber().getSeconds().intValue());
+				atdata.setRedAmberTimeOfSignal(sid, xmls.getRedAmber().getSeconds().intValue());
+
 			}
+
 			amberTimesData.addAmberTimeData(atdata);
 		}
-		
-			
+
+	}
 
 }
-	
-}
-
