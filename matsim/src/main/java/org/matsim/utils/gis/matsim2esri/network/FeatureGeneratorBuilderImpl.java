@@ -25,7 +25,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -64,6 +63,7 @@ public class FeatureGeneratorBuilderImpl implements FeatureGeneratorBuilder {
 		}
 	}
 
+	@Override
 	public FeatureGenerator createFeatureGenerator() {
 
 		WidthCalculator widthCalc = createWidthCalculator();

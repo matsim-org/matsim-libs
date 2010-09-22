@@ -29,11 +29,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderTeleatlas;
 
 /**
- * Adds additional speed restrictions to a MATSim {@link NetworkLayer network} created
+ * Adds additional speed restrictions to a MATSim {@link Network network} created
  * by {@link NetworkReaderTeleatlas}. The input speed restriction DBF file is based on
  * <strong>Tele Atlas MultiNet Shapefile 4.3.2.1 Format Specifications
  * document version Final v1.0, June 2007</strong>.
@@ -63,7 +62,7 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * To add speed restrictions to a Tele Atlas MultiNet {@link NetworkLayer network}.
+	 * To add speed restrictions to a Tele Atlas MultiNet {@link Network network}.
 	 *
 	 * @param srDbfFileName Tele Atlas MultiNet speed restriction DBF file
 	 */
@@ -78,7 +77,7 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Reading and assigning speed restrictions to the {@link Link links} of a {@link NetworkLayer network}.
+	 * Reading and assigning speed restrictions to the {@link Link links} of a {@link Network network}.
 	 *
 	 * <p>It uses the following attributes from the Tele Atlas MultiNet speed restriction DBF file:
 	 * <ul>

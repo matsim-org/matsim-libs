@@ -31,10 +31,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
 
 /**
- * Contains several helper methods for working with {@link NetworkLayer networks}.
+ * Contains several helper methods for working with {@link Network networks}.
  *
  * @author mrieser
  */

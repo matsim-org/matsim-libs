@@ -32,7 +32,6 @@ import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.TriangleScenario;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.MatsimWorldReader;
 
 /**
  *

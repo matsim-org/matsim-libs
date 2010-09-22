@@ -33,13 +33,12 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
- * A Procedure to expand a node of the {@link NetworkLayer network}.
+ * A Procedure to expand a node of the {@link Network network}.
  *
  * <p><b>Note:</b> it is actually not completely clear that this should be a
  * MATSim network module. It could also be a method in the network layer
@@ -96,7 +95,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 
 	/**
 	 * The run method such that it is still consistent with the other network algorithms.
-	 * But rather use {@link #expandNode(NetworkLayer,Id,ArrayList,double,double)}.
+	 * But rather use {@link #expandNode(Network,Id,ArrayList,double,double)}.
 	 *
 	 * @param network
 	 */
@@ -112,7 +111,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Expands the {@link Node node} that is part of the {@link NetworkLayer network} and holds
+	 * Expands the {@link Node node} that is part of the {@link Network network} and holds
 	 * {@link Id nodeId}.
 	 *
 	 * <p>It is done in the following way:
@@ -155,7 +154,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 *                 v   |
 	 * </pre>
 	 * </li>
-	 * <li>removes the given {@link Node node} from the {@link NetworkLayer network}
+	 * <li>removes the given {@link Node node} from the {@link Network network}
 	 * <pre>
 	 * <-----12------ o     o <----21-------
 	 *
@@ -196,7 +195,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 * </ol>
 	 * </p>
 	 *
-	 * @param network MATSim {@link NetworkLayer network} DB
+	 * @param network MATSim {@link Network network} DB
 	 * @param nodeId the {@link Id} of the {@link Node} to expand
 	 * @param turns The {@link ArrayList} of {@link Tuple tuples} of {@link Id linkIds}
 	 * of the incident {@link Link links} of the given {@link Node node} that define

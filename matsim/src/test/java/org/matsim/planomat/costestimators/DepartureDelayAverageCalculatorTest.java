@@ -29,7 +29,6 @@ import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 

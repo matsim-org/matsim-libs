@@ -30,10 +30,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 
@@ -451,10 +450,12 @@ public class MultiNodeDijkstraTest extends TestCase {
 			this.travelCosts.put(id, Double.valueOf(travelCost));
 		}
 
+		@Override
 		public double getLinkTravelTime(final Link link, final double time) {
 			return this.travelTimes.get(link.getId()).doubleValue();
 		}
 
+		@Override
 		public double getLinkTravelCost(final Link link, final double time) {
 			return this.travelCosts.get(link.getId()).doubleValue();
 		}

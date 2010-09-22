@@ -28,22 +28,16 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
-
-
-public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase{
-
-
-
+public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase {
 
 	public void testRiskCostCalculatorNoCostsForEqualRiskLinks() {
 		NetworkImpl net = NetworkImpl.createNetwork();

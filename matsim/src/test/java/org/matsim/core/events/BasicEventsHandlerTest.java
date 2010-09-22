@@ -26,7 +26,6 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -53,10 +52,12 @@ public class BasicEventsHandlerTest extends MatsimTestCase {
 
 		/*package*/ int counter = 0;
 
+		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			this.counter++;
 		}
 
+		@Override
 		public void reset(int iteration) {
 			this.counter = 0;
 		}

@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderTeleatlas;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -107,7 +106,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * To create maneuver restrictions to a Tele Atlas MultiNet {@link NetworkLayer network}.
+	 * To create maneuver restrictions to a Tele Atlas MultiNet {@link Network network}.
 	 *
 	 * @param mnShpFileName Tele Atlas MultiNet maneuver Shape file
 	 * @param mpDbfFileName Tele Atlas MultiNet maneuver path DBF file
@@ -124,7 +123,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Reading and assigning (expanding {@link NodeImpl nodes}) maneuver restrictions to the {@link NetworkLayer network}.
+	 * Reading and assigning (expanding {@link NodeImpl nodes}) maneuver restrictions to the {@link Network network}.
 	 *
 	 * <p>It uses the following attributes from the Tele Atlas MultiNet maneuver Shape file:
 	 * <ul>
@@ -156,7 +155,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	 *   {@link NodeImpl nodes} with {@link NetworkExpandNode node expanding procedure}.</li>
 	 * </ul></p>
 	 *
-	 * @param network MATSim {@link NetworkLayer network} created by {@link NetworkReaderTeleatlas}.
+	 * @param network MATSim {@link Network network} created by {@link NetworkReaderTeleatlas}.
 	 * @throws RuntimeException with another Exception in it in the case something goes wrong
 	 */
 	@Override
