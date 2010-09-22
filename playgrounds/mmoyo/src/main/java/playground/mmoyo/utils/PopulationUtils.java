@@ -63,7 +63,7 @@ public class PopulationUtils {
 		if (args.length>0){
 			configFile = args[0];
 		}else{
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";	
+			configFile = "../../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";	
 		}
 		System.out.println("counting population for config file: " + configFile);
 		ScenarioImpl scenario = new TransScenarioLoader().loadScenario(configFile);
