@@ -48,16 +48,14 @@ public class NetworkImpl implements Network, BasicLocations {
 
 	private final static Logger log = Logger.getLogger(NetworkImpl.class);
 
-	public static final Id LAYER_TYPE = new IdImpl("link");
-
 	public static NetworkImpl createNetwork() {
 		return new NetworkImpl();
 	}
-	
+
 	private double capperiod = 3600.0 ;
 
 	protected final Map<Id, Node> nodes = new TreeMap<Id, Node>();
-	
+
 	private Map<Id, Link> links = new TreeMap<Id, Link>();
 
 	protected QuadTree<Node> nodeQuadTree = null;
@@ -78,6 +76,7 @@ public class NetworkImpl implements Network, BasicLocations {
 		this.factory = new NetworkFactoryImpl(this);
 	}
 
+	@Override
 	public void addLink(final Link link) {
 		Link testLink = links.get(link.getId());
 		if (testLink != null) {
@@ -96,6 +95,7 @@ public class NetworkImpl implements Network, BasicLocations {
 		links.put(link.getId(), link);
 	}
 
+	@Override
 	public void addNode(final Node nn) {
 		Id id = nn.getId() ;
 		Node node = this.nodes.get(id);
@@ -225,6 +225,7 @@ public class NetworkImpl implements Network, BasicLocations {
 		}
 	}
 
+	@Override
 	public final double getCapacityPeriod() {
 		return this.capperiod;
 	}
@@ -233,10 +234,12 @@ public class NetworkImpl implements Network, BasicLocations {
 		return this.effectiveCellSize;
 	}
 
+	@Override
 	public final double getEffectiveLaneWidth() {
 		return this.effectiveLaneWidth;
 	}
 
+	@Override
 	public Map<Id, Node> getNodes() {
 		return this.nodes;
 	}
@@ -420,6 +423,7 @@ public class NetworkImpl implements Network, BasicLocations {
 		return this.networkChangeEvents;
 	}
 
+	@Override
 	public NetworkFactoryImpl getFactory() {
 		return this.factory;
 	}
@@ -479,6 +483,7 @@ public class NetworkImpl implements Network, BasicLocations {
 		log.info("Building QuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
 	}
 
+	@Override
 	public Map<Id, Link> getLinks() {
 		return Collections.unmodifiableMap(links);
 	}
@@ -515,21 +520,21 @@ public class NetworkImpl implements Network, BasicLocations {
 	public final LinkImpl createAndAddLink(final Id id, final Node fromNode,
 			final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes,
 			final String origId, final String type) {
-			
+
 				if (this.nodes.get(fromNode.getId()) == null) {
 					throw new IllegalArgumentException(this+"[from="+fromNode+" does not exist]");
 				}
-			
+
 				if (this.nodes.get(toNode.getId()) == null) {
 					throw new IllegalArgumentException(this+"[to="+toNode+" does not exist]");
 				}
-			
+
 				LinkImpl link = (LinkImpl) this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
 				link.setType(type);
 				link.setOrigId(origId);
-			
+
 				this.addLink( link ) ;
-			
+
 				return link;
 			}
 

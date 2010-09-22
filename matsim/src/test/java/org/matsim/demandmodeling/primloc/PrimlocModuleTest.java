@@ -76,12 +76,9 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-//		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
-		world.setFacilityLayer(scenario.getActivityFacilities());
-		
 		System.out.println("  creating plans object... ");
 		Population population = scenario.getPopulation();
 		System.out.println("  done.");
@@ -98,7 +95,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  ** running primary location choice module (PLCM)");
 		PrimlocModule plcm = new PrimlocModule(scenario.getConfig(), knowledges);
 		plcm.externalTripDist = CumulativeDistribution.readDistributionFromFile("test/input/org/matsim/demandmodeling/primloc/sample_dist.txt");
-		plcm.setup( world, population );
+		plcm.setup( world, population, scenario.getActivityFacilities() );
 		plcm.run(population);
 
 		// ************

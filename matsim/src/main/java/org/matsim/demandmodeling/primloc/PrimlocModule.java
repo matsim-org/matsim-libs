@@ -64,9 +64,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
@@ -175,7 +175,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		}
 	}
 
-	public void setup( World world, Population population ){
+	public void setup( World world, Population population, ActivityFacilities facilities ){
 
 		random = new Random(this.cfg.global().getRandomSeed());
 
@@ -187,7 +187,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 
 		setupNumberHomesPerZone( population );
 
-		setupNumberJobsPerZone(world.getFacilities());
+		setupNumberJobsPerZone(facilities);
 
 		normalizeJobHomeVectors();
 
@@ -317,7 +317,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		return false;
 	}
 
-	private void setupNumberJobsPerZone(ActivityFacilitiesImpl facilities){
+	private void setupNumberJobsPerZone(ActivityFacilities facilities){
 		// Setup the number of available facilities at the destination of the trips
 		// In this case we take the capacities of the existing Facilities
 		// and maintain a list of Facilities per Zone

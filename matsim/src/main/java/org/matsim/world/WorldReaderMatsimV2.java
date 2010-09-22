@@ -24,7 +24,6 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -46,8 +45,6 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 	private Scenario scenario;
 	private World world;
 	private ZoneLayer currLayer = null;
-	private Layer currUpLayer = null;
-	private Layer currDownLayer = null;
 
 	public WorldReaderMatsimV2(final ScenarioImpl scenario, World world) {
 		this.scenario = scenario;
@@ -57,15 +54,12 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if (WORLD.equals(name)) {
-			startWorld(atts);
 		} else if (LAYER.equals(name)) {
 			startLayer(atts);
 		} else if (MAPPING.equals(name)) {
-			startMapping(atts);
 		} else if (ZONE.equals(name)) {
 			startZone(atts);
 		} else if (REF.equals(name)) {
-			startRef(atts);
 		} else {
 			Gbl.errorMsg(this + "[tag=" + name + " not known or not supported]");
 		}
@@ -74,15 +68,10 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (WORLD.equals(name)) {
-			this.world.complete(this.scenario.getConfig());
 			this.world = null;
 		} else if (LAYER.equals(name)) {
 			this.currLayer = null;
 		}
-	}
-
-	private void startWorld(final Attributes atts) {
-		this.world.setName(atts.getValue("name"));
 	}
 
 	private void startLayer(final Attributes meta) {
@@ -91,20 +80,7 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 
 	private void startZone(final Attributes atts) {
 		this.currLayer.createZone(scenario.createId(atts.getValue("id")), atts.getValue("center_x"), atts.getValue("center_y"), atts.getValue("min_x"), atts.getValue("min_y"),
-				 atts.getValue("max_x"), atts.getValue("max_y"), atts.getValue("area"), atts.getValue("name"));
-	}
-
-	private void startMapping(final Attributes atts) {
-		String [] strings = atts.getValue("mapping_rule").split("\\[|\\]-\\[|\\]");
-		this.currDownLayer = this.world.getLayer(new IdImpl(strings[0]));
-		this.currUpLayer = this.world.getLayer(new IdImpl(strings[3]));
-		this.currDownLayer.setUpLayer(this.currUpLayer);
-		this.currUpLayer.setDownLayer(this.currDownLayer);
-	}
-
-	private void startRef(final Attributes atts) {
-		this.world.addMapping(this.currDownLayer, this.currUpLayer, scenario.createId(atts.getValue("down_zone_id")), scenario.createId(atts.getValue("up_zone_id")));
-
+				 atts.getValue("max_x"), atts.getValue("max_y"));
 	}
 
 }

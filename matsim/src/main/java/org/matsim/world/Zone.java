@@ -48,8 +48,6 @@ public class Zone extends AbstractLocation {
 
 	private Coord min    = null;
 	private Coord max    = null;
-	private double area  = Double.NaN;
-	private String name  = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -57,12 +55,10 @@ public class Zone extends AbstractLocation {
 
 	@Deprecated // use of current matsim zone object is discouraged; use geotools instead
 	public Zone(final ZoneLayer layer, final Id id, final Coord center,
-	               final Coord min, final Coord max, final double area, final String name) {
+	               final Coord min, final Coord max) {
 		super(layer,id,center);
 		this.setMin(min);
 		this.setMax(max);
-		this.setArea(area);
-		this.setName(name);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -162,15 +158,6 @@ public class Zone extends AbstractLocation {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void setArea(final double area) {
-		if (area < 0.0) { throw new NumberFormatException("An area has to be >= 0.0"); }
-		this.area = area;
-	}
-
-	public final void setName(final String name) {
-		this.name = name;
-	}
-
 	public final void setMin(final Coord min) {
 		if ((min != null) && (min.getX() <= this.center.getX()) && (min.getY() <= this.center.getY())) { this.min = min; }
 		else { this.min = this.center; }
@@ -193,13 +180,6 @@ public class Zone extends AbstractLocation {
 		return this.max;
 	}
 
-	public final double getArea() {
-		return this.area;
-	}
-
-	public final String getName() {
-		return this.name;
-	}
 
 	//////////////////////////////////////////////////////////////////////
 	// print methods
@@ -209,9 +189,7 @@ public class Zone extends AbstractLocation {
 	public final String toString() {
 		return super.toString() +
 				"[min=" + this.min + "]" +
-				"[max=" + this.max + "]" +
-				"[area=" + this.area + "]" +
-				"[name=" + this.name + "]";
-	}
+				"[max=" + this.max + "]";
+		}
 
 }

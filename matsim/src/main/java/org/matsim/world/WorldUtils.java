@@ -83,7 +83,7 @@ public abstract class WorldUtils {
 				radius = 0.7*CoordUtils.calcDistance(zoneCenter, center);
 			} else {
 				// the other zone has an extent(min/max), so just use the full distance
-				radius = aZone.calcDistance(center);
+				radius = CoordUtils.calcDistance(aZone.getCoord(), center);
 			}
 			if (radius < shortestDistance) {
 				shortestDistance = radius;

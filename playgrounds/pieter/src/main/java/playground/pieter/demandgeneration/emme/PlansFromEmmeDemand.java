@@ -173,7 +173,7 @@ public class PlansFromEmmeDemand {
 		 * Now create the zones.
 		 */
 		for (ZoneXY zxy : this.zoneXYs.values()) {
-			this.zones.createZone(zxy.getZoneId(), zxy.getX(), zxy.getY(), null, null, null, null, null, null);
+			this.zones.createZone(zxy.getZoneId(), zxy.getX(), zxy.getY(), null, null, null, null);
 		}
 		this.zoneXYs.clear();
 	}

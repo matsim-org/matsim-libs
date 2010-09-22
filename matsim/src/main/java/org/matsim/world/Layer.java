@@ -22,21 +22,8 @@ package org.matsim.world;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 
 public interface Layer extends Locations {
-
-	@Deprecated
-	// a "type" that returns an "Id" ???
-	public Id getType();
-
-	@Deprecated
-	// use of mapping layers is discouraged
-	public Layer getUpLayer();
-
-	@Deprecated
-	// use of mapping layers is discouraged
-	public Layer getDownLayer();
 
 	/**
 	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in
@@ -62,17 +49,5 @@ public interface Layer extends Locations {
 	 *
 	 */
 	public ArrayList<MappedLocation> getNearestLocations(final Coord coord, final Location excludeLocation);
-
-	@Deprecated
-	public boolean removeUpLayer();
-
-	@Deprecated
-	public boolean removeDownLayer();
-
-	@Deprecated
-	public void setUpLayer(final Layer up_layer);
-
-	@Deprecated
-	public void setDownLayer(final Layer down_layer);
 
 }

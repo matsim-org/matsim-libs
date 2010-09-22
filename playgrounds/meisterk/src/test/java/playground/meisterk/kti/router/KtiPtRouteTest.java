@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.fakes.FakeLink;
@@ -95,9 +94,9 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		ZoneLayer municipalities = (ZoneLayer) world.createLayer(new IdImpl("municipality"), "municipalities");
 
 		Coord dummyMuniCoord = new CoordImpl(3003.0, 3003.0);
-		Location fromMunicipality = new Zone(municipalities, new IdImpl("30000"), dummyMuniCoord, dummyMuniCoord, dummyMuniCoord, 0.0, "Ixwil");
+		Location fromMunicipality = new Zone(municipalities, new IdImpl("30000"), dummyMuniCoord, dummyMuniCoord, dummyMuniCoord);
 		dummyMuniCoord.setXY(4004.0, 4004.0);
-		Location toMunicipality = new Zone(municipalities, new IdImpl("30001"), dummyMuniCoord, dummyMuniCoord, dummyMuniCoord, 0.0, "Ypslikon");
+		Location toMunicipality = new Zone(municipalities, new IdImpl("30001"), dummyMuniCoord, dummyMuniCoord, dummyMuniCoord);
 
 		KtiPtRoute testee = new KtiPtRoute(link1.getId(), link2.getId(), this.plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
 		assertEquals(link1.getId(), testee.getStartLinkId());

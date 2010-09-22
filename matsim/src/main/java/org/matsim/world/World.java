@@ -20,267 +20,29 @@
 
 package org.matsim.world;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.network.NetworkImpl;
 
 public class World {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
-	private String name = null;
-
 	private final Map<Id, Layer> layers = new TreeMap<Id, Layer>();
-//	private final Map<String, MappingRule> rules = new TreeMap<String, MappingRule>();
-
-	private Layer top_layer = null;
-	private Layer bottom_layer = null;
-
-	private ActivityFacilitiesImpl facilities;
-
-	private final static Logger log = Logger.getLogger(World.class);
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// complete
-	//////////////////////////////////////////////////////////////////////
-
-	@Deprecated
-	public final void complete(final Config config) {
-		complete(new HashSet<String>(), config);
-	}
-
-	@Deprecated
-	public final void complete(Set<String> excludingLinkTypes, final Config config) {
-		// 1. remove rules and mappings containing network and/or facility layers
-		Layer f_layer = this.layers.get(ActivityFacilitiesImpl.LAYER_TYPE);
-		Layer n_layer = this.layers.get(NetworkImpl.LAYER_TYPE);
-		for (Layer l : layers.values()) {
-			if (f_layer != null) {
-				this.removeMappingRule(f_layer.getType(),l.getType());
-				this.removeMappingRule(l.getType(),f_layer.getType());
-			}
-			if (n_layer != null) {
-				this.removeMappingRule(n_layer.getType(),l.getType());
-				this.removeMappingRule(l.getType(),n_layer.getType());
-			}
-		}
-		// 2. complete the zone layers
-		// 2.1. get the zone layers
-		ArrayList<ZoneLayer> zlayers = new ArrayList<ZoneLayer>();
-		Iterator<Id> lid_it = this.layers.keySet().iterator();
-		while (lid_it.hasNext()) {
-			Id lid = lid_it.next();
-			if ((lid != NetworkImpl.LAYER_TYPE) && (lid != ActivityFacilitiesImpl.LAYER_TYPE)) {
-				zlayers.add((ZoneLayer)this.layers.get(lid));
-			}
-		}
-		// 2.2 set the top and bottom layer reference
-		if (zlayers.size() == 0) {
-			this.top_layer = null;
-			this.bottom_layer = null;
-		}
-		else { // zlayers.size() > 0
-			// 2.2.1. find the top layer
-			this.top_layer = null;
-			for (int i=0; i<zlayers.size(); i++) {
-				Layer l = zlayers.get(i);
-				if (zlayers.get(i).getUpLayer() == null) { this.top_layer = l; }
-			}
-			if (this.top_layer == null) { throw new RuntimeException("data inconsistency"); }
-			// 2.2.2. find the bottom layer
-			int step_cnt = 1;
-			this.bottom_layer = this.top_layer;
-			while (this.bottom_layer.getDownLayer() != null) {
-				this.bottom_layer = this.bottom_layer.getDownLayer();
-				step_cnt++;
-			}
-			if (step_cnt != zlayers.size()) { throw new RuntimeException("data inconsistency"); }
-		}
-		// 3. create mapping rule (but no zone<->facility mappings) for the facility layer
-		if (f_layer != null) {
-			if (this.bottom_layer == null) { // no zone layers exist
-				this.top_layer = this.bottom_layer = f_layer;
-			}
-			else {
-				this.createMapping(f_layer, this.bottom_layer);
-				this.bottom_layer = this.bottom_layer.getDownLayer();
-			}
-		}
-		// 4. create mapping rule (but no facility<->link mappings) for the net layer
-		if (n_layer != null) {
-			if (this.bottom_layer == null) { // no zone nor facility layer exist
-				this.top_layer = this.bottom_layer = n_layer;
-			}
-//			else if (this.bottom_layer.getType() == Facilities.LAYER_TYPE) {
-//				this.createMappingRule(n_layer.getType().toString() + "[m]-[m]" + this.bottom_layer.getType().toString());
-//				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
-//			}  // it's the same as the "else" below
-			else {
-				this.createMapping(n_layer, this.bottom_layer);
-				this.bottom_layer = this.bottom_layer.getDownLayer();
-			}
-		}
-
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// remove methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Deprecated
-	private final boolean removeMappingRule(final Id l1_id, final Id l2_id) {
-		if ((this.layers.get(l1_id) == null) || (this.layers.get(l2_id) == null)) { return false; }
-		Layer down_layer = this.layers.get(l1_id);
-		Layer up_layer = this.layers.get(l2_id);
-
-		if (down_layer.getUpLayer() != up_layer) {
-			if (down_layer.getDownLayer() == up_layer) {
-				// we mixed the two, switch them
-				Layer tmp = down_layer;
-				down_layer = up_layer;
-				up_layer = tmp;
-			} else {
-				// something is wrong, nothing to do, just finish work here
-				return true;
-			}
-		}
-		down_layer.removeUpLayer();
-		up_layer.removeDownLayer();
-		return true;
-	}
-
-	@Deprecated
-	public final boolean removeMapping(MappedLocation loc1, MappedLocation loc2) {
-		if (loc1.getLayer().getUpLayer() == loc2.getLayer()) {
-			// loc1 = down_loc; loc2 = up_loc
-			if (loc1.getUpMapping().containsKey(loc2.getId()) && loc2.getDownMapping().containsKey(loc1.getId())) {
-				loc1.getUpMapping().remove(loc2.getId());
-				loc2.getDownMapping().remove(loc1.getId());
-				return true;
-			}
-			else {
-				log.warn("loc1="+loc1+",loc2="+loc2+": mapping not found.");
-				return false;
-			}
-		} else if (loc1.getLayer().getDownLayer() == loc2.getLayer()) {
-			// loc1 = up_loc; loc2 = down_loc
-			if (loc1.getDownMapping().containsKey(loc2.getId()) && loc2.getUpMapping().containsKey(loc1.getId())) {
-				loc1.getDownMapping().remove(loc2.getId());
-				loc2.getUpMapping().remove(loc1.getId());
-				return true;
-			}
-			else {
-				log.warn("loc1="+loc1+",loc2="+loc2+": mapping not found.");
-				return false;
-			}
-		} else {
-			log.warn("loc1="+loc1+",loc2="+loc2+": mapping rule not found.");
-			return false;
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// create methods
-	//////////////////////////////////////////////////////////////////////
 
 	@Deprecated
 	public final Layer createLayer(final Id type, final String name) {
 		if (this.layers.containsKey(type)) {
 			throw new IllegalArgumentException("Layer type=" + type + " already exixts.");
 		}
-		if (type.equals(ActivityFacilitiesImpl.LAYER_TYPE)) { throw new RuntimeException(); }
-		if (type.equals(NetworkImpl.LAYER_TYPE)) { throw new RuntimeException(); }
 		return this.createZoneLayer(type,name);
 	}
 
 	@Deprecated
-	public final void createMapping(final Layer downLayer, final Layer upLayer) {
-		downLayer.setUpLayer(upLayer);
-		upLayer.setDownLayer(downLayer);
-	}
-
-	@Deprecated
 	private final ZoneLayer createZoneLayer(final Id type,final String name) {
-		ZoneLayer l = new ZoneLayer(type,name);
-		this.layers.put(l.getType(),l);
+		ZoneLayer l = new ZoneLayer();
+		this.layers.put(type,l);
 		return l;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Deprecated
-	public void setFacilityLayer(final ActivityFacilitiesImpl facilityLayer) {
-		this.facilities = facilityLayer;
-	}
-
-	@Deprecated
-	public void setNetworkLayer(final NetworkImpl network) {
-		throw new RuntimeException();
-	}
-
-	protected final void setName(final String name) {
-		this.name = name;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// add methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Deprecated
-	public final boolean addMapping(MappedLocation loc1, MappedLocation loc2) {
-		if (loc1.getLayer().getUpLayer() == loc2.getLayer()) {
-			// loc1 = down_loc; loc2 = up_loc
-			loc1.addUpMapping(loc2);
-			loc2.addDownMapping(loc1);
-		} else if (loc1.getLayer().getDownLayer() == loc2.getLayer()) {
-			// loc1 = up_loc; loc2 = down_loc
-			loc1.addDownMapping(loc2);
-			loc2.addUpMapping(loc1);
-		} else {
-			log.warn(this.toString() + "[loc1=" + loc1 + ",loc2=" + loc2 + " mapping rule not found]");
-			return false;
-		}
-		return true;
-	}
-
-	@Deprecated
-	protected final void addMapping(final Layer downLayer, final Layer upLayer, final Id down_zone_id, final Id up_zone_id) {
-		Zone down_zone = (Zone)downLayer.getLocation(down_zone_id);
-		Zone up_zone   = (Zone)upLayer.getLocation(up_zone_id);
-		if (down_zone == null) {
-			throw new RuntimeException(this.toString() + "[down_zone_id=" + down_zone_id + " down_zone does not exist]");
-		}
-		if (up_zone == null) {
-			throw new RuntimeException(this.toString() + "[up_zone_id=" + up_zone_id + " down_zone does not exist]");
-		}
-		down_zone.addUpMapping(up_zone);
-		up_zone.addDownMapping(down_zone);
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final String getName() {
-		return this.name;
 	}
 
 	public final Layer getLayer(final Id layer_type) {
@@ -292,41 +54,9 @@ public class World {
 		return this.layers.get(new IdImpl(layer_type));
 	}
 
-	@Deprecated
-	public final Map<Id,Layer> getLayers() {
-		return this.layers;
-	}
-
-	@Deprecated
-	public final Layer getBottomLayer() {
-		if ((this.bottom_layer == null) && !this.layers.isEmpty()) {
-			throw new RuntimeException("bottom_layer = null while world contains layers!");
-		}
-		return this.bottom_layer;
-	}
-
-	@Deprecated
-	public final Layer getTopLayer() {
-		if ((this.top_layer == null) && !this.layers.isEmpty()) {
-			throw new RuntimeException("top_layer = null while world contains layers!");
-		}
-		return this.top_layer;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
-
 	@Override
 	public final String toString() {
-		return "[name=" + this.name + "]" +
-				"[nof_layers=" + this.layers.size() + "]" +
-				"[top_layer=" + this.top_layer + "]" +
-				"[bottom_layer=" + this.bottom_layer + "]";
-	}
-
-	public ActivityFacilitiesImpl getFacilities() {
-		return facilities;
+		return "[nof_layers=" + this.layers.size() + "]";
 	}
 
 }

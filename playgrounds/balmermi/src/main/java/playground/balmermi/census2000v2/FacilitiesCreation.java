@@ -66,7 +66,6 @@ public class FacilitiesCreation {
 		System.out.println("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-		world.complete(config);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

@@ -36,7 +36,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.world.World;
 
 import playground.balmermi.census2000v2.modules.PersonAssignToNetwork;
@@ -78,7 +77,6 @@ public class IIDMAssign2Network {
 		System.out.println("  reading the network xml file...");
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		world.complete(null);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

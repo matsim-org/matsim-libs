@@ -32,13 +32,9 @@ import org.matsim.core.api.experimental.BasicLocations;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 
 public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocations {
-
-	@Deprecated
-	public static final Id LAYER_TYPE = new IdImpl("facility");
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -56,14 +52,11 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public ActivityFacilitiesImpl(final String name) {
 		this.name = name;
 	}
 
-	/**
-	 * Creates a new Facilities object with streaming switched off.
-	 */
 	public ActivityFacilitiesImpl() {
 		this(null);
 	}
@@ -88,11 +81,13 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 
 		return f;
 	}
-	
+
+	@Override
 	public MatsimFactory getFactory() {
-		throw new UnsupportedOperationException( "The factory for facilities needs to be implemented.  kai, jul09" ) ; 
+		throw new UnsupportedOperationException( "The factory for facilities needs to be implemented.  kai, jul09" ) ;
 	}
 
+	@Override
 	public final Map<Id, ActivityFacility> getFacilities() {
 		return facilities;
 	}
@@ -127,5 +122,5 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 }

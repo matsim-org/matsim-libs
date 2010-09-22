@@ -281,7 +281,7 @@ public class ModdedConverterE {
 
 	public void createZone(final ZoneXY zxy) {
 		this.zones.createZone(new IdImpl(zxy.getZoneId()), zxy.getX(), zxy.getY(), null, null,
-				null, null, null, null);
+				null, null);
 	}
 
 	public static void main(final String[] args) {

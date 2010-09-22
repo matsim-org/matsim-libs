@@ -41,7 +41,6 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.world.World;
 
@@ -77,13 +76,11 @@ public class DilutedZurichFilter {
 		log.info("  reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-		world.complete(config);
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		world.complete(config);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

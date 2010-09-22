@@ -21,7 +21,7 @@ package org.matsim.world;
 
 import org.matsim.api.core.v01.Coord;
 
-public interface MappedLocation extends Location, Mappings {
+public interface MappedLocation extends Location {
 
 	/**
 	 * Calculates the distance from a given coordinate to that location.
