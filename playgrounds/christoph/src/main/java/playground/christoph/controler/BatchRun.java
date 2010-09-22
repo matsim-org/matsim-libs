@@ -6,17 +6,17 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 
 public class BatchRun {
-	
+
 	private static final Logger log = Logger.getLogger(BatchRun.class);
-	
-	//protected static String[] knowledgeFactors = {"1.05", "1.10", "1.15", "1.20", "1.25", "1.50", "1.75", "2.00", "2.50", "3.00", "full"}; 
+
+	//protected static String[] knowledgeFactors = {"1.05", "1.10", "1.15", "1.20", "1.25", "1.50", "1.75", "2.00", "2.50", "3.00", "full"};
 	protected static String[] knowledgeFactors = {"2.0"};
 	//protected static double[] probabilityFactors = {0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95};
 	protected static double[] probabilityFactors = {0.65};
-		
+
 /*	// no replanning, initial replanning, act end replanning, leave link replanning
 	protected static int[][] Versuchsplan = {{4, 2, 3, 1},
 											 {2, 3, 4, 1},
@@ -56,21 +56,21 @@ public class BatchRun {
 //											 {0, 8, 0, 2},
 //											 {0, 9, 0, 1},
 //											 {0, 10, 0, 0}};
-	
+
 	protected static int[][] Versuchsplan = {{0, 0, 10, 0}};
-	
-	
+
+
 	// Default Config
 //	protected static String configFileName = "config.xml";
-//	protected static String configFilePath = "../../matsim/test/scenarios/berlin";	
+//	protected static String configFilePath = "../../matsim/test/scenarios/berlin";
 //	protected static String outbase = "../../matsim/output/scenarios/berlin";
 //	protected static String inbase = "../../matsim/test/scenarios/berlin";
-	
+
 	protected static String outbase = "../../matsim/mysimulations/kt-zurich/output";
 	protected static String inbase = "../../matsim/mysimulations/kt-zurich/input";
 	protected static String configFilePath = "../../matsim/mysimulations/kt-zurich";
 	protected static String configFileName = "config.xml";
-	
+
 //	protected static String configFilePath = "mysimulations/zurich-cut";
 //	protected static String configFileName = "config.xml";
 //	protected static String outbase = "mysimulations/zurich-cut/output";
@@ -80,28 +80,28 @@ public class BatchRun {
 //	protected static String configFileName = "config.xml";
 //	protected static String outbase = "mysimulations/berlin/output";
 //	protected static String inbase = "mysimulations/berlin";
-	
-	
+
+
 	private final String separator = System.getProperty("file.separator");
-	
+
 	protected static String outputDirectory;
 	protected static String inputDirectory;
-	
+
 	/*
 	 * Select which kind of BatchRun you want to run.
 	 */
 	public static void main(final String[] args)
-	{			
+	{
 		BatchRun batchRun = new BatchRun();
 		//batchRun.runBatchRunRandomCompass();
 		//batchRun.runBatchRunCompass();
 		batchRun.runBatchRunWithinDay();
 //		batchRun.runBatchRunWithinDayKnowledge();
 //		batchRun.runBatchRunDoE();
-		
+
 		System.exit(0);
 	}
-	
+
 	protected void runBatchRunRandomCompass()
 	{
 		for (int i = 0; i < knowledgeFactors.length; i++)
@@ -110,19 +110,19 @@ public class BatchRun {
 			{
 				outputDirectory = outbase + "/RandomCompassRouter" + "_Knowledge" + knowledgeFactors[i] + "_Probability" + probabilityFactors[j];
 				inputDirectory = inbase;
-			
+
 				outputDirectory = outputDirectory.replace("/", separator);
 				inputDirectory = inputDirectory.replace("/", separator);
-				
-				Gbl.reset();
-				
+
+				MatsimRandom.reset();
+
 				// only for RandomCompassRoute Batch Runs...
 //				RandomCompassRoute.compassProbability = probabilityFactors[j];
-			
+
 				Config config = readConfigFile();
-				
+
 				updateConfigData(config, knowledgeFactors[i]);
-				
+
 				//EventControler controler = new EventControler(config);
 				String confFileName = configFilePath + separator + configFileName;
 				String[] args = new String[1];
@@ -135,28 +135,28 @@ public class BatchRun {
 				controler.pLeaveLinkReplanning = 0.0;
 				controler.run();
 				controler = null;
-				
+
 			}
 		}
 	}
-	
+
 	protected void runBatchRunCompass()
 	{
 		for (int i = 0; i < knowledgeFactors.length; i++)
 		{
 			outputDirectory = outbase + "/CompassRouter" + "_Knowledge" + knowledgeFactors[i];
 			inputDirectory = inbase;
-			
+
 			outputDirectory = outputDirectory.replace("/", separator);
 			inputDirectory = inputDirectory.replace("/", separator);
-			
-			Gbl.reset();
-					
+
+			MatsimRandom.reset();
+
 			Config config = readConfigFile();
-				
+
 			updateConfigData(config, knowledgeFactors[i]);
-				
-			WithinDayControler controler = new WithinDayControler(config);			
+
+			WithinDayControler controler = new WithinDayControler(config);
 			controler.setOverwriteFiles(true);
 //			controler.pNoReplanning = 0.0;
 			controler.pInitialReplanning = 1.0;
@@ -166,7 +166,7 @@ public class BatchRun {
 			controler = null;
 		}
 	}
-	
+
 	protected void runBatchRunWithinDay()
 	{
 		for (int i = 0; i < knowledgeFactors.length; i++)
@@ -175,17 +175,17 @@ public class BatchRun {
 			outputDirectory = outbase + "/output_leave_link_full";
 //			outputDirectory = outbase + "/output_total_full";
 			inputDirectory = inbase;
-		
+
 			outputDirectory = outputDirectory.replace("/", separator);
 			inputDirectory = inputDirectory.replace("/", separator);
-			
-			Gbl.reset();
-		
+
+			MatsimRandom.reset();
+
 			Config config = readConfigFile();
-			
+
 			updateConfigData(config, knowledgeFactors[i]);
-			
-			WithinDayControler controler = new WithinDayControler(config);			
+
+			WithinDayControler controler = new WithinDayControler(config);
 			controler.setOverwriteFiles(true);
 			controler.pInitialReplanning = 0.0;
 			controler.pActEndReplanning = 0.0;
@@ -194,7 +194,7 @@ public class BatchRun {
 			controler = null;
 		}
 	}
-	
+
 	protected void runBatchRunWithinDayKnowledge()
 	{
 		for (int i = 0; i < knowledgeFactors.length; i++)
@@ -202,16 +202,16 @@ public class BatchRun {
 			outputDirectory = outbase + "/output_act_end_" + knowledgeFactors[i];
 //			outputDirectory = outbase + "/output_leave_link_" + knowledgeFactors[i];
 			inputDirectory = inbase;
-					
+
 			outputDirectory = outputDirectory.replace("/", separator);
 			inputDirectory = inputDirectory.replace("/", separator);
-						
-			Gbl.reset();
-					
+
+			MatsimRandom.reset();
+
 			Config config = readConfigFile();
-						
+
 			updateConfigData(config, knowledgeFactors[i]);
-						
+
 			WithinDayKnowledgeControler controler = new WithinDayKnowledgeControler(config);
 			controler.tableName = "BatchTable" + knowledgeFactors[i].replace('.', '_');
 			controler.setOverwriteFiles(true);
@@ -222,7 +222,7 @@ public class BatchRun {
 			controler = null;
 		}
 	}
-	
+
 	protected void runBatchRunDoE()
 	{
 		for (int i = 0; i < Versuchsplan.length; i++)
@@ -232,18 +232,16 @@ public class BatchRun {
 			// use always full knowledge
 			outputDirectory = outbase + "/DoE" + "_Knowledge_Full" + "_Exeriment_" + (i + 1);
 			inputDirectory = inbase;
-		
+
 			outputDirectory = outputDirectory.replace("/", separator);
 			inputDirectory = inputDirectory.replace("/", separator);
-			
-			Gbl.reset();
-					
+
 			Config config = readConfigFile();
-			
+
 			//updateConfigData(config, knowledgeFactors[i]);
 			// use always full knowledge
 			updateConfigData(config, "full");
-			
+
 			WithinDayControler controler = new WithinDayControler(config);
 			controler.setOverwriteFiles(true);
 
@@ -256,37 +254,37 @@ public class BatchRun {
 			controler.pInitialReplanning = pInitialReplanning;
 			controler.pActEndReplanning = pActEndReplanning;
 			controler.pLeaveLinkReplanning = pLeaveLinkReplanning;
-			
+
 			controler.run();
 			controler = null;
-			
+
 //			log.info("Leave Link Replanning Counter: " + DuringLegReplanningModule.replanningCounter);
 //			log.info("Act End Replanning Counter: " + DuringActivityReplanningModule.replanningCounter);
 		}
-		
+
 	}
-	
+
 	protected Config readConfigFile()
-	{		
+	{
 		String dtdFileName = null;
 		String confFileName = configFilePath + separator + configFileName;
 
 		Config config = new Config();
 		config.addCoreModules();
-		
-		if (confFileName != null) 
+
+		if (confFileName != null)
 		{
-			try 
+			try
 			{
 				new MatsimConfigReader(config).readFile(confFileName, dtdFileName);
-			} 
-			catch (IOException e) 
+			}
+			catch (IOException e)
 			{
 				log.error("Problem loading the configuration file from " + confFileName);
 				throw new RuntimeException(e);
 			}
 		}
-		
+
 		return config;
 	}
 
@@ -301,12 +299,12 @@ public class BatchRun {
 		log.info("Complete config dump done.");
 	}
 	*/
-	
+
 	/*
 	 * Set / Overwrite some Parameters in the Config Module.
 	 */
 	protected void updateConfigData(Config config, String knowledgeFactor)
-	{	
+	{
 		// if Module does not exist -> create it
 		if (config.getModule("selection") == null)
 		{
@@ -314,12 +312,12 @@ public class BatchRun {
 		}
 		// overwrite paths in Config
 		config.getModule("config").addParam("outputConfigFile", outputDirectory + "/output_config.xml");
-		
+
 		//controler.getConfig().getModule("selection").addParam("inputSelectionFile", inputDirectory +  "/input_selection.xml.gz");
 		//controler.getConfig().getModule("selection").addParam("inputSelectionFile", inputDirectory +  "/" + knowledgeFactors[i] + "_input_selection.xml.gz");
 		config.getModule("selection").addParam("inputSelectionFile", inputDirectory +  "/" + knowledgeFactor + "_input_selection.xml.gz");
 		config.getModule("selection").addParam("outputSelectionFile", outputDirectory +  "/output_selection.xml.gz");
-		
+
 		config.getModule("controler").addParam("outputDirectory", outputDirectory);
 
 		config.getModule("events").addParam("inputFile",inputDirectory + "/events.txt.gz");
@@ -339,5 +337,5 @@ public class BatchRun {
 		config.getModule("plans").addParam("outputPlansFile", outputDirectory + "/output_plans.xml.gz");
 
 	}
-	
+
 }

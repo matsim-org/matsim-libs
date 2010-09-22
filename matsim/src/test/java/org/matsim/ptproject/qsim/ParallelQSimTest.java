@@ -60,7 +60,6 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -1250,7 +1249,6 @@ public class ParallelQSimTest extends TestCase {
 		final ArrayList<Id> linkIds2;
 
 		public Fixture() {
-			Gbl.reset();
 			this.scenario = new ScenarioImpl();
 			this.config = scenario.getConfig();
 			this.config.setQSimConfigGroup(new QSimConfigGroup());

@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
@@ -52,7 +51,7 @@ public class QueueSimulationBeforeAfterSimStepListenerTest extends MatsimTestCas
 		// redo the test with different settings
 		config.simulation().setEndTime(6.0 * 3600 + 50);
 		config.simulation().setTimeStepSize(10.0);
-		Gbl.reset(); // reset...
+
 		scenario = new ScenarioLoaderImpl(config).loadScenario();
 		qsim = QueueSimulationFactory.createMobsimStatic(scenario, new EventsManagerImpl());
 

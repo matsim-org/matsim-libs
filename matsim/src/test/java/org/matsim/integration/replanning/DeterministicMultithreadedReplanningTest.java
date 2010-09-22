@@ -22,7 +22,6 @@ package org.matsim.integration.replanning;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
@@ -65,37 +64,36 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
 		new TestControler(config, strategyManager).run();
 
-		Gbl.reset();
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		new TestControler(config, strategyManager).run();
-		
+
 		for (int i = 0; i <= lastIteration; i++) {
-			
+
 			long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.txt.gz");
 			long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.txt.gz");
-			
+
 			assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
 		}
-		
+
 		for (int i = 0; i < 2; i++) {
 			long pcksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
 			long pcksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
-			assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);			
+			assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);
 		}
 	}
-	
+
 	/**
 	 * Tests that the generic {@link ReRoute} generates always the same results
 	 * with the same number of threads using only one agent.
 	 */
 	public void testReRouteOneAgent() {
 		int lastIteration = 5;
-		
+
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
 		config.plans().setInputFile(this.getClassInputDirectory() + "plans1.xml");
-		
+
 		// setup run1
 		PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
 		StrategyManager strategyManager = new StrategyManager();
@@ -107,7 +105,6 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		controler.run();
 
 		// setup run2
-		Gbl.reset();
 		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
 		StrategyManager strategyManager2 = new StrategyManager();
 		strategyManager2.addStrategy(strategy2, 1.0);
@@ -116,23 +113,23 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		config.global().setNumberOfThreads(3); // use a different number of threads because the result must be the same
 		Controler controler2 = new TestControler(config, strategyManager2);
 		strategy2.addStrategyModule(new ReRoute(controler2));
-		
+
 		controler2.run();
-	
+
 		for (int i = 0; i <= lastIteration; i++) {
-			
+
 			long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.txt.gz");
 			long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.txt.gz");
-			
+
 			assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
 		}
-		
+
 		for (int i = 0; i < 2; i++) {
 			long pcksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
 			long pcksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
-			assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);			
+			assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);
 		}
-	
+
 	}
 
 	/**
@@ -144,8 +141,8 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
-		
-		
+
+
 		// setup run1
 		PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
 		StrategyManager strategyManager = new StrategyManager();
@@ -156,7 +153,6 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		strategy.addStrategyModule(new ReRoute(controler));
 		controler.run();
 
-		Gbl.reset();
 		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
 		StrategyManager strategyManager2 = new StrategyManager();
 		strategyManager2.addStrategy(strategy2, 1.0);
@@ -166,19 +162,19 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		Controler controler2 = new TestControler(config, strategyManager2);
 		strategy2.addStrategyModule(new ReRoute(controler2));
 		controler2.run();
-		
+
 		for (int i = 0; i <= lastIteration; i++) {
-			
+
 			long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.txt.gz");
 			long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.txt.gz");
-			
+
 			assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
 		}
-		
+
 		for (int i = 0; i < 2; i++) {
 			long pcksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
 			long pcksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
-			assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);			
+			assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);
 		}
 	}
 

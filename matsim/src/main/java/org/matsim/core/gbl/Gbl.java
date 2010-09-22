@@ -93,12 +93,6 @@ public abstract class Gbl {
 	// reset scenario
 	//////////////////////////////////////////////////////////////////////
 
-	@Deprecated
-	public static final void reset() {
-		log.info("Gbl.reset() -- reset config");
-		MatsimRandom.reset();
-	}
-
 	public static final void printMemoryUsage() {
 		long totalMem = Runtime.getRuntime().totalMemory();
 		long freeMem = Runtime.getRuntime().freeMemory();

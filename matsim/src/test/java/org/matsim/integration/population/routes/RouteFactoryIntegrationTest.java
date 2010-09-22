@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.CompressedNetworkRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -82,7 +81,6 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		}
 
 		// test another setting
-		Gbl.reset();
 		config.controler().setOutputDirectory(getOutputDirectory() + "/variant1");
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		scenario.getNetwork().getFactory().setRouteFactory(TransportMode.car, new CompressedNetworkRouteFactory(scenario.getNetwork()));

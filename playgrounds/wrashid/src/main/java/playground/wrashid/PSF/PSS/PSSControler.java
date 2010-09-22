@@ -10,7 +10,6 @@ import java.io.PrintWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.ParametersPSFMutator;
@@ -57,7 +56,7 @@ public class PSSControler {
 	 * number of iterations, in which both MATSim and PSS (Power System
 	 * Simulation) is run. The number of iterations within matsim is specified
 	 * in the config file.
-	 * 
+	 *
 	 * @param numberOfIterations
 	 */
 	public void runMATSimPSSIterations(int numberOfIterations) {
@@ -95,7 +94,7 @@ public class PSSControler {
 			minimumPriceSignal = new double[numberOfTimeBins][ParametersPSF.getNumberOfHubs()];
 		}
 
-		
+
 
 		// from iteration 1 onwards: maintain price levels.
 		if (iterationNumber >= 1) {
@@ -106,12 +105,12 @@ public class PSSControler {
 
 			for (int i = 0; i < numberOfTimeBins; i++) {
 				for (int j = 0; j < ParametersPSF.getNumberOfHubs(); j++) {
-					// get new values for price level and minimum price signal level 
+					// get new values for price level and minimum price signal level
 					double[] priceSignalProcessing=FirstPriceSignalMaintainingAlgorithm.processPriceSignal(newPriceSignalMatrix[i][j], oldPriceSignalMatrix[i][j], minimumPriceSignal[i][j]);
-					
+
 					newPriceSignalMatrix[i][j]=priceSignalProcessing[0];
 					minimumPriceSignal[i][j]=priceSignalProcessing[1];
-					
+
 				}
 			}
 
@@ -171,24 +170,20 @@ public class PSSControler {
 	}
 
 	public void runMATSimIterations() {
-		
-		Gbl.reset();
-		
-		
-		
-		// use the right Controler (read parameter 
+
+		// use the right Controler (read parameter
 		Config config = new Config();
 		MatsimConfigReader reader = new MatsimConfigReader(config);
 		reader.readFile(configFilePath);
 		String tempStringValue = config.findParam(ParametersPSF.getPSFModule(), "main.inputEventsForSimulationPath");
 		if (tempStringValue != null) {
-			// ATTENTION, this does not work at the moment, because the read link from the 
+			// ATTENTION, this does not work at the moment, because the read link from the
 			// event file is null and this causes some probelems in my handlers...
 			controler = new EventReadControler(configFilePath,tempStringValue);
 		} else {
 			controler = new Controler(configFilePath);
 		}
-		
+
 		controler.addControlerListener(new AddEnergyScoreListener());
 		controler.setOverwriteFiles(true);
 

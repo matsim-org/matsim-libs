@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
@@ -117,7 +116,6 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.strategy().addParam("Module_" + index, "ReRoute_Landmarks");
 		config.strategy().addParam("ModuleProbability_" + index, "0.1");
 		try {
-			Gbl.reset();
 			Controler controler = new TestControler(config);
 			controler.setOverwriteFiles(true);
 			controler.run();
@@ -129,7 +127,6 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		// try to fix the strategy, but fail again
 		config.strategy().addParam("Module_" + index, "ReRoute_Dijkstra");
 		try {
-			Gbl.reset();
 			Controler controler = new TestControler(config);
 			controler.setOverwriteFiles(true);
 			controler.run();
@@ -141,7 +138,6 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		// now fix it
 		config.strategy().addParam("Module_" + index, "ReRoute");
 		try {
-			Gbl.reset();
 			Controler controler = new TestControler(config);
 			controler.setOverwriteFiles(true);
 			controler.run();
@@ -164,7 +160,6 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		double scoreBasecase = controler1.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore().doubleValue();
 
 		// now run toll case
-		Gbl.reset();
 		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "distanceToll.xml");
 		config.controler().setOutputDirectory(getOutputDirectory() + "/tollcase/");

@@ -26,6 +26,7 @@ import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -64,7 +65,7 @@ public class MatsimTestUtils extends TestWatchman {
 	private String testMethodName = null;
 
 	public MatsimTestUtils() {
-		Gbl.reset(); // make sure we start with a clean environment
+		MatsimRandom.reset();
 	}
 
 	/**

@@ -25,12 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -104,7 +102,6 @@ public class ControlerEventsTest extends MatsimTestCase {
 		assertEquals(0, finishIt.get(0).getIteration());
 
 		// prepare remove test
-		Gbl.reset();
 		controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);

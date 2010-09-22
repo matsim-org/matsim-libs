@@ -27,6 +27,7 @@ import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 
 @Ignore
@@ -65,7 +66,7 @@ public class MatsimTestCase extends TestCase {
 		this.packageInputDirectory = this.classInputDirectory.substring(0, this.classInputDirectory.lastIndexOf("/") + 1);
 		this.classInputDirectory = this.classInputDirectory + "/";
 		this.inputDirectory = this.classInputDirectory + getName() + "/";
-		Gbl.reset(); // make sure we start with a clean environment
+		MatsimRandom.reset();
 	}
 
 	/**

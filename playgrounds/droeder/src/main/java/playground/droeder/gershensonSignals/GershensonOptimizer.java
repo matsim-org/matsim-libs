@@ -25,10 +25,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.droeder.DaPaths;
@@ -40,11 +40,11 @@ import playground.droeder.ValueComparator;
  *
  */
 public class GershensonOptimizer {
-	
+
 	private Solution init(){
 		Solution s = new Solution();
 		double temp =0;
-		
+
 		do{
 			temp = Math.random();
 		}while(temp<0.5);
@@ -57,13 +57,13 @@ public class GershensonOptimizer {
 		}while (s.getU() > s.getMaxRed());
 		return s;
 	}
-	
+
 	private Map<Integer, Solution> getBest(Map<Integer, Solution> solutions, Integer firstBest){
 		Map<Integer, Double> temp = new HashMap<Integer, Double>();
 		ValueComparator vc = new ValueComparator(temp);
 		TreeMap<Integer, Double> tempBest = new TreeMap<Integer, Double>(vc);
 		Map<Integer, Solution> bests = new HashMap<Integer, Solution>();
-		
+
 		for(Entry<Integer, Solution> e:solutions.entrySet()){
 			temp.put(e.getKey(), e.getValue().getAvTT());
 		}
@@ -74,7 +74,7 @@ public class GershensonOptimizer {
 		}
 		return bests;
 	}
-	
+
 	private Map<Integer, Solution> recombination(Map<Integer, Solution> bests, double randSize){
 		Map<Integer, Solution> recombinated = new HashMap<Integer, Solution>();
 		Solution s;
@@ -120,7 +120,7 @@ public class GershensonOptimizer {
 		}while(recombinated.size()<(randSize));
 		return recombinated;
 	}
-	
+
 	public void writeToTxt (Map <Integer, Solution> data, String fileName){
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
@@ -152,14 +152,14 @@ public class GershensonOptimizer {
 				writer.newLine();
 			}
 			writer.close();
-			
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public Map<Integer, Solution> readFromTxt(String fileName){
 		Map<Integer, Solution> solutions = new HashMap<Integer, Solution>();
 		Map<String, Double> fac;
@@ -192,16 +192,16 @@ public class GershensonOptimizer {
 				}
 			}while(!(line == null));
 			reader.close();
-			
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return solutions;
 	}
-	
+
 
 	public static void main(String[] args) {
 		GershensonOptimizer g = new GershensonOptimizer();
@@ -212,15 +212,15 @@ public class GershensonOptimizer {
 		String folder = DaPaths.OUTPUT + scenario + "\\optimization2\\";
 		int i;
 		int b = 200;
-		
-		
+
+
 		for (int ii = 0; ii<b; ii++){
 			temp.put(ii, g.init());
 		}
 		for (Entry<Integer, Solution> e  : temp.entrySet()){
 			runner = new GershensonRunner(e.getValue().getU(), e.getValue().getN(), e.getValue().getCap(), e.getValue().getD(), e.getValue().getMaxRed(), false, false);
-			Gbl.reset();
-			
+			MatsimRandom.reset();
+
 			runner.runScenario(scenario);
 			e.getValue().setAvTT(runner.getAvTT());
 			e.getValue().setAvWaitingFactor(runner.getAvWaitFactor());
@@ -229,11 +229,11 @@ public class GershensonOptimizer {
 			e.getValue().setMedianWaitFac(runner.getFactors().get("median"));
 			e.getValue().setAbsTT(runner.getAbsTT());
 		}
-		
+
 		g.writeToTxt(temp,  folder + "randomSeed.txt");
 		best = g.getBest(temp,b/5);
 		g.writeToTxt(best, folder + "bestRandom.txt");
-		
+
 		for (int n = 1 ; n < 1000; n++){
 			temp.clear();
 			temp = g.recombination(best, b/10);
@@ -244,7 +244,7 @@ public class GershensonOptimizer {
 			System.out.println(temp.size());
 			for (Entry<Integer, Solution> e  : temp.entrySet()){
 				runner = new GershensonRunner(e.getValue().getU(), e.getValue().getN(), e.getValue().getCap(), e.getValue().getD(), e.getValue().getMaxRed(), false, false);
-				Gbl.reset();
+				MatsimRandom.reset();
 				runner.runScenario(scenario);
 				e.getValue().setAvTT(runner.getAvTT());
 				e.getValue().setAvWaitingFactor(runner.getAvWaitFactor());
@@ -284,9 +284,9 @@ class Solution{
 	private double minFac;
 	private double maxFac;
 	private double medianFac;
-	
+
 	public Solution(){
-		
+
 	}
 	public Solution(int u, int n, int maxRed, double cap, double d){
 		this.u = u;
@@ -335,42 +335,42 @@ class Solution{
 	public void setD(double d) {
 		this.d = d;
 	}
-	
+
 	public void setAvTT(double time){
 		this.avTT =  ((int)(time*100.00))/100.00;
 	}
-	
+
 	public double getAvTT(){
 		return this.avTT;
 	}
-	
+
 	public void setAbsTT(double time){
 		this.absTT =  ((int)(time*100.00))/100.00;
 	}
 	public double getAbsTT(){
 		return this.absTT;
 	}
-	
+
 	public void setAvWaitingFactor(double factor){
 		this.waitingFactor = ((int)(factor*100.00))/100.00;
 	}
-	
+
 	public double getAvWaitingFactor(){
 		return this.waitingFactor;
 	}
-	
+
 	public void setMinWaitFac(double factor){
 		this.minFac = ((int) (factor*100.00))/100.00;
 	}
-	
+
 	public void setMaxWaitFac(double factor){
 		this.maxFac = ((int) (factor*100.00))/100.00;
 	}
-	
+
 	public void setMedianWaitFac(double factor){
 		this.medianFac = ((int) (factor*100.00))/100.00;
 	}
-	
+
 	public double getMinWaitFac(){
 		return this.minFac;
 	}
@@ -378,29 +378,29 @@ class Solution{
 	public double getMaxWaitFac(){
 		return this.maxFac;
 	}
-	
+
 	public double getMedianFac() {
 		return this.medianFac;
 	}
-	
+
 	@Override
 	public String toString(){
 		String temp;
 		temp = "avTT=" + avTT + " d=" + d + " cap=" + cap + " u=" + u + " n=" + n + " maxRed =" + maxRed ;
 		return temp;
 	}
-	
+
 	@Override
 	public boolean equals(Object o){
 		if (!(o instanceof Solution)) return false;
 		Solution s = (Solution) o;
-		
-		if (this.cap == s.getCap() && this.d == s.getD() && this.maxRed == s.getMaxRed() 
+
+		if (this.cap == s.getCap() && this.d == s.getD() && this.maxRed == s.getMaxRed()
 				&& this.n == s.getN() && this.u == s.getU()){
 			return true;
 		} else{
 			return false;
 		}
 	}
-	
+
 }

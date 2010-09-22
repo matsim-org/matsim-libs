@@ -262,9 +262,11 @@ public class QSimTest {
 
 	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {
 		public final ArrayList<LinkEnterEvent> events = new ArrayList<LinkEnterEvent>();
+		@Override
 		public void handleEvent(final LinkEnterEvent event) {
 			this.events.add(event);
 		}
+		@Override
 		public void reset(final int iteration) {
 			this.events.clear();
 		}
@@ -1113,10 +1115,12 @@ public class QSimTest {
 			this.linkId = linkId;
 		}
 
+		@Override
 		public void handleEvent(final LinkEnterEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) this.counter++;
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			this.counter = 0;
 		}
@@ -1130,6 +1134,7 @@ public class QSimTest {
 		public Event firstEvent = null;
 		public Event lastEvent = null;
 
+		@Override
 		public void handleEvent(final Event event) {
 			if (firstEvent == null) {
 				firstEvent = event;
@@ -1137,6 +1142,7 @@ public class QSimTest {
 			lastEvent = event;
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			firstEvent = null;
 			lastEvent = null;
@@ -1164,7 +1170,6 @@ public class QSimTest {
 		final ArrayList<Id> linkIds2;
 
 		public Fixture() {
-			Gbl.reset();
 			this.scenario = new ScenarioImpl();
 			this.config = scenario.getConfig();
 			this.config.setQSimConfigGroup(new QSimConfigGroup());

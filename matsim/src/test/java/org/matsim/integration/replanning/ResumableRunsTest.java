@@ -54,7 +54,6 @@ public class ResumableRunsTest extends MatsimTestCase {
 		controler1.run();
 
 		// run2
-		Gbl.reset();
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		config.controler().setFirstIteration(10);
 		config.plans().setInputFile(getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz");
