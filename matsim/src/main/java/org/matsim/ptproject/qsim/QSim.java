@@ -70,7 +70,6 @@ import org.matsim.ptproject.qsim.interfaces.SimTimerI;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTimeCost;
 import org.matsim.ptproject.qsim.netsimengine.CarDepartureHandler;
 import org.matsim.ptproject.qsim.netsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.netsimengine.DefaultQSimEngineFactory;
@@ -117,7 +116,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	private QSimEngineImpl netEngine = null;
 	private NetworkChangeEventsEngine changeEventsEngine = null;
 	private MultiModalSimEngine multiModalEngine = null;
-	
+
 	private CarDepartureHandler carDepartureHandler;
 
 	private SimTimerI simTimer;
@@ -165,7 +164,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	public void setMultiModalSimEngine(MultiModalSimEngine multiModalEngine) {
 		this.multiModalEngine = multiModalEngine;
 	}
-	
+
 	/**
 	 * extended constructor method that can also be after assignments of another constructor
 	 * <p/>
@@ -211,7 +210,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		}
 
 		if (sc.getConfig().multiModal().isMultiModalSimulationEnabled()) {
-			
+
 			/*
 			 * Create a MultiModalTravelTime Calculator. It is passed over the the MultiModalQNetwork which
 			 * needs it to estimate the TravelTimes of the NonCarModes.
@@ -220,9 +219,9 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			 * Object.
 			 */
 //			MultiModalTravelTimeCost multiModalTravelTime = new MultiModalTravelTimeCost(sc.getConfig().plansCalcRoute(), sc.getConfig().multiModal());
-			
+
 //			TravelTime travelTime = ((MultiModalMobsimFactory)simEngineFac).getTravelTime();
-//			
+//
 //			if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
 //				BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
 //				bufferedTravelTime.setScaleFactor(1.25);
@@ -231,14 +230,14 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 //				log.warn("TravelTime is not instance of TravelTimeCalculatorWithBuffer!");
 //				log.warn("No BufferedTravelTime Object could be created. Using FreeSpeedTravelTimes instead.");
 //			}
-			
+
 			// create MultiModalSimEngine
 			multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(this);
-			
+
 			// add MultiModalDepartureHandler
 			this.addDepartureHandler(new MultiModalDepartureHandler(this, multiModalEngine, scenario.getConfig().multiModal()));
 		}
-		
+
 		this.agentFactory = new AgentFactory(this);
 
 		this.carDepartureHandler = new CarDepartureHandler(this);
@@ -375,7 +374,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		if ( this.netEngine != null ) {
 			this.netEngine.afterSim();
 		}
-		
+
 		if (this.multiModalEngine != null) {
 			this.multiModalEngine.afterSim();
 		}
@@ -430,7 +429,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 		// "facilities" "engine":
 		this.handleActivityEnds(time);
-		
+
 		// network engine:
 		if ( this.netEngine != null ) {
 			this.netEngine.doSimStep(time);
@@ -440,7 +439,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		if (this.multiModalEngine != null) {
 			this.multiModalEngine.doSimStep(time);
 		}
-		
+
 		this.printSimLog(time);
 		if (time >= this.snapshotTime) {
 			this.snapshotTime += this.snapshotPeriod;
@@ -514,7 +513,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			}
 		}
 	}
-	
+
+	@Override
 	public final void registerAgentAtPtWaitLocation(final PersonAgent agent) {
 		if (agent instanceof DefaultPersonDriverAgent) { // yyyy but why is this needed?  Does the driver get registered?
 			Leg leg = (Leg) agent.getCurrentPlanElement() ;
@@ -538,7 +538,8 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			}
 		}
 	}
-	
+
+	@Override
 	public final void unregisterAgentAtPtWaitLocation( final PersonAgent agent ) {
 		if (agent instanceof DefaultPersonDriverAgent) { // yyyy but why is this needed?
 			Leg leg = (Leg) agent.getCurrentPlanElement() ;
@@ -554,7 +555,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			if (agent.getDepartureTime() <= time) {
 				this.activityEndsList.poll();
 				unregisterAgentAtActivityLocation(agent);
-				agent.endActivityAndAssumeControl(time); 
+				agent.endActivityAndAssumeControl(time);
 				// gives control to agent; comes back via "agentDeparts" or "scheduleActivityEnd"
 			} else {
 				return;
@@ -643,11 +644,11 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			if (this.multiModalEngine != null) {
 				nofActiveLinks = this.multiModalEngine.getNumberOfSimulatedLinks();
 				int nofActiveNodes = this.multiModalEngine.getNumberOfSimulatedNodes();
-				log.info("SIMULATION (MultiModalSim) AT " + Time.writeTime(time) + 
+				log.info("SIMULATION (MultiModalSim) AT " + Time.writeTime(time) +
 						" #links=" + nofActiveLinks +
 						" #nodes=" + nofActiveNodes);
 			}
-			
+
 			Gbl.printMemoryUsage();
 		}
 	}
@@ -726,7 +727,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	public MultiModalSimEngine getMultiModalSimEngine() {
 		return this.multiModalEngine;
 	}
-	
+
 	@Override
 	@Deprecated // if you think you need to use this, ask kai.  aug'10
 	public void addFeature(final VisMobsimFeature queueSimulationFeature) {
