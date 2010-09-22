@@ -19,32 +19,45 @@
 
 package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.MatsimRandom;
+import java.util.Collection;
 
-import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
-/**
- * @author mrieser
- */
-/*package*/ abstract class QueueNetworkCreator {
+import playground.mrieser.core.mobsim.api.SimVehicle;
+import playground.mrieser.core.mobsim.network.api.VisLink;
 
-	public static QueueNetwork createQueueNetwork(final Network network, final TimestepSimEngine simEngine, final Operator operator) {
-		QueueNetwork qnet = new QueueNetwork(simEngine, operator);
+public class VisLinkImpl implements VisLink {
 
-		for (Link link : network.getLinks().values()) {
-			qnet.addLink(new QueueLink(link, qnet, operator));
+	private final QueueLink link;
+
+	public VisLinkImpl(final QueueLink link) {
+		this.link = link;
+	}
+
+	@Override
+	public void getVehiclePositions(final Collection<AgentSnapshotInfo> positions) {
+
+		double dist = this.link.link.getLength();
+		int vehCount = this.link.buffer.buffer.size() + this.link.vehQueue.size();
+		double vehSize = Math.min(7.5, dist / vehCount);
+
+		for (SimVehicle veh : this.link.buffer.buffer) {
+			dist -= vehSize;
+			AgentSnapshotInfo pi = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh.getId(), this.link.link, dist, 1);
+			pi.setColorValueBetweenZeroAndOne(1.0);
+			pi.setAgentState(AgentState.PERSON_DRIVING_CAR);
+			positions.add(pi);
 		}
-		for (Node node : network.getNodes().values()) {
-			qnet.addNode(new QueueNode(node, qnet, operator, MatsimRandom.getLocalInstance()));
+		vehSize = dist / this.link.vehQueue.size();
+		for (SimVehicle veh : this.link.vehQueue) {
+			dist -= vehSize;
+			AgentSnapshotInfo pi = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh.getId(), this.link.link, dist, 1);
+			pi.setColorValueBetweenZeroAndOne(0.5);
+			pi.setAgentState(AgentState.PERSON_DRIVING_CAR);
+			positions.add(pi);
 		}
-		for (QueueLink ql : qnet.getLinks().values()) {
-			ql.buffer.init();
-		}
-
-		return qnet;
 	}
 
 }

@@ -27,7 +27,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 
-import playground.mrieser.core.mobsim.features.OTFVisFeature;
 import playground.mrieser.core.mobsim.features.SignalSystemsFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
 import playground.mrieser.core.mobsim.features.TransitFeature;
@@ -58,7 +57,6 @@ public class TransitSimFactory implements MobsimFactory {
 		planSim.addSimFeature(new SignalSystemsFeature());
 		planSim.addSimFeature(new TransitFeature());
 		planSim.addSimFeature(netFeature);
-		planSim.addSimFeature(new OTFVisFeature());
 
 		// setup PlanElementHandlers
 		ActivityHandler ah = new ActivityHandler(engine);
@@ -74,7 +72,7 @@ public class TransitSimFactory implements MobsimFactory {
 		lh.setDepartureHandler(TransportMode.bike, teleporter);
 
 		// register agent sources
-		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation()));
+		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(), 1.0));
 		// TODO transit agent source
 
 		return planSim;

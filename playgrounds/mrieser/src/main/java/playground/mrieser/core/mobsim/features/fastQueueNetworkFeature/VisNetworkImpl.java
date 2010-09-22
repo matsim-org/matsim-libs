@@ -19,32 +19,40 @@
 
 package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.MatsimRandom;
+import java.util.HashMap;
+import java.util.Map;
 
-import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import org.matsim.api.core.v01.Id;
 
-/**
- * @author mrieser
- */
-/*package*/ abstract class QueueNetworkCreator {
+import playground.mrieser.core.mobsim.network.api.VisLink;
+import playground.mrieser.core.mobsim.network.api.VisNetwork;
+import playground.mrieser.core.mobsim.network.api.VisNode;
 
-	public static QueueNetwork createQueueNetwork(final Network network, final TimestepSimEngine simEngine, final Operator operator) {
-		QueueNetwork qnet = new QueueNetwork(simEngine, operator);
+public class VisNetworkImpl implements VisNetwork {
 
-		for (Link link : network.getLinks().values()) {
-			qnet.addLink(new QueueLink(link, qnet, operator));
+	private final Map<Id, VisLinkImpl> links;
+	private final Map<Id, VisNodeImpl> nodes;
+
+	public VisNetworkImpl(final QueueNetwork qnet) {
+		this.links = new HashMap<Id, VisLinkImpl>((int) (qnet.getLinks().size() * 1.5));
+		this.nodes = new HashMap<Id, VisNodeImpl>((int) (qnet.getNodes().size() * 1.5));
+
+		for (QueueLink link : qnet.getLinks().values()) {
+			this.links.put(link.getId(), new VisLinkImpl(link));
 		}
-		for (Node node : network.getNodes().values()) {
-			qnet.addNode(new QueueNode(node, qnet, operator, MatsimRandom.getLocalInstance()));
+		for (QueueNode node : qnet.getNodes().values()) {
+			this.nodes.put(node.getId(), new VisNodeImpl());
 		}
-		for (QueueLink ql : qnet.getLinks().values()) {
-			ql.buffer.init();
-		}
+	}
 
-		return qnet;
+	@Override
+	public Map<Id, ? extends VisLink> getLinks() {
+		return this.links;
+	}
+
+	@Override
+	public Map<Id, ? extends VisNode> getNodes() {
+		return this.nodes;
 	}
 
 }

@@ -32,9 +32,11 @@ import playground.mrieser.core.mobsim.api.PlanAgent;
 public class PopulationAgentSource implements AgentSource {
 
 	private final Population population;
+	private final double agentWeight;
 
-	public PopulationAgentSource(final Population population) {
+	public PopulationAgentSource(final Population population, final double agentWeight) {
 		this.population = population;
+		this.agentWeight = agentWeight;
 	}
 
 	@Override
@@ -42,7 +44,7 @@ public class PopulationAgentSource implements AgentSource {
 		List<PlanAgent> agents = new ArrayList<PlanAgent>(this.population.getPersons().size());
 		for (Person person : this.population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
-			agents.add(new DefaultPlanAgent(plan));
+			agents.add(new DefaultPlanAgent(plan, this.agentWeight));
 		}
 		return agents;
 	}

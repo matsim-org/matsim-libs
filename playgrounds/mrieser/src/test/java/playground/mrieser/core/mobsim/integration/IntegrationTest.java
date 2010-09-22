@@ -84,7 +84,7 @@ public class IntegrationTest {
 		/* setup end */ // TODO too much boilerplate code
 
 		// register agent sources
-		planSim.addAgentSource(new PopulationAgentSource(f.scenario.getPopulation()));
+		planSim.addAgentSource(new PopulationAgentSource(f.scenario.getPopulation(), 1.0));
 
 		planSim.runSim();
 
@@ -124,7 +124,7 @@ public class IntegrationTest {
 		/* setup end */ // TODO too much boilerplate code
 
 		// register agent sources
-		planSim.addAgentSource(new PopulationAgentSource(f.scenario.getPopulation()));
+		planSim.addAgentSource(new PopulationAgentSource(f.scenario.getPopulation(), 1.0));
 
 		planSim.runSim();
 
@@ -165,7 +165,7 @@ public class IntegrationTest {
 		/* setup end */ // TODO too much boilerplate code
 
 		// register agent sources
-		planSim.addAgentSource(new PopulationAgentSource(f.scenario.getPopulation()));
+		planSim.addAgentSource(new PopulationAgentSource(f.scenario.getPopulation(), 1.0));
 
 		planSim.runSim();
 

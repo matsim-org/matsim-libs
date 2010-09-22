@@ -19,7 +19,25 @@
 
 package playground.mrieser.core.mobsim.features;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshots.writers.SnapshotWriter;
+
+import playground.mrieser.core.mobsim.network.api.VisLink;
+import playground.mrieser.core.mobsim.network.api.VisNetwork;
+
 public class OTFVisFeature implements MobSimFeature {
+
+	private final VisNetwork visNetwork;
+	private final SnapshotWriter snapshotWriter;
+	private boolean takeSnapshots = true;
+
+	public OTFVisFeature(final VisNetwork visNetwork, final SnapshotWriter snapshotWriter) {
+		this.visNetwork = visNetwork;
+		this.snapshotWriter = snapshotWriter;
+	}
 
 	@Override
 	public void beforeMobSim() {
@@ -27,7 +45,17 @@ public class OTFVisFeature implements MobSimFeature {
 
 	@Override
 	public void doSimStep(double time) {
-		// TODO Auto-generated method stub
+		if (time > 8*3600) {
+			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>(10000);
+			for (VisLink link : visNetwork.getLinks().values()) {
+				link.getVehiclePositions(positions);
+			}
+			this.snapshotWriter.beginSnapshot(time);
+			for (AgentSnapshotInfo pi : positions) {
+				this.snapshotWriter.addAgent(pi);
+			}
+			this.snapshotWriter.endSnapshot();
+		}
 	}
 
 	@Override

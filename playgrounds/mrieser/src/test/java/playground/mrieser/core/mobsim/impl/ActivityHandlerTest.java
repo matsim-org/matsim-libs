@@ -43,8 +43,6 @@ import org.matsim.testcases.utils.LogCounter;
 
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
-import playground.mrieser.core.mobsim.impl.ActivityHandler;
-import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
 
 /**
  * @author mrieser
@@ -402,7 +400,7 @@ public class ActivityHandlerTest {
 			this.lastHomeAct = new ActivityImpl("work", c);
 			this.plan1.addActivity(this.lastHomeAct);
 
-			this.agent1 = new DefaultPlanAgent(plan1);
+			this.agent1 = new DefaultPlanAgent(plan1, 1.0);
 		}
 	}
 

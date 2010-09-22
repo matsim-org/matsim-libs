@@ -34,9 +34,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
 import playground.mrieser.core.mobsim.api.PlanSimulation;
-import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
-import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
-import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
 
 /**
  * @author mrieser
@@ -53,7 +50,7 @@ public class TimestepSimEngineTest {
 		plan.addActivity(new ActivityImpl("shop", c));
 		plan.addLeg(new LegImpl(TransportMode.car));
 		plan.addActivity(new ActivityImpl("home", c));
-		PlanAgent agent = new DefaultPlanAgent(plan);
+		PlanAgent agent = new DefaultPlanAgent(plan, 1.0);
 
 		PlanSimulation planSim = new PlanSimulationImpl(null);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, null);
@@ -95,14 +92,14 @@ public class TimestepSimEngineTest {
 		plan1.addActivity(new ActivityImpl("shop", c));
 		plan1.addLeg(new LegImpl(TransportMode.car));
 		plan1.addActivity(new ActivityImpl("home", c));
-		PlanAgent agent1 = new DefaultPlanAgent(plan1);
+		PlanAgent agent1 = new DefaultPlanAgent(plan1, 1.0);
 		Plan plan2 = new PlanImpl();
 		plan2.addActivity(new ActivityImpl("home", c));
 		plan2.addLeg(new LegImpl(TransportMode.car));
 		plan2.addActivity(new ActivityImpl("leisure", c));
 		plan2.addLeg(new LegImpl(TransportMode.car));
 		plan2.addActivity(new ActivityImpl("home", c));
-		PlanAgent agent2 = new DefaultPlanAgent(plan2);
+		PlanAgent agent2 = new DefaultPlanAgent(plan2, 1.0);
 
 		PlanSimulation planSim = new PlanSimulationImpl(null);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, null);

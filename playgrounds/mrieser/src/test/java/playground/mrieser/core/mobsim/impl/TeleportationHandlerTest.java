@@ -32,8 +32,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
-import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
-import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.impl.TimestepSimEngineTest.CountingPlanElementHandler;
 
 /**
@@ -54,7 +52,7 @@ public class TeleportationHandlerTest {
 		leg.setTravelTime(80.0);
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("home", c));
-		PlanAgent agent = new DefaultPlanAgent(plan);
+		PlanAgent agent = new DefaultPlanAgent(plan, 1.0);
 
 		FakeSimEngine engine = new FakeSimEngine();
 		CountingPlanElementHandler actHandler = new CountingPlanElementHandler();

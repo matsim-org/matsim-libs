@@ -73,7 +73,7 @@ public class CarDepartureHandlerTest {
 		plan.addLeg(leg);
 		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("work", f.ids[3]));
 		plan.setPerson(f.scenario.getPopulation().getFactory().createPerson(f.ids[0]));
-		PlanAgent agent = new DefaultPlanAgent(plan);
+		PlanAgent agent = new DefaultPlanAgent(plan, 1.0);
 		MobSimLink link = f.networkFeature.getSimNetwork().getLinks().get(f.ids[0]);
 		SimVehicle veh = new FakeSimVehicle(f.ids[0]);
 		link.insertVehicle(veh, MobSimLink.POSITION_AT_TO_NODE, MobSimLink.PRIORITY_PARKING);
@@ -118,7 +118,7 @@ public class CarDepartureHandlerTest {
 		plan.addActivity(f.scenario.getPopulation().getFactory().createActivityFromLinkId("leisure", f.ids[3]));
 
 		plan.setPerson(f.scenario.getPopulation().getFactory().createPerson(f.ids[0]));
-		PlanAgent agent = new DefaultPlanAgent(plan);
+		PlanAgent agent = new DefaultPlanAgent(plan, 1.0);
 		MobSimLink link = f.networkFeature.getSimNetwork().getLinks().get(f.ids[3]);
 		SimVehicle veh = new FakeSimVehicle(f.ids[0]);
 		link.insertVehicle(veh, MobSimLink.POSITION_AT_TO_NODE, MobSimLink.PRIORITY_PARKING);
@@ -177,7 +177,7 @@ public class CarDepartureHandlerTest {
 
 		Id personId = f.ids[0];
 		plan.setPerson(f.scenario.getPopulation().getFactory().createPerson(personId));
-		PlanAgent agent = new DefaultPlanAgent(plan);
+		PlanAgent agent = new DefaultPlanAgent(plan, 1.0);
 
 		f.networkFeature.doSimStep(0);
 
@@ -253,7 +253,7 @@ public class CarDepartureHandlerTest {
 
 		Id personId = f.ids[0];
 		plan.setPerson(f.scenario.getPopulation().getFactory().createPerson(personId));
-		PlanAgent agent = new DefaultPlanAgent(plan);
+		PlanAgent agent = new DefaultPlanAgent(plan, 1.0);
 
 		f.networkFeature.doSimStep(0);
 
@@ -322,7 +322,7 @@ public class CarDepartureHandlerTest {
 
 		Id personId = f.ids[0];
 		plan.setPerson(f.scenario.getPopulation().getFactory().createPerson(personId));
-		PlanAgent agent = new DefaultPlanAgent(plan);
+		PlanAgent agent = new DefaultPlanAgent(plan, 1.0);
 
 		f.networkFeature.doSimStep(0);
 

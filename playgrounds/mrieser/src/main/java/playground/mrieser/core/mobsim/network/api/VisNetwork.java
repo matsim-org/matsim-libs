@@ -17,34 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
+package playground.mrieser.core.mobsim.network.api;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.MatsimRandom;
+import java.util.Map;
 
-import playground.mrieser.core.mobsim.api.TimestepSimEngine;
+import org.matsim.api.core.v01.Id;
 
-/**
- * @author mrieser
- */
-/*package*/ abstract class QueueNetworkCreator {
+public interface VisNetwork {
 
-	public static QueueNetwork createQueueNetwork(final Network network, final TimestepSimEngine simEngine, final Operator operator) {
-		QueueNetwork qnet = new QueueNetwork(simEngine, operator);
+	Map<Id, ? extends VisLink> getLinks();
 
-		for (Link link : network.getLinks().values()) {
-			qnet.addLink(new QueueLink(link, qnet, operator));
-		}
-		for (Node node : network.getNodes().values()) {
-			qnet.addNode(new QueueNode(node, qnet, operator, MatsimRandom.getLocalInstance()));
-		}
-		for (QueueLink ql : qnet.getLinks().values()) {
-			ql.buffer.init();
-		}
-
-		return qnet;
-	}
+	Map<Id, ? extends VisNode> getNodes();
 
 }

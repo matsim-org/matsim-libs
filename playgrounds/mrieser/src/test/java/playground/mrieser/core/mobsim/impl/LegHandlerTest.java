@@ -38,8 +38,6 @@ import org.matsim.testcases.utils.EventsCollector;
 import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
-import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
-import playground.mrieser.core.mobsim.impl.LegHandler;
 
 /**
  * @author mrieser
@@ -143,7 +141,7 @@ public class LegHandlerTest {
 			act = new ActivityImpl("work", c);
 			this.plan1.addActivity(act);
 
-			this.agent1 = new DefaultPlanAgent(this.plan1);
+			this.agent1 = new DefaultPlanAgent(this.plan1, 1.0);
 		}
 	}
 

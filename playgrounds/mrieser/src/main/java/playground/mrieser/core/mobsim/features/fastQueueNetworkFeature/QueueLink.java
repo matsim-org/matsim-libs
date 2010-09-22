@@ -51,8 +51,8 @@ import playground.mrieser.core.mobsim.network.api.MobSimLink;
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
 	 */
-	private final LinkedList<SimVehicle> vehQueue = new LinkedList<SimVehicle>();
-	private final HashMap<SimVehicle, Double> earliestLeaveTimes = new HashMap<SimVehicle, Double>();
+	/*package*/ final LinkedList<SimVehicle> vehQueue = new LinkedList<SimVehicle>();
+	/*package*/ final HashMap<SimVehicle, Double> earliestLeaveTimes = new HashMap<SimVehicle, Double>();
 
 	private double storageCapacity = 0.0;
 

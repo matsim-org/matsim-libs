@@ -73,7 +73,7 @@ public class RefSimFactory implements MobsimFactory {
 		planSim.addSimFeature(netFeature); // order of features is important!
 
 		// register agent sources
-		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation()));
+		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(), 1.0));
 
 		return planSim;
 	}

@@ -29,11 +29,14 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
+import org.matsim.vis.otfvis2.OTFVisClient;
+import org.matsim.vis.otfvis2.OTFVisLiveServer;
 
 /**
  * @author mrieser
  */
-public class UseCase4_OptimizedCarSim {
+public class UseCase5_FastWithVis {
 
 	public static void main(final String[] args) {
 
@@ -54,9 +57,18 @@ public class UseCase4_OptimizedCarSim {
 
 		/* **************************************************************** */
 
+		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
+		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("foobar", server);
+		OTFVisClient client = new OTFVisClient();
+		client.setHostConnectionManager(hostConnectionManager);
+		client.setSwing(true);
+		client.run();
+
 		OptimizedCarSimFactory simFactory = new OptimizedCarSimFactory(2);
+		simFactory.setOtfvisServer(server);
 		Simulation sim = simFactory.createMobsim(scenario, events);
 		sim.run(); // replace with PlanSimulation.runSim();
+
 
 		/* **************************************************************** */
 

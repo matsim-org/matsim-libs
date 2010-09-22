@@ -66,7 +66,7 @@ public class TeleportOnlySimFactory implements MobsimFactory {
 		lh.setDepartureHandler(TransportMode.bike, teleporter);
 
 		// register agent sources
-		planSim.addAgentSource(new PopulationAgentSource(sc.getPopulation()));
+		planSim.addAgentSource(new PopulationAgentSource(sc.getPopulation(), 1.0));
 
 		return planSim;
 	}

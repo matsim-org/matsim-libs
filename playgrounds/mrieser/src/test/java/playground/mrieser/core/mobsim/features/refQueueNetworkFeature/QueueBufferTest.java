@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
@@ -35,9 +34,6 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import playground.mrieser.core.mobsim.api.SimVehicle;
 import playground.mrieser.core.mobsim.fakes.FakeSimEngine;
 import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
-import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueBuffer;
-import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueLink;
-import playground.mrieser.core.mobsim.features.refQueueNetworkFeature.QueueNetwork;
 import playground.mrieser.core.mobsim.impl.DefaultSimVehicle;
 
 /**

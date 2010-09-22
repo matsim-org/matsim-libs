@@ -26,7 +26,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.vis.otfvis2.OTFVisLiveServer;
 
+import playground.mrieser.core.mobsim.features.OTFVisFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
 import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.FastQueueNetworkFeature;
 import playground.mrieser.core.mobsim.impl.ActivityHandler;
@@ -36,16 +38,22 @@ import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanSimulationImpl;
 import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
+import playground.mrieser.core.mobsim.network.api.VisNetwork;
 
 public class OptimizedCarSimFactory implements MobsimFactory {
 
 	private final int nOfThreads;
+	private OTFVisLiveServer otfvisServer = null;
 
 	/**
 	 * @param nOfThreads use <code>0</code> if you do not want to use threads
 	 */
 	public OptimizedCarSimFactory(final int nOfThreads) {
 		this.nOfThreads = nOfThreads;
+	}
+
+	public void setOtfvisServer(final OTFVisLiveServer otfvisServer) {
+		this.otfvisServer = otfvisServer;
 	}
 
 	@Override
@@ -85,8 +93,14 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 		planSim.addSimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
 		planSim.addSimFeature(netFeature); // order of features is important!
 
+		if (this.otfvisServer != null) {
+			VisNetwork visNetwork = netFeature.getVisNetwork();
+			OTFVisFeature otfvisFeature = new OTFVisFeature(visNetwork, this.otfvisServer.getSnapshotReceiver());
+			planSim.addSimFeature(otfvisFeature);
+		}
+
 		// register agent sources
-		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation()));
+		planSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(), 1.0));
 
 		return planSim;
 	}

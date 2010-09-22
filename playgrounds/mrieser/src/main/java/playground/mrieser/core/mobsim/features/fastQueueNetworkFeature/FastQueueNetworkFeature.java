@@ -24,10 +24,12 @@ import org.matsim.api.core.v01.network.Network;
 import playground.mrieser.core.mobsim.api.TimestepSimEngine;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.network.api.MobSimNetwork;
+import playground.mrieser.core.mobsim.network.api.VisNetwork;
 
 public class FastQueueNetworkFeature implements NetworkFeature {
 
-	private final MobSimNetwork network;
+	private final QueueNetwork network;
+	private volatile VisNetwork visNetwork;
 
 	public FastQueueNetworkFeature(final Network network, final TimestepSimEngine simEngine) {
 		this.network = QueueNetworkCreator.createQueueNetwork(network, simEngine, new SingleCPUOperator());
@@ -36,7 +38,7 @@ public class FastQueueNetworkFeature implements NetworkFeature {
 	public FastQueueNetworkFeature(final Network network, final TimestepSimEngine simEngine, final int nOfThreads) {
 		ParallelOperator operator = new ParallelOperator(nOfThreads);
 		this.network = QueueNetworkCreator.createQueueNetwork(network, simEngine, operator);
-		operator.setQueueNetwork((QueueNetwork) this.network);
+		operator.setQueueNetwork(this.network);
 	}
 
 	@Override
@@ -57,6 +59,19 @@ public class FastQueueNetworkFeature implements NetworkFeature {
 	@Override
 	public MobSimNetwork getSimNetwork() {
 		return this.network;
+	}
+
+	public VisNetwork getVisNetwork() {
+		if (this.visNetwork == null) {
+			buildVisNetwork();
+		}
+		return this.visNetwork;
+	}
+
+	private synchronized void buildVisNetwork() {
+		if (this.visNetwork == null) {
+			this.visNetwork = new VisNetworkImpl(this.network);
+		}
 	}
 
 }

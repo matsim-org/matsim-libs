@@ -31,9 +31,11 @@ public class DefaultPlanAgent implements PlanAgent {
 	private final Plan plan;
 	private final Iterator<PlanElement> peIterator;
 	private PlanElement currentElement = null;
+	private final double weight;
 
-	public DefaultPlanAgent(final Plan plan) {
+	public DefaultPlanAgent(final Plan plan, final double weight) {
 		this.plan = plan;
+		this.weight = weight;
 		this.peIterator = this.plan.getPlanElements().iterator();
 	}
 
@@ -55,6 +57,11 @@ public class DefaultPlanAgent implements PlanAgent {
 			this.currentElement = null;
 		}
 		return this.currentElement;
+	}
+
+	 @Override
+	public double getWeight() {
+		return this.weight;
 	}
 
 }

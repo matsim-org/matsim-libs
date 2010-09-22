@@ -35,4 +35,8 @@ public interface PlanAgent {
 	 */
 	public PlanElement useNextPlanElement();
 
+	/**
+	 * @return a statistical weight, how many "real" agents this agent represents, e.g. "5.0" if you simulate a 20%-sample.
+	 */
+	public double getWeight();
 }
