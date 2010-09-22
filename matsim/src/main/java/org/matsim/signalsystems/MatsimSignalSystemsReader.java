@@ -47,6 +47,8 @@ public class MatsimSignalSystemsReader {
 	public static final String SIGNALSYSTEMS11 = "http://www.matsim.org/files/dtd/signalSystems_v1.1.xsd";
 
 	public static final String SIGNALSYSTEMS20 = "http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd";
+
+	public static final String SIGNALGROUPS20 = "http://www.matsim.org/files/dtd/signalGroups_v2.0.xsd";
 	
 	private SignalSystems lightSignalSystems;
 	@Deprecated 
