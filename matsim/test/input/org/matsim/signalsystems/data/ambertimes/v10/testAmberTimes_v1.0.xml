@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<amberTimes>
-<!--xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/amberTimes_v1.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">-->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<amberTimes xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/amberTimes_v1.0.xsd" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
 		<globalDefaults>
-			<amberTimeGreen proportion="0.3"/> 
 			<redAmber seconds="1" />
 			<amber seconds="4" />
+			<amberTimeGreen proportion="0.3"/> 
 		</globalDefaults>
     <signalSystem refId="1">
 				<systemDefaults>
