@@ -28,12 +28,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkSegmentDoubleLinks;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.run.NetworkCleaner;
@@ -45,10 +42,10 @@ public class OsmToMatsim {
 
 	/**
 	 * @param args
-	 * This class creates a Matsim network from an OSM network file. 
+	 * This class creates a Matsim network from an OSM network file.
 	 */
 	public static void main(String[] args) {
-		
+
 		NetworkImpl network = NetworkImpl.createNetwork();
 		OsmNetworkReader osmReader = new OsmNetworkReader(network,
 				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
@@ -57,8 +54,8 @@ public class OsmToMatsim {
 		osmReader.setScaleMaxSpeed(true);
 		String input = args[0];				// OSM Input File
 		String output = args[1];			// MATSim Output File
-		
-//		 set osmReader useHighwayDefaults false 
+
+//		 set osmReader useHighwayDefaults false
 //		 Autobahn
 		osmReader.setHighwayDefaults(1, "motorway",      2, 120.0/3.6, 1.0, 2000, true);
 		osmReader.setHighwayDefaults(1, "motorway_link", 1,  80.0/3.6, 1.0, 1500, true);
@@ -80,7 +77,7 @@ public class OsmToMatsim {
 		osmReader.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  600);
 //		 Spielstrassen irrelevant, since only tiny percentile
 //		 osmReader.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
-		
+
 		try {
 			osmReader.parse(input);
 		} catch (SAXException e) {
@@ -90,14 +87,14 @@ public class OsmToMatsim {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		// Write network to file
 		new NetworkWriter(network).write(output + ".xml.gz");
 		System.out.println("Done! Unprocessed MATSim Network saved as " + output + ".xml.gz");
 		// Clean network
 		new NetworkCleaner().run(new String[] {output + ".xml.gz", output + "_cl.xml.gz"});
 		System.out.println("NetworkCleaner done! Cleaned Network saved as " + output + "_cl.xml.gz");
-		
+
 		// Simplyfy Network
 		Scenario scenario = new ScenarioImpl();
 		network = (NetworkImpl) scenario.getNetwork();
@@ -113,13 +110,13 @@ public class OsmToMatsim {
 		new NetworkWriter(network).write(output + "_cl_simple.xml.gz");
 		System.out.println("Simplifier done! Network saved as " + output + "_cl_simple.xml.gz");
 		System.out.println("Conversion completed!");
-		
+
 //		// Double Links
 //		NetworkSegmentDoubleLinks networkDoubleLinks = new NetworkSegmentDoubleLinks();
 //		networkDoubleLinks.run(network);
 //		new NetworkWriter(network).write(output + "_cl_simple_dl.xml.gz");
 //		System.out.println("\nConversion completed! Saved as " + output + "_cl_simple_dl.xml.gz");
-		
+
 	}
 
 }

@@ -29,19 +29,18 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 /**
- * 
+ *
  * @author Manuel Schneider
  *
  */
 public class CMCFNetworkConverter {
-	
-	
+
+
 	/**
-	 * reads a cmcf graph file in xml format from filename 
+	 * reads a cmcf graph file in xml format from filename
 	 * @param filename
 	 * @return a NetworkLayer that is the graph represented in the cmcf file
 	 * @throws JDOMException
@@ -76,7 +75,7 @@ public class CMCFNetworkConverter {
 			 String to	= edge.getChildText("to");
 			 String length = edge.getChildText("length");
 			 String capacity = edge.getChildText("capacity");
-			 //build a new edge in 
+			 //build a new edge in
 			 Id matsimid  = new IdImpl(id);
 			 //TODO free speed is set to 1.3 find something better
 			 result.createAndAddLink(matsimid, result.getNodes().get(new IdImpl(from)), result.getNodes().get(new IdImpl(to)),
@@ -85,14 +84,14 @@ public class CMCFNetworkConverter {
 					 Double.parseDouble(capacity),
 					 1.);
 		 }
-			
+
 		return result;
 	}
 
 	/**
 	 * @param usage: 1. argument inputfile 2. argument outfile (optional)
 	 */
-	public static void main(String[] args) { 
+	public static void main(String[] args) {
 		if(args.length == 0 && args.length > 2){
 			System.out.println("usage: 1. argument inputfile 2. argument outfile (optional)");
 			return;
@@ -111,7 +110,7 @@ public class CMCFNetworkConverter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 
 	}
 

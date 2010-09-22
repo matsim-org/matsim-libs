@@ -33,17 +33,13 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
 import playground.gregor.sim2d.controller.Sim2DConfig;
 import playground.gregor.sim2d.events.XYZEventsGenerator;
-import playground.gregor.sim2d.events.XYZEventsManager;
 import playground.gregor.sim2d.peekabot.Sim2DVis;
-
-//import playground.gregor.sim2d.peekabot.PeekABotClient;
 
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -53,7 +49,7 @@ public class Sim2D {
 
 	private final Config config;
 	private final Population population;
-	private final NetworkLayer network;
+	private final Network network;
 	private static EventsManager events;
 	private double stopTime;
 	private final Network2D network2D;
@@ -65,13 +61,13 @@ public class Sim2D {
 
 	private Sim2DVis sim2DVis;
 	private XYZEventsGenerator xyzEventsGen = null;
-	
-	
+
+
 	public Sim2D(final Network network, final Map<MultiPolygon,List<Link>> floors, final Map<Id,LineString> ls, final Population plans, final EventsManager events, final SegmentedStaticForceField sff, final Config config){
 		this.config = config;
 		this.endTime = 9*3600+30*60;
-		this.network = (NetworkLayer) network;
-		Map<MultiPolygon,NetworkLayer> f = new HashMap<MultiPolygon, NetworkLayer>();
+		this.network = network;
+		Map<MultiPolygon,Network> f = new HashMap<MultiPolygon, Network>();
 		for (Entry<MultiPolygon,List<Link>> e : floors.entrySet()) {
 			f.put(e.getKey(),this.network);
 		}
@@ -178,7 +174,7 @@ public class Sim2D {
 
 			if (agent.initialize()) {
 				this.network2D.addAgent(agent);
-				
+
 			}
 
 		}

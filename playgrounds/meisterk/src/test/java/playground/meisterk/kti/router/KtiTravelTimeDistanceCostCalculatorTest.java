@@ -31,7 +31,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -45,40 +44,41 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 
 	private static final Id TEST_LINK_ID = new IdImpl(1);
 	private static final Id DUMMY_PERSON_ID = new IdImpl(1000);
-	
+
 	private NetworkImpl network = null;
 	private KtiTravelTimeDistanceCostCalculator testee = null;
 	private EventsManager events = null;
-	
+
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(1000.0, 1000.0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(2000.0, 1000.0));
 		network.createAndAddLink(TEST_LINK_ID, node1, node2, 1000.0, 50.0/3.6, 2000.0, 1);
-		
+
 		Config config = new Config();
 		config = super.loadConfig(null);
 		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
 		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
-		
+
 		ktiConfigGroup.setDistanceCostCar(5.0);
 		config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.5);
-		
+
 		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(
-				this.network, 
+				this.network,
 				config.travelTimeCalculator());
 
 		this.events = new EventsManagerImpl();
 		this.events.addHandler(travelTimeCalculator);
-		
+
 		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
-		this.testee = 
+		this.testee =
 			(KtiTravelTimeDistanceCostCalculator) costCalculatorFactory.createTravelCostCalculator(
-					travelTimeCalculator, 
+					travelTimeCalculator,
 					config.charyparNagelScoring());
-		
+
 
 	}
 
@@ -91,36 +91,36 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 	}
 
 	public void testKtiTravelTimeDistanceCostCalculator() {
-		
+
 		assertEquals(-0.0025, testee.getMarginalUtlOfDistance(), MatsimTestCase.EPSILON);
 		assertEquals(0.003333334, testee.getTravelCostFactor(), 1e-6);
-		
+
 	}
-	
+
 	public void testGetLinkMinimumTravelCost() {
-		
+
 		double actualMinimumCost = testee.getLinkMinimumTravelCost(this.network.getLinks().get(TEST_LINK_ID));
 		assertEquals(2.74, actualMinimumCost, MatsimTestCase.EPSILON);
 	}
-	
+
 	public void testGetLinkTravelCost() {
-		
+
 		LinkEnterEvent enter = new LinkEnterEventImpl(Time.parseTime("06:01:00"), DUMMY_PERSON_ID, TEST_LINK_ID);
 		this.events.processEvent(enter);
 		LinkLeaveEvent leave = new LinkLeaveEventImpl(Time.parseTime("06:21:00"), DUMMY_PERSON_ID, TEST_LINK_ID);
 		this.events.processEvent(leave);
-		
+
 		double expectedLinkTravelCost = 6.5;
-		
+
 		double actualLinkTravelCost = this.testee.getLinkTravelCost(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("06:10:00"));
 		assertEquals(expectedLinkTravelCost, actualLinkTravelCost, MatsimTestCase.EPSILON);
-		
+
 		actualLinkTravelCost = this.testee.getLinkTravelCost(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("05:55:55"));
 		assertEquals(2.74, actualLinkTravelCost, MatsimTestCase.EPSILON);
 
 		actualLinkTravelCost = this.testee.getLinkTravelCost(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("06:31:00"));
 		assertEquals(2.74, actualLinkTravelCost, MatsimTestCase.EPSILON);
-		
+
 	}
-	
+
 }

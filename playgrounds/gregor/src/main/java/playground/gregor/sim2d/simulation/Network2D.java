@@ -32,15 +32,11 @@ import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
-
-import playground.gregor.sim2d.gisdebug.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -56,7 +52,7 @@ public class Network2D {
 
 	private final Floor floor;
 
-	private NetworkImpl networkLayer;
+	private Network networkLayer;
 
 	private HashMap<Link, LineString> finishLines;
 
@@ -80,12 +76,12 @@ public class Network2D {
 
 
 
-	public Network2D(NetworkImpl network, Map<MultiPolygon, NetworkLayer> floors, SegmentedStaticForceField sff, Map<Id, LineString> ls) {
+	public Network2D(Network network, Map<MultiPolygon, Network> floors, SegmentedStaticForceField sff, Map<Id, LineString> ls) {
 		this.ls = ls;
 		if (floors.size() > 1) {
 			throw new RuntimeException("this has not been implemented yet!");
 		}
-		Entry<MultiPolygon,NetworkLayer> e  = floors.entrySet().iterator().next();
+		Entry<MultiPolygon,Network> e  = floors.entrySet().iterator().next();
 		this.networkLayer = e.getValue();
 		init();
 		try {
@@ -113,15 +109,15 @@ public class Network2D {
 			Polygon p = (Polygon) ((MultiPolygon)geo).getGeometryN(0);
 //			Id id = new IdImpl((Long) ft.getAttribute("ID"));
 			nodes.put(p.getCentroid().getX(),p.getCentroid().getY(), p.getExteriorRing());
-			
+
 		}
-		
+
 		for (Link link : this.networkLayer.getLinks().values()) {
 			Coord c = link.getToNode().getCoord();
 			LineString ls = nodes.get(c.getX(),c.getY());
 			this.finishLines.put(link, ls);
 		}
-		
+
 	}
 
 
@@ -138,14 +134,14 @@ public class Network2D {
 			c.x /= length;
 			c.y /= length;
 			this.drivingDirections.put(link,c);
-			
+
 			Coordinate from = MGC.coord2Coordinate(link.getFromNode().getCoord());
 			from.x -= c.x*10;
 			from.y -= c.y*10;
-			
+
 			Coordinate to = MGC.coord2Coordinate(link.getToNode().getCoord());
 			to.x += c.x*10;
-			to.y += c.y*10;			
+			to.y += c.y*10;
 
 			LineString ls1 = this.geofac.createLineString(new Coordinate[] {from,to});
 			this.linksGeos.put(link, ls1);
@@ -160,7 +156,7 @@ public class Network2D {
 	private LineString getPerpendicularFinishLine(Link link, Node node) {
 		Coordinate t = MGC.coord2Coordinate(node.getCoord());
 		Coordinate pred = MGC.coord2Coordinate(link.getFromNode().getCoord());
-		
+
 //		LineString l = this.ls.get(link.getId());
 //		if (l == null  && !link.getId().toString().contains("el")) {
 //			int i = Integer.parseInt(link.getId().toString());

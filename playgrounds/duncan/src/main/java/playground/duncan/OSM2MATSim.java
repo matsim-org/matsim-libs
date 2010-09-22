@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.OsmNetworkReader;
@@ -38,8 +37,8 @@ public class OSM2MATSim {
 	private static final Logger log = Logger.getLogger(OSM2MATSim.class);
 
 	public static void main(final String[] args) {
-		
-		log.error( "This still doesn't have the coordinate transform problem fixed.  kai, jan09" ) ; 
+
+		log.error( "This still doesn't have the coordinate transform problem fixed.  kai, jan09" ) ;
 
 		Gbl.startMeasurement();
 		NetworkImpl network = NetworkImpl.createNetwork();

@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -64,10 +63,10 @@ public class MyNetworkGenerator {
 		c.global().setCoordinateSystem(UTM35S);
 
 		// TODO Sort out these errors: Cannot instatiate FeatureGeneratorBuilder.
-		
+
 //		FeatureGeneratorBuilder fgb = new FeatureGeneratorBuilderImpl(net, UTM35S);
 //		FeatureGenerator builder = fgb.createFeatureGenerator();
-//			
+//
 //		builder.setWidthCoefficient(0.01);
 //		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 //		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);

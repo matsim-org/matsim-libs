@@ -49,7 +49,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.world.Layer;
-import org.matsim.world.MatsimWorldReader;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Municipality;
@@ -114,17 +113,17 @@ public class IncomeAttacher {
 		this.scenario = scenario;
 	}
 
-	
-	/** 
-	 * Method that reads/calculates all necessary input data (agents' municipality and education, and income per education) 
+
+	/**
+	 * Method that reads/calculates all necessary input data (agents' municipality and education, and income per education)
 	 * @param municipalityIncome
 	 * @param agentsEducation
 	 * @param haushalte
 	 * @param zielpersonen
 	 */
-	private void run (String municipalityIncome, 
-			String agentsEducation, 
-			String haushalte, 
+	private void run (String municipalityIncome,
+			String agentsEducation,
+			String haushalte,
 			String zielpersonen){
 
 		log.info("  reading municipality income information... ");

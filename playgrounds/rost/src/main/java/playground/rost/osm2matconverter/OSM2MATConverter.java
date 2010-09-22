@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -53,13 +52,13 @@ import playground.rost.util.PathTracker;
  *
  */
 public class OSM2MATConverter {
-	
+
 	private static final Logger log = Logger.getLogger(OSM2MATConverter.class);
 
 	protected static Map<BigInteger, Node> mapNd2Node;
-	
+
 	public static NetworkImpl readOSM(String filename) throws JAXBException, IOException {
-		
+
 		long kreuzungId = 99999;
 		Osm osmdata;
 		NetworkImpl network = NetworkImpl.createNetwork();
@@ -71,14 +70,14 @@ public class OSM2MATConverter {
 		parseStrassen(network, osmdata, strassenKnoten);
 		return network;
 	}
-	
+
 	protected static void parseStrassen(NetworkImpl network, Osm osmdata, Map<BigInteger, Node> strassenKnoten)
 	{
 		Map<String, Integer> roadStats = new HashMap<String, Integer>();
-		
-		
+
+
 		log.debug("Start parsing roads..");
-		
+
 		log.debug("Get HighwayAttributes..");
 		HighwayAttributeMapping haMap;
 		try {
@@ -145,20 +144,20 @@ public class OSM2MATConverter {
 				++debug_count;
 				//erzeuge Stra�e
 				double capacity = Math.max(haMap.getWidth(highwayType) / 1.25, 1);
-				network.createAndAddLink(new IdImpl(String.valueOf(++streetId)), 
-									network.getNodes().get(new IdImpl(String.valueOf(startNode.getId()))), 
-									network.getNodes().get(new IdImpl(String.valueOf(endNode.getId()))), 
-									laenge, 
-									1.3, //TODO 
+				network.createAndAddLink(new IdImpl(String.valueOf(++streetId)),
+									network.getNodes().get(new IdImpl(String.valueOf(startNode.getId()))),
+									network.getNodes().get(new IdImpl(String.valueOf(endNode.getId()))),
+									laenge,
+									1.3, //TODO
 									capacity,  //TODO
 									1);  //TODO!
-				
 
-				network.createAndAddLink(new IdImpl(String.valueOf(++streetId)), 
-									network.getNodes().get(new IdImpl(String.valueOf(endNode.getId()))), 
-									network.getNodes().get(new IdImpl(String.valueOf(startNode.getId()))), 
-									laenge, 
-									1.3, //TODO 
+
+				network.createAndAddLink(new IdImpl(String.valueOf(++streetId)),
+									network.getNodes().get(new IdImpl(String.valueOf(endNode.getId()))),
+									network.getNodes().get(new IdImpl(String.valueOf(startNode.getId()))),
+									laenge,
+									1.3, //TODO
 									capacity,  //TODO
 									1);  //TODO!
 				//endknoten wird neuer startknoten:
@@ -187,15 +186,15 @@ public class OSM2MATConverter {
 			log.debug(output);
 			roadStats.remove(bestKey);
 		}
-		
+
 	}
 
-	
+
 	/**
 	 * Aus den bestehenden Wegen des Osm-Materials werden diejenigen Knoten extrahiert,
 	 * welche auch wirklich Stra�enkreuzungen darstellen und nicht etwa Geb�udebegrenzungen oder �hnliches sind.
 	 * Zur�ckgegeben wird eine Map der Stra�enkreuzungen
-	 * 
+	 *
 	 * @param network Das Netwerk, in dem die Knoten eingef�gt werden sollen
 	 * @param osmdata Osm-Daten
 	 * @return Map von Knoten Id auf Knoten
@@ -230,7 +229,7 @@ public class OSM2MATConverter {
 			if(node == null)
 			{
 				debug_count--;
-				
+
 			}
 			if(!strassenKnoten.containsKey(node.getId()))
 			{
@@ -252,7 +251,7 @@ public class OSM2MATConverter {
 				node = mapNd2Node.get(nd.getRef());
 				if(wegKnoten.containsKey(nd.getRef()))
 				{
-					
+
 					//der Knoten liegt auch auf einem anderen Weg ist also eine Kreuzung
 					++debug_count;
 					strassenKnoten.put(nd.getRef(), node);
@@ -268,7 +267,7 @@ public class OSM2MATConverter {
 				log.debug("node count: " +debug_iter);
 				debug_iter = debug_count;
 			}
-			
+
 		}
 		//Knoten im eigentlichen Netzwerk abspeichern
 		for(Node node: strassenKnoten.values())
@@ -284,7 +283,7 @@ public class OSM2MATConverter {
 		}
 		return strassenKnoten;
 	}
-	
+
 	protected static Map<BigInteger, Node> createNodeMap(Osm osmdata)
 	{
 		log.debug("Start building NodeMap..");
@@ -292,14 +291,14 @@ public class OSM2MATConverter {
 		for(Node node : osmdata.getNode())
 		{
 			result.put(node.getId(), node);
-		} 
+		}
 		return result;
 	}
 
 	public static void parseAndWrite()
 	{
 		HighwayAttributeMapping.writeDefaultValuesXMLFile(PathTracker.resolve("highwayMappingDefault"));
-		
+
 		String inputfile = PathTracker.resolve("osmMap");
 		String outfile = PathTracker.resolve("matMap");
 		try {
@@ -314,7 +313,7 @@ public class OSM2MATConverter {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		parseAndWrite();
 	}

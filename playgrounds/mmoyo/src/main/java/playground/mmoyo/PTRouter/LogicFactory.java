@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -153,8 +152,8 @@ public class LogicFactory{
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-		
-		
+
+
 		//System.out.println("\n\n\n\n\ntransfers: "  + transfers + " detTransfers: " + detTransfers + " total: " + ( transfers + detTransfers));
 		System.out.println("duration of logic net creation: " + (System.currentTimeMillis()-startTime));
 	}

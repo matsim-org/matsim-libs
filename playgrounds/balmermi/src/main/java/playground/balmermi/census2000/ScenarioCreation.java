@@ -27,7 +27,6 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatsimMatricesReader;
-import org.matsim.world.MatsimWorldReader;
 
 import playground.balmermi.census2000.modules.FacilitiesSetCapacity;
 

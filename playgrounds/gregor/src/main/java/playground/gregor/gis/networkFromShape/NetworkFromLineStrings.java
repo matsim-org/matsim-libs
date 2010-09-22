@@ -24,16 +24,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.management.RuntimeErrorException;
-
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.collections.QuadTree;
@@ -60,7 +56,7 @@ public class NetworkFromLineStrings {
 	private int linkId;
 
 	static final double CATCH_RADIUS = 0.5;
-	
+
 	NetworkFromLineStrings(FeatureSource fs, Envelope envelope){
 		this.features = fs;
 		this.envelope = envelope;
@@ -73,7 +69,7 @@ public class NetworkFromLineStrings {
 		Envelope e = fs.getBounds();
 		NetworkImpl net = new NetworkFromLineStrings(fs, e).generateFromGraph();
 		new NetworkWriter(net).write("/home/laemmel/devel/sim2d/data/duisburg/network.xml");
-		
+
 	}
 
 
@@ -97,7 +93,7 @@ public class NetworkFromLineStrings {
 			}
 			LineString ls = (LineString) multiLineString.getGeometryN(0);
 			processLineString(ls,feature);
-			
+
 
 		}
 
@@ -109,10 +105,10 @@ public class NetworkFromLineStrings {
 
 	private void processLineString(LineString ls, Feature feature){
 
-		
+
 		Point sP = ls.getStartPoint();
 		Point eP = ls.getEndPoint();
-		
+
 		Long fromID = (Long)feature.getAttribute("fromID");
 		Collection<Node> tmpFrom = this.network.getNearestNodes(MGC.point2Coord(sP), CATCH_RADIUS);
 		if (tmpFrom.size() > 1) {
@@ -125,7 +121,7 @@ public class NetworkFromLineStrings {
 				eP = tmpP;
 			}
 		}
-		
+
 		Long toID = (Long)feature.getAttribute("toID");
 		Collection<Node> tmpTo = this.network.getNearestNodes(MGC.point2Coord(eP), CATCH_RADIUS);
 		if (tmpTo.size() > 1) {
@@ -138,9 +134,9 @@ public class NetworkFromLineStrings {
 				eP = tmpP;
 			}
 		}
-		
-		
-		
+
+
+
 		Node from = this.network.getNodes().get(new IdImpl(getNode(sP,fromID)));
 		Node to  = this.network.getNodes().get(new IdImpl(getNode(eP,toID)));
 		Long id = (Long) feature.getAttribute("ID");
