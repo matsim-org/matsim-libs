@@ -35,7 +35,6 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -369,13 +368,14 @@ public class DBSimLink {
 	private void calculateFlowCapacity(final double time) {
 		this.simulatedFlowCapacity = ((LinkImpl)this.getLink()).getFlowCapacity(time);
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * SimulationTimer.getSimTickTime()
+			* this.simEngine.getSim().getScenario().getConfig().simulation().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 	}
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
+		double storageCapFactor = this.simEngine.getSim().getScenario().getConfig().simulation().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 
 		double numberOfLanes = this.getLink().getNumberOfLanes(time);
@@ -564,6 +564,7 @@ public class DBSimLink {
 		/**
 		 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
 		 */
+		@Override
 		public double getDisplayableSpaceCapValue() {
 			return (DBSimLink.this.buffer.size() + DBSimLink.this.vehQueue.size()) / DBSimLink.this.storageCapacity;
 		}
@@ -576,6 +577,7 @@ public class DBSimLink {
 		 *
 		 * @return A measure for the number of vehicles being delayed on this link.
 		 */
+		@Override
 		public double getDisplayableTimeCapValue(double now) {
 			int count = DBSimLink.this.buffer.size();
 			for (DBSimVehicle veh : DBSimLink.this.vehQueue) {
@@ -587,9 +589,10 @@ public class DBSimLink {
 			return count * 2.0 / DBSimLink.this.storageCapacity;
 		}
 
+		@Override
 		public Collection<AgentSnapshotInfo> getVehiclePositions(
 				final Collection<AgentSnapshotInfo> positions) {
-			String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
+			String snapshotStyle = simEngine.getSim().getScenario().getConfig().simulation().getSnapshotStyle();
 			if ("queue".equals(snapshotStyle)) {
 				getVehiclePositionsQueue(positions);
 			} else if ("equiDist".equals(snapshotStyle)) {
@@ -671,7 +674,7 @@ public class DBSimLink {
 			double now = SimulationTimer.getTime();
 			Link link = DBSimLink.this.getLink();
 			double queueEnd = getInitialQueueEnd();
-			double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
+			double storageCapFactor = simEngine.getSim().getScenario().getConfig().simulation().getStorageCapFactor();
 			double cellSize = ((NetworkImpl)DBSimLink.this.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize();
 			double vehLen = calculateVehicleLength(link, storageCapFactor, cellSize);
 

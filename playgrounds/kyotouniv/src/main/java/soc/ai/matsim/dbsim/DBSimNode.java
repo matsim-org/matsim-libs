@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.gbl.Gbl;
 
 /**
  * Represents a node in the QueueSimulation.
@@ -50,6 +49,8 @@ public class DBSimNode {
 
 	public DBSimNetwork queueNetwork;
 
+	private DBSimEngine simEngine = null;
+
 	public DBSimNode(final Node n, final DBSimNetwork queueNetwork) {
 		this.node = n;
 		this.queueNetwork = queueNetwork;
@@ -57,6 +58,10 @@ public class DBSimNode {
 		int nofInLinks = this.node.getInLinks().size();
 		this.inLinksArrayCache = new DBSimLink[nofInLinks];
 		this.tempLinks = new DBSimLink[nofInLinks];
+	}
+
+	public void setSimEngine(DBSimEngine simEngine) {
+		this.simEngine = simEngine;
 	}
 
 	/**
@@ -102,7 +107,7 @@ public class DBSimNode {
 				throw new RuntimeException("Cannot move vehicle " + veh.getId() +
 						" from link " + currentLink.getId() + " to link " + nextLinkId);
 			}
-			
+
 			DBSimLink nextQueueLink = this.queueNetwork.getQueueLink(nextLinkId);
 
 			if (nextQueueLink.hasSpace()) {
@@ -119,7 +124,7 @@ public class DBSimNode {
 				 * of if there is space on the next link or not.. optionally we let them
 				 * die here, we have a config setting for that!
 				 */
-				if (Gbl.getConfig().simulation().isRemoveStuckVehicles()) {
+				if (this.simEngine.getSim().getScenario().getConfig().simulation().isRemoveStuckVehicles()) {
 					link.popFirstFromBuffer();
 					AbstractSimulation.decLiving();
 					AbstractSimulation.incLost();
@@ -220,6 +225,7 @@ public class DBSimNode {
 
 	protected static class QueueLinkIdComparator implements Comparator<DBSimLink>, Serializable {
 		private static final long serialVersionUID = 1L;
+		@Override
 		public int compare(final DBSimLink o1, final DBSimLink o2) {
 			return o1.getLink().getId().compareTo(o2.getLink().getId());
 		}

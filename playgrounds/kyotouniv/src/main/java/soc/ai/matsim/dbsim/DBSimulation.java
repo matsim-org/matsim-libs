@@ -140,7 +140,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 	public DBSimulation(final Scenario scenario, final EventsManager events) {
 		this.scenario = scenario;
 		this.listenerManager = new SimulationListenerManager(this);
-		AbstractSimulation.reset();
+		AbstractSimulation.reset(scenario.getConfig().simulation().getStuckTime());
 		this.config = scenario.getConfig();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
 		setEvents(events);
@@ -154,7 +154,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 
 		this.notTeleportedModes.add(TransportMode.car);
 
-		this.simEngine = new DBSimEngine(this.network, MatsimRandom.getRandom());
+		this.simEngine = new DBSimEngine(this.network, MatsimRandom.getRandom(), this);
 	}
 
 	/**

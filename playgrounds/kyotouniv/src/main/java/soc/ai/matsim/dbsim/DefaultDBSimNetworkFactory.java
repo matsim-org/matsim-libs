@@ -28,13 +28,12 @@ import org.matsim.api.core.v01.network.Node;
  */
 /*package*/ final class DefaultDBSimNetworkFactory implements DBSimNetworkFactory<DBSimNode, DBSimLink> {
 
+	@Override
 	public DBSimLink newQueueLink(final Link link, final DBSimNetwork queueNetwork, final DBSimNode toQueueNode) {
 		return new DBSimLink(link, queueNetwork, toQueueNode);
 	}
 
-	/**
-	 * 
-	 */
+	@Override
 	public DBSimNode newQueueNode(final Node node, final DBSimNetwork dbsimNetwork) {
 		return new DBSimNode(node, dbsimNetwork);
 	}

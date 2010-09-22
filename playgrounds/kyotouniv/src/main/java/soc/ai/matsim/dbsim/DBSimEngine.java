@@ -30,7 +30,7 @@ import java.util.Random;
 
 
 /**
- * Coordinates the movement of vehicles on the links and the nodes. 
+ * Coordinates the movement of vehicles on the links and the nodes.
  *
  * @author mrieser
  * @author dgrether
@@ -55,25 +55,31 @@ public class DBSimEngine {
 	private final DBSimNode[] simNodesArray;
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<DBSimLink> simActivateThis = new ArrayList<DBSimLink>();
-	
+
 	private final Random random;
-	
-	public DBSimEngine(final DBSimNetwork network, final Random random) {
-		this(network.getLinks().values(), network.getNodes().values(), random);
+	private final DBSimulation sim;
+
+	public DBSimEngine(final DBSimNetwork network, final Random random, final DBSimulation sim) {
+		this(network.getLinks().values(), network.getNodes().values(), random, sim);
 	}
-	
-	/*package*/ DBSimEngine(final Collection<DBSimLink> links, final Collection<DBSimNode> nodes, final Random random) {
+
+	/*package*/ DBSimEngine(final Collection<DBSimLink> links, final Collection<DBSimNode> nodes, final Random random, final DBSimulation sim) {
 		this.random = random;
 		this.allLinks = new ArrayList<DBSimLink>(links);
-		
+		this.sim = sim;
+
 		this.simNodesArray = nodes.toArray(new DBSimNode[nodes.size()]);
 		//dg[april08] as the order of nodes has an influence on the simulation
 		//results they are sorted to avoid indeterministic simulations
 		Arrays.sort(this.simNodesArray, new Comparator<DBSimNode>() {
+			@Override
 			public int compare(final DBSimNode o1, final DBSimNode o2) {
 				return o1.getNode().getId().compareTo(o2.getNode().getId());
 			}
 		});
+		for (DBSimNode node : this.simNodesArray) {
+			node.setSimEngine(this);
+		}
 		for (DBSimLink link : this.allLinks) {
 			link.finishInit();
 			link.setSimEngine(this);
@@ -93,7 +99,7 @@ public class DBSimEngine {
 			link.clearVehicles();
 		}
 	}
-	
+
 	/**
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
@@ -152,5 +158,9 @@ public class DBSimEngine {
 	 */
 	protected int getNumberOfSimulatedLinks() {
 		return this.simLinksArray.size();
+	}
+
+	public DBSimulation getSim() {
+		return sim;
 	}
 }
