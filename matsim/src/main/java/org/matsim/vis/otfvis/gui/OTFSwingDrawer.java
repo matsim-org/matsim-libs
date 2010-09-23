@@ -34,11 +34,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D.Double;
 
 import javax.swing.JComponent;
 
+import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
@@ -74,6 +75,7 @@ abstract class OTFSwingDrawable implements OTFDrawable, OTFDataReceiver{
  * @author dstrippgen
  */
 public class OTFSwingDrawer extends JComponent {
+	private static final Logger log = Logger.getLogger("dummy");
 
 	public static Graphics2D g2d = null;
 
@@ -320,7 +322,7 @@ public class OTFSwingDrawer extends JComponent {
 		protected char[] id;
 		protected float startX, startY, color;
 		protected int state;
-
+		
 		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
 			this.id = id;

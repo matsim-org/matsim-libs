@@ -38,6 +38,7 @@ import org.matsim.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.AgentDrawer;
@@ -219,6 +220,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	}
 
 	public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver {
+		
 		@Override
 		@Deprecated
 		public void setAgent(char[] id, float startX, float startY, int state, int userdefined, float color) {
@@ -232,46 +234,51 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, new Color(0.0f, 0.7f, 1.0f), true);
 			}
 		}
-
+		
 		@Override
 		public void setAgent( AgentSnapshotInfo agInfo ) {
 			char[] id = agInfo.getId().toString().toCharArray();
-			if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
-				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), colorizer.getColorZeroOne(agInfo.getColorValueBetweenZeroAndOne()), true);
-			} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
-				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
-			} else if ( agInfo.getAgentState()==AgentState.PERSON_OTHER_MODE ) {
-				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.MAGENTA, true);
-			} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
-				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.BLUE, true);
-			} else {
-				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.YELLOW, true);
-			}
+			
+			if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equalsIgnoreCase( OTFVisConfigGroup.COLORING_BVG ) ) {
 
-			// version for bvg demo (obviously, this should be made switchable, but ...).  kai, apr'10
-//			if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
-//				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.DARK_GRAY, true);
-//			} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
-//				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
-//			} else if ( agInfo.getAgentState()==AgentState.PERSON_OTHER_MODE ) {
-//
-//			} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
-//
-//				String idstr = agInfo.getId().toString();
-//				if ( idstr.contains("line_B")) {
-//					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.MAGENTA, true);
-//				} else if ( idstr.contains("line_T")) {
-//					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.RED, true);
-//				} else if ( idstr.contains("line_S")) {
-//					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.GREEN, true);
-//				} else if ( idstr.contains("line_U")) {
-//					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.BLUE, true);
-//				} else {
-//					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
-//				}
-//			} else {
-//				OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.YELLOW, true);
-//			}
+				if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
+					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.DARK_GRAY, true);
+				} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
+					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
+					//			} else if ( agInfo.getAgentState()==AgentState.PERSON_OTHER_MODE ) {
+					// probably a passenger?
+				} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
+
+					String idstr = agInfo.getId().toString();
+					if ( idstr.contains("line_B")) {
+						OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.MAGENTA, true);
+					} else if ( idstr.contains("line_T")) {
+						OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.RED, true);
+					} else if ( idstr.contains("line_S")) {
+						OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.GREEN, true);
+					} else if ( idstr.contains("line_U")) {
+						OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.BLUE, true);
+					} else {
+						OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
+					}
+				} else {
+					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.YELLOW, true);
+				}
+			} else {
+			
+				if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
+					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), colorizer.getColorZeroOne(agInfo.getColorValueBetweenZeroAndOne()), true);
+				} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
+					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
+				} else if ( agInfo.getAgentState()==AgentState.PERSON_OTHER_MODE ) {
+					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.MAGENTA, true);
+				} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
+					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.BLUE, true);
+				} else {
+					OGLAgentPointLayer.this.drawer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.YELLOW, true);
+				}
+
+			}
 
 		}
 

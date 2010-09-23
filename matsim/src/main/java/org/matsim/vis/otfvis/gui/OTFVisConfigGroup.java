@@ -86,6 +86,18 @@ public class OTFVisConfigGroup extends Module {
   private final List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
 
   private boolean scaleQuadTreeRect;
+  
+	// ---
+	
+	private static final String COLORING="coloringScheme" ;
+	
+	public static final String COLORING_STANDARD = "standard" ;
+	public static final String COLORING_BVG = "bvg" ;
+
+	private String coloring = COLORING_STANDARD ;
+	
+	// ---
+
 
   public OTFVisConfigGroup() {
     super(GROUP_NAME);
@@ -167,6 +179,8 @@ public class OTFVisConfigGroup extends Module {
 		else if (LINK_WIDTH.equalsIgnoreCase(key)){
 			return Float.toString(this.getLinkWidth());
 		}
+		else if ( COLORING.equalsIgnoreCase(key) )
+			return this.coloring ;
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -180,6 +194,8 @@ public class OTFVisConfigGroup extends Module {
 			this.middleMouseFunc = value;
 		} else if (LEFT_MOUSE_FUNC.equals(key)) {
 			this.leftMouseFunc = value;
+		} else if ( COLORING.equalsIgnoreCase(key) ) {
+			this.setColoringScheme( value ) ;
 		}  else if (RIGHT_MOUSE_FUNC.equals(key)) {
 			this.rightMouseFunc = value;
 		}
@@ -203,6 +219,8 @@ public class OTFVisConfigGroup extends Module {
 		map.put(RIGHT_MOUSE_FUNC, getValue(RIGHT_MOUSE_FUNC));
 		map.put(SHOW_TELEPORTATION, getValue(SHOW_TELEPORTATION));
 		map.put(LINK_WIDTH, this.getValue(LINK_WIDTH));
+		map.put(COLORING, getValue(COLORING)) ;
+
 		return map;
 	}
 
@@ -212,6 +230,7 @@ public class OTFVisConfigGroup extends Module {
 		map.put(AGENT_SIZE, "The (initial) size of the agents.  Only a range of numbers is allowed, otherwise otfvis aborts"
 				+ " rather ungracefully, or displays no agents at all." ) ;
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
+		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
 		return map ;
 	}
 
@@ -440,6 +459,15 @@ public class OTFVisConfigGroup extends Module {
   public void setScaleQuadTreeRect(final boolean doScale){
     this.scaleQuadTreeRect = doScale;
   }
+  
+	public String getColoringScheme() {
+		return this.coloring ;
+	}
+	public void setColoringScheme( String value ) {
+		this.coloring = value ;
+	}
+
+
 
 
 }
