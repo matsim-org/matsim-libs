@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayControler.java
+ * EvacuationControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -41,11 +41,14 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalControler;
+import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.BufferedTravelTime;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBuffer;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.EvacuationDuringActivityReplanningModule;
 import playground.christoph.evacuation.mobsim.EvacuationDuringLegReplanningModule;
-import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.withinday.replanning.CurrentLegToRescueFacilityReplanner;
 import playground.christoph.evacuation.withinday.replanning.CurrentLegToSecureFacilityReplanner;
 import playground.christoph.evacuation.withinday.replanning.EndActivityAndEvacuateReplanner;
@@ -55,9 +58,6 @@ import playground.christoph.evacuation.withinday.replanning.identifiers.Insecure
 import playground.christoph.evacuation.withinday.replanning.identifiers.SecureActivityPerformingIdentifiers;
 import playground.christoph.evacuation.withinday.replanning.identifiers.SecureLegPerformingIdentifier;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
-import playground.christoph.multimodal.mobsim.MultiModalControler;
-import playground.christoph.multimodal.router.costcalculator.BufferedTravelTime;
-import playground.christoph.multimodal.router.costcalculator.TravelTimeCalculatorWithBuffer;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
@@ -352,7 +352,7 @@ public class EvacuationControler extends MultiModalControler {
 	 */
 	@Override
 	public MobsimFactory getMobsimFactory() {
-		return new EvacuationQSimFactory(this.getTravelTimeCalculator());
+		return new MultiModalMobsimFactory(super.getMobsimFactory(), travelTime);
 	}
 
 	public static class ReplanningFlagInitializer implements SimulationInitializedListener {
