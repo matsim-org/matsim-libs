@@ -20,12 +20,15 @@
 
 package playground.balmermi.census2000v2;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.facilities.algorithms.FacilitiesCombine;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -92,11 +95,11 @@ public class FacilitiesCreation {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 
 		Gbl.startMeasurement();
 
-		Config config = Gbl.createConfig(args);
+		Config config = ConfigUtils.loadConfig(args[0]);
 
 		createHomeFacilities(config);
 

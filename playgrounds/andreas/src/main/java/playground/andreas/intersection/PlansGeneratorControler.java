@@ -20,6 +20,7 @@
 
 package playground.andreas.intersection;
 
+import java.io.IOException;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
@@ -30,11 +31,11 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class PlansGeneratorControler extends Controler {
 
@@ -182,13 +183,18 @@ public class PlansGeneratorControler extends Controler {
 
 	public static void main(final String[] args) {
 
-		Config config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/test/data/bottleneck/config.xml" });
+		try {
+			Config config;
+			config = ConfigUtils.loadConfig("./src/playground/andreas/intersection/test/data/bottleneck/config.xml");
+			final PlansGeneratorControler controler = new PlansGeneratorControler(config);
+			controler.setOverwriteFiles(true);
+			controler.setWriteEventsInterval(1);
 
-		final PlansGeneratorControler controler = new PlansGeneratorControler(config);
-		controler.setOverwriteFiles(true);
-		controler.setWriteEventsInterval(1);
+			controler.run();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		controler.run();
 	}
 
 }

@@ -35,8 +35,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
@@ -84,8 +82,8 @@ public class PTActWriter {
 		this.logicToPlainConverter = logicFactory.getLogicToPlainTranslator();
 		this.firstWalkRange = ptValues.FIRST_WALKRANGE;
 
-		Config config = new Config();
-		config = Gbl.createConfig(new String[]{ configFile, "http://www.matsim.org/files/dtd/plans_v4.dtd"});
+//		Config config = new Config();
+//		config = Gbl.createConfig(new String[]{ configFile, "http://www.matsim.org/files/dtd/plans_v4.dtd"});
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.setNetwork(this.plainNet);

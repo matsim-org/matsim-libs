@@ -34,12 +34,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 import playground.msieg.structure.Commodities;
@@ -61,8 +61,8 @@ public class CMCFDemandWriter{
 //		this.popReader = new MatsimPopulationReader(this.plans);
 //	}
 
-	public CMCFDemandWriter(final String configPath){
-		this(Gbl.createConfig(new String[] { configPath, "config_v1.dtd" }));
+	public CMCFDemandWriter(final String configPath) throws IOException{
+		this(ConfigUtils.loadConfig(configPath));
 	}
 
 	private CMCFDemandWriter(final Config config) {
@@ -235,7 +235,7 @@ public class CMCFDemandWriter{
 		}
 	}
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 		if(args.length==0){
 			System.out.println("Usage: java CMCFDemandWriter config.xml \n\tOR: java CMCFDemandWriter network.xml plans.xml [outputFile] [input] \n" +
 					"\t second argument is the plansFile to convert, if not given, then the plans file in the config is used." +

@@ -20,6 +20,8 @@
 
 package playground.ciarif.modechoice_old;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -29,6 +31,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkSummary;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.algorithms.PersonCreatePlanFromKnowledge;
@@ -174,9 +177,9 @@ public class Mode_choice_main {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 		Gbl.startMeasurement();
-		Config config = Gbl.createConfig(args);
+		Config config = ConfigUtils.loadConfig(args[0]);
 
 		testRun01(config);
 		Gbl.printElapsedTime();

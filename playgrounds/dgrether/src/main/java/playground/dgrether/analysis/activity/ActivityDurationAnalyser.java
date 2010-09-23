@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.activity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,10 +31,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 
@@ -76,7 +77,11 @@ public class ActivityDurationAnalyser {
 
 	public ActivityDurationAnalyser() {
 		//set config
-		this.config = Gbl.createConfig(new String[] {configfile});
+		try {
+			this.config = ConfigUtils.loadConfig(configfile);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 //		config = Gbl.createConfig(null);
 
 		ScenarioImpl scenario = new ScenarioImpl(this.config);

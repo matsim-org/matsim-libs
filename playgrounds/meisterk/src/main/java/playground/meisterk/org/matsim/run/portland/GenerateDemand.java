@@ -20,11 +20,12 @@
 
 package playground.meisterk.org.matsim.run.portland;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -33,16 +34,17 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.world.World;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class GenerateDemand {
 
 	/**
 	 * @param args
+	 * @throws IOException
 	 */
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 
-		Config config = Gbl.createConfig(args);
+		Config config = ConfigUtils.loadConfig(args[0]);
 		GenerateDemand.generateDemand(config);
 
 	}

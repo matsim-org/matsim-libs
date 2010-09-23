@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.msieg.cmcf.BestFitTimeRouter;
 import playground.msieg.cmcf.CMCFDemandWriter;
@@ -83,6 +83,7 @@ public class IncreasingDemandRunner {
 
 	private static void runAllConfigsInDirectory(File dir){
 		String[] cfgFiles = dir.list(new FilenameFilter() {
+			@Override
 			public boolean accept(File arg0, String arg1) {
 				return arg1.startsWith("config") && arg1.endsWith(".xml") && !arg1.equals("config.xml");
 			}
@@ -102,11 +103,11 @@ public class IncreasingDemandRunner {
 		}
 	}
 
-	private static void createAllConfigs(String cfgFile) {
+	private static void createAllConfigs(String cfgFile) throws IOException {
 		String topDir = cfgFile.lastIndexOf(File.separatorChar) == -1 ?
 						"." : cfgFile.substring(0, cfgFile.lastIndexOf(File.separatorChar));
 
-		Config config = Gbl.createConfig(new String[] { cfgFile, "config_v1.dtd" });
+		Config config = ConfigUtils.loadConfig(cfgFile);
 
 		String  //cfgFile = args[0],
 				netFile = new File(config.network().getInputFile()).getAbsolutePath(),

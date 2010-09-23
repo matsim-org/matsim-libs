@@ -20,11 +20,13 @@
 
 package playground.balmermi.census2000;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatsimMatricesReader;
 
@@ -95,9 +97,8 @@ public class ScenarioCreation {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(final String[] args) {
-		Config config = Gbl.createConfig(args);
-
+	public static void main(final String[] args) throws IOException {
+		Config config = ConfigUtils.loadConfig(args[0]);
 		fuseScenario(config);
 	}
 }

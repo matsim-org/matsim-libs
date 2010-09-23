@@ -20,6 +20,8 @@
 
 package playground.balmermi.census2000;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -29,6 +31,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.balmermi.census2000.modules.PersonVaryTimes;
 
@@ -82,10 +85,10 @@ public class InitTimesVariation {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 		Gbl.startMeasurement();
 
-		Config config = Gbl.createConfig(args);
+		Config config = ConfigUtils.loadConfig(args[0]);
 
 		varyInitTimes(config);
 

@@ -20,6 +20,7 @@
 
 package playground.balmermi.census2000v2;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,6 +37,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.world.World;
 
 import playground.balmermi.census2000v2.modules.PersonAssignToNetwork;
@@ -138,11 +140,11 @@ public class IIDMAssign2Network {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 
 		Gbl.startMeasurement();
 
-		Config config = Gbl.createConfig(args);
+		Config config = ConfigUtils.loadConfig(args[0]);
 
 		assignNetwork(config);
 

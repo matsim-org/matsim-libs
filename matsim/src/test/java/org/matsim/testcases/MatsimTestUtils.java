@@ -20,14 +20,15 @@
 package org.matsim.testcases;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * Some helper methods for writing JUnit 4 tests in MATSim.
@@ -75,12 +76,16 @@ public class MatsimTestUtils extends TestWatchman {
 	 * @return The loaded configuration.
 	 */
 	public Config loadConfig(final String configfile) {
-		String [] args = {configfile};
 		Config config;
 		if (configfile != null) {
-			config = Gbl.createConfig(args);
+			try {
+				config = ConfigUtils.loadConfig(configfile);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
-			config = Gbl.createConfig(new String[0]);
+			config = new Config();
+			config.addCoreModules();
 		}
 		createOutputDirectory();
 		config.controler().setOutputDirectory(this.outputDirectory);

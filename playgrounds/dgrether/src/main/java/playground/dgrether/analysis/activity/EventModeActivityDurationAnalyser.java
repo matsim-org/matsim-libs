@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.activity;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -36,13 +37,13 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.dgrether.utils.IntegerCountMap;
@@ -81,10 +82,12 @@ public class EventModeActivityDurationAnalyser {
 
 	public EventModeActivityDurationAnalyser() {
 
-		this.config = Gbl.createConfig(new String[] {CONFIGFILE});
+		try {
+			this.config = ConfigUtils.loadConfig(CONFIGFILE);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 //		config = Gbl.createConfig(null);
-//		Gbl.getWorld().setNetworkLayer(net);
-//		Gbl.getWorld().complete();
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
 
@@ -172,6 +175,7 @@ public class EventModeActivityDurationAnalyser {
 			}
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			this.homeActivityCarCount /= 2;
 			this.homeActivityNonCarCount /= 2;

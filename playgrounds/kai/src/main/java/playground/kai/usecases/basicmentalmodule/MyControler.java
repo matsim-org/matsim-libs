@@ -19,19 +19,21 @@
 
 package playground.kai.usecases.basicmentalmodule;
 
+import java.io.IOException;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class MyControler {
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 
 		Config config;
 		if ( args.length==0 ) {
-			config = Gbl.createConfig(new String[] {"../../eclipse/matsim/examples/equil/myconfig.xml"});
+			config = ConfigUtils.loadConfig("../../eclipse/matsim/examples/equil/myconfig.xml");
 		} else {
-			config = Gbl.createConfig(args) ;
+			config = ConfigUtils.loadConfig(args[0]);
 		}
 
 		final Controler controler = new Controler(config);

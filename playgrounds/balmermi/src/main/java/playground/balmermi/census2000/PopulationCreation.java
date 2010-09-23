@@ -20,6 +20,8 @@
 
 package playground.balmermi.census2000;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -29,6 +31,7 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;
@@ -121,12 +124,11 @@ public class PopulationCreation {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 
 		Gbl.startMeasurement();
 
-		Config config = Gbl.createConfig(args);
-
+		Config config = ConfigUtils.loadConfig(args[0]);
 		createPopulation(config);
 
 		Gbl.printElapsedTime();

@@ -7,7 +7,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
@@ -65,8 +64,8 @@ public class Matsim4Urbansim {
 		}
 
 		// parse the config arguments so we have a config.  generate scenario data from this
-		Config config = Gbl.createConfig(args);
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
+		Config config = loader.getScenario().getConfig();
 		loader.loadScenario();
 		ScenarioImpl scenarioData = loader.getScenario();
 

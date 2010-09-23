@@ -27,15 +27,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.net.URL;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigReaderMatsimV1;
-import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.xml.sax.SAXException;
 
 /* The usage of Gbl.getConfig() all throughout the code makes it very hard
  * to debug. We would thus prefer if Gbl.getConfig() could be removed in
@@ -47,47 +39,6 @@ public abstract class Gbl {
 	public final static String ONLYONCE=" This message given only once.";
 
 	private static final Logger log = Logger.getLogger(Gbl.class);
-
-	//////////////////////////////////////////////////////////////////////
-	// config creation
-	//////////////////////////////////////////////////////////////////////
-	/**
-	 * @param args
-	 * @return
-	 * @deprecated use {@link ScenarioLoaderImpl#loadScenario()} to read
-	 * a complete Scenario from file. If only a config-file should be loaded,
-	 * use <code>new ScenarioLoaderImpl(configFilename).getScenario().getConfig()</code>.
-	 * If only a default, empty (=not loaded) Config instance is needed, use
-	 * <code>Scenario sc = new {@link ScenarioImpl}(); Config config = sc.getConfig();</code>.
-	 */
-	@Deprecated
-	public static final Config createConfig(final String[] args) {
-		Config config = new Config();
-		config.addCoreModules();
-
-		if ((args != null) && (args.length == 1)) {
-			log.info("Input config file: " + args[0]);
-			MatsimConfigReader reader = new MatsimConfigReader(config);
-			try {
-				reader.parse(args[0]);
-			} catch (SAXException e) {
-				throw new RuntimeException(e);
-			} catch (ParserConfigurationException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		} else if ((args != null) && (args.length >= 1)) {
-			log.info("Input config file: " + args[0]);
-			log.info("Input local config dtd: " + args[1]);
-			ConfigReaderMatsimV1 reader = new ConfigReaderMatsimV1(config);
-			reader.readFile(args[0], args[1]);
-		}
-
-		MatsimRandom.reset(config.global().getRandomSeed());
-
-		return config;
-	}
 
 	//////////////////////////////////////////////////////////////////////
 	// reset scenario

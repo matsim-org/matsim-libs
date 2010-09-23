@@ -20,11 +20,13 @@
 
 package playground.meisterk.org.matsim.run.facilities;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesAllActivitiesFTE;
 
@@ -73,9 +75,9 @@ public class FacilitiesProductionKTI {
 
 	private static Logger log = Logger.getLogger(FacilitiesProductionKTI.class);
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
-		Config config = Gbl.createConfig(args);
+		Config config = ConfigUtils.loadConfig(args[0]);
 		FacilitiesProductionKTI.facilitiesProduction(KTIYear.KTI_YEAR_2008, config);
 
 	}

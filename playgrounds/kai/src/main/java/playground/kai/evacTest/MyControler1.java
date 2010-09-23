@@ -22,7 +22,6 @@ package playground.kai.evacTest;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
-import org.matsim.core.gbl.Gbl;
 import org.matsim.evacuation.run.EvacuationQSimControler;
 
 
@@ -35,14 +34,14 @@ public class MyControler1 extends EvacuationQSimControler {
 
 	public static void main(final String[] args) {
 
-		if ( args.length==0 ) {
-//			Gbl.createConfig(new String[] {"../studies/schweiz/6-9SepFmaZurichOnly_rad=26000m-hwh/config-10pct.xml"});
-//			Gbl.createConfig(new String[] {"./examples/roundabout/config.xml"});
-//			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
-			Gbl.createConfig(new String[] {"../padang/dlr-network/pconfig.xml"});
-		} else {
-			Gbl.createConfig(args) ;
-		}
+//		if ( args.length==0 ) {
+////			Gbl.createConfig(new String[] {"../studies/schweiz/6-9SepFmaZurichOnly_rad=26000m-hwh/config-10pct.xml"});
+////			Gbl.createConfig(new String[] {"./examples/roundabout/config.xml"});
+////			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
+//			Gbl.createConfig(new String[] {"../padang/dlr-network/pconfig.xml"});
+//		} else {
+//			Gbl.createConfig(args) ;
+//		}
 
 		final MyControler1 controler = new MyControler1(args);
 		controler.setOverwriteFiles(true) ;

@@ -19,6 +19,7 @@
 package playground.dgrether.analysis.activity;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
@@ -26,11 +27,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 
 
@@ -61,10 +62,12 @@ public class ModeActivityDurationAnalyser {
 
 	public ModeActivityDurationAnalyser() {
 
-		this.config = Gbl.createConfig(new String[] {CONFIGFILE});
+		try {
+			this.config = ConfigUtils.loadConfig(CONFIGFILE);
+		} catch (IOException e1) {
+			throw new RuntimeException(e1);
+		}
 //	config = Gbl.createConfig(null);
-//	Gbl.getWorld().setNetworkLayer(net);
-//	Gbl.getWorld().complete();
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
 

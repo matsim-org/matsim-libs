@@ -17,8 +17,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -207,8 +205,7 @@ public class Converter {
 
 		Converter c = new Converter();
 
-		Config config = Gbl.createConfig(null);
-		ScenarioImpl scenario = new ScenarioImpl(config);
+		ScenarioImpl scenario = new ScenarioImpl();
 		c.setZones((ZoneLayer) new World().createLayer(new IdImpl("zones"),
 				"toronto_test"));
 

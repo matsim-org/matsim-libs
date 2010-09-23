@@ -20,19 +20,16 @@
 
 package playground.meisterk.org.matsim.controler;
 
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 
 public class ParsimoniousControler {
 
 	public static void main(String[] args) {
 
-		Config config = Gbl.createConfig(args);
-		Controler controler = new Controler(config);
+		Controler controler = new Controler(args);
 		controler.setCreateGraphs(false);
 		controler.run();
-		
+
 	}
 
 }

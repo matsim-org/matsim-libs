@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PersonImpl;
@@ -48,6 +47,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -120,14 +120,14 @@ public class MyControler2 {
 		return population ;
 	}
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 
 		Config config;
 		// parse the config arguments so we have a config.  generate scenario data from this
 		if ( args.length==0 ) {
-			config = Gbl.createConfig(new String[] {"./src/playground/duncan/myconfig1.xml"});
+			config = ConfigUtils.loadConfig("./src/playground/duncan/myconfig1.xml");
 		} else {
-			config = Gbl.createConfig(args) ;
+			config = ConfigUtils.loadConfig(args[0]);
 		}
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadNetwork();

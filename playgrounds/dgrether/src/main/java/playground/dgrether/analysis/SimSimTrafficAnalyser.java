@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -155,8 +154,6 @@ public class SimSimTrafficAnalyser {
 
 
 		String srs = TransformationFactory.CH1903_LV03;
-
-		Gbl.createConfig(null);
 
 		SimSimTrafficAnalyser analyser = new SimSimTrafficAnalyser();
 		analyser.runAnalysis(net, linkstats1, linkstats2, srs, outfile);

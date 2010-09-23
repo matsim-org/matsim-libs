@@ -78,9 +78,9 @@ public class KMLActsWriter {
 		this.network = network;
 		this.activityList = activityList;
 	}
-	
+
 	public KMLActsWriter(Network network, Activity activity) {
-		this(network, new LinkedList<Activity>());		
+		this(network, new LinkedList<Activity>());
 		this.activityList.add(activity);
 	}
 
@@ -91,7 +91,7 @@ public class KMLActsWriter {
 	public void addActivity(Activity act){
 		this.activityList.add(act);
 	}
-	
+
 	public void writeFile() {
 
 		String outputFile = this.outputDirectory + "/" + this.kmzFileName;
@@ -125,20 +125,20 @@ public class KMLActsWriter {
 			// add the MATSim logo to the kml
 			ScreenOverlayType logo = MatsimKMLLogo.writeMatsimKMLLogo(writer);
 			mainFolder.getAbstractFeatureGroup().add(LocalkmlObjectFactory.createScreenOverlay(logo));
-			
+
 			// add the person's activity links to the kml
 			if(this.writeActivities){
 				createActivityLinks();
-				
+
 				Collection<FolderType> activityFolderCollection = getActivities();
-				
+
 				for (FolderType activityFolder : activityFolderCollection) {
 					if (activityFolder != null) {
 						activityFolder.setVisibility(Boolean.FALSE);
 						mainFolder.getAbstractFeatureGroup().add(LocalkmlObjectFactory.createFolder(activityFolder));
 					}
-				}			
-				
+				}
+
 			}
 
 			// add the person's activity links to the kml
@@ -159,26 +159,26 @@ public class KMLActsWriter {
 		writer.close();
 		log.info("... finished");
 	}
-	
+
 	private Collection<FolderType> getActivities() throws IOException {
-	
+
 //		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
 //		this.networkNodeStyle = this.styleFactory.createDefaultColoredNodeStyle();
-		
-		HashMap<String, FolderType> folderTypes = new HashMap<String, FolderType>();		
-		
+
+		HashMap<String, FolderType> folderTypes = new HashMap<String, FolderType>();
+
 		for (Activity act : this.activityList) {
-			
+
 			if(folderTypes.get(act.getType()) == null){
 				FolderType linkFolder = this.kmlObjectFactory.createFolderType();
 				linkFolder.setName(act.getType() + " activities");
 				folderTypes.put(act.getType(), linkFolder);
 			}
-			
+
 			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createActFeature(act, this.styleFactory.createDefaultColoredNodeStyle(act.getType()));
 			folderTypes.get(act.getType()).getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
 		}
-		
+
 		return folderTypes.values();
 	}
 
@@ -193,7 +193,7 @@ public class KMLActsWriter {
 			for (Link link : links) {
 				AbstractFeatureType abstractFeature = this.networkFeatureFactory.createLinkFeature(link, this.networkLinkStyle);
 				linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
-			}	
+			}
 
 			return linkFolder;
 		} else {
@@ -202,15 +202,15 @@ public class KMLActsWriter {
 	}
 
 	private List<Link> createActivityLinks() {
-		
+
 		List<Link> links = new LinkedList<Link>();
-		
+
 		for (Activity act : this.activityList) {
 			if(act.getLinkId() != null && this.network != null){
 				links.add(this.network.getLinks().get(act.getLinkId()));
 			}
 		}
-		
+
 		if(links.size() == 0) {
 			return null;
 		} else {
@@ -255,7 +255,6 @@ public class KMLActsWriter {
 		final String kmzFilename = "test.kmz";
 		final String outputDirectory = "E:\\temp";
 
-		Gbl.createConfig(null);
 //		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 //		new MatsimNetworkReader(network).readFile(netFilename);
 
@@ -264,10 +263,10 @@ public class KMLActsWriter {
 		actList.add(act);
 		act = new ActivityImpl("whatever", new CoordImpl(4579260, 5841710));
 		actList.add(act);
-		
+
 		Activity act2 = new ActivityImpl("whatever2", new CoordImpl(4579260, 5841710));
 		actList.add(act2);
-		
+
 		KMLActsWriter test = new KMLActsWriter(null, actList);
 
 		test.setCoordinateTransformation(new GK4toWGS84());

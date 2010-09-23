@@ -20,22 +20,23 @@
 
 package playground.david;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class ExternalMobsimTest {
 
-	public static void main(final String[] args) {
-		String[] defaultArgs = {"test/simple/default_config.xml"};
-		Config config = Gbl.createConfig(defaultArgs);
+	public static void main(final String[] args) throws IOException {
+		Config config = ConfigUtils.loadConfig("test/simple/default_config.xml");
 		ScenarioImpl scenario = new ScenarioImpl(config);
 
 		new MatsimNetworkReader(scenario).readFile("e:/Development/tmp/studies/equil//equil_netENG.xml");
@@ -63,7 +64,7 @@ public class ExternalMobsimTest {
 		// commenting out the last line.  I don't think that anybody is using this piece of code, and even if so
 		// I think that the code still works without that line (in particular, since it is not in the test repository).
 		// kai, may'10
-		
+
 		Simulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events_);
 		sim.run();
 

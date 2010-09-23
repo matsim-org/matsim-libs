@@ -74,6 +74,7 @@ import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.kml.KMZWriter;
 
@@ -199,9 +200,10 @@ public class ShopsOf2005ToFacilities {
 
 	/**
 	 * @param args
+	 * @throws IOException
 	 */
-	public static void main(final String[] args) {
-		Config config = Gbl.createConfig(args);
+	public static void main(final String[] args) throws IOException {
+		Config config = ConfigUtils.loadConfig(args[0]);
 
 		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
 //		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities(config);

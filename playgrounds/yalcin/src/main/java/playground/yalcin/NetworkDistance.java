@@ -44,9 +44,9 @@ import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -117,7 +117,8 @@ public class NetworkDistance {
 		new MatsimNetworkReader(scenario).readFile(wgs84NetworkFilename);
 
 		// set the config to only look at distance costs, not travel time costs
-		Config config = Gbl.createConfig(null);
+		Config config = new Config();
+		config.addCoreModules();
 		config.charyparNagelScoring().setTraveling(0.0);
 		config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.001); // -1 per kilometer == -0.001 per meter
 

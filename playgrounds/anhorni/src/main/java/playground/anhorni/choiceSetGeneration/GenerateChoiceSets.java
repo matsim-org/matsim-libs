@@ -38,6 +38,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.anhorni.choiceSetGeneration.choicesetextractors.ExtractChoiceSetsRouting;
 import playground.anhorni.choiceSetGeneration.filters.ActTypeAndAreaTripFilter;
@@ -209,8 +210,11 @@ public class GenerateChoiceSets {
 
 	public void run() {
 
-		String configArgs [] = {this.matsimRunConfigFile};
-		this.config = Gbl.createConfig(configArgs);
+		try {
+			this.config = ConfigUtils.loadConfig(this.matsimRunConfigFile);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
 		this.createChoiceSetFacilities();
 

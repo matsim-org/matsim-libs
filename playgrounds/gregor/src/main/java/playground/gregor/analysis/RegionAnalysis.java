@@ -45,13 +45,12 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.world.World;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -266,7 +265,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 
 	}
 
-	public static void main(final String [] args) throws FactoryException {
+	public static void main(final String [] args) throws FactoryException, IOException {
 //		String district_shape_file;
 
 		final String shapefile = "../inputs/padang/region.shp";
@@ -274,7 +273,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 		if (args.length != 1) {
 			throw new RuntimeException("wrong number of arguments! Pleas run DistanceAnalysis config.xml shapefile.shp" );
 		}
-		Config config = Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
+		Config config = ConfigUtils.loadConfig(args[0]);
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
 

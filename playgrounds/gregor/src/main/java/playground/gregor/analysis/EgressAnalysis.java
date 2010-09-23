@@ -48,7 +48,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
@@ -64,6 +63,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.gregor.gis.helper.GTH;
@@ -225,7 +225,7 @@ public class EgressAnalysis {
 
 
 
-	public static void main(final String [] args) {
+	public static void main(final String [] args) throws IOException {
 
 
 		String district_shape_file;
@@ -235,7 +235,7 @@ public class EgressAnalysis {
 		if (args.length != 2) {
 			throw new RuntimeException("wrong number of arguments! Pleas run DistanceAnalysis config.xml shapefile.shp" );
 		}
-		Config config = Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
+		Config config = ConfigUtils.loadConfig(args[0]);
 		district_shape_file = args[1];
 
 		ScenarioImpl scenario = new ScenarioImpl(config);

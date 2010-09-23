@@ -20,9 +20,11 @@
 
 package playground.kai.oevTest;
 
+import java.io.IOException;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author nagel
@@ -30,13 +32,13 @@ import org.matsim.core.gbl.Gbl;
  */
 public class OevTest {
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 
 		Config config;
 		if ( args.length==0 ) {
-			config = Gbl.createConfig(new String[] {"./test/shared/oev-test-network/configs/config1.xml"});
+			config = ConfigUtils.loadConfig("./test/shared/oev-test-network/configs/config1.xml");
 		} else {
-			config = Gbl.createConfig(args) ;
+			config = ConfigUtils.loadConfig(args[0]);
 		}
 
 		final Controler controler = new Controler(config);

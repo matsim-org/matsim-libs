@@ -21,14 +21,15 @@
 package org.matsim.testcases;
 
 import java.io.File;
+import java.io.IOException;
 
 import junit.framework.TestCase;
 
 import org.junit.Ignore;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 @Ignore
 public class MatsimTestCase extends TestCase {
@@ -76,12 +77,17 @@ public class MatsimTestCase extends TestCase {
 	 * @return The loaded configuration.
 	 */
 	public Config loadConfig(final String configfile) {
-		String [] args = {configfile};
 		Config config;
 		if (configfile != null) {
-			config = Gbl.createConfig(args);
+			try {
+				config = ConfigUtils.loadConfig(configfile);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			MatsimRandom.reset(config.global().getRandomSeed());
 		} else {
-			config = Gbl.createConfig(new String[0]);
+			config = new Config();
+			config.addCoreModules();
 		}
 		createOutputDirectory();
 		config.controler().setOutputDirectory(this.outputDirectory);

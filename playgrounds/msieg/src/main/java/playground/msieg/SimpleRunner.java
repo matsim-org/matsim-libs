@@ -38,7 +38,7 @@ public class SimpleRunner {
 	public static void main(String[] args) {
 		test3();
 	}
-	
+
 	public static void test1(){
 		CMCFNetworkWriter.main(
 				new String[] {"examples/siouxfalls/network.xml", "examples/test/sioux/netCMCF.xml"});
@@ -46,7 +46,7 @@ public class SimpleRunner {
 				new String[] {"examples/siouxfalls/network.xml", "1000"});
 	}
 
-	public static void test2(){
+	public static void test2() throws IOException{
 		CMCFDemandWriter cdw = new CMCFDemandWriter("examples/test/sioux/config.xml");
 		try {
 			Writer out =  new FileWriter("examples/test/sioux/plansCMCF.xml");
@@ -57,7 +57,7 @@ public class SimpleRunner {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void test3(){
 		CMCFRouter btr = new BestFitTimeRouter(
 				"examples/test/sioux/network.xml",

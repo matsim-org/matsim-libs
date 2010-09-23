@@ -21,7 +21,6 @@
 package playground.ciarif;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 
 public abstract class Scenario {
 
@@ -48,7 +47,8 @@ public abstract class Scenario {
 	//////////////////////////////////////////////////////////////////////
 
 	public static final Config setUpScenarioConfig() {
-		final Config config = Gbl.createConfig(null);
+		final Config config = new Config();
+		config.addCoreModules();
 
 		config.network().setInputFile(input_directory + "network.xml.gz");
 

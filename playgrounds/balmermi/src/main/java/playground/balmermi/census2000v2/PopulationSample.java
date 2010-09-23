@@ -20,6 +20,8 @@
 
 package playground.balmermi.census2000v2;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
@@ -30,7 +32,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.world.World;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class PopulationSample {
 
@@ -112,11 +114,11 @@ public class PopulationSample {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 
 		Gbl.startMeasurement();
 
-		Config config = Gbl.createConfig(args);
+		Config config = ConfigUtils.loadConfig(args[0]);
 
 		samplePopulation(config);
 

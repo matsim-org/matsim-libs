@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 public class MZ2Plans {
 
@@ -86,8 +87,7 @@ public class MZ2Plans {
 	public static void main(final String[] args) throws Exception {
 		Gbl.startMeasurement();
 
-		Config config = Gbl.createConfig(args);
-
+		Config config = ConfigUtils.loadConfig(args[0]);
 		createMZ2Plans(config);
 
 		Gbl.printElapsedTime();
