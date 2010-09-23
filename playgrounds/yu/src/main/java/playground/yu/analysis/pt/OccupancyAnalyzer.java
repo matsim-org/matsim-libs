@@ -63,7 +63,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
 	/** Map< stopFacilityId,value[]> */
-	private final Map<Id, int[]> boards, alights, occupancies;
+	private Map<Id, int[]> boards, alights, occupancies;
 
 	/** Map< vehId,stopFacilityId> */
 	private final Map<Id, Id> veh_stops = new HashMap<Id, Id>();
@@ -88,6 +88,18 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 		this.boards = new HashMap<Id, int[]>();
 		this.alights = new HashMap<Id, int[]>();
 		this.occupancies = new HashMap<Id, int[]>();
+	}
+
+	public void setBoards(Map<Id, int[]> boards) {
+		this.boards = boards;
+	}
+
+	public void setAlights(Map<Id, int[]> alights) {
+		this.alights = alights;
+	}
+
+	public void setOccupancies(Map<Id, int[]> occupancies) {
+		this.occupancies = occupancies;
 	}
 
 	private int getTimeSlotIndex(final double time) {

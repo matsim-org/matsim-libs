@@ -40,9 +40,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * This class is a copy of main() from
  * org.matsim.utils.gis.matsim2esri.network.Network2ESRIShape and can convert a
  * MATSim-network to a QGIS .shp-file (link or polygon)
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class MATSimNet2QGISDemo implements X2QGIS {
 
@@ -56,13 +56,17 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		// String netfile = "test/scenarios/berlin/network.xml.gz";
 		// String outputFileLs = "output/bvg/berlinLinks.shp";
 		// String outputFileP = "output/bvg/berlinPolygon.shp";
-		String netfile = "../berlin data/network.xml";
-		String outputFileLs = "../berlin data/Links.shp";
-		String outputFileP = "../berlin data/Polygon.shp";
+		// String netfile = "../berlin data/network.xml";
+		// String outputFileLs = "../berlin data/Links.shp";
+		// String outputFileP = "../berlin data/Polygon.shp";
+
+		String netfile = "../matsim/test/scenarios/chessboard/network.xml";
+		String outputFileLs = "../matsimTests/locationChoice/chessboard/Links.shp";
+		String outputFileP = "../matsimTests/locationChoice/chessboard/Polygon.shp";
 
 		// String coordinateSys = ch1903;
 		String coordinateSys = "DHDN_GK4";
-//		String coordinateSys = "Atlantis";
+		// String coordinateSys = "Atlantis";
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().global().setCoordinateSystem(coordinateSys);
 
@@ -72,7 +76,8 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		log.info("done.");
 
-		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, coordinateSys);
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(
+				network, coordinateSys);
 		builder
 				.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
@@ -80,7 +85,7 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		new Links2ESRIShape(network, outputFileLs, builder).write();
 
 		CoordinateReferenceSystem crs = MGC.getCRS(coordinateSys);
-		builder.setWidthCoefficient(0.01);
+		builder.setWidthCoefficient(10);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);

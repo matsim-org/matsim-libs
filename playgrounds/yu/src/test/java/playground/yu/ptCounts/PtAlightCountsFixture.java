@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SubTourModeChoiceControler.java
+ * PtBoardCountsFixture.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,48 +18,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
-package playground.yu.test;
+package playground.yu.ptCounts;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import java.util.HashMap;
+import java.util.Map;
 
-import playground.yu.analysis.MZComparison.MZComparisonListener;
-import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
-/**
- * @author yu
- * 
- */
-public class SubTourModeChoiceControler extends Controler {
+import playground.yu.counts.pt.PtAlightCountComparisonAlgorithm;
+import playground.yu.counts.pt.PtCountsComparisonAlgorithm;
 
-	public SubTourModeChoiceControler(String args) {
-		super(args);
+public class PtAlightCountsFixture extends PtCountsFixture {
+
+	public PtAlightCountsFixture() {
+		super("inputAlightCountsFile");
 	}
 
 	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		MyStrategyManagerConfigLoader.load(this, manager);
-		return manager;
-	}
+	public PtCountsComparisonAlgorithm getCCA() {
+		Map<Id, int[]> alights = new HashMap<Id, int[]>();
 
-	public static void main(String[] args) {
-		Config config = new ScenarioLoaderImpl(args[0]).loadScenario()
-				.getConfig();
-		Controler controler = new SubTourModeChoiceControler(args[0]);
-		controler
-				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring(), config.vspExperimental()
-								.getOffsetWalk()));
-//		controler.addControlerListener(new MZComparisonListener());
-		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
-		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
-		controler.setOverwriteFiles(true);
-		controler.run();
+		int[] alightArrayStop3 = new int[24];
+		alightArrayStop3[8] = 50;
+		alights.put(new IdImpl("stop3"), alightArrayStop3);
+
+		int[] alightArrayStop4 = new int[24];
+		alightArrayStop4[8] = 15;
+		alights.put(new IdImpl("stop4"), alightArrayStop4);
+
+		this.oa.setAlights(alights);
+		PtCountsComparisonAlgorithm cca = new PtAlightCountComparisonAlgorithm(
+				oa, counts, network, Double.parseDouble(config.findParam(
+						MODULE_NAME, "countsScaleFactor")));
+		cca.setDistanceFilter(Double.valueOf(config.findParam(MODULE_NAME,
+				"distanceFilter")), config.findParam(MODULE_NAME,
+				"distanceFilterCenterNode"));
+		return cca;
 	}
 }

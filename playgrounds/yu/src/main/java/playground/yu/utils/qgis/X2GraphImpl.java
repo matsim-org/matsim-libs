@@ -64,11 +64,9 @@ public abstract class X2GraphImpl implements X2Graph {
 		// //////////////////////////////////////////////////////////////
 		double width = getLinkWidth(link);
 		// //////////////////////////////////////////////////////////////
-		Coordinate from = new Coordinate(link.getFromNode().getCoord().getX(),
-				link.getFromNode().getCoord().getY());
+		Coordinate from = getCoordinate(link.getFromNode().getCoord());
 
-		Coordinate to = new Coordinate(link.getToNode().getCoord().getX(), link
-				.getToNode().getCoord().getY());
+		Coordinate to = getCoordinate(link.getToNode().getCoord());
 
 		double xdiff = to.x - from.x;
 		double ydiff = to.y - from.y;

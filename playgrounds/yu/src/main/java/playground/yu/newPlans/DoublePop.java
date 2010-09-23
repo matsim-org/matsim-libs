@@ -66,17 +66,20 @@ public class DoublePop extends NewPopulation {
 		long oldId = Integer.parseInt(person.getId().toString());
 		// produce new Person with new Id
 		// if (n == 1) {
-		for (int i = 1; i < 2; i++)
-		// createNewPerson(oldId + i);
+		
+		
+		
+		for (int i = 1; i < 20; i++)
 
 		{
-			createNewPerson(oldId + i * 100);
+			createNewPerson(oldId + i * 5);
 		}
 
 		// } else if (n == 2) {
-		// for (int i = 1; i <= 89; i++)
-		// createNewPerson(oldId+i);
-		// }
+		
+//		for (int i = 1; i <= 99; i++) {
+//			createNewPerson(oldId + i);
+//		}
 
 		// createNewPerson(oldId + "A");
 		// createNewPerson(oldId + "B");
@@ -99,9 +102,9 @@ public class DoublePop extends NewPopulation {
 
 	public static void main(final String[] args) {
 
-		String networkFilename = "../../matsim/examples/equil/network.xml";
-		String plansFilename = "../../MATSim_integration_demandCalibration/tests/plans100withPt.xml";
-		String outputPlansFilename = "../../MATSim_integration_demandCalibration/tests/plans200withPt.xml";
+		String networkFilename = "../playgrounds/yu/test/input/playground/yu/ptCounts/ptNet.xml";
+		String plansFilename = "../playgrounds/yu/test/input/playground/yu/ptCounts/ptPop.xml";
+		String outputPlansFilename = "../playgrounds/yu/test/input/playground/yu/ptCounts/pt100Pop.xml";
 
 		ScenarioImpl s = new ScenarioImpl();
 

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RemoveWorstPlanSelector.java
+ * PtCountsLoadCurveGraphTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,37 +18,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.yu.replanning.selectors;
+package playground.yu.ptCounts;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.junit.Test;
+import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
+import org.matsim.testcases.MatsimTestCase;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.replanning.selectors.PlanSelector;
-import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-import org.matsim.core.utils.collections.Tuple;
+public class PtCountsLoadCurveGraphTest extends MatsimTestCase {
+	@Test
+	public void testCreateBoardChart() {
+		PtCountsFixture fixture = new PtBoardCountsFixture();
+		fixture.setUp();
 
-/**
- * @author yu
- * 
- */
-public class RemoveWorstPlanSelector implements PlanSelector {
-	private PlanSelector removalPlanSelector = new WorstPlanForRemovalSelector();
-	private List<Tuple<Id, Plan>> removeds = new ArrayList<Tuple<Id, Plan>>();
-
-	public List<Tuple<Id, Plan>> getRemoveds() {
-		// System.out.println(">>>>>\tremoveds:\t" + removeds);
-		return removeds;
+		CountsLoadCurveGraph eg = new CountsLoadCurveGraph(fixture
+				.ceateCountSimCompList(), 1, "testCreateChart");
+		assertNotNull("No graph is created", eg.createChart(0));
 	}
 
-	public Plan selectPlan(Person person) {
-		Plan worstPlan = this.removalPlanSelector.selectPlan(person);
-		removeds.add(new Tuple<Id, Plan>(person.getId(), worstPlan));
-		return worstPlan;
+	@Test
+	public void testCreateAlightChart() {
+		PtCountsFixture fixture = new PtAlightCountsFixture();
+		fixture.setUp();
+
+		CountsLoadCurveGraph eg = new CountsLoadCurveGraph(fixture
+				.ceateCountSimCompList(), 1, "testCreateChart");
+		assertNotNull("No graph is created", eg.createChart(0));
+	}
+
+	@Test
+	public void testCreateOccupancyChart() {
+		PtCountsFixture fixture = new PtOccupancyCountsFixture();
+		fixture.setUp();
+
+		CountsLoadCurveGraph eg = new CountsLoadCurveGraph(fixture
+				.ceateCountSimCompList(), 1, "testCreateChart");
+		assertNotNull("No graph is created", eg.createChart(0));
 	}
 }

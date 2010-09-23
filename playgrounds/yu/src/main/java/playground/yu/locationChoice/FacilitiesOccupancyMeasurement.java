@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SubTourModeChoiceControler.java
+ * FacilitiesOccupancyCounter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,48 +18,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
-package playground.yu.test;
+package playground.yu.locationChoice;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import java.util.HashMap;
+import java.util.Map;
 
-import playground.yu.analysis.MZComparison.MZComparisonListener;
-import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 
 /**
+ * measures the occupancy degree of facilities from eventsfile
+ * 
  * @author yu
  * 
  */
-public class SubTourModeChoiceControler extends Controler {
+public class FacilitiesOccupancyMeasurement implements
+		ActivityStartEventHandler, ActivityEndEventHandler {
+	/**
+	 * Map<facilityId, Map<time,number of agents in this facility"Id" at this
+	 * time>> counts
+	 */
+	private Map<Id, Map<Double, Integer>> facilitiesDiaries = new HashMap<Id, Map<Double, Integer>>();
 
-	public SubTourModeChoiceControler(String args) {
-		super(args);
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		if (!event.getActType().startsWith("h")) {
+			Id facilityId = event.getFacilityId();
+			Map<Double, Integer> diary = new HashMap<Double, Integer>();
+		}
 	}
 
 	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		MyStrategyManagerConfigLoader.load(this, manager);
-		return manager;
+	public void reset(int iteration) {
+
 	}
 
-	public static void main(String[] args) {
-		Config config = new ScenarioLoaderImpl(args[0]).loadScenario()
-				.getConfig();
-		Controler controler = new SubTourModeChoiceControler(args[0]);
-		controler
-				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						config.charyparNagelScoring(), config.vspExperimental()
-								.getOffsetWalk()));
-//		controler.addControlerListener(new MZComparisonListener());
-		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
-		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
-		controler.setOverwriteFiles(true);
-		controler.run();
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		// TODO Auto-generated method stub
+
 	}
+
 }
