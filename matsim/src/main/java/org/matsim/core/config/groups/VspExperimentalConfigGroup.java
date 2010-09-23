@@ -32,30 +32,46 @@ public class VspExperimentalConfigGroup extends Module {
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "vspExperimental";
+	
+	// ---
 
 	@Deprecated
 	private static final String USE_ACTIVITY_DURATIONS = "useActivityDurations";
 	private static final String ACTIVITY_DURATION_INTERPRETATION="activityDurationInterpretation" ;
+
 	public static final String MIN_OF_DURATION_AND_END_TIME="minOfDurationAndEndTime" ;
 	public static final String TRY_END_TIME_THEN_DURATION="tryEndTimeThenDuration" ;
 	public static final String END_TIME_ONLY="endTimeOnly" ;
 
-	private static final String INPUT_MZ05_FILE = "inputMZ05File";
+//	@Deprecated
+//	private boolean useActivityDurations = true;
+	private String activityDurationInterpretation = MIN_OF_DURATION_AND_END_TIME ;
 
+	// ---
+	
+	private static final String INPUT_MZ05_FILE = "inputMZ05File";
+	private String inputMZ05File = "";
+
+	// ---
+	
 	private static final String MODES_FOR_SUBTOURMODECHOICE = "modes";
 	private static final String CHAIN_BASED_MODES = "chainBasedModes";
 
-	private static final String OFFSET_WALK = "offsetWalk";
-
-//	@Deprecated
-//	private boolean useActivityDurations = true;
-	private String activityDurationInterpretation = "minOfDurationAndEndTime" ;
-
-	private String inputMZ05File = "";
-
 	private String modesForSubTourModeChoice = "car, pt";
 	private String chainBasedModes = "car";
+	
+	// ---
+	
+	private static final String COLORING="coloring" ;
+	
+	public static final String COLORING_STANDARD = "standard" ;
+	public static final String COLORING_BVG = "bvg" ;
 
+	private String coloring = COLORING_STANDARD ;
+	
+	// ---
+
+	private static final String OFFSET_WALK = "offsetWalk";
 	private double offsetWalk = 0d;
 
 
@@ -75,6 +91,8 @@ public class VspExperimentalConfigGroup extends Module {
 		map.put(CHAIN_BASED_MODES, "set chainBasedModes, e.g. \"car,bike\", \"car\"");
 
 		map.put(OFFSET_WALK, "set offset for mode \"walk\" in leg scoring function");
+		
+		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
 		return map;
 	}
 
@@ -82,9 +100,12 @@ public class VspExperimentalConfigGroup extends Module {
 	public String getValue(final String key) {
 		/* if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
 			return Boolean.toString(this.isUseActivityDurations());
-		} else */ if (ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key)) {
+		} else */ 
+		if (ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key))
 			return this.getActivityDurationInterpretation() ;
-		} else if (INPUT_MZ05_FILE.equalsIgnoreCase(key))
+		else if ( COLORING.equalsIgnoreCase(key) )
+			return this.coloring ;
+		else if (INPUT_MZ05_FILE.equalsIgnoreCase(key))
 			return this.getInputMZ05File();
 		else if (MODES_FOR_SUBTOURMODECHOICE.equalsIgnoreCase(key))
 			return this.getModesForSubTourModeChoice();
@@ -106,6 +127,8 @@ public class VspExperimentalConfigGroup extends Module {
 			}
 		} else if ( ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key)) {
 			this.setActivityDurationInterpretation(value) ;
+		} else if ( COLORING.equalsIgnoreCase(key) ) {
+			this.setColoring( value ) ;
 		} else if (INPUT_MZ05_FILE.equalsIgnoreCase(key))
 			this.setInputMZ05File(value);
 		else if (MODES_FOR_SUBTOURMODECHOICE.equalsIgnoreCase(key))
@@ -131,6 +154,8 @@ public class VspExperimentalConfigGroup extends Module {
 		map.put(CHAIN_BASED_MODES, getValue(CHAIN_BASED_MODES));
 
 		map.put(OFFSET_WALK, getValue(OFFSET_WALK));
+		
+		map.put(COLORING, getValue(COLORING)) ;
 		return map;
 	}
 
@@ -141,6 +166,13 @@ public class VspExperimentalConfigGroup extends Module {
 //	public void setUseActivityDurations(final boolean useActivityDurations) {
 //		this.useActivityDurations = useActivityDurations;
 //	}
+	
+	public String getColoring() {
+		return this.coloring ;
+	}
+	public void setColoring( String value ) {
+		this.coloring = value ;
+	}
 
 	public String getInputMZ05File() {
 		return this.inputMZ05File;
