@@ -243,6 +243,20 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 		Pair<LinkedList<HoldoverInterval>,Pair<Integer,Integer>> result = new Pair<LinkedList<HoldoverInterval>,Pair<Integer,Integer>>(list,flows);
 		return result;
 	}
+	
+	public int bottleneck(int starttime, int stoptime, boolean forward){
+		int cap =0;
+		Pair<LinkedList<HoldoverInterval>,Pair<Integer,Integer>> relevant = getIntersecting(starttime,stoptime);
+		int lowest= relevant.second.first;
+		int highest= relevant.second.second;
+		if(forward){
+			cap = Math.max(0, this._capacity-highest);
+		}else{
+			cap = Math.max(0, lowest);
+		}
+		
+		return cap;
+	}
 
 
 	@Override

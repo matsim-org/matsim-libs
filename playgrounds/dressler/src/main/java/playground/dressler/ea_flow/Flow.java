@@ -424,7 +424,19 @@ public class Flow {
 					}
 					//throw new RuntimeException("BottleNeck for residual StepSinkFlow not supported yet!");
 				} // inflow into sink is uncapped
-			} else {
+			}else if(step instanceof StepHold){
+				StepHold hold = (StepHold) step;
+				Node node = hold.getStartNode().getRealNode();
+				int starttime =hold.getStartTime();
+				int stoptime =hold.getArrivalTime();
+				boolean forw = hold.getForward();
+				HoldoverIntervals intervals = (HoldoverIntervals)this._holdover.get(node);
+				cap = intervals.bottleneck(starttime, stoptime, forw);
+				if (cap < result) {
+					result = cap;
+				}
+				//TODO holdover done calculate min cap
+			}else {
 				throw new RuntimeException("Unsupported kind of PathStep!");
 			}
 
@@ -702,7 +714,22 @@ public class Flow {
 				// there isn't any upper capacity on this link
 				this._sinkflow.get(sink).augment(step.getStartTime(), gamma, Integer.MAX_VALUE);
 			}
-		} else {
+		} else if (step instanceof StepHold) {
+			StepHold hold = (StepHold) step;
+			Node node = hold.getStartNode().getRealNode();
+			int starttime =hold.getStartTime();
+			int stoptime =hold.getArrivalTime();
+			boolean forw = hold.getForward();
+			HoldoverIntervals intervals = (HoldoverIntervals)this._holdover.get(node);
+			if (step.getForward()) {
+				intervals.augment(starttime, stoptime , gamma);
+			}
+			if (!step.getForward()) {
+				intervals.augment(stoptime, starttime , -gamma);
+			}
+			//TODO holdover done augment the step
+		}else {
+		
 			throw new RuntimeException("Unsupported kind of PathStep!");
 		}
 

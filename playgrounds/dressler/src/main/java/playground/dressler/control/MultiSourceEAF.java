@@ -707,7 +707,7 @@ public class MultiSourceEAF {
 		int timeStep;
 		double flowFactor;
 
-		int instance = 11;
+		int instance = 111;
 		// 1 = siouxfalls, demand 500
 		// 11 same as above only Manuel and 5s euclid
 		// 2 = swissold, demand 100
@@ -733,6 +733,12 @@ public class MultiSourceEAF {
 			sinkid = "supersink";
 		}else if (instance == 11) {
 			networkfile  = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
+			uniformDemands = 10;
+			timeStep = 5;
+			flowFactor = 1.0;
+			sinkid = "supersink";
+		}else if (instance == 111) {
+			networkfile  = "/home/manuel/Dokumente/Advest/testdata/siouxfalls_network_5s_euclid.xml";
 			uniformDemands = 10;
 			timeStep = 5;
 			flowFactor = 1.0;
