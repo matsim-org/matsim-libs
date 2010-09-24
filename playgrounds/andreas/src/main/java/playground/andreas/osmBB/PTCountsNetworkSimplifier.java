@@ -33,6 +33,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.Volume;
+import org.matsim.run.NetworkCleaner;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -145,6 +146,8 @@ public class PTCountsNetworkSimplifier {
 			new TransitScheduleWriter(osmScenario.getTransitSchedule()).writeFile(this.scheduleOutFile);
 			log.info("Writing counts file to " + this.countsOutFile);
 			new CountsWriter(this.outCounts).write(this.countsOutFile);
+			log.info("Running network cleaner... Result may not be consistent with countsfile");
+			new NetworkCleaner().run(this.netOutFile, this.netOutFile + "_cl.xml");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
