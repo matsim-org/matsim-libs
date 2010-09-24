@@ -8,17 +8,17 @@
 	</module>
 
 	<module name="transit">
-		<param name="transitScheduleFile" value="../playgrounds/yu/test/input/playground/yu/ptCounts/transitSchedule.xml"/>
-		<param name="vehiclesFile" value="../playgrounds/yu/test/input/playground/yu/ptCounts/vehicles.xml"/>
+		<param name="transitScheduleFile" value="test/input/playground/yu/ptCounts/transitSchedule.xml"/>
+		<param name="vehiclesFile" value="test/input/playground/yu/ptCounts/vehicles.xml"/>
 		<param name="transitModes" value="pt" />
 	</module>
 	
 	<module name="network">
-		<param name="inputNetworkFile" value="../playgrounds/yu/test/input/playground/yu/ptCounts/ptNet.xml"/>
+		<param name="inputNetworkFile" value="test/input/playground/yu/ptCounts/ptNet.xml"/>
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="../playgrounds/yu/test/input/playground/yu/ptCounts/ptPop.xml" />
+		<param name="inputPlansFile" value="test/input/playground/yu/ptCounts/ptPop.xml" />
 	</module>
 
 	<module name="scenario">
@@ -27,7 +27,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="../playgrounds/yu/test/input/playground/yu/ptCounts" />
+		<param name="outputDirectory" value="test/input/playground/yu/ptCounts" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 	</module>
@@ -90,9 +90,9 @@
 	</module>
 	
 	<module name="ptCounts">
-		<param name="inputBoardCountsFile" value="../playgrounds/yu/test/input/playground/yu/ptCounts/board.xml" />
-		<param name="inputAlightCountsFile" value="../playgrounds/yu/test/input/playground/yu/ptCounts/alight.xml" />
-		<param name="inputOccupancyCountsFile" value="../playgrounds/yu/test/input/playground/yu/ptCounts/occupancy.xml" />
+		<param name="inputBoardCountsFile" value="test/input/playground/yu/ptCounts/board.xml" />
+		<param name="inputAlightCountsFile" value="test/input/playground/yu/ptCounts/alight.xml" />
+		<param name="inputOccupancyCountsFile" value="test/input/playground/yu/ptCounts/occupancy.xml" />
 		<param name="outputformat" value="kml" />
 		<param name="distanceFilter" value="300000" />
 		<param name="countsScaleFactor" value="10" />
