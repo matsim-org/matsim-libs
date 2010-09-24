@@ -846,11 +846,11 @@ public class Controler {
 
 	private void addPtCountControlerListener() {
 		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
-		log.info("Using counts.");
+		log.info("Using pt counts.");
 		OccupancyAnalyzerListener oal = new OccupancyAnalyzerListener(occupancyAnalyzer);
 		addControlerListener(oal);
 		addControlerListener(new PtCountControlerListener(config, occupancyAnalyzer));
-		setCreateGraphs(false);
+//		setCreateGraphs(false);
 	}
 
 	private void addTransitControlerListener() {
