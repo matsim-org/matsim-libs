@@ -98,6 +98,11 @@ public class TransitScheduleCleaner {
 		
 		log.info("Tagging pt network links");
 		
+		if(transitSchedule == null){
+			log.info("No transit schedule given. Returning unmodified network...");
+			return network;
+		}
+		
 		for (TransitStopFacility stopFacitlity : transitSchedule.getFacilities().values()) {
 			network.getLinks().get(stopFacitlity.getLinkId()).getAllowedModes().add(TransportMode.pt);
 		}
@@ -145,7 +150,7 @@ public class TransitScheduleCleaner {
 		log.info("Untagging pt network links");	
 		int removedTags = 0;
 		for (Link link : network.getLinks().values()) {
-			Set<String> allowedModes = link.getAllowedModes();
+			Set<String> allowedModes = new TreeSet<String>(link.getAllowedModes());
 			if(allowedModes.remove(TransportMode.pt)){
 				removedTags++;
 			}
