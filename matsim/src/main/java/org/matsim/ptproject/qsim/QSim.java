@@ -637,7 +637,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 			long diffreal = (endtime.getTime() - this.realWorldStarttime.getTime())/1000;
 			double diffsim  = time - this.simTimer.getSimStartTime();
 			int nofActiveLinks = this.netEngine.getNumberOfSimulatedLinks();
-			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + ": #Veh=" + this.agentCounter.getLiving()
+			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + " (it." + this.iterationNumber + "): #Veh=" + this.agentCounter.getLiving()
 					+ " lost=" + this.agentCounter.getLost() + " #links=" + nofActiveLinks
 					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
 
