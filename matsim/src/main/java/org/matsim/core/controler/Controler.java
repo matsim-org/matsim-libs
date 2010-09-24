@@ -691,10 +691,12 @@ public class Controler {
 			}
 			if (outputDir.list().length > 0) {
 				if (this.overwriteFiles) {
+					System.out.flush();
 					log.warn("###########################################################");
 					log.warn("### THE CONTROLER WILL OVERWRITE FILES IN:");
 					log.warn("### " + outputPath);
 					log.warn("###########################################################");
+					System.err.flush() ;
 				} else {
 					// the directory is not empty, we do not overwrite any
 					// files!
