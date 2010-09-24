@@ -27,7 +27,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="test/input/playground/yu/ptCounts" />
+		<param name="outputDirectory" value="test/output/playground/yu/ptCounts" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 	</module>
