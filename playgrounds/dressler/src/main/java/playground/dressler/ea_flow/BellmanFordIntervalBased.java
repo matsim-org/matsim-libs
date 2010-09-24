@@ -883,7 +883,7 @@ public class BellmanFordIntervalBased {
 			// Create predecessor. It is not shifted correctly.
 			PathStep pred;
 
-			pred = new StepHold(v, inter.getHighBound(), inter.getHighBound(), original);
+			pred = new StepHold(v, inter.getHighBound()-1, inter.getHighBound(), original);
 			//FIXME holdover may be incorrect build correct preds
 			arriveProperties.setPredecessor(pred);
 		} else {
@@ -909,9 +909,9 @@ public class BellmanFordIntervalBased {
 		if(arrive != null && !arrive.isEmpty()){
 			System.out.println("setti arrive ho"+arrive.size());
 			//FIXME holdover  a causes loops
-			//changed = labelto.setTrueList(arrive, arriveProperties);
+			changed = labelto.setTrueList(arrive, arriveProperties);
 			System.out.println("done setti arrive ho");
-			return null; //changed;
+			return changed;
 			
 		}else{					
 			return null;
@@ -1202,8 +1202,12 @@ public class BellmanFordIntervalBased {
 		
 			this._roundpolls++;
 			this._totalpolls++;			
-			
-			// gets the first task in the queue			
+			System.out.println("polls: " +this._totalpolls);
+			// gets the first task in the queue		
+			if(this._totalpolls==830){
+				@SuppressWarnings("unused")
+				int ahhhhh=1;
+			}
 			task = queue.poll();
 			if (task == null) {
 				break;

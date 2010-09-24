@@ -90,6 +90,7 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 		if(reverse){
 			throw new RuntimeException("no propagating of holdover implemented for reverse search"); 
 		}
+		//TODO holdover a look till next labeled intevall
 		ArrayList<Interval> result = new ArrayList<Interval>();
 		HoldoverInterval current;
 		Interval toinsert;
@@ -130,14 +131,14 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 						collecting = false;
 					}
 				}
-				System.out.println("current loww bound"+ current.getLowBound());
+				//System.out.println("current loww bound"+ current.getLowBound());
 				if (this.isLast(current)) {
 					break;
 				} 
 				current = this.getIntervalAt(current.getHighBound());
 
 			}
-			System.out.println("done looping");
+			//System.out.println("done looping");
 			if (collecting) { // finish the Interval
 				low = Math.max(low, effectiveStart);
 				high = Math.min(high, effectiveEnd);
