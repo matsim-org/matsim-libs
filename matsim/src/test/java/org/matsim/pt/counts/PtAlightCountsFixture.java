@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PtCountSimComparisonWriter.java
+ * PtBoardCountsFixture.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,37 +18,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.pt.counts;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.algorithms.CountSimComparisonTimeFilter;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
-public abstract class PtCountSimComparisonWriter {
-	public enum PtCountsType {
-		Boarding, Alighting, Occupancy
-	};
+public class PtAlightCountsFixture extends PtCountsFixture {
 
-	protected int iter;
-
-	protected CountSimComparisonTimeFilter boardCountComparisonFilter, alightCountComparisonFilter, occupancyCountComparisonFilter;
-
-	/**
-	 * 
-	 */
-	public PtCountSimComparisonWriter(final List<CountSimComparison> boardCountSimCompList, final List<CountSimComparison> alightCountSimCompList, final List<CountSimComparison> occupancyCountSimCompList) {
-		this.boardCountComparisonFilter = new CountSimComparisonTimeFilter(boardCountSimCompList);
-		this.alightCountComparisonFilter = new CountSimComparisonTimeFilter(alightCountSimCompList);
-		this.occupancyCountComparisonFilter = new CountSimComparisonTimeFilter(occupancyCountSimCompList);
+	public PtAlightCountsFixture() {
+		super("inputAlightCountsFile");
 	}
 
-	public abstract void writeFile(final String filename);
+	@Override
+	public PtCountsComparisonAlgorithm getCCA() {
+		Map<Id, int[]> alights = new HashMap<Id, int[]>();
 
-	public void setIterationNumber(int iter) {
-		this.iter = iter;
+		int[] alightArrayStop3 = new int[24];
+		alightArrayStop3[8] = 50;
+		alights.put(new IdImpl("stop3"), alightArrayStop3);
+
+		int[] alightArrayStop4 = new int[24];
+		alightArrayStop4[8] = 15;
+		alights.put(new IdImpl("stop4"), alightArrayStop4);
+
+		this.oa.setAlights(alights);
+		PtCountsComparisonAlgorithm cca = new PtAlightCountComparisonAlgorithm(oa, counts, network, Double.parseDouble(config.findParam(MODULE_NAME, "countsScaleFactor")));
+		cca.setDistanceFilter(Double.valueOf(config.findParam(MODULE_NAME,"distanceFilter")), config.findParam(MODULE_NAME,	"distanceFilterCenterNode"));
+		return cca;
 	}
 }

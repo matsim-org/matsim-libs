@@ -75,8 +75,16 @@ public class SimpleWriter implements Closeable, Flushable {
 		}
 	}
 
+	public void write(Object o) {
+		write(o.toString());
+	}
+
 	public void writeln(String s) {
 		write(s + "\n");
+	}
+
+	public void writeln(Object o) {
+		write(o + "\n");
 	}
 
 	public void writeln() {
@@ -97,5 +105,9 @@ public class SimpleWriter implements Closeable, Flushable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void writeln(StringBuffer line) {
+		writeln(line.toString());
 	}
 }

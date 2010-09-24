@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PtCountSimComparisonWriter.java
+ * PtBoardCountsComparisonAlgorithmTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,37 +18,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.pt.counts;
 
 import java.util.List;
 
+import org.junit.Test;
 import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.algorithms.CountSimComparisonTimeFilter;
+import org.matsim.testcases.MatsimTestCase;
 
-public abstract class PtCountSimComparisonWriter {
-	public enum PtCountsType {
-		Boarding, Alighting, Occupancy
-	};
 
-	protected int iter;
+public class PtAlightCountsComparisonAlgorithmTest extends MatsimTestCase {
 
-	protected CountSimComparisonTimeFilter boardCountComparisonFilter, alightCountComparisonFilter, occupancyCountComparisonFilter;
+	@Test
+	public void testCompare() {
+		PtCountsFixture fixture = new PtAlightCountsFixture();
+		fixture.setUp();
 
-	/**
-	 * 
-	 */
-	public PtCountSimComparisonWriter(final List<CountSimComparison> boardCountSimCompList, final List<CountSimComparison> alightCountSimCompList, final List<CountSimComparison> occupancyCountSimCompList) {
-		this.boardCountComparisonFilter = new CountSimComparisonTimeFilter(boardCountSimCompList);
-		this.alightCountComparisonFilter = new CountSimComparisonTimeFilter(alightCountSimCompList);
-		this.occupancyCountComparisonFilter = new CountSimComparisonTimeFilter(occupancyCountSimCompList);
+		PtCountsComparisonAlgorithm cca = fixture.getCCA();
+		cca.run();
+
+		List<CountSimComparison> csc_list = cca.getComparison();
+
+		int cnt = 0;
+		for (CountSimComparison csc : csc_list) {
+			if (cnt != 8 && cnt!=32) {
+				assertEquals("Wrong sim value set", 0d, csc.getSimulationValue(), 0d);
+			} else if(cnt==8) {
+				assertEquals("Wrong sim value set", 500d, csc.getSimulationValue(), 0d);
+			}else{
+				assertEquals("Wrong sim value set", 150d, csc.getSimulationValue(), 0d);
+			}
+			cnt++;
+		}
 	}
 
-	public abstract void writeFile(final String filename);
+	@Test
+	public void testDistanceFilter() {
+		PtCountsFixture fixture = new PtAlightCountsFixture();
+		fixture.setUp();
 
-	public void setIterationNumber(int iter) {
-		this.iter = iter;
+		PtCountsComparisonAlgorithm cca = fixture.getCCA();
+		cca.setDistanceFilter(Double.valueOf(4000), "11");
+		cca.run();
+
+		List<CountSimComparison> csc_list = cca.getComparison();
+		assertEquals("Distance filter not working", 24, csc_list.size());
 	}
 }

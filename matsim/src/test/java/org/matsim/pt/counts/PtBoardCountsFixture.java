@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PtCountSimComparisonWriter.java
+ * PtBoardCountsFixture.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,37 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.pt.counts;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.algorithms.CountSimComparisonTimeFilter;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
-public abstract class PtCountSimComparisonWriter {
-	public enum PtCountsType {
-		Boarding, Alighting, Occupancy
-	};
+public class PtBoardCountsFixture extends PtCountsFixture {
 
-	protected int iter;
-
-	protected CountSimComparisonTimeFilter boardCountComparisonFilter, alightCountComparisonFilter, occupancyCountComparisonFilter;
-
-	/**
-	 * 
-	 */
-	public PtCountSimComparisonWriter(final List<CountSimComparison> boardCountSimCompList, final List<CountSimComparison> alightCountSimCompList, final List<CountSimComparison> occupancyCountSimCompList) {
-		this.boardCountComparisonFilter = new CountSimComparisonTimeFilter(boardCountSimCompList);
-		this.alightCountComparisonFilter = new CountSimComparisonTimeFilter(alightCountSimCompList);
-		this.occupancyCountComparisonFilter = new CountSimComparisonTimeFilter(occupancyCountSimCompList);
+	public PtBoardCountsFixture() {
+		super("inputBoardCountsFile");
 	}
 
-	public abstract void writeFile(final String filename);
-
-	public void setIterationNumber(int iter) {
-		this.iter = iter;
+	@Override
+	public PtCountsComparisonAlgorithm getCCA() {
+		Map<Id, int[]> boards = new HashMap<Id, int[]>();
+		int[] boardArray = new int[24];
+		boardArray[8] = 65;
+		boards.put(new IdImpl("stop1"), boardArray);
+		this.oa.setBoards(boards);
+		PtCountsComparisonAlgorithm cca = new PtBoardCountComparisonAlgorithm(oa, counts, network, Double.parseDouble(config.findParam(MODULE_NAME, "countsScaleFactor")));
+		cca.setDistanceFilter(Double.valueOf(config.findParam(MODULE_NAME,"distanceFilter")), config.findParam(MODULE_NAME,"distanceFilterCenterNode"));
+		return cca;
 	}
 }

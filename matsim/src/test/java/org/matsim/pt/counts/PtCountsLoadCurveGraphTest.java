@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PtCountSimComparisonWriter.java
+ * PtCountsLoadCurveGraphTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,37 +18,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.pt.counts;
 
-import java.util.List;
+import org.junit.Test;
+import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
+import org.matsim.testcases.MatsimTestCase;
 
-import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.algorithms.CountSimComparisonTimeFilter;
+public class PtCountsLoadCurveGraphTest extends MatsimTestCase {
+	@Test
+	public void testCreateBoardChart() {
+		PtCountsFixture fixture = new PtBoardCountsFixture();
+		fixture.setUp();
 
-public abstract class PtCountSimComparisonWriter {
-	public enum PtCountsType {
-		Boarding, Alighting, Occupancy
-	};
-
-	protected int iter;
-
-	protected CountSimComparisonTimeFilter boardCountComparisonFilter, alightCountComparisonFilter, occupancyCountComparisonFilter;
-
-	/**
-	 * 
-	 */
-	public PtCountSimComparisonWriter(final List<CountSimComparison> boardCountSimCompList, final List<CountSimComparison> alightCountSimCompList, final List<CountSimComparison> occupancyCountSimCompList) {
-		this.boardCountComparisonFilter = new CountSimComparisonTimeFilter(boardCountSimCompList);
-		this.alightCountComparisonFilter = new CountSimComparisonTimeFilter(alightCountSimCompList);
-		this.occupancyCountComparisonFilter = new CountSimComparisonTimeFilter(occupancyCountSimCompList);
+		CountsLoadCurveGraph eg = new CountsLoadCurveGraph(fixture
+				.ceateCountSimCompList(), 1, "testCreateChart");
+		assertNotNull("No graph is created", eg.createChart(0));
 	}
 
-	public abstract void writeFile(final String filename);
+	@Test
+	public void testCreateAlightChart() {
+		PtCountsFixture fixture = new PtAlightCountsFixture();
+		fixture.setUp();
 
-	public void setIterationNumber(int iter) {
-		this.iter = iter;
+		CountsLoadCurveGraph eg = new CountsLoadCurveGraph(fixture
+				.ceateCountSimCompList(), 1, "testCreateChart");
+		assertNotNull("No graph is created", eg.createChart(0));
+	}
+
+	@Test
+	public void testCreateOccupancyChart() {
+		PtCountsFixture fixture = new PtOccupancyCountsFixture();
+		fixture.setUp();
+
+		CountsLoadCurveGraph eg = new CountsLoadCurveGraph(fixture
+				.ceateCountSimCompList(), 1, "testCreateChart");
+		assertNotNull("No graph is created", eg.createChart(0));
 	}
 }

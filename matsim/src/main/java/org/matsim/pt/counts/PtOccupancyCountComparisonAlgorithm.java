@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PtCountSimComparisonWriter.java
+ * PtOccupancyCountComparisonAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,37 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.pt.counts;
 
-import java.util.List;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.counts.Counts;
 
-import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.algorithms.CountSimComparisonTimeFilter;
+public class PtOccupancyCountComparisonAlgorithm extends
+		PtCountsComparisonAlgorithm {
 
-public abstract class PtCountSimComparisonWriter {
-	public enum PtCountsType {
-		Boarding, Alighting, Occupancy
-	};
-
-	protected int iter;
-
-	protected CountSimComparisonTimeFilter boardCountComparisonFilter, alightCountComparisonFilter, occupancyCountComparisonFilter;
-
-	/**
-	 * 
-	 */
-	public PtCountSimComparisonWriter(final List<CountSimComparison> boardCountSimCompList, final List<CountSimComparison> alightCountSimCompList, final List<CountSimComparison> occupancyCountSimCompList) {
-		this.boardCountComparisonFilter = new CountSimComparisonTimeFilter(boardCountSimCompList);
-		this.alightCountComparisonFilter = new CountSimComparisonTimeFilter(alightCountSimCompList);
-		this.occupancyCountComparisonFilter = new CountSimComparisonTimeFilter(occupancyCountSimCompList);
+	public PtOccupancyCountComparisonAlgorithm(OccupancyAnalyzer oa,
+			Counts counts, Network net, double countsScaleFactor) {
+		super(oa, counts, net, countsScaleFactor);
 	}
 
-	public abstract void writeFile(final String filename);
-
-	public void setIterationNumber(int iter) {
-		this.iter = iter;
+	protected int[] getVolumesForStop(Id stopId) {
+		return this.oa.getOccupancyVolumesForStop(stopId);
 	}
+
 }

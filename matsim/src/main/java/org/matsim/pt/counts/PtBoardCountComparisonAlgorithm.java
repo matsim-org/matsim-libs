@@ -23,12 +23,15 @@
  */
 package org.matsim.pt.counts;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.counts.Count;
-import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
-import org.matsim.counts.Volume;
 
+
+/**
+ * @author yu
+ *
+ */
 public class PtBoardCountComparisonAlgorithm extends
 		PtCountsComparisonAlgorithm {
 
@@ -38,42 +41,12 @@ public class PtBoardCountComparisonAlgorithm extends
 	 * @param network
 	 */
 	public PtBoardCountComparisonAlgorithm(OccupancyAnalyzer oa, Counts counts,
-			Network network, final double countsScaleFactor) {
+			Network network, double countsScaleFactor) {
 		super(oa, counts, network, countsScaleFactor);
 	}
 
 	@Override
-	protected void compare() {
-		double countValue;
-		for (Count count : this.counts.getCounts().values()) {
-			if (!isInRange(count.getCoord())) {
-				System.out.println("InRange?\t" + isInRange(count.getCoord()));
-				continue;
-			}
-			// -------------------------------------------------------------------
-			int[] volumes = this.oa.getBoardVolumesForStop(count.getLocId());
-			// ------------------------^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-			if (volumes == null) {
-				log.warn("No volumes for stop: " + count.getLocId().toString());
-				continue;
-			} else /* volumes!=null */if (volumes.length == 0) {
-				log.warn("No volumes for stop: " + count.getLocId().toString());
-				continue;
-			}
-			for (int hour = 1; hour <= 24; hour++) {
-				// real volumes:
-				Volume volume = count.getVolume(hour);
-				if (volume != null) {
-					countValue = volume.getValue();
-					double simValue = volumes[hour - 1];
-					simValue *= this.countsScaleFactor;
-					this.countSimComp.add(new CountSimComparisonImpl(count
-							.getLocId(), hour, countValue, simValue));
-				} else {
-					countValue = 0.0;
-				}
-			}
-		}
+	protected int[] getVolumesForStop(Id stopId) {
+		return this.oa.getBoardVolumesForStop(stopId);
 	}
-
 }

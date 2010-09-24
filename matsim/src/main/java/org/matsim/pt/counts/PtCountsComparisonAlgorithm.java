@@ -25,12 +25,16 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
+import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
+import org.matsim.counts.Volume;
 
 /**
  * This is a modified copy of CountsComparisonAlgorithm, in order to realize the
@@ -59,6 +63,8 @@ public abstract class PtCountsComparisonAlgorithm {
 	protected double countsScaleFactor;
 
 	protected final static Logger log = Logger.getLogger(PtCountsComparisonAlgorithm.class);
+	
+	protected StringBuffer content = new StringBuffer();
 
 	public PtCountsComparisonAlgorithm(final OccupancyAnalyzer oa,
 			final Counts counts, final Network network, final double countsScaleFactor) {
@@ -73,7 +79,62 @@ public abstract class PtCountsComparisonAlgorithm {
 	 * Creates the List with the counts vs sim values stored in the
 	 * countAttribute Attribute of this class.
 	 */
-	protected abstract void compare();
+	protected void compare() {
+		double countValue;
+		for (Count count : this.counts.getCounts().values()) {
+			Id stopId = count.getLocId();
+			if (!isInRange(count.getCoord())) {
+				System.out.println("InRange?\t" + isInRange(count.getCoord()));
+				continue;
+			}
+			// -------------------------------------------------------------------
+			int[] volumes = this.getVolumesForStop(stopId);
+			// ------------------------^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+			if (volumes == null) {
+				log.warn("No volumes for stop: " + stopId);
+				continue;
+			} else /* volumes!=null */if (volumes.length == 0) {
+				log.warn("No volumes for stop: " + stopId);
+				continue;
+			}
+
+			this.content.append("StopId :\t");
+			this.content.append(stopId.toString());
+			this.content.append("\nhour\tsimVal\tscaledSimVal\tcountVal\n");
+
+			for (int hour = 1; hour <= 24; hour++) {
+				// real volumes:
+				Volume volume = count.getVolume(hour);
+				if (volume != null) {
+
+					this.content.append(hour);
+					this.content.append('\t');
+
+					countValue = volume.getValue();
+					double simValue = volumes[hour - 1];
+
+					this.content.append(simValue);
+					this.content.append('\t');
+
+					simValue *= this.countsScaleFactor;
+
+					this.content.append(simValue);
+					this.content.append('\t');
+					this.content.append(countValue);
+					this.content.append('\n');
+
+					this.countSimComp.add(new CountSimComparisonImpl(stopId,
+							hour, countValue, simValue));
+
+				} else {
+					countValue = 0.0;
+				}
+
+			}
+		}
+	}
+
+	protected abstract int[] getVolumesForStop(Id stopId);
 
 	/**
 	 *
@@ -119,5 +180,9 @@ public abstract class PtCountsComparisonAlgorithm {
 
 	public void setCountsScaleFactor(final double countsScaleFactor) {
 		this.countsScaleFactor = countsScaleFactor;
+	}
+
+	public void write(String outputFilename) {
+		new SimpleWriter(outputFilename, content.toString());
 	}
 }

@@ -21,11 +21,14 @@
 package org.matsim.pt.counts;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -35,57 +38,95 @@ public class PtCountControlerListener implements StartupListener, IterationEndsL
 	private final static String MODULE_NAME = "ptCounts";
 
 	private final Config config;
-	private final Counts boardCounts, alightCounts;
+	private final Counts boardCounts, alightCounts,occupancyCounts;
 	private final OccupancyAnalyzer oa;
 
 	public PtCountControlerListener(final Config config, OccupancyAnalyzer oa) {
 		this.config = config;
 		this.boardCounts = new Counts();
 		this.alightCounts = new Counts();
+		this.occupancyCounts = new Counts();
 		this.oa = oa;
 	}
 
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
-		new MatsimCountsReader(this.boardCounts).readFile(this.config.findParam(MODULE_NAME, "inputBoardCountsFile"));
-		new MatsimCountsReader(this.alightCounts).readFile(this.config.findParam(MODULE_NAME, "inputAlightCountsFile"));
+		Module ptCounts = this.config.getModule(MODULE_NAME);
+		if(ptCounts!=null){	
+			String boardCountsFilename = this.config.findParam(MODULE_NAME, "inputBoardCountsFile");
+			if (boardCountsFilename != null) {
+				new MatsimCountsReader(this.boardCounts).readFile(boardCountsFilename);
+			}
+	
+			String alightCountsFilename = this.config.findParam(MODULE_NAME, "inputAlightCountsFile");
+			if (alightCountsFilename != null) {
+				new MatsimCountsReader(this.alightCounts).readFile(alightCountsFilename);
+			}
+	
+			String occupancyCountsFilename = this.config.findParam(MODULE_NAME, "inputOccupancyCountsFile");
+			if (occupancyCountsFilename != null) {
+				new MatsimCountsReader(this.occupancyCounts).readFile(occupancyCountsFilename);
+			}
+		}
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		Controler controler = event.getControler();
-		int iter = event.getIteration();
-		if ((iter % 10 == 0) && (iter > controler.getFirstIteration())) {
-			controler.stopwatch.beginOperation("compare with counts");
+		Module ptCounts = this.config.getModule(MODULE_NAME);
+		if (ptCounts != null) {
+			Controler controler = event.getControler();
+			int iter = event.getIteration();
+			if ((iter % 10 == 0) && (iter > controler.getFirstIteration())) {
+				controler.stopwatch.beginOperation("compare with counts");
 
-			double countsScaleFactor = Double.parseDouble(controler.getConfig().getParam("ptCounts", "countsScaleFactor"));
-			PtCountsComparisonAlgorithm ccaBoard = new PtBoardCountComparisonAlgorithm(this.oa, this.boardCounts, controler.getNetwork(), countsScaleFactor);
-			PtCountsComparisonAlgorithm ccaAlight = new PtAlightCountComparisonAlgorithm(this.oa, this.alightCounts, controler.getNetwork(), countsScaleFactor);
+				double countsScaleFactor = Double.parseDouble(this.config.getParam(MODULE_NAME, "countsScaleFactor"));
+				NetworkImpl network = controler.getNetwork();
+				PtCountsComparisonAlgorithm ccaBoard = new PtBoardCountComparisonAlgorithm(this.oa, this.boardCounts, network, countsScaleFactor);
+				PtCountsComparisonAlgorithm ccaAlight = new PtAlightCountComparisonAlgorithm(this.oa, this.alightCounts, network, countsScaleFactor);
+				PtCountsComparisonAlgorithm ccaOccupancy = new PtOccupancyCountComparisonAlgorithm(this.oa, this.occupancyCounts, network, countsScaleFactor);
 
-			String distanceFilter = this.config.findParam(MODULE_NAME, "distanceFilter");
-			String distanceFilterCenterNodeId = this.config.findParam(MODULE_NAME, "distanceFilterCenterNode");
-			if ((distanceFilter	!= null) && (distanceFilterCenterNodeId != null)) {
-				Double distance = Double.valueOf(distanceFilter);
-				ccaBoard.setDistanceFilter(distance, distanceFilterCenterNodeId);
-				ccaAlight.setDistanceFilter(distance, distanceFilterCenterNodeId);
+				String distanceFilterStr = this.config.findParam(MODULE_NAME, "distanceFilter");
+				String distanceFilterCenterNodeId = this.config.findParam(MODULE_NAME, "distanceFilterCenterNode");
+				if ((distanceFilterStr != null)
+						&& (distanceFilterCenterNodeId != null)) {
+					Double distanceFilter = Double.valueOf(distanceFilterStr);
+					ccaBoard.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+					ccaAlight.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+					ccaOccupancy.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+				}
+
+				ccaBoard.setCountsScaleFactor(countsScaleFactor);
+				ccaAlight.setCountsScaleFactor(countsScaleFactor);
+				ccaOccupancy.setCountsScaleFactor(countsScaleFactor);
+
+				ccaBoard.run();
+				ccaAlight.run();
+				ccaOccupancy.run();
+
+				String outputFormat = this.config.findParam(MODULE_NAME,
+						"outputformat");
+				if (outputFormat.contains("kml")
+						|| outputFormat.contains("all")) {
+					ControlerIO ctlIO=controler.getControlerIO();
+					
+					String filename = ctlIO.getIterationFilename(iter, "countscompare.kmz");
+					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(), ccaAlight.getComparison(), ccaOccupancy.getComparison(),
+							TransformationFactory.getCoordinateTransformation(this.config.global().getCoordinateSystem(),TransformationFactory.WGS84),
+							this.boardCounts, this.alightCounts,occupancyCounts);
+					
+					kmlWriter.setIterationNumber(iter);
+					kmlWriter.writeFile(filename);
+					if (ccaBoard != null) {
+						ccaBoard.write(ctlIO.getIterationFilename(iter, "simCountCompareBoarding.txt"));
+					}
+					if (ccaAlight != null) {
+						ccaAlight.write(ctlIO.getIterationFilename(iter, "simCountCompareAlighting.txt"));
+					}
+					if (ccaOccupancy != null) {
+						ccaOccupancy.write(ctlIO.getIterationFilename(iter,	"simCountCompareOccupancy.txt"));
+					}
+				}
+
+				controler.stopwatch.endOperation("compare with counts");
 			}
-
-			ccaBoard.setCountsScaleFactor(Double.parseDouble(this.config.findParam(MODULE_NAME, "countsScaleFactor")));
-			ccaAlight.setCountsScaleFactor(Double.parseDouble(this.config.findParam(MODULE_NAME, "countsScaleFactor")));
-
-			ccaBoard.run();
-			ccaAlight.run();
-			String outputFormat = this.config.findParam(MODULE_NAME, "outputformat");
-			if (outputFormat.contains("kml") || outputFormat.contains("all")) {
-				String filename = event.getControler().getControlerIO().getIterationFilename(iter, "countscompare.kmz");
-				PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(
-						ccaBoard.getComparison(), ccaAlight.getComparison(),
-						TransformationFactory.getCoordinateTransformation(
-								this.config.global().getCoordinateSystem(),
-								TransformationFactory.WGS84), this.boardCounts,
-						this.alightCounts);
-				kmlWriter.setIterationNumber(iter);
-				kmlWriter.writeFile(filename);
-			}
-			controler.stopwatch.endOperation("compare with counts");
 		}
 	}
 }
