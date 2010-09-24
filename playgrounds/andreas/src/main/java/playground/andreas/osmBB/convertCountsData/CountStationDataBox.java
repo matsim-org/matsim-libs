@@ -71,8 +71,8 @@ public class CountStationDataBox {
 	@Override
 	public String toString() {
 		return "Count Station " + getShortName() + ", " + getUnitName() 
-		+ " at " + getCoord() + " " + getPosition() 
-		+ " " + getPositionDetail() + " " + getOrientation() 
+		+ " at " + getCoord() + " - " + getPosition() 
+		+ ", " + getPositionDetail() + " towards " + getDirection() + ", " + getOrientation() 
 		+ " with " + getNumberOfLanesDetected() + " lanes";
 	}	
 	
