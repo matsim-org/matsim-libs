@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyPlansSelector.java
+ * GeneratedDemandRunner
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,44 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.kai.usecases.mentalmodule;
+package tutorial.programming.example08DemandGeneration;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.run.Controler;
+import org.matsim.run.OTFVis;
+
 
 /**
- * @author nagel
+ * Runs the generated demand and displays the 0th iteration in OTFVis
+ * @author dgrether
  *
  */
-class MyPlanSelector implements PlanSelector,
-ActivityEndEventHandler // as an example
-{
-	private static final Logger log = Logger.getLogger("dummy");
-	private Scenario sc;
-	
-	MyPlanSelector( Scenario scenario ) {
-		this.sc = scenario ;
-	}
+public class GeneratedDemandRunner {
 
-	@Override
-	public Plan selectPlan(Person person) {
-		log.error("calling selectPlan") ;
-		return null ;
-	}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Controler controler = new Controler("../matsimExamples/tutorial/example8DemandGeneration/config.xml");
+		controler.setOverwriteFiles(true) ;
+		controler.run();
 
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		log.error("calling handleEvent for an ActivityEndEvent") ;
-	}
-
-	@Override
-	public void reset(int iteration) {
-		log.error("calling reset") ;
+		String[] outputMvi = {"../matsimExamples/tutorial/example8DemandGeneration/output/ITERS/it.0/0.otfvis.mvi"};
+		OTFVis.main(outputMvi);
+		
 	}
 
 }

@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * MyPlansSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,41 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package tutorial.programming.example10PluggablePlanStrategy;
 
-package tutorial.programming.example9PlansHandling;
-
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
-import org.matsim.population.algorithms.PlansFilterByLegMode;
-import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
- * @author kn after mrieser
+ * @author nagel
+ *
  */
-public class MyPlansToPlans {
-
-	public void run(final String[] args) {
-		ScenarioLoader sl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader(
-				"examples/tutorial/multipleIterations.xml") ;
-		Scenario sc = sl.loadScenario() ;
-		Population pop = sc.getPopulation();
-
-		PlansFilterByLegMode pf = new PlansFilterByLegMode( TransportMode.car, FilterType.keepAllPlansWithMode ) ;
-		pf.run(pop) ;
-
-		PopulationWriter popwriter = new PopulationWriter(pop,sc.getNetwork()) ;
-		popwriter.write("output/pop.xml.gz") ;
-
-		System.out.println("done.");
+class MyPlanSelector implements PlanSelector,
+ActivityEndEventHandler // as an example
+{
+	private static final Logger log = Logger.getLogger("dummy");
+	private Scenario sc;
+	
+	MyPlanSelector( Scenario scenario ) {
+		this.sc = scenario ;
 	}
 
-	public static void main(final String[] args) {
-		MyPlansToPlans app = new MyPlansToPlans();
-		app.run(args);
+	@Override
+	public Plan selectPlan(Person person) {
+		log.error("calling selectPlan") ;
+		return null ;
+	}
+
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		log.error("calling handleEvent for an ActivityEndEvent") ;
+	}
+
+	@Override
+	public void reset(int iteration) {
+		log.error("calling reset") ;
 	}
 
 }

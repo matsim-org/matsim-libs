@@ -1,4 +1,4 @@
-package playground.kai.usecases.mentalmodule;
+package tutorial.programming.example10PluggablePlanStrategy;
 
 import java.util.ArrayList;
 import java.util.List;

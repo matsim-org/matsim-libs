@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example6EventsHandling;
+package tutorial.programming.example06EventsHandling;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;

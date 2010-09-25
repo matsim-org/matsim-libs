@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.mentalmodule;
+package tutorial.programming.example10PluggablePlanStrategy;
 
 import java.io.IOException;
 
@@ -31,7 +31,7 @@ class Main {
 
 		Config config;
 		if ( args.length==0 ) {
-			config = ConfigUtils.loadConfig("./kai/src/main/java/playground/kai/other/myconfig.xml");
+			config = ConfigUtils.loadConfig( "examples/tutorial/pluggablePlanStrategy-config.xml" ) ;
 		} else {
 			config = ConfigUtils.loadConfig(args[0]);
 		}

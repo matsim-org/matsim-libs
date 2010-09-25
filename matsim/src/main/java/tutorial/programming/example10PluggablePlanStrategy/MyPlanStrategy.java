@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.mentalmodule;
+package tutorial.programming.example10PluggablePlanStrategy;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.EventHandler;
