@@ -44,7 +44,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
 import playground.meisterk.phd.config.PopulationConvergenceConfigGroup;
@@ -93,7 +93,7 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		out.print("#iter");
 		
 		List<String> strategyNames = new ArrayList<String>();
-		for (PlanStrategyImpl strategy : c.getStrategyManager().getStrategies()) {
+		for (PlanStrategy strategy : c.getStrategyManager().getStrategies()) {
 			strategyNames.add(strategy.toString());
 		}
 		Collections.sort(strategyNames);

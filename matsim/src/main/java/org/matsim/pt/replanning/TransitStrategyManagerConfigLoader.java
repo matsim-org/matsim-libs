@@ -24,8 +24,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -41,9 +42,9 @@ public class TransitStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 	 *
 	 * @param controler the {@link Controler} that provides miscellaneous data for the replanning modules
 	 * @param config the {@link Config} object containing the configuration for the strategyManager
-	 * @param manager the {@link StrategyManager} to be configured according to the configuration
+	 * @param manager the {@link StrategyManagerImpl} to be configured according to the configuration
 	 */
-	public static void load(final Controler controler, final Config config, final StrategyManager manager) {
+	public static void load(final Controler controler, final Config config, final StrategyManagerImpl manager) {
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
 		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
@@ -57,7 +58,7 @@ public class TransitStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
 			}
 
-			PlanStrategyImpl strategy = loadStrategy(controler, classname, settings);
+			PlanStrategy strategy = loadStrategy(controler, classname, settings);
 
 			if (strategy == null) {
 				Gbl.errorMsg("Could not initialize strategy named " + classname);
@@ -79,8 +80,8 @@ public class TransitStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 		}
 	}
 
-	protected static PlanStrategyImpl loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
-		PlanStrategyImpl strategy = null;
+	protected static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
+		PlanStrategy strategy = null;
 
 	if (name.equals("ChangeLegMode")) {
 		strategy = new PlanStrategyImpl(new RandomPlanSelector());

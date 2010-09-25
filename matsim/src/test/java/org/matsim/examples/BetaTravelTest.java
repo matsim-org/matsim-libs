@@ -48,7 +48,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -269,8 +269,8 @@ public class BetaTravelTest extends MatsimTestCase {
 		}
 
 		@Override
-		protected StrategyManager loadStrategyManager() {
-			StrategyManager manager = new StrategyManager();
+		protected StrategyManagerImpl loadStrategyManager() {
+			StrategyManagerImpl manager = new StrategyManagerImpl();
 			manager.setMaxPlansPerAgent(5);
 
 			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.charyparNagelScoring()));

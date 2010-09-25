@@ -31,7 +31,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
@@ -77,9 +77,9 @@ public class ControlerMFeil extends Controler {
 
 
 	@Override
-	protected StrategyManager loadStrategyManager() {
+	protected StrategyManagerImpl loadStrategyManager() {
 
-		final StrategyManager manager = new StrategyManager();
+		final StrategyManagerImpl manager = new StrategyManagerImpl();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
 		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {

@@ -24,7 +24,7 @@
 package playground.yu.replanning;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 
 /**
@@ -43,8 +43,8 @@ public class ControlerWithRemoveOldestPlan extends Controler {
 	}
 
 	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManagerWithRemoveOldestPlan();
+	protected StrategyManagerImpl loadStrategyManager() {
+		StrategyManagerImpl manager = new StrategyManagerWithRemoveOldestPlan();
 		StrategyManagerConfigLoader.load(this, manager);
 		return manager;
 	}

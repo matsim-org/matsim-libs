@@ -66,9 +66,9 @@ public class StrategyManagerConfigLoader {
 	 * Reads and instantiates the strategy modules specified in the config-object.
 	 *
 	 * @param controler the {@link Controler} that provides miscellaneous data for the replanning modules
-	 * @param manager the {@link StrategyManager} to be configured according to the configuration
+	 * @param manager the {@link StrategyManagerImpl} to be configured according to the configuration
 	 */
-	public static void load(final Controler controler, final StrategyManager manager) {
+	public static void load(final Controler controler, final StrategyManagerImpl manager) {
 		Config config = controler.getConfig();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
@@ -83,7 +83,7 @@ public class StrategyManagerConfigLoader {
 				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
 			}
 
-			PlanStrategyImpl strategy = loadStrategy(controler, classname, settings);
+			PlanStrategy strategy = loadStrategy(controler, classname, settings);
 
 			if (strategy == null) {
 				Gbl.errorMsg("Could not initialize strategy named " + classname);
@@ -105,13 +105,13 @@ public class StrategyManagerConfigLoader {
 		}
 	}
 
-	protected static PlanStrategyImpl loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
+	protected static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
 		Network network = controler.getNetwork();
 		PersonalizableTravelCost travelCostCalc = controler.createTravelCostCalculator();
 		PersonalizableTravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		Config config = controler.getConfig();
 
-		PlanStrategyImpl strategy = null;
+		PlanStrategy strategy = null;
 		if (name.equals("KeepLastSelected")) {
 			strategy = new PlanStrategyImpl(new KeepSelected());
 		} else if (name.equals("ReRoute") || name.equals("threaded.ReRoute")) {
@@ -203,18 +203,19 @@ public class StrategyManagerConfigLoader {
 			}
 			else {
 				try {
-					Class<? extends PlanStrategyImpl> klas = (Class<? extends PlanStrategyImpl>) Class.forName(name);
+					Class<? extends PlanStrategy> klas = (Class<? extends PlanStrategy>) Class.forName(name);
 					Class[] args = new Class[1];
 					args[0] = Scenario.class;
-					Constructor<? extends PlanStrategyImpl> c = null;
+					Constructor<? extends PlanStrategy> c = null;
 					try{
 						c = klas.getConstructor(args);
 						strategy = c.newInstance(controler.getScenario());
 					} catch(NoSuchMethodException e){
-						log.warn("Cannot find Constructor in PlanStrategy " + name + " with single argument of type Scenario. " +
+						log.info("Cannot find Constructor in PlanStrategy " + name + " with single argument of type Scenario. " +
 								"This is not fatal, trying to find other constructor, however a constructor expecting Scenario as " +
 								"single argument is recommended!" );
-						log.warn("(People who need access to events should ignore this warning.)") ;
+						log.info("(People who need access to events should ignore this warning.)") ;
+						// I think that one needs events fairly often. kai, sep'10
 					}
 					if (c == null){
 						args[0] = Controler.class;

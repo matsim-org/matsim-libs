@@ -55,7 +55,7 @@ import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.ChangeLegMode;
@@ -136,7 +136,7 @@ public final class MZControler {
 	private TravelTimeCalculator travelTimeCalculator = null;
 	private PersonalizableTravelCost travelCostCalculator = null;
 	private ScoringFunctionFactory scoringFunctionFactory = null;
-	private StrategyManager strategyManager = null;
+	private StrategyManagerImpl strategyManager = null;
 
 	/**
 	 * Defines in which iterations the events should be written. <tt>1</tt> is
@@ -420,8 +420,8 @@ public final class MZControler {
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
-	private StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
+	private StrategyManagerImpl loadStrategyManager() {
+		StrategyManagerImpl manager = new StrategyManagerImpl();
 		load(manager);
 		return manager;
 	}
@@ -555,9 +555,9 @@ public final class MZControler {
 	 * Reads and instantiates the strategy modules specified in the config-object.
 	 *
 	 * @param controler the {@link MZControler} that provides miscellaneous data for the replanning modules
-	 * @param manager the {@link StrategyManager} to be configured according to the configuration
+	 * @param manager the {@link StrategyManagerImpl} to be configured according to the configuration
 	 */
-	private void load(final StrategyManager manager) {
+	private void load(final StrategyManagerImpl manager) {
 		Config config = this.config;
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 

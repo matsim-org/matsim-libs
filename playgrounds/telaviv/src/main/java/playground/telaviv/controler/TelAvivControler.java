@@ -21,7 +21,7 @@
 package playground.telaviv.controler;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -49,8 +49,8 @@ public class TelAvivControler extends Controler {
 	 * the replanning. 
 	 */
 	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new TTAStrategyManager(this.scenarioData);
+	protected StrategyManagerImpl loadStrategyManager() {
+		StrategyManagerImpl manager = new TTAStrategyManager(this.scenarioData);
 		LocationChoiceStrategyManagerConfigLoader.load(this, manager);
 		return manager;
 	}	

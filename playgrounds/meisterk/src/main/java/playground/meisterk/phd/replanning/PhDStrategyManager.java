@@ -30,10 +30,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.StrategyManagerImpl;
 
-public class PhDStrategyManager extends StrategyManager {
+public class PhDStrategyManager extends StrategyManagerImpl {
 
 	/**
 	 * Records which person is selected for what plan strategy.
@@ -87,7 +87,7 @@ public class PhDStrategyManager extends StrategyManager {
 	// the modification from the parent class is replaced by "beforeStrategyRunHook" below.   kai, sep'10
 
 	@Override
-	protected void beforeStrategyRunHook(Person person, PlanStrategyImpl strategy) {
+	protected void beforeStrategyRunHook(Person person, PlanStrategy strategy) {
 		Set<Person> personIdSet = null;
 		if (this.personTreatment.containsKey(strategy.toString())) {
 			personIdSet = this.personTreatment.get(strategy.toString());

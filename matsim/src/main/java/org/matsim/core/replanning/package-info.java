@@ -2,7 +2,7 @@
 <p>The StrategyManager controls the replanning of all agents in a population.</p>
 
 <p>Various strategies can be created and added to the
-{@link org.matsim.core.replanning.StrategyManager}. The
+{@link org.matsim.core.replanning.StrategyManagerImpl}. The
 <code>StrategyManager</code> selects for each agent randomly one of the
 strategies. When adding strategies to the strategy manager, a weight must be
 provided which influences the probability the strategy gets chosen for a person.

@@ -25,7 +25,7 @@ package playground.yu.test;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.yu.analysis.MZComparison.MZComparisonListener;
@@ -42,8 +42,8 @@ public class SubTourModeChoiceControler extends Controler {
 	}
 
 	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
+	protected StrategyManagerImpl loadStrategyManager() {
+		StrategyManagerImpl manager = new StrategyManagerImpl();
 		MyStrategyManagerConfigLoader.load(this, manager);
 		return manager;
 	}

@@ -27,7 +27,7 @@ import org.matsim.core.controler.listener.ReplanningListener;
 /**
  * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
  * replanning of plans in every iteration. Basically it integrates the
- * {@link org.matsim.core.replanning.StrategyManager} with the
+ * {@link org.matsim.core.replanning.StrategyManagerImpl} with the
  * {@link org.matsim.core.controler.Controler}.
  *
  * @author mrieser

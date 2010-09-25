@@ -24,7 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -58,7 +58,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new TimeAllocationMutator(config));
-		StrategyManager strategyManager = new StrategyManager();
+		StrategyManagerImpl strategyManager = new StrategyManagerImpl();
 		strategyManager.addStrategy(strategy, 1.0);
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
@@ -96,7 +96,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		// setup run1
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		StrategyManager strategyManager = new StrategyManager();
+		StrategyManagerImpl strategyManager = new StrategyManagerImpl();
 		strategyManager.addStrategy(strategy, 1.0);
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
@@ -106,7 +106,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		// setup run2
 		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-		StrategyManager strategyManager2 = new StrategyManager();
+		StrategyManagerImpl strategyManager2 = new StrategyManagerImpl();
 		strategyManager2.addStrategy(strategy2, 1.0);
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
@@ -145,7 +145,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		// setup run1
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		StrategyManager strategyManager = new StrategyManager();
+		StrategyManagerImpl strategyManager = new StrategyManagerImpl();
 		strategyManager.addStrategy(strategy, 1.0);
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
@@ -154,7 +154,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		controler.run();
 
 		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-		StrategyManager strategyManager2 = new StrategyManager();
+		StrategyManagerImpl strategyManager2 = new StrategyManagerImpl();
 		strategyManager2.addStrategy(strategy2, 1.0);
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
@@ -185,7 +185,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 	 */
 	private static class TestControler extends Controler {
 
-		public TestControler(final Config config, final StrategyManager manager) {
+		public TestControler(final Config config, final StrategyManagerImpl manager) {
 			super(config);
 			this.strategyManager = manager;
 			this.setCreateGraphs(false);
@@ -193,7 +193,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		}
 
 		@Override
-		protected StrategyManager loadStrategyManager() {
+		protected StrategyManagerImpl loadStrategyManager() {
 			return this.strategyManager;
 		}
 	}

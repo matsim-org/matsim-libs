@@ -40,7 +40,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	/**
 	 * Test how a plan selector reacts when one or more (or even all plans) have an undefined score.
 	 * This test only ensures that in all cases a plan is returned, but doesn't distinguish which one.
-	 * Currently, the {@link org.matsim.core.replanning.StrategyManager} should never pass a person to
+	 * Currently, the {@link org.matsim.core.replanning.StrategyManagerImpl} should never pass a person to
 	 * a PlanSelector that still has unscored plans, as such plans would be selected by default
 	 * ("optimistic behavior"). But as this may be optional sometimes later, it's best to ensure
 	 * already now that PlanSelector's can cope with such a situation.

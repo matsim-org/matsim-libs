@@ -50,7 +50,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		}
 
 		// setup StrategyManager
-		StrategyManager manager = new StrategyManager();
+		StrategyManagerImpl manager = new StrategyManagerImpl();
 		StrategyCounter strategy1 = new StrategyCounter(new RandomPlanSelector());
 		StrategyCounter strategy2 = new StrategyCounter(new RandomPlanSelector());
 		StrategyCounter strategy3 = new StrategyCounter(new RandomPlanSelector());
@@ -130,7 +130,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		}
 
 		// setup StrategyManager
-		StrategyManager manager = new StrategyManager();
+		StrategyManagerImpl manager = new StrategyManagerImpl();
 		StrategyCounter strategy1 = new StrategyCounter(new RandomPlanSelector());
 		StrategyCounter strategy2 = new StrategyCounter(new RandomPlanSelector());
 
@@ -203,7 +203,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		plans[9] = person.createAndAddPlan(false);
 		population.addPerson(person);
 
-		StrategyManager manager = new StrategyManager();
+		StrategyManagerImpl manager = new StrategyManagerImpl();
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new TestPlanSelector());
 		manager.addStrategy(strategy, 1.0);
 
@@ -229,7 +229,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 	public void testSetPlanSelectorForRemoval() {
 		// init StrategyManager
-		StrategyManager manager = new StrategyManager();
+		StrategyManagerImpl manager = new StrategyManagerImpl();
 		manager.addStrategy(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
 
 		// init Population

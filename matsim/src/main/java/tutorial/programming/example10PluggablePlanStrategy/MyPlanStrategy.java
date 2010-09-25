@@ -19,14 +19,19 @@
 
 package tutorial.programming.example10PluggablePlanStrategy;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.selectors.PlanSelector;
 
 
-public class MyPlanStrategy extends PlanStrategyImpl {
-	// the reason why this class needs to is that this is defined in the config file
-	// yyyy it has to use inheritance since there is no interface.  kai, sep'10
+public class MyPlanStrategy implements PlanStrategy {
+	// the reason why this class needs to be here is that this is defined in the config file
+	
+	PlanStrategy planStrategyDelegate = null ;
 
 	public MyPlanStrategy(Controler controler) {
 		// also possible: MyStrategy( Scenario scenario ).  But then I do not have events.  kai, aug'10
@@ -34,7 +39,7 @@ public class MyPlanStrategy extends PlanStrategyImpl {
 		// A PlanStrategy is something that can be applied to a person(!).  
 		
 		// It first selects one of the plans:
-		super( new MyPlanSelector( controler.getScenario() ) );
+		planStrategyDelegate = new PlanStrategyImpl( new MyPlanSelector( controler.getScenario() ) );
 		
 		// the plan selector may, at the same time, collect events:
 		controler.getEvents().addHandler( (EventHandler) this.getPlanSelector() ) ;
@@ -49,6 +54,34 @@ public class MyPlanStrategy extends PlanStrategyImpl {
 		// these modules may, at the same time, be events listeners (so that they can collect information):
 		controler.getEvents().addHandler( mod ) ;
 		
+	}
+
+	public void addStrategyModule(PlanStrategyModule module) {
+		planStrategyDelegate.addStrategyModule(module);
+	}
+
+	public void finish() {
+		planStrategyDelegate.finish();
+	}
+
+	public int getNumberOfStrategyModules() {
+		return planStrategyDelegate.getNumberOfStrategyModules();
+	}
+
+	public PlanSelector getPlanSelector() {
+		return planStrategyDelegate.getPlanSelector();
+	}
+
+	public void init() {
+		planStrategyDelegate.init();
+	}
+
+	public void run(Person person) {
+		planStrategyDelegate.run(person);
+	}
+
+	public String toString() {
+		return planStrategyDelegate.toString();
 	}
 
 }

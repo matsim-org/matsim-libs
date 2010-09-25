@@ -21,7 +21,7 @@
 package playground.mmoyo.ptRouterAdapted;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -52,8 +52,8 @@ public class AdaptedControler extends Controler {
 	
 	//loads the AdaptedStrategyManagerConfigLoader to get the MmoyoTimeAllocationMutatorReRoute strategy
 	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
+	protected StrategyManagerImpl loadStrategyManager() {
+		StrategyManagerImpl manager = new StrategyManagerImpl();
 		AdaptedStrategyManagerConfigLoader.load(this, manager);
 		return manager;
 	}

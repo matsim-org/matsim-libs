@@ -25,14 +25,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
-//import org.matsim.pt.replanning.TransitTimeAllocationMutator;
 
 /**
  * @author manuel
@@ -46,9 +46,9 @@ public class AdaptedStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 	 * Reads and instantiates the strategy modules specified in the config-object.
 	 *
 	 * @param controler the {@link Controler} that provides miscellaneous data for the replanning modules
-	 * @param manager the {@link StrategyManager} to be configured according to the configuration
+	 * @param manager the {@link StrategyManagerImpl} to be configured according to the configuration
 	 */
-	public static void load(final Controler controler, final StrategyManager manager) {
+	public static void load(final Controler controler, final StrategyManagerImpl manager) {
 		log.info("Using AdaptedStrategyManagerConfigloader");
 		Config config = controler.getConfig();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
@@ -64,7 +64,7 @@ public class AdaptedStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
 			}
 
-			PlanStrategyImpl strategy = loadStrategy(controler, classname, settings);
+			PlanStrategy strategy = loadStrategy(controler, classname, settings);
 
 			if (strategy == null) {
 				Gbl.errorMsg("Could not initialize strategy named " + classname);
@@ -86,9 +86,9 @@ public class AdaptedStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 		}
 	}
 	
-	protected static PlanStrategyImpl loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
+	protected static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
 		Config config = controler.getConfig();
-		PlanStrategyImpl strategy = null;
+		PlanStrategy strategy = null;
 		if (name.equals("MmoyoTimeAllocationMutatorReRoute") ) {
 			log.info("Using MmoyoTimeAllocationMutatorReRoute replanning strategy");
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());

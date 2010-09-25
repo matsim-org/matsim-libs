@@ -99,7 +99,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -204,7 +204,7 @@ public class Controler {
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	private PersonalizableTravelCost travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
-	protected StrategyManager strategyManager = null;
+	protected StrategyManagerImpl strategyManager = null;
 
 	/**
 	 * Defines in which iterations the events should be written. <tt>1</tt> is
@@ -741,13 +741,13 @@ public class Controler {
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
-	protected StrategyManager loadStrategyManager() {
+	protected StrategyManagerImpl loadStrategyManager() {
 		if (this.config.scenario().isUseTransit()) {
-			StrategyManager manager = new StrategyManager();
+			StrategyManagerImpl manager = new StrategyManagerImpl();
 			TransitStrategyManagerConfigLoader.load(this, this.config, manager);
 			return manager;
 		} else {
-			StrategyManager manager = new StrategyManager();
+			StrategyManagerImpl manager = new StrategyManagerImpl();
 			StrategyManagerConfigLoader.load(this, manager);
 			return manager;
 		}
@@ -1077,10 +1077,10 @@ public class Controler {
 	}
 
 	/**
-	 * @return Returns the {@link org.matsim.core.replanning.StrategyManager}
+	 * @return Returns the {@link org.matsim.core.replanning.StrategyManagerImpl}
 	 *         used for the replanning of plans.
 	 */
-	public final StrategyManager getStrategyManager() {
+	public final StrategyManagerImpl getStrategyManager() {
 		return this.strategyManager;
 	}
 

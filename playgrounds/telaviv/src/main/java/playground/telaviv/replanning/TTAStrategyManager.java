@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 
-public class TTAStrategyManager extends StrategyManager {
+public class TTAStrategyManager extends StrategyManagerImpl {
 
 	private Population nonTTAPopulation;
 	

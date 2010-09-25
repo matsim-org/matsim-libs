@@ -35,7 +35,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  * @author mrieser
  * @see org.matsim.core.replanning
  */
-public class PlanStrategyImpl {
+public class PlanStrategyImpl implements PlanStrategy {
 
 	private PlanSelector planSelector = null;
 	private PlanStrategyModule firstModule = null;
@@ -53,10 +53,8 @@ public class PlanStrategyImpl {
 		this.planSelector = planSelector;
 	}
 
-	/**
-	 * Adds a strategy module to this strategy.
-	 *
-	 * @param module
+	/* (non-Javadoc)
+	 * @see org.matsim.core.replanning.PlanStrategy#addStrategyModule(org.matsim.api.core.v01.replanning.PlanStrategyModule)
 	 */
 	public final void addStrategyModule(final PlanStrategyModule module) {
 		if (this.firstModule == null) {
@@ -66,8 +64,8 @@ public class PlanStrategyImpl {
 		}
 	}
 	
-	/**
-	 * @return the number of strategy modules added to this strategy
+	/* (non-Javadoc)
+	 * @see org.matsim.core.replanning.PlanStrategy#getNumberOfStrategyModules()
 	 */
 	public final int getNumberOfStrategyModules() {
 		if (this.firstModule == null) {
@@ -76,14 +74,8 @@ public class PlanStrategyImpl {
 		return this.modules.size() + 1; // we also have to count "firstModule", thus +1
 	}
 
-	/**
-	 * Adds a person to this strategy to be handled. It is not required that
-	 * the person is immediately handled during this method-call (e.g. when using
-	 * multi-threaded strategy-modules).  This method ensures that an unscored
-	 * plan is selected if the person has such a plan ("optimistic behavior").
-	 *
-	 * @param person
-	 * @see #finish()
+	/* (non-Javadoc)
+	 * @see org.matsim.core.replanning.PlanStrategy#run(org.matsim.api.core.v01.population.Person)
 	 */
 	public void run(final Person person) {
 		// yyyy "Ablaufsteuerung" should be final (in my view).  kai, sep'10
@@ -115,9 +107,8 @@ public class PlanStrategyImpl {
 		}
 	}
 
-	/**
-	 * Tells this strategy to initialize its modules. Called before a bunch of
-	 * person are handed to this strategy.
+	/* (non-Javadoc)
+	 * @see org.matsim.core.replanning.PlanStrategy#init()
 	 */
 	public final void init() {
 		if (this.firstModule != null) {
@@ -125,11 +116,8 @@ public class PlanStrategyImpl {
 		}
 	}
 
-	/**
-	 * Indicates that no additional persons will be handed to this module and
-	 * waits until this strategy has finished handling all persons.
-	 *
-	 * @see #run(PersonImpl)
+	/* (non-Javadoc)
+	 * @see org.matsim.core.replanning.PlanStrategy#finish()
 	 */
 	public final void finish() {
 		// yyyy I don't think this needs to be public once StrategyManager.run is final.  kai, sep'10
@@ -150,10 +138,8 @@ public class PlanStrategyImpl {
 		this.counter = 0;
 	}
 
-	/** Returns a descriptive name for this strategy, based on the class names on the used
-	 * {@link PlanSelector plan selector} and {@link PlanStrategyModule strategy modules}.
-	 *
-	 * @return An automatically generated name for this strategy.
+	/* (non-Javadoc)
+	 * @see org.matsim.core.replanning.PlanStrategy#toString()
 	 */
 	@Override
 	public String toString() {
@@ -170,6 +156,9 @@ public class PlanStrategyImpl {
 		return name.toString();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.replanning.PlanStrategy#getPlanSelector()
+	 */
 	public final PlanSelector getPlanSelector() {
 		return planSelector;
 	}

@@ -12,7 +12,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.replanning.modules.ExternalModule;
@@ -37,7 +37,7 @@ public class MyStrategyManagerConfigLoader {
 
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 
-	public static void load(final Controler controler, final Config config, final StrategyManager manager) {
+	public static void load(final Controler controler, final Config config, final StrategyManagerImpl manager) {
 
 		Network network = controler.getNetwork();
 		PersonalizableTravelCost travelCostCalc = controler.createTravelCostCalculator();

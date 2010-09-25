@@ -12,7 +12,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.modules.PlanomatModule;
@@ -41,9 +41,9 @@ public class MyStrategyManagerConfigLoader {
 	 * Reads and instantiates the strategy modules specified in the config-object.
 	 *
 	 * @param controler the {@link Controler} that provides miscellaneous data for the replanning modules
-	 * @param manager the {@link StrategyManager} to be configured according to the configuration
+	 * @param manager the {@link StrategyManagerImpl} to be configured according to the configuration
 	 */
-	public static void load(final Controler controler, final StrategyManager manager) {
+	public static void load(final Controler controler, final StrategyManagerImpl manager) {
 		Config config = controler.getConfig();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 

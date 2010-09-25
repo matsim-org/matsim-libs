@@ -27,8 +27,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -47,12 +48,12 @@ public class MyStrategyManagerConfigLoader extends StrategyManagerConfigLoader {
 	 *            the {@link Controler} that provides miscellaneous data for the
 	 *            replanning modules
 	 * @param manager
-	 *            the {@link StrategyManager} to be configured according to the
+	 *            the {@link StrategyManagerImpl} to be configured according to the
 	 *            configuration
 	 */
 	public static void load(final Controler controler,
 	// final Config config,
-			final StrategyManager manager) {
+			final StrategyManagerImpl manager) {
 		Config config = controler.getConfig();
 		manager.setMaxPlansPerAgent(config.strategy()
 				.getMaxAgentPlanMemorySize());
@@ -71,7 +72,7 @@ public class MyStrategyManagerConfigLoader extends StrategyManagerConfigLoader {
 						"org.matsim.demandmodeling.plans.strategies.", "");
 			}
 
-			PlanStrategyImpl strategy = loadStrategy(controler, classname, settings);
+			PlanStrategy strategy = loadStrategy(controler, classname, settings);
 
 			if (strategy == null) {
 				Gbl
@@ -99,12 +100,12 @@ public class MyStrategyManagerConfigLoader extends StrategyManagerConfigLoader {
 		}
 	}
 
-	protected static PlanStrategyImpl loadStrategy(final Controler controler,
+	protected static PlanStrategy loadStrategy(final Controler controler,
 			final String name,
 			final StrategyConfigGroup.StrategySettings settings) {
 		Config config = controler.getConfig();
 
-		PlanStrategyImpl strategy = null;
+		PlanStrategy strategy = null;
 
 		if (name.equals(
 		// "playground.yu.test." +
