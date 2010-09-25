@@ -128,7 +128,7 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 	private StyleType greenCrossStyle;
 	private StyleType greyCrossStyle;
 	private StyleType greyMinusStyle;
-	
+
 	/**
 	 * maps stopids to filenames in the kmz
 	 */
@@ -148,16 +148,17 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 	 * @param countSimCompList
 	 * @param network
 	 * @param coordTransform
-	 * @param stopID2lineIdMap 
-	 * @param stopIDMap 
+	 * @param stopID2lineIdMap
+	 * @param stopIDMap
 	 */
 	public PtCountCountComparisonKMLWriter(
 			final List<CountSimComparison> boardCountSimCompList,
 			final List<CountSimComparison> alightCountSimCompList,
+			final List<CountSimComparison> occupancyCountSimCompList,
 			// final Network network,
 			final CoordinateTransformation coordTransform,
 			final Counts boradCounts, final Counts alightCounts, HashMap<String,String> stopIDMap, Map<String, TreeSet<String>> stopID2lineIdMap, boolean writePlacemarkName) {
-		super(boardCountSimCompList, alightCountSimCompList);
+		super(boardCountSimCompList, alightCountSimCompList, occupancyCountSimCompList);
 		// this.network = network;
 		this.coordTransform = coordTransform;
 		this.boardCounts = boradCounts;
@@ -409,8 +410,8 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 //		} else {
 //			placemark.setName(this.stopIDMap.get(stopid));
 //		}
-		
-		StringBuffer name = new StringBuffer();		
+
+		StringBuffer name = new StringBuffer();
 		if (countsType.equals("board")) {
 			name.append("B: ");
 		} else {
@@ -422,11 +423,11 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 			}
 		} else {
 			log.warn(stopid + " is not served by any line!?");
-		}	
+		}
 		if(this.writePlacemarkName == true){
 			placemark.setName(name.toString());
 		}
-		
+
 		return placemark;
 	}
 
@@ -467,7 +468,7 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 							+ Double.toString(coord.getY()) + ",0.0");
 			placemark.setAbstractGeometryGroup(kmlObjectFactory
 					.createPoint(point));
-			
+
 			// first check if we got any counts
 			if (csc.getSimulationValue() == 0.0 && csc.getCountValue() == 0.0){
 				// no, so place something neutral, e.g. grey dot
@@ -490,11 +491,11 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 						placemark.setStyleUrl("#greenMinusStyle");
 					} else if (csc.getSimulationValue() > csc.getCountValue() * 0.5) {
 						placemark.setStyleUrl("#yellowMinusStyle");
-					} else {				
+					} else {
 						placemark.setStyleUrl("#redMinusStyle");
 					}
 				}
-			}			
+			}
 			folder.getAbstractFeatureGroup().add(
 					kmlObjectFactory.createPlacemark(placemark));
 		}
@@ -552,7 +553,7 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 		} else {
 			log.warn(stopid + " is not served by any line!?");
 		}
-	
+
 		buffer.append(NetworkFeatureFactory.ENDH3);
 		buffer.append(NetworkFeatureFactory.STARTP);
 
@@ -627,10 +628,10 @@ public class PtCountCountComparisonKMLWriter extends PtCountSimComparisonWriter 
 
 			PtCountsSimRealPerHourGraph graphBoard = new PtCountsSimRealPerHourGraph(
 					this.boardCountComparisonFilter.getCountsForHour(null),
-					this.iter, filenameBoard.toString(), "board");
+					this.iter, filenameBoard.toString(), PtCountsType.Boarding);
 			PtCountsSimRealPerHourGraph graphAlight = new PtCountsSimRealPerHourGraph(
 					this.alightCountComparisonFilter.getCountsForHour(null),
-					this.iter, filenameAlight.toString(), "alight");
+					this.iter, filenameAlight.toString(), PtCountsType.Alighting);
 
 			graphBoard.createChart(timestep);
 			graphAlight.createChart(timestep);
