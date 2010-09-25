@@ -21,10 +21,10 @@ package tutorial.programming.example10PluggablePlanStrategy;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 
 
-public class MyPlanStrategy extends PlanStrategy {
+public class MyPlanStrategy extends PlanStrategyImpl {
 	// the reason why this class needs to is that this is defined in the config file
 	// yyyy it has to use inheritance since there is no interface.  kai, sep'10
 

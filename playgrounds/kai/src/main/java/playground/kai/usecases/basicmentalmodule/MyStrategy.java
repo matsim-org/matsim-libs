@@ -20,11 +20,11 @@
 package playground.kai.usecases.basicmentalmodule;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 
-public class MyStrategy extends PlanStrategy {
+public class MyStrategy extends PlanStrategyImpl {
 	
 	public MyStrategy(Scenario sc) {
 		super(new RandomPlanSelector());

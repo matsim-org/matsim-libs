@@ -30,7 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -88,46 +88,46 @@ public class ControlerMFeil extends Controler {
 				continue;
 			}
 			String classname = settings.getModuleName();
-			PlanStrategy strategy = null;
+			PlanStrategyImpl strategy = null;
 
 			if (classname.equals("PlanomatX")) {
 				ActivityTypeFinder finder = new ActivityTypeFinder (this);
-				strategy = new PlanStrategy(new RandomPlanSelector());
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
 				PlanStrategyModule planomatXStrategyModule = new PlanomatXInitialiser(this, finder);
 				strategy.addStrategyModule(planomatXStrategyModule);
 			}
 			else if  (classname.equals("ReRoute") || classname.equals("threaded.ReRoute")) {
-				strategy = new PlanStrategy(new RandomPlanSelector());
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
 				strategy.addStrategyModule(new ReRoute(this));
 			}
 			else if (classname.equals("BestScore")) {
-				strategy = new PlanStrategy(new BestPlanSelector());
+				strategy = new PlanStrategyImpl(new BestPlanSelector());
 			}
 			else if (classname.equals("Planomat")) {
-				strategy = new PlanStrategy(new RandomPlanSelector());
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
 				PlanStrategyModule planomatStrategyModule = new PlanomatModule(this, this.getEvents(), this.getNetwork(), this.getScoringFunctionFactory(), this.createTravelCostCalculator(), this.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
 			}
 			else if (classname.equals("Recycling")) {
 				ActivityTypeFinder finder = new ActivityTypeFinder (this);
 				finder.run(this.getFacilities());
-				strategy = new PlanStrategy(new RandomPlanSelector());
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
 				PlanStrategyModule module = new ScheduleRecycling(this, finder);
 				strategy.addStrategyModule(module);
 			}
 			else if (classname.equals("TimeModeChoicer")) {
-				strategy = new PlanStrategy(new RandomPlanSelector());
+				strategy = new PlanStrategyImpl(new RandomPlanSelector());
 				PlanStrategyModule module = new TimeModeChoicerInitialiser(this);
 				strategy.addStrategyModule(module);
 			}
 			else if (classname.equals("LocationChoice")) {
-	    	strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
+	    	strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 	    	strategy.addStrategyModule(new LocationChoice(this.getNetwork(), this, (this.getScenario()).getKnowledges()));
 	    	strategy.addStrategyModule(new ReRoute(this));
 				strategy.addStrategyModule(new TimeAllocationMutator(config));
 			}
 			else if (classname.equals("PlansConstructor")) {
-		    	strategy = new PlanStrategy(new KeepSelected());
+		    	strategy = new PlanStrategyImpl(new KeepSelected());
 				strategy.addStrategyModule(new PlansConstructor(this));
 			}
 		

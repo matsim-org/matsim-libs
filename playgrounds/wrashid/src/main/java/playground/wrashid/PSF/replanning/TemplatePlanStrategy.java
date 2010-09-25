@@ -21,10 +21,10 @@
 package playground.wrashid.PSF.replanning;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-public class TemplatePlanStrategy extends PlanStrategy {
+public class TemplatePlanStrategy extends PlanStrategyImpl {
 
 	public TemplatePlanStrategy(Scenario scenario) {
 		super(new RandomPlanSelector());

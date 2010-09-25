@@ -204,7 +204,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		population.addPerson(person);
 
 		StrategyManager manager = new StrategyManager();
-		PlanStrategy strategy = new PlanStrategy(new TestPlanSelector());
+		PlanStrategyImpl strategy = new PlanStrategyImpl(new TestPlanSelector());
 		manager.addStrategy(strategy, 1.0);
 
 		// in each "iteration", an unscored plans should be selected
@@ -230,7 +230,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	public void testSetPlanSelectorForRemoval() {
 		// init StrategyManager
 		StrategyManager manager = new StrategyManager();
-		manager.addStrategy(new PlanStrategy(new RandomPlanSelector()), 1.0);
+		manager.addStrategy(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
 
 		// init Population
 		PersonImpl p = new PersonImpl(new IdImpl(1));
@@ -270,7 +270,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	static private class StrategyCounter extends PlanStrategy {
+	static private class StrategyCounter extends PlanStrategyImpl {
 
 		private int counter = 0;
 

@@ -48,7 +48,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -649,23 +649,23 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			manager.setMaxPlansPerAgent(4);
 
 			// ChangeExpBeta
-			PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanChanger(this.config.charyparNagelScoring().getBrainExpBeta()));
+			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanChanger(this.config.charyparNagelScoring().getBrainExpBeta()));
 			manager.addStrategy(strategy1, 0.7);
 
 			// ChangeLegModeWithParkLocation
-			PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
+			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy2.addStrategyModule(new ChangeLegModeWithParkLocation(
 					this.config, this.network));
 			strategy2.addStrategyModule(new ReRoute(this));
 			manager.addStrategy(strategy2, 0.1);
 
 			// ReRoute
-			PlanStrategy strategy3 = new PlanStrategy(new RandomPlanSelector());
+			PlanStrategyImpl strategy3 = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy3.addStrategyModule(new ReRoute(this));
 			manager.addStrategy(strategy3, 0.1);
 
 			// TimeAllocationMutator
-			PlanStrategy strategy4 = new PlanStrategy(new RandomPlanSelector());
+			PlanStrategyImpl strategy4 = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy4.addStrategyModule(new TimeAllocationMutator(this.config));
 			manager.addStrategy(strategy4, 0.1);
 

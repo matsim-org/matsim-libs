@@ -26,7 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -62,7 +62,7 @@ public class LocationChoiceStrategyManagerConfigLoader extends StrategyManagerCo
 				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
 			}
 
-			PlanStrategy strategy = loadStrategy(controler, classname, settings);
+			PlanStrategyImpl strategy = loadStrategy(controler, classname, settings);
 
 			if (strategy == null) {
 				Gbl.errorMsg("Could not initialize strategy named " + classname);
@@ -84,9 +84,9 @@ public class LocationChoiceStrategyManagerConfigLoader extends StrategyManagerCo
 		}
 	}
 
-	protected static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings)
+	protected static PlanStrategyImpl loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings)
 	{
-		PlanStrategy strategy = null;
+		PlanStrategyImpl strategy = null;
 		
 		Network network = controler.getNetwork();
 		PersonalizableTravelCost travelCostCalc = controler.createTravelCostCalculator();
@@ -95,15 +95,15 @@ public class LocationChoiceStrategyManagerConfigLoader extends StrategyManagerCo
 		Scenario scenario = controler.getScenario();
 		
 	if (name.equals("LocationChoice_ReRoute")) {
-		strategy = new PlanStrategy(new RandomPlanSelector());
+		strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new LocationChoicePlanModule(scenario));
 		strategy.addStrategyModule(new ReRoute(controler));
 	} else if (name.equals("LocationChoice_ReRoute_Dijkstra")) {
-		strategy = new PlanStrategy(new RandomPlanSelector());
+		strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new LocationChoicePlanModule(scenario));
 		strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc));
 	} else if (name.equals("LocationChoice_ReRoute_Landmarks")) {
-		strategy = new PlanStrategy(new RandomPlanSelector());
+		strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new LocationChoicePlanModule(scenario));
 		strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));		
 	} else {

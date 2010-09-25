@@ -31,7 +31,7 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -72,7 +72,7 @@ public class Template implements MatsimModule {
 		
 		// *** ReplanningModule *********************
 		
-		PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
+		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		c.getStrategyManager().addStrategy(strategy, 0.5);
 		// TODO needs improvement, not directly add to StrategyManager, but offer option to be loaded via config
 		// register PlanStrategy, PlanSelector, StrategyModule?

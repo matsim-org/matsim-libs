@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -64,7 +64,7 @@ public class AdaptedStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
 			}
 
-			PlanStrategy strategy = loadStrategy(controler, classname, settings);
+			PlanStrategyImpl strategy = loadStrategy(controler, classname, settings);
 
 			if (strategy == null) {
 				Gbl.errorMsg("Could not initialize strategy named " + classname);
@@ -86,12 +86,12 @@ public class AdaptedStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 		}
 	}
 	
-	protected static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
+	protected static PlanStrategyImpl loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
 		Config config = controler.getConfig();
-		PlanStrategy strategy = null;
+		PlanStrategyImpl strategy = null;
 		if (name.equals("MmoyoTimeAllocationMutatorReRoute") ) {
 			log.info("Using MmoyoTimeAllocationMutatorReRoute replanning strategy");
-			strategy = new PlanStrategy(new RandomPlanSelector());
+			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
 			//TransitTimeAllocationMutator tam = new TransitTimeAllocationMutator(controler.getConfig());
 			int mutationRange= Integer.parseInt(config.getParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE));

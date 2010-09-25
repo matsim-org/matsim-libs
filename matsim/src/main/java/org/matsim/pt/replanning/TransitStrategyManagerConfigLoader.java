@@ -24,7 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ChangeLegMode;
@@ -57,7 +57,7 @@ public class TransitStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
 			}
 
-			PlanStrategy strategy = loadStrategy(controler, classname, settings);
+			PlanStrategyImpl strategy = loadStrategy(controler, classname, settings);
 
 			if (strategy == null) {
 				Gbl.errorMsg("Could not initialize strategy named " + classname);
@@ -79,16 +79,16 @@ public class TransitStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 		}
 	}
 
-	protected static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
-		PlanStrategy strategy = null;
+	protected static PlanStrategyImpl loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
+		PlanStrategyImpl strategy = null;
 
 	if (name.equals("ChangeLegMode")) {
-		strategy = new PlanStrategy(new RandomPlanSelector());
+		strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
 		strategy.addStrategyModule(new ChangeLegMode(controler.getConfig()));
 		strategy.addStrategyModule(new ReRoute(controler));
 	} else if (name.equals("TimeAllocationMutator")) {
-		strategy = new PlanStrategy(new RandomPlanSelector());
+		strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		TransitTimeAllocationMutator tam = new TransitTimeAllocationMutator(controler.getConfig());
 //		tam.setUseActivityDurations(controler.getConfig().vspExperimental().isUseActivityDurations());
 		// functionality moved into TimeAllocationMutation.  kai, aug'10

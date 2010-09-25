@@ -21,7 +21,7 @@
 package playground.yu.replanning;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -37,7 +37,7 @@ public class RandomPlanSelectorControler extends Controler {
 		StrategyManager manager = new StrategyManager();
 		StrategyManagerConfigLoader.load(this, manager);
 
-		PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
+		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		manager.addStrategy(strategy, 0.0);
 		manager.addChangeRequest(601, strategy, 1.0);
 

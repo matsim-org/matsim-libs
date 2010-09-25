@@ -9,7 +9,7 @@ provided which influences the probability the strategy gets chosen for a person.
 The probability for a strategy to be chosen is defined as the strategy's weight
 divided by the sum of all strategies' weights.</p>
 
-<p>A {@link org.matsim.core.replanning.PlanStrategy} always consists
+<p>A {@link org.matsim.core.replanning.PlanStrategyImpl} always consists
 of exactly one <code>PlanSelector</code> and zero or more <code>StrategyModule</code>s.
 A {@link org.matsim.core.replanning.selectors.PlanSelector
 PlanSelector} selects one of the agents' existing plans, while

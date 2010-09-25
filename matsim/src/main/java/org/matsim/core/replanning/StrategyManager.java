@@ -43,15 +43,15 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
  */
 public class StrategyManager {
 
-	private final ArrayList<PlanStrategy> strategies = new ArrayList<PlanStrategy>();
+	private final ArrayList<PlanStrategyImpl> strategies = new ArrayList<PlanStrategyImpl>();
 	private final ArrayList<Double> weights = new ArrayList<Double>();
 	private double totalWeights = 0.0;
 	private int maxPlansPerAgent = 0;
 	
 	private PlanSelector removalPlanSelector = new WorstPlanForRemovalSelector();
 
-	private final TreeMap<Integer, Map<PlanStrategy, Double>> changeRequests =
-			new TreeMap<Integer, Map<PlanStrategy, Double>>();
+	private final TreeMap<Integer, Map<PlanStrategyImpl, Double>> changeRequests =
+			new TreeMap<Integer, Map<PlanStrategyImpl, Double>>();
 
 	/**
 	 * Adds a strategy to this manager with the specified weight. This weight
@@ -61,7 +61,7 @@ public class StrategyManager {
 	 * @param strategy
 	 * @param weight
 	 */
-	public final void addStrategy(final PlanStrategy strategy, final double weight) {
+	public final void addStrategy(final PlanStrategyImpl strategy, final double weight) {
 		this.strategies.add(strategy);
 		this.weights.add(Double.valueOf(weight));
 		this.totalWeights += weight;
@@ -74,7 +74,7 @@ public class StrategyManager {
 	 * @return true if the strategy was successfully removed from this manager,
 	 * 		false if the strategy was not part of this manager and could thus not be removed.
 	 */
-	public final boolean removeStrategy(final PlanStrategy strategy) {
+	public final boolean removeStrategy(final PlanStrategyImpl strategy) {
 		int idx = this.strategies.indexOf(strategy);
 		if (idx != -1) {
 			this.strategies.remove(idx);
@@ -93,7 +93,7 @@ public class StrategyManager {
 	 * @return true if the strategy is part of this manager and the weight could
 	 * 		be changed successfully, false otherwise.
 	 */
-	public final boolean changeWeightOfStrategy(final PlanStrategy strategy, final double newWeight) {
+	public final boolean changeWeightOfStrategy(final PlanStrategyImpl strategy, final double newWeight) {
 		int idx = this.strategies.indexOf(strategy);
 		if (idx != -1) {
 			double oldWeight = this.weights.set(idx, Double.valueOf(newWeight)).doubleValue();
@@ -120,7 +120,7 @@ public class StrategyManager {
 		// left empty for inheritance
 	}
 	
-	protected void beforeStrategyRunHook( Person person, PlanStrategy strategy ) {
+	protected void beforeStrategyRunHook( Person person, PlanStrategyImpl strategy ) {
 		// left empty for inheritance
 	}
 
@@ -135,7 +135,7 @@ public class StrategyManager {
 		beforePopulationRunHook( population ) ;
 		
 		// initialize all strategies
-		for (PlanStrategy strategy : this.strategies) {
+		for (PlanStrategyImpl strategy : this.strategies) {
 			strategy.init();
 		}
 		
@@ -148,7 +148,7 @@ public class StrategyManager {
 			}
 			
 			// ... choose the strategy to be used for this person (in evol comp lang this would be the choice of the mutation operator)
-			PlanStrategy strategy = this.chooseStrategy();
+			PlanStrategyImpl strategy = this.chooseStrategy();
 			
 			beforeStrategyRunHook( person, strategy ) ;
 			
@@ -161,7 +161,7 @@ public class StrategyManager {
 		}
 		
 		// finally make sure all strategies have finished there work
-		for (PlanStrategy strategy : this.strategies) {
+		for (PlanStrategyImpl strategy : this.strategies) {
 			strategy.finish();
 		}
 		
@@ -199,9 +199,9 @@ public class StrategyManager {
 	 * @param iteration
 	 */
 	private final void handleChangeRequests(final int iteration) {
-		Map<PlanStrategy, Double> changes = this.changeRequests.remove(Integer.valueOf(iteration));
+		Map<PlanStrategyImpl, Double> changes = this.changeRequests.remove(Integer.valueOf(iteration));
 		if (changes != null) {
-			for (java.util.Map.Entry<PlanStrategy, Double> entry : changes.entrySet()) {
+			for (java.util.Map.Entry<PlanStrategyImpl, Double> entry : changes.entrySet()) {
 				changeWeightOfStrategy(entry.getKey(), entry.getValue().doubleValue());
 			}
 		}
@@ -212,7 +212,7 @@ public class StrategyManager {
 	 *
 	 * @return the chosen strategy
 	 */
-	private final PlanStrategy chooseStrategy() {
+	private final PlanStrategyImpl chooseStrategy() {
 		double rnd = MatsimRandom.getRandom().nextDouble() * this.totalWeights;
 
 		double sum = 0.0;
@@ -249,11 +249,11 @@ public class StrategyManager {
 	 * @param strategy
 	 * @param newWeight
 	 */
-	public final void addChangeRequest(final int iteration, final PlanStrategy strategy, final double newWeight) {
+	public final void addChangeRequest(final int iteration, final PlanStrategyImpl strategy, final double newWeight) {
 		Integer iter = Integer.valueOf(iteration);
-		Map<PlanStrategy, Double> iterationRequests = this.changeRequests.get(iter);
+		Map<PlanStrategyImpl, Double> iterationRequests = this.changeRequests.get(iter);
 		if (iterationRequests == null) {
-			iterationRequests = new HashMap<PlanStrategy, Double>(3);
+			iterationRequests = new HashMap<PlanStrategyImpl, Double>(3);
 			this.changeRequests.put(iter, iterationRequests);
 		}
 		iterationRequests.put(strategy, Double.valueOf(newWeight));
@@ -272,7 +272,7 @@ public class StrategyManager {
 		this.removalPlanSelector = planSelector;
 	}
 
-	public final List<PlanStrategy> getStrategies() {
+	public final List<PlanStrategyImpl> getStrategies() {
 		return Collections.unmodifiableList(this.strategies);
 	}
 

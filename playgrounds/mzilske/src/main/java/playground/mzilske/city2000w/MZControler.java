@@ -54,7 +54,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -572,7 +572,7 @@ public final class MZControler {
 				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
 			}
 
-			PlanStrategy strategy = loadStrategy(classname, settings);
+			PlanStrategyImpl strategy = loadStrategy(classname, settings);
 
 			if (strategy == null) {
 				Gbl.errorMsg("Could not initialize strategy named " + classname);
@@ -605,51 +605,51 @@ public final class MZControler {
 		}
 	}
 
-	private PlanStrategy loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings) {
+	private PlanStrategyImpl loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings) {
 		Network network = this.network;
 		PersonalizableTravelCost travelCostCalc = this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
 		PersonalizableTravelTime travelTimeCalc = this.travelTimeCalculator;
 		Config config = this.config;
 
-		PlanStrategy strategy = null;
+		PlanStrategyImpl strategy = null;
 		if (name.equals("KeepLastSelected")) {
-			strategy = new PlanStrategy(new KeepSelected());
+			strategy = new PlanStrategyImpl(new KeepSelected());
 		} else if (name.equals("ReRoute") || name.equals("threaded.ReRoute")) {
-			strategy = new PlanStrategy(new RandomPlanSelector());
+			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new ReRoute(this));
 		} else if (name.equals("ReRoute_Dijkstra")) {
-			strategy = new PlanStrategy(new RandomPlanSelector());
+			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc));
 		} else if (name.equals("ReRoute_Landmarks")) {
-			strategy = new PlanStrategy(new RandomPlanSelector());
+			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
 		} else if (name.equals("TimeAllocationMutator") || name.equals("threaded.TimeAllocationMutator")) {
-			strategy = new PlanStrategy(new RandomPlanSelector());
+			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			TimeAllocationMutator tam = new TimeAllocationMutator(config);
 //			tam.setUseActivityDurations(config.vspExperimental().isUseActivityDurations());
 			// functionality moved into TimeAllocationMutator.  kai, aug'10
 			strategy.addStrategyModule(tam);
 		} else if (name.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
-			strategy = new PlanStrategy(new RandomPlanSelector());
+			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new TimeAllocationMutator(config, 7200));
 			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.charyparNagelScoring())));
 		} else if (name.equals("ExternalModule")) {
 			externalCounter++;
-			strategy = new PlanStrategy(new RandomPlanSelector());
+			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			String exePath = settings.getExePath();
 			ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controlerIO, scenarioData, 1);
 			em.setIterationNumber(iteration);
 			strategy.addStrategyModule(em);
 		} else if (name.equals("BestScore")) {
-			strategy = new PlanStrategy(new BestPlanSelector());
+			strategy = new PlanStrategyImpl(new BestPlanSelector());
 		} else if (name.equals("SelectExpBeta")) {
-			strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
+			strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 		} else if (name.equals("ChangeExpBeta")) {
-			strategy = new PlanStrategy(new ExpBetaPlanChanger(config.charyparNagelScoring().getBrainExpBeta()));
+			strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(config.charyparNagelScoring().getBrainExpBeta()));
 		} else if (name.equals("SelectRandom")) {
-			strategy = new PlanStrategy(new RandomPlanSelector());
+			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		} else if (name.equals("ChangeLegMode")) {
-			strategy = new PlanStrategy(new RandomPlanSelector());
+			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new ChangeLegMode(config));
 			strategy.addStrategyModule(new ReRoute(this));
 		} else {
@@ -659,10 +659,10 @@ public final class MZControler {
 			}
 			else {
 				try {
-					Class<? extends PlanStrategy> klas = (Class<? extends PlanStrategy>) Class.forName(name);
+					Class<? extends PlanStrategyImpl> klas = (Class<? extends PlanStrategyImpl>) Class.forName(name);
 					Class[] args = new Class[1];
 					args[0] = Scenario.class;
-					Constructor<? extends PlanStrategy> c = null;
+					Constructor<? extends PlanStrategyImpl> c = null;
 					try{
 						c = klas.getConstructor(args);
 						strategy = c.newInstance(scenarioData);

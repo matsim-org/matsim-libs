@@ -47,7 +47,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
@@ -273,10 +273,10 @@ public class BetaTravelTest extends MatsimTestCase {
 			StrategyManager manager = new StrategyManager();
 			manager.setMaxPlansPerAgent(5);
 
-			PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanSelector(this.config.charyparNagelScoring()));
+			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.charyparNagelScoring()));
 			manager.addStrategy(strategy1, 0.80);
 
-			PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
+			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(this.config.global().getNumberOfThreads()));
 			manager.addStrategy(strategy2, 0.80);
 

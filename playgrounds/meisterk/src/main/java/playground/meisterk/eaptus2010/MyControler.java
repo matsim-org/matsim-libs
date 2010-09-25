@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
@@ -28,10 +28,10 @@ public class MyControler extends Controler {
 		super.loadControlerListeners();
 		
 		// erzeuge ChangeProbStats objekt
-		List<PlanStrategy> strategies = this.strategyManager.getStrategies();
+		List<PlanStrategyImpl> strategies = this.strategyManager.getStrategies();
 		
 		ExpBetaPlanChanger2 expBetaChanger2 = null;
-		for (PlanStrategy planStrategy : strategies) {
+		for (PlanStrategyImpl planStrategy : strategies) {
 			
 			PlanSelector planSelector = planStrategy.getPlanSelector();
 			

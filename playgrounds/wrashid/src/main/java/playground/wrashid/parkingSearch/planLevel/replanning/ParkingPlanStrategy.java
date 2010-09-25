@@ -21,10 +21,10 @@
 package playground.wrashid.parkingSearch.planLevel.replanning;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-public class ParkingPlanStrategy extends PlanStrategy {
+public class ParkingPlanStrategy extends PlanStrategyImpl {
 
 	public ParkingPlanStrategy(Scenario scenario) {
 		super(new RandomPlanSelector());

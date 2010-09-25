@@ -26,7 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -267,7 +267,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 			// ExpBetaPlanChanger());
 			// manager.addStrategy(strategy1, 0.1);
 
-			PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
+			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy2.addStrategyModule(new ChangeLegModeWithParkLocation(
 					this.config, this.network));
 			strategy2.addStrategyModule(new ReRoute(this));

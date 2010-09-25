@@ -19,7 +19,7 @@
 package playground.andreas.intersection.dijkstra;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
@@ -29,7 +29,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
  * Controler
  */
 @Deprecated
-public class SignalSystemRoutePlanStrategy extends PlanStrategy {
+public class SignalSystemRoutePlanStrategy extends PlanStrategyImpl {
 
 	public SignalSystemRoutePlanStrategy(Controler controler) {
 		super(new RandomPlanSelector());

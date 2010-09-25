@@ -25,7 +25,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -44,10 +44,10 @@ public class BottleneckControler extends Controler {
 		StrategyManager manager = new StrategyManager();
 		manager.setMaxPlansPerAgent(5);
 		//
-		PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanSelector(this.config.charyparNagelScoring()));
+		PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.charyparNagelScoring()));
 		manager.addStrategy(strategy1, 0.95);
 
-		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
+		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(this.config));
 		manager.addStrategy(strategy2, 0.05);
 		return manager;

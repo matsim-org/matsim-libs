@@ -35,21 +35,21 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  * @author mrieser
  * @see org.matsim.core.replanning
  */
-public class PlanStrategy {
+public class PlanStrategyImpl {
 
 	private PlanSelector planSelector = null;
 	private PlanStrategyModule firstModule = null;
 	private final ArrayList<PlanStrategyModule> modules = new ArrayList<PlanStrategyModule>();
 	private final ArrayList<Plan> plans = new ArrayList<Plan>();
 	private long counter = 0;
-	private final static Logger log = Logger.getLogger(PlanStrategy.class);
+	private final static Logger log = Logger.getLogger(PlanStrategyImpl.class);
 
 	/**
 	 * Creates a new strategy using the specified planSelector.
 	 *
 	 * @param planSelector
 	 */
-	public PlanStrategy(final PlanSelector planSelector) {
+	public PlanStrategyImpl(final PlanSelector planSelector) {
 		this.planSelector = planSelector;
 	}
 

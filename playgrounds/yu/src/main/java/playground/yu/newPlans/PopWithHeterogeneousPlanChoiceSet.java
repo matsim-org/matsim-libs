@@ -24,7 +24,7 @@
 package playground.yu.newPlans;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
@@ -69,7 +69,7 @@ public class PopWithHeterogeneousPlanChoiceSet extends Controler {
 				);
 
 		if (this.strategyChangerIteration > 0) {
-			PlanStrategy expBetaPlanChanger = new PlanStrategy(
+			PlanStrategyImpl expBetaPlanChanger = new PlanStrategyImpl(
 					new ExpBetaPlanChanger(config.charyparNagelScoring()
 							.getBrainExpBeta()));
 			manager.addStrategy(expBetaPlanChanger, 0.0);

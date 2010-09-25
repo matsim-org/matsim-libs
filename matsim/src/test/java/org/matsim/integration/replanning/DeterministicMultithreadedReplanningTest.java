@@ -23,7 +23,7 @@ package org.matsim.integration.replanning;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
@@ -56,7 +56,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		config.controler().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
 
-		PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
+		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new TimeAllocationMutator(config));
 		StrategyManager strategyManager = new StrategyManager();
 		strategyManager.addStrategy(strategy, 1.0);
@@ -95,7 +95,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		config.plans().setInputFile(this.getClassInputDirectory() + "plans1.xml");
 
 		// setup run1
-		PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
+		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		StrategyManager strategyManager = new StrategyManager();
 		strategyManager.addStrategy(strategy, 1.0);
 
@@ -105,7 +105,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		controler.run();
 
 		// setup run2
-		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
+		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 		StrategyManager strategyManager2 = new StrategyManager();
 		strategyManager2.addStrategy(strategy2, 1.0);
 
@@ -144,7 +144,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 
 		// setup run1
-		PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
+		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		StrategyManager strategyManager = new StrategyManager();
 		strategyManager.addStrategy(strategy, 1.0);
 
@@ -153,7 +153,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		strategy.addStrategyModule(new ReRoute(controler));
 		controler.run();
 
-		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
+		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 		StrategyManager strategyManager2 = new StrategyManager();
 		strategyManager2.addStrategy(strategy2, 1.0);
 
