@@ -213,14 +213,15 @@ public class StrategyManagerConfigLoader {
 					} catch(NoSuchMethodException e){
 						log.warn("Cannot find Constructor in PlanStrategy " + name + " with single argument of type Scenario. " +
 								"This is not fatal, trying to find other constructor, however a constructor expecting Scenario as " +
-								"single argument is recommented!" );
+								"single argument is recommended!" );
+						log.warn("(People who need access to events should ignore this warning.)") ;
 					}
 					if (c == null){
 						args[0] = Controler.class;
 						c = klas.getConstructor(args);
 						strategy = c.newInstance(controler);
 					}
-					log.info("Loaded PlanStrategy from class " + name);
+					log.info("Loaded PlanStrategy (known as `module' in the config) from class " + name);
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				} catch (InstantiationException e) {
