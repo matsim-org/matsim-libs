@@ -20,10 +20,12 @@
 
 package playground.mmoyo.analysis.comp;
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.controler.Controler;
-import playground.mmoyo.utils.TransScenarioLoader;
+import java.io.File;
+import java.io.FileNotFoundException;
 
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.controler.Controler;
 /**
  * @author manuel
  * 
@@ -31,13 +33,32 @@ import playground.mmoyo.utils.TransScenarioLoader;
  */
 public class Controler_launcher {
 	
-	public static void main(String[] args) {
-		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
-		ScenarioImpl scenario = new TransScenarioLoader().loadScenario(configFile);
-		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
+	
+	
+	public static void main(String[] args) throws FileNotFoundException {
+		String configFile; 
+		if (args.length==1){
+			configFile = args[0];
+		}else{
+			configFile = "../playgrounds/mmoyo/test/input/playground/mmoyo/EquilCalibration/equil_config.xml";
+			//configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			//configFile = "../playgrounds/mmoyo/test/input/playground/mmoyo/EquilCalibration/equil_config.xml";
+		}
+
+		if (!new File(configFile).exists()) {
+			throw new FileNotFoundException(configFile);
+		}
+
+		Config config = new Config();
+		config.addCoreModules();
+		new MatsimConfigReader(config).readFile(configFile);
+		config.scenario().setUseTransit(true);
+		config.scenario().setUseVehicles(true);
+
+		Controler controler = new Controler( config ) ;
+		controler.setCreateGraphs(true);
 		controler.setOverwriteFiles(true);
 		controler.setWriteEventsInterval(5); 
 		controler.run();
-	}
+	} 
 }
