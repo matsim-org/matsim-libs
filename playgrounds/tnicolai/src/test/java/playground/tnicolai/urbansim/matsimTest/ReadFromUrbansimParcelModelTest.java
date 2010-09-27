@@ -63,23 +63,23 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 	@Test
 	// Tests if facilities are created correctly
 	public void testReadFromUrbansimParcelModel(){
-		log.info("Starting testReadFromUrbansimParcelModel1 run: Testing computation of UrbanSim zones.");
+		log.info("Starting testReadFromUrbansimParcelModel1 run.");
 		prepareTest("testReadFromUrbansimParcelModel1", 1);		
 	}
 	
 	@Test
 	// Tests if new population is created correctly
 	public void testReadFromUrbansimParcelModel2(){
-		log.info("Starting testReadFromUrbansimParcelModel2 run: Testing computation of UrbanSim zones.");
+		log.info("Starting testReadFromUrbansimParcelModel2 run.");
 		prepareTest("testReadFromUrbansimParcelModel2", 2);	
 	}
 	
-	@Test
-	// Tests if old population is recognized correctly
-	public void testReadFromUrbansimParcelModel3(){
-		log.info("Starting testReadFromUrbansimParcelModel3 run: Testing computation of UrbanSim zones.");
-		prepareTest("testReadFromUrbansimParcelModel3", 3);	
-	}
+//	@Test
+//	// Tests if old population is recognized correctly
+//	public void testReadFromUrbansimParcelModel3(){
+//		log.info("Starting testReadFromUrbansimParcelModel3 run: Testing computation of UrbanSim zones.");
+//		prepareTest("testReadFromUrbansimParcelModel3", 3);	
+//	}
 	
 	/**
 	 * preparing ReadFromUrbansimParcelModel test run
@@ -98,19 +98,23 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		
 		switch (testNr) {
 		case 1:
+			log.info("Testing computation of UrbanSim zones");
 			testFileName = Constants.URBANSIM_PARCEL_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
 			createParcelInputTestFile(testFileDirectory, testFileName);
 			// running ReadFromUrbansimParcelModel generating zones and facilities
 			ActivityFacilitiesImpl zones = testRunPracels( dummyYear );
 			Assert.assertTrue( validateResult(zones) );
+			log.info("Testing computation of UrbanSim zones finished");
 			break;
 
 		case 2:
+			log.info("Testing computation of UrbanSim zones");
 			testFileName = Constants.URBANSIM_PERSON_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
 			createPersonInputTestFile(testFileDirectory, testFileName);
 			// running ReadFromUrbansimParcelModel generating population
 			boolean result = testRunPopulation( dummyYear );
 			Assert.assertTrue(result);
+			log.info("Testing computation of UrbanSim zones finished");
 			break;
 			
 		case 3:
