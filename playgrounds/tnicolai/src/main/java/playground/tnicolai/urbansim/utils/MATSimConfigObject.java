@@ -33,6 +33,8 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityPar
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
+import playground.tnicolai.urbansim.com.matsim.config.Matsim4UrbansimType;
+import playground.tnicolai.urbansim.com.matsim.config.MatsimConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
 
 /**
@@ -132,19 +134,28 @@ public class MATSimConfigObject {
 	 * creating and initializing a scenario and config.
 	 * @return true if init process successful
 	 */
-	public static boolean initMATSimConfigObject(ConfigType matsimConfig){
+	public static boolean initMATSimConfigObject(MatsimConfigType matsimConfig){
 		
 		try{
-			networkFile = matsimConfig.getNetwork().getInputFile();
-			firstIteration = matsimConfig.getControler().getFirstIteration().intValue();
-			lastIteration = matsimConfig.getControler().getLastIteration().intValue();
-			activityType_0 = matsimConfig.getPlanCalcScore().getActivityType0();
-			activityType_1 = matsimConfig.getPlanCalcScore().getActivityType1();
-			samplingRate = matsimConfig.getUrbansimParameter().getSamplingRate();
-			year = matsimConfig.getUrbansimParameter().getYear().intValue();
-			tempDirectory = matsimConfig.getUrbansimParameter().getTempDirectory();
-			opusHomeDirectory = matsimConfig.getUrbansimParameter().getOpusHOME();
-			isTestRun = matsimConfig.getUrbansimParameter().isIsTestRun();
+			ConfigType matsimParameter = matsimConfig.getConfig();
+			Matsim4UrbansimType matsim4UrbanSimParameter = matsimConfig.getMatsim4Urbansim();
+			
+			// MATSim config parameter
+			// network
+			networkFile = matsimParameter.getNetwork().getInputFile();
+			// controler
+			firstIteration = matsimParameter.getControler().getFirstIteration().intValue();
+			lastIteration = matsimParameter.getControler().getLastIteration().intValue();
+			// planCalcScore
+			activityType_0 = matsimParameter.getPlanCalcScore().getActivityType0();
+			activityType_1 = matsimParameter.getPlanCalcScore().getActivityType1();
+			
+			// MATSim 4 URbanSim parameter
+			samplingRate = matsim4UrbanSimParameter.getUrbansimParameter().getSamplingRate();
+			year = matsim4UrbanSimParameter.getUrbansimParameter().getYear().intValue();
+			tempDirectory = matsim4UrbanSimParameter.getUrbansimParameter().getTempDirectory();
+			opusHomeDirectory = matsim4UrbanSimParameter.getUrbansimParameter().getOpusHOME();
+			isTestRun = matsim4UrbanSimParameter.getUrbansimParameter().isIsTestRun();
 			
 			// only for debugging and testing reasons
 			// sets a new OPUS_HOME directory
