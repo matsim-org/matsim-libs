@@ -42,6 +42,7 @@ public class TempDirectoryUtil {
 	private static final Logger log = Logger.getLogger(TempDirectoryUtil.class);
 	// storage for created custom directories
 	private static ArrayList<File> tempDirectoryList = null;
+
 	
 	/**
 	 * creates a custom temp directory
@@ -150,6 +151,8 @@ public class TempDirectoryUtil {
 	public static void createOPUSDirectories(){
 		log.info("Creating temp directories");
 		
+		// TODO for loop
+		
 		// set temp directory as opus_home
 		Constants.setOpusHomeDirectory(System.getProperty("java.io.tmpdir"));
 
@@ -176,22 +179,24 @@ public class TempDirectoryUtil {
 	 */
 	public static void cleaningUpOPUSDirectories(){
 		log.info("Removing temp directories");
+		
+		// TODO for loop
 
 		File tempFile = new File(Constants.OPUS_HOME);
 		if(tempFile.exists())
-			tempFile.delete();
+			deleteDirectory(tempFile);
 		tempFile = new File(Constants.OPUS_MATSIM_DIRECTORY);
 		if(tempFile.exists())
-			tempFile.delete();
+			deleteDirectory(tempFile);
 		tempFile = new File(Constants.OPUS_MATSIM_OUTPUT_DIRECTORY);
 		if(tempFile.exists())
-			tempFile.delete();
+			deleteDirectory(tempFile);
 		tempFile = new File(Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY);
 		if(tempFile.exists())
-			tempFile.delete();
+			deleteDirectory(tempFile);
 		tempFile = new File(Constants.MATSIM_CONFIG_DIRECTORY);
 		if(tempFile.exists())
-			tempFile.delete();		
+			deleteDirectory(tempFile);	
 		log.info("Finished removing temp directories");
 	}
 
