@@ -94,11 +94,6 @@ public abstract class AbstractLocation implements MappedLocation {
 	}
 
 	@Override
-	public Layer getLayer() {
-		return this.layer;
-	}
-
-	@Override
 	public final Coord getCoord() {
 		return this.center;
 	}

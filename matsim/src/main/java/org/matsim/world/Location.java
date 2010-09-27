@@ -28,14 +28,7 @@ import org.matsim.api.core.v01.Identifiable;
  *
  */
 public interface Location extends BasicLocation, Identifiable {
-	// yy One can debate if "Location" should have an "id" by force.  It is, 
+	// yy One can debate if "Location" should have an "id" by force.  It is,
 	// however, easier to refactor this way.  If you just want a coordinate,
 	// you can still use BasicLocation.  kai, jul09
-
-	@Deprecated // use of the current "layer" structure is discouraged
-	public abstract Layer getLayer();
-	// yyyy There was some decision that "location objects" have the back pointer.  
-	// If there is agreement on this, we could leave the getLayer syntax there
-	// (although, without the mappings, it is not very meaningful)
-
 }
