@@ -22,6 +22,7 @@ package playground.mrieser.core.mobsim.usecases;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -55,6 +56,7 @@ public class UseCase4_OptimizedCarSim {
 		/* **************************************************************** */
 
 		OptimizedCarSimFactory simFactory = new OptimizedCarSimFactory(2);
+		simFactory.setTeleportedModes(new String[] {TransportMode.bike, TransportMode.pt, TransportMode.ride, TransportMode.walk});
 		Simulation sim = simFactory.createMobsim(scenario, events);
 		sim.run(); // replace with PlanSimulation.runSim();
 

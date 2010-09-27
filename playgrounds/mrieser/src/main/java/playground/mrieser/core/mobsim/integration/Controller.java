@@ -19,6 +19,7 @@
 
 package playground.mrieser.core.mobsim.integration;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
@@ -43,6 +44,7 @@ public class Controller {
 		} else if ("-fastCarSim".equals(args[0])) {
 			int numberOfThreads = Integer.parseInt(args[1]);
 			mobsimFactory = new OptimizedCarSimFactory(numberOfThreads);
+			((OptimizedCarSimFactory) mobsimFactory).setTeleportedModes(new String[] {TransportMode.bike, TransportMode.pt, TransportMode.ride, TransportMode.walk, "undefined"});
 			shiftBy = 2;
 		} else if ("-qsim".equals(args[0])) {
 			mobsimFactory = new QSimFactory();

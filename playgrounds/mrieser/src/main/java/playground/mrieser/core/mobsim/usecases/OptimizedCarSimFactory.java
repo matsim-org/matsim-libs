@@ -40,10 +40,12 @@ import playground.mrieser.core.mobsim.impl.PopulationAgentSource;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;
 
+// This is rather a Builder than a factory... but the interface is named Factory, so well....
 public class OptimizedCarSimFactory implements MobsimFactory {
 
 	private final int nOfThreads;
 	private OTFVisLiveServer otfvisServer = null;
+	private String[] teleportedModes = null;
 
 	/**
 	 * @param nOfThreads use <code>0</code> if you do not want to use threads
@@ -54,6 +56,10 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 
 	public void setOtfvisServer(final OTFVisLiveServer otfvisServer) {
 		this.otfvisServer = otfvisServer;
+	}
+
+	public void setTeleportedModes(final String[] teleportedModes) {
+		this.teleportedModes = teleportedModes.clone();
 	}
 
 	@Override
@@ -82,10 +88,11 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 		carHandler.setTeleportVehicles(true);
 		lh.setDepartureHandler(TransportMode.car, carHandler);
 		TeleportationHandler teleporter = new TeleportationHandler(engine);
-		lh.setDepartureHandler(TransportMode.pt, teleporter);
-		lh.setDepartureHandler(TransportMode.walk, teleporter);
-		lh.setDepartureHandler(TransportMode.bike, teleporter);
-		lh.setDepartureHandler(TransportMode.ride, teleporter);
+		if (this.teleportedModes != null) {
+			for (String mode : this.teleportedModes) {
+				lh.setDepartureHandler(mode, teleporter);
+			}
+		}
 
 		// register all features at the end in the right order
 		planSim.addSimFeature(new StatusFeature());
