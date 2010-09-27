@@ -92,15 +92,15 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.replanning.StrategyManagerImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
@@ -262,7 +262,7 @@ public class Controler {
 	private TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 	private ControlerIO controlerIO;
 
-	private MobsimFactory mobsimFactory = new QueueSimulationFactory();
+	private MobsimFactory mobsimFactory = null;
 
 	private TransitConfigGroup transitConfig = null;
 
@@ -892,34 +892,18 @@ public class Controler {
 	 */
 
 	protected void runMobSim() {
-		// dg feb 09: this null checks are not really safe
-		// consider the case that a user copies a config with some
-		// externalMobsim or JDEQSim information in it and isn't aware
-		// that those configs will be used instead of the "normal"
-		// queuesimulation
-		// configuration
-		/*
-		 * well, that's the user's problem if he doesn't know what settings he
-		 * starts his simulation with. mr/mar09
-		 */
 		if (this.config.simulation().getExternalExe() == null) {
-			final String JDEQ_SIM = "JDEQSim";
-			if (this.config.getModule(JDEQ_SIM) != null) {
-				JDEQSimulation sim = new JDEQSimulation(this.scenarioData, this.events);
-				sim.run();
-			} else {
-				Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
-				if (simulation instanceof IOSimulation){
-					((IOSimulation)simulation).setControlerIO(this.getControlerIO());
-					((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
-				}
-				if (simulation instanceof ObservableSimulation){
-					for (SimulationListener l : this.getQueueSimulationListener()) {
-						((ObservableSimulation)simulation).addQueueSimulationListeners(l);
-					}
-				}
-				simulation.run();
+			Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
+			if (simulation instanceof IOSimulation){
+				((IOSimulation)simulation).setControlerIO(this.getControlerIO());
+				((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
 			}
+			if (simulation instanceof ObservableSimulation){
+				for (SimulationListener l : this.getQueueSimulationListener()) {
+					((ObservableSimulation)simulation).addQueueSimulationListeners(l);
+				}
+			}
+			simulation.run();
 		} else {
 			ExternalMobsim sim = new ExternalMobsim(this.scenarioData, this.events);
 			sim.setControlerIO(this.controlerIO);
@@ -1230,32 +1214,36 @@ public class Controler {
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
-			Config c = event.getControler().getScenario().getConfig();
-			QSimConfigGroup conf = (QSimConfigGroup) c.getModule(QSimConfigGroup.GROUP_NAME);
-			if (conf != null){
-				if (conf.getNumberOfThreads() > 1){
-					event.getControler().setMobsimFactory(new ParallelQSimFactory());
-				}
-				else {
-					event.getControler().setMobsimFactory(new QSimFactory());
-				}
+			if (event.getControler().getMobsimFactory() == null) {
+				Config c = event.getControler().getScenario().getConfig();
+				QSimConfigGroup conf = (QSimConfigGroup) c.getModule(QSimConfigGroup.GROUP_NAME);
+				if (conf != null) {
+					if (conf.getNumberOfThreads() > 1) {
+						event.getControler().setMobsimFactory(new ParallelQSimFactory());
+					}
+					else {
+						event.getControler().setMobsimFactory(new QSimFactory());
+					}
 
-				/*
-				 * cdobler:
-				 * If a multi modal simulation should be run, we use a MultiModalMobsimFactory
-				 * which is only a wrapper. It hands over the TravelTimeCalculator to the
-				 * MultiModalSimEngine.
-				 * I do not like this - but at the moment I see no better way to do so...
-				 */
-				if (c.multiModal().isMultiModalSimulationEnabled()) {
-					MobsimFactory factory = event.getControler().getMobsimFactory();
-					MobsimFactory multiModalFactory = new MultiModalMobsimFactory(factory, event.getControler().getTravelTimeCalculator());
-					event.getControler().setMobsimFactory(multiModalFactory);
+					/*
+					 * cdobler:
+					 * If a multi modal simulation should be run, we use a MultiModalMobsimFactory
+					 * which is only a wrapper. It hands over the TravelTimeCalculator to the
+					 * MultiModalSimEngine.
+					 * I do not like this - but at the moment I see no better way to do so...
+					 */
+					if (c.multiModal().isMultiModalSimulationEnabled()) {
+						MobsimFactory factory = event.getControler().getMobsimFactory();
+						MobsimFactory multiModalFactory = new MultiModalMobsimFactory(factory, event.getControler().getTravelTimeCalculator());
+						event.getControler().setMobsimFactory(multiModalFactory);
+					}
+				} else if (c.getModule("JDEQSim") != null) {
+					event.getControler().setMobsimFactory(new JDEQSimulationFactory());
+				} else {
+					log.warn("There might be no configuration for a mobility simulation in the config. The Controler " +
+					" uses the default QueueSimulation that might not have all features implemented.");
+					event.getControler().setMobsimFactory(new QueueSimulationFactory());
 				}
-			}
-			else if (c.getModule("JDEQSim") == null) {
-				log.warn("There might be no configuration for a mobility simulation in the config. The Controler " +
-				" uses the default QueueSimulation that might not have all features implemented.");
 			}
 		}
 

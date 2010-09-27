@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -36,11 +37,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -467,10 +471,43 @@ public class ControlerTest extends MatsimTestCase {
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
 	}
 
+	/**
+	 * @author mrieser
+	 */
+	public void testSetMobsimFactory() {
+		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(1);
+		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
+
+		final Controler controler = new Controler(config);
+		assertNull(controler.getMobsimFactory());
+		FakeMobsimFactory testFactory = new FakeMobsimFactory();
+		controler.setMobsimFactory(testFactory);
+		assertEquals(testFactory, controler.getMobsimFactory());
+		controler.setCreateGraphs(false);
+		controler.run();
+		assertEquals(2, testFactory.counter);
+	}
+
+	/*package*/ static class FakeMobsim implements Simulation {
+		@Override
+		public void run() {
+			// nothing to do
+		}
+	}
+
+	/*package*/ static class FakeMobsimFactory implements MobsimFactory {
+		/*package*/ int counter = 0;
+		@Override
+		public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+			this.counter++;
+			return new FakeMobsim();
+		}
+	}
 
 	/** A helper class for testSetScoringFunctionFactory() */
 	/*package*/ static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
-
+		@Override
 		public ScoringFunction createNewScoringFunction(final Plan plan) {
 			return new ScoringFunctionAccumulator();
 		}
