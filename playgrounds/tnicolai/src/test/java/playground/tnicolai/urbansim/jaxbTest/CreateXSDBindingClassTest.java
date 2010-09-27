@@ -40,6 +40,7 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.UpdateXMLBindingClasses;
 import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
+import playground.tnicolai.urbansim.com.matsim.config.MatsimConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.CommonUtilities;
 import playground.tnicolai.urbansim.utils.MATSimConfigObject;
@@ -129,13 +130,13 @@ public class CreateXSDBindingClassTest extends MatsimTestCase {
 			Object object = unmarschaller.unmarshal(inputFile);
 			
 			// Java representation of the schema file.
-			ConfigType matsimConfig;
+			MatsimConfigType matsimConfig;
 			
 			// The structure of both objects must match.
 			if(object.getClass() == ConfigType.class)
-				matsimConfig = (ConfigType) object;
+				matsimConfig = (MatsimConfigType) object;
 			else
-				matsimConfig = (( JAXBElement<ConfigType>) object).getValue();
+				matsimConfig = (( JAXBElement<MatsimConfigType>) object).getValue();
 			
 			// creatin MASim config object that contains the values from the xml config file.
 			if(matsimConfig != null){
