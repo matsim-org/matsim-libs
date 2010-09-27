@@ -163,37 +163,11 @@ public class StrategyManagerConfigLoader {
 			strategy.addStrategyModule(new ReRoute(controler));
 		} else if (name.equals("SelectPathSizeLogit")) {
 			strategy = new PlanStrategyImpl(new PathSizeLogitSelector(controler.getNetwork(), config.charyparNagelScoring()));
-//			// JH
-		} else if (name.equals("KSecLoc")){
-//			strategy = new PlanStrategy(new RandomPlanSelector());
-//			PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(network, travelCostCalc, travelTimeCalc);
-//			strategy.addStrategyModule(socialNetStrategyModule);
-			log.warn("jhackney: No replanning module available in the core for keywords KSecLoc, FSecLoc,SSecloc. The modules have moved to the playground.");
-		} else if (name.equals("FSecLoc")){
-//			strategy = new PlanStrategy(new RandomPlanSelector());
-//			PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherF(network, travelCostCalc, travelTimeCalc, facilities);
-//			strategy.addStrategyModule(socialNetStrategyModule);
-			log.warn("jhackney: No replanning module available in the core for keywords KSecLoc, FSecLoc,SSecloc. The modules have moved to the playground.");
-		} else if (name.equals("SSecLoc")){
-//			strategy = new PlanStrategy(new RandomPlanSelector());
-//			PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(network,travelCostCalc,travelTimeCalc);
-//			strategy.addStrategyModule(socialNetStrategyModule);
-			log.warn("jhackney: No replanning module available in the core for keywords KSecLoc, FSecLoc,SSecloc. The modules have moved to the playground.");
-//			// JH
 		} else if (name.equals("LocationChoice")) {
 			strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 			strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenario()).getKnowledges()));
 			strategy.addStrategyModule(new ReRoute(controler));
 			strategy.addStrategyModule(new TimeAllocationMutator(config));
-			/* not really happy about the following line. Imagine what happens if everybody does
-			 * this, that one doesn't know at the end which removal-strategy is really used.
-			 * The removal strategy must not be tight to a replanning-strategy, but is a general
-			 * option that should be set somewhere else.  marcel/9jun2009/CLEANUP
-			 */
-			// not yet working correctly:
-			// compreh. tests needed
-			// ah/27jun2009
-			// manager.setPlanSelectorForRemoval(new ExpBetaPlanForRemovalSelector());
 		}
 		//if none of the strategies above could be selected we try to load the class by name
 		else {
