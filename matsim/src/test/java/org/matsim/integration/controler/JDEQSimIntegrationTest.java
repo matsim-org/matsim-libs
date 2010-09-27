@@ -37,7 +37,7 @@ public class JDEQSimIntegrationTest {
 	@Rule public MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
-	public void testUseQSimFactory() {
+	public void testUseJDEQSimFactory() {
 		final Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		Assert.assertNull(config.getQSimConfigGroup());
