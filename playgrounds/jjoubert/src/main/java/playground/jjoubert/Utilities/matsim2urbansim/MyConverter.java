@@ -93,17 +93,26 @@ public class MyConverter {
 		double ct = carTime / 60;
 		switch (studyAreaCode) {
 		case 1: // eThekwini
-			/* The following parameters were obtained after fitting a 5th
-			 * degree polynomial to the logs of public transport travel time 
-			 * (from NHTS) against private car travel time (from MATSim). 
-			 * Last update: 20 July 2010 (jwjoubert)
+			/* 20 July 2010: The following parameters were obtained after 
+			 * fitting a 5th degree polynomial to the logs of public transport 
+			 * travel time (from NHTS) against private car travel time (from 
+			 * MATSim). 
+			 * Update: 31 Aug July 2010 (jwjoubert) - Fitted new function
+			 * based on the new proposed car allocation model.
 			 */
-			double a =	2.43874904018E+000;
-			double b =	3.78853675201E-001;
-			double c =	1.52594038400E-002;
-			double d =	2.04099913494E-003;
-			double e =	1.09340128891E-004;
-			double f =	2.76219195512E-004;
+//			double a =	2.43874904018E+000;
+//			double b =	3.78853675201E-001;
+//			double c =	1.52594038400E-002;
+//			double d =	2.04099913494E-003;
+//			double e =	1.09340128891E-004;
+//			double f =	2.76219195512E-004;
+			double a =	2.800368e+00;
+			double b =	3.017928e-01;
+			double c =	1.296653e-02;
+			double d =	7.702851e-04;
+			double e =	7.666573e-04;
+			double f =	1.474628e-05;	
+			
 			double pt = Math.exp(
 					a + 
 					b*Math.log(ct) + 
