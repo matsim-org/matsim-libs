@@ -87,7 +87,7 @@ public class MatsimTestUtils extends TestWatchman {
 			config = new Config();
 			config.addCoreModules();
 		}
-		createOutputDirectory();
+		this.outputDirectory = getOutputDirectory();
 		config.controler().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
