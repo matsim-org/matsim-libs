@@ -20,11 +20,12 @@
 package playground.dgrether.detailedEval;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import org.geotools.data.FeatureSource;
+import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -39,6 +40,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -48,6 +50,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.dgrether.DgPaths;
@@ -62,26 +66,35 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *
  */
 public class BavariaGvCreator {
+	
+	private static final Logger log = Logger.getLogger(BavariaGvCreator.class);
 
 	public static final String shapeFile = DgPaths.REPOS + "shared-svn/projects/detailedEval/Net/shapeFromVISUM/Verkehrszellen_Umrisse_area.SHP";
 	
-	private static final String popPrognose2025_2004 = "";
+	private static final String popPrognose2025_2004 = DgPaths.REPOS  + "runs-svn/run1060/1060.output_plans.xml.gz";
 	
 	private static final String netPrognose2025_2004 = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/network_cleaned_wgs84.xml.gz";
 	
-	private static final String events2004 = "";
+	private static final String events2004 = DgPaths.REPOS  + "runs-svn/run1060/ITERS/it.0/1060.0.events.xml.gz";
+	
+	private static final String popOutFile = DgPaths.REPOS + "shared-svn/projects/detailedEval/pop/gueterVerkehr/population_gv_bavaria_10pct_wgs84.xml.gz";
 
+	private CoordinateTransformation wgs84ToDhdnGk4 = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4); 
+	
 	private Scenario scenario;
 
 	private Network net;
 
 	private Population pop;
 
-	private FeatureSource bayernFeatures;
 
 	private GeometryFactory factory;
 
 	private EventsByLinkIdCollector collector;
+
+	private Set<Id> blauweissLinkIds;
+
+	private Set<Feature> bayernFeatures;
 	
 	
 	public BavariaGvCreator(){
@@ -90,28 +103,43 @@ public class BavariaGvCreator {
 	private void readData() throws IOException{
 		this.factory = new GeometryFactory();
 		//read shape file
-		this.bayernFeatures = ShapeFileReader.readDataFile(shapeFile);
-
+//		this.bayernFeatures = new ShapeFileReader().readDataFileToMemory(shapeFile);
+		this.bayernFeatures = new ShapeFileReader().readFileAndInitialize(shapeFile);
+		
 		this.scenario = new ScenarioImpl();
 		MatsimNetworkReader netReader	= new MatsimNetworkReader(scenario);
 		netReader.readFile(netPrognose2025_2004);
 		this.net = scenario.getNetwork();
+		this.blauweissLinkIds = this.detectBlauweissLinkIds(this.net);
 		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario); 
+		popReader.readFile(popPrognose2025_2004);
 		this.pop = scenario.getPopulation();
 		
 		EventsManager manager = new EventsManagerFactoryImpl().createEventsManager();
-		this.collector = new EventsByLinkIdCollector();
+		this.collector = new EventsByLinkIdCollector(this.blauweissLinkIds);
 		manager.addHandler(this.collector);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(manager);
 		eventsReader.readFile(events2004);
 	}
 	
 	
-	private boolean isLinkBlauWeiss(Link link) throws IOException{
+	private Set<Id> detectBlauweissLinkIds(Network network){
+		Set<Id> linkIds = new HashSet<Id>();
+		for (Link link : network.getLinks().values()){
+			if (this.isLinkBlauWeiss(link)){
+				linkIds.add(link.getId());
+			}
+		}
+		return linkIds;
+	}
+	
+	
+	private boolean isLinkBlauWeiss(Link link) {
 		boolean found = false;
 		Coord linkCoord = link.getCoord();
-		Geometry geo = factory.createPoint(new Coordinate(linkCoord.getX(), linkCoord.getY()));
-		for (Feature ft : (Collection<Feature>) bayernFeatures.getFeatures()){
+		Coord dhdnCoord = this.wgs84ToDhdnGk4.transform(linkCoord);
+		Geometry geo = factory.createPoint(new Coordinate(dhdnCoord.getX(), dhdnCoord.getY()));
+		for (Feature ft : bayernFeatures){
 			if (ft.getDefaultGeometry().contains(geo)){
 				found = true;
 				break;
@@ -132,6 +160,8 @@ public class BavariaGvCreator {
 		LinkLeaveEvent leaveEvent = this.collector.getLinkLeaveEvent(person.getId(), startLink.getId());
 		newAct.setEndTime(leaveEvent.getTime());
 		newPlan.addActivity(newAct);
+		Leg leg = popFactory.createLeg("car");
+		newPlan.addLeg(leg);
 		//end activity
 		Link endLink = net.getLinks().get(route.getEndLinkId());
 		newAct = popFactory.createActivityFromCoord("gvHome", endLink.getCoord());
@@ -139,7 +169,9 @@ public class BavariaGvCreator {
 	}
 	
 	public void createBavariaGvPop() throws IOException{
+		log.info("start to create blauweiss demand...");
 		this.readData();
+		log.info("data loaded...");
 		Scenario newScenario = new ScenarioImpl();
 		Population newPop = newScenario.getPopulation();
 		
@@ -149,6 +181,9 @@ public class BavariaGvCreator {
 					Route route = ((Leg)pe).getRoute();
 					NetworkRoute netRoute = (NetworkRoute) route;
 					Link startLink = net.getLinks().get(route.getStartLinkId());
+					if (startLink.getId().equals(netRoute.getEndLinkId())){
+						break;
+					}
 					if (isLinkBlauWeiss(startLink)){
 						this.addNewPerson(startLink, person, newPop, route);
 					}
@@ -165,6 +200,10 @@ public class BavariaGvCreator {
 				}
 			}
 		}
+		log.info("writing population...");
+		PopulationWriter popWriter = new PopulationWriter(newPop, this.net);
+		popWriter.write(popOutFile);
+		log.info("blauweiss demand completed.");
 	}
 	
 	/**
@@ -180,22 +219,35 @@ public class BavariaGvCreator {
 class EventsByLinkIdCollector implements LinkLeaveEventHandler {
 	// person -> linkId -> LinkLeaveEvent
 	private Map<Id, Map<Id, LinkLeaveEvent>> events = new HashMap<Id, Map<Id, LinkLeaveEvent>>();
+	private Set<Id> linkIds;
 	
+	public EventsByLinkIdCollector(Set<Id> linkIds) {
+		this.linkIds  = linkIds;
+	}
+
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Map<Id, LinkLeaveEvent> map = this.events.get(event.getPersonId());
-		if (map == null){
-			events.put(event.getPersonId(), new HashMap<Id, LinkLeaveEvent>());
+		if (this.linkIds.contains(event.getLinkId())){
+			Map<Id, LinkLeaveEvent> map = this.events.get(event.getPersonId());
+			if (map == null){
+				map = new HashMap<Id, LinkLeaveEvent>();
+				events.put(event.getPersonId(), map);
+			}
+			map.put(event.getLinkId(), event);
 		}
-		map.put(event.getLinkId(), event);
 	}
 
 	public LinkLeaveEvent getLinkLeaveEvent(Id personId, Id linkId){
-		return this.events.get(personId).get(linkId);
+		Map<Id, LinkLeaveEvent> m = this.events.get(personId);
+		if (m == null){
+			throw new IllegalArgumentException("Cannot find link leave events for person " + personId);
+		}
+		return m.get(linkId);
 	}
 	
 	@Override
 	public void reset(int iteration) {
+		this.events.clear();
 	}
 	
 }
