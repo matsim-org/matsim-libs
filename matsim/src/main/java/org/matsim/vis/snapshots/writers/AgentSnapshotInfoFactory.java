@@ -36,7 +36,7 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  *
  */
 public class AgentSnapshotInfoFactory {
-	
+
 	private Scenario sc = null ;
 	private static final double TWO_PI = 2.0 * Math.PI;
 	private static final double PI_HALF = Math.PI / 2.0;
@@ -56,16 +56,16 @@ public class AgentSnapshotInfoFactory {
 	//(without a static Gbl)? [GL] - april 08
 	//
 	// The design is now in a way that this could, in principle, be fixed.  kai, aug'10
-	
+
 	/**
 	 * default factory that is here so that the static methods can use the non-static "calculatePosition".  kai, aug'10
 	 */
-	private static final AgentSnapshotInfoFactory defaultFactory = new AgentSnapshotInfoFactory( null ) ; 
-	
+	private static final AgentSnapshotInfoFactory defaultFactory = new AgentSnapshotInfoFactory( null ) ;
+
 	public AgentSnapshotInfoFactory( Scenario sc ) {
 		this.sc = sc ;
 	}
-	
+
 	// static creators based on x/y
 
 	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(Id agentId, double easting, double northing, double elevation, double azimuth) {
@@ -73,8 +73,7 @@ public class AgentSnapshotInfoFactory {
 		info.setId( agentId ) ;
 		info.setEasting( easting ) ;
 		info.setNorthing( northing ) ;
-		info.setElevation( elevation ) ;
-		info.setElevation( azimuth ) ;
+		info.setAzimuth( azimuth ) ;
 		return info ;
 	}
 
@@ -86,23 +85,22 @@ public class AgentSnapshotInfoFactory {
 		info.setId( agentId ) ;
 		info.setEasting( easting ) ;
 		info.setNorthing( northing ) ;
-		info.setElevation( elevation ) ;
-		info.setElevation( azimuth ) ;
+		info.setAzimuth( azimuth ) ;
 		info.setColorValueBetweenZeroAndOne(colorValue) ;
 		info.setAgentState( agentState ) ;
 		return info ;
 	}
-	
+
 	// static creators based on link
-	
+
 	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(Id agentId, Link link) {
 		return staticCreateAgentSnapshotInfo( agentId, link, 0 ) ;
 	}
-	
+
 	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(Id agentId, Link link, int cnt) {
 		return staticCreateAgentSnapshotInfo( agentId, link, 0.9*link.getLength(), cnt ) ;
 	}
-	
+
 	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(Id agentId, Link link, double distanceOnLink, int lane) {
 		return staticCreateAgentSnapshotInfo( agentId, link, distanceOnLink, lane, 0 ) ;
 //		return new PositionInfo(agentId, link, distanceOnLink, lane);
@@ -152,7 +150,7 @@ public class AgentSnapshotInfoFactory {
 			}
 		}
 		if (theta < 0.0) theta += TWO_PI;
-		
+
 		// "correction" is needed because link lengths are usually different (usually longer) than the Euklidean distances.
 		// For the visualization, however, the vehicles are distributed in a straight line between the end points.
 		// Since the simulation, on the other hand, reports odometer distances, this needs to be corrected.  kai, apr'10
@@ -165,19 +163,18 @@ public class AgentSnapshotInfoFactory {
 				correction = CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()) / link.getLength();
 			}
 		}
-		
+
 		// "link scale" is not from me.  Presumably, it "pulls back" the drawing of the vehicles from the nodes on
 		// both ends.  kai, apr'10
 		if (linkScale != 1.0) {
 			Tuple<Point2D.Double, Point2D.Double> scaledLinkTuple = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
 			linkStart = scaledLinkTuple.getFirst();
 		}
-		
+
 		info.setEasting( linkStart.getX() + Math.cos(theta) * (distanceOnLink * linkScale) * correction
 		                + Math.sin(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH*lane)*correction ) ;
 		info.setNorthing( linkStart.getY() + Math.sin(theta) * (distanceOnLink * linkScale) * correction
 		                - Math.cos(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH*lane)*correction );
-		info.setElevation( 0.0 );
 		info.setAzimuth( theta / TWO_PI * 360. ) ;
 	}
 

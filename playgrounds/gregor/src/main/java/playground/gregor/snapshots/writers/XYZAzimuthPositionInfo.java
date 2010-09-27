@@ -27,21 +27,21 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class XYZAzimuthPositionInfo implements AgentSnapshotInfo {
 
-	
+
 	private double azimuth;
 	private Coordinate c;
 	private double time;
 	private Id id;
-	
+
 	public XYZAzimuthPositionInfo(Id id,Coordinate c, double azimuth, double time) {
 		this.c = c;
 		this.azimuth = azimuth;
 		this.time = time;
 		this.id = id;
 	}
-	
-	
-	
+
+
+
 	@Override
 	public AgentState getAgentState() {
 		throw new RuntimeException("not yet implemented");
@@ -61,11 +61,6 @@ public class XYZAzimuthPositionInfo implements AgentSnapshotInfo {
 	@Override
 	public double getEasting() {
 		return this.c.x;
-	}
-
-	@Override
-	public double getElevation() {
-		return this.c.z;
 	}
 
 	@Override

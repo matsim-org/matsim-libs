@@ -119,11 +119,6 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	}
 
 	@Override
-	public double getElevation() {
-		return 0. ;
-	}
-
-	@Override
 	public int getType() {
 		return this.type ;
 	}

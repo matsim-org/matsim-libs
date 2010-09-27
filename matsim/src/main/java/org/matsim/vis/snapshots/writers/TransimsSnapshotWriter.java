@@ -59,25 +59,26 @@ public class TransimsSnapshotWriter implements SnapshotWriter {
 			e.printStackTrace();
 		}
 	}
-	
+
+	@Override
 	public void addAgent(AgentSnapshotInfo position) {
-		
-		//drop all parking vehicles 
+
+		//drop all parking vehicles
 		if (position.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) return;
-		
+
 //		String visualizerData = 	position.getVisualizerData();
 //		if (visualizerData == null){
 //			visualizerData = "0";
 //		}
-		
+
 		String buffer = position.getId().toString()
 					    			+ "\t" + (int)this.currentTime
 		                + "\t0\t0\t1\t0\t" + position.getColorValueBetweenZeroAndOne() // link(0), from node(0), lane(1), dist(0), speed
 		                + "\t1\t0\t" + position.getId().toString()   // vehtype(1), acceleration(0), driver-id
 		                + "\t0\t" + position.getEasting()   // # of passengers(0), easting
-		                + "\t" + position.getNorthing() 
-		                + "\t" + position.getElevation()
-		                + "\t" + position.getAzimuth()
+		                + "\t" + position.getNorthing()
+		                + "\t0" // elevation
+		                + "\t0" // azimuth
 		                + "\t"+ "0" + "\n"; // user(0)
 		try {
 			out.write(buffer);
@@ -86,14 +87,17 @@ public class TransimsSnapshotWriter implements SnapshotWriter {
 		}
 	}
 
+	@Override
 	public void beginSnapshot(double time) {
 		this.currentTime = time;
 	}
 
+	@Override
 	public void endSnapshot() {
 		this.currentTime = -1;
 	}
 
+	@Override
 	public void finish() {
 		if (this.out != null) {
 			try {

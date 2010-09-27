@@ -20,8 +20,8 @@
 
 package playground.gregor.snapshots.writers;
 
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -29,7 +29,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 import com.vividsolutions.jts.geom.LineSegment;
 
-public class PositionInfo 
+public class PositionInfo
 //extends org.matsim.vis.snapshots.writers.PositionInfo
 implements AgentSnapshotInfo
 {
@@ -133,12 +133,6 @@ implements AgentSnapshotInfo
 	@Override
 	public double getNorthing() {
 		return this.northing;
-	}
-
-
-	@Override
-	public double getElevation() {
-		return this.elevation;
 	}
 
 

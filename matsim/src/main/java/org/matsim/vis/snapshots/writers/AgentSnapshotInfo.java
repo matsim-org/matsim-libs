@@ -35,9 +35,6 @@ public interface AgentSnapshotInfo {
 	double getNorthing();
 
 	@Deprecated
-	double getElevation();
-
-	@Deprecated
 	double getAzimuth();
 
 	double getColorValueBetweenZeroAndOne();

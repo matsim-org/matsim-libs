@@ -38,7 +38,6 @@ public class PositionInfo implements AgentSnapshotInfo {
 	private Id agentId;
 	private double easting;
 	private double northing;
-	private double elevation;
 	private double azimuth;
 	private double colorValue;
 	private AgentState agentState;
@@ -70,14 +69,6 @@ public class PositionInfo implements AgentSnapshotInfo {
 	}
 	public final void setNorthing( double tmp ) {
 		this.northing = tmp ;
-	}
-
-	@Override
-	public final double getElevation() {
-		return this.elevation;
-	}
-	public final void setElevation( double tmp ) {
-		this.elevation = tmp ;
 	}
 
 	@Override
