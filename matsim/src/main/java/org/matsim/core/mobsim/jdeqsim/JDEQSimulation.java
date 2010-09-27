@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.utils.misc.Time;
 
@@ -38,7 +39,7 @@ import org.matsim.core.utils.misc.Time;
  * @see http://www.matsim.org/docs/jdeqsim
  * @author rashid_waraich
  */
-public class JDEQSimulation {
+public class JDEQSimulation implements Simulation {
 
 	private final static Logger log = Logger.getLogger(JDEQSimulation.class);
 	protected Scenario scenario;
@@ -128,6 +129,7 @@ public class JDEQSimulation {
 
 	}
 
+	@Override
 	public void run() {
 		Timer t = new Timer();
 		t.startTimer();
