@@ -20,7 +20,12 @@ import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
 
-
+/**
+ * This class has not been checked - Boarding and Alighting should work, but occupancy does not deliver any values.
+ * 
+ * @author aneumann
+ *
+ */
 public class Compare2PTCounts extends Events2PTCounts{
 
 	static String inDir = "F:/counts2/";
@@ -49,6 +54,8 @@ public class Compare2PTCounts extends Events2PTCounts{
 	}
 
 	private void compare() {
+	
+			log.warn("This class has not been checked - Boarding and Alighting should work, but occupancy does not deliver any values.");
 
 			// compare counts 2 minus counts 1
 			String parentDir = this.outDir;
