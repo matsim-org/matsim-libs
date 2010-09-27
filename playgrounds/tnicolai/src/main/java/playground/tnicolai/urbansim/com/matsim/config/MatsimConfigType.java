@@ -8,26 +8,24 @@
 
 package playground.tnicolai.urbansim.com.matsim.config;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for controlerType complex type.
+ * <p>Java class for matsim_configType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="controlerType">
+ * &lt;complexType name="matsim_configType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="firstIteration" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger"/>
- *         &lt;element name="lastIteration" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger"/>
+ *         &lt;element name="config" type="{}configType"/>
+ *         &lt;element name="matsim4urbansim" type="{}matsim4urbansimType"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -37,65 +35,63 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "controlerType", propOrder = {
-    "firstIteration",
-    "lastIteration"
+@XmlType(name = "matsim_configType", propOrder = {
+    "config",
+    "matsim4Urbansim"
 })
-public class ControlerType {
+public class MatsimConfigType {
 
     @XmlElement(required = true)
-    @XmlSchemaType(name = "nonNegativeInteger")
-    protected BigInteger firstIteration;
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "nonNegativeInteger")
-    protected BigInteger lastIteration;
+    protected ConfigType config;
+    @XmlElement(name = "matsim4urbansim", required = true)
+    protected Matsim4UrbansimType matsim4Urbansim;
 
     /**
-     * Gets the value of the firstIteration property.
+     * Gets the value of the config property.
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link ConfigType }
      *     
      */
-    public BigInteger getFirstIteration() {
-        return firstIteration;
+    public ConfigType getConfig() {
+        return config;
     }
 
     /**
-     * Sets the value of the firstIteration property.
+     * Sets the value of the config property.
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link ConfigType }
      *     
      */
-    public void setFirstIteration(BigInteger value) {
-        this.firstIteration = value;
+    public void setConfig(ConfigType value) {
+        this.config = value;
     }
 
     /**
-     * Gets the value of the lastIteration property.
+     * Gets the value of the matsim4Urbansim property.
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link Matsim4UrbansimType }
      *     
      */
-    public BigInteger getLastIteration() {
-        return lastIteration;
+    public Matsim4UrbansimType getMatsim4Urbansim() {
+        return matsim4Urbansim;
     }
 
     /**
-     * Sets the value of the lastIteration property.
+     * Sets the value of the matsim4Urbansim property.
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link Matsim4UrbansimType }
      *     
      */
-    public void setLastIteration(BigInteger value) {
-        this.lastIteration = value;
+    public void setMatsim4Urbansim(Matsim4UrbansimType value) {
+        this.matsim4Urbansim = value;
     }
 
 }

@@ -26,7 +26,6 @@ package playground.tnicolai.urbansim;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -40,7 +39,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigReaderMatsimV1;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -50,6 +48,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.xml.sax.SAXException;
 
 import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
+import playground.tnicolai.urbansim.com.matsim.config.MatsimConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.CommonUtilities;
 import playground.tnicolai.urbansim.utils.MATSimConfigObject;
@@ -204,8 +203,9 @@ public class MATSim4Urbansim {
 			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
 			// ... and initialize it with an xsd (xsd lies in the urbansim project)
 			
-			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/", "MATSim4UrbanSimConfigSchema.xsd");
-			File file2XSD = loadFile.loadMATSim4UrbanSimXSD();
+//			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/", "MATSim4UrbanSimConfigSchema.xsd");
+//			File file2XSD = loadFile.loadMATSim4UrbanSimXSD();
+			File file2XSD = new File("/Users/thomas/Development/workspace/playgrounds/tnicolai/src/main/resources/MATSim4UrbanSimXSD/MATSim4UrbanSimConfigSchema.xsd");
 			
 			// for debugging
 			// File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
@@ -233,13 +233,13 @@ public class MATSim4Urbansim {
 			Object object = unmarschaller.unmarshal(inputFile);
 			
 			// Java representation of the schema file.
-			ConfigType matsimConfig;
+			MatsimConfigType matsimConfig;
 			
 			// The structure of both objects must match.
 			if(object.getClass() == ConfigType.class)
-				matsimConfig = (ConfigType) object;
+				matsimConfig = (MatsimConfigType) object;
 			else
-				matsimConfig = (( JAXBElement<ConfigType>) object).getValue();
+				matsimConfig = (( JAXBElement<MatsimConfigType>) object).getValue();
 			
 			// creatin MASim config object that contains the values from the xml config file.
 			if(matsimConfig != null){

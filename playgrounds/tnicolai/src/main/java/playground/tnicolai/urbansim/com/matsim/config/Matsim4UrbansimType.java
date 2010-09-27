@@ -11,23 +11,20 @@ package playground.tnicolai.urbansim.com.matsim.config;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java class for networkType complex type.
+ * <p>Java class for matsim4urbansimType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="networkType">
+ * &lt;complexType name="matsim4urbansimType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="inputFile" type="{http://www.w3.org/2001/XMLSchema}token"/>
+ *         &lt;element name="urbansimParameter" type="{}urbansimParameterType"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -37,38 +34,36 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "networkType", propOrder = {
-    "inputFile"
+@XmlType(name = "matsim4urbansimType", propOrder = {
+    "urbansimParameter"
 })
-public class NetworkType {
+public class Matsim4UrbansimType {
 
     @XmlElement(required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "token")
-    protected String inputFile;
+    protected UrbansimParameterType urbansimParameter;
 
     /**
-     * Gets the value of the inputFile property.
+     * Gets the value of the urbansimParameter property.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link UrbansimParameterType }
      *     
      */
-    public String getInputFile() {
-        return inputFile;
+    public UrbansimParameterType getUrbansimParameter() {
+        return urbansimParameter;
     }
 
     /**
-     * Sets the value of the inputFile property.
+     * Sets the value of the urbansimParameter property.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link UrbansimParameterType }
      *     
      */
-    public void setInputFile(String value) {
-        this.inputFile = value;
+    public void setUrbansimParameter(UrbansimParameterType value) {
+        this.urbansimParameter = value;
     }
 
 }
