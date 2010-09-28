@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.signalsystems.data.SignalsData;
 
 
 /**
@@ -46,5 +47,7 @@ public interface SignalSystemsManager {
 	public void setAmberLogic(AmberLogic amberLogic);
 	
 	public void resetModel(Integer iterationNumber);
+
+	public SignalsData getSignalData();
 	
 }

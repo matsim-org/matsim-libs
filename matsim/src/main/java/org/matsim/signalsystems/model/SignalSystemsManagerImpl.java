@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.signalsystems.data.SignalsData;
 
 /**
  * @author dgrether
@@ -77,6 +78,12 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 	@Override
 	public Map<Id, SignalSystem> getSignalSystems() {
 		return this.signalSystems;
+	}
+
+	@Override
+	public SignalsData getSignalData() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
