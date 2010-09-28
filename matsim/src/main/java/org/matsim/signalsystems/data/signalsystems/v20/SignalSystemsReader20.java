@@ -50,12 +50,10 @@ public class SignalSystemsReader20 extends MatsimJaxbXmlParser {
 
 	private SignalSystemsData signalSystemsData;
 
-	private SignalSystemsDataFactory builder;
 
 	public SignalSystemsReader20(SignalSystemsData signalSystemData, String schemaLocation) {
 		super(schemaLocation);
 		this.signalSystemsData = signalSystemData;
-		this.builder = this.signalSystemsData.getFactory();
 	}
 
 	@Override
@@ -88,11 +86,12 @@ public class SignalSystemsReader20 extends MatsimJaxbXmlParser {
 		}
 		
 		//convert from Jaxb types to MATSim-API conform types
+		SignalSystemsDataFactory builder = this.signalSystemsData.getFactory();
 		for (XMLSignalSystemType xmlss : xmlssdefs.getSignalSystem()){
-			SignalSystemData ssdata = this.builder.createSignalSystemData(new IdImpl(xmlss.getId()));
+			SignalSystemData ssdata = builder.createSignalSystemData(new IdImpl(xmlss.getId()));
 			this.signalSystemsData.addSignalSystemData(ssdata);
 			for (XMLSignalType xmlsignal : xmlss.getSignals().getSignal()){
-				SignalData signal = this.builder.createSignalData(new IdImpl(xmlsignal.getId()));
+				SignalData signal = builder.createSignalData(new IdImpl(xmlsignal.getId()));
 				signal.setLinkId(new IdImpl(xmlsignal.getLinkIdRef()));
 				ssdata.addSignalData(signal);
 				if (xmlsignal.getLane() != null){

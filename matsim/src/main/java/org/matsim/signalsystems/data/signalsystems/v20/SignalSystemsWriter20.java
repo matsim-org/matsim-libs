@@ -50,11 +50,9 @@ public class SignalSystemsWriter20 extends MatsimJaxbXmlWriter {
 	
 	private SignalSystemsData signalData;
 	
-	private XMLSignalSystems xmlSignals;
 	
 	public SignalSystemsWriter20(SignalSystemsData signalSystemsData){
 		this.signalData = signalSystemsData;
-		this.xmlSignals = convertDataToXml();
 	}
 	
 	private XMLSignalSystems convertDataToXml() {
@@ -95,17 +93,17 @@ public class SignalSystemsWriter20 extends MatsimJaxbXmlWriter {
 		return xmlContainer;
 	}
 
-	@Override
-	public void write(final String filename) {
+	public void write(final String filename, XMLSignalSystems xmlSignals){
 		log.info("writing file: " + filename);
-  	JAXBContext jc;
+		JAXBContext jc;
 		try {
 			jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystems20.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
 			super.setMarshallerProperties(MatsimSignalSystemsReader.SIGNALSYSTEMS20, m);
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
-			m.marshal(this.xmlSignals, bufout);
+			m.marshal(xmlSignals, bufout);
 			bufout.close();
+			log.info(filename + " written successfully.");
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
@@ -113,6 +111,13 @@ public class SignalSystemsWriter20 extends MatsimJaxbXmlWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+	}
+	
+	@Override
+	public void write(final String filename) {
+		XMLSignalSystems xmlSignals = convertDataToXml();
+		this.write(filename, xmlSignals);
 	}
 	
 }
