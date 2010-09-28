@@ -1,3 +1,4 @@
+
 /* *********************************************************************** *
  * project: org.matsim.*
  * SignalSystemsLinkConverter.java
@@ -17,7 +18,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
+/*
 package playground.jbischoff.BAsignals;
 
 import java.io.BufferedReader;
@@ -134,4 +135,4 @@ public static  Map<Id,LinkConversionsData> readConv(String filename){
 }
 	
 }
-
+*/
