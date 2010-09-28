@@ -31,6 +31,8 @@ import org.matsim.api.core.v01.Identifiable;
  */
 public interface SignalData extends Identifiable {
 
+	public Id getId();
+	
 	public Id getLinkId();
 	
 	public void setLinkId(Id id);
@@ -38,7 +40,9 @@ public interface SignalData extends Identifiable {
 	public Set<Id> getLaneIds();
 	
 	public void addLaneId(Id laneId);
-	
+	/**
+	 * @return may return null if no turning  move restrictions are set
+	 */
 	public Set<Id> getTurningMoveRestrictions();
 	
 	public void addTurningMoveRestriction(Id linkId);
