@@ -97,11 +97,11 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		SignalSystemControllerData systemControlData = signalsData.getSignalSystemControlData().getSignalSystemControllerDataBySystemId().get(system.getId());
 		SignalController controller = this.factory.createSignalSystemController(systemControlData.getControllerIdentifier());
 		controller.setSignalSystem(system);
+		system.setSignalSystemController(controller);
 		for (SignalPlanData planData : systemControlData.getSignalPlanData().values()){
 			SignalPlan plan = new DatabasedSignalPlan(planData);
 			controller.addPlan(plan);
 		}
-		system.setSignalSystemController(controller);
 	}
 	
 	public void createAndAddAmberLogic(SignalSystemsManager manager){
@@ -112,12 +112,17 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
+	public SignalSystemsManager createSignalSystemManager(){
+		SignalSystemsManager manager = this.factory.createSignalSystemsManager();
+		manager.setEventsManager(events);
+		return manager;
+	}
+	
 	
 	@Override
 	public SignalSystemsManager createAndInitializeSignalSystemsManager() {
 		//1.) SignalSystemsManager
-		SignalSystemsManager manager = this.factory.createSignalSystemsManager();
-		manager.setEventsManager(events);
+		SignalSystemsManager manager = this.createSignalSystemManager();
 		//2.) SignalSystems
 		this.createAndAddSignalSystemsFromData(manager);
 		//3.) Signals then SignalGroups then SignalController
