@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
-
 import org.xml.sax.SAXException;
 
 
@@ -47,6 +46,8 @@ public class MatsimSignalSystemConfigurationsReader {
 	public static final String SIGNALSYSTEMSCONFIG10 = "http://www.matsim.org/files/dtd/lightSignalSystemsConfig_v1.0.xsd";
 
 	public static final String SIGNALSYSTEMSCONFIG11 = "http://www.matsim.org/files/dtd/signalSystemsConfig_v1.1.xsd";
+	
+	public static final String SIGNALCONTROL20 = "http://www.matsim.org/files/dtd/signalControl_v2.0.xsd";
 	
 	private SignalSystemConfigurations lightSignalSystemConfigs;
 
