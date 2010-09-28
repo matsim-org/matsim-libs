@@ -34,11 +34,11 @@ import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
  * @author dgrether
  *
  */
-public class SignalEngineImpl implements SignalEngine {
+public class QSimSignalEngine implements SignalEngine {
 
 	private SignalSystemsManager signalManager;
 
-	public SignalEngineImpl(SignalSystemsManager signalManager) {
+	public QSimSignalEngine(SignalSystemsManager signalManager) {
 		this.signalManager = signalManager;
 	}
 
