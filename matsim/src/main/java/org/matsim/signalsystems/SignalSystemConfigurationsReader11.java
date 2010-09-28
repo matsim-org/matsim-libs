@@ -60,46 +60,49 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 
 	private final static Logger log = Logger.getLogger(SignalSystemConfigurationsReader11.class);
 
-  private XMLSignalSystemConfig xmlLssConfig;
-
-  private SignalSystemConfigurationsFactory builder;
 
 	private SignalSystemConfigurations lssConfigurations;
 
 	public SignalSystemConfigurationsReader11(SignalSystemConfigurations lssConfigs, String schemaLocation) {
 		super(schemaLocation);
 		this.lssConfigurations = lssConfigs;
-		this.builder = this.lssConfigurations.getFactory();
+	}
+	
+	
+	public XMLSignalSystemConfig readSignalSystemConfig11File(String filename) throws SAXException, ParserConfigurationException, IOException, JAXBException{
+	  XMLSignalSystemConfig xmlLssConfig;
+  	JAXBContext jc;
+		jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystemsconfig11.ObjectFactory.class);
+		Unmarshaller u = jc.createUnmarshaller();
+		//validate file
+		super.validateFile(filename, u);
+		InputStream stream = null;
+		try {
+			stream = IOUtils.getInputstream(filename);
+			xmlLssConfig = (XMLSignalSystemConfig)u.unmarshal(stream);
+		}
+		finally {
+			try {
+				if (stream != null) { stream.close();	}
+			} catch (IOException e) {
+				log.warn("Could not close stream.", e);
+			}
+		}
+		return xmlLssConfig;
 	}
 
 	@Override
 	public void readFile(final String filename) throws ParserConfigurationException, IOException, JAXBException, SAXException {
-  	JAXBContext jc;
-			jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystemsconfig11.ObjectFactory.class);
-			Unmarshaller u = jc.createUnmarshaller();
-			//validate file
-			super.validateFile(filename, u);
-
-			InputStream stream = null;
-			try {
-				stream = IOUtils.getInputstream(filename);
-				xmlLssConfig = (XMLSignalSystemConfig)u.unmarshal(stream);
-			}
-			finally {
-				try {
-					if (stream != null) { stream.close();	}
-				} catch (IOException e) {
-					log.warn("Could not close stream.", e);
-				}
-			}
-
+		SignalSystemConfigurationsFactory builder = this.lssConfigurations.getFactory();
+		XMLSignalSystemConfig xmlLssConfig = this.readSignalSystemConfig11File(filename);
+		
 		//convert the parsed xml-instances to basic instances
 			for (XMLSignalSystemConfigurationType xmlLssConfiguration : xmlLssConfig.getSignalSystemConfiguration()){
 				SignalSystemConfiguration blssc = builder.createSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
 
 				XMLSignalSystemControlInfoType xmlcit = xmlLssConfiguration.getSignalSystemControlInfo();
 				SignalSystemControlInfo controlInfo;
-				controlInfo = convertXmlControlInfoToBasic(xmlcit);
+				controlInfo = convertXmlControlInfoToBasic(xmlcit, builder);
 				blssc.setSignalSystemControlInfo(controlInfo);
 
 				this.lssConfigurations.getSignalSystemConfigurations().put(blssc.getSignalSystemId(), blssc);
@@ -107,7 +110,7 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 	}
 
 	private SignalSystemControlInfo convertXmlControlInfoToBasic(
-			XMLSignalSystemControlInfoType xmlcit) {
+			XMLSignalSystemControlInfoType xmlcit, SignalSystemConfigurationsFactory builder) {
 		SignalSystemControlInfo controlInfo = null;
 		if (xmlcit instanceof XMLPlanbasedSignalSystemControlInfoType) {
 			XMLPlanbasedSignalSystemControlInfoType xmlpcit = (XMLPlanbasedSignalSystemControlInfoType) xmlcit;
@@ -116,7 +119,7 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 			controlInfo = pcontrolInfo;
 
 			for (XMLSignalSystemPlanType xmlplan : xmlpcit.getSignalSystemPlan()) {
-				pcontrolInfo.addPlan(convertXmlPlanToBasic(xmlplan));
+				pcontrolInfo.addPlan(convertXmlPlanToBasic(xmlplan, builder));
 			}
 		}
 		else if (xmlcit instanceof XMLAdaptivePlanbasedSignalSystemControlInfoType){
@@ -128,7 +131,7 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 				aci.addSignalGroupId(new IdImpl(idref.getRefId()));
 			}
 			for (XMLSignalSystemPlanType xmlplan : sscit.getSignalSystemPlan()) {
-				aci.addPlan(convertXmlPlanToBasic(xmlplan));
+				aci.addPlan(convertXmlPlanToBasic(xmlplan, builder));
 			}
 		}
 		else if (xmlcit instanceof XMLAdaptiveSignalSystemControlInfoType) {
@@ -144,7 +147,7 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 
 	}
 
-	private SignalSystemPlan convertXmlPlanToBasic(XMLSignalSystemPlanType xmlplan){
+	private SignalSystemPlan convertXmlPlanToBasic(XMLSignalSystemPlanType xmlplan, SignalSystemConfigurationsFactory builder){
 		SignalSystemPlan plan = builder.createSignalSystemPlan(new IdImpl(xmlplan.getId()));
 		plan.setStartTime(getSeconds(xmlplan.getStart().getDaytime()));
 		plan.setEndTime(getSeconds(xmlplan.getStop().getDaytime()));

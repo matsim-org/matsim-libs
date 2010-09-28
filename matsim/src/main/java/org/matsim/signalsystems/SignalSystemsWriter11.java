@@ -72,6 +72,7 @@ public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
 			m.marshal(this.xmlLightSignalSystems, bufout);
 			bufout.close();
+			log.info(filename + " written successfully.");
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {

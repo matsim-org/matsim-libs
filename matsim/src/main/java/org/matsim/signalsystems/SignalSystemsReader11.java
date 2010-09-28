@@ -48,19 +48,14 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 
 	private static final Logger log = Logger.getLogger(SignalSystemsReader11.class);
 
-	private SignalSystems lightSignalSystems;
-
-	private SignalSystemsFactory builder;
+	private SignalSystems signalSystems;
 
 	public SignalSystemsReader11(SignalSystems lightSignalSystems, String schemaLocation) {
 		super(schemaLocation);
-		this.lightSignalSystems = lightSignalSystems;
-		this.builder = this.lightSignalSystems.getFactory();
+		this.signalSystems = lightSignalSystems;
 	}
-
-	@Override
-	public void readFile(final String filename) throws JAXBException,
-			SAXException, ParserConfigurationException, IOException {
+	
+	public XMLSignalSystems readSignalSystems11File(String filename) throws JAXBException, SAXException, ParserConfigurationException, IOException{
 		// create jaxb infrastructure
 		JAXBContext jc;
 		XMLSignalSystems xmlLssDefinition;
@@ -75,6 +70,7 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 //			stream = new FileInputStream(filename);
 		  stream = IOUtils.getInputstream(filename);
 			xmlLssDefinition = (XMLSignalSystems) u.unmarshal(stream);
+			log.info("unmarshalling complete");
 		}
 		finally {
 			try {
@@ -83,7 +79,17 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 				log.warn("Could not close stream.", e);
 			}
 		}
+		return xmlLssDefinition;
+	}
+	
 
+	@Override
+	public void readFile(final String filename) throws JAXBException,
+			SAXException, ParserConfigurationException, IOException {
+		SignalSystemsFactory builder = this.signalSystems.getFactory();
+		
+		XMLSignalSystems xmlLssDefinition = this.readSignalSystems11File(filename);
+		
 		SignalSystemDefinition lssdef;
 		for (XMLSignalSystemDefinitionType xmllssDef : xmlLssDefinition
 				.getSignalSystemDefinition()) {
@@ -101,7 +107,7 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 				lssdef.setDefaultSynchronizationOffset(xmllssDef
 						.getDefaultSynchronizationOffset().getSeconds());
 			}
-			lightSignalSystems.addSignalSystemDefinition(lssdef);
+			signalSystems.addSignalSystemDefinition(lssdef);
 		}
 		// parsing lightSignalGroupDefinitions
 		SignalGroupDefinition lsgdef;
@@ -117,7 +123,7 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 			for (XMLIdRefType refIds : xmllsgdef.getToLink()) {
 				lsgdef.addToLinkId(new IdImpl(refIds.getRefId()));
 			}
-			lightSignalSystems.addSignalGroupDefinition(lsgdef);
+			signalSystems.addSignalGroupDefinition(lsgdef);
 		}
 
 	}
