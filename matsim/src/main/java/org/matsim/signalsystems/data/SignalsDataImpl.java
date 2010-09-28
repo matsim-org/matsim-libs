@@ -21,7 +21,6 @@ package org.matsim.signalsystems.data;
 
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesDataImpl;
-import org.matsim.signalsystems.data.intergreentimes.v10.IntergreenTimesData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
@@ -58,10 +57,10 @@ public class SignalsDataImpl implements SignalsData {
 		return this.ambertimesdata;
 	}
 
-	@Override
-	public IntergreenTimesData getIntergreenTimesData() {
-		return null;
-	}
+//	@Override
+//	public IntergreenTimesData getIntergreenTimesData() {
+//		return null;
+//	}
 
 	@Override
 	public SignalGroupsData getSignalGroupsData() {
