@@ -20,6 +20,9 @@
 
 package org.matsim.signalsystems;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -28,72 +31,68 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author aneumann
  * @author dgrether
  */
-public class TravelTimeFourWaysTest extends MatsimTestCase {
+public class TravelTimeFourWaysTest {
 
 	private static final String EVENTSFILE = "events.xml.gz";
 	
-	public void testTrafficLightIntersection4arms() {
-		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
-		String laneDefinitions = this.getClassInputDirectory()
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	
+	private Scenario createTestScenario(){
+		Scenario scenario = new ScenarioImpl();
+		Config conf = scenario.getConfig();
+		conf.network().setInputFile(this.testUtils.getClassInputDirectory() + "network.xml.gz");
+		String laneDefinitions = this.testUtils.getClassInputDirectory()
 				+ "testLaneDefinitions_v1.1.xml";
-		String lsaDefinition = this.getClassInputDirectory()
+		String lsaDefinition = this.testUtils.getClassInputDirectory()
 				+ "testSignalSystems_v1.1.xml";
-		String lsaConfig = this.getClassInputDirectory()
+		String lsaConfig = this.testUtils.getClassInputDirectory()
 				+ "testSignalSystemConfigurations_v1.1.xml";
 		conf.network().setLaneDefinitionsFile(laneDefinitions);
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
-
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(true);
 		conf.setQSimConfigGroup(new QSimConfigGroup());
-		ScenarioImpl scenario = new ScenarioImpl(conf);
+		return scenario;
+	}
+	
+	public void testTrafficLightIntersection4arms() {
+		Scenario scenario = this.createTestScenario();
+		scenario.getConfig().plans().setInputFile(this.testUtils.getClassInputDirectory() + "plans.xml.gz");
+		
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
-		
-		String eventsOut = this.getOutputDirectory() + EVENTSFILE;
+		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 		QSim sim = new QSim(scenario, events);
 		sim.run();
 		eventsXmlWriter.closeFile();
-		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));
+		Assert.assertEquals("different events files", CRCChecksum.getCRCFromFile(this.testUtils.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));
 	}
 
 	public void testTrafficLightIntersection4armsWithUTurn() {
-		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
-		String laneDefinitions = this.getClassInputDirectory()
-				+ "testLaneDefinitions_v1.1.xml";
-		String lsaDefinition = this.getClassInputDirectory()
-				+ "testSignalSystems_v1.1.xml";
-		String lsaConfig = this.getClassInputDirectory()
-				+ "testSignalSystemConfigurations_v1.1.xml";
-		conf.network().setLaneDefinitionsFile(laneDefinitions);
-		conf.signalSystems().setSignalSystemFile(lsaDefinition);
-		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
-		conf.plans().setInputFile(this.getClassInputDirectory() + "plans_uturn.xml.gz");
-		conf.scenario().setUseLanes(true);
-		conf.scenario().setUseSignalSystems(true);
-		conf.setQSimConfigGroup(new QSimConfigGroup());
-		ScenarioImpl data = new ScenarioImpl(conf);
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
+		Scenario scenario = this.createTestScenario();
+		scenario.getConfig().plans().setInputFile(this.testUtils.getClassInputDirectory() + "plans_uturn.xml.gz");
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
 
-		String eventsOut = this.getOutputDirectory() + EVENTSFILE;
+		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 		
-		QSim sim = new QSim(data, events);
+		QSim sim = new QSim(scenario, events);
 		sim.run();
 		eventsXmlWriter.closeFile();
-		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));
+		Assert.assertEquals("different events files", CRCChecksum.getCRCFromFile(this.testUtils.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));
 	}
 }
