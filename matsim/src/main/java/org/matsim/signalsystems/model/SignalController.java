@@ -30,7 +30,11 @@ package org.matsim.signalsystems.model;
  * @author dgrether
  */
 public interface SignalController {
-		
+	
+	/**
+	 * Is called every timestep to notify that the controller may update the state of the signal groups
+	 * @param timeSeconds
+	 */
 	public void updateState(double timeSeconds);
 
 	public void addPlan(SignalPlan plan);
