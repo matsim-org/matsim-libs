@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalGroupsDataFactory
+ * SignalGroupsData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,14 +20,15 @@
 package org.matsim.signalsystems.data.signalgroups.v20;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimFactory;
-
-
 /**
- * @author dgrether
- *
+ * @author jbischoff
+ * 
  */
-public interface SignalGroupsDataFactory extends MatsimFactory {
+public class SignalGroupsDataFactoryImpl implements SignalGroupsDataFactory {
 
-	public SignalGroupData createSignalGroupData(Id id);
+	@Override
+	public SignalGroupData createSignalGroupData(Id id) {
+		return new SignalGroupDataImpl(id);
+	}
+
 }

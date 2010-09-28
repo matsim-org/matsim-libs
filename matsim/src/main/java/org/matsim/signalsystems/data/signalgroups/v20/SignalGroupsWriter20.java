@@ -22,53 +22,60 @@ package org.matsim.signalsystems.data.signalgroups.v20;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
+import org.matsim.jaxb.signalgroups20.ObjectFactory;
+import org.matsim.jaxb.signalgroups20.XMLIdRefType;
+import org.matsim.jaxb.signalgroups20.XMLSignalGroupType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroups;
+import org.matsim.jaxb.signalgroups20.XMLSignalSystemSignalGroupType;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-
 
 /**
  * @author dgrether
- *
+ * @author jbischoff
+ * 
  */
 public class SignalGroupsWriter20 extends MatsimJaxbXmlWriter {
-	
+
 	private static final Logger log = Logger.getLogger(SignalGroupsWriter20.class);
-	
+
 	private SignalGroupsData signalGroupsData;
-	
-	public SignalGroupsWriter20(SignalGroupsData signalGroupsData){
+
+	public SignalGroupsWriter20(SignalGroupsData signalGroupsData) {
 		this.signalGroupsData = signalGroupsData;
 	}
-	
-	public void write(final String filename, XMLSignalGroups xmlSignalGroups){
-			log.info("writing file: " + filename);
-	  	JAXBContext jc;
-			try {
-				jc = JAXBContext.newInstance(org.matsim.jaxb.signalgroups20.ObjectFactory.class);
-				Marshaller m = jc.createMarshaller();
-				super.setMarshallerProperties(MatsimSignalSystemsReader.SIGNALGROUPS20, m);
-				BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
-				m.marshal(xmlSignalGroups, bufout);
-				bufout.close();
-				log.info(filename + " written successfully.");
-			} catch (JAXBException e) {
-				e.printStackTrace();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
+
+	public void write(final String filename, XMLSignalGroups xmlSignalGroups) {
+		log.info("writing file: " + filename);
+		JAXBContext jc;
+		try {
+			jc = JAXBContext.newInstance(org.matsim.jaxb.signalgroups20.ObjectFactory.class);
+			Marshaller m = jc.createMarshaller();
+			super.setMarshallerProperties(MatsimSignalSystemsReader.SIGNALGROUPS20, m);
+			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
+			m.marshal(xmlSignalGroups, bufout);
+			bufout.close();
+			log.info(filename + " written successfully.");
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
-	
+
 	@Override
 	public void write(String filename) {
 		XMLSignalGroups xmlSignalGroups = this.convertDataToXml();
@@ -76,7 +83,28 @@ public class SignalGroupsWriter20 extends MatsimJaxbXmlWriter {
 	}
 
 	private XMLSignalGroups convertDataToXml() {
-		return null;
-	}
+		ObjectFactory fac = new ObjectFactory();
+		XMLSignalGroups xmlContainer = fac.createXMLSignalGroups();
 
+		for (Entry<Id, Map<Id, SignalGroupData>> ssid : this.signalGroupsData
+				.getSignalGroupDataBySignalSystemId().entrySet()) {
+			// signal System
+			XMLSignalSystemSignalGroupType xsssgt = fac.createXMLSignalSystemSignalGroupType();
+			xsssgt.setRefId(ssid.getKey().toString());
+
+			for (Entry<Id, SignalGroupData> signal : ssid.getValue().entrySet()) {
+				XMLSignalGroupType xsgt = fac.createXMLSignalGroupType();
+				xsgt.setId(signal.getValue().getId().toString());
+				for (Id ids : signal.getValue().getSignalIds()) {
+					XMLIdRefType xmlid = fac.createXMLIdRefType();
+					xmlid.setRefId(ids.toString());
+					xsgt.getSignal().add(xmlid);
+				}
+				xsssgt.getSignalGroup().add(xsgt);
+
+			}
+			xmlContainer.getSignalSystem().add(xsssgt);
+		}
+		return xmlContainer;
+	}
 }

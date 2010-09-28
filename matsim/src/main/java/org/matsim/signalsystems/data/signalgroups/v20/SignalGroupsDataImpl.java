@@ -32,6 +32,10 @@ import org.matsim.api.core.v01.Id;
 public class SignalGroupsDataImpl implements SignalGroupsData {
 
 	private Map<Id, Map<Id, SignalGroupData>> signalGroupsDataBySystemId = new HashMap<Id, Map<Id, SignalGroupData>>();
+	SignalGroupsDataFactory factory;
+	public SignalGroupsDataImpl(){
+		this.factory=new SignalGroupsDataFactoryImpl();
+	}
 	
 	@Override
 	public void addSignalGroupData(SignalGroupData signalGroupData) {
@@ -51,7 +55,12 @@ public class SignalGroupsDataImpl implements SignalGroupsData {
 
 	@Override
 	public SignalGroupsDataFactory getFactory() {
-		return null;
+		return this.factory;
+	}
+
+	@Override
+	public Map<Id, Map<Id, SignalGroupData>> getSignalGroupDataBySignalSystemId() {
+		return signalGroupsDataBySystemId;
 	}
 
 	

@@ -27,7 +27,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
  * @author dgrether
- *
+ * @author jbischoff
  */
 public interface SignalGroupsData extends MatsimToplevelContainer {
 
@@ -36,5 +36,7 @@ public interface SignalGroupsData extends MatsimToplevelContainer {
 	public Map<Id, SignalGroupData> getSignalGroupDataBySystemId(Id signalSystemId);
 	
 	public void addSignalGroupData(SignalGroupData signalGroupData);
+	
+	public Map<Id,Map<Id,SignalGroupData>> getSignalGroupDataBySignalSystemId();
 	
 }

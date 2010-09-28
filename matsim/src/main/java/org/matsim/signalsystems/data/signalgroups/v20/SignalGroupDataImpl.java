@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalGroupsDataFactory
+ * SignalGroupDataImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,15 +19,48 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.data.signalgroups.v20;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimFactory;
-
-
 /**
+ * @author jbischoff
  * @author dgrether
- *
  */
-public interface SignalGroupsDataFactory extends MatsimFactory {
+public class SignalGroupDataImpl implements SignalGroupData {
 
-	public SignalGroupData createSignalGroupData(Id id);
+	Set<Id> signalIds = new HashSet<Id>();
+	Id signalGroupId;
+	Id signalSystemId;
+
+	public SignalGroupDataImpl(Id signalSystemId) {
+		this.signalSystemId = signalSystemId;
+
+	}
+
+	@Override
+	public void addSignalId(Id signalId) {
+		signalIds.add(signalId);
+	}
+
+	@Override
+	public Id getId() {
+		return this.signalGroupId;
+	}
+
+	@Override
+	public Set<Id> getSignalIds() {
+		return this.signalIds;
+	}
+
+	@Override
+	public Id getSignalSystemId() {
+		return this.signalSystemId;
+	}
+
+	@Override
+	public void setId(Id sgid) {
+		this.signalGroupId = sgid;
+	}
+
 }
