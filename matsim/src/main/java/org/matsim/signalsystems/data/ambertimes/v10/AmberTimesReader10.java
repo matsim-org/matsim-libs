@@ -84,20 +84,34 @@ public class AmberTimesReader10 extends MatsimJaxbXmlParser {
 		// convert from Jaxb types to MATSim-API conform types
 
 		// Global Defaults
-		amberTimesData
+		if (xmlatdefs.getGlobalDefaults() != null){
+			if (xmlatdefs.getGlobalDefaults().getAmber() != null){
+				amberTimesData
 				.setDefaultAmber(xmlatdefs.getGlobalDefaults().getAmber().getSeconds().intValue());
-		amberTimesData.setDefaultRedAmber(xmlatdefs.getGlobalDefaults().getRedAmber().getSeconds()
-				.intValue());
-		amberTimesData.setDefaultAmberTimeGreen(xmlatdefs.getGlobalDefaults().getAmberTimeGreen()
-				.getProportion().doubleValue());
+			}
+			if (xmlatdefs.getGlobalDefaults().getAmberTimeGreen() != null){
+				amberTimesData.setDefaultAmberTimeGreen(xmlatdefs.getGlobalDefaults().getAmberTimeGreen()
+						.getProportion().doubleValue());
+			}
+			if (xmlatdefs.getGlobalDefaults().getRedAmber() != null){
+				amberTimesData.setDefaultRedAmber(xmlatdefs.getGlobalDefaults().getRedAmber().getSeconds()
+						.intValue());
+			}
+		}
 
 		for (XMLSignalSystem xmlss : xmlatdefs.getSignalSystem()) {
 			Id ssid = new IdImpl(xmlss.getRefId().toString());
 			AmberTimeData atdata = new AmberTimeDataImpl(ssid);
 
 			// Signalsystem Defaults
-			atdata.setDefaultAmber(xmlss.getSystemDefaults().getAmber().getSeconds().intValue());
-			atdata.setDefaultRedAmber(xmlss.getSystemDefaults().getRedAmber().getSeconds().intValue());
+			if (xmlss.getSystemDefaults() != null){
+				if (xmlss.getSystemDefaults().getAmber() != null){
+					atdata.setDefaultAmber(xmlss.getSystemDefaults().getAmber().getSeconds().intValue());
+				}
+				if (xmlss.getSystemDefaults().getRedAmber() != null){
+					atdata.setDefaultRedAmber(xmlss.getSystemDefaults().getRedAmber().getSeconds().intValue());
+				}
+			}
 
 			for (XMLSignal xmls : xmlss.getSignal()) {
 

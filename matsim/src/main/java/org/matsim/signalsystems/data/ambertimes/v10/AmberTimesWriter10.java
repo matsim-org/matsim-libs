@@ -53,13 +53,11 @@ public class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 		private static final Logger log = Logger.getLogger(AmberTimesWriter10.class);
 		
 		private AmberTimesData amberTimesData;
-		
-		private XMLAmberTimes xmlAmberTimes;
 	
 		public static final String AMBERTIMES10 = "http://www.matsim.org/files/dtd/amberTimes_v1.0.xsd";
+		
 		public AmberTimesWriter10(AmberTimesData amberTimesData){
 			this.amberTimesData = amberTimesData;
-			this.xmlAmberTimes = convertDataToXml();
 		}
 		
 		private XMLAmberTimes convertDataToXml() {
@@ -112,14 +110,10 @@ public class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 				}		
 				xmlContainer.getSignalSystem().add(xmlss);
 			}
-			
-				
-			
 			return xmlContainer;
 		}
 
-		@Override
-		public void write(final String filename) {
+		public void write(String filename, XMLAmberTimes xmlAmberTimes) {
 			log.info("writing file: " + filename);
 	  	JAXBContext jc;
 			try {
@@ -127,7 +121,7 @@ public class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 				Marshaller m = jc.createMarshaller();
 				super.setMarshallerProperties(AmberTimesWriter10.AMBERTIMES10, m);
 				BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
-				m.marshal(this.xmlAmberTimes, bufout);
+				m.marshal(xmlAmberTimes, bufout);
 				bufout.close();
 			} catch (JAXBException e) {
 				e.printStackTrace();
@@ -136,7 +130,16 @@ public class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
 		}
+
+		
+		@Override
+		public void write(final String filename) {
+			XMLAmberTimes xmlAmberTimes = convertDataToXml();
+			this.write(filename, xmlAmberTimes);
+		}
+
 		
 	}
 
