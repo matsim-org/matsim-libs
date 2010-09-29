@@ -47,7 +47,6 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
 import org.xml.sax.SAXException;
 
-import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
 import playground.tnicolai.urbansim.com.matsim.config.MatsimConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.CommonUtilities;
@@ -203,15 +202,15 @@ public class MATSim4Urbansim {
 			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
 			// ... and initialize it with an xsd (xsd lies in the urbansim project)
 			
-//			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/", "MATSim4UrbanSimConfigSchema.xsd");
-//			File file2XSD = loadFile.loadMATSim4UrbanSimXSD();
-			File file2XSD = new File("/Users/thomas/Development/workspace/playgrounds/tnicolai/src/main/resources/MATSim4UrbanSimXSD/MATSim4UrbanSimConfigSchema.xsd");
+			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/", "MATSim4UrbanSimConfigSchema.xsd");
+			File file2XSD = loadFile.loadMATSim4UrbanSimXSD();
+//			File file2XSD = new File("/Users/thomas/Development/workspace/playgrounds/tnicolai/src/main/resources/MATSim4UrbanSimXSD/MATSim4UrbanSimConfigSchema.xsd");
 			
 			// for debugging
 			// File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
 			if(file2XSD == null || !file2XSD.exists()){
 				
-				log.warn(file2XSD.getCanonicalPath() + " is not available. Loading compensatory xsd instead (this may be is an older version).");
+				log.warn(file2XSD.getCanonicalPath() + " is not available. Loading compensatory xsd instead (this could be an older xsd version and may not work correctly).");
 				log.warn("Compensatory xsd file: " + CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/MATSim4UrbanSimConfigSchema.xsd");
 				
 				file2XSD = new File(CommonUtilities.getCurrentPath(MATSim4Urbansim.class) + "tmp/MATSim4UrbanSimConfigSchema.xsd");
@@ -236,7 +235,7 @@ public class MATSim4Urbansim {
 			MatsimConfigType matsimConfig;
 			
 			// The structure of both objects must match.
-			if(object.getClass() == ConfigType.class)
+			if(object.getClass() == MatsimConfigType.class)
 				matsimConfig = (MatsimConfigType) object;
 			else
 				matsimConfig = (( JAXBElement<MatsimConfigType>) object).getValue();

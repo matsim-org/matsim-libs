@@ -200,28 +200,28 @@ public class UpdateXMLBindingClasses {
 		
 }
 
-class JAXBRun extends Thread{
-	
-	private String targetPackage = null;
-	private String tmpDirectory = null;
-	private String xsdLocation = null;
-	
-	public JAXBRun(String targetPackage, String tmpDirectory, String xsdLocation){
-		this.targetPackage = targetPackage;
-		this.tmpDirectory = tmpDirectory;
-		this.xsdLocation = xsdLocation;
-	}
-	
-	public void run(){
-		
-		String[] arg = new String[] { "-p", targetPackage, "-d", tmpDirectory, xsdLocation };
-		
-		try {
-			XJCFacade.main(arg);
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-	}
-	
-}
+//class JAXBRun extends Thread{
+//	
+//	private String targetPackage = null;
+//	private String tmpDirectory = null;
+//	private String xsdLocation = null;
+//	
+//	public JAXBRun(String targetPackage, String tmpDirectory, String xsdLocation){
+//		this.targetPackage = targetPackage;
+//		this.tmpDirectory = tmpDirectory;
+//		this.xsdLocation = xsdLocation;
+//	}
+//	
+//	public void run(){
+//		
+//		String[] arg = new String[] { "-p", targetPackage, "-d", tmpDirectory, xsdLocation };
+//		
+//		try {
+//			XJCFacade.main(arg);
+//		} catch (Throwable e) {
+//			e.printStackTrace();
+//		}
+//	}
+//	
+//}
 
