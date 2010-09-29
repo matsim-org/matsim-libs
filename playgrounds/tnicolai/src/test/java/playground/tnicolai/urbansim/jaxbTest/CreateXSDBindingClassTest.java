@@ -39,7 +39,6 @@ import org.matsim.testcases.MatsimTestCase;
 
 import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.UpdateXMLBindingClasses;
-import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
 import playground.tnicolai.urbansim.com.matsim.config.MatsimConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.CommonUtilities;
@@ -133,7 +132,7 @@ public class CreateXSDBindingClassTest extends MatsimTestCase {
 			MatsimConfigType matsimConfig;
 			
 			// The structure of both objects must match.
-			if(object.getClass() == ConfigType.class)
+			if(object.getClass() == MatsimConfigType.class)
 				matsimConfig = (MatsimConfigType) object;
 			else
 				matsimConfig = (( JAXBElement<MatsimConfigType>) object).getValue();
