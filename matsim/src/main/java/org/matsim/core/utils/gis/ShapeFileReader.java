@@ -69,9 +69,7 @@ public class ShapeFileReader implements MatsimSomeReader {
 	 * @param fileName File name of a shape file (ending in <code>*.shp</code>)
 	 * @return FeatureSource containing all features.
 	 * @throws IOException if the file cannot be found or another error happens during reading
-	 * @deprecated use non static readFileAndInitialize Method
 	 */
-	@Deprecated
 	public static FeatureSource readDataFile(final String fileName) throws IOException {
 		return new ShapeFileReader().openFeatureSource(fileName);
 	}
