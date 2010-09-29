@@ -8,13 +8,13 @@ import playground.wrashid.lib.GeneralLib;
 public class PlanShrinker {
 
 	public static void main(final String[] args) {
-		String inputPlansFile="A:/data/matsim/input/runRW1003/plans-10pct-miv-dilzh30km-unmapped.xml.gz";
-		String inputNetworkFile="A:/data/matsim/input/runRW1003/network-osm-ch.xml.gz";
-		String inputFacilities="A:/data/matsim/input/runRW1003/facilities.zrhCutC.xml.gz";
-		double populationFraction=0.1;
+		String inputPlansFile="H:/data/cvs/ivt/studies/switzerland/plans/teleatlas-ivtcheu-zrhCutC/census2000v2_zrhCutC_25pct/plans.xml.gz";
+		String inputNetworkFile="H:/data/cvs/ivt/studies/switzerland/networks/teleatlas-ivtcheu-zrhCutC/network.xml.gz";
+		String inputFacilities="H:/data/cvs/ivt/studies/switzerland/facilities/facilities.zrhCutC.xml.gz";
+		double populationFraction=0.04;
 		// e.g. 0.1 means 10% of input population
 		
-		String outputPlansFile="v:/data/v-temp/plans-new.xml.gz";		
+		String outputPlansFile="H:/data/experiments/ARTEMIS/input/plans_census2000v2_zrhCutC_1pct.xml.gz";		
 		
 		Scenario scenario= GeneralLib.readScenario(inputPlansFile, inputNetworkFile,inputFacilities);
 		new PopulationWriter(scenario.getPopulation(),scenario.getNetwork(),populationFraction).write(outputPlansFile);
