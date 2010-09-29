@@ -159,7 +159,7 @@ public class MATSimConfigObject {
 			
 			// only for debugging and testing reasons
 			// sets a new OPUS_HOME directory
-			isModifyingOpusHomeDirectory();
+			// isModifyingOpusHomeDirectory();
 	
 			log.info("Network: " + networkFile);
 			log.info("Controler FirstIteration: " + firstIteration + " LastIteration: " + lastIteration );
