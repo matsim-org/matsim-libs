@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.example10PluggablePlanStrategy;
+package tutorial.programming.example10PluggablePlanStrategyFromFile;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;

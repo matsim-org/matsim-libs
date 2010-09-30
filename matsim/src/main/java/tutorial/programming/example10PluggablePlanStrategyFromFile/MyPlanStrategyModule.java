@@ -1,4 +1,4 @@
-package tutorial.programming.example10PluggablePlanStrategy;
+package tutorial.programming.example10PluggablePlanStrategyFromFile;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.example10PluggablePlanStrategy;
+package tutorial.programming.example11PluggablePlanStrategyInCode;
 
 import java.io.IOException;
 
@@ -31,13 +31,14 @@ class Main {
 
 		Config config;
 		if ( args.length==0 ) {
-			config = ConfigUtils.loadConfig( "examples/tutorial/pluggablePlanStrategy-config.xml" ) ;
+			config = ConfigUtils.loadConfig( "examples/tutorial/singleIteration.xml" ) ;
 		} else {
 			config = ConfigUtils.loadConfig(args[0]);
 		}
 
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
+		controler.addControlerListener(new MyControlerListener(controler)) ;
 		controler.run();
 
 	}

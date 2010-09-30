@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example10PluggablePlanStrategy;
+package tutorial.programming.example10PluggablePlanStrategyFromFile;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
