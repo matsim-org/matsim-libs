@@ -27,7 +27,7 @@ public class ShelterEvacuationControllerTest extends MatsimTestCase{
 
 	private static final Logger log = Logger.getLogger(ShelterEvacuationControllerTest.class);
 
-	public void testShelterEvacuationController() {
+	public void estShelterEvacuationController() {
 		String config = getInputDirectory() + "config.xml";
 		String refEventsFileIt0 = getInputDirectory() + "0.events.xml.gz";
 		String testEventsFileIt0 = getOutputDirectory() +"ITERS/it.0/0.events.xml.gz";
