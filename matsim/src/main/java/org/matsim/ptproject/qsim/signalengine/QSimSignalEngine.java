@@ -114,7 +114,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
       Id linkId = signalGroup.getLinkRefId();
       QLinkLanesImpl qlink = (QLinkLanesImpl) this.qNetwork.getQLink(linkId);
       for (QLane qlane : qlink.getToNodeQueueLanes()){
-        qlane.updateGreenState(time);
+//        qlane.updateGreenState(time);
       }
     }
   }
@@ -162,7 +162,7 @@ public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
 			}
 			list.add(signalGroupDefinition);
 			((QLinkLanesImpl)queueLink).addSignalGroupDefinition(signalGroupDefinition);
-			this.qNetwork.getNodes().get(queueLink.getLink().getToNode().getId()).setSignalized(true);
+//			this.qNetwork.getNodes().get(queueLink.getLink().getToNode().getId()).setSignalized(true);
 		}
 	}
 
