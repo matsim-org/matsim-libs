@@ -32,17 +32,11 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataImpl;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsReader20;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsWriter20;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
 /**
- * Test case for the readers and writers for the (light-)signalSystems_v1.*.xsd file
+ * Test case for the readers and writers for the signalSystems_v2.0.xsd file
  * format.
  * @author dgrether
  */
@@ -71,6 +65,7 @@ public class SignalSystemsData20ReaderWriterTest {
   	
   	checkContent(lss);
   }
+  
   @Test
   public void testWriter() throws JAXBException, SAXException, ParserConfigurationException, IOException {
   	String testoutput = this.testUtils.getOutputDirectory()  + "testLssOutput.xml";
