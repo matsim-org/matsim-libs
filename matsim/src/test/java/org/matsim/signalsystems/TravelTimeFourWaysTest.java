@@ -25,13 +25,21 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.signalsystems.builder.FromDataBuilder;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.SignalsScenarioLoader;
+import org.matsim.signalsystems.model.QSimSignalEngine;
+import org.matsim.signalsystems.model.SignalEngine;
+import org.matsim.signalsystems.model.SignalSystemsManager;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -51,17 +59,32 @@ public class TravelTimeFourWaysTest {
 		conf.network().setInputFile(this.testUtils.getClassInputDirectory() + "network.xml.gz");
 		String laneDefinitions = this.testUtils.getClassInputDirectory()
 				+ "testLaneDefinitions_v1.1.xml";
-		String lsaDefinition = this.testUtils.getClassInputDirectory()
-				+ "testSignalSystems_v1.1.xml";
-		String lsaConfig = this.testUtils.getClassInputDirectory()
-				+ "testSignalSystemConfigurations_v1.1.xml";
 		conf.network().setLaneDefinitionsFile(laneDefinitions);
-		conf.signalSystems().setSignalSystemFile(lsaDefinition);
-		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		conf.scenario().setUseLanes(true);
-		conf.scenario().setUseSignalSystems(true);
+		conf.scenario().setUseSignalSystems(false);
+
+		SignalSystemsConfigGroup signalsConfig = conf.signalSystems();
+		String signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
+		String signalGroupsFile = testUtils.getClassInputDirectory() + "testSignalGroups_v2.0.xml";
+		String signalControlFile = testUtils.getClassInputDirectory() + "testSignalControl_v2.0.xml";
+		String amberTimesFile = testUtils.getClassInputDirectory() + "testAmberTimes_v1.0.xml";
+		signalsConfig.setSignalSystemFile(signalSystemsFile);
+		signalsConfig.setSignalGroupsFile(signalGroupsFile);
+		signalsConfig.setSignalControlFile(signalControlFile);
+		signalsConfig.setAmberTimesFile(amberTimesFile);
 		conf.setQSimConfigGroup(new QSimConfigGroup());
+
 		return scenario;
+	}
+	
+	private SignalEngine initSignalEngine(SignalSystemsConfigGroup signalsConfig, EventsManager events) {
+		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
+		SignalsData signalsData = signalsLoader.loadSignalsData();
+
+		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
+		SignalEngine engine = new QSimSignalEngine(manager);
+		return engine;
 	}
 	
 	@Test
@@ -75,12 +98,16 @@ public class TravelTimeFourWaysTest {
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
+		
+		SignalEngine signalEngine = this.initSignalEngine(scenario.getConfig().signalSystems(), events);
+		
 		QSim sim = new QSim(scenario, events);
+		sim.addQueueSimulationListeners(signalEngine);
 		sim.run();
 		eventsXmlWriter.closeFile();
 		Assert.assertEquals("different events files", CRCChecksum.getCRCFromFile(this.testUtils.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));
 	}
-	
+
 	@Test
 	public void testTrafficLightIntersection4armsWithUTurn() {
 		Scenario scenario = this.createTestScenario();
@@ -93,7 +120,10 @@ public class TravelTimeFourWaysTest {
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 		
+		SignalEngine signalEngine = this.initSignalEngine(scenario.getConfig().signalSystems(), events);
+		
 		QSim sim = new QSim(scenario, events);
+		sim.addQueueSimulationListeners(signalEngine);
 		sim.run();
 		eventsXmlWriter.closeFile();
 		Assert.assertEquals("different events files", CRCChecksum.getCRCFromFile(this.testUtils.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));

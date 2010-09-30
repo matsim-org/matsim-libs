@@ -20,52 +20,59 @@
 package org.matsim.integration.signalsystems;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 
 /**
  * @author dgrether
  *
  */
-public class SignalSystemsIntegrationTest extends MatsimTestCase {
+public class SignalSystemsIntegrationTest {
   
   private static final Logger log = Logger.getLogger(SignalSystemsIntegrationTest.class);
   
 	private final static String CONFIG_FILE_NAME = "signalSystemsIntegrationConfig.xml";
 
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	
+	@Test
 	public void testSignalSystems() {
-		Config config = this.loadConfig(this.getClassInputDirectory() + CONFIG_FILE_NAME);
-		config.controler().setOutputDirectory(this.getOutputDirectory());
+		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config.setQSimConfigGroup(new QSimConfigGroup());
 		Controler c = new Controler(config);
 		c.setCreateGraphs(false);
 		c.run();
-
-		//iteration 0 
-		String iterationOutput = this.getOutputDirectory() + "ITERS/it.0/";
-		String inputDirectory = getInputDirectory();
 		
-		assertEquals("different events files", 
+			//iteration 0 
+		String iterationOutput = testUtils.getOutputDirectory() + "ITERS/it.0/";
+		String inputDirectory = testUtils.getInputDirectory();
+		
+		Assert.assertEquals("different events files after iteration 0 ", 
 				CRCChecksum.getCRCFromFile(inputDirectory + "0.events.xml.gz"), 
 				CRCChecksum.getCRCFromFile(iterationOutput + "0.events.xml.gz"));
 
-		assertEquals("different population files", 
-				CRCChecksum.getCRCFromFile(this.getInputDirectory() + "0.plans.xml.gz"), 
+		Assert.assertEquals("different population files after iteration 0 ", 
+				CRCChecksum.getCRCFromFile(testUtils.getInputDirectory() + "0.plans.xml.gz"), 
 				CRCChecksum.getCRCFromFile(iterationOutput + "0.plans.xml.gz"));
 
 		//iteration 10 
-		iterationOutput = this.getOutputDirectory() + "ITERS/it.10/";
+		iterationOutput = testUtils.getOutputDirectory() + "ITERS/it.10/";
 		
-		assertEquals("different events files", 
+		Assert.assertEquals("different events files after iteration 10 ", 
 				CRCChecksum.getCRCFromFile(inputDirectory + "10.events.xml.gz"), 
 				CRCChecksum.getCRCFromFile(iterationOutput + "10.events.xml.gz"));
 
-		assertEquals("different population files", 
-				CRCChecksum.getCRCFromFile(this.getInputDirectory() + "10.plans.xml.gz"), 
+		Assert.assertEquals("different population files after iteration 10 ", 
+				CRCChecksum.getCRCFromFile(testUtils.getInputDirectory() + "10.plans.xml.gz"), 
 				CRCChecksum.getCRCFromFile(iterationOutput + "10.plans.xml.gz"));
 	}
 	

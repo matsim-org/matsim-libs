@@ -19,142 +19,229 @@
  * *********************************************************************** */
 package org.matsim.signalsystems;
 
+import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.LaneEnterEvent;
+import org.matsim.core.events.LaneLeaveEvent;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.SignalGroupStateChangedEvent;
+import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.events.handler.LaneEnterEventHandler;
+import org.matsim.core.events.handler.LaneLeaveEventHandler;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
+import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.SignalGroupSettings;
-import org.matsim.signalsystems.config.SignalSystemConfiguration;
-import org.matsim.signalsystems.config.SignalSystemConfigurations;
-import org.matsim.signalsystems.config.SignalSystemPlan;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.signalsystems.builder.FromDataBuilder;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.SignalsScenarioLoader;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.model.SignalEngine;
+import org.matsim.signalsystems.model.QSimSignalEngine;
+import org.matsim.signalsystems.model.SignalSystemsManager;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author aneumann
  * @author dgrether
  */
-public class TravelTimeOneWayTest extends MatsimTestCase {
+public class TravelTimeOneWayTest {
 
 	private static final Logger log = Logger.getLogger(TravelTimeOneWayTest.class);
 
 	final static int timeToWaitBeforeMeasure = 498; // Make sure measurement starts with second 0 in signalsystemplan
 
-	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60() {
-		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
-		String laneDefinitions = this.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
-		String lsaDefinition = this.getClassInputDirectory() + "testSignalSystems_v1.1.xml";
-		String lsaConfig = this.getClassInputDirectory() + "testSignalSystemConfigurations_v1.1.xml";
-		conf.network().setLaneDefinitionsFile(laneDefinitions);
-		conf.signalSystems().setSignalSystemFile(lsaDefinition);
-		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
-//		conf.simulation().setEndTime(21*3600.0);
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
+	private Scenario createAndInitConfig() {
+		Config conf = new Config();
+		conf.addCoreModules();
+		conf.network().setInputFile(this.testUtils.getClassInputDirectory() + "network.xml.gz");
+		conf.plans().setInputFile(this.testUtils.getClassInputDirectory() + "plans.xml.gz");
+		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
+		conf.network().setLaneDefinitionsFile(laneDefinitions);
+		conf.setQSimConfigGroup(new QSimConfigGroup());
+		conf.getQSimConfigGroup().setStuckTime(1000);
+		conf.getQSimConfigGroup().setRemoveStuckVehicles(false);
 		conf.scenario().setUseLanes(true);
-		conf.scenario().setUseSignalSystems(true);
+		conf.scenario().setUseSignalSystems(false);
+
+		SignalSystemsConfigGroup signalsConfig = conf.signalSystems();
+		String signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
+		String signalGroupsFile = testUtils.getClassInputDirectory() + "testSignalGroups_v2.0.xml";
+		String signalControlFile = testUtils.getClassInputDirectory() + "testSignalControl_v2.0.xml";
+		String amberTimesFile = testUtils.getClassInputDirectory() + "testAmberTimes_v1.0.xml";
+		signalsConfig.setSignalSystemFile(signalSystemsFile);
+		signalsConfig.setSignalGroupsFile(signalGroupsFile);
+		signalsConfig.setSignalControlFile(signalControlFile);
+		signalsConfig.setAmberTimesFile(amberTimesFile);
+		
 		ScenarioImpl data = new ScenarioImpl(conf);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();
+		return data;
+	}
 
-//		LaneDefinitions lanedefs = data.getLaneDefinitions();
+	private SignalEngine initSignalEngine(SignalSystemsConfigGroup signalsConfig, EventsManager events) {
+		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
+		SignalsData signalsData = signalsLoader.loadSignalsData();
+
+		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
+		SignalEngine engine = new QSimSignalEngine(manager);
+		return engine;
+	}
+
+	/**
+	 * 
+	 * @author aneumann
+	 * @author dgrether
+	 */
+	@Test
+	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60() {
+		ScenarioImpl scenario = (ScenarioImpl) this.createAndInitConfig();
 
 		EventsManagerImpl events = new EventsManagerImpl();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
-
-//		TreeMap<Integer, MeasurementPoint> results = new TreeMap<Integer, MeasurementPoint>();
-
+//		events.addHandler(new LogOutputEventHandler());
 		int circulationTime = 60;
-
-//		SignalSystems lssDefs = data.getSignalSystems();
-		SignalSystemConfigurations lssConfigs = data.getSignalSystemConfigurations();
 
 		Id id2 = new IdImpl(2);
 		Id id100 = new IdImpl(100);
 
-		for (int dropping = 1; dropping <= circulationTime; dropping++) {
+		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(scenario.getConfig().signalSystems());
+		SignalsData signalsData = signalsLoader.loadSignalsData();
+
+		
+		for (int dropping = 10; dropping <= circulationTime; dropping++) {
 			eventHandler.reset(1);
 
-			for (SignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
-				PlanBasedSignalSystemControlInfo controlInfo = (PlanBasedSignalSystemControlInfo) lssConfig
-						.getControlInfo();
-				SignalSystemPlan p = controlInfo.getPlans().get(id2);
-				p.setCycleTime(circulationTime);
-				SignalGroupSettings group = p.getGroupConfigs().get(id100);
-				group.setDropping(dropping);
-			}
-			QSim sim = new QSim(data, events);
+			SignalSystemControllerData controllerData = signalsData.getSignalSystemControlData().getSignalSystemControllerDataBySystemId().get(id2);
+			SignalPlanData signalPlan = controllerData.getSignalPlanData().get(id2);
+			signalPlan.setCycleTime(circulationTime);
+			signalPlan.getSignalGroupSettingsDataByGroupId().get(id100).setDropping(dropping);
+			
+//			for (SignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations()
+//					.values()) {
+//				PlanBasedSignalSystemControlInfo controlInfo = (PlanBasedSignalSystemControlInfo) lssConfig
+//						.getControlInfo();
+//				SignalSystemPlan p = controlInfo.getPlans().get(id2);
+//				p.setCycleTime(circulationTime);
+//				SignalGroupSettings group = p.getGroupConfigs().get(id100);
+//				group.setDropping(dropping);
+//			}
+			
+			//build the signal model
+			FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+			SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
+			SignalEngine signalEngine = new QSimSignalEngine(manager);
+			//run the qsim
+			QSim sim = new QSim(scenario, events);
+			sim.addQueueSimulationListeners(signalEngine);
 			sim.run();
-//			results.put(Integer.valueOf(dropping), eventHandler.beginningOfLink2);
 			log.debug("circulationTime: " + circulationTime);
 			log.debug("dropping  : " + dropping);
 
-			assertEquals((dropping * 2000.0 / circulationTime),
+			Assert.assertEquals((dropping * 2000.0 / circulationTime),
 					eventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure, 1.0);
-			assertEquals(5000.0, eventHandler.beginningOfLink2.numberOfVehPassed, EPSILON);
+			Assert.assertEquals(5000.0, eventHandler.beginningOfLink2.numberOfVehPassed,
+					MatsimTestUtils.EPSILON);
 		}
 	}
 
+	/**
+	 * This tests if a QSim with signals that are all the time green produces the same
+	 * result as a QSim without any signals.
+	 * 
+	 * @author aneumann
+	 * @author dgrether
+	 */
+	@Test
 	public void testTrafficLightIntersection2arms_w_TrafficLight() {
-		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
-		String laneDefinitions = this.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
-		String lsaDefinition = this.getClassInputDirectory() + "testSignalSystems_v1.1.xml";
-		String lsaConfig = this.getClassInputDirectory() + "testSignalSystemConfigurations_v1.1.xml";
-		conf.network().setLaneDefinitionsFile(laneDefinitions);
-		conf.signalSystems().setSignalSystemFile(lsaDefinition);
-		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
-		conf.setQSimConfigGroup(new QSimConfigGroup());
-		conf.scenario().setUseLanes(true);
-		conf.scenario().setUseSignalSystems(true);
-		ScenarioImpl data = new ScenarioImpl(conf);
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
-		loader.loadScenario();
+		Scenario scenario = this.createAndInitConfig();
 
+
+		//test with signal systems
 		EventsManagerImpl events = new EventsManagerImpl();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
-		QSim sim = new QSim(data, events);
+
+		SignalEngine signalEngine = this.initSignalEngine(scenario.getConfig().signalSystems(), events);
+		
+		QSim sim = new QSim(scenario, events);
+		sim.addQueueSimulationListeners(signalEngine);
 		sim.run();
-		// log.debug("tF = 60s, " +
-		// this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure + ", " +
-		// this.beginningOfLink2.numberOfVehPassed + ", " +
-		// this.beginningOfLink2.firstVehPassTime_s + ", " +
-		// this.beginningOfLink2.lastVehPassTime_s);
-
-		MeasurementPoint qSim = eventHandler.beginningOfLink2;
-		eventHandler.reset(1);
-
-		new QSim(data, events).run();
+		MeasurementPoint qSimMeasurementPoint = eventHandler.beginningOfLink2;
+		
+	
+		//test without signal systems 
+		events = new EventsManagerImpl();
+		eventHandler = new StubLinkEnterEventHandler();
+		events.addHandler(eventHandler);
+		new QSim(scenario, events).run();
 		if (eventHandler.beginningOfLink2 != null) {
-			log.debug("tF = 60s, "
-					+ eventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure + ", "
-					+ eventHandler.beginningOfLink2.numberOfVehPassed + ", "
+			log.debug("tF = 60s, " + eventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure
+					+ ", " + eventHandler.beginningOfLink2.numberOfVehPassed + ", "
 					+ eventHandler.beginningOfLink2.firstVehPassTime_s + ", "
 					+ eventHandler.beginningOfLink2.lastVehPassTime_s);
 		}
 		else {
-			fail("seems like no LinkEnterEvent was handled, as this.beginningOfLink2 is not set.");
+			Assert.fail("seems like no LinkEnterEvent was handled, as this.beginningOfLink2 is not set.");
 		}
 		MeasurementPoint queueSimulation = eventHandler.beginningOfLink2;
-
 		// circle time is 60s, green 60s
-		assertEquals(5000.0, qSim.numberOfVehPassed, EPSILON);
+		Assert.assertEquals(5000.0, qSimMeasurementPoint.numberOfVehPassed, MatsimTestUtils.EPSILON);
 
-		assertEquals(qSim.firstVehPassTime_s, queueSimulation.firstVehPassTime_s, EPSILON);
-		assertEquals(qSim.numberOfVehPassed, queueSimulation.numberOfVehPassed, EPSILON);
-		assertEquals(qSim.numberOfVehPassedDuringTimeToMeasure,
-				queueSimulation.numberOfVehPassedDuringTimeToMeasure, EPSILON);
+		Assert.assertEquals(qSimMeasurementPoint.firstVehPassTime_s, queueSimulation.firstVehPassTime_s,
+				MatsimTestUtils.EPSILON);
+		Assert.assertEquals(qSimMeasurementPoint.numberOfVehPassed, queueSimulation.numberOfVehPassed,
+				MatsimTestUtils.EPSILON);
+		Assert.assertEquals(qSimMeasurementPoint.numberOfVehPassedDuringTimeToMeasure,
+				queueSimulation.numberOfVehPassedDuringTimeToMeasure, MatsimTestUtils.EPSILON);
 	}
 
-
-	/*package*/ static class StubLinkEnterEventHandler implements LinkEnterEventHandler {
+	/* package */ static class StubLinkEnterEventHandler implements LinkEnterEventHandler {
 
 		public MeasurementPoint beginningOfLink2 = null;
 
@@ -206,5 +293,95 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 			this.timeToStartMeasurement = time;
 		}
 	}
+	
+	private static class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
+	ActivityStartEventHandler, ActivityEndEventHandler, 
+	AgentDepartureEventHandler, AgentArrivalEventHandler, 
+	AgentMoneyEventHandler, AgentStuckEventHandler, 
+	PersonEventHandler, AgentWait2LinkEventHandler,
+	LaneEnterEventHandler, LaneLeaveEventHandler,
+	SignalGroupStateChangedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
+	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
+
+	private static final Logger log = Logger.getLogger(LogOutputEventHandler.class);
+
+	public void handleEvent(LinkEnterEvent event) {
+//		log.info("LinkEnterEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " link id " + event.getLinkId());
+	}
+
+	public void reset(int iteration) {}
+
+	public void handleEvent(LinkLeaveEvent event) {
+//		log.info("LinkLeaveEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " link id " + event.getLinkId());
+	}
+
+	public void handleEvent(ActivityStartEvent event) {
+//		log.info("ActivityStartEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " activity type " + event.getActType());
+	}
+
+	public void handleEvent(ActivityEndEvent event) {
+//		log.info("ActivityEndEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " activity type " + event.getActType());
+	}
+
+	public void handleEvent(AgentDepartureEvent event) {
+//		log.info("AgentDepartureEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId());
+	}
+
+	public void handleEvent(AgentArrivalEvent event) {
+//		log.info("AgentArrivalEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId());
+	}
+
+	public void handleEvent(AgentMoneyEvent event) {
+		log.info("AgentMoneyEvent person id " + event.getPersonId());
+	}
+
+	public void handleEvent(AgentStuckEvent event) {
+		log.info("AgentStuckEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId());
+	}
+
+	public void handleEvent(PersonEvent event) {
+//		log.info("PersonEvent at " + Time.writeTime(event.getTime()) + " person id "  + event.getPersonId());
+	}
+
+	public void handleEvent(AgentWait2LinkEvent event) {
+//		log.info("AgentWait2LinkEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " link id " + event.getLinkId());
+	}
+
+	public void handleEvent(LaneEnterEvent event) {
+//		log.info("LaneEnterEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " lane id " + event.getLaneId() + " link id " + event.getLinkId());
+	}
+
+	public void handleEvent(LaneLeaveEvent event) {
+//		log.info("LaneLeaveEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " lane id " + event.getLaneId() + " link id " + event.getLinkId());
+	}
+
+	public void handleEvent(SignalGroupStateChangedEvent event) {
+		log.info("SignalGroupStateChangedEvent at " + Time.writeTime(event.getTime()) 
+				+	" SignalSystem id " + event.getSignalSystemId() 
+				+ " SignalGroup id " + event.getSignalGroupId() 
+				+ " SignalGroupState " + event.getNewState());
+	}
+
+	public void handleEvent(PersonEntersVehicleEvent e) {
+		log.info("PersonEntersVehicleEvent at " + Time.writeTime(e.getTime()) + " person id " + e.getPersonId() + " vehicle id " + e.getVehicleId());
+	}
+
+	public void handleEvent(PersonLeavesVehicleEvent e) {
+		log.info("PersonLeavesVehicleEvent at " + Time.writeTime(e.getTime()) + " person id " + e.getPersonId() + " vehicle id " + e.getVehicleId());		
+	}
+
+	@Override
+	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+		log.info("VehicleArrivesAtFacilityEvent at " + Time.writeTime(event.getTime()) + " facility id " + event.getFacilityId() + " vehicle id " + event.getVehicleId() + " delay " + event.getDelay());
+	}
+	
+	@Override
+	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+		log.info("VehicleDepartsAtFacilityEvent at " + Time.writeTime(event.getTime()) + " facility id " + event.getFacilityId() + " vehicle id " + event.getVehicleId() + " delay " + event.getDelay());
+	}
+
+}
+
+	
 
 }

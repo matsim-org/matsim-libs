@@ -20,22 +20,36 @@
 package org.matsim.signalsystems;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.config.PlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.SignalGroupSettings;
 import org.matsim.signalsystems.config.SignalSystemConfiguration;
 import org.matsim.signalsystems.config.SignalSystemConfigurations;
 import org.matsim.signalsystems.config.SignalSystemPlan;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.SignalsScenarioLoader;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.model.QSimSignalEngine;
+import org.matsim.signalsystems.model.SignalEngine;
+import org.matsim.signalsystems.model.SignalSystemsManager;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Simple test case for the QueueSim signal system implementation.
@@ -44,20 +58,30 @@ import org.matsim.testcases.MatsimTestCase;
  *
  * @author dgrether
  */
-public class SignalSystemsOneAgentTest extends MatsimTestCase implements
+public class SignalSystemsOneAgentTest implements
 		LinkEnterEventHandler {
 
 	private static final Logger log = Logger.getLogger(SignalSystemsOneAgentTest.class);
 
 	private Id id1 = new IdImpl(1);
 	private Id id2 = new IdImpl(2);
+	private Id id100 = new IdImpl(100);
+	
+	private double link2EnterTime = Double.NaN;
 
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	
+//	@Test
 	public void testTrafficLightIntersection2arms1Agent() {
-		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
-		String plansFile = this.getClassInputDirectory() + "plans1Agent.xml";
-		String laneDefinitions = this.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
-		String lsaDefinition = this.getClassInputDirectory() + "testSignalSystems_v1.1.xml";
-		String lsaConfig = this.getClassInputDirectory() + "testSignalSystemConfigurations_v1.1.xml";
+		String plansFile = testUtils.getClassInputDirectory() + "plans1Agent.xml";
+		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
+		String lsaDefinition = testUtils.getClassInputDirectory() + "testSignalSystems_v1.1.xml";
+		String lsaConfig = testUtils.getClassInputDirectory() + "testSignalSystemConfigurations_v1.1.xml";
+
+		ScenarioImpl scenario = new ScenarioImpl();
+		Config conf = scenario.getConfig();
+		conf.network().setInputFile(testUtils.getClassInputDirectory() + "network.xml.gz");
 		conf.network().setLaneDefinitionsFile(laneDefinitions);
 		conf.signalSystems().setSignalSystemFile(lsaDefinition);
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
@@ -65,14 +89,15 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(true);
 		conf.setQSimConfigGroup(new QSimConfigGroup());
-		ScenarioImpl scenario = new ScenarioImpl(conf);
+		conf.getQSimConfigGroup().setStuckTime(1000);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 
 		loader.loadScenario();
 
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(this);
-
+		this.link2EnterTime = 38.0;
+		
 		SignalSystemConfigurations lssConfigs = scenario.getSignalSystemConfigurations();
 		for (SignalSystemConfiguration lssConfig : lssConfigs.getSignalSystemConfigurations().values()) {
 			PlanBasedSignalSystemControlInfo controlInfo = (PlanBasedSignalSystemControlInfo) lssConfig
@@ -85,15 +110,106 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 
 		new QSim(scenario, events).run();
 	}
+	
+	private Scenario createAndLoadTestScenario(){
+		String plansFile = testUtils.getClassInputDirectory() + "plans1Agent.xml";
+		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
+		ScenarioImpl scenario = new ScenarioImpl();
+		Config conf = scenario.getConfig();
+		conf.network().setInputFile(testUtils.getClassInputDirectory() + "network.xml.gz");
+		conf.network().setLaneDefinitionsFile(laneDefinitions);
+		conf.plans().setInputFile(plansFile);
+		conf.scenario().setUseLanes(true);
+		//as signals are configured below we don't need signals on
+		conf.scenario().setUseSignalSystems(false);
+		conf.setQSimConfigGroup(new QSimConfigGroup());
+		conf.getQSimConfigGroup().setStuckTime(1000);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
+		loader.loadScenario();
+		return scenario;
+	}
+	
+	private void setSignalSystemConfigValues(SignalSystemsConfigGroup signalsConfig){
+		String signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
+		String signalGroupsFile = testUtils.getClassInputDirectory() + "testSignalGroups_v2.0.xml";
+		String signalControlFile = testUtils.getClassInputDirectory() + "testSignalControl_v2.0.xml";
+		String amberTimesFile = testUtils.getClassInputDirectory() + "testAmberTimes_v1.0.xml";
+		signalsConfig.setSignalSystemFile(signalSystemsFile);
+		signalsConfig.setSignalGroupsFile(signalGroupsFile);
+		signalsConfig.setSignalControlFile(signalControlFile);
+		signalsConfig.setAmberTimesFile(amberTimesFile);
+	}
 
+	/**
+	 * Tests the setup with a traffic light that shows all the time green
+	 */
+	@Test
+	public void testTrafficLightIntersection2arms1AgentV20() {
+		//configure and load standard scenario
+		Scenario scenario = this.createAndLoadTestScenario();
+		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
+		this.setSignalSystemConfigValues(signalsConfig);
+		
+		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
+		SignalsData signalsData = signalsLoader.loadSignalsData();
+		
+		EventsManagerImpl events = new EventsManagerImpl();
+		events.addHandler(this);
+		this.link2EnterTime = 38.0;
+		
+		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
+		SignalEngine engine = new QSimSignalEngine(manager);
+		
+		QSim qsim = new QSim(scenario, events);
+		qsim.addQueueSimulationListeners(engine);
+		qsim.run();
+	}
+	
+
+	/**
+	 * Tests the setup with a traffic light that shows all the time green
+	 */
+	@Test
+	public void testSignalSystems1AgentGreenAtSec100() {
+		//configure and load standard scenario
+		Scenario scenario = this.createAndLoadTestScenario();
+		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
+		this.setSignalSystemConfigValues(signalsConfig);
+		
+		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
+		SignalsData signalsData = signalsLoader.loadSignalsData();
+		
+		SignalSystemControllerData controllerData = signalsData.getSignalSystemControlData().getSignalSystemControllerDataBySystemId().get(id2);
+		SignalPlanData planData = controllerData.getSignalPlanData().get(id2);
+		planData.setCycleTime(5 * 3600);
+		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(id100);
+		groupData.setDropping(0);
+		groupData.setOnset(100);
+		
+		EventsManagerImpl events = new EventsManagerImpl();
+		events.addHandler(this);
+		this.link2EnterTime = 100.0;
+		
+		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
+		SignalEngine engine = new QSimSignalEngine(manager);
+		
+		QSim qsim = new QSim(scenario, events);
+		qsim.addQueueSimulationListeners(engine);
+		qsim.run();
+	}
+
+	
+	
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
-		log.info("LinkEnter: " + e.getLinkId().toString() + " time: " + e.getTime());
+		log.info("Link id: " + e.getLinkId().toString() + " enter time: " + e.getTime());
 		if (e.getLinkId().equals(id1)){
-			assertEquals(1.0, e.getTime(), EPSILON);
+			Assert.assertEquals(1.0, e.getTime(), MatsimTestUtils.EPSILON);
 		}
 		else if (e.getLinkId().equals(id2)){
-			assertEquals(38.0, e.getTime(), EPSILON);
+			Assert.assertEquals(this.link2EnterTime, e.getTime(), MatsimTestUtils.EPSILON);
 		}
 	}
 
