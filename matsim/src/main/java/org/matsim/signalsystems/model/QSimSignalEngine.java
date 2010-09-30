@@ -22,8 +22,11 @@ package org.matsim.signalsystems.model;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.ptproject.qsim.interfaces.QLink;
+import org.matsim.ptproject.qsim.interfaces.QNetworkI;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.netsimengine.QLane;
+import org.matsim.ptproject.qsim.netsimengine.QLinkImpl;
 import org.matsim.ptproject.qsim.netsimengine.QLinkLanesImpl;
 
 
@@ -51,25 +54,25 @@ public class QSimSignalEngine implements SignalEngine {
 	}
 
 	private void initializeSignalizedItems(QSimI qSim) {
-//		QNetworkI net = qSim.getQNetwork();
-//		for (SignalSystem system : this.signalManager.getSignalSystems().values()){
-//			for (Signal signal : system.getSignals().values()){
-//				QLink link = net.getLinks().get(signal.getLinkId());
-//				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
-//					QLinkImpl l = (QLinkImpl) link;
-//					//TODO l.setSignalized()
-//					signal.addSignalizedItem((SignalizeableItem)l);
-//				}
-//				else {
-//					QLinkLanesImpl l = (QLinkLanesImpl) link;
-//					for (Id laneId : signal.getLaneIds()){
-//						QLane lane = getQLane(laneId, l);
-//						lane.setSignalized(true);
-//						signal.addSignalizedItem(lane);
-//					}
-//				}
-//			}
-//		}
+		QNetworkI net = qSim.getQNetwork();
+		for (SignalSystem system : this.signalManager.getSignalSystems().values()){
+			for (Signal signal : system.getSignals().values()){
+				QLink link = net.getLinks().get(signal.getLinkId());
+				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
+					QLinkImpl l = (QLinkImpl) link;
+					//TODO l.setSignalized()
+					signal.addSignalizeableItem((SignalizeableItem)l);
+				}
+				else {
+					QLinkLanesImpl l = (QLinkLanesImpl) link;
+					for (Id laneId : signal.getLaneIds()){
+						QLane lane = getQLane(laneId, l);
+						lane.setSignalized(true);
+						signal.addSignalizeableItem(lane);
+					}
+				}
+			}
+		}
 	}
 
 	public QLane getQLane(Id laneId, QLinkLanesImpl link){

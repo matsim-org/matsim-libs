@@ -42,6 +42,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	@Override
 	public void updateState(double timeSeconds) {
 		this.checkActivePlan();
+		
 		List<Id> droppingGroupIds = this.activePlan.getDroppings(timeSeconds);
 		if (droppingGroupIds != null){
 			for (Id id : droppingGroupIds){

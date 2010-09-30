@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
@@ -34,7 +35,8 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
  *
  */
 public class DatabasedSignalPlan implements SignalPlan {
-
+	private static final Logger log = Logger.getLogger(DatabasedSignalPlan.class);
+	
 	private SignalPlanData data;
 	private int cylce;
 	

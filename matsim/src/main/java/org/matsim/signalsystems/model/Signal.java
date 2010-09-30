@@ -37,7 +37,7 @@ public interface Signal {
 	
 	public Set<Id> getLaneIds();
 
-	public void addSignalizedItem(SignalizeableItem signalizedItem);
+	public void addSignalizeableItem(SignalizeableItem signalizedItem);
 
 	public void setState(SignalGroupState state);
 	

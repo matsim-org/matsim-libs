@@ -45,15 +45,13 @@ public class SignalSystemsConfigGroup extends Module {
 	public static final String GROUPNAME = "signalsystems";
 
 	private String signalSystemFile;
-	private String signalSystemConfigFile;
+	private String signalControlFile;
 
 	private String signalGroupsFile;
 
 	private String amberTimesFile;
 	
 	private String intergreenTimesFile;
-
-	private String signalControlFile;
 
 	public SignalSystemsConfigGroup() {
 		super(GROUPNAME);
@@ -69,10 +67,10 @@ public class SignalSystemsConfigGroup extends Module {
 		if (SIGNALSYSTEM_FILE.equalsIgnoreCase(key)){
 			this.signalSystemFile = value.replace("\\", "/").trim();
 		}
-		else if (SIGNALSYSTEMCONFIG_FILE.equalsIgnoreCase(key)) {
-			this.signalSystemConfigFile = value.replace("\\", "/").trim();
+		else if (SIGNALSYSTEMCONFIG_FILE.equalsIgnoreCase(key) || SIGNALCONTROL_FILE.equalsIgnoreCase(key)) {
+			this.signalControlFile = value.replace("\\", "/").trim();
 		}
-		else if (SIGNALGROUPS_FILE.equalsIgnoreCase(key) || SIGNALCONTROL_FILE.equalsIgnoreCase(key)){
+		else if (SIGNALGROUPS_FILE.equalsIgnoreCase(key)){
 			this.signalGroupsFile = value.replace("\\", "/").trim();
 		}
 		else if (AMBERTIMES_FILE.equalsIgnoreCase(key)){
@@ -99,7 +97,7 @@ public class SignalSystemsConfigGroup extends Module {
 
 	@Override
 	protected void checkConsistency() {
-		if ((this.signalSystemFile == null) && (this.signalSystemConfigFile != null)) {
+		if ((this.signalSystemFile == null) && (this.signalControlFile != null)) {
 			throw new IllegalStateException("For using a SignalSystemConfiguration a definition of the signal systems must exist!");
 		}
 	}
@@ -115,15 +113,20 @@ public class SignalSystemsConfigGroup extends Module {
 	}
 
 
-
+	/**
+	 * 
+	 * @deprecated use getSignalControlFile instead
+	 */
+	@Deprecated
 	public String getSignalSystemConfigFile() {
-		return this.signalSystemConfigFile;
+		return this.signalControlFile;
 	}
-
-
-
+	/**
+	 * @deprecated use setSignalControlFile instead
+	 */
+	@Deprecated
 	public void setSignalSystemConfigFile(final String signalSystemConfigFile) {
-		this.signalSystemConfigFile = signalSystemConfigFile;
+		this.signalControlFile = signalSystemConfigFile;
 	}
 
 	public String getSignalGroupsFile() {

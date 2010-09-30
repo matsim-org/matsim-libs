@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.SignalGroupStateChangedEventImpl;
@@ -36,6 +37,8 @@ import org.matsim.core.events.SignalGroupStateChangedEventImpl;
  */
 public class SignalSystemImpl implements SignalSystem {
 
+	private static final Logger log = Logger.getLogger(SignalSystemImpl.class);
+	
 	private SignalController controller;
 	private StateLogic stateLogic;
 	private Map<Id, SignalGroup> signalGroups = new HashMap<Id, SignalGroup>();
@@ -66,12 +69,14 @@ public class SignalSystemImpl implements SignalSystem {
 		this.controller = controller;
 	}
 	
-	public void scheduleDropping(double timeSeconds, Id signalGroup){
-		Set<SignalGroupStateChangeRequest> rqs = this.manager.getAmberLogic().processDropping(timeSeconds, this.getId(), signalGroup);
+	public void scheduleDropping(double timeSeconds, Id signalGroupId){
+//		log.debug("dropping  at time " + timeSeconds + " of  group " + signalGroupId);
+		Set<SignalGroupStateChangeRequest> rqs = this.manager.getAmberLogic().processDropping(timeSeconds, this.getId(), signalGroupId);
 		requests.addAll(rqs);
 	}
 	
 	public void scheduleOnset(double timeSeconds, Id signalGroupId){
+//		log.debug("onset at time " + timeSeconds + " of  group " + signalGroupId);
 		if (this.stateLogic != null){
 			this.stateLogic.checkOnset(timeSeconds, signalGroupId);
 		}
@@ -79,15 +84,18 @@ public class SignalSystemImpl implements SignalSystem {
 		requests.addAll(rqs);
 	}
 	
+	
+	
 	@Override
 	public void updateState(double timeSeconds) {
 		this.controller.updateState(timeSeconds);
 		SignalGroupStateChangedEvent stateEvent;
 		this.sortedRequests.addAll(this.requests);
+		this.requests.clear();
 		SignalGroupStateChangeRequest request = this.sortedRequests.peek();
 		while (request != null && request.getTimeOfDay() <= timeSeconds){
+			log.debug("system id " + this.id + " group " + request.getSignalGroupId() + " state " + request.getRequestedState() + " at time " + timeSeconds);
 			this.signalGroups.get(request.getSignalGroupId()).setState(request.getRequestedState());
-			
 			stateEvent = new SignalGroupStateChangedEventImpl(timeSeconds, this.getId(), request.getSignalGroupId(), request.getRequestedState());
 			this.getSignalSystemsManager().getEventsManager().processEvent(stateEvent);
 			this.sortedRequests.poll();

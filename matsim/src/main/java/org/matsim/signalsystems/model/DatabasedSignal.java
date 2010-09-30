@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.control.SignalGroupState;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
@@ -33,6 +34,8 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
  *
  */
 public class DatabasedSignal implements Signal {
+
+	private static final Logger log = Logger.getLogger(DatabasedSignal.class);
 
 	private SignalData data;
 	private List<SignalizeableItem> signalizedItems = new ArrayList<SignalizeableItem>();
@@ -64,7 +67,7 @@ public class DatabasedSignal implements Signal {
 
 	
 	@Override
-	public void addSignalizedItem(SignalizeableItem signalizedItem) {
+	public void addSignalizeableItem(SignalizeableItem signalizedItem) {
 		this.signalizedItems.add(signalizedItem);
 	}
 
