@@ -49,7 +49,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -642,8 +642,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		}
 
 		@Override
-		protected StrategyManagerImpl loadStrategyManager() {
-			StrategyManagerImpl manager = new StrategyManagerImpl();
+		protected StrategyManager loadStrategyManager() {
+			StrategyManager manager = new StrategyManager();
 			StrategyManagerConfigLoader.load(this, manager);
 
 			manager.setMaxPlansPerAgent(4);

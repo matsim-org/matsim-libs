@@ -25,7 +25,7 @@ package playground.yu.newPlans;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 
@@ -61,8 +61,8 @@ public class PopWithHeterogeneousPlanChoiceSet extends Controler {
 		this.strategyChangerIteration = strategyChangerIteration;
 	}
 
-	protected StrategyManagerImpl loadStrategyManager() {
-		StrategyManagerImpl manager = new StrategyManagerImpl();
+	protected StrategyManager loadStrategyManager() {
+		StrategyManager manager = new StrategyManager();
 		StrategyManagerConfigLoader.load(this, manager);
 		manager.setPlanSelectorForRemoval(new RandomPlanSelectorWithPlanType()
 		// RandomPlanSelector()

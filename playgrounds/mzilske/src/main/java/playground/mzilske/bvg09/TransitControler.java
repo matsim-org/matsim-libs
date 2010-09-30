@@ -40,7 +40,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.IOSimulation;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -108,8 +108,8 @@ public class TransitControler extends Controler {
 	}
 
 	@Override
-	protected StrategyManagerImpl loadStrategyManager() {
-		StrategyManagerImpl manager = new StrategyManagerImpl();
+	protected StrategyManager loadStrategyManager() {
+		StrategyManager manager = new StrategyManager();
 		TransitStrategyManagerConfigLoader.load(this, this.config, manager);
 		return manager;
 	}

@@ -21,7 +21,7 @@
 package playground.meisterk.phd.controler;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 
 import playground.meisterk.kti.controler.KTIControler;
@@ -44,7 +44,7 @@ public class KTIPhDControler extends KTIControler {
 	}
 	
 	@Override
-	protected StrategyManagerImpl loadStrategyManager() {
+	protected StrategyManager loadStrategyManager() {
 		PhDStrategyManager manager = new PhDStrategyManager();
 		StrategyManagerConfigLoader.load(this, manager);
 		return manager;

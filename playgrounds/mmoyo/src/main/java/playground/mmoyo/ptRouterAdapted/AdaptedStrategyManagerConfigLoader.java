@@ -27,7 +27,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
@@ -46,9 +46,9 @@ public class AdaptedStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 	 * Reads and instantiates the strategy modules specified in the config-object.
 	 *
 	 * @param controler the {@link Controler} that provides miscellaneous data for the replanning modules
-	 * @param manager the {@link StrategyManagerImpl} to be configured according to the configuration
+	 * @param manager the {@link StrategyManager} to be configured according to the configuration
 	 */
-	public static void load(final Controler controler, final StrategyManagerImpl manager) {
+	public static void load(final Controler controler, final StrategyManager manager) {
 		log.info("Using AdaptedStrategyManagerConfigloader");
 		Config config = controler.getConfig();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());

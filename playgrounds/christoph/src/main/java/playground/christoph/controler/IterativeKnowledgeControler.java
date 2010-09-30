@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
@@ -173,9 +173,9 @@ public class IterativeKnowledgeControler extends Controler{
 	}
 
 	@Override
-	protected StrategyManagerImpl loadStrategyManager()
+	protected StrategyManager loadStrategyManager()
 	{
-		StrategyManagerImpl manager = new StrategyManagerImpl();
+		StrategyManager manager = new StrategyManager();
 		MyStrategyManagerConfigLoader.load(this, this.config, manager);
 		return manager;
 	}

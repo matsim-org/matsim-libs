@@ -31,7 +31,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
@@ -70,7 +70,7 @@ public class PhDControler extends Controler {
 	}
 
 	@Override
-	protected StrategyManagerImpl loadStrategyManager() {
+	protected StrategyManager loadStrategyManager() {
 		PhDStrategyManager manager = new PhDStrategyManager();
 		StrategyManagerConfigLoader.load(this, manager);
 		return manager;

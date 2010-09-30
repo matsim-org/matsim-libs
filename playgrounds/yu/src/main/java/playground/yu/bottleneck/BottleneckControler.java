@@ -26,7 +26,7 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
@@ -40,8 +40,8 @@ public class BottleneckControler extends Controler {
 	}
 
 	@Override
-	protected StrategyManagerImpl loadStrategyManager() {
-		StrategyManagerImpl manager = new StrategyManagerImpl();
+	protected StrategyManager loadStrategyManager() {
+		StrategyManager manager = new StrategyManager();
 		manager.setMaxPlansPerAgent(5);
 		//
 		PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.charyparNagelScoring()));

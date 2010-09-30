@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
@@ -40,7 +40,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  * @author yu
  * 
  */
-public class StrategyManagerWithRemoveOldestPlan extends StrategyManagerImpl {
+public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 	public static class OldestPlanForRemovalSelector implements PlanSelector {
 
 		@Override

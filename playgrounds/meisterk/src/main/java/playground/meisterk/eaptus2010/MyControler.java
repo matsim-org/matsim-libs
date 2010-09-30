@@ -7,7 +7,7 @@ import java.util.List;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 
@@ -58,8 +58,8 @@ public class MyControler extends Controler {
 	}
 
 	@Override
-	protected StrategyManagerImpl loadStrategyManager() {
-		StrategyManagerImpl manager = new StrategyManagerImpl();
+	protected StrategyManager loadStrategyManager() {
+		StrategyManager manager = new StrategyManager();
 		MyStrategyManagerConfigLoader.load(this, manager);
 		return manager;
 	}

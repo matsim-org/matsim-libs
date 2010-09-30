@@ -35,7 +35,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -294,8 +294,8 @@ public class SimpleRouterControler extends Controler {
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
 	@Override
-	protected StrategyManagerImpl loadStrategyManager() {
-		StrategyManagerImpl manager = new StrategyManagerImpl();
+	protected StrategyManager loadStrategyManager() {
+		StrategyManager manager = new StrategyManager();
 		MyStrategyManagerConfigLoader.load(this, this.config, manager);
 		return manager;
 	}

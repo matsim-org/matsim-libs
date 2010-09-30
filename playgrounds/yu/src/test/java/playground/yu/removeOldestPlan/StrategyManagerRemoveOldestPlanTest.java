@@ -13,7 +13,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -45,7 +45,7 @@ public class StrategyManagerRemoveOldestPlanTest extends MatsimTestCase {
 	 */
 	public void testRemoveOldestPlan() {
 		// init StrategyManager
-		StrategyManagerImpl manager = new StrategyManagerImpl();
+		StrategyManager manager = new StrategyManager();
 		manager.addStrategy(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
 
 		// init Population
