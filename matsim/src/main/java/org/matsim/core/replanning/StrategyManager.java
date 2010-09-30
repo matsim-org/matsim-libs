@@ -158,6 +158,8 @@ public class StrategyManager {
 			} else {
 				Gbl.errorMsg("No strategy found!");
 			}
+			
+			afterStrategyRunHook( person, strategy ) ;
 		}
 		
 		// finally make sure all strategies have finished there work
@@ -166,6 +168,10 @@ public class StrategyManager {
 		}
 		
 		afterRunHook( population ) ;
+	}
+	
+	protected void afterStrategyRunHook( Person person, PlanStrategy strategy ) {
+		// left empty for inheritance
 	}
 	
 	protected void afterRunHook( Population population ) {
