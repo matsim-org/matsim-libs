@@ -59,10 +59,10 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
@@ -147,8 +147,7 @@ import org.matsim.ptproject.qsim.multimodalsimengine.tools.MultiModalNetworkCrea
 import org.matsim.ptproject.qsim.multimodalsimengine.tools.NonCarRouteDropper;
 import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.signalsystems.SignalSystemConfigurationsWriter11;
-import org.matsim.signalsystems.SignalSystemsWriter11;
+import org.matsim.signalsystems.initialization.SignalsControllerListener;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
@@ -533,10 +532,11 @@ public class Controler {
 			if (this.config.scenario().isUseLanes()){
 				new LaneDefinitionsWriter20(this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
 			}
-			if (this.config.scenario().isUseSignalSystems()){
-				new SignalSystemsWriter11(this.scenarioData.getSignalSystems()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS));
-				new SignalSystemConfigurationsWriter11(this.scenarioData.getSignalSystemConfigurations()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS_CONFIG));
-			}
+//TODO dg remove
+			//			if (this.config.scenario().isUseSignalSystems()){
+//				new SignalSystemsWriter11(this.scenarioData.getSignalSystems()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS));
+//				new SignalSystemConfigurationsWriter11(this.scenarioData.getSignalSystemConfigurations()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS_CONFIG));
+//			}
 
 			if (unexpected) {
 				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
@@ -843,6 +843,9 @@ public class Controler {
 			if (config.getModule(COUNTS_MODULE_NAME) != null) {
 				addPtCountControlerListener();
 			}
+		}
+		if (this.config.scenario().isUseSignalSystems()){
+			addControlerListener(new SignalsControllerListener());
 		}
 	}
 

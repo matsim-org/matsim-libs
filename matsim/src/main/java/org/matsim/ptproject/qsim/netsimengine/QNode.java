@@ -60,8 +60,6 @@ public class QNode implements VisNode, Customizable {
 	/**
 	 * Indicates whether this node is signalized or not
 	 */
-	private boolean signalized = false;
-
   private QSimEngineImpl simEngine;
 
 	protected QNode(final Node n, final QSimEngine simEngine) {
@@ -201,7 +199,7 @@ public class QNode implements VisNode, Customizable {
   protected boolean moveVehicleOverNode(final QVehicle veh, final QBufferItem qbufferedItem, final double now) {
     Id nextLinkId = veh.getDriver().chooseNextLinkId();
     Link currentLink = veh.getCurrentLink();
-    if (this.isSignalized() && (!qbufferedItem.hasGreenForToLink(nextLinkId))) {
+    if ((!qbufferedItem.hasGreenForToLink(nextLinkId))) {
     		if (!((now - qbufferedItem.getBufferLastMovedTime()) > this.simEngine.getStuckTime())){
     			return false;
     		}
@@ -252,13 +250,6 @@ public class QNode implements VisNode, Customizable {
     return true;
   }
 
-  public void setSignalized(final boolean b) {
-		this.signalized = b;
-	}
-
-	 boolean isSignalized(){
-		return this.signalized;
-	}
 
 	protected static class QueueLinkIdComparator implements Comparator<QLink>, Serializable {
 		private static final long serialVersionUID = 1L;

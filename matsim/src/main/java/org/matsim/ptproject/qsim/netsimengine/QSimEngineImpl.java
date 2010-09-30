@@ -118,7 +118,7 @@ private final double stucktimeCache;
 
 	protected void moveNodes(final double time) {
 		for (QNode node : this.simNodesArray) {
-			if (node.isActive() || node.isSignalized() || simulateAllNodes) {
+			if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes) {
 				/* It is faster to first test if the node is active, and only then call moveNode(),
 				 * than calling moveNode() directly and that one returns immediately when it's not
 				 * active. Most likely, the getter isActive() can be in-lined by the compiler, while
@@ -162,6 +162,7 @@ private final double stucktimeCache;
 	/**
 	 * @return Returns the simLinksArray.
 	 */
+	@Override
 	public int getNumberOfSimulatedLinks() {
 		return this.simLinksArray.size();
 	}

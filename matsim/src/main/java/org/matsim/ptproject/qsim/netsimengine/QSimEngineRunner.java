@@ -132,7 +132,7 @@ public class QSimEngineRunner extends QSimEngine implements Runnable {
 					QNode node = extendedQueueNode.getQueueNode();
 //					synchronized(node)
 //					{
-						if (node.isActive() || node.isSignalized() || simulateAllNodes)
+						if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes)
 						{
 							node.moveNode(time, extendedQueueNode.getRandom());
 						}
@@ -213,6 +213,7 @@ public class QSimEngineRunner extends QSimEngine implements Runnable {
 //		return this.linksToActivate;
 //	}
 
+	@Override
 	public int getNumberOfSimulatedLinks()
 	{
 		return this.links.size();

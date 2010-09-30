@@ -306,6 +306,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		return this.parkedVehicles.get(vehicleId);
 	}
 
+	@Override
 	public QVehicle removeParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
@@ -366,6 +367,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		return true;
 	}
 
+	@Override
 	boolean hasSpace() {
 		return this.originalLane.hasSpace();
 	}

@@ -48,6 +48,9 @@ import org.matsim.pt.qsim.TransitQLaneFeature;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
+import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.signalsystems.mobsim.QSignalizedItem;
+import org.matsim.signalsystems.model.SignalizeableItem;
 import org.matsim.signalsystems.systems.SignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisData;
@@ -64,7 +67,7 @@ import org.matsim.vis.snapshots.writers.VisData;
  * @author aneumann
  * @author mrieser
  */
-public final class QLane extends QBufferItem {
+public final class QLane extends QBufferItem implements SignalizeableItem {
 	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
 	// syntax).  kai, aug'10
 
@@ -161,6 +164,8 @@ public final class QLane extends QBufferItem {
 	private boolean fireLaneEvents = false;
 
 	/*package*/ final TransitQLaneFeature transitQueueLaneFeature;
+
+	private QSignalizedItem qSignalizedItem;
 
 	/*package*/ QLane(final QLink ql, Lane laneData, boolean isOriginalLane) {
 		this.queueLink = (QLinkInternalI) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
@@ -672,9 +677,36 @@ public final class QLane extends QBufferItem {
 
 	@Override
 	boolean hasGreenForToLink(Id toLinkId){
-		return true;
+		if (this.qSignalizedItem != null){
+			return this.qSignalizedItem.isLinkGreenForToLink(toLinkId);
+		}
+		return true; //the lane is not signalized and thus always green
+	}
+	
+	protected Lane getLaneData() {
+		return this.laneData;
 	}
 
+	@Override
+	public void setSignalStateAllTurningMoves(SignalGroupState state) {
+		this.qSignalizedItem.setSignalStateAllTurningMoves(state);
+		this.thisTimeStepGreen = this.qSignalizedItem.isLinkGreen();
+	}
+
+	@Override
+	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId) {
+		if (!this.getQLink().getToQueueNode().getNode().getOutLinks().containsKey(toLinkId)){
+			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLane Id " + this.getId() + " on QLink " + this.getQLink().getLink().getId());
+		}
+		this.qSignalizedItem.setSignalStateForTurningMove(state, toLinkId);
+		this.thisTimeStepGreen = this.qSignalizedItem.isLinkGreen();
+	}
+
+	@Override
+	public void setSignalized(boolean isSignalized) {
+		this.qSignalizedItem = new QSignalizedItem(this.queueLink.getLink().getToNode().getOutLinks().keySet());
+	}
+	
 	/**
 	 * Inner class to capsulate visualization methods
 	 *
@@ -697,7 +729,7 @@ public final class QLane extends QBufferItem {
 			return positions;
 		}
 	}
-
+	
 	static class FromLinkEndComparator implements Comparator<QLane>, Serializable {
 		private static final long serialVersionUID = 1L;
 		@Override
@@ -712,7 +744,5 @@ public final class QLane extends QBufferItem {
 		}
 	}
 
-	protected Lane getLaneData() {
-		return this.laneData;
-	}
+
 }

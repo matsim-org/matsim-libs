@@ -41,10 +41,6 @@ import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
-import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
-import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.signalsystems.config.SignalSystemConfigurations;
-import org.matsim.signalsystems.systems.SignalSystems;
 import org.xml.sax.SAXException;
 
 /**
@@ -112,10 +108,6 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 		if (this.config.scenario().isUseLanes()) {
 			this.loadLanes();
 		}
-		if (this.config.scenario().isUseSignalSystems()) {
-			this.loadSignalSystems();
-			this.loadSignalSystemConfigurations();
-		}
 		return getScenario();
 	}
 
@@ -176,34 +168,6 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 			}
 			else {
 				log.info("no households file set in config or feature disabled, not able to load anything");
-			}
-	}
-
-	private void loadSignalSystemConfigurations() {
-			if ((this.getScenario().getSignalSystemConfigurations() != null)
-					&& (this.config.signalSystems().getSignalSystemConfigFile() != null)) {
-				SignalSystemConfigurations signalSystemConfigurations = this.getScenario()
-						.getSignalSystemConfigurations();
-				MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(
-						signalSystemConfigurations);
-				log.info("loading signalsystemsconfiguration from " + this.config.signalSystems().getSignalSystemConfigFile());
-				reader.readFile(this.config.signalSystems().getSignalSystemConfigFile());
-			}
-			else {
-				log.info("no signal system configurations file set in config or feature disabled, not able to load anything");
-			}
-	}
-
-	private void loadSignalSystems() {
-			if (( this.getScenario().getSignalSystems() != null)
-					&& (this.config.signalSystems().getSignalSystemFile() != null)) {
-				SignalSystems signalSystems = this.getScenario().getSignalSystems();
-				MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(signalSystems);
-				log.info("loading signalsystems from " + this.config.signalSystems().getSignalSystemFile());
-				reader.readFile(this.config.signalSystems().getSignalSystemFile());
-			}
-			else {
-				log.info("no signal system definition file set in config or feature disabled, not able to load anything");
 			}
 	}
 

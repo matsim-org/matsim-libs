@@ -198,16 +198,16 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 		// then tell the QNetwork to use the simEngine (this also creates qlinks and qnodes)
 		network.initialize(this.netEngine);
 
-
-		if (sc.getConfig().scenario().isUseSignalSystems()) {
-			if ((((ScenarioImpl)sc).getSignalSystems() == null)
-					|| (((ScenarioImpl)sc).getSignalSystemConfigurations() == null)) {
-				throw new IllegalStateException(
-						"Signal systems and signal system configurations have to be set if feature is enabled!");
-			}
-			this.signalEngine  = new QSimSignalEngine(this);
-			this.signalEngine.setSignalSystems(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
-		}
+//TODO dg remove
+//		if (sc.getConfig().scenario().isUseSignalSystems()) {
+//			if ((((ScenarioImpl)sc).getSignalSystems() == null)
+//					|| (((ScenarioImpl)sc).getSignalSystemConfigurations() == null)) {
+//				throw new IllegalStateException(
+//						"Signal systems and signal system configurations have to be set if feature is enabled!");
+//			}
+//			this.signalEngine  = new QSimSignalEngine(this);
+//			this.signalEngine.setSignalSystems(((ScenarioImpl)sc).getSignalSystems(), ((ScenarioImpl)sc).getSignalSystemConfigurations());
+//		}
 
 		if (sc.getConfig().multiModal().isMultiModalSimulationEnabled()) {
 
