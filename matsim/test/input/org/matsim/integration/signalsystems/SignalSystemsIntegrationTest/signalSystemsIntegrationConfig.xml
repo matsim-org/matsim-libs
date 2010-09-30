@@ -30,8 +30,10 @@
   </module>
 
   <module name="signalsystems">
-    <param name="signalsystems" value="&INPUTBASE;/testSignalSystems_v1.1.xml" />
-    <param name="signalsystemsconfiguration" value="&INPUTBASE;/testSignalSystemConfigurations_v1.1.xml" />
+    <param name="signalsystems" value="&INPUTBASE;/testSignalSystems_v2.0.xml" />
+    <param name="signalcontrol" value="&INPUTBASE;/testSignalControl_v2.0.xml" />
+    <param name="signalgroups" value="&INPUTBASE;/testSignalGroups_v2.0.xml" />
+    <param name="ambertimes" value="&INPUTBASE;/testAmberTimes_v1.0.xml" />
   </module>
   
   <module name="planCalcScore">
