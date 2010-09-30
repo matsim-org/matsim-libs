@@ -35,7 +35,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -78,7 +78,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		Controler controler = new Controler(scenario);
 //		controler.setFreespeedTravelTimeCost(new FreespeedTravelTimeCost());
 		controler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
-		final StrategyManagerImpl manager = new StrategyManagerImpl();
+		final StrategyManager manager = new StrategyManager();
 		StrategyManagerConfigLoader.load(controler, manager);
 		manager.run(population);
 

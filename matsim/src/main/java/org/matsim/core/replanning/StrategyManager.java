@@ -41,7 +41,7 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
  *
  * @author mrieser
  */
-public class StrategyManagerImpl {
+public class StrategyManager {
 
 	private final ArrayList<PlanStrategy> strategies = new ArrayList<PlanStrategy>();
 	private final ArrayList<Double> weights = new ArrayList<Double>();

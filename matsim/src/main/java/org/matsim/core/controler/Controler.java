@@ -100,7 +100,7 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.replanning.StrategyManagerImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
@@ -203,7 +203,7 @@ public class Controler {
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	private PersonalizableTravelCost travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
-	protected StrategyManagerImpl strategyManager = null;
+	protected StrategyManager strategyManager = null;
 
 	/**
 	 * Defines in which iterations the events should be written. <tt>1</tt> is
@@ -735,13 +735,13 @@ public class Controler {
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
-	protected StrategyManagerImpl loadStrategyManager() {
+	protected StrategyManager loadStrategyManager() {
 		if (this.config.scenario().isUseTransit()) {
-			StrategyManagerImpl manager = new StrategyManagerImpl();
+			StrategyManager manager = new StrategyManager();
 			TransitStrategyManagerConfigLoader.load(this, this.config, manager);
 			return manager;
 		} else {
-			StrategyManagerImpl manager = new StrategyManagerImpl();
+			StrategyManager manager = new StrategyManager();
 			StrategyManagerConfigLoader.load(this, manager);
 			return manager;
 		}
@@ -1058,10 +1058,10 @@ public class Controler {
 	}
 
 	/**
-	 * @return Returns the {@link org.matsim.core.replanning.StrategyManagerImpl}
+	 * @return Returns the {@link org.matsim.core.replanning.StrategyManager}
 	 *         used for the replanning of plans.
 	 */
-	public final StrategyManagerImpl getStrategyManager() {
+	public final StrategyManager getStrategyManager() {
 		return this.strategyManager;
 	}
 
