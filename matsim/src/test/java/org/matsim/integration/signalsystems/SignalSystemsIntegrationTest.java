@@ -44,17 +44,25 @@ public class SignalSystemsIntegrationTest extends MatsimTestCase {
 		Controler c = new Controler(config);
 		c.setCreateGraphs(false);
 		c.run();
-		
-		String iterationOutput = this.getOutputDirectory() + "ITERS/it.10/";
-		
-		String eventsFileIn = this.getInputDirectory() + "10.events.xml.gz";
-		String eventsFileOut = iterationOutput + "10.events.xml.gz";
-		
-		log.info("comparing " + eventsFileIn + " " + eventsFileOut);
+
+		//iteration 0 
+		String iterationOutput = this.getOutputDirectory() + "ITERS/it.0/";
+		String inputDirectory = getInputDirectory();
 		
 		assertEquals("different events files", 
-				CRCChecksum.getCRCFromFile(eventsFileIn), 
-				CRCChecksum.getCRCFromFile(eventsFileOut));
+				CRCChecksum.getCRCFromFile(inputDirectory + "0.events.xml.gz"), 
+				CRCChecksum.getCRCFromFile(iterationOutput + "0.events.xml.gz"));
+
+		assertEquals("different population files", 
+				CRCChecksum.getCRCFromFile(this.getInputDirectory() + "0.plans.xml.gz"), 
+				CRCChecksum.getCRCFromFile(iterationOutput + "0.plans.xml.gz"));
+
+		//iteration 10 
+		iterationOutput = this.getOutputDirectory() + "ITERS/it.10/";
+		
+		assertEquals("different events files", 
+				CRCChecksum.getCRCFromFile(inputDirectory + "10.events.xml.gz"), 
+				CRCChecksum.getCRCFromFile(iterationOutput + "10.events.xml.gz"));
 
 		assertEquals("different population files", 
 				CRCChecksum.getCRCFromFile(this.getInputDirectory() + "10.plans.xml.gz"), 
