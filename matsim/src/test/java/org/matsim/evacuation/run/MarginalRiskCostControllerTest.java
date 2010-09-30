@@ -24,6 +24,11 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class MarginalRiskCostControllerTest extends MatsimTestCase {
 
+	public void testFake(){
+		assertTrue(true);
+	}
+
+	
 	public void estMarginalRiskCostController() {
 		String config = getInputDirectory() + "config.xml";
 		String refEventsFile = getInputDirectory() + "events.txt.gz";
