@@ -532,12 +532,6 @@ public class Controler {
 			if (this.config.scenario().isUseLanes()){
 				new LaneDefinitionsWriter20(this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
 			}
-//TODO dg remove
-			//			if (this.config.scenario().isUseSignalSystems()){
-//				new SignalSystemsWriter11(this.scenarioData.getSignalSystems()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS));
-//				new SignalSystemConfigurationsWriter11(this.scenarioData.getSignalSystemConfigurations()).write(this.controlerIO.getOutputFilename(FILENAME_SIGNALSYSTEMS_CONFIG));
-//			}
-
 			if (unexpected) {
 				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
 			} else {
