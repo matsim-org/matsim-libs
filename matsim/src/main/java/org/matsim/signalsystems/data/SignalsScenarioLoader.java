@@ -60,6 +60,7 @@ public class SignalsScenarioLoader {
 	private void loadIntergreenTimes(SignalsData data){
 		if (this.signalConfig.getIntergreenTimesFile() != null) {
 			//TODO write when reader is available
+			throw new UnsupportedOperationException("not implemented yet");
 		}
 	}
 	
