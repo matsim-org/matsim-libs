@@ -24,19 +24,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.ScenarioFactoryImpl;
 import org.matsim.core.api.experimental.ScenarioLoader;
@@ -46,10 +40,6 @@ import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
-
-import charts.BkChartWriter;
-import charts.types.BkDeltaUtilsChart;
-import charts.types.BkDeltaUtilsQuantilesChart;
 
 /**
  * @author bkickhoefer after kn and dgrether
@@ -155,7 +145,9 @@ public class BkAnalysisTest {
 		
 		
 		//BkDeltaUtilsChartGeneral - plots individual utility differences over income (linear axis)
-		BkDeltaUtilsChart deltaUtilsChart = new BkDeltaUtilsChart(populationInformation);
+//		BkDeltaUtilsChart deltaUtilsChart = new BkDeltaUtilsChart(populationInformation);
+		System.err.println( "BkDeltaUtilsChart was moved away by Benjamin; I don't know what happened there."
+				+"Disabling this line so that the code compiles.  Kai" ) ;
 		
 		//
 		
