@@ -127,4 +127,8 @@ public class TravelTimeFourWaysTest {
 		eventsXmlWriter.closeFile();
 		Assert.assertEquals("different events files", CRCChecksum.getCRCFromFile(this.testUtils.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));
 	}
+	
+	public void testFake(){
+		Assert.assertTrue(true);
+	}
 }
