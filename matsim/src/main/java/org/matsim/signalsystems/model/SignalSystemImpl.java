@@ -94,7 +94,7 @@ public class SignalSystemImpl implements SignalSystem {
 		this.requests.clear();
 		SignalGroupStateChangeRequest request = this.sortedRequests.peek();
 		while (request != null && request.getTimeOfDay() <= timeSeconds){
-			log.debug("system id " + this.id + " group " + request.getSignalGroupId() + " state " + request.getRequestedState() + " at time " + timeSeconds);
+//			log.debug("system id " + this.id + " group " + request.getSignalGroupId() + " state " + request.getRequestedState() + " at time " + timeSeconds);
 			this.signalGroups.get(request.getSignalGroupId()).setState(request.getRequestedState());
 			stateEvent = new SignalGroupStateChangedEventImpl(timeSeconds, this.getId(), request.getSignalGroupId(), request.getRequestedState());
 			this.getSignalSystemsManager().getEventsManager().processEvent(stateEvent);
@@ -121,6 +121,10 @@ public class SignalSystemImpl implements SignalSystem {
 	@Override
 	public void addSignalGroup(SignalGroup group) {
 		this.signalGroups.put(group.getId(), group);
+	}
+	
+	public Map<Id, SignalGroup> getSignalGroups(){
+		return this.signalGroups;
 	}
 
 

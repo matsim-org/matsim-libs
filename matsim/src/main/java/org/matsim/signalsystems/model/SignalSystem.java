@@ -45,6 +45,8 @@ public interface SignalSystem extends Identifiable {
 	public Map<Id, Signal> getSignals();
 
 	public void addSignalGroup(SignalGroup group);
+	
+	public Map<Id, SignalGroup> getSignalGroups();
 
 	public void scheduleDropping(double timeSeconds, Id signalGroupId);
 

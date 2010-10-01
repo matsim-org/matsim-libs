@@ -37,8 +37,9 @@ public class DatabasedSignal implements Signal {
 
 	private static final Logger log = Logger.getLogger(DatabasedSignal.class);
 
-	private SignalData data;
 	private List<SignalizeableItem> signalizedItems = new ArrayList<SignalizeableItem>();
+
+	private SignalData data;
 
 	public DatabasedSignal(SignalData signalData) {
 		this.data = signalData;

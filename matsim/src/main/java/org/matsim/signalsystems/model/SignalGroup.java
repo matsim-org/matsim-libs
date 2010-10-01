@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.model;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.control.SignalGroupState;
 
@@ -36,5 +38,7 @@ public interface SignalGroup {
 	public SignalGroupState getState();
 
 	public void addSignal(Signal signal);
+	
+	public Map<Id, Signal> getSignals();
 
 }

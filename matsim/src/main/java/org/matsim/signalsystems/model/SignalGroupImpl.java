@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.control.SignalGroupState;
@@ -33,7 +33,7 @@ import org.matsim.signalsystems.control.SignalGroupState;
 public class SignalGroupImpl implements SignalGroup {
 	
 	private Id id;
-	private List<Signal> signals = new ArrayList<Signal>();
+	private Map<Id, Signal> signals = new HashMap<Id, Signal>();
 	private SignalGroupState state;
 
 	public SignalGroupImpl(Id id) {
@@ -47,7 +47,7 @@ public class SignalGroupImpl implements SignalGroup {
 	@Override
 	public void setState(SignalGroupState state) {
 		this.state = state;
-		for (Signal s : this.signals){
+		for (Signal s : this.signals.values()){
 			s.setState(state);
 		}
 	}
@@ -59,7 +59,12 @@ public class SignalGroupImpl implements SignalGroup {
 
 	@Override
 	public void addSignal(Signal signal) {
-		this.signals.add(signal);
+		this.signals.put(signal.getId(), signal);
+	}
+
+	@Override
+	public Map<Id, Signal> getSignals() {
+		return this.signals;
 	}
 
 }
