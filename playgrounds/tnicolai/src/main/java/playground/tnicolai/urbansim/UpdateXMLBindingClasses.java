@@ -128,10 +128,7 @@ public class UpdateXMLBindingClasses {
 		for ( int i=0 ; i<args.length ; i++ ) {
 			log.info( "Parameter: " + i + " = " + args[i] ) ;
 			String[] parts = args[i].split("=");
-			if ( parts[0].equals("--xsdLocation") ) {
-				xsdLocation = parts[1];
-			}
-			else if ( parts[0].equals("--destination") ) {
+			if ( parts[0].equals("--destination") ) {
 				outputDirectory = parts[1];
 			}
 			else if ( parts[0].equals("--package") ) {

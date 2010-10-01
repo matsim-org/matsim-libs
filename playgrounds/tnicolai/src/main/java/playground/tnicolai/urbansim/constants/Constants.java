@@ -23,11 +23,15 @@
  */
 package playground.tnicolai.urbansim.constants;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author thomas
  *
  */
 public class Constants {
+	
+	private static final Logger log = Logger.getLogger(Constants.class);
 	
 	/** important system environments */
 	public static String OPUS_HOME = System.getenv("OPUS_HOME");			// TODO: schould be provided by UrbanSim via the configuration file
@@ -53,6 +57,14 @@ public class Constants {
 		MATSIM_CONFIG_DIRECTORY = opusHome+"opus_matsim/matsim_config/";
 		OPUS_MATSIM_OUTPUT_DIRECTORY = opusHome+"opus_matsim/output/";
 		OPUS_MATSIM_TEMPORARY_DIRECTORY = opusHome+"opus_matsim/tmp/";
+		
+		log.info("");
+		log.info("Set OPUS_HOME to :" + OPUS_HOME);
+		log.info("Set OPUS MATSim directory to :" + OPUS_MATSIM_DIRECTORY);
+		log.info("Set MATSim config directory to :" + MATSIM_CONFIG_DIRECTORY);
+		log.info("Set OPUS MATSim output directory to :" + OPUS_MATSIM_OUTPUT_DIRECTORY);
+		log.info("Set OPUS MATSim temp directory to :" + OPUS_MATSIM_TEMPORARY_DIRECTORY);
+		log.info("");
 	}
 	
 	/** subdirectories in MATSim */

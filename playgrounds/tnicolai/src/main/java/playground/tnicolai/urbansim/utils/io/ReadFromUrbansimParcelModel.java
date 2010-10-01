@@ -32,7 +32,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.world.Location;
 
 import playground.kai.urbansim.ids.ZoneId;
 import playground.tnicolai.urbansim.constants.Constants;
@@ -188,44 +187,47 @@ public class ReadFromUrbansimParcelModel {
 	 * @param network
 	 * @param samplingRate
 	 */
-	public void readPersons(final Population oldPop, final Population newPop, final ActivityFacilitiesImpl facilities, final NetworkImpl network, final double samplingRate ) {
-
-		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
-		log.info( "Starting to read persons from " + filename ) ;
+	public void readPersons(final Population oldPop, final Population newPop, final ActivityFacilitiesImpl facilities, final NetworkImpl network, final double samplingRate) {
 
 		Population backupPop = new ScenarioImpl().getPopulation() ;
 		long NUrbansimPersons=0 ;
+		long notFoundCnt = 0 ;
+		long jobLocationIdNullCnt = 0 ;
+		boolean flag = false;
+		
+		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		log.info( "Starting to read persons from " + filename ) ;
+		
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
 
 			String line = reader.readLine();
+			// get columns for home, work and person id
 			Map<String,Integer> idxFromKey = CommonMATSimUtilities.createIdxFromKey( line, Constants.TAB_SEPERATOR );
+			final int indexParcelID_HOME 	= idxFromKey.get( Constants.PARCEL_ID_HOME );
+			final int indexParcelID_WORK 	= idxFromKey.get( Constants.PARCEL_ID_WORK );
+			final int indexPersonID			= idxFromKey.get( Constants.PERSON_ID );
 
 			// We consider two cases:
 			// (1) We have an old population.  Then we look for those people who have the same id.
 			// (2) We do not have an old population.  Then we construct a new one.
-			// In both cases we assume that the new population has the right size.
-
-			long foundCnt = 0 ;
-			long notFoundCnt = 0 ;
-			long jobLocationIdNullCnt = 0 ;
-			boolean flag = false ;
+			// In both cases we assume that the new population has the right size.			
+			
 			while ( (line=reader.readLine()) != null ) {
-				NUrbansimPersons++ ;
+				NUrbansimPersons++;
 				String[] parts = line.split( Constants.TAB_SEPERATOR );
 
-				Id personId = new IdImpl( parts[idxFromKey.get("person_id")] ) ;
+				// create new person
+				Id personId = new IdImpl( parts[ indexPersonID ] ) ;
 				PersonImpl newPerson = new PersonImpl( personId ) ;
 
-				double random = MatsimRandom.getRandom().nextDouble();
-				boolean param3 = oldPop==null ? false : (oldPop.getPersons().get( personId))!=null;
-
-				if ( !( flag || random < samplingRate || param3 ) )
+				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || personExistsInOldPopulation(oldPop, personId) ) )
 					continue ;
 
 				flag = false ;
-
-				Id homeParcelId = new IdImpl( parts[idxFromKey.get("parcel_id_home")] ) ;
+				
+				// get home location id
+				Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] ) ;
 				ActivityFacility homeLocation = facilities.getFacilities().get( homeParcelId ) ;
 				if ( homeLocation==null ) {
 					log.warn( "homeLocation==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
@@ -236,27 +238,30 @@ public class ReadFromUrbansimParcelModel {
 					log.warn( "homeCoord==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
 					continue ;
 				}
-
+				
+				// add home location to plan
 				PlanImpl plan = newPerson.createAndAddPlan(true);
 				plan.setSelected(true) ;
 				CommonMATSimUtilities.makeHomePlan(plan, homeCoord) ;
 
-				int idx = idxFromKey.get("parcel_id_work") ;
-				if ( parts[idx].equals("-1") ) {
+				// determine employment status
+				if ( parts[ indexParcelID_WORK ].equals("-1") )
 					newPerson.setEmployed(Boolean.FALSE);
-				} else {
+				else {
 					newPerson.setEmployed(Boolean.TRUE);
-					Id workParcelId = new IdImpl( parts[idx] ) ;
+					Id workParcelId = new IdImpl( parts[ indexParcelID_WORK ] ) ;
 					ActivityFacility jobLocation = facilities.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {
+						// show warning message only once
 						if ( jobLocationIdNullCnt < 1 ) {
 							jobLocationIdNullCnt++ ;
 							log.warn( "jobLocationId==null, probably out of area. person_id: " + personId
 									+ " workp_prcl_id: " + workParcelId + Gbl.ONLYONCE ) ;
 						}
-						flag = true ;
+						flag = true ; // WHY?
 						continue ;
 					}
+					// complete agent plan
 					Coord workCoord = jobLocation.getCoord() ;
 					CommonMATSimUtilities.completePlanToHwh(plan, workCoord) ;
 				}
@@ -264,23 +269,25 @@ public class ReadFromUrbansimParcelModel {
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...
 
 				while ( true ) { // loop from which we can "break":
+					
 					Person oldPerson ;
+					
 					if ( oldPop==null ) { // no pre-existing population.  Accept:
-						newPop.addPerson(newPerson) ;
-						break ;
+						newPop.addPerson(newPerson);
+						break;
 					} else if ( (oldPerson=oldPop.getPersons().get(personId))==null ) { // did not find person.  Put in backup:
-						backupPop.addPerson( newPerson) ;
-						notFoundCnt++ ;
-						break ;
+						backupPop.addPerson( newPerson );
+						notFoundCnt++;
+						break;
 					} else if ( ((PersonImpl) oldPerson).isEmployed() != newPerson.isEmployed() ) { // employment status changed.  Accept new person:
-						newPop.addPerson(newPerson) ;
-						break ;
+						newPop.addPerson(newPerson);
+						break;
 					}
 					Activity oldHomeAct = ((PlanImpl) oldPerson.getSelectedPlan()).getFirstActivity();
-					Activity newHomeAct =    ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity() ;
+					Activity newHomeAct = ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity();
 					if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // act changed.  Accept new person:
-						newPop.addPerson(newPerson) ;
-						break ;
+						newPop.addPerson(newPerson);
+						break;
 					}
 
 					// check if new person works
@@ -291,7 +298,7 @@ public class ReadFromUrbansimParcelModel {
 
 					// check if work act has changed:
 					ActivityImpl oldWorkAct = (ActivityImpl) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
-					ActivityImpl newWorkAct = (ActivityImpl)    newPerson.getSelectedPlan().getPlanElements().get(2) ;
+					ActivityImpl newWorkAct = (ActivityImpl) newPerson.getSelectedPlan().getPlanElements().get(2) ;
 					if ( actHasChanged ( oldWorkAct, newWorkAct, network ) ) {
 						newPop.addPerson(newPerson) ;
 						break ;
@@ -330,6 +337,20 @@ public class ReadFromUrbansimParcelModel {
 				+ " bakPopSize: " + backupPop.getPersons().size() + " NUrbansimPersons: " + NUrbansimPersons ) ;
 
 		log.info( "Done with reading persons." ) ;
+	}
+	
+	/**
+	 * determine if a person already exists
+	 * @param oldPop
+	 * @param personId
+	 * @return true if a person already exists in an old poulation 
+	 */
+	private boolean personExistsInOldPopulation(Population oldPop, Id personId){
+		
+		if(oldPop == null)
+			return false;
+		else
+			return oldPop.getPersons().get( personId) != null;
 	}
 
 	/**
