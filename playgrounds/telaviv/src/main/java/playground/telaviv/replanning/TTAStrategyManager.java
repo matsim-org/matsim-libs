@@ -20,6 +20,9 @@
 
 package playground.telaviv.replanning;
 
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
@@ -27,37 +30,49 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.StrategyManager;
 
+/*
+ * @cdobler
+ * An extended Version of a StrategyManager that handles only
+ * non TTA Agents. The implementation is quite a hack - in the near
+ * future MATSim should support sub-populations - then it should
+ * be possible so implement the functionality of this class much
+ * better...
+ */
 public class TTAStrategyManager extends StrategyManager {
 
-	private Population nonTTAPopulation;
+	private Population TTAPopulation;
 	
-	public TTAStrategyManager(Scenario scenario)
-	{
+	public TTAStrategyManager(Scenario scenario) {
 		super();
 		
 		createNonTTAPopulation(scenario);
 	}
 	
-	/*
-	 * Run it with the nonTTAPopulation
-	 */
-	public void run(final Population population) {
-		super.run(nonTTAPopulation);
+	@Override
+	protected void beforePopulationRunHook(Population population) {
+		for (Person person : TTAPopulation.getPersons().values()) {
+			population.getPersons().remove(person.getId());			
+		}
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	protected void afterRunHook(Population population) {
+		Map<Id, Person> map = (Map<Id, Person>) population.getPersons();
+		map.putAll(TTAPopulation.getPersons());
 	}
 	
 	/*
 	 * Create a new Population that contains only non Transit Traffic Agents (TTAs).
 	 * Therefore TTAs are not replanned.
 	 */
-	private void createNonTTAPopulation(Scenario scenario)
-	{
+	private void createNonTTAPopulation(Scenario scenario) {
 		Population fullPopulation = scenario.getPopulation();
-		nonTTAPopulation = new PopulationImpl((ScenarioImpl)scenario);
+		TTAPopulation = new PopulationImpl((ScenarioImpl)scenario);
 		
-		for (Person person : fullPopulation.getPersons().values())
-		{
-			// if it is not a tta Agent
-			if (!person.getId().toString().toLowerCase().contains("tta")) nonTTAPopulation.addPerson(person);
+		for (Person person : fullPopulation.getPersons().values()) {			
+			// if it is a TTA Agent
+			if (person.getId().toString().toLowerCase().contains("tta")) TTAPopulation.addPerson(person);
 		}
 	}
 }
