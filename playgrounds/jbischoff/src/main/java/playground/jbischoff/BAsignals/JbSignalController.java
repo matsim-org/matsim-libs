@@ -46,7 +46,7 @@ public class JbSignalController implements SignalController {
 
 	@Override
 	public void updateState(double timeSeconds) {
-		SignalsData signalData = this.system.getSignalSystemsManager().getSignalData();
+		SignalsData signalData = this.system.getSignalSystemsManager().getSignalsData();
 		
 		
 	}
