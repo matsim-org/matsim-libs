@@ -10,7 +10,13 @@ import junit.framework.TestCase;
 public class PolynomialTest extends TestCase{
 
 	public void testBasic(){
-		Polynomial polynomial=new Polynomial(1.0,1.0,5.0);
+		double[] coefficients=new double[3];
+		
+		coefficients[0]=1.0;
+		coefficients[1]=1.0;
+		coefficients[2]=5.0;
+		
+		Polynomial polynomial=new Polynomial(coefficients);
 		
 		assertEquals(131.0, polynomial.evaluate(5.0));
 	}

@@ -22,16 +22,16 @@ package playground.wrashid.lib.obj.math;
 
 public class Polynomial {
 
-	private Double[] coefficients;
+	private double[] coefficients;
 	
 	/**
 	 * first coefficient is for x^0, then x^1, etc.
 	 * @param coefficients
-	 */
-	public Polynomial(Double... coefficients) {
+	 */	
+	public Polynomial(double[] coefficients) {
 		this.coefficients = coefficients;
 	}
-	
+
 	public double evaluate(double xValue){
 		double result=0;
 		
