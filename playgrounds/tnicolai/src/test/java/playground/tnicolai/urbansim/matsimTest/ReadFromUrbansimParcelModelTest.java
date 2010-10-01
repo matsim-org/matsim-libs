@@ -40,12 +40,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.utils.MATSimConfigObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 import playground.tnicolai.urbansim.utils.io.TempDirectoryUtil;
 
@@ -74,12 +72,12 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		prepareTest("testReadFromUrbansimParcelModel2", 2);	
 	}
 	
-//	@Test
-//	// Tests if old population is recognized correctly
-//	public void testReadFromUrbansimParcelModel3(){
-//		log.info("Starting testReadFromUrbansimParcelModel3 run: Testing computation of UrbanSim zones.");
-//		prepareTest("testReadFromUrbansimParcelModel3", 3);	
-//	}
+	@Test
+	// Tests if old population is recognized correctly
+	public void testReadFromUrbansimParcelModel3(){
+		log.info("Starting testReadFromUrbansimParcelModel3 run: Testing computation of UrbanSim zones.");
+		prepareTest("testReadFromUrbansimParcelModel3", 3);	
+	}
 	
 	/**
 	 * preparing ReadFromUrbansimParcelModel test run
@@ -87,9 +85,9 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 	 */
 	private void prepareTest(String testRunName, int testNr){
 		
-		Constants.setOpusHomeDirectory( System.getProperty("java.io.tmpdir") );
 		// create temp directories
 		TempDirectoryUtil.createOPUSDirectories();
+		boolean result = false;
 		
 		// preparing input test file
 		int dummyYear = 2000;
@@ -99,26 +97,43 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		switch (testNr) {
 		case 1:
 			log.info("Testing computation of UrbanSim zones");
+			// create parcel table
 			testFileName = Constants.URBANSIM_PARCEL_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
 			createParcelInputTestFile(testFileDirectory, testFileName);
 			// running ReadFromUrbansimParcelModel generating zones and facilities
 			ActivityFacilitiesImpl zones = testRunPracels( dummyYear );
-			Assert.assertTrue( validateResult(zones) );
+			result = validateResult(zones);
+			Assert.assertTrue( result );
 			log.info("Testing computation of UrbanSim zones finished");
 			break;
 
 		case 2:
 			log.info("Testing computation of UrbanSim zones");
+			// create parcel table
+			testFileName = Constants.URBANSIM_PARCEL_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
+			createParcelInputTestFile(testFileDirectory, testFileName);
+			// create person table
 			testFileName = Constants.URBANSIM_PERSON_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
 			createPersonInputTestFile(testFileDirectory, testFileName);
 			// running ReadFromUrbansimParcelModel generating population
-			boolean result = testRunPopulation( dummyYear );
+			result = testRunPopulation( dummyYear, false );
 			Assert.assertTrue(result);
 			log.info("Testing computation of UrbanSim zones finished");
 			break;
 			
 		case 3:
-			// TODO
+			log.info("Testing computation of UrbanSim zones");
+			// create parcel table
+			testFileName = Constants.URBANSIM_PARCEL_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
+			createParcelInputTestFile(testFileDirectory, testFileName);
+			// create person table
+			testFileName = Constants.URBANSIM_PERSON_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
+			createPersonInputTestFile(testFileDirectory, testFileName);
+			// running ReadFromUrbansimParcelModel generating population
+			result = testRunPopulation( dummyYear, true );
+			Assert.assertTrue(result);
+			log.info("Testing computation of UrbanSim zones finished");
+			break;
 		}
 		
 		// remove temp directories
@@ -183,11 +198,14 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 	 * @return returns true if number of generated population aproximatly equals 
 	 * 		   "sample rate * number of urbansim persons".
 	 */
-	private boolean testRunPopulation(int year){
+	private boolean testRunPopulation(int year, boolean enableOldPopulation){
 		
 		log.info("Running ReadFromUrbansimParcelModel with argument year = " + year);
 		
-		double sampleRate = 0.1;
+		double sampleRate = 1.0;
+		boolean result = false;
+		int newPopSize = 0;
+		int oldPopSize = 0;
 		
 		// get the data from urbansim (parcels and persons)
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year );
@@ -197,24 +215,38 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("dummy zones");
 		readFromUrbansim.readFacilities(facilities, zones);
 		
-		Population oldPopulation = null;
+		
 		Population newPopulation = new ScenarioImpl().getPopulation();
-		// read urbansim persons.  Generates hwh acts as side effect
-		readFromUrbansim.readPersons( oldPopulation, newPopulation, facilities, null, sampleRate );
 		
-		int populationCountLowerBorder = (int) (this.popSize * 0.05);
-		int populationCountUpperBorder = (int) (this.popSize * 0.2);
+		// read urbansim persons. Generates hwh acts as side effect
+		readFromUrbansim.readPersons( null, newPopulation, facilities, null, sampleRate );
 		
-		int populationActualCount = newPopulation.getPersons().size();
+		if(enableOldPopulation){ // only for testing purposes 
+			Population oldPopulation = newPopulation;
+			newPopulation = new ScenarioImpl().getPopulation(); // re-initializing
+			readFromUrbansim.readPersons( oldPopulation, newPopulation, facilities, null, sampleRate );
+			
+			// determine result
+			if(newPopulation != null)
+				newPopSize = newPopulation.getPersons().size();
+			if(oldPopulation != null)
+				oldPopSize = oldPopulation.getPersons().size();
+			result = (newPopSize == this.popSize && oldPopSize == this.popSize);
+			return result;
+		}
 		
-		return (populationActualCount >= populationCountLowerBorder && populationActualCount <= populationCountUpperBorder);
+		// determine result
+		if(newPopulation != null)
+			newPopSize = newPopulation.getPersons().size();
+		result = newPopSize == this.popSize;
+		return result;
 	}
 	
 	/**
 	 * creates person table
-	 * @param directory poits to the directory were to store the test input file
+	 * @param directory points to the directory were to store the test input file
 	 * @param fileName name of the test input file
-	 * @return boolean indicates wether the creation of the test input file was successful
+	 * @return boolean indicates whether the creation of the test input file was successful
 	 */
 	private boolean createPersonInputTestFile(String directory, String fileName){
 		
@@ -380,9 +412,9 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 	
 	/**
 	 * create a test parcel data set table 
-	 * @param directory poits to the directory were to store the test input file
+	 * @param directory points to the directory were to store the test input file
 	 * @param fileName name of the test input file
-	 * @return boolean indicates wether the creation of the test input file was successful
+	 * @return boolean indicates weather the creation of the test input file was successful
 	 */
 	private boolean createParcelInputTestFile(String directory, String fileName){
 		
@@ -435,7 +467,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 	 * @param directory
 	 * @param fileName
 	 * @param testFileContent
-	 * @return ture if successful, flase otherwise
+	 * @return true if successful, false otherwise
 	 */
 	private boolean testFileWiter(String directory, String fileName, StringBuffer testFileContent){
 		
