@@ -114,6 +114,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	
 	public SignalSystemsManager createSignalSystemManager(){
 		SignalSystemsManager manager = this.factory.createSignalSystemsManager();
+		manager.setSignalsData(this.signalsData);
 		manager.setEventsManager(events);
 		return manager;
 	}

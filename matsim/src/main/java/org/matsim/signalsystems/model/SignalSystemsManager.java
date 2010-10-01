@@ -48,6 +48,8 @@ public interface SignalSystemsManager {
 	
 	public void resetModel(Integer iterationNumber);
 
-	public SignalsData getSignalData();
+	public SignalsData getSignalsData();
+	
+	public void setSignalsData(SignalsData signalsData);
 	
 }

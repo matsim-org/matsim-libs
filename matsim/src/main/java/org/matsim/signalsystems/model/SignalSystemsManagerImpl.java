@@ -37,6 +37,12 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 	private AmberLogic amberLogic;
 
 	private EventsManager eventsManager;
+
+	private SignalsData signalData;
+	
+	public SignalSystemsManagerImpl(){
+		
+	}
 	
 	@Override
 	public EventsManager getEventsManager() {
@@ -79,11 +85,14 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 	public Map<Id, SignalSystem> getSignalSystems() {
 		return this.signalSystems;
 	}
+	
+	public void setSignalsData(SignalsData signalsData){
+		this.signalData = signalsData;
+	}
 
 	@Override
-	public SignalsData getSignalData() {
-		// TODO Auto-generated method stub
-		return null;
+	public SignalsData getSignalsData() {
+		return this.signalData;
 	}
 
 }
