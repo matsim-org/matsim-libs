@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
@@ -37,6 +38,7 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * @author yChen
@@ -45,6 +47,9 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler,
 		VehicleDepartsAtFacilityEventHandler {
+	
+	private static final Logger log = Logger.getLogger("dummy");
+	
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
 	/** Map< stopFacilityId,value[]> */
@@ -84,6 +89,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 		return ((int) time / this.timeBinSize);
 	}
 
+	@Override
 	public void reset(int iteration) {
 		this.boards.clear();
 		this.alights.clear();
@@ -92,6 +98,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 	}
 
+	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Id vehId = event.getVehicleId(), stopId = this.veh_stops.get(vehId);
 		double time = event.getTime();
@@ -111,6 +118,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 				+ event.getPersonId() + "\n");
 	}
 
+	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		Id vehId = event.getVehicleId();
 		Id stopId = this.veh_stops.get(vehId);
@@ -138,11 +146,13 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 				+ "\n");
 	}
 
+	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		Id stopId = event.getFacilityId();
 		this.veh_stops.put(event.getVehicleId(), stopId);
 	}
 
+	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		Id stopId = event.getFacilityId();
 		Id vehId = event.getVehicleId();
@@ -249,7 +259,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 
 			int[] board = this.boards.get(stopId);
 			if (board == null){
-				System.out.println("stopId:\t" + stopId + "\thas null boards!");
+				log.debug("stopId:\t" + stopId + "\thas null boards!");
 			}
 			for (int i = 0; i < 24; i++) {
 				writer.write((board != null ? board[i] : 0) + "\t");
@@ -257,7 +267,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 
 			int[] alight = this.alights.get(stopId);
 			if (alight == null) {
-				System.out.println("stopId:\t" + stopId + "\thas null alights!");
+				log.debug("stopId:\t" + stopId + "\thas null alights!");
 			}
 			for (int i = 0; i < 24; i++) {
 				writer.write((alight != null ? alight[i] : 0) + "\t");
@@ -265,7 +275,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 
 			int[] ocuppancy = this.occupancies.get(stopId);
 			if (ocuppancy == null) {
-				System.out.println("stopId:\t" + stopId + "\tthere aren't passengers in Bus after the transfer!");
+				log.debug("stopId:\t" + stopId + "\tthere aren't passengers in Bus after the transfer!");
 			}
 			for (int i = 0; i < 24; i++) {
 				writer.write((ocuppancy != null ? ocuppancy[i] : 0) + "\t");
