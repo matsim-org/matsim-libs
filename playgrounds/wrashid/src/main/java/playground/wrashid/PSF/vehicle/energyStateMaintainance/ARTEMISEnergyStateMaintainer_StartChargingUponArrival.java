@@ -22,16 +22,49 @@ package playground.wrashid.PSF.vehicle.energyStateMaintainance;
 
 import org.matsim.api.core.v01.network.Link;
 
+import playground.wrashid.PSF.vehicle.energyConsumption.EnergyConsumptionTable;
 import playground.wrashid.PSF.vehicle.vehicleFleet.ConventionalVehicle;
+import playground.wrashid.PSF.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF.vehicle.vehicleFleet.Vehicle;
+import playground.wrashid.lib.GeneralLib;
 
-public class ARTEMISEnergyStateMaintainer extends EnergyStateMaintainer {
+public class ARTEMISEnergyStateMaintainer_StartChargingUponArrival extends EnergyStateMaintainer {
+
+	
+	
+	public ARTEMISEnergyStateMaintainer_StartChargingUponArrival(EnergyConsumptionTable energyConsumptionTable) {
+		super(energyConsumptionTable);
+	}
 
 	@Override
 	public void processVehicleEnergyState(Vehicle vehicle, double timeSpendOnLink, Link link) {
-		if (vehicle instanceof ConventionalVehicle){
-			//TODO: update the energy consumption of the vehicle.
-		}
+		double energyConsumptionOnLinkInJoule=energyConsumptionTable.getEnergyConsumptionInJoule(vehicle.getVehicleClassId(),vehicle.getAverageSpeedOfVehicleOnLink(timeSpendOnLink, link),link.getFreespeed(),link.getLength());
 		
+		vehicle.updateEnergyState(energyConsumptionOnLinkInJoule);
 	}
+	
+	
+	
+	public void chargeVehicle(Vehicle vehicle,double arrivalTime, double departureTime, double plugSizeInWatt){
+		if (vehicle instanceof PlugInHybridElectricVehicle){
+			PlugInHybridElectricVehicle phev=(PlugInHybridElectricVehicle) vehicle;
+			
+			double maxChargingAvailableInJoule=GeneralLib.getIntervalDuration(arrivalTime, departureTime)*plugSizeInWatt;
+			
+			if (phev.getRequiredBatteryCharge()>0){
+				if (phev.getRequiredBatteryCharge()<maxChargingAvailableInJoule){
+					//phev.processCharging();
+					
+					
+					// TODO: cont.
+					// log, when charging started and ended
+					// update phev state => perform also consitency check there...
+				}
+			}
+			
+			
+		}
+	}
+	
+	
 }

@@ -20,10 +20,26 @@
 
 package playground.wrashid.PSF.vehicle.vehicleFleet;
 
-public class ElectricVehicle {
+import org.matsim.api.core.v01.Id;
+
+import playground.wrashid.PSF.vehicle.energyStateMaintainance.EnergyStateMaintainer;
+
+public class ElectricVehicle extends Vehicle {
+
+	public ElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleId, Id vehicleClassId) {
+		super(energyStateMaintainer, vehicleId, vehicleClassId);
+	}
 
 	// we can track here, how much the battery was over used (the vehicle ran out of fuel).
 	double batteryOverUsageInkWh;
+
+	@Override
+	public void updateEnergyState(double energyConsumptionOnLinkInJoule) {
+		logEnergyConsumption(energyConsumptionOnLinkInJoule);
+		
+		// TODO: cont here furthe...
+		
+	}
 	
 	
 }

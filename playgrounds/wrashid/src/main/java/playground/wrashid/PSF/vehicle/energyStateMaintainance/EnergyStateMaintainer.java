@@ -22,14 +22,17 @@ package playground.wrashid.PSF.vehicle.energyStateMaintainance;
 
 import org.matsim.api.core.v01.network.Link;
 
+import playground.wrashid.PSF.vehicle.energyConsumption.EnergyConsumptionTable;
 import playground.wrashid.PSF.vehicle.vehicleFleet.Vehicle;
 
 public abstract class EnergyStateMaintainer {
 
+	protected final EnergyConsumptionTable energyConsumptionTable;
+
 	public abstract void processVehicleEnergyState(Vehicle vehicle, double timeSpendOnLink, Link link);
 
-	private double getAverageSpeedOfVehicleOnLink(double timeSpentOnLink, Link link){
-		return link.getLength()/timeSpentOnLink;
+	public EnergyStateMaintainer(EnergyConsumptionTable energyConsumptionTable){
+		this.energyConsumptionTable = energyConsumptionTable;
 	}
 	
 }

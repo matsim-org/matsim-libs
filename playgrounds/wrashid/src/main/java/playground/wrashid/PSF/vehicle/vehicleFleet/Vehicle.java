@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.wrashid.PSF.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 
-public class Vehicle {
+public abstract class Vehicle {
 
 	private final EnergyStateMaintainer energyStateMaintainer;
 	private Id vehicleId;
@@ -39,6 +39,8 @@ public class Vehicle {
 		this.vehicleClassId=vehicleClassId;
 	}
 	
+	public abstract void updateEnergyState(double energyConsumptionOnLinkInJoule);
+	
 	public void updateEnergyState(double timeSpendOnLink, Link link){
 		energyStateMaintainer.processVehicleEnergyState(this, timeSpendOnLink, link);
 	}
@@ -51,7 +53,7 @@ public class Vehicle {
 		return vehicleClassId;
 	}
 	
-	public void addEnergyConcumption(double energyConsumptionInJoule){
+	public void logEnergyConsumption(double energyConsumptionInJoule){
 		this.energyConcumptionForWholeDayInJoule+=energyConsumptionInJoule;
 	}
 	
@@ -65,5 +67,9 @@ public class Vehicle {
 	
 	public void resetEnergyConsumptionSum(){
 		energyConcumptionForWholeDayInJoule=0;
+	}
+	
+	public static double getAverageSpeedOfVehicleOnLink(double timeSpentOnLink, Link link){
+		return link.getLength()/timeSpentOnLink;
 	}
 }

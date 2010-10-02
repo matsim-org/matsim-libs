@@ -23,20 +23,46 @@ package playground.wrashid.PSF.vehicle.vehicleFleet;
 import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.PSF.vehicle.energyStateMaintainance.EnergyStateMaintainer;
+import playground.wrashid.lib.DebugLib;
 
 public class PlugInHybridElectricVehicle extends Vehicle {
 
-	double batterySizeInkWh;
-	double maxUnchargableBatterySizeInkWh;
+	double batterySizeInJoule;
+	double batteryMinThresholdInJoule;
+	double currentBatteryChargeInJoule;
+	
+	double electricEnergyUseInJouleDuringDay;
 	
 	public PlugInHybridElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleId, Id vehicleClassId) {
 		super(energyStateMaintainer, vehicleId, vehicleClassId);
 	}
+
+	@Override
+	public void updateEnergyState(double energyConsumptionOnLinkInJoule) {
+		logEnergyConsumption(energyConsumptionOnLinkInJoule);
+		
+		if (getAvailbleBatteryCharge()>=energyConsumptionOnLinkInJoule){
+			processElectricityUsage(energyConsumptionOnLinkInJoule);
+		} else if (getAvailbleBatteryCharge()>0){
+			processElectricityUsage(getAvailbleBatteryCharge());
+		}
+	}
 	
-	public void addEnergyConcumption(double energyConsumptionInJoule) {
-		super.addEnergyConcumption(energyConsumptionInJoule);
+	private void processElectricityUsage(double energyConsumptionInJoule){
+		electricEnergyUseInJouleDuringDay+=energyConsumptionInJoule;
+		currentBatteryChargeInJoule-=energyConsumptionInJoule;
 		
-		
+		if (currentBatteryChargeInJoule<0){
+			DebugLib.stopSystemAndReportInconsistency();
+		}
+	}
+	
+	private double getAvailbleBatteryCharge(){
+		return currentBatteryChargeInJoule-batteryMinThresholdInJoule;
 	}
 
+	public double getRequiredBatteryCharge(){
+		return batterySizeInJoule - currentBatteryChargeInJoule;
+	}
+	
 }

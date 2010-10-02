@@ -30,4 +30,9 @@ public class ConventionalVehicle extends Vehicle {
 		super(energyStateMaintainer, vehicleId, vehicleClassId);
 	}
 
+	@Override
+	public void updateEnergyState(double energyConsumptionOnLinkInJoule) {
+		logEnergyConsumption(energyConsumptionOnLinkInJoule);
+	}
+
 }
