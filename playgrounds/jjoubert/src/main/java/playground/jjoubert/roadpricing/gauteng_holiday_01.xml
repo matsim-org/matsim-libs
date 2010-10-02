@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE roadpricing SYSTEM "http://www.matsim.org/files/dtd/roadpricing_v1.dtd">
+
+<roadpricing type="cordon" name="equil-net cordon-toll">
+
+        <description>
+        	Gauteng Freeway Improvement Project - Class A, Public Holiday - Scenario 1
+        </description>
+
+        <links>
+                <link id="?"> <!-- TG001 Scientiae -->
+                    <cost start_time="00:00" end_time="00:00" amount="6.44" /> <!-- Peak period 4 -->
+                </link>             
+                <link id="?"> <!-- TG002 Waterkloof -->
+            		<cost start_time="00:00" end_time="00:00" amount="6.44" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG003 Airforce -->
+            		<cost start_time="00:00" end_time="00:00" amount="5.26" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG004 Technopark -->
+            		<cost start_time="00:00" end_time="00:00" amount="5.26" /> <!-- Peak period 4 -->
+               </link>
+                <link id="?"> <!-- TG005 Nelmapius -->
+            		<cost start_time="00:00" end_time="00:00" amount="5.04" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG006 Samrand -->
+            		<cost start_time="00:00" end_time="00:00" amount="5.04" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG007 New Road -->
+            		<cost start_time="00:00" end_time="00:00" amount="6.33" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG008 Jukskei -->
+            		<cost start_time="00:00" end_time="00:00" amount="6.33" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG009 Woodmead -->
+            		<cost start_time="00:00" end_time="00:00" amount="4.82" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG010 Main -->
+            		<cost start_time="00:00" end_time="00:00" amount="4.82" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG011 Curzon -->
+            		<cost start_time="00:00" end_time="00:00" amount="5.94" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG012 Hans Strydom -->
+            		<cost start_time="00:00" end_time="00:00" amount="5.94" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG013 9th Avenue -->
+            		<cost start_time="00:00" end_time="00:00" amount="5.43" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG014 Gordon -->
+            		<cost start_time="00:00" end_time="00:00" amount="5.43" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG015 New Canada -->
+            		<cost start_time="00:00" end_time="00:00" amount="4.82" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG016 Rand Show -->
+            		<cost start_time="00:00" end_time="00:00" amount="4.82" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG017 Diepkloof -->
+            		<cost start_time="00:00" end_time="00:00" amount="3.25" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG018 Buccleuch -->
+            		<cost start_time="00:00" end_time="00:00" amount="3.92" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG019 London -->
+            		<cost start_time="00:00" end_time="00:00" amount="3.92" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG020 Modderfontein -->
+            		<cost start_time="00:00" end_time="00:00" amount="4.37" /> <!-- Peak period 4 -->
+                </link>
+                 <link id="?"> <!-- TG021 Linksfield -->
+            		<cost start_time="00:00" end_time="00:00" amount="4.37" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG022 Kloof -->
+            		<cost start_time="00:00" end_time="00:00" amount="4.31" /> <!-- Peak period 4 -->
+                </link>
+                 <link id="?"> <!-- TG023 Geldenhuys -->
+            		<cost start_time="00:00" end_time="00:00" amount="4.31" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG024 Rand Airport -->
+            		<cost start_time="00:00" end_time="00:00" amount="4.31" /> <!-- Peak period 4 -->
+                </link>
+                <link id="?"> <!-- TG025 Heidelberg -->
+            		<cost start_time="00:00" end_time="00:00" amount="4.31" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG028 Ridgeway-->
+            		<cost start_time="00:00" end_time="00:00" amount="5.60" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG029 Kliprivier-->
+            		<cost start_time="00:00" end_time="00:00" amount="5.60" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG030 Comaro-->
+            		<cost start_time="00:00" end_time="00:00" amount="4.48" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG031 Reading-->
+            		<cost start_time="00:00" end_time="00:00" amount="4.48" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG032 Bedfordview-->
+            		<cost start_time="00:00" end_time="00:00" amount="5.94" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG033 Rietfontein-->
+            		<cost start_time="00:00" end_time="00:00" amount="5.94" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG034 Atlas-->
+            		<cost start_time="00:00" end_time="00:00" amount="4.70" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG035 Tom Jones-->
+            		<cost start_time="00:00" end_time="00:00" amount="4.70" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG037 Erasmus Park-->
+            		<cost start_time="00:00" end_time="00:00" amount="6.55" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG038 Pierre van Reineveld-->
+            		<cost start_time="00:00" end_time="00:00" amount="6.55" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG039 Rietvlei-->
+            		<cost start_time="00:00" end_time="00:00" amount="3.47" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG040 Olifants-->
+            		<cost start_time="00:00" end_time="00:00" amount="3.47" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG041 Railway-->
+            		<cost start_time="00:00" end_time="00:00" amount="7.90" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG042 Tembisa-->
+            		<cost start_time="00:00" end_time="00:00" amount="7.90" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG043 Emperor's-->
+            		<cost start_time="00:00" end_time="00:00" amount="6.72" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG044 Griffiths-->
+            		<cost start_time="00:00" end_time="00:00" amount="6.72" /> <!-- Peak period 4 -->
+                </link>
+               	<link id="?"> <!-- TG045 Isando-->
+            		<cost start_time="00:00" end_time="00:00" amount="4.87" /> <!-- Peak period 4 -->
+                </link>
+                
+        </links>
+        <!-- amount: [monetary unit] / [traveling across a tolled link.] -->
+ </roadpricing>
