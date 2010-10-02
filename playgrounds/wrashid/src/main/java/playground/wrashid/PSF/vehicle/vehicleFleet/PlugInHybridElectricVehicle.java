@@ -22,7 +22,7 @@ package playground.wrashid.PSF.vehicle.vehicleFleet;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.wrashid.PSF.vehicle.EnergyStateMaintainer;
+import playground.wrashid.PSF.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 
 public class PlugInHybridElectricVehicle extends Vehicle {
 

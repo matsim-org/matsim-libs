@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EnergyStateMaintainer.java
+ * ARTEMISEnergyStateMaintainer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,18 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF.vehicle;
+package playground.wrashid.PSF.vehicle.energyStateMaintainance;
 
 import org.matsim.api.core.v01.network.Link;
 
+import playground.wrashid.PSF.vehicle.vehicleFleet.ConventionalVehicle;
 import playground.wrashid.PSF.vehicle.vehicleFleet.Vehicle;
 
-public abstract class EnergyStateMaintainer {
+public class ARTEMISEnergyStateMaintainer extends EnergyStateMaintainer {
 
-	public abstract void processVehicleEnergyState(Vehicle vehicle, double timeSpendOnLink, Link link);
-
-	private double getAverageSpeedOfVehicleOnLink(double timeSpentOnLink, Link link){
-		return link.getLength()/timeSpentOnLink;
+	@Override
+	public void processVehicleEnergyState(Vehicle vehicle, double timeSpendOnLink, Link link) {
+		if (vehicle instanceof ConventionalVehicle){
+			//TODO: update the energy consumption of the vehicle.
+		}
+		
 	}
-	
 }
