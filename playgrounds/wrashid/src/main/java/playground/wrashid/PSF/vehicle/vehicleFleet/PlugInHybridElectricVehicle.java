@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EnergyStateMaintainer.java
+ * PHEV.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,18 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF.vehicle;
+package playground.wrashid.PSF.vehicle.vehicleFleet;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 
-import playground.wrashid.PSF.vehicle.vehicleFleet.Vehicle;
+import playground.wrashid.PSF.vehicle.EnergyStateMaintainer;
 
-public abstract class EnergyStateMaintainer {
+public class PlugInHybridElectricVehicle extends Vehicle {
 
-	public abstract void processVehicleEnergyState(Vehicle vehicle, double timeSpendOnLink, Link link);
-
-	private double getAverageSpeedOfVehicleOnLink(double timeSpentOnLink, Link link){
-		return link.getLength()/timeSpentOnLink;
+	double batterySizeInkWh;
+	double maxUnchargableBatterySizeInkWh;
+	
+	public PlugInHybridElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleId, Id vehicleClassId) {
+		super(energyStateMaintainer, vehicleId, vehicleClassId);
 	}
 	
+	public void addEnergyConcumption(double energyConsumptionInJoule) {
+		super.addEnergyConcumption(energyConsumptionInJoule);
+		
+		
+	}
+
 }

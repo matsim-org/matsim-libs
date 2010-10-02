@@ -22,11 +22,14 @@ package playground.wrashid.PSF.vehicle;
 
 import org.matsim.api.core.v01.network.Link;
 
+import playground.wrashid.PSF.vehicle.vehicleFleet.ConventionalVehicle;
+import playground.wrashid.PSF.vehicle.vehicleFleet.Vehicle;
+
 public class ARTEMISEnergyStateMaintainer extends EnergyStateMaintainer {
 
 	@Override
 	public void processVehicleEnergyState(Vehicle vehicle, double timeSpendOnLink, Link link) {
-		if (vehicle instanceof SingleEnergySourceVehicleWithInfinitPowerTank){
+		if (vehicle instanceof ConventionalVehicle){
 			//TODO: update the energy consumption of the vehicle.
 		}
 		

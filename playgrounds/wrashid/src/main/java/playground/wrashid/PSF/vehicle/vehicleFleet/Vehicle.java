@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FossilFuelConsumingVehicle.java
+ * Vehicle.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,26 +18,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF.vehicle;
+package playground.wrashid.PSF.vehicle.vehicleFleet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
-/**
- * Used to model: gasoline, diesel and other vehicle types only using one energy
- * source. The assumption is, that the model does not consider the tank size of
- * these vehicles.
- * 
- * @author wrashid
- * 
- */
-public class SingleEnergySourceVehicleWithInfinitPowerTank extends Vehicle {
+import playground.wrashid.PSF.vehicle.EnergyStateMaintainer;
 
-	private double energyConcumptionForWholeDayInJoule;
+public class Vehicle {
+
+	private final EnergyStateMaintainer energyStateMaintainer;
+	private Id vehicleId;
+	private Id vehicleClassId;
 	
-	public SingleEnergySourceVehicleWithInfinitPowerTank(EnergyStateMaintainer energyStateMaintainer, Id vehicleId, Id vehicleClassId) {
-		super(energyStateMaintainer, vehicleClassId, vehicleClassId);
+	private double energyConcumptionForWholeDayInJoule;
+
+	public Vehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleId, Id vehicleClassId){
+		this.energyStateMaintainer = energyStateMaintainer;
+		this.vehicleId=vehicleId;
+		this.vehicleClassId=vehicleClassId;
+	}
+	
+	public void updateEnergyState(double timeSpendOnLink, Link link){
+		energyStateMaintainer.processVehicleEnergyState(this, timeSpendOnLink, link);
 	}
 
+	public Id getVehicleId() {
+		return vehicleId;
+	}
+
+	public Id getVehicleClassId() {
+		return vehicleClassId;
+	}
+	
 	public void addEnergyConcumption(double energyConsumptionInJoule){
 		this.energyConcumptionForWholeDayInJoule+=energyConsumptionInJoule;
 	}
@@ -49,5 +62,8 @@ public class SingleEnergySourceVehicleWithInfinitPowerTank extends Vehicle {
 	public double getEnergyConcumptionForWholeDayInJoule() {
 		return energyConcumptionForWholeDayInJoule;
 	}
-
+	
+	public void resetEnergyConsumptionSum(){
+		energyConcumptionForWholeDayInJoule=0;
+	}
 }

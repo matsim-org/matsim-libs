@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Vehicle.java
+ * EV.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,32 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF.vehicle;
+package playground.wrashid.PSF.vehicle.vehicleFleet;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+public class ElectricVehicle {
 
-public class Vehicle {
-
-	private final EnergyStateMaintainer energyStateMaintainer;
-	private Id vehicleId;
-	private Id vehicleClassId;
-
-	public Vehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleId, Id vehicleClassId){
-		this.energyStateMaintainer = energyStateMaintainer;
-		this.vehicleId=vehicleId;
-		this.vehicleClassId=vehicleClassId;
-	}
+	// we can track here, how much the battery was over used (the vehicle ran out of fuel).
+	double batteryOverUsageInkWh;
 	
-	public void updateEnergyState(double timeSpendOnLink, Link link){
-		energyStateMaintainer.processVehicleEnergyState(this, timeSpendOnLink, link);
-	}
-
-	public Id getVehicleId() {
-		return vehicleId;
-	}
-
-	public Id getVehicleClassId() {
-		return vehicleClassId;
-	}
+	
 }
