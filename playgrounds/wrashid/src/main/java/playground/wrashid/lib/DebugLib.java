@@ -15,5 +15,9 @@ public class DebugLib {
 			System.out.println();
 		}
 	}
+	
+	public static void stopSystemAndReportInconsistency(){
+		throw new Error("system is in inconsistent state");
+	}
 
 }
