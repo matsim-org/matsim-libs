@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -270,18 +271,20 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	static private class StrategyCounter extends PlanStrategyImpl {
+	static private class StrategyCounter implements PlanStrategy {
+		
+		private PlanStrategy planStrategyDelegate = null ;
 
 		private int counter = 0;
 
 		protected StrategyCounter(final PlanSelector selector) {
-			super(selector);
+			planStrategyDelegate = new PlanStrategyImpl( selector ) ;
 		}
 
 		@Override
 		public void run(final Person person) {
 			this.counter++;
-			super.run(person);
+			planStrategyDelegate.run(person);
 		}
 
 		public int getCounter() {
@@ -290,6 +293,36 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		protected void resetCounter() {
 			this.counter = 0;
+		}
+
+		@Override
+		public void addStrategyModule(PlanStrategyModule module) {
+			planStrategyDelegate.addStrategyModule(module);
+		}
+
+		@Override
+		public int getNumberOfStrategyModules() {
+			return planStrategyDelegate.getNumberOfStrategyModules();
+		}
+
+		@Override
+		public void init() {
+			planStrategyDelegate.init();
+		}
+
+		@Override
+		public void finish() {
+			planStrategyDelegate.finish();
+		}
+
+		@Override
+		public String toString() {
+			return planStrategyDelegate.toString();
+		}
+
+		@Override
+		public PlanSelector getPlanSelector() {
+			return planStrategyDelegate.getPlanSelector();
 		}
 	}
 
@@ -303,6 +336,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		public TestPlanSelector() {
 		}
+		@Override
 		public PlanImpl selectPlan(final Person person) {
 			throw new UnsupportedOperationException();
 		}

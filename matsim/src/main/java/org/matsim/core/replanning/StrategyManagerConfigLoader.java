@@ -58,7 +58,7 @@ import org.matsim.pt.replanning.TransitTimeAllocationMutator;
  *
  * @author mrieser
  */
-public class StrategyManagerConfigLoader {
+public final class StrategyManagerConfigLoader {
 
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 

@@ -35,7 +35,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  * @author mrieser
  * @see org.matsim.core.replanning
  */
-public class PlanStrategyImpl implements PlanStrategy {
+public final class PlanStrategyImpl implements PlanStrategy {
 
 	private PlanSelector planSelector = null;
 	private PlanStrategyModule firstModule = null;
@@ -56,6 +56,7 @@ public class PlanStrategyImpl implements PlanStrategy {
 	/* (non-Javadoc)
 	 * @see org.matsim.core.replanning.PlanStrategy#addStrategyModule(org.matsim.api.core.v01.replanning.PlanStrategyModule)
 	 */
+	@Override
 	public final void addStrategyModule(final PlanStrategyModule module) {
 		if (this.firstModule == null) {
 			this.firstModule = module;
@@ -67,6 +68,7 @@ public class PlanStrategyImpl implements PlanStrategy {
 	/* (non-Javadoc)
 	 * @see org.matsim.core.replanning.PlanStrategy#getNumberOfStrategyModules()
 	 */
+	@Override
 	public final int getNumberOfStrategyModules() {
 		if (this.firstModule == null) {
 			return 0;
@@ -77,6 +79,7 @@ public class PlanStrategyImpl implements PlanStrategy {
 	/* (non-Javadoc)
 	 * @see org.matsim.core.replanning.PlanStrategy#run(org.matsim.api.core.v01.population.Person)
 	 */
+	@Override
 	public void run(final Person person) {
 		// yyyy "Ablaufsteuerung" should be final (in my view).  kai, sep'10
 		this.counter++;
@@ -110,6 +113,7 @@ public class PlanStrategyImpl implements PlanStrategy {
 	/* (non-Javadoc)
 	 * @see org.matsim.core.replanning.PlanStrategy#init()
 	 */
+	@Override
 	public final void init() {
 		if (this.firstModule != null) {
 			this.firstModule.prepareReplanning();
@@ -119,6 +123,7 @@ public class PlanStrategyImpl implements PlanStrategy {
 	/* (non-Javadoc)
 	 * @see org.matsim.core.replanning.PlanStrategy#finish()
 	 */
+	@Override
 	public final void finish() {
 		// yyyy I don't think this needs to be public once StrategyManager.run is final.  kai, sep'10
 		if (this.firstModule != null) {
@@ -159,6 +164,7 @@ public class PlanStrategyImpl implements PlanStrategy {
 	/* (non-Javadoc)
 	 * @see org.matsim.core.replanning.PlanStrategy#getPlanSelector()
 	 */
+	@Override
 	public final PlanSelector getPlanSelector() {
 		return planSelector;
 	}
