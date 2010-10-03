@@ -20,9 +20,7 @@
 
 package playground.mmoyo.ptRouterAdapted.precalculation;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
@@ -35,12 +33,10 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.routes.ExperimentalTransitRouteTest;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouter;
 import playground.mmoyo.ptRouterAdapted.MyTransitRouterConfig;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 /**
  *  Finds pt connection according to a priority : time or less transfers
@@ -62,9 +58,9 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		StaticConnection fastestConnection= null;
 		StaticConnection lessTransConnection= null;
-		
+
 		double travelTime = 0.0;
-		
+
 		double vdTime = depTime;
 		//Set<StaticConnection> conections = new HashSet();
 		System.out.println("starting");
@@ -72,7 +68,7 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 		for (vdTime = depTime+1800; vdTime>depTime-1800 ; vdTime-=180){   //find all possible connections in the last 30 mins and in the next 30 mins
 			//System.out.println("vdtime + conections size: " + vdTime + space + conections.size());
 			List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), vdTime);
-		
+
 			//calculate travelTime and distance
 			travelTime = 0.0;
 			double travelDistance = 0.0;
@@ -87,21 +83,21 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 					//TODO: travelDistance += leg2.; //set distance
 				}
 			}
-			
 
-			StaticConnection staticConnection = new StaticConnection(legs, travelTime, travelDistance, ptLegsNum); 
+
+			StaticConnection staticConnection = new StaticConnection(legs, travelTime, travelDistance, ptLegsNum);
 
 			//connection with less transfers
 			if (lessTransConnection == null || (ptLegsNum < lessTransConnection.getPtTripNum() && !lessTransConnection.equals(fastestConnection)) ){
-				lessTransConnection = staticConnection;	
-			}				
+				lessTransConnection = staticConnection;
+			}
 
-			//fastest connection			
+			//fastest connection
 			if (fastestConnection==null || travelTime< fastestConnection.getTravelTime()){
 				fastestConnection= staticConnection;
 			}
 
-			
+
 			/*
 			boolean contained = false;
 			for (StaticConnection conection : conections){
@@ -110,20 +106,20 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 					break;
 				}
 			}
-			
+
 			ExperimentalTransitRoute expRoute = (ExperimentalTransitRoute)staticConnection.getLegs().get(1).getRoute();
 			if (contained==false){
 				conections.add(staticConnection);
 			}
 			*/
 		}
-		
+
 		/*
 		for (StaticConnection connection : conections ){
 			System.out.println(connection.toString());
 		}
 		*/
-		
+
 		//super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, legs));
 		/*
 		double travelTime = 0.0;
@@ -133,7 +129,7 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 			}
 		}
 		*/
-		
+
 		super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, lessTransConnection.getLegs() ));
 		//super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, fastestConnection.getLegs() ));
 		return travelTime;
