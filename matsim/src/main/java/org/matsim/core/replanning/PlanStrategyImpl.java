@@ -80,8 +80,7 @@ public final class PlanStrategyImpl implements PlanStrategy {
 	 * @see org.matsim.core.replanning.PlanStrategy#run(org.matsim.api.core.v01.population.Person)
 	 */
 	@Override
-	public void run(final Person person) {
-		// yyyy "Ablaufsteuerung" should be final (in my view).  kai, sep'10
+	public final void run(final Person person) {
 		this.counter++;
 		
 		// if there is at least one unscored plan, find that one:
