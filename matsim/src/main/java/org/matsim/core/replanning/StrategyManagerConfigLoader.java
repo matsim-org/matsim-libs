@@ -48,6 +48,8 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.locationchoice.LocationChoice;
+import org.matsim.pt.replanning.TransitActsRemoverStrategy;
+import org.matsim.pt.replanning.TransitTimeAllocationMutator;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -161,6 +163,15 @@ public class StrategyManagerConfigLoader {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new ChangeLegMode(config));
 			strategy.addStrategyModule(new ReRoute(controler));
+		} else if (name.equals("TransitChangeLegMode")) {
+			strategy = new PlanStrategyImpl(new RandomPlanSelector());
+			strategy.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
+			strategy.addStrategyModule(new ChangeLegMode(controler.getConfig()));
+			strategy.addStrategyModule(new ReRoute(controler));
+		} else if (name.equals("TransitTimeAllocationMutator")) {
+			strategy = new PlanStrategyImpl(new RandomPlanSelector());
+			TransitTimeAllocationMutator tam = new TransitTimeAllocationMutator(controler.getConfig());
+			strategy.addStrategyModule(tam);
 		} else if (name.equals("SelectPathSizeLogit")) {
 			strategy = new PlanStrategyImpl(new PathSizeLogitSelector(controler.getNetwork(), config.charyparNagelScoring()));
 		} else if (name.equals("LocationChoice")) {

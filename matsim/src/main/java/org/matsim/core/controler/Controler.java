@@ -59,10 +59,10 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
@@ -99,8 +99,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
@@ -134,7 +134,6 @@ import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountControlerListener;
-import org.matsim.pt.replanning.TransitStrategyManagerConfigLoader;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.ptproject.qsim.ParallelQSimFactory;
@@ -736,15 +735,9 @@ public class Controler {
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
 	protected StrategyManager loadStrategyManager() {
-		if (this.config.scenario().isUseTransit()) {
-			StrategyManager manager = new StrategyManager();
-			TransitStrategyManagerConfigLoader.load(this, this.config, manager);
-			return manager;
-		} else {
-			StrategyManager manager = new StrategyManager();
-			StrategyManagerConfigLoader.load(this, manager);
-			return manager;
-		}
+		StrategyManager manager = new StrategyManager();
+		StrategyManagerConfigLoader.load(this, manager);
+		return manager;
 	}
 
 	/**
