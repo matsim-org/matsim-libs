@@ -18,8 +18,12 @@
  * *********************************************************************** */
 package playground.andreas.intersection.dijkstra;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
@@ -29,12 +33,42 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
  * Controler
  */
 @Deprecated
-public class SignalSystemRoutePlanStrategy extends PlanStrategyImpl {
+public class SignalSystemRoutePlanStrategy implements PlanStrategy {
+	PlanStrategy psDelegate = null ;
 
 	public SignalSystemRoutePlanStrategy(Controler controler) {
-		super(new RandomPlanSelector());
+		this.psDelegate = new PlanStrategyImpl( new RandomPlanSelector());
 		this.addStrategyModule(new ReRouteDijkstraTurningMoves(controler.getConfig(), controler.getNetwork(),
 				controler.createTravelCostCalculator(), controler.getTravelTimeCalculator()));
+	}
+
+	public void addStrategyModule(PlanStrategyModule module) {
+		this.psDelegate.addStrategyModule(module);
+	}
+
+	public void finish() {
+		this.psDelegate.finish();
+	}
+
+	public int getNumberOfStrategyModules() {
+		return this.psDelegate.getNumberOfStrategyModules();
+	}
+
+	public PlanSelector getPlanSelector() {
+		return this.psDelegate.getPlanSelector();
+	}
+
+	public void init() {
+		this.psDelegate.init();
+	}
+
+	public void run(Person person) {
+		this.psDelegate.run(person);
+	}
+
+	@Override
+	public String toString() {
+		return this.psDelegate.toString();
 	}
 
 }

@@ -21,13 +21,51 @@
 package playground.wrashid.parkingSearch.planLevel.replanning;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-public class ParkingPlanStrategy extends PlanStrategyImpl {
+public class ParkingPlanStrategy implements PlanStrategy {
+	
+	PlanStrategy planStrategyDelegate = null ;
 
+	/**
+	 * @param scenario needs to be there because of the class loader 
+	 */
 	public ParkingPlanStrategy(Scenario scenario) {
-		super(new RandomPlanSelector());
+		this.planStrategyDelegate = new PlanStrategyImpl( new RandomPlanSelector() ) ;
 		this.addStrategyModule(new ParkingStrategyModule());
+	}
+
+	public void addStrategyModule(PlanStrategyModule module) {
+		this.planStrategyDelegate.addStrategyModule(module);
+	}
+
+	public void finish() {
+		this.planStrategyDelegate.finish();
+	}
+
+	public int getNumberOfStrategyModules() {
+		return this.planStrategyDelegate.getNumberOfStrategyModules();
+	}
+
+	public PlanSelector getPlanSelector() {
+		return this.planStrategyDelegate.getPlanSelector();
+	}
+
+	public void init() {
+		this.planStrategyDelegate.init();
+	}
+
+	public void run(Person person) {
+		this.planStrategyDelegate.run(person);
+	}
+
+	@Override
+	public String toString() {
+		return this.planStrategyDelegate.toString();
 	}
 }
