@@ -35,7 +35,8 @@ public class ExpBetaPlanChanger implements PlanSelector {
 	private static final Logger log = Logger.getLogger(ExpBetaPlanChanger.class);
 
 	private final double beta;
-	static boolean betaFlag = true ;
+	static boolean betaWrnFlag = true ;
+	static boolean scoreWrnFlag = true ;
 
 	public ExpBetaPlanChanger(double beta) {
 		this.beta = beta;
@@ -45,6 +46,7 @@ public class ExpBetaPlanChanger implements PlanSelector {
 	 * Changes to another plan with a probability proportional to exp( Delta scores ).
 	 * Need to think through if this goes to Nash Equilibrium or to SUE !!!
 	 */
+	@Override
 	public Plan selectPlan(final Person person) {
 		// current plan and random plan:
 		Plan currentPlan = person.getSelectedPlan();
@@ -60,14 +62,19 @@ public class ExpBetaPlanChanger implements PlanSelector {
 			 * This resulted in weight=NaN below as well, and then ultimately in returning
 			 * the currentPlan---what we're doing right now as well.
 			 */
+			if ( currentPlan.getScore()!=null && otherPlan.getScore()==null ) {
+				if ( scoreWrnFlag ) {
+					log.error( "yyyyyy not switching to other plan although it needs to be explored.  "
+							+ "Possibly a serious bug; ask kai if you encounter this.  kai, sep'10" ) ;
+					scoreWrnFlag = false ;
+				}
+			}
 			return currentPlan;
 		}
 		double currentScore = currentPlan.getScore().doubleValue();
 		double otherScore = otherPlan.getScore().doubleValue();
 
-		if ( betaFlag ) {
-//			System.err.println( "ExpBetaPlanChanger: The following beta should be replaced by beta/2.  Not fatal.") ; // ask kai.  Jul08
-//			System.err.println( "(This has now been done.  If you have used expBetaPlanChanger before, double the beta in your config file.)") ; // ask kai.  Jul08
+		if ( betaWrnFlag ) {
 			log.warn("Would make sense to revise this once more.  See comments in code.  kai, nov08") ;
 			/*** Gunnar says, rightly I think, that what is below hits the "0.01*weight > 1" threshold fairly quickly.
 			 *   An alternative might be to divide by exp(0.5*beta*oS)+exp(0.5*beta*cS), or the max of these two numbers.  But:
@@ -75,7 +82,7 @@ public class ExpBetaPlanChanger implements PlanSelector {
 			 *       (convergence to logit and proba of jump between equal options = 0.01
 			 *   (2) someone would need to test if the "traffic" results are similar
 			 */
-			betaFlag = false ;
+			betaWrnFlag = false ;
 		}
 		double weight = Math.exp( 0.5 * this.beta * (otherScore - currentScore) );
 		// (so far, this is >1 if otherScore>currentScore, and <=1 otherwise)
