@@ -11,6 +11,8 @@ public class StaticConnection implements Comparable<StaticConnection>{
 	private double distance=0;
 	private double walkDist = 0;
 	private int ptTripNum=0;
+	String PT = "pt";
+	String TRWALK = "transit_walk";
 	
 	public StaticConnection(List<Leg> legs, double travelTime, double distance, int transfers) {
 		this.legs = legs;
@@ -72,8 +74,6 @@ public class StaticConnection implements Comparable<StaticConnection>{
 			return -1;
 		}
 
-		String PT = "pt";
-		String TRWALK = "transit_walk";
 		for (int i=1; i< this.legs.size()-1; i++){
 			Leg thisLeg = this.legs.get(i);
 			Leg otherLeg = other.legs.get(i);
