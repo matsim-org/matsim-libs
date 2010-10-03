@@ -40,7 +40,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.IOSimulation;
-import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -50,7 +49,6 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
-import org.matsim.pt.replanning.TransitStrategyManagerConfigLoader;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.ptproject.qsim.QSim;
@@ -107,12 +105,12 @@ public class TransitControler extends Controler {
 		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 	}
 
-	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		TransitStrategyManagerConfigLoader.load(this, this.config, manager);
-		return manager;
-	}
+//	@Override
+//	protected StrategyManager loadStrategyManager() {
+//		StrategyManager manager = new StrategyManager();
+//		TransitStrategyManagerConfigLoader.load(this, this.config, manager);
+//		return manager;
+//	}
 
 	@Override
 	protected void loadControlerListeners() {
@@ -147,9 +145,9 @@ public class TransitControler extends Controler {
 		}
 		sim.getQSimTransitEngine().setUseUmlaeufe(true);
 		sim.getQSimTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-		
+
 //		this.events.addHandler(new LogOutputEventHandler());
-		
+
 		if (sim instanceof IOSimulation){
 			((IOSimulation)sim).setControlerIO(this.getControlerIO());
 			((IOSimulation)sim).setIterationNumber(this.getIterationNumber());
@@ -171,6 +169,7 @@ public class TransitControler extends Controler {
 			this.config = config;
 		}
 
+		@Override
 		public void notifyStartup(final StartupEvent event) {
 			if (this.config.getTransitScheduleFile() != null) {
 				try {
@@ -221,6 +220,7 @@ public class TransitControler extends Controler {
 			this.occupancyAnalyzer = occupancyAnalyzer;
 		}
 
+		@Override
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 			int iter = event.getIteration();
 			if (iter % 10 == 0&& iter > event.getControler().getFirstIteration()) {
@@ -229,6 +229,7 @@ public class TransitControler extends Controler {
 			}
 		}
 
+		@Override
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			int it = event.getIteration();
 			if (it % 10 == 0 && it > event.getControler().getFirstIteration()) {
