@@ -38,7 +38,7 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
  * Just testing, that the scenario runs without errors.
  */
 
-class OptimizedChargerTestGeneral extends MatsimTestCase implements ParametersPSFMutator {
+class OptimizedChargerTestGeneral implements ParametersPSFMutator {
 
 	Controler controler;
 
@@ -76,7 +76,7 @@ class OptimizedChargerTestGeneral extends MatsimTestCase implements ParametersPS
 		// because the energy consumption
 		// per link is set very low in the scenario and there is no need to
 		// charge during peak time.
-		assertEquals(1, chargingTimesOfAgentOne.getChargingTimes().size());
+		MatsimTestCase.assertEquals(1, chargingTimesOfAgentOne.getChargingTimes().size());
 	}
 
 }
