@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.PersonEntersVehicleEvent;
@@ -38,7 +39,6 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.gbl.Gbl;
 
 /**
  * @author yChen
@@ -62,6 +62,8 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	private StringBuffer occupancyRecord;
 
 	public OccupancyAnalyzer(final int timeBinSize, final double maxTime) {
+		log.setLevel( Level.INFO ) ;
+		
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = ((int) this.maxTime) / this.timeBinSize + 1;
