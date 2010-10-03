@@ -40,6 +40,7 @@ import net.opengis.kml._2.LinkType;
 import net.opengis.kml._2.NetworkLinkType;
 import net.opengis.kml._2.ObjectFactory;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -81,6 +82,8 @@ public class KMZWriter {
 	 *          the location of the file to be written.
 	 */
 	public KMZWriter(final String outFilename) {
+		log.setLevel( Level.INFO ) ;
+		
 		String filename = outFilename;
 		if (filename.endsWith(".kml") || filename.endsWith(".kmz")) {
 			filename = filename.substring(0, filename.length() - 4);
