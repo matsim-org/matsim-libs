@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * IterativeKnowledgeControler.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.christoph.controler;
 
 import java.util.ArrayList;
@@ -9,7 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
@@ -19,7 +39,6 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.network.SubNetwork;
 import playground.christoph.network.util.SubNetworkCreator;
-import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
@@ -38,28 +57,24 @@ public class IterativeKnowledgeControler extends Controler{
 	 */
 	private static final String tableName = "BatchTable1_5";
 
-	public IterativeKnowledgeControler(String[] args)
-	{
+	public IterativeKnowledgeControler(String[] args) {
 		super(args);
 
 		setConstructorParameters();
 	}
 
-	private void setConstructorParameters()
-	{
+	private void setConstructorParameters() {
 //		// Use MyLinkImpl. They can carry some additional Information like their
 //		// TravelTime or VehicleCount.
 //		this.getNetwork().getFactory().setLinkFactory(new MyLinkFactoryImpl());
 	}
 
-	private void setScoringFunction()
-	{
+	private void setScoringFunction() {
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 	}
 
-	private void setCalculators()
-	{
+	private void setCalculators() {
 		// Use knowledge when Re-Routing
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCalculator());
 		final KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
@@ -78,8 +93,7 @@ public class IterativeKnowledgeControler extends Controler{
 //		this.setTravelCostCalculator(travelCost);
 	}
 
-	private void initialReplanning()
-	{
+	private void initialReplanning() {
 		log.info("Do initial Replanning");
 
 //		// Use a Wrapper - by doing this, already available MATSim
@@ -104,16 +118,13 @@ public class IterativeKnowledgeControler extends Controler{
 		}
 	}
 
-	private void loadKnowledgeFromDB()
-	{
+	private void loadKnowledgeFromDB() {
 		log.info("Loading Knowledge from Database");
 	
-		if (numOfThreads == 1)
-		{
+		if (numOfThreads == 1) {
 			SubNetworkCreator snc = new SubNetworkCreator(network);
 			
-			for (Person person : this.getPopulation().getPersons().values())
-			{
+			for (Person person : this.getPopulation().getPersons().values()) {
 				Map<String, Object> customAttributes = person.getCustomAttributes();
 				
 				customAttributes.put("NodeKnowledgeStorageType", MapKnowledgeDB.class.getName());
@@ -134,19 +145,16 @@ public class IterativeKnowledgeControler extends Controler{
 				}
 			}
 		}
-		else
-		{
+		else {
 			LoadKnowledgeFromDBThread[] threads = new LoadKnowledgeFromDBThread[numOfThreads];
 			
 			// create the Threads
-			for (int i = 0; i < threads.length; i++)
-			{
+			for (int i = 0; i < threads.length; i++) {
 				threads[i] = new LoadKnowledgeFromDBThread();
 			}
 			
 			int distributor = 0;
-			for (Person person : this.getPopulation().getPersons().values())
-			{
+			for (Person person : this.getPopulation().getPersons().values()) {
 				threads[distributor % numOfThreads].addPerson(person);
 			}
 		
@@ -156,10 +164,8 @@ public class IterativeKnowledgeControler extends Controler{
 			// wait until the Threads are finished
 			try {
 				for (LoadKnowledgeFromDBThread thread : threads) thread.join();
-			} 
-			catch (InterruptedException e) 
-			{
-				log.error(e.getMessage());
+			} catch (InterruptedException e) {
+				Gbl.errorMsg(e);
 			}
 		}
 	}
@@ -173,18 +179,8 @@ public class IterativeKnowledgeControler extends Controler{
 	}
 
 	@Override
-	protected StrategyManager loadStrategyManager()
-	{
-		StrategyManager manager = new StrategyManager();
-		MyStrategyManagerConfigLoader.load(this, this.config, manager);
-		return manager;
-	}
-
-	@Override
-	protected void runMobSim()
-	{
-		if (!knowledgeLoaded)
-		{
+	protected void runMobSim() {
+		if (!knowledgeLoaded) {
 			loadKnowledgeFromDB();
 			initialReplanning();
 			knowledgeLoaded = true;
@@ -193,26 +189,21 @@ public class IterativeKnowledgeControler extends Controler{
 		super.runMobSim();
 	}
 
-	private class LoadKnowledgeFromDBThread extends Thread
-	{
+	private class LoadKnowledgeFromDBThread extends Thread {
 		private List<Person> persons;
 		private SubNetworkCreator snc = new SubNetworkCreator(network);
 		
-		public LoadKnowledgeFromDBThread()
-		{
+		public LoadKnowledgeFromDBThread() {
 			this.persons = new ArrayList<Person>();
 		}
 		
-		public void addPerson(Person person)
-		{
+		public void addPerson(Person person) {
 			this.persons.add(person);
 		}
 			
 		@Override
-		public void run()
-		{
-			for (Person person : persons)
-			{
+		public void run() {
+			for (Person person : persons) {
 				Map<String, Object> customAttributes = person.getCustomAttributes();
 
 				customAttributes.put("NodeKnowledgeStorageType", MapKnowledgeDB.class.getName());
@@ -226,8 +217,7 @@ public class IterativeKnowledgeControler extends Controler{
 
 				customAttributes.put("NodeKnowledge", mapKnowledgeDB);
 				
-				if (createSubNetworks)
-				{
+				if (createSubNetworks) {
 					SubNetwork subNetwork = snc.createSubNetwork(mapKnowledgeDB);
 					customAttributes.put("SubNetwork", subNetwork);
 				}
@@ -235,16 +225,13 @@ public class IterativeKnowledgeControler extends Controler{
 		}
 	}
 	
-	public static void main(final String[] args)
-	{
-		if ((args == null) || (args.length == 0))
-		{
+	public static void main(final String[] args) {
+		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		}
-		else
-		{
+		else {
 			final IterativeKnowledgeControler controler = new IterativeKnowledgeControler(args);
 			controler.setOverwriteFiles(true);
 			controler.run();

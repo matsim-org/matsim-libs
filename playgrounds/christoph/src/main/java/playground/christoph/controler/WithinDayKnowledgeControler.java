@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -71,14 +71,12 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 	 */
 	protected String tableName = "BatchTable1_15";
 	
-	public WithinDayKnowledgeControler(String[] args)
-	{
+	public WithinDayKnowledgeControler(String[] args) {
 		super(args);
 	}
 
 	// only for Batch Runs
-	public WithinDayKnowledgeControler(Config config)
-	{
+	public WithinDayKnowledgeControler(Config config) {
 		super(config);
 	}
 	
@@ -160,8 +158,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 	 * -> Where to get the Knowledge from?
 	 */
 	@Override
-	protected void runMobSim() 
-	{
+	protected void runMobSim() {
 		setKnowledgeStorageHandler();
 		super.runMobSim();
 	}
@@ -170,10 +167,8 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 	 * How to store the known Nodes of the Agents?
 	 * Currently we store them in a Database.
 	 */
-	private void setKnowledgeStorageHandler()
-	{		
-		for(Person person : population.getPersons().values())
-		{			
+	private void setKnowledgeStorageHandler() {		
+		for(Person person : population.getPersons().values()) {			
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 			
 			customAttributes.put("NodeKnowledgeStorageType", MapKnowledgeDB.class.getName());

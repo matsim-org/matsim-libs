@@ -34,7 +34,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -43,7 +42,6 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
-import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 import playground.christoph.withinday.mobsim.DuringActivityReplanningModule;
@@ -238,17 +236,6 @@ public class WithinDayControler extends Controler {
 
 		sim.run();
 	}
-
-	/**
-	 * @return A fully initialized StrategyManager for the plans replanning.
-	 */
-	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		MyStrategyManagerConfigLoader.load(this, this.config, manager);
-		return manager;
-	}
-
 
 	public static class ReplanningFlagInitializer implements SimulationInitializedListener {
 

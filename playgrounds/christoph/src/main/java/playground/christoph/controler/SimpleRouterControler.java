@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimpleRoutingControler.java
+ * SimpleRouterControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -35,7 +35,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -45,7 +44,6 @@ import org.matsim.ptproject.qsim.QSim;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
-import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.router.CompassRoute;
 import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomDijkstraRoute;
@@ -288,16 +286,6 @@ public class SimpleRouterControler extends Controler {
 
 			customAttributes.put("NodeKnowledge", mapKnowledgeDB);
 		}
-	}
-
-	/**
-	 * @return A fully initialized StrategyManager for the plans replanning.
-	 */
-	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		MyStrategyManagerConfigLoader.load(this, this.config, manager);
-		return manager;
 	}
 
 	public static class ReplanningFlagInitializer implements SimulationInitializedListener {

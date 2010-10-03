@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * BatchRun.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.christoph.controler;
 
 import java.io.IOException;
@@ -17,7 +37,8 @@ public class BatchRun {
 	//protected static double[] probabilityFactors = {0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95};
 	protected static double[] probabilityFactors = {0.65};
 
-/*	// no replanning, initial replanning, act end replanning, leave link replanning
+/*	
+ 	// no replanning, initial replanning, act end replanning, leave link replanning
 	protected static int[][] Versuchsplan = {{4, 2, 3, 1},
 											 {2, 3, 4, 1},
 											 {1, 3, 5, 1},
@@ -90,8 +111,7 @@ public class BatchRun {
 	/*
 	 * Select which kind of BatchRun you want to run.
 	 */
-	public static void main(final String[] args)
-	{
+	public static void main(final String[] args) {
 		BatchRun batchRun = new BatchRun();
 		//batchRun.runBatchRunRandomCompass();
 		//batchRun.runBatchRunCompass();
@@ -102,12 +122,9 @@ public class BatchRun {
 		System.exit(0);
 	}
 
-	protected void runBatchRunRandomCompass()
-	{
-		for (int i = 0; i < knowledgeFactors.length; i++)
-		{
-			for (int j = 0; j < probabilityFactors.length; j++)
-			{
+	protected void runBatchRunRandomCompass() {
+		for (int i = 0; i < knowledgeFactors.length; i++) {
+			for (int j = 0; j < probabilityFactors.length; j++) {
 				outputDirectory = outbase + "/RandomCompassRouter" + "_Knowledge" + knowledgeFactors[i] + "_Probability" + probabilityFactors[j];
 				inputDirectory = inbase;
 
@@ -140,10 +157,8 @@ public class BatchRun {
 		}
 	}
 
-	protected void runBatchRunCompass()
-	{
-		for (int i = 0; i < knowledgeFactors.length; i++)
-		{
+	protected void runBatchRunCompass() {
+		for (int i = 0; i < knowledgeFactors.length; i++) {
 			outputDirectory = outbase + "/CompassRouter" + "_Knowledge" + knowledgeFactors[i];
 			inputDirectory = inbase;
 
@@ -167,10 +182,8 @@ public class BatchRun {
 		}
 	}
 
-	protected void runBatchRunWithinDay()
-	{
-		for (int i = 0; i < knowledgeFactors.length; i++)
-		{
+	protected void runBatchRunWithinDay() {
+		for (int i = 0; i < knowledgeFactors.length; i++) {
 //			outputDirectory = outbase + "/output_act_end_full";
 			outputDirectory = outbase + "/output_leave_link_full";
 //			outputDirectory = outbase + "/output_total_full";
@@ -195,10 +208,8 @@ public class BatchRun {
 		}
 	}
 
-	protected void runBatchRunWithinDayKnowledge()
-	{
-		for (int i = 0; i < knowledgeFactors.length; i++)
-		{
+	protected void runBatchRunWithinDayKnowledge() {
+		for (int i = 0; i < knowledgeFactors.length; i++) {
 			outputDirectory = outbase + "/output_act_end_" + knowledgeFactors[i];
 //			outputDirectory = outbase + "/output_leave_link_" + knowledgeFactors[i];
 			inputDirectory = inbase;
@@ -223,10 +234,8 @@ public class BatchRun {
 		}
 	}
 
-	protected void runBatchRunDoE()
-	{
-		for (int i = 0; i < Versuchsplan.length; i++)
-		{
+	protected void runBatchRunDoE() {
+		for (int i = 0; i < Versuchsplan.length; i++) {
 			//outputDirectory = outbase + "/LeaveLinkReplanningRouter" + "_Knowledge" + knowledgeFactors[i];
 
 			// use always full knowledge
@@ -264,22 +273,17 @@ public class BatchRun {
 
 	}
 
-	protected Config readConfigFile()
-	{
+	protected Config readConfigFile() {
 		String dtdFileName = null;
 		String confFileName = configFilePath + separator + configFileName;
 
 		Config config = new Config();
 		config.addCoreModules();
 
-		if (confFileName != null)
-		{
-			try
-			{
+		if (confFileName != null) {
+			try {
 				new MatsimConfigReader(config).readFile(confFileName, dtdFileName);
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				log.error("Problem loading the configuration file from " + confFileName);
 				throw new RuntimeException(e);
 			}
@@ -303,11 +307,9 @@ public class BatchRun {
 	/*
 	 * Set / Overwrite some Parameters in the Config Module.
 	 */
-	protected void updateConfigData(Config config, String knowledgeFactor)
-	{
+	protected void updateConfigData(Config config, String knowledgeFactor) {
 		// if Module does not exist -> create it
-		if (config.getModule("selection") == null)
-		{
+		if (config.getModule("selection") == null) {
 			config.addModule("selection", new Module("selection"));
 		}
 		// overwrite paths in Config
@@ -325,9 +327,6 @@ public class BatchRun {
 
 		config.getModule("facilities").addParam("inputFacilitiesFile", inputDirectory + "/facilities.xml.gz");
 		config.getModule("facilities").addParam("outputFacilitiesFile", outputDirectory + "/output_facilities.xml.gz");
-
-//		config.getModule("matrices").addParam("inputMatricesFile", inputDirectory + "/matrices.xml");
-//		config.getModule("matrices").addParam("outputMatricesFile", outputDirectory + "/output_matrices.xml");
 
 		config.getModule("network").addParam("inputNetworkFile", inputDirectory + "/network.xml");
 		config.getModule("network").addParam("outputNetworkFile", outputDirectory + "/output_network.xml");
