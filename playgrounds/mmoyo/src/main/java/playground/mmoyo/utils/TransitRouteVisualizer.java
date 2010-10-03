@@ -20,7 +20,7 @@ public class TransitRouteVisualizer {
 	public TransitRouteVisualizer(String config,String strTrRouteId){
 		
 		//find transitRoute
-		ScenarioImpl scenario = new TransScenarioLoader ().loadScenarioWithTrSchedule(config);
+		ScenarioImpl scenario = new DataLoader ().loadScenarioWithTrSchedule(config);
 		TransitRoute transitRoute = null;
 		Iterator<Entry<Id, TransitLine>> iter = scenario.getTransitSchedule().getTransitLines().entrySet().iterator();
 		while(transitRoute==null && iter.hasNext()){

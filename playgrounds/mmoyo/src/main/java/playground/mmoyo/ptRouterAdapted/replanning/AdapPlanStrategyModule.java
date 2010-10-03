@@ -8,7 +8,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.core.router.PlansCalcRoute;
 
 import playground.mmoyo.ptRouterAdapted.AdaptedPlansCalcTransitRoute;
 import playground.mmoyo.ptRouterAdapted.MyTransitRouterConfig;

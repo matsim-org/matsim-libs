@@ -39,6 +39,7 @@ import org.matsim.pt.replanning.TransitActsRemoverStrategy;
  *
  * A StrategyManagerConfigLoader to get a transit replanning strategy that combines timeAllocationMutator and Reroute
  */
+@Deprecated
 public class AdaptedStrategyManagerConfigLoader extends StrategyManagerConfigLoader{
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 	

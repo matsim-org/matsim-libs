@@ -17,10 +17,7 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-
-import playground.mmoyo.PTRouter.LogicFactory;
-import playground.mmoyo.PTRouter.MyDijkstra;
-import playground.mmoyo.utils.TransScenarioLoader;
+import playground.mmoyo.utils.DataLoader;
 
 /**
  * Identifies isolated TransitRoutes
@@ -34,6 +31,7 @@ public class TransitRouteValidator {
 		this.transitSchedule = transitSchedule;
 	}
 
+	/*
 	public void getIsolatedPTLines(){
 
 		int isolated=0;
@@ -109,6 +107,7 @@ public class TransitRouteValidator {
 		}
 	}
 
+	
 	public static void main(String[] args) {
 		String config = null;
 
@@ -117,7 +116,7 @@ public class TransitRouteValidator {
 		}else{
 			config= "../playgrounds/mmoyo/output/trRoutVis/config.xml";
 		}
-		ScenarioImpl scenarioImpl = new TransScenarioLoader().loadScenarioWithTrSchedule(config);
+		ScenarioImpl scenarioImpl = new DataLoader().loadScenarioWithTrSchedule(config);
 		new TransitRouteValidator(scenarioImpl.getTransitSchedule()).findRepetedStops();
 	}
 	

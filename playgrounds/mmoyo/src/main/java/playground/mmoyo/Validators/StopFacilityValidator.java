@@ -8,13 +8,13 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.mmoyo.utils.TransScenarioLoader;
+import playground.mmoyo.utils.DataLoader;
 
 //validates a 1-1 relationship between stopFacility and link
 public class StopFacilityValidator {
 	
 	public StopFacilityValidator(String config){
-		ScenarioImpl scenario = new TransScenarioLoader ().loadScenarioWithTrSchedule(config);
+		ScenarioImpl scenario = new DataLoader ().loadScenarioWithTrSchedule(config);
 		TransitSchedule trSchedule = scenario.getTransitSchedule();
 		List<Id> LinkIdList = new ArrayList<Id>();
 		for (TransitStopFacility transitStopFacility: trSchedule.getFacilities().values()){

@@ -20,18 +20,23 @@
 package playground.mmoyo.ptRouterAdapted.replanning;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
 
-
-public class AdapTimeMut_ReRouteStrategy extends PlanStrategyImpl {
+public class AdapTimeMut_ReRouteStrategy implements PlanStrategy {
 	private static final Logger log = Logger.getLogger(AdapTimeMut_ReRouteStrategy.class);
+	PlanStrategy planStrategyDelegate = null ;
 	
 	public AdapTimeMut_ReRouteStrategy(Controler controler) {
-		super( new RandomPlanSelector() );
+		
+		planStrategyDelegate = new PlanStrategyImpl( new RandomPlanSelector( ) );
 		log.info("Using Experimental AdapTimeMut_ReRouteStrategy");
 
 		//remove transit acts
@@ -49,5 +54,40 @@ public class AdapTimeMut_ReRouteStrategy extends PlanStrategyImpl {
 
 		// to collect events:
 		//controler.getEvents().addHandler( (EventHandler) this.getPlanSelector() ) ;
+	}
+
+	@Override
+	public void addStrategyModule(PlanStrategyModule module) {
+		planStrategyDelegate.addStrategyModule(module);
+	}
+
+
+	@Override
+	public void finish() {
+		planStrategyDelegate.finish();
+	}
+
+	@Override
+	public int getNumberOfStrategyModules() {
+		return planStrategyDelegate.getNumberOfStrategyModules();
+	}
+	
+	@Override
+	public PlanSelector getPlanSelector() {
+		return planStrategyDelegate.getPlanSelector();
+	}
+
+	@Override
+	public void init() {
+		planStrategyDelegate.init();
+	}
+
+	@Override
+	public void run(Person person) {
+		planStrategyDelegate.run(person);
+	}
+
+	public String toString() {
+		return planStrategyDelegate.toString();
 	}
 }

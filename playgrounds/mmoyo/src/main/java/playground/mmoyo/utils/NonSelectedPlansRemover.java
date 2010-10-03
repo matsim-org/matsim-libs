@@ -57,7 +57,7 @@ public class NonSelectedPlansRemover {
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		}
 
-		ScenarioImpl scenario = new TransScenarioLoader().loadScenario(configFile);
+		ScenarioImpl scenario = new DataLoader().loadScenario(configFile);
 		new NonSelectedPlansRemover().writeOnlySelectedPlans(scenario);
 	}
 

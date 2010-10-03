@@ -28,7 +28,7 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.xml.sax.SAXException;
 
-import playground.mmoyo.utils.TransScenarioLoader;
+import playground.mmoyo.utils.DataLoader;
 
 /**validates that pt veh in a events file followed their predefined transit route**/
 public class TransitRoutePathValidator implements BasicEventHandler { 
@@ -239,7 +239,7 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 			//eventFile = "../playgrounds/mmoyo/output/input/10.events.xml.gz";
 		}
 		
-		ScenarioImpl scenario = new TransScenarioLoader().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenario = new DataLoader().loadScenarioWithTrSchedule(configFile);
 		new TransitRoutePathValidator(scenario).run(eventFile);
 	}
 

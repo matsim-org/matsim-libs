@@ -30,7 +30,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import playground.mmoyo.utils.TransScenarioLoader;
+
+import playground.mmoyo.ptRouterAdapted.replanning.AdapContListener;
+import playground.mmoyo.utils.DataLoader;
+import tutorial.programming.example11PluggablePlanStrategyInCode.MyControlerListener;
 
 /**
  * @author manuel
@@ -94,6 +97,9 @@ public class AdaptedControler extends Controler {
 		controler.setCreateGraphs(true);
 		controler.setOverwriteFiles(true);
 		controler.setWriteEventsInterval(5); 
+		
+		controler.addControlerListener(new AdapContListener(controler)) ;
+		
 		controler.run();
 	}
 }

@@ -35,7 +35,7 @@ public class Plan2Population {
 		}else{
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";	
 		}
-		Scenario scenario = new TransScenarioLoader().loadScenario(configFile);
+		Scenario scenario = new DataLoader().loadScenario(configFile);
 		Plan2Population plan2Population = new Plan2Population(scenario);
 		plan2Population.CreatePersonFile("11101104X1");
 	}

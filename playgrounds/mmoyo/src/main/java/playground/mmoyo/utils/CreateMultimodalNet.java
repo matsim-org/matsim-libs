@@ -46,7 +46,7 @@ public class CreateMultimodalNet {
 		}else{
 			configFile = "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/transfer/config_withoutPT.xml";
 		}
-		ScenarioImpl scenario = new TransScenarioLoader().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenario = new DataLoader().loadScenarioWithTrSchedule(configFile);
 		new CreateMultimodalNet().run(scenario, scenario.getConfig().controler().getOutputDirectory() + "/multimodalNetwork.xml");
 	}
 

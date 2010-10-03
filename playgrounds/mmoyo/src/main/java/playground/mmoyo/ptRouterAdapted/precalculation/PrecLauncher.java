@@ -1,4 +1,4 @@
-package playground.mmoyo.ptRouterAdapted;
+package playground.mmoyo.ptRouterAdapted.precalculation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,21 +11,19 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.pt.config.TransitConfigGroup;
 
+import playground.mmoyo.ptRouterAdapted.MyTransitRouterConfig;
 import playground.mmoyo.utils.FileCompressor;
-import playground.mmoyo.utils.PlanFragmenter;
 import playground.mmoyo.utils.DataLoader;
 
-
-/**routes scenario based on the values of the transitRouterConfig**/
-public class AdaptedLauncher {
+/**Defines input data and parameters for route precalculation**/
+public class PrecLauncher {
 	MyTransitRouterConfig myTransitRouterConfig;
 
-	public AdaptedLauncher(MyTransitRouterConfig myTransitRouterConfig) {
+	public PrecLauncher(MyTransitRouterConfig myTransitRouterConfig) {
 		this.myTransitRouterConfig = myTransitRouterConfig;
 	}
 
-	public String route(final String configFile){
-		
+	public String run(final String configFile){
 		//load scenario
 		ScenarioImpl scenarioImpl = new DataLoader ().loadScenarioWithTrSchedule(configFile); 
 		
@@ -38,7 +36,7 @@ public class AdaptedLauncher {
 			}
 		}
 		
-		String routedPlansFile = scenarioImpl.getConfig().controler().getOutputDirectory()+ "/routedPlan_" + this.myTransitRouterConfig.scenarioName + ".xml";
+		String routedPlansFile = scenarioImpl.getConfig().controler().getOutputDirectory()+ "/lessTransRoutedPlan_" + this.myTransitRouterConfig.scenarioName + ".xml";
 		
 		//Get rid of only car plans
 		if (this.myTransitRouterConfig.noCarPlans){
@@ -51,21 +49,11 @@ public class AdaptedLauncher {
 		FreespeedTravelTimeCost freespeedTravelTimeCost = new FreespeedTravelTimeCost(scenarioImpl.getConfig().charyparNagelScoring());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 
-		// yy The following comes from PlansCalcRoute; in consequence, one can configure the car router attributes.  In addition, one can configure _some_
-		// of the transit attributes from here (transitSchedule, transitConfig), but not some others.  Please describe the design reason for this.  kai, apr'10
-		// The design reason is, I guess, that these are the arguments that are used for the constructor of the super-class (designed by others)?  kai, apr'10
-		//Yes, it uses matsim.pt.router.PlansCalcTransitRoute class to keep the compatibility of potentially handling many TransportMode types. Manuel,.
-		
-		AdaptedPlansCalcTransitRoute adaptedPlansCalcTransitRoute = new AdaptedPlansCalcTransitRoute(scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getNetwork(), 
+		PrecalPlansCalcTransitRoute precPlansCalcTransitRoute = new PrecalPlansCalcTransitRoute(scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getNetwork(), 
 				freespeedTravelTimeCost, freespeedTravelTimeCost, dijkstraFactory, scenarioImpl.getTransitSchedule(), transitConfig, this.myTransitRouterConfig);
 
-		adaptedPlansCalcTransitRoute.run(scenarioImpl.getPopulation());
+		precPlansCalcTransitRoute.run(scenarioImpl.getPopulation());
 
-		//fragment plans
-		if (this.myTransitRouterConfig.fragmentPlans){
-			scenarioImpl.setPopulation(new PlanFragmenter().run(scenarioImpl.getPopulation()));					
-		}
-		
 		//write 
 		System.out.println("writing output plan file..." + routedPlansFile);
 		PopulationWriter popwriter = new PopulationWriter(scenarioImpl.getPopulation(), scenarioImpl.getNetwork()) ;
@@ -88,40 +76,31 @@ public class AdaptedLauncher {
 			configFilePath = args[0];
 			varName = args[1];
 		}else{
-			configFilePath = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/config.xml";
-			varName =  "adap"; 
+			configFilePath = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			varName =  "exp"; 
 		}
 
 		MyTransitRouterConfig myTransitRouterConfig = new MyTransitRouterConfig();
-		myTransitRouterConfig.searchRadius = 600.0;
-		myTransitRouterConfig.extensionRadius = 200.0; 
 		myTransitRouterConfig.beelineWalkConnectionDistance = 300.0;
 		myTransitRouterConfig.fragmentPlans = false;
 		myTransitRouterConfig.noCarPlans= true;
-		myTransitRouterConfig.allowDirectWalks= true;
 		myTransitRouterConfig.compressPlan = true;
 
-		//once
+		//set optimal values
+		myTransitRouterConfig.beelineWalkSpeed = 3.0/3.6;  	
+		myTransitRouterConfig.marginalUtilityOfTravelTimeWalk = -6.0 / 3600.0; 	//-6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
+		myTransitRouterConfig.marginalUtilityOfTravelTimeTransit = -6.0 / 3600.0;//-6.0 / 3600.0; // in Eu/sec; includes opportunity cost of time.  kai, apr'10
+		myTransitRouterConfig.marginalUtilityOfTravelDistanceTransit = -0.7/1000.0; //-0.7/1000.0;    // yyyy presumably, in Eu/m ?????????  so far, not used.  kai, apr'10
+		myTransitRouterConfig.costLineSwitch = 240.0 * - myTransitRouterConfig.marginalUtilityOfTravelTimeTransit;	//* -this.marginalUtilityOfTravelTimeTransit; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
+		myTransitRouterConfig.searchRadius = 600.0;								//initial distance for stations around origin and destination points
+		myTransitRouterConfig.extensionRadius = 200.0; 
+		myTransitRouterConfig.allowDirectWalks= true;
+		
 		myTransitRouterConfig.scenarioName = varName;
 		System.out.println(myTransitRouterConfig.scenarioName) ;
-		AdaptedLauncher adaptedLauncher	= new AdaptedLauncher(myTransitRouterConfig);
-		String routedPlan = adaptedLauncher.route(configFilePath);
-		
-		
-		//many times
-		/*
-		for ( double dVariable = 1.5; dVariable <= 1.5 ; dVariable += 0.1 ) {
-			double roundedVarValue = Math.round(dVariable*100)/100.0;
-			String strVarValue = String.valueOf(roundedVarValue);			
-			myTransitRouterConfig.marginalUtilityOfTravelDistanceTransit = -roundedVarValue / 3600.0; //modify 
-			myTransitRouterConfig.scenarioName = varName + strVarValue;
-			System.out.println ("routing " + myTransitRouterConfig.scenarioName);
-			AdaptedLauncher adaptedLauncher	= new AdaptedLauncher(myTransitRouterConfig);
-			String routedPlan = adaptedLauncher.route(configFilePath);
-		}
-		*/
+		PrecLauncher adaptedLauncher	= new PrecLauncher(myTransitRouterConfig);
+		String routedPlan = adaptedLauncher.run(configFilePath);
 	}
-	
 }
 
 
