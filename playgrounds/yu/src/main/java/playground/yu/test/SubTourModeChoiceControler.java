@@ -25,38 +25,31 @@ package playground.yu.test;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
-import playground.yu.analysis.MZComparison.MZComparisonListener;
 import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
 
 /**
  * @author yu
  * 
  */
-public class SubTourModeChoiceControler extends Controler {
-
-	public SubTourModeChoiceControler(String args) {
-		super(args);
-	}
-
-	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		MyStrategyManagerConfigLoader.load(this, manager);
-		return manager;
-	}
+public class SubTourModeChoiceControler {
 
 	public static void main(String[] args) {
 		Config config = new ScenarioLoaderImpl(args[0]).loadScenario()
 				.getConfig();
-		Controler controler = new SubTourModeChoiceControler(args[0]);
+		Controler controler = new Controler(args[0]);
+		/*
+		 * <module name="strategy"> <param name="maxAgentPlanMemorySize"
+		 * value="x" /> <!-- 0 means unlimited --> ... <param
+		 * name="ModuleProbability_y" value="0.1" /> <param name="Module_y"
+		 * value="playground.yu.test.SubTourModeChoicePlanStrategy" /> </module>
+		 */
 		controler
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
 						config.charyparNagelScoring(), config.vspExperimental()
 								.getOffsetWalk()));
-//		controler.addControlerListener(new MZComparisonListener());
+		// controler.addControlerListener(new MZComparisonListener());
 		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
 		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
 		controler.setOverwriteFiles(true);
