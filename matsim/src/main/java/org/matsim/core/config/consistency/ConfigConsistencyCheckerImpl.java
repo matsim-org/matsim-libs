@@ -21,28 +21,30 @@ package org.matsim.core.config.consistency;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-
+import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
 /**
  * Implementation of the ConfigCosistencyChecker interface.
- * @author dgrether
  *
+ * @author dgrether
  */
 public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
-	
+
 	private static final Logger log = Logger
 			.getLogger(ConfigConsistencyCheckerImpl.class);
-	
+
+	@Override
 	public void checkConsistency(Config config) {
 		this.checkScenarioFeaturesEnabled(config);
 		this.checkEventsFormatLanesSignals(config);
 		this.checkTravelTimeCalculationRoutingConfiguration(config);
 		this.checkLaneDefinitionRoutingConfiguration(config);
 		this.checkSignalSystemConfiguration(config);
+		this.checkTransitReplanningConfiguration(config);
 	}
-	
+
 	private void checkEventsFormatLanesSignals(Config c) {
 		ScenarioConfigGroup scg = c.scenario();
 		if (scg.isUseLanes() || scg.isUseSignalSystems()) {
@@ -73,15 +75,15 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 						"configuration file for the systems. This may not be fatal if " +
 				"incode custom configuration is implemented. ");
 			}
-			
+
 			if ((config.signalSystems().getSignalSystemFile() == null) &&
 					(config.signalSystems().getSignalSystemConfigFile() != null)){
 				throw new IllegalStateException("SignalSystemConfigurations are set " +
 				"in config but no input file for the SignalSystems is specified.!");
 			}
-			
+
 			if ((config.network().getLaneDefinitionsFile() == null) &&
-					(config.signalSystems().getSignalSystemFile() != null) && 
+					(config.signalSystems().getSignalSystemFile() != null) &&
 					(config.signalSystems().getSignalSystemConfigFile() != null)) {
 				throw new IllegalStateException("Cannot use the signal systems framework without" +
 				"a definition of lanes.");
@@ -90,12 +92,12 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 
 
 	private void checkTravelTimeCalculationRoutingConfiguration(Config config){
-		if (config.controler().isLinkToLinkRoutingEnabled() && 
+		if (config.controler().isLinkToLinkRoutingEnabled() &&
 				!config.travelTimeCalculator().isCalculateLinkToLinkTravelTimes()){
 			throw new IllegalStateException("LinkToLinkRouting is activated in config and" +
 					" link to link traveltime calculation is not enabled but required!");
 		}
-		
+
 		if (config.travelTimeCalculator().isCalculateLinkTravelTimes() &&
 				config.travelTimeCalculator().isCalculateLinkToLinkTravelTimes() &&
 				!config.controler().isLinkToLinkRoutingEnabled()) {
@@ -104,27 +106,40 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 					"if only one method is used, however it might be necessary to enable " +
 					"a certain module configuration.");
 		}
-		
+
 		if (!config.travelTimeCalculator().isCalculateLinkTravelTimes()){
 			log.warn("Link travel time calculation is switched off, be aware that this optimization" +
 					"might not work with all modules. ");
 		}
-		
-		if (config.travelTimeCalculator().isCalculateLinkToLinkTravelTimes() && 
+
+		if (config.travelTimeCalculator().isCalculateLinkToLinkTravelTimes() &&
 				config.getQSimConfigGroup().isRemoveStuckVehicles()){
 			throw new IllegalStateException("Link to link travel time calculation is not" +
 					"available if using the remove stuck vehicles option!");
 		}
-		
-		
+
+
 	}
-	
-	
+
+
 	private void checkLaneDefinitionRoutingConfiguration(Config config) {
-		if ((config.scenario().isUseLanes()) && 
+		if ((config.scenario().isUseLanes()) &&
 		    !config.controler().isLinkToLinkRoutingEnabled()){
-		  	log.warn("Using lanes without enabling linktolinkrouting might not lead to expected simulation results"); 
+		  	log.warn("Using lanes without enabling linktolinkrouting might not lead to expected simulation results");
 		   }
+	}
+
+
+	private void checkTransitReplanningConfiguration(final Config config) {
+		if (config.scenario().isUseTransit()) {
+			for (StrategySettings settings : config.strategy().getStrategySettings()) {
+				if ("TimeAllocationMutator".equals(settings.getModuleName())) {
+					log.error("The strategy 'TimeAllocationMutator' should be replaced with 'TransitTimeAllocationMutator' when transit is enabled!");
+				} else if ("ChangeLegMode".equals(settings.getModuleName())) {
+					log.error("The strategy 'ChangeLegMode' should be replaced with 'TransitChangeLegMode' when transit is enabled!");
+				}
+			}
+		}
 	}
 
 }
