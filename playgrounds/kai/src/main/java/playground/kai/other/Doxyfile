@@ -559,9 +559,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ../../../../playgrounds/christoph/src/main/java/playground/christoph \
-                         ../../../../playgrounds/mrieser/src/main/java/playground/mrieser \
-                         ../../../../playgrounds/jjoubert/src/main/java/playground/jjoubert \
+INPUT                  = ../../../../playgrounds/mrieser/src/main/java/playground/mrieser \
                          org/matsim/api \
                          org/matsim/core \
                          org/matsim/facilities \
