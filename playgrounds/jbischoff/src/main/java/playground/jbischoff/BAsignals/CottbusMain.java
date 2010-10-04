@@ -23,9 +23,19 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.population.algorithms.PersonPrepareForSim;
+import org.matsim.population.algorithms.XY2Links;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
@@ -33,43 +43,45 @@ import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.model.QSimSignalEngine;
 import org.matsim.signalsystems.model.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
+import org.matsim.signalsystems.model.SignalSystemsManagerImpl;
 
 
 /**
  * @author dgrether
  *
  */
-public class CottbusMain {
+public class CottbusMain implements StartupListener, IterationStartsListener{
 
-	private String config = JbBaPaths.BASIMH+"scenario-lsa/cottbusConfig.xml";
+	private String config = JbBaPaths.BASIMW+"scenario-lsa/cottbusConfig.xml";
+	private SignalSystemsManager manager;
 	
 	public void runCottbus(){
-		ScenarioLoader loader = new ScenarioLoaderImpl(config);
-		Scenario scenario = loader.loadScenario();
-		
-
-		EventsManager events = new EventsManagerImpl();
-		
-		SignalEngine signalEngine = this.initSignalEngine(scenario.getConfig().signalSystems(), events);
-		QSim qsim = new QSim(scenario, events);
-		qsim.addQueueSimulationListeners(signalEngine);
-		qsim.run();
-		
-		
+		Controler controler = new Controler(config);
+		controler.getConfig().scenario().setUseSignalSystems(false);
+		controler.addControlerListener(this);
+		controler.setOverwriteFiles(true);
+		controler.run();
 	}
-	
-	private SignalEngine initSignalEngine(SignalSystemsConfigGroup signalsConfig, EventsManager events) {
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		this.manager.resetModel(event.getIteration());
+	}
+
+	@Override
+	public void notifyStartup(StartupEvent e) {
+		Controler c = e.getControler();
+		Scenario scenario = c.getScenario();
+		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
-
-		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+		FromDataBuilder builder = new FromDataBuilder(signalsData, c.getEvents());
 		JbSignalBuilder jbBuilder = new JbSignalBuilder(signalsData, builder);
-		SignalSystemsManager manager = jbBuilder.createAndInitializeSignalSystemsManager();
+		this.manager = jbBuilder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
-		return engine;
+		c.getQueueSimulationListener().add(engine);
 	}
 
-	
 	
 	/**
 	 * @param args
@@ -77,5 +89,6 @@ public class CottbusMain {
 	public static void main(String[] args) {
 		new CottbusMain().runCottbus();
 	}
+
 
 }

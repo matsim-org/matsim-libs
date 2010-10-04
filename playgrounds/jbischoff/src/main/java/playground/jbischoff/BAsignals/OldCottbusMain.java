@@ -21,10 +21,13 @@
 package playground.jbischoff.BAsignals;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -37,19 +40,24 @@ import org.matsim.signalsystems.model.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
 public class OldCottbusMain {
-private String config = "/Users/JB/Desktop/BA-Arbeit/sim/scenario/oldcoord/cottbusConfig.xml";
+private String config = JbBaPaths.BASIMW+"/scenario-lsa/cottbusConfig.xml";
 	
 	public void runCottbus(){
 		ScenarioLoader loader = new ScenarioLoaderImpl(config);
-		Scenario scenario = loader.loadScenario();
+		ScenarioImpl scenario = (ScenarioImpl) loader.loadScenario();
 		
-
-		EventsManager events = new EventsManagerImpl();
+//		ControlerIO controlerIo = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
+		System.out.println(scenario.getNetwork().getLinks().get(new IdImpl(6495)).getLength());
+		Controler controler = new Controler(scenario);
+		controler.setOverwriteFiles(true);
+		controler.run();
 		
-		SignalEngine signalEngine = this.initSignalEngine(scenario.getConfig().signalSystems(), events);
-		QSim qsim = new QSim(scenario, events);
-		qsim.addQueueSimulationListeners(signalEngine);
-		qsim.run();
+//		EventsManager events = new EventsManagerImpl();
+//		SignalEngine signalEngine = this.initSignalEngine(scenario.getConfig().signalSystems(), events);
+//		QSim qsim = new QSim(scenario, events);
+//		qsim.setControlerIO();
+//		qsim.addQueueSimulationListeners(signalEngine);
+//		qsim.run();
 		
 		
 		
