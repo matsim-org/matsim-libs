@@ -32,7 +32,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
-import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.QLink;
 import org.matsim.ptproject.qsim.interfaces.QNetworkI;
@@ -237,9 +236,6 @@ public class QSimSignalEngine implements SignalEngine, SimEngine, Steppable {
 			//when we have standardized code for adaptive control
 			//within org.matsim here is the point to create those controlers
 			throw new IllegalArgumentException("Loading classes by name within the org.matsim packages is not allowed!");
-		}
-		else if (controllerName.equalsIgnoreCase("SheltersDoorBlockerController")){
-			controler = new SheltersDoorBlockerController(config);
 		}
 		else {
 			try {
