@@ -19,8 +19,11 @@
 
 package playground.yu.test;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -28,6 +31,9 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.utils.misc.ConfigUtils;
+
+import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
 
 public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 	// the reason why this class needs to be here is that this is defined in the
@@ -55,7 +61,7 @@ public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 		SubTourModeChoice stmc = new SubTourModeChoice(controler.getConfig(),
 				controler.getFacilities(), controler.getNetwork());
 		addStrategyModule(stmc);
-		
+
 		addStrategyModule(new ReRoute(controler));
 		// these modules may, at the same time, be events listeners (so that
 		// they can collect information):
@@ -91,4 +97,30 @@ public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 		return planStrategyDelegate.toString();
 	}
 
+	public static void main(String[] args) {
+		try {
+			Config config = ConfigUtils.loadConfig(args[0]);
+			Controler controler = new Controler(config);
+			/*
+			 * <module name="strategy"> <param name="maxAgentPlanMemorySize"
+			 * value="x" /> <!-- 0 means unlimited --> ... <param
+			 * name="ModuleProbability_y" value="0.1" /> <param name="Module_y"
+			 * value="playground.yu.test.SubTourModeChoicePlanStrategy" />
+			 * </module>
+			 */
+			controler
+					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+							config.charyparNagelScoring(), config
+									.vspExperimental().getOffsetWalk()));
+			// controler.addControlerListener(new MZComparisonListener());
+			controler.setWriteEventsInterval(Integer.parseInt(args[1]));
+			controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
+			controler.setOverwriteFiles(true);
+			controler.run();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 }
