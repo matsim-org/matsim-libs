@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CottbusMain
+ * OldCottbusMain.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,13 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.jbischoff.BAsignals;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
@@ -34,14 +36,8 @@ import org.matsim.signalsystems.model.QSimSignalEngine;
 import org.matsim.signalsystems.model.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
-
-/**
- * @author dgrether
- *
- */
-public class CottbusMain {
-
-	private String config = JbBaPaths.BASIMH+"scenario-lsa/cottbusConfig.xml";
+public class OldCottbusMain {
+private String config = "/Users/JB/Desktop/BA-Arbeit/sim/scenario/oldcoord/cottbusConfig.xml";
 	
 	public void runCottbus(){
 		ScenarioLoader loader = new ScenarioLoaderImpl(config);
@@ -54,6 +50,7 @@ public class CottbusMain {
 		QSim qsim = new QSim(scenario, events);
 		qsim.addQueueSimulationListeners(signalEngine);
 		qsim.run();
+		
 		
 		
 	}
@@ -75,7 +72,8 @@ public class CottbusMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new CottbusMain().runCottbus();
+		new OldCottbusMain().runCottbus();
 	}
 
 }
+
