@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.jbischoff.BAsignals;
 
-import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
@@ -48,6 +47,12 @@ public class JbSignalController implements SignalController {
 	public void updateState(double timeSeconds) {
 	//	SignalsData signalData = this.system.getSignalSystemsManager().getSignalData();
 		
+		
+	}
+
+	@Override
+	public void reset(Integer iterationNumber) {
+		// TODO Auto-generated method stub
 		
 	}
 
