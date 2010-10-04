@@ -61,86 +61,86 @@ public class ControlerWithMultiPopulationTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	public void testTravelTimeCalculation() {
-		Config config = loadConfig(null);
-		Fixture f = new Fixture(config);
-
-		/* Create 2 persons driving from link 1 to link 3, both starting at the
-		 * same time at 7am.  */
-		Population population = new PopulationImpl(f.scenario);
-		f.scenario.getPopulations().add(population);
-		PopulationFactory factory = population.getFactory();
-		Person person1 = null;
-
-		person1 = factory.createPerson(f.scenario.createId("1"));
-		Plan plan1 = factory.createPlan();
-		person1.addPlan(plan1);
-		Activity a1 = factory.createActivityFromLinkId("h", f.link1.getId());
-		a1.setEndTime(7.0*3600);
-		plan1.addActivity(a1);
-		Leg leg1 = factory.createLeg(TransportMode.car);
-		plan1.addLeg(leg1);
-		NetworkRoute route1 = (NetworkRoute)f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
-		leg1.setRoute(route1);
-		ArrayList<Id> linkIds = new ArrayList<Id>();
-		linkIds.add(f.link2.getId());
-		route1.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
-		plan1.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
-		population.addPerson(person1);
-
-		Person person2 = factory.createPerson(f.scenario.createId("2"));
-		Plan plan2 = factory.createPlan();
-		person2.addPlan(plan2);
-		Activity a2 = factory.createActivityFromLinkId("h", f.link1.getId());
-		a2.setEndTime(7.0*3600);
-		plan2.addActivity(a2);
-		Leg leg2 = factory.createLeg(TransportMode.car);
-		plan2.addLeg(leg2);
-		NetworkRoute route2 = (NetworkRoute)f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
-		leg2.setRoute(route2);
-		route2.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
-		plan2.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
-		population.addPerson(person2);
-
-		// Complete the configuration for our test case
-		// - set scoring parameters
-		ActivityParams actParams = new ActivityParams("h");
-		actParams.setTypicalDuration(8*3600);
-		actParams.setPriority(1.0);
-		config.charyparNagelScoring().addActivityParams(actParams);
-		// - define iterations
-		config.controler().setLastIteration(0);
-		// - make sure we don't use threads, as they are not deterministic
-		config.global().setNumberOfThreads(0);
-
-		// Now run the simulation
-		Controler controler = new Controler(f.scenario);
-		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
-		controler.run();
-
-		// test if we got the right result
-		// the actual result is 151sec, not 150, as each vehicle "loses" 1sec in the buffer
-		assertEquals("TravelTimeCalculator has wrong result",
-				151.0, controler.getTravelTimeCalculator().getLinkTravelTime(f.link2, 7*3600), 0.0);
-
-		// now test that the ReRoute-Strategy also knows about these travel times...
-		config.controler().setLastIteration(1);
-		Module strategyParams = config.getModule("strategy");
-		strategyParams.addParam("maxAgentPlanMemorySize", "4");
-		strategyParams.addParam("ModuleProbability_1", "1.0");
-		strategyParams.addParam("Module_1", "ReRoute");
-		// Run the simulation again
-		controler = new Controler(f.scenario);
-		controler.setCreateGraphs(false);
-		controler.setOverwriteFiles(true);
-		controler.setWriteEventsInterval(0);
-		controler.run();
-
-		// test that the plans have the correct times
-		assertEquals("ReRoute seems to have wrong travel times.",
-				151.0, ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), 0.0);
-	}
+//	public void testTravelTimeCalculation() {
+//		Config config = loadConfig(null);
+//		Fixture f = new Fixture(config);
+//
+//		/* Create 2 persons driving from link 1 to link 3, both starting at the
+//		 * same time at 7am.  */
+//		Population population = new PopulationImpl(f.scenario);
+//		f.scenario.getPopulations().add(population);
+//		PopulationFactory factory = population.getFactory();
+//		Person person1 = null;
+//
+//		person1 = factory.createPerson(f.scenario.createId("1"));
+//		Plan plan1 = factory.createPlan();
+//		person1.addPlan(plan1);
+//		Activity a1 = factory.createActivityFromLinkId("h", f.link1.getId());
+//		a1.setEndTime(7.0*3600);
+//		plan1.addActivity(a1);
+//		Leg leg1 = factory.createLeg(TransportMode.car);
+//		plan1.addLeg(leg1);
+//		NetworkRoute route1 = (NetworkRoute)f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+//		leg1.setRoute(route1);
+//		ArrayList<Id> linkIds = new ArrayList<Id>();
+//		linkIds.add(f.link2.getId());
+//		route1.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
+//		plan1.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
+//		population.addPerson(person1);
+//
+//		Person person2 = factory.createPerson(f.scenario.createId("2"));
+//		Plan plan2 = factory.createPlan();
+//		person2.addPlan(plan2);
+//		Activity a2 = factory.createActivityFromLinkId("h", f.link1.getId());
+//		a2.setEndTime(7.0*3600);
+//		plan2.addActivity(a2);
+//		Leg leg2 = factory.createLeg(TransportMode.car);
+//		plan2.addLeg(leg2);
+//		NetworkRoute route2 = (NetworkRoute)f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+//		leg2.setRoute(route2);
+//		route2.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
+//		plan2.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
+//		population.addPerson(person2);
+//
+//		// Complete the configuration for our test case
+//		// - set scoring parameters
+//		ActivityParams actParams = new ActivityParams("h");
+//		actParams.setTypicalDuration(8*3600);
+//		actParams.setPriority(1.0);
+//		config.charyparNagelScoring().addActivityParams(actParams);
+//		// - define iterations
+//		config.controler().setLastIteration(0);
+//		// - make sure we don't use threads, as they are not deterministic
+//		config.global().setNumberOfThreads(0);
+//
+//		// Now run the simulation
+//		Controler controler = new Controler(f.scenario);
+//		controler.setCreateGraphs(false);
+//		controler.setWriteEventsInterval(0);
+//		controler.run();
+//
+//		// test if we got the right result
+//		// the actual result is 151sec, not 150, as each vehicle "loses" 1sec in the buffer
+//		assertEquals("TravelTimeCalculator has wrong result",
+//				151.0, controler.getTravelTimeCalculator().getLinkTravelTime(f.link2, 7*3600), 0.0);
+//
+//		// now test that the ReRoute-Strategy also knows about these travel times...
+//		config.controler().setLastIteration(1);
+//		Module strategyParams = config.getModule("strategy");
+//		strategyParams.addParam("maxAgentPlanMemorySize", "4");
+//		strategyParams.addParam("ModuleProbability_1", "1.0");
+//		strategyParams.addParam("Module_1", "ReRoute");
+//		// Run the simulation again
+//		controler = new Controler(f.scenario);
+//		controler.setCreateGraphs(false);
+//		controler.setOverwriteFiles(true);
+//		controler.setWriteEventsInterval(0);
+//		controler.run();
+//
+//		// test that the plans have the correct times
+//		assertEquals("ReRoute seems to have wrong travel times.",
+//				151.0, ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), 0.0);
+//	}
 
 	/**
 	 * Tests that a custom scoring function factory doesn't get overwritten
@@ -183,141 +183,141 @@ public class ControlerWithMultiPopulationTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	public void testCalcMissingRoutes() {
-		Config config = loadConfig(null);
-		Fixture f = new Fixture(config);
-
-		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		Population population = new PopulationImpl(f.scenario);
-		f.scenario.getPopulations().add(population);
-		PopulationFactory factory = population.getFactory();
-		Person person1 = null;
-		Leg leg1 = null;
-		Leg leg2 = null;
-
-		person1 = factory.createPerson(f.scenario.createId("1"));
-		// --- plan 1 ---
-		Plan plan1 = factory.createPlan();
-		person1.addPlan(plan1);
-		Activity a1 = factory.createActivityFromLinkId("h", f.link1.getId());
-		a1.setEndTime(7.0*3600);
-		plan1.addActivity(a1);
-		leg1 = factory.createLeg(TransportMode.car);
-		plan1.addLeg(leg1);
-		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		plan1.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
-		// --- plan 2 ---
-		Plan plan2 = factory.createPlan();
-		person1.addPlan(plan2);
-		Activity a2 = factory.createActivityFromLinkId("h", f.link1.getId());
-		a2.setEndTime(7.0*3600);
-		plan2.addActivity(a2);
-
-		leg2 = factory.createLeg(TransportMode.car);
-		plan2.addLeg(leg2);
-		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		plan2.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
-		population.addPerson(person1);
-
-		// Complete the configuration for our test case
-		// - set scoring parameters
-		ActivityParams actParams = new ActivityParams("h");
-		actParams.setTypicalDuration(8*3600);
-		actParams.setPriority(1.0);
-		config.charyparNagelScoring().addActivityParams(actParams);
-		// - define iterations
-		config.controler().setLastIteration(0);
-		// - make sure we don't use threads, as they are not deterministic
-		config.global().setNumberOfThreads(1);
-
-		// Now run the simulation
-		Controler controler = new Controler(f.scenario);
-		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
-		controler.run();
-		/* if something goes wrong, there will be an exception we don't catch and the test fails,
-		 * otherwise, everything is fine. */
-
-		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
-		assertNotNull(leg1.getRoute());
-		assertNotNull(leg2.getRoute());
-	}
+//	public void testCalcMissingRoutes() {
+//		Config config = loadConfig(null);
+//		Fixture f = new Fixture(config);
+//
+//		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
+//		Population population = new PopulationImpl(f.scenario);
+//		f.scenario.getPopulations().add(population);
+//		PopulationFactory factory = population.getFactory();
+//		Person person1 = null;
+//		Leg leg1 = null;
+//		Leg leg2 = null;
+//
+//		person1 = factory.createPerson(f.scenario.createId("1"));
+//		// --- plan 1 ---
+//		Plan plan1 = factory.createPlan();
+//		person1.addPlan(plan1);
+//		Activity a1 = factory.createActivityFromLinkId("h", f.link1.getId());
+//		a1.setEndTime(7.0*3600);
+//		plan1.addActivity(a1);
+//		leg1 = factory.createLeg(TransportMode.car);
+//		plan1.addLeg(leg1);
+//		// DO NOT CREATE A ROUTE FOR THE LEG!!!
+//		plan1.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
+//		// --- plan 2 ---
+//		Plan plan2 = factory.createPlan();
+//		person1.addPlan(plan2);
+//		Activity a2 = factory.createActivityFromLinkId("h", f.link1.getId());
+//		a2.setEndTime(7.0*3600);
+//		plan2.addActivity(a2);
+//
+//		leg2 = factory.createLeg(TransportMode.car);
+//		plan2.addLeg(leg2);
+//		// DO NOT CREATE A ROUTE FOR THE LEG!!!
+//		plan2.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
+//		population.addPerson(person1);
+//
+//		// Complete the configuration for our test case
+//		// - set scoring parameters
+//		ActivityParams actParams = new ActivityParams("h");
+//		actParams.setTypicalDuration(8*3600);
+//		actParams.setPriority(1.0);
+//		config.charyparNagelScoring().addActivityParams(actParams);
+//		// - define iterations
+//		config.controler().setLastIteration(0);
+//		// - make sure we don't use threads, as they are not deterministic
+//		config.global().setNumberOfThreads(1);
+//
+//		// Now run the simulation
+//		Controler controler = new Controler(f.scenario);
+//		controler.setCreateGraphs(false);
+//		controler.setWriteEventsInterval(0);
+//		controler.run();
+//		/* if something goes wrong, there will be an exception we don't catch and the test fails,
+//		 * otherwise, everything is fine. */
+//
+//		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
+//		assertNotNull(leg1.getRoute());
+//		assertNotNull(leg2.getRoute());
+//	}
 
 	/**
 	 * Tests that plans with missing act locations are completed (=xy2links and routed) before the mobsim starts.
 	 *
 	 * @author mrieser
 	 */
-	public void testCalcMissingActLinks() {
-		Config config = loadConfig(null);
-		Fixture f = new Fixture(config);
-
-		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		Population population = new PopulationImpl(f.scenario);
-		f.scenario.getPopulations().add(population);
-		PopulationFactory factory = population.getFactory();
-		Person person1 = null;
-		Activity act1a = null;
-		Activity act1b = null;
-		Activity act2a = null;
-		Activity act2b = null;
-		Leg leg1 = null;
-		Leg leg2 = null;
-
-		person1 = new PersonImpl(new IdImpl(1));
-		// --- plan 1 ---
-		Plan plan1 = factory.createPlan();
-		person1.addPlan(plan1);
-		act1a = factory.createActivityFromCoord("h", f.scenario.createCoord(-50.0, 10.0));
-		act1a.setEndTime(7.0*3600);
-		plan1.addActivity(act1a);
-		leg1 = factory.createLeg(TransportMode.car);
-		plan1.addLeg(leg1);
-		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		act1b = factory.createActivityFromCoord("h", f.scenario.createCoord(1075.0, -10.0));
-		plan1.addActivity(act1b);
-		// --- plan 2 ---
-		Plan plan2 = factory.createPlan();
-		person1.addPlan(plan2);
-		act2a = factory.createActivityFromCoord("h", f.scenario.createCoord(-50.0, -10.0));
-		act2a.setEndTime(7.9*3600);
-		plan2.addActivity(act2a);
-		leg2 = factory.createLeg(TransportMode.car);
-		plan2.addLeg(leg2);
-		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		act2b = factory.createActivityFromCoord("h", f.scenario.createCoord(1111.1, 10.0));
-		plan2.addActivity(act2b);
-		population.addPerson(person1);
-
-		// Complete the configuration for our test case
-		// - set scoring parameters
-		ActivityParams actParams = new ActivityParams("h");
-		actParams.setTypicalDuration(8*3600);
-		actParams.setPriority(1.0);
-		config.charyparNagelScoring().addActivityParams(actParams);
-		// - define iterations
-		config.controler().setLastIteration(0);
-		// - make sure we don't use threads, as they are not deterministic
-		config.global().setNumberOfThreads(1);
-
-		// Now run the simulation
-		Controler controler = new Controler(f.scenario);
-		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
-		controler.run();
-		/* if something goes wrong, there will be an exception we don't catch and the test fails,
-		 * otherwise, everything is fine. */
-
-		// check that BOTH plans have their act-locations calculated
-		assertEquals(f.link1.getId(), act1a.getLinkId());
-		assertEquals(f.link3.getId(), act1b.getLinkId());
-		assertEquals(f.link1.getId(), act2a.getLinkId());
-		assertEquals(f.link3.getId(), act2b.getLinkId());
-
-		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
-		assertNotNull(leg1.getRoute());
-		assertNotNull(leg2.getRoute());
-	}
+//	public void testCalcMissingActLinks() {
+//		Config config = loadConfig(null);
+//		Fixture f = new Fixture(config);
+//
+//		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
+//		Population population = new PopulationImpl(f.scenario);
+//		f.scenario.getPopulations().add(population);
+//		PopulationFactory factory = population.getFactory();
+//		Person person1 = null;
+//		Activity act1a = null;
+//		Activity act1b = null;
+//		Activity act2a = null;
+//		Activity act2b = null;
+//		Leg leg1 = null;
+//		Leg leg2 = null;
+//
+//		person1 = new PersonImpl(new IdImpl(1));
+//		// --- plan 1 ---
+//		Plan plan1 = factory.createPlan();
+//		person1.addPlan(plan1);
+//		act1a = factory.createActivityFromCoord("h", f.scenario.createCoord(-50.0, 10.0));
+//		act1a.setEndTime(7.0*3600);
+//		plan1.addActivity(act1a);
+//		leg1 = factory.createLeg(TransportMode.car);
+//		plan1.addLeg(leg1);
+//		// DO NOT CREATE A ROUTE FOR THE LEG!!!
+//		act1b = factory.createActivityFromCoord("h", f.scenario.createCoord(1075.0, -10.0));
+//		plan1.addActivity(act1b);
+//		// --- plan 2 ---
+//		Plan plan2 = factory.createPlan();
+//		person1.addPlan(plan2);
+//		act2a = factory.createActivityFromCoord("h", f.scenario.createCoord(-50.0, -10.0));
+//		act2a.setEndTime(7.9*3600);
+//		plan2.addActivity(act2a);
+//		leg2 = factory.createLeg(TransportMode.car);
+//		plan2.addLeg(leg2);
+//		// DO NOT CREATE A ROUTE FOR THE LEG!!!
+//		act2b = factory.createActivityFromCoord("h", f.scenario.createCoord(1111.1, 10.0));
+//		plan2.addActivity(act2b);
+//		population.addPerson(person1);
+//
+//		// Complete the configuration for our test case
+//		// - set scoring parameters
+//		ActivityParams actParams = new ActivityParams("h");
+//		actParams.setTypicalDuration(8*3600);
+//		actParams.setPriority(1.0);
+//		config.charyparNagelScoring().addActivityParams(actParams);
+//		// - define iterations
+//		config.controler().setLastIteration(0);
+//		// - make sure we don't use threads, as they are not deterministic
+//		config.global().setNumberOfThreads(1);
+//
+//		// Now run the simulation
+//		Controler controler = new Controler(f.scenario);
+//		controler.setCreateGraphs(false);
+//		controler.setWriteEventsInterval(0);
+//		controler.run();
+//		/* if something goes wrong, there will be an exception we don't catch and the test fails,
+//		 * otherwise, everything is fine. */
+//
+//		// check that BOTH plans have their act-locations calculated
+//		assertEquals(f.link1.getId(), act1a.getLinkId());
+//		assertEquals(f.link3.getId(), act1b.getLinkId());
+//		assertEquals(f.link1.getId(), act2a.getLinkId());
+//		assertEquals(f.link3.getId(), act2b.getLinkId());
+//
+//		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
+//		assertNotNull(leg1.getRoute());
+//		assertNotNull(leg2.getRoute());
+//	}
 
 	/**
 	 * @author mrieser

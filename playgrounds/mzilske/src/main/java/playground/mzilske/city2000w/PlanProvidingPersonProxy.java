@@ -1,5 +1,6 @@
 package playground.mzilske.city2000w;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class PlanProvidingPersonProxy implements Person {
 
 	@Override
 	public List<? extends Plan> getPlans() {
-		throw new RuntimeException();
+		return Arrays.asList(person.getSelectedPlan());
 	}
 
 	@Override
