@@ -174,28 +174,23 @@ public class MATSimConfigObject {
 		return true;
 	}
 	
-	/**
-	 * only for debugging and testing reasons.
-	 * cecks if xml config contains the key word "TEST_DIRECTORY"
-	 * to set OPUS_HOME to that directory.
-	 */
-	private static void isModifyingOpusHomeDirectory(){
-		
-		if(opusHomeDirectory.equalsIgnoreCase("TEST_DIRECTORY")){
-			log.info("Indicated to set OPUS_HOME to a temp directory (for debugging or testing reasons)...");
-			Constants.setOpusHomeDirectory( System.getProperty("java.io.tmpdir") );
-		}
-		// update opus home path if needed
-		else if( Constants.OPUS_HOME == null || !Constants.OPUS_HOME.equalsIgnoreCase(opusHomeDirectory)){
-			log.info("Indicated new OPUS_HOME path. Setting new path...");
-			Constants.setOpusHomeDirectory(opusHomeDirectory);
-		}
-		log.info("Set OPUS_HOME to: " + Constants.OPUS_HOME);
-		log.info("Set OPUS_MATSIM_DIRECTORY to: " + Constants.OPUS_MATSIM_DIRECTORY);
-		log.info("Set MATSIM_CONFIG_DIRECTORY to: " + Constants.MATSIM_CONFIG_DIRECTORY);
-		log.info("Set OPUS_MATSIM_OUTPUT_DIRECTORY to: " + Constants.OPUS_MATSIM_OUTPUT_DIRECTORY);
-		log.info("Set OPUS_MATSIM_TEMPORARY_DIRECTORY to: " + Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY);
-	}
+//	/**
+//	 * only for debugging and testing reasons.
+//	 * cecks if xml config contains the key word "TEST_DIRECTORY"
+//	 * to set OPUS_HOME to that directory.
+//	 */
+//	private static void isModifyingOpusHomeDirectory(){
+//		
+//		if(opusHomeDirectory.equalsIgnoreCase("TEST_DIRECTORY")){
+//			log.info("Indicated to set OPUS_HOME to a temp directory (for debugging or testing reasons)...");
+//			Constants.setOpusHomeDirectory( System.getProperty("java.io.tmpdir") );
+//		}
+//		// update opus home path if needed
+//		else if( Constants.OPUS_HOME == null || !Constants.OPUS_HOME.equalsIgnoreCase(opusHomeDirectory)){
+//			log.info("Indicated new OPUS_HOME path. Setting new path...");
+//			Constants.setOpusHomeDirectory(opusHomeDirectory);
+//		}
+//	}
 	
 	/**
 	 * creates a MATSim config object with the parameter from the JaxB data structure
@@ -235,6 +230,9 @@ public class MATSimConfigObject {
 		// init loader
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
+		
+		// output dir
+//		config.controler().setOutputDirectory( Constants.OPUS_MATSIM_OUTPUT_DIRECTORY );
 	}
 }
 
