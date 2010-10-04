@@ -78,4 +78,9 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		this.signalSystem = system;
 	}
 
+	@Override
+	public void reset(Integer iterationNumber) {
+		
+	}
+
 }

@@ -20,6 +20,7 @@
 package org.matsim.signalsystems.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -80,6 +81,11 @@ public class DatabasedSignal implements Signal {
 	@Override
 	public Id getId() {
 		return this.data.getId();
+	}
+
+	@Override
+	public Collection<SignalizeableItem> getSignalizeableItems() {
+		return this.signalizedItems;
 	}
 
 

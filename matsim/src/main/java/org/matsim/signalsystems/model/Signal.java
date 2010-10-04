@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.model;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -39,6 +40,9 @@ public interface Signal {
 
 	public void addSignalizeableItem(SignalizeableItem signalizedItem);
 
+	public Collection<SignalizeableItem> getSignalizeableItems();
+	
 	public void setState(SignalGroupState state);
+	
 	
 }

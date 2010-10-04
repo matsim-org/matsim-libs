@@ -51,5 +51,7 @@ public interface SignalSystem extends Identifiable {
 	public void scheduleDropping(double timeSeconds, Id signalGroupId);
 
 	public void scheduleOnset(double timeSeconds, Id signalGroupId);
+
+	public SignalController getSignalController();
 	
 }

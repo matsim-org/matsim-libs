@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalSystemController
+ * SignalImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,28 +19,68 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.control.SignalGroupState;
 
 
 /**
- * <ul>
- * 		<li></li>
- * 		<li></li>
- * </ul>
  * @author dgrether
+ *
  */
-public interface SignalController {
+public class SignalImpl implements Signal {
+
+	private List<SignalizeableItem> signalizeableItems = new ArrayList<SignalizeableItem>();
 	
-	/**
-	 * Is called every timestep to notify that the controller may update the state of the signal groups
-	 * @param timeSeconds
-	 */
-	public void updateState(double timeSeconds);
-
-	public void addPlan(SignalPlan plan);
-
-	public void setSignalSystem(SignalSystem system);
-
-	public void reset(Integer iterationNumber);
+	private Id linkId;
 	
+	private Set<Id> laneIds = null;
+
+	private Id id;
+	
+	public SignalImpl(Id id, Id linkId){
+		this.linkId = linkId;
+		this.id = id;
+	}
+	
+	@Override
+	public void addSignalizeableItem(SignalizeableItem signalizedItem) {
+		this.signalizeableItems.add(signalizedItem);
+	}
+
+	@Override
+	public Id getId() {
+		return this.id;
+	}
+
+	@Override
+	public Set<Id> getLaneIds() {
+		if (this.laneIds  == null) {
+			this.laneIds = new HashSet<Id>();
+		}
+		return this.laneIds;
+	}
+
+	@Override
+	public Id getLinkId() {
+		return this.linkId;
+	}
+
+	@Override
+	public void setState(SignalGroupState state) {
+		for (SignalizeableItem item : this.signalizeableItems){
+			item.setSignalStateAllTurningMoves(state);
+		}
+	}
+
+	@Override
+	public Collection<SignalizeableItem> getSignalizeableItems() {
+		return this.signalizeableItems;
+	}
+
 }

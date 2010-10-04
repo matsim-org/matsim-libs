@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalSystemController
+ * EmptyAmberLogicImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,28 +19,43 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.model;
 
+import java.util.HashSet;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.control.SignalGroupState;
 
 
 /**
- * <ul>
- * 		<li></li>
- * 		<li></li>
- * </ul>
  * @author dgrether
+ *
  */
-public interface SignalController {
-	
+public class EmptyAmberLogicImpl implements AmberLogic {
+
 	/**
-	 * Is called every timestep to notify that the controller may update the state of the signal groups
-	 * @param timeSeconds
+	 * 
 	 */
-	public void updateState(double timeSeconds);
+	public EmptyAmberLogicImpl() {
+	}
 
-	public void addPlan(SignalPlan plan);
+	@Override
+	public Set<SignalGroupStateChangeRequest> processDropping(double timeSec, Id systemId,
+			Id signalGroupId) {
+		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
+		SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED, 
+				timeSec);
+		ret.add(redRequest);
+		return ret;
+	}
 
-	public void setSignalSystem(SignalSystem system);
+	@Override
+	public Set<SignalGroupStateChangeRequest> processOnsets(double timeSeconds, Id systemId,
+			Id signalGroupId) {
+		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
+		SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.GREEN, 
+				timeSeconds);
+		ret.add(redRequest);
+		return ret;
+	}
 
-	public void reset(Integer iterationNumber);
-	
 }

@@ -52,7 +52,7 @@ public class QSimSignalEngine implements SignalEngine {
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
 		this.signalManager.requestControlUpdate(e.getSimulationTime());
 	}
-
+	
 	private void initializeSignalizedItems(QSimI qSim) {
 		QNetworkI net = qSim.getQNetwork();
 		for (SignalSystem system : this.signalManager.getSignalSystems().values()){
@@ -83,6 +83,7 @@ public class QSimSignalEngine implements SignalEngine {
 		}
 		throw new IllegalArgumentException("QLane not found");
 	}
+
 	
 	
 }

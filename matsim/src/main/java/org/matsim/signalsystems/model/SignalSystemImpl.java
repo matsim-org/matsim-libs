@@ -127,5 +127,10 @@ public class SignalSystemImpl implements SignalSystem {
 		return this.signalGroups;
 	}
 
+	@Override
+	public SignalController getSignalController() {
+		return this.controller;
+	}
+
 
 }
