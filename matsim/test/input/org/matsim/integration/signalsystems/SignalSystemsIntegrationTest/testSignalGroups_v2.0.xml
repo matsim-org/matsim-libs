@@ -4,28 +4,18 @@
         <signalGroup id="1">
             <signal refId="1"/>
         </signalGroup>
-    </signalSystem>
-    <signalSystem refId="1">
         <signalGroup id="2">
             <signal refId="2"/>
         </signalGroup>
-    </signalSystem>
-    <signalSystem refId="1">
         <signalGroup id="3">
             <signal refId="3"/>
         </signalGroup>
-    </signalSystem>
-    <signalSystem refId="1">
         <signalGroup id="4">
             <signal refId="4"/>
         </signalGroup>
-    </signalSystem>
-    <signalSystem refId="1">
         <signalGroup id="5">
             <signal refId="5"/>
         </signalGroup>
-    </signalSystem>
-    <signalSystem refId="1">
         <signalGroup id="6">
             <signal refId="6"/>
         </signalGroup>
