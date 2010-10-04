@@ -352,6 +352,44 @@ public class ReadFromUrbansimParcelModel {
 		else
 			return oldPop.getPersons().get( personId) != null;
 	}
+	
+	/**
+	 * 
+	 * @return number of persons determined by person id
+	 */
+	public int countPersons(){
+		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		log.info( "Starting to read persons from " + filename ) ;
+		// counter
+		int persons = 0;
+		
+		try {
+			BufferedReader reader = IOUtils.getBufferedReader( filename );
+
+			String line = reader.readLine();
+			// get columns for home, work and person id
+			Map<String,Integer> idxFromKey = CommonMATSimUtilities.createIdxFromKey( line, Constants.TAB_SEPERATOR );
+			final int indexPersonID			= idxFromKey.get( Constants.PERSON_ID );
+			
+			while ( (line=reader.readLine()) != null ) {
+				String[] parts = line.split( Constants.TAB_SEPERATOR );
+
+				try{
+					// make sure that column contains an id 
+					Integer.parseInt( parts[ indexPersonID ] );
+					persons ++;
+				}
+				catch (NumberFormatException nfe) {
+					nfe.printStackTrace();
+				}
+			}
+			return persons;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
 
 	/**
 	 *
