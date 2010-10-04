@@ -27,35 +27,44 @@ public class ShelterEvacuationControllerTest extends MatsimTestCase{
 
 	private static final Logger log = Logger.getLogger(ShelterEvacuationControllerTest.class);
 
-	public void testFake(){
-		assertTrue(true);
-	}
-	
-	public void estShelterEvacuationController() {
+	public void testShelterEvacuationController() {
 		String config = getInputDirectory() + "config.xml";
 		String refEventsFileIt0 = getInputDirectory() + "0.events.xml.gz";
 		String testEventsFileIt0 = getOutputDirectory() +"ITERS/it.0/0.events.xml.gz";
 
+		String refEventsFileIt1 = getInputDirectory() + "1.events.xml.gz";
+		String testEventsFileIt1 = getOutputDirectory() +"ITERS/it.1/1.events.xml.gz";
+
+		
 		String refEventsFile = getInputDirectory() + "10.events.xml.gz";
 		String testEventsFile = getOutputDirectory() +"ITERS/it.10/10.events.xml.gz";
 
 
 		EvacuationQSimControllerII controler = new EvacuationQSimControllerII(new String [] {config});
 		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(10);
+		controler.setWriteEventsInterval(1);
 		controler.run();
 		//it 0
 		log.info("comparing events files: ");
 		log.info(refEventsFileIt0);
 		log.info(testEventsFileIt0);
 		int i = EventsFileComparator.compare(refEventsFileIt0, testEventsFileIt0);
-		assertEquals("different events-files.",0, i);
+		assertEquals("different events-files in iteration 0",0, i);
+
+		//it 0
+		log.info("comparing events files: ");
+		log.info(refEventsFileIt1);
+		log.info(testEventsFileIt1);
+		i = EventsFileComparator.compare(refEventsFileIt1, testEventsFileIt1);
+		assertEquals("different events-files in iteration 1.",0, i);
+
+		
 		//it 10
 		log.info("comparing events files: ");
 		log.info(refEventsFile);
 		log.info(testEventsFile);
 		i = EventsFileComparator.compare(refEventsFile, testEventsFile);
-		assertEquals("different events-files.",0, i);
+		assertEquals("different events-files in iteration 10.",0, i);
 	}
 
 }
