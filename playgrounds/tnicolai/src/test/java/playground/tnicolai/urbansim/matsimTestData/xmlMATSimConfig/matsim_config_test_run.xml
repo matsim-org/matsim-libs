@@ -11,7 +11,7 @@
 				0
 			</firstIteration>
 			<lastIteration>
-				3
+				1
 			</lastIteration>
 		</controler>
 		<planCalcScore>
@@ -26,7 +26,7 @@
 	<matsim4urbansim>
 		<urbansimParameter>
 			<samplingRate>
-				0.01
+				1
 			</samplingRate>
 			<year>
 				2001

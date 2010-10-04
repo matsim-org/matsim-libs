@@ -24,8 +24,12 @@
 package playground.tnicolai.urbansim.matsimTest;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -33,6 +37,7 @@ import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.CommonUtilities;
 import playground.tnicolai.urbansim.utils.io.FileCopy;
+import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 import playground.tnicolai.urbansim.utils.io.TempDirectoryUtil;
 
 /**
@@ -51,6 +56,8 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 	public void testMATSimConfig(){
 		log.info("Starting testMATSimConfig run: Testing if MATSim config is valid.");
 		prepareTest("matsim_config_test_run.xml");
+		// remove temp directories
+		TempDirectoryUtil.cleaningUpOPUSDirectories();
 		log.info("End of testMATSimConfig.");
 	}
 	
@@ -58,6 +65,11 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 	public void testMATSimRun(){
 		log.info("Starting testMATSimRun run: Testing if MATSim run is passes through.");
 		prepareTest("matsim_config_normal_run.xml");
+		
+		Assert.assertTrue( postProgressing() );
+		// remove temp directories
+		TempDirectoryUtil.cleaningUpOPUSDirectories();
+		
 		log.info("End of testMATSimRun.");
 	}
 	
@@ -81,9 +93,28 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 		
 		// running MATSim4UrbanSim
 		testRun( matsimConfigDir+matsimConfigName );
+	}
+	
+	private boolean postProgressing(){
 		
-		// remove temp directories
-		TempDirectoryUtil.cleaningUpOPUSDirectories();
+		int inputPopulation= -1;
+		Population outputPopulation = null;
+		
+		// get population size from MATSim input file
+		ReadFromUrbansimParcelModel readFromUrbanSim = new ReadFromUrbansimParcelModel(2001);
+		inputPopulation = readFromUrbanSim.countPersons();
+		
+		// population size from MATSim output file
+		ScenarioImpl scenario = new ScenarioImpl();
+		PopulationReaderMatsimV4 populationReader = new PopulationReaderMatsimV4(scenario);
+		populationReader.readFile( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "pop.xml.gz" );
+//		populationReader.readFile( Constants.OPUS_MATSIM_OUTPUT_DIRECTORY + "output_plans.xml.gz" );
+		outputPopulation = scenario.getPopulation();
+		
+		log.info("Population size in inputput file : " + inputPopulation);
+		log.info("Population size in output file : " + outputPopulation.getPersons().size());
+		
+		return outputPopulation.getPersons().size() == inputPopulation;
 	}
 	
 	/**

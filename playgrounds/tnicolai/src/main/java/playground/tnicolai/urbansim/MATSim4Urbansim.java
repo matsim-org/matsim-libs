@@ -173,7 +173,7 @@ public class MATSim4Urbansim {
 	 */
 	private static void prepareRun(){
 		// binding the parameter from the MATSim Config into the JaxB data structure
-		if(!unmaschalMATSimConfig()){
+		if(!unmaschalMATSimConfig()){ // TODO Set Output Dir for MATSim files???
 			if(MATSimConfigObject.isTestRun()){
 				log.error("TestRun failed !!!");
 				System.exit(Constants.TEST_RUN_FAILD);
