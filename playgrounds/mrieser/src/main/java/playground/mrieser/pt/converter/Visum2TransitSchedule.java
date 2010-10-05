@@ -129,7 +129,7 @@ public class Visum2TransitSchedule {
 					TransitRoute tRoute = builder.createTransitRoute(new IdImpl(timeProfile.lineName.toString()+"."+timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+"."+timeProfile.DCode.toString()),null,stops,mode);
 					//  convert departures
 					for (VisumNetwork.Departure d : this.visum.departures.values()){
-						if (d.lineName.equals(line.id.toString()) && d.lineRouteName.equals(timeProfile.lineRouteName.toString()) && d.TRI.equals(timeProfile.index.toString())) {
+						if (d.lineName.equals(line.id.toString()) && d.lineRouteName.equals(timeProfile.lineRouteName.toString()) && d.TRI.equals(timeProfile.index.toString()) && d.DCode.equals(timeProfile.DCode)) {
 							Departure departure = builder.createDeparture(new IdImpl(d.index), Time.parseTime(d.dep));
 							VehicleType vehType = defaultVehType;
 							if (d.vehCombinationNo != null) {
