@@ -2,7 +2,7 @@
 <signalControl xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalControl_v2.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
     <signalSystem refId="42">
         <signalSystemController>
-	          <controllerIdentifier>planbasedController</controllerIdentifier>
+	          <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
             <signalPlan id="8">
                 <start daytime="00:00:00"/>
                 <stop daytime="00:00:00"/>
