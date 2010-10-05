@@ -68,7 +68,7 @@ public class SignalsDataImpl implements SignalsData {
 	}
 
 	@Override
-	public SignalControlData getSignalSystemControlData() {
+	public SignalControlData getSignalControlData() {
 		return this.signalcontroldata;
 	}
 

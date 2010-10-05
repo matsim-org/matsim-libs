@@ -180,7 +180,7 @@ public class SignalSystemsOneAgentTest implements
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 		
-		SignalSystemControllerData controllerData = signalsData.getSignalSystemControlData().getSignalSystemControllerDataBySystemId().get(id2);
+		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(id2);
 		SignalPlanData planData = controllerData.getSignalPlanData().get(id2);
 		planData.setCycleTime(5 * 3600);
 		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(id100);

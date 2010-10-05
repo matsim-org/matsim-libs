@@ -59,10 +59,10 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
@@ -146,7 +146,8 @@ import org.matsim.ptproject.qsim.multimodalsimengine.tools.MultiModalNetworkCrea
 import org.matsim.ptproject.qsim.multimodalsimengine.tools.NonCarRouteDropper;
 import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.signalsystems.initialization.SignalsControllerListener;
+import org.matsim.signalsystems.initialization.DefaultSignalsControllerListenerFactory;
+import org.matsim.signalsystems.initialization.SignalsControllerListenerFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
@@ -264,6 +265,8 @@ public class Controler {
 
 	private TransitConfigGroup transitConfig = null;
 
+	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
+	
 	/** initializes Log4J */
 	static {
 		final String logProperties = "log4j.xml";
@@ -835,7 +838,7 @@ public class Controler {
 			}
 		}
 		if (this.config.scenario().isUseSignalSystems()){
-			addControlerListener(new SignalsControllerListener());
+			addControlerListener(this.signalsFactory.createSignalsControllerListener());
 		}
 	}
 
@@ -1444,6 +1447,16 @@ public class Controler {
 
 	public void setMobsimFactory(MobsimFactory mobsimFactory) {
 		this.mobsimFactory = mobsimFactory;
+	}
+
+	
+	public SignalsControllerListenerFactory getSignalsControllerListenerFactory() {
+		return signalsFactory;
+	}
+
+	
+	public void setSignalsControllerListenerFactory(SignalsControllerListenerFactory signalsFactory) {
+		this.signalsFactory = signalsFactory;
 	}
 
 }

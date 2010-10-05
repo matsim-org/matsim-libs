@@ -31,6 +31,7 @@ import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.builder.SignalSystemsModelBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
+import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.model.QSimSignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
@@ -39,7 +40,7 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
  * @author dgrether
  *
  */
-public class SignalsControllerListener implements StartupListener, ShutdownListener, IterationStartsListener {
+public class DefaultSignalsControllerListener implements StartupListener, ShutdownListener, IterationStartsListener {
 
 	private SignalSystemsModelBuilder modelBuilder;
 	private SignalSystemsManager signalManager;
@@ -66,13 +67,12 @@ public class SignalsControllerListener implements StartupListener, ShutdownListe
 	
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		//TODO dg write data to output dir as currently done in Controler
+		new SignalsScenarioWriter(event.getControler().getControlerIO().getOutputPath()).writeSignalsData(this.signalsData);
 	}
 
 	private void loadData(SignalSystemsConfigGroup config) {
 		SignalsScenarioLoader loader = new SignalsScenarioLoader(config);
 		this.signalsData = loader.loadSignalsData();
-		//TODO dg is this really needed?
 		this.scenario.addScenarioElement(this.signalsData);
 	}
 

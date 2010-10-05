@@ -66,34 +66,40 @@ public class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 			
 			//global defaults
 			XMLGlobalDefaultsType gdt = fac.createXMLGlobalDefaultsType();
-			XMLAmber gda = fac.createXMLAmberTimesTypeXMLAmber();
-			XMLRedAmber gdra = fac.createXMLAmberTimesTypeXMLRedAmber();
-			XMLAmberTimeGreen gdatg = fac.createXMLGlobalDefaultsTypeXMLAmberTimeGreen();
-			
-			gda.setSeconds(BigInteger.valueOf(this.amberTimesData.getDefaultAmber()));
-			gdra.setSeconds(BigInteger.valueOf(this.amberTimesData.getDefaultRedAmber()));
-			gdatg.setProportion(BigDecimal.valueOf(this.amberTimesData.getDefaultAmberTimeGreen()));
-			
-			gdt.setAmber(gda);
-			gdt.setRedAmber(gdra);
-			gdt.setAmberTimeGreen(gdatg);
-			
+			if (this.amberTimesData.getDefaultAmber() != null){
+				XMLAmber gda = fac.createXMLAmberTimesTypeXMLAmber();
+				gda.setSeconds(BigInteger.valueOf(this.amberTimesData.getDefaultAmber()));
+				gdt.setAmber(gda);
+			}
+			if (this.amberTimesData.getDefaultRedAmber() != null){
+				XMLRedAmber gdra = fac.createXMLAmberTimesTypeXMLRedAmber();
+				gdra.setSeconds(BigInteger.valueOf(this.amberTimesData.getDefaultRedAmber()));
+				gdt.setRedAmber(gdra);
+			}
+			if (this.amberTimesData.getDefaultAmberTimeGreen() != null){
+				XMLAmberTimeGreen gdatg = fac.createXMLGlobalDefaultsTypeXMLAmberTimeGreen();
+				gdatg.setProportion(BigDecimal.valueOf(this.amberTimesData.getDefaultAmberTimeGreen()));
+				gdt.setAmberTimeGreen(gdatg);
+			}
 			xmlContainer.setGlobalDefaults(gdt);
 			
 			for (AmberTimeData atdata : this.amberTimesData.getAmberTimeDataBySystemId().values()){
-		
 							
 				XMLSignalSystem xmlss = fac.createXMLAmberTimesXMLSignalSystem();
 				xmlss.setRefId(atdata.getSignalSystemId().toString());
 							
 				//Signal System Defaults
 				XMLAmberTimesType ssd = fac.createXMLAmberTimesType();	
-				XMLAmber ssda = fac.createXMLAmberTimesTypeXMLAmber();
-				XMLRedAmber ssdra = fac.createXMLAmberTimesTypeXMLRedAmber();
-				ssda.setSeconds(BigInteger.valueOf(atdata.getDefaultAmber()));
-				ssdra.setSeconds(BigInteger.valueOf(atdata.getDefaultRedAmber()));
-				ssd.setAmber(ssda);
-				ssd.setRedAmber(ssdra);
+				if (atdata.getDefaultAmber() != null){
+					XMLAmber ssda = fac.createXMLAmberTimesTypeXMLAmber();
+					ssda.setSeconds(BigInteger.valueOf(atdata.getDefaultAmber()));
+					ssd.setAmber(ssda);
+				}
+				if (atdata.getDefaultRedAmber() != null){
+					XMLRedAmber ssdra = fac.createXMLAmberTimesTypeXMLRedAmber();
+					ssdra.setSeconds(BigInteger.valueOf(atdata.getDefaultRedAmber()));
+					ssd.setRedAmber(ssdra);
+				}
 				xmlss.setSystemDefaults(ssd);
 				
 				for (Map.Entry<Id,Integer> amt : atdata.getSignalAmberMap().entrySet()){

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalData
+ * SignalsControllerListenerFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,28 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.data;
+package org.matsim.signalsystems.initialization;
 
-import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
-import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.core.controler.listener.ControlerListener;
 
 
 /**
  * @author dgrether
  *
  */
-public interface SignalsData {
-	
-	public SignalSystemsData getSignalSystemsData();
-	
-	public SignalControlData getSignalControlData();
+public interface SignalsControllerListenerFactory {
 
-	public SignalGroupsData getSignalGroupsData();
-	
-	public AmberTimesData getAmberTimesData();
-	
-//	public IntergreenTimesData getIntergreenTimesData();
+	public ControlerListener createSignalsControllerListener();
 	
 }

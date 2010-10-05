@@ -157,7 +157,7 @@ public class TravelTimeOneWayTest {
 		for (int dropping = 10; dropping <= circulationTime; dropping++) {
 			eventHandler.reset(1);
 
-			SignalSystemControllerData controllerData = signalsData.getSignalSystemControlData().getSignalSystemControllerDataBySystemId().get(id2);
+			SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(id2);
 			SignalPlanData signalPlan = controllerData.getSignalPlanData().get(id2);
 			signalPlan.setCycleTime(circulationTime);
 			signalPlan.getSignalGroupSettingsDataByGroupId().get(id100).setDropping(dropping);

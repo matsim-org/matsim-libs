@@ -35,6 +35,7 @@ import org.xml.sax.SAXException;
 
 
 /**
+ * 
  * @author dgrether
  *
  */
@@ -59,7 +60,7 @@ public class SignalsScenarioLoader {
 	
 	private void loadIntergreenTimes(SignalsData data){
 		if (this.signalConfig.getIntergreenTimesFile() != null) {
-			//TODO write when reader is available
+			//TODO read/write when reader/writer is available
 			throw new UnsupportedOperationException("not implemented yet");
 		}
 	}
@@ -83,7 +84,7 @@ public class SignalsScenarioLoader {
 	}
 	
 	private void loadControl(SignalsData data){
-		SignalControlReader20 controlReader = new SignalControlReader20(data.getSignalSystemControlData(), MatsimSignalSystemsReader.SIGNALCONTROL20);
+		SignalControlReader20 controlReader = new SignalControlReader20(data.getSignalControlData(), MatsimSignalSystemsReader.SIGNALCONTROL20);
 		try {
 			controlReader.readFile(this.signalConfig.getSignalControlFile());
 		} catch (JAXBException e) {

@@ -94,7 +94,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	
 	public void createAndAddSignalSystemControllerFromData(SignalSystem system){
 		//process information of SignalControlData
-		SignalSystemControllerData systemControlData = signalsData.getSignalSystemControlData().getSignalSystemControllerDataBySystemId().get(system.getId());
+		SignalSystemControllerData systemControlData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(system.getId());
 		SignalController controller = this.factory.createSignalSystemController(systemControlData.getControllerIdentifier());
 		controller.setSignalSystem(system);
 		system.setSignalSystemController(controller);

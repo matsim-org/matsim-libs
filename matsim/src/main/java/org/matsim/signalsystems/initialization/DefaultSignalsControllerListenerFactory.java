@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalData
+ * DefaultSignalsControllerListenerFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,28 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.data;
+package org.matsim.signalsystems.initialization;
 
-import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
-import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.apache.log4j.Logger;
+import org.matsim.core.controler.listener.ControlerListener;
 
 
 /**
+ * Factory implementation for the MATSim default, data driven signal model
  * @author dgrether
- *
  */
-public interface SignalsData {
+public class DefaultSignalsControllerListenerFactory implements SignalsControllerListenerFactory {
 	
-	public SignalSystemsData getSignalSystemsData();
+	private static final Logger log = Logger.getLogger(DefaultSignalsControllerListenerFactory.class);
 	
-	public SignalControlData getSignalControlData();
+	@Override
+	public ControlerListener createSignalsControllerListener() {
+		log.info("using MATSim default signal model...");
+		return new DefaultSignalsControllerListener();
+	}
 
-	public SignalGroupsData getSignalGroupsData();
-	
-	public AmberTimesData getAmberTimesData();
-	
-//	public IntergreenTimesData getIntergreenTimesData();
-	
 }

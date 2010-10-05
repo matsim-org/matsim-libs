@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.integration.signalsystems;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -27,6 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.testcases.MatsimTestUtils;
 
 
@@ -74,6 +77,17 @@ public class SignalSystemsIntegrationTest {
 		Assert.assertEquals("different population files after iteration 10 ", 
 				CRCChecksum.getCRCFromFile(testUtils.getInputDirectory() + "10.plans.xml.gz"), 
 				CRCChecksum.getCRCFromFile(iterationOutput + "10.plans.xml.gz"));
+		
+		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControlerIO().getOutputPath());
+		File file = new File(writer.getSignalSystemsOutputFilename());
+		Assert.assertTrue(file.exists());
+		file = new File(writer.getSignalGroupsOutputFilename());
+		Assert.assertTrue(file.exists());
+		file = new File(writer.getSignalControlOutputFilename());
+		Assert.assertTrue(file.exists());
+		file = new File(writer.getAmberTimesOutputFilename());
+		Assert.assertTrue(file.exists());
+		
 	}
 	
 	
