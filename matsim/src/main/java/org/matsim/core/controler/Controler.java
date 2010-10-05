@@ -402,7 +402,10 @@ public class Controler {
 		} else {
 			// this would not be necessary if TransitConfigGroup is part of core config
 			Module oldModule = this.config.getModule(TransitConfigGroup.GROUP_NAME);
+
 			this.config.removeModule(TransitConfigGroup.GROUP_NAME);
+			// yyyy it is not clear to me why this works: the module is removed but never re-added--???  kai, oct'10
+			
 			this.transitConfig.addParam("transitScheduleFile", oldModule.getValue("transitScheduleFile"));
 			this.transitConfig.addParam("vehiclesFile", oldModule.getValue("vehiclesFile"));
 			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
@@ -1358,7 +1361,7 @@ public class Controler {
 		@Override
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 			int iter = event.getIteration();
-			if (iter % 10 == 0&& iter > event.getControler().getFirstIteration()) {
+			if (iter % 1 == 0&& iter >= event.getControler().getFirstIteration()) {
 				occupancyAnalyzer.reset(iter);
 				event.getControler().getEvents().addHandler(occupancyAnalyzer);
 			}
@@ -1367,7 +1370,7 @@ public class Controler {
 		@Override
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			int it = event.getIteration();
-			if (it % 10 == 0 && it > event.getControler().getFirstIteration()) {
+			if (it % 1 == 0 && it >= event.getControler().getFirstIteration()) {
 				event.getControler().getEvents().removeHandler(occupancyAnalyzer);
 				occupancyAnalyzer.write(event.getControler().getControlerIO()
 						.getIterationFilename(it, "occupancyAnalysis.txt"));
