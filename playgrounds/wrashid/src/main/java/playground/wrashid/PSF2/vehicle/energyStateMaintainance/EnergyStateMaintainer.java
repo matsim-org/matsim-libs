@@ -18,12 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF.vehicle.energyStateMaintainance;
+package playground.wrashid.PSF2.vehicle.energyStateMaintainance;
 
 import org.matsim.api.core.v01.network.Link;
 
-import playground.wrashid.PSF.vehicle.energyConsumption.EnergyConsumptionTable;
-import playground.wrashid.PSF.vehicle.vehicleFleet.Vehicle;
+import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 
 public abstract class EnergyStateMaintainer {
 

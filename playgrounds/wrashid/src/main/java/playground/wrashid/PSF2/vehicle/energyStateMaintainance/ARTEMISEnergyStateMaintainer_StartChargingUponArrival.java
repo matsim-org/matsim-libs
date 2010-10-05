@@ -18,14 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF.vehicle.energyStateMaintainance;
+package playground.wrashid.PSF2.vehicle.energyStateMaintainance;
 
 import org.matsim.api.core.v01.network.Link;
 
-import playground.wrashid.PSF.vehicle.energyConsumption.EnergyConsumptionTable;
-import playground.wrashid.PSF.vehicle.vehicleFleet.ConventionalVehicle;
-import playground.wrashid.PSF.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
-import playground.wrashid.PSF.vehicle.vehicleFleet.Vehicle;
+import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.ConventionalVehicle;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.GeneralLib;
 
 public class ARTEMISEnergyStateMaintainer_StartChargingUponArrival extends EnergyStateMaintainer {
@@ -48,21 +48,18 @@ public class ARTEMISEnergyStateMaintainer_StartChargingUponArrival extends Energ
 	public void chargeVehicle(Vehicle vehicle,double arrivalTime, double departureTime, double plugSizeInWatt){
 		if (vehicle instanceof PlugInHybridElectricVehicle){
 			PlugInHybridElectricVehicle phev=(PlugInHybridElectricVehicle) vehicle;
+			double chargingDuration;
 			
 			double maxChargingAvailableInJoule=GeneralLib.getIntervalDuration(arrivalTime, departureTime)*plugSizeInWatt;
 			
 			if (phev.getRequiredBatteryCharge()>0){
 				if (phev.getRequiredBatteryCharge()<maxChargingAvailableInJoule){
-					//phev.processCharging();
-					
-					
-					// TODO: cont.
-					// log, when charging started and ended
-					// update phev state => perform also consitency check there...
+					chargingDuration=phev.getRequiredBatteryCharge()/plugSizeInWatt;
+				} else {
+					chargingDuration=maxChargingAvailableInJoule/plugSizeInWatt;
 				}
+				phev.centralizedCharging(arrivalTime,chargingDuration, plugSizeInWatt);
 			}
-			
-			
 		}
 	}
 	

@@ -645,6 +645,8 @@ public class GeneralLib {
 				line = br.readLine();
 			}
 		} catch (Exception e){
+			e.printStackTrace();
+			
 			throw new Error("Error reading the file");
 		}		
 				

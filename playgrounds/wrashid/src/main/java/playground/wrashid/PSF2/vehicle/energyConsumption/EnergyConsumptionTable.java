@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF.vehicle.energyConsumption;
+package playground.wrashid.PSF2.vehicle.energyConsumption;
 
 import java.util.HashMap;
 

@@ -18,12 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF.vehicle.vehicleFleet;
+package playground.wrashid.PSF2.vehicle.vehicleFleet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-import playground.wrashid.PSF.vehicle.energyStateMaintainance.EnergyStateMaintainer;
+import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 
 public abstract class Vehicle {
 

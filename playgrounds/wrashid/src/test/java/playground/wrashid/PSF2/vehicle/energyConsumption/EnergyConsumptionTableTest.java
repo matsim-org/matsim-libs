@@ -1,4 +1,4 @@
-package playground.wrashid.PSF.vehicle.energyConsumption;
+package playground.wrashid.PSF2.vehicle.energyConsumption;
 
 import java.util.Set;
 
@@ -19,6 +19,7 @@ import playground.wrashid.PSF.data.HubPriceInfo;
 import playground.wrashid.PSF.energy.AfterSimulationListener;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
+import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
 
 public class EnergyConsumptionTableTest extends MatsimTestCase {
 	

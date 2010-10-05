@@ -18,11 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF.vehicle.vehicleFleet;
+package playground.wrashid.PSF2.vehicle.vehicleFleet;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.wrashid.PSF.vehicle.energyStateMaintainance.EnergyStateMaintainer;
+import playground.wrashid.PSF.ParametersPSF;
+import playground.wrashid.PSF.lib.PSFGeneralLib;
+import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 import playground.wrashid.lib.DebugLib;
 
 public class PlugInHybridElectricVehicle extends Vehicle {
@@ -31,7 +33,7 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 	double batteryMinThresholdInJoule;
 	double currentBatteryChargeInJoule;
 	
-	double electricEnergyUseInJouleDuringDay;
+	double electricEnergyUseInJouleDuringDayForDriving;
 	
 	public PlugInHybridElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleId, Id vehicleClassId) {
 		super(energyStateMaintainer, vehicleId, vehicleClassId);
@@ -49,7 +51,7 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 	}
 	
 	private void processElectricityUsage(double energyConsumptionInJoule){
-		electricEnergyUseInJouleDuringDay+=energyConsumptionInJoule;
+		electricEnergyUseInJouleDuringDayForDriving+=energyConsumptionInJoule;
 		currentBatteryChargeInJoule-=energyConsumptionInJoule;
 		
 		if (currentBatteryChargeInJoule<0){
@@ -63,6 +65,28 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 
 	public double getRequiredBatteryCharge(){
 		return batterySizeInJoule - currentBatteryChargeInJoule;
+	}
+
+	
+	private void chargeVehicle(double energyConsumptionInJoule){
+		currentBatteryChargeInJoule+=energyConsumptionInJoule;
+		
+		if (currentBatteryChargeInJoule>batterySizeInJoule){
+			DebugLib.stopSystemAndReportInconsistency();
+		}
+	}
+	
+	public void centralizedCharging(double arrivalTime, double chargingDuration, double plugSizeInWatt) {
+		double chargeInJoule=chargingDuration*plugSizeInWatt;
+		
+		chargeVehicle(chargeInJoule);
+		
+		
+		// write out the charging pattern
+			// we need a handle to the charge output file here...
+		
+		
+		// if needed, also log graph...
 	}
 	
 }
