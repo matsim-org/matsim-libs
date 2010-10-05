@@ -49,7 +49,7 @@ public class WorldConnectLocations {
 	public final static String CONFIG_F2L = "f2l";
 
 	public final static String CONFIG_F2L_INPUTF2LFile = "inputF2LFile";
-	
+
 	public final static String CONFIG_F2L_OUTPUTF2LFile = "outputF2LFile";
 
 	public WorldConnectLocations(final Config config) {
@@ -124,11 +124,6 @@ public class WorldConnectLocations {
 
 	public final void connectFacilitiesWithLinks(final ActivityFacilities facilities, final NetworkImpl network) {
 		log.info("  connecting facilities with links...");
-		log.info("    remove all given connections f<==>l...");
-		for (ActivityFacility f : facilities.getFacilities().values()) {
-			removeLinkMapping(f);
-		}
-		log.info("    done.");
 
 		Set<Id> remainingFacilities = new HashSet<Id>(facilities.getFacilities().keySet());
 		if (this.config != null) {
@@ -158,8 +153,4 @@ public class WorldConnectLocations {
 		log.info("  done. (connecting facilities with links)");
 	}
 
-	private void removeLinkMapping(ActivityFacility f) {
-		
-	}
-	
 }
