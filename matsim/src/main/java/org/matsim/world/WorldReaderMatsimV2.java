@@ -53,14 +53,11 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
-		if (WORLD.equals(name)) {
-		} else if (LAYER.equals(name)) {
+		if (LAYER.equals(name)) {
 			startLayer(atts);
-		} else if (MAPPING.equals(name)) {
 		} else if (ZONE.equals(name)) {
 			startZone(atts);
-		} else if (REF.equals(name)) {
-		} else {
+		} else if (!WORLD.equals(name) && !MAPPING.equals(name) && !REF.equals(name)) {
 			Gbl.errorMsg(this + "[tag=" + name + " not known or not supported]");
 		}
 	}
@@ -75,7 +72,7 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 	}
 
 	private void startLayer(final Attributes meta) {
-		this.currLayer = (ZoneLayer)this.world.createLayer(scenario.createId(meta.getValue("type")),meta.getValue("name"));
+		this.currLayer = (ZoneLayer)this.world.createLayer(scenario.createId(meta.getValue("type")));
 	}
 
 	private void startZone(final Attributes atts) {

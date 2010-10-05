@@ -31,15 +31,15 @@ public class World {
 	private final Map<Id, Layer> layers = new TreeMap<Id, Layer>();
 
 	@Deprecated
-	public final Layer createLayer(final Id type, final String name) {
+	public final Layer createLayer(final Id type) {
 		if (this.layers.containsKey(type)) {
 			throw new IllegalArgumentException("Layer type=" + type + " already exixts.");
 		}
-		return this.createZoneLayer(type,name);
+		return this.createZoneLayer(type);
 	}
 
 	@Deprecated
-	private final ZoneLayer createZoneLayer(final Id type,final String name) {
+	private final ZoneLayer createZoneLayer(final Id type) {
 		ZoneLayer l = new ZoneLayer();
 		this.layers.put(type,l);
 		return l;

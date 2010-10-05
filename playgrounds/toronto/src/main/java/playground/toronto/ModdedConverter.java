@@ -288,7 +288,7 @@ public class ModdedConverter {
 
 		ModdedConverter c = new ModdedConverter();
 
-		c.setZones((ZoneLayer) new World().createLayer(new IdImpl("zones"), "toronto_test"));
+		c.setZones((ZoneLayer) new World().createLayer(new IdImpl("zones")));
 
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
 

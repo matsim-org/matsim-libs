@@ -206,8 +206,7 @@ public class Converter {
 		Converter c = new Converter();
 
 		ScenarioImpl scenario = new ScenarioImpl();
-		c.setZones((ZoneLayer) new World().createLayer(new IdImpl("zones"),
-				"toronto_test"));
+		c.setZones((ZoneLayer) new World().createLayer(new IdImpl("zones")));
 
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
 
