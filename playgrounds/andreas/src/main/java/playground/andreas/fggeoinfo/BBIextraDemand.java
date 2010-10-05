@@ -59,19 +59,6 @@ public class BBIextraDemand {
 		}
 	}
 	
-//	public static void main(final String[] args) {
-//		
-//		BBIextraDemand bbi = new BBIextraDemand();
-//		bbi.initialize();
-		
-//		bbi.createAgents(false);
-//		bbi.writePopulation("d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20100809_verwendet\\pop_generated_TXL_SXF.xml.gz");
-//		
-//		bbi.createAgents(true);
-//		bbi.writePopulation("d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20100809_verwendet\\pop_generated_BBI_only.xml.gz");
-//				
-//	}
-	
 	void createDemand(){
 		// create BBI only demand -> new demand
 		createAgents(false);
@@ -81,16 +68,6 @@ public class BBIextraDemand {
 		createAgents(true);
 		writePopulation(this.oldDemandTXLSXFoutFile);
 	}
-
-//	private void initialize() {
-//		try {
-//			this.demandList = ReadBBIDemand.readBBIDemand("d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20100809_verwendet\\Anreise_Autobahnauffahrten_20100804.csv");
-//			this.timeStructure = ReadBBITimeStructure.readBBITimeStructure("d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20100809_verwendet\\Analyse_Fluege_20100804.csv");
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}		
-//	}
 
 	private void createAgents(boolean onlyBBI) {
 		

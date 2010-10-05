@@ -18,7 +18,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 
 import playground.andreas.utils.ana.acts2kml.KMLActsWriter;
@@ -167,44 +166,6 @@ public class FilterPersonActs extends NewPopulation {
 
 		Gbl.printElapsedTime();
 	}
-
-//	public static void main(final String[] args) {
-//		Gbl.startMeasurement();
-//
-//		ScenarioImpl sc = new ScenarioImpl();
-//		
-//		String inputDir = "d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20100809_verwendet\\";
-//
-//		String networkFile = inputDir + "network_modified_20100806_added_BBI_AS_cl.xml.gz";
-//		String inPlansFile = "d:\\Berlin\\berlin-sharedsvn\\plans\\baseplan_900s.xml.gz";
-//		String outPlansFile = inputDir + "baseplan_900s_movedToBBI.xml.gz";
-//
-//		NetworkImpl net = sc.getNetwork();
-//		new MatsimNetworkReader(sc).readFile(networkFile);
-//
-//		Population inPop = sc.getPopulation();
-//		PopulationReader popReader = new MatsimPopulationReader(sc);
-//		popReader.readFile(inPlansFile);
-//
-//		FilterPersonActs dp = new FilterPersonActs(net, inPop, outPlansFile);
-//		dp.enableKMLOutput("filteredActsTXLSXF.kmz", "E:\\temp");
-//		dp.run(inPop);
-//		System.out.println(dp.personshandled + " persons handled; " + dp.planswritten + " plans written to file");
-//		
-//		
-//		System.out.println("SXF nActs:");
-//		for (Entry<String, Integer> entry : dp.actSXF.entrySet()) {
-//			System.out.println(entry.getKey() + " " + entry.getValue());
-//		}
-//		System.out.println("TXL nActs:");
-//		for (Entry<String, Integer> entry : dp.actTXL.entrySet()) {
-//			System.out.println(entry.getKey() + " " + entry.getValue());
-//		}
-//		dp.writeEndPlans();
-//		dp.writeKML();
-//
-//		Gbl.printElapsedTime();
-//	}
 
 	private void enableKMLOutput(String name, String dir) {
 		this.kmlOutputEnabled = true;
