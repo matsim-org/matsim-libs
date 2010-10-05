@@ -147,7 +147,7 @@ public class PlansFromEmmeDemand {
 	public void readZones(){
 		World w = new World();
 
-		ZoneLayer zl =  (ZoneLayer) w.createLayer(new IdImpl("zones"), "emme");
+		ZoneLayer zl =  (ZoneLayer) w.createLayer(new IdImpl("zones"));
 //		ZoneLayer layer = new ZoneLayer(new IdImpl("zones"), "emme");
 		this.zones = zl;
 		this.zoneXYs = new HashMap<String, ZoneXY>();
