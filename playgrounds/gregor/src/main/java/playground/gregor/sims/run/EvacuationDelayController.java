@@ -30,6 +30,8 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.EvacuationConfigGroup.EvacuationScenario;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
@@ -49,6 +51,8 @@ import org.matsim.evacuation.shelters.signalsystems.ShelterDoorBlockerSetup;
 import org.matsim.evacuation.shelters.signalsystems.ShelterInputCounterSignalSystems;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
+import org.matsim.signalsystems.model.QSimSignalEngine;
+import org.matsim.signalsystems.model.SignalSystemsManager;
 
 import playground.gregor.sims.evacuationdelay.DelayedEvacuationPopulationLoader;
 
@@ -143,10 +147,18 @@ public class EvacuationDelayController extends Controler {
 
 		ShelterInputCounterSignalSystems sic = new ShelterInputCounterSignalSystems(this.scenarioData,this.shelterLinkMapping);
 		this.events.addHandler(sic);
-
-		this.addControlerListener(new ShelterDoorBlockerSetup());
 		this.getQueueSimulationListener().add(sic);
 
+		ShelterDoorBlockerSetup shelterSetup = new ShelterDoorBlockerSetup(sic);
+		final SignalSystemsManager signalManager = shelterSetup.createSignalManager(getScenario());
+		signalManager.setEventsManager(events);
+		this.getQueueSimulationListener().add(new QSimSignalEngine(signalManager));
+		this.addControlerListener(new IterationStartsListener(){
+			@Override
+			public void notifyIterationStarts(IterationStartsEvent event) {
+				signalManager.resetModel(event.getIteration());
+			}
+		});
 	}
 
 
