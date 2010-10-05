@@ -22,15 +22,12 @@ package org.matsim.signalsystems.data;
 import org.apache.log4j.Logger;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesWriter10;
-import org.matsim.signalsystems.data.intergreentimes.v10.IntergreenTimesData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsWriter20;
-
-import visad.data.netcdf.UnsupportedOperationException;
 
 
 /**
@@ -107,9 +104,9 @@ public class SignalsScenarioWriter {
 		writer.write(this.amberTimesOutputFilename);
 	}
 	
-	public void writeIntergreenTimesData(IntergreenTimesData intergreenTimesData){
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
+//	public void writeIntergreenTimesData(IntergreenTimesData intergreenTimesData){
+//		throw new UnsupportedOperationException("Not implemented yet");
+//	}
 
 	
 	public String getSignalSystemsOutputFilename() {
