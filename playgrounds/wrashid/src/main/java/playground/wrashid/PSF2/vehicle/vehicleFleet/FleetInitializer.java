@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Vehicle.java
+ * FleetInitializer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,52 +20,15 @@
 
 package playground.wrashid.PSF2.vehicle.vehicleFleet;
 
+import java.util.HashMap;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 
-public abstract class Vehicle {
+public interface FleetInitializer {
 
-	private final EnergyStateMaintainer energyStateMaintainer;
-	private Id vehicleClassId;
+	public HashMap<Id, Vehicle> getVehicles(Set<Id> personIds, EnergyStateMaintainer energyStateMaintainer);
 	
-	private double energyConcumptionForWholeDayInJoule;
-
-	public Vehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId){
-		this.energyStateMaintainer = energyStateMaintainer;
-		this.vehicleClassId=vehicleClassId;
-	}
-	
-	public abstract void updateEnergyState(double energyConsumptionOnLinkInJoule);
-	
-	public void updateEnergyState(double timeSpendOnLink, Link link){
-		energyStateMaintainer.processVehicleEnergyState(this, timeSpendOnLink, link);
-	}
-
-	
-
-	public Id getVehicleClassId() {
-		return vehicleClassId;
-	}
-	
-	public void logEnergyConsumption(double energyConsumptionInJoule){
-		this.energyConcumptionForWholeDayInJoule+=energyConsumptionInJoule;
-	}
-	
-	public void setEnergyConcumptionForWholeDayInJoule(double energyConcumptionForWholeDayInJoule) {
-		this.energyConcumptionForWholeDayInJoule = energyConcumptionForWholeDayInJoule;
-	}
-
-	public double getEnergyConcumptionForWholeDayInJoule() {
-		return energyConcumptionForWholeDayInJoule;
-	}
-	
-	public void resetEnergyConsumptionSum(){
-		energyConcumptionForWholeDayInJoule=0;
-	}
-	
-	public static double getAverageSpeedOfVehicleOnLink(double timeSpentOnLink, Link link){
-		return link.getLength()/timeSpentOnLink;
-	}
 }

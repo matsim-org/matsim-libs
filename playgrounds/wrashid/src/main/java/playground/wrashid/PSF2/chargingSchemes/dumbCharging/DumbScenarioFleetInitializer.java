@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Vehicle.java
+ * DumbScenarioFleetInitializer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,54 +18,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.vehicle.vehicleFleet;
+package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.FleetInitializer;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 
-public abstract class Vehicle {
+public class DumbScenarioFleetInitializer implements FleetInitializer {
 
-	private final EnergyStateMaintainer energyStateMaintainer;
-	private Id vehicleClassId;
-	
-	private double energyConcumptionForWholeDayInJoule;
-
-	public Vehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId){
-		this.energyStateMaintainer = energyStateMaintainer;
-		this.vehicleClassId=vehicleClassId;
-	}
-	
-	public abstract void updateEnergyState(double energyConsumptionOnLinkInJoule);
-	
-	public void updateEnergyState(double timeSpendOnLink, Link link){
-		energyStateMaintainer.processVehicleEnergyState(this, timeSpendOnLink, link);
-	}
-
-	
-
-	public Id getVehicleClassId() {
-		return vehicleClassId;
-	}
-	
-	public void logEnergyConsumption(double energyConsumptionInJoule){
-		this.energyConcumptionForWholeDayInJoule+=energyConsumptionInJoule;
-	}
-	
-	public void setEnergyConcumptionForWholeDayInJoule(double energyConcumptionForWholeDayInJoule) {
-		this.energyConcumptionForWholeDayInJoule = energyConcumptionForWholeDayInJoule;
+	@Override
+	public HashMap<Id, Vehicle> getVehicles(Set<Id> personIds, EnergyStateMaintainer energyStateMaintainer) {
+		HashMap<Id, Vehicle> result=new HashMap<Id, Vehicle>();
+		
+		Iterator<Id> iter=personIds.iterator();
+		
+		while (iter.hasNext()){
+			Id personId=iter.next();
+			
+			result.put(personId, new PlugInHybridElectricVehicle(energyStateMaintainer, new IdImpl(1)));
+		}
+		
+		return result;
 	}
 
-	public double getEnergyConcumptionForWholeDayInJoule() {
-		return energyConcumptionForWholeDayInJoule;
-	}
-	
-	public void resetEnergyConsumptionSum(){
-		energyConcumptionForWholeDayInJoule=0;
-	}
-	
-	public static double getAverageSpeedOfVehicleOnLink(double timeSpentOnLink, Link link){
-		return link.getLength()/timeSpentOnLink;
-	}
 }

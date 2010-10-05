@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EV.java
+ * SimulationStartupListenerV2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,28 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.vehicle.vehicleFleet;
+package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 
-import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
-
-public class ElectricVehicle extends Vehicle {
-
-	public ElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId) {
-		super(energyStateMaintainer, vehicleClassId);
-	}
-
-	// we can track here, how much the battery was over used (the vehicle ran out of fuel).
-	double batteryOverUsageInkWh;
+public class SimulationStartupListenerV2 implements StartupListener {
 
 	@Override
-	public void updateEnergyState(double energyConsumptionOnLinkInJoule) {
-		logEnergyConsumption(energyConsumptionOnLinkInJoule);
-		
-		// TODO: cont here furthe...
-		
+	public void notifyStartup(StartupEvent event) {
+		// TODO Auto-generated method stub
 	}
-	
-	
 }

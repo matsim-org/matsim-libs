@@ -26,8 +26,8 @@ import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMainta
 
 public class ConventionalVehicle extends Vehicle {
 
-	public ConventionalVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleId, Id vehicleClassId) {
-		super(energyStateMaintainer, vehicleId, vehicleClassId);
+	public ConventionalVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId) {
+		super(energyStateMaintainer, vehicleClassId);
 	}
 
 	@Override

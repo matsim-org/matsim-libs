@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EV.java
+ * LinkEnergyConsumptionTracker.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,28 +18,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.vehicle.vehicleFleet;
+package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
-import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
-
-public class ElectricVehicle extends Vehicle {
-
-	public ElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId) {
-		super(energyStateMaintainer, vehicleClassId);
-	}
-
-	// we can track here, how much the battery was over used (the vehicle ran out of fuel).
-	double batteryOverUsageInkWh;
+public class LinkEnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler {
 
 	@Override
-	public void updateEnergyState(double energyConsumptionOnLinkInJoule) {
-		logEnergyConsumption(energyConsumptionOnLinkInJoule);
-		
-		// TODO: cont here furthe...
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
 		
 	}
-	
-	
+
+	@Override
+	public void handleEvent(AgentWait2LinkEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

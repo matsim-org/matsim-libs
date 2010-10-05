@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Vehicle.java
+ * ParametersPSF2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,54 +18,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.PSF2.vehicle.vehicleFleet;
+package playground.wrashid.PSF2;
+
+import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.Controler;
 
+import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.FleetInitializer;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 
-public abstract class Vehicle {
+public class ParametersPSF2 {
 
-	private final EnergyStateMaintainer energyStateMaintainer;
-	private Id vehicleClassId;
+	public static String pathToEnergyConsumptionTable="c:\\data\\My Dropbox\\ETH\\Projekte\\IATBR2009\\old\\matsim\\input\\runRW1002\\VehicleEnergyConsumptionRegressionTable.txt";
 	
-	private double energyConcumptionForWholeDayInJoule;
+	
+	
+	public static FleetInitializer fleetInitializer;
+	public static HashMap<Id, Vehicle> vehicles;
 
-	public Vehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId){
-		this.energyStateMaintainer = energyStateMaintainer;
-		this.vehicleClassId=vehicleClassId;
-	}
-	
-	public abstract void updateEnergyState(double energyConsumptionOnLinkInJoule);
-	
-	public void updateEnergyState(double timeSpendOnLink, Link link){
-		energyStateMaintainer.processVehicleEnergyState(this, timeSpendOnLink, link);
-	}
 
-	
 
-	public Id getVehicleClassId() {
-		return vehicleClassId;
-	}
-	
-	public void logEnergyConsumption(double energyConsumptionInJoule){
-		this.energyConcumptionForWholeDayInJoule+=energyConsumptionInJoule;
-	}
-	
-	public void setEnergyConcumptionForWholeDayInJoule(double energyConcumptionForWholeDayInJoule) {
-		this.energyConcumptionForWholeDayInJoule = energyConcumptionForWholeDayInJoule;
-	}
+	public static EnergyConsumptionTable energyConsumptionTable;
 
-	public double getEnergyConcumptionForWholeDayInJoule() {
-		return energyConcumptionForWholeDayInJoule;
-	}
+
+
+	public static EnergyStateMaintainer energyStateMaintainer;
 	
-	public void resetEnergyConsumptionSum(){
-		energyConcumptionForWholeDayInJoule=0;
-	}
 	
-	public static double getAverageSpeedOfVehicleOnLink(double timeSpentOnLink, Link link){
-		return link.getLength()/timeSpentOnLink;
-	}
+	public static void initVehicleFleet(Controler controler){
+		ParametersPSF2.vehicles=ParametersPSF2.fleetInitializer.getVehicles(controler.getPopulation().getPersons().keySet(), ParametersPSF2.energyStateMaintainer);
+	};
 }

@@ -22,12 +22,12 @@ import playground.wrashid.lib.GeneralLib;
 
 public class PSSControler {
 
-	Controler controler;
+	protected Controler controler;
 	String resultDirectory = "A:\\data\\results\\";
 	String inputPSSPath = "A:\\data\\PSS\\input";
 	String outputPSSPath = "A:\\data\\PSS\\output";
-	String configFilePath;
-	ParametersPSFMutator parameterPSFMutator;
+	protected String configFilePath;
+	protected ParametersPSFMutator parameterPSFMutator;
 	private static int iterationNumber = 0;
 	private static final int numberOfTimeBins = 96;
 	private double[][] minimumPriceSignal;
