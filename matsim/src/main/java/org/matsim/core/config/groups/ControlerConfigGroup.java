@@ -158,7 +158,7 @@ public class ControlerConfigGroup extends Module {
 		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + " or " + RoutingAlgorithmType.AStarLandmarks);
 		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");
 		map.put(EVENTS_FILE_FORMAT, "Specifies the file format for writing events. Currently supported: txt, xml. Multiple values can be specified separated by commas (',').");
-		map.put(WRITE_EVENTS_INTERVAL, "Defines in which iterations events are written to a file. `0' disables events writing completely." ) ;
+		map.put(WRITE_EVENTS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely." ) ;
 		return map;
 	}
 
