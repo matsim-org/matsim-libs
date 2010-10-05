@@ -69,7 +69,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 		if (facilities.containsKey(id)) {
 			Gbl.errorMsg("Facility id=" + id + " already exists.");
 		}
-		ActivityFacilityImpl f = new ActivityFacilityImpl(id,center,null);
+		ActivityFacilityImpl f = new ActivityFacilityImpl(id, center);
 		facilities.put(f.getId(),f);
 
 		// show counter

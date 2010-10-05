@@ -38,10 +38,10 @@ public class ActivityFacilityImpl implements ActivityFacility {
 	private Coord coord;
 
 	private Id id;
-	
+
 	private Id linkId;
 
-	protected ActivityFacilityImpl(final Id id, final Coord center, Id linkId) {
+	protected ActivityFacilityImpl(final Id id, final Coord center) {
 		this.id = id;
 		this.coord = center;
 	}
@@ -73,14 +73,16 @@ public class ActivityFacilityImpl implements ActivityFacility {
 		return this.desc;
 	}
 
+	@Override
 	public final Map<String, ActivityOption> getActivityOptions() {
 		return this.activities;
 	}
 
+	@Override
 	public Id getLinkId() {
 		return this.linkId;
 	}
-	
+
 	public void setLinkId(Id linkId) {
 		this.linkId = linkId;
 	}
