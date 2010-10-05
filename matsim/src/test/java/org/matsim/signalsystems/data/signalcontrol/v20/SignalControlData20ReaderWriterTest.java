@@ -99,7 +99,7 @@ public class SignalControlData20ReaderWriterTest {
 		SignalSystemControllerData systemController = controlData.getSignalSystemControllerDataBySystemId().get(id42);
 		Assert.assertNotNull(systemController);
 		Assert.assertNotNull(systemController.getControllerIdentifier());
-		Assert.assertEquals("planbasedController", systemController.getControllerIdentifier());
+		Assert.assertEquals("DefaultPlanbasedSignalSystemController", systemController.getControllerIdentifier());
 		Assert.assertNotNull(systemController.getSignalPlanData());
 		SignalPlanData plan = systemController.getSignalPlanData().get(id8);
 		Assert.assertNotNull(plan);
