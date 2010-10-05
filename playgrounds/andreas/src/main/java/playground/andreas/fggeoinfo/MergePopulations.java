@@ -13,7 +13,7 @@ import org.matsim.core.population.PopulationReader;
 import playground.andreas.utils.pop.NewPopulation;
 
 /**
- * Filter persons, depending on ID
+ * Merges two population files into one
  *
  * @author aneumann
  *
@@ -45,39 +45,34 @@ public class MergePopulations extends NewPopulation {
 		this.planswritten++;
 
 	}
-
-	public static void main(final String[] args) {
-		Gbl.startMeasurement();
-
+	
+	@Override
+	public String toString(){
+		return this.personsAdded + " new persons added; " + this.planswritten + " old plans written to file - total pop should be " + (this.personsAdded + this.planswritten);
+	}
+	
+	public static void mergePopulations(String network, String plansFileOne, String plansFileTwo, String plansOutFile){
 		ScenarioImpl sc = new ScenarioImpl();
 		ScenarioImpl scA = new ScenarioImpl();
 		
-		String inputDir = "d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20100809_verwendet\\";
-
-		String networkFile = inputDir + "network_modified_20100806_added_BBI_AS_cl.xml.gz";
-		String inPlansFile = "d:\\Berlin\\BVG\\berlin-bvg09\\pop\\baseplan_900s.xml.gz";
-//		String inPlansFile = inputDir + "baseplan_1x_900s_movedToBBI.xml.gz";
-		String additionalPlansFile = inputDir + "pop_1x_generated_TXL_SXF.xml";
-		String outPlansFile = inputDir + "pop_1x_merged_TXL_SXF.xml.gz";
-
 		NetworkImpl net = sc.getNetwork();
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc).readFile(network);
 
 		Population inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);
-		popReader.readFile(inPlansFile);
+		popReader.readFile(plansFileOne);
 		
 		Population additionalPop = scA.getPopulation();
 		PopulationReader additionalPopReader = new MatsimPopulationReader(scA);
-		additionalPopReader.readFile(additionalPlansFile);
+		additionalPopReader.readFile(plansFileTwo);
 		
 
-		MergePopulations dp = new MergePopulations(net, inPop, additionalPop, outPlansFile);
+		MergePopulations dp = new MergePopulations(net, inPop, additionalPop, plansOutFile);
 		dp.run(inPop);
-		System.out.println(dp.personsAdded + " new persons added; " + dp.planswritten + " old plans written to file - total pop should be " + (dp.personsAdded + dp.planswritten));
+		System.out.println(dp.toString());
 			
 		dp.writeEndPlans();
-
+		
 		Gbl.printElapsedTime();
 	}
 }
