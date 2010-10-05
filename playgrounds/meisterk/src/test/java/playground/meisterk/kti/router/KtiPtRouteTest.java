@@ -91,7 +91,7 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		SwissHaltestelle toStop = new SwissHaltestelle(new IdImpl("456"), new CoordImpl(2000.0, 2000.0));
 
 		World world = new World();
-		ZoneLayer municipalities = (ZoneLayer) world.createLayer(new IdImpl("municipality"), "municipalities");
+		ZoneLayer municipalities = (ZoneLayer) world.createLayer(new IdImpl("municipality"));
 
 		Coord dummyMuniCoord = new CoordImpl(3003.0, 3003.0);
 		Location fromMunicipality = new Zone(municipalities, new IdImpl("30000"), dummyMuniCoord, dummyMuniCoord, dummyMuniCoord);
