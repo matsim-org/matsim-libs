@@ -27,9 +27,10 @@ import java.util.ListIterator;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitQLaneFeature;
@@ -53,10 +54,11 @@ public class AgentSnapshotInfoBuilder {
 	private final String snapshotStyle;
 
 
-	public AgentSnapshotInfoBuilder(QSimConfigGroup configGroup, double cellSize){
-		this.storageCapacityFactor = configGroup.getStorageCapFactor();
-		this.cellSize = cellSize;
-		this.snapshotStyle = configGroup.getSnapshotStyle() ;
+	public AgentSnapshotInfoBuilder( Scenario sc ){
+		this.storageCapacityFactor = sc.getConfig().getQSimConfigGroup().getStorageCapFactor();
+		this.cellSize = ((NetworkImpl) sc.getNetwork()).getEffectiveCellSize() ;
+		this.snapshotStyle = sc.getConfig().getQSimConfigGroup().getSnapshotStyle() ;
+//		AgentSnapshotInfoFactory.setLaneWidth( sc.getNetwork().getEffectiveLaneWidth() );
 	}
 
 	/**

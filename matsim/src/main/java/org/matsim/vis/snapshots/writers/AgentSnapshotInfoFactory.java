@@ -48,7 +48,10 @@ public class AgentSnapshotInfoFactory {
 	 */
 	private static final double WIDTH_OF_MEDIAN = 30. ; // default
 
-	private static final double LANE_WIDTH = 3.75;
+	private static double LANE_WIDTH = 3.75;
+	public static void setLaneWidth( double dd ) {
+		LANE_WIDTH = dd ;
+	}
 
 	//TODO lane width is no longer static but it is defined in network. The question is,
 	//how to get this information here? One possibility is to use Gbl ... but I suppose not everyone

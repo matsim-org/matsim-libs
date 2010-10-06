@@ -69,8 +69,7 @@ private final double stucktimeCache;
 	public QSimEngineImpl(final QSim sim, final Random random) {
     this.random = random;
     this.qsim = sim;
-    this.positionInfoBuilder = new AgentSnapshotInfoBuilder(sim.getScenario().getConfig().getQSimConfigGroup(),
-    		((NetworkImpl)sim.getScenario().getNetwork()).getEffectiveCellSize());
+    this.positionInfoBuilder = new AgentSnapshotInfoBuilder( sim.getScenario() );
     this.stucktimeCache = sim.getScenario().getConfig().getQSimConfigGroup().getStuckTime();
 	}
 
