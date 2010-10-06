@@ -17,11 +17,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package analysisTest;
+package analysis;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.SortedMap;
@@ -42,23 +39,23 @@ import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
 /**
- * @author bkickhoefer after kn and dgrether
+ * @author fuerbas after bkickhoefer after kn and dgrether
  */
 
 public class BkAnalysisTest {
 	
 	private static final Logger log = Logger.getLogger(BkAnalysisTest.class);
 	
-//	String netfile = "run860.output_network.xml.gz";
-//	String plansfile1 = "run860.output_plans.xml.gz";
-//	String plansfile2 = "run864.output_plans.xml.gz";
-//	String householdsfile = "households.xml";
+	String netfile = "run860.output_network.xml.gz";
+	String plansfile1 = "run860.output_plans.xml.gz";
+	String plansfile2 = "run864.output_plans.xml.gz";
+	String householdsfile = "households.xml";
 //	String outputfiles = "../runs-svn/run864/analysis/deltaUtilsPerPersons";
 	
-	String netfile = "../runs-svn/run860/run860.output_network.xml.gz";
-	String plansfile1 = "../runs-svn/run860/run860.output_plans.xml.gz";
-	String plansfile2 = "../runs-svn/run864/run864.output_plans.xml.gz";
-	String householdsfile = "../shared-svn/studies/bkick/oneRouteTwoModeIncomeTest/households.xml";
+//	String netfile = "../runs-svn/run860/run860.output_network.xml.gz";
+//	String plansfile1 = "../runs-svn/run860/run860.output_plans.xml.gz";
+//	String plansfile2 = "../runs-svn/run864/run864.output_plans.xml.gz";
+//	String householdsfile = "../shared-svn/studies/bkick/oneRouteTwoModeIncomeTest/households.xml";
 //	String outputfiles = "../runs-svn/run864/analysis/deltaUtilsPerPersons";
 	
 	//main class
@@ -123,41 +120,15 @@ public class BkAnalysisTest {
 //======================================================================================================================================================
 		
 		
-		//		OUTPUT TO TXT FILE
+		// APPLY FILTERS AND OUTPUT TO TXT FILE
 		
-		BufferedWriter bw = new BufferedWriter(new FileWriter(new File("output1.txt")));
+		BkAnalysisFilter filter = new BkAnalysisFilter();
 		
-		bw.write("PersonalIncome\tScore1\tScore2\tScoreDiff");
-		bw.newLine();
+		filter.createIncomeRanking(populationInformation);
+		filter.getHigherScorePopulation(populationInformation);
+		filter.getLowerScorePopulation(populationInformation);
+
 			
-		for (RowTest row : populationInformation.values()) {
-			bw.write(getIncomeShare(row, personalIncome)+"\t"+row.getScore1()+"\t"+row.getScore2()+"\t"+row.getScoreDiff());
-			bw.newLine();
-		}
-		
-		bw.close();
-		
-		
-		
-		
-		//	Alternative Output
-		
-		
-		
-		//BkDeltaUtilsChartGeneral - plots individual utility differences over income (linear axis)
-//		BkDeltaUtilsChart deltaUtilsChart = new BkDeltaUtilsChart(populationInformation);
-		System.err.println( "BkDeltaUtilsChart was moved away by Benjamin; I don't know what happened there."
-				+"Disabling this line so that the code compiles.  Kai" ) ;
-		
-		//
-		
-//		MISSING TYPE ROW?!?!
-//		BkDeltaUtilsQuantilesChart deltaUtilsQuantilesChart = new BkDeltaUtilsQuantilesChart(populationInformation);
-		
-		//===
-		
-		//BkChartWriter gets an jchart object from the defined charts above to write the chart:
-//		BkChartWriter.writeChart(outputfiles, deltaUtilsChart.createChart());
 		
 		log.info( "\n" + "******************************" + "\n"
 				       + "Chart(s) and table(s) written." + "\n"
@@ -166,70 +137,8 @@ public class BkAnalysisTest {
 	
 //============================================================================================================	
 	
-//	CALCULATION AND FILTERS
-	
-	private Double calculateAverageIncome(final Population pop, final SortedMap<Id, Double> personalIncome) {
-		Double totalIncome = .0;
-		for (Double income : personalIncome.values()) {
-			totalIncome+=income;
-		}
-		return totalIncome/pop.getPersons().size();		//average Income
-	}
-	
-	private Double getMaximumIncome (final SortedMap<Id, Double> personalIncome) {
-		Double maximumIncome=.0;
-		for (Double income : personalIncome.values()) {
-			if (income>maximumIncome) maximumIncome=income;
-		}
-		return maximumIncome;
-	}
-	
-	private Double getIncomeShare (RowTest row, final SortedMap<Id, Double> personalIncome) {				
-		return row.getPersonalIncome()/getMaximumIncome(personalIncome);	
-	}
-	
-	private SortedMap<Id, RowTest> getHigherScorePopulation (SortedMap<Id, RowTest> populationInformation) {
-		SortedMap<Id, RowTest> improved = new TreeMap<Id, RowTest>(new ComparatorImplementation());
-		for (RowTest row : populationInformation.values()) {
-			if (row.getScore2()>row.getScore1()) {
-				improved.put(row.getId(), row);
-			}
-		}
-		return improved;
-	}
-	
-	private SortedMap<Id, RowTest> getLowerScorePopulation (SortedMap<Id, RowTest> populationInformation) {
-		SortedMap<Id, RowTest> worse = new TreeMap<Id, RowTest>(new ComparatorImplementation());
-		for (RowTest row : populationInformation.values()) {
-			if (row.getScore2()<=row.getScore1()) {
-				worse.put(row.getId(), row);
-			}
-		}
-		return worse;
-	}
-	
-//	private SortedMap<Id, Row> changesMode (Population pop1, Population pop2) {
-//		SortedMap<Id, Row> changes = new TreeMap<Id, Row>(new ComparatorImplementation());
-//		for (Person person : pop1.getPersons().values()) {
-//			Row row = new Row();
-//			row.setId(person.getId());
-//			row.setScore1();
-//			
-//			for (Plan plan1 : person.getPlans()) {
-//				for (PlanElement element1 : plan1.getPlanElements()){ 
-//					if (element1 instanceof Leg) {
-//						Plan plan2 = (Plan) pop2.getPersons().get(person.getId()).getPlans();
-//						PlanElement element2 = (PlanElement) plan2.getPlanElements();
-//						if (((Leg) element1).getMode() != ((Leg)element2).getMode())	{
-//							
-//							changes.put(person.getId(), value)
-//						}
-//					}
-//				}
-//			}
-//		}
-//		return null;
-//	}
+
+
 	
 
 //============================================================================================================	
@@ -271,15 +180,17 @@ public class BkAnalysisTest {
 		return null;
 	}
 
-	private SortedMap<Id, Double> getHomeYFromPlans(Population population1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	private SortedMap<Id, Double> getHomeXFromPlans(Population population1) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	private SortedMap<Id, Double> getHomeYFromPlans(Population population1) {
+		SortedMap<Id,Double> homeY = new TreeMap<Id, Double>(new ComparatorImplementation());
+		return null;
+	}
+
+
 
 	private SortedMap<Id, Double> getPersonalIncomeFromHouseholds(Households households) {
 		SortedMap<Id,Double> personId2PersonalIncome = new TreeMap<Id, Double>(new ComparatorImplementation());
@@ -314,7 +225,7 @@ public class BkAnalysisTest {
 //============================================================================================================		
 
 	//comparator to compare Ids not as Strings but as Integers (see above)
-	private final class ComparatorImplementation implements Comparator<Id> {
+	protected final class ComparatorImplementation implements Comparator<Id> {
 		@Override
 		public int compare(Id id1, Id id2) {
 			Integer i1 = Integer.parseInt(id1.toString());
