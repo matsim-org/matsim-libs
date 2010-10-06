@@ -11,6 +11,7 @@ Features:
 - org.matsim.run.OTFVis now supports Double-MVI (r11281), and removed again (r12288)
 - Swing-OTFVis can now show Link-Ids (r11300) and different link-widths (r11366)
 - NetVis is no longer available (r11317ff)
+- OsmNetworkReader more stable, e.g. does not crash if specified node-ref is missing (e.g. by filtering osm-file with osmosis 0.36 as shown in tutorial) (r11383, users-mailing-list 30sept2010)
 
 
 API-Changes:
@@ -28,7 +29,8 @@ Bug-Fixes:
 Non-API Changes:
 
 - QVehicle.getBasicVehicle() has been renamed to QVehicle.getVehicle()
-- org.matsim.withinday is completely removed
+- org.matsim.withinday removed completely
+- World, Layer data structures removed completely
 
 
 Release version 0.1.1
