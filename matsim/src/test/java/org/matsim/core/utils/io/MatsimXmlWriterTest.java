@@ -36,6 +36,7 @@ public class MatsimXmlWriterTest {
 		Assert.assertEquals("tick &quot; tack", writer.encodeAttributeValue("tick \" tack"));
 		Assert.assertEquals("tick &quot; tack &quot; tock", writer.encodeAttributeValue("tick \" tack \" tock"));
 		Assert.assertEquals("this &amp; that &quot; these &amp; those", writer.encodeAttributeValue("this & that \" these & those"));
+		Assert.assertEquals("tick &lt; tack &gt; tock", writer.encodeAttributeValue("tick < tack > tock"));
 	}
 
 }

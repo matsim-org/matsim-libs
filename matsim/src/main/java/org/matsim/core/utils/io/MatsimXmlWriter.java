@@ -182,7 +182,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 						length = 0;
 					}
 				}
-				this.writer.write(" " + t.getFirst() + "=\"" + t.getSecond() + "\"");
+				this.writer.write(" " + t.getFirst() + "=\"" + encodeAttributeValue(t.getSecond()) + "\"");
 			}
 		}
 		if (closeElement) {
@@ -240,7 +240,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * @return String with some characters replaced by their xml-encoding.
 	 */
 	protected String encodeAttributeValue(final String attributeValue) {
-		return attributeValue.replace("&", "&amp;").replace("\"", "&quot;");
+		return attributeValue.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
 	}
 
 }
