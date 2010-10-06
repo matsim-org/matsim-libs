@@ -60,7 +60,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.sims.shelters.allocation.EvacuationShelterNetLoaderForShelterAllocation;
 import playground.gregor.sims.shelters.allocation.GreedyShelterAllocator;
-import playground.gregor.sims.shelters.allocation.ShelterAllocationRePlanner;
+import playground.gregor.sims.shelters.allocation.ShelterAssignmentRePlanner;
 import playground.gregor.sims.shelters.allocation.ShelterCounter;
 import playground.gregor.sims.shelters.allocation.ShelterLocationRePlannerII;
 
@@ -68,7 +68,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 
-public class ShelterAllocationController extends Controler {
+public class ShelterAssignmentController extends Controler {
 
 	final private static Logger log = Logger.getLogger(EvacuationQSimControllerII.class);
 
@@ -91,7 +91,7 @@ public class ShelterAllocationController extends Controler {
 
 
 
-	public ShelterAllocationController(String[] args, int shift, double pshelter, String plans) {
+	public ShelterAssignmentController(String[] args, int shift, double pshelter, String plans) {
 		super(args);
 		this.shift = shift;
 		this.pshelter = pshelter;
@@ -131,7 +131,7 @@ public class ShelterAllocationController extends Controler {
 //			this.events.addHandler(sc);
 			}
 			
-			ShelterAllocationRePlanner sARP = new ShelterAllocationRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings,sc, this.pshelter);
+			ShelterAssignmentRePlanner sARP = new ShelterAssignmentRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings,sc, this.pshelter);
 			this.addControlerListener(sARP);
 		}
 
@@ -176,7 +176,7 @@ public class ShelterAllocationController extends Controler {
 				public PersonalizableTravelCost createTravelCostCalculator(
 						PersonalizableTravelTime timeCalculator,
 						CharyparNagelScoringConfigGroup cnScoringGroup) {
-					return ShelterAllocationController.this.pluggableTravelCost;
+					return ShelterAssignmentController.this.pluggableTravelCost;
 				}
 
 			});
@@ -304,7 +304,7 @@ public class ShelterAllocationController extends Controler {
 		double pshelter = Double.parseDouble(args[2]);
 		String plans = args[3];
 //		String shelterFile = args[3];
-		final Controler controler = new ShelterAllocationController(args,shift,pshelter,plans);
+		final Controler controler = new ShelterAssignmentController(args,shift,pshelter,plans);
 		controler.run();
 //		try {
 //			dumpShelters(((ShelterAllocationController)controler).buildings,"/home/laemmel/devel/allocation/output/output_shelters.shp");

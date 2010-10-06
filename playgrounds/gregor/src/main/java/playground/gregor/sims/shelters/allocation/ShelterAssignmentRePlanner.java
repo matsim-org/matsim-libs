@@ -54,9 +54,9 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.evacuation.base.Building;
 
-public class ShelterAllocationRePlanner implements IterationStartsListener {
+public class ShelterAssignmentRePlanner implements IterationStartsListener {
 
-	private static final Logger log = Logger.getLogger(ShelterAllocationRePlanner.class);
+	private static final Logger log = Logger.getLogger(ShelterAssignmentRePlanner.class);
 
 
 	private static final double FULL_RED_BOUNDERY = 600;
@@ -76,11 +76,11 @@ public class ShelterAllocationRePlanner implements IterationStartsListener {
 
 	private final boolean swNash;
 
-	public ShelterAllocationRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings) {
+	public ShelterAssignmentRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings) {
 		this(sc,tc,tt,buildings,null,0);
 	}
 
-	public ShelterAllocationRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings,ShelterCounter shc, double pshelter) {
+	public ShelterAssignmentRePlanner(ScenarioImpl sc, TravelCost tc, TravelTime tt, List<Building> buildings,ShelterCounter shc, double pshelter) {
 		this.router =  new Dijkstra(sc.getNetwork(),tc,tt);
 		this.tt = tt;
 		this.scenario = sc;
