@@ -222,4 +222,9 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		return this.departure;
 	}
 
+	@Override
+	public void resetCaches() {
+		throw new UnsupportedOperationException("withinday replanning not implemented for UmlaufDriver") ;
+	}
+
 }

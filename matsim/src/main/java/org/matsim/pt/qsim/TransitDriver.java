@@ -52,6 +52,8 @@ public class TransitDriver extends AbstractTransitDriver {
 	final double departureTime;
 
 	private final Leg currentLeg;
+	
+	// as long as all instance variables are final, it should be ok to leave "resetCaches" empty.  kai, oct'10
 
 	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final QSimI sim) {
 		super(sim, agentTracker);
@@ -122,6 +124,11 @@ public class TransitDriver extends AbstractTransitDriver {
 	@Override
 	public Departure getDeparture() {
 		return this.departure;
+	}
+
+	@Override
+	public void resetCaches() {
+		// since all instance variables are final, it should be ok to leave this empty.  kai, oct'10
 	}
 
 }

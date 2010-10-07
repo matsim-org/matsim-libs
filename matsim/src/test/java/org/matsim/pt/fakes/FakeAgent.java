@@ -49,6 +49,7 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	private final TransitStopFacility exitStop;
 	private final Leg dummyLeg;
 	private final PersonImpl dummyPerson = new PersonImpl(new IdImpl(1));
+	// as long as all instance variables are final, the "resetCaches" method can remain empty.  kai, oct'10
 
 	/**
 	 * Creates a new fake Agent. If enterStop or exitStop are <code>null</code>,
@@ -140,6 +141,11 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	@Override
 	public QVehicle getVehicle() {
 		return null;
+	}
+
+	@Override
+	public void resetCaches() {
+		// as long as all instance variables are final, there is nothing to do here.  kai, oct'10
 	}
 
 }
