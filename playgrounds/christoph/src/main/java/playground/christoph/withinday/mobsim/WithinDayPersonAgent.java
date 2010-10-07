@@ -92,7 +92,7 @@ public class WithinDayPersonAgent extends DefaultPersonDriverAgent {
 	public Activity getCurrentActivity() {
 		// yyyy given that there is getCurrentPlanElement(), does this method have to be so complicated?  kai, oct'10
 
-		// yyyy what if leg and activity are not alternating (as is the current matsim design)?  kai, oct'10
+		// yyyy what if leg and activity are not alternating (as is the current matsim design specification)?  kai, oct'10
 		
 		Activity currentActivity = null;
 		
