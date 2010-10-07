@@ -22,12 +22,13 @@ package org.matsim.core.network;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
 public class TimeVariantLinkFactory implements LinkFactory {
 
 	@Override
-	public Link createLink(Id id, Node from, Node to, NetworkImpl network, double length, double freespeed,
+	public Link createLink(Id id, Node from, Node to, Network network, double length, double freespeed,
 			double capacity, double nOfLanes) {
 		return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, nOfLanes);
 	}

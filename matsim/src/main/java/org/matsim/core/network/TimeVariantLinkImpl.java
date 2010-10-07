@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
@@ -56,7 +57,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public TimeVariantLinkImpl(final Id id, final Node from, final Node to, final NetworkImpl network, final double length, final double freespeed, final double capacity, final double lanes) {
+	public TimeVariantLinkImpl(final Id id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(id, from, to, network, length, freespeed, capacity, lanes);
 	}
 
@@ -297,6 +298,6 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	public TreeMap<Double,NetworkChangeEvent> getChangeEvents() {
 		return this.changeEvents;
 	}
-	
+
 }
 

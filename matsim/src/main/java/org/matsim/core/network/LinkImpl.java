@@ -82,7 +82,7 @@ public class LinkImpl implements Link {
 
 
 
-	protected LinkImpl(final Id id, final Node from, final Node to, final NetworkImpl network, final double length, final double freespeed, final double capacity, final double lanes) {
+	protected LinkImpl(final Id id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
 		this.id = id;
 		this.network = network;
 		this.from = from;

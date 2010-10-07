@@ -23,9 +23,9 @@ package playground.christoph.network;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 
 /*
  *  This extended Version of a LinkImpl contains some
@@ -58,7 +58,7 @@ public class MyLinkImpl extends LinkImpl{
 	private double sumTravelTimes = 0.0;	// We cache the sum of the TravelTimes
 	private double freeSpeedTravelTime = Double.MAX_VALUE;	// We cache the FreeSpeedTravelTimes
 
-	public MyLinkImpl(Id id, Node from, Node to, NetworkImpl network, double length, double freespeed, double capacity, double lanes)
+	public MyLinkImpl(Id id, Node from, Node to, Network network, double length, double freespeed, double capacity, double lanes)
 	{
 		super(id, from, to, network, length, freespeed, capacity, lanes);
 	}
@@ -137,7 +137,7 @@ public class MyLinkImpl extends LinkImpl{
 		double meanTravelTime = freeSpeedTravelTime;
 //		if (this.tripInfos.size() > 0) meanTravelTime = sumTravelTimes / this.storedTravelTimes;
 		if (this.storedTravelTimes > 0) meanTravelTime = sumTravelTimes / this.storedTravelTimes;
-		
+
 		if (meanTravelTime * this.fadingFactor < freeSpeedTravelTime)
 		{
 			System.out.println("Warning: Mean TravelTime to short?");
