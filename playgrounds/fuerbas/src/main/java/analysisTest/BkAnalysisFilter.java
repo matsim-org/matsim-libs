@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 
-package analysis;
+package analysisTest;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -37,9 +37,9 @@ import org.matsim.api.core.v01.population.Population;
  */
 
 public class BkAnalysisFilter extends BkAnalysisTest {
-	
+
 	protected String output;
-	
+
 	BkAnalysisFilter() {
 		this.output=output;
 	}
@@ -48,10 +48,10 @@ public class BkAnalysisFilter extends BkAnalysisTest {
 		Double totalIncome = .0;
 		for (Double income : personalIncome.values()) {
 			totalIncome+=income;
-		}		
+		}
 		return totalIncome;
 	}
-	
+
 	protected Double calculateAverageIncome(final Population population1, final SortedMap<Id, Double> personalIncome) {
 		Double totalIncome = .0;
 		for (Double income : personalIncome.values()) {
@@ -59,7 +59,7 @@ public class BkAnalysisFilter extends BkAnalysisTest {
 		}
 		return totalIncome/population1.getPersons().size();
 	}
-	
+
 	protected Double getMaximumIncome (final SortedMap<Id, Double> personalIncome) {
 		Double maximumIncome=.0;
 		for (Double income : personalIncome.values()) {
@@ -67,11 +67,11 @@ public class BkAnalysisFilter extends BkAnalysisTest {
 		}
 		return maximumIncome;
 	}
-	
-	protected Double getIncomeShare (RowTest row, final SortedMap<Id, Double> personalIncome) {				
-		return row.getPersonalIncome()/getMaximumIncome(personalIncome);	
+
+	protected Double getIncomeShare (RowTest row, final SortedMap<Id, Double> personalIncome) {
+		return row.getPersonalIncome()/getMaximumIncome(personalIncome);
 	}
-	
+
 	protected void createIncomeRanking (SortedMap<Id, RowTest> populationInformation) throws IOException {
 		output = "incomeranking";
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(output+".txt")));
@@ -89,8 +89,8 @@ public class BkAnalysisFilter extends BkAnalysisTest {
 		}
 		bw.close();
 	}
-	
-	protected void getHigherScorePopulation (SortedMap<Id, RowTest> populationInformation) throws IOException {	
+
+	protected void getHigherScorePopulation (SortedMap<Id, RowTest> populationInformation) throws IOException {
 		output = "increasedScore";
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(output+".txt")));
 		SortedMap<Id, RowTest> improved = new TreeMap<Id, RowTest>(new ComparatorImplementation());
@@ -107,7 +107,7 @@ public class BkAnalysisFilter extends BkAnalysisTest {
 		}
 		bw.close();
 	}
-	
+
 	protected void getLowerScorePopulation (SortedMap<Id, RowTest> populationInformation) throws IOException {
 		output = "decreasedScore";
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(output+".txt")));
@@ -125,21 +125,21 @@ public class BkAnalysisFilter extends BkAnalysisTest {
 		}
 		bw.close();
 	}
-	
+
 //	protected SortedMap<Id, Row> changesMode (Population pop1, Population pop2) {
 //	SortedMap<Id, Row> changes = new TreeMap<Id, Row>(new ComparatorImplementation());
 //	for (Person person : pop1.getPersons().values()) {
 //		Row row = new Row();
 //		row.setId(person.getId());
 //		row.setScore1();
-//		
+//
 //		for (Plan plan1 : person.getPlans()) {
-//			for (PlanElement element1 : plan1.getPlanElements()){ 
+//			for (PlanElement element1 : plan1.getPlanElements()){
 //				if (element1 instanceof Leg) {
 //					Plan plan2 = (Plan) pop2.getPersons().get(person.getId()).getPlans();
 //					PlanElement element2 = (PlanElement) plan2.getPlanElements();
 //					if (((Leg) element1).getMode() != ((Leg)element2).getMode())	{
-//						
+//
 //						changes.put(person.getId(), value)
 //					}
 //				}
@@ -148,8 +148,9 @@ public class BkAnalysisFilter extends BkAnalysisTest {
 //	}
 //	return null;
 //}
-	
+
 	protected final class IncomeComparator implements Comparator<Double> {
+		@Override
 		public int compare(Double income1, Double income2) {
 			return income1.compareTo(income2);
 		}

@@ -1,4 +1,23 @@
-package analysis;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package analysisTest;
 
 import org.matsim.api.core.v01.Id;
 
@@ -10,7 +29,7 @@ public class RowTest {
 	private double personalIncome;
 	private double homeX;
 	private double homeY;
-	
+
 	private boolean isCarAvail;
 	private boolean isSelectedPlanCar;
 
@@ -22,14 +41,14 @@ public class RowTest {
 		this.setPersonalIncome(0.0);
 		this.setHomeX(0.0);
 		this.setHomeY(0.0);
-		
+
 		// true = yes, false = no //wtf is this null check?!?
 		this.setCarAvail(null != null);
 		this.setSelectedPlanCar(null != null);
 	}
 
-//===	
-	
+//===
+
 	public Id getId() {
 		return id;
 	}
@@ -37,7 +56,7 @@ public class RowTest {
 	public void setId(Id id) {
 		this.id = id;
 	}
-	
+
 	public void setScore1(Double score1) {
 		this.score1 = score1;
 	}
