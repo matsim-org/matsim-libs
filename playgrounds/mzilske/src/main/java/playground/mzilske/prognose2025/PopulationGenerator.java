@@ -186,14 +186,27 @@ public class PopulationGenerator implements Runnable {
 
 	private Activity createWork(Coord workLocation) {
 		Activity activity = population.getFactory().createActivityFromCoord("work", workLocation);
-		activity.setEndTime(17*60*60);
+		activity.setEndTime(calculateRandomEndTime(17*60*60));
 		return activity;
 	}
 
 	private Activity createHome(Coord homeLocation) {
 		Activity activity = population.getFactory().createActivityFromCoord("home", homeLocation);
-		activity.setEndTime(9*60*60);
+		activity.setEndTime(calculateRandomEndTime(8*60*60));
 		return activity;
+	}
+
+	private double calculateRandomEndTime(int i) {
+		Random random = new Random();
+		//draw two random numbers [0;1] from uniform distribution
+		double r1 = random.nextDouble();
+		double r2 = random.nextDouble();
+		
+		//Box-Muller-Method in order to get a normally distributed variable
+		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
+		//linear transformation in order to optain N[i,3600²]
+		double endTimeInSec = 60 * 60 * normal + i;
+		return endTimeInSec;
 	}
 
 	private Coord shoot(Zone source) {
