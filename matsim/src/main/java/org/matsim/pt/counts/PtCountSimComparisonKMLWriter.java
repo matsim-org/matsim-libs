@@ -216,6 +216,10 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 					colors.get(styleType)[1], colors.get(styleType)[2],
 					colors.get(styleType)[3] });
 			icon.setScale(ICONSCALE);
+			
+			if ( styleType==this.redCrossStyle || styleType==this.redMinusStyle ) {
+				icon.setScale(ICONSCALE) ; // yyyy kai: make configurable!
+			}
 
 			LinkType link = kmlObjectFactory.createLinkType();
 			link.setHref(hrefs.get(styleType));
@@ -403,6 +407,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 		stringBuffer.delete(0, stringBuffer.length());
 		stringBuffer.append(STOP);
 		stringBuffer.append(stopid);
+//		placemark.setName(stringBuffer.toString()) ; // adds "name" to icon in image.  not so useful
 		placemark.setDescription(createPlacemarkDescription(stopid, csc,
 				relativeError, timestep, type));
 		return placemark;
