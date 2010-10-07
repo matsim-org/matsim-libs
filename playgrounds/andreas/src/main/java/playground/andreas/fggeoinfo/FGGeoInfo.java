@@ -28,7 +28,7 @@ public class FGGeoInfo {
 		String newDemandBBIoutFile = "newDemandBBI.xml.gz";
 		
 		String movedBackgroundDemand = "movedBGdemand.xml.gz";
-		String shapeFile = "F:/shapeTest/Bezirke_Polygon_GK4.shp";
+		String shapeFile = "d:/Berlin/berlin-fggeoinfo/10_Eingangsdaten/20101007_bezirke_GK4/Bezirke_Polygon_GK4.shp";
 		String actTypeOne = "work";
 		String actTypeTwo = "home";
 		String resultsOutFile = "workHomeStats.txt";
@@ -49,9 +49,6 @@ public class FGGeoInfo {
 		
 //		Coord minTXL = new CoordImpl(4585293.203, 5824791.757);
 //		Coord maxTXL = new CoordImpl(4589791.816, 5826794.636);
-		
-//		String additionalPlansFile = inputDir + "pop_1x_generated_TXL_SXF.xml";
-//		String outPlansFile = inputDir + "pop_1x_merged_TXL_SXF.xml.gz";
 		
 		// Generate population from passengers
 		BBIextraDemand bbi = new BBIextraDemand(bbiDemandInFile, timeStructure,
