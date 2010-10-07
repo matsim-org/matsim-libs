@@ -4,6 +4,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.andreas.utils.ana.filterActsPerShape.FilterActsPerShape;
+
 public class FGGeoInfo {
 
 	/**
@@ -15,7 +17,7 @@ public class FGGeoInfo {
 		
 		Gbl.startMeasurement();
 		
-		String inputDir = "d:\\Berlin\\FG Geoinformation\\Scenario\\Ausgangsdaten\\20101005_run777\\";
+		String inputDir = "d:\\Berlin\\berlin-fggeoinfo\\30_Run_20_percent\\20101005_run777_778\\";
 		String networkFile = inputDir + "network_modified_20100806_added_BBI_AS_cl.xml.gz";
 		String inPlansFile = "d:\\Berlin\\berlin-sharedsvn\\plans\\baseplan_10x_900s.xml.gz";
 		
@@ -26,6 +28,10 @@ public class FGGeoInfo {
 		String newDemandBBIoutFile = "newDemandBBI.xml.gz";
 		
 		String movedBackgroundDemand = "movedBGdemand.xml.gz";
+		String shapeFile = "F:/shapeTest/Bezirke_Polygon_GK4.shp";
+		String actTypeOne = "work";
+		String actTypeTwo = "home";
+		String resultsOutFile = "workHomeStats.txt";
 		
 		Coord coordBBI = new CoordImpl(4604545.48760, 5805194.68221);
 		Coord coordTXL = new CoordImpl(4588068.19422, 5824668.31998);
@@ -59,10 +65,12 @@ public class FGGeoInfo {
 		
 		// Move background demand towards BBI and merge it with new demand
 		FilterPersonActs.filterPersonActs(networkFile, inPlansFile, inputDir + movedBackgroundDemand,
-				minSXF, maxSXF, minTXL, maxTXL, coordBBI, inputDir, "movedActs.kmz");
-		
+				minSXF, maxSXF, minTXL, maxTXL, coordBBI, inputDir, "movedActs.kmz");		
 		MergePopulations.mergePopulations(networkFile, inputDir + movedBackgroundDemand, inputDir + newDemandBBIoutFile,
-				inputDir + "completeNewDemandBBI.xml.gz");	
+				inputDir + "completeNewDemandBBI.xml.gz");		
+		
+		// Filter acts based on location - where do employees of BBI live
+		FilterActsPerShape.run(networkFile, inputDir + "completeNewDemandBBI.xml.gz", shapeFile, coordBBI, coordBBI, actTypeOne, actTypeTwo, inputDir + resultsOutFile);
 		
 		Gbl.printElapsedTime();
 	}
