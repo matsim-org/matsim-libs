@@ -40,7 +40,7 @@ public interface DriverAgent extends MobsimAgent {
 
 
 //	// yyyy would be nice if this was (Basic)Vehicle, not QVehicle.  kai, may'10
-	public void setVehicle( QVehicle veh ) ;
+	public void setVehicle( final QVehicle veh ) ;
 	public QVehicle getVehicle() ;
 	
 	/**

@@ -135,7 +135,7 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public void setVehicle(QVehicle veh) {
+	public void setVehicle(final QVehicle veh) {
 	}
 
 	@Override
