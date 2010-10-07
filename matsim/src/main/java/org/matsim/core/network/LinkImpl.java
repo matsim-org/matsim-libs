@@ -96,7 +96,8 @@ public class LinkImpl implements Link {
 		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
 			loopWarnCnt++ ;
 			log.warn("[from=to=" + this.to + " link is a loop]");
-			log.warn(Gbl.ONLYONCE);
+			if ( loopWarnCnt == maxLoopWarnCnt ) 
+				log.warn(Gbl.FUTURE_SUPPRESSED ) ;
 		}
 	}
 
@@ -116,28 +117,35 @@ public class LinkImpl implements Link {
 		 */
 		if ((this.capacity <= 0.0) && (cpWarnCnt < maxCpWarnCnt) ) {
 			cpWarnCnt++ ;
-			log.warn("[capacity=" + this.capacity + " of link id " + this.getId() + " may cause problems. Future occurences of this warning are suppressed.]");
+			log.warn("[capacity=" + this.capacity + " of link id " + this.getId() + " may cause problems]");
+			log.warn( Gbl.FUTURE_SUPPRESSED ) ;
 		}
 	}
 
 	private void checkFreespeedSemantics() {
 		if ((this.freespeed <= 0.0) && (fsWarnCnt < maxFsWarnCnt) ) {
 			fsWarnCnt++ ;
-			log.warn("[freespeed=" + this.freespeed + " of link id " + this.getId() + " may cause problems. Future occurences of this warning are suppressed.]");
+			log.warn("[freespeed=" + this.freespeed + " of link id " + this.getId() + " may cause problems]");
+			if ( fsWarnCnt == maxFsWarnCnt )
+				log.warn( Gbl.FUTURE_SUPPRESSED) ;
 		}
 	}
 
 	private void checkNumberOfLanesSemantics(){
 		if ((this.nofLanes < 1) && (plWarnCnt < maxPlWarnCnt) ) {
 			plWarnCnt++ ;
-			log.warn("[permlanes=" + this.nofLanes + " of link id " + this.getId() +" may cause problems. Future occurences of this warning are suppressed.]");
+			log.warn("[permlanes=" + this.nofLanes + " of link id " + this.getId() +" may cause problems]");
+			if ( plWarnCnt == maxPlWarnCnt )
+				log.warn( Gbl.FUTURE_SUPPRESSED ) ;
 		}
 	}
 
 	private void checkLengthSemantics(){
 		if ((this.getLength() <= 0.0) && (lengthWarnCnt < maxLengthWarnCnt)) {
 			lengthWarnCnt++;
-			log.warn("[length=" + this.length + " of link id " + this.getId() + " may cause problems. Future occurences of this warning are suprressed.]");
+			log.warn("[length=" + this.length + " of link id " + this.getId() + " may cause problems]");
+			if ( lengthWarnCnt == maxLengthWarnCnt ) 
+				log.warn(Gbl.FUTURE_SUPPRESSED) ;
 		}
 	}
 
