@@ -59,10 +59,10 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
@@ -266,7 +266,7 @@ public class Controler {
 	private TransitConfigGroup transitConfig = null;
 
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
-	
+
 	/** initializes Log4J */
 	static {
 		final String logProperties = "log4j.xml";
@@ -408,7 +408,7 @@ public class Controler {
 
 			this.config.removeModule(TransitConfigGroup.GROUP_NAME);
 			// yyyy it is not clear to me why this works: the module is removed but never re-added--???  kai, oct'10
-			
+
 			this.transitConfig.addParam("transitScheduleFile", oldModule.getValue("transitScheduleFile"));
 			this.transitConfig.addParam("vehiclesFile", oldModule.getValue("vehiclesFile"));
 			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
@@ -1364,20 +1364,16 @@ public class Controler {
 		@Override
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 			int iter = event.getIteration();
-			if (iter % 1 == 0&& iter >= event.getControler().getFirstIteration()) {
-				occupancyAnalyzer.reset(iter);
-				event.getControler().getEvents().addHandler(occupancyAnalyzer);
-			}
+			occupancyAnalyzer.reset(iter);
+			event.getControler().getEvents().addHandler(occupancyAnalyzer);
 		}
 
 		@Override
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			int it = event.getIteration();
-			if (it % 1 == 0 && it >= event.getControler().getFirstIteration()) {
-				event.getControler().getEvents().removeHandler(occupancyAnalyzer);
-				occupancyAnalyzer.write(event.getControler().getControlerIO()
-						.getIterationFilename(it, "occupancyAnalysis.txt"));
-			}
+			event.getControler().getEvents().removeHandler(occupancyAnalyzer);
+			occupancyAnalyzer.write(event.getControler().getControlerIO()
+					.getIterationFilename(it, "occupancyAnalysis.txt"));
 		}
 
 	}
@@ -1449,12 +1445,12 @@ public class Controler {
 		this.mobsimFactory = mobsimFactory;
 	}
 
-	
+
 	public SignalsControllerListenerFactory getSignalsControllerListenerFactory() {
 		return signalsFactory;
 	}
 
-	
+
 	public void setSignalsControllerListenerFactory(SignalsControllerListenerFactory signalsFactory) {
 		this.signalsFactory = signalsFactory;
 	}
