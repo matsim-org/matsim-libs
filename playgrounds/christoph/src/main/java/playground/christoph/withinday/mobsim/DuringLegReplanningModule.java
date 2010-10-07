@@ -36,6 +36,7 @@ public class DuringLegReplanningModule extends WithinDayReplanningModule {
 		this.parallelReplanner = parallelDuringLegReplanner;
 	}
 	
+	@Override
 	public void doReplanning(double time) {
 		for (WithinDayReplanner replanner : this.parallelReplanner.getWithinDayReplanners()) {
 			if(replanner instanceof WithinDayDuringLegReplanner) {
