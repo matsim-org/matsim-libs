@@ -78,10 +78,14 @@ public class TrCtl extends TransitControler {
 	 */
 	public static void main(String[] args) {
 		TrCtl ctl = new TrCtl(args);
-		OccupancyAnalyzerListener oal = new OccupancyAnalyzerListener();
-		ctl.addControlerListener(oal);
-		ctl.addControlerListener(new PtCountControlerListener(ctl.config,
-				ctl.oa));
+
+//		OccupancyAnalyzerListener oal = new OccupancyAnalyzerListener();
+//		ctl.addControlerListener(oal);
+//		ctl.addControlerListener(new PtCountControlerListener(ctl.config,
+//		ctl.oa));
+		ctl.addControlerListener(new PtCountControlerListener(ctl.config) ) ;
+		// the PtCountControlerListener now has its own OccupancyAnalyzer.  kai, oct'10
+
 		ctl.setOverwriteFiles(true);
 		ctl.setCreateGraphs(false);
 		ctl.run();

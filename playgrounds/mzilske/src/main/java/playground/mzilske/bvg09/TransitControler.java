@@ -122,11 +122,14 @@ public class TransitControler extends Controler {
 	}
 
 	private void addPtCountControlerListener() {
-		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
 		logger.info("Using counts.");
-		OccupancyAnalyzerListener oal = new OccupancyAnalyzerListener(occupancyAnalyzer);
-		addControlerListener(oal);
-		addControlerListener(new PtCountControlerListener(config, occupancyAnalyzer));
+
+//		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
+//		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
+//		addControlerListener(new PtCountControlerListener(config, occupancyAnalyzer));
+		addControlerListener(new PtCountControlerListener(config) );
+		// the PtCountControlerListener now has its own OccupancyAnalyzer.  kai, oct'10
+
 		setCreateGraphs(false);
 	}
 
