@@ -53,21 +53,20 @@ import org.matsim.ptproject.qsim.netsimengine.QNetwork;
 
 import playground.christoph.withinday.mobsim.WithinDayQSim;
 
-/*
+/**
  * This Module is used by a CurrentLegReplanner. It calculates the time
  * when an agent should do CurrentLegReplanning.
- *
+ * <p/>
  * The time is estimated as following:
  * When a LinkEnterEvent is thrown the Replanning Time is set to
  * the current time + the FreeSpeed Travel Time. This guarantees that
  * the replanning will be done while the agent is on the Link.
- *
+  * <p/>
  * Additionally a Replanning Interval can be set. This allows an Agent
  * to do multiple Replanning on a single Link. This may be useful if the
  * Traffic System is congested and the Link Travel Times are much longer
  * than the Freespeed Travel Times.
  */
-
 public class LinkReplanningMap implements LinkEnterEventHandler,
 		LinkLeaveEventHandler, AgentArrivalEventHandler,
 		AgentDepartureEventHandler, AgentWait2LinkEventHandler,
