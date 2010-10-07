@@ -47,6 +47,7 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import org.matsim.pt.config.PtCountsConfigGroup;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
 /**
@@ -66,33 +67,34 @@ public class Config {
 
 	/* the following members are for the direct access to the core config groups. */
 
-	private GlobalConfigGroup global = null;
-	private ControlerConfigGroup controler = null;
-	private SimulationConfigGroup simulation = null;
-	private CountsConfigGroup counts = null;
+	// config groups that are in org.matsim.core.config.groups:
 	private CharyparNagelScoringConfigGroup charyparNagelScoring = null;
+	private ControlerConfigGroup controler = null;
+	private CountsConfigGroup counts = null;
+	private EvacuationConfigGroup evacuation = null;
+	private FacilitiesConfigGroup facilities = null;
+	private GlobalConfigGroup global = null;
+	private HouseholdsConfigGroup households;
+	private LocationChoiceConfigGroup locationchoice = null;
+	private MultiModalConfigGroup multiModal = null;
 	private NetworkConfigGroup network = null;
-	private PlansConfigGroup plans = null;
 	private PlanomatConfigGroup planomat = null;
 	private PlansCalcRouteConfigGroup plansCalcRoute = null;
-	private FacilitiesConfigGroup facilities = null;
-	private RoadPricingConfigGroup roadpricing = null;
-	private EvacuationConfigGroup evacuation = null;
-	private StrategyConfigGroup strategy = null;
-	private LocationChoiceConfigGroup locationchoice = null;
-	private SignalSystemsConfigGroup signalSystemConfigGroup = null;
-	private ScenarioConfigGroup scenarioConfigGroup = null;
-	private VspExperimentalConfigGroup vspExperimentalGroup = null;
+	private PlansConfigGroup plans = null;
 	private QSimConfigGroup qSimConfigGroup = null;
-	private MultiModalConfigGroup multiModal = null;
+	private RoadPricingConfigGroup roadpricing = null;
+	private ScenarioConfigGroup scenarioConfigGroup = null;
+	private SignalSystemsConfigGroup signalSystemConfigGroup = null;
+	private SimulationConfigGroup simulation = null;
+	private StrategyConfigGroup strategy = null;
+	private VspExperimentalConfigGroup vspExperimentalGroup = null;
 
-	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup;
+	// config groups that are elsewhere:
+	private OTFVisConfigGroup otfVis = null ;
+	private PtCountsConfigGroup ptCounts = null ;
+	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup = null ;
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
-
-	private HouseholdsConfigGroup households;
-
-	private OTFVisConfigGroup otfVis;
 
 	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
@@ -173,6 +175,9 @@ public class Config {
 		
 		this.multiModal = new MultiModalConfigGroup();
 		this.modules.put(MultiModalConfigGroup.GROUP_NAME, this.multiModal);
+		
+		this.ptCounts = new PtCountsConfigGroup() ;
+		this.modules.put(PtCountsConfigGroup.GROUP_NAME, this.ptCounts);
 	}
 
 	/** Checks each module for consistency, e.g. if the parameters that are currently set make sense
@@ -410,11 +415,6 @@ public class Config {
 		return this.scenarioConfigGroup;
 	}
 
-	public void addConfigConsistencyChecker(
-			final ConfigConsistencyChecker checker) {
-		this.consistencyCheckers.add(checker);
-	}
-
 	public PlansCalcRouteConfigGroup plansCalcRoute() {
 		return this.plansCalcRoute;
 	}
@@ -431,12 +431,27 @@ public class Config {
 		return this.multiModal;
 	}
 	
-  public QSimConfigGroup getQSimConfigGroup() {
-    return this.qSimConfigGroup;
-  }
+	public QSimConfigGroup getQSimConfigGroup() {
+		return this.qSimConfigGroup;
+	}
+	
+	public PtCountsConfigGroup ptCounts() {
+		return this.ptCounts ;
+	}
+	
+	// methods that are somehow out of the "regular" system:
 
-  public void setQSimConfigGroup(final QSimConfigGroup qSimConfigGroup) {
-    this.qSimConfigGroup = qSimConfigGroup;
-    this.modules.put(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
-  }
+	public void setQSimConfigGroup(final QSimConfigGroup qSimConfigGroup) {
+		log.warn("setting QSimConfigGroup in Config.  This will silently overwrite any pre-existing entry." ) ;
+		log.warn("Might be better to modify the code to use the existing create/add/removeModule mechanics. kai, oct'10") ;
+		this.qSimConfigGroup = qSimConfigGroup;
+		this.modules.put(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
+	}
+	
+	public void addConfigConsistencyChecker(
+			final ConfigConsistencyChecker checker) {
+		this.consistencyCheckers.add(checker);
+	}
+
+
 }

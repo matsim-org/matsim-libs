@@ -20,6 +20,7 @@
 
 package org.matsim.pt.counts;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
@@ -32,10 +33,14 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.pt.config.PtCountsConfigGroup;
 
 public class PtCountControlerListener implements StartupListener, IterationEndsListener {
+	
+	private static final Logger log = Logger.getLogger("noname");
 
 	private final static String MODULE_NAME = "ptCounts";
+	// yy the above should be removed; the commands should be replaced by the "typed" commands.  kai, oct'10
 
 	private final Config config;
 	private final Counts boardCounts, alightCounts,occupancyCounts;
@@ -50,8 +55,9 @@ public class PtCountControlerListener implements StartupListener, IterationEndsL
 	}
 
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
-		Module ptCounts = this.config.getModule(MODULE_NAME);
-		if(ptCounts!=null){	
+		PtCountsConfigGroup ptCounts = this.config.ptCounts();
+		if( ptCounts.getAlightCountsFileName()!=null ){	
+			log.warn("note: for pt counts, at this point all three files must be given!  kai, oct'10") ;
 			String boardCountsFilename = this.config.findParam(MODULE_NAME, "inputBoardCountsFile");
 			if (boardCountsFilename != null) {
 				new MatsimCountsReader(this.boardCounts).readFile(boardCountsFilename);
@@ -70,11 +76,17 @@ public class PtCountControlerListener implements StartupListener, IterationEndsL
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		Module ptCounts = this.config.getModule(MODULE_NAME);
-		if (ptCounts != null) {
+		PtCountsConfigGroup ptCounts = this.config.ptCounts() ;
+		if (ptCounts.getAlightCountsFileName() != null) {
 			Controler controler = event.getControler();
 			int iter = event.getIteration();
-			if ((iter % 10 == 0) && (iter > controler.getFirstIteration())) {
+			if ((iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0) 
+					&& (iter >= controler.getFirstIteration())) {
+
+				if ( this.config.ptCounts().getPtCountsInterval() != 10 )
+					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
+							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10" ) ;
+				
 				controler.stopwatch.beginOperation("compare with counts");
 
 				double countsScaleFactor = Double.parseDouble(this.config.getParam(MODULE_NAME, "countsScaleFactor"));

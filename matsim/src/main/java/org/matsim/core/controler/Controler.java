@@ -834,7 +834,9 @@ public class Controler {
 
 		if (this.config.scenario().isUseTransit()) {
 			addTransitControlerListener();
-			if (config.getModule(COUNTS_MODULE_NAME) != null) {
+			if (config.ptCounts().getAlightCountsFileName() != null) {
+				// only works when all three files are defined!  kai, oct'10
+
 				addPtCountControlerListener();
 			}
 		}
@@ -846,8 +848,7 @@ public class Controler {
 	private void addPtCountControlerListener() {
 		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
 		log.info("Using pt counts.");
-		OccupancyAnalyzerListener oal = new OccupancyAnalyzerListener(occupancyAnalyzer);
-		addControlerListener(oal);
+		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
 		addControlerListener(new PtCountControlerListener(config, occupancyAnalyzer));
 //		setCreateGraphs(false);
 	}

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountsConfigGroup.java
+ * TransitConfigGroup.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,35 +18,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.config.groups;
+package org.matsim.pt.config;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.core.config.Module;
+import org.matsim.core.config.groups.CountsConfigGroup;
 
 /**
- * @author dgrether
+ * @author nagel
  */
-public class CountsConfigGroup extends Module {
+public class PtCountsConfigGroup extends Module {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String GROUP_NAME = "counts";
+	public static final String GROUP_NAME = "ptCounts";
 
 	private static final String OUTPUTFORMAT = "outputformat";
 	private static final String DISTANCEFILTER = "distanceFilter";
 	private static final String DISTANCEFILTERCENTERNODE = "distanceFilterCenterNode";
-	private static final String COUNTSINPUTFILENAME = "inputCountsFile";
+	private static final String OCCUPANCY_COUNTS_INPUT_FILENAME = "inputOccupancyCountsFile";
+	private static final String BOARD_COUNTS_INPUT_FILENAME = "inputBoardCountsFile";
+	private static final String ALIGHT_COUNTS_INPUT_FILENAME = "inputAlightCountsFile";
 	private static final String COUNTSSCALEFACTOR = "countsScaleFactor";
+	private static final String PT_COUNTS_INTERVAL = "ptCountsInterval" ;
 
 	private String outputFormat;
 
 	/**
 	 * the distance filter in m
-	 * <p/>
-	 * yyyy I don't think this is in `m'; it is rather implied by the coordinate system (which happens to be in m in 
-	 * Switzerland).  kai, oct'10
 	 */
 	private Double distanceFilter;
 
@@ -58,13 +59,16 @@ public class CountsConfigGroup extends Module {
 	/**
 	 * the path to the file with the counts
 	 */
-	private String countsFileName = null;
+	private String occupancyCountsFileName = null;
+	private String boardCountsFileName = null;
+	private String alightCountsFileName = null;
 	/**
 	 * the scaling for the counts
 	 */
 	private double countsScaleFactor = 1.0;
+	private int ptCountsInterval = 10 ;
 
-	public CountsConfigGroup() {
+	public PtCountsConfigGroup() {
 		super(GROUP_NAME);
 	}
 
@@ -79,10 +83,16 @@ public class CountsConfigGroup extends Module {
 			return getDistanceFilter().toString();
 		} else if (DISTANCEFILTERCENTERNODE.equals(key)) {
 			return getDistanceFilterCenterNode();
-		} else if (COUNTSINPUTFILENAME.equals(key)) {
-			return getCountsFileName();
+		} else if (OCCUPANCY_COUNTS_INPUT_FILENAME.equals(key)) {
+			return getOccupancyCountsFileName();
+		} else if (BOARD_COUNTS_INPUT_FILENAME.equals(key)) {
+			return getBoardCountsFileName();
+		} else if (ALIGHT_COUNTS_INPUT_FILENAME.equals(key)) {
+			return getAlightCountsFileName();
 		} else if (COUNTSSCALEFACTOR.equals(key)) {
 			return Double.toString(getCountsScaleFactor());
+		} else if (PT_COUNTS_INTERVAL.equals(key)) {
+			return Integer.toString(getPtCountsInterval());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -100,10 +110,16 @@ public class CountsConfigGroup extends Module {
 			}
 		} else if (DISTANCEFILTERCENTERNODE.equals(key)) {
 			setDistanceFilterCenterNode(value);
-		} else if (COUNTSINPUTFILENAME.equals(key)) {
-			setCountsFileName(value.replace('\\', '/'));
+		} else if (OCCUPANCY_COUNTS_INPUT_FILENAME.equals(key)) {
+			setOccupancyCountsFileName(value.replace('\\', '/'));
+		} else if (BOARD_COUNTS_INPUT_FILENAME.equals(key)) {
+			setBoardCountsFileName(value.replace('\\', '/'));
+		} else if (ALIGHT_COUNTS_INPUT_FILENAME.equals(key)) {
+			setAlightCountsFileName(value.replace('\\', '/'));
 		} else if (COUNTSSCALEFACTOR.equals(key)) {
 			this.setCountsScaleFactor(Double.parseDouble(value));
+		} else if (PT_COUNTS_INTERVAL.equals(key)) {
+			this.setPtCountsInterval(Integer.parseInt(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -115,75 +131,91 @@ public class CountsConfigGroup extends Module {
 		this.addParameterToMap(map, OUTPUTFORMAT);
 		this.addParameterToMap(map, DISTANCEFILTER);
 		this.addParameterToMap(map, DISTANCEFILTERCENTERNODE);
-		this.addParameterToMap(map, COUNTSINPUTFILENAME);
+		this.addParameterToMap(map, OCCUPANCY_COUNTS_INPUT_FILENAME);
+		this.addParameterToMap(map, BOARD_COUNTS_INPUT_FILENAME);
+		this.addParameterToMap(map, ALIGHT_COUNTS_INPUT_FILENAME);
 		this.addParameterToMap(map, COUNTSSCALEFACTOR);
+		this.addParameterToMap(map, PT_COUNTS_INTERVAL);
 		return map;
 	}
-	
-	// the following are public so they can be re-used in PtCountsComparisonConfigGroup.  Once that group is moved into the same
-	// package, they can be made package-private.  kai, oct'10
-	public static final String COUNTS_OUTPUTFORMAT_COMMENT = "possible values: `html', `kml', `txt', `all'"  ;
-	public static final String COUNTS_DISTANCEFILTER_COMMENT = "distance to distanceFilterCenterNode to include counting stations. The unit of distance is "
-		+ "the Euclidean distance implied by the coordinate system" ;
-	public static final String COUNTS_DISTANCEFILTERCENTERNODE_COMMENT = "node id for center node of distance filter" ;
-	public static final String COUNTSINPUTFILENAME_COMMENT = "input file name to counts package" ;
-	public static final String COUNTSSCALEFACTOR_COMMENT = "factor by which to re-scale the simulated values.  necessary when "
-		+ "simulation runs with something different from 100%.  needs to be adapted manually" ;
 	
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
-		comments.put(OUTPUTFORMAT, COUNTS_OUTPUTFORMAT_COMMENT ) ;
-		comments.put(DISTANCEFILTER,  COUNTS_DISTANCEFILTER_COMMENT ) ;
-		comments.put(DISTANCEFILTERCENTERNODE, COUNTS_DISTANCEFILTERCENTERNODE_COMMENT ) ;
-		comments.put(COUNTSINPUTFILENAME, COUNTSINPUTFILENAME_COMMENT ) ;
-		comments.put(COUNTSSCALEFACTOR, COUNTSSCALEFACTOR_COMMENT ) ;
+		comments.put(OUTPUTFORMAT, CountsConfigGroup.COUNTS_OUTPUTFORMAT_COMMENT ) ;
+		comments.put(DISTANCEFILTER,  CountsConfigGroup.COUNTS_DISTANCEFILTER_COMMENT ) ;
+		comments.put(DISTANCEFILTERCENTERNODE, CountsConfigGroup.COUNTS_DISTANCEFILTERCENTERNODE_COMMENT ) ;
+		comments.put(OCCUPANCY_COUNTS_INPUT_FILENAME, "input file containing the occupancy counts for pt" ) ;
+		comments.put(ALIGHT_COUNTS_INPUT_FILENAME, "input file containing the alighting (getting off) counts for pt" ) ;
+		comments.put(BOARD_COUNTS_INPUT_FILENAME, "input file containing the boarding (getting on) counts for pt" ) ;
+		comments.put(COUNTSSCALEFACTOR, CountsConfigGroup.COUNTSSCALEFACTOR_COMMENT ) ;
+		comments.put(PT_COUNTS_INTERVAL, "every how many iterations (starting with 0) counts comparisons are generated" );
 		return comments;
 	}
 
 	public String getOutputFormat() {
-		return this.outputFormat;
+		return outputFormat;
 	}
 
-	public void setOutputFormat(final String outputFormat) {
+	public void setOutputFormat(String outputFormat) {
 		this.outputFormat = outputFormat;
 	}
 
 	public Double getDistanceFilter() {
-		return this.distanceFilter;
+		return distanceFilter;
 	}
 
-	public void setDistanceFilter(final Double distanceFilter) {
+	public void setDistanceFilter(Double distanceFilter) {
 		this.distanceFilter = distanceFilter;
 	}
 
 	public String getDistanceFilterCenterNode() {
-		return this.distanceFilterCenterNode;
+		return distanceFilterCenterNode;
 	}
 
-	public void setDistanceFilterCenterNode(final String distanceFilterCenterNode) {
+	public void setDistanceFilterCenterNode(String distanceFilterCenterNode) {
 		this.distanceFilterCenterNode = distanceFilterCenterNode;
 	}
 
-	/**
-	 * @return the filename of the counts file to be read in
-	 */
-	public String getCountsFileName() {
-		return this.countsFileName;
+	public String getOccupancyCountsFileName() {
+		return occupancyCountsFileName;
 	}
 
-	/**
-	 * @param countsFileName the filename of the counts file to be read in
-	 */
-	public void setCountsFileName(final String countsFileName) {
-		this.countsFileName = countsFileName;
+	public void setOccupancyCountsFileName(String occupancyCountsFileName) {
+		this.occupancyCountsFileName = occupancyCountsFileName;
+	}
+
+	public String getBoardCountsFileName() {
+		return boardCountsFileName;
+	}
+
+	public void setBoardCountsFileName(String boardCountsFileName) {
+		this.boardCountsFileName = boardCountsFileName;
+	}
+
+	public String getAlightCountsFileName() {
+		return alightCountsFileName;
+	}
+
+	public void setAlightCountsFileName(String alightCountsFileName) {
+		this.alightCountsFileName = alightCountsFileName;
 	}
 
 	public double getCountsScaleFactor() {
-		return this.countsScaleFactor;
+		return countsScaleFactor;
 	}
 
-	public void setCountsScaleFactor(final double countsScaleFactor) {
+	public void setCountsScaleFactor(double countsScaleFactor) {
 		this.countsScaleFactor = countsScaleFactor;
 	}
+
+	public int getPtCountsInterval() {
+		return ptCountsInterval;
+	}
+
+	public void setPtCountsInterval(int ptCountsInterval) {
+		this.ptCountsInterval = ptCountsInterval;
+	}
+
+
 }

@@ -438,9 +438,11 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 			switch (type) {
 			case Boarding:
 				count = this.boardCounts.getCount(stopid);
+//				continue ; // kai: this is where these icons can be disabled.  
 				break;
 			case Alighting:
 				count = this.alightCounts.getCount(stopid);
+//				continue ; // kai: this is where these icons can be disabled.  
 				break;
 			default:
 				count = this.occupancyCounts.getCount(stopid);
