@@ -366,9 +366,10 @@ public class Controler {
 		loadConfig();
 		setUpOutputDir();
 		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-			setupMultiModalConfig();
+			setupMultiModalSimulation();
 		}
 		if (this.config.scenario().isUseTransit()) {
+			log.warn("setting up the transit config _after_ the config dump :-( ...") ;
 			setupTransitConfig();
 		}
 		initEvents();
@@ -379,7 +380,7 @@ public class Controler {
 		loadControlerListeners();
 	}
 
-	private final void setupMultiModalConfig() {
+	private final void setupMultiModalSimulation() {
 		log.info("setting up multi modal simulation");
 
 		// Use a TravelTimeCalculator that buffers the TravelTimes form the previous Iteration.
