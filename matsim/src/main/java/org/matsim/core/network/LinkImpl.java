@@ -114,6 +114,8 @@ public class LinkImpl implements Link {
 		/*
 		 * I see no reason why a freespeed and a capacity of zero should not be
 		 * allowed! joh 9may2008
+		 * The warning says that it _may_ cause problems.  Not pretty if you want to get rid of warnings completely, but
+		 * hopefully acceptable for the time being.  kai, oct'10
 		 */
 		if ((this.capacity <= 0.0) && (cpWarnCnt < maxCpWarnCnt) ) {
 			cpWarnCnt++ ;
