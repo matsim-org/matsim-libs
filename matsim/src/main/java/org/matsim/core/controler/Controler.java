@@ -133,6 +133,7 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.counts.OccupancyAnalyzer;
+import org.matsim.pt.counts.OccupancyAnalyzerListener;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -846,11 +847,13 @@ public class Controler {
 	}
 
 	private void addPtCountControlerListener() {
-		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
+		// yyyy seems to me that in the following the OccupancyAnalyser could be completely pushed into the PtCountControlerListener.
+		// kai, oct'10
+		
+//		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
 		log.info("Using pt counts.");
-		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
-		addControlerListener(new PtCountControlerListener(config, occupancyAnalyzer));
-//		setCreateGraphs(false);
+//		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
+		addControlerListener(new PtCountControlerListener(config));
 	}
 
 	private void addTransitControlerListener() {
@@ -1353,38 +1356,6 @@ public class Controler {
 		}
 
 	}
-
-	public static class OccupancyAnalyzerListener implements
-	BeforeMobsimListener, AfterMobsimListener {
-
-		private OccupancyAnalyzer occupancyAnalyzer;
-
-		public OccupancyAnalyzerListener(OccupancyAnalyzer occupancyAnalyzer) {
-			this.occupancyAnalyzer = occupancyAnalyzer;
-		}
-
-		@Override
-		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-			int iter = event.getIteration();
-			occupancyAnalyzer.reset(iter);
-			event.getControler().getEvents().addHandler(occupancyAnalyzer);
-		}
-
-		@Override
-		public void notifyAfterMobsim(AfterMobsimEvent event) {
-			int it = event.getIteration();
-			event.getControler().getEvents().removeHandler(occupancyAnalyzer);
-			occupancyAnalyzer.write(event.getControler().getControlerIO()
-					.getIterationFilename(it, "occupancyAnalysis.txt"));
-		}
-
-	}
-
-	/*
-	 * ===================================================================
-	 * main
-	 * ===================================================================
-	 */
 
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {

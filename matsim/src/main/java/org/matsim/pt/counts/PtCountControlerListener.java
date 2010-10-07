@@ -25,8 +25,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
@@ -35,7 +39,8 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.pt.config.PtCountsConfigGroup;
 
-public class PtCountControlerListener implements StartupListener, IterationEndsListener {
+public class PtCountControlerListener implements StartupListener, IterationEndsListener, 
+BeforeMobsimListener, AfterMobsimListener  {
 	
 	private static final Logger log = Logger.getLogger("noname");
 
@@ -44,16 +49,17 @@ public class PtCountControlerListener implements StartupListener, IterationEndsL
 
 	private final Config config;
 	private final Counts boardCounts, alightCounts,occupancyCounts;
-	private final OccupancyAnalyzer oa;
+	private final OccupancyAnalyzer occupancyAnalyzer;
 
-	public PtCountControlerListener(final Config config, OccupancyAnalyzer oa) {
+	public PtCountControlerListener(final Config config) {
 		this.config = config;
 		this.boardCounts = new Counts();
 		this.alightCounts = new Counts();
 		this.occupancyCounts = new Counts();
-		this.oa = oa;
+		this.occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1) ;
 	}
 
+	@Override
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
 		PtCountsConfigGroup ptCounts = this.config.ptCounts();
 		if( ptCounts.getAlightCountsFileName()!=null ){	
@@ -75,13 +81,39 @@ public class PtCountControlerListener implements StartupListener, IterationEndsL
 		}
 	}
 
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		int iter = event.getIteration();
+		if ( isActiveInThisIteration( iter, event.getControler() ) ) {
+			occupancyAnalyzer.reset(iter);
+			event.getControler().getEvents().addHandler(occupancyAnalyzer);
+		}
+	}
+
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		int it = event.getIteration();
+		if ( isActiveInThisIteration( it, event.getControler() ) ) {
+			event.getControler().getEvents().removeHandler(occupancyAnalyzer);
+			occupancyAnalyzer.write(event.getControler().getControlerIO()
+					.getIterationFilename(it, "occupancyAnalysis.txt"));
+		}
+	}
+	
+	private boolean isActiveInThisIteration( int iter , Controler controler ) {
+		if ( iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0 && iter >= controler.getFirstIteration() ) {
+			return true ;
+		}
+		return false ;
+	}
+
+	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		PtCountsConfigGroup ptCounts = this.config.ptCounts() ;
-		if (ptCounts.getAlightCountsFileName() != null) {
+		if (ptCounts.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be done in isActiveInThisIteration.  kai, oct'10 
 			Controler controler = event.getControler();
 			int iter = event.getIteration();
-			if ((iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0) 
-					&& (iter >= controler.getFirstIteration())) {
+			if ( isActiveInThisIteration( iter, controler ) ) {
 
 				if ( this.config.ptCounts().getPtCountsInterval() != 10 )
 					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
@@ -91,9 +123,9 @@ public class PtCountControlerListener implements StartupListener, IterationEndsL
 
 				double countsScaleFactor = Double.parseDouble(this.config.getParam(MODULE_NAME, "countsScaleFactor"));
 				NetworkImpl network = controler.getNetwork();
-				PtCountsComparisonAlgorithm ccaBoard = new PtBoardCountComparisonAlgorithm(this.oa, this.boardCounts, network, countsScaleFactor);
-				PtCountsComparisonAlgorithm ccaAlight = new PtAlightCountComparisonAlgorithm(this.oa, this.alightCounts, network, countsScaleFactor);
-				PtCountsComparisonAlgorithm ccaOccupancy = new PtOccupancyCountComparisonAlgorithm(this.oa, this.occupancyCounts, network, countsScaleFactor);
+				PtCountsComparisonAlgorithm ccaBoard = new PtBoardCountComparisonAlgorithm(this.occupancyAnalyzer, this.boardCounts, network, countsScaleFactor);
+				PtCountsComparisonAlgorithm ccaAlight = new PtAlightCountComparisonAlgorithm(this.occupancyAnalyzer, this.alightCounts, network, countsScaleFactor);
+				PtCountsComparisonAlgorithm ccaOccupancy = new PtOccupancyCountComparisonAlgorithm(this.occupancyAnalyzer, this.occupancyCounts, network, countsScaleFactor);
 
 				String distanceFilterStr = this.config.findParam(MODULE_NAME, "distanceFilter");
 				String distanceFilterCenterNodeId = this.config.findParam(MODULE_NAME, "distanceFilterCenterNode");
