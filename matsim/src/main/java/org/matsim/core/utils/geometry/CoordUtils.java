@@ -23,6 +23,45 @@ package org.matsim.core.utils.geometry;
 import org.matsim.api.core.v01.Coord;
 
 public abstract class CoordUtils {
+	
+	public static Coord plus ( Coord coord1, Coord coord2 ) {
+		double xx = coord1.getX() + coord2.getX();
+		double yy = coord1.getY() + coord2.getY();
+		return new CoordImpl( xx, yy ) ;
+	}
+	
+	public static Coord minus ( Coord coord1, Coord coord2 ) {
+		double xx = coord1.getX() - coord2.getX();
+		double yy = coord1.getY() - coord2.getY();
+		return new CoordImpl( xx, yy ) ;
+	}
+	
+	public static Coord scalarMult( double alpha, Coord coord ) {
+		double xx = alpha * coord.getX() ;
+		double yy = alpha * coord.getY() ;
+		return new CoordImpl( xx, yy ) ;
+	}
+	
+	public static Coord getCenter( Coord coord1, Coord coord2 ) {
+		double xx = 0.5*( coord1.getX() + coord2.getX() ) ;
+		double yy = 0.5*( coord1.getY() + coord2.getY() ) ;
+		return new CoordImpl( xx, yy ) ;
+	}
+	
+	public static double length( Coord coord1 ) {
+		return Math.sqrt( coord1.getX()*coord1.getX() + coord1.getY()*coord1.getY() ) ;
+	}
+	
+	public static Coord rotateToRight( Coord coord1 ) {
+		return new CoordImpl( coord1.getY(), -coord1.getX() ) ;
+	}
+	
+	public static Coord getCenterWOffset( Coord coord1, Coord coord2 ) {
+		Coord fromTo = minus( coord2, coord1 ) ;
+		Coord offset = scalarMult( 0.1 , rotateToRight( fromTo ) ) ;
+		Coord centerWOffset = plus( getCenter( coord1, coord2 ) , offset ) ;
+		return centerWOffset ;
+	}
 
 	public static double calcDistance(Coord coord, Coord other) {
 		//depending on the coordinate system that is used, determining the
