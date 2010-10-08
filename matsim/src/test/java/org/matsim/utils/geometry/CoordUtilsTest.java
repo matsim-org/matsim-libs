@@ -20,8 +20,6 @@
 
 package org.matsim.utils.geometry;
 
-import static org.junit.Assert.fail;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -30,10 +28,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * @author nagel
- *
  */
 public class CoordUtilsTest {
-	private final double delta = 0.000001; 
+	private static final double delta = 0.000001;
 
 	/**
 	 * Test method for {@link org.matsim.core.utils.geometry.CoordUtils#plus(org.matsim.api.core.v01.Coord, org.matsim.api.core.v01.Coord)}.

@@ -53,7 +53,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("TEST MODULE PRIMLOC:");
 
 		Config config = super.loadConfig( "test/input/org/matsim/demandmodeling/primloc/config_primloc_triangle.xml");
-		String outputDirectory = super.getOutputDirectory();
+//		String outputDirectory = super.getOutputDirectory();
 
 		config.network().setInputFile(inputfolder + "network.xml");
 
