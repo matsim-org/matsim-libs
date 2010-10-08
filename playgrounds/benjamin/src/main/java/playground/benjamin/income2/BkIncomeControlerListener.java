@@ -56,28 +56,27 @@ public class BkIncomeControlerListener implements StartupListener {
 		
 		this.personHouseholdMapping = new PersonHouseholdMapping( ((ScenarioImpl) scenario).getHouseholds() );
 		
-		/*		Setting the needed scoring function.
-		Remark: parameters must be set in several classes and independently for scoring and router!*/
-		ScoringFunctionFactory scoringFactory = new IncomeScoringFunctionFactory(scenario.getConfig(), personHouseholdMapping, scenario.getNetwork());
-		
-		controler.setScoringFunctionFactory(scoringFactory);
-
+		// Make sure both the scoring function and the travel cost calculator (for the routing) are configured in a consistent way!
+		installScoringFunctionFactory(controler);
 		installTravelCostCalculatorFactory(controler);
+	}
+
+	private void installScoringFunctionFactory(Controler controler) {
+		Scenario scenario = controler.getScenario();
+		ScoringFunctionFactory scoringFactory = 
+			new IncomeScoringFunctionFactory(scenario.getConfig(), personHouseholdMapping, scenario.getNetwork());
+		controler.setScoringFunctionFactory(scoringFactory);
 	}
 	
 	private void installTravelCostCalculatorFactory(Controler controler) {
 		//returns null, if there is no road pricing
 		if (controler.getConfig().scenario().isUseRoadpricing()){
 			RoadPricingScheme roadPricingScheme = controler.getRoadPricing().getRoadPricingScheme();
-			
-			/*		Setting travel cost calculator for the router.
-			Remark: parameters must be set in several classes and independently for scoring and router!*/
-			TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme);
+			TravelCostCalculatorFactory travelCostCalculatorFactory = 
+				new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme);
 			controler.setTravelCostCalculatorFactory(travelCostCalculatorFactory);
 		}
 		else{
-			/*		Setting travel cost calculator for the router.
-			Remark: parameters must be set in several classes and independently for scoring and router!*/
 			TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
 			controler.setTravelCostCalculatorFactory(travelCostCalculatorFactory);
 		}
