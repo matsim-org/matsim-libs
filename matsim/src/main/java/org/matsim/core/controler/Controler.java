@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
@@ -129,7 +127,7 @@ import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.ReconstructingUmlaufBuilder;
+import org.matsim.pt.TransitControlerListener;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -145,9 +143,6 @@ import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.signalsystems.initialization.DefaultSignalsControllerListenerFactory;
 import org.matsim.signalsystems.initialization.SignalsControllerListenerFactory;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.vehicles.VehicleReaderV1;
-import org.xml.sax.SAXException;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -812,13 +807,13 @@ public class Controler {
 		}
 
 		if (this.config.scenario().isUseTransit()) {
-			addTransitControlerListener();
+			addControlerListener(new TransitControlerListener());
 			if (config.ptCounts().getAlightCountsFileName() != null) {
 				// only works when all three files are defined!  kai, oct'10
-
 				addPtCountControlerListener();
 			}
 		}
+
 		if (this.config.scenario().isUseSignalSystems()){
 			addControlerListener(this.signalsFactory.createSignalsControllerListener());
 		}
@@ -832,11 +827,6 @@ public class Controler {
 		log.info("Using pt counts.");
 //		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
 		addControlerListener(new PtCountControlerListener(config));
-	}
-
-	private void addTransitControlerListener() {
-		TransitControlerListener cl = new TransitControlerListener();
-		addControlerListener(cl);
 	}
 
 	/**
@@ -1296,43 +1286,6 @@ public class Controler {
 				writer.closeFile();
 			}
 		}
-	}
-
-	public class TransitControlerListener implements StartupListener {
-
-		@Override
-		public void notifyStartup(final StartupEvent event) {
-			if (Controler.this.config.transit().getTransitScheduleFile() != null) {
-				try {
-					new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork()).readFile(Controler.this.config.transit().getTransitScheduleFile());
-				} catch (SAXException e) {
-					throw new RuntimeException("could not read transit schedule.", e);
-				} catch (ParserConfigurationException e) {
-					throw new RuntimeException("could not read transit schedule.", e);
-				} catch (IOException e) {
-					throw new RuntimeException("could not read transit schedule.", e);
-				}
-			}
-			if (Controler.this.config.transit().getVehiclesFile() != null) {
-				try {
-					new VehicleReaderV1(event.getControler().getScenario().getVehicles()).parse(Controler.this.config.transit().getVehiclesFile());
-				} catch (SAXException e) {
-					throw new RuntimeException("could not read vehicles.", e);
-				} catch (ParserConfigurationException e) {
-					throw new RuntimeException("could not read vehicles.", e);
-				} catch (IOException e) {
-					throw new RuntimeException("could not read vehicles.", e);
-				}
-			}
-			ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(
-					event.getControler().getScenario().getNetwork(), event
-					.getControler().getScenario()
-					.getTransitSchedule().getTransitLines().values(),
-					event.getControler().getScenario().getVehicles(),
-					event.getControler().getScenario().getConfig().charyparNagelScoring());
-			reconstructingUmlaufBuilder.build();
-		}
-
 	}
 
 	public static void main(final String[] args) {
