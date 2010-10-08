@@ -50,9 +50,19 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private static final String TRAVELING_PT = "travelingPt";
 	private static final String TRAVELING_WALK = "travelingWalk";
 	private static final String WAITING  = "waiting";
+
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private static final String MARGINAL_UTL_OF_DISTANCE_CAR = "marginalUtlOfDistanceCar";
+
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private static final String MARGINAL_UTL_OF_DISTANCE_PT = "marginalUtlOfDistancePt";
+
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private static final String MARGINAL_UTL_OF_DISTANCE_WALK = "marginalUtlOfDistanceWalk";
+	
+	private static final String MARGINAL_UTL_OF_MONEY = "marginalUtilityOfMoney" ;
+	private static final String MONETARY_DISTANCE_COST_RATE_CAR = "monetaryDistanceCostRateCar" ;
+	private static final String MONETARY_DISTANCE_COST_RATE_PT  = "monetaryDistanceCostRatePt" ;
 
 	private static final String ACTIVITY_TYPE = "activityType_";
 	private static final String ACTIVITY_PRIORITY = "activityPriority_";
@@ -76,10 +86,19 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private double traveling = -6.0;
 	private double travelingPt = -6.0;
 	private double travelingWalk = -6.0;
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private double marginalUtlOfDistanceCar = 0.0;
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private double marginalUtlOfDistancePt = 0.0;
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private double marginalUtlOfDistanceWalk = 0.0;
+
 	private double waiting = -0.0;
+	
+	private double marginalUtilityOfMoney = 0.0 ;
+	private double monetaryDistanceCostRateCar = 0.0 ;
+	private double monetaryDistanceCostRatePt = 0.0 ;
+	
 
 	private final HashMap<String, ActivityParams> activityTypes = new LinkedHashMap<String, ActivityParams>();
 	private final HashMap<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
@@ -110,6 +129,12 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			return Double.toString(this.getMarginalUtlOfDistancePt());
 		} else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
 			return Double.toString(this.getMarginalUtlOfDistanceWalk());
+		} else if ( MARGINAL_UTL_OF_MONEY.equals(key) ) {
+			return Double.toString( this.getMarginalUtilityOfMoney() ) ;
+		} else if ( MONETARY_DISTANCE_COST_RATE_CAR.equals(key) ) {
+			return Double.toString( this.getMonetaryDistanceCostRateCar() ) ;
+		} else if ( MONETARY_DISTANCE_COST_RATE_PT.equals(key) ) {
+			return Double.toString( this.getMonetaryDistanceCostRatePt() ) ;
 		}	else if (WAITING.equals(key)) {
 			return Double.toString(getWaiting());
 		} else if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
@@ -167,6 +192,12 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			setMarginalUtlOfDistancePt(Double.parseDouble(value));
 		} else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
 			setMarginalUtlOfDistanceWalk(Double.parseDouble(value));
+		} else if ( MARGINAL_UTL_OF_MONEY.equals(key) ) {
+			setMarginalUtilityOfMoney( Double.parseDouble(value) ) ;
+		} else if ( MONETARY_DISTANCE_COST_RATE_CAR.equals(key) ) {
+			setMonetaryDistanceCostRateCar( Double.parseDouble(value) );
+		} else if ( MONETARY_DISTANCE_COST_RATE_PT.equals(key) ) {
+			setMonetaryDistanceCostRatePt( Double.parseDouble(value) ) ;
 		} else if (WAITING.equals(key)) {
 			setWaiting(Double.parseDouble(value));
 		} else if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
@@ -217,6 +248,9 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, Double.toString(this.getMarginalUtlOfDistanceCar()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_PT, Double.toString(this.getMarginalUtlOfDistancePt()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, Double.toString(this.getMarginalUtlOfDistanceWalk()));
+		map.put(MARGINAL_UTL_OF_MONEY, Double.toString( this.getMarginalUtilityOfMoney() ) ) ;
+		map.put(MONETARY_DISTANCE_COST_RATE_CAR, Double.toString( this.getMonetaryDistanceCostRateCar() ) ) ;
+		map.put(MONETARY_DISTANCE_COST_RATE_PT, Double.toString( this.getMonetaryDistanceCostRatePt() ) ) ;
 		int index = 0;
 		for(ActivityParams params : this.activityTypes.values()) {
 			String key = Integer.toString(index);
@@ -249,6 +283,10 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
 		map.put(MARGINAL_UTL_OF_DISTANCE_PT, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
 		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
+		
+		map.put(MARGINAL_UTL_OF_MONEY, "[utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils" ) ;
+		map.put(MONETARY_DISTANCE_COST_RATE_CAR, "[unit_of_money/m] conversion of car distance into money" ) ;
+		map.put(MONETARY_DISTANCE_COST_RATE_PT, "[unit_of_money/m] conversion of pt distance into money" );
 
 		return map ;
 	}
@@ -366,12 +404,14 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	/**
 	 * @return the marginal utility of distance for mode walk per meter
 	 */
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	public double getMarginalUtlOfDistanceWalk() {
 		return this.marginalUtlOfDistanceWalk;
 	}
 	/**
 	 * @param marginalUtlOfDistanceWalk the marginal utility of distance for mode walk per meter
 	 */
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {
 		this.marginalUtlOfDistanceWalk = marginalUtlOfDistanceWalk;
 	}
@@ -379,24 +419,28 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	/**
 	 * @return the marginal utility of distance for mode pt per meter
 	 */
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	public double getMarginalUtlOfDistancePt() {
 		return this.marginalUtlOfDistancePt;
 	}
 	/**
 	 * @param marginalUtlOfDistancePt the marginal utility of distance for mode pt per meter
 	 */
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	public void setMarginalUtlOfDistancePt(final double marginalUtlOfDistancePt) {
 		this.marginalUtlOfDistancePt = marginalUtlOfDistancePt;
 	}
 	/**
 	 * @return the marginal utility of distance for mode car per meter
 	 */
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	public double getMarginalUtlOfDistanceCar() {
 		return this.marginalUtlOfDistanceCar;
 	}
 	/**
 	 * @param marginalUtlOfDistanceCar the marginal utility of distance for mode car per meter
 	 */
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	public void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
 		this.marginalUtlOfDistanceCar = marginalUtlOfDistanceCar;
 	}
@@ -500,6 +544,30 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		public void setClosingTime(final double closingTime) {
 			this.closingTime = closingTime;
 		}
+	}
+
+	public double getMarginalUtilityOfMoney() {
+		return marginalUtilityOfMoney;
+	}
+
+	public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
+		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
+	}
+
+	public double getMonetaryDistanceCostRateCar() {
+		return monetaryDistanceCostRateCar;
+	}
+
+	public void setMonetaryDistanceCostRateCar(double monetaryDistanceCostRateCar) {
+		this.monetaryDistanceCostRateCar = monetaryDistanceCostRateCar;
+	}
+
+	public double getMonetaryDistanceCostRatePt() {
+		return monetaryDistanceCostRatePt;
+	}
+
+	public void setMonetaryDistanceCostRatePt(double monetaryDistanceCostRatePt) {
+		this.monetaryDistanceCostRatePt = monetaryDistanceCostRatePt;
 	}
 
 }
