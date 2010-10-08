@@ -21,12 +21,9 @@
 package org.matsim.counts;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.text.DecimalFormat;
 public class CountsWriterHandlerImplV1 implements CountsWriterHandler {
-	// interface implementation
-	//////////////////////////////////////////////////////////////////////
-	// <counts ... > ... </counts>
-	//////////////////////////////////////////////////////////////////////
+
+	@Override
 	public void startCounts(final Counts counts, final BufferedWriter out) throws IOException {
 		out.write("<counts ");
 		out.write("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
@@ -44,12 +41,13 @@ public class CountsWriterHandlerImplV1 implements CountsWriterHandler {
 		}
 		out.write(" > \n");
 	}
+
+	@Override
 	public void endCounts(final BufferedWriter out) throws IOException {
 		out.write("</counts>\n");
 	}
-	//////////////////////////////////////////////////////////////////////
-	// <count ... > ... </count>
-	//////////////////////////////////////////////////////////////////////
+
+	@Override
 	public void startCount(final Count count, final BufferedWriter out) throws IOException {
 		out.write("\t<count");
 		out.write(" loc_id=\"" + count.getLocId() + "\"");
@@ -60,29 +58,26 @@ public class CountsWriterHandlerImplV1 implements CountsWriterHandler {
 		}
 		out.write(">\n");
 	}
+
+	@Override
 	public void endCount(final BufferedWriter out) throws IOException {
 		out.write("\t</count>\n\n");
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// <volume ... />
-	//////////////////////////////////////////////////////////////////////
+	@Override
 	public void startVolume(final Volume volume, final BufferedWriter out) throws IOException {
-		
-		DecimalFormat formatter = new DecimalFormat("0.00");
-		
 		out.write("\t\t<volume");
 		out.write(" h=\"" + volume.getHour() + "\"");
-		out.write(" val=\"" + formatter.format(volume.getValue()) + "\"");
+		out.write(" val=\"" + volume.getValue() + "\"");
 		out.write(" />\n");
 	}
+
+	@Override
 	public void endVolume(final BufferedWriter out) throws IOException {
 	}
-	//////////////////////////////////////////////////////////////////////
-	// <!-- ============ ... ========== -->
-	//////////////////////////////////////////////////////////////////////
+
+	@Override
 	public void writeSeparator(final BufferedWriter out) throws IOException {
-		out.write("<!-- =================================================" +
-							"===================== -->\n\n");
+		out.write("<!-- ====================================================================== -->\n\n");
 	}
 }
