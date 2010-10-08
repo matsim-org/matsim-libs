@@ -57,7 +57,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.Module;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -131,9 +130,6 @@ import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
-import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.counts.OccupancyAnalyzer;
-import org.matsim.pt.counts.OccupancyAnalyzerListener;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -175,8 +171,6 @@ public class Controler {
 	public static final String FILENAME_SIGNALSYSTEMS = "output_signalsystems.xml.gz";
 	public static final String FILENAME_SIGNALSYSTEMS_CONFIG = "output_signalsystem_configuration.xml.gz";
 	public static final String FILENAME_CONFIG = "output_config.xml.gz";
-
-	private final static String COUNTS_MODULE_NAME = "ptCounts";
 
 	private enum ControlerState {
 		Init, Running, Shutdown, Finished
@@ -263,8 +257,6 @@ public class Controler {
 	private ControlerIO controlerIO;
 
 	private MobsimFactory mobsimFactory = null;
-
-	private TransitConfigGroup transitConfig = null;
 
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
 
@@ -371,7 +363,7 @@ public class Controler {
 		}
 		if (this.config.scenario().isUseTransit()) {
 			log.warn("setting up the transit config _after_ the config dump :-( ...") ;
-			setupTransitConfig();
+			setupTransitSimulation();
 		}
 		initEvents();
 		initLogging();
@@ -399,22 +391,8 @@ public class Controler {
 		if (simulatedModes.contains("pt")) this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
 	}
 
-	private final void setupTransitConfig() {
+	private final void setupTransitSimulation() {
 		log.info("setting up transit simulation");
-		this.transitConfig = new TransitConfigGroup();
-		if (this.config.getModule(TransitConfigGroup.GROUP_NAME) == null) {
-			this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
-		} else {
-			// this would not be necessary if TransitConfigGroup is part of core config
-			Module oldModule = this.config.getModule(TransitConfigGroup.GROUP_NAME);
-
-			this.config.removeModule(TransitConfigGroup.GROUP_NAME);
-			// yyyy it is not clear to me why this works: the module is removed but never re-added--???  kai, oct'10
-
-			this.transitConfig.addParam("transitScheduleFile", oldModule.getValue("transitScheduleFile"));
-			this.transitConfig.addParam("vehiclesFile", oldModule.getValue("vehiclesFile"));
-			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
-		}
 		if (!this.config.scenario().isUseVehicles()) {
 			log.warn("Your are using Transit but not Vehicles. This most likely won't work.");
 		}
@@ -849,7 +827,7 @@ public class Controler {
 	private void addPtCountControlerListener() {
 		// yyyy seems to me that in the following the OccupancyAnalyser could be completely pushed into the PtCountControlerListener.
 		// kai, oct'10
-		
+
 //		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
 		log.info("Using pt counts.");
 //		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
@@ -1110,7 +1088,7 @@ public class Controler {
 					.getLeastCostPathCalculatorFactory(), this.scenarioData.getRoadPricingScheme());
 		} else if (this.config.scenario().isUseTransit()) {
 			return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
-					this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.transitConfig);
+					this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.config.transit());
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {
 			return new MultiModalPlansCalcRoute(this.config.plansCalcRoute(), this.config.multiModal(), this.network,
 					travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
@@ -1324,9 +1302,9 @@ public class Controler {
 
 		@Override
 		public void notifyStartup(final StartupEvent event) {
-			if (Controler.this.transitConfig.getTransitScheduleFile() != null) {
+			if (Controler.this.config.transit().getTransitScheduleFile() != null) {
 				try {
-					new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork()).readFile(Controler.this.transitConfig.getTransitScheduleFile());
+					new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork()).readFile(Controler.this.config.transit().getTransitScheduleFile());
 				} catch (SAXException e) {
 					throw new RuntimeException("could not read transit schedule.", e);
 				} catch (ParserConfigurationException e) {
@@ -1335,9 +1313,9 @@ public class Controler {
 					throw new RuntimeException("could not read transit schedule.", e);
 				}
 			}
-			if (Controler.this.transitConfig.getVehiclesFile() != null) {
+			if (Controler.this.config.transit().getVehiclesFile() != null) {
 				try {
-					new VehicleReaderV1(event.getControler().getScenario().getVehicles()).parse(Controler.this.transitConfig.getVehiclesFile());
+					new VehicleReaderV1(event.getControler().getScenario().getVehicles()).parse(Controler.this.config.transit().getVehiclesFile());
 				} catch (SAXException e) {
 					throw new RuntimeException("could not read vehicles.", e);
 				} catch (ParserConfigurationException e) {

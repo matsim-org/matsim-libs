@@ -48,6 +48,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.pt.config.PtCountsConfigGroup;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
 /**
@@ -87,6 +88,7 @@ public class Config {
 	private SignalSystemsConfigGroup signalSystemConfigGroup = null;
 	private SimulationConfigGroup simulation = null;
 	private StrategyConfigGroup strategy = null;
+	private TransitConfigGroup transit = null;
 	private VspExperimentalConfigGroup vspExperimentalGroup = null;
 
 	// config groups that are elsewhere:
@@ -170,14 +172,17 @@ public class Config {
 		this.vspExperimentalGroup = new VspExperimentalConfigGroup();
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, this.vspExperimentalGroup);
 
-		this.otfVis = new OTFVisConfigGroup() ;
-		this.modules.put( OTFVisConfigGroup.GROUP_NAME, this.otfVis ) ;
-		
+		this.otfVis = new OTFVisConfigGroup();
+		this.modules.put( OTFVisConfigGroup.GROUP_NAME, this.otfVis);
+
 		this.multiModal = new MultiModalConfigGroup();
 		this.modules.put(MultiModalConfigGroup.GROUP_NAME, this.multiModal);
-		
-		this.ptCounts = new PtCountsConfigGroup() ;
+
+		this.ptCounts = new PtCountsConfigGroup();
 		this.modules.put(PtCountsConfigGroup.GROUP_NAME, this.ptCounts);
+
+		this.transit = new TransitConfigGroup();
+		this.modules.put(TransitConfigGroup.GROUP_NAME, this.transit);
 	}
 
 	/** Checks each module for consistency, e.g. if the parameters that are currently set make sense
@@ -426,19 +431,23 @@ public class Config {
 	public OTFVisConfigGroup otfVis() {
 		return this.otfVis;
 	}
-	
+
 	public MultiModalConfigGroup multiModal() {
 		return this.multiModal;
 	}
-	
+
 	public QSimConfigGroup getQSimConfigGroup() {
 		return this.qSimConfigGroup;
 	}
-	
+
 	public PtCountsConfigGroup ptCounts() {
-		return this.ptCounts ;
+		return this.ptCounts;
 	}
-	
+
+	public TransitConfigGroup transit() {
+		return this.transit;
+	}
+
 	// methods that are somehow out of the "regular" system:
 
 	public void setQSimConfigGroup(final QSimConfigGroup qSimConfigGroup) {
@@ -447,7 +456,7 @@ public class Config {
 		this.qSimConfigGroup = qSimConfigGroup;
 		this.modules.put(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
 	}
-	
+
 	public void addConfigConsistencyChecker(
 			final ConfigConsistencyChecker checker) {
 		this.consistencyCheckers.add(checker);
