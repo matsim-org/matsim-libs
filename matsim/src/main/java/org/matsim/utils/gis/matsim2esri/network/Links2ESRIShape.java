@@ -67,15 +67,18 @@ public class Links2ESRIShape {
 
 
 	public void write() {
+		log.info("creating features...");
 		Collection<Feature> features = new ArrayList<Feature>();
 		for (Link link : this.network.getLinks().values()) {
 			features.add(this.featureGenerator.getFeature(link));
 		}
+		log.info("writing features to shape file... " + this.filename);
 		try {
 			ShapeFileWriter.writeGeometries(features, this.filename);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		log.info("done writing shape file.");
 	}
 
 	public static void main(final String [] args) {
