@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.helpers.AgentSnapshotInfoBuilder;
 
@@ -80,7 +79,8 @@ private final double stucktimeCache;
     //dg[april08] as the order of nodes has an influence on the simulation
     //results they are sorted to avoid indeterministic simulations
     Arrays.sort(this.simNodesArray, new Comparator<QNode>() {
-      public int compare(final QNode o1, final QNode o2) {
+      @Override
+			public int compare(final QNode o1, final QNode o2) {
         return o1.getNode().getId().compareTo(o2.getNode().getId());
       }
     });
@@ -91,6 +91,7 @@ private final double stucktimeCache;
   }
 
 
+	@Override
 	public void afterSim() {
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
 		 * (this.simLinksArray), because there may be links that have vehicles only
@@ -106,6 +107,7 @@ private final double stucktimeCache;
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
 	 */
+	@Override
 	public void doSimStep(final double time) {
 		moveNodes(time);
 		moveLinks(time);

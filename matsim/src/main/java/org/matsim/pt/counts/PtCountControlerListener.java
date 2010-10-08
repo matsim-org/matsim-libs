@@ -22,7 +22,6 @@ package org.matsim.pt.counts;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -39,10 +38,10 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.pt.config.PtCountsConfigGroup;
 
-public class PtCountControlerListener implements StartupListener, IterationEndsListener, 
+public class PtCountControlerListener implements StartupListener, IterationEndsListener,
 BeforeMobsimListener, AfterMobsimListener  {
-	
-	private static final Logger log = Logger.getLogger("noname");
+
+	private static final Logger log = Logger.getLogger(PtCountControlerListener.class);
 
 	private final static String MODULE_NAME = "ptCounts";
 	// yy the above should be removed; the commands should be replaced by the "typed" commands.  kai, oct'10
@@ -62,18 +61,18 @@ BeforeMobsimListener, AfterMobsimListener  {
 	@Override
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
 		PtCountsConfigGroup ptCounts = this.config.ptCounts();
-		if( ptCounts.getAlightCountsFileName()!=null ){	
+		if( ptCounts.getAlightCountsFileName()!=null ){
 			log.warn("note: for pt counts, at this point all three files must be given!  kai, oct'10") ;
 			String boardCountsFilename = this.config.findParam(MODULE_NAME, "inputBoardCountsFile");
 			if (boardCountsFilename != null) {
 				new MatsimCountsReader(this.boardCounts).readFile(boardCountsFilename);
 			}
-	
+
 			String alightCountsFilename = this.config.findParam(MODULE_NAME, "inputAlightCountsFile");
 			if (alightCountsFilename != null) {
 				new MatsimCountsReader(this.alightCounts).readFile(alightCountsFilename);
 			}
-	
+
 			String occupancyCountsFilename = this.config.findParam(MODULE_NAME, "inputOccupancyCountsFile");
 			if (occupancyCountsFilename != null) {
 				new MatsimCountsReader(this.occupancyCounts).readFile(occupancyCountsFilename);
@@ -99,7 +98,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 					.getIterationFilename(it, "occupancyAnalysis.txt"));
 		}
 	}
-	
+
 	private boolean isActiveInThisIteration( int iter , Controler controler ) {
 		if ( iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0 && iter >= controler.getFirstIteration() ) {
 			return true ;
@@ -110,7 +109,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		PtCountsConfigGroup ptCounts = this.config.ptCounts() ;
-		if (ptCounts.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be done in isActiveInThisIteration.  kai, oct'10 
+		if (ptCounts.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be done in isActiveInThisIteration.  kai, oct'10
 			Controler controler = event.getControler();
 			int iter = event.getIteration();
 			if ( isActiveInThisIteration( iter, controler ) ) {
@@ -118,7 +117,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 				if ( this.config.ptCounts().getPtCountsInterval() != 10 )
 					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
 							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10" ) ;
-				
+
 				controler.stopwatch.beginOperation("compare with counts");
 
 				double countsScaleFactor = Double.parseDouble(this.config.getParam(MODULE_NAME, "countsScaleFactor"));
@@ -150,12 +149,12 @@ BeforeMobsimListener, AfterMobsimListener  {
 				if (outputFormat.contains("kml")
 						|| outputFormat.contains("all")) {
 					ControlerIO ctlIO=controler.getControlerIO();
-					
+
 					String filename = ctlIO.getIterationFilename(iter, "countscompare.kmz");
 					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(), ccaAlight.getComparison(), ccaOccupancy.getComparison(),
 							TransformationFactory.getCoordinateTransformation(this.config.global().getCoordinateSystem(),TransformationFactory.WGS84),
 							this.boardCounts, this.alightCounts,occupancyCounts);
-					
+
 					kmlWriter.setIterationNumber(iter);
 					kmlWriter.writeFile(filename);
 					if (ccaBoard != null) {
