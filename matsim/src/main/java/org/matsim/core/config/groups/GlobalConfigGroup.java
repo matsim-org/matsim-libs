@@ -22,9 +22,11 @@ package org.matsim.core.config.groups;
 
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class GlobalConfigGroup extends Module {
+	private static final Logger log = Logger.getLogger("dummy");
 
 	private static final long serialVersionUID = 1L;
 
@@ -90,6 +92,7 @@ public class GlobalConfigGroup extends Module {
 		return this.numberOfThreads;
 	}
 	public void setNumberOfThreads(final int numberOfThreads) {
+		log.info("setting number of threads to: " + numberOfThreads ) ; // might not be so bad to do this everywhere?  benjamin/kai, oct'10
 		this.numberOfThreads = numberOfThreads;
 	}
 
