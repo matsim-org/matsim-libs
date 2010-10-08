@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LanesBasedWidthCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,27 +19,35 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
-public class LanesBasedWidthCalculator implements WidthCalculator{
+/**
+ * @author mrieser
+ */
+public class LanesBasedWidthCalculatorTest {
 
-	private final double effectiveLaneWidth;
-	private final double widthCoefficient;
+	@Test
+	public void testGetWidth_laneWidthNaN() {
+		Network net = NetworkImpl.createNetwork();
+		Node n1 = net.getFactory().createNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node n2 = net.getFactory().createNode(new IdImpl("2"), new CoordImpl(1000, 0));
+		net.addNode(n1);
+		net.addNode(n2);
+		Link l1 = net.getFactory().createLink(new IdImpl("1"), n1.getId(), n2.getId());
+		l1.setNumberOfLanes(2.0);
 
-	/**
-	 * This constructor is used by reflection.
-	 * It's signature mustn't be changed or it won't work anymore. :-(
-	 */
-	public LanesBasedWidthCalculator(final NetworkImpl network, final Double coef) {
-		double w = network.getEffectiveLaneWidth();
-		this.effectiveLaneWidth = (Double.isNaN(w) ? 1.0 : w);
-		this.widthCoefficient = coef;
-	}
 
-	@Override
-	public double getWidth(final Link link) {
-		return link.getNumberOfLanes() * this.effectiveLaneWidth * this.widthCoefficient;
+		Assert.assertTrue(Double.isNaN(net.getEffectiveLaneWidth()));
+		double w = new LanesBasedWidthCalculator((NetworkImpl) net, 1.0).getWidth(l1);
+		Assert.assertFalse(Double.isNaN(w));
+		Assert.assertEquals(2.0, w, 1e-10);
 	}
 
 }
