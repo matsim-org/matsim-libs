@@ -23,7 +23,8 @@ import org.xml.sax.SAXException;
  */
 public class NetworkGenerator {
 	public static final String UTM33N = "PROJCS[\"WGS_1984_UTM_Zone_33N\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",15],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"Meter\",1]]";
-
+	public static final String CRS = UTM33N; // the coordinate reference system to be used.
+	// for this basic example UTM zone 33 North is the right coordinate system. This may differ depending on your scenario. See also http://en.wikipedia.org/wiki/Universal_Transverse_Mercator
 
 
 	public static void main(String [] args) {
@@ -32,9 +33,7 @@ public class NetworkGenerator {
 		Scenario sc = new ScenarioImpl() ;
 		Network net = sc.getNetwork();
 
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S); //the coordinate transformation is needed to get a projected  coordinate system
-		// for this basic example UTM zone 33 North is the right coordinate system. This may differ depending on your scenario. See also http://en.wikipedia.org/wiki/Universal_Transverse_Mercator
-
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, CRS);
 
 		OsmNetworkReader onr = new OsmNetworkReader(net,ct); //constructs a new openstreetmap reader
 		try {
@@ -47,16 +46,14 @@ public class NetworkGenerator {
 			e.printStackTrace();
 		}
 		//at this point we already have a matsim network...
-		new NetworkCleaner().run(net); //but may be there are isolated not connected links. The network cleaner removes those links
+		new NetworkCleaner().run(net); //but may be there are isolated (not connected) links. The network cleaner removes those links
 
 		new NetworkWriter(net).write("./inputs/network.xml");//here we write the network to a xml file
 
 
 		//the remaining lines of code are necessary to create a ESRI shape file of the matsim network
 
-		sc.getConfig().global().setCoordinateSystem(UTM33N);
-
-		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(net, UTM33N);
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(net, CRS);
 		builder.setWidthCoefficient(0.01);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
