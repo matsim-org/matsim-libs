@@ -60,10 +60,10 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
-public class OTFVisMobsimFeature implements VisMobsimFeature, 
+public class OTFVisMobsimFeature implements VisMobsimFeature,
 SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener {
 
-	private static final Logger log = Logger.getLogger("noname");
+	private static final Logger log = Logger.getLogger(OTFVisMobsimFeature.class);
 
 	protected OnTheFlyServer otfServer = null;
 
@@ -106,10 +106,10 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 			UUID idOne = UUID.randomUUID();
 			this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), queueSimulation.getEventsManager());
 			this.otfServer.setSimulation(this);
-			
-			// the "connect" statements for the regular links are called by 
+
+			// the "connect" statements for the regular links are called by
 			// new DefaultConnectionManagerFactory().createConnectionManager() above.  kai, aug'10
-			
+
 			if (this.doVisualizeTeleportedAgents) {
 				this.teleportationWriter = new OTFTeleportAgentsDataWriter();
 				this.otfServer.addAdditionalElement(this.teleportationWriter);
@@ -126,8 +126,8 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 			}
 			if (config.scenario().isUseTransit()) {
 				this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
-						queueSimulation.getVisNetwork().getNetwork(), 
-						((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule(), 
+						queueSimulation.getVisNetwork().getNetwork(),
+						((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule(),
 						((QSim) queueSimulation).getQSimTransitEngine().getAgentTracker()
 				));
 				this.connectionManager.connectWriterToReader(
@@ -195,7 +195,7 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 
 	@Override
 	public void reset( @SuppressWarnings("unused") int cnt ) {
-		throw new UnsupportedOperationException("although it would be nice to have and should not be that difficult, at this point" 
+		throw new UnsupportedOperationException("although it would be nice to have and should not be that difficult, at this point"
 				+ " live mode does not support iterations. kai, aug'10" ) ;
 	}
 	@Override

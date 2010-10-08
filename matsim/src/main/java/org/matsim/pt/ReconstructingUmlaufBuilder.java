@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.pt;
 
 import java.util.ArrayList;
@@ -17,13 +36,13 @@ import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-
 public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
-	private static final Logger log = Logger.getLogger("dummy");
+	private static final Logger log = Logger.getLogger(ReconstructingUmlaufBuilder.class);
 
 
 	private static final Comparator<UmlaufStueck> departureTimeComparator = new Comparator<UmlaufStueck>() {
 
+		@Override
 		public int compare(UmlaufStueck o1, UmlaufStueck o2) {
 			return Double.compare(o1.getDeparture().getDepartureTime(), o2.getDeparture().getDepartureTime());
 		}
@@ -46,6 +65,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 		this.basicVehicles = basicVehicles;
 	}
 
+	@Override
 	public Collection<Umlauf> build() {
 		createEmptyUmlaeufe();
 		createUmlaufStuecke();

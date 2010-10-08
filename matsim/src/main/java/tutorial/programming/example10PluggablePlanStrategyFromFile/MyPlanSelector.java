@@ -29,14 +29,13 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
  * @author nagel
- *
  */
 class MyPlanSelector implements PlanSelector,
 ActivityEndEventHandler // as an example
 {
-	private static final Logger log = Logger.getLogger("dummy");
+	private static final Logger log = Logger.getLogger(MyPlanSelector.class);
 	private Scenario sc;
-	
+
 	MyPlanSelector( Scenario scenario ) {
 		this.sc = scenario ;
 	}

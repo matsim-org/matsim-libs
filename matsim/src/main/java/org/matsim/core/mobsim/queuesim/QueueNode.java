@@ -42,7 +42,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
  */
 class QueueNode implements VisNode {
 
-	private static final Logger log = Logger.getLogger("noname");
+	private static final Logger log = Logger.getLogger(QueueNode.class);
 
 	private static final QueueLinkIdComparator qlinkIdComparator = new QueueLinkIdComparator();
 
@@ -82,6 +82,7 @@ class QueueNode implements VisNode {
 		Arrays.sort(this.inLinksArrayCache, QueueNode.qlinkIdComparator);
 	}
 
+	@Override
 	public Node getNode() { // accessed from elsewhere
 		return this.node;
 	}
@@ -229,6 +230,7 @@ class QueueNode implements VisNode {
 
 	protected static class QueueLinkIdComparator implements Comparator<QueueLink>, Serializable {
 		private static final long serialVersionUID = 1L;
+		@Override
 		public int compare(final QueueLink o1, final QueueLink o2) {
 			return o1.getLink().getId().compareTo(o2.getLink().getId());
 		}

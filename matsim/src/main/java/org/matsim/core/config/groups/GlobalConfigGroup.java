@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class GlobalConfigGroup extends Module {
-	private static final Logger log = Logger.getLogger("dummy");
+	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
 	private static final long serialVersionUID = 1L;
 

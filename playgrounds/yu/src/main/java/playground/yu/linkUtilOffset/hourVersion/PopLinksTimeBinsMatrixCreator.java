@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.linkUtilOffset.hourVersion;
 
@@ -29,8 +29,8 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -54,7 +54,7 @@ import Jama.QRDecomposition;
 
 /**
  * @author yu
- * 
+ *
  */
 public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 	/** matrix[mxn] m-number of pop, n-number of links */
@@ -208,7 +208,7 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		// linkUtilityOffsetFilename =
 		// "../integration-demandCalibration1.0.1/test/output/prepare/linkIdTimeBinX.log";
 
-		String networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml", // 
+		String networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml", //
 		populationFilename = "../integration-demandCalibration1.0.1/test/input/um1/1000.plans.xml.gz", //
 		eventsFilename = "../integration-demandCalibration1.0.1/test/input/um1/1000.events.txt.gz", //
 		matrixOutputFilename = "../integration-demandCalibration1.0.1/test/input/um1/popLinksMatrix.log", //
@@ -284,10 +284,10 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 	}
 
 	public static void main(String[] args) {
-		Logger.getLogger("Start time").info(
+		Logger.getLogger(PopLinksTimeBinsMatrixCreator.class).info(
 				"----------------->STARTED-------------------------");
 		runJama(args);
-		Logger.getLogger("End time").info(
+		Logger.getLogger(PopLinksTimeBinsMatrixCreator.class).info(
 				"----------------->ENDED-------------------------");
 	}
 }
