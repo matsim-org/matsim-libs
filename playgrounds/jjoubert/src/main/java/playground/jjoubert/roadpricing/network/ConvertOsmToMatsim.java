@@ -31,27 +31,31 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.xml.sax.SAXException;
 
 public class ConvertOsmToMatsim {
 
 	/**
+	 * Class to 
 	 * @param args
 	 */
 	public static void main(String[] args) {
 
 		String inputFile = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gauteng.osm";
-		String outputFile = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork_Full.xml.gz";
-		String shapefileLinks = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork_Full_Links.shp";
-		String shapefileNodes = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork_Full_Nodes.shp";
+		String outputFile = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork_Clean.xml.gz";
+		String shapefileLinks = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork_Clean_Links.shp";
+		String shapefileNodes = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/SANRAL/Network/gautengNetwork_Clean_Nodes.shp";
 
 		Scenario sc = new ScenarioImpl();
 		Network nw = sc.getNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S);
 		OsmNetworkReader onr = new OsmNetworkReader(nw, ct);
-		onr.setKeepPaths(true);
+		onr.setKeepPaths(false);
 		/*
 		 * Configure the highway classification.
 		 */
@@ -67,11 +71,14 @@ public class ConvertOsmToMatsim {
 		}
 		new NetworkWriter(nw).writeFileV1(outputFile);
 		
-		Links2ESRIShape l2e = new Links2ESRIShape(nw, shapefileLinks, TransformationFactory.WGS84_UTM35S);
-		l2e.write();
+		sc.getConfig().global().setCoordinateSystem("WGS84_UTM35S");
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(nw, "WGS84_UTM35S");
+		builder.setWidthCoefficient(-0.01);
+		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		
-		Nodes2ESRIShape n2e = new Nodes2ESRIShape(nw, shapefileNodes, TransformationFactory.WGS84_UTM35S);
-		n2e.write();
+		new Links2ESRIShape(nw, shapefileLinks, builder).write();
+		new Nodes2ESRIShape(nw, shapefileNodes, "WGS84_UTM35S").write();
 	}
 
 }
