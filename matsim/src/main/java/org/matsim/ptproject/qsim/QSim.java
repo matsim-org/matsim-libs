@@ -127,7 +127,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
-	protected final PriorityQueue<Tuple<Double, PersonAgent>> teleportationList =
+	private final PriorityQueue<Tuple<Double, PersonAgent>> teleportationList =
 		new PriorityQueue<Tuple<Double, PersonAgent>>(30, new TeleportationArrivalTimeComparator());
 	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100*3600;
