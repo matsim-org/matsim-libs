@@ -1,4 +1,4 @@
-package playground.anhorni.locationchoice.preprocess.helper;
+package playground.anhorni.utils;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +31,16 @@ public abstract class Utils {
 			sum += (v-mean) * (v-mean);
 		}
 		return sum / values.size();
+	}
+	
+	public static double getStdDev(List<Double> values) {
+		double mean = Utils.mean(values);
+
+		double sum = 0.0;
+		for (Double v : values) {
+			sum += (v-mean) * (v-mean);
+		}
+		return Math.sqrt(sum / values.size());
 	}
 
 	public static double getMin(List<Double> values) {
@@ -79,7 +89,8 @@ public abstract class Utils {
 		}
 		return sum / cnt;
 	}
-
+	
+	// -----------------
 	// dirty hack in a weak minute. Cast problems.
 	public static double [] divideAndConvert(List<Double> divisorList, List<Double> denominatorList) {
 

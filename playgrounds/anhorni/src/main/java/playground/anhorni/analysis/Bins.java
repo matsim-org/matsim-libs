@@ -1,13 +1,17 @@
-package playground.anhorni.locationchoice.preprocess.helper;
+package playground.anhorni.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.io.IOUtils;
+
+import playground.anhorni.utils.Utils;
+
 
 public class Bins {
 	
@@ -64,10 +68,11 @@ public class Bins {
 			categories[i] = Integer.toString(i);
 		}		
 		
+		DecimalFormat formatter = new DecimalFormat("0.00");
 		String s = xLabel + " " + 
-		"[interval = " + this.interval + xUnit + "]" +
-		"[mean = " + Utils.mean(values) + xUnit + "]" +
-		"[variance = " + Utils.getVariance(values) + xUnit + "]";
+		"[interval = " + formatter.format(this.interval) + xUnit + "]" +
+		"[mean = " + formatter.format(Utils.mean(values)) + xUnit + "]" +
+		"[sigma = " + formatter.format(Utils.getStdDev(values)) + xUnit + "]";
 		
 		BarChart chart = 
 			new BarChart(desc, s , "#", categories);
