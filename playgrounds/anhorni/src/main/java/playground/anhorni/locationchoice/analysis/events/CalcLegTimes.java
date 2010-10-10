@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
-import playground.anhorni.locationchoice.preprocess.helper.Utils;
+import playground.anhorni.utils.Utils;
 
 public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 

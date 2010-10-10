@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.anhorni.locationchoice.preprocess.helper.Utils;
+import playground.anhorni.utils.Utils;
 
 public class PlanLegsTravelDistanceCalculator  extends PlanLegsTravelMeasureCalculator {
 

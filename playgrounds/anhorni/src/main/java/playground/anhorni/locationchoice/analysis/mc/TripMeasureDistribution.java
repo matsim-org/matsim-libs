@@ -8,7 +8,7 @@ import java.util.Vector;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.anhorni.locationchoice.preprocess.helper.Utils;
+import playground.anhorni.utils.Utils;
 
 public class TripMeasureDistribution {
 	

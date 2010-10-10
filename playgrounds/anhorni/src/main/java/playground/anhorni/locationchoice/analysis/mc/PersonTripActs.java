@@ -8,7 +8,7 @@ import java.util.Vector;
 import org.matsim.api.core.v01.Id;
 
 import playground.anhorni.locationchoice.analysis.mc.filters.ZHTripFilter;
-import playground.anhorni.locationchoice.preprocess.helper.Utils;
+import playground.anhorni.utils.Utils;
 
 
 public class PersonTripActs {

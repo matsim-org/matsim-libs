@@ -41,7 +41,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.anhorni.locationchoice.preprocess.helper.Utils;
+import playground.anhorni.utils.Utils;
 
 /**
  *

@@ -11,7 +11,7 @@ import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.anhorni.locationchoice.preprocess.helper.BinsOld;
-import playground.anhorni.locationchoice.preprocess.helper.Utils;
+import playground.anhorni.utils.Utils;
 
 public class BinsHandling {
 	
