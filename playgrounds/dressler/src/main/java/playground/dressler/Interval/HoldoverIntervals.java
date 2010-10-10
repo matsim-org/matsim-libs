@@ -149,7 +149,60 @@ public class HoldoverIntervals extends Intervals<HoldoverInterval> implements Ed
 				collecting = false;
 			}
 		}else{  //TODO holdover a implement propagation residual holdover
-			;
+			int effectiveStart = incoming.getLowBound() ;
+			boolean stop =false;
+			int effectiveEnd = 0 ;
+			if(effectiveStart==effectiveEnd){
+				return result;
+			}
+			current = this.getIntervalAt(effectiveStart-1);
+			while (current.getLowBound() >= effectiveEnd) {
+				if (current.getLowBound()< incoming.getLowBound()){
+					stop=true;
+				}
+				int flow = current.getFlow();
+				if (flow > 0) {				
+					if (collecting) {
+						low = current.getLowBound();
+					} else {
+						collecting = true;
+						low = current.getLowBound();					  
+						high = current.getHighBound();
+					}
+
+				} else {
+					if(stop){
+						break;
+					}
+					if (collecting) { // finish the Interval
+						low = Math.max(low, effectiveEnd);
+						high = Math.min(high, effectiveStart);
+						if (low < high) {
+							toinsert = new Interval(low, high);					  
+							result.add(toinsert);
+							collecting =false;		
+							//break;
+						}
+						collecting = false;
+					}
+				}
+				//System.out.println("current loww bound"+ current.getLowBound());
+				if (current.getLowBound()==0) {
+					break;
+				} 
+				current = this.getIntervalAt(current.getLowBound()-1);
+
+			}
+			//System.out.println("done looping");
+			if (collecting) { // finish the Interval
+				low = Math.max(low, effectiveEnd);
+				high = Math.min(high, effectiveStart);
+				if (low < high) {
+					toinsert = new Interval(low, high);					  
+					result.add(toinsert);
+				}
+				collecting = false;;
+			}
 		}
 		
 		return result;

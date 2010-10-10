@@ -806,7 +806,33 @@ public class BellmanFordIntervalBased {
 		}
 			
 		TaskQueue queue = new SimpleTaskQueue();
-		
+		if(this._settings.useHoldover){
+			int max =inter.getHighBound();
+			int min = inter.getLowBound();
+			ArrayList<VertexInterval> changed = relabelHoldover(v, inter,true,false, this._settings.TimeHorizon);
+			if(changed!=null){
+				for(VertexInterval changedinterval : changed){
+					if(changedinterval.getHighBound()>max){
+						max=changedinterval.getHighBound();
+					}
+					//queue.add(new BFTask(new VirtualNormalNode(v, 0), changedinterval, false));
+				}
+			}
+			/*changed = relabelHoldover(v, inter,false,false, this._settings.TimeHorizon);
+			if(changed!=null){
+				for(VertexInterval changedinterval : changed){
+					if(changedinterval.getLowBound()<min){
+						min=changedinterval.getLowBound();
+					}
+					//queue.add(new BFTask(new VirtualNormalNode(v, 0), changedinterval, false));
+				}
+			}*/
+			if(inter.getLowBound()!=min||inter.getHighBound()!=max){
+				Interval tempinter = new Interval(min,max);
+				System.out.println(inter+" replaced by "+ tempinter);
+				inter = tempinter;
+			}
+		}
 		// visit neighbors
 		// link is outgoing edge of v => forward edge
 		for (Link link : v.getOutLinks().values()) {				
@@ -853,14 +879,7 @@ public class BellmanFordIntervalBased {
 				}
 			}
 		}
-		if(this._settings.useHoldover){
-			ArrayList<VertexInterval> changed = relabelHoldover(v, inter,true,false, this._settings.TimeHorizon);
-			if(changed!=null){
-				for(VertexInterval changedinterval : changed){
-					queue.add(new BFTask(new VirtualNormalNode(v, 0), changedinterval, false));
-				}
-			}
-		}
+		
 		
 		return new Pair<TaskQueue, Interval>(queue, inter);
 	}
@@ -882,8 +901,11 @@ public class BellmanFordIntervalBased {
 
 			// Create predecessor. It is not shifted correctly.
 			PathStep pred;
-
-			pred = new StepHold(v, inter.getHighBound()-1, inter.getHighBound(), original);
+			if (original) {
+				pred = new StepHold(v, inter.getHighBound()-1, inter.getHighBound(), original);
+			}else{
+				pred = new StepHold(v, inter.getLowBound(), inter.getLowBound()+1, original);
+			}
 			//FIXME holdover may be incorrect build correct preds
 			arriveProperties.setPredecessor(pred);
 		} else {
@@ -1204,7 +1226,7 @@ public class BellmanFordIntervalBased {
 			this._totalpolls++;			
 			System.out.println("polls: " +this._totalpolls);
 			// gets the first task in the queue		
-			if(this._totalpolls==830){
+			if(this._totalpolls==5252){
 				@SuppressWarnings("unused")
 				int ahhhhh=1;
 			}
