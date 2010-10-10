@@ -45,23 +45,23 @@ import playground.christoph.withinday.replanning.parallel.ParallelDuringActivity
 import playground.christoph.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import playground.christoph.withinday.replanning.parallel.ParallelInitialReplanner;
 
-public class MyWithinDayControler extends Controler {
+class MyWithinDayControler extends Controler {
 
-	public MyWithinDayControler(String configFileName) {
+	MyWithinDayControler(String configFileName) {
 		super(configFileName);
 	}
 
-	public MyWithinDayControler(Config config) {
+	MyWithinDayControler(Config config) {
 		super(config);
 	}
 
-	public static void start(String configFilePath) {
+	static void start(String configFilePath) {
 		final MyWithinDayControler controler = new MyWithinDayControler(configFilePath);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
 
-	public static void start(Config config) {
+	static void start(Config config) {
 		final MyWithinDayControler controler = new MyWithinDayControler(config);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -96,7 +96,7 @@ public class MyWithinDayControler extends Controler {
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalised Router.
 	 */
-	protected void initReplanningRouter() {
+	private void initReplanningRouter() {
 
 		// use dijkstra for replanning (routing)
 		travelTime = this.getTravelTimeCalculator();
@@ -127,7 +127,7 @@ public class MyWithinDayControler extends Controler {
 	/*
 	 * Initializes the ParallelReplannerModules
 	 */
-	protected void initParallelReplanningModules()
+	private void initParallelReplanningModules()
 	{
 		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, this);
 		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, this);
@@ -140,7 +140,7 @@ public class MyWithinDayControler extends Controler {
 	 *
 	 * The full initialization of them is done later (we don't have all necessary Objects yet).
 	 */
-	protected void createHandlersAndListeners()
+	private void createHandlersAndListeners()
 	{
 		replanningManager = new ReplanningManager();
 	}
