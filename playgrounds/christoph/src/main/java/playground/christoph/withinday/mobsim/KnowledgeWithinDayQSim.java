@@ -56,7 +56,7 @@ public class KnowledgeWithinDayQSim extends WithinDayQSim {
 	{
 		if (value && (knowledgeDBStorageHandler == null))
 		{
-			this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(this.scenario.getPopulation());
+			this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(this.getScenario().getPopulation());
 			this.knowledgeDBStorageHandler.start();
 			getEventsManager().addHandler(knowledgeDBStorageHandler);
 			this.addQueueSimulationListeners(this.knowledgeDBStorageHandler);
