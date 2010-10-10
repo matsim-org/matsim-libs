@@ -25,8 +25,8 @@ package org.matsim.core.trafficmonitoring;
  */
 public class PessimisticTravelTimeAggregator extends AbstractTravelTimeAggregator {
 
-	public PessimisticTravelTimeAggregator(int travelTimeBinSize, int numSlots) {
-		super(travelTimeBinSize, numSlots);
+	public PessimisticTravelTimeAggregator(int numSlots,int travelTimeBinSize) {
+		super(numSlots,travelTimeBinSize);
 	}
 
 	@Override

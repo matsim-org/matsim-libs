@@ -19,21 +19,33 @@
 
 package org.matsim.evacuation.run;
 
-import org.matsim.core.utils.misc.CRCChecksum;
+import org.apache.log4j.Logger;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public class MarginalRiskCostControllerTest extends MatsimTestCase {
 
+	private static final Logger log = Logger.getLogger(MarginalRiskCostControllerTest.class);
+	
 	public void testMarginalRiskCostController() {
 		String config = getInputDirectory() + "config.xml";
-		String refEventsFile = getInputDirectory() + "events.txt.gz";
-		String testEventsFile = getOutputDirectory() +"ITERS/it.10/10.events.txt.gz";
 
+		String refEventsFile = getInputDirectory() + "10.events.xml.gz";
+		String testEventsFile = getOutputDirectory() +"ITERS/it.10/10.events.xml.gz";
+			
 		EvacuationQSimControllerII controler = new EvacuationQSimControllerII(new String [] {config});
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(10);
 		controler.run();
-		assertEquals("different events-files.", CRCChecksum.getCRCFromFile(refEventsFile),	CRCChecksum.getCRCFromFile(testEventsFile));
+		
+		//it 10
+		log.info("comparing events files: ");
+		log.info(refEventsFile);
+		log.info(testEventsFile);
+		int i = EventsFileComparator.compare(refEventsFile, testEventsFile);
+		assertEquals("different events-files in iteration 10.",0, i);
+		
+		
 
 	}
 }
