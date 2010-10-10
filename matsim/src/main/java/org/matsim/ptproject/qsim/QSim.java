@@ -135,7 +135,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	private SimulationListenerManager listenerManager;
 	protected final PriorityBlockingQueue<PersonAgent> activityEndsList =
 		new PriorityBlockingQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
-	protected Scenario scenario = null;
+	private Scenario scenario = null;
 	private QSimSignalEngine signalEngine = null;
 
 //	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>();
