@@ -103,7 +103,7 @@ public class EvacuationDelayController extends Controler {
 
 	private void initSocialCostOptimization() {
 		initPluggableTravelCostCalculator();
-		SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network,getEvents());
+		SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(),getEvents());
 		this.pluggableTravelCost.addTravelCost(sc);
 		this.events.addHandler(sc);
 		this.strategyManager = loadStrategyManager();

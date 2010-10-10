@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ShelterAllocationController.java
+ * ShelterAssignmentSimulateAnealingController.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -60,7 +60,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.sims.shelters.assignment.EvacuationShelterNetLoaderForShelterAllocation;
 import playground.gregor.sims.shelters.assignment.GreedyShelterAllocator;
+import playground.gregor.sims.shelters.assignment.RandomShelterAllocator;
 import playground.gregor.sims.shelters.assignment.ShelterAssignmentRePlanner;
+import playground.gregor.sims.shelters.assignment.ShelterAssignmentSimulatedAnnealingRePlanner;
 import playground.gregor.sims.shelters.assignment.ShelterCounter;
 import playground.gregor.sims.shelters.assignment.ShelterLocationRePlannerII;
 
@@ -68,8 +70,11 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 
-public class ShelterAssignmentController extends Controler {
-
+/**
+ * @author laemmel
+ *
+ */
+public class ShelterAssignmentSimulatedAnnealingController extends Controler {
 	final private static Logger log = Logger.getLogger(EvacuationQSimControllerII.class);
 
 	private List<Building> buildings;
@@ -82,21 +87,13 @@ public class ShelterAssignmentController extends Controler {
 
 	PluggableTravelCostCalculator pluggableTravelCost = null;
 
-	private int shift;
-
-	private double pshelter;
-
-	private String plans;
 
 
-
-
-	public ShelterAssignmentController(String[] args, int shift, double pshelter, String plans) {
+	public ShelterAssignmentSimulatedAnnealingController(String[] args) {
 		super(args);
-		this.shift = shift;
-		this.pshelter = pshelter;
+
 		this.setOverwriteFiles(true);
-		this.plans = plans;
+
 		//		this.config.scenario().setUseSignalSystems(true);
 		//		this.config.scenario().setUseLanes(true);
 		this.config.setQSimConfigGroup(new QSimConfigGroup());
@@ -122,20 +119,9 @@ public class ShelterAssignmentController extends Controler {
 
 
 		initPluggableTravelCostCalculator();
-		if (shift >= 1) {
-			
-			ShelterCounter sc = new ShelterCounter(this.scenarioData.getNetwork(), this.shelterLinkMapping);
-			if (shift == 2) {
-				ShelterLocationRePlannerII sLRP = new ShelterLocationRePlannerII(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings,sc);
-				this.addControlerListener(sLRP);
-//			this.events.addHandler(sc);
-			}
-			
-			ShelterAssignmentRePlanner sARP = new ShelterAssignmentRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.buildings,sc, this.pshelter);
-			this.addControlerListener(sARP);
-		}
-
-
+		ShelterAssignmentSimulatedAnnealingRePlanner srp = new ShelterAssignmentSimulatedAnnealingRePlanner(this.getScenario(), this.pluggableTravelCost, this.getTravelTimeCalculator(), this.shelterLinkMapping);
+		this.addControlerListener(srp);
+				
 		unloadNetcdfReaders();
 	}
 
@@ -176,7 +162,8 @@ public class ShelterAssignmentController extends Controler {
 				public PersonalizableTravelCost createTravelCostCalculator(
 						PersonalizableTravelTime timeCalculator,
 						CharyparNagelScoringConfigGroup cnScoringGroup) {
-					return ShelterAssignmentController.this.pluggableTravelCost;
+					return  ShelterAssignmentSimulatedAnnealingController.this.pluggableTravelCost;
+					        
 				}
 
 			});
@@ -278,7 +265,8 @@ public class ShelterAssignmentController extends Controler {
 			}
 
 			if (this.scenarioData.getConfig().evacuation().isGenerateEvacNetFromSWWFile()) {
-				new GreedyShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,this.netcdfReaders).getPopulation();
+//				new GreedyShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,this.netcdfReaders).getPopulation();
+				new RandomShelterAllocator(this.buildings,this.scenarioData,this.esnl,this.netcdfReaders).getPopulation();
 			} else {
 				new GreedyShelterAllocator(this.scenarioData.getPopulation(),this.buildings,this.scenarioData,this.esnl,null).getPopulation();
 			}
@@ -300,59 +288,11 @@ public class ShelterAssignmentController extends Controler {
 	}
 
 	public static void main(final String[] args) {
-		int shift = Integer.parseInt(args[1]);
-		double pshelter = Double.parseDouble(args[2]);
-		String plans = args[3];
-//		String shelterFile = args[3];
-		final Controler controler = new ShelterAssignmentController(args,shift,pshelter,plans);
+		final Controler controler = new ShelterAssignmentSimulatedAnnealingController(args);
 		controler.run();
-//		try {
-//			dumpShelters(((ShelterAllocationController)controler).buildings,"/home/laemmel/devel/allocation/output/output_shelters.shp");
-//		} catch (FactoryRegistryException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (SchemaException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IllegalAttributeException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 		System.exit(0);
 	}
 
 
-	private static void dumpShelters(List<Building> buildings2, String string) throws FactoryRegistryException, SchemaException, IllegalAttributeException, IOException {
-		CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, targetCRS);
-		AttributeType id = AttributeTypeFactory.newAttributeType("id", String.class);
-		AttributeType cap = AttributeTypeFactory.newAttributeType("capacity", Integer.class);
-//		AttributeType agLost = AttributeTypeFactory.newAttributeType("agLost", Integer.class);
-//		AttributeType agLostRate = AttributeTypeFactory.newAttributeType("agLostRate", Double.class);
-//		AttributeType agLostPerc = AttributeTypeFactory.newAttributeType("agLostPerc", Integer.class);
-//		AttributeType agLostPercStr = AttributeTypeFactory.newAttributeType("agLostPercStr", String.class);
-		
-		FeatureType ft = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id,cap}, "Shelters");
-		List<Feature> fts = new ArrayList<Feature>();
-		for (Building b : buildings2) {
-			if (b.isQuakeProof()){
-				Geometry geo = b.getGeo();
-				if (geo == null) {
-					continue;
-				}
-				Point p = null;
-				if (geo instanceof MultiPoint) {
-					p = (Point) geo.getGeometryN(0);
-				} else {
-					p = (Point) geo;
-				}
-				fts.add(ft.create(new Object[] {p,b.getId().toString(),b.getShelterSpace()}));
-			}
-		}
-		ShapeFileWriter.writeGeometries(fts, string);
-	}
 
 }

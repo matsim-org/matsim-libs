@@ -62,6 +62,9 @@ implements AgentSnapshotInfo
 	private int usr = 0;
 
 
+	private int type;
+
+
 
 	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed,
 			final AgentState vehicleState, final String visualizerData) {
@@ -200,14 +203,14 @@ implements AgentSnapshotInfo
 
 	@Override
 	public int getType() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
+		return this.type;
 	}
 
 	@Override
 	public int getUserDefined() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
+		return this.usr;
+//		// TODO Auto-generated method stub
+//		throw new UnsupportedOperationException() ;
 	}
 
 	@Override
@@ -224,8 +227,7 @@ implements AgentSnapshotInfo
 
 	@Override
 	public void setType(int tmp) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
+		this.type = tmp;
 	}
 
 	@Override
