@@ -39,8 +39,7 @@ public class LinkstatsStringBasedFeatureGenerator implements FeatureGenerator{
 		this.geofac = new GeometryFactory();
 		initFeatureType();
 
-		this.compareResultMap = EvaluateLinkstats.compareLinkstatFiles("e:\\temp\\771.1000.linkstats.txt", "e:\\temp\\772.1000.linkstats.txt");
-
+		this.compareResultMap = EvaluateLinkstats.compareLinkstatFiles(LinkStatsCompareConfig.linkStatsFileOne, LinkStatsCompareConfig.linkStatsFileTwo);
 	}
 
 
