@@ -42,7 +42,7 @@ public class ReadCountStations implements TabularFileHandler{
 				tempBuffer.append(", ");
 			}
 			log.info("Ignoring: " + tempBuffer);
-		} else if(row.length == 11){
+		} else if(row.length == 14){
 			CountStationDataBox cS = new CountStationDataBox();
 			cS.setShortName(row[0]);
 			cS.setUnitName(row[1]);

@@ -22,10 +22,10 @@ public class PTCountsOsm2Matsim {
 	public static void main(String[] args) {
 		String osmRepository = "e:/osm_berlinbrandenburg/workingset/";
 		String osmFile = "berlinbrandenburg_filtered.osm";
-		String countsFile = "f:/cgtest/Di-Do_counts.xml";
-		String countsOutFile = "f:/cgtest/Di-Do_counts_out.xml";
+		String countsFile = "f:/vkrz_counts_convert/Di-Do_counts.xml";
+		String countsOutFile = "f:/vkrz_counts_convert/Di-Do_counts_out.xml";
 		
-		String outDir = "f:/cgtest/";
+		String outDir = "f:/vkrz_counts_convert/";
 		String outName = "counts";
 		
 		String filteredOsmFile = outDir + outName + ".osm";
@@ -34,7 +34,7 @@ public class PTCountsOsm2Matsim {
 		String[] streetFilter = new String[]{"motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary"};
 		
 //		String[] transitFilter = new String[]{"ferry", "subway", "light_rail", "tram", "train", "bus", "trolleybus"};
-		String[] transitFilter = new String[]{"bus"};
+		String[] transitFilter = new String[]{"fsfsfgsg"};
 		
 		OsmPrepare osmPrepare = new OsmPrepare(osmRepository + osmFile, filteredOsmFile, streetFilter, transitFilter);
 		osmPrepare.prepareOsm();

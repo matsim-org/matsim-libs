@@ -22,7 +22,7 @@ public class ConvertTSV2Counts {
 		
 		String workingDir = "F:\\vkrz_counts_convert\\";
 		String startTag = "Di-Do";
-		String countStationsFileName = workingDir + "DZS-Koordinaten.csv";
+		String countStationsFileName = workingDir + "DZS-Koordinaten_AN.csv";
 		String countsOutFile = workingDir + startTag + "_counts.xml";
 		
 		log.info("Reading count stations from " + countStationsFileName + " ...");
