@@ -77,6 +77,11 @@ public class OTFSwingDrawerContainer extends JPanel implements OTFDrawer {
 		this.networkScrollPane.scaleNetwork(scale);
 		this.delegate.hostControlBar.updateScaleLabel();
 	}
+	
+	public void setScale(Rectangle destrect, float factor){
+		this.networkScrollPane.scaleNetwork(destrect, factor);
+		this.delegate.hostControlBar.updateScaleLabel();
+	}
 
 	@Override
 	public void paint(Graphics g) {

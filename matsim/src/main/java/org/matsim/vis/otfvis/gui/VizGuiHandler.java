@@ -44,7 +44,7 @@ class VizGuiHandler extends MouseInputAdapter implements MouseWheelListener {
 	public void mouseReleased(MouseEvent e) {
 		if (currentRect.getHeight() > 10 && currentRect.getWidth() > 10) {
 			float scale =  otfSwingDrawer.getScale();
-			scrollPane.scaleNetwork(currentRect,scale);
+			otfSwingDrawer.setScale(currentRect,scale);
 			currentRect.setSize(0,0);
 		}
 	}

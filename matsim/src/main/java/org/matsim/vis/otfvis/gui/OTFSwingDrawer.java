@@ -25,7 +25,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -78,8 +77,6 @@ public class OTFSwingDrawer extends JComponent {
 	private static final Logger log = Logger.getLogger("dummy");
 
 	public static Graphics2D g2d = null;
-
-	private static final Color netColor = new Color(180,180,210,128);
 
 	double scale = 1;
 
@@ -213,24 +210,10 @@ public class OTFSwingDrawer extends JComponent {
 	 * Drawer class for drawing simple quads
 	 */
 	public static class SimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQuadReceiver{
-		private final boolean drawStreetsAsLines = false;
-		protected final Point2D.Float[] quad = new Point2D.Float[4];
+		protected final float[] line = new float[5];
 		protected String id = "noId";
-		private float oldResizer = 1;
 		//		protected float coloridx = 0;
 
-
-		Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end, int nrLanes){
-			double dx = end.y - start.y;
-			double dy = end.x -start.x;
-			double sqr1 = Math.sqrt(dx*dx +dy*dy);
-			final double cellWidth_m = nrLanes*linkWidth;
-
-			dx = dx*cellWidth_m/sqr1;
-			dy = -dy*cellWidth_m/sqr1;
-
-			return new Point2D.Float((float)dx,(float)dy);
-		}
 
 		@Override
 		public void setQuad(float startX, float startY, float endX, float endY) {
@@ -239,47 +222,32 @@ public class OTFSwingDrawer extends JComponent {
 
 		@Override
 		public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
-			this.quad[0] = new Point2D.Float(startX, startY);
-			this.quad[1] = new Point2D.Float(endX, endY);
-			final Point2D.Float ortho = calcOrtho(this.quad[0], this.quad[1], nrLanes);
-			this.quad[2] = new Point2D.Float(startX + ortho.x, startY + ortho.y);
-			this.quad[3] = new Point2D.Float(endX + ortho.x, endY + ortho.y);
+			this.line[0] = startX;
+			this.line[1] = startY;
+			this.line[2] = endX;
+			this.line[3] = endY;
+			this.line[4] = nrLanes;
 		}
 
 		@Override
 		public void setColor(float coloridx) {
-			//			this.coloridx = coloridx;
+//			this.coloridx = coloridx;
 		}
 
 		@Override
 		public void onDraw(Graphics2D display) {
-			if (drawStreetsAsLines){
-				display.setColor(Color.black);
-				display.drawLine((int)quad[0].x, (int)quad[0].y, (int)quad[1].x, (int)quad[1].y);
-			} else {
-				Polygon poly = new Polygon();
-				float resizer = (float) ((2*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth())/(1*linkWidth) + 0.5);
-				quad[2].x = resizer/this.oldResizer * (quad[2].x - quad[0].x) + quad[0].x;
-				quad[2].y = resizer/this.oldResizer * (quad[2].y - quad[0].y) + quad[0].y;
-				quad[3].x = resizer/this.oldResizer * (quad[3].x - quad[1].x) + quad[1].x;
-				quad[3].y = resizer/this.oldResizer * (quad[3].y - quad[1].y) + quad[1].y;
-				this.oldResizer=resizer;
-
-				poly.addPoint((int)(quad[0].x), (int)(quad[0].y));
-				poly.addPoint((int)(quad[1].x), (int)(quad[1].y));
-				poly.addPoint((int)(quad[3].x), (int)(quad[3].y));
-				poly.addPoint((int)(quad[2].x), (int)(quad[2].y));
-				display.setColor(netColor);
-				display.fill(poly);
-			}
+			display.setColor(new Color(OTFClientControl.getInstance().getOTFVisConfig().getNetworkColor().getRGB()));
+			display.setStroke(new BasicStroke(this.line[4] * OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			display.drawLine(Math.round(this.line[0]), Math.round(this.line[1]), Math.round(this.line[2]), Math.round(this.line[3]));
+			display.setStroke(new BasicStroke(5));
 
 
 			// Show LinkIds
 			if (OTFClientControl.getInstance().getOTFVisConfig().drawLinkIds()){
 			    float idSize = 4*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
 			    int fontSize = (int)idSize;
-			    float middleX = (float)(0.5*this.quad[0].x + (0.5)*this.quad[3].x);
-			    float middleY = (float)(0.5*this.quad[0].y + (0.5)*this.quad[3].y);
+			    float middleX = (float)(0.5*this.line[0] + (0.5)*this.line[2]);
+			    float middleY = (float)(0.5*this.line[1] + (0.5)*this.line[3]);
 				Line2D line = new Line2D.Float(middleX, middleY, (middleX + idSize),(middleY + idSize));
 				display.setColor(Color.blue);
 				display.draw(line);
@@ -298,9 +266,6 @@ public class OTFSwingDrawer extends JComponent {
 				display.setFont(font_old);
 			}
 
-
-			//display.setColor(Color.BLUE);
-			//display.draw(poly);
 		}
 
 		@Override
@@ -362,10 +327,10 @@ public class OTFSwingDrawer extends JComponent {
 			//			% lanes + 1) : agent.getLane());
 
 
-			final double agentWidth = linkWidth *0.9;
-			final double agentLength = agentWidth*0.9;
+//			final double agentWidth = linkWidth *0.9;
+//			final double agentLength = agentWidth*0.9;
 			float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
-			final double offsetX = - 0.5 * agentLength;
+			double offset = - 0.5 * agentSize;
 
 			// there is only ONE displayvalue!
 			if (state == 1 ) {
@@ -373,8 +338,8 @@ public class OTFSwingDrawer extends JComponent {
 			} else {
 				display.setColor(color);
 			}
-//			display.fillOval((int)Math.round(pos.x + offsetX), (int)pos.y, (int)Math.round(agentLength), (int)Math.round(agentWidth));
-			display.fillOval((int)Math.round(pos.x + offsetX), (int)pos.y, Math.round(agentSize), Math.round(agentSize));
+
+			display.fillOval((int) Math.round(pos.x + offset), (int)Math.round(pos.y + offset), Math.round(agentSize), Math.round(agentSize));
 		}
 
 	}
