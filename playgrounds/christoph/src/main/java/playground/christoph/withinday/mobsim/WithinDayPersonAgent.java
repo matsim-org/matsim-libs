@@ -121,6 +121,11 @@ public class WithinDayPersonAgent extends DefaultPersonDriverAgent {
 		return currentActivity;
 	}
 	
+	
+	// If I am understanding this correctly, the replanners that are added in the following are not actively used as instances,
+	// but they are used in order to identify those agents that possess those replanners.  And only those are submitted to 
+	// the replanning process.
+	
 	public boolean addWithinDayReplanner(WithinDayReplanner replanner) {
 		return this.withinDayReplanner.add(replanner);
 	}

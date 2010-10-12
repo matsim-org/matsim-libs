@@ -102,6 +102,7 @@ class MyWithinDayControler extends Controler {
 		travelTime = this.getTravelTimeCalculator();
 //		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
+		// ReplanningModule is a wrapper that either returns PlansCalcRoute or MultiModalPlansCalcRoute
 
 //		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 //		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
@@ -111,17 +112,44 @@ class MyWithinDayControler extends Controler {
 
 
 		// use replanning during activity
-		this.duringActivityIdentifier = new OldPeopleIdentifier(this.sim);
-		this.duringActivityReplanner = new ReplannerOldPeople(ReplanningIdGenerator.getNextId(), this.scenarioData);
-		this.duringActivityReplanner.setAbstractMultithreadedModule(router);
-		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
-		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 
+		this.duringActivityIdentifier = new OldPeopleIdentifier(this.sim);
+		// which persons are replanned?
+		
+		this.duringActivityReplanner = new ReplannerOldPeople(ReplanningIdGenerator.getNextId(), this.scenarioData);
+		// defines a "doReplanning" method which contains the core of the work
+		// as a piece, it re-routes a _future_ leg.  
+		
+		this.duringActivityReplanner.setAbstractMultithreadedModule(router);
+		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
+
+		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
+		// persons identifier added to replanner
+		
+		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
+		// I think this just adds the stuff to the threads mechanics (can't say why it is not enough to use the multithreaded
+		// module).  kai, oct'10
+
+		
+		// replanning while on leg:
+		
 		this.duringLegIdentifier = new YoungPeopleIdentifier(this.sim);
+		// which persons are replanned?
+
 		this.duringLegReplanner = new ReplannerYoungPeople(ReplanningIdGenerator.getNextId(), this.scenarioData);
+		// defines a "doReplanning" method which contains the core of the work
+		// as a piece, it replaces a future activity
+		// in order to get there, it re-routes the current route
+		
 		this.duringLegReplanner.setAbstractMultithreadedModule(router);
+		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
+
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
+		// persons identifier added to replanner
+
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
+		// I think this just adds the stuff to the threads mechanics (can't say why it is not enough to use the multithreaded
+		// module).  kai, oct'10
 	}
 
 	/*
@@ -149,8 +177,13 @@ class MyWithinDayControler extends Controler {
 	protected void runMobSim()
 	{
 		createHandlersAndListeners();
+		// initializes "replanningManager"
 
 		sim = new WithinDayQSim(this.scenarioData, this.events);
+		// a QSim with two differences:
+		// (1) uses WithinDayAgentFactory instead of the regular agent factory
+		// (2) offers "rescheduleActivityEnd" although I am not sure that this is still needed (after some modifications
+		//     that happened in the meantime)
 
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
@@ -158,11 +191,12 @@ class MyWithinDayControler extends Controler {
 		 */
 		foqsl.addQueueSimulationInitializedListener(replanningManager);
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
-
 		sim.addQueueSimulationListeners(foqsl);
+		// essentially, can just imagine the replanningManager as a regular MobsimListener
 
 		log.info("Initialize Parallel Replanning Modules");
 		initParallelReplanningModules();
+		// these are containers, but they don't do anything by themselves
 
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter();

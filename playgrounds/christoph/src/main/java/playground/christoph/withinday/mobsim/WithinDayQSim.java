@@ -20,9 +20,7 @@
 
 package playground.christoph.withinday.mobsim;
 
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -31,7 +29,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.ptproject.qsim.AgentFactory;
 import org.matsim.ptproject.qsim.QSim;
@@ -63,13 +60,13 @@ public class WithinDayQSim extends QSim {
 		super.setAgentFactory(agentFactory);
 	}
 	
-	/*
-	 * Used by the Activity End Replanning Module.
-	 * This contains all Agents that are going to end their Activities.
-	 */
-	public PriorityBlockingQueue<PersonAgent> getActivityEndsList() {
-		return super.activityEndsList;
-	}
+//	/*
+//	 * Used by the Activity End Replanning Module.
+//	 * This contains all Agents that are going to end their Activities.
+//	 */
+//	public PriorityBlockingQueue<PersonAgent> getActivityEndsList() {
+//		return super.activityEndsList;
+//	}
 	
 	/*
 	 * - Remove Agent from the ActivityEndsList.
@@ -80,10 +77,14 @@ public class WithinDayQSim extends QSim {
 	 *   by the DepartureTimes.
 	 */
 	public void rescheduleActivityEnd(double now, WithinDayPersonAgent withinDayPersonAgent) {
-		boolean removed = this.getActivityEndsList().remove(withinDayPersonAgent);
+//		boolean removed = this.getActivityEndsList().remove(withinDayPersonAgent);
+		boolean found = this.getActivityEndsList().contains( withinDayPersonAgent ) ;
 
 		// If the agent is not in the activityEndsList return without doing anything else.
-		if (!removed) return;
+//		if (!removed) return;
+		if ( !found ) return ;
+		
+		double oldTime = withinDayPersonAgent.getDepartureTime() ;
 		
 		PlanElement planElement = withinDayPersonAgent.getCurrentPlanElement();
 		if (planElement instanceof Activity) {
@@ -98,15 +99,16 @@ public class WithinDayQSim extends QSim {
 		 * from the ActivityEndsList and decrease the living counter.
 		 * Otherwise reschedule the Activity by adding it again to the ActivityEndsList.
 		 */
-		Activity currentActivity = withinDayPersonAgent.getCurrentActivity();		
-		List<PlanElement> planElements = withinDayPersonAgent.getPerson().getSelectedPlan().getPlanElements();
-		if (planElements.size() - 1 == planElements.indexOf(currentActivity)) {
-			// This is the last activity, therefore remove the agent from the simulation
-			this.getAgentCounter().decLiving();
-		}
-		else {
-			this.getActivityEndsList().add(withinDayPersonAgent);
-		}
+//		Activity currentActivity = withinDayPersonAgent.getCurrentActivity();		
+//		List<PlanElement> planElements = withinDayPersonAgent.getPerson().getSelectedPlan().getPlanElements();
+//		if (planElements.size() - 1 == planElements.indexOf(currentActivity)) {
+//			// This is the last activity, therefore remove the agent from the simulation
+//			this.getAgentCounter().decLiving();
+//		}
+//		else {
+//			this.getActivityEndsList().add(withinDayPersonAgent);
+//		}
+		super.rescheduleActivityEnd(withinDayPersonAgent, oldTime, withinDayPersonAgent.getDepartureTime() ) ;
 		
 	}
 	
