@@ -39,7 +39,7 @@ public class CountVehOnLinksPolygonBasedFeatureGenerator implements FeatureGener
 		this.geofac = new GeometryFactory();
 		initFeatureType();
 
-		this.compareResultMap = CountVehOnLinks.compareEventFiles("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\763.500.events.txt", "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\762.500.events.txt");
+		this.compareResultMap = CountVehOnLinks.compareEventFiles(EventsCompareConfig.eventsFileOne, EventsCompareConfig.eventsFileTwo);
 	}
 
 	private void initFeatureType() {
