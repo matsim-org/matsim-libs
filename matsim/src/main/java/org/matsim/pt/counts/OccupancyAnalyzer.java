@@ -135,6 +135,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 		// ------------------------veh_passenger---------------------------
 		Integer nPassengers = this.veh_passengers.get(vehId);
 		if (nPassengers == null) {
+			log.error( "tests for `null' but exception says 'negative'???  kai, oct'10 ") ;
 			throw new RuntimeException("negative passenger-No. in vehicle?");
 		}
 		this.veh_passengers.put(vehId, nPassengers - 1);
@@ -151,7 +152,11 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		Id stopId = event.getFacilityId();
+
 		this.veh_stops.put(event.getVehicleId(), stopId);
+		// (constructing a table with vehId as key, and stopId as value; constructed when veh arrives at stop; necessary
+		// since personEnters/LeavesVehicle does not carry stop id)
+		
 	}
 
 	@Override
@@ -161,13 +166,18 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 		this.veh_stops.remove(vehId);
 		// -----------------------occupancy--------------------------------
 		int[] occupancyAtStop = this.occupancies.get(stopId);
+
 		if (occupancyAtStop == null) {
+			// no previous departure from this stop, therefore no occupancy record yet.  Create this:
 			occupancyAtStop = new int[this.maxSlotIndex + 1];
 			this.occupancies.put(stopId, occupancyAtStop);
 		}
+		
 		Integer noPassengersInVeh = this.veh_passengers.get(vehId);
+
 		if (noPassengersInVeh != null) {
 			occupancyAtStop[this.getTimeSlotIndex(event.getTime())] += noPassengersInVeh;
+
 			this.occupancyRecord.append(event.getTime());
 			this.occupancyRecord.append("\t");
 			this.occupancyRecord.append(vehId);
