@@ -20,6 +20,8 @@
 
 package org.matsim.core.mobsim.framework;
 
+import org.matsim.api.core.v01.Identifiable;
+
 /**An interface for all matsim mobsim agents.  mobsim agents are entities capable of autonomous behavior.  This could, in my view, 
  * include signals.  "PersonAgent" as the joint super-interface is almost certainly too tight, since we want to include automatic
  * drivers.  Possibly, it could be "MobileAgents".  kai, aug'10

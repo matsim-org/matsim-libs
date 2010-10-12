@@ -33,11 +33,13 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.QSimI;
 import org.matsim.ptproject.qsim.interfaces.QVehicle;
 
@@ -63,7 +65,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 
 	private int currentPlanElementIndex = 0;
 
-	private transient Id destinationLinkId;
+	private transient Id cachedDestinationLinkId;
 
 	private Leg currentLeg;
 	private List<Id> cachedRouteLinkIds = null;
@@ -92,7 +94,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	public final void resetCaches() {
 		this.cachedNextLinkId = null;
 		this.cachedRouteLinkIds = null;
-		this.destinationLinkId = null;
+		this.cachedDestinationLinkId = null;
 
 		/*
 		 * The Leg may have been exchanged in the Person's Plan, so
@@ -110,7 +112,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 			this.simulation.getAgentCounter().incLost();
 			return;
 		}
-		this.destinationLinkId = route.getEndLinkId();
+		this.cachedDestinationLinkId = route.getEndLinkId();
 	}
 
 	public final boolean initializeAndCheckIfAlive() {
@@ -143,9 +145,9 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 				this.simulation.getEventsManager().getFactory().createAgentArrivalEvent(
 						now, this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 
-		if(!this.currentLinkId.equals(this.destinationLinkId)) {
+		if(!this.currentLinkId.equals(this.cachedDestinationLinkId)) {
 			// yyyyyy needs to throw a stuck/abort event
-			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.destinationLinkId
+			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.cachedDestinationLinkId
 					+ ", but arrived on link " + this.currentLinkId + ". Removing the agent from the simulation.");
 			this.simulation.getAgentCounter().decLiving();
 			this.simulation.getAgentCounter().incLost();
@@ -182,15 +184,15 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 		if (this.currentLinkIdIndex >= this.cachedRouteLinkIds.size() ) {
 			// we have no more information for the route, so we should have arrived at the destination link
 			Link currentLink = this.simulation.getScenario().getNetwork().getLinks().get(this.currentLinkId);
-			Link destinationLink = this.simulation.getScenario().getNetwork().getLinks().get(this.destinationLinkId);
+			Link destinationLink = this.simulation.getScenario().getNetwork().getLinks().get(this.cachedDestinationLinkId);
 			if (currentLink.getToNode().equals(destinationLink.getFromNode())) {
 				this.cachedNextLinkId = destinationLink.getId();
 				return this.cachedNextLinkId;
 			}
-			if (!(this.currentLinkId.equals(this.destinationLinkId))) {
+			if (!(this.currentLinkId.equals(this.cachedDestinationLinkId))) {
 				// there must be something wrong. Maybe the route is too short, or something else, we don't know...
 				log.error("The vehicle with driver " + this.getPerson().getId() + ", currently on link " + this.currentLinkId.toString()
-						+ ", is at the end of its route, but has not yet reached its destination link " + this.destinationLinkId.toString());
+						+ ", is at the end of its route, but has not yet reached its destination link " + this.cachedDestinationLinkId.toString());
 				// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
 			}
 			return null; // vehicle is at the end of its route
@@ -207,6 +209,8 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 		return null;
 	}
 	
+	private static int lastActHasDpTimeCnt = 0 ;
+	
 	/**
 	 * If this method is called to update a changed ActivityEndTime please
 	 * ensure, that the ActivityEndsList in the {@link QSim} is also updated.
@@ -217,15 +221,18 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 	public final void calculateDepartureTime(Activity tmpAct) {
 		double now = this.getQSimulation().getSimTimer().getTimeOfDay() ;
 		ActivityImpl act = (ActivityImpl) tmpAct ; // since we need the duration.  kai, aug'10
+
 		if ( act.getDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
+			// yyyy does this make sense?  below there is at least one execution path where this should lead to an exception.  kai, oct'10
 			this.activityDepartureTime = Double.POSITIVE_INFINITY ;
 			return ;
 		}
+		
 		double departure = 0;
 
 		if ( this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation()
 				.equals(VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
-			/* The person leaves the activity either 'actDur' later or when the end is defined of the activity, whatever comes first. */
+			// person stays at the activity either until its duration is over or until its end time, whatever comes first
 			if (act.getDuration() == Time.UNDEFINED_TIME) {
 				departure = act.getEndTime();
 			} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
@@ -260,6 +267,18 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 			departure = now;
 			// actually, we will depart in (now+1) because we already missed the departing in this time step
 		}
+		
+		if ( this.currentPlanElementIndex == this.getPlanElements().size()-1 ) {
+			if ( lastActHasDpTimeCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
+				log.error( "last activity has end time < infty; setting it to infty") ;
+				log.error( Gbl.ONLYONCE ) ;
+				lastActHasDpTimeCnt++ ;
+			}
+			departure = Double.POSITIVE_INFINITY ;
+		}
+			
+
+		
 		this.activityDepartureTime = departure ;
 	}
 		
@@ -304,7 +323,7 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 			this.simulation.getAgentCounter().incLost();
 			return false;
 		}
-		this.destinationLinkId = route.getEndLinkId();
+		this.cachedDestinationLinkId = route.getEndLinkId();
 
 		// set the route according to the next leg
 		this.currentLeg = leg;
@@ -383,14 +402,13 @@ public class DefaultPersonDriverAgent implements PersonDriverAgent {
 
 	@Override
 	public final Id getDestinationLinkId() {
-		return this.destinationLinkId;
+		return this.cachedDestinationLinkId;
 	}
 
 	@Override
 	public final Person getPerson() {
 		return this.person;
 	}
-
 
 
 }

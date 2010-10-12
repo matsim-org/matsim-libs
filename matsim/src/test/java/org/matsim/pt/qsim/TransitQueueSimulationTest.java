@@ -223,7 +223,7 @@ public class TransitQueueSimulationTest {
 		@Override
 		protected void createAgents() {
 			super.createAgents();
-			this.createdAgents.addAll(super.activityEndsList);
+			this.createdAgents.addAll(super.getActivityEndsList() );
 		}
 	}
 

@@ -22,10 +22,11 @@ package org.matsim.ptproject.qsim;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -127,14 +128,18 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
-	private final PriorityQueue<Tuple<Double, PersonAgent>> teleportationList =
+	private final Queue<Tuple<Double, PersonAgent>> teleportationList =
 		new PriorityQueue<Tuple<Double, PersonAgent>>(30, new TeleportationArrivalTimeComparator());
+
+	private final Queue<PersonAgent> activityEndsList =
+		new PriorityQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
+	// can't use the "Tuple" trick from teleportation list, since we need to be able to "find" agents for replanning. kai, oct'10
+	// yy On second thought, this does also not work for the teleportationList since we have the same problem there ... kai, oct'10
+
 	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100*3600;
 	private AgentFactory agentFactory;
 	private SimulationListenerManager listenerManager;
-	protected final PriorityBlockingQueue<PersonAgent> activityEndsList =
-		new PriorityBlockingQueue<PersonAgent>(500, new PersonAgentDepartureTimeComparator());
 	private Scenario scenario = null;
 	private QSimSignalEngine signalEngine = null;
 
@@ -150,6 +155,9 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	private AgentCounterI agentCounter;
 
 	private Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
+	
+	// everything above this line is private and should remain private.  pls contact me if this is in your way.  kai, oct'10 
+	// ============================================================================================================================
 
 	public QSim(final Scenario scenario, final EventsManager events) {
 		this(scenario, events, new DefaultQSimEngineFactory());
@@ -494,8 +502,25 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 */
 	@Override
 	public void scheduleActivityEnd(final PersonAgent agent) {
+		// yy can't make this final since it is overwritten by christoph.  kai, oct'10 
 		this.activityEndsList.add(agent);
 		registerAgentAtActivityLocation(agent);
+	}
+	
+	public final void rescheduleActivityEnd(final PersonAgent agent, final double oldTime, final double newTime ) {
+		// yyyy quite possibly, this should be "notifyChangedPlan".  kai, oct'10
+		// yy the "newTime" is strictly speaking not necessary.  kai, oct'10
+		
+		// change the position in the queue:
+		this.activityEndsList.remove( agent ) ;
+		this.activityEndsList.add( agent ) ;
+		
+		if ( oldTime==Double.POSITIVE_INFINITY && newTime!=Double.POSITIVE_INFINITY) {
+			this.getAgentCounter().incLiving() ;
+		} else if ( oldTime!=Double.POSITIVE_INFINITY && newTime==Double.POSITIVE_INFINITY ) {
+			this.getAgentCounter().decLiving() ;
+		}
+
 	}
 
 	private void registerAgentAtActivityLocation(final PersonAgent agent) {
@@ -516,6 +541,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 	@Override
 	public final void registerAgentAtPtWaitLocation(final PersonAgent agent) {
+		// called by TransitEngine
 		if (agent instanceof DefaultPersonDriverAgent) { // yyyy but why is this needed?  Does the driver get registered?
 			Leg leg = (Leg) agent.getCurrentPlanElement() ;
 			Id linkId = leg.getRoute().getStartLinkId();
@@ -541,6 +567,7 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 
 	@Override
 	public final void unregisterAgentAtPtWaitLocation( final PersonAgent agent ) {
+		// called by TransitDriver
 		if (agent instanceof DefaultPersonDriverAgent) { // yyyy but why is this needed?
 			Leg leg = (Leg) agent.getCurrentPlanElement() ;
 			Id linkId = leg.getRoute().getStartLinkId();
@@ -693,12 +720,14 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 *
 	 * @param teleportVehicles
 	 */
+	@Deprecated // I don't think that something that has so obvious access to config (via scenario) should also be separately 
+	// configurable.  (But we do not all agree on this.)  kai, oct'10
 	/*package*/ void setTeleportVehicles(final boolean teleportVehicles) {
 		this.carDepartureHandler.setTeleportVehicles(teleportVehicles);
 	}
 
 	@Override
-	public QNetwork getQNetwork() {
+	public final QNetwork getQNetwork() {
 		if ( this.netEngine != null ) {
 			return this.netEngine.getQNetwork() ;
 		} else {
@@ -707,12 +736,12 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 	@Override
-	public VisNetwork getVisNetwork() {
+	public final VisNetwork getVisNetwork() {
 		return this.netEngine.getQNetwork() ;
 	}
 
 	@Override
-	public Scenario getScenario() {
+	public final Scenario getScenario() {
 		return this.scenario;
 	}
 
@@ -720,11 +749,11 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 //		return this.scenario.getConfig().vspExperimental().isUseActivityDurations();
 //	}
 
-	public SignalEngine getQSimSignalEngine() {
+	public final SignalEngine getQSimSignalEngine() {
 		return this.signalEngine;
 	}
 
-	public MultiModalSimEngine getMultiModalSimEngine() {
+	public final MultiModalSimEngine getMultiModalSimEngine() {
 		return this.multiModalEngine;
 	}
 
@@ -753,16 +782,12 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	}
 
 	@Override
-	public SimTimerI getSimTimer() {
+	public final SimTimerI getSimTimer() {
 		return this.simTimer ;
 	}
 
-	public QSimEngine getQSimEngine() {
+	public final QSimEngine getQSimEngine() {
 	  return this.netEngine;
-	}
-
-	public Collection<PersonAgent> getTransitAgents(){
-		return this.transitAgents; // set null to save memory
 	}
 
 	@Override
@@ -775,11 +800,11 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 //	}
 
 	@Override
-	public AgentCounterI getAgentCounter(){
+	public final AgentCounterI getAgentCounter(){
 		return this.agentCounter;
 	}
 
-	public void addDepartureHandler(final DepartureHandler departureHandler) {
+	public final void addDepartureHandler(final DepartureHandler departureHandler) {
 		this.departureHandlers.add(departureHandler);
 	}
 
@@ -789,17 +814,32 @@ public class QSim implements IOSimulation, ObservableSimulation, VisMobsim, Acce
 	 * @param listeners
 	 */
 	@Override
-	public void addQueueSimulationListeners(final SimulationListener listener){
+	public final void addQueueSimulationListeners(final SimulationListener listener){
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
-	@Override
-	public Collection<MobsimAgent> getAgents() {
-		return this.agents ;
-	}
-
-	public TransitQSimEngine getQSimTransitEngine() {
+	public final TransitQSimEngine getQSimTransitEngine() {
 		return transitEngine;
 	}
+
+	// different agent sublists:
+	
+	@Override
+	public final Collection<MobsimAgent> getAgents() {
+		return Collections.unmodifiableCollection( this.agents ) ;
+		// changed this to unmodifiable in oct'10.  kai
+	}
+
+	public final Collection<PersonAgent> getActivityEndsList() {
+		return Collections.unmodifiableCollection( activityEndsList ) ;
+		// changed this to unmodifiable in oct'10.  kai
+	}
+	
+	public final Collection<PersonAgent> getTransitAgents(){
+		return Collections.unmodifiableCollection( this.transitAgents ) ;
+		// changed this to unmodifiable in oct'10.  kai
+	}
+
+
 
 }
