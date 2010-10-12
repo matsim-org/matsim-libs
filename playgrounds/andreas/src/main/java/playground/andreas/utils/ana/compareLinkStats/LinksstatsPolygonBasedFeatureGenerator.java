@@ -45,7 +45,7 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 
 	private void initFeatureType() {
 
-		AttributeType [] attribs = new AttributeType[9+8+24];
+		AttributeType [] attribs = new AttributeType[9+8+24+1];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Polygon",Polygon.class, true, null, null, this.crs);
 		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("fromID", String.class);
@@ -56,13 +56,19 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		attribs[7] = AttributeTypeFactory.newAttributeType("lanes", Double.class);
 		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);
 
+		// 3 hour average
 		for (int i = 0; i < 8; i++) {
 			attribs[9 + i] = AttributeTypeFactory.newAttributeType("HRS" + (i + i * 2) + "-" + (i + i * 2 + 3) + "avg", Double.class);
 		}
 
+		// 1 hour average
 		for (int i = 0; i < 24; i++) {
 			attribs[9 + 8 + i] = AttributeTypeFactory.newAttributeType("HRS" + i + "-" + (i+1) + "avg", Double.class);
 		}
+		
+		// 24 hour average
+		attribs[9 + 8 + 24] = AttributeTypeFactory.newAttributeType("HRS 24 avg", Double.class);
+		
 
 		try {
 			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
@@ -108,7 +114,7 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		Coordinate to2 = new Coordinate(xto2,yto2);
 
 		Polygon p = this.geofac.createPolygon(this.geofac.createLinearRing(new Coordinate[] {from, to, to2, from2, from}), null);
-		Object [] attribs = new Object[9+8+24];
+		Object [] attribs = new Object[9+8+24+1];
 		attribs[0] = p;
 		attribs[1] = link.getId().toString();
 		attribs[2] = link.getFromNode().getId().toString();
@@ -119,20 +125,28 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		attribs[7] = link.getNumberOfLanes();
 		attribs[8] = width;
 
+		// 3 hour average
 		if(this.compareResultMap.get(link.getId().toString()) != null){
 			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
 			for (int i = 0; i < 8; i++) {
 				attribs[9 + i] = Double.valueOf((tempArray.get(i + i * 2).doubleValue() + tempArray.get(i + 1 + i * 2).doubleValue() + tempArray.get(i + 2 + i * 2).doubleValue()) / 3);
 			}
 		}
+		
+		double average24hours = 0.0;
 
+		// 1 hour average
 		if(this.compareResultMap.get(link.getId().toString()) != null){
 			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
 			for (int i = 0; i < tempArray.size(); i++) {
 				attribs[9 + 8 + i] = tempArray.get(i);
+				average24hours += tempArray.get(i).doubleValue();
 			}
 		}
 
+		// 24 hour average
+		attribs[9 + 8 + 24] = new Double(average24hours / 24);
+		
 		try {
 			return this.featureType.create(attribs);
 		} catch (IllegalAttributeException e) {

@@ -46,8 +46,8 @@ public class NetworkAndMore2ESRI extends Links2ESRIShape{
 		if ( args.length == 0 ) {
 			netfile = "d:\\Berlin\\berlin-fggeoinfo\\30_Run_20_percent\\20101005_run777_778\\network_modified_20100806_added_BBI_AS_cl.xml.gz";
 //		String netfile = "./test/scenarios/berlin/network.xml.gz";
-			LinkStatsCompareConfig.linkStatsFileOne = "F:/server/run778/output/ITERS/it.900/run778.900.linkstats.txt";
-			LinkStatsCompareConfig.linkStatsFileTwo = "F:/server/run777/output/ITERS/it.900/run777.900.linkstats.txt";
+			LinkStatsCompareConfig.linkStatsFileOne = "E:/run778/output/ITERS/it.900/run778.900.linkstats.txt";
+			LinkStatsCompareConfig.linkStatsFileTwo = "E:/run777/output/ITERS/it.900/run777.900.linkstats.txt";
 
 			outputFileLs = "e:\\temp\\networkLs.shp";
 			outputFileP = "e:\\temp\\networkP.shp";

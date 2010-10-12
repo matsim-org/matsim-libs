@@ -45,7 +45,7 @@ public class LinkstatsStringBasedFeatureGenerator implements FeatureGenerator{
 
 	private void initFeatureType() {
 
-		AttributeType [] attribs = new AttributeType[10+8+24];
+		AttributeType [] attribs = new AttributeType[10+8+24+1];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, this.crs);
 		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("fromID", String.class);
@@ -57,13 +57,19 @@ public class LinkstatsStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);
 		attribs[9] = AttributeTypeFactory.newAttributeType("type", String.class);
 
+		// 3 hour average
 		for (int i = 0; i < 8; i++) {
 			attribs[10 + i] = AttributeTypeFactory.newAttributeType("HRS" + (i + i * 2) + "-" + (i + i * 2 + 3) + "avg", Double.class);
 		}
 
+		// 1 hour average
 		for (int i = 0; i < 24; i++) {
 			attribs[10 + 8 + i] = AttributeTypeFactory.newAttributeType("HRS" + i + "-" + (i+1) + "avg", Double.class);
 		}
+		
+		// 24 hour average
+		attribs[10 + 8 + 24] = AttributeTypeFactory.newAttributeType("HRS 24 avg", Double.class);
+		
 
 		try {
 			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
@@ -84,7 +90,7 @@ public class LinkstatsStringBasedFeatureGenerator implements FeatureGenerator{
 		LineString ls = this.geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),
 				MGC.coord2Coordinate(link.getToNode().getCoord())});
 
-		Object [] attribs = new Object[10+8+24];
+		Object [] attribs = new Object[10+8+24+1];
 		attribs[0] = ls;
 		attribs[1] = link.getId().toString();
 		attribs[2] = link.getFromNode().getId().toString();
@@ -96,20 +102,28 @@ public class LinkstatsStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[8] = width;
 		attribs[9] = ((LinkImpl) link).getType();
 
+		// 3 hour average
 		if(this.compareResultMap.get(link.getId().toString()) != null){
 			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
 			for (int i = 0; i < 8; i++) {
 				attribs[10 + i] = Double.valueOf((tempArray.get(i + i * 2).doubleValue() + tempArray.get(i + 1 + i * 2).doubleValue() + tempArray.get(i + 2 + i * 2).doubleValue()) / 3);
 			}
 		}
+		
+		double average24hours = 0.0;
 
+		// 1 hour average
 		if(this.compareResultMap.get(link.getId().toString()) != null){
 			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
 			for (int i = 0; i < tempArray.size(); i++) {
 				attribs[10 + 8 + i] = tempArray.get(i);
+				average24hours += tempArray.get(i).doubleValue();
 			}
 		}
-
+		
+		// 24 hour average
+		attribs[10 + 8 + 24] = new Double(average24hours / 24);
+		
 		try {
 			return this.featureType.create(attribs);
 		} catch (IllegalAttributeException e) {
