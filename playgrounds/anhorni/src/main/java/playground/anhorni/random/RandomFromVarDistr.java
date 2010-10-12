@@ -21,4 +21,8 @@ public class RandomFromVarDistr {
 		double u = this.rnd.nextDouble();
 		return h * (1 - Math.sqrt(1 - u));
 	}
+	
+	public double getGaussian(double mean, double sigma) {
+		return mean + sigma  * rnd.nextGaussian();
+	}
 }
